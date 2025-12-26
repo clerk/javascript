@@ -12,7 +12,6 @@ import { ClerkScripts } from '../../utils/clerk-script';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { RouterTelemetry } from '../../utils/router-telemetry';
-import { detectKeylessEnvDriftAction } from '../keyless-actions';
 import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
@@ -30,13 +29,6 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
   const router = useRouter();
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
-
-  // Call drift detection on mount (client-side)
-  useSafeLayoutEffect(() => {
-    if (canUseKeyless) {
-      void detectKeylessEnvDriftAction();
-    }
-  }, []);
 
   // Avoid rendering nested ClerkProviders by checking for the existence of the ClerkNextOptions context provider
   const isNested = Boolean(useClerkNextOptions());

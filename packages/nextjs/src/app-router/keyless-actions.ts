@@ -43,7 +43,6 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
      * Force middleware to execute to read the new keys from the cookies and populate the authentication state correctly.
      */
     redirect(`/clerk-sync-keyless?returnUrl=${returnUrl}`, RedirectType.replace);
-    return;
   }
 
   return;
@@ -54,7 +53,7 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
     return null;
   }
 
-  const result = await import('../server/keyless-node.js').then(m => m.createOrReadKeyless()).catch(() => null);
+  const result = await import('../server/keyless-node.js').then(m => m.keyless().getOrCreateKeys()).catch(() => null);
 
   if (!result) {
     errorThrower.throwMissingPublishableKeyError();
@@ -90,19 +89,6 @@ export async function deleteKeylessAction() {
     return;
   }
 
-  await import('../server/keyless-node.js').then(m => m.removeKeyless()).catch(() => {});
+  await import('../server/keyless-node.js').then(m => m.keyless().removeKeys()).catch(() => {});
   return;
-}
-
-export async function detectKeylessEnvDriftAction() {
-  if (!canUseKeyless) {
-    return;
-  }
-
-  try {
-    const { detectKeylessEnvDrift } = await import('../server/keyless-telemetry.js');
-    await detectKeylessEnvDrift();
-  } catch {
-    // ignore
-  }
 }

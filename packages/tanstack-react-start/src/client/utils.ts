@@ -7,6 +7,8 @@ export const pickFromClerkInitState = (
   clerkInitState: any,
 ): TanStackProviderAndInitialProps & {
   clerkSsrState: any;
+  __keylessClaimUrl?: string;
+  __keylessApiKeysUrl?: string;
 } => {
   const {
     __clerk_ssr_state,
@@ -25,6 +27,8 @@ export const pickFromClerkInitState = (
     __signUpForceRedirectUrl,
     __signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl,
+    __keylessClaimUrl,
+    __keylessApiKeysUrl,
   } = clerkInitState || {};
 
   return {
@@ -46,6 +50,8 @@ export const pickFromClerkInitState = (
     signUpForceRedirectUrl: __signUpForceRedirectUrl,
     signInFallbackRedirectUrl: __signInFallbackRedirectUrl,
     signUpFallbackRedirectUrl: __signUpFallbackRedirectUrl,
+    __keylessClaimUrl,
+    __keylessApiKeysUrl,
   };
 };
 

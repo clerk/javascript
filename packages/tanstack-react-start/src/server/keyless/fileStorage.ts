@@ -1,7 +1,7 @@
-import { createKeylessService, type KeylessStorage } from '@clerk/shared/keyless';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
-import { createClerkClientWithOptions } from './createClerkClient';
-import { nodeCwdOrThrow, nodeFsOrThrow, nodePathOrThrow } from './fs/utils';
+import type { KeylessStorage } from '@clerk/shared/keyless';
 
 const CLERK_HIDDEN = '.clerk';
 const CLERK_LOCK = 'clerk.lock';
@@ -9,10 +9,12 @@ const TEMP_DIR_NAME = '.tmp';
 const CONFIG_FILE = 'keyless.json';
 const README_FILE = 'README.md';
 
-function createFileStorage(): KeylessStorage {
-  const fs = nodeFsOrThrow();
-  const path = nodePathOrThrow();
-  const cwd = nodeCwdOrThrow();
+export interface FileStorageOptions {
+  cwd?: () => string;
+}
+
+export function createFileStorage(options: FileStorageOptions = {}): KeylessStorage {
+  const { cwd = () => process.cwd() } = options;
 
   let inMemoryLock = false;
 
@@ -75,10 +77,13 @@ function createFileStorage(): KeylessStorage {
 
   const writeReadme = () => {
     const readme = `## DO NOT COMMIT
-This directory is auto-generated from \`@clerk/nextjs\` because you are running in Keyless mode.
+This directory is auto-generated from \`@clerk/tanstack-react-start\` because you are running in Keyless mode.
 Avoid committing the \`.clerk/\` directory as it includes the secret key of the unclaimed instance.
 `;
-    fs.writeFileSync(getReadmePath(), readme, { encoding: 'utf8', mode: 0o600 });
+    fs.writeFileSync(getReadmePath(), readme, {
+      encoding: 'utf8',
+      mode: 0o600,
+    });
   };
 
   return {
@@ -120,39 +125,4 @@ Avoid committing the \`.clerk/\` directory as it includes the secret key of the 
       }
     },
   };
-}
-
-// Lazily initialized keyless service singleton
-let keylessServiceInstance: ReturnType<typeof createKeylessService> | null = null;
-
-export function keyless() {
-  if (!keylessServiceInstance) {
-    const client = createClerkClientWithOptions({});
-
-    keylessServiceInstance = createKeylessService({
-      storage: createFileStorage(),
-      api: {
-        async createAccountlessApplication(requestHeaders?: Headers) {
-          try {
-            return await client.__experimental_accountlessApplications.createAccountlessApplication({
-              requestHeaders,
-            });
-          } catch {
-            return null;
-          }
-        },
-        async completeOnboarding(requestHeaders?: Headers) {
-          try {
-            return await client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
-              requestHeaders,
-            });
-          } catch {
-            return null;
-          }
-        },
-      },
-      framework: 'nextjs',
-    });
-  }
-  return keylessServiceInstance;
 }
