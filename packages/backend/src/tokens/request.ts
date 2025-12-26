@@ -788,6 +788,13 @@ export const authenticateRequest: AuthenticateRequest = (async (
     if (acceptsToken === TokenType.SessionToken) {
       return authenticateRequestWithTokenInHeader();
     }
+    // When acceptsToken is an array, route based on the actual token type
+    if (Array.isArray(acceptsToken)) {
+      if (isMachineToken(authenticateContext.tokenInHeader)) {
+        return authenticateMachineRequestWithTokenInHeader();
+      }
+      return authenticateRequestWithTokenInHeader();
+    }
     return authenticateMachineRequestWithTokenInHeader();
   }
 

@@ -1426,6 +1426,38 @@ describe('tokens.authenticateRequest(options)', () => {
           isAuthenticated: false,
         });
       });
+
+      test('accepts session_token when it is in acceptsToken array with machine tokens', async () => {
+        server.use(
+          http.get('https://api.clerk.test/v1/jwks', () => {
+            return HttpResponse.json(mockJwks);
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${mockJwt}` });
+        const requestState = await authenticateRequest(
+          request,
+          mockOptions({ acceptsToken: ['session_token', 'api_key'] }),
+        );
+
+        expect(requestState).toBeSignedIn();
+      });
+
+      test('accepts api_key when it is in acceptsToken array with session_token', async () => {
+        server.use(
+          http.post(mockMachineAuthResponses.api_key.endpoint, () => {
+            return HttpResponse.json(mockVerificationResults.api_key);
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.api_key}` });
+        const requestState = await authenticateRequest(
+          request,
+          mockOptions({ acceptsToken: ['session_token', 'api_key'] }),
+        );
+
+        expect(requestState).toBeMachineAuthenticated();
+      });
     });
 
     describe('Token Location Validation', () => {
