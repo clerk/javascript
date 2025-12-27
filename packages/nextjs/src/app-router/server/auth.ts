@@ -71,6 +71,18 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
 
+  // Call connection() first to explicitly opt out of prerendering when using Next.js 16 Cache Components
+  // This prevents "During prerendering, headers() rejects" errors during build
+  try {
+    // @ts-expect-error: connection() only exists in Next.js 16+
+    const { connection } = await import('next/server');
+    if (typeof connection === 'function') {
+      await connection();
+    }
+  } catch {
+    // connection() doesn't exist in older Next.js versions, that's fine
+  }
+
   const request = await buildRequestLike();
 
   const stepsBasedOnSrcDirectory = async () => {
