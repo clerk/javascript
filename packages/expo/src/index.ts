@@ -8,10 +8,6 @@ export {
   isClerkRuntimeError,
 } from '@clerk/react/errors';
 
-/**
- * @deprecated Use `getClerkInstance()` instead.
- */
-export { clerk as Clerk } from './provider/singleton';
 export { getClerkInstance } from './provider/singleton';
 
 export * from './provider/ClerkProvider';
