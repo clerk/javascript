@@ -5,7 +5,7 @@ interface Props {
 
 const { title } = Astro.props;
 
-import { SignedIn, SignedOut, UserButton } from '@clerk/astro/react';
+import { Show, UserButton } from '@clerk/astro/react';
 import { LanguagePicker } from '../../components/LanguagePicker';
 ---
 
@@ -79,11 +79,17 @@ import { LanguagePicker } from '../../components/LanguagePicker';
           <div class='flex gap-5 items-center'>
             <LanguagePicker client:idle />
 
-            <SignedIn client:load>
+            <Show
+              when='signed-in'
+              client:load
+            >
               <UserButton client:load />
-            </SignedIn>
+            </Show>
 
-            <SignedOut client:load>
+            <Show
+              when='signed-out'
+              client:load
+            >
               <div class='sm:flex sm:gap-4'>
                 <a
                   class='inline-flex group relative isolate w-fit transform-gpu overflow-hidden rounded-md px-3 py-[0.1875rem] cursor-pointer after:absolute after:inset-0 after:hover:opacity-100 transition duration-300 ease-[cubic-bezier(.4,.36,0,1)] after:duration-300 after:ease-[cubic-bezier(.4,.36,0,1)] after:transtion-opacity shadow-[inset_0px_1px_0px_theme(colors.white/12%),inset_0px_-1px_0px_theme(colors.white/4%),0px_2px_2px_-1px_rgb(66,67,77,0.24),0px_4px_4px_-2px_rgb(66,67,77,0.12)] bg-[#3C169C] ring-1 ring-[#230B6A] after:bg-[linear-gradient(theme(colors.white/24%),theme(colors.white/16%)_46%,theme(colors.white/12%)_54%,theme(colors.white/8%))] after:opacity-60 [--text-color:#FFFFFF]'
@@ -109,7 +115,7 @@ import { LanguagePicker } from '../../components/LanguagePicker';
                   </a>
                 </div>
               </div>
-            </SignedOut>
+            </Show>
           </div>
         </div>
       </div>

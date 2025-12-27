@@ -2,27 +2,15 @@ import { deprecated } from '@clerk/shared/deprecated';
 import type {
   HandleOAuthCallbackParams,
   PendingSessionOptions,
-  ProtectProps as _ProtectProps,
   RedirectOptions,
+  ShowWhenCondition,
 } from '@clerk/shared/types';
-import { defineComponent } from 'vue';
+import { defineComponent, type VNodeChild } from 'vue';
 
 import { useAuth } from '../composables/useAuth';
 import { useClerk } from '../composables/useClerk';
 import { useClerkContext } from '../composables/useClerkContext';
 import { useClerkLoaded } from '../utils/useClerkLoaded';
-
-export const SignedIn = defineComponent<PendingSessionOptions>(({ treatPendingAsSignedOut }, { slots }) => {
-  const { userId } = useAuth({ treatPendingAsSignedOut });
-
-  return () => (userId.value ? slots.default?.() : null);
-});
-
-export const SignedOut = defineComponent<PendingSessionOptions>(({ treatPendingAsSignedOut }, { slots }) => {
-  const { userId } = useAuth({ treatPendingAsSignedOut });
-
-  return () => (userId.value === null ? slots.default?.() : null);
-});
 
 export const ClerkLoaded = defineComponent((_, { slots }) => {
   const clerk = useClerk();
@@ -112,9 +100,28 @@ export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOA
   return () => null;
 });
 
-export type ProtectProps = _ProtectProps & PendingSessionOptions;
+/**
+ * Props for `<Show>` that control when content renders based on sign-in or authorization state.
+ *
+ * @public
+ * @property fallback Optional content shown when the condition fails; can be provided via prop or `fallback` slot.
+ * @property when Condition controlling visibility; supports `"signed-in"`, `"signed-out"`, authorization descriptors, or a predicate that receives the `has` helper.
+ * @property treatPendingAsSignedOut Inherited from `PendingSessionOptions`; treat pending sessions as signed out while loading.
+ * @example
+ * ```vue
+ * <Show :when="{ role: 'admin' }" fallback="Access denied">
+ *   <AdminPanel />
+ * </Show>
+ *
+ * <Show :when="(has) => has({ permission: 'org:read' })">
+ *   <template #fallback>Not authorized</template>
+ *   <ProtectedFeature />
+ * </Show>
+ * ```
+ */
+export type ShowProps = PendingSessionOptions & { fallback?: unknown; when: ShowWhenCondition };
 
-export const Protect = defineComponent((props: ProtectProps, { slots }) => {
+export const Show = defineComponent((props: ShowProps, { slots }) => {
   const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
 
   return () => {
@@ -125,37 +132,33 @@ export const Protect = defineComponent((props: ProtectProps, { slots }) => {
       return null;
     }
 
-    /**
-     * Fallback to UI provided by user or `null` if authorization checks failed
-     */
+    const authorized = (slots.default?.() ?? null) as VNodeChild | null;
+    const fallbackFromSlot = slots.fallback?.() ?? null;
+    const fallbackFromProp = (props.fallback as VNodeChild | null | undefined) ?? null;
+    const unauthorized = (fallbackFromSlot ?? fallbackFromProp ?? null) as VNodeChild | null;
+
+    if (props.when === 'signed-out') {
+      return userId.value ? unauthorized : authorized;
+    }
+
     if (!userId.value) {
-      return slots.fallback?.();
+      return unauthorized;
     }
 
-    /**
-     * Check against the results of `has` called inside the callback
-     */
-    if (typeof props.condition === 'function') {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      if (props.condition(has.value!)) {
-        return slots.default?.();
-      }
-
-      return slots.fallback?.();
+    if (props.when === 'signed-in') {
+      return authorized;
     }
 
-    if (props.role || props.permission || props.feature || props.plan) {
-      if (has.value?.(props)) {
-        return slots.default?.();
-      }
+    const hasValue = has.value;
 
-      return slots.fallback?.();
+    if (!hasValue) {
+      return unauthorized;
     }
 
-    /**
-     * If neither of the authorization params are passed behave as the `<SignedIn/>`.
-     * If fallback is present render that instead of rendering nothing.
-     */
-    return slots.default?.();
+    if (typeof props.when === 'function') {
+      return props.when(hasValue) ? authorized : unauthorized;
+    }
+
+    return hasValue(props.when) ? authorized : unauthorized;
   };
 });

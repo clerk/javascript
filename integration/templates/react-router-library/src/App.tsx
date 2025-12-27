@@ -1,15 +1,15 @@
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/react-router';
+import { Show, SignInButton, UserButton } from '@clerk/react-router';
 import './App.css';
 
 function App() {
   return (
     <header>
-      <SignedOut>
+      <Show when='signed-out'>
         <SignInButton />
-      </SignedOut>
-      <SignedIn>
+      </Show>
+      <Show when='signed-in'>
         <UserButton />
-      </SignedIn>
+      </Show>
     </header>
   );
 }

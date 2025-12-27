@@ -1,17 +1,17 @@
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
+import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 
 export default function Home() {
   return (
     <header>
-      <SignedOut>
+      <Show when='signed-out'>
         <p>signed-out-state</p>
         <SignInButton />
         <SignUpButton />
-      </SignedOut>
-      <SignedIn>
+      </Show>
+      <Show when='signed-in'>
         <p>signed-in-state</p>
         <UserButton />
-      </SignedIn>
+      </Show>
     </header>
   );
 }
