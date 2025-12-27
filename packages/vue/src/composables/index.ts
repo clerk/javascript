@@ -13,3 +13,5 @@ export { useSignUp } from './useSignUp';
 export { useSessionList } from './useSessionList';
 
 export { useOrganization } from './useOrganization';
+
+export { usePortalRoot } from './usePortalRoot';
