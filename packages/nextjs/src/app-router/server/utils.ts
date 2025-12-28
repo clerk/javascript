@@ -21,18 +21,6 @@ export const isPrerenderingBailout = (e: unknown) => {
 
 export async function buildRequestLike(): Promise<NextRequest> {
   try {
-    // Call connection() first to explicitly opt out of prerendering when using Next.js 16 Cache Components
-    // This prevents "During prerendering, headers() rejects" errors during build
-    try {
-      // @ts-expect-error: connection() only exists in Next.js 16+
-      const { connection } = await import('next/server');
-      if (typeof connection === 'function') {
-        await connection();
-      }
-    } catch {
-      // connection() doesn't exist in older Next.js versions, that's fine
-    }
-
     // Dynamically import next/headers, otherwise Next12 apps will break
     // @ts-expect-error: Cannot find module 'next/headers' or its corresponding type declarations.ts(2307)
     const { headers } = await import('next/headers');
