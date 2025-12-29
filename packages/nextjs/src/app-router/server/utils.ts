@@ -1,5 +1,9 @@
 import { NextRequest } from 'next/server';
 
+// Pre-compiled regex patterns for use cache error detection
+const USE_CACHE_SIMPLE_PATTERN = /use cache|cache scope/i;
+const DYNAMIC_CACHE_PATTERN = /dynamic data source/i;
+
 export const isPrerenderingBailout = (e: unknown) => {
   if (!(e instanceof Error) || !('message' in e)) {
     return false;
@@ -19,6 +23,27 @@ export const isPrerenderingBailout = (e: unknown) => {
   return routeRegex.test(message) || dynamicServerUsage || bailOutPrerendering;
 };
 
+/**
+ * Detects if the error is from using dynamic APIs inside a "use cache" component.
+ * Next.js 15+ throws specific errors when headers(), cookies(), or other dynamic
+ * APIs are accessed inside a cache scope.
+ */
+export const isNextjsUseCacheError = (e: unknown): boolean => {
+  if (!(e instanceof Error)) {
+    return false;
+  }
+
+  const { message } = e;
+
+  // Short-circuit: check simple patterns first
+  if (USE_CACHE_SIMPLE_PATTERN.test(message)) {
+    return true;
+  }
+
+  // Check compound pattern: requires both "dynamic data source" AND "cache"
+  return DYNAMIC_CACHE_PATTERN.test(message) && message.toLowerCase().includes('cache');
+};
+
 export async function buildRequestLike(): Promise<NextRequest> {
   try {
     // Dynamically import next/headers, otherwise Next12 apps will break
@@ -31,6 +56,27 @@ export async function buildRequestLike(): Promise<NextRequest> {
     // https://nextjs.org/docs/messages/ppr-caught-error
     if (e && isPrerenderingBailout(e)) {
       throw e;
+    }
+
+    // Provide a more helpful error message for "use cache" components
+    if (e && isNextjsUseCacheError(e)) {
+      throw new Error(
+        `Clerk: auth() and currentUser() cannot be called inside a "use cache" function. ` +
+          `These functions access \`headers()\` internally, which is a dynamic API not allowed in cached contexts.\n\n` +
+          `To fix this, call auth() outside the cached function and pass the userId as an argument:\n\n` +
+          `  import { auth, clerkClient } from '@clerk/nextjs/server';\n\n` +
+          `  async function getCachedUser(userId: string) {\n` +
+          `    "use cache";\n` +
+          `    const client = await clerkClient();\n` +
+          `    return client.users.getUser(userId);\n` +
+          `  }\n\n` +
+          `  // In your component/page:\n` +
+          `  const { userId } = await auth();\n` +
+          `  if (userId) {\n` +
+          `    const user = await getCachedUser(userId);\n` +
+          `  }\n\n` +
+          `Original error: ${e}`,
+      );
     }
 
     throw new Error(
