@@ -79,11 +79,11 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
     if (typeof connection === 'function') {
       await connection();
     }
-  } catch (e) {
+  } catch (error) {
     // If this is a prerendering bailout, re-throw it
     const { isPrerenderingBailout } = await import('./utils.js');
-    if (isPrerenderingBailout(e)) {
-      throw e;
+    if (isPrerenderingBailout(error)) {
+      throw error;
     }
     // Otherwise connection() doesn't exist in older Next.js versions, that's fine
   }
