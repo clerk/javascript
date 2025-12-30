@@ -97,6 +97,22 @@ describe('OrganizationSwitcher', () => {
       expect(getByText('Personal account')).toBeInTheDocument();
     });
 
+    it('does not show user identifiers in the personal workspace trigger', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          username: 'testuser',
+        });
+      });
+
+      props.setProps({ hidePersonal: false });
+      const { getByText, queryByText } = render(<OrganizationSwitcher />, { wrapper });
+      expect(getByText('Personal account')).toBeInTheDocument();
+      expect(queryByText('test@clerk.com')).not.toBeInTheDocument();
+      expect(queryByText('testuser')).not.toBeInTheDocument();
+    });
+
     it('shows "No organization selected" when user has no active organization and hidePersonal is true', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
