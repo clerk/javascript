@@ -395,6 +395,12 @@ export const nbNO: LocalizationResource = {
         headerTitle__members: 'Medlemmer',
         headerTitle__requests: 'Forespørsler',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roller er midlertidig låst',
+          subtitle: 'Vi oppdaterer tilgjengelige roller. Når det er gjort, vil du kunne oppdatere roller igjen.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

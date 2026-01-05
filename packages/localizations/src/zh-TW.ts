@@ -391,6 +391,12 @@ export const zhTW: LocalizationResource = {
         headerTitle__members: '成員',
         headerTitle__requests: '請求',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: '角色暫時被鎖定',
+          subtitle: '我們正在更新可用角色。完成後，您將能夠再次更新角色。',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
