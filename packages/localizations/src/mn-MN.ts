@@ -751,8 +751,8 @@ export const mnMN: LocalizationResource = {
       title: 'Two-step баталгаажуулалт',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Нэвтрэхийн тулд доороос түрийвч сонгоно уу',
+      title: 'Solana-аар нэвтрэх',
     },
   },
   signInEnterPasswordTitle: 'Нууц үгээ оруулна уу',
@@ -845,8 +845,8 @@ export const mnMN: LocalizationResource = {
       titleCombined: 'Бүртгэл үүсгэх',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Бүртгүүлэхийн тулд доороос түрийвч сонгоно уу',
+      title: 'Solana-аар бүртгүүлэх',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}-р үргэлжлүүлэх',
@@ -869,6 +869,10 @@ export const mnMN: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'Та байгууллагад харьяалагдах ёстой',
+      subtitle: 'Урилга авахын тулд байгууллагын админтай холбогдоно уу.',
     },
     signOut: {
       actionLink: undefined,
@@ -893,6 +897,8 @@ export const mnMN: LocalizationResource = {
     captcha_unavailable:
       'Ботын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
     form_code_incorrect: 'Маягтын код буруу байна',
+    form_email_address_blocked:
+      'Түр зуурын имэйл үйлчилгээг дэмжихгүй. Данс үүсгэхийн тулд ердийн имэйл хаягаа ашиглана уу.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -910,6 +916,8 @@ export const mnMN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Нууц үг буруу байна.',
+    form_password_or_identifier_incorrect:
+      'Нууц үг эсвэл имэйл хаяг буруу байна. Дахин оролдох эсвэл өөр арга ашиглана уу.',
     form_password_length_too_short: 'Нууц үгийн урт хэт богино байна.',
     form_password_not_strong_enough: 'Таны нууц үг хангалттай хүчтэй биш байна.',
     form_password_pwned:
@@ -949,8 +957,10 @@ export const mnMN: LocalizationResource = {
     phone_number_exists: 'Энэ утасны дугаарыг авсан. Өөр оролдоно уу.',
     session_exists: 'Та аль хэдийн нэвтэрсэн байна.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected:
+      'Та гарын үсгийн хүсэлтийг цуцалсан байна. Үргэлжлүүлэхийн тулд дахин оролдоно уу.',
+    web3_solana_signature_generation_failed:
+      'Гарын үсэг үүсгэх үед алдаа гарлаа. Үргэлжлүүлэхийн тулд дахин оролдоно уу.',
     zxcvbn: {
       couldBeStronger: 'Таны нууц үг ажилладаг, гэхдээ илүү хүчтэй байж болно. Илүү олон тэмдэгт нэмж үзээрэй.',
       goodPassword: 'Таны нууц үг шаардлагатай бүх шаардлагыг хангаж байна.',
@@ -1320,6 +1330,10 @@ export const mnMN: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 wallets',
         title: 'Web3 wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Өөрийн бүртгэлтэй холбох Solana түрийвч сонгоно уу.',
+          title: 'Solana түрийвч нэмэх',
+        },
       },
     },
     usernamePage: {
@@ -1343,21 +1357,22 @@ export const mnMN: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Нэвтрэх',
+      actionText: 'Та аль хэдийн нэвтрэх эрхтэй юу?',
+      formButton: 'Хүлээлгийн жагсаалтад нэгдэх',
+      subtitle: 'Имэйл хаягаа оруулаад таны байр бэлэн болоход мэдэгдэх болно',
+      title: 'Хүлээлгийн жагсаалтад нэгдэх',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Удахгүй дахин чиглүүлэх болно...',
+      subtitle: 'Таны байр бэлэн болоход бид холбогдох болно',
+      title: 'Хүлээлгийн жагсаалтад нэгдсэнд баярлалаа!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}}-аар холбох',
+    continue: '{{walletName}}-аар үргэлжлүүлэх',
+    noneAvailable:
+      'Solana Web3 түрийвч илрээгүй. Web3-ийг дэмждэг {{ solanaWalletsLink || link("wallet extension") }} суулгана уу.',
   },
 } as const;

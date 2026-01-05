@@ -1,5 +1,44 @@
 # Change Log
 
+## 3.32.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.9
+
+## 3.32.0
+
+### Minor Changes
+
+- Display message in `TaskChooseOrganization` when user is not allowed to create organizations ([#7502](https://github.com/clerk/javascript/pull/7502)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Added waitlist translations. ([#7483](https://github.com/clerk/javascript/pull/7483)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.8
+
+## 3.31.0
+
+### Minor Changes
+
+- Add Web3 Solana support to `<UserProfile />` ([#7435](https://github.com/clerk/javascript/pull/7435)) by [@kduprey](https://github.com/kduprey)
+
+- Add support for Sign in with Solana. ([#7293](https://github.com/clerk/javascript/pull/7293)) by [@kduprey](https://github.com/kduprey)
+
+### Patch Changes
+
+- Added temporary email services support error localization key. ([#7436](https://github.com/clerk/javascript/pull/7436)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fixed incorrect word in `da-DK` localization ([#7462](https://github.com/clerk/javascript/pull/7462)) by [@jacekradko](https://github.com/jacekradko)
+
+- Added missing password or identifier incorrect error localization. ([#7437](https://github.com/clerk/javascript/pull/7437)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.7
+
 ## 3.30.1
 
 ### Patch Changes

@@ -751,8 +751,8 @@ export const fiFI: LocalizationResource = {
       title: 'Kaksivaiheinen todennus',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Valitse alta lompakko kirjautumista varten',
+      title: 'Kirjaudu sisään Solanalla',
     },
   },
   signInEnterPasswordTitle: 'Syötä salasanasi',
@@ -846,8 +846,8 @@ export const fiFI: LocalizationResource = {
       titleCombined: 'Luo tili',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Valitse alta lompakko rekisteröitymistä varten',
+      title: 'Rekisteröidy Solanalla',
     },
   },
   socialButtonsBlockButton: 'Jatka palvelun {{provider|titleize}} avulla',
@@ -870,6 +870,10 @@ export const fiFI: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'Sinun täytyy kuulua organisaatioon',
+      subtitle: 'Ota yhteyttä organisaatiosi ylläpitäjään saadaksesi kutsun.',
     },
     signOut: {
       actionLink: undefined,
@@ -894,6 +898,8 @@ export const fiFI: LocalizationResource = {
     captcha_unavailable:
       'Rekisteröityminen epäonnistui, koska botin vahvistus epäonnistui. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Väliaikaiset sähköpostipalvelut eivät ole tuettuja. Käytä tavallista sähköpostiosoitetta tilin luomiseen.',
     form_identifier_exists__email_address: 'Tämä sähköpostiosoite on jo käytössä. Kokeile toista.',
     form_identifier_exists__phone_number: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     form_identifier_exists__username: 'Tämä käyttäjänimi on jo käytössä. Kokeile toista.',
@@ -911,6 +917,8 @@ export const fiFI: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Salasana tai sähköpostiosoite on väärä. Yritä uudelleen tai käytä toista menetelmää.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Salasana ei ole riittävän vahva.',
     form_password_pwned: 'Salasana on ollut osallisena tietovuodossa. Valitse toinen salasana.',
@@ -949,8 +957,8 @@ export const fiFI: LocalizationResource = {
     phone_number_exists: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     session_exists: 'Olet jo kirjautunut sisään.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Hylkäsit allekirjoituspyynnön. Yritä uudelleen jatkaaksesi.',
+    web3_solana_signature_generation_failed: 'Allekirjoitusta luotaessa tapahtui virhe. Yritä uudelleen jatkaaksesi.',
     zxcvbn: {
       couldBeStronger: 'Salasanasi toimii, mutta se voisi olla vahvempi. Kokeile lisätä erikoismerkkejä tai numeroita.',
       goodPassword: 'Salasanasi täyttää kaikki tarvittavat vaatimukset.',
@@ -1322,6 +1330,10 @@ export const fiFI: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3-lompakot',
         title: 'Web3-lompakot',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Valitse Solana-lompakko yhdistettäväksi tiliisi.',
+          title: 'Lisää Solana-lompakko',
+        },
       },
     },
     usernamePage: {
@@ -1345,21 +1357,22 @@ export const fiFI: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Kirjaudu sisään',
+      actionText: 'Onko sinulla jo pääsy?',
+      formButton: 'Liity jonoon',
+      subtitle: 'Syötä sähköpostiosoitteesi ja ilmoitamme sinulle, kun paikkasi on valmis',
+      title: 'Liity jonoon',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Sinut ohjataan pian...',
+      subtitle: 'Olemme yhteydessä, kun paikkasi on valmis',
+      title: 'Kiitos liittymisestä jonoon!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Yhdistä {{walletName}}',
+    continue: 'Jatka {{walletName}}',
+    noneAvailable:
+      'Solana Web3 -lompakoita ei havaittu. Asenna Web3-yhteensopiva {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

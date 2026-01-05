@@ -759,8 +759,8 @@ export const ruRU: LocalizationResource = {
       title: 'Двухфакторная верификация',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Выберите кошелёк ниже, чтобы войти',
+      title: 'Войти через Solana',
     },
   },
   signInEnterPasswordTitle: 'Введите Ваш пароль',
@@ -857,8 +857,8 @@ export const ruRU: LocalizationResource = {
       titleCombined: 'Создайте Вашу учетную запись',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Выберите кошелёк ниже, чтобы зарегистрироваться',
+      title: 'Зарегистрироваться через Solana',
     },
   },
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',
@@ -881,6 +881,10 @@ export const ruRU: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'Вы должны принадлежать к организации',
+      subtitle: 'Свяжитесь с администратором вашей организации для получения приглашения.',
     },
     signOut: {
       actionLink: undefined,
@@ -907,6 +911,8 @@ export const ruRU: LocalizationResource = {
     captcha_unavailable:
       'Регистрация не удалась из-за неудачной проверки бота. Пожалуйста, обновите страницу, чтобы попробовать снова, или обратитесь в службу поддержки для получения дополнительной помощи.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Временные почтовые службы не поддерживаются. Пожалуйста, используйте свой обычный адрес электронной почты для создания аккаунта.',
     form_identifier_exists__email_address: 'Этот адрес электронной почты уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__phone_number: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__username: 'Это имя пользователя уже занято. Пожалуйста, попробуйте другое.',
@@ -924,6 +930,8 @@ export const ruRU: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Пароль или адрес электронной почты неверен. Попробуйте снова или используйте другой метод.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Ваш пароль недостаточно надежный.',
     form_password_pwned: 'Этот пароль был взломан и не может быть использован, попробуйте другой пароль.',
@@ -965,8 +973,10 @@ export const ruRU: LocalizationResource = {
     phone_number_exists: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     session_exists: 'Вы уже вошли в систему.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected:
+      'Вы отклонили запрос на подпись. Пожалуйста, попробуйте ещё раз, чтобы продолжить.',
+    web3_solana_signature_generation_failed:
+      'Произошла ошибка при создании подписи. Пожалуйста, попробуйте ещё раз, чтобы продолжить.',
     zxcvbn: {
       couldBeStronger: 'Ваш пароль подходит, но мог бы быть надежнее. Попробуйте добавить больше символов.',
       goodPassword: 'Хорошая работа. Это отличный пароль.',
@@ -1341,6 +1351,10 @@ export const ruRU: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 кошельки',
         title: 'Web3 кошельки',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Выберите кошелёк Solana для подключения к вашему аккаунту.',
+          title: 'Добавить кошелёк Solana',
+        },
       },
     },
     usernamePage: {
@@ -1376,9 +1390,10 @@ export const ruRU: LocalizationResource = {
       title: 'Спасибо за присоединение к списку ожидания!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Подключиться через {{walletName}}',
+    continue: 'Продолжить через {{walletName}}',
+    noneAvailable:
+      'Кошельки Solana Web3 не обнаружены. Установите {{ solanaWalletsLink || link("wallet extension") }} с поддержкой Web3.',
   },
 } as const;

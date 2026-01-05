@@ -869,6 +869,10 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter your organization details to continue',
       title: 'Setup your organization',
     },
+    organizationCreationDisabled: {
+      title: 'You must belong to an organization',
+      subtitle: 'Contact your organization admin for an invitation.',
+    },
     signOut: {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',
@@ -891,6 +895,7 @@ export const enUS: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -908,6 +913,7 @@ export const enUS: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: undefined,
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned:
@@ -1322,6 +1328,10 @@ export const enUS: LocalizationResource = {
         detailsAction__nonPrimary: 'Set as primary',
         primaryButton: 'Connect wallet',
         title: 'Web3 wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Select a Solana wallet to connect to your account.',
+          title: 'Add a Solana wallet',
+        },
       },
     },
     usernamePage: {
@@ -1357,7 +1367,7 @@ export const enUS: LocalizationResource = {
       title: 'Thanks for joining the waitlist!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: 'Connect with {{walletName}}',
     continue: 'Continue with {{walletName}}',
     noneAvailable:

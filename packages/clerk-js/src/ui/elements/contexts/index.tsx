@@ -128,6 +128,7 @@ export type FlowMetadata = {
     | 'complete'
     | 'accountSwitcher'
     | 'chooseOrganization'
+    | 'organizationCreationDisabled'
     | 'enterpriseConnections'
     | 'chooseWallet';
 };

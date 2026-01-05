@@ -751,8 +751,8 @@ export const hrHR: LocalizationResource = {
       title: 'Dvostupanjska verifikacija',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Odaberite novčanik u nastavku za prijavu',
+      title: 'Prijava putem Solane',
     },
   },
   signInEnterPasswordTitle: 'Unesite svoju lozinku',
@@ -847,8 +847,8 @@ export const hrHR: LocalizationResource = {
       titleCombined: 'Kreirajte svoj račun',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Odaberite novčanik u nastavku za registraciju',
+      title: 'Registracija putem Solane',
     },
   },
   socialButtonsBlockButton: 'Nastavite s {{provider|titleize}}',
@@ -871,6 +871,10 @@ export const hrHR: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'Morate pripadati organizaciji',
+      subtitle: 'Kontaktirajte administratora svoje organizacije za pozivnicu.',
     },
     signOut: {
       actionLink: undefined,
@@ -896,6 +900,8 @@ export const hrHR: LocalizationResource = {
     captcha_unavailable:
       'Registracija neuspješna zbog neuspjele provjere bota. Molimo osvježite stranicu i pokušajte ponovno ili se obratite podršci za dodatnu pomoć.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Privremene e-mail usluge nisu podržane. Molimo koristite svoju redovitu e-mail adresu za kreiranje računa.',
     form_identifier_exists__email_address: 'Ova e-mail adresa je zauzeta. Molimo pokušajte s drugom.',
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušajte s drugim.',
@@ -913,6 +919,8 @@ export const hrHR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Lozinka ili e-mail adresa je netočna. Pokušajte ponovno ili koristite drugu metodu.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Vaša lozinka nije dovoljno jaka.',
     form_password_pwned:
@@ -955,8 +963,9 @@ export const hrHR: LocalizationResource = {
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     session_exists: 'Već ste prijavljeni.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Odbili ste zahtjev za potpis. Pokušajte ponovno za nastavak.',
+    web3_solana_signature_generation_failed:
+      'Došlo je do pogreške pri generiranju potpisa. Pokušajte ponovno za nastavak.',
     zxcvbn: {
       couldBeStronger: 'Vaša lozinka funkcionira, ali mogla bi biti jača. Pokušajte dodati više znakova.',
       goodPassword: 'Vaša lozinka zadovoljava sve potrebne zahtjeve.',
@@ -1325,6 +1334,10 @@ export const hrHR: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Poveži novčanik',
         title: 'Web3 novčanici',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Odaberite Solana novčanik za povezivanje s vašim računom.',
+          title: 'Dodaj Solana novčanik',
+        },
       },
     },
     usernamePage: {
@@ -1348,21 +1361,22 @@ export const hrHR: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Prijavi se',
+      actionText: 'Već imaš pristup?',
+      formButton: 'Pridruži se listi čekanja',
+      subtitle: 'Unesi svoju e-mail adresu i obavijestit ćemo te kada tvoje mjesto bude spremno',
+      title: 'Pridruži se listi čekanja',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Uskoro ćeš biti preusmjeren...',
+      subtitle: 'Javit ćemo ti se kada tvoje mjesto bude spremno',
+      title: 'Hvala što si se pridružio/la listi čekanja!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Poveži se s {{walletName}}',
+    continue: 'Nastavi s {{walletName}}',
+    noneAvailable:
+      'Nisu otkrivene Solana Web3 novčanike. Instalirajte {{ solanaWalletsLink || link("wallet extension") }} s podrškom za Web3.',
   },
 } as const;

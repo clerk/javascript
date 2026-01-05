@@ -751,8 +751,8 @@ export const enGB: LocalizationResource = {
       title: 'Two-step verification',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Select a wallet below to sign in',
+      title: 'Sign in with Solana',
     },
   },
   signInEnterPasswordTitle: 'Enter your password',
@@ -847,8 +847,8 @@ export const enGB: LocalizationResource = {
       titleCombined: 'Create your account',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Select a wallet below to sign up',
+      title: 'Sign up with Solana',
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
@@ -871,6 +871,10 @@ export const enGB: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'You must belong to an organisation',
+      subtitle: 'Contact your organisation admin for an invitation.',
     },
     signOut: {
       actionLink: undefined,
@@ -895,6 +899,8 @@ export const enGB: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Temporary email services are not supported. Please use your regular email address to create an account.',
     form_identifier_exists__email_address: 'This email address is taken. Please try another.',
     form_identifier_exists__phone_number: 'This phone number is taken. Please try another.',
     form_identifier_exists__username: 'This username is taken. Please try another.',
@@ -912,6 +918,7 @@ export const enGB: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'The value entered is invalid. Please correct it.',
     form_password_incorrect: 'The password you entered is incorrect. Please try again.',
+    form_password_or_identifier_incorrect: 'Password or email address is incorrect. Try again, or use another method.',
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned:
@@ -954,8 +961,9 @@ export const enGB: LocalizationResource = {
     phone_number_exists: 'This phone number is taken. Please try another.',
     session_exists: "You're already signed in.",
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
+    web3_solana_signature_generation_failed:
+      'An error occurred while generating the signature. Please try again to continue.',
     zxcvbn: {
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',
       goodPassword: 'Your password meets all the necessary requirements.',
@@ -1325,6 +1333,10 @@ export const enGB: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Connect wallet',
         title: 'Web3 wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Select a Solana wallet to connect to your account.',
+          title: 'Add a Solana wallet',
+        },
       },
     },
     usernamePage: {
@@ -1360,9 +1372,10 @@ export const enGB: LocalizationResource = {
       title: 'Thanks for joining the waitlist!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Connect with {{walletName}}',
+    continue: 'Continue with {{walletName}}',
+    noneAvailable:
+      'No Solana Web3 wallets detected. Please install a Web3 supported {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

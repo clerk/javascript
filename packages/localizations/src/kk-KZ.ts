@@ -742,8 +742,8 @@ export const kkKZ: LocalizationResource = {
       title: 'Екі қадамды растау',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Кіру үшін төменде әмиянды таңдаңыз',
+      title: 'Solana арқылы кіру',
     },
   },
   signInEnterPasswordTitle: 'Құпия сөзді енгізіңіз',
@@ -837,8 +837,8 @@ export const kkKZ: LocalizationResource = {
       titleCombined: 'Есептік жазбаны құру',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Тіркелу үшін төменде әмиянды таңдаңыз',
+      title: 'Solana арқылы тіркелу',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} арқылы жалғастыру',
@@ -862,6 +862,10 @@ export const kkKZ: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Сіз ұйымға тиесілі болуыңыз керек',
+      subtitle: 'Шақыру алу үшін ұйымыңыздың әкімшісіне хабарласыңыз.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,
@@ -883,6 +887,8 @@ export const kkKZ: LocalizationResource = {
     captcha_invalid: 'Қауіпсіздік тексерілуі сәтсіз аяқталды. Браузерді өзгерту немесе кеңейтулерді өшіруге тырысыңыз.',
     captcha_unavailable: 'Бот тексерілуі сәтсіз аяқталды. Бетті жаңартып немесе қолдау қызметіне хабарласыңыз.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Уақытша электрондық пошта қызметтері қолдау көрсетілмейді. Есептік жазбаны жасау үшін кәдімгі электрондық пошта мекенжайыңызды пайдаланыңыз.',
     form_identifier_exists__email_address: 'Бұл электрондық пошта тіркелген. Басқасын қолданыңыз.',
     form_identifier_exists__phone_number: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
     form_identifier_exists__username: 'Бұл пайдаланушы аты тіркелген. Басқасын қолданыңыз.',
@@ -900,6 +906,8 @@ export const kkKZ: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Енгізілген мән жарамсыз.',
     form_password_incorrect: 'Құпия сөз қате.',
+    form_password_or_identifier_incorrect:
+      'Құпия сөз немесе электрондық пошта мекенжайы дұрыс емес. Қайталап көріңіз немесе басқа әдісті пайдаланыңыз.',
     form_password_length_too_short: 'Құпия сөз тым қысқа. Кемінде 8 таңба болуы керек.',
     form_password_not_strong_enough: 'Құпия сөз әлсіз.',
     form_password_pwned: 'Бұл құпия сөз қауіпсіздік бұзылуынан табылды. Басқа құпия сөзді қолданыңыз.',
@@ -938,8 +946,9 @@ export const kkKZ: LocalizationResource = {
     phone_number_exists: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 Wallet кеңейтуі табылмады. Орнатыңыз.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Сіз қолтаңба сұрауын қабылдамадыңыз. Жалғастыру үшін қайтадан көріңіз.',
+    web3_solana_signature_generation_failed:
+      'Қолтаңбаны жасау кезінде қате орын алды. Жалғастыру үшін қайтадан көріңіз.',
     zxcvbn: {
       couldBeStronger: 'Құпия сөз әлсіз. Таңбалар санын көбейтіңіз.',
       goodPassword: 'Құпия сөз талаптарға сай.',
@@ -1298,6 +1307,10 @@ export const kkKZ: LocalizationResource = {
         detailsAction__nonPrimary: 'Негізгі ретінде орнату',
         primaryButton: 'Әптәпқалманы қосу',
         title: 'Web3 әптәпқалмалары',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Есептік жазбаңызға қосу үшін Solana әмиянын таңдаңыз.',
+          title: 'Solana әмиянын қосу',
+        },
       },
     },
     usernamePage: {
@@ -1333,9 +1346,10 @@ export const kkKZ: LocalizationResource = {
       title: 'Күту тізіміне қосылғаныңыз үшін рақмет!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} арқылы қосылу',
+    continue: '{{walletName}} арқылы жалғастыру',
+    noneAvailable:
+      'Solana Web3 әмияндары табылмады. Web3 қолдайтын {{ solanaWalletsLink || link("wallet extension") }} орнатыңыз.',
   },
 } as const;

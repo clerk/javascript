@@ -759,8 +759,8 @@ export const faIR: LocalizationResource = {
       title: 'تأیید  دو مرحله‌ای',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'برای ورود، یک کیف پول را در زیر انتخاب کنید',
+      title: 'ورود با Solana',
     },
   },
   signInEnterPasswordTitle: 'رمز عبور خود را وارد کنید',
@@ -856,8 +856,8 @@ export const faIR: LocalizationResource = {
       titleCombined: 'حساب کاربری خود را ایجاد کنید',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'برای ثبت‌نام، یک کیف پول را در زیر انتخاب کنید',
+      title: 'ثبت‌نام با Solana',
     },
   },
   socialButtonsBlockButton: 'ادامه با {{provider|titleize}}',
@@ -881,6 +881,10 @@ export const faIR: LocalizationResource = {
       subtitle: 'سازمان جدیدی برای شروع کار ایجاد کنید',
       title: 'ایجاد سازمان جدید',
     },
+    organizationCreationDisabled: {
+      title: 'شما باید عضو یک سازمان باشید',
+      subtitle: 'برای دریافت دعوتنامه با مدیر سازمان خود تماس بگیرید.',
+    },
     signOut: {
       actionLink: 'خروج از همه حساب‌ها',
       actionText: 'می‌خواهید خارج شوید؟',
@@ -903,6 +907,8 @@ export const faIR: LocalizationResource = {
     captcha_unavailable:
       'به دلیل عدم موفقیت در اعتبارسنجی ربات، ثبت نام ناموفق بود. لطفاً برای امتحان مجدد، صفحه را رفرش کنید یا برای راهنمایی بیشتر با پشتیبانی تماس بگیرید.',
     form_code_incorrect: 'کد وارد شده نادرست است.',
+    form_email_address_blocked:
+      'سرویس‌های ایمیل موقت پشتیبانی نمی‌شوند. لطفاً از آدرس ایمیل معمولی خود برای ایجاد حساب استفاده کنید.',
     form_identifier_exists__email_address: 'این آدرس ایمیل قبلاً استفاده شده است.',
     form_identifier_exists__phone_number: 'این شماره تلفن قبلاً استفاده شده است.',
     form_identifier_exists__username: 'این نام کاربری قبلاً گرفته شده است.',
@@ -920,6 +926,8 @@ export const faIR: LocalizationResource = {
     form_param_type_invalid__phone_number: 'شماره تلفن باید یک رشته معتبر باشد.',
     form_param_value_invalid: 'مقدار پارامتر نامعتبر است.',
     form_password_incorrect: 'رمز عبور نادرست است.',
+    form_password_or_identifier_incorrect:
+      'رمز عبور یا آدرس ایمیل نادرست است. دوباره تلاش کنید یا از روش دیگری استفاده کنید.',
     form_password_length_too_short: 'رمز عبور شما خیلی کوتاه است. باید حداقل ۸ کاراکتر داشته باشد.',
     form_password_not_strong_enough: 'رمز عبور شما به اندازه کافی قوی نیست.',
     form_password_pwned:
@@ -958,8 +966,8 @@ export const faIR: LocalizationResource = {
     phone_number_exists: 'این شماره تلفن قبلاً استفاده شده است.',
     session_exists: 'جلسه از قبل وجود دارد.',
     web3_missing_identifier: 'افزونه‌ی کیف پول وب۳ پیدا نشد. برای ادامه، لطفاً یکی نصب کنید.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'درخواست امضا را رد کرده‌اید. برای ادامه دوباره تلاش کنید.',
+    web3_solana_signature_generation_failed: 'هنگام ایجاد امضا خطایی رخ داد. برای ادامه دوباره تلاش کنید.',
     zxcvbn: {
       couldBeStronger: 'رمز عبور شما کار می‌کند، اما می‌توانست قوی‌تر باشد. سعی کنید کاراکترهای بیشتری اضافه کنید.',
       goodPassword: 'رمز عبور شما تمام شرایط لازم را برآورده می‌کند.',
@@ -1329,6 +1337,10 @@ export const faIR: LocalizationResource = {
         detailsAction__nonPrimary: 'به عنوان اصلی تنظیم کنید',
         primaryButton: 'اتصال کیف پول',
         title: 'کیف پول های Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'یک کیف پول Solana را برای اتصال به حساب خود انتخاب کنید.',
+          title: 'افزودن کیف پول Solana',
+        },
       },
     },
     usernamePage: {
@@ -1364,9 +1376,10 @@ export const faIR: LocalizationResource = {
       title: 'ممنون که به لیست انتظار پیوستید!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'اتصال با {{walletName}}',
+    continue: 'ادامه با {{walletName}}',
+    noneAvailable:
+      'هیچ کیف پول Solana Web3 شناسایی نشد. لطفاً یک {{ solanaWalletsLink || link("wallet extension") }} پشتیبانی‌شده از Web3 نصب کنید.',
   },
 } as const;

@@ -748,8 +748,8 @@ export const arSA: LocalizationResource = {
       title: 'نظام التحقق بخطوتين',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'حدد محفظة أدناه لتسجيل الدخول',
+      title: 'تسجيل الدخول باستخدام Solana',
     },
   },
   signInEnterPasswordTitle: 'إدخل كلمة المرور',
@@ -842,8 +842,8 @@ export const arSA: LocalizationResource = {
       titleCombined: 'أنشاء حساب جديد',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'حدد محفظة أدناه للتسجيل',
+      title: 'التسجيل باستخدام Solana',
     },
   },
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
@@ -866,6 +866,10 @@ export const arSA: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'يجب أن تنتمي إلى منظمة',
+      subtitle: 'تواصل مع مسؤول منظمتك للحصول على دعوة.',
     },
     signOut: {
       actionLink: undefined,
@@ -890,6 +894,8 @@ export const arSA: LocalizationResource = {
     captcha_unavailable:
       'التسجيل غير ناجح بسبب فشل التحقق من صحة الروبوت. يُرجى تحديث الصفحة للمحاولة مرة أخرى أو التواصل مع فريق الدعم للحصول على مزيد من المساعدة',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'خدمات البريد الإلكتروني المؤقتة غير مدعومة. يرجى استخدام عنوان بريدك الإلكتروني العادي لإنشاء حساب.',
     form_identifier_exists__email_address: 'تم إستخدام البريد الإلكتروني هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__phone_number: 'تم إستخدام رقم الهاتف هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__username: 'تم إستخدام اسم المستخدمد هذا. يرجى المحاولة مرة أخرى',
@@ -907,6 +913,8 @@ export const arSA: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'كلمة المرور أو عنوان البريد الإلكتروني غير صحيح. حاول مرة أخرى أو استخدم طريقة أخرى.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'كلمة المرور ليست قوية',
     form_password_pwned: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',
@@ -945,8 +953,8 @@ export const arSA: LocalizationResource = {
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
     session_exists: 'لقد قمت بتسجيل الدخول بالفعل',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'لقد رفضت طلب التوقيع. يرجى المحاولة مرة أخرى للمتابعة.',
+    web3_solana_signature_generation_failed: 'حدث خطأ أثناء إنشاء التوقيع. يرجى المحاولة مرة أخرى للمتابعة.',
     zxcvbn: {
       couldBeStronger: 'كلمة مرورك سليمة من الأفضل ان تكون اقوى. الرجاء أضافة حروف أكثر',
       goodPassword: 'كلمة مرورك طابقت جميع المتطلبات الازمة',
@@ -1311,6 +1319,10 @@ export const arSA: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'محافظ Web3',
         title: 'محافظ Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'حدد محفظة Solana للاتصال بحسابك.',
+          title: 'إضافة محفظة Solana',
+        },
       },
     },
     usernamePage: {
@@ -1334,21 +1346,22 @@ export const arSA: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'تسجيل الدخول',
+      actionText: 'هل لديك وصول بالفعل؟',
+      formButton: 'الانضمام إلى قائمة الانتظار',
+      subtitle: 'أدخل عنوان بريدك الإلكتروني وسنخبرك عندما يكون مكانك جاهزًا',
+      title: 'الانضمام إلى قائمة الانتظار',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'سيتم إعادة توجيهك قريبًا...',
+      subtitle: 'سنكون على اتصال عندما يكون مكانك جاهزًا',
+      title: 'شكرًا للانضمام إلى قائمة الانتظار!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'الاتصال باستخدام {{walletName}}',
+    continue: 'المتابعة باستخدام {{walletName}}',
+    noneAvailable:
+      'لم يتم اكتشاف محافظ Solana Web3. يرجى تثبيت {{ solanaWalletsLink || link("wallet extension") }} مدعوم بـ Web3.',
   },
 } as const;

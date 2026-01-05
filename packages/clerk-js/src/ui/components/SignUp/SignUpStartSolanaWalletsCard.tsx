@@ -2,15 +2,15 @@ import { useClerk } from '@clerk/shared/react';
 import { lazy, Suspense } from 'react';
 
 import { withRedirectToAfterSignUp, withRedirectToSignUpTask } from '@/ui/common/withRedirect';
-import { descriptors, Flex, Flow, localizationKeys } from '@/ui/customizables';
+import { descriptors, Flex, Flow, localizationKeys, Spinner } from '@/ui/customizables';
 import { BackLink } from '@/ui/elements/BackLink';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
-const Web3WalletButtons = lazy(() =>
-  import(/* webpackChunkName: "web3-wallet-buttons" */ '@/ui/elements/Web3SolanaWalletButtons').then(m => ({
+const Web3SolanaWalletButtons = lazy(() =>
+  import(/* webpackChunkName: "web3-solana-wallet-buttons" */ '@/ui/elements/Web3SolanaWalletButtons').then(m => ({
     default: m.Web3SolanaWalletButtons,
   })),
 );
@@ -41,14 +41,32 @@ const SignUpStartSolanaWalletsCardInner = () => {
             direction='col'
             gap={4}
           >
-            <Suspense fallback={null}>
-              <Web3WalletButtons
+            <Suspense
+              fallback={
+                <Flex
+                  direction={'row'}
+                  align={'center'}
+                  justify={'center'}
+                  sx={t => ({
+                    height: '100%',
+                    minHeight: t.sizes.$32,
+                  })}
+                >
+                  <Spinner
+                    size={'lg'}
+                    colorScheme={'primary'}
+                    elementDescriptor={descriptors.spinner}
+                  />
+                </Flex>
+              }
+            >
+              <Web3SolanaWalletButtons
                 web3AuthCallback={({ walletName }) => {
                   return clerk
                     .authenticateWithWeb3({
                       customNavigate: router.navigate,
                       redirectUrl: ctx.afterSignUpUrl || '/',
-                      signUpContinueUrl: '../continue',
+                      signUpContinueUrl: 'continue',
                       strategy: 'web3_solana_signature',
                       unsafeMetadata: ctx.unsafeMetadata,
                       walletName,

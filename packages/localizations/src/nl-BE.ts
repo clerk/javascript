@@ -750,8 +750,8 @@ export const nlBE: LocalizationResource = {
       title: 'Tweestapsverificatie',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecteer hieronder een wallet om in te loggen',
+      title: 'Inloggen met Solana',
     },
   },
   signInEnterPasswordTitle: 'Vul je wachtwoord in',
@@ -845,8 +845,8 @@ export const nlBE: LocalizationResource = {
       titleCombined: 'Maak je account aan',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecteer hieronder een wallet om je te registreren',
+      title: 'Registreren met Solana',
     },
   },
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
@@ -869,6 +869,10 @@ export const nlBE: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'Je moet tot een organisatie behoren',
+      subtitle: 'Neem contact op met de beheerder van je organisatie voor een uitnodiging.',
     },
     signOut: {
       actionLink: undefined,
@@ -893,6 +897,8 @@ export const nlBE: LocalizationResource = {
     captcha_unavailable:
       'Aanmelding mislukt vanwege mislukte botvalidatie. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
     form_code_incorrect: 'De ingevoerde code is incorrect.',
+    form_email_address_blocked:
+      'Tijdelijke e-maildiensten worden niet ondersteund. Gebruik uw normale e-mailadres om een account aan te maken.',
     form_identifier_exists__email_address: 'Dit e-mailadres is al in gebruik.',
     form_identifier_exists__phone_number: 'Dit telefoonnummer is al in gebruik.',
     form_identifier_exists__username: 'Deze gebruikersnaam is al in gebruik.',
@@ -910,6 +916,8 @@ export const nlBE: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'De waarde die je hebt ingevoerd is ongeldig.',
     form_password_incorrect: 'Het wachtwoord is incorrect.',
+    form_password_or_identifier_incorrect:
+      'Het wachtwoord of het e-mailadres is onjuist. Probeer het opnieuw of gebruik een andere methode.',
     form_password_length_too_short: 'Het wachtwoord is te kort.',
     form_password_not_strong_enough: 'Je wachtwoord is niet sterk genoeg.',
     form_password_pwned: 'Dit wachtwoord is in een datalek gevonden.',
@@ -948,8 +956,10 @@ export const nlBE: LocalizationResource = {
     phone_number_exists: 'Dit telefoonnummer is al in gebruik. Probeer een ander nummer.',
     session_exists: 'Je bent al ingelogd.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected:
+      'Je hebt het handtekeningverzoek afgewezen. Probeer het opnieuw om verder te gaan.',
+    web3_solana_signature_generation_failed:
+      'Er is een fout opgetreden bij het genereren van de handtekening. Probeer het opnieuw om verder te gaan.',
     zxcvbn: {
       couldBeStronger: 'Je wachtwoord werkt, maar kan sterker zijn. Probeer meer tekens toe te voegen.',
       goodPassword: 'Je wachtwoord voldoet aan alle vereisten.',
@@ -1317,6 +1327,10 @@ export const nlBE: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 portefeuilles',
         title: 'Web3 portefeuilles',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selecteer een Solana-wallet om aan je account te koppelen.',
+          title: 'Solana-wallet toevoegen',
+        },
       },
     },
     usernamePage: {
@@ -1352,9 +1366,10 @@ export const nlBE: LocalizationResource = {
       title: 'Succes!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Verbinden met {{walletName}}',
+    continue: 'Doorgaan met {{walletName}}',
+    noneAvailable:
+      'Geen Solana Web3-wallets gedetecteerd. Installeer een Web3-ondersteunde {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

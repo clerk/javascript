@@ -139,6 +139,7 @@ describe('PasswordSection', () => {
                   updated_at: 123,
                   logo_public_url: null,
                   protocol: 'saml',
+                  enterprise_connection_id: 'ent_123',
                 },
                 verification: {
                   status: 'verified',
@@ -155,6 +156,8 @@ describe('PasswordSection', () => {
                   object: 'verification',
                 },
                 id: 'eac_123',
+                last_authenticated_at: 123,
+                enterprise_connection_id: 'ent_123',
               },
             ],
           });
@@ -212,6 +215,7 @@ describe('PasswordSection', () => {
                   updated_at: 123,
                   logo_public_url: null,
                   protocol: 'saml',
+                  enterprise_connection_id: null,
                 },
                 verification: {
                   status: 'verified',
@@ -228,6 +232,8 @@ describe('PasswordSection', () => {
                   object: 'verification',
                 },
                 id: 'eac_123',
+                last_authenticated_at: null,
+                enterprise_connection_id: null,
               },
             ],
           });
@@ -378,6 +384,7 @@ describe('PasswordSection', () => {
                   updated_at: 123,
                   logo_public_url: null,
                   protocol: 'saml',
+                  enterprise_connection_id: null,
                 },
                 verification: {
                   status: 'verified',
@@ -394,6 +401,8 @@ describe('PasswordSection', () => {
                   object: 'verification',
                 },
                 id: 'eac_123',
+                last_authenticated_at: null,
+                enterprise_connection_id: null,
               },
             ],
           });
@@ -452,6 +461,7 @@ describe('PasswordSection', () => {
                   updated_at: 123,
                   logo_public_url: null,
                   protocol: 'saml',
+                  enterprise_connection_id: null,
                 },
                 verification: {
                   status: 'verified',
@@ -468,6 +478,8 @@ describe('PasswordSection', () => {
                   object: 'verification',
                 },
                 id: 'eac_123',
+                last_authenticated_at: null,
+                enterprise_connection_id: null,
               },
             ],
           });

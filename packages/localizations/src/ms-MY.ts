@@ -755,8 +755,8 @@ export const msMY: LocalizationResource = {
       title: 'Pengesahan dua langkah',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Pilih dompet di bawah untuk log masuk',
+      title: 'Log masuk dengan Solana',
     },
   },
   signInEnterPasswordTitle: 'Masukkan kata laluan anda',
@@ -853,8 +853,8 @@ export const msMY: LocalizationResource = {
       titleCombined: 'Cipta akaun anda',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Pilih dompet di bawah untuk mendaftar',
+      title: 'Daftar dengan Solana',
     },
   },
   socialButtonsBlockButton: 'Teruskan dengan {{provider|titleize}}',
@@ -877,6 +877,10 @@ export const msMY: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'Anda mesti menjadi ahli organisasi',
+      subtitle: 'Hubungi pentadbir organisasi anda untuk jemputan.',
     },
     signOut: {
       actionLink: undefined,
@@ -901,6 +905,8 @@ export const msMY: LocalizationResource = {
     captcha_unavailable:
       'Pendaftaran tidak berjaya kerana pengesahan bot gagal. Sila muat semula halaman untuk mencuba lagi atau hubungi sokongan untuk bantuan lebih lanjut.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Perkhidmatan e-mel sementara tidak disokong. Sila gunakan alamat e-mel biasa anda untuk membuat akaun.',
     form_identifier_exists__email_address: 'Alamat e-mel ini telah diambil. Sila cuba yang lain.',
     form_identifier_exists__phone_number: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini telah diambil. Sila cuba yang lain.',
@@ -919,6 +925,8 @@ export const msMY: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Nilai yang dimasukkan tidak sah. Sila betulkannya.',
     form_password_incorrect: 'Kata laluan yang anda masukkan tidak betul. Sila cuba lagi.',
+    form_password_or_identifier_incorrect:
+      'Kata laluan atau alamat e-mel tidak betul. Cuba lagi atau gunakan kaedah lain.',
     form_password_length_too_short: 'Kata laluan anda terlalu pendek. Ia mesti sekurang-kurangnya 8 aksara panjang.',
     form_password_not_strong_enough: 'Kata laluan anda tidak cukup kuat.',
     form_password_pwned:
@@ -964,8 +972,9 @@ export const msMY: LocalizationResource = {
     phone_number_exists: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     session_exists: undefined,
     web3_missing_identifier: 'Sambungan Dompet Web3 tidak dapat dijumpai. Sila pasang satu untuk meneruskan.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Anda telah menolak permintaan tandatangan. Sila cuba lagi untuk meneruskan.',
+    web3_solana_signature_generation_failed:
+      'Ralat berlaku semasa menjana tandatangan. Sila cuba lagi untuk meneruskan.',
     zxcvbn: {
       couldBeStronger: 'Kata laluan anda berfungsi, tetapi boleh lebih kuat. Cuba tambah lebih banyak aksara.',
       goodPassword: 'Kata laluan anda memenuhi semua keperluan yang diperlukan.',
@@ -1338,6 +1347,10 @@ export const msMY: LocalizationResource = {
         detailsAction__nonPrimary: 'Tetapkan sebagai utama',
         primaryButton: 'Sambung dompet',
         title: 'Dompet web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Pilih dompet Solana untuk disambungkan ke akaun anda.',
+          title: 'Tambah dompet Solana',
+        },
       },
     },
     usernamePage: {
@@ -1373,9 +1386,10 @@ export const msMY: LocalizationResource = {
       title: 'Terima kasih kerana menyertai senarai menunggu!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Sambung dengan {{walletName}}',
+    continue: 'Teruskan dengan {{walletName}}',
+    noneAvailable:
+      'Tiada dompet Solana Web3 dikesan. Sila pasang {{ solanaWalletsLink || link("wallet extension") }} yang menyokong Web3.',
   },
 } as const;

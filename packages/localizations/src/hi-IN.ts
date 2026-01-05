@@ -753,8 +753,8 @@ export const hiIN: LocalizationResource = {
       title: 'दो-चरण सत्यापन',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'साइन इन करने के लिए नीचे एक वॉलेट चुनें',
+      title: 'Solana के साथ साइन इन करें',
     },
   },
   signInEnterPasswordTitle: 'अपना पासवर्ड दर्ज करें',
@@ -850,8 +850,8 @@ export const hiIN: LocalizationResource = {
       titleCombined: 'अपना खाता बनाएं',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'साइन अप करने के लिए नीचे एक वॉलेट चुनें',
+      title: 'Solana के साथ साइन अप करें',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} के साथ जारी रखें',
@@ -874,6 +874,10 @@ export const hiIN: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'आपको किसी संगठन से संबंधित होना चाहिए',
+      subtitle: 'आमंत्रण के लिए अपने संगठन के व्यवस्थापक से संपर्क करें।',
     },
     signOut: {
       actionLink: undefined,
@@ -898,6 +902,8 @@ export const hiIN: LocalizationResource = {
     captcha_unavailable:
       'असफल बॉट सत्यापन के कारण साइन अप असफल रहा। पुनः प्रयास करने के लिए कृपया पृष्ठ को रिफ्रेश करें या अधिक सहायता के लिए सपोर्ट से संपर्क करें।',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'अस्थायी ईमेल सेवाएं समर्थित नहीं हैं। कृपया खाता बनाने के लिए अपना नियमित ईमेल पता उपयोग करें।',
     form_identifier_exists__email_address: 'यह ईमेल पता पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_exists__phone_number: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_exists__username: 'यह उपयोगकर्ता नाम पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
@@ -915,6 +921,8 @@ export const hiIN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'दर्ज किया गया मान अमान्य है। कृपया इसे सही करें।',
     form_password_incorrect: 'आपके द्वारा दर्ज किया गया पासवर्ड गलत है। कृपया पुनः प्रयास करें।',
+    form_password_or_identifier_incorrect:
+      'पासवर्ड या ईमेल पता गलत है। कृपया पुनः प्रयास करें या किसी अन्य विधि का उपयोग करें।',
     form_password_length_too_short: 'आपका पासवर्ड बहुत छोटा है। इसमें कम से कम 8 अक्षर होने चाहिए।',
     form_password_not_strong_enough: 'आपका पासवर्ड पर्याप्त मजबूत नहीं है।',
     form_password_pwned:
@@ -959,8 +967,10 @@ export const hiIN: LocalizationResource = {
     phone_number_exists: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 वॉलेट एक्सटेंशन नहीं मिल सका। जारी रखने के लिए कृपया एक इंस्टॉल करें।',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected:
+      'आपने सिग्नेचर अनुरोध अस्वीकार कर दिया है। जारी रखने के लिए कृपया फिर से प्रयास करें।',
+    web3_solana_signature_generation_failed:
+      'सिग्नेचर बनाते समय एक त्रुटि हुई। जारी रखने के लिए कृपया फिर से प्रयास करें।',
     zxcvbn: {
       couldBeStronger: 'आपका पासवर्ड काम करता है, लेकिन मजबूत हो सकता है। अधिक अक्षर जोड़ने का प्रयास करें।',
       goodPassword: 'आपका पासवर्ड सभी आवश्यक आवश्यकताओं को पूरा करता है।',
@@ -1330,6 +1340,10 @@ export const hiIN: LocalizationResource = {
         detailsAction__nonPrimary: 'प्राथमिक के रूप में सेट करें',
         primaryButton: 'वॉलेट कनेक्ट करें',
         title: 'Web3 वॉलेट',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'अपने खाते से कनेक्ट करने के लिए एक Solana वॉलेट चुनें।',
+          title: 'Solana वॉलेट जोड़ें',
+        },
       },
     },
     usernamePage: {
@@ -1365,9 +1379,10 @@ export const hiIN: LocalizationResource = {
       title: 'प्रतीक्षा सूची में शामिल होने के लिए धन्यवाद!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} के साथ कनेक्ट करें',
+    continue: '{{walletName}} के साथ जारी रखें',
+    noneAvailable:
+      'कोई Solana Web3 वॉलेट नहीं मिला। कृपया Web3 समर्थित {{ solanaWalletsLink || link("wallet extension") }} इंस्टॉल करें।',
   },
 } as const;

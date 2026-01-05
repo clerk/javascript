@@ -752,8 +752,8 @@ export const svSE: LocalizationResource = {
       title: 'Tvåstegsverifiering',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Välj en plånbok nedan för att logga in',
+      title: 'Logga in med Solana',
     },
   },
   signInEnterPasswordTitle: 'Ange ditt lösenord',
@@ -848,8 +848,8 @@ export const svSE: LocalizationResource = {
       titleCombined: 'Skapa ditt konto',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Välj en plånbok nedan för att registrera dig',
+      title: 'Registrera dig med Solana',
     },
   },
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
@@ -872,6 +872,10 @@ export const svSE: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'Du måste tillhöra en organisation',
+      subtitle: 'Kontakta din organisationsadministratör för en inbjudan.',
     },
     signOut: {
       actionLink: undefined,
@@ -896,6 +900,8 @@ export const svSE: LocalizationResource = {
     captcha_unavailable:
       'Registrering misslyckades på grund av misslyckad bot-validering. Vänligen uppdatera sidan och försök igen eller kontakta supporten för mer hjälp.',
     form_code_incorrect: 'Koden är felaktig',
+    form_email_address_blocked:
+      'Tillfälliga e-posttjänster stöds inte. Använd din vanliga e-postadress för att skapa ett konto.',
     form_identifier_exists__email_address: 'Denna e-postadress är taget. Vänligen prova ett annat.',
     form_identifier_exists__phone_number: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     form_identifier_exists__username: 'Detta användarnamn är taget. Vänligen prova ett annat.',
@@ -913,6 +919,8 @@ export const svSE: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Lösenordet är felaktigt.',
+    form_password_or_identifier_incorrect:
+      'Lösenordet eller e-postadressen är felaktig. Försök igen eller använd en annan metod.',
     form_password_length_too_short: 'Lösenordet är för kort.',
     form_password_not_strong_enough: 'Ditt lösenord är inte tillräckligt starkt.',
     form_password_pwned: 'Lösenordet har läckt i tidigare dataintrång.',
@@ -951,8 +959,9 @@ export const svSE: LocalizationResource = {
     phone_number_exists: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     session_exists: 'Du är redan inloggad.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Du avvisade signaturbegäran. Försök igen för att fortsätta.',
+    web3_solana_signature_generation_failed:
+      'Ett fel uppstod när signaturen skulle genereras. Försök igen för att fortsätta.',
     zxcvbn: {
       couldBeStronger: 'Ditt lösenord fungerar, men kunde vara starkare. Försök lägga till fler tecken.',
       goodPassword: 'Ditt lösenord uppfyller alla nödvändiga krav.',
@@ -1321,6 +1330,10 @@ export const svSE: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 plånböcker',
         title: 'Web3 plånböcker',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Välj en Solana-plånbok för att ansluta den till ditt konto.',
+          title: 'Lägg till en Solana-plånbok',
+        },
       },
     },
     usernamePage: {
@@ -1344,21 +1357,22 @@ export const svSE: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Logga in',
+      actionText: 'Har du redan åtkomst?',
+      formButton: 'Gå med i väntelistan',
+      subtitle: 'Ange din e-postadress så meddelar vi dig när din plats är redo',
+      title: 'Gå med i väntelistan',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Du kommer att omdirigeras snart...',
+      subtitle: 'Vi hör av oss när din plats är redo',
+      title: 'Tack för att du gick med i väntelistan!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Anslut med {{walletName}}',
+    continue: 'Fortsätt med {{walletName}}',
+    noneAvailable:
+      'Inga Solana Web3-plånböcker upptäcktes. Installera en Web3-stödd {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

@@ -718,6 +718,10 @@ export type __internal_LocalizationResource = {
         primaryButton: LocalizationValue;
         destructiveAction: LocalizationValue;
         detailsAction__nonPrimary: LocalizationValue;
+        web3SelectSolanaWalletScreen: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
       };
       dangerSection: {
         title: LocalizationValue;
@@ -1299,6 +1303,10 @@ export type __internal_LocalizationResource = {
       action__createOrganization: LocalizationValue;
       action__invitationAccept: LocalizationValue;
     };
+    organizationCreationDisabled: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
   };
   taskResetPassword: {
     title: LocalizationValue;
@@ -1309,7 +1317,7 @@ export type __internal_LocalizationResource = {
     };
     formButtonPrimary: LocalizationValue;
   };
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: LocalizationValue<'walletName'>;
     continue: LocalizationValue<'walletName'>;
     noneAvailable: LocalizationValue<'solanaWalletsLink'>;
@@ -1350,10 +1358,12 @@ type UnstableErrors = WithParamName<{
   form_param_type_invalid: LocalizationValue;
   form_param_type_invalid__phone_number: LocalizationValue;
   form_param_type_invalid__email_address: LocalizationValue;
+  form_email_address_blocked: LocalizationValue;
   form_password_length_too_short: LocalizationValue;
   form_param_nil: LocalizationValue;
   form_code_incorrect: LocalizationValue;
   form_password_incorrect: LocalizationValue;
+  form_password_or_identifier_incorrect: LocalizationValue;
   form_password_validation_failed: LocalizationValue;
   not_allowed_access: LocalizationValue;
   form_identifier_exists: LocalizationValue;

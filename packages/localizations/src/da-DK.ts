@@ -738,7 +738,7 @@ export const daDK: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Log ind',
       titleCombined: undefined,
@@ -749,8 +749,8 @@ export const daDK: LocalizationResource = {
       title: 'Totrinsbekræftelse',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Vælg en wallet nedenfor for at logge ind',
+      title: 'Log ind med Solana',
     },
   },
   signInEnterPasswordTitle: 'Indtast din adgangskode',
@@ -763,7 +763,7 @@ export const daDK: LocalizationResource = {
     continue: {
       actionLink: 'Log ind',
       actionText: 'Har du en konto?',
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Udfyld manglende felter',
     },
     emailCode: {
@@ -784,7 +784,7 @@ export const daDK: LocalizationResource = {
         title: 'Tilmelding...',
       },
       resendButton: 'Send link igen',
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Bekræft din email',
       verified: {
         title: 'Vellykket tilmelding',
@@ -837,17 +837,17 @@ export const daDK: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
-      subtitle: 'Forsæt til {{applicationName}}',
-      subtitleCombined: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
+      subtitleCombined: 'Fortsæt til {{applicationName}}',
       title: 'Opret din konto',
       titleCombined: 'Opret din konto',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Vælg en wallet nedenfor for at tilmelde dig',
+      title: 'Tilmeld dig med Solana',
     },
   },
-  socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',
+  socialButtonsBlockButton: 'Fortsæt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
@@ -867,6 +867,10 @@ export const daDK: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'Du skal tilhøre en organisation',
+      subtitle: 'Kontakt din organisationsadministrator for en invitation.',
     },
     signOut: {
       actionLink: undefined,
@@ -891,6 +895,8 @@ export const daDK: LocalizationResource = {
     captcha_unavailable:
       'Tilmelding mislykkedes på grund af fejlet botvalidering. Opdater siden for at prøve igen, eller kontakt support for yderligere assistance.',
     form_code_incorrect: 'Koden er forkert.',
+    form_email_address_blocked:
+      'Midlertidige e-mailtjenester understøttes ikke. Brug venligst din almindelige e-mailadresse til at oprette en konto.',
     form_identifier_exists__email_address: 'E-mailadressen er allerede i brug.',
     form_identifier_exists__phone_number: 'Telefonnummeret er allerede i brug.',
     form_identifier_exists__username: 'Brugernavnet er allerede i brug.',
@@ -908,6 +914,8 @@ export const daDK: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Adgangskoden er forkert.',
+    form_password_or_identifier_incorrect:
+      'Adgangskoden eller e-mailadressen er forkert. Prøv igen eller brug en anden metode.',
     form_password_length_too_short: 'Adgangskoden er for kort.',
     form_password_not_strong_enough: 'Adgangskoden er ikke stærk nok.',
     form_password_pwned: 'Adgangskoden er blevet kompromitteret.',
@@ -946,8 +954,9 @@ export const daDK: LocalizationResource = {
     phone_number_exists: 'Dette telefonnummer er allerede taget. Prøv et andet.',
     session_exists: 'Du er allerede logget ind.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Du har afvist signaturanmodningen. Prøv igen for at fortsætte.',
+    web3_solana_signature_generation_failed:
+      'Der opstod en fejl under generering af signaturen. Prøv igen for at fortsætte.',
     zxcvbn: {
       couldBeStronger: 'Din adgangskode virker, men kunne være stærkere. Prøv at tilføje flere tegn.',
       goodPassword: 'Din adgangskode opfylder alle nødvendige krav.',
@@ -1317,6 +1326,10 @@ export const daDK: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Tilføj Web3 tegnebøger',
         title: 'Web3 tegnebøger',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Vælg en Solana-wallet for at forbinde den til din konto.',
+          title: 'Tilføj en Solana-wallet',
+        },
       },
     },
     usernamePage: {
@@ -1340,21 +1353,22 @@ export const daDK: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Log ind',
+      actionText: 'Har du allerede adgang?',
+      formButton: 'Tilmeld dig ventelisten',
+      subtitle: 'Indtast din e-mailadresse, så giver vi dig besked, når din plads er klar',
+      title: 'Tilmeld dig ventelisten',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Du vil blive omdirigeret snart...',
+      subtitle: 'Vi kontakter dig, når din plads er klar',
+      title: 'Tak fordi du tilmeldte dig ventelisten!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Forbind med {{walletName}}',
+    continue: 'Fortsæt med {{walletName}}',
+    noneAvailable:
+      'Ingen Solana Web3-wallets fundet. Installer venligst en Web3-understøttet {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

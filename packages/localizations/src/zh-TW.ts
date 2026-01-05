@@ -738,8 +738,8 @@ export const zhTW: LocalizationResource = {
       title: '兩步驟驗證',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: '請選擇下方錢包以登入',
+      title: '使用 Solana 登入',
     },
   },
   signInEnterPasswordTitle: '輸入您的密碼',
@@ -833,8 +833,8 @@ export const zhTW: LocalizationResource = {
       titleCombined: '建立您的帳戶',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: '請選擇下方錢包以註冊',
+      title: '使用 Solana 註冊',
     },
   },
   socialButtonsBlockButton: '以 {{provider|titleize}} 帳戶登入',
@@ -858,6 +858,10 @@ export const zhTW: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: '您必須屬於一個組織',
+      subtitle: '請聯繫您的組織管理員以獲取邀請。',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,
@@ -879,6 +883,7 @@ export const zhTW: LocalizationResource = {
     captcha_invalid: '由於安全驗證失敗，註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     captcha_unavailable: '由於機器人驗證失敗導致註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     form_code_incorrect: undefined,
+    form_email_address_blocked: '不支援臨時電子郵件服務。請使用您的常規電子郵件地址建立帳戶。',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -896,6 +901,7 @@ export const zhTW: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: '密碼或電子郵件地址不正確。請重試，或使用其他方法。',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: '您的密碼強度不足。',
     form_password_pwned: '此密碼已在已知的資料外洩事件中出現，請改用其他密碼。',
@@ -932,8 +938,8 @@ export const zhTW: LocalizationResource = {
     phone_number_exists: '此電話號碼已被使用，請嘗試其他號碼。',
     session_exists: '您已經登錄。',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: '您已拒絕簽名請求。請再試一次以繼續。',
+    web3_solana_signature_generation_failed: '產生簽名時發生錯誤。請再試一次以繼續。',
     zxcvbn: {
       couldBeStronger: '您的密碼強度尚可，但可以更安全。請嘗試增加長度或複雜度。',
       goodPassword: '密碼強度良好。',
@@ -1286,6 +1292,10 @@ export const zhTW: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: '新增 Web3 錢包',
         title: 'Web3 錢包',
+        web3SelectSolanaWalletScreen: {
+          subtitle: '選擇一個 Solana 錢包以連線到您的帳戶。',
+          title: '新增 Solana 錢包',
+        },
       },
     },
     usernamePage: {
@@ -1309,21 +1319,22 @@ export const zhTW: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: '登入',
+      actionText: '已有存取權限？',
+      formButton: '加入候補名單',
+      subtitle: '輸入您的電子郵件地址，我們會在您的位置準備好時通知您',
+      title: '加入候補名單',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: '您將很快被重新導向...',
+      subtitle: '當您的位置準備好時，我們會與您聯繫',
+      title: '感謝您加入候補名單！',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: '使用 {{walletName}} 連線',
+    continue: '使用 {{walletName}} 繼續',
+    noneAvailable:
+      '未偵測到 Solana Web3 錢包。請安裝支援 Web3 的 {{ solanaWalletsLink || link("wallet extension") }}。',
   },
 } as const;

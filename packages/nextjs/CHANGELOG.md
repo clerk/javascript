@@ -1,5 +1,39 @@
 # Change Log
 
+## 6.36.5
+
+### Patch Changes
+
+- Fix React peer dependency version ranges to use `~` instead of `^` for React 19 versions, ensuring non-overlapping version constraints. ([#7513](https://github.com/clerk/javascript/pull/7513)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`ede3e2a`](https://github.com/clerk/javascript/commit/ede3e2a326c9cbbd4ab09375f4bb291483681892), [`03dd374`](https://github.com/clerk/javascript/commit/03dd37458eedf59198dc3574e12030b217efcb41)]:
+  - @clerk/backend@2.29.0
+  - @clerk/clerk-react@5.59.2
+  - @clerk/shared@3.41.1
+  - @clerk/types@4.101.9
+
+## 6.36.4
+
+### Patch Changes
+
+- Updated dependencies [[`79eb5af`](https://github.com/clerk/javascript/commit/79eb5afd91d7b002faafd2980850d944acb37917), [`5d25027`](https://github.com/clerk/javascript/commit/5d250277ea389695e82ec9471f1eadadf7cbc4c3), [`b3b02b4`](https://github.com/clerk/javascript/commit/b3b02b46dfa6d194ed12d2e6b9e332796ee73c4a), [`7b3024a`](https://github.com/clerk/javascript/commit/7b3024a71e6e45e926d83f1a9e887216e7c14424), [`2cd4da9`](https://github.com/clerk/javascript/commit/2cd4da9c72bc7385c0c7c71e2a7ca856d79ce630), [`d4e2739`](https://github.com/clerk/javascript/commit/d4e2739422bdeea44f240c9d7637f564dce5320f)]:
+  - @clerk/shared@3.41.0
+  - @clerk/backend@2.28.0
+  - @clerk/clerk-react@5.59.1
+  - @clerk/types@4.101.8
+
+## 6.36.3
+
+### Patch Changes
+
+- Mark internal keyless header function async to comply with Server Actions async requirements ([#7445](https://github.com/clerk/javascript/pull/7445)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`375a32d`](https://github.com/clerk/javascript/commit/375a32d0f44933605ffb513ff28f522ac5e851d6), [`175883b`](https://github.com/clerk/javascript/commit/175883b05228138c9ff55d0871cc1041bd68d7fe), [`43d3c3e`](https://github.com/clerk/javascript/commit/43d3c3eaff767054ef74fd3655e632caffeaaf33), [`f626046`](https://github.com/clerk/javascript/commit/f626046c589956022b1e1ac70382c986822f4733), [`14342d2`](https://github.com/clerk/javascript/commit/14342d2b34fe0882f7676195aefaaa17f034af70)]:
+  - @clerk/shared@3.40.0
+  - @clerk/backend@2.27.1
+  - @clerk/clerk-react@5.59.0
+  - @clerk/types@4.101.7
+
 ## 6.36.2
 
 ### Patch Changes

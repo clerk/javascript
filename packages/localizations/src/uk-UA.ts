@@ -748,8 +748,8 @@ export const ukUA: LocalizationResource = {
       title: 'Двоетапна перевірка',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Виберіть гаманець нижче, щоб увійти',
+      title: 'Увійти через Solana',
     },
   },
   signInEnterPasswordTitle: 'Введіть Ваш пароль',
@@ -842,8 +842,8 @@ export const ukUA: LocalizationResource = {
       titleCombined: 'Створіть Ваш акаунт',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Виберіть гаманець нижче, щоб зареєструватися',
+      title: 'Зареєструватися через Solana',
     },
   },
   socialButtonsBlockButton: 'Продовжити за допомогою {{provider|titleize}}',
@@ -866,6 +866,10 @@ export const ukUA: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'Ви повинні належати до організації',
+      subtitle: 'Зверніться до адміністратора вашої організації для отримання запрошення.',
     },
     signOut: {
       actionLink: undefined,
@@ -891,6 +895,8 @@ export const ukUA: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Тимчасові поштові служби не підтримуються. Будь ласка, використовуйте свою звичайну адресу електронної пошти для створення облікового запису.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -908,6 +914,8 @@ export const ukUA: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Пароль або адреса електронної пошти невірні. Спробуйте ще раз або використайте інший метод.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Ваш пароль недостатньо надійний.',
     form_password_pwned: 'Цей пароль було зламано і його не можна використовувати, спробуйте інший пароль.',
@@ -946,8 +954,9 @@ export const ukUA: LocalizationResource = {
     phone_number_exists: 'Цей номер телефону вже використовується. Спробуйте інший.',
     session_exists: 'Ви вже увійшли в систему.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Ви відхилили запит на підпис. Будь ласка, спробуйте ще раз, щоб продовжити.',
+    web3_solana_signature_generation_failed:
+      'Під час створення підпису сталася помилка. Будь ласка, спробуйте ще раз, щоб продовжити.',
     zxcvbn: {
       couldBeStronger: 'Ваш пароль підходить, але міг би бути надійнішим. Спробуйте додати більше символів.',
       goodPassword: 'Хороша робота. Це відмінний пароль.',
@@ -1317,6 +1326,10 @@ export const ukUA: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 гаманці',
         title: 'Web3 гаманці',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Виберіть гаманець Solana, щоб підключити його до свого облікового запису.',
+          title: 'Додати гаманець Solana',
+        },
       },
     },
     usernamePage: {
@@ -1340,21 +1353,22 @@ export const ukUA: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Увійти',
+      actionText: 'Вже маєте доступ?',
+      formButton: 'Приєднатися до списку очікування',
+      subtitle: 'Введіть свою електронну адресу, і ми повідомимо вас, коли ваше місце буде готове',
+      title: 'Приєднатися до списку очікування',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Ви будете перенаправлені незабаром...',
+      subtitle: "Ми зв'яжемося з вами, коли ваше місце буде готове",
+      title: 'Дякуємо за приєднання до списку очікування!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Підключитися через {{walletName}}',
+    continue: 'Продовжити через {{walletName}}',
+    noneAvailable:
+      'Гаманці Solana Web3 не виявлено. Установіть {{ solanaWalletsLink || link("wallet extension") }} з підтримкою Web3.',
   },
 } as const;

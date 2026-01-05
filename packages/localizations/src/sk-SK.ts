@@ -752,8 +752,8 @@ export const skSK: LocalizationResource = {
       title: 'Dvojfaktorové overenie',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Vyberte nižšie peňaženku na prihlásenie',
+      title: 'Prihlásiť sa cez Solana',
     },
   },
   signInEnterPasswordTitle: 'Zadajte svoje heslo',
@@ -850,8 +850,8 @@ export const skSK: LocalizationResource = {
       titleCombined: 'Vytvorte si účet',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Vyberte nižšie peňaženku na registráciu',
+      title: 'Zaregistrovať sa cez Solana',
     },
   },
   socialButtonsBlockButton: 'Pokračovať s {{provider|titleize}}',
@@ -874,6 +874,10 @@ export const skSK: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'Musíte patriť do organizácie',
+      subtitle: 'Kontaktujte administrátora vašej organizácie pre pozvánku.',
     },
     signOut: {
       actionLink: undefined,
@@ -899,6 +903,8 @@ export const skSK: LocalizationResource = {
     captcha_unavailable:
       'Registrácia zlyhala z dôvodu neúspešného overenia proti botom. Obnovte stránku a skúste to znova alebo kontaktujte podporu pre ďalšiu pomoc.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Dočasné e-mailové služby nie sú podporované. Prosím, použite svoju bežnú e-mailovú adresu na vytvorenie účtu.',
     form_identifier_exists__email_address: 'Táto emailová adresa je už obsadená. Skúste prosím inú.',
     form_identifier_exists__phone_number: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     form_identifier_exists__username: 'Táto použivateľské meno je už obsadené. Skúste prosím iné.',
@@ -916,6 +922,8 @@ export const skSK: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Hodnota je neplatná. Skontrolujte a opravte.',
     form_password_incorrect: 'Heslo je nesprávne. Skontrolujte a skúste to znova.',
+    form_password_or_identifier_incorrect:
+      'Heslo alebo e-mailová adresa je nesprávna. Skúste to znova alebo použite inú metódu.',
     form_password_length_too_short: 'Heslo musí mať aspoň 8 znakov.',
     form_password_not_strong_enough: 'Vaše heslo nie je dostatočne silné.',
     form_password_pwned: 'Toto heslo bolo nájdené v rámci úniku dát a nemôže byť použité, prosím zvoľte iné heslo.',
@@ -956,8 +964,9 @@ export const skSK: LocalizationResource = {
     phone_number_exists: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     session_exists: 'Jste už přihlášen.',
     web3_missing_identifier: 'Rozšírenie Web3 Peňaženky nebolo nájdené. Je potrebné ho nainštalovať.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Odmietli ste žiadosť o podpis. Skúste to znova, aby ste mohli pokračovať.',
+    web3_solana_signature_generation_failed:
+      'Pri generovaní podpisu sa vyskytla chyba. Skúste to znova, aby ste mohli pokračovať.',
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by byť silnejšie. Skúste pridať viac znakov.',
       goodPassword: 'Dobrá práca. Toto je vynikajúce heslo.',
@@ -1326,6 +1335,10 @@ export const skSK: LocalizationResource = {
         detailsAction__nonPrimary: 'Nastaiť ako hlavnú',
         primaryButton: 'Web3 peňaženky',
         title: 'Web3 peňaženky',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Vyberte Solana peňaženku na pripojenie k vášmu účtu.',
+          title: 'Pridať Solana peňaženku',
+        },
       },
     },
     usernamePage: {
@@ -1361,9 +1374,10 @@ export const skSK: LocalizationResource = {
       title: 'Ďakujeme, že ste sa pridali na waitlist!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Pripojiť pomocou {{walletName}}',
+    continue: 'Pokračovať pomocou {{walletName}}',
+    noneAvailable:
+      'Neboli zistené žiadne Solana Web3 peňaženky. Nainštalujte si {{ solanaWalletsLink || link("wallet extension") }} s podporou Web3.',
   },
 } as const;

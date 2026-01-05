@@ -759,8 +759,8 @@ export const ptBR: LocalizationResource = {
       title: 'Verificação em duas etapas',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecione uma carteira abaixo para entrar',
+      title: 'Entrar com Solana',
     },
   },
   signInEnterPasswordTitle: 'Insira sua senha',
@@ -857,8 +857,8 @@ export const ptBR: LocalizationResource = {
       titleCombined: 'Criar sua conta',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecione uma carteira abaixo para se cadastrar',
+      title: 'Cadastrar-se com Solana',
     },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
@@ -881,6 +881,10 @@ export const ptBR: LocalizationResource = {
       formFieldLabel__slug: 'Rótulo do URL',
       subtitle: 'Conte-nos um pouco sobre sua organização',
       title: 'Configure sua conta',
+    },
+    organizationCreationDisabled: {
+      title: 'Você deve pertencer a uma organização',
+      subtitle: 'Entre em contato com o administrador da sua organização para obter um convite.',
     },
     signOut: {
       actionLink: 'Sair',
@@ -906,6 +910,8 @@ export const ptBR: LocalizationResource = {
     captcha_unavailable:
       'Não foi possível se inscrever devido à indisponibilidade do captcha. Por favor atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     form_code_incorrect: 'Código incorreto.',
+    form_email_address_blocked:
+      'Serviços de e-mail temporários não são suportados. Por favor, use seu endereço de e-mail regular para criar uma conta.',
     form_identifier_exists__email_address: 'E-mail já está em uso. Por favor, tente outro.',
     form_identifier_exists__phone_number: 'Telefone já está em uso. Por favor, tente outro.',
     form_identifier_exists__username: 'Nome de usuário já está em uso. Por favor, tente outro.',
@@ -923,6 +929,8 @@ export const ptBR: LocalizationResource = {
     form_param_type_invalid__phone_number: 'Número de telefone inválido.',
     form_param_value_invalid: 'Valor inválido.',
     form_password_incorrect: 'Senha incorreta.',
+    form_password_or_identifier_incorrect:
+      'A senha ou o endereço de e-mail está incorreto. Tente novamente ou use outro método.',
     form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',
     form_password_not_strong_enough: 'Sua senha não é forte o suficiente.',
     form_password_pwned: 'Esta senha foi comprometida e não pode ser usada, por favor, tente outra senha.',
@@ -965,8 +973,8 @@ export const ptBR: LocalizationResource = {
     session_exists: 'Você já está conectado.',
     web3_missing_identifier:
       'Uma extensão de carteira Web3 não pode ser encontrada. Por favor, instale uma para continuar.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Você rejeitou a solicitação de assinatura. Tente novamente para continuar.',
+    web3_solana_signature_generation_failed: 'Ocorreu um erro ao gerar a assinatura. Tente novamente para continuar.',
     zxcvbn: {
       couldBeStronger: 'Sua senha funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
       goodPassword: 'Sua senha atende a todos os requisitos necessários.',
@@ -1339,6 +1347,10 @@ export const ptBR: LocalizationResource = {
         detailsAction__nonPrimary: 'Definir como principal',
         primaryButton: 'Carteiras Web3',
         title: 'Carteiras Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selecione uma carteira Solana para conectar à sua conta.',
+          title: 'Adicionar uma carteira Solana',
+        },
       },
     },
     usernamePage: {
@@ -1374,9 +1386,10 @@ export const ptBR: LocalizationResource = {
       title: 'Obrigado por entrar na lista de espera!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Conectar com {{walletName}}',
+    continue: 'Continuar com {{walletName}}',
+    noneAvailable:
+      'Nenhuma carteira Solana Web3 foi detectada. Instale uma {{ solanaWalletsLink || link("wallet extension") }} compatível com Web3.',
   },
 } as const;

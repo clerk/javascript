@@ -755,8 +755,8 @@ export const taIN: LocalizationResource = {
       title: 'இரண்டு-படி சரிபார்ப்பு',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'உள்நுழைய கீழே ஒரு வாலெட்டைத் தேர்ந்தெடுக்கவும்',
+      title: 'Solana மூலம் உள்நுழையவும்',
     },
   },
   signInEnterPasswordTitle: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
@@ -852,8 +852,8 @@ export const taIN: LocalizationResource = {
       titleCombined: 'உங்கள் கணக்கை உருவாக்கவும்',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'பதிவு செய்ய கீழே ஒரு வாலெட்டைத் தேர்ந்தெடுக்கவும்',
+      title: 'Solana மூலம் பதிவு செய்யவும்',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} மூலம் தொடரவும்',
@@ -876,6 +876,10 @@ export const taIN: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'நீங்கள் ஒரு அமைப்பில் உறுப்பினராக இருக்க வேண்டும்',
+      subtitle: 'அழைப்புக்கு உங்கள் அமைப்பின் நிர்வாகியைத் தொடர்பு கொள்ளவும்.',
     },
     signOut: {
       actionLink: undefined,
@@ -900,6 +904,8 @@ export const taIN: LocalizationResource = {
     captcha_unavailable:
       'போட் சரிபார்ப்பு தோல்வியடைந்ததால் பதிவு செய்ய முடியவில்லை. மீண்டும் முயற்சிக்க பக்கத்தை புதுப்பிக்கவும் அல்லது மேலும் உதவிக்கு ஆதரவை தொடர்பு கொள்ளவும்.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'தற்காலிக மின்னஞ்சல் சேவைகள் ஆதரிக்கப்படவில்லை. கணக்கை உருவாக்க உங்கள் வழக்கமான மின்னஞ்சல் முகவரியைப் பயன்படுத்தவும்.',
     form_identifier_exists__email_address: 'இந்த மின்னஞ்சல் முகவரி எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     form_identifier_exists__phone_number: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     form_identifier_exists__username: 'இந்த பயனர்பெயர் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
@@ -917,6 +923,8 @@ export const taIN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'உள்ளிடப்பட்ட மதிப்பு தவறானது. அதை திருத்தவும்.',
     form_password_incorrect: 'நீங்கள் உள்ளிட்ட கடவுச்சொல் தவறானது. மீண்டும் முயற்சிக்கவும்.',
+    form_password_or_identifier_incorrect:
+      'கடவுச்சொல் அல்லது மின்னஞ்சல் முகவரி தவறானது. மீண்டும் முயற்சிக்கவும் அல்லது வேறு முறையைப் பயன்படுத்தவும்.',
     form_password_length_too_short:
       'உங்கள் கடவுச்சொல் மிகவும் குறுகியது. இது குறைந்தது 8 எழுத்துகள் நீளமாக இருக்க வேண்டும்.',
     form_password_not_strong_enough: 'உங்கள் கடவுச்சொல் போதுமான வலிமை இல்லை.',
@@ -963,8 +971,9 @@ export const taIN: LocalizationResource = {
     phone_number_exists: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 வாலட் நீட்டிப்பு காணப்படவில்லை. தொடர ஒன்றை நிறுவவும்.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'நீங்கள் கையொப்ப கோரிக்கையை நிராகரித்துவிட்டீர்கள். தொடர மீண்டும் முயற்சிக்கவும்.',
+    web3_solana_signature_generation_failed:
+      'கையொப்பத்தை உருவாக்கும் போது பிழை ஏற்பட்டது. தொடர மீண்டும் முயற்சிக்கவும்.',
     zxcvbn: {
       couldBeStronger:
         'உங்கள் கடவுச்சொல் செயல்படுகிறது, ஆனால் மேலும் வலுவாக இருக்கலாம். மேலும் எழுத்துகளைச் சேர்க்க முயற்சிக்கவும்.',
@@ -1336,6 +1345,10 @@ export const taIN: LocalizationResource = {
         detailsAction__nonPrimary: 'முதன்மையாக அமைக்கவும்',
         primaryButton: 'வாலட்டை இணைக்கவும்',
         title: 'Web3 வாலட்டுகள்',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'உங்கள் கணக்குடன் இணைக்க Solana வாலெட்டைத் தேர்ந்தெடுக்கவும்.',
+          title: 'Solana வாலெட்டை சேர்க்கவும்',
+        },
       },
     },
     usernamePage: {
@@ -1371,9 +1384,10 @@ export const taIN: LocalizationResource = {
       title: 'காத்திருப்பில் சேர்ந்ததற்கு நன்றி!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} மூலம் இணைக்கவும்',
+    continue: '{{walletName}} மூலம் தொடரவும்',
+    noneAvailable:
+      'Solana Web3 வாலெட்டுகள் எதுவும் கண்டறியப்படவில்லை. Web3 ஆதரிக்கும் {{ solanaWalletsLink || link("wallet extension") }} ஐ நிறுவவும்.',
   },
 } as const;

@@ -16,8 +16,8 @@ export const WalletInitialIcon = (props: WalletInitialIconProps) => {
   return (
     <Box
       as='span'
-      elementDescriptor={[descriptors.walletIcon, descriptors.web3WalletButtonsWalletInitialIcon]}
-      elementId={descriptors.web3WalletButtonsWalletInitialIcon.setId(id)}
+      elementDescriptor={[descriptors.walletIcon, descriptors.web3SolanaWalletButtonsWalletInitialIcon]}
+      elementId={descriptors.web3SolanaWalletButtonsWalletInitialIcon.setId(id)}
       sx={t => ({
         ...common.centeredFlex('inline-flex'),
         width: t.space.$4,

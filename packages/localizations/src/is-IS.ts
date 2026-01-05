@@ -752,8 +752,8 @@ export const isIS: LocalizationResource = {
       title: 'Tveggja þrepa auðkenning',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Veldu veski hér að neðan til að skrá þig inn',
+      title: 'Skrá inn með Solana',
     },
   },
   signInEnterPasswordTitle: 'Sláðu inn lykilorðið þitt',
@@ -847,8 +847,8 @@ export const isIS: LocalizationResource = {
       titleCombined: 'Stofna reikning',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Veldu veski hér að neðan til að skrá þig',
+      title: 'Skráðu þig með Solana',
     },
   },
   socialButtonsBlockButton: 'Halda áfram með {{provider|titleize}}',
@@ -871,6 +871,10 @@ export const isIS: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'Þú verður að tilheyra samtökum',
+      subtitle: 'Hafðu samband við stjórnanda samtakanna til að fá boð.',
     },
     signOut: {
       actionLink: undefined,
@@ -895,6 +899,8 @@ export const isIS: LocalizationResource = {
     captcha_unavailable:
       'Skráning mistókst vegna misheppnaðrar vélmenna staðfestingar. Vinsamlegast endurhlaðið síðuna til að reyna aftur eða hafið samband við stuðning til að fá frekari aðstoð.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Tímabundin tölvupóstþjónusta er ekki studd. Vinsamlegast notaðu venjulega netfangið þitt til að búa til reikning.',
     form_identifier_exists__email_address: 'Þetta netfang er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_exists__phone_number: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_exists__username: 'Þetta notendanafn er þegar í notkun. Vinsamlegast reyndu annað.',
@@ -912,6 +918,7 @@ export const isIS: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: 'Lykilorðið eða netfangið er rangt. Reyndu aftur eða notaðu aðra aðferð.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Lykilorðið þitt er ekki nógu sterkt.',
     form_password_pwned:
@@ -953,8 +960,9 @@ export const isIS: LocalizationResource = {
     phone_number_exists: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     session_exists: 'Þú ert nú þegar innskráður.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Þú hafðir hafnað beiðni um undirritun. Reyndu aftur til að halda áfram.',
+    web3_solana_signature_generation_failed:
+      'Villa kom upp við að búa til undirritun. Reyndu aftur til að halda áfram.',
     zxcvbn: {
       couldBeStronger: 'Lykilorðið þitt virkar, en gæti verið sterkara. Reyndu að bæta við fleiri stöfum.',
       goodPassword: 'Lykilorðið þitt uppfyllir allar nauðsynlegar kröfur.',
@@ -1326,6 +1334,10 @@ export const isIS: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 veski',
         title: 'Web3 veski',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Veldu Solana-veski til að tengja við aðganginn þinn.',
+          title: 'Bæta við Solana-veski',
+        },
       },
     },
     usernamePage: {
@@ -1349,21 +1361,22 @@ export const isIS: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Skrá inn',
+      actionText: 'Áttu nú þegar aðgang?',
+      formButton: 'Skrá sig á biðlista',
+      subtitle: 'Sláðu inn netfangið þitt og við látum þig vita þegar staða þín er tilbúin',
+      title: 'Skrá sig á biðlista',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Þú verður áframsendur fljótlega...',
+      subtitle: 'Við höfum samband þegar staða þín er tilbúin',
+      title: 'Takk fyrir að skrá sig á biðlistann!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Tengjast með {{walletName}}',
+    continue: 'Halda áfram með {{walletName}}',
+    noneAvailable:
+      'Engin Solana Web3 veski fundust. Vinsamlegast settu upp Web3-stutt {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

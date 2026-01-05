@@ -1,5 +1,34 @@
 # Change Log
 
+## 2.8.14
+
+### Patch Changes
+
+- Fix React peer dependency version ranges to use `~` instead of `^` for React 19 versions, ensuring non-overlapping version constraints. ([#7513](https://github.com/clerk/javascript/pull/7513)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`ede3e2a`](https://github.com/clerk/javascript/commit/ede3e2a326c9cbbd4ab09375f4bb291483681892), [`03dd374`](https://github.com/clerk/javascript/commit/03dd37458eedf59198dc3574e12030b217efcb41)]:
+  - @clerk/clerk-js@5.117.0
+  - @clerk/clerk-react@5.59.2
+  - @clerk/shared@3.41.1
+
+## 2.8.13
+
+### Patch Changes
+
+- Updated dependencies [[`4bcc8b6`](https://github.com/clerk/javascript/commit/4bcc8b62fcbaf2d4bdc516fe3ba3db6c93eb5a05), [`79eb5af`](https://github.com/clerk/javascript/commit/79eb5afd91d7b002faafd2980850d944acb37917), [`0f4c27e`](https://github.com/clerk/javascript/commit/0f4c27ec05401aaba3fde525f561fea79f83f1b5), [`b3b02b4`](https://github.com/clerk/javascript/commit/b3b02b46dfa6d194ed12d2e6b9e332796ee73c4a), [`7b3024a`](https://github.com/clerk/javascript/commit/7b3024a71e6e45e926d83f1a9e887216e7c14424), [`2cd4da9`](https://github.com/clerk/javascript/commit/2cd4da9c72bc7385c0c7c71e2a7ca856d79ce630), [`85fea1d`](https://github.com/clerk/javascript/commit/85fea1dfda0b9b2526f52abf44e57d0b9a4790da)]:
+  - @clerk/clerk-js@5.116.0
+  - @clerk/shared@3.41.0
+  - @clerk/clerk-react@5.59.1
+
+## 2.8.12
+
+### Patch Changes
+
+- Updated dependencies [[`375a32d`](https://github.com/clerk/javascript/commit/375a32d0f44933605ffb513ff28f522ac5e851d6), [`175883b`](https://github.com/clerk/javascript/commit/175883b05228138c9ff55d0871cc1041bd68d7fe), [`28c56ca`](https://github.com/clerk/javascript/commit/28c56ca4fe9a329c4f3db5d14274ff19c107c5b1), [`f626046`](https://github.com/clerk/javascript/commit/f626046c589956022b1e1ac70382c986822f4733), [`14342d2`](https://github.com/clerk/javascript/commit/14342d2b34fe0882f7676195aefaaa17f034af70)]:
+  - @clerk/clerk-js@5.115.0
+  - @clerk/shared@3.40.0
+  - @clerk/clerk-react@5.59.0
+
 ## 2.8.11
 
 ### Patch Changes

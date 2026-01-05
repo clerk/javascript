@@ -742,8 +742,8 @@ export const heIL: LocalizationResource = {
       title: 'אימות שני שלבים',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'בחר/י ארנק למטה כדי להתחבר',
+      title: 'התחברות עם Solana',
     },
   },
   signInEnterPasswordTitle: 'הזן את הסיסמה שלך',
@@ -836,8 +836,8 @@ export const heIL: LocalizationResource = {
       titleCombined: 'צור את החשבון שלך',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'בחר/י ארנק למטה כדי להירשם',
+      title: 'הרשמה עם Solana',
     },
   },
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',
@@ -861,6 +861,10 @@ export const heIL: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'עליך להשתייך לארגון',
+      subtitle: 'פנה למנהל הארגון שלך לקבלת הזמנה.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,
@@ -882,6 +886,8 @@ export const heIL: LocalizationResource = {
     captcha_invalid: 'ההרשמה נכשלה עקב כשל באימות האבטחה. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
     captcha_unavailable: 'ההרשמה נכשלה עקב כשל באימות נגד בוטים. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'שירותי אימייל זמניים אינם נתמכים. אנא השתמש בכתובת האימייל הרגילה שלך כדי ליצור חשבון.',
     form_identifier_exists__email_address: 'כתובת המייל הזאת כבר תפוסה. אנא נסה אחרת.',
     form_identifier_exists__phone_number: 'מספר הטלפון הזה כבר תפוס. אנא נסה מספר אחר.',
     form_identifier_exists__username: 'שם המשתמש הזה כבר תפוס. אנא נסה שם משתמש אחר',
@@ -899,6 +905,7 @@ export const heIL: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: 'הסיסמה או כתובת האימייל שגויים. נסה שוב או השתמש בשיטה אחרת.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'הסיסמה שלך אינה מספיק חזקה.',
     form_password_pwned: 'הסיסמה הזו נמצאה כחלק מהפרטים שנחשפו בהפרת נתונים ולא ניתן להשתמש בה, נסה סיסמה אחרת במקום.',
@@ -938,8 +945,8 @@ export const heIL: LocalizationResource = {
     phone_number_exists: 'מספר הטלפון הזה כבר בשימוש. אנא נסה מספר אחר.',
     session_exists: 'אתה כבר מחובר לחשבון.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'דחית את בקשת החתימה. נסה/י שוב כדי להמשיך.',
+    web3_solana_signature_generation_failed: 'אירעה שגיאה בעת יצירת החתימה. נסה/י שוב כדי להמשיך.',
     zxcvbn: {
       couldBeStronger: 'הסיסמה שלך תקפה, אך יכולה להיות חזקה יותר. נסה להוסיף יותר תווים.',
       goodPassword: 'עבודה טובה. זו סיסמה מצוינת.',
@@ -1298,6 +1305,10 @@ export const heIL: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'ארנקי Web3',
         title: 'ארנקי Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'בחר/י ארנק Solana כדי לחבר לחשבון שלך.',
+          title: 'הוסף/י ארנק Solana',
+        },
       },
     },
     usernamePage: {
@@ -1333,9 +1344,10 @@ export const heIL: LocalizationResource = {
       title: 'תודה שהצטרפת לרשימת ההמתנה!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'התחבר/י עם {{walletName}}',
+    continue: 'המשך/י עם {{walletName}}',
+    noneAvailable:
+      'לא זוהו ארנקי Solana Web3. נא להתקין {{ solanaWalletsLink || link("wallet extension") }} התומך ב‑Web3.',
   },
 } as const;

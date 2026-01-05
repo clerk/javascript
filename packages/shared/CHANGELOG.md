@@ -1,5 +1,39 @@
 # Change Log
 
+## 3.41.1
+
+### Patch Changes
+
+- Fix React peer dependency version ranges to use `~` instead of `^` for React 19 versions, ensuring non-overlapping version constraints. ([#7513](https://github.com/clerk/javascript/pull/7513)) by [@jacekradko](https://github.com/jacekradko)
+
+## 3.41.0
+
+### Minor Changes
+
+- Display message in `TaskChooseOrganization` when user is not allowed to create organizations ([#7502](https://github.com/clerk/javascript/pull/7502)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Fix locale fallback logic to render English values when localization keys are `undefined`. ([#7494](https://github.com/clerk/javascript/pull/7494)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix is known error issues due to cross-bundle scenarios where instanceof fails due to different class instances. ([#7507](https://github.com/clerk/javascript/pull/7507)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Refactor internal Clerk error handling functions ([#7490](https://github.com/clerk/javascript/pull/7490)) by [@kduprey](https://github.com/kduprey)
+
+## 3.40.0
+
+### Minor Changes
+
+- Add Web3 Solana support to `<UserProfile />` ([#7435](https://github.com/clerk/javascript/pull/7435)) by [@kduprey](https://github.com/kduprey)
+
+- Add support for Sign in with Solana. ([#7293](https://github.com/clerk/javascript/pull/7293)) by [@kduprey](https://github.com/kduprey)
+
+### Patch Changes
+
+- Added temporary email services support error localization key. ([#7436](https://github.com/clerk/javascript/pull/7436)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Added missing password or identifier incorrect error localization. ([#7437](https://github.com/clerk/javascript/pull/7437)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 3.39.0
 
 ### Minor Changes

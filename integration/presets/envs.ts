@@ -154,7 +154,6 @@ const withSessionTasks = base
 const withSessionTasksResetPassword = base
   .clone()
   .setId('withSessionTasksResetPassword')
-  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-session-tasks-reset-password').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks-reset-password').pk);
 

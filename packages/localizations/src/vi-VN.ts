@@ -757,8 +757,8 @@ export const viVN: LocalizationResource = {
       title: 'Xác thực hai bước',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Chọn ví bên dưới để đăng nhập',
+      title: 'Đăng nhập với Solana',
     },
   },
   signInEnterPasswordTitle: 'Nhập mật khẩu',
@@ -853,8 +853,8 @@ export const viVN: LocalizationResource = {
       titleCombined: 'Tạo tài khoản của bạn',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Chọn ví bên dưới để đăng ký',
+      title: 'Đăng ký với Solana',
     },
   },
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',
@@ -878,6 +878,10 @@ export const viVN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Bạn phải thuộc về một tổ chức',
+      subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để nhận lời mời.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,
@@ -900,6 +904,8 @@ export const viVN: LocalizationResource = {
     captcha_unavailable:
       'Đăng ký không thành công do lỗi bot. Vui lòng tải lại trang để thử lại hoặc liên hệ hỗ trợ để được hỗ trợ.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Các dịch vụ email tạm thời không được hỗ trợ. Vui lòng sử dụng địa chỉ email thông thường của bạn để tạo tài khoản.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -917,6 +923,8 @@ export const viVN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Mật khẩu hoặc địa chỉ email không đúng. Vui lòng thử lại hoặc sử dụng phương thức khác.',
     form_password_length_too_short: 'Mật khẩu của bạn quá ngắn. Nó phải có ít nhất 8 ký tự.',
     form_password_not_strong_enough: 'Mật khẩu của bạn không đủ mạnh.',
     form_password_pwned:
@@ -955,8 +963,8 @@ export const viVN: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Không tìm thấy phần mở rộng Web3 Wallet. Vui lòng cài đặt một phần mở rộng để tiếp tục.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Bạn đã từ chối yêu cầu ký. Vui lòng thử lại để tiếp tục.',
+    web3_solana_signature_generation_failed: 'Đã xảy ra lỗi khi tạo chữ ký. Vui lòng thử lại để tiếp tục.',
     zxcvbn: {
       couldBeStronger: 'Mật khẩu của bạn hoạt động, nhưng có thể mạnh hơn. Hãy thử thêm nhiều ký tự.',
       goodPassword: 'Mật khẩu của bạn đáp ứng tất cả các yêu cầu cần thiết.',
@@ -1328,6 +1336,10 @@ export const viVN: LocalizationResource = {
         detailsAction__nonPrimary: 'Đặt làm chính',
         primaryButton: 'Kết nối ví',
         title: 'Ví Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Chọn một ví Solana để kết nối với tài khoản của bạn.',
+          title: 'Thêm ví Solana',
+        },
       },
     },
     usernamePage: {
@@ -1363,9 +1375,10 @@ export const viVN: LocalizationResource = {
       title: 'Cảm ơn bạn đã tham gia danh sách chờ!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Kết nối với {{walletName}}',
+    continue: 'Tiếp tục với {{walletName}}',
+    noneAvailable:
+      'Không phát hiện ví Solana Web3 nào. Vui lòng cài đặt {{ solanaWalletsLink || link("wallet extension") }} hỗ trợ Web3.',
   },
 } as const;

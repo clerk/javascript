@@ -753,8 +753,8 @@ export const idID: LocalizationResource = {
       title: 'Verifikasi dua langkah',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Pilih dompet di bawah untuk masuk',
+      title: 'Masuk dengan Solana',
     },
   },
   signInEnterPasswordTitle: 'Masukkan kata sandi Anda',
@@ -851,8 +851,8 @@ export const idID: LocalizationResource = {
       titleCombined: 'Buat akun Anda',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Pilih dompet di bawah untuk mendaftar',
+      title: 'Daftar dengan Solana',
     },
   },
   socialButtonsBlockButton: 'Lanjutkan dengan {{provider|titleize}}',
@@ -875,6 +875,10 @@ export const idID: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    organizationCreationDisabled: {
+      title: 'Anda harus menjadi anggota organisasi',
+      subtitle: 'Hubungi admin organisasi Anda untuk mendapatkan undangan.',
     },
     signOut: {
       actionLink: undefined,
@@ -899,6 +903,8 @@ export const idID: LocalizationResource = {
     captcha_unavailable:
       'Pendaftaran gagal karena validasi bot gagal. Silakan muat ulang halaman untuk mencoba lagi atau hubungi dukungan untuk bantuan lebih lanjut.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Layanan email sementara tidak didukung. Silakan gunakan alamat email reguler Anda untuk membuat akun.',
     form_identifier_exists__email_address: 'Alamat email ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__phone_number: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini sudah digunakan. Silakan coba yang lain.',
@@ -916,6 +922,7 @@ export const idID: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: 'Kata sandi atau alamat email salah. Coba lagi atau gunakan metode lain.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Kata sandi Anda tidak cukup kuat.',
     form_password_pwned:
@@ -958,8 +965,9 @@ export const idID: LocalizationResource = {
     phone_number_exists: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     session_exists: 'Anda sudah masuk.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Anda menolak permintaan tanda tangan. Silakan coba lagi untuk melanjutkan.',
+    web3_solana_signature_generation_failed:
+      'Terjadi kesalahan saat membuat tanda tangan. Silakan coba lagi untuk melanjutkan.',
     zxcvbn: {
       couldBeStronger: 'Kata sandi Anda berfungsi, tapi bisa lebih kuat. Coba tambahkan lebih banyak karakter.',
       goodPassword: 'Kata sandi Anda memenuhi semua persyaratan yang diperlukan.',
@@ -1319,6 +1327,10 @@ export const idID: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: undefined,
         title: undefined,
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Pilih dompet Solana untuk dihubungkan ke akun Anda.',
+          title: 'Tambahkan dompet Solana',
+        },
       },
     },
     usernamePage: {
@@ -1354,9 +1366,10 @@ export const idID: LocalizationResource = {
       title: 'Terima kasih telah bergabung dengan daftar tunggu!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Hubungkan dengan {{walletName}}',
+    continue: 'Lanjutkan dengan {{walletName}}',
+    noneAvailable:
+      'Tidak ada dompet Solana Web3 yang terdeteksi. Silakan instal {{ solanaWalletsLink || link("wallet extension") }} yang mendukung Web3.',
   },
 } as const;
