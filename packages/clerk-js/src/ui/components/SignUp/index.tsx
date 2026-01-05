@@ -21,7 +21,7 @@ function RedirectToSignUp() {
   const clerk = useClerk();
   React.useEffect(() => {
     void clerk.redirectToSignUp();
-  }, []);
+  }, [clerk]);
   return null;
 }
 
