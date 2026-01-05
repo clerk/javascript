@@ -1,12 +1,16 @@
 /**
  * Represents an accountless application created in keyless mode.
- * This matches the structure returned by the Clerk API.
+ *
+ * This interface matches the shape of `AccountlessApplication` from `@clerk/backend`.
+ * We define it here to avoid a circular dependency (shared cannot depend on backend).
+ * Framework packages that depend on both shared and backend can use either type
+ * interchangeably since they have the same structure.
  */
 export interface AccountlessApplication {
-  publishableKey: string;
-  secretKey: string;
-  claimUrl: string;
-  apiKeysUrl: string;
+  readonly publishableKey: string;
+  readonly secretKey: string;
+  readonly claimUrl: string;
+  readonly apiKeysUrl: string;
 }
 
 /**

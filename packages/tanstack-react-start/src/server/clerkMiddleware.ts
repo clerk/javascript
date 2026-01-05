@@ -7,7 +7,7 @@ import { createMiddleware, json } from '@tanstack/react-start';
 
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
-import { keyless } from './keyless';
+import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import { loadOptions } from './loadOptions';
 import type { ClerkMiddlewareOptions } from './types';
 import { getResponseClerkState, patchRequest } from './utils';
@@ -17,33 +17,19 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): AnyRequestMid
     const clerkRequest = createClerkRequest(patchRequest(request));
 
     // Get keys - either from options, env, or keyless mode
-    let publishableKey = options?.publishableKey;
-    let secretKey = options?.secretKey;
-    let keylessClaimUrl: string | undefined;
-    let keylessApiKeysUrl: string | undefined;
+    const {
+      publishableKey,
+      secretKey,
+      claimUrl: keylessClaimUrl,
+      apiKeysUrl: keylessApiKeysUrl,
+    } = await resolveKeysWithKeylessFallback(options?.publishableKey, options?.secretKey);
 
-    // In keyless mode, try to read/create keys from the file system
-    if (canUseKeyless && (!publishableKey || !secretKey)) {
-      const keylessService = keyless();
-      const keylessApp = await keylessService.getOrCreateKeys();
-      if (keylessApp) {
-        publishableKey = publishableKey || keylessApp.publishableKey;
-        secretKey = secretKey || keylessApp.secretKey;
-        keylessClaimUrl = keylessApp.claimUrl;
-        keylessApiKeysUrl = keylessApp.apiKeysUrl;
-
-        keylessService.logKeylessMessage(keylessApp.claimUrl);
-      }
-    }
-
-    // Load options with keyless fallback
-    const effectiveOptions = {
+    // Load options with resolved keys
+    const loadedOptions = loadOptions(clerkRequest, {
       ...options,
       publishableKey,
       secretKey,
-    };
-
-    const loadedOptions = loadOptions(clerkRequest, effectiveOptions);
+    });
 
     const requestState = await clerkClient().authenticateRequest(clerkRequest, {
       ...loadedOptions,
