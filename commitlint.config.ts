@@ -25,7 +25,6 @@ export const getPackageNames = () => {
   return packageNames;
 };
 
-// Common camelCase terms that should be allowed in commit subjects
 export const ALLOWED_CAMEL_CASE_TERMS = [
   'className',
   'forEach',
