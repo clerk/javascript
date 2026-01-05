@@ -12,9 +12,13 @@ type CreateM2MTokenParams = {
    */
   machineSecretKey?: string;
   /**
-   * Number of seconds until the token expires.
+   * Number of milliseconds until the token expires.
    *
    * @default null - Token does not expire
+   */
+  millisecondsUntilExpiration?: number | null;
+  /**
+   * @deprecated Use `millisecondsUntilExpiration` instead. This property will be removed in the next major release.
    */
   secondsUntilExpiration?: number | null;
   claims?: Record<string, unknown> | null;
@@ -59,14 +63,14 @@ export class M2MTokenApi extends AbstractAPI {
   }
 
   async createToken(params?: CreateM2MTokenParams) {
-    const { claims = null, machineSecretKey, secondsUntilExpiration = null } = params || {};
+    const { claims = null, machineSecretKey, millisecondsUntilExpiration = null } = params || {};
 
     const requestOptions = this.#createRequestOptions(
       {
         method: 'POST',
         path: basePath,
         bodyParams: {
-          secondsUntilExpiration,
+          millisecondsUntilExpiration,
           claims,
         },
       },
