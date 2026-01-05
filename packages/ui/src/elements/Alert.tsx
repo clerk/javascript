@@ -1,22 +1,23 @@
 import type { LocalizationKey } from '../customizables';
 import { Alert as AlertCust, AlertIcon, Col, descriptors, Text } from '../customizables';
-import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 
 type _AlertProps = {
   variant?: 'danger' | 'warning' | 'info';
   title?: LocalizationKey | string;
   subtitle?: LocalizationKey | string;
-  titleSx?: ThemableCssProp;
 };
 
 type AlertProps = Omit<PropsOfComponent<typeof AlertCust>, keyof _AlertProps> & _AlertProps;
 
 export const Alert = (props: AlertProps): JSX.Element | null => {
-  const { children, title, subtitle, variant = 'warning', titleSx, ...rest } = props;
+  const { children, title, subtitle, variant = 'warning', ...rest } = props;
 
   if (!children && !title && !subtitle) {
     return null;
   }
+
+  const textColorScheme = variant === 'danger' ? 'danger' : variant === 'warning' ? 'warning' : 'secondary';
 
   return (
     <AlertCust
@@ -38,14 +39,14 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
         elementDescriptor={descriptors.alertTextContainer}
         elementId={descriptors.alertTextContainer.setId(variant)}
         gap={1}
+        sx={{ textAlign: 'left' }}
       >
         <Text
           elementDescriptor={descriptors.alertText}
           elementId={descriptors.alert.setId(variant)}
-          colorScheme={variant === 'danger' ? 'danger' : variant === 'warning' ? 'warning' : 'secondary'}
-          variant='body'
+          colorScheme={textColorScheme}
+          variant={subtitle ? 'h3' : 'body'}
           localizationKey={title}
-          sx={[{ textAlign: 'left' }, titleSx]}
         >
           {children}
         </Text>
@@ -53,7 +54,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
           <Text
             elementDescriptor={descriptors.alertText}
             elementId={descriptors.alert.setId(variant)}
-            colorScheme={variant === 'danger' ? 'danger' : variant === 'warning' ? 'warning' : 'secondary'}
+            colorScheme={textColorScheme}
             variant='body'
             localizationKey={subtitle}
           />
