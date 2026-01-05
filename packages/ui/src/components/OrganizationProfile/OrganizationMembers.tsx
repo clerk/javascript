@@ -149,6 +149,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
                           subtitle={localizationKeys(
                             'organizationProfile.membersPage.alerts.roleSetMigrationInProgress.subtitle',
                           )}
+                          titleSx={theme => ({ fontWeight: theme.fontWeights.$semibold })}
                         />
                       )}
                       <ActiveMembersList

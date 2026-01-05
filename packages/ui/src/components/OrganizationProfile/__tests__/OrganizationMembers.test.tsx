@@ -639,6 +639,139 @@ describe('OrganizationMembers', () => {
     memberButtons.forEach(button => expect(button).toBeDisabled());
   });
 
+  it('displays a warning alert when role set migration is in progress', async () => {
+    const membersList: OrganizationMembershipResource[] = [
+      createFakeMember({
+        id: '1',
+        orgId: '1',
+        role: 'admin',
+        identifier: 'test_user1',
+        firstName: 'First1',
+        lastName: 'Last1',
+        createdAt: new Date('2022-01-01'),
+      }),
+    ];
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [{ name: 'Org1', id: '1' }],
+      });
+    });
+
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+
+    fixtures.clerk.organization?.getMemberships.mockReturnValue(
+      Promise.resolve({
+        data: membersList,
+        total_count: 1,
+      }),
+    );
+
+    fixtures.clerk.organization?.getRoles.mockResolvedValue({
+      total_count: 2,
+      has_role_set_migration: true,
+      data: [
+        {
+          pathRoot: '',
+          reload: vi.fn(),
+          id: 'member',
+          key: 'member',
+          name: 'Member',
+          description: '',
+          permissions: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          pathRoot: '',
+          reload: vi.fn(),
+          id: 'admin',
+          key: 'admin',
+          name: 'Admin',
+          description: '',
+          permissions: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+    });
+
+    const { container, getByText } = render(<OrganizationMembers />, { wrapper });
+
+    await waitForLoadingCompleted(container);
+
+    expect(getByText('Roles are temporarily locked')).toBeInTheDocument();
+    expect(
+      getByText("We are updating the available roles. Once that's done, you'll be able to update roles again."),
+    ).toBeInTheDocument();
+  });
+
+  it('does not display a warning alert when role set migration is not in progress', async () => {
+    const membersList: OrganizationMembershipResource[] = [
+      createFakeMember({
+        id: '1',
+        orgId: '1',
+        role: 'admin',
+        identifier: 'test_user1',
+        firstName: 'First1',
+        lastName: 'Last1',
+        createdAt: new Date('2022-01-01'),
+      }),
+    ];
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [{ name: 'Org1', id: '1' }],
+      });
+    });
+
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+
+    fixtures.clerk.organization?.getMemberships.mockReturnValue(
+      Promise.resolve({
+        data: membersList,
+        total_count: 1,
+      }),
+    );
+
+    fixtures.clerk.organization?.getRoles.mockResolvedValue({
+      total_count: 2,
+      has_role_set_migration: false,
+      data: [
+        {
+          pathRoot: '',
+          reload: vi.fn(),
+          id: 'member',
+          key: 'member',
+          name: 'Member',
+          description: '',
+          permissions: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          pathRoot: '',
+          reload: vi.fn(),
+          id: 'admin',
+          key: 'admin',
+          name: 'Admin',
+          description: '',
+          permissions: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+    });
+
+    const { container, queryByText } = render(<OrganizationMembers />, { wrapper });
+
+    await waitForLoadingCompleted(container);
+
+    expect(queryByText('Roles are temporarily locked')).not.toBeInTheDocument();
+  });
+
   describe('InviteMembersScreen', () => {
     it('shows the invite screen when user clicks on Invite button', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
