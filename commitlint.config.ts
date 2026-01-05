@@ -25,35 +25,13 @@ export const getPackageNames = () => {
   return packageNames;
 };
 
-export const ALLOWED_CAMEL_CASE_TERMS = [
-  'className',
-  'forEach',
-  'getElementById',
-  'innerHTML',
-  'localStorage',
-  'onChange',
-  'onClick',
-  'sessionStorage',
-  'useCallback',
-  'useContext',
-  'useEffect',
-  'useId',
-  'useMemo',
-  'useReducer',
-  'useRef',
-  'useState',
-];
-
-export const CAMEL_CASE_PATTERN = new RegExp(`\\b(${ALLOWED_CAMEL_CASE_TERMS.join('|')})\\b`);
-
 const Configuration = {
   extends: ['@commitlint/config-conventional'],
-  ignores: [(commit: string) => CAMEL_CASE_PATTERN.test(commit)],
   rules: {
     'body-max-line-length': [1, 'always', '150'],
     'scope-empty': [2, 'never'],
     'scope-enum': [2, 'always', [...getPackageNames(), 'repo', 'release', 'e2e', '*', 'ci']],
-    'subject-case': [2, 'always', ['lower-case', 'sentence-case']],
+    'subject-case': [2, 'always', ['camel-case', 'lower-case', 'sentence-case']],
   },
 };
 
