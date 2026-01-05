@@ -116,9 +116,11 @@ test.describe('next start - invalid middleware at root on src/ @quickstart', () 
         ? 'Your Middleware exists at ./src/middleware.(ts|js) or proxy.(ts|js)'
         : 'Your Middleware exists at ./src/middleware.(ts|js)';
     expect(app.serveOutput).not.toContain(expectedMessage);
-    expect(app.serveOutput).toContain(
-      'Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./src/middleware.ts. Currently located at ./middleware.ts',
-    );
+    const expectedError =
+      major >= 16
+        ? 'Clerk: clerkMiddleware() was not run, your middleware or proxy file might be misplaced. Move your middleware or proxy file to ./src/middleware.ts. Currently located at ./middleware.ts'
+        : 'Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./src/middleware.ts. Currently located at ./middleware.ts';
+    expect(app.serveOutput).toContain(expectedError);
   });
 
   test('Does not display misplaced middleware error on Next 16+', async ({ page, context }) => {
@@ -161,8 +163,10 @@ test.describe('next start - invalid middleware inside app on src/ @quickstart', 
         ? 'Your Middleware exists at ./src/middleware.(ts|js) or proxy.(ts|js)'
         : 'Your Middleware exists at ./src/middleware.(ts|js)';
     expect(app.serveOutput).not.toContain(expectedMessage);
-    expect(app.serveOutput).toContain(
-      'Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./src/middleware.ts. Currently located at ./src/app/middleware.ts',
-    );
+    const expectedError =
+      major >= 16
+        ? 'Clerk: clerkMiddleware() was not run, your middleware or proxy file might be misplaced. Move your middleware or proxy file to ./src/middleware.ts. Currently located at ./src/app/middleware.ts'
+        : 'Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./src/middleware.ts. Currently located at ./src/app/middleware.ts';
+    expect(app.serveOutput).toContain(expectedError);
   });
 });
