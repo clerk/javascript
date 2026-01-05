@@ -81,26 +81,6 @@ const withEmailCodesQuickstart = withEmailCodes
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '');
 
-const withAPCore1ClerkV4 = environmentConfig()
-  .setId('withAPCore1ClerkV4')
-  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk);
-
-// Uses staging instance which runs Core 3
-const withAPCore3ClerkV4 = environmentConfig()
-  .setId('withAPCore3ClerkV4')
-  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk);
-
-const withAPCore1ClerkV6 = environmentConfig()
-  .setId('withAPCore1ClerkV6')
-  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk);
-
 // Uses staging instance which runs Core 3
 const withAPCore3ClerkV6 = environmentConfig()
   .setId('withAPCore3ClerkV6')
@@ -213,9 +193,6 @@ export const envs = {
   base,
   sessionsProd1,
   withAPIKeys,
-  withAPCore1ClerkV4,
-  withAPCore1ClerkV6,
-  withAPCore3ClerkV4,
   withAPCore3ClerkLatest,
   withAPCore3ClerkV6,
   withBilling,
