@@ -16,7 +16,11 @@ import { withClerk } from './withClerk';
  *
  * // Basic usage with default "Subscription details" text
  * function BasicSubscriptionDetails() {
- *   return <SubscriptionDetailsButton />;
+ *   return (
+ *     <Show when="signed-in">
+ *       <SubscriptionDetailsButton />
+ *     </Show>
+ *   );
  * }
  *
  * // Custom button with Organization Subscription
