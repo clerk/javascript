@@ -581,4 +581,58 @@ const App = () => (
         `,
     output: null,
   },
+  {
+    name: 'Transforms self-closing namespaced Protect component',
+    source: `
+import * as Clerk from "@clerk/react";
+
+const App = () => <Clerk.Protect permission="org:read" />;
+        `,
+    output: `
+import * as Clerk from "@clerk/react";
+
+const App = () => <Clerk.Show when={{
+  permission: "org:read"
+}} />;
+`,
+  },
+  {
+    name: 'Transforms namespaced SignedIn and SignedOut in same file',
+    source: `
+import * as Clerk from "@clerk/nextjs";
+
+const App = () => (
+  <>
+    <Clerk.SignedIn>
+      <Dashboard />
+    </Clerk.SignedIn>
+    <Clerk.SignedOut>
+      <Login />
+    </Clerk.SignedOut>
+    <Clerk.Protect role="admin">
+      <AdminPanel />
+    </Clerk.Protect>
+  </>
+);
+        `,
+    output: `
+import * as Clerk from "@clerk/nextjs";
+
+const App = () => (
+  <>
+    <Clerk.Show when="signed-in">
+      <Dashboard />
+    </Clerk.Show>
+    <Clerk.Show when="signed-out">
+      <Login />
+    </Clerk.Show>
+    <Clerk.Show when={{
+      role: "admin"
+    }}>
+      <AdminPanel />
+    </Clerk.Show>
+  </>
+);
+`,
+  },
 ];

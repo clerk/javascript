@@ -236,15 +236,22 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
       }
     } else if (j.JSXMemberExpression.check(openingElement.name)) {
       const member = openingElement.name;
-      if (j.Identifier.check(member.object) && j.Identifier.check(member.property)) {
-        const objectName = member.object.name;
+      if (
+        (j.JSXIdentifier.check(member.object) || j.JSXMemberExpression.check(member.object)) &&
+        j.JSXIdentifier.check(member.property)
+      ) {
+        const objectName = j.JSXIdentifier.check(member.object) ? member.object.name : null;
         const propertyName = member.property.name;
 
-        if (namespaceImports.has(objectName) && ['Protect', 'SignedIn', 'SignedOut'].includes(propertyName)) {
+        if (
+          objectName &&
+          namespaceImports.has(objectName) &&
+          ['Protect', 'SignedIn', 'SignedOut'].includes(propertyName)
+        ) {
           kind = propertyName === 'Protect' ? 'protect' : propertyName === 'SignedIn' ? 'signed-in' : 'signed-out';
 
           renameNodeToShow = node => {
-            if (j.JSXMemberExpression.check(node) && j.Identifier.check(node.property)) {
+            if (j.JSXMemberExpression.check(node) && j.JSXIdentifier.check(node.property)) {
               node.property.name = 'Show';
             }
           };
