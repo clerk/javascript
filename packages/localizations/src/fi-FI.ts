@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
@@ -613,6 +613,12 @@ export const fiFI: LocalizationResource = {
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
       title: 'Tarkista sähköpostisi',
     },
+    emailCodeMfa: {
+      formTitle: 'Tarkista sähköpostisi',
+      resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
+      subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      title: 'Tarkista sähköpostisi',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Jatkaaksesi avaa vahvistuslinkki laitteella ja selaimella, josta aloitit kirjautumisen',
@@ -648,6 +654,12 @@ export const fiFI: LocalizationResource = {
         titleNewTab: 'Kirjautunut toiseen välilehteen',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',
+      resendButton: 'Etkö saanut linkkiä? Lähetä uudelleen',
+      subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      title: 'Tarkista sähköpostisi',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -665,6 +677,8 @@ export const fiFI: LocalizationResource = {
       label__alternativeMethods: 'tai kirjaudu sisään toisella tavalla',
       title: 'Unohditko salasanasi?',
     },
+    newDeviceVerificationNotice:
+      'Kirjaudut sisään uudesta laitteesta. Pyydämme vahvistusta tilisi turvallisuuden varmistamiseksi.',
     noAvailableMethods: {
       message: 'Kirjautuminen ei onnistu. Käytettävissä ei ole yhtään todennusmenetelmää.',
       subtitle: 'Tapahtui virhe',
@@ -680,8 +694,14 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Syötä tilisi salasana',
       title: 'Syötä salasanasi',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Salasana kompromisoitu',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Vahvistuskoodi',
@@ -729,6 +749,10 @@ export const fiFI: LocalizationResource = {
       formTitle: 'Todennuskoodi',
       subtitle: 'Syötä todennuskoodi autentikointisovelluksestasi',
       title: 'Kaksivaiheinen todennus',
+    },
+    web3Solana: {
+      subtitle: 'Valitse alta lompakko kirjautumista varten',
+      title: 'Kirjaudu sisään Solanalla',
     },
   },
   signInEnterPasswordTitle: 'Syötä salasanasi',
@@ -821,44 +845,66 @@ export const fiFI: LocalizationResource = {
       title: 'Luo tili',
       titleCombined: 'Luo tili',
     },
+    web3Solana: {
+      subtitle: 'Valitse alta lompakko rekisteröitymistä varten',
+      title: 'Rekisteröidy Solanalla',
+    },
   },
   socialButtonsBlockButton: 'Jatka palvelun {{provider|titleize}} avulla',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Luo uusi organisaatio',
+      action__invitationAccept: 'Liity',
+      action__suggestionsAccept: 'Pyydä liittymistä',
+      subtitle: 'Liity olemassa olevaan organisaatioon tai luo uusi',
+      suggestionsAcceptedLabel: 'Odottaa hyväksyntää',
+      title: 'Valitse organisaatio',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Peruuta',
+      formButtonSubmit: 'Jatka',
+      formFieldInputPlaceholder__name: 'Minun organisaationi',
+      formFieldInputPlaceholder__slug: 'minun-organisaationi',
+      formFieldLabel__name: 'Nimi',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Syötä organisaatiosi tiedot jatkaaksesi',
+      title: 'Aseta organisaatiosi',
     },
+    organizationCreationDisabled: {
+      title: 'Sinun täytyy kuulua organisaatioon',
+      subtitle: 'Ota yhteyttä organisaatiosi ylläpitäjään saadaksesi kutsun.',
+    },
+    signOut: {
+      actionLink: 'Kirjaudu ulos',
+      actionText: 'Kirjautuneena käyttäjänä {{identifier}}',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
+    title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Tiedostokoko ylittää enimmäisrajan 10 Mt. Valitse pienempi tiedosto.',
+    avatar_file_type_invalid: 'Tiedostotyyppiä ei tueta. Lataa JPG-, PNG-, GIF- tai WEBP-kuva.',
     captcha_invalid:
       'Rekisteröityminen epäonnistui epäonnistuneiden tietoturvatarkistusten vuoksi. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
     captcha_unavailable:
       'Rekisteröityminen epäonnistui, koska botin vahvistus epäonnistui. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Väliaikaiset sähköpostipalvelut eivät ole tuettuja. Käytä tavallista sähköpostiosoitetta tilin luomiseen.',
     form_identifier_exists__email_address: 'Tämä sähköpostiosoite on jo käytössä. Kokeile toista.',
     form_identifier_exists__phone_number: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     form_identifier_exists__username: 'Tämä käyttäjänimi on jo käytössä. Kokeile toista.',
     form_identifier_not_found: 'Ei voi löytää tiliä näillä tiedoilla.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Sähköpostiosoiteen tulee olla kelvollinen.',
     form_param_format_invalid__phone_number: 'Puhelinnumeron on oltava kelvollisessa kansainvälisessä muodossa',
@@ -871,15 +917,19 @@ export const fiFI: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Salasana tai sähköpostiosoite on väärä. Yritä uudelleen tai käytä toista menetelmää.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Salasana ei ole riittävän vahva.',
     form_password_pwned: 'Salasana on ollut osallisena tietovuodossa. Valitse toinen salasana.',
     form_password_pwned__sign_in: 'Salasana on ollut osallisena tietovuodossa. Vaihdathan salasanasi.',
     form_password_size_in_bytes_exceeded:
       'Salasanasi on ylittänyt sallitun tavumäärän, lyhennä sitä tai poista joitain erikoismerkkejä.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Väärä salasana.',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Käyttäjänimessä tulee olla vähintään yksi ei-numeerinen merkki.',
     identification_deletion_failed: 'Et voi poistaa viimeistä henkilöllisyyttäsi.',
     not_allowed_access:
       "Sähköpostiosoite tai puhelinnumero ei ole sallittu rekisteröityäksesi. Tämä voi johtua siitä, että sähköpostiosoite sisältää '+', '=', '#' tai '.' merkkejä, käyttäät aluetta, joka on sidottu tilapäisyyden sähköpostitilaukseen, tai olet eksplisiittisesti estetty. Jos uskoo, että tämä on virhe, ota yhteyttä tukeen.",
@@ -907,6 +957,8 @@ export const fiFI: LocalizationResource = {
     phone_number_exists: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     session_exists: 'Olet jo kirjautunut sisään.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Hylkäsit allekirjoituspyynnön. Yritä uudelleen jatkaaksesi.',
+    web3_solana_signature_generation_failed: 'Allekirjoitusta luotaessa tapahtui virhe. Yritä uudelleen jatkaaksesi.',
     zxcvbn: {
       couldBeStronger: 'Salasanasi toimii, mutta se voisi olla vahvempi. Kokeile lisätä erikoismerkkejä tai numeroita.',
       goodPassword: 'Salasanasi täyttää kaikki tarvittavat vaatimukset.',
@@ -1278,6 +1330,10 @@ export const fiFI: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3-lompakot',
         title: 'Web3-lompakot',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Valitse Solana-lompakko yhdistettäväksi tiliisi.',
+          title: 'Lisää Solana-lompakko',
+        },
       },
     },
     usernamePage: {
@@ -1301,16 +1357,22 @@ export const fiFI: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Kirjaudu sisään',
+      actionText: 'Onko sinulla jo pääsy?',
+      formButton: 'Liity jonoon',
+      subtitle: 'Syötä sähköpostiosoitteesi ja ilmoitamme sinulle, kun paikkasi on valmis',
+      title: 'Liity jonoon',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Sinut ohjataan pian...',
+      subtitle: 'Olemme yhteydessä, kun paikkasi on valmis',
+      title: 'Kiitos liittymisestä jonoon!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Yhdistä {{walletName}}',
+    continue: 'Jatka {{walletName}}',
+    noneAvailable:
+      'Solana Web3 -lompakoita ei havaittu. Asenna Web3-yhteensopiva {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

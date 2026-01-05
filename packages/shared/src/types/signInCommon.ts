@@ -26,8 +26,6 @@ import type {
   ResetPasswordPhoneCodeAttempt,
   ResetPasswordPhoneCodeFactor,
   ResetPasswordPhoneCodeFactorConfig,
-  SamlConfig,
-  SamlFactor,
   TOTPAttempt,
   TOTPFactor,
   Web3Attempt,
@@ -53,7 +51,6 @@ import type {
   PhoneCodeStrategy,
   ResetPasswordEmailCodeStrategy,
   ResetPasswordPhoneCodeStrategy,
-  SamlStrategy,
   TicketStrategy,
   TOTPStrategy,
   Web3Strategy,
@@ -64,6 +61,7 @@ export type SignInStatus =
   | 'needs_identifier'
   | 'needs_first_factor'
   | 'needs_second_factor'
+  | 'needs_client_trust'
   | 'needs_new_password'
   | 'complete';
 
@@ -83,10 +81,9 @@ export type SignInFirstFactor =
   | ResetPasswordEmailCodeFactor
   | Web3SignatureFactor
   | OauthFactor
-  | SamlFactor
   | EnterpriseSSOFactor;
 
-export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor | EmailCodeFactor;
+export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor | EmailCodeFactor | EmailLinkFactor;
 
 export interface UserData {
   firstName?: string;
@@ -106,7 +103,6 @@ export type PrepareFirstFactorParams =
   | ResetPasswordPhoneCodeFactorConfig
   | ResetPasswordEmailCodeFactorConfig
   | OAuthConfig
-  | SamlConfig
   | EnterpriseSSOConfig;
 
 export type AttemptFirstFactorParams =
@@ -118,13 +114,13 @@ export type AttemptFirstFactorParams =
   | ResetPasswordPhoneCodeAttempt
   | ResetPasswordEmailCodeAttempt;
 
-export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig | EmailCodeSecondFactorConfig;
+export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig | EmailCodeSecondFactorConfig | EmailLinkConfig;
 
 export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt | EmailCodeAttempt;
 
 export type SignInCreateParams = (
   | {
-      strategy: OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy;
+      strategy: OAuthStrategy | EnterpriseSSOStrategy;
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
       identifier?: string;
@@ -195,5 +191,8 @@ export type SignInStrategy =
   | TOTPStrategy
   | BackupCodeStrategy
   | OAuthStrategy
-  | SamlStrategy
   | EnterpriseSSOStrategy;
+
+export interface SignInAuthenticateWithSolanaParams {
+  walletName: string;
+}

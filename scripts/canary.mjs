@@ -2,25 +2,13 @@
 
 import { $, echo } from 'zx';
 
-import { constants } from './common.mjs';
+import { constants, getPackageNames, pinWorkspaceDeps } from './common.mjs';
+
+const packageNames = await getPackageNames();
+const packageEntries = packageNames.map(name => `'${name}': patch`).join('\n');
 
 const snapshot = `---
-'@clerk/chrome-extension': patch
-'@clerk/localizations': patch
-'@clerk/clerk-js': patch
-'@clerk/backend': patch
-'@clerk/fastify': patch
-'@clerk/agent-toolkit': patch
-'@clerk/nextjs': patch
-'@clerk/shared': patch
-'@clerk/themes': patch
-'@clerk/clerk-react': patch
-'@clerk/remix': patch
-'@clerk/types': patch
-'@clerk/clerk-expo': patch
-'@clerk/express': patch
-'@clerk/testing': patch
-'@clerk/elements': patch
+${packageEntries}
 ---
 
 Canary release
@@ -35,12 +23,17 @@ try {
   // this will remove the prerelease versions
   // but will also clear the changeset .md files
   await $`pnpm changeset version`;
-  // generate a temp .md file that indicates that all packages have changes
-  // in order to force a snapshot release
-  await $`touch .changeset/snap.md && echo ${snapshot} > .changeset/snap.md`;
 } catch {
-  // otherwise, do nothing
+  // not in pre-release mode, continue
 }
+
+// Always generate a temp .md file that indicates that all packages have changes
+// in order to force a canary release of all packages
+await $`touch .changeset/snap.md && echo ${snapshot} > .changeset/snap.md`;
+
+// Convert workspace:^ to workspace:* for @clerk/* deps to ensure exact versions
+// This prevents semver range issues like ^3.0.0-canary matching older snapshots
+await pinWorkspaceDeps();
 
 const res = await $`pnpm changeset version --snapshot canary`;
 const success = !res.stderr.includes('No unreleased changesets found');

@@ -107,22 +107,22 @@ export type VersionedJwtPayload =
 
       /**
        *
-       * Active organization permissions.
+       * Active Organization Permissions.
        */
       org_permissions?: OrganizationCustomPermissionKey[];
 
       /**
-       * Active organization ID.
+       * Active Organization ID.
        */
       org_id?: string;
 
       /**
-       * Active organization slug.
+       * Active Organization slug.
        */
       org_slug?: string;
 
       /**
-       * Active organization role.
+       * Active Organization Role.
        */
       org_role?: OrganizationCustomRoleKey;
     }
@@ -145,28 +145,28 @@ export type VersionedJwtPayload =
       pla?: string;
 
       /**
-       * Active organization information.
+       * Active Organization information.
        *
        * @experimental This structure is subject to change.
        */
       o?: {
         /**
-         * Active organization ID.
+         * Active Organization ID.
          */
         id: string;
 
         /**
-         * Active organization slug.
+         * Active Organization slug.
          */
         slg?: string;
 
         /**
-         * Active organization role.
+         * Active Organization role.
          */
         rol?: OrganizationCustomRoleKey;
 
         /**
-         * Active organization permissions.
+         * Active Organization permissions.
          */
         per?: string;
 
@@ -186,6 +186,7 @@ export type JwtPayload = JWTPayloadBase & CustomJwtSessionClaims & VersionedJwtP
 
 /**
  * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
+ *
  * @inline
  */
 export interface ActClaim {

@@ -6,13 +6,12 @@ import type {
   SignedOutAuthObject,
 } from '@clerk/backend/internal';
 import type {
-  LegacyRedirectProps,
   MultiDomainAndOrProxy,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { LoaderFunction, LoaderFunctionArgs, UNSAFE_DataWithResponseInit } from 'react-router';
 
 export type GetAuthReturn = Promise<SignedInAuthObject | SignedOutAuthObject>;
@@ -37,9 +36,9 @@ export type ClerkMiddlewareOptions = {
   signInUrl?: string;
   signUpUrl?: string;
   /**
-   * Used to activate a specific [organization](https://clerk.com/docs/guides/organizations/overview) or [personal account](https://clerk.com/docs/guides/dashboard/overview) based on URL path parameters. If there's a mismatch between the active organization in the session (e.g., as reported by `auth()`) and the organization indicated by the URL, an attempt to activate the organization specified in the URL will be made.
+   * Used to activate a specific [Organization](https://clerk.com/docs/guides/organizations/overview) or [Personal Account](https://clerk.com/docs/guides/dashboard/overview) based on URL path parameters. If there's a mismatch between the Active Organization in the session (e.g., as reported by `auth()`) and the Organization indicated by the URL, an attempt to activate the Organization specified in the URL will be made.
    *
-   * If the activation can't be performed, either because an organization doesn't exist or the user lacks access, the active organization in the session won't be changed. Ultimately, it's the responsibility of the page to verify that the resources are appropriate to render given the URL and handle mismatches appropriately (e.g., by returning a 404).
+   * If the activation can't be performed, either because an Organization doesn't exist or the user lacks access, the Active Organization in the session won't be changed. Ultimately, it's the responsibility of the page to verify that the resources are appropriate to render given the URL and handle mismatches appropriately (e.g., by returning a 404).
    */
   organizationSyncOptions?: OrganizationSyncOptions;
 } & Pick<VerifyTokenOptions, 'audience' | 'authorizedParties'> &
@@ -47,8 +46,7 @@ export type ClerkMiddlewareOptions = {
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
-  SignUpFallbackRedirectUrl &
-  LegacyRedirectProps;
+  SignUpFallbackRedirectUrl;
 
 export type RootAuthLoaderOptions = ClerkMiddlewareOptions & {
   /**
@@ -69,8 +67,7 @@ export type RequestStateWithRedirectUrls = RequestState &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
-  SignUpFallbackRedirectUrl &
-  LegacyRedirectProps;
+  SignUpFallbackRedirectUrl;
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
   args: LoaderFunctionArgsWithAuth<Options>,

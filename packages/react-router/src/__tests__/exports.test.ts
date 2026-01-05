@@ -2,6 +2,7 @@ import { logger } from '@clerk/shared/logger';
 import { vi } from 'vitest';
 
 import * as publicExports from '../index';
+import * as legacyExports from '../legacy';
 import * as serverExports from '../server/index';
 
 describe('root public exports', () => {
@@ -23,5 +24,11 @@ describe('deprecated ssr public exports', () => {
     expect(Object.keys(ssrExports).sort()).toMatchSnapshot();
     expect(warnOnceSpy).toHaveBeenCalled();
     warnOnceSpy.mockRestore();
+  });
+});
+
+describe('legacy public exports', () => {
+  it('should not change unexpectedly', () => {
+    expect(Object.keys(legacyExports).sort()).toMatchSnapshot();
   });
 });

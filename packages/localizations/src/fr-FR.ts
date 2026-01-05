@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
@@ -627,6 +627,12 @@ export const frFR: LocalizationResource = {
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Vérifiez votre messagerie',
     },
+    emailCodeMfa: {
+      formTitle: 'Vérifiez votre messagerie',
+      resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
+      subtitle: 'pour continuer vers {{applicationName}}',
+      title: 'Vérifiez votre messagerie',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Ce lien ne correspond pas à la demande en cours.',
@@ -662,6 +668,12 @@ export const frFR: LocalizationResource = {
         titleNewTab: 'Connecté sur un autre onglet',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Utilisez le lien de vérification envoyé par e-mail',
+      resendButton: "Vous n'avez pas reçu de lien ? Renvoyer",
+      subtitle: 'pour continuer vers {{applicationName}}',
+      title: 'Vérifiez votre messagerie',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -679,6 +691,8 @@ export const frFR: LocalizationResource = {
       label__alternativeMethods: 'Ou connectez-vous avec une autre méthode.',
       title: 'Mot de passe oublié ?',
     },
+    newDeviceVerificationNotice:
+      'Vous vous connectez depuis un nouvel appareil. Nous demandons une vérification pour sécuriser votre compte.',
     noAvailableMethods: {
       message: "Impossible de poursuivre la connexion. Aucun facteur d'authentification n'est disponible.",
       subtitle: "Une erreur s'est produite",
@@ -693,8 +707,14 @@ export const frFR: LocalizationResource = {
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Tapez votre mot de passe',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Mot de passe compromis',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Code de vérification',
@@ -743,6 +763,10 @@ export const frFR: LocalizationResource = {
       formTitle: 'Le code de vérification',
       subtitle: "Entrez le code de l'application d'authentification.",
       title: 'Vérification en deux étapes',
+    },
+    web3Solana: {
+      subtitle: 'Sélectionnez un portefeuille ci-dessous pour vous connecter',
+      title: 'Se connecter avec Solana',
     },
   },
   signInEnterPasswordTitle: 'Tapez votre mot de passe',
@@ -836,6 +860,10 @@ export const frFR: LocalizationResource = {
       title: 'Créez votre compte',
       titleCombined: 'Créez votre compte',
     },
+    web3Solana: {
+      subtitle: 'Sélectionnez un portefeuille ci-dessous pour vous inscrire',
+      title: "S'inscrire avec Solana",
+    },
   },
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -858,22 +886,42 @@ export const frFR: LocalizationResource = {
       subtitle: 'Entrez les détails de votre organisation pour continuer',
       title: 'Configurer votre organisation',
     },
+    organizationCreationDisabled: {
+      title: 'Vous devez appartenir à une organisation',
+      subtitle: "Contactez l'administrateur de votre organisation pour obtenir une invitation.",
+    },
     signOut: {
       actionLink: 'Se déconnecter',
       actionText: 'Connecté en tant que {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Vous êtes déjà membre de cette organisation.',
+    avatar_file_size_exceeded:
+      'La taille du fichier dépasse la limite maximale de 10 Mo. Veuillez choisir un fichier plus petit.',
+    avatar_file_type_invalid:
+      'Type de fichier non pris en charge. Veuillez télécharger une image JPG, PNG, GIF ou WEBP.',
     captcha_invalid:
       "Inscription échouée en raison de validations de sécurité incorrectes. Veuillez rafraîchir la page pour réessayer ou contacter le support pour obtenir de l'aide.",
     captcha_unavailable:
       "Inscription échouée en raison d'une validation de captcha non réussie. Veuillez actualiser la page pour réessayer ou contacter le support pour obtenir de l'aide.",
     form_code_incorrect: 'Code incorrect',
+    form_email_address_blocked:
+      'Les services de messagerie temporaire ne sont pas pris en charge. Veuillez utiliser votre adresse e-mail habituelle pour créer un compte.',
     form_identifier_exists__email_address: 'Cette adresse e-mail existe déjà.',
     form_identifier_exists__phone_number: 'Ce numéro de téléphone existe déjà.',
     form_identifier_exists__username: "Ce nom d'utilisateur existe déjà.",
     form_identifier_not_found: "Nous n'avons pas trouvé de compte avec ces détails.",
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Le format est invalide',
     form_param_format_invalid__email_address: "L'adresse e-mail doit être une adresse e-mail valide.",
     form_param_format_invalid__phone_number: 'Le numéro de téléphone doit être au format international.',
@@ -886,6 +934,8 @@ export const frFR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'La valeur fournie est invalide.',
     form_password_incorrect: 'Mot de passe incorrect',
+    form_password_or_identifier_incorrect:
+      "Le mot de passe ou l'adresse e-mail est incorrect. Réessayez ou utilisez une autre méthode.",
     form_password_length_too_short: 'Votre mot de passe est trop court.',
     form_password_not_strong_enough: "Votre mot de passe n'est pas assez fort.",
     form_password_pwned:
@@ -893,9 +943,11 @@ export const frFR: LocalizationResource = {
     form_password_pwned__sign_in: 'Mot de passe compromis. Veuillez le réinitialiser.',
     form_password_size_in_bytes_exceeded:
       "Votre mot de passe a dépassé le nombre maximum d'octets autorisés. Veuillez le raccourcir ou supprimer certains caractères spéciaux.",
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Mot de passe incorrect',
     form_username_invalid_character: "L'identifiant contient des caractères invalides.",
     form_username_invalid_length: "Le nombre de caractères de l'identifiant est invalide.",
+    form_username_needs_non_number_char: "Votre nom d'utilisateur doit contenir au moins un caractère non numérique.",
     identification_deletion_failed: 'Vous ne pouvez pas supprimer votre dernière identification.',
     not_allowed_access:
       "L'adresse e-mail ou le numéro de téléphone n'est pas autorisée à s'inscrire. Cela peut être dû à l'utilisation de '+', '=', '#' ou '.' dans votre adresse e-mail, l'utilisation d'un domaine connecté à un service de messagerie temporaire ou l'exclusion explicite. Si vous pensez que c'est une erreur, veuillez contacter le support.",
@@ -925,6 +977,9 @@ export const frFR: LocalizationResource = {
     phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
     session_exists: 'Vous êtes déjà connecté.',
     web3_missing_identifier: 'Aucune extension de portefeuille Web3 trouvée. Veuillez en installer une pour continuer.',
+    web3_signature_request_rejected: 'Vous avez refusé la demande de signature. Veuillez réessayer pour continuer.',
+    web3_solana_signature_generation_failed:
+      "Une erreur s'est produite lors de la génération de la signature. Veuillez réessayer pour continuer.",
     zxcvbn: {
       couldBeStronger: "Votre mot de passe fonctionne mais pourrait être plus sûr. Essayez d'ajouter des caractères.",
       goodPassword: "Bien joué. C'est un excellent mot de passe.",
@@ -1298,6 +1353,10 @@ export const frFR: LocalizationResource = {
         detailsAction__nonPrimary: 'Définir comme principal',
         primaryButton: 'Portefeuilles Web3',
         title: 'Portefeuilles Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Sélectionnez un portefeuille Solana à connecter à votre compte.',
+          title: 'Ajouter un portefeuille Solana',
+        },
       },
     },
     usernamePage: {
@@ -1332,5 +1391,11 @@ export const frFR: LocalizationResource = {
       subtitle: 'Nous vous contacterons bientôt avec plus de détails.',
       title: 'Inscription réussie',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Se connecter avec {{walletName}}',
+    continue: 'Continuer avec {{walletName}}',
+    noneAvailable:
+      'Aucun portefeuille Solana Web3 détecté. Veuillez installer une {{ solanaWalletsLink || link("wallet extension") }} compatible Web3.',
   },
 } as const;

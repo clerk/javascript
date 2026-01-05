@@ -1,11 +1,13 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
+
 Monorepo Architecture and Structure
 
 Repository Overview
+
 - This is the official Clerk JavaScript SDK monorepo containing all Clerk authentication packages
 - Clerk provides streamlined user experiences for sign up, sign in, and profile management
 - All packages are published under the @clerk namespace on npm
@@ -13,16 +15,17 @@ Repository Overview
 - Supports multiple JavaScript frameworks and environments
 
 Core Package Categories
+
 - **Core SDK**: `@clerk/clerk-js` - Core browser SDK with UI components
 - **Framework Integrations**: Next.js, React, Vue, Astro, Nuxt, Remix, Express, Fastify
 - **Platform Support**: Expo (React Native), Chrome Extension
 - **Backend**: `@clerk/backend` - Server-side utilities and JWT verification
 - **Shared Utilities**: `@clerk/shared`, `@clerk/types` - Common utilities and TypeScript types
 - **Developer Tools**: `@clerk/testing`, `@clerk/dev-cli`, `@clerk/upgrade`
-- **UI Libraries**: `@clerk/elements` - Unstyled UI primitives, `@clerk/themes` - Pre-built themes
 - **Specialized**: `@clerk/agent-toolkit` - AI agent integration tools
 
 Directory Structure
+
 - `packages/` - All publishable packages
 - `integration/` - End-to-end tests and integration templates
 - `playground/` - Development and testing applications
@@ -31,6 +34,7 @@ Directory Structure
 - `tools/` - Internal development tools
 
 Development Workflow
+
 - Use `pnpm dev` to start development mode for all packages
 - Use `pnpm build` to build all packages
 - Use `pnpm test` to run unit tests across all packages
@@ -39,17 +43,18 @@ Development Workflow
 - Changesets for version management and release automation
 
 Framework-Specific Packages
+
 - `@clerk/nextjs` - Next.js App Router and Pages Router support
-- `@clerk/clerk-react` - React hooks and components
+- `@clerk/react` - React hooks and components
 - `@clerk/vue` - Vue.js composables and components
 - `@clerk/astro` - Astro integration with SSR support
 - `@clerk/nuxt` - Nuxt.js module
-- `@clerk/remix` - Remix loader and action utilities
 - `@clerk/express` - Express.js middleware
 - `@clerk/fastify` - Fastify plugin
 - `@clerk/expo` - React Native/Expo SDK
 
 Testing Architecture
+
 - Unit tests with Jest and Vitest
 - Integration tests with Playwright
 - Component testing with React Testing Library
@@ -58,6 +63,7 @@ Testing Architecture
 - Separate test configurations per framework
 
 Build System
+
 - Turbo for monorepo orchestration and caching
 - tsup for TypeScript compilation and bundling
 - ESLint with custom configurations for different package types
@@ -66,28 +72,42 @@ Build System
 - Type checking with TypeScript and publint
 
 Environment Configuration
-- Supports multiple Clerk environment variables (CLERK_*, NEXT_PUBLIC_CLERK_*, etc.)
+
+- Supports multiple Clerk environment variables (CLERK*\*, NEXT_PUBLIC_CLERK*\*, etc.)
 - Development, staging, and production configurations
 - Verdaccio for local npm registry testing
 - Docker support for integration testing
 - CI/CD with GitHub Actions
 
 Localization Support
+
 - `packages/localizations/` contains translations for 30+ languages
 - Modular localization system allowing partial imports
 - Support for RTL languages
 - Framework-agnostic translation utilities
 
 Package Interdependency Rules
+
 - `@clerk/shared` is a common dependency for most packages
-- `@clerk/types` provides TypeScript definitions used across packages
+- `@clerk/shared/types` provides TypeScript definitions used across packages
+  - `@clerk/types` is an alias for `@clerk/shared/types`, but its usage is deprecated. Prefer using `@clerk/shared/types`.
+  - If a TypeScript error comes from a type imported from `@clerk/shared/types`, run `turbo build --filter=@clerk/shared --filter=@clerk/types` to make sure the latest version of the packages are being used.
 - `@clerk/backend` is independent and used for server-side operations
 - Framework packages depend on `@clerk/clerk-js` for core functionality
 - Integration packages build upon framework-specific packages
 
 Release Management
+
 - Automated releases with Changesets
 - Semantic versioning across all packages
 - Canary and snapshot releases for testing
 - Git tags and GitHub releases for version tracking
 - Coordinated releases to maintain compatibility between packages
+
+Commit Messages
+
+- Commit messages must follow the conventional commit format using lowercase
+- Commit messages must be in English
+- Commit messages must be concise and to the point
+- Commit messages must be prefixed with the type of change
+- Commit messages must be prefixed with the scope of the change (package name or `js` for `clekr-js`, repo, release, e2e, \*)

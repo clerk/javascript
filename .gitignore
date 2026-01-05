@@ -8,6 +8,7 @@ out
 **/dist/*
 **/build/*
 packages/*/dist/**
+**/.pnpm-store/**
 
 # dependencies
 node_modules

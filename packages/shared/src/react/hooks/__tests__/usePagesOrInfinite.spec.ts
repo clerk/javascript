@@ -1,16 +1,80 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createDeferredPromise } from '../../../utils/createDeferredPromise';
+import { createDeferredPromise } from '@/utils/createDeferredPromise';
+
+import type { ResourceCacheStableKey } from '../../stable-keys';
+import { createCacheKeys } from '../createCacheKeys';
 import { usePagesOrInfinite } from '../usePagesOrInfinite';
+import { createMockClerk, createMockQueryClient } from './mocks/clerk';
 import { wrapper } from './wrapper';
 
-describe('usePagesOrInfinite - basic pagination', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+const defaultQueryClient = createMockQueryClient();
+
+const mockClerk = createMockClerk({
+  queryClient: defaultQueryClient,
+});
+
+type ConfigOverrides = Partial<{
+  infinite: boolean;
+  keepPreviousData: boolean;
+  enabled: boolean;
+  isSignedIn: boolean;
+  __experimental_mode: 'cache';
+  initialPage: number;
+  pageSize: number;
+}>;
+
+const buildConfig = <Params extends { initialPage?: number; pageSize?: number }>(
+  params: Params,
+  overrides: ConfigOverrides = {},
+) => ({
+  infinite: overrides.infinite ?? false,
+  keepPreviousData: overrides.keepPreviousData ?? false,
+  enabled: overrides.enabled ?? true,
+  isSignedIn: overrides.isSignedIn,
+  __experimental_mode: overrides.__experimental_mode,
+  initialPage: overrides.initialPage ?? params.initialPage ?? 1,
+  pageSize: overrides.pageSize ?? params.pageSize ?? 10,
+});
+
+const buildKeys = <Params extends Record<string, unknown>>(
+  stablePrefix: string,
+  params: Params,
+  tracked: Record<string, unknown> = {},
+  authenticated = true,
+) =>
+  createCacheKeys({
+    // Casting to ResourceCacheStableKey to satisfy the type checker,
+    // it is fine because we only want to limit the types to ensure our stable keys
+    // do not diverge when consumed from other pacakges.
+    // Since this is a test mocking most things we can safely ignore the type checker.
+    stablePrefix: stablePrefix as ResourceCacheStableKey,
+    authenticated,
+    tracked,
+    untracked: { args: params },
   });
 
-  it('uses SWR with merged key and fetcher params; maps data and count', async () => {
+const renderUsePagesOrInfinite = (args: { fetcher: any; config: any; keys: any }) =>
+  renderHook(() => usePagesOrInfinite(args as any), { wrapper });
+
+vi.mock('../../contexts', () => {
+  return {
+    useAssertWrappedByClerkProvider: () => {},
+    useClerkInstanceContext: () => mockClerk,
+    useUserContext: () => ({ id: 'user_123' }),
+    useOrganizationContext: () => ({ organization: { id: 'org_123' } }),
+  };
+});
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  defaultQueryClient.client.clear();
+  mockClerk.loaded = true;
+});
+
+describe('usePagesOrInfinite - basic pagination', () => {
+  it('uses query client with merged key and fetcher params; maps data and count', async () => {
     const fetcher = vi.fn(async (p: any) => {
       // simulate API returning paginated response
       return {
@@ -19,14 +83,11 @@ describe('usePagesOrInfinite - basic pagination', () => {
       };
     });
 
-    const params = { initialPage: 2, pageSize: 5 } as const;
-    const config = { infinite: false, keepPreviousData: true } as const;
-    const cacheKeys = { type: 't-basic', userId: 'user_123' } as const;
+    const params = { initialPage: 2, pageSize: 5 };
+    const config = buildConfig(params, { keepPreviousData: true });
+    const keys = buildKeys('t-basic', params, { userId: 'user_123' });
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     // wait until SWR mock finishes fetching
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -34,9 +95,7 @@ describe('usePagesOrInfinite - basic pagination', () => {
     // ensure fetcher received params without cache keys and with page info
     expect(fetcher).toHaveBeenCalledTimes(1);
     const calledWith = fetcher.mock.calls[0][0];
-    expect(calledWith).toMatchObject({ initialPage: 2, pageSize: 5 });
-    expect(calledWith.type).toBeUndefined();
-    expect(calledWith.userId).toBeUndefined();
+    expect(calledWith).toStrictEqual({ initialPage: 2, pageSize: 5 });
 
     // hook result mapping
     expect(result.current.isLoading).toBe(false);
@@ -76,14 +135,11 @@ describe('usePagesOrInfinite - request params and getDifferentKeys', () => {
       }),
     );
 
-    const params = { initialPage: 2, pageSize: 3, someFilter: 'A' } as const;
-    const cacheKeys = { type: 't-params', userId: 'user_42' } as const;
-    const config = { infinite: false, enabled: true } as const;
+    const params = { initialPage: 2, pageSize: 3, someFilter: 'A' };
+    const config = buildConfig(params);
+    const keys = buildKeys('t-params', params, { userId: 'user_42' });
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     await waitFor(() => expect(result.current.isLoading).toBe(true));
 
@@ -121,14 +177,11 @@ describe('usePagesOrInfinite - infinite mode', () => {
       });
     });
 
-    const params = { initialPage: 1, pageSize: 2 } as const;
-    const config = { infinite: true, keepPreviousData: false, enabled: true } as const;
-    const cacheKeys = { type: 't-infinite', orgId: 'org_1' } as const;
+    const params = { initialPage: 1, pageSize: 2 };
+    const config = buildConfig(params, { infinite: true });
+    const keys = buildKeys('t-infinite', params, { orgId: 'org_1' });
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     // first render should fetch first page
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -179,14 +232,11 @@ describe('usePagesOrInfinite - disabled and isSignedIn gating', () => {
   it('does not fetch when enabled=false (pagination mode)', () => {
     const fetcher = vi.fn(async () => ({ data: [], total_count: 0 }));
 
-    const params = { initialPage: 1, pageSize: 3 } as const;
-    const config = { infinite: false, enabled: false } as const;
-    const cacheKeys = { type: 't-disabled' } as const;
+    const params = { initialPage: 1, pageSize: 3 };
+    const config = buildConfig(params, { enabled: false });
+    const keys = buildKeys('t-disabled', params);
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     // our SWR mock sets loading=false if key is null and not calling fetcher
     expect(fetcher).toHaveBeenCalledTimes(0);
@@ -198,14 +248,11 @@ describe('usePagesOrInfinite - disabled and isSignedIn gating', () => {
   it('does not fetch when isSignedIn=false (pagination mode)', () => {
     const fetcher = vi.fn(async () => ({ data: [], total_count: 0 }));
 
-    const params = { initialPage: 1, pageSize: 3 } as const;
-    const config = { infinite: false, enabled: true, isSignedIn: false } as const;
-    const cacheKeys = { type: 't-signedin-false' } as const;
+    const params = { initialPage: 1, pageSize: 3 };
+    const config = buildConfig(params, { isSignedIn: false });
+    const keys = buildKeys('t-signedin-false', params);
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     expect(fetcher).toHaveBeenCalledTimes(0);
     expect(result.current.data).toEqual([]);
@@ -215,11 +262,11 @@ describe('usePagesOrInfinite - disabled and isSignedIn gating', () => {
   it('does not fetch when isSignedIn=false (infinite mode)', async () => {
     const fetcher = vi.fn(async () => ({ data: [], total_count: 0 }));
 
-    const params = { initialPage: 1, pageSize: 3 } as const;
-    const config = { infinite: true, enabled: true, isSignedIn: false } as const;
-    const cacheKeys = { type: 't-signedin-false-inf' } as const;
+    const params = { initialPage: 1, pageSize: 3 };
+    const config = buildConfig(params, { infinite: true, isSignedIn: false });
+    const keys = buildKeys('t-signedin-false-inf', params);
 
-    const { result } = renderHook(() => usePagesOrInfinite(params, fetcher, config, cacheKeys), { wrapper });
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     expect(fetcher).toHaveBeenCalledTimes(0);
     expect(result.current.data).toEqual([]);
@@ -231,14 +278,11 @@ describe('usePagesOrInfinite - cache mode', () => {
   it('does not call fetcher in cache mode and allows local setData/revalidate', async () => {
     const fetcher = vi.fn(async () => ({ data: [{ id: 'remote' }], total_count: 10 }));
 
-    const params = { initialPage: 1, pageSize: 3 } as const;
-    const config = { infinite: false, enabled: true, __experimental_mode: 'cache' as const };
-    const cacheKeys = { type: 't-cache', userId: 'u1' } as const;
+    const params = { initialPage: 1, pageSize: 3 };
+    const config = buildConfig(params, { __experimental_mode: 'cache' });
+    const keys = buildKeys('t-cache', params, { userId: 'u1' });
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     // Should never be fetching in cache mode
     expect(result.current.isFetching).toBe(false);
@@ -269,14 +313,12 @@ describe('usePagesOrInfinite - keepPreviousData behavior', () => {
       return deferred.promise.then(() => ({ data: [{ id: 'p2-a' }, { id: 'p2-b' }], total_count: 4 }));
     });
 
-    const params = { initialPage: 1, pageSize: 2 } as const;
-    const config = { infinite: false, keepPreviousData: true, enabled: true } as const;
-    const cacheKeys = { type: 't-keepPrev' } as const;
+    const params = { initialPage: 1, pageSize: 2 };
+    const config = buildConfig(params, { keepPreviousData: true });
+    const keys = buildKeys('t-keepPrev', params);
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
+    expect(result.current.isLoading).toBe(true);
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.data).toEqual([{ id: 'p1-a' }, { id: 'p1-b' }]);
 
@@ -285,8 +327,42 @@ describe('usePagesOrInfinite - keepPreviousData behavior', () => {
     });
     // page updated immediately, data remains previous while fetching
     expect(result.current.page).toBe(2);
+    // expect(result.current.isLoading).toBe(false);
     expect(result.current.isFetching).toBe(true);
     expect(result.current.data).toEqual([{ id: 'p1-a' }, { id: 'p1-b' }]);
+
+    // resolve next page
+    deferred.resolve(undefined);
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+    expect(result.current.data).toEqual([{ id: 'p2-a' }, { id: 'p2-b' }]);
+  });
+
+  it('empties previous page data when fetching next page (pagination mode)', async () => {
+    const deferred = createDeferredPromise();
+    const fetcher = vi.fn(async (p: any) => {
+      if (p.initialPage === 1) {
+        return { data: [{ id: 'p1-a' }, { id: 'p1-b' }], total_count: 4 };
+      }
+      return deferred.promise.then(() => ({ data: [{ id: 'p2-a' }, { id: 'p2-b' }], total_count: 4 }));
+    });
+
+    const params = { initialPage: 1, pageSize: 2 };
+    const config = buildConfig(params, { keepPreviousData: false });
+    const keys = buildKeys('t-keepPrev', params);
+
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
+    expect(result.current.isLoading).toBe(true);
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual([{ id: 'p1-a' }, { id: 'p1-b' }]);
+
+    act(() => {
+      result.current.fetchNext();
+    });
+    // page updated immediately, data remains previous while fetching
+    expect(result.current.page).toBe(2);
+    // expect(result.current.isLoading).toBe(false);
+    expect(result.current.isFetching).toBe(true);
+    expect(result.current.data).toEqual([]);
 
     // resolve next page
     deferred.resolve(undefined);
@@ -303,14 +379,11 @@ describe('usePagesOrInfinite - pagination helpers', () => {
       total_count: totalCount,
     }));
 
-    const params = { initialPage: 3, pageSize: 5 } as const;
-    const config = { infinite: false, enabled: true } as const;
-    const cacheKeys = { type: 't-helpers' } as const;
+    const params = { initialPage: 3, pageSize: 5 };
+    const config = buildConfig(params);
+    const keys = buildKeys('t-helpers', params);
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
@@ -336,14 +409,11 @@ describe('usePagesOrInfinite - pagination helpers', () => {
       total_count: totalCount,
     }));
 
-    const params = { initialPage: 1, pageSize: 4 } as const;
-    const config = { infinite: true, enabled: true } as const;
-    const cacheKeys = { type: 't-infinite-page' } as const;
+    const params = { initialPage: 1, pageSize: 4 };
+    const config = buildConfig(params, { infinite: true });
+    const keys = buildKeys('t-infinite-page', params);
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
@@ -374,14 +444,11 @@ describe('usePagesOrInfinite - behaviors mirrored from useCoreOrganization', () 
       });
     });
 
-    const params = { initialPage: 1, pageSize: 2 } as const;
-    const config = { infinite: false, keepPreviousData: false, enabled: true } as const;
-    const cacheKeys = { type: 't-core-like-paginated' } as const;
+    const params = { initialPage: 1, pageSize: 2 };
+    const config = buildConfig(params, { keepPreviousData: false });
+    const keys = buildKeys('t-core-like-paginated', params);
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     // initial
     expect(result.current.isLoading).toBe(true);
@@ -418,14 +485,11 @@ describe('usePagesOrInfinite - behaviors mirrored from useCoreOrganization', () 
       return deferred.promise.then(() => ({ data: [{ id: '3' }, { id: '4' }], total_count: 4 }));
     });
 
-    const params = { initialPage: 1, pageSize: 2 } as const;
-    const config = { infinite: true, keepPreviousData: false, enabled: true } as const;
-    const cacheKeys = { type: 't-core-like-infinite' } as const;
+    const params = { initialPage: 1, pageSize: 2 };
+    const config = buildConfig(params, { infinite: true, keepPreviousData: false });
+    const keys = buildKeys('t-core-like-infinite', params);
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.isFetching).toBe(false);
@@ -445,6 +509,35 @@ describe('usePagesOrInfinite - behaviors mirrored from useCoreOrganization', () 
 });
 
 describe('usePagesOrInfinite - revalidate behavior', () => {
+  it('refetches current data when revalidate is invoked', async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce({
+        data: [{ id: 'initial-1' }],
+        total_count: 1,
+      })
+      .mockResolvedValueOnce({
+        data: [{ id: 'refetched-1' }],
+        total_count: 1,
+      });
+
+    const params = { initialPage: 1, pageSize: 1 };
+    const config = buildConfig(params);
+    const keys = buildKeys('t-revalidate-refresh', params);
+
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual([{ id: 'initial-1' }]);
+
+    await act(async () => {
+      await (result.current as any).revalidate();
+    });
+
+    await waitFor(() => expect(result.current.data).toEqual([{ id: 'refetched-1' }]));
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
   it('pagination mode: isFetching toggles during revalidate, isLoading stays false after initial load', async () => {
     const deferred = createDeferredPromise();
     let callCount = 0;
@@ -459,14 +552,11 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
       }));
     });
 
-    const params = { initialPage: 1, pageSize: 2 } as const;
-    const config = { infinite: false, enabled: true } as const;
-    const cacheKeys = { type: 't-revalidate-paginated' } as const;
+    const params = { initialPage: 1, pageSize: 2 };
+    const config = buildConfig(params);
+    const keys = buildKeys('t-revalidate-paginated', params);
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     // Wait for initial load
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -505,14 +595,11 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
       }));
     });
 
-    const params = { initialPage: 1, pageSize: 2 } as const;
-    const config = { infinite: true, enabled: true } as const;
-    const cacheKeys = { type: 't-revalidate-infinite' } as const;
+    const params = { initialPage: 1, pageSize: 2 };
+    const config = buildConfig(params, { infinite: true });
+    const keys = buildKeys('t-revalidate-infinite', params);
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     // Wait for initial load
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -551,14 +638,11 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
       };
     });
 
-    const params = { initialPage: 1, pageSize: 2 } as const;
-    const config = { infinite: true, enabled: true } as const;
-    const cacheKeys = { type: 't-revalidate-all-pages' } as const;
+    const params = { initialPage: 1, pageSize: 2 };
+    const config = buildConfig(params, { infinite: true });
+    const keys = buildKeys('t-revalidate-all-pages', params);
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     // Wait for initial page load
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -603,6 +687,47 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
       { id: 'p2-1-revalidate' },
     ]);
   });
+
+  it('cascades revalidation to related queries only in React Query mode', async () => {
+    const params = { initialPage: 1, pageSize: 1 };
+    const keys = buildKeys('t-revalidate-cascade', params, { userId: 'user_123' });
+    const fetcher = vi.fn(async ({ initialPage }: any) => ({
+      data: [{ id: `item-${initialPage}-${fetcher.mock.calls.length}` }],
+      total_count: 3,
+    }));
+
+    const useBoth = () => {
+      const paginated = usePagesOrInfinite({
+        fetcher,
+        config: buildConfig(params),
+        keys,
+      });
+      const infinite = usePagesOrInfinite({
+        fetcher,
+        config: buildConfig(params, { infinite: true }),
+        keys,
+      });
+
+      return { paginated, infinite };
+    };
+
+    const { result } = renderHook(useBoth, { wrapper });
+
+    await waitFor(() => expect(result.current.paginated.isLoading).toBe(false));
+    await waitFor(() => expect(result.current.infinite.isLoading).toBe(false));
+
+    fetcher.mockClear();
+
+    await act(async () => {
+      await result.current.paginated.revalidate();
+    });
+
+    if (__CLERK_USE_RQ__) {
+      await waitFor(() => expect(fetcher.mock.calls.length).toBeGreaterThanOrEqual(2));
+    } else {
+      await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(1));
+    }
+  });
 });
 
 describe('usePagesOrInfinite - error propagation', () => {
@@ -611,14 +736,11 @@ describe('usePagesOrInfinite - error propagation', () => {
       throw new Error('boom');
     });
 
-    const params = { initialPage: 1, pageSize: 2 } as const;
-    const config = { infinite: false, enabled: true } as const;
-    const cacheKeys = { type: 't-error' } as const;
+    const params = { initialPage: 1, pageSize: 2 };
+    const config = buildConfig(params);
+    const keys = buildKeys('t-error', params);
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.error).toBeInstanceOf(Error);
@@ -628,19 +750,188 @@ describe('usePagesOrInfinite - error propagation', () => {
   it('sets error and isError in infinite mode when fetcher throws', async () => {
     const fetcher = vi.fn(() => Promise.reject(new Error('boom2')));
 
-    const params = { initialPage: 1, pageSize: 2 } as const;
-    const config = { infinite: true, enabled: true } as const;
-    const cacheKeys = { type: 't-error-inf' } as const;
+    const params = { initialPage: 1, pageSize: 2 };
+    const config = buildConfig(params, { infinite: true });
+    const keys = buildKeys('t-error-inf', params);
 
-    const { result } = renderHook(
-      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
-      { wrapper },
-    );
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.isError).toBe(true);
     expect(result.current.error).toBeInstanceOf(Error);
     expect(result.current.isLoading).toBe(false);
+  });
+});
+
+describe('usePagesOrInfinite - query state transitions and remounting', () => {
+  it('pagination mode: isLoading may briefly be true when query key changes, even with cached data', async () => {
+    const fetcher = vi.fn(async (p: any) => ({
+      data: [{ id: `item-${p.filter}` }],
+      total_count: 1,
+    }));
+
+    type TestParams = { initialPage: number; pageSize: number; filter: string };
+    const params1: TestParams = { initialPage: 1, pageSize: 2, filter: 'A' };
+
+    // First render with filter 'A'
+    const { result, rerender } = renderHook(
+      ({ params }: { params: TestParams }) =>
+        usePagesOrInfinite({
+          fetcher: fetcher as any,
+          config: buildConfig(params),
+          keys: buildKeys('t-transition-test', params),
+        } as any),
+      { wrapper, initialProps: { params: params1 } },
+    );
+
+    // Wait for initial data to load
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual([{ id: 'item-A' }]);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+
+    // Change query parameters (simulating tab switch or filter change)
+    const params2: TestParams = { initialPage: 1, pageSize: 2, filter: 'B' };
+    rerender({ params: params2 });
+
+    // During the transition, isLoading may briefly be true as RQ processes the new query
+    // This is the behavior that caused the flaky test - components that conditionally
+    // render based on isLoading may show loading state briefly
+    const capturedStates: Array<{ isLoading: boolean; isFetching: boolean }> = [];
+
+    // Capture states during transition
+    let iterations = 0;
+    while (iterations < 10 && result.current.data[0]?.id !== 'item-B') {
+      capturedStates.push({
+        isLoading: result.current.isLoading,
+        isFetching: result.current.isFetching,
+      });
+      await new Promise(resolve => setTimeout(resolve, 10));
+      iterations++;
+    }
+
+    // Wait for new data to settle
+    await waitFor(() => expect(result.current.data).toEqual([{ id: 'item-B' }]));
+    expect(result.current.isLoading).toBe(false);
+
+    // Document that during transition, we may see loading/fetching states
+    // This is expected RQ behavior and tests must account for it
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    const paramsCalls = fetcher.mock.calls.map(([params]) => params);
+    expect(paramsCalls[0]).toStrictEqual({ initialPage: 1, pageSize: 2, filter: 'A' });
+    expect(paramsCalls[1]).toStrictEqual({ initialPage: 1, pageSize: 2, filter: 'B' });
+  });
+
+  it('pagination mode: after data loads, subsequent renders with same params keep isLoading false', async () => {
+    const fetcher = vi.fn(async (_p: any) => ({
+      data: [{ id: 'stable' }],
+      total_count: 1,
+    }));
+
+    const params = { initialPage: 1, pageSize: 2 };
+    const config = buildConfig(params);
+    const keys = buildKeys('t-stable-render', params);
+
+    const { result, rerender } = renderUsePagesOrInfinite({ fetcher, config, keys });
+
+    // Wait for initial load
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual([{ id: 'stable' }]);
+
+    const initialCallCount = fetcher.mock.calls.length;
+
+    // Multiple re-renders with same params should not trigger loading state
+    rerender();
+    expect(result.current.isLoading).toBe(false);
+
+    rerender();
+    expect(result.current.isLoading).toBe(false);
+
+    rerender();
+    expect(result.current.isLoading).toBe(false);
+
+    // Should not have triggered additional fetches
+    expect(fetcher).toHaveBeenCalledTimes(initialCallCount);
+    expect(result.current.data).toEqual([{ id: 'stable' }]);
+  });
+
+  it('infinite mode: isLoading stays false when component re-renders after initial data load', async () => {
+    const fetcher = vi.fn(async (_p: any) => ({
+      data: [{ id: 'inf-1' }, { id: 'inf-2' }],
+      total_count: 2,
+    }));
+
+    const params = { initialPage: 1, pageSize: 2 };
+    const config = buildConfig(params, { infinite: true });
+    const keys = buildKeys('t-infinite-stable', params);
+
+    const { result, rerender } = renderUsePagesOrInfinite({ fetcher, config, keys });
+
+    // Wait for initial load
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual([{ id: 'inf-1' }, { id: 'inf-2' }]);
+
+    // Re-render multiple times - isLoading should remain false
+    rerender();
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.data).toEqual([{ id: 'inf-1' }, { id: 'inf-2' }]);
+
+    rerender();
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.data).toEqual([{ id: 'inf-1' }, { id: 'inf-2' }]);
+  });
+
+  it('documents the difference between isLoading and isFetching for test authors', async () => {
+    const deferred = createDeferredPromise();
+    let callCount = 0;
+    const fetcher = vi.fn(async (_p: any) => {
+      callCount++;
+      if (callCount === 1) {
+        return { data: [{ id: 'first' }], total_count: 1 };
+      }
+      return deferred.promise.then(() => ({ data: [{ id: 'second' }], total_count: 1 }));
+    });
+
+    const params = { initialPage: 1, pageSize: 2 };
+    const config = buildConfig(params);
+    const keys = buildKeys('t-loading-vs-fetching', params);
+
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
+
+    // On initial mount:
+    // - isLoading: true (first fetch, no data)
+    // - isFetching: true (query is running)
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.isFetching).toBe(true);
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.isFetching).toBe(false);
+    expect(result.current.data).toEqual([{ id: 'first' }]);
+
+    // Trigger refetch
+    act(() => {
+      (result.current as any).revalidate();
+    });
+
+    await waitFor(() => expect(result.current.isFetching).toBe(true));
+
+    // After initial load, during refetch:
+    // - isLoading: false (we have data, this is not the first fetch)
+    // - isFetching: true (query is running)
+    // This is CRITICAL for test stability - components that render based on
+    // isLoading should not show loading state during refetches
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isFetching).toBe(true);
+
+    // Resolve refetch
+    deferred.resolve(undefined);
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+
+    // After refetch completes:
+    // - isLoading: false
+    // - isFetching: false
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isFetching).toBe(false);
+    expect(result.current.data).toEqual([{ id: 'second' }]);
   });
 });

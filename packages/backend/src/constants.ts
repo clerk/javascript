@@ -3,7 +3,7 @@ export const API_VERSION = 'v1';
 
 export const USER_AGENT = `${PACKAGE_NAME}@${PACKAGE_VERSION}`;
 export const MAX_CACHE_LAST_UPDATED_AT_SECONDS = 5 * 60;
-export const SUPPORTED_BAPI_VERSION = '2025-04-10';
+export const SUPPORTED_BAPI_VERSION = '2025-11-10';
 
 const Attributes = {
   AuthToken: '__clerkAuthToken',
@@ -36,6 +36,7 @@ const QueryParameters = {
   HandshakeReason: '__clerk_hs_reason',
   HandshakeNonce: Cookies.HandshakeNonce,
   HandshakeFormat: 'format',
+  Session: '__session',
 } as const;
 
 const Headers = {

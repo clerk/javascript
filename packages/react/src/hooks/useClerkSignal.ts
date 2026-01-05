@@ -1,3 +1,4 @@
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { SignInSignalValue, SignUpSignalValue } from '@clerk/shared/types';
 import { useCallback, useSyncExternalStore } from 'react';
 
@@ -10,6 +11,17 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUp
   useAssertWrappedByClerkProvider('useClerkSignal');
 
   const clerk = useIsomorphicClerkContext();
+
+  switch (signal) {
+    case 'signIn':
+      clerk.telemetry?.record(eventMethodCalled('useSignIn', { apiVersion: '2025-11' }));
+      break;
+    case 'signUp':
+      clerk.telemetry?.record(eventMethodCalled('useSignUp', { apiVersion: '2025-11' }));
+      break;
+    default:
+      break;
+  }
 
   const subscribe = useCallback(
     (callback: () => void) => {
@@ -53,7 +65,7 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUp
  * This hook allows you to access the Signal-based `SignIn` resource.
  *
  * @example
- * import { useSignInSignal } from "@clerk/clerk-react/experimental";
+ * import { useSignInSignal } from "@clerk/react/experimental";
  *
  * function SignInForm() {
  *   const { signIn, errors, fetchStatus } = useSignInSignal();
@@ -62,7 +74,7 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUp
  *
  * @experimental This experimental API is subject to change.
  */
-export function useSignInSignal() {
+export function useSignIn() {
   return useClerkSignal('signIn');
 }
 
@@ -70,7 +82,7 @@ export function useSignInSignal() {
  * This hook allows you to access the Signal-based `SignUp` resource.
  *
  * @example
- * import { useSignUpSignal } from "@clerk/clerk-react/experimental";
+ * import { useSignUpSignal } from "@clerk/react/experimental";
  *
  * function SignUpForm() {
  *   const { signUp, errors, fetchStatus } = useSignUpSignal();
@@ -79,6 +91,6 @@ export function useSignInSignal() {
  *
  * @experimental This experimental API is subject to change.
  */
-export function useSignUpSignal() {
+export function useSignUp() {
   return useClerkSignal('signUp');
 }

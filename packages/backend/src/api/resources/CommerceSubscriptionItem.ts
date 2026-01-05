@@ -1,4 +1,4 @@
-import type { BillingMoneyAmount, BillingMoneyAmountJSON } from '@clerk/types';
+import type { BillingMoneyAmount, BillingMoneyAmountJSON } from '@clerk/shared/types';
 
 import { BillingPlan } from './CommercePlan';
 import type { BillingSubscriptionItemJSON } from './JSON';
@@ -19,7 +19,7 @@ export class BillingSubscriptionItem {
      */
     readonly status: BillingSubscriptionItemJSON['status'],
     /**
-     * The plan period for the subscription item.
+     * The Plan period for the subscription item.
      */
     readonly planPeriod: 'month' | 'annual',
     /**
@@ -29,26 +29,29 @@ export class BillingSubscriptionItem {
     /**
      * The next payment information.
      */
-    readonly nextPayment: {
-      /**
-       * The amount of the next payment.
-       */
-      amount: number;
-      /**
-       * Unix timestamp (milliseconds) of when the next payment is scheduled.
-       */
-      date: number;
-    } | null,
+    readonly nextPayment:
+      | {
+          /**
+           * The amount of the next payment.
+           */
+          amount: number;
+          /**
+           * Unix timestamp (milliseconds) of when the next payment is scheduled.
+           */
+          date: number;
+        }
+      | null
+      | undefined,
     /**
      * The current amount for the subscription item.
      */
-    readonly amount: BillingMoneyAmount | null | undefined,
+    readonly amount: BillingMoneyAmount | undefined,
     /**
-     * The plan associated with this subscription item.
+     * The Plan associated with this subscription item.
      */
     readonly plan: BillingPlan | null,
     /**
-     * The plan ID.
+     * The Plan ID.
      */
     readonly planId: string | null,
     /**
@@ -78,7 +81,7 @@ export class BillingSubscriptionItem {
     /**
      * The payer ID.
      */
-    readonly payerId: string,
+    readonly payerId: string | undefined,
     /**
      * Whether this subscription item is currently in a free trial period.
      */
@@ -86,7 +89,7 @@ export class BillingSubscriptionItem {
     /**
      * The lifetime amount paid for this subscription item.
      */
-    readonly lifetimePaid?: BillingMoneyAmount | null,
+    readonly lifetimePaid?: BillingMoneyAmount,
   ) {}
 
   static fromJSON(data: BillingSubscriptionItemJSON): BillingSubscriptionItem {
@@ -111,7 +114,7 @@ export class BillingSubscriptionItem {
       data.plan_period,
       data.period_start,
       data.next_payment,
-      formatAmountJSON(data.amount),
+      formatAmountJSON(data.amount) ?? undefined,
       data.plan ? BillingPlan.fromJSON(data.plan) : null,
       data.plan_id ?? null,
       data.created_at,
@@ -122,7 +125,7 @@ export class BillingSubscriptionItem {
       data.ended_at,
       data.payer_id,
       data.is_free_trial,
-      formatAmountJSON(data.lifetime_paid),
+      formatAmountJSON(data.lifetime_paid) ?? undefined,
     );
   }
 }

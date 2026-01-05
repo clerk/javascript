@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
@@ -613,6 +613,12 @@ export const caES: LocalizationResource = {
       subtitle: 'per continuar a {{applicationName}}',
       title: 'Comprova el teu correu electrònic',
     },
+    emailCodeMfa: {
+      formTitle: 'Comprova el teu correu electrònic',
+      resendButton: 'No has rebut el codi? Reenvia',
+      subtitle: 'per continuar a {{applicationName}}',
+      title: 'Comprova el teu correu electrònic',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -648,6 +654,12 @@ export const caES: LocalizationResource = {
         titleNewTab: "S'ha iniciat sessió en una altra pestanya",
       },
     },
+    emailLinkMfa: {
+      formSubtitle: "Utilitzeu l'enllaç de verificació enviat al vostre correu electrònic",
+      resendButton: "No heu rebut l'enllaç? Reenviar",
+      subtitle: 'per continuar a {{applicationName}}',
+      title: 'Comproveu el vostre correu electrònic',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -665,6 +677,8 @@ export const caES: LocalizationResource = {
       label__alternativeMethods: 'O bé, inicia sessió amb un altre mètode',
       title: 'Has oblidat la contrasenya?',
     },
+    newDeviceVerificationNotice:
+      "Estàs iniciant sessió des d'un dispositiu nou. Demanem verificació per mantenir el compte segur.",
     noAvailableMethods: {
       message: "No es pot procedir amb l'inici de sessió. No hi ha cap factor d'autenticació disponible.",
       subtitle: "S'ha produït un error",
@@ -679,7 +693,13 @@ export const caES: LocalizationResource = {
       subtitle: 'Introdueix la contrasenya associada al teu compte',
       title: 'Introdueix la teva contrasenya',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -729,6 +749,10 @@ export const caES: LocalizationResource = {
       formTitle: 'Codi de verificació',
       subtitle: "Per continuar, introdueix el codi de verificació generat per la teva aplicació d'autenticació",
       title: 'Verificació de dos passos',
+    },
+    web3Solana: {
+      subtitle: 'Selecciona una cartera a continuació per iniciar la sessió',
+      title: 'Inicia la sessió amb Solana',
     },
   },
   signInEnterPasswordTitle: 'Introdueix la teva contrasenya',
@@ -820,44 +844,67 @@ export const caES: LocalizationResource = {
       title: 'Crea el teu compte',
       titleCombined: 'Crea el teu compte',
     },
+    web3Solana: {
+      subtitle: 'Selecciona una cartera a continuació per registrar-te',
+      title: "Registra't amb Solana",
+    },
   },
   socialButtonsBlockButton: 'Continua amb {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Crear nova organització',
+      action__invitationAccept: 'Unir-se',
+      action__suggestionsAccept: 'Sol·licitar unir-se',
+      subtitle: 'Uniu-vos a una organització existent o creeu-ne una de nova',
+      suggestionsAcceptedLabel: "Pendent d'aprovació",
+      title: 'Trieu una organització',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Cancel·lar',
+      formButtonSubmit: 'Continuar',
+      formFieldInputPlaceholder__name: 'La meva organització',
+      formFieldInputPlaceholder__slug: 'la-meva-organitzacio',
+      formFieldLabel__name: 'Nom',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Introduïu els detalls de la vostra organització per continuar',
+      title: 'Configureu la vostra organització',
     },
+    organizationCreationDisabled: {
+      title: 'Heu de pertànyer a una organització',
+      subtitle: "Contacteu amb l'administrador de la vostra organització per obtenir una invitació.",
+    },
+    signOut: {
+      actionLink: 'Tancar sessió',
+      actionText: 'Sessió iniciada com a {{identifier}}',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
+    title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded:
+      'La mida del fitxer supera el límit màxim de 10 MB. Si us plau, tria un fitxer més petit.',
+    avatar_file_type_invalid: 'El tipus de fitxer no és compatible. Si us plau, puja una imatge JPG, PNG, GIF o WEBP.',
     captcha_invalid:
       "El registre no ha estat exitós a causa de validacions de seguretat fallides. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
     captcha_unavailable:
       "El registre no ha estat exitós a causa de la validació fallida de bot. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
     form_code_incorrect: 'El codi introduït no és vàlid. Si us plau, comprova el codi i torna-ho a intentar.',
+    form_email_address_blocked:
+      'Els serveis de correu electrònic temporal no estan suportats. Si us plau, utilitzeu la vostra adreça de correu electrònic habitual per crear un compte.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'No hem trobat cap compte amb aquests detalls.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Format de paràmetre no vàlid.',
     form_param_format_invalid__email_address: "L'adreça de correu electrònic ha de ser una adreça vàlida.",
     form_param_format_invalid__phone_number: 'El número de telèfon ha de tenir un format internacional vàlid.',
@@ -870,6 +917,8 @@ export const caES: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'La contrasenya introduïda és incorrecta.',
+    form_password_or_identifier_incorrect:
+      "La contrasenya o l'identificador és incorrecte. Torna-ho a intentar o utilitza un altre mètode.",
     form_password_length_too_short: 'La teva contrasenya ha de tenir almenys 8 caràcters.',
     form_password_not_strong_enough: 'La teva contrasenya no és prou forta.',
     form_password_pwned:
@@ -877,9 +926,11 @@ export const caES: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'La teva contrasenya ha superat el nombre màxim de bytes permesos, si us plau, redueix-la o elimina alguns caràcters especials.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Contrasenya incorrecta',
     form_username_invalid_character: "El nom d'usuari conté caràcters no vàlids.",
     form_username_invalid_length: "El nom d'usuari ha de tenir entre 3 i 50 caràcters.",
+    form_username_needs_non_number_char: "El vostre nom d'usuari ha de contenir almenys un caràcter no numèric.",
     identification_deletion_failed: 'No pots eliminar la teva última identificació.',
     not_allowed_access:
       "L'adreça de correu electrònic o el número de telèfon no es permet registrar-se. Això podria ser degut a l'ús de '+', '=', '#' o '.' a la vostra adreça de correu electrònic, utilitzant un domini connectat amb un servei de correu electrònic temporal o bloquejant-se explícitament. Si creieu que es tracta d'un error, poseu-vos en contacte amb el servei d'assistència.",
@@ -907,6 +958,9 @@ export const caES: LocalizationResource = {
     phone_number_exists: "Aquest número de telèfon ja està en ús. Si us plau, prova'n un altre.",
     session_exists: 'Ja estàs connectat.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Has rebutjat la sol·licitud de signatura. Torna-ho a provar per continuar.',
+    web3_solana_signature_generation_failed:
+      "S'ha produït un error en generar la signatura. Torna-ho a provar per continuar.",
     zxcvbn: {
       couldBeStronger: 'La teva contrasenya funciona, però podria ser més forta. Prova afegint més caràcters.',
       goodPassword: 'La teva contrasenya compleix tots els requisits necessaris.',
@@ -1281,6 +1335,10 @@ export const caES: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Carteres Web3',
         title: 'Carteres Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selecciona una cartera de Solana per connectar-la al teu compte.',
+          title: 'Afegeix una cartera de Solana',
+        },
       },
     },
     usernamePage: {
@@ -1304,16 +1362,22 @@ export const caES: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Iniciar sessió',
+      actionText: 'Ja tens accés?',
+      formButton: "Unir-se a la llista d'espera",
+      subtitle: "Introdueix la teva adreça de correu electrònic i t'avisarem quan el teu lloc estigui llest",
+      title: "Unir-se a la llista d'espera",
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: "Se't redirigirà aviat...",
+      subtitle: "T'enviarem un missatge quan el teu lloc estigui llest",
+      title: "Gràcies per unir-te a la llista d'espera!",
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Connecta amb {{walletName}}',
+    continue: 'Continua amb {{walletName}}',
+    noneAvailable:
+      'No s\'han detectat carteres Web3 de Solana. Instal·la una {{ solanaWalletsLink || link("wallet extension") }} compatible amb Web3.',
   },
 } as const;

@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - release/v4
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -43,27 +42,25 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
-
-      - name: Build release
-        run: pnpm turbo build $TURBO_ARGS --force
+          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          # turbo-team: ${{ vars.TURBO_TEAM }}
+          # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Create Release PR
         id: changesets
         uses: changesets/action@v1
         with:
-          commit: 'ci(repo): Version packages'
-          title: 'ci(repo): Version packages'
-          publish: pnpm release
+          commit: 'ci(repo): Version packages (Core 3)'
+          title: 'ci(repo): Version packages (Core 3)'
+          publish: pnpm turbo build $TURBO_ARGS --force && pnpm release
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: pnpm version-packages
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          HUSKY: '0'
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
@@ -78,14 +75,15 @@ jobs:
             const preMode = require("fs").existsSync("./.changeset/pre.json");
             if (!preMode) {
               const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+              const clerkUiVersion = require('./packages/ui/package.json').version;
               const nextjsVersion = require('./packages/nextjs/package.json').version;
 
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
                 repo: 'sdk-infra-workers',
-                workflow_id: 'update-clerkjs.yml',
+                workflow_id: 'update-pkg-versions.yml',
                 ref: 'main',
-                inputs: { version: clerkjsVersion }
+                inputs: { clerkjsVersion, clerkUiVersion }
               })
 
               github.rest.actions.createWorkflowDispatch({
@@ -94,7 +92,7 @@ jobs:
                 workflow_id: 'prepare-nextjs-sdk-update.yml',
                 ref: 'main',
                 inputs: { version: nextjsVersion }
-              })
+              }) 
 
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
@@ -139,6 +137,9 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
+          fetch-depth: 1
+          fetch-tags: false
+          filter: 'blob:none'
           show-progress: false
 
       - name: Cache node_modules (Node v${{ matrix.version }})

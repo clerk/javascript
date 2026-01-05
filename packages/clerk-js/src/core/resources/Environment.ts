@@ -2,16 +2,18 @@ import type {
   AuthConfigResource,
   CommerceSettingsResource,
   DisplayConfigResource,
+  EnableEnvironmentSettingParams,
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
   OrganizationSettingsResource,
+  ProtectConfigResource,
   UserSettingsResource,
 } from '@clerk/shared/types';
 
 import { eventBus, events } from '../../core/events';
 import { APIKeySettings } from './APIKeySettings';
-import { AuthConfig, BaseResource, CommerceSettings, DisplayConfig, UserSettings } from './internal';
+import { AuthConfig, BaseResource, CommerceSettings, DisplayConfig, ProtectConfig, UserSettings } from './internal';
 import { OrganizationSettings } from './OrganizationSettings';
 
 export class Environment extends BaseResource implements EnvironmentResource {
@@ -26,6 +28,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
   organizationSettings: OrganizationSettingsResource = new OrganizationSettings();
   commerceSettings: CommerceSettingsResource = new CommerceSettings();
   apiKeysSettings: APIKeySettings = new APIKeySettings();
+  protectConfig: ProtectConfigResource = new ProtectConfig();
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
@@ -54,6 +57,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
     this.userSettings = new UserSettings(data.user_settings);
     this.commerceSettings = new CommerceSettings(data.commerce_settings);
     this.apiKeysSettings = new APIKeySettings(data.api_keys_settings);
+    this.protectConfig = new ProtectConfig(data.protect_config);
 
     return this;
   }
@@ -95,6 +99,14 @@ export class Environment extends BaseResource implements EnvironmentResource {
       user_settings: this.userSettings.__internal_toSnapshot(),
       commerce_settings: this.commerceSettings.__internal_toSnapshot(),
       api_keys_settings: this.apiKeysSettings.__internal_toSnapshot(),
+      protect_config: this.protectConfig.__internal_toSnapshot(),
     };
+  }
+
+  async __internal_enableEnvironmentSetting(params: EnableEnvironmentSettingParams) {
+    await this._basePatch({
+      path: `/dev_tools/enable_environment_setting`,
+      body: params,
+    });
   }
 }

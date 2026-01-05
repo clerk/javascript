@@ -18,8 +18,6 @@ import type {
   PasskeyJSON,
   PhoneNumberJSON,
   PublicUserDataJSON,
-  SamlAccountConnectionJSON,
-  SamlAccountJSON,
   SessionJSON,
   SignUpJSON,
   SignUpVerificationJSON,
@@ -31,6 +29,7 @@ import type {
   Web3WalletJSON,
 } from './json';
 import type { OrganizationSettingsJSON } from './organizationSettings';
+import type { ProtectConfigJSON } from './protectConfig';
 import type { SignInJSON } from './signIn';
 import type { UserSettingsJSON } from './userSettings';
 import type { Nullable, Override } from './utils';
@@ -78,7 +77,6 @@ export type UserJSONSnapshot = Override<
     passkeys: PasskeyJSONSnapshot[];
     enterprise_accounts: EnterpriseAccountJSONSnapshot[];
     phone_numbers: PhoneNumberJSONSnapshot[];
-    saml_accounts: SamlAccountJSONSnapshot[];
     web3_wallets: Web3WalletJSONSnapshot[];
   }
 >;
@@ -119,6 +117,8 @@ export type EnvironmentJSONSnapshot = EnvironmentJSON;
 
 export type DisplayConfigJSONSnapshot = DisplayConfigJSON;
 
+export type ProtectConfigJSONSnapshot = ProtectConfigJSON;
+
 export type EmailAddressJSONSnapshot = Override<
   EmailAddressJSON,
   {
@@ -151,15 +151,6 @@ export type PhoneNumberJSONSnapshot = Override<
     verification: VerificationJSONSnapshot;
   }
 >;
-
-export type SamlAccountJSONSnapshot = Override<
-  SamlAccountJSON,
-  {
-    verification: VerificationJSONSnapshot | null;
-  }
->;
-
-export type SamlAccountConnectionJSONSnapshot = SamlAccountConnectionJSON;
 
 export type SignUpVerificationsJSONSnapshot = Override<
   SignUpVerificationsJSON,

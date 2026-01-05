@@ -1,5 +1,6 @@
-import { isClerkAPIResponseError } from '@clerk/shared/error';
-import type { Errors, SignInSignal, SignUpSignal } from '@clerk/shared/types';
+import type { ClerkAPIError, ClerkError } from '@clerk/shared/error';
+import { createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
+import type { Errors, SignInErrors, SignInSignal, SignUpErrors, SignUpSignal } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 import { computed, signal } from 'alien-signals';
 
@@ -7,7 +8,7 @@ import type { SignIn } from './resources/SignIn';
 import type { SignUp } from './resources/SignUp';
 
 export const signInResourceSignal = signal<{ resource: SignIn | null }>({ resource: null });
-export const signInErrorSignal = signal<{ error: unknown }>({ error: null });
+export const signInErrorSignal = signal<{ error: ClerkError | null }>({ error: null });
 export const signInFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
 
 export const signInComputedSignal: SignInSignal = computed(() => {
@@ -15,13 +16,13 @@ export const signInComputedSignal: SignInSignal = computed(() => {
   const error = signInErrorSignal().error;
   const fetchStatus = signInFetchSignal().status;
 
-  const errors = errorsToParsedErrors(error);
+  const errors = errorsToSignInErrors(error);
 
   return { errors, fetchStatus, signIn: signIn ? signIn.__internal_future : null };
 });
 
 export const signUpResourceSignal = signal<{ resource: SignUp | null }>({ resource: null });
-export const signUpErrorSignal = signal<{ error: unknown }>({ error: null });
+export const signUpErrorSignal = signal<{ error: ClerkError | null }>({ error: null });
 export const signUpFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
 
 export const signUpComputedSignal: SignUpSignal = computed(() => {
@@ -29,7 +30,7 @@ export const signUpComputedSignal: SignUpSignal = computed(() => {
   const error = signUpErrorSignal().error;
   const fetchStatus = signUpFetchSignal().status;
 
-  const errors = errorsToParsedErrors(error);
+  const errors = errorsToSignUpErrors(error);
 
   return { errors, fetchStatus, signUp: signUp ? signUp.__internal_future : null };
 });
@@ -38,20 +39,12 @@ export const signUpComputedSignal: SignUpSignal = computed(() => {
  * Converts an error to a parsed errors object that reports the specific fields that the error pertains to. Will put
  * generic non-API errors into the global array.
  */
-function errorsToParsedErrors(error: unknown): Errors {
-  const parsedErrors: Errors = {
-    fields: {
-      firstName: null,
-      lastName: null,
-      emailAddress: null,
-      identifier: null,
-      phoneNumber: null,
-      password: null,
-      username: null,
-      code: null,
-      captcha: null,
-      legalAccepted: null,
-    },
+export function errorsToParsedErrors<T extends Record<string, unknown>>(
+  error: ClerkError | null,
+  initialFields: T,
+): Errors<T> {
+  const parsedErrors: Errors<T> = {
+    fields: { ...initialFields },
     raw: null,
     global: null,
   };
@@ -62,29 +55,59 @@ function errorsToParsedErrors(error: unknown): Errors {
 
   if (!isClerkAPIResponseError(error)) {
     parsedErrors.raw = [error];
-    parsedErrors.global = [error];
+    parsedErrors.global = [createClerkGlobalHookError(error)];
     return parsedErrors;
   }
 
-  error.errors.forEach(error => {
-    if (parsedErrors.raw) {
-      parsedErrors.raw.push(error);
-    } else {
-      parsedErrors.raw = [error];
-    }
+  function isFieldError(error: ClerkAPIError): boolean {
+    return 'meta' in error && error.meta && 'paramName' in error.meta && error.meta.paramName !== undefined;
+  }
+  const hasFieldErrors = error.errors.some(isFieldError);
+  if (hasFieldErrors) {
+    error.errors.forEach(error => {
+      if (parsedErrors.raw) {
+        parsedErrors.raw.push(error);
+      } else {
+        parsedErrors.raw = [error];
+      }
+      if (isFieldError(error)) {
+        const name = snakeToCamel(error.meta.paramName);
+        if (name in parsedErrors.fields) {
+          (parsedErrors.fields as any)[name] = error;
+        }
+      }
+      // Note that this assumes a given ClerkAPIResponseError will only have either field errors or global errors, but
+      // not both. If a global error is present, it will be discarded.
+    });
 
-    if ('meta' in error && error.meta && 'paramName' in error.meta) {
-      const name = snakeToCamel(error.meta.paramName);
-      parsedErrors.fields[name as keyof typeof parsedErrors.fields] = error;
-      return;
-    }
+    return parsedErrors;
+  }
 
-    if (parsedErrors.global) {
-      parsedErrors.global.push(error);
-    } else {
-      parsedErrors.global = [error];
-    }
-  });
+  // At this point, we know that `error` is a ClerkAPIResponseError and that it has no field errors.
+  parsedErrors.raw = [error];
+  parsedErrors.global = [createClerkGlobalHookError(error)];
 
   return parsedErrors;
+}
+
+function errorsToSignInErrors(error: ClerkError | null): SignInErrors {
+  return errorsToParsedErrors(error, {
+    identifier: null,
+    password: null,
+    code: null,
+  });
+}
+
+function errorsToSignUpErrors(error: ClerkError | null): SignUpErrors {
+  return errorsToParsedErrors(error, {
+    firstName: null,
+    lastName: null,
+    emailAddress: null,
+    phoneNumber: null,
+    password: null,
+    username: null,
+    code: null,
+    captcha: null,
+    legalAccepted: null,
+  });
 }

@@ -75,10 +75,10 @@ Below you can find code snippets for running tests in a specific manner, easily 
 
 #### Keep temporary site
 
-During E2E runs a temporary site is created in which the template is copied into. If you want to keep the site around, pass the `CLEANUP` environment variable:
+During E2E runs a temporary site is created in which the template is copied into. If you want to keep the site around, pass the `E2E_CLEANUP` environment variable:
 
 ```shell
-CLEANUP=0 pnpm test:integration:base
+E2E_CLEANUP=0 pnpm test:integration:base
 ```
 
 For all available environment variables, check the [`constants.ts`](../integration/constants.ts) file.
@@ -364,11 +364,10 @@ Assuming you have a `react-parcel` template defined in `integration/templates`, 
      .setName('react-parcel')
      .useTemplate(templates['react-parcel'])
      .setEnvFormatter('public', key => `${key}`)
-     .addDependency('@clerk/clerk-react', constants.E2E_CLERK_VERSION || clerkReactLocal);
+     .addDependency('@clerk/react', constants.E2E_CLERK_JS_VERSION || clerkReactLocal);
    ```
 
    Here's what each thing is doing:
-
    - `setName`: Set internal name
    - `useTemplate`: Define which template inside `integration/templates` to use
    - `setEnvFormatter`: Define how environment variables should be formatted. The first argument accepts `'public'` and `'private'`. Inside [`envs.ts`](./presets/envs.ts) the environment variables you can use through [`withEnv`](#environment-configs) are defined. Since different frameworks require environment variables to be in different formats (e.g. Next.js wants public env vars to be prefixed with `NEXT_PUBLIC_`) you can use this formatter to change that.
@@ -579,7 +578,6 @@ Before writing tests, it's important to understand how Playwright handles test i
 > [!NOTE]
 > The test suite also uses these environment variables to run some tests:
 >
-> - `MAILSAC_API_KEY`: Used for [Mailsac](https://mailsac.com/) to retrieve email codes and magic links from temporary email addresses.
 > - `VERCEL_PROJECT_ID`: Only required if you plan on running deployment tests locally. This is the Vercel project ID, and it points to an application created via the Vercel dashboard. The easiest way to get access to it is by linking a local app to the Vercel project using the Vercel CLI, and then copying the values from the `.vercel` directory.
 > - `VERCEL_ORG_ID`: The organization that owns the Vercel project. See above for more details.
 > - `VERCEL_TOKEN`: A personal access token. This corresponds to a real user running the deployment command. Attention: Be extra careful with this token as it can't be scoped to a single Vercel project, meaning that the token has access to every project in the account it belongs to.

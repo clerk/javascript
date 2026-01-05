@@ -10,7 +10,6 @@ const FILES_WITHOUT_HEADINGS = [
   'use-organization-params.mdx',
   'paginated-resources.mdx',
   'pages-or-infinite-options.mdx',
-  'pages-or-infinite-options.mdx',
   'paginated-hook-config.mdx',
   'use-organization-list-return.mdx',
   'use-organization-list-params.mdx',
@@ -19,6 +18,21 @@ const FILES_WITHOUT_HEADINGS = [
   'verify-token-options.mdx',
   'public-organization-data-json.mdx',
   'organization-membership-public-user-data.mdx',
+  'use-checkout-return.mdx',
+  'use-checkout-options.mdx',
+  'use-payment-element-return.mdx',
+  'use-payment-methods-return.mdx',
+  'use-payment-attempts-return.mdx',
+  'use-plans-return.mdx',
+  'use-statements-return.mdx',
+  'hook-params.mdx',
+  'use-subscription-params.mdx',
+  'subscription-result.mdx',
+  'needs-reverification-parameters.mdx',
+  'use-reverification-options.mdx',
+  'use-reverification-params.mdx',
+  'payment-element-provider-props.mdx',
+  'payment-element-props.mdx',
 ];
 
 /**
@@ -29,6 +43,8 @@ const LINK_REPLACEMENTS = [
   ['set-active-params', '/docs/reference/javascript/types/set-active-params'],
   ['clerk-paginated-response', '/docs/reference/javascript/types/clerk-paginated-response'],
   ['paginated-resources', '#paginated-resources'],
+  ['use-checkout-options', '#use-checkout-options'],
+  ['needs-reverification-parameters', '#needs-reverification-parameters'],
   ['create-organization-params', '#create-organization-params'],
   ['session-resource', '/docs/reference/javascript/session'],
   ['signed-in-session-resource', '/docs/reference/javascript/session'],
@@ -62,13 +78,18 @@ const LINK_REPLACEMENTS = [
   ['billing-payer-resource', '/docs/reference/javascript/types/billing-payer-resource'],
   ['billing-plan-resource', '/docs/reference/javascript/types/billing-plan-resource'],
   ['billing-checkout-totals', '/docs/reference/javascript/types/billing-checkout-totals'],
+  ['billing-checkout-resource', '/docs/reference/javascript/types/billing-checkout-resource'],
   ['billing-money-amount', '/docs/reference/javascript/types/billing-money-amount'],
   ['billing-subscription-item-resource', '/docs/reference/javascript/types/billing-subscription-item-resource'],
   ['feature-resource', '/docs/reference/javascript/types/feature-resource'],
   ['billing-statement-group', '/docs/reference/javascript/types/billing-statement-group'],
+  ['billing-statement-resource', '/docs/reference/javascript/types/billing-statement-resource'],
+  ['billing-subscription-resource', '/docs/reference/javascript/types/billing-subscription-resource'],
+  ['clerk-api-response-error', '/docs/reference/javascript/types/clerk-api-response-error'],
   ['billing-statement-totals', '/docs/reference/javascript/types/billing-statement-totals'],
   ['billing-payment-resource', '/docs/reference/javascript/types/billing-payment-resource'],
   ['deleted-object-resource', '/docs/reference/javascript/types/deleted-object-resource'],
+  ['use-checkout-return', '/docs/reference/hooks/use-checkout#returns'],
 ];
 
 /**
@@ -100,10 +121,6 @@ function getCatchAllReplacements() {
     {
       pattern: /(?<![\[\w`])`Appearance`\\<`Theme`\\>/g,
       replace: '[`Appearance<Theme>`](/docs/guides/customizing-clerk/appearance-prop/overview)',
-    },
-    {
-      pattern: /(?<![\[\w`])`?BillingMoneyAmount`?(?![\]\w`])/g,
-      replace: '[`BillingMoneyAmount`](/docs/reference/javascript/types/billing-money-amount)',
     },
     {
       pattern: /\(CreateOrganizationParams\)/g,

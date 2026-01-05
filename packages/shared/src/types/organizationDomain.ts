@@ -19,6 +19,7 @@ export type OrganizationEnrollmentMode = 'manual_invitation' | 'automatic_invita
 
 /**
  * The `OrganizationDomain` object is the model around an organization domain.
+ *
  * @interface
  */
 export interface OrganizationDomainResource extends ClerkResource {

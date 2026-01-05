@@ -1,15 +1,9 @@
 // It's crucial this is the first import,
 // otherwise chunk loading will not work
-// eslint-disable-next-line
+
 import './utils/setWebpackChunkPublicPath';
 
-import 'regenerator-runtime/runtime';
-
 import { Clerk } from './core/clerk';
-
-import { mountComponentRenderer } from './ui/Components';
-
-Clerk.mountComponentRenderer = mountComponentRenderer;
 
 const publishableKey =
   document.querySelector('script[data-clerk-publishable-key]')?.getAttribute('data-clerk-publishable-key') ||
@@ -28,7 +22,6 @@ const domain =
 if (!window.Clerk) {
   window.Clerk = new Clerk(publishableKey, {
     proxyUrl,
-    // @ts-expect-error
     domain,
   });
 }

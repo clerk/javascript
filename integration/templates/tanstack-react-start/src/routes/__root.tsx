@@ -22,17 +22,25 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider>
-      <html>
-        <head>
-          <HeadContent />
-        </head>
-        <body>
+    <html>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <ClerkProvider
+          clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL}
+          clerkUiUrl={import.meta.env.VITE_CLERK_UI_URL}
+          appearance={{
+            options: {
+              showOptionalFields: true,
+            },
+          }}
+        >
           {children}
-          <TanStackRouterDevtools position='bottom-right' />
-          <Scripts />
-        </body>
-      </html>
-    </ClerkProvider>
+        </ClerkProvider>
+        <TanStackRouterDevtools position='bottom-right' />
+        <Scripts />
+      </body>
+    </html>
   );
 }

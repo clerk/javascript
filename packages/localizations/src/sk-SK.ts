@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
@@ -614,6 +614,12 @@ export const skSK: LocalizationResource = {
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Skontrolujte svoj email',
     },
+    emailCodeMfa: {
+      formTitle: 'Skontrolujte svoj email',
+      resendButton: 'Nedostali ste kód? Znova odoslať',
+      subtitle: 'pre pokračovanie do {{applicationName}}',
+      title: 'Skontrolujte svoj email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Pre pokračovanie otvorte overovací odkaz na zariadení a prehliadači použitom na prihlásenie.',
@@ -649,6 +655,12 @@ export const skSK: LocalizationResource = {
         titleNewTab: 'Prihlásené v inom okne',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Použite overovací odkaz odoslaný na váš e-mail',
+      resendButton: 'Nedostali ste odkaz? Znovu odoslať',
+      subtitle: 'pre pokračovanie do {{applicationName}}',
+      title: 'Skontrolujte svoj e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -666,6 +678,8 @@ export const skSK: LocalizationResource = {
       label__alternativeMethods: 'Alebo sa prihláste pomocou inej metódy.',
       title: 'Zabudli ste heslo?',
     },
+    newDeviceVerificationNotice:
+      'Prihlasujete sa z nového zariadenia. Žiadame o overenie, aby sme udržali váš účet v bezpečí.',
     noAvailableMethods: {
       message: 'Nemožno pokračovať v prihlásení. Nie je k dispozícii žiadna dostupná autentifikačná metóda.',
       subtitle: 'Došlo k chybe',
@@ -681,7 +695,13 @@ export const skSK: LocalizationResource = {
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Zadajte svoje heslo',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -730,6 +750,10 @@ export const skSK: LocalizationResource = {
       formTitle: 'Overovací kód',
       subtitle: 'Pre pokračovanie zadajte overovací kód z vašej autentifikačnej aplikácie',
       title: 'Dvojfaktorové overenie',
+    },
+    web3Solana: {
+      subtitle: 'Vyberte nižšie peňaženku na prihlásenie',
+      title: 'Prihlásiť sa cez Solana',
     },
   },
   signInEnterPasswordTitle: 'Zadajte svoje heslo',
@@ -825,44 +849,67 @@ export const skSK: LocalizationResource = {
       title: 'Vytvorte si účet',
       titleCombined: 'Vytvorte si účet',
     },
+    web3Solana: {
+      subtitle: 'Vyberte nižšie peňaženku na registráciu',
+      title: 'Zaregistrovať sa cez Solana',
+    },
   },
   socialButtonsBlockButton: 'Pokračovať s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Vytvoriť novú organizáciu',
+      action__invitationAccept: 'Pridať sa',
+      action__suggestionsAccept: 'Požiadať o pridanie',
+      subtitle: 'Pridajte sa k existujúcej organizácii alebo vytvorte novú',
+      suggestionsAcceptedLabel: 'Čaká na schválenie',
+      title: 'Vyberte organizáciu',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Zrušiť',
+      formButtonSubmit: 'Pokračovať',
+      formFieldInputPlaceholder__name: 'Moja organizácia',
+      formFieldInputPlaceholder__slug: 'moja-organizacia',
+      formFieldLabel__name: 'Názov',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Zadajte údaje o vašej organizácii pre pokračovanie',
+      title: 'Nastavte svoju organizáciu',
     },
+    organizationCreationDisabled: {
+      title: 'Musíte patriť do organizácie',
+      subtitle: 'Kontaktujte administrátora vašej organizácie pre pozvánku.',
+    },
+    signOut: {
+      actionLink: 'Odhlásiť sa',
+      actionText: 'Prihlásený ako {{identifier}}',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
+    title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Veľkosť súboru presahuje maximálny limit 10 MB. Vyberte prosím menší súbor.',
+    avatar_file_type_invalid:
+      'Typ súboru nie je podporovaný. Nahrajte prosím obrázok vo formáte JPG, PNG, GIF alebo WEBP.',
     captcha_invalid:
       'Registrácia zlyhala z dôvodu neúspešného overenia zabezpečenia. Obnovte stránku a skúste to znova alebo kontaktujte podporu pre ďalšiu pomoc.',
     captcha_unavailable:
       'Registrácia zlyhala z dôvodu neúspešného overenia proti botom. Obnovte stránku a skúste to znova alebo kontaktujte podporu pre ďalšiu pomoc.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Dočasné e-mailové služby nie sú podporované. Prosím, použite svoju bežnú e-mailovú adresu na vytvorenie účtu.',
     form_identifier_exists__email_address: 'Táto emailová adresa je už obsadená. Skúste prosím inú.',
     form_identifier_exists__phone_number: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     form_identifier_exists__username: 'Táto použivateľské meno je už obsadené. Skúste prosím iné.',
     form_identifier_not_found: 'Účet s týmto identifikátorom nebol nájdený. Skontrolujte údaje a skúste to znova.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Zadaná hodnota nie je v správnom formáte. Skontrolujte a opravte.',
     form_param_format_invalid__email_address: 'Emailová adresa musí byť platná.',
     form_param_format_invalid__phone_number: 'Telefónne číslo musí byť v platnom medzinárodnom formáte.',
@@ -875,6 +922,8 @@ export const skSK: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Hodnota je neplatná. Skontrolujte a opravte.',
     form_password_incorrect: 'Heslo je nesprávne. Skontrolujte a skúste to znova.',
+    form_password_or_identifier_incorrect:
+      'Heslo alebo e-mailová adresa je nesprávna. Skúste to znova alebo použite inú metódu.',
     form_password_length_too_short: 'Heslo musí mať aspoň 8 znakov.',
     form_password_not_strong_enough: 'Vaše heslo nie je dostatočne silné.',
     form_password_pwned: 'Toto heslo bolo nájdené v rámci úniku dát a nemôže byť použité, prosím zvoľte iné heslo.',
@@ -882,11 +931,13 @@ export const skSK: LocalizationResource = {
       'Toto heslo bolo nájdené v rámci úniku dát a nemôže byť použité, prosím zvoľte iné heslo.',
     form_password_size_in_bytes_exceeded:
       'Vaše heslo prekročilo maximálny povolený počet bytov, prosím skráťte ho alebo odstráňte niektoré špeciálne znaky.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Nesprávne heslo',
     form_username_invalid_character:
       'Používateľské meno môže obsahovať len písmená, číslice, pomlčky a podčiarkovníky.',
     form_username_invalid_length:
       'Používateľské meno musí mať aspoň {{min_length}} znaky a maximálne {{max_length}} znakov.',
+    form_username_needs_non_number_char: 'Vaše používateľské meno musí obsahovať aspoň jeden nečíselný znak.',
     identification_deletion_failed: 'Nemôžete odstrániť váš posledný identifikátor.',
     not_allowed_access: 'Nemáte povolený prístup k tejto stránke. Ak si myslíte, že je to chyba, kontaktujte podporu.',
     organization_domain_blocked: undefined,
@@ -913,6 +964,9 @@ export const skSK: LocalizationResource = {
     phone_number_exists: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     session_exists: 'Jste už přihlášen.',
     web3_missing_identifier: 'Rozšírenie Web3 Peňaženky nebolo nájdené. Je potrebné ho nainštalovať.',
+    web3_signature_request_rejected: 'Odmietli ste žiadosť o podpis. Skúste to znova, aby ste mohli pokračovať.',
+    web3_solana_signature_generation_failed:
+      'Pri generovaní podpisu sa vyskytla chyba. Skúste to znova, aby ste mohli pokračovať.',
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by byť silnejšie. Skúste pridať viac znakov.',
       goodPassword: 'Dobrá práca. Toto je vynikajúce heslo.',
@@ -1281,6 +1335,10 @@ export const skSK: LocalizationResource = {
         detailsAction__nonPrimary: 'Nastaiť ako hlavnú',
         primaryButton: 'Web3 peňaženky',
         title: 'Web3 peňaženky',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Vyberte Solana peňaženku na pripojenie k vášmu účtu.',
+          title: 'Pridať Solana peňaženku',
+        },
       },
     },
     usernamePage: {
@@ -1315,5 +1373,11 @@ export const skSK: LocalizationResource = {
       subtitle: 'Budeme vás informovať, keď bude prístup povolený.',
       title: 'Ďakujeme, že ste sa pridali na waitlist!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Pripojiť pomocou {{walletName}}',
+    continue: 'Pokračovať pomocou {{walletName}}',
+    noneAvailable:
+      'Neboli zistené žiadne Solana Web3 peňaženky. Nainštalujte si {{ solanaWalletsLink || link("wallet extension") }} s podporou Web3.',
   },
 } as const;

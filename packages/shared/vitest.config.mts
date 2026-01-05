@@ -21,17 +21,11 @@ function HookAliasPlugin() {
 
       const candidates: string[] = [];
       for (const base of baseDirs) {
-        if (name.toLowerCase().includes('provider')) {
-          candidates.push(
-            path.join(base, 'src', 'react', 'providers', impl),
-            path.join(base, 'src', 'react', 'hooks', impl),
-          );
-        } else {
-          candidates.push(
-            path.join(base, 'src', 'react', 'hooks', impl),
-            path.join(base, 'src', 'react', 'providers', impl),
-          );
-        }
+        candidates.push(
+          path.join(base, 'src', 'react', 'hooks', impl),
+          path.join(base, 'src', 'react', 'billing', impl),
+          path.join(base, 'src', 'react', 'providers', impl),
+        );
       }
 
       for (const candidate of candidates) {
@@ -46,6 +40,11 @@ function HookAliasPlugin() {
 
 export default defineConfig({
   plugins: [HookAliasPlugin()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   test: {
     watch: false,
     typecheck: {

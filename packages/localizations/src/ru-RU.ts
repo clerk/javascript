@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ruRU: LocalizationResource = {
   locale: 'ru-RU',
@@ -620,6 +620,12 @@ export const ruRU: LocalizationResource = {
       subtitle: 'для продолжения работы в "{{applicationName}}"',
       title: 'Проверьте Вашу почту',
     },
+    emailCodeMfa: {
+      formTitle: 'Проверьте Вашу почту',
+      resendButton: 'Не получили код? Отправить снова.',
+      subtitle: 'для продолжения работы в "{{applicationName}}"',
+      title: 'Проверьте Вашу почту',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -656,6 +662,12 @@ export const ruRU: LocalizationResource = {
         titleNewTab: 'Залогиньтесь на другой вкладке',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Используйте ссылку для подтверждения, отправленную на вашу электронную почту',
+      resendButton: 'Не получили ссылку? Отправить повторно',
+      subtitle: 'чтобы продолжить в {{applicationName}}',
+      title: 'Проверьте свою электронную почту',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -673,6 +685,8 @@ export const ruRU: LocalizationResource = {
       label__alternativeMethods: 'Или, войти другим способом',
       title: 'Забыли пароль?',
     },
+    newDeviceVerificationNotice:
+      'Вы входите с нового устройства. Мы просим подтверждение для обеспечения безопасности вашего аккаунта.',
     noAvailableMethods: {
       message: 'Невозможно войти. Нет доступных факторов аутентификации.',
       subtitle: 'Произошла ошибка',
@@ -688,8 +702,14 @@ export const ruRU: LocalizationResource = {
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Введите пароль',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Пароль скомпрометирован',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Верификационный код',
@@ -737,6 +757,10 @@ export const ruRU: LocalizationResource = {
       formTitle: 'Верификационный код',
       subtitle: 'Чтобы продолжить, пожалуйста, введите код проверки, сгенерированный вашим приложением аутентификации.',
       title: 'Двухфакторная верификация',
+    },
+    web3Solana: {
+      subtitle: 'Выберите кошелёк ниже, чтобы войти',
+      title: 'Войти через Solana',
     },
   },
   signInEnterPasswordTitle: 'Введите Ваш пароль',
@@ -832,44 +856,68 @@ export const ruRU: LocalizationResource = {
       title: 'Создайте Вашу учетную запись',
       titleCombined: 'Создайте Вашу учетную запись',
     },
+    web3Solana: {
+      subtitle: 'Выберите кошелёк ниже, чтобы зарегистрироваться',
+      title: 'Зарегистрироваться через Solana',
+    },
   },
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Создать новую организацию',
+      action__invitationAccept: 'Присоединиться',
+      action__suggestionsAccept: 'Запросить присоединение',
+      subtitle: 'Присоединитесь к существующей организации или создайте новую',
+      suggestionsAcceptedLabel: 'Ожидает одобрения',
+      title: 'Выберите организацию',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Отмена',
+      formButtonSubmit: 'Продолжить',
+      formFieldInputPlaceholder__name: 'Моя организация',
+      formFieldInputPlaceholder__slug: 'moya-organizatsiya',
+      formFieldLabel__name: 'Название',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Введите данные вашей организации для продолжения',
+      title: 'Настройте вашу организацию',
     },
+    organizationCreationDisabled: {
+      title: 'Вы должны принадлежать к организации',
+      subtitle: 'Свяжитесь с администратором вашей организации для получения приглашения.',
+    },
+    signOut: {
+      actionLink: 'Выйти',
+      actionText: 'Вошли как {{identifier}}',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
+    title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} уже является членом организации.',
+    avatar_file_size_exceeded:
+      'Размер файла превышает максимальный лимит 10 МБ. Пожалуйста, выберите файл меньшего размера.',
+    avatar_file_type_invalid:
+      'Тип файла не поддерживается. Пожалуйста, загрузите изображение в формате JPG, PNG, GIF или WEBP.',
     captcha_invalid:
       'Регистрация не удалась из-за неудачных проверок безопасности. Пожалуйста, обновите страницу, чтобы попробовать снова, или обратитесь в службу поддержки для получения дополнительной помощи.',
     captcha_unavailable:
       'Регистрация не удалась из-за неудачной проверки бота. Пожалуйста, обновите страницу, чтобы попробовать снова, или обратитесь в службу поддержки для получения дополнительной помощи.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Временные почтовые службы не поддерживаются. Пожалуйста, используйте свой обычный адрес электронной почты для создания аккаунта.',
     form_identifier_exists__email_address: 'Этот адрес электронной почты уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__phone_number: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__username: 'Это имя пользователя уже занято. Пожалуйста, попробуйте другое.',
     form_identifier_not_found: 'Мы не смогли найти учетную запись с этими данными.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Адрес электронной почты должен быть действительным.',
     form_param_format_invalid__phone_number: 'Номер телефона должен быть в действующем международном формате.',
@@ -882,6 +930,8 @@ export const ruRU: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Пароль или адрес электронной почты неверен. Попробуйте снова или используйте другой метод.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Ваш пароль недостаточно надежный.',
     form_password_pwned: 'Этот пароль был взломан и не может быть использован, попробуйте другой пароль.',
@@ -889,9 +939,11 @@ export const ruRU: LocalizationResource = {
       'Этот пароль был найден в утечке данных и не может быть использован. Пожалуйста, сбросьте пароль.',
     form_password_size_in_bytes_exceeded:
       'Ваш пароль превышает максимально допустимое количество байтов, сократите его или удалите некоторые специальные символы.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Неверный пароль',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Имя пользователя должно содержать хотя бы один нецифровой символ.',
     identification_deletion_failed: 'Вы не можете удалить последнюю идентификацию.',
     not_allowed_access:
       "Адрес электронной почты или номер телефона не разрешен для регистрации. Это может быть связано с использованием '+', '=', '#' или '.' в вашем адресе электронной почты, использованием домена, связанного с временной электронной почтой, или явным исключением.",
@@ -921,6 +973,10 @@ export const ruRU: LocalizationResource = {
     phone_number_exists: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     session_exists: 'Вы уже вошли в систему.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected:
+      'Вы отклонили запрос на подпись. Пожалуйста, попробуйте ещё раз, чтобы продолжить.',
+    web3_solana_signature_generation_failed:
+      'Произошла ошибка при создании подписи. Пожалуйста, попробуйте ещё раз, чтобы продолжить.',
     zxcvbn: {
       couldBeStronger: 'Ваш пароль подходит, но мог бы быть надежнее. Попробуйте добавить больше символов.',
       goodPassword: 'Хорошая работа. Это отличный пароль.',
@@ -1295,6 +1351,10 @@ export const ruRU: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 кошельки',
         title: 'Web3 кошельки',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Выберите кошелёк Solana для подключения к вашему аккаунту.',
+          title: 'Добавить кошелёк Solana',
+        },
       },
     },
     usernamePage: {
@@ -1329,5 +1389,11 @@ export const ruRU: LocalizationResource = {
       subtitle: 'Мы свяжемся с вами, когда появится ваш доступ',
       title: 'Спасибо за присоединение к списку ожидания!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Подключиться через {{walletName}}',
+    continue: 'Продолжить через {{walletName}}',
+    noneAvailable:
+      'Кошельки Solana Web3 не обнаружены. Установите {{ solanaWalletsLink || link("wallet extension") }} с поддержкой Web3.',
   },
 } as const;

@@ -24,6 +24,13 @@ const mockClaimedInstanceEnvironmentCall = async (page: Page) => {
 
 test.describe('Keyless mode @quickstart', () => {
   test.describe.configure({ mode: 'serial' });
+
+  test.use({
+    extraHTTPHeaders: {
+      'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET || '',
+    },
+  });
+
   let app: Application;
   let dashboardUrl = 'https://dashboard.clerk.com/';
 
@@ -88,7 +95,7 @@ test.describe('Keyless mode @quickstart', () => {
 
       const signUpForceRedirectUrlCheck =
         signUpForceRedirectUrl?.startsWith(urlToReturnTo) ||
-        (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}workspace-selection`) &&
+        (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
           signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
 
       return (
