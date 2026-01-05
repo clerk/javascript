@@ -11,12 +11,21 @@ const mocks = vi.hoisted(() => {
       presentExplicitSignIn: vi.fn(),
     },
     isSuccessResponse: vi.fn(),
+    isClerkAPIResponseError: vi.fn(),
   };
 });
 
 vi.mock('@clerk/react', () => {
   return {
     useClerk: mocks.useClerk,
+  };
+});
+
+vi.mock('@clerk/shared/error', async importOriginal => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    isClerkAPIResponseError: mocks.isClerkAPIResponseError,
   };
 });
 
@@ -93,6 +102,9 @@ describe('useSignInWithGoogle', () => {
         signUp: mockSignUp,
       },
     });
+
+    // Default to false - tests that need this can override
+    mocks.isClerkAPIResponseError.mockReturnValue(false);
   });
 
   afterEach(() => {
@@ -228,11 +240,13 @@ describe('useSignInWithGoogle', () => {
 
       // Mock signIn.create to throw external_account_not_found Clerk error
       const externalAccountError = {
-        clerkError: true,
         errors: [{ code: 'external_account_not_found' }],
         message: 'External account not found',
       };
       mockSignIn.create.mockRejectedValue(externalAccountError);
+
+      // Mock isClerkAPIResponseError to return true for this error
+      mocks.isClerkAPIResponseError.mockReturnValue(true);
 
       // Mock signUp.create to succeed with a new session
       const mockSignUpWithSession = {

@@ -2436,7 +2436,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {'0': node >=0.10.0}
+    engines: {node: '>=0.10.0'}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==}
@@ -2475,9 +2475,6 @@ packages:
 
   '@expo/config-types@54.0.10':
     resolution: {integrity: sha512-/J16SC2an1LdtCZ67xhSkGXpALYUVUNyZws7v+PVsFZxClYehDSoKLqyRaGkpHlYrCc08bS0RF5E0JV6g50psA==}
-
-  '@expo/config-types@54.0.8':
-    resolution: {integrity: sha512-lyIn/x/Yz0SgHL7IGWtgTLg6TJWC9vL7489++0hzCHZ4iGjVcfZmPTUfiragZ3HycFFj899qN0jlhl49IHa94A==}
 
   '@expo/config@10.0.11':
     resolution: {integrity: sha512-nociJ4zr/NmbVfMNe9j/+zRlt7wz/siISu7PjdWE4WE+elEGxWWxsGzltdJG0llzrM+khx8qUiFK5aiVcdMBww==}
@@ -2525,9 +2522,6 @@ packages:
   '@expo/image-utils@0.8.7':
     resolution: {integrity: sha512-SXOww4Wq3RVXLyOaXiCCuQFguCDh8mmaHBv54h/R29wGl4jRY8GEyQEx8SypV/iHt1FbzsU/X3Qbcd9afm2W2w==}
 
-  '@expo/json-file@10.0.7':
-    resolution: {integrity: sha512-z2OTC0XNO6riZu98EjdNHC05l51ySeTto6GP7oSQrCvQgG9ARBwD1YvMQaVZ9wU7p/4LzSf1O7tckL3B45fPpw==}
-
   '@expo/json-file@10.0.8':
     resolution: {integrity: sha512-9LOTh1PgKizD1VXfGQ88LtDH0lRwq9lsTb4aichWTWSWqy3Ugfkhfm3BhzBIkJJfQQ5iJu3m/BoRlEIjoCGcnQ==}
 
@@ -2574,9 +2568,6 @@ packages:
 
   '@expo/plist@0.2.2':
     resolution: {integrity: sha512-ZZGvTO6vEWq02UAPs3LIdja+HRO18+LRI5QuDl6Hs3Ps7KX7xU6Y6kjahWKY37Rx2YjNpX07dGpBFzzC+vKa2g==}
-
-  '@expo/plist@0.4.7':
-    resolution: {integrity: sha512-dGxqHPvCZKeRKDU1sJZMmuyVtcASuSYh1LPFVaM1DuffqPL36n6FMEL0iUqq2Tx3xhWk8wCnWl34IKplUjJDdA==}
 
   '@expo/plist@0.4.8':
     resolution: {integrity: sha512-pfNtErGGzzRwHP+5+RqswzPDKkZrx+Cli0mzjQaus1ZWFsog5ibL+nVT3NcporW51o8ggnt7x813vtRbPiyOrQ==}
@@ -17036,13 +17027,13 @@ snapshots:
       '@expo/devcert': 1.2.0
       '@expo/env': 2.0.7
       '@expo/image-utils': 0.8.7
-      '@expo/json-file': 10.0.7
+      '@expo/json-file': 10.0.8
       '@expo/mcp-tunnel': 0.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@expo/metro': 54.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@expo/metro-config': 54.0.9(bufferutil@4.0.9)(expo@54.0.23(@babel/core@7.28.5)(bufferutil@4.0.9)(graphql@16.12.0)(react-native@0.81.5(@babel/core@7.28.5)(@react-native-community/cli@12.3.7(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@types/react@18.3.26)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)
       '@expo/osascript': 2.3.7
       '@expo/package-manager': 1.9.8
-      '@expo/plist': 0.4.7
+      '@expo/plist': 0.4.8
       '@expo/prebuild-config': 54.0.6(expo@54.0.23(@babel/core@7.28.5)(bufferutil@4.0.9)(graphql@16.12.0)(react-native@0.81.5(@babel/core@7.28.5)(@react-native-community/cli@12.3.7(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@types/react@18.3.26)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10))
       '@expo/schema-utils': 0.1.7
       '@expo/spawn-async': 1.7.2
@@ -17172,8 +17163,6 @@ snapshots:
 
   '@expo/config-types@54.0.10': {}
 
-  '@expo/config-types@54.0.8': {}
-
   '@expo/config@10.0.11':
     dependencies:
       '@babel/code-frame': 7.10.4
@@ -17196,8 +17185,8 @@ snapshots:
     dependencies:
       '@babel/code-frame': 7.10.4
       '@expo/config-plugins': 54.0.4
-      '@expo/config-types': 54.0.8
-      '@expo/json-file': 10.0.7
+      '@expo/config-types': 54.0.10
+      '@expo/json-file': 10.0.8
       deepmerge: 4.3.1
       getenv: 2.0.0
       glob: 10.4.5
@@ -17328,11 +17317,6 @@ snapshots:
       temp-dir: 2.0.0
       unique-string: 2.0.0
 
-  '@expo/json-file@10.0.7':
-    dependencies:
-      '@babel/code-frame': 7.10.4
-      json5: 2.2.3
-
   '@expo/json-file@10.0.8':
     dependencies:
       '@babel/code-frame': 7.10.4
@@ -17394,7 +17378,7 @@ snapshots:
       '@babel/generator': 7.28.5
       '@expo/config': 12.0.10
       '@expo/env': 2.0.7
-      '@expo/json-file': 10.0.7
+      '@expo/json-file': 10.0.8
       '@expo/metro': 54.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@expo/spawn-async': 1.7.2
       browserslist: 4.27.0
@@ -17443,7 +17427,7 @@ snapshots:
 
   '@expo/package-manager@1.9.8':
     dependencies:
-      '@expo/json-file': 10.0.7
+      '@expo/json-file': 10.0.8
       '@expo/spawn-async': 1.7.2
       chalk: 4.1.2
       npm-package-arg: 11.0.3
@@ -17462,12 +17446,6 @@ snapshots:
       base64-js: 1.5.1
       xmlbuilder: 14.0.0
 
-  '@expo/plist@0.4.7':
-    dependencies:
-      '@xmldom/xmldom': 0.8.11
-      base64-js: 1.5.1
-      xmlbuilder: 15.1.1
-
   '@expo/plist@0.4.8':
     dependencies:
       '@xmldom/xmldom': 0.8.11
@@ -17478,9 +17456,9 @@ snapshots:
     dependencies:
       '@expo/config': 12.0.10
       '@expo/config-plugins': 54.0.4
-      '@expo/config-types': 54.0.8
+      '@expo/config-types': 54.0.10
       '@expo/image-utils': 0.8.7
-      '@expo/json-file': 10.0.7
+      '@expo/json-file': 10.0.8
       '@react-native/normalize-colors': 0.81.5
       debug: 4.4.3(supports-color@8.1.1)
       expo: 54.0.23(@babel/core@7.28.5)(bufferutil@4.0.9)(graphql@16.12.0)(react-native@0.81.5(@babel/core@7.28.5)(@react-native-community/cli@12.3.7(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@types/react@18.3.26)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
