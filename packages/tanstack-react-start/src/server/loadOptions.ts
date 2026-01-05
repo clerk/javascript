@@ -5,8 +5,8 @@ import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
 
-import { canUseKeyless } from '../utils/feature-flags';
 import { errorThrower } from '../utils';
+import { canUseKeyless } from '../utils/feature-flags';
 import { commonEnvs } from './constants';
 import type { LoaderOptions } from './types';
 
