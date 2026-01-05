@@ -8,6 +8,7 @@ import type {
   GetMembershipRequestParams,
   GetMemberships,
   GetRolesParams,
+  GetRolesResponse,
   InviteMemberParams,
   InviteMembersParams,
   OrganizationDomainJSON,
@@ -84,7 +85,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     });
   };
 
-  getRoles = async (getRolesParams?: GetRolesParams) => {
+  getRoles = async (getRolesParams?: GetRolesParams): Promise<GetRolesResponse> => {
     return await BaseResource._fetch(
       {
         path: `/organizations/${this.id}/roles`,
