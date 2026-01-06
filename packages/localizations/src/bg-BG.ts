@@ -396,6 +396,12 @@ export const bgBG: LocalizationResource = {
         headerTitle__members: 'Членове',
         headerTitle__requests: 'Заявки',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Ролите са временно заключени',
+          subtitle: 'Актуализираме наличните роли. Когато това приключи, ще можете отново да актуализирате ролите.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

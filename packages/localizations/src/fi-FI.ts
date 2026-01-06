@@ -396,6 +396,12 @@ export const fiFI: LocalizationResource = {
         headerTitle__members: 'Jäsenet',
         headerTitle__requests: 'Pyyntöjä',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roolit on tilapäisesti lukittu',
+          subtitle: 'Päivitämme käytettävissä olevia rooleja. Kun se on tehty, voit päivittää rooleja uudelleen.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

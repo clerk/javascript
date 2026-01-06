@@ -403,6 +403,12 @@ export const jaJP: LocalizationResource = {
         headerTitle__members: 'メンバー',
         headerTitle__requests: 'リクエスト',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'ロールは一時的にロックされています',
+          subtitle: '利用可能なロールを更新しています。完了次第、ロールを再度更新できるようになります。',
+        },
+      },
     },
     navbar: {
       apiKeys: 'APIキー',

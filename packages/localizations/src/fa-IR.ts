@@ -402,6 +402,13 @@ export const faIR: LocalizationResource = {
         headerTitle__members: 'اعضا',
         headerTitle__requests: 'درخواست‌ها',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'نقش‌ها موقتاً قفل شده‌اند',
+          subtitle:
+            'ما در حال به‌روزرسانی نقش‌های موجود هستیم. پس از اتمام، می‌توانید دوباره نقش‌ها را به‌روزرسانی کنید.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'کلیدهای API',

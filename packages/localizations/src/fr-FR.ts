@@ -406,6 +406,13 @@ export const frFR: LocalizationResource = {
         headerTitle__members: 'Membres',
         headerTitle__requests: 'Demandes',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Les rôles sont temporairement verrouillés',
+          subtitle:
+            'Nous mettons à jour les rôles disponibles. Une fois terminé, vous pourrez de nouveau modifier les rôles.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'Clés API',
