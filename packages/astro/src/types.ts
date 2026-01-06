@@ -3,7 +3,8 @@ import type {
   ClerkOptions,
   ClientResource,
   MultiDomainAndOrProxyPrimitives,
-  ProtectProps,
+  ProtectParams,
+  ShowProps,
   Without,
 } from '@clerk/shared/types';
 import type { ClerkUiConstructor } from '@clerk/shared/ui';
@@ -62,7 +63,16 @@ declare global {
   }
 }
 
-export type { AstroClerkUpdateOptions, AstroClerkIntegrationParams, AstroClerkCreateInstanceParams, ProtectProps };
+export type {
+  AstroClerkUpdateOptions,
+  AstroClerkIntegrationParams,
+  AstroClerkCreateInstanceParams,
+  ProtectParams,
+  ShowProps,
+};
+
+// Backward compatibility alias
+export type ProtectProps = ProtectParams;
 
 export type ButtonProps<Tag> = {
   /**

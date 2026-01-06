@@ -20,7 +20,7 @@ export const ActiveMembersList = ({ memberships, pageSize }: ActiveMembersListPr
   const card = useCardState();
   const { organization } = useOrganization();
 
-  const { options, isLoading: loadingRoles } = useFetchRoles();
+  const { options, isLoading: loadingRoles, hasRoleSetMigration } = useFetchRoles();
 
   if (!organization) {
     return null;
@@ -61,6 +61,7 @@ export const ActiveMembersList = ({ memberships, pageSize }: ActiveMembersListPr
           options={options}
           onRoleChange={handleRoleChange(m)}
           onRemove={handleRemove(m)}
+          hasRoleSetMigration={hasRoleSetMigration}
         />
       ))}
     />
@@ -73,8 +74,9 @@ const MemberRow = (props: {
   onRemove: () => unknown;
   options: Parameters<typeof RoleSelect>[0]['roles'];
   onRoleChange: (role: string) => unknown;
+  hasRoleSetMigration: boolean;
 }) => {
-  const { membership, onRemove, onRoleChange, options } = props;
+  const { membership, onRemove, onRoleChange, options, hasRoleSetMigration } = props;
   const { localizeCustomRole } = useLocalizeCustomRoles();
   const card = useCardState();
   const { user } = useUser();
@@ -112,7 +114,7 @@ const MemberRow = (props: {
           }
         >
           <RoleSelect
-            isDisabled={card.isLoading || !onRoleChange}
+            isDisabled={card.isLoading || !onRoleChange || hasRoleSetMigration}
             value={membership.role}
             fallbackLabel={membership.roleName}
             onChange={onRoleChange}

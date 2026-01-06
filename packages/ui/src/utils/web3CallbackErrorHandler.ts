@@ -10,8 +10,8 @@ type Web3CallbackErrorHandler = {
 export const web3CallbackErrorHandler: Web3CallbackErrorHandler = (err, setError) => {
   if (
     isClerkAPIResponseError(err) &&
-    err.errors[0].meta?.paramName === 'identifier' &&
-    err.errors[0].code === 'form_param_nil'
+    err.errors?.[0]?.meta?.paramName === 'identifier' &&
+    err.errors?.[0]?.code === 'form_param_nil'
   ) {
     const error = new ClerkRuntimeError('A Web3 Wallet extension cannot be found. Please install one to continue.', {
       code: 'web3_missing_identifier',

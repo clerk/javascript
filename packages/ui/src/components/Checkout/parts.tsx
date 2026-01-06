@@ -42,7 +42,7 @@ export const InvalidPlanScreen = () => {
   const { errors } = useCheckout();
 
   const InvalidPlanError = errors?.global
-    ?.filter(e => e.isClerkApiResponseError())
+    ?.filter(e => e.isClerkAPIResponseError())
     .flatMap(e => e.errors)
     .find(e => e.code === 'invalid_plan_change');
 

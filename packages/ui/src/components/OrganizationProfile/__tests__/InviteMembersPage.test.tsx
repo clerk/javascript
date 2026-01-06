@@ -21,6 +21,57 @@ describe('InviteMembersPage', () => {
     clearFetchCache();
   });
 
+  it('disables the role select when role set migration is in progress', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [{ name: 'Org1', role: 'admin' }],
+      });
+    });
+
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+    fixtures.clerk.organization?.getRoles.mockResolvedValue({
+      total_count: 2,
+      has_role_set_migration: true,
+      data: [
+        {
+          pathRoot: '',
+          reload: vi.fn(),
+          id: 'member',
+          key: 'member',
+          name: 'member',
+          description: '',
+          permissions: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          pathRoot: '',
+          reload: vi.fn(),
+          id: 'admin',
+          key: 'admin',
+          name: 'Admin',
+          description: '',
+          permissions: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+    });
+
+    const { getByRole } = render(
+      <Action.Root>
+        <InviteMembersScreen />
+      </Action.Root>,
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(getByRole('button', { name: /select role/i })).toBeDisabled();
+    });
+  });
+
   it('renders the component', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();

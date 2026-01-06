@@ -2,9 +2,52 @@ import * as readline from 'node:readline';
 
 import chalk from 'chalk';
 
+const gradientColors = ['#5ee7df', '#b490ca'];
+
+const hexToRgb = hex => {
+  const value = hex.replace('#', '');
+  const chunk = value.length === 3 ? value.split('').map(char => char + char) : value.match(/.{2}/g);
+  return chunk.map(part => parseInt(part, 16));
+};
+
+const interpolate = (start, end, t) => Math.round(start + (end - start) * t);
+
+const applyGradient = text => {
+  if (!text) {
+    return '';
+  }
+
+  const rgb = gradientColors.map(hexToRgb);
+  const maxIndex = text.length - 1 || 1;
+  const segmentCount = rgb.length - 1;
+
+  return text
+    .split('')
+    .map((char, index) => {
+      const progress = index / maxIndex;
+      const segment = Math.min(Math.floor(progress * segmentCount), segmentCount - 1);
+      const localT = segmentCount === 0 ? 0 : progress * segmentCount - segment;
+      const [r1, g1, b1] = rgb[segment];
+      const [r2, g2, b2] = rgb[segment + 1] || rgb[segment];
+      const r = interpolate(r1, r2, localT);
+      const g = interpolate(g1, g2, localT);
+      const b = interpolate(b1, b2, localT);
+      return chalk.rgb(r, g, b)(char);
+    })
+    .join('');
+};
+
 export function renderHeader() {
   console.log('');
-  console.log(chalk.magenta.bold('>> Clerk Upgrade CLI <<'));
+  const heading = [
+    ' █▀▀ █   █▀▀ █▀█ █▄▀   █ █ █▀█ █▀▀ █▀█ ▄▀█ █▀▄ █▀▀',
+    ' █▄▄ █▄▄ ██▄ █▀▄ █ █   █▄█ █▀▀ █▄█ █▀▄ █▀█ █▄▀ ██▄',
+  ];
+
+  heading.forEach(line => console.log(applyGradient(line)));
+  console.log('');
+  console.log("Hello friend! We're excited to help you upgrade Clerk modules. Before we get started, a couple");
+  console.log('questions...');
   console.log('');
 }
 

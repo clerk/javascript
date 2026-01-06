@@ -22,7 +22,7 @@ export const useCheckout = (options?: UseCheckoutParams): CheckoutSignalValue =>
   const clerk = useClerkInstanceContext();
 
   if (user === null && isLoaded) {
-    throw new Error('Clerk: Ensure that `useCheckout` is inside a component wrapped with `<SignedIn />`.');
+    throw new Error('Clerk: Ensure that `useCheckout` is inside a component wrapped with `<Show when="signed-in" />`.');
   }
 
   if (isLoaded && forOrganization === 'organization' && organization === null) {

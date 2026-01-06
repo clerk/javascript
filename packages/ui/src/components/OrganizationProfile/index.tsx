@@ -2,19 +2,20 @@ import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationProfileModalProps, OrganizationProfileProps } from '@clerk/shared/types';
 import React from 'react';
 
-import { withCardStateProvider } from '@/ui/elements/contexts';
-import { NavbarMenuButtonRow } from '@/ui/elements/Navbar';
-import { ProfileCard } from '@/ui/elements/ProfileCard';
+import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID } from '@/constants';
+import { OrganizationProfileContext, SubscriberTypeContext, withCoreUserGuard } from '@/contexts';
+import { Flow, localizationKeys } from '@/customizables';
+import { withCardStateProvider } from '@/elements/contexts';
+import { NavbarMenuButtonRow } from '@/elements/Navbar';
+import { ProfileCard } from '@/elements/ProfileCard';
+import type { WithInternalRouting } from '@/internal';
+import { Route, Switch } from '@/router';
+import type { OrganizationProfileCtx } from '@/types';
 
-import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
-import { OrganizationProfileContext, SubscriberTypeContext, withCoreUserGuard } from '../../contexts';
-import { Flow, localizationKeys } from '../../customizables';
-import { Route, Switch } from '../../router';
-import type { OrganizationProfileCtx } from '../../types';
 import { OrganizationProfileNavbar } from './OrganizationProfileNavbar';
 import { OrganizationProfileRoutes } from './OrganizationProfileRoutes';
 
-const _OrganizationProfile = (_: OrganizationProfileProps) => {
+const OrganizationProfileInternal = () => {
   const { organization } = useOrganization();
 
   if (!organization) {
@@ -55,7 +56,11 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
   );
 });
 
-export const OrganizationProfile = withCardStateProvider(_OrganizationProfile);
+export const OrganizationProfile: React.ComponentType<OrganizationProfileProps> =
+  withCardStateProvider(OrganizationProfileInternal);
+
+const InternalOrganizationProfile: React.ComponentType<WithInternalRouting<OrganizationProfileProps>> =
+  withCardStateProvider(OrganizationProfileInternal);
 
 export const OrganizationProfileModal = (props: OrganizationProfileModalProps): JSX.Element => {
   const organizationProfileProps: OrganizationProfileCtx = {
@@ -70,7 +75,7 @@ export const OrganizationProfileModal = (props: OrganizationProfileModalProps): 
       <OrganizationProfileContext.Provider value={organizationProfileProps}>
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
-          <OrganizationProfile {...organizationProfileProps} />
+          <InternalOrganizationProfile {...organizationProfileProps} />
         </div>
       </OrganizationProfileContext.Provider>
     </Route>

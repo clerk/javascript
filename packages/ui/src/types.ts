@@ -26,6 +26,8 @@ import type {
   WaitlistProps,
 } from '@clerk/shared/types';
 
+import type { WithInternalRouting } from './internal';
+
 export type {
   __internal_OAuthConsentProps,
   __internal_UserVerificationProps,
@@ -65,23 +67,23 @@ export type AvailableComponentProps =
 type ComponentMode = 'modal' | 'mounted';
 type SignInMode = 'modal' | 'redirect';
 
-export type SignInCtx = SignInProps & {
+export type SignInCtx = WithInternalRouting<SignInProps> & {
   componentName: 'SignIn';
   mode?: ComponentMode;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl;
 
-export type UserVerificationCtx = __internal_UserVerificationProps & {
+export type UserVerificationCtx = WithInternalRouting<__internal_UserVerificationProps> & {
   componentName: 'UserVerification';
   mode?: ComponentMode;
 };
 
-export type UserProfileCtx = UserProfileProps & {
+export type UserProfileCtx = WithInternalRouting<UserProfileProps> & {
   componentName: 'UserProfile';
   mode?: ComponentMode;
 };
 
-export type SignUpCtx = SignUpProps & {
+export type SignUpCtx = WithInternalRouting<SignUpProps> & {
   componentName: 'SignUp';
   mode?: ComponentMode;
   emailLinkRedirectUrl?: string;
@@ -98,12 +100,12 @@ export type UserAvatarCtx = UserAvatarProps & {
   componentName: 'UserAvatar';
 };
 
-export type OrganizationProfileCtx = OrganizationProfileProps & {
+export type OrganizationProfileCtx = WithInternalRouting<OrganizationProfileProps> & {
   componentName: 'OrganizationProfile';
   mode?: ComponentMode;
 };
 
-export type CreateOrganizationCtx = CreateOrganizationProps & {
+export type CreateOrganizationCtx = WithInternalRouting<CreateOrganizationProps> & {
   componentName: 'CreateOrganization';
   mode?: ComponentMode;
 };

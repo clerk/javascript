@@ -1,0 +1,76 @@
+//https://eips.ethereum.org/EIPS/eip-6963
+
+import type { MetamaskWeb3Provider, OKXWalletWeb3Provider } from '../../types';
+
+interface EIP6963ProviderInfo {
+  walletId: string;
+  uuid: string;
+  name: string;
+  icon: string;
+}
+
+interface EIP1193Provider {
+  isStatus?: boolean;
+  host?: string;
+  path?: string;
+  sendAsync?: (
+    request: { method: string; params?: [] },
+    callback: (error: Error | null, response: unknown) => void,
+  ) => void; // For sending asynchronous requests
+  send?: (request: { method: string; params?: [] }, callback: (error: Error | null, response: unknown) => void) => void; // For sending synchronous requests
+  request: (request: { method: string; params?: string[] }) => Promise<string>; // Standard method for sending requests per EIP-1193
+}
+
+interface EIP6963ProviderDetail {
+  info: EIP6963ProviderInfo;
+  provider: EIP1193Provider;
+}
+
+type EIP6963AnnounceProviderEvent = CustomEvent<EIP6963ProviderDetail>;
+type InjectedWeb3EthProvider = MetamaskWeb3Provider | OKXWalletWeb3Provider;
+
+class InjectedWeb3EthProviders {
+  #providers: EIP6963ProviderDetail[] = [];
+  #providerIdMap: Record<InjectedWeb3EthProvider, string> = {
+    metamask: 'MetaMask',
+    okx_wallet: 'OKX Wallet',
+  } as const;
+  static #instance: InjectedWeb3EthProviders | null = null;
+
+  private constructor() {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    window.addEventListener('eip6963:announceProvider', this.#onAnnouncement as EventListener);
+    window.dispatchEvent(new Event('eip6963:requestProvider'));
+  }
+
+  public static getInstance(): InjectedWeb3EthProviders {
+    if (!InjectedWeb3EthProviders.#instance) {
+      InjectedWeb3EthProviders.#instance = new InjectedWeb3EthProviders();
+    }
+    return InjectedWeb3EthProviders.#instance;
+  }
+
+  get = (provider: InjectedWeb3EthProvider) => {
+    const ethProvider = this.#providers.find(p => p.info.name === this.#providerIdMap[provider])?.provider;
+    if (ethProvider !== undefined) {
+      return ethProvider;
+    }
+
+    // In case we weren't able to find the requested provider, fallback to the
+    // global injected provider instead, if any, to allow the user to continue
+    // the flow rather than blocking it
+    // @ts-expect-error missing types
+    return window.ethereum;
+  };
+
+  #onAnnouncement = (event: EIP6963AnnounceProviderEvent) => {
+    if (this.#providers.some(p => p.info.uuid === event.detail.info.uuid)) {
+      return;
+    }
+    this.#providers.push(event.detail);
+  };
+}
+
+export const getInjectedWeb3EthProviders = () => InjectedWeb3EthProviders.getInstance();

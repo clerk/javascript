@@ -1,15 +1,15 @@
 ---
-import { SignedIn, SignedOut, UserButton } from '@clerk/astro/components';
+import { Show, UserButton } from '@clerk/astro/components';
 import Layout from '../../layouts/ViewTransitionsLayout.astro';
 ---
 
 <Layout title='Sign in'>
   <div class='w-full flex justify-center'>
-    <SignedOut>
+    <Show when='signed-out'>
       <a href='/transitions/sign-in'>Sign in</a>
-    </SignedOut>
-    <SignedIn>
+    </Show>
+    <Show when='signed-in'>
       <UserButton />
-    </SignedIn>
+    </Show>
   </div>
 </Layout>

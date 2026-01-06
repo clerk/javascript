@@ -1,20 +1,21 @@
 import type { UserProfileModalProps, UserProfileProps } from '@clerk/shared/types';
 import React from 'react';
 
-import { withCardStateProvider } from '@/ui/elements/contexts';
-import { NavbarMenuButtonRow } from '@/ui/elements/Navbar';
-import { ProfileCard } from '@/ui/elements/ProfileCard';
+import { USER_PROFILE_CARD_SCROLLBOX_ID } from '@/constants';
+import { UserProfileContext, withCoreUserGuard } from '@/contexts';
+import { Flow, localizationKeys } from '@/customizables';
+import { withCardStateProvider } from '@/elements/contexts';
+import { NavbarMenuButtonRow } from '@/elements/Navbar';
+import { ProfileCard } from '@/elements/ProfileCard';
+import type { WithInternalRouting } from '@/internal';
+import { Route, Switch } from '@/router';
+import type { UserProfileCtx } from '@/types';
 
-import { USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
-import { UserProfileContext, withCoreUserGuard } from '../../contexts';
-import { Flow, localizationKeys } from '../../customizables';
-import { Route, Switch } from '../../router';
-import type { UserProfileCtx } from '../../types';
 import { UserProfileNavbar } from './UserProfileNavbar';
 import { UserProfileRoutes } from './UserProfileRoutes';
 import { VerificationSuccessPage } from './VerifyWithLink';
 
-const _UserProfile = (_: UserProfileProps) => {
+const _UserProfile = () => {
   return (
     <Flow.Root flow='userProfile'>
       <Flow.Part>
@@ -49,7 +50,10 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
   );
 });
 
-export const UserProfile = withCardStateProvider(_UserProfile);
+export const UserProfile: React.ComponentType<UserProfileProps> = withCardStateProvider(_UserProfile);
+
+const InternalUserProfile: React.ComponentType<WithInternalRouting<UserProfileProps>> =
+  withCardStateProvider(_UserProfile);
 
 export const UserProfileModal = (props: UserProfileModalProps): JSX.Element => {
   const userProfileProps: UserProfileCtx = {
@@ -64,7 +68,7 @@ export const UserProfileModal = (props: UserProfileModalProps): JSX.Element => {
       <UserProfileContext.Provider value={userProfileProps}>
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
-          <UserProfile {...userProfileProps} />
+          <InternalUserProfile {...userProfileProps} />
         </div>
       </UserProfileContext.Provider>
     </Route>

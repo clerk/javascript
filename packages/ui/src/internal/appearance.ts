@@ -650,6 +650,17 @@ export type ElementsConfig = {
   enterpriseConnectionsRoot: WithOptions;
   enterpriseConnectionButton: WithOptions;
   enterpriseConnectionButtonText: WithOptions;
+
+  web3SolanaWalletButtonsRoot: WithOptions;
+  web3SolanaWalletButtons: WithOptions;
+  web3SolanaWalletButtonsIconButton: WithOptions<string, LoadingState>;
+  web3SolanaWalletButtonsBlockButton: WithOptions<string, LoadingState>;
+  web3SolanaWalletButtonsBlockButtonText: WithOptions<string>;
+  web3SolanaWalletButtonsWalletIcon: WithOptions<string, LoadingState>;
+  web3SolanaWalletButtonsWalletInitialIcon: WithOptions<string, LoadingState>;
+
+  walletIcon: WithOptions<string, LoadingState>;
+  walletInitialIcon: WithOptions<string, LoadingState>;
 };
 
 export type Elements = {

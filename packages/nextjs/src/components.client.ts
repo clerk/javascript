@@ -1,2 +1,2 @@
 export { ClerkProvider } from './client-boundary/ClerkProvider';
-export { SignedIn, SignedOut, Protect } from './client-boundary/controlComponents';
+export { Show } from './client-boundary/controlComponents';

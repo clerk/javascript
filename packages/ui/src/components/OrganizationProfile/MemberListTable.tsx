@@ -242,6 +242,12 @@ const RolesListItem = memo((props: RolesListItemProps) => {
           width: '100%',
           padding: `${theme.space.$2} ${theme.space.$4}`,
           borderRadius: theme.radii.$md,
+          '&:hover': {
+            backgroundColor: theme.colors.$neutralAlpha100,
+          },
+          '&[data-focused="true"]': {
+            backgroundColor: theme.colors.$neutralAlpha150,
+          },
         }),
         sx,
       ]}

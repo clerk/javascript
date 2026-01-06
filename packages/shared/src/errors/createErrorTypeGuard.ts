@@ -27,6 +27,14 @@ export function createErrorTypeGuard<T extends new (...args: any[]) => Value>(
     if (!target) {
       throw new TypeError(`${ErrorClass.kind || ErrorClass.name} type guard requires an error object`);
     }
+    // Use duck-typing with 'kind' property to handle cross-bundle scenarios
+    // where instanceof fails due to different class instances
+    if (ErrorClass.kind && typeof target === 'object' && target !== null && 'constructor' in target) {
+      const targetConstructor = (target as { constructor?: { kind?: string } }).constructor;
+      if (targetConstructor?.kind === ErrorClass.kind) {
+        return true;
+      }
+    }
     return target instanceof ErrorClass;
   }
 

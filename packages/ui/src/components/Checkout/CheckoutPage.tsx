@@ -62,7 +62,7 @@ const FetchStatus = ({
   const internalFetchStatus = useMemo(() => {
     if (errors.global) {
       const errorCodes = errors.global.flatMap(e => {
-        if (e.isClerkApiResponseError()) {
+        if (e.isClerkAPIResponseError()) {
           return e.errors.map(e => e.code);
         }
       });

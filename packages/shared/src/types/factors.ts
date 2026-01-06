@@ -42,6 +42,7 @@ export type Web3SignatureFactor = {
   strategy: Web3Strategy;
   web3WalletId: string;
   primary?: boolean;
+  walletName?: string;
 };
 
 export type PasswordFactor = {

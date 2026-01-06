@@ -21,6 +21,7 @@ export const applicationConfig = () => {
   const envFormatters = { public: (key: string) => key, private: (key: string) => key };
   const logger = createLogger({ prefix: 'appConfig', color: 'yellow' });
   const dependencies = new Map<string, string>();
+  const resolutions = new Map<string, string>();
 
   const self = {
     clone: () => {
@@ -32,6 +33,7 @@ export const applicationConfig = () => {
         clone.useTemplate(template);
       }
       dependencies.forEach((v, k) => clone.addDependency(k, v));
+      resolutions.forEach((v, k) => clone.addResolution(k, v));
       Object.entries(scripts).forEach(([k, v]) => clone.addScript(k as keyof typeof scripts, v));
       files.forEach((v, k) => clone.addFile(k, () => v));
       return clone;
@@ -74,6 +76,10 @@ export const applicationConfig = () => {
       if (version) {
         dependencies.set(name, version);
       }
+      return self;
+    },
+    addResolution: (name: string, version: string) => {
+      resolutions.set(name, version);
       return self;
     },
     /**
@@ -122,6 +128,15 @@ export const applicationConfig = () => {
         logger.info(`Modifying dependencies in "${packageJsonPath}"`);
         const contents = await fs.readJSON(packageJsonPath);
         contents.dependencies = { ...contents.dependencies, ...Object.fromEntries(dependencies) };
+        await fs.writeJSON(packageJsonPath, contents, { spaces: 2 });
+      }
+
+      // Adjust package.json resolutions
+      if (resolutions.size > 0) {
+        const packageJsonPath = path.resolve(appDirPath, 'package.json');
+        logger.info(`Modifying resolutions in "${packageJsonPath}"`);
+        const contents = await fs.readJSON(packageJsonPath);
+        contents.resolutions = { ...contents.resolutions, ...Object.fromEntries(resolutions) };
         await fs.writeJSON(packageJsonPath, contents, { spaces: 2 });
       }
 

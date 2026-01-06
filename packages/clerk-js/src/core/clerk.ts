@@ -59,6 +59,7 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  AuthenticateWithSolanaParams,
   BillingNamespace,
   CheckoutSignalValue,
   Clerk as ClerkInterface,
@@ -74,7 +75,7 @@ import type {
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
-  GenerateSignatureParams,
+  GenerateSignature,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -450,7 +451,7 @@ export class Clerk implements ClerkInterface {
     }
 
     // Log a development mode warning once
-    if (this.#instanceType === 'development') {
+    if (this.#instanceType === 'development' && !options?.unsafe_disableDevelopmentModeConsoleWarning) {
       logger.warnOnce(
         'Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview',
       );
@@ -2338,6 +2339,13 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  public authenticateWithSolana = async (props: AuthenticateWithSolanaParams): Promise<void> => {
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_solana_signature',
+    });
+  };
+
   public authenticateWithWeb3 = async ({
     redirectUrl,
     signUpContinueUrl,
@@ -2346,6 +2354,7 @@ export class Clerk implements ClerkInterface {
     strategy,
     legalAccepted,
     secondFactorUrl,
+    walletName,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (!this.client || !this.environment) {
       return;
@@ -2354,8 +2363,8 @@ export class Clerk implements ClerkInterface {
     const { displayConfig } = this.environment;
 
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
-    const identifier = await web3().getWeb3Identifier({ provider });
-    let generateSignature: (params: GenerateSignatureParams) => Promise<string>;
+    const identifier = await web3().getWeb3Identifier({ provider, walletName });
+    let generateSignature: GenerateSignature;
     switch (provider) {
       case 'metamask':
         generateSignature = web3().generateSignatureWithMetamask;
@@ -2365,6 +2374,15 @@ export class Clerk implements ClerkInterface {
         break;
       case 'coinbase_wallet':
         generateSignature = web3().generateSignatureWithCoinbaseWallet;
+        break;
+      case 'solana':
+        if (!walletName) {
+          throw new ClerkRuntimeError('Wallet name is required for Solana authentication.', {
+            code: 'web3_solana_wallet_name_required',
+          });
+        }
+        // Solana requires walletName; bind it into the helper
+        generateSignature = params => web3().generateSignatureWithSolana({ ...params, walletName });
         break;
       default:
         generateSignature = web3().generateSignatureWithOKXWallet;
@@ -2395,6 +2413,7 @@ export class Clerk implements ClerkInterface {
         identifier,
         generateSignature,
         strategy,
+        walletName,
       });
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
@@ -2404,6 +2423,7 @@ export class Clerk implements ClerkInterface {
           unsafeMetadata,
           strategy,
           legalAccepted,
+          walletName,
         });
 
         if (

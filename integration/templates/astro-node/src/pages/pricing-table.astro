@@ -1,5 +1,5 @@
 ---
-import { Protect, PricingTable } from '@clerk/astro/components';
+import { Show, PricingTable } from '@clerk/astro/components';
 import Layout from '../layouts/Layout.astro';
 
 const newSubscriptionRedirectUrl = Astro.url.searchParams.get('newSubscriptionRedirectUrl');
@@ -7,15 +7,15 @@ const newSubscriptionRedirectUrl = Astro.url.searchParams.get('newSubscriptionRe
 
 <Layout title='Pricing Table'>
   <div class='w-full flex justify-center'>
-    <Protect plan='free_user'>
+    <Show when={{ plan: 'free_user' }}>
       <p>user in free</p>
-    </Protect>
-    <Protect plan='pro'>
+    </Show>
+    <Show when={{ plan: 'pro' }}>
       <p>user in pro</p>
-    </Protect>
-    <Protect plan='plus'>
+    </Show>
+    <Show when={{ plan: 'plus' }}>
       <p>user in plus</p>
-    </Protect>
+    </Show>
     <PricingTable newSubscriptionRedirectUrl={newSubscriptionRedirectUrl} />
   </div>
 </Layout>

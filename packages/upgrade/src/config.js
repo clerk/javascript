@@ -7,6 +7,16 @@ import matter from 'gray-matter';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const VERSIONS_DIR = path.join(__dirname, 'versions');
 
+export function getAvailableReleases() {
+  return fs
+    .readdirSync(VERSIONS_DIR, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .map(d => d.name)
+    .filter(name => fs.existsSync(path.join(VERSIONS_DIR, name, 'index.js')))
+    .sort()
+    .reverse();
+}
+
 export async function loadConfig(sdk, currentVersion, release) {
   const versionDirs = fs
     .readdirSync(VERSIONS_DIR, { withFileTypes: true })

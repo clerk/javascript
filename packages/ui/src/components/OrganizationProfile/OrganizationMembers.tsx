@@ -1,6 +1,8 @@
 import { useOrganization } from '@clerk/shared/react';
 import { useState } from 'react';
 
+import { useFetchRoles } from '@/hooks/useFetchRoles';
+import { Alert } from '@/ui/elements/Alert';
 import { Animated } from '@/ui/elements/Animated';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -23,6 +25,7 @@ export const ACTIVE_MEMBERS_PAGE_SIZE = 10;
 export const OrganizationMembers = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   const card = useCardState();
+  const { hasRoleSetMigration } = useFetchRoles();
   const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
   const canReadMemberships = useProtect({ permission: 'org:sys_memberships:read' });
   const isDomainsEnabled = organizationSettings?.domains?.enabled && canManageMemberships;
@@ -137,6 +140,17 @@ export const OrganizationMembers = withCardStateProvider(() => {
                           />
                         }
                       />
+                      {hasRoleSetMigration && (
+                        <Alert
+                          variant='warning'
+                          title={localizationKeys(
+                            'organizationProfile.membersPage.alerts.roleSetMigrationInProgress.title',
+                          )}
+                          subtitle={localizationKeys(
+                            'organizationProfile.membersPage.alerts.roleSetMigrationInProgress.subtitle',
+                          )}
+                        />
+                      )}
                       <ActiveMembersList
                         pageSize={ACTIVE_MEMBERS_PAGE_SIZE}
                         memberships={memberships}

@@ -56,6 +56,11 @@ describe('getSdkVersion', () => {
     const version = getSdkVersion('nextjs', getFixturePath('no-clerk'));
     expect(version).toBeNull();
   });
+
+  it('returns null for catalog: protocol versions', () => {
+    const version = getSdkVersion('nextjs', getFixturePath('nextjs-catalog'));
+    expect(version).toBeNull();
+  });
 });
 
 describe('getMajorVersion', () => {
@@ -77,6 +82,18 @@ describe('getMajorVersion', () => {
 
   it('returns null for invalid semver', () => {
     expect(getMajorVersion('invalid')).toBeNull();
+  });
+
+  it('returns null for catalog: protocol', () => {
+    expect(getMajorVersion('catalog:')).toBeNull();
+  });
+
+  it('returns null for catalog:default', () => {
+    expect(getMajorVersion('catalog:default')).toBeNull();
+  });
+
+  it('returns null for workspace: protocol', () => {
+    expect(getMajorVersion('workspace:*')).toBeNull();
   });
 });
 

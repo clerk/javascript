@@ -1,71 +1,66 @@
-import type { ProtectProps } from '@clerk/react';
-import type { PendingSessionOptions } from '@clerk/shared/types';
+import type { PendingSessionOptions, ShowWhenCondition } from '@clerk/shared/types';
 import React from 'react';
 
 import { auth } from './auth';
 
-export async function SignedIn(
-  props: React.PropsWithChildren<PendingSessionOptions>,
-): Promise<React.JSX.Element | null> {
-  const { children } = props;
-  const { userId } = await auth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
-  return userId ? <>{children}</> : null;
-}
-
-export async function SignedOut(
-  props: React.PropsWithChildren<PendingSessionOptions>,
-): Promise<React.JSX.Element | null> {
-  const { children } = props;
-  const { userId } = await auth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
-  return userId ? null : <>{children}</>;
-}
+export type AppRouterShowProps = React.PropsWithChildren<
+  PendingSessionOptions & {
+    fallback?: React.ReactNode;
+    when: ShowWhenCondition;
+  }
+>;
 
 /**
- * Use `<Protect/>` in order to prevent unauthenticated or unauthorized users from accessing the children passed to the component.
+ * Use `<Show/>` to render children when an authorization or sign-in condition passes.
+ * When `treatPendingAsSignedOut` is true, pending sessions are treated as signed out.
+ * Renders the provided `fallback` (or `null`) when the condition fails.
  *
- * Examples:
- * ```
- * <Protect permission="a_permission_key" />
- * <Protect role="a_role_key" />
- * <Protect condition={(has) => has({permission:"a_permission_key"})} />
- * <Protect condition={(has) => has({role:"a_role_key"})} />
- * <Protect fallback={<p>Unauthorized</p>} />
+ * The `when` prop supports:
+ * - `"signed-in"` or `"signed-out"` shorthands
+ * - Authorization objects such as `{ permission: "..." }`, `{ role: "..." }`, `{ feature: "..." }`, or `{ plan: "..." }`
+ * - Predicate functions `(has) => boolean` that receive the `has` helper
+ *
+ * @example
+ * ```tsx
+ * <Show when={{ permission: "org:billing:manage" }} fallback={<p>Unauthorized</p>}>
+ *   <BillingSettings />
+ * </Show>
+ *
+ * <Show when={{ role: "admin" }}>
+ *   <AdminPanel />
+ * </Show>
+ *
+ * <Show when={(has) => has({ permission: "org:read" }) && isFeatureEnabled}>
+ *   <ProtectedFeature />
+ * </Show>
+ *
+ * <Show when="signed-in">
+ *   <Dashboard />
+ * </Show>
  * ```
  */
-export async function Protect(props: ProtectProps): Promise<React.JSX.Element | null> {
-  const { children, fallback, ...restAuthorizedParams } = props;
-  const { has, userId } = await auth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
+export async function Show(props: AppRouterShowProps): Promise<React.JSX.Element | null> {
+  const { children, fallback, treatPendingAsSignedOut, when } = props;
+  const { has, userId } = await auth({ treatPendingAsSignedOut });
 
-  /**
-   * Fallback to UI provided by user or `null` if authorization checks failed
-   */
+  const resolvedWhen = when;
+  const authorized = <>{children}</>;
   const unauthorized = fallback ? <>{fallback}</> : null;
 
-  const authorized = <>{children}</>;
+  if (typeof resolvedWhen === 'string') {
+    if (resolvedWhen === 'signed-out') {
+      return userId ? unauthorized : authorized;
+    }
+    return userId ? authorized : unauthorized;
+  }
 
   if (!userId) {
     return unauthorized;
   }
 
-  /**
-   * Check against the results of `has` called inside the callback
-   */
-  if (typeof restAuthorizedParams.condition === 'function') {
-    return restAuthorizedParams.condition(has) ? authorized : unauthorized;
+  if (typeof resolvedWhen === 'function') {
+    return resolvedWhen(has) ? authorized : unauthorized;
   }
 
-  if (
-    restAuthorizedParams.role ||
-    restAuthorizedParams.permission ||
-    restAuthorizedParams.feature ||
-    restAuthorizedParams.plan
-  ) {
-    return has(restAuthorizedParams) ? authorized : unauthorized;
-  }
-
-  /**
-   * If neither of the authorization params are passed behave as the `<SignedIn/>`.
-   * If fallback is present render that instead of rendering nothing.
-   */
-  return authorized;
+  return has(resolvedWhen) ? authorized : unauthorized;
 }

@@ -1,6 +1,7 @@
 import type { Appearance } from './appearance';
 
 export type { ComponentControls, MountComponentRenderer } from '../Components';
+export type { WithInternalRouting } from './routing';
 
 /**
  * Extracts the appearance type from a Ui object. We got 3 cases:

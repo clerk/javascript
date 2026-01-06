@@ -1,5 +1,7 @@
 import type { ClerkAPIResponseError } from './clerkApiResponseError';
+import { isClerkAPIResponseError } from './clerkApiResponseError';
 import type { ClerkRuntimeError } from './clerkRuntimeError';
+import { isClerkRuntimeError } from './clerkRuntimeError';
 import type { EmailLinkError } from './emailLinkError';
 import type { MetamaskError } from './metamaskError';
 
@@ -53,35 +55,6 @@ export function isNetworkError(e: any): boolean {
  */
 export function isKnownError(error: any): error is ClerkAPIResponseError | ClerkRuntimeError | MetamaskError {
   return isClerkAPIResponseError(error) || isMetamaskError(error) || isClerkRuntimeError(error);
-}
-
-/**
- * Checks if the provided error is a ClerkAPIResponseError.
- *
- * @internal
- */
-export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError {
-  return err && 'clerkError' in err;
-}
-
-/**
- * Checks if the provided error object is an instance of ClerkRuntimeError.
- *
- * @param err - The error object to check.
- * @returns True if the error is a ClerkRuntimeError, false otherwise.
- *
- * @example
- * const error = new ClerkRuntimeError('An error occurred');
- * if (isClerkRuntimeError(error)) {
- *   // Handle ClerkRuntimeError
- *   console.error('ClerkRuntimeError:', error.message);
- * } else {
- *   // Handle other errors
- *   console.error('Other error:', error.message);
- * }
- */
-export function isClerkRuntimeError(err: any): err is ClerkRuntimeError {
-  return 'clerkRuntimeError' in err;
 }
 
 /**

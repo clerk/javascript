@@ -23,7 +23,6 @@ jobs:
       - uses: actions/stale@v9
         name: Regular stale action
         with:
-          repo-token: ${{ secrets.CLERK_COOKIE_PAT }}
           days-before-issue-stale: 30
           days-before-pr-stale: 50
           days-before-issue-close: 10
@@ -61,7 +60,6 @@ jobs:
       - uses: actions/stale@v9
         name: Stale action for needs-reproduction issues
         with:
-          repo-token: ${{ secrets.CLERK_COOKIE_PAT }}
           days-before-issue-stale: 7
           days-before-issue-close: 1
           exempt-all-assignees: true
@@ -78,7 +76,6 @@ jobs:
             After 8 days without a reproduction being supplied, we are closing this issue. Keep in mind, I'm just a robot, so if I've closed this issue in error, please reply here and my human colleagues will reopen it. Likewise if a reproduction is prepared after it has been closed.
       - uses: dessant/lock-threads@v4
         with:
-          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           issue-inactive-days: '365'
           issue-comment: 'This issue has been automatically locked since there has not been any recent activity after it was closed. Please open a new issue for related bugs.'
           process-only: 'issues'

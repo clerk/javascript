@@ -20,9 +20,9 @@ export type ParsedInternalTheme = InternalTheme;
 export type ParsedOptions = Required<Options>;
 export type ParsedCaptcha = Required<CaptchaAppearanceOptions>;
 
-type PublicAppearanceTopLevelKey = keyof Omit<
-  Appearance,
-  'theme' | 'elements' | 'layout' | 'variables' | 'captcha' | 'cssLayerName'
+type PublicAppearanceTopLevelKey = Exclude<
+  keyof Appearance,
+  keyof Theme | 'captcha' | 'cssLayerName' | 'elements' | 'layout' | 'theme' | 'variables'
 >;
 
 export type AppearanceCascade = {

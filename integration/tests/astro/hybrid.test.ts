@@ -94,7 +94,7 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
       await expect(u.page.getByText("I'm an admin")).toBeVisible();
     });
 
-    test('render Protect fallback', async ({ page, context }) => {
+    test('render Show fallback', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToAppHome();
 

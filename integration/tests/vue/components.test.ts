@@ -259,7 +259,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.signIn.waitForMounted();
   });
 
-  test('renders <Protect /> component contents to admins', async ({ page, context }) => {
+  test('renders <Show /> guard contents to admins', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
