@@ -1,11 +1,13 @@
 import { useOrganization } from '@clerk/shared/react';
 import { useState } from 'react';
 
+import { Alert } from '@/ui/elements/Alert';
 import { Animated } from '@/ui/elements/Animated';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
+import { useFetchRoles } from '@/ui/hooks/useFetchRoles';
 
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
@@ -24,6 +26,7 @@ export const ACTIVE_MEMBERS_PAGE_SIZE = 10;
 export const OrganizationMembers = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   const card = useCardState();
+  const { hasRoleSetMigration } = useFetchRoles();
   const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
   const canReadMemberships = useProtect({ permission: 'org:sys_memberships:read' });
   const isDomainsEnabled = organizationSettings?.domains?.enabled && canManageMemberships;
@@ -142,6 +145,17 @@ export const OrganizationMembers = withCardStateProvider(() => {
                           />
                         }
                       />
+                      {hasRoleSetMigration && (
+                        <Alert
+                          variant='warning'
+                          title={localizationKeys(
+                            'organizationProfile.membersPage.alerts.roleSetMigrationInProgress.title',
+                          )}
+                          subtitle={localizationKeys(
+                            'organizationProfile.membersPage.alerts.roleSetMigrationInProgress.subtitle',
+                          )}
+                        />
+                      )}
                       <ActiveMembersList
                         pageSize={ACTIVE_MEMBERS_PAGE_SIZE}
                         memberships={memberships}
