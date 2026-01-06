@@ -405,6 +405,13 @@ export const deDE: LocalizationResource = {
         headerTitle__members: 'Mitglieder',
         headerTitle__requests: 'Anfragen',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Rollen sind vorübergehend gesperrt',
+          subtitle:
+            'Wir aktualisieren die verfügbaren Rollen. Sobald dies abgeschlossen ist, können Sie die Rollen wieder aktualisieren.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'API-Keys',
@@ -764,6 +771,10 @@ export const deDE: LocalizationResource = {
         'Um fortzufahren, geben Sie bitte den Verifizierungscode ein, der von Ihrer Authenticator-App generiert wurde.',
       title: 'Bestätigung in zwei Schritten',
     },
+    web3Solana: {
+      subtitle: 'Wähle unten eine Wallet aus, um dich anzumelden',
+      title: 'Mit Solana anmelden',
+    },
   },
   signInEnterPasswordTitle: 'Geben Sie Ihr Passwort ein',
   signUp: {
@@ -855,6 +866,10 @@ export const deDE: LocalizationResource = {
       title: 'Erstellen Sie Ihr Konto',
       titleCombined: 'Erstellen Sie Ihr Konto',
     },
+    web3Solana: {
+      subtitle: 'Wählen Sie unten eine Wallet aus, um sich zu registrieren',
+      title: 'Mit Solana registrieren',
+    },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -876,6 +891,10 @@ export const deDE: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Geben Sie Ihre Organisationsdetails ein, um fortzufahren',
       title: 'Organisation einrichten',
+    },
+    organizationCreationDisabled: {
+      title: 'Sie müssen einer Organisation angehören',
+      subtitle: 'Kontaktieren Sie Ihren Organisationsadministrator für eine Einladung.',
     },
     signOut: {
       actionLink: 'Abmelden',
@@ -902,6 +921,8 @@ export const deDE: LocalizationResource = {
     captcha_unavailable:
       'Die Anmeldung ist aufgrund einer fehlgeschlagenen Bot-Validierung fehlgeschlagen. Bitte aktualisieren Sie die Seite, um es erneut zu versuchen, oder wenden Sie sich an den Support, um weitere Unterstützung zu erhalten.',
     form_code_incorrect: 'Der eingegebene Code ist falsch. Bitte überprüfen Sie ihn und versuchen Sie es erneut.',
+    form_email_address_blocked:
+      'Temporäre E-Mail-Dienste werden nicht unterstützt. Bitte verwenden Sie Ihre reguläre E-Mail-Adresse, um ein Konto zu erstellen.',
     form_identifier_exists__email_address: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen anderen.',
@@ -919,6 +940,8 @@ export const deDE: LocalizationResource = {
     form_param_type_invalid__phone_number: 'Bitte geben Sie eine gültige Telefonnummer ein.',
     form_param_value_invalid: 'Der eingegebene Wert ist ungültig.',
     form_password_incorrect: 'Das eingegebene Passwort ist falsch.',
+    form_password_or_identifier_incorrect:
+      'Passwort oder E-Mail-Adresse ist falsch. Versuchen Sie es erneut oder verwenden Sie eine andere Methode.',
     form_password_length_too_short: 'Das Passwort ist zu kurz. Es muss mindestens 8 Zeichen lang sein.',
     form_password_not_strong_enough: 'Passwort nicht stark genug.',
     form_password_pwned:
@@ -968,6 +991,10 @@ export const deDE: LocalizationResource = {
     session_exists: 'Sie sind bereits angemeldet.',
     web3_missing_identifier:
       'Eine Web3 Wallet-Erweiterung wurde nicht gefunden. Bitte installieren Sie eine, um fortzufahren.',
+    web3_signature_request_rejected:
+      'Du hast die Signaturanfrage abgelehnt. Bitte versuche es erneut, um fortzufahren.',
+    web3_solana_signature_generation_failed:
+      'Beim Erstellen der Signatur ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut, um fortzufahren.',
     zxcvbn: {
       couldBeStronger: 'Ihr Passwort funktioniert, könnte aber besser sein. Versuchen Sie, mehr Zeichen hinzuzufügen.',
       goodPassword: 'Ihr Passwort erfüllt alle notwendigen Anforderungen.',
@@ -1343,6 +1370,10 @@ export const deDE: LocalizationResource = {
         detailsAction__nonPrimary: 'Als primär festlegen',
         primaryButton: 'Web3-Wallets',
         title: 'Web3-Wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Wählen Sie eine Solana-Wallet aus, um sie mit Ihrem Konto zu verbinden.',
+          title: 'Solana-Wallet hinzufügen',
+        },
       },
     },
     usernamePage: {
@@ -1378,5 +1409,11 @@ export const deDE: LocalizationResource = {
       subtitle: 'Vielen Dank für Ihre Geduld. Sie erhalten eine Benachrichtigung, sobald der Zugang freigegeben wird.',
       title: 'Erfolgreich auf die Warteliste gesetzt',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Mit {{walletName}} verbinden',
+    continue: 'Weiter mit {{walletName}}',
+    noneAvailable:
+      'Keine Solana-Web3-Wallets erkannt. Bitte installieren Sie eine Web3-unterstützte {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

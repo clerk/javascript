@@ -260,86 +260,86 @@ const resolveAuthState = ({
 }: AuthStateOptions): UseAuthReturn | undefined => {
   if (sessionId === undefined && userId === undefined) {
     return {
+      actor: undefined,
+      getToken,
+      has: () => false,
       isLoaded: false,
       isSignedIn: undefined,
-      sessionId,
-      sessionClaims: undefined,
-      userId,
-      actor: undefined,
       orgId: undefined,
       orgRole: undefined,
       orgSlug: undefined,
-      has: undefined,
+      sessionClaims: undefined,
+      sessionId,
       signOut,
-      getToken,
+      userId,
     } as const;
   }
 
   if (sessionId === null && userId === null) {
     return {
+      actor: null,
+      getToken,
+      has: () => false,
       isLoaded: true,
       isSignedIn: false,
-      sessionId,
-      userId,
-      sessionClaims: null,
-      actor: null,
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has: () => false,
+      sessionClaims: null,
+      sessionId,
       signOut,
-      getToken,
+      userId,
     } as const;
   }
 
   if (treatPendingAsSignedOut && sessionStatus === 'pending') {
     return {
+      actor: null,
+      getToken,
+      has: () => false,
       isLoaded: true,
       isSignedIn: false,
-      sessionId: null,
-      userId: null,
-      sessionClaims: null,
-      actor: null,
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has: () => false,
+      sessionClaims: null,
+      sessionId: null,
       signOut,
-      getToken,
+      userId: null,
     } as const;
   }
 
   if (!!sessionId && !!sessionClaims && !!userId && !!orgId && !!orgRole) {
     return {
+      actor: actor || null,
+      getToken,
+      has,
       isLoaded: true,
       isSignedIn: true,
-      sessionId,
-      sessionClaims,
-      userId,
-      actor: actor || null,
       orgId,
       orgRole,
       orgSlug: orgSlug || null,
-      has,
+      sessionClaims,
+      sessionId,
       signOut,
-      getToken,
+      userId,
     } as const;
   }
 
   if (!!sessionId && !!sessionClaims && !!userId && !orgId) {
     return {
+      actor: actor || null,
+      getToken,
+      has,
       isLoaded: true,
       isSignedIn: true,
-      sessionId,
-      sessionClaims,
-      userId,
-      actor: actor || null,
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has,
+      sessionClaims,
+      sessionId,
       signOut,
-      getToken,
+      userId,
     } as const;
   }
 };

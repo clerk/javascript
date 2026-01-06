@@ -2,12 +2,15 @@
 import Layout from '../../layouts/react/Layout.astro';
 import Card from '../../components/Card.astro';
 
-import { SignedIn, SignedOut, SignOutButton, OrganizationSwitcher } from '@clerk/astro/react';
+import { Show, SignOutButton, OrganizationSwitcher } from '@clerk/astro/react';
 ---
 
 <Layout title='Welcome to Astro.'>
   <h1>Welcome to <span class='text-gradient'>Astro</span> + React</h1>
-  <SignedIn client:load>
+  <Show
+    when='signed-in'
+    client:load
+  >
     <OrganizationSwitcher
       client:load
       appearance={{
@@ -19,7 +22,7 @@ import { SignedIn, SignedOut, SignOutButton, OrganizationSwitcher } from '@clerk
       afterSelectOrganizationUrl='/organization'
     />
     <SignOutButton client:load>Sign out!</SignOutButton>
-  </SignedIn>
+  </Show>
 
   <div class='h-12'></div>
 
@@ -31,7 +34,10 @@ import { SignedIn, SignedOut, SignOutButton, OrganizationSwitcher } from '@clerk
     role='list'
     class='link-card-grid'
   >
-    <SignedOut client:load>
+    <Show
+      when='signed-out'
+      client:load
+    >
       <Card
         href='/sign-in'
         title='Log in'
@@ -42,8 +48,11 @@ import { SignedIn, SignedOut, SignOutButton, OrganizationSwitcher } from '@clerk
         title='Create account'
         body='Supercharge your project with new frameworks and libraries.'
       />
-    </SignedOut>
-    <SignedIn client:load>
+    </Show>
+    <Show
+      when='signed-in'
+      client:load
+    >
       <Card
         href='/user'
         title='User Profile'
@@ -69,7 +78,7 @@ import { SignedIn, SignedOut, SignOutButton, OrganizationSwitcher } from '@clerk
         title='For members'
         body='Learn how Astro works and explore the official API docs.'
       />
-    </SignedIn>
+    </Show>
   </ul>
 </Layout>
 

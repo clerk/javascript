@@ -394,6 +394,13 @@ export const ptPT: LocalizationResource = {
         headerTitle__members: 'Membros',
         headerTitle__requests: 'Pedidos',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'As funções estão temporariamente bloqueadas',
+          subtitle:
+            'Estamos a atualizar as funções disponíveis. Assim que terminar, poderá atualizar as funções novamente.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -747,6 +754,10 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Insira o código de verificação enviado para o seu dispositivo.',
       title: 'Verificação de duas etapas',
     },
+    web3Solana: {
+      subtitle: 'Selecione uma carteira abaixo para iniciar sessão',
+      title: 'Iniciar sessão com Solana',
+    },
   },
   signInEnterPasswordTitle: 'Insira a sua palavra-passe',
   signUp: {
@@ -838,31 +849,39 @@ export const ptPT: LocalizationResource = {
       title: 'Criar a sua conta',
       titleCombined: 'Criar a sua conta',
     },
+    web3Solana: {
+      subtitle: 'Selecione uma carteira abaixo para se registar',
+      title: 'Registar-se com Solana',
+    },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Criar nova organização',
+      action__invitationAccept: 'Participar',
+      action__suggestionsAccept: 'Solicitar participação',
+      subtitle: 'Junte-se a uma organização existente ou crie uma nova',
+      suggestionsAcceptedLabel: 'Aprovação pendente',
+      title: 'Escolha uma organização',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Cancelar',
+      formButtonSubmit: 'Continuar',
+      formFieldInputPlaceholder__name: 'A minha organização',
+      formFieldInputPlaceholder__slug: 'a-minha-organizacao',
+      formFieldLabel__name: 'Nome',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Introduza os detalhes da sua organização para continuar',
+      title: 'Configurar a sua organização',
+    },
+    organizationCreationDisabled: {
+      title: 'Deve pertencer a uma organização',
+      subtitle: 'Contacte o administrador da sua organização para obter um convite.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Terminar sessão',
+      actionText: 'Sessão iniciada como {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -884,6 +903,8 @@ export const ptPT: LocalizationResource = {
     captcha_unavailable:
       'Inscrição mal-sucedida devido a falha na validação de bot. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     form_code_incorrect: 'Código incorreto.',
+    form_email_address_blocked:
+      'Serviços de e-mail temporários não são suportados. Por favor, use o seu endereço de e-mail regular para criar uma conta.',
     form_identifier_exists__email_address: 'O endereço de e-mail já está em uso.',
     form_identifier_exists__phone_number: 'O número de telemóvel já está em uso.',
     form_identifier_exists__username: 'O nome de utilizador já está em uso.',
@@ -901,6 +922,8 @@ export const ptPT: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valor de parâmetro inválido.',
     form_password_incorrect: 'Palavra-passe incorreta.',
+    form_password_or_identifier_incorrect:
+      'A palavra-passe ou o endereço de e-mail está incorreto. Tente novamente ou use outro método.',
     form_password_length_too_short: 'A palavra-passe é muito curta.',
     form_password_not_strong_enough: 'A sua palavra-passe não é forte o suficiente.',
     form_password_pwned:
@@ -941,6 +964,8 @@ export const ptPT: LocalizationResource = {
     phone_number_exists: 'Este número de telemóvel já está em uso. Por favor, tente outro.',
     session_exists: 'Já está conectado.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Rejeitou o pedido de assinatura. Tente novamente para continuar.',
+    web3_solana_signature_generation_failed: 'Ocorreu um erro ao gerar a assinatura. Tente novamente para continuar.',
     zxcvbn: {
       couldBeStronger: 'A sua palavra-passe funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
       goodPassword: 'A sua palavra-passe atende a todos os requisitos necessários.',
@@ -1309,6 +1334,10 @@ export const ptPT: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Carteiras Web3',
         title: 'Carteiras Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selecione uma carteira Solana para ligar à sua conta.',
+          title: 'Adicionar uma carteira Solana',
+        },
       },
     },
     usernamePage: {
@@ -1343,5 +1372,11 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Aguarde enquanto processamos o seu pedido.',
       title: 'Inscrição bem-sucedida na lista de espera',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Conectar com {{walletName}}',
+    continue: 'Continuar com {{walletName}}',
+    noneAvailable:
+      'Não foram detetadas carteiras Solana Web3. Instale uma {{ solanaWalletsLink || link("wallet extension") }} com suporte Web3.',
   },
 } as const;

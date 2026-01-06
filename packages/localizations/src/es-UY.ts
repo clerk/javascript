@@ -397,6 +397,13 @@ export const esUY: LocalizationResource = {
         headerTitle__members: 'Miembros',
         headerTitle__requests: 'Solicitudes',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Los roles están temporalmente bloqueados',
+          subtitle:
+            'Estamos actualizando los roles disponibles. Una vez hecho esto, podrás actualizar los roles de nuevo.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -753,6 +760,10 @@ export const esUY: LocalizationResource = {
       subtitle: 'Para continuar, ingresá el código generado por tu aplicación autenticadora',
       title: 'Verificación en dos pasos',
     },
+    web3Solana: {
+      subtitle: 'Selecciona una billetera abajo para iniciar sesión',
+      title: 'Iniciar sesión con Solana',
+    },
   },
   signInEnterPasswordTitle: 'Ingresá tu contraseña',
   signUp: {
@@ -847,31 +858,39 @@ export const esUY: LocalizationResource = {
       title: 'Creá tu cuenta',
       titleCombined: 'Creá tu cuenta',
     },
+    web3Solana: {
+      subtitle: 'Selecciona una billetera abajo para registrarte',
+      title: 'Registrarse con Solana',
+    },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Crear nueva organización',
+      action__invitationAccept: 'Unirse',
+      action__suggestionsAccept: 'Solicitar unirse',
+      subtitle: 'Unirse a una organización existente o crear una nueva',
+      suggestionsAcceptedLabel: 'Pendiente de aprobación',
+      title: 'Elegir una organización',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Cancelar',
+      formButtonSubmit: 'Continuar',
+      formFieldInputPlaceholder__name: 'Mi Organización',
+      formFieldInputPlaceholder__slug: 'mi-organizacion',
+      formFieldLabel__name: 'Nombre',
+      formFieldLabel__slug: 'Identificador',
+      subtitle: 'Ingresá los detalles de tu organización para continuar',
+      title: 'Configurar tu organización',
+    },
+    organizationCreationDisabled: {
+      title: 'Debés pertenecer a una organización',
+      subtitle: 'Contactá al administrador de tu organización para obtener una invitación.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Cerrar sesión',
+      actionText: 'Logueado como {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -893,6 +912,8 @@ export const esUY: LocalizationResource = {
     captcha_unavailable:
       'El registro no se pudo completar debido a la validación fallida contra bots. Por favor, actualizá la página para intentarlo de nuevo o contactá al soporte para más asistencia.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Los servicios de correo electrónico temporal no están soportados. Por favor, usá tu dirección de correo electrónico habitual para crear una cuenta.',
     form_identifier_exists__email_address: 'Este correo electrónico ya está en uso. Por favor, probá con otro.',
     form_identifier_exists__phone_number: 'Este número de teléfono ya está en uso. Por favor, probá con otro.',
     form_identifier_exists__username: 'Este nombre de usuario ya está en uso. Por favor, probá con otro.',
@@ -910,6 +931,8 @@ export const esUY: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'El valor ingresado es inválido. Por favor, corregilo.',
     form_password_incorrect: 'La contraseña ingresada es incorrecta. Por favor, intentá de nuevo.',
+    form_password_or_identifier_incorrect:
+      'La contraseña o la dirección de correo electrónico es incorrecta. Intentá de nuevo o usá otro método.',
     form_password_length_too_short: 'Tu contraseña es demasiado corta. Debe tener al menos 8 caracteres.',
     form_password_not_strong_enough: 'Tu contraseña no es lo suficientemente fuerte.',
     form_password_pwned:
@@ -953,6 +976,9 @@ export const esUY: LocalizationResource = {
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, probá con otro.',
     session_exists: 'Ya has iniciado sesión',
     web3_missing_identifier: 'No se encontró una extensión de cartera Web3. Por favor, instalá una para continuar.',
+    web3_signature_request_rejected: 'Has rechazado la solicitud de firma. Inténtalo de nuevo para continuar.',
+    web3_solana_signature_generation_failed:
+      'Se produjo un error al generar la firma. Inténtalo de nuevo para continuar.',
     zxcvbn: {
       couldBeStronger: 'Tu contraseña funciona, pero podría ser más fuerte. Intentá agregar más caracteres.',
       goodPassword: 'Tu contraseña cumple con todos los requisitos necesarios.',
@@ -1323,6 +1349,10 @@ export const esUY: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Conectar cartera',
         title: 'Carteras Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selecciona una billetera de Solana para conectarla a tu cuenta.',
+          title: 'Agregar una billetera de Solana',
+        },
       },
     },
     usernamePage: {
@@ -1357,5 +1387,11 @@ export const esUY: LocalizationResource = {
       subtitle: 'Nos pondremos en contacto cuando tu lugar esté listo',
       title: '¡Gracias por unirte a la lista de espera!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Conectar con {{walletName}}',
+    continue: 'Continuar con {{walletName}}',
+    noneAvailable:
+      'No se detectaron billeteras Web3 de Solana. Instala una {{ solanaWalletsLink || link("wallet extension") }} compatible con Web3.',
   },
 } as const;

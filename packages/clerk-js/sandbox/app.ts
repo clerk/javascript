@@ -167,7 +167,6 @@ function appearanceVariableOptions() {
     'colorDanger',
     'colorSuccess',
     'colorWarning',
-    'colorForeground',
     'colorMutedForeground',
     'colorInputForeground',
     'colorInput',
@@ -378,6 +377,7 @@ void (async () => {
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
+      clerkUiCtor: window.__internal_ClerkUiCtor,
     });
     renderCurrentRoute();
     updateVariables();

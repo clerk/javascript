@@ -123,7 +123,20 @@ const common = ({ mode, variant, disableRHC = false }) => {
           },
           defaultVendors: {
             minChunks: 1,
-            test: /[\\/]node_modules[\\/]/,
+            test: module => {
+              if (!(module instanceof rspack.NormalModule) || !module.resource) {
+                return false;
+              }
+              // Exclude Solana packages and their known transitive dependencies
+              if (
+                /[\\/]node_modules[\\/](@solana|@solana-mobile|@wallet-standard|bn\.js|borsh|buffer|superstruct|bs58|jayson|rpc-websockets|qrcode)[\\/]/.test(
+                  module.resource,
+                )
+              ) {
+                return false;
+              }
+              return /[\\/]node_modules[\\/]/.test(module.resource);
+            },
             name: 'vendors',
             priority: -10,
           },
@@ -252,11 +265,17 @@ const prodConfig = ({ mode, env, analysis }) => {
       ? {
           entry: { sandbox: './sandbox/app.ts' },
           plugins: [
+            new rspack.CopyRspackPlugin({
+              patterns: [{ from: path.resolve(__dirname, '../ui/dist/*.js'), to: '[name][ext]' }],
+            }),
             new rspack.HtmlRspackPlugin({
               minify: false,
               template: './sandbox/template.html',
               inject: false,
               hash: true,
+              templateParameters: {
+                uiScriptUrl: './ui.browser.js',
+              },
             }),
           ],
         }
@@ -456,6 +475,9 @@ const devConfig = ({ mode, env }) => {
             minify: false,
             template: './sandbox/template.html',
             inject: false,
+            templateParameters: {
+              uiScriptUrl: 'http://localhost:4011/npm/ui.browser.js',
+            },
           }),
       ].filter(Boolean),
       devtool: 'eval-cheap-source-map',
