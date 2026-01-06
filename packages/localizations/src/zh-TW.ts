@@ -391,6 +391,12 @@ export const zhTW: LocalizationResource = {
         headerTitle__members: '成員',
         headerTitle__requests: '請求',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: '角色暫時被鎖定',
+          subtitle: '我們正在更新可用角色。完成後，您將能夠再次更新角色。',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -858,6 +864,10 @@ export const zhTW: LocalizationResource = {
       subtitle: '輸入您的組織詳細資訊以繼續',
       title: '設定您的組織',
     },
+    organizationCreationDisabled: {
+      title: '您必須屬於一個組織',
+      subtitle: '請聯繫您的組織管理員以獲取邀請。',
+    },
     signOut: {
       actionLink: '登出',
       actionText: '已登入為 {{identifier}}',
@@ -1315,16 +1325,16 @@ export const zhTW: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: '登入',
+      actionText: '已有存取權限？',
+      formButton: '加入候補名單',
+      subtitle: '輸入您的電子郵件地址，我們會在您的位置準備好時通知您',
+      title: '加入候補名單',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: '您將很快被重新導向...',
+      subtitle: '當您的位置準備好時，我們會與您聯繫',
+      title: '感謝您加入候補名單！',
     },
   },
   web3SolanaWalletButtons: {

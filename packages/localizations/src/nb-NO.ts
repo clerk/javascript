@@ -395,6 +395,12 @@ export const nbNO: LocalizationResource = {
         headerTitle__members: 'Medlemmer',
         headerTitle__requests: 'Forespørsler',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roller er midlertidig låst',
+          subtitle: 'Vi oppdaterer tilgjengelige roller. Når det er gjort, vil du kunne oppdatere roller igjen.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -868,6 +874,10 @@ export const nbNO: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Skriv inn organisasjonsdetaljene dine for å fortsette',
       title: 'Sett opp din organisasjon',
+    },
+    organizationCreationDisabled: {
+      title: 'Du må tilhøre en organisasjon',
+      subtitle: 'Kontakt organisasjonsadministratoren din for en invitasjon.',
     },
     signOut: {
       actionLink: 'Logg ut',
@@ -1351,16 +1361,16 @@ export const nbNO: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Logg inn',
+      actionText: 'Har du allerede tilgang?',
+      formButton: 'Bli med på ventelisten',
+      subtitle: 'Skriv inn e-postadressen din, så gir vi deg beskjed når plassen din er klar',
+      title: 'Bli med på ventelisten',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Du vil bli omdirigert snart...',
+      subtitle: 'Vi tar kontakt når plassen din er klar',
+      title: 'Takk for at du ble med på ventelisten!',
     },
   },
   web3SolanaWalletButtons: {

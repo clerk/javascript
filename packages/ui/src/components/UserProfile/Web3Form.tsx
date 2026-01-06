@@ -2,16 +2,15 @@ import { createWeb3 } from '@clerk/shared/internal/clerk-js/web3';
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { Web3Provider, Web3Strategy } from '@clerk/shared/types';
 
+import { useModuleManager } from '@/contexts';
+import { descriptors, Image, localizationKeys } from '@/customizables';
+import { useEnabledThirdPartyProviders } from '@/hooks';
 import { Web3SelectSolanaWalletScreen } from '@/ui/components/UserProfile/Web3SelectSolanaWalletScreen';
 import { Action } from '@/ui/elements/Action';
 import { useActionContext } from '@/ui/elements/Action/ActionRoot';
 import { useCardState } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
-import { getFieldError, handleError } from '@/ui/utils/errorHandler';
-
-import { useModuleManager } from '../../contexts';
-import { descriptors, Image, localizationKeys, Text } from '../../customizables';
-import { useEnabledThirdPartyProviders } from '../../hooks';
+import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
 export const AddWeb3WalletActionMenu = () => {
   const card = useCardState();
@@ -64,12 +63,7 @@ export const AddWeb3WalletActionMenu = () => {
       card.setIdle();
     } catch (err: any) {
       card.setIdle();
-      const fieldError = getFieldError(err);
-      if (fieldError) {
-        card.setError(fieldError.longMessage);
-      } else {
-        handleError(err, [], card.setError);
-      }
+      web3CallbackErrorHandler(err, card.setError);
     }
   };
 
@@ -116,18 +110,6 @@ export const AddWeb3WalletActionMenu = () => {
           <Web3SelectSolanaWalletScreen onConnect={connect} />
         </Action.Card>
       </Action.Open>
-
-      {card.error && (
-        <Text
-          colorScheme='danger'
-          sx={t => ({
-            padding: t.sizes.$1x5,
-            paddingLeft: t.sizes.$8x5,
-          })}
-        >
-          {card.error}
-        </Text>
-      )}
     </>
   );
 };

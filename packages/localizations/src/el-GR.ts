@@ -396,6 +396,13 @@ export const elGR: LocalizationResource = {
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Οι ρόλοι είναι προσωρινά κλειδωμένοι',
+          subtitle:
+            'Ενημερώνουμε τους διαθέσιμους ρόλους. Μόλις ολοκληρωθεί, θα μπορείτε να ενημερώσετε ξανά τους ρόλους.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -871,6 +878,10 @@ export const elGR: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Εισάγετε τα στοιχεία του οργανισμού σας για να συνεχίσετε',
       title: 'Ρυθμίστε τον οργανισμό σας',
+    },
+    organizationCreationDisabled: {
+      title: 'Πρέπει να ανήκετε σε έναν οργανισμό',
+      subtitle: 'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για πρόσκληση.',
     },
     signOut: {
       actionLink: 'Αποσύνδεση',
@@ -1361,16 +1372,17 @@ export const elGR: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Σύνδεση',
+      actionText: 'Έχετε ήδη πρόσβαση;',
+      formButton: 'Εγγραφή στη λίστα αναμονής',
+      subtitle:
+        'Εισάγετε τη διεύθυνση ηλεκτρονικού ταχυδρομείου σας και θα σας ενημερώσουμε όταν η θέση σας είναι έτοιμη',
+      title: 'Εγγραφή στη λίστα αναμονής',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Θα ανακατευθυνθείτε σύντομα...',
+      subtitle: 'Θα επικοινωνήσουμε μαζί σας όταν η θέση σας είναι έτοιμη',
+      title: 'Ευχαριστούμε που εγγραφήκατε στη λίστα αναμονής!',
     },
   },
   web3SolanaWalletButtons: {

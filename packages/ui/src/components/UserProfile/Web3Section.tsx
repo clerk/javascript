@@ -95,7 +95,10 @@ export const Web3Section = withCardStateProvider(
                           </Flex>
                         </Box>
                       </Flex>
-                      <Web3WalletMenu walletId={walletId} />
+                      <Web3WalletMenu
+                        walletId={walletId}
+                        isVerified={wallet.verification.status === 'verified'}
+                      />
                     </ProfileSection.Item>
 
                     <Action.Open value={`remove-${walletId}`}>
@@ -115,7 +118,7 @@ export const Web3Section = withCardStateProvider(
   },
 );
 
-const Web3WalletMenu = ({ walletId }: { walletId: string }) => {
+const Web3WalletMenu = ({ walletId, isVerified }: { walletId: string; isVerified: boolean }) => {
   const card = useCardState();
   const { open } = useActionContext();
   const { user } = useUser();
@@ -126,7 +129,8 @@ const Web3WalletMenu = ({ walletId }: { walletId: string }) => {
 
   const actions = (
     [
-      !isPrimary
+      // Only allow setting as primary if the wallet is verified and not already primary
+      !isPrimary && isVerified
         ? {
             label: localizationKeys('userProfile.start.web3WalletsSection.detailsAction__nonPrimary'),
             onClick: () => {

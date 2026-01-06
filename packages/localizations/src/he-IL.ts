@@ -393,6 +393,12 @@ export const heIL: LocalizationResource = {
         headerTitle__members: 'חברים',
         headerTitle__requests: 'בקשות',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'התפקידים נעולים זמנית',
+          subtitle: 'אנחנו מעדכנים את התפקידים הזמינים. לאחר שזה יסתיים, תוכל לעדכן תפקידים שוב.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -860,6 +866,10 @@ export const heIL: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'הזן את פרטי הארגון שלך כדי להמשיך',
       title: 'הגדר את הארגון שלך',
+    },
+    organizationCreationDisabled: {
+      title: 'עליך להשתייך לארגון',
+      subtitle: 'פנה למנהל הארגון שלך לקבלת הזמנה.',
     },
     signOut: {
       actionLink: 'התנתק',

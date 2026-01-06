@@ -395,6 +395,12 @@ export const plPL: LocalizationResource = {
         headerTitle__members: 'Członkowie',
         headerTitle__requests: 'Prośby',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Role są tymczasowo zablokowane',
+          subtitle: 'Aktualizujemy dostępne role. Po zakończeniu będziesz mógł ponownie aktualizować role.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -874,6 +880,10 @@ export const plPL: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Wprowadź szczegóły swojej organizacji',
       title: 'Utwórz swoją organizację',
+    },
+    organizationCreationDisabled: {
+      title: 'Musisz należeć do organizacji',
+      subtitle: 'Skontaktuj się z administratorem swojej organizacji, aby uzyskać zaproszenie.',
     },
     signOut: {
       actionLink: 'Wyloguj',

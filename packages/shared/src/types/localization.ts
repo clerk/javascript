@@ -1128,6 +1128,12 @@ export type __internal_LocalizationResource = {
           primaryButton: LocalizationValue;
         };
       };
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
+      };
     };
     billingPage: {
       title: LocalizationValue;
@@ -1302,6 +1308,10 @@ export type __internal_LocalizationResource = {
       action__suggestionsAccept: LocalizationValue;
       action__createOrganization: LocalizationValue;
       action__invitationAccept: LocalizationValue;
+    };
+    organizationCreationDisabled: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
     };
   };
   taskResetPassword: {

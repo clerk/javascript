@@ -397,6 +397,13 @@ export const msMY: LocalizationResource = {
         headerTitle__members: 'Ahli',
         headerTitle__requests: 'Permintaan',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Peranan dikunci buat sementara waktu',
+          subtitle:
+            'Kami sedang mengemas kini peranan yang tersedia. Setelah selesai, anda akan dapat mengemas kini peranan semula.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -877,6 +884,10 @@ export const msMY: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Masukkan butiran organisasi anda untuk meneruskan',
       title: 'Sediakan organisasi anda',
+    },
+    organizationCreationDisabled: {
+      title: 'Anda mesti menjadi ahli organisasi',
+      subtitle: 'Hubungi pentadbir organisasi anda untuk jemputan.',
     },
     signOut: {
       actionLink: 'Daftar keluar',

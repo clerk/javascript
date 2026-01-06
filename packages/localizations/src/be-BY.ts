@@ -396,6 +396,12 @@ export const beBY: LocalizationResource = {
         headerTitle__members: 'Удзельнікі',
         headerTitle__requests: 'Заявкі',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Ролі часова заблакіраваны',
+          subtitle: 'Мы абнаўляем даступныя ролі. Калі гэта будзе зроблена, вы зможаце абнавіць ролі зноў.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -874,6 +880,10 @@ export const beBY: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Увядзіце даныя вашай арганізацыі для працягу',
       title: 'Наладзьце вашу арганізацыю',
+    },
+    organizationCreationDisabled: {
+      title: 'Вы павінны належаць да арганізацыі',
+      subtitle: 'Звярніцеся да адміністратара вашай арганізацыі для атрымання запрашэння.',
     },
     signOut: {
       actionLink: 'Выйсці',

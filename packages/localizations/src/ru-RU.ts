@@ -399,6 +399,12 @@ export const ruRU: LocalizationResource = {
         headerTitle__members: 'Участники',
         headerTitle__requests: 'Заявки',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Роли временно заблокированы',
+          subtitle: 'Мы обновляем доступные роли. Как только это будет сделано, вы сможете снова обновлять роли.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -881,6 +887,10 @@ export const ruRU: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Введите данные вашей организации для продолжения',
       title: 'Настройте вашу организацию',
+    },
+    organizationCreationDisabled: {
+      title: 'Вы должны принадлежать к организации',
+      subtitle: 'Свяжитесь с администратором вашей организации для получения приглашения.',
     },
     signOut: {
       actionLink: 'Выйти',

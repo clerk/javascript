@@ -394,6 +394,13 @@ export const ptPT: LocalizationResource = {
         headerTitle__members: 'Membros',
         headerTitle__requests: 'Pedidos',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'As funções estão temporariamente bloqueadas',
+          subtitle:
+            'Estamos a atualizar as funções disponíveis. Assim que terminar, poderá atualizar as funções novamente.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -867,6 +874,10 @@ export const ptPT: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Introduza os detalhes da sua organização para continuar',
       title: 'Configurar a sua organização',
+    },
+    organizationCreationDisabled: {
+      title: 'Deve pertencer a uma organização',
+      subtitle: 'Contacte o administrador da sua organização para obter um convite.',
     },
     signOut: {
       actionLink: 'Terminar sessão',

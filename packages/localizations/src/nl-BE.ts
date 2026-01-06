@@ -395,6 +395,13 @@ export const nlBE: LocalizationResource = {
         headerTitle__members: 'Leden',
         headerTitle__requests: 'Verzoeken',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Rollen zijn tijdelijk vergrendeld',
+          subtitle:
+            'We zijn de beschikbare rollen aan het bijwerken. Zodra dit klaar is, kunt u de rollen opnieuw bijwerken.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -869,6 +876,10 @@ export const nlBE: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Voer de gegevens van je organisatie in om door te gaan',
       title: 'Stel je organisatie in',
+    },
+    organizationCreationDisabled: {
+      title: 'Je moet tot een organisatie behoren',
+      subtitle: 'Neem contact op met de beheerder van je organisatie voor een uitnodiging.',
     },
     signOut: {
       actionLink: 'Uitloggen',

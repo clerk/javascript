@@ -396,6 +396,13 @@ export const idID: LocalizationResource = {
         headerTitle__members: 'Anggota',
         headerTitle__requests: 'Permintaan',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Peran untuk sementara terkunci',
+          subtitle:
+            'Kami sedang memperbarui peran yang tersedia. Setelah selesai, Anda akan dapat memperbarui peran lagi.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -875,6 +882,10 @@ export const idID: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Masukkan detail organisasi Anda untuk melanjutkan',
       title: 'Atur organisasi Anda',
+    },
+    organizationCreationDisabled: {
+      title: 'Anda harus menjadi anggota organisasi',
+      subtitle: 'Hubungi admin organisasi Anda untuk mendapatkan undangan.',
     },
     signOut: {
       actionLink: 'Keluar',

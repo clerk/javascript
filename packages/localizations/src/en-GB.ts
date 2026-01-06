@@ -396,6 +396,12 @@ export const enGB: LocalizationResource = {
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roles are temporarily locked',
+          subtitle: "We are updating the available roles. Once that's done, you'll be able to update roles again.",
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -871,6 +877,10 @@ export const enGB: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Enter your organisation details to continue',
       title: 'Setup your organisation',
+    },
+    organizationCreationDisabled: {
+      title: 'You must belong to an organisation',
+      subtitle: 'Contact your organisation admin for an invitation.',
     },
     signOut: {
       actionLink: 'Sign out',

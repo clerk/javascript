@@ -403,6 +403,12 @@ export const jaJP: LocalizationResource = {
         headerTitle__members: 'メンバー',
         headerTitle__requests: 'リクエスト',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'ロールは一時的にロックされています',
+          subtitle: '利用可能なロールを更新しています。完了次第、ロールを再度更新できるようになります。',
+        },
+      },
     },
     navbar: {
       apiKeys: 'APIキー',
@@ -881,6 +887,10 @@ export const jaJP: LocalizationResource = {
       formFieldLabel__slug: 'スラグ',
       subtitle: '続行するには組織の詳細を入力してください',
       title: '組織をセットアップ',
+    },
+    organizationCreationDisabled: {
+      title: '組織に所属する必要があります',
+      subtitle: '招待を受けるには組織の管理者にお問い合わせください。',
     },
     signOut: {
       actionLink: 'サインアウト',

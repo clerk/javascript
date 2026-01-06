@@ -396,6 +396,12 @@ export const bgBG: LocalizationResource = {
         headerTitle__members: 'Членове',
         headerTitle__requests: 'Заявки',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Ролите са временно заключени',
+          subtitle: 'Актуализираме наличните роли. Когато това приключи, ще можете отново да актуализирате ролите.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -870,6 +876,10 @@ export const bgBG: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Въведете данните за вашата организация, за да продължите',
       title: 'Настройте вашата организация',
+    },
+    organizationCreationDisabled: {
+      title: 'Трябва да принадлежите към организация',
+      subtitle: 'Свържете се с администратора на вашата организация за покана.',
     },
     signOut: {
       actionLink: 'Изход',

@@ -395,6 +395,12 @@ export const huHU: LocalizationResource = {
         headerTitle__members: 'Tagok',
         headerTitle__requests: 'Kérések',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'A szerepkörök ideiglenesen zárolva vannak',
+          subtitle: 'Frissítjük az elérhető szerepköröket. Ha ez befejeződött, újra frissítheti a szerepköröket.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -868,6 +874,10 @@ export const huHU: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Adja meg szervezete adatait a folytatáshoz',
       title: 'Állítsa be szervezetét',
+    },
+    organizationCreationDisabled: {
+      title: 'Egy szervezethez kell tartoznia',
+      subtitle: 'Kérjen meghívót a szervezet adminisztrátorától.',
     },
     signOut: {
       actionLink: 'Kijelentkezés',
@@ -1354,16 +1364,16 @@ export const huHU: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Bejelentkezés',
+      actionText: 'Már van hozzáférésed?',
+      formButton: 'Csatlakozás a várólistához',
+      subtitle: 'Add meg az e-mail címedet, és értesítünk, amikor a helyed elkészül',
+      title: 'Csatlakozás a várólistához',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Hamarosan átirányítunk...',
+      subtitle: 'Visszajelzünk, amikor a helyed elkészül',
+      title: 'Köszönjük, hogy csatlakoztál a várólistához!',
     },
   },
   web3SolanaWalletButtons: {

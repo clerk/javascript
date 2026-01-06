@@ -395,6 +395,12 @@ export const arSA: LocalizationResource = {
         headerTitle__members: 'الأعضاء',
         headerTitle__requests: 'الطلبات',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'الأدوار مقفلة مؤقتًا',
+          subtitle: 'نحن نقوم بتحديث الأدوار المتاحة. بمجرد الانتهاء، ستتمكن من تحديث الأدوار مرة أخرى.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -866,6 +872,10 @@ export const arSA: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'أدخل تفاصيل منظمتك للمتابعة',
       title: 'إعداد منظمتك',
+    },
+    organizationCreationDisabled: {
+      title: 'يجب أن تنتمي إلى منظمة',
+      subtitle: 'تواصل مع مسؤول منظمتك للحصول على دعوة.',
     },
     signOut: {
       actionLink: 'تسجيل الخروج',
@@ -1342,16 +1352,16 @@ export const arSA: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'تسجيل الدخول',
+      actionText: 'هل لديك وصول بالفعل؟',
+      formButton: 'الانضمام إلى قائمة الانتظار',
+      subtitle: 'أدخل عنوان بريدك الإلكتروني وسنخبرك عندما يكون مكانك جاهزًا',
+      title: 'الانضمام إلى قائمة الانتظار',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'سيتم إعادة توجيهك قريبًا...',
+      subtitle: 'سنكون على اتصال عندما يكون مكانك جاهزًا',
+      title: 'شكرًا للانضمام إلى قائمة الانتظار!',
     },
   },
   web3SolanaWalletButtons: {

@@ -392,6 +392,12 @@ export const kkKZ: LocalizationResource = {
         headerTitle__members: 'Мүшелер',
         headerTitle__requests: 'Сұраулар',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Рөлдер уақытша құлыпталған',
+          subtitle: 'Қолжетімді рөлдерді жаңартып жатырмыз. Бұл аяқталғаннан кейін рөлдерді қайта жаңарта аласыз.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -861,6 +867,10 @@ export const kkKZ: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Жалғастыру үшін ұйымыңыздың мәліметтерін енгізіңіз',
       title: 'Ұйымыңызды баптаңыз',
+    },
+    organizationCreationDisabled: {
+      title: 'Сіз ұйымға тиесілі болуыңыз керек',
+      subtitle: 'Шақыру алу үшін ұйымыңыздың әкімшісіне хабарласыңыз.',
     },
     signOut: {
       actionLink: 'Шығу',

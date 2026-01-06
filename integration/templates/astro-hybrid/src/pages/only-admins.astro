@@ -1,13 +1,13 @@
 ---
-import { Protect } from '@clerk/astro/components';
+import { Show } from '@clerk/astro/components';
 import Layout from '../layouts/Layout.astro';
 
 export const prerender = true;
 ---
 
 <Layout title='Protected'>
-  <Protect role='org:admin'>
+  <Show when={{ role: 'org:admin' }}>
     <h1>I'm an admin</h1>
     <h1 slot='fallback'>Not an admin</h1>
-  </Protect>
+  </Show>
 </Layout>

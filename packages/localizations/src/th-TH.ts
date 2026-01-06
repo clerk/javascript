@@ -399,6 +399,12 @@ export const thTH: LocalizationResource = {
         headerTitle__members: 'สมาชิก',
         headerTitle__requests: 'คำขอ',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'บทบาทถูกล็อคชั่วคราว',
+          subtitle: 'เรากำลังอัปเดตบทบาทที่มีอยู่ เมื่อเสร็จแล้ว คุณจะสามารถอัปเดตบทบาทได้อีกครั้ง',
+        },
+      },
     },
     navbar: {
       apiKeys: 'คีย์ API',
@@ -870,6 +876,10 @@ export const thTH: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'ใส่รายละเอียดองค์กรของคุณเพื่อดำเนินการต่อ',
       title: 'ตั้งค่าองค์กรของคุณ',
+    },
+    organizationCreationDisabled: {
+      title: 'คุณต้องเป็นสมาชิกขององค์กร',
+      subtitle: 'ติดต่อผู้ดูแลระบบขององค์กรของคุณเพื่อขอคำเชิญ',
     },
     signOut: {
       actionLink: 'ออกจากระบบ',

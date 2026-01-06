@@ -397,6 +397,13 @@ export const esUY: LocalizationResource = {
         headerTitle__members: 'Miembros',
         headerTitle__requests: 'Solicitudes',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Los roles están temporalmente bloqueados',
+          subtitle:
+            'Estamos actualizando los roles disponibles. Una vez hecho esto, podrás actualizar los roles de nuevo.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -876,6 +883,10 @@ export const esUY: LocalizationResource = {
       formFieldLabel__slug: 'Identificador',
       subtitle: 'Ingresá los detalles de tu organización para continuar',
       title: 'Configurar tu organización',
+    },
+    organizationCreationDisabled: {
+      title: 'Debés pertenecer a una organización',
+      subtitle: 'Contactá al administrador de tu organización para obtener una invitación.',
     },
     signOut: {
       actionLink: 'Cerrar sesión',

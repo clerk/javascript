@@ -395,6 +395,12 @@ export const trTR: LocalizationResource = {
         headerTitle__members: 'Üyeler',
         headerTitle__requests: 'İstekler',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roller geçici olarak kilitlendi',
+          subtitle: 'Mevcut rolleri güncelliyoruz. Bu tamamlandığında rolleri tekrar güncelleyebileceksiniz.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -870,6 +876,10 @@ export const trTR: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Devam etmek için organizasyon bilgilerinizi girin',
       title: 'Organizasyonunuzu ayarlayın',
+    },
+    organizationCreationDisabled: {
+      title: 'Bir organizasyona ait olmalısınız',
+      subtitle: 'Davet için organizasyon yöneticinizle iletişime geçin.',
     },
     signOut: {
       actionLink: 'Çıkış yap',

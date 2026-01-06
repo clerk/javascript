@@ -401,6 +401,12 @@ export const csCZ: LocalizationResource = {
         headerTitle__members: 'Členové',
         headerTitle__requests: 'Žádosti',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Role jsou dočasně uzamčeny',
+          subtitle: 'Aktualizujeme dostupné role. Jakmile to bude hotové, budete moci role opět aktualizovat.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'API klíče',
@@ -880,6 +886,10 @@ export const csCZ: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Zadejte údaje o vaší organizaci pro pokračování',
       title: 'Nastavte svou organizaci',
+    },
+    organizationCreationDisabled: {
+      title: 'Musíte patřit do organizace',
+      subtitle: 'Kontaktujte administrátora vaší organizace pro pozvánku.',
     },
     signOut: {
       actionLink: 'Odhlásit se',

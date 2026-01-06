@@ -405,6 +405,13 @@ export const deDE: LocalizationResource = {
         headerTitle__members: 'Mitglieder',
         headerTitle__requests: 'Anfragen',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Rollen sind vorübergehend gesperrt',
+          subtitle:
+            'Wir aktualisieren die verfügbaren Rollen. Sobald dies abgeschlossen ist, können Sie die Rollen wieder aktualisieren.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'API-Keys',
@@ -884,6 +891,10 @@ export const deDE: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Geben Sie Ihre Organisationsdetails ein, um fortzufahren',
       title: 'Organisation einrichten',
+    },
+    organizationCreationDisabled: {
+      title: 'Sie müssen einer Organisation angehören',
+      subtitle: 'Kontaktieren Sie Ihren Organisationsadministrator für eine Einladung.',
     },
     signOut: {
       actionLink: 'Abmelden',

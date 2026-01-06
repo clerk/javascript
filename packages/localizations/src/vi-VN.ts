@@ -401,6 +401,12 @@ export const viVN: LocalizationResource = {
         headerTitle__members: 'Thành viên',
         headerTitle__requests: 'Yêu cầu',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Các vai trò tạm thời bị khóa',
+          subtitle: 'Chúng tôi đang cập nhật các vai trò có sẵn. Sau khi hoàn tất, bạn sẽ có thể cập nhật vai trò lại.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'Khoá API',
@@ -877,6 +883,10 @@ export const viVN: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Nhập thông tin chi tiết tổ chức của bạn để tiếp tục',
       title: 'Thiết lập tổ chức của bạn',
+    },
+    organizationCreationDisabled: {
+      title: 'Bạn phải thuộc về một tổ chức',
+      subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để nhận lời mời.',
     },
     signOut: {
       actionLink: 'Đăng xuất',

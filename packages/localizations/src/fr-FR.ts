@@ -406,6 +406,13 @@ export const frFR: LocalizationResource = {
         headerTitle__members: 'Membres',
         headerTitle__requests: 'Demandes',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Les rôles sont temporairement verrouillés',
+          subtitle:
+            'Nous mettons à jour les rôles disponibles. Une fois terminé, vous pourrez de nouveau modifier les rôles.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'Clés API',
@@ -885,6 +892,10 @@ export const frFR: LocalizationResource = {
       formFieldLabel__slug: 'Identifiant (slug)',
       subtitle: 'Entrez les détails de votre organisation pour continuer',
       title: 'Configurer votre organisation',
+    },
+    organizationCreationDisabled: {
+      title: 'Vous devez appartenir à une organisation',
+      subtitle: "Contactez l'administrateur de votre organisation pour obtenir une invitation.",
     },
     signOut: {
       actionLink: 'Se déconnecter',

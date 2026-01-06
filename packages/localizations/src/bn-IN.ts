@@ -397,6 +397,12 @@ export const bnIN: LocalizationResource = {
         headerTitle__members: 'সদস্য',
         headerTitle__requests: 'অনুরোধ',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'ভূমিকাগুলি সাময়িকভাবে লক করা আছে',
+          subtitle: 'আমরা উপলব্ধ ভূমিকাগুলি আপডেট করছি। এটি সম্পন্ন হলে, আপনি আবার ভূমিকা আপডেট করতে পারবেন।',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -874,6 +880,10 @@ export const bnIN: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'চালিয়ে যাওয়ার জন্য আপনার সংগঠনের বিবরণ লিখুন',
       title: 'আপনার সংগঠন সেটআপ করুন',
+    },
+    organizationCreationDisabled: {
+      title: 'আপনাকে অবশ্যই একটি সংগঠনের অন্তর্ভুক্ত হতে হবে',
+      subtitle: 'আমন্ত্রণের জন্য আপনার সংগঠনের প্রশাসকের সাথে যোগাযোগ করুন।',
     },
     signOut: {
       actionLink: 'সাইন আউট',

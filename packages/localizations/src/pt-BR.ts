@@ -403,6 +403,13 @@ export const ptBR: LocalizationResource = {
         headerTitle__members: 'Membros',
         headerTitle__requests: 'Solicitações',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'As funções estão temporariamente bloqueadas',
+          subtitle:
+            'Estamos atualizando as funções disponíveis. Assim que isso for concluído, você poderá atualizar as funções novamente.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'Chaves de API',
@@ -881,6 +888,10 @@ export const ptBR: LocalizationResource = {
       formFieldLabel__slug: 'Rótulo do URL',
       subtitle: 'Conte-nos um pouco sobre sua organização',
       title: 'Configure sua conta',
+    },
+    organizationCreationDisabled: {
+      title: 'Você deve pertencer a uma organização',
+      subtitle: 'Entre em contato com o administrador da sua organização para obter um convite.',
     },
     signOut: {
       actionLink: 'Sair',

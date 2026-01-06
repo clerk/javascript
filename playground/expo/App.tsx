@@ -1,4 +1,4 @@
-import { ClerkProvider, SignedIn, SignedOut, useAuth, useSignIn, useUser } from '@clerk/expo';
+import { ClerkProvider, Show, useAuth, useSignIn, useUser } from '@clerk/expo';
 import { passkeys } from '@clerk/expo/passkeys';
 import * as SecureStore from 'expo-secure-store';
 import React from 'react';
@@ -145,12 +145,12 @@ export default function App() {
       __experimental_passkeys={passkeys}
     >
       <View style={styles.container}>
-        <SignedIn>
+        <Show when='signed-in'>
           <ProtectedView />
-        </SignedIn>
-        <SignedOut>
+        </Show>
+        <Show when='signed-out'>
           <PublicView />
-        </SignedOut>
+        </Show>
       </View>
     </ClerkProvider>
   );

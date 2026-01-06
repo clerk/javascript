@@ -397,6 +397,13 @@ export const hiIN: LocalizationResource = {
         headerTitle__members: 'सदस्य',
         headerTitle__requests: 'अनुरोध',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'भूमिकाएं अस्थायी रूप से लॉक हैं',
+          subtitle:
+            'हम उपलब्ध भूमिकाओं को अपडेट कर रहे हैं। एक बार यह हो जाने के बाद, आप फिर से भूमिकाएं अपडेट कर सकेंगे।',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -874,6 +881,10 @@ export const hiIN: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'जारी रखने के लिए अपने संगठन का विवरण दर्ज करें',
       title: 'अपने संगठन को सेटअप करें',
+    },
+    organizationCreationDisabled: {
+      title: 'आपको किसी संगठन से संबंधित होना चाहिए',
+      subtitle: 'आमंत्रण के लिए अपने संगठन के व्यवस्थापक से संपर्क करें।',
     },
     signOut: {
       actionLink: 'साइन आउट',
