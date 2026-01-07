@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
@@ -29,7 +29,13 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
 
   const billingEnabled = useBillingHookEnabled(params);
 
-  clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
+  const recordedRef = useRef(false);
+  useEffect(() => {
+    if (!recordedRef.current && clerk?.telemetry) {
+      clerk.telemetry.record(eventMethodCalled(HOOK_NAME));
+      recordedRef.current = true;
+    }
+  }, [clerk]);
 
   const keepPreviousData = params?.keepPreviousData ?? false;
 
