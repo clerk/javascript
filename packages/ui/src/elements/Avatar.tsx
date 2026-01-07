@@ -19,6 +19,9 @@ type AvatarProps = PropsOfComponent<typeof Flex> & {
   showLoadingSpinner?: boolean;
 };
 
+const SPINNER_DELAY_MS = 150;
+const SPINNER_MIN_DURATION_MS = 400;
+
 export const Avatar = (props: AvatarProps) => {
   const {
     size = () => 26,
@@ -34,14 +37,42 @@ export const Avatar = (props: AvatarProps) => {
   } = props;
   const [error, setError] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
+  const [spinnerVisible, setSpinnerVisible] = React.useState(false);
+  const spinnerShownAtRef = React.useRef<number | null>(null);
 
-  // Reset loaded state when imageUrl changes
   React.useEffect(() => {
     setLoaded(false);
     setError(false);
+    setSpinnerVisible(false);
+    spinnerShownAtRef.current = null;
   }, [imageUrl]);
 
-  const isLoading = showLoadingSpinner && imageUrl && !loaded && !error;
+  React.useEffect(() => {
+    if (!showLoadingSpinner || !imageUrl || loaded || error) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setSpinnerVisible(true);
+      spinnerShownAtRef.current = Date.now();
+    }, SPINNER_DELAY_MS);
+
+    return () => clearTimeout(timer);
+  }, [showLoadingSpinner, imageUrl, loaded, error]);
+
+  const handleImageLoad = React.useCallback(() => {
+    if (spinnerShownAtRef.current) {
+      const elapsed = Date.now() - spinnerShownAtRef.current;
+      const remaining = SPINNER_MIN_DURATION_MS - elapsed;
+      if (remaining > 0) {
+        const timer = setTimeout(() => setLoaded(true), remaining);
+        return () => clearTimeout(timer);
+      }
+    }
+    setLoaded(true);
+  }, []);
+
+  const isLoading = showLoadingSpinner && spinnerVisible && imageUrl && !loaded && !error;
 
   const ImgOrFallback =
     initials && (!imageUrl || error) ? (
@@ -60,7 +91,7 @@ export const Avatar = (props: AvatarProps) => {
           transition: 'opacity 0.2s ease-in-out',
         }}
         onError={() => setError(true)}
-        onLoad={() => setLoaded(true)}
+        onLoad={handleImageLoad}
         size={imageFetchSize}
       />
     );
