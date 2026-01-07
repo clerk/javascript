@@ -1,6 +1,5 @@
 export { useAuth } from './useAuth';
 export { useEmailLink } from './useEmailLink';
-export { useSignIn, useSignUp, useWaitlist } from './useClerkSignal';
 export {
   useClerk,
   useOrganization,
@@ -9,6 +8,9 @@ export {
   useUser,
   useSession,
   useReverification,
+  useSignIn,
+  useSignUp,
+  useWaitlist,
   __experimental_useCheckout,
   __experimental_CheckoutProvider,
   __experimental_usePaymentElement,

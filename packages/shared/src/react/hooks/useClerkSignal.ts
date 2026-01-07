@@ -1,9 +1,10 @@
-import { eventMethodCalled } from '@clerk/shared/telemetry';
-import type { SignInSignalValue, SignUpSignalValue, WaitlistSignalValue } from '@clerk/shared/types';
+'use client';
+
 import { useCallback, useSyncExternalStore } from 'react';
 
-import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
-import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
+import { eventMethodCalled } from '../../telemetry';
+import type { SignInSignalValue, SignUpSignalValue, WaitlistSignalValue } from '../../types';
+import { useClerkInstanceContext, useAssertWrappedByClerkProvider } from '../contexts';
 
 function useClerkSignal(signal: 'signIn'): SignInSignalValue;
 function useClerkSignal(signal: 'signUp'): SignUpSignalValue;
@@ -13,7 +14,7 @@ function useClerkSignal(
 ): SignInSignalValue | SignUpSignalValue | WaitlistSignalValue {
   useAssertWrappedByClerkProvider('useClerkSignal');
 
-  const clerk = useIsomorphicClerkContext();
+  const clerk = useClerkInstanceContext();
 
   switch (signal) {
     case 'signIn':
@@ -73,10 +74,10 @@ function useClerkSignal(
  * This hook allows you to access the Signal-based `SignIn` resource.
  *
  * @example
- * import { useSignInSignal } from "@clerk/react/experimental";
+ * import { useSignIn } from "@clerk/react/experimental";
  *
  * function SignInForm() {
- *   const { signIn, errors, fetchStatus } = useSignInSignal();
+ *   const { signIn, errors, fetchStatus } = useSignIn();
  *   //
  * }
  *
@@ -90,10 +91,10 @@ export function useSignIn() {
  * This hook allows you to access the Signal-based `SignUp` resource.
  *
  * @example
- * import { useSignUpSignal } from "@clerk/react/experimental";
+ * import { useSignUp } from "@clerk/react/experimental";
  *
  * function SignUpForm() {
- *   const { signUp, errors, fetchStatus } = useSignUpSignal();
+ *   const { signUp, errors, fetchStatus } = useSignUp();
  *   //
  * }
  *
