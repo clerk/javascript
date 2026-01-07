@@ -5,7 +5,7 @@ import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
 import { createTestUtils } from '../../testUtils';
 
-const commonSetup = appConfigs.tanstack.reactStartQuickstart.clone();
+const commonSetup = appConfigs.tanstack.reactStart.clone();
 
 const mockClaimedInstanceEnvironmentCall = async (page: Page) => {
   await page.route('*/**/v1/environment*', async route => {
