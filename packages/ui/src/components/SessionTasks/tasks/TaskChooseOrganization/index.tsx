@@ -21,6 +21,10 @@ const TaskChooseOrganizationInternal = () => {
   const hasExistingResources = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
   const isOrganizationCreationDisabled = !isLoading && !user?.createOrganizationEnabled && !hasExistingResources;
 
+  if (isOrganizationCreationDisabled) {
+    return <OrganizationCreationDisabledScreen />;
+  }
+
   return (
     <Flow.Root flow='taskChooseOrganization'>
       <Flow.Part part='chooseOrganization'>
@@ -42,8 +46,6 @@ const TaskChooseOrganizationInternal = () => {
                   elementDescriptor={descriptors.spinner}
                 />
               </Flex>
-            ) : isOrganizationCreationDisabled ? (
-              <OrganizationCreationDisabledScreen />
             ) : (
               <TaskChooseOrganizationFlows initialFlow={hasExistingResources ? 'choose' : 'create'} />
             )}
