@@ -124,7 +124,7 @@
     "test:coverage": "vitest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@tanstack/query-core": "5.90.12",
+    "@tanstack/query-core": "5.90.16",
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",
