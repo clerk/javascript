@@ -394,6 +394,13 @@ export const ptPT: LocalizationResource = {
         headerTitle__members: 'Membros',
         headerTitle__requests: 'Pedidos',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'As funções estão temporariamente bloqueadas',
+          subtitle:
+            'Estamos a atualizar as funções disponíveis. Assim que terminar, poderá atualizar as funções novamente.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

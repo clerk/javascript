@@ -395,6 +395,12 @@ export const ukUA: LocalizationResource = {
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Ролі тимчасово заблоковані',
+          subtitle: 'Ми оновлюємо доступні ролі. Коли це буде зроблено, ви зможете знову оновлювати ролі.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -1353,16 +1359,16 @@ export const ukUA: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Увійти',
+      actionText: 'Вже маєте доступ?',
+      formButton: 'Приєднатися до списку очікування',
+      subtitle: 'Введіть свою електронну адресу, і ми повідомимо вас, коли ваше місце буде готове',
+      title: 'Приєднатися до списку очікування',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Ви будете перенаправлені незабаром...',
+      subtitle: "Ми зв'яжемося з вами, коли ваше місце буде готове",
+      title: 'Дякуємо за приєднання до списку очікування!',
     },
   },
   web3SolanaWalletButtons: {

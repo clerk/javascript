@@ -396,6 +396,12 @@ export const isIS: LocalizationResource = {
         headerTitle__members: 'Meðlimir',
         headerTitle__requests: 'Beiðnir',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Hlutverk eru tímabundið læst',
+          subtitle: 'Við erum að uppfæra tiltæk hlutverk. Þegar því er lokið geturðu uppfært hlutverk aftur.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -1361,16 +1367,16 @@ export const isIS: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Skrá inn',
+      actionText: 'Áttu nú þegar aðgang?',
+      formButton: 'Skrá sig á biðlista',
+      subtitle: 'Sláðu inn netfangið þitt og við látum þig vita þegar staða þín er tilbúin',
+      title: 'Skrá sig á biðlista',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Þú verður áframsendur fljótlega...',
+      subtitle: 'Við höfum samband þegar staða þín er tilbúin',
+      title: 'Takk fyrir að skrá sig á biðlistann!',
     },
   },
   web3SolanaWalletButtons: {

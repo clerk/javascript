@@ -1,8 +1,7 @@
 import {
   ClerkProvider,
   RedirectToSignIn,
-  SignedIn,
-  SignedOut,
+  Show,
   SignIn,
   SignUp,
   UserButton,
@@ -126,12 +125,12 @@ function ClerkProviderWithRoutes() {
           path='/protected'
           element={
             <>
-              <SignedIn>
+              <Show when='signed-in'>
                 <ProtectedPage />
-              </SignedIn>
-              <SignedOut>
+              </Show>
+              <Show when='signed-out'>
                 <RedirectToSignIn />
-              </SignedOut>
+              </Show>
             </>
           }
         />

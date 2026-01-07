@@ -1,13 +1,11 @@
 'use client';
-import { SignedIn, SignedOut } from '@clerk/nextjs';
+import { Show } from '@clerk/nextjs';
 
 export default function Page() {
   return (
     <div>
-      {/* @ts-ignore */}
-      <SignedIn>Hello In</SignedIn>
-      {/* @ts-ignore */}
-      <SignedOut>Hello Out</SignedOut>
+      <Show when='signed-in'>Hello In</Show>
+      <Show when='signed-out'>Hello Out</Show>
     </div>
   );
 }

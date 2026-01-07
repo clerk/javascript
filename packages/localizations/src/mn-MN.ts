@@ -396,6 +396,13 @@ export const mnMN: LocalizationResource = {
         headerTitle__members: 'Гишүүд',
         headerTitle__requests: 'Хүсэлтүүд',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Дүрүүд түр хугацаанд түгжигдсэн байна',
+          subtitle:
+            'Бид боломжтой дүрүүдийг шинэчилж байна. Дууссаны дараа та дүрүүдийг дахин шинэчлэх боломжтой болно.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -1357,16 +1364,16 @@ export const mnMN: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Нэвтрэх',
+      actionText: 'Та аль хэдийн нэвтрэх эрхтэй юу?',
+      formButton: 'Хүлээлгийн жагсаалтад нэгдэх',
+      subtitle: 'Имэйл хаягаа оруулаад таны байр бэлэн болоход мэдэгдэх болно',
+      title: 'Хүлээлгийн жагсаалтад нэгдэх',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Удахгүй дахин чиглүүлэх болно...',
+      subtitle: 'Таны байр бэлэн болоход бид холбогдох болно',
+      title: 'Хүлээлгийн жагсаалтад нэгдсэнд баярлалаа!',
     },
   },
   web3SolanaWalletButtons: {

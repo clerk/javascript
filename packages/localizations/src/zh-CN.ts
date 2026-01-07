@@ -391,6 +391,12 @@ export const zhCN: LocalizationResource = {
         headerTitle__members: '成员',
         headerTitle__requests: '请求',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: '角色暂时被锁定',
+          subtitle: '我们正在更新可用角色。完成后，您将能够再次更新角色。',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -1321,16 +1327,16 @@ export const zhCN: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: '登录',
+      actionText: '已有访问权限？',
+      formButton: '加入候补名单',
+      subtitle: '输入您的电子邮件地址，我们会在您的位置准备好时通知您',
+      title: '加入候补名单',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: '您将很快被重定向...',
+      subtitle: '当您的位置准备好时，我们会与您联系',
+      title: '感谢您加入候补名单！',
     },
   },
   web3SolanaWalletButtons: {

@@ -395,6 +395,12 @@ export const svSE: LocalizationResource = {
         headerTitle__members: 'Medlemmar',
         headerTitle__requests: 'Förfrågningar',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roller är tillfälligt låsta',
+          subtitle: 'Vi uppdaterar tillgängliga roller. När det är klart kommer du att kunna uppdatera roller igen.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -1357,16 +1363,16 @@ export const svSE: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Logga in',
+      actionText: 'Har du redan åtkomst?',
+      formButton: 'Gå med i väntelistan',
+      subtitle: 'Ange din e-postadress så meddelar vi dig när din plats är redo',
+      title: 'Gå med i väntelistan',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Du kommer att omdirigeras snart...',
+      subtitle: 'Vi hör av oss när din plats är redo',
+      title: 'Tack för att du gick med i väntelistan!',
     },
   },
   web3SolanaWalletButtons: {

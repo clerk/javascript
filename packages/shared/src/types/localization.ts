@@ -1128,6 +1128,12 @@ export type __internal_LocalizationResource = {
           primaryButton: LocalizationValue;
         };
       };
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
+      };
     };
     billingPage: {
       title: LocalizationValue;

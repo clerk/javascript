@@ -395,6 +395,12 @@ export const koKR: LocalizationResource = {
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: '역할이 일시적으로 잠겨 있습니다',
+          subtitle: '사용 가능한 역할을 업데이트하고 있습니다. 완료되면 다시 역할을 업데이트할 수 있습니다.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -1339,16 +1345,16 @@ export const koKR: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: '로그인',
+      actionText: '이미 액세스 권한이 있으신가요?',
+      formButton: '대기 목록에 가입',
+      subtitle: '이메일 주소를 입력하시면 준비되면 알려드리겠습니다',
+      title: '대기 목록에 가입',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: '곧 리디렉션됩니다...',
+      subtitle: '준비되면 연락드리겠습니다',
+      title: '대기 목록에 가입해 주셔서 감사합니다!',
     },
   },
   web3SolanaWalletButtons: {
