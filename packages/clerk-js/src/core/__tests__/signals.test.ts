@@ -2,7 +2,7 @@ import type { ClerkError } from '@clerk/shared/error';
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { describe, expect, it } from 'vitest';
 
-import { errorsToParsedErrors } from '../signals';
+import { errorsToParsedErrors } from '../state';
 
 describe('errorsToParsedErrors', () => {
   it('returns empty errors object when error is null', () => {

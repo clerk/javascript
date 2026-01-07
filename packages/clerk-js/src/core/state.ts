@@ -1,60 +1,45 @@
-import type { ClerkError } from '@clerk/shared/error';
-import type { State as StateInterface } from '@clerk/shared/types';
-import { computed, effect } from 'alien-signals';
+import type { ClerkAPIError, ClerkError } from '@clerk/shared/error';
+import { createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { signInSchema, signUpSchema, waitlistSchema } from '@clerk/shared/resourceSchemas';
+import type { Errors, SignInSignal, SignUpSignal, State as StateInterface, WaitlistSignal } from '@clerk/shared/types';
+import { snakeToCamel } from '@clerk/shared/underscore';
+import { computed, effect, signal } from 'alien-signals';
 
 import { eventBus } from './events';
 import type { BaseResource } from './resources/Base';
+import type { SignIn } from './resources/SignIn';
+import type { SignUp } from './resources/SignUp';
 import { Waitlist } from './resources/Waitlist';
 import { RESOURCE_TYPE, type SignalBackedResource } from './resourceType';
-import {
-  signInComputedSignal,
-  signInErrorSignal,
-  signInFetchSignal,
-  signInResourceSignal,
-  signUpComputedSignal,
-  signUpErrorSignal,
-  signUpFetchSignal,
-  signUpResourceSignal,
-  waitlistComputedSignal,
-  waitlistErrorSignal,
-  waitlistFetchSignal,
-  waitlistResourceSignal,
-} from './signals';
+
+/**
+ * Configuration for registering a signal-backed resource.
+ */
+interface ResourceConfig {
+  /** Resource type name (e.g., 'signIn', 'signUp', 'waitlist') */
+  name: string;
+  /** Error fields from schema for error parsing (any object shape) */
+  errorFields: object;
+  /** Transform resource before exposing in computed signal (e.g., extract __internal_future) */
+  getPublicResource?: (resource: unknown) => unknown;
+  /** If true, ignore null updates when hasBeenFinalized is false (for client-based resources) */
+  ignoreNullWhenNotFinalized?: boolean;
+}
 
 /**
  * Registry entry for a signal-backed resource.
  */
 interface ResourceRegistration {
-  resourceSignal: (payload: { resource: unknown }) => void;
-  errorSignal: (payload: { error: ClerkError | null }) => void;
-  fetchSignal: (payload: { status: 'idle' | 'fetching' }) => void;
+  resourceSignal: ReturnType<typeof signal<{ resource: unknown }>>;
+  errorSignal: ReturnType<typeof signal<{ error: ClerkError | null }>>;
+  fetchSignal: ReturnType<typeof signal<{ status: 'idle' | 'fetching' }>>;
   computedSignal: () => unknown;
-  /**
-   * If true, ignore null updates when hasBeenFinalized is false.
-   * Used for client-based resources like SignIn/SignUp.
-   */
-  ignoreNullWhenNotFinalized?: boolean;
+  config: ResourceConfig;
 }
 
 export class State implements StateInterface {
   // Registry of signal-backed resources
   private registry = new Map<string, ResourceRegistration>();
-
-  // Keep public signals for backwards compatibility (used by react StateProxy)
-  signInResourceSignal = signInResourceSignal;
-  signInErrorSignal = signInErrorSignal;
-  signInFetchSignal = signInFetchSignal;
-  signInSignal = signInComputedSignal;
-
-  signUpResourceSignal = signUpResourceSignal;
-  signUpErrorSignal = signUpErrorSignal;
-  signUpFetchSignal = signUpFetchSignal;
-  signUpSignal = signUpComputedSignal;
-
-  waitlistResourceSignal = waitlistResourceSignal;
-  waitlistErrorSignal = waitlistErrorSignal;
-  waitlistFetchSignal = waitlistFetchSignal;
-  waitlistSignal = waitlistComputedSignal;
 
   private _waitlistInstance: Waitlist;
 
@@ -62,34 +47,110 @@ export class State implements StateInterface {
   __internal_computed = computed;
 
   constructor() {
-    // Register resources in the registry
-    this.registry.set('signIn', {
-      resourceSignal: signInResourceSignal,
-      errorSignal: signInErrorSignal,
-      fetchSignal: signInFetchSignal,
-      computedSignal: signInComputedSignal,
+    // Register all signal-backed resources dynamically from schemas
+    this.registerResource({
+      name: signInSchema.name,
+      errorFields: signInSchema.errorFields,
+      getPublicResource: (resource) => (resource as SignIn).__internal_future,
       ignoreNullWhenNotFinalized: true,
-    });
-    this.registry.set('signUp', {
-      resourceSignal: signUpResourceSignal,
-      errorSignal: signUpErrorSignal,
-      fetchSignal: signUpFetchSignal,
-      computedSignal: signUpComputedSignal,
-      ignoreNullWhenNotFinalized: true,
-    });
-    this.registry.set('waitlist', {
-      resourceSignal: waitlistResourceSignal,
-      errorSignal: waitlistErrorSignal,
-      fetchSignal: waitlistFetchSignal,
-      computedSignal: waitlistComputedSignal,
     });
 
+    this.registerResource({
+      name: signUpSchema.name,
+      errorFields: signUpSchema.errorFields,
+      getPublicResource: (resource) => (resource as SignUp).__internal_future,
+      ignoreNullWhenNotFinalized: true,
+    });
+
+    this.registerResource({
+      name: waitlistSchema.name,
+      errorFields: waitlistSchema.errorFields,
+      // Waitlist is a singleton, no transformation needed
+    });
+
+    // Subscribe to resource events
     eventBus.on('resource:update', this.onResourceUpdated);
     eventBus.on('resource:error', this.onResourceError);
     eventBus.on('resource:fetch', this.onResourceFetch);
 
+    // Initialize waitlist singleton
     this._waitlistInstance = new Waitlist(null);
-    this.waitlistResourceSignal({ resource: this._waitlistInstance });
+    this.registry.get('waitlist')?.resourceSignal({ resource: this._waitlistInstance });
+  }
+
+  /**
+   * Register a new signal-backed resource.
+   * Creates signals and computed signal from config.
+   */
+  private registerResource(config: ResourceConfig): void {
+    const resourceSignal = signal<{ resource: unknown }>({ resource: null });
+    const errorSignal = signal<{ error: ClerkError | null }>({ error: null });
+    const fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+
+    const computedSignal = computed(() => {
+      const resource = resourceSignal().resource;
+      const error = errorSignal().error;
+      const fetchStatus = fetchSignal().status;
+
+      const errors = errorsToParsedErrors(error, config.errorFields as Record<string, unknown>);
+      const publicResource = resource ? (config.getPublicResource?.(resource) ?? resource) : null;
+
+      return {
+        errors,
+        fetchStatus,
+        [config.name]: publicResource,
+      };
+    });
+
+    this.registry.set(config.name, {
+      resourceSignal,
+      errorSignal,
+      fetchSignal,
+      computedSignal,
+      config,
+    });
+  }
+
+  // Backward compatibility: expose signals as public properties
+  // These getters dynamically retrieve from the registry
+
+  get signInResourceSignal() {
+    return this.registry.get('signIn')!.resourceSignal;
+  }
+  get signInErrorSignal() {
+    return this.registry.get('signIn')!.errorSignal;
+  }
+  get signInFetchSignal() {
+    return this.registry.get('signIn')!.fetchSignal;
+  }
+  get signInSignal(): SignInSignal {
+    return this.registry.get('signIn')!.computedSignal as SignInSignal;
+  }
+
+  get signUpResourceSignal() {
+    return this.registry.get('signUp')!.resourceSignal;
+  }
+  get signUpErrorSignal() {
+    return this.registry.get('signUp')!.errorSignal;
+  }
+  get signUpFetchSignal() {
+    return this.registry.get('signUp')!.fetchSignal;
+  }
+  get signUpSignal(): SignUpSignal {
+    return this.registry.get('signUp')!.computedSignal as SignUpSignal;
+  }
+
+  get waitlistResourceSignal() {
+    return this.registry.get('waitlist')!.resourceSignal;
+  }
+  get waitlistErrorSignal() {
+    return this.registry.get('waitlist')!.errorSignal;
+  }
+  get waitlistFetchSignal() {
+    return this.registry.get('waitlist')!.fetchSignal;
+  }
+  get waitlistSignal(): WaitlistSignal {
+    return this.registry.get('waitlist')!.computedSignal as WaitlistSignal;
   }
 
   get __internal_waitlist() {
@@ -100,9 +161,9 @@ export class State implements StateInterface {
    * Get the computed signal for a resource type.
    * Used by hooks to subscribe to resource changes.
    */
-  getSignal(type: 'signIn'): typeof signInComputedSignal | undefined;
-  getSignal(type: 'signUp'): typeof signUpComputedSignal | undefined;
-  getSignal(type: 'waitlist'): typeof waitlistComputedSignal | undefined;
+  getSignal(type: 'signIn'): SignInSignal | undefined;
+  getSignal(type: 'signUp'): SignUpSignal | undefined;
+  getSignal(type: 'waitlist'): WaitlistSignal | undefined;
   getSignal(type: string): (() => unknown) | undefined;
   getSignal(type: string) {
     return this.registry.get(type)?.computedSignal;
@@ -125,8 +186,8 @@ export class State implements StateInterface {
     if (!registration) return;
 
     // For client-based resources, check if we should ignore null updates
-    if (registration.ignoreNullWhenNotFinalized) {
-      const currentResource = (registration.resourceSignal as any)?.()?.resource;
+    if (registration.config.ignoreNullWhenNotFinalized) {
+      const currentResource = registration.resourceSignal().resource;
       if (shouldIgnoreNullUpdate(currentResource, payload.resource)) {
         return;
       }
@@ -152,4 +213,57 @@ function shouldIgnoreNullUpdate(previousResource: unknown, newResource: unknown)
   const hasNoId = !(newResource as { id?: unknown })?.id;
   const previousFuture = (previousResource as { __internal_future?: { hasBeenFinalized?: boolean } })?.__internal_future;
   return hasNoId && !!previousResource && previousFuture?.hasBeenFinalized === false;
+}
+
+/**
+ * Converts an error to a parsed errors object that reports the specific fields that the error pertains to.
+ * Generic non-API errors go into the global array.
+ */
+export function errorsToParsedErrors<T extends Record<string, unknown>>(
+  error: ClerkError | null,
+  initialFields: T,
+): Errors<T> {
+  const parsedErrors: Errors<T> = {
+    fields: { ...initialFields },
+    raw: null,
+    global: null,
+  };
+
+  if (!error) {
+    return parsedErrors;
+  }
+
+  if (!isClerkAPIResponseError(error)) {
+    parsedErrors.raw = [error];
+    parsedErrors.global = [createClerkGlobalHookError(error)];
+    return parsedErrors;
+  }
+
+  function isFieldError(error: ClerkAPIError): boolean {
+    return 'meta' in error && error.meta && 'paramName' in error.meta && error.meta.paramName !== undefined;
+  }
+
+  const hasFieldErrors = error.errors.some(isFieldError);
+  if (hasFieldErrors) {
+    error.errors.forEach(err => {
+      if (parsedErrors.raw) {
+        parsedErrors.raw.push(err);
+      } else {
+        parsedErrors.raw = [err];
+      }
+      if (isFieldError(err)) {
+        const name = snakeToCamel(err.meta.paramName);
+        if (name in parsedErrors.fields) {
+          (parsedErrors.fields as Record<string, unknown>)[name] = err;
+        }
+      }
+    });
+    return parsedErrors;
+  }
+
+  // At this point, we know that `error` is a ClerkAPIResponseError with no field errors.
+  parsedErrors.raw = [error];
+  parsedErrors.global = [createClerkGlobalHookError(error)];
+
+  return parsedErrors;
 }

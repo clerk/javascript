@@ -1,6 +1,6 @@
 import type { ClerkError } from '@clerk/shared/error';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import { checkoutSchema, type CheckoutFields } from '@clerk/shared/resourceSchemas';
+import { checkoutSchema } from '@clerk/shared/resourceSchemas';
 import { retry } from '@clerk/shared/retry';
 import type {
   BillingCheckoutJSON,
@@ -11,16 +11,17 @@ import type {
   BillingSubscriptionPlanPeriod,
   CheckoutFlowFinalizeParams,
   CheckoutFlowResourceNonStrict,
+  CheckoutSignalValue,
   ConfirmCheckoutParams,
   CreateCheckoutParams,
 } from '@clerk/shared/types';
-import { endBatch, startBatch } from 'alien-signals';
+import { computed, endBatch, signal, startBatch } from 'alien-signals';
 
 import { unixEpochToDate } from '@/utils/date';
 
 import { billingTotalsFromJSON } from '../../utils';
 import { Billing } from '../modules/billing/namespace';
-import { createResourceSignals } from '../signalFactory';
+import { errorsToParsedErrors } from '../state';
 import { BillingPayer } from './BillingPayer';
 import { BaseResource, BillingPaymentMethod, BillingPlan } from './internal';
 
@@ -100,13 +101,38 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
 }
 
 /**
- * Creates signals for the Checkout resource using the shared factory.
+ * Checkout signal set type for use in CheckoutFlow.
  */
-export const createSignals = () => {
-  return createResourceSignals<CheckoutFlow, CheckoutFields>({
-    schema: checkoutSchema,
-    // Checkout doesn't need transformation, the CheckoutFlow is already the public resource
+interface CheckoutSignals {
+  resourceSignal: ReturnType<typeof signal<{ resource: CheckoutFlow | null }>>;
+  errorSignal: ReturnType<typeof signal<{ error: ClerkError | null }>>;
+  fetchSignal: ReturnType<typeof signal<{ status: 'idle' | 'fetching' }>>;
+  computedSignal: () => CheckoutSignalValue;
+}
+
+/**
+ * Creates signals for the Checkout resource.
+ * Checkout is a "keyed" resource with its own lifecycle, so signals are created inline.
+ */
+export const createSignals = (): CheckoutSignals => {
+  const resourceSignal = signal<{ resource: CheckoutFlow | null }>({ resource: null });
+  const errorSignal = signal<{ error: ClerkError | null }>({ error: null });
+  const fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+
+  const computedSignal = computed(() => {
+    const resource = resourceSignal().resource;
+    const error = errorSignal().error;
+    const fetchStatus = fetchSignal().status;
+    const errors = errorsToParsedErrors(error, checkoutSchema.errorFields);
+
+    return {
+      errors,
+      fetchStatus,
+      checkout: resource,
+    } as CheckoutSignalValue;
   });
+
+  return { resourceSignal, errorSignal, fetchSignal, computedSignal };
 };
 
 type CheckoutTask = 'start' | 'confirm' | 'finalize';
@@ -114,10 +140,10 @@ type CheckoutTask = 'start' | 'confirm' | 'finalize';
 export class CheckoutFlow implements CheckoutFlowResourceNonStrict {
   private resource = new BillingCheckout(null);
   private readonly config: CreateCheckoutParams;
-  private readonly signals: ReturnType<typeof createSignals>;
+  private readonly signals: CheckoutSignals;
   private readonly pendingOperations = new Map<CheckoutTask, Promise<{ error: unknown }> | null>();
 
-  constructor(signals: ReturnType<typeof createSignals>, config: CreateCheckoutParams) {
+  constructor(signals: CheckoutSignals, config: CreateCheckoutParams) {
     this.config = config;
     this.signals = signals;
     this.signals.resourceSignal({ resource: this });
@@ -212,7 +238,7 @@ export class CheckoutFlow implements CheckoutFlowResourceNonStrict {
 
 function createRunAsyncCheckoutTask(
   resource: CheckoutFlow,
-  signals: ReturnType<typeof createSignals>,
+  signals: CheckoutSignals,
   pendingOperations: Map<CheckoutTask, Promise<{ error: unknown }> | null>,
 ): <T>(
   operationType: CheckoutTask,
