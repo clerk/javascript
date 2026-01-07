@@ -75,8 +75,6 @@ describe('UserSettings', () => {
         },
       },
     } as any as UserSettingsJSON);
-    expect(sut.instanceIsPasswordBased).toEqual(false);
-
     expect(sut.instanceIsPasswordBased).toEqual(true);
 
     sut = new UserSettings({
@@ -87,6 +85,8 @@ describe('UserSettings', () => {
         },
       },
     } as any as UserSettingsJSON);
+
+    expect(sut.instanceIsPasswordBased).toEqual(false);
   });
 
   it('respects default values for min and max password length', function () {
