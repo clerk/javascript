@@ -395,6 +395,12 @@ export const trTR: LocalizationResource = {
         headerTitle__members: 'Üyeler',
         headerTitle__requests: 'İstekler',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roller geçici olarak kilitlendi',
+          subtitle: 'Mevcut rolleri güncelliyoruz. Bu tamamlandığında rolleri tekrar güncelleyebileceksiniz.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

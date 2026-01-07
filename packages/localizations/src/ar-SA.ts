@@ -395,6 +395,12 @@ export const arSA: LocalizationResource = {
         headerTitle__members: 'الأعضاء',
         headerTitle__requests: 'الطلبات',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'الأدوار مقفلة مؤقتًا',
+          subtitle: 'نحن نقوم بتحديث الأدوار المتاحة. بمجرد الانتهاء، ستتمكن من تحديث الأدوار مرة أخرى.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

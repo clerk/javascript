@@ -397,6 +397,13 @@ export const teIN: LocalizationResource = {
         headerTitle__members: 'సభ్యులు',
         headerTitle__requests: 'అభ్యర్థనలు',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'పాత్రలు తాత్కాలికంగా లాక్ చేయబడ్డాయి',
+          subtitle:
+            'మేము అందుబాటులో ఉన్న పాత్రలను అప్‌డేట్ చేస్తున్నాము. అది పూర్తయిన తర్వాత, మీరు మళ్ళీ పాత్రలను అప్‌డేట్ చేయగలరు.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

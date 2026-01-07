@@ -398,6 +398,13 @@ export const taIN: LocalizationResource = {
         headerTitle__members: 'உறுப்பினர்கள்',
         headerTitle__requests: 'கோரிக்கைகள்',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'பாத்திரங்கள் தற்காலிகமாக பூட்டப்பட்டுள்ளன',
+          subtitle:
+            'கிடைக்கக்கூடிய பாத்திரங்களை நாங்கள் புதுப்பிக்கிறோம். இது முடிந்ததும், நீங்கள் மீண்டும் பாத்திரங்களை புதுப்பிக்க முடியும்.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

@@ -395,6 +395,12 @@ export const daDK: LocalizationResource = {
         headerTitle__members: 'Medlemmer',
         headerTitle__requests: 'Anmodninger',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roller er midlertidigt låst',
+          subtitle: 'Vi opdaterer de tilgængelige roller. Når det er gjort, vil du kunne opdatere roller igen.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

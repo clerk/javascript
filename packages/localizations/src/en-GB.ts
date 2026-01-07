@@ -396,6 +396,12 @@ export const enGB: LocalizationResource = {
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roles are temporarily locked',
+          subtitle: "We are updating the available roles. Once that's done, you'll be able to update roles again.",
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

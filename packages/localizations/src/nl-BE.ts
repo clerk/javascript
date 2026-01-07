@@ -395,6 +395,13 @@ export const nlBE: LocalizationResource = {
         headerTitle__members: 'Leden',
         headerTitle__requests: 'Verzoeken',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Rollen zijn tijdelijk vergrendeld',
+          subtitle:
+            'We zijn de beschikbare rollen aan het bijwerken. Zodra dit klaar is, kunt u de rollen opnieuw bijwerken.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
