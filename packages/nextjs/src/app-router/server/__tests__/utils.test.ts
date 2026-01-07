@@ -28,6 +28,15 @@ describe('isPrerenderingBailout', () => {
     expect(isPrerenderingBailout(error)).toBe(true);
   });
 
+  it('returns true for headers() rejection during prerendering (Next.js 15+ cacheComponents)', () => {
+    const error = new Error(
+      'During prerendering, `headers()` rejects when the prerender is complete. ' +
+        'Typically these errors are handled by React but if you move `headers()` to a different context ' +
+        'by using `setTimeout`, `after`, or similar functions you may observe this error and you should handle it in that context.',
+    );
+    expect(isPrerenderingBailout(error)).toBe(true);
+  });
+
   it('returns false for unrelated errors', () => {
     const error = new Error('Some other error');
     expect(isPrerenderingBailout(error)).toBe(false);
