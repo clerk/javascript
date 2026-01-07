@@ -261,9 +261,9 @@ describe('usePlans', () => {
       await result.current.userPlans.revalidate();
     });
 
-    const calls = getPlansSpy.mock.calls.map(call => call[0]?.for);
-
     await waitFor(() => expect(getPlansSpy.mock.calls.length).toBeGreaterThanOrEqual(1));
+
+    const calls = getPlansSpy.mock.calls.map(call => call[0]?.for);
     expect(calls.every(value => value === 'user')).toBe(true);
   });
 });
