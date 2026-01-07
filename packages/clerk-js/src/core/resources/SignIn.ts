@@ -91,9 +91,11 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
+import { RESOURCE_TYPE } from '../resourceType';
 import { BaseResource, UserData, Verification } from './internal';
 
 export class SignIn extends BaseResource implements SignInResource {
+  [RESOURCE_TYPE] = 'signIn' as const;
   pathRoot = '/client/sign_ins';
 
   id?: string;

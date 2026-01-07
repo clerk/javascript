@@ -4,9 +4,11 @@ import type { JoinWaitlistParams, WaitlistJSON, WaitlistResource } from '@clerk/
 import { unixEpochToDate } from '../../utils/date';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { eventBus } from '../events';
+import { RESOURCE_TYPE } from '../resourceType';
 import { BaseResource } from './internal';
 
 export class Waitlist extends BaseResource implements WaitlistResource {
+  [RESOURCE_TYPE] = 'waitlist' as const;
   pathRoot = '/waitlist';
 
   id = '';

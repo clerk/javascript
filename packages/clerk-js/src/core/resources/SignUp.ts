@@ -62,6 +62,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
+import { RESOURCE_TYPE } from '../resourceType';
 import { BaseResource, SignUpVerifications } from './internal';
 
 declare global {
@@ -71,6 +72,7 @@ declare global {
 }
 
 export class SignUp extends BaseResource implements SignUpResource {
+  [RESOURCE_TYPE] = 'signUp' as const;
   pathRoot = '/client/sign_ups';
 
   id: string | undefined;

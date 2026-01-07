@@ -4,9 +4,8 @@ import { computed, effect } from 'alien-signals';
 
 import { eventBus } from './events';
 import type { BaseResource } from './resources/Base';
-import { SignIn } from './resources/SignIn';
-import { SignUp } from './resources/SignUp';
 import { Waitlist } from './resources/Waitlist';
+import { RESOURCE_TYPE, type SignalBackedResource } from './resourceType';
 import {
   signInComputedSignal,
   signInErrorSignal,
@@ -22,7 +21,26 @@ import {
   waitlistResourceSignal,
 } from './signals';
 
+/**
+ * Registry entry for a signal-backed resource.
+ */
+interface ResourceRegistration {
+  resourceSignal: (payload: { resource: unknown }) => void;
+  errorSignal: (payload: { error: ClerkError | null }) => void;
+  fetchSignal: (payload: { status: 'idle' | 'fetching' }) => void;
+  computedSignal: () => unknown;
+  /**
+   * If true, ignore null updates when hasBeenFinalized is false.
+   * Used for client-based resources like SignIn/SignUp.
+   */
+  ignoreNullWhenNotFinalized?: boolean;
+}
+
 export class State implements StateInterface {
+  // Registry of signal-backed resources
+  private registry = new Map<string, ResourceRegistration>();
+
+  // Keep public signals for backwards compatibility (used by react StateProxy)
   signInResourceSignal = signInResourceSignal;
   signInErrorSignal = signInErrorSignal;
   signInFetchSignal = signInFetchSignal;
@@ -44,6 +62,28 @@ export class State implements StateInterface {
   __internal_computed = computed;
 
   constructor() {
+    // Register resources in the registry
+    this.registry.set('signIn', {
+      resourceSignal: signInResourceSignal,
+      errorSignal: signInErrorSignal,
+      fetchSignal: signInFetchSignal,
+      computedSignal: signInComputedSignal,
+      ignoreNullWhenNotFinalized: true,
+    });
+    this.registry.set('signUp', {
+      resourceSignal: signUpResourceSignal,
+      errorSignal: signUpErrorSignal,
+      fetchSignal: signUpFetchSignal,
+      computedSignal: signUpComputedSignal,
+      ignoreNullWhenNotFinalized: true,
+    });
+    this.registry.set('waitlist', {
+      resourceSignal: waitlistResourceSignal,
+      errorSignal: waitlistErrorSignal,
+      fetchSignal: waitlistFetchSignal,
+      computedSignal: waitlistComputedSignal,
+    });
+
     eventBus.on('resource:update', this.onResourceUpdated);
     eventBus.on('resource:error', this.onResourceError);
     eventBus.on('resource:fetch', this.onResourceFetch);
@@ -56,63 +96,56 @@ export class State implements StateInterface {
     return this._waitlistInstance;
   }
 
+  /**
+   * Get the computed signal for a resource type.
+   * Used by hooks to subscribe to resource changes.
+   */
+  getSignal(type: string) {
+    return this.registry.get(type)?.computedSignal;
+  }
+
   private onResourceError = (payload: { resource: BaseResource; error: ClerkError | null }) => {
-    if (payload.resource instanceof SignIn) {
-      this.signInErrorSignal({ error: payload.error });
-    }
-
-    if (payload.resource instanceof SignUp) {
-      this.signUpErrorSignal({ error: payload.error });
-    }
-
-    if (payload.resource instanceof Waitlist) {
-      this.waitlistErrorSignal({ error: payload.error });
+    const resource = payload.resource as unknown as SignalBackedResource;
+    const type = resource[RESOURCE_TYPE];
+    if (type) {
+      this.registry.get(type)?.errorSignal({ error: payload.error });
     }
   };
 
   private onResourceUpdated = (payload: { resource: BaseResource }) => {
-    if (payload.resource instanceof SignIn) {
-      const previousResource = this.signInResourceSignal().resource;
-      if (shouldIgnoreNullUpdate(previousResource, payload.resource)) {
+    const resource = payload.resource as unknown as SignalBackedResource;
+    const type = resource[RESOURCE_TYPE];
+    if (!type) return;
+
+    const registration = this.registry.get(type);
+    if (!registration) return;
+
+    // For client-based resources, check if we should ignore null updates
+    if (registration.ignoreNullWhenNotFinalized) {
+      const currentResource = (registration.resourceSignal as any)?.()?.resource;
+      if (shouldIgnoreNullUpdate(currentResource, payload.resource)) {
         return;
       }
-      this.signInResourceSignal({ resource: payload.resource });
     }
 
-    if (payload.resource instanceof SignUp) {
-      const previousResource = this.signUpResourceSignal().resource;
-      if (shouldIgnoreNullUpdate(previousResource, payload.resource)) {
-        return;
-      }
-      this.signUpResourceSignal({ resource: payload.resource });
-    }
-
-    if (payload.resource instanceof Waitlist) {
-      this.waitlistResourceSignal({ resource: payload.resource });
-    }
+    registration.resourceSignal({ resource: payload.resource });
   };
 
   private onResourceFetch = (payload: { resource: BaseResource; status: 'idle' | 'fetching' }) => {
-    if (payload.resource instanceof SignIn) {
-      this.signInFetchSignal({ status: payload.status });
-    }
-
-    if (payload.resource instanceof SignUp) {
-      this.signUpFetchSignal({ status: payload.status });
-    }
-
-    if (payload.resource instanceof Waitlist) {
-      this.waitlistFetchSignal({ status: payload.status });
+    const resource = payload.resource as unknown as SignalBackedResource;
+    const type = resource[RESOURCE_TYPE];
+    if (type) {
+      this.registry.get(type)?.fetchSignal({ status: payload.status });
     }
   };
 }
 
 /**
- * Returns true if the new resource is null and the previous resource has not been finalized. This is used to prevent
- * nullifying the resource after it's been completed.
+ * Returns true if the new resource is null/without ID and the previous resource has not been finalized.
+ * This is used to prevent nullifying the resource after it's been completed.
  */
-function shouldIgnoreNullUpdate(previousResource: SignIn | null, newResource: SignIn | null): boolean;
-function shouldIgnoreNullUpdate(previousResource: SignUp | null, newResource: SignUp | null): boolean;
-function shouldIgnoreNullUpdate(previousResource: SignIn | SignUp | null, newResource: SignIn | SignUp | null) {
-  return !newResource?.id && previousResource && previousResource.__internal_future?.hasBeenFinalized === false;
+function shouldIgnoreNullUpdate(previousResource: unknown, newResource: unknown): boolean {
+  const hasNoId = !(newResource as { id?: unknown })?.id;
+  const previousFuture = (previousResource as { __internal_future?: { hasBeenFinalized?: boolean } })?.__internal_future;
+  return hasNoId && !!previousResource && previousFuture?.hasBeenFinalized === false;
 }
