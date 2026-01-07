@@ -48,7 +48,15 @@ type CheckoutSignalProps = {
 };
 
 export class StateProxy implements State {
-  constructor(private isomorphicClerk: IsomorphicClerk) {}
+  constructor(private isomorphicClerk: IsomorphicClerk) {
+    // Initialize signal registry for Map-based lookup
+    this.signalRegistry.set('signIn', this.signInSignal.bind(this));
+    this.signalRegistry.set('signUp', this.signUpSignal.bind(this));
+    this.signalRegistry.set('waitlist', this.waitlistSignal.bind(this));
+  }
+
+  // Registry for dynamic signal lookup (mirrors clerk-js State registry pattern)
+  private readonly signalRegistry = new Map<string, () => unknown>();
 
   private readonly signInSignalProxy = this.buildSignInProxy();
   private readonly signUpSignalProxy = this.buildSignUpProxy();
@@ -340,16 +348,7 @@ export class StateProxy implements State {
    * Returns the proxy signal for the given resource type.
    */
   getSignal(type: 'signIn' | 'signUp' | 'waitlist') {
-    switch (type) {
-      case 'signIn':
-        return this.signInSignal.bind(this);
-      case 'signUp':
-        return this.signUpSignal.bind(this);
-      case 'waitlist':
-        return this.waitlistSignal.bind(this);
-      default:
-        return undefined;
-    }
+    return this.signalRegistry.get(type);
   }
 
   __internal_effect(_: () => void): () => void {

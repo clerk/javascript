@@ -3,7 +3,7 @@ import type { ResourceSchema } from './types';
 /**
  * Checkout uses raw/global errors only, no field-level errors.
  */
-type CheckoutFields = Record<string, never>;
+export type CheckoutFields = Record<string, never>;
 
 /**
  * Schema for the Checkout resource.

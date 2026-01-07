@@ -9,11 +9,26 @@ export interface PropertyDef<T = unknown> {
 }
 
 /**
+ * Base constraint for error field objects.
+ * @deprecated Use explicit type parameters instead for better type safety.
+ */
+export type FieldsConstraint = { [key: string]: unknown };
+
+/**
+ * Extract the error fields type from a ResourceSchema.
+ * Enables type inference when using schemas with factories.
+ */
+export type SchemaFields<T> = T extends ResourceSchema<infer F> ? F : never;
+
+/**
  * Schema for a signal-backed resource.
  * Provides a single source of truth for both clerk-js (signal creation)
  * and clerk-react (StateProxy generation).
+ *
+ * TFields is intentionally unconstrained to allow specific interfaces like SignInFields
+ * that don't have index signatures.
  */
-export interface ResourceSchema<TFields extends Record<string, unknown>> {
+export interface ResourceSchema<TFields> {
   /**
    * Resource key (e.g., 'signIn', 'signUp').
    * Used as the property name in hook return values.
@@ -57,9 +72,9 @@ export interface ResourceSchema<TFields extends Record<string, unknown>> {
  * Create default Errors<T> object from error fields.
  * Used to generate SSR-safe default error state.
  */
-export function createDefaultErrors<T extends Record<string, unknown>>(fields: T): Errors<T> {
+export function createDefaultErrors<T>(fields: T): Errors<T> {
   const fieldDefaults = {} as T;
-  for (const key in fields) {
+  for (const key in fields as object) {
     (fieldDefaults as Record<string, unknown>)[key] = null;
   }
   return { fields: fieldDefaults, raw: null, global: null };

@@ -1,50 +1,53 @@
 import type { ClerkAPIError, ClerkError } from '@clerk/shared/error';
 import { createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { signInSchema, signUpSchema, waitlistSchema } from '@clerk/shared/resourceSchemas';
-import type { Errors, SignInSignal, SignUpSignal, WaitlistSignal } from '@clerk/shared/types';
+import type {
+  Errors,
+  SignInFields,
+  SignInSignal,
+  SignUpFields,
+  SignUpSignal,
+  WaitlistFields,
+  WaitlistSignal,
+} from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
-
 
 import type { SignIn } from './resources/SignIn';
 import type { SignUp } from './resources/SignUp';
 import type { Waitlist } from './resources/Waitlist';
 import { createResourceSignals } from './signalFactory';
 
-// SignIn signals using factory with schema
-const signInSignals = createResourceSignals<SignIn, Record<string, unknown>>({
-  name: signInSchema.name,
-  errorFields: signInSchema.errorFields as unknown as Record<string, unknown>,
-  getPublicResource: (resource: unknown) => (resource as SignIn).__internal_future,
+// SignIn signals using factory with schema - explicit TFields for type safety
+const signInSignals = createResourceSignals<SignIn, SignInFields>({
+  schema: signInSchema,
+  getPublicResource: (resource) => (resource as SignIn).__internal_future,
 });
 
 export const signInResourceSignal = signInSignals.resourceSignal;
 export const signInErrorSignal = signInSignals.errorSignal;
 export const signInFetchSignal = signInSignals.fetchSignal;
-export const signInComputedSignal = signInSignals.computedSignal as unknown as SignInSignal;
+export const signInComputedSignal: SignInSignal = signInSignals.computedSignal as SignInSignal;
 
-// SignUp signals using factory with schema
-const signUpSignals = createResourceSignals<SignUp, Record<string, unknown>>({
-  name: signUpSchema.name,
-  errorFields: signUpSchema.errorFields as unknown as Record<string, unknown>,
-  getPublicResource: (resource: unknown) => (resource as SignUp).__internal_future,
+// SignUp signals using factory with schema - explicit TFields for type safety
+const signUpSignals = createResourceSignals<SignUp, SignUpFields>({
+  schema: signUpSchema,
+  getPublicResource: (resource) => (resource as SignUp).__internal_future,
 });
 
 export const signUpResourceSignal = signUpSignals.resourceSignal;
 export const signUpErrorSignal = signUpSignals.errorSignal;
 export const signUpFetchSignal = signUpSignals.fetchSignal;
-export const signUpComputedSignal = signUpSignals.computedSignal as unknown as SignUpSignal;
+export const signUpComputedSignal: SignUpSignal = signUpSignals.computedSignal as SignUpSignal;
 
-// Waitlist signals using factory with schema
-const waitlistSignals = createResourceSignals<Waitlist, Record<string, unknown>>({
-  name: waitlistSchema.name,
-  errorFields: waitlistSchema.errorFields as unknown as Record<string, unknown>,
-  // Waitlist is a singleton, no transformation needed
+// Waitlist signals using factory with schema - explicit TFields for type safety
+const waitlistSignals = createResourceSignals<Waitlist, WaitlistFields>({
+  schema: waitlistSchema,
 });
 
 export const waitlistResourceSignal = waitlistSignals.resourceSignal;
 export const waitlistErrorSignal = waitlistSignals.errorSignal;
 export const waitlistFetchSignal = waitlistSignals.fetchSignal;
-export const waitlistComputedSignal = waitlistSignals.computedSignal as unknown as WaitlistSignal;
+export const waitlistComputedSignal: WaitlistSignal = waitlistSignals.computedSignal as WaitlistSignal;
 
 /**
  * Converts an error to a parsed errors object that reports the specific fields that the error pertains to. Will put

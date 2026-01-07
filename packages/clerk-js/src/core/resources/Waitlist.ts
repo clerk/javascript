@@ -35,7 +35,13 @@ export class Waitlist extends BaseResource implements WaitlistResource {
 
   async join(params: JoinWaitlistParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this, async () => {
-      await Waitlist.join(params);
+      const json = await BaseResource._fetch<WaitlistJSON>({
+        path: '/waitlist',
+        method: 'POST',
+        body: params as any,
+      });
+      // Update this instance with the response data
+      this.fromJSON(json as unknown as WaitlistJSON);
     });
   }
 

@@ -1,6 +1,6 @@
 import type { ClerkError } from '@clerk/shared/error';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import { checkoutSchema } from '@clerk/shared/resourceSchemas';
+import { checkoutSchema, type CheckoutFields } from '@clerk/shared/resourceSchemas';
 import { retry } from '@clerk/shared/retry';
 import type {
   BillingCheckoutJSON,
@@ -103,9 +103,8 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
  * Creates signals for the Checkout resource using the shared factory.
  */
 export const createSignals = () => {
-  return createResourceSignals<CheckoutFlow, typeof checkoutSchema.errorFields>({
-    name: checkoutSchema.name,
-    errorFields: checkoutSchema.errorFields,
+  return createResourceSignals<CheckoutFlow, CheckoutFields>({
+    schema: checkoutSchema,
     // Checkout doesn't need transformation, the CheckoutFlow is already the public resource
   });
 };

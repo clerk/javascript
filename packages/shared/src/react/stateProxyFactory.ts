@@ -19,7 +19,7 @@ type LoadedClerk = {
 /**
  * Options for building a resource proxy.
  */
-export interface BuildResourceProxyOptions<TFields extends Record<string, unknown>> {
+export interface BuildResourceProxyOptions<TFields> {
   /** The resource schema */
   schema: ResourceSchema<TFields>;
   /** Function to get the target resource from clerk */
@@ -97,7 +97,7 @@ function buildNestedMethods(
  * Build a resource proxy from a schema.
  * Returns an SSR-safe proxy that gates properties and methods based on clerk.loaded state.
  */
-export function buildResourceProxy<TFields extends Record<string, unknown>>(
+export function buildResourceProxy<TFields>(
   options: BuildResourceProxyOptions<TFields>,
 ): {
   errors: ReturnType<typeof createDefaultErrors<TFields>>;
