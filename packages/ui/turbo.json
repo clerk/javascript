@@ -3,7 +3,7 @@
   "tasks": {
     "dev:sandbox": {
       "cache": false,
-      "dependsOn": ["^build"],
+      "dependsOn": ["build"],
       "persistent": true
     },
     "build": {
