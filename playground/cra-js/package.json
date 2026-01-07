@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
+    "@clerk/react": "file:.yalc/@clerk/react",
     "@clerk/shared": "file:.yalc/@clerk/shared",
     "@clerk/types": "file:.yalc/@clerk/types",
     "@testing-library/jest-dom": "^5.16.5",

@@ -13,11 +13,7 @@ type NextFetcher = Fetcher & {
  */
 interface StaticGenerationAsyncStorage {
   /**
-   * Available for Next 14
-   */
-  readonly pagePath?: string;
-  /**
-   * Available for Next 15
+   * Field exposed by modern Next.js App Router releases (>=15.0.0).
    */
   readonly page?: string;
 }

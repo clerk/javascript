@@ -1,0 +1,3 @@
+---
+'@clerk/ui': patch
+---

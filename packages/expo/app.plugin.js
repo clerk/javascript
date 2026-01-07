@@ -2,7 +2,7 @@
  * Expo config plugin for @clerk/clerk-expo
  * Automatically configures iOS to work with Clerk native components
  */
-const { withXcodeProject, withDangerousMod } = require('@expo/config-plugins');
+const { withXcodeProject, withDangerousMod, withInfoPlist } = require('@expo/config-plugins');
 const path = require('path');
 const fs = require('fs');
 
@@ -451,4 +451,45 @@ const withClerkIOS = config => {
   return config;
 };
 
-module.exports = withClerkIOS;
+/**
+ * Add Google Sign-In URL scheme to Info.plist (from main branch)
+ */
+const withClerkGoogleSignIn = config => {
+  const iosUrlScheme =
+    process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME ||
+    (config.extra && config.extra.EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME);
+
+  if (!iosUrlScheme) {
+    return config;
+  }
+
+  return withInfoPlist(config, modConfig => {
+    if (!Array.isArray(modConfig.modResults.CFBundleURLTypes)) {
+      modConfig.modResults.CFBundleURLTypes = [];
+    }
+
+    const schemeExists = modConfig.modResults.CFBundleURLTypes.some(urlType =>
+      urlType.CFBundleURLSchemes?.includes(iosUrlScheme),
+    );
+
+    if (!schemeExists) {
+      modConfig.modResults.CFBundleURLTypes.push({
+        CFBundleURLSchemes: [iosUrlScheme],
+      });
+      console.log(`✅ Added Google Sign-In URL scheme: ${iosUrlScheme}`);
+    }
+
+    return modConfig;
+  });
+};
+
+/**
+ * Combined Clerk Expo plugin
+ */
+const withClerkExpo = config => {
+  config = withClerkIOS(config);
+  config = withClerkGoogleSignIn(config);
+  return config;
+};
+
+module.exports = withClerkExpo;

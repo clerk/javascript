@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
@@ -396,6 +396,13 @@ export const elGR: LocalizationResource = {
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Οι ρόλοι είναι προσωρινά κλειδωμένοι',
+          subtitle:
+            'Ενημερώνουμε τους διαθέσιμους ρόλους. Μόλις ολοκληρωθεί, θα μπορείτε να ενημερώσετε ξανά τους ρόλους.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -694,6 +701,9 @@ export const elGR: LocalizationResource = {
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Εισαγωγή κωδικού πρόσβασης',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Παραβιασμένος κωδικός',
     },
@@ -747,6 +757,10 @@ export const elGR: LocalizationResource = {
       formTitle: 'Κωδικός επαλήθευσης',
       subtitle: undefined,
       title: 'Aυθεντικοποίηση δύο βημάτων',
+    },
+    web3Solana: {
+      subtitle: 'Επιλέξτε ένα πορτοφόλι παρακάτω για να συνδεθείτε',
+      title: 'Σύνδεση με Solana',
     },
   },
   signInEnterPasswordTitle: 'Εισαγωγή κωδικού πρόσβασης',
@@ -839,31 +853,39 @@ export const elGR: LocalizationResource = {
       title: 'Δημιουργήστε τον λογαριασμό σας',
       titleCombined: 'Δημιουργήστε τον λογαριασμό σας',
     },
+    web3Solana: {
+      subtitle: 'Επιλέξτε ένα πορτοφόλι παρακάτω για να εγγραφείτε',
+      title: 'Εγγραφή με Solana',
+    },
   },
   socialButtonsBlockButton: 'Συνέχεια με {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Δημιουργία νέου οργανισμού',
+      action__invitationAccept: 'Συμμετοχή',
+      action__suggestionsAccept: 'Αίτημα συμμετοχής',
+      subtitle: 'Συμμετάσχετε σε έναν υπάρχοντα οργανισμό ή δημιουργήστε νέο',
+      suggestionsAcceptedLabel: 'Σε αναμονή έγκρισης',
+      title: 'Επιλέξτε οργανισμό',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Ακύρωση',
+      formButtonSubmit: 'Συνέχεια',
+      formFieldInputPlaceholder__name: 'Ο οργανισμός μου',
+      formFieldInputPlaceholder__slug: 'o-organismos-mou',
+      formFieldLabel__name: 'Όνομα',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Εισάγετε τα στοιχεία του οργανισμού σας για να συνεχίσετε',
+      title: 'Ρυθμίστε τον οργανισμό σας',
+    },
+    organizationCreationDisabled: {
+      title: 'Πρέπει να ανήκετε σε έναν οργανισμό',
+      subtitle: 'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για πρόσκληση.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Αποσύνδεση',
+      actionText: 'Συνδεδεμένος ως {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -872,19 +894,26 @@ export const elGR: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded:
+      'Το μέγεθος του αρχείου υπερβαίνει το μέγιστο όριο των 10 MB. Επιλέξτε ένα μικρότερο αρχείο.',
+    avatar_file_type_invalid: 'Ο τύπος αρχείου δεν υποστηρίζεται. Ανεβάστε μια εικόνα JPG, PNG, GIF ή WEBP.',
     captcha_invalid:
       'Η εγγραφή απέτυχε λόγω αποτυχημένων ελέγχων ασφαλείας. Ανανεώστε τη σελίδα για να δοκιμάσετε ξανά ή επικοινωνήστε με το κέντρο υποστήριξης για περισσότερη βοήθεια.',
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Οι προσωρινές υπηρεσίες email δεν υποστηρίζονται. Παρακαλώ χρησιμοποιήστε τη συνηθισμένη διεύθυνση email σας για να δημιουργήσετε λογαριασμό.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Δεν βρέθηκε λογαριασμός με αυτές τις λεπτομέρειες.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Η διεύθυνση email πρέπει να είναι μια έγκυρη διεύθυνση email.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
@@ -897,6 +926,8 @@ export const elGR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Ο κωδικός πρόσβασης ή η διεύθυνση email είναι λανθασμένη. Δοκιμάστε ξανά ή χρησιμοποιήστε άλλη μέθοδο.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Ο κωδικός πρόσβασής σας δεν είναι αρκετά ισχυρός.',
     form_password_pwned:
@@ -936,6 +967,9 @@ export const elGR: LocalizationResource = {
     phone_number_exists: 'Αυτός ο αριθμός τηλεφώνου χρησιμοποιείται ήδη. Δοκιμάστε έναν άλλο.',
     session_exists: 'Έχετε ήδη συνδεθεί.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Απορρίψατε το αίτημα υπογραφής. Δοκιμάστε ξανά για να συνεχίσετε.',
+    web3_solana_signature_generation_failed:
+      'Παρουσιάστηκε σφάλμα κατά τη δημιουργία της υπογραφής. Δοκιμάστε ξανά για να συνεχίσετε.',
     zxcvbn: {
       couldBeStronger:
         'Ο κωδικός πρόσβασής σας είναι αρκετός, αλλά θα μπορούσε να είναι πιο ισχυρός. Δοκιμάστε να προσθέσετε περισσότερους χαρακτήρες.',
@@ -1311,6 +1345,10 @@ export const elGR: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Πορτοφόλια Web3',
         title: 'Πορτοφόλια Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Επιλέξτε ένα πορτοφόλι Solana για σύνδεση με τον λογαριασμό σας.',
+          title: 'Προσθήκη πορτοφολιού Solana',
+        },
       },
     },
     usernamePage: {
@@ -1334,16 +1372,23 @@ export const elGR: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Σύνδεση',
+      actionText: 'Έχετε ήδη πρόσβαση;',
+      formButton: 'Εγγραφή στη λίστα αναμονής',
+      subtitle:
+        'Εισάγετε τη διεύθυνση ηλεκτρονικού ταχυδρομείου σας και θα σας ενημερώσουμε όταν η θέση σας είναι έτοιμη',
+      title: 'Εγγραφή στη λίστα αναμονής',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Θα ανακατευθυνθείτε σύντομα...',
+      subtitle: 'Θα επικοινωνήσουμε μαζί σας όταν η θέση σας είναι έτοιμη',
+      title: 'Ευχαριστούμε που εγγραφήκατε στη λίστα αναμονής!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Σύνδεση με {{walletName}}',
+    continue: 'Συνέχεια με {{walletName}}',
+    noneAvailable:
+      'Δεν εντοπίστηκαν πορτοφόλια Solana Web3. Εγκαταστήστε ένα {{ solanaWalletsLink || link("wallet extension") }} με υποστήριξη Web3.',
   },
 } as const;

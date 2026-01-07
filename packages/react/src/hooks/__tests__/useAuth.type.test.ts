@@ -4,7 +4,7 @@ import { describe, expectTypeOf, it } from 'vitest';
 import type { useAuth } from '../useAuth';
 
 type UseAuthParameters = Parameters<typeof useAuth>[0];
-type HasFunction = Exclude<ReturnType<typeof useAuth>['has'], undefined>;
+type HasFunction = ReturnType<typeof useAuth>['has'];
 type ParamsOfHas = Parameters<HasFunction>[0];
 
 describe('useAuth type tests', () => {

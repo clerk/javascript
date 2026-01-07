@@ -1,4 +1,5 @@
 import { ClerkAPIError, errorToJSON } from '@clerk/shared/error';
+import { convertJSONToPublicKeyCreateOptions } from '@clerk/shared/internal/clerk-js/passkeys';
 import type {
   PasskeyVerificationResource,
   PhoneCodeChannel,
@@ -17,7 +18,6 @@ import type {
 } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { convertJSONToPublicKeyCreateOptions } from '../../utils/passkeys';
 import { BaseResource } from './internal';
 
 export class Verification extends BaseResource implements VerificationResource {

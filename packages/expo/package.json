@@ -1,6 +1,6 @@
 {
-  "name": "@clerk/clerk-expo",
-  "version": "2.19.6",
+  "name": "@clerk/expo",
+  "version": "2.19.10",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -28,7 +28,6 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./app.plugin": "./app.plugin.js",
     "./app.plugin.js": "./app.plugin.js",
     "./native": {
       "types": "./dist/native/index.d.ts",
@@ -61,6 +60,10 @@
     "./experimental": {
       "types": "./dist/experimental.d.ts",
       "default": "./dist/experimental.js"
+    },
+    "./legacy": {
+      "types": "./dist/legacy.d.ts",
+      "default": "./dist/legacy.js"
     }
   },
   "main": "./dist/index.js",
@@ -68,6 +71,7 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
+    "android",
     "ios",
     "native",
     "web",
@@ -76,6 +80,7 @@
     "secure-store",
     "resource-cache",
     "token-cache",
+    "expo-module.config.json",
     "app.plugin.js"
   ],
   "scripts": {
@@ -93,34 +98,36 @@
   },
   "dependencies": {
     "@clerk/clerk-js": "workspace:^",
-    "@clerk/clerk-react": "workspace:^",
+    "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "base-64": "^1.0.0",
     "react-native-url-polyfill": "2.0.0",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
     "@clerk/expo-passkeys": "workspace:*",
-    "@expo/config-plugins": "^8.0.0",
-    "@expo/config-types": "^51.0.0",
+    "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
     "esbuild": "^0.19.0",
     "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "^5.4.0",
+    "expo-constants": "^18.0.0",
     "expo-crypto": "^15.0.7",
     "expo-local-authentication": "^13.8.0",
-    "expo-modules-core": "^2.0.0",
+    "expo-modules-core": "^3.0.0",
     "expo-secure-store": "^12.8.1",
     "expo-web-browser": "^12.8.2",
     "react-native": "^0.81.4"
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",
+    "expo": ">=53 <55",
     "expo-apple-authentication": ">=7.0.0",
     "expo-auth-session": ">=5",
+    "expo-constants": ">=12",
     "expo-crypto": ">=12",
     "expo-local-authentication": ">=13.5.0",
+    "expo-modules-core": ">=3.0.0",
     "expo-secure-store": ">=12.4.0",
     "expo-web-browser": ">=12.5.0",
     "react": "catalog:peer-react",
@@ -134,6 +141,9 @@
     "expo-apple-authentication": {
       "optional": true
     },
+    "expo-constants": {
+      "optional": true
+    },
     "expo-crypto": {
       "optional": true
     },
@@ -145,7 +155,7 @@
     }
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

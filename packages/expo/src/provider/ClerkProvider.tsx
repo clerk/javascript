@@ -1,7 +1,7 @@
 import '../polyfills';
 
-import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
-import type { Without } from '@clerk/types';
+import { ClerkProvider as ClerkReactProvider } from '@clerk/react';
+import type { Ui } from '@clerk/react/internal';
 import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
 import { useEffect } from 'react';
@@ -11,7 +11,10 @@ import { isNative, isWeb } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
 
-export type ClerkProviderProps = Without<React.ComponentProps<typeof ClerkReactProvider>, 'publishableKey'> & {
+export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<
+  React.ComponentProps<typeof ClerkReactProvider<TUi>>,
+  'publishableKey'
+> & {
   /**
    * Used to override the default EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY env variable if needed.
    * This is optional for Expo as the ClerkProvider will automatically use the EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY env variable if it exists.
@@ -42,7 +45,7 @@ const SDK_METADATA = {
   version: PACKAGE_VERSION,
 };
 
-export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
+export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi>): JSX.Element {
   const {
     children,
     tokenCache,

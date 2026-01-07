@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
@@ -393,6 +393,12 @@ export const heIL: LocalizationResource = {
         headerTitle__members: 'חברים',
         headerTitle__requests: 'בקשות',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'התפקידים נעולים זמנית',
+          subtitle: 'אנחנו מעדכנים את התפקידים הזמינים. לאחר שזה יסתיים, תוכל לעדכן תפקידים שוב.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -685,6 +691,9 @@ export const heIL: LocalizationResource = {
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'הכנס את סיסמתך',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: undefined,
     },
@@ -737,6 +746,10 @@ export const heIL: LocalizationResource = {
       formTitle: 'קוד אימות',
       subtitle: 'להמשך, אנא הכנס את קוד האימות שנוצר על ידי אפליקציית האימות שלך',
       title: 'אימות שני שלבים',
+    },
+    web3Solana: {
+      subtitle: 'בחר/י ארנק למטה כדי להתחבר',
+      title: 'התחברות עם Solana',
     },
   },
   signInEnterPasswordTitle: 'הזן את הסיסמה שלך',
@@ -828,31 +841,39 @@ export const heIL: LocalizationResource = {
       title: 'צור את החשבון שלך',
       titleCombined: 'צור את החשבון שלך',
     },
+    web3Solana: {
+      subtitle: 'בחר/י ארנק למטה כדי להירשם',
+      title: 'הרשמה עם Solana',
+    },
   },
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'צור ארגון חדש',
+      action__invitationAccept: 'הצטרף',
+      action__suggestionsAccept: 'בקש להצטרף',
+      subtitle: 'הצטרף לארגון קיים או צור חדש',
+      suggestionsAcceptedLabel: 'ממתין לאישור',
+      title: 'בחר ארגון',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'ביטול',
+      formButtonSubmit: 'המשך',
+      formFieldInputPlaceholder__name: 'הארגון שלי',
+      formFieldInputPlaceholder__slug: 'ha-irgun-sheli',
+      formFieldLabel__name: 'שם',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'הזן את פרטי הארגון שלך כדי להמשיך',
+      title: 'הגדר את הארגון שלך',
+    },
+    organizationCreationDisabled: {
+      title: 'עליך להשתייך לארגון',
+      subtitle: 'פנה למנהל הארגון שלך לקבלת הזמנה.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'התנתק',
+      actionText: 'מחובר כ-{{identifier}}',
     },
   },
   taskResetPassword: {
@@ -861,17 +882,23 @@ export const heIL: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} כבר חבר בארגון',
+    avatar_file_size_exceeded: 'גודל הקובץ חורג מהמגבלה המקסימלית של 10MB. אנא בחר קובץ קטן יותר.',
+    avatar_file_type_invalid: 'סוג הקובץ אינו נתמך. אנא העלה תמונה בפורמט JPG, PNG, GIF או WEBP.',
     captcha_invalid: 'ההרשמה נכשלה עקב כשל באימות האבטחה. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
     captcha_unavailable: 'ההרשמה נכשלה עקב כשל באימות נגד בוטים. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'שירותי אימייל זמניים אינם נתמכים. אנא השתמש בכתובת האימייל הרגילה שלך כדי ליצור חשבון.',
     form_identifier_exists__email_address: 'כתובת המייל הזאת כבר תפוסה. אנא נסה אחרת.',
     form_identifier_exists__phone_number: 'מספר הטלפון הזה כבר תפוס. אנא נסה מספר אחר.',
     form_identifier_exists__username: 'שם המשתמש הזה כבר תפוס. אנא נסה שם משתמש אחר',
     form_identifier_not_found: 'לא ניתן למצוא חשבון עם אלו הפרטים.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'כתובת האימייל חייבת להיות כתובת אימייל תקינה.',
     form_param_format_invalid__phone_number: 'מספר הטלפון חייב להיות בפורמט בינלאומי תקין.',
@@ -884,6 +911,7 @@ export const heIL: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: 'הסיסמה או כתובת האימייל שגויים. נסה שוב או השתמש בשיטה אחרת.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'הסיסמה שלך אינה מספיק חזקה.',
     form_password_pwned: 'הסיסמה הזו נמצאה כחלק מהפרטים שנחשפו בהפרת נתונים ולא ניתן להשתמש בה, נסה סיסמה אחרת במקום.',
@@ -923,6 +951,8 @@ export const heIL: LocalizationResource = {
     phone_number_exists: 'מספר הטלפון הזה כבר בשימוש. אנא נסה מספר אחר.',
     session_exists: 'אתה כבר מחובר לחשבון.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'דחית את בקשת החתימה. נסה/י שוב כדי להמשיך.',
+    web3_solana_signature_generation_failed: 'אירעה שגיאה בעת יצירת החתימה. נסה/י שוב כדי להמשיך.',
     zxcvbn: {
       couldBeStronger: 'הסיסמה שלך תקפה, אך יכולה להיות חזקה יותר. נסה להוסיף יותר תווים.',
       goodPassword: 'עבודה טובה. זו סיסמה מצוינת.',
@@ -1281,6 +1311,10 @@ export const heIL: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'ארנקי Web3',
         title: 'ארנקי Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'בחר/י ארנק Solana כדי לחבר לחשבון שלך.',
+          title: 'הוסף/י ארנק Solana',
+        },
       },
     },
     usernamePage: {
@@ -1315,5 +1349,11 @@ export const heIL: LocalizationResource = {
       subtitle: 'אנו ניצור איתך קשר כשהמקום שלך יהיה מוכן',
       title: 'תודה שהצטרפת לרשימת ההמתנה!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'התחבר/י עם {{walletName}}',
+    continue: 'המשך/י עם {{walletName}}',
+    noneAvailable:
+      'לא זוהו ארנקי Solana Web3. נא להתקין {{ solanaWalletsLink || link("wallet extension") }} התומך ב‑Web3.',
   },
 } as const;

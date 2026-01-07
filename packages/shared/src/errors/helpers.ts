@@ -1,5 +1,7 @@
 import type { ClerkAPIResponseError } from './clerkApiResponseError';
+import { isClerkAPIResponseError } from './clerkApiResponseError';
 import type { ClerkRuntimeError } from './clerkRuntimeError';
+import { isClerkRuntimeError } from './clerkRuntimeError';
 import type { EmailLinkError } from './emailLinkError';
 import type { MetamaskError } from './metamaskError';
 
@@ -56,35 +58,6 @@ export function isKnownError(error: any): error is ClerkAPIResponseError | Clerk
 }
 
 /**
- * Checks if the provided error is a ClerkAPIResponseError.
- *
- * @internal
- */
-export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError {
-  return err && 'clerkError' in err;
-}
-
-/**
- * Checks if the provided error object is an instance of ClerkRuntimeError.
- *
- * @param err - The error object to check.
- * @returns True if the error is a ClerkRuntimeError, false otherwise.
- *
- * @example
- * const error = new ClerkRuntimeError('An error occurred');
- * if (isClerkRuntimeError(error)) {
- *   // Handle ClerkRuntimeError
- *   console.error('ClerkRuntimeError:', error.message);
- * } else {
- *   // Handle other errors
- *   console.error('Other error:', error.message);
- * }
- */
-export function isClerkRuntimeError(err: any): err is ClerkRuntimeError {
-  return 'clerkRuntimeError' in err;
-}
-
-/**
  * Checks if the provided error is a Clerk runtime error indicating a reverification was cancelled.
  *
  * @internal
@@ -121,12 +94,12 @@ export function isPasswordPwnedError(err: any) {
 }
 
 /**
- * Checks if the provided error is a clerk api response error indicating a password was untrusted.
+ * Checks if the provided error is a clerk api response error indicating a password was compromised.
  *
  * @internal
  */
-export function isPasswordUntrustedError(err: any) {
-  return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_password_untrusted';
+export function isPasswordCompromisedError(err: any) {
+  return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_password_compromised';
 }
 
 /**

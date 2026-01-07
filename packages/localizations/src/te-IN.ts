@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const teIN: LocalizationResource = {
   locale: 'te-IN',
@@ -397,6 +397,13 @@ export const teIN: LocalizationResource = {
         headerTitle__members: 'సభ్యులు',
         headerTitle__requests: 'అభ్యర్థనలు',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'పాత్రలు తాత్కాలికంగా లాక్ చేయబడ్డాయి',
+          subtitle:
+            'మేము అందుబాటులో ఉన్న పాత్రలను అప్‌డేట్ చేస్తున్నాము. అది పూర్తయిన తర్వాత, మీరు మళ్ళీ పాత్రలను అప్‌డేట్ చేయగలరు.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -697,6 +704,9 @@ export const teIN: LocalizationResource = {
       subtitle: 'మీ ఖాతాతో సంబంధం ఉన్న పాస్‌వర్డ్‌ను నమోదు చేయండి',
       title: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'పాస్‌వర్డ్ ప్రమాదంలో ఉంది',
     },
@@ -750,6 +760,10 @@ export const teIN: LocalizationResource = {
       formTitle: 'ధృవీకరణ కోడ్',
       subtitle: 'కొనసాగించడానికి, దయచేసి మీ ప్రమాణీకరణ యాప్ ద్వారా రూపొందించిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
       title: 'రెండు-దశల ధృవీకరణ',
+    },
+    web3Solana: {
+      subtitle: 'సైన్ ఇన్ చేయడానికి క్రింద వాలెట్‌ను ఎంచుకోండి',
+      title: 'Solana తో సైన్ ఇన్ చేయండి',
     },
   },
   signInEnterPasswordTitle: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
@@ -844,31 +858,39 @@ export const teIN: LocalizationResource = {
       title: 'మీ ఖాతాను సృష్టించండి',
       titleCombined: 'మీ ఖాతాను సృష్టించండి',
     },
+    web3Solana: {
+      subtitle: 'సైన్ అప్ చేయడానికి క్రింద వాలెట్‌ను ఎంచుకోండి',
+      title: 'Solana తో సైన్ అప్ చేయండి',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}}తో కొనసాగించండి',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'కొత్త సంస్థను సృష్టించండి',
+      action__invitationAccept: 'చేరండి',
+      action__suggestionsAccept: 'చేరడానికి అభ్యర్థించండి',
+      subtitle: 'ఇప్పటికే ఉన్న సంస్థలో చేరండి లేదా కొత్తదాన్ని సృష్టించండి',
+      suggestionsAcceptedLabel: 'ఆమోదం కోసం పెండింగ్‌లో ఉంది',
+      title: 'ఒక సంస్థను ఎంచుకోండి',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'రద్దు చేయి',
+      formButtonSubmit: 'కొనసాగించు',
+      formFieldInputPlaceholder__name: 'నా సంస్థ',
+      formFieldInputPlaceholder__slug: 'na-sanstha',
+      formFieldLabel__name: 'పేరు',
+      formFieldLabel__slug: 'స్లగ్',
+      subtitle: 'కొనసాగించడానికి మీ సంస్థ వివరాలను నమోదు చేయండి',
+      title: 'మీ సంస్థను సెటప్ చేయండి',
+    },
+    organizationCreationDisabled: {
+      title: 'మీరు ఒక సంస్థకు చెంది ఉండాలి',
+      subtitle: 'ఆహ్వానం కోసం మీ సంస్థ నిర్వాహకుడిని సంప్రదించండి.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'సైన్ అవుట్',
+      actionText: '{{identifier}}గా సైన్ ఇన్ చేయబడింది',
     },
   },
   taskResetPassword: {
@@ -877,19 +899,25 @@ export const teIN: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ఇప్పటికే సంస్థ సభ్యుడు.',
+    avatar_file_size_exceeded: 'ఫైల్ పరిమాణం గరిష్ట 10MB పరిమితిని మించిపోయింది. దయచేసి చిన్న ఫైల్‌ను ఎంచుకోండి.',
+    avatar_file_type_invalid: 'ఫైల్ రకం సపోర్ట్ చేయబడలేదు. దయచేసి JPG, PNG, GIF లేదా WEBP చిత్రాన్ని అప్‌లోడ్ చేయండి.',
     captcha_invalid:
       'భద్రతా ధృవీకరణలు విఫలమైనందున సైన్ అప్ విజయవంతం కాలేదు. మళ్ళీ ప్రయత్నించడానికి దయచేసి పేజీని రిఫ్రెష్ చేయండి లేదా మరింత సహాయం కోసం మద్దతును సంప్రదించండి.',
     captcha_unavailable:
       'బాట్ ధృవీకరణ విఫలమైనందున సైన్ అప్ విజయవంతం కాలేదు. మళ్ళీ ప్రయత్నించడానికి దయచేసి పేజీని రిఫ్రెష్ చేయండి లేదా మరింత సహాయం కోసం మద్దతును సంప్రదించండి.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'తాత్కాలిక ఇమెయిల్ సేవలు మద్దతు లేవు. దయచేసి ఖాతాను సృష్టించడానికి మీ సాధారణ ఇమెయిల్ చిరునామాను ఉపయోగించండి.',
     form_identifier_exists__email_address: 'ఈ ఇమెయిల్ చిరునామా తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     form_identifier_exists__phone_number: 'ఈ ఫోన్ నంబర్ తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     form_identifier_exists__username: 'ఈ వినియోగదారు పేరు తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     form_identifier_not_found: 'ఈ గుర్తింపుదారుతో ఖాతా కనుగొనబడలేదు. దయచేసి తనిఖీ చేసి మళ్ళీ ప్రయత్నించండి.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'నమోదు చేసిన విలువ చెల్లని ఫార్మాట్‌లో ఉంది. దయచేసి తనిఖీ చేసి దిద్దుబాటు చేయండి.',
     form_param_format_invalid__email_address: 'ఇమెయిల్ చిరునామా చెల్లుబాటు అయ్యే ఇమెయిల్ చిరునామా అయి ఉండాలి.',
     form_param_format_invalid__phone_number: 'ఫోన్ నంబర్ చెల్లుబాటు అయ్యే అంతర్జాతీయ ఫార్మాట్‌లో ఉండాలి.',
@@ -902,6 +930,8 @@ export const teIN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'నమోదు చేసిన విలువ చెల్లనిది. దయచేసి దిద్దుబాటు చేయండి.',
     form_password_incorrect: 'మీరు నమోదు చేసిన పాస్‌వర్డ్ తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి.',
+    form_password_or_identifier_incorrect:
+      'పాస్‌వర్డ్ లేదా ఇమెయిల్ చిరునామా తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి లేదా మరొక పద్ధతిని ఉపయోగించండి.',
     form_password_length_too_short: 'మీ పాస్‌వర్డ్ చాలా చిన్నది. ఇది కనీసం 8 అక్షరాల పొడవు ఉండాలి.',
     form_password_not_strong_enough: 'మీ పాస్‌వర్డ్ సరిపడా బలంగా లేదు.',
     form_password_pwned:
@@ -944,6 +974,9 @@ export const teIN: LocalizationResource = {
     phone_number_exists: 'ఈ ఫోన్ నంబర్ తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 వాలెట్ పొడిగింపు కనుగొనబడలేదు. కొనసాగించడానికి దయచేసి ఒకదాన్ని ఇన్‌స్టాల్ చేయండి.',
+    web3_signature_request_rejected: 'మీరు సంతకం అభ్యర్థనను తిరస్కరించారు. కొనసాగేందుకు దయచేసి మళ్లీ ప్రయత్నించండి.',
+    web3_solana_signature_generation_failed:
+      'సంతకం తయారు చేసే సమయంలో లోపం జరిగింది. కొనసాగేందుకు దయచేసి మళ్లీ ప్రయత్నించండి.',
     zxcvbn: {
       couldBeStronger:
         'మీ పాస్‌వర్డ్ పనిచేస్తుంది, కానీ మరింత బలంగా ఉండవచ్చు. మరిన్ని అక్షరాలను జోడించడానికి ప్రయత్నించండి.',
@@ -1315,6 +1348,10 @@ export const teIN: LocalizationResource = {
         detailsAction__nonPrimary: 'ప్రాథమికంగా సెట్ చేయండి',
         primaryButton: 'వాలెట్‌ను కనెక్ట్ చేయండి',
         title: 'Web3 వాలెట్‌లు',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'మీ ఖాతాతో కనెక్ట్ చేయడానికి Solana వాలెట్‌ను ఎంచుకోండి.',
+          title: 'Solana వాలెట్‌ను జోడించండి',
+        },
       },
     },
     usernamePage: {
@@ -1349,5 +1386,11 @@ export const teIN: LocalizationResource = {
       subtitle: 'మీ స్థానం సిద్ధంగా ఉన్నప్పుడు మేము మిమ్మల్ని సంప్రదిస్తాము',
       title: 'వెయిట్‌లిస్ట్‌లో చేరినందుకు ధన్యవాదాలు!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} తో కనెక్ట్ అవ్వండి',
+    continue: '{{walletName}} తో కొనసాగించండి',
+    noneAvailable:
+      'Solana Web3 వాలెట్లు ఏవీ గుర్తించబడలేదు. Web3 కి మద్దతు ఉన్న {{ solanaWalletsLink || link("wallet extension") }} ను ఇన్‌స్టాల్ చేయండి.',
   },
 } as const;

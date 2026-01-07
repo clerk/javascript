@@ -1,4 +1,4 @@
-import { ClerkLoaded, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { ClerkLoaded, Show, UserButton } from '@clerk/nextjs';
 import { auth } from '@clerk/nextjs/server';
 import React from 'react';
 import { ClientSideWrapper } from '@/app/protected/ClientSideWrapper';
@@ -13,23 +13,22 @@ export default async function Page() {
     <div>
       <h1>Protected page</h1>
       <pre></pre>
-      <SignedIn>
+      <Show when='signed-in'>
         <h2>Signed in</h2>
-      </SignedIn>
-      <SignedOut>
+      </Show>
+      <Show when='signed-out'>
         <h2>Signed out</h2>
-      </SignedOut>
+      </Show>
       <ClerkLoaded>
         <h2>Clerk loaded</h2>
       </ClerkLoaded>
       <UserButton />
-      <UserButton afterSignOutUrl='/' />
 
       <ClientSideWrapper>
         server content
-        <SignedIn>
+        <Show when='signed-in'>
           <div>SignedIn</div>
-        </SignedIn>
+        </Show>
         <ClerkLoaded>
           <div>ClerkLoaded</div>
         </ClerkLoaded>

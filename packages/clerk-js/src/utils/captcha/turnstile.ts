@@ -1,18 +1,19 @@
 import { waitForElement } from '@clerk/shared/dom';
+import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from '@clerk/shared/internal/clerk-js/constants';
 import { loadScript } from '@clerk/shared/loadScript';
-import type { CaptchaAppearanceOptions, CaptchaWidgetType } from '@clerk/shared/types';
+import type { CaptchaWidgetType } from '@clerk/shared/types';
 
-import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
 import type { CaptchaOptions } from './types';
 
 // We use the explicit render mode to be able to control when the widget is rendered.
 // CF docs: https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/#disable-implicit-rendering
 const CLOUDFLARE_TURNSTILE_ORIGINAL_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 
+// These belong to `clerk/ui` now
 type CaptchaAttributes = {
-  theme?: CaptchaAppearanceOptions['theme'];
-  language?: CaptchaAppearanceOptions['language'];
-  size: CaptchaAppearanceOptions['size'];
+  theme?: unknown;
+  language?: unknown;
+  size: unknown;
 };
 
 declare global {
@@ -53,9 +54,9 @@ async function loadCaptchaFromCloudflareURL(nonce?: string) {
 
 function getCaptchaAttibutesFromElemenet(element: HTMLElement): CaptchaAttributes {
   try {
-    const theme = (element.getAttribute('data-cl-theme') as CaptchaAppearanceOptions['theme']) || undefined;
-    const language = (element.getAttribute('data-cl-language') as CaptchaAppearanceOptions['language']) || undefined;
-    const size = (element.getAttribute('data-cl-size') as CaptchaAppearanceOptions['size']) || undefined;
+    const theme = element.getAttribute('data-cl-theme') || undefined;
+    const language = element.getAttribute('data-cl-language') || undefined;
+    const size = element.getAttribute('data-cl-size') || undefined;
 
     return { theme, language, size };
   } catch {
@@ -79,9 +80,9 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   let captchaToken = '';
   let id = '';
   let turnstileSiteKey = siteKey;
-  let captchaTheme: CaptchaAppearanceOptions['theme'];
-  let captchaSize: CaptchaAppearanceOptions['size'];
-  let captchaLanguage: CaptchaAppearanceOptions['language'];
+  let captchaTheme: any;
+  let captchaSize: any;
+  let captchaLanguage: any;
   let retries = 0;
   let widgetContainerQuerySelector: string | undefined;
   // The backend uses this to determine which Turnstile site-key was used in order to verify the token
@@ -128,7 +129,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       captchaSize = size;
     } else {
       console.error(
-        'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/guides/development/custom-flows/bot-sign-up-protection for instructions',
+        'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/guides/development/custom-flows/authentication/bot-sign-up-protection for instructions',
       );
     }
   }

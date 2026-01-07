@@ -11,7 +11,7 @@ const props = defineProps<APIKeysProps>();
   <ClerkHostRenderer
     :mount="clerk?.mountAPIKeys"
     :unmount="clerk?.unmountAPIKeys"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal_updateProps"
     :props="props"
   />
 </template>

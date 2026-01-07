@@ -3,7 +3,7 @@ import type { Clerk } from '@clerk/clerk-js';
 import { AUTH_HEADER } from '../constants';
 import type { JWTHandler } from './jwt-handler';
 
-type Handler = Parameters<Clerk['__unstable__onAfterResponse']>[0];
+type Handler = Parameters<Clerk['__internal_onAfterResponse']>[0];
 type Res = Parameters<Handler>[1];
 
 /** Retrieve the JWT to the FAPI response */

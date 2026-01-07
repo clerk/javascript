@@ -1,4 +1,4 @@
-import { OrganizationSwitcher, SignedIn, SignedOut, SignIn, UserButton } from '@clerk/nextjs';
+import { OrganizationSwitcher, Show, SignIn, UserButton } from '@clerk/nextjs';
 import { auth, clerkClient, currentUser } from '@clerk/nextjs/server';
 import Link from 'next/link';
 
@@ -27,7 +27,7 @@ export default async function Page() {
         <h1>Hello, Next.js!</h1>
         {userId ? <h3>Signed in as: {userId}</h3> : <h3>Signed out</h3>}
         {/* @ts-ignore */}
-        <SignedIn>
+        <Show when='signed-in'>
           <UserButton
             userProfileMode='navigation'
             userProfileUrl='/app-dir/user'
@@ -40,11 +40,11 @@ export default async function Page() {
           />
           <div>{JSON.stringify(user)}</div>
           <div>{JSON.stringify(currentUser_)}</div>
-        </SignedIn>
+        </Show>
         {/* @ts-ignore */}
-        <SignedOut>
+        <Show when='signed-out'>
           <SignIn routing='hash' />
-        </SignedOut>
+        </Show>
       </div>
     </main>
   );

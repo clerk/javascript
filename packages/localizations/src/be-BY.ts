@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const beBY: LocalizationResource = {
   locale: 'be-BY',
@@ -396,6 +396,12 @@ export const beBY: LocalizationResource = {
         headerTitle__members: 'Удзельнікі',
         headerTitle__requests: 'Заявкі',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Ролі часова заблакіраваны',
+          subtitle: 'Мы абнаўляем даступныя ролі. Калі гэта будзе зроблена, вы зможаце абнавіць ролі зноў.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -697,6 +703,9 @@ export const beBY: LocalizationResource = {
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Увядзіце пароль',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Пароль быў узламаны',
     },
@@ -749,6 +758,10 @@ export const beBY: LocalizationResource = {
       formTitle: 'Код верыфікацыі',
       subtitle: 'Увядзіце код, атрыманы з вашага TOTP-генератара.',
       title: 'Двухфактарная верыфікацыя',
+    },
+    web3Solana: {
+      subtitle: 'Выберыце кашалёк ніжэй, каб увайсці',
+      title: 'Увайсці з Solana',
     },
   },
   signInEnterPasswordTitle: undefined,
@@ -842,31 +855,39 @@ export const beBY: LocalizationResource = {
       title: 'Стварыце Ваш акаўнт',
       titleCombined: 'Стварыце Ваш акаўнт',
     },
+    web3Solana: {
+      subtitle: 'Выберыце кашалёк ніжэй, каб зарэгістравацца',
+      title: 'Зарэгістравацца з Solana',
+    },
   },
   socialButtonsBlockButton: 'Працягнуць з дапамогай {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Стварыць новую арганізацыю',
+      action__invitationAccept: 'Далучыцца',
+      action__suggestionsAccept: 'Запытаць далучэння',
+      subtitle: 'Далучыцеся да існуючай арганізацыі або стварыце новую',
+      suggestionsAcceptedLabel: 'Чакае зацвярджэння',
+      title: 'Выберыце арганізацыю',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Адмяніць',
+      formButtonSubmit: 'Працягнуць',
+      formFieldInputPlaceholder__name: 'Мая арганізацыя',
+      formFieldInputPlaceholder__slug: 'maya-arhanizatsyya',
+      formFieldLabel__name: 'Назва',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Увядзіце даныя вашай арганізацыі для працягу',
+      title: 'Наладзьце вашу арганізацыю',
+    },
+    organizationCreationDisabled: {
+      title: 'Вы павінны належаць да арганізацыі',
+      subtitle: 'Звярніцеся да адміністратара вашай арганізацыі для атрымання запрашэння.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Выйсці',
+      actionText: 'Увайшлі як {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -875,19 +896,26 @@ export const beBY: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: 'Вы ўжо з’яўляецеся членам гэтай арганізацыі.',
+    avatar_file_size_exceeded: 'Памер файла перавышае максімальны ліміт 10 МБ. Калі ласка, абярыце меншы файл.',
+    avatar_file_type_invalid:
+      'Тып файла не падтрымліваецца. Калі ласка, загрузіце малюнак у фармаце JPG, PNG, GIF або WEBP.',
     captcha_invalid:
       'Рэгістрацыя не ўдалася з-за памылак бяспекі. Калі ласка, абнавіце старонку, каб паспрабаваць яшчэ раз, або звяжыцеся са службай падтрымкі для атрымання дапамогі.',
     captcha_unavailable:
       'Рэгістрацыя не ўдалася з-за памылак праверкі ботаў. Калі ласка, абнавіце старонку, каб паспрабаваць яшчэ раз або звяжыцеся са службай падтрымкі для атрымання дапамогі.',
     form_code_incorrect: 'Невядомы код. Пераканайцеся, што вы ўвялі правільны код.',
+    form_email_address_blocked:
+      'Часовая пошта не падтрымліваецца. Калі ласка, выкарыстоўвайце свой звычайны адрас электроннай пошты для стварэння акаўнта.',
     form_identifier_exists__email_address: 'Гэты адрас электроннай пошты ўжо выкарыстоўваецца.',
     form_identifier_exists__phone_number: 'Гэты нумар тэлефона ўжо выкарыстоўваецца.',
     form_identifier_exists__username: 'Гэта імя ўжо занята.',
     form_identifier_not_found: 'Мы не знойдзем акаўнта з такімі данымі.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address:
       'Адрас электроннай пошты павінен быць сапраўдным адрасам электроннай пошты.',
@@ -901,6 +929,8 @@ export const beBY: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Невядомы або недапушчальны значэнне.',
     form_password_incorrect: 'Невірны пароль.',
+    form_password_or_identifier_incorrect:
+      'Пароль або адрас электроннай пошты няправільны. Паспрабуйце яшчэ раз або выкарыстоўвайце іншы метад.',
     form_password_length_too_short: 'Пароль занадта кароткі.',
     form_password_not_strong_enough: 'Ваш пароль недастаткова надзейны.',
     form_password_pwned: 'Гэты пароль быў узламаны і не можа быць выкарыстаны, паспрабуйце іншы пароль.',
@@ -939,6 +969,9 @@ export const beBY: LocalizationResource = {
     phone_number_exists: 'Гэты нумар тэлефона ўжо заняты. Калі ласка, паспрабуйце іншы.',
     session_exists: 'Вы ўжо ўвайшлі.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Вы адхілілі запыт на подпіс. Калі ласка, паспрабуйце яшчэ раз, каб працягнуць.',
+    web3_solana_signature_generation_failed:
+      'Адбылася памылка пры стварэнні подпісу. Калі ласка, паспрабуйце яшчэ раз, каб працягнуць.',
     zxcvbn: {
       couldBeStronger: 'Ваш пароль падыходзіць, але мог бы быць надзейнейшым. Паспрабуйце дадаць больш сімвалаў.',
       goodPassword: 'Добрая праца. Гэта выдатны пароль.',
@@ -1311,6 +1344,10 @@ export const beBY: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 кашалькі',
         title: 'Web3 кашалькі',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Выберыце кашалёк Solana для падключэння да вашага акаўнта.',
+          title: 'Дадаць кашалёк Solana',
+        },
       },
     },
     usernamePage: {
@@ -1345,5 +1382,11 @@ export const beBY: LocalizationResource = {
       subtitle: 'Дзякуй за вашае терпліванне, мы паведамім вам, калі з’явяцца месцы.',
       title: 'Вы ў чакальным спісе',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Падключыцца з {{walletName}}',
+    continue: 'Працягнуць з {{walletName}}',
+    noneAvailable:
+      'Кашалькі Solana Web3 не выяўлены. Калі ласка, усталюйце {{ solanaWalletsLink || link("wallet extension") }} з падтрымкай Web3.',
   },
 } as const;

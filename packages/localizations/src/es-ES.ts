@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const esES: LocalizationResource = {
   locale: 'es-ES',
@@ -396,6 +396,13 @@ export const esES: LocalizationResource = {
         headerTitle__members: 'Miembros',
         headerTitle__requests: 'Solicitudes',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Los roles están temporalmente bloqueados',
+          subtitle:
+            'Estamos actualizando los roles disponibles. Una vez hecho esto, podrás actualizar los roles de nuevo.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -694,6 +701,9 @@ export const esES: LocalizationResource = {
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Introduzca su contraseña',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Tu contraseña ha sido comprometida',
     },
@@ -746,6 +756,10 @@ export const esES: LocalizationResource = {
       formTitle: 'Código de verificación',
       subtitle: 'Introduce el código que te enviamos a tu dispositivo',
       title: 'Verificación de dos pasos',
+    },
+    web3Solana: {
+      subtitle: 'Selecciona una cartera abajo para iniciar sesión',
+      title: 'Iniciar sesión con Solana',
     },
   },
   signInEnterPasswordTitle: 'Ingresa tu contraseña',
@@ -838,31 +852,39 @@ export const esES: LocalizationResource = {
       title: 'Crea tu cuenta',
       titleCombined: 'Crea tu cuenta',
     },
+    web3Solana: {
+      subtitle: 'Selecciona una cartera abajo para registrarte',
+      title: 'Registrarse con Solana',
+    },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Crear nueva organización',
+      action__invitationAccept: 'Unirse',
+      action__suggestionsAccept: 'Solicitar unirse',
+      subtitle: 'Unirse a una organización existente o crear una nueva',
+      suggestionsAcceptedLabel: 'Pendiente de aprobación',
+      title: 'Elegir una organización',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Cancelar',
+      formButtonSubmit: 'Continuar',
+      formFieldInputPlaceholder__name: 'Mi Organización',
+      formFieldInputPlaceholder__slug: 'mi-organizacion',
+      formFieldLabel__name: 'Nombre',
+      formFieldLabel__slug: 'Identificador',
+      subtitle: 'Ingrese los detalles de su organización para continuar',
+      title: 'Configurar su organización',
+    },
+    organizationCreationDisabled: {
+      title: 'Debe pertenecer a una organización',
+      subtitle: 'Contacte al administrador de su organización para obtener una invitación.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Cerrar sesión',
+      actionText: 'Sesión iniciada como {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -871,19 +893,26 @@ export const esES: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
+    avatar_file_size_exceeded:
+      'El tamaño del archivo supera el límite máximo de 10 MB. Por favor, elija un archivo más pequeño.',
+    avatar_file_type_invalid: 'Tipo de archivo no compatible. Por favor, suba una imagen JPG, PNG, GIF o WEBP.',
     captcha_invalid:
       'Registro fallido debido a validaciones de seguridad fallidas. Por favor, actualice la página para intentarlo de nuevo o comuníquese con el soporte para más asistencia.',
     captcha_unavailable:
       'Registro fallido debido a una validación de bot fallida. Por favor, actualice la página para intentarlo de nuevo o comuníquese con el soporte para más asistencia.',
     form_code_incorrect: 'El código ingresado es incorrecto.',
+    form_email_address_blocked:
+      'Los servicios de correo electrónico temporal no están soportados. Por favor, use su dirección de correo electrónico regular para crear una cuenta.',
     form_identifier_exists__email_address: 'Ya existe una cuenta con esta dirección de correo electrónico.',
     form_identifier_exists__phone_number: 'Ya existe una cuenta con este número de teléfono.',
     form_identifier_exists__username: 'Ya existe una cuenta con este nombre de usuario.',
     form_identifier_not_found: 'No se ha encontrado ninguna cuenta con este identificador.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formato de parámetro inválido.',
     form_param_format_invalid__email_address:
       'La dirección de correo electrónico debe ser una dirección de correo electrónico válida.',
@@ -897,6 +926,8 @@ export const esES: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valor inválido.',
     form_password_incorrect: 'Contraseña incorrecta.',
+    form_password_or_identifier_incorrect:
+      'La contraseña o la dirección de correo electrónico es incorrecta. Inténtalo de nuevo o usa otro método.',
     form_password_length_too_short: 'La contraseña es demasiado corta.',
     form_password_not_strong_enough: 'Tu contraseña no es lo suficientemente fuerte.',
     form_password_pwned: 'Tu contraseña ha sido comprometida en una violación de seguridad.',
@@ -937,6 +968,9 @@ export const esES: LocalizationResource = {
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, inténtelo con otro.',
     session_exists: 'Ya has iniciado sesión',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Has rechazado la solicitud de firma. Inténtalo de nuevo para continuar.',
+    web3_solana_signature_generation_failed:
+      'Se produjo un error al generar la firma. Inténtalo de nuevo para continuar.',
     zxcvbn: {
       couldBeStronger: undefined,
       goodPassword: undefined,
@@ -1308,6 +1342,10 @@ export const esES: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Agregar cartera Web3',
         title: 'Cartera Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selecciona una cartera de Solana para conectarla a tu cuenta.',
+          title: 'Añadir una cartera de Solana',
+        },
       },
     },
     usernamePage: {
@@ -1343,5 +1381,11 @@ export const esES: LocalizationResource = {
       subtitle: 'Recibirás una invitación para unirte cuando haya espacio disponible.',
       title: '¡Te has unido a la lista de espera!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Conectar con {{walletName}}',
+    continue: 'Continuar con {{walletName}}',
+    noneAvailable:
+      'No se detectaron carteras Solana Web3. Instala una {{ solanaWalletsLink || link("wallet extension") }} compatible con Web3.',
   },
 } as const;

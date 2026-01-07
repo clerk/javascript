@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const msMY: LocalizationResource = {
   locale: 'ms-MY',
@@ -397,6 +397,13 @@ export const msMY: LocalizationResource = {
         headerTitle__members: 'Ahli',
         headerTitle__requests: 'Permintaan',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Peranan dikunci buat sementara waktu',
+          subtitle:
+            'Kami sedang mengemas kini peranan yang tersedia. Setelah selesai, anda akan dapat mengemas kini peranan semula.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -698,6 +705,9 @@ export const msMY: LocalizationResource = {
       subtitle: 'Masukkan kata laluan yang berkaitan dengan akaun anda',
       title: 'Masukkan kata laluan anda',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Kata laluan dikompromi',
     },
@@ -750,6 +760,10 @@ export const msMY: LocalizationResource = {
       formTitle: 'Kod pengesahan',
       subtitle: 'Untuk meneruskan, sila masukkan kod pengesahan yang dijana oleh aplikasi pengesah anda',
       title: 'Pengesahan dua langkah',
+    },
+    web3Solana: {
+      subtitle: 'Pilih dompet di bawah untuk log masuk',
+      title: 'Log masuk dengan Solana',
     },
   },
   signInEnterPasswordTitle: 'Masukkan kata laluan anda',
@@ -845,31 +859,39 @@ export const msMY: LocalizationResource = {
       title: 'Cipta akaun anda',
       titleCombined: 'Cipta akaun anda',
     },
+    web3Solana: {
+      subtitle: 'Pilih dompet di bawah untuk mendaftar',
+      title: 'Daftar dengan Solana',
+    },
   },
   socialButtonsBlockButton: 'Teruskan dengan {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Cipta organisasi baharu',
+      action__invitationAccept: 'Sertai',
+      action__suggestionsAccept: 'Minta untuk menyertai',
+      subtitle: 'Sertai organisasi sedia ada atau cipta yang baharu',
+      suggestionsAcceptedLabel: 'Menunggu kelulusan',
+      title: 'Pilih organisasi',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Batal',
+      formButtonSubmit: 'Teruskan',
+      formFieldInputPlaceholder__name: 'Organisasi Saya',
+      formFieldInputPlaceholder__slug: 'organisasi-saya',
+      formFieldLabel__name: 'Nama',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Masukkan butiran organisasi anda untuk meneruskan',
+      title: 'Sediakan organisasi anda',
+    },
+    organizationCreationDisabled: {
+      title: 'Anda mesti menjadi ahli organisasi',
+      subtitle: 'Hubungi pentadbir organisasi anda untuk jemputan.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Daftar keluar',
+      actionText: 'Log masuk sebagai {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -878,19 +900,25 @@ export const msMY: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi ahli organisasi.',
+    avatar_file_size_exceeded: 'Saiz fail melebihi had maksimum 10MB. Sila pilih fail yang lebih kecil.',
+    avatar_file_type_invalid: 'Jenis fail tidak disokong. Sila muat naik imej JPG, PNG, GIF atau WEBP.',
     captcha_invalid:
       'Pendaftaran tidak berjaya kerana pengesahan keselamatan gagal. Sila muat semula halaman untuk mencuba lagi atau hubungi sokongan untuk bantuan lebih lanjut.',
     captcha_unavailable:
       'Pendaftaran tidak berjaya kerana pengesahan bot gagal. Sila muat semula halaman untuk mencuba lagi atau hubungi sokongan untuk bantuan lebih lanjut.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Perkhidmatan e-mel sementara tidak disokong. Sila gunakan alamat e-mel biasa anda untuk membuat akaun.',
     form_identifier_exists__email_address: 'Alamat e-mel ini telah diambil. Sila cuba yang lain.',
     form_identifier_exists__phone_number: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini telah diambil. Sila cuba yang lain.',
     form_identifier_not_found: 'Tiada akaun dijumpai dengan pengenal ini. Sila periksa dan cuba lagi.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid:
       'Nilai yang dimasukkan adalah dalam format yang tidak sah. Sila periksa dan betulkannya.',
     form_param_format_invalid__email_address: 'Alamat e-mel mestilah alamat e-mel yang sah.',
@@ -904,6 +932,8 @@ export const msMY: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Nilai yang dimasukkan tidak sah. Sila betulkannya.',
     form_password_incorrect: 'Kata laluan yang anda masukkan tidak betul. Sila cuba lagi.',
+    form_password_or_identifier_incorrect:
+      'Kata laluan atau alamat e-mel tidak betul. Cuba lagi atau gunakan kaedah lain.',
     form_password_length_too_short: 'Kata laluan anda terlalu pendek. Ia mesti sekurang-kurangnya 8 aksara panjang.',
     form_password_not_strong_enough: 'Kata laluan anda tidak cukup kuat.',
     form_password_pwned:
@@ -949,6 +979,9 @@ export const msMY: LocalizationResource = {
     phone_number_exists: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     session_exists: undefined,
     web3_missing_identifier: 'Sambungan Dompet Web3 tidak dapat dijumpai. Sila pasang satu untuk meneruskan.',
+    web3_signature_request_rejected: 'Anda telah menolak permintaan tandatangan. Sila cuba lagi untuk meneruskan.',
+    web3_solana_signature_generation_failed:
+      'Ralat berlaku semasa menjana tandatangan. Sila cuba lagi untuk meneruskan.',
     zxcvbn: {
       couldBeStronger: 'Kata laluan anda berfungsi, tetapi boleh lebih kuat. Cuba tambah lebih banyak aksara.',
       goodPassword: 'Kata laluan anda memenuhi semua keperluan yang diperlukan.',
@@ -1321,6 +1354,10 @@ export const msMY: LocalizationResource = {
         detailsAction__nonPrimary: 'Tetapkan sebagai utama',
         primaryButton: 'Sambung dompet',
         title: 'Dompet web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Pilih dompet Solana untuk disambungkan ke akaun anda.',
+          title: 'Tambah dompet Solana',
+        },
       },
     },
     usernamePage: {
@@ -1355,5 +1392,11 @@ export const msMY: LocalizationResource = {
       subtitle: 'Kami akan menghubungi anda apabila tempat anda sudah bersedia',
       title: 'Terima kasih kerana menyertai senarai menunggu!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Sambung dengan {{walletName}}',
+    continue: 'Teruskan dengan {{walletName}}',
+    noneAvailable:
+      'Tiada dompet Solana Web3 dikesan. Sila pasang {{ solanaWalletsLink || link("wallet extension") }} yang menyokong Web3.',
   },
 } as const;

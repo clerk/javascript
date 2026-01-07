@@ -4,6 +4,7 @@ import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
 import type { OAuthStrategy, PasskeyStrategy, Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
+import type { Web3Provider } from './web3';
 
 export interface SignInFutureCreateParams {
   /**
@@ -15,7 +16,7 @@ export interface SignInFutureCreateParams {
    * The first factor verification strategy to use in the sign-in flow. Depends on the `identifier` value. Each
    * authentication identifier supports different verification strategies.
    */
-  strategy?: OAuthStrategy | 'saml' | 'enterprise_sso' | PasskeyStrategy;
+  strategy?: OAuthStrategy | 'enterprise_sso' | PasskeyStrategy;
   /**
    * The full URL or path that the OAuth provider should redirect to after successful authorization on their part.
    */
@@ -244,6 +245,14 @@ export interface SignInFutureWeb3Params {
    * The verification strategy to validate the user's sign-in request.
    */
   strategy: Web3Strategy;
+  /**
+   * The Web3 wallet provider to use for the sign-in.
+   */
+  provider: Web3Provider;
+  /**
+   * The name of the wallet to use for Solana sign-ins. Required when `provider` is set to `'solana'`.
+   */
+  walletName?: string;
 }
 
 export interface SignInFuturePasskeyParams {
@@ -326,6 +335,13 @@ export interface SignInFutureResource {
    * `identifier` property.
    */
   readonly userData: UserData;
+
+  /**
+   * Indicates that the sign-in has been finalized.
+   *
+   * @internal
+   */
+  readonly hasBeenFinalized: boolean;
 
   /**
    * Creates a new `SignIn` instance initialized with the provided parameters. The instance maintains the sign-in
