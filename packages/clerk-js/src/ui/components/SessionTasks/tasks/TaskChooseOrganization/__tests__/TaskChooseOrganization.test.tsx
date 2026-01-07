@@ -240,4 +240,74 @@ describe('TaskChooseOrganization', () => {
       expect(queryByLabelText(/Slug/i)).toBeInTheDocument();
     });
   });
+
+  describe('when users are not allowed to create organizations', () => {
+    it('does not display create organization screen', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withForceOrganizationSelection();
+        f.withUser({
+          create_organization_enabled: false,
+          tasks: [{ key: 'choose-organization' }],
+        });
+      });
+
+      const { queryByText } = render(<TaskChooseOrganization />, { wrapper });
+
+      expect(queryByText(/create new organization/i)).not.toBeInTheDocument();
+      expect(queryByText(/you must belong to an organization/i)).toBeInTheDocument();
+      expect(queryByText(/contact your organization admin for an invitation/i)).toBeInTheDocument();
+    });
+
+    it('with existing memberships or suggestions, displays create organization screen', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withForceOrganizationSelection();
+        f.withUser({
+          create_organization_enabled: false,
+        });
+      });
+
+      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+        Promise.resolve({
+          data: [
+            createFakeUserOrganizationMembership({
+              id: '1',
+              organization: {
+                id: '1',
+                name: 'Existing Org',
+                slug: 'org1',
+                membersCount: 1,
+                adminDeleteEnabled: false,
+                maxAllowedMemberships: 1,
+                pendingInvitationsCount: 1,
+              },
+            }),
+          ],
+          total_count: 1,
+        }),
+      );
+
+      fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValueOnce(
+        Promise.resolve({
+          data: [
+            createFakeUserOrganizationSuggestion({
+              id: '2',
+              emailAddress: 'two@clerk.com',
+              publicOrganizationData: {
+                name: 'OrgTwoSuggestion',
+              },
+            }),
+          ],
+          total_count: 1,
+        }),
+      );
+
+      const { findByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
+
+      expect(await findByText('Existing Org')).toBeInTheDocument();
+      expect(await findByText('Create new organization')).toBeInTheDocument();
+      expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
+    });
+  });
 });
