@@ -20,7 +20,7 @@ import { ClerkProvider, getClerkInstance } from '@clerk/expo';
 const clerkInstance = getClerkInstance({ publishableKey: 'pk_xxx' });
 
 // Use the instance outside of React
-const token = await clerkInstance.session?.getToken();
+const token = await clerkInstance?.session?.getToken();
 fetch('https://example.com/api', { headers: { Authorization: `Bearer ${token}` } });
 ```
 
