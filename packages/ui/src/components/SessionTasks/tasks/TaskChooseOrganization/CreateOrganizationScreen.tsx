@@ -118,6 +118,7 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
             organization={{ name: nameField.value, imageUrl: defaultLogoUrl ?? undefined }}
             onAvatarChange={async file => await setFile(file)}
             onAvatarRemove={file || defaultLogoUrl ? onAvatarRemove : null}
+            showLoadingSpinner={!!defaultLogoUrl}
             avatarPreviewPlaceholder={
               <IconButton
                 variant='ghost'

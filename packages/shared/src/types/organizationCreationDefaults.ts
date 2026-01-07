@@ -15,6 +15,7 @@ export interface OrganizationCreationDefaultsJSON extends ClerkResourceJSON {
     name: string;
     slug: string;
     logo: string | null;
+    blur_hash: string | null;
   };
 }
 
@@ -28,5 +29,6 @@ export interface OrganizationCreationDefaultsResource extends ClerkResource {
     name: string;
     slug: string;
     logo: string | null;
+    blurHash: string | null;
   };
 }

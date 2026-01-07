@@ -18,10 +18,12 @@ export class OrganizationCreationDefaults extends BaseResource implements Organi
     name: string;
     slug: string;
     logo: string | null;
+    blurHash: string | null;
   } = {
     name: '',
     slug: '',
     logo: null,
+    blurHash: null,
   };
 
   public constructor(data: OrganizationCreationDefaultsJSON | OrganizationCreationDefaultsJSONSnapshot | null = null) {
@@ -42,6 +44,7 @@ export class OrganizationCreationDefaults extends BaseResource implements Organi
       this.form.name = this.withDefault(data.form.name, this.form.name);
       this.form.slug = this.withDefault(data.form.slug, this.form.slug);
       this.form.logo = this.withDefault(data.form.logo, this.form.logo);
+      this.form.blurHash = this.withDefault(data.form.blur_hash, this.form.blurHash);
     }
 
     return this;
