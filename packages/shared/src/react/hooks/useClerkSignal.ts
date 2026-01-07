@@ -3,28 +3,28 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
 import { eventMethodCalled } from '../../telemetry';
-import type { SignInSignalValue, SignUpSignalValue, WaitlistSignalValue } from '../../types';
+import type { SignalName, SignInSignalValue, SignUpSignalValue, WaitlistSignalValue } from '../../types';
 import { useClerkInstanceContext, useAssertWrappedByClerkProvider } from '../contexts';
 
-function useClerkSignal(signal: 'signIn'): SignInSignalValue;
-function useClerkSignal(signal: 'signUp'): SignUpSignalValue;
-function useClerkSignal(signal: 'waitlist'): WaitlistSignalValue;
-function useClerkSignal(
-  signal: 'signIn' | 'signUp' | 'waitlist',
-): SignInSignalValue | SignUpSignalValue | WaitlistSignalValue {
+/**
+ * Return type map for signal hooks.
+ */
+type SignalValueMap = {
+  signIn: SignInSignalValue;
+  signUp: SignUpSignalValue;
+  waitlist: WaitlistSignalValue;
+};
+
+function useClerkSignal<T extends SignalName>(signalName: T): SignalValueMap[T] {
   useAssertWrappedByClerkProvider('useClerkSignal');
 
   const clerk = useClerkInstanceContext();
 
-  switch (signal) {
-    case 'signIn':
-      clerk.telemetry?.record(eventMethodCalled('useSignIn', { apiVersion: '2025-11' }));
-      break;
-    case 'signUp':
-      clerk.telemetry?.record(eventMethodCalled('useSignUp', { apiVersion: '2025-11' }));
-      break;
-    default:
-      break;
+  // Record telemetry for specific hooks
+  if (signalName === 'signIn') {
+    clerk.telemetry?.record(eventMethodCalled('useSignIn', { apiVersion: '2025-11' }));
+  } else if (signalName === 'signUp') {
+    clerk.telemetry?.record(eventMethodCalled('useSignUp', { apiVersion: '2025-11' }));
   }
 
   const subscribe = useCallback(
@@ -34,40 +34,37 @@ function useClerkSignal(
       }
 
       return clerk.__internal_state.__internal_effect(() => {
-        switch (signal) {
-          case 'signIn':
-            clerk.__internal_state.signInSignal();
-            break;
-          case 'signUp':
-            clerk.__internal_state.signUpSignal();
-            break;
-          case 'waitlist':
-            clerk.__internal_state.waitlistSignal();
-            break;
-          default:
-            throw new Error(`Unknown signal: ${signal}`);
+        // Use getSignal for dynamic lookup instead of switch
+        const signal = clerk.__internal_state.getSignal(signalName);
+        if (signal) {
+          signal();
         }
         callback();
       });
     },
-    [clerk, clerk.loaded, clerk.__internal_state],
+    [clerk, clerk.loaded, clerk.__internal_state, signalName],
   );
+
   const getSnapshot = useCallback(() => {
-    switch (signal) {
-      case 'signIn':
-        return clerk.__internal_state.signInSignal() as SignInSignalValue;
-      case 'signUp':
-        return clerk.__internal_state.signUpSignal() as SignUpSignalValue;
-      case 'waitlist':
-        return clerk.__internal_state.waitlistSignal() as WaitlistSignalValue;
-      default:
-        throw new Error(`Unknown signal: ${signal}`);
+    // Use getSignal for dynamic lookup instead of switch
+    const signal = clerk.__internal_state.getSignal(signalName);
+    if (!signal) {
+      throw new Error(`Unknown signal: ${signalName}`);
     }
-  }, [clerk.__internal_state]);
+    return signal() as SignalValueMap[T];
+  }, [clerk.__internal_state, signalName]);
 
   const value = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
   return value;
+}
+
+/**
+ * Creates a signal hook for a given signal name.
+ * This factory enables one-liner hook creation from signal names.
+ */
+export function createSignalHook<T extends SignalName>(name: T): () => SignalValueMap[T] {
+  return () => useClerkSignal(name);
 }
 
 /**

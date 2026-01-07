@@ -100,6 +100,10 @@ export class State implements StateInterface {
    * Get the computed signal for a resource type.
    * Used by hooks to subscribe to resource changes.
    */
+  getSignal(type: 'signIn'): typeof signInComputedSignal | undefined;
+  getSignal(type: 'signUp'): typeof signUpComputedSignal | undefined;
+  getSignal(type: 'waitlist'): typeof waitlistComputedSignal | undefined;
+  getSignal(type: string): (() => unknown) | undefined;
   getSignal(type: string) {
     return this.registry.get(type)?.computedSignal;
   }

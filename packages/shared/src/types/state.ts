@@ -191,6 +191,20 @@ export interface WaitlistSignal {
   (): NullableWaitlistSignal;
 }
 
+/**
+ * Signal names that can be retrieved via getSignal().
+ */
+export type SignalName = 'signIn' | 'signUp' | 'waitlist';
+
+/**
+ * Map of signal names to their return types.
+ */
+export interface SignalTypeMap {
+  signIn: SignInSignal;
+  signUp: SignUpSignal;
+  waitlist: WaitlistSignal;
+}
+
 export interface State {
   /**
    * A Signal that updates when the underlying `SignIn` resource changes, including errors.
@@ -206,6 +220,19 @@ export interface State {
    * A Signal that updates when the underlying `Waitlist` resource changes, including errors.
    */
   waitlistSignal: WaitlistSignal;
+
+  /**
+   * Get a signal by name. Enables dynamic signal lookup without switch statements.
+   *
+   * @param type - The signal name ('signIn', 'signUp', 'waitlist')
+   * @returns The computed signal for the given resource type
+   *
+   * @experimental This experimental API is subject to change.
+   */
+  getSignal(type: 'signIn'): SignInSignal | undefined;
+  getSignal(type: 'signUp'): SignUpSignal | undefined;
+  getSignal(type: 'waitlist'): WaitlistSignal | undefined;
+  getSignal(type: SignalName): SignInSignal | SignUpSignal | WaitlistSignal | undefined;
 
   /**
    * An alias for `effect()` from `alien-signals`, which can be used to subscribe to changes from Signals.

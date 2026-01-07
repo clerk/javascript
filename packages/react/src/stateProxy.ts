@@ -335,6 +335,23 @@ export class StateProxy implements State {
     };
   }
 
+  /**
+   * Get a signal by name. Enables dynamic signal lookup without switch statements.
+   * Returns the proxy signal for the given resource type.
+   */
+  getSignal(type: 'signIn' | 'signUp' | 'waitlist') {
+    switch (type) {
+      case 'signIn':
+        return this.signInSignal.bind(this);
+      case 'signUp':
+        return this.signUpSignal.bind(this);
+      case 'waitlist':
+        return this.waitlistSignal.bind(this);
+      default:
+        return undefined;
+    }
+  }
+
   __internal_effect(_: () => void): () => void {
     throw new Error('__internal_effect called before Clerk is loaded');
   }
