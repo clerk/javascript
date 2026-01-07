@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
-import { createFakeUserOrganizationMembership } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
+import {
+  createFakeUserOrganizationMembership,
+  createFakeUserOrganizationSuggestion,
+} from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
 
 import { TaskChooseOrganization } from '..';
 
@@ -265,6 +268,7 @@ describe('TaskChooseOrganization', () => {
         f.withForceOrganizationSelection();
         f.withUser({
           create_organization_enabled: false,
+          tasks: [{ key: 'choose-organization' }],
         });
       });
 
@@ -303,10 +307,10 @@ describe('TaskChooseOrganization', () => {
         }),
       );
 
-      const { findByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
+      const { findByText, queryByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
 
       expect(await findByText('Existing Org')).toBeInTheDocument();
-      expect(await findByText('Create new organization')).toBeInTheDocument();
+      expect(await queryByText('Create new organization')).not.toBeInTheDocument();
       expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
     });
   });
