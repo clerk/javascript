@@ -3,21 +3,6 @@ import * as l from '../../localizations';
 import type { Clerk as ClerkType } from '../';
 import * as scenarios from './scenarios';
 
-const AVAILABLE_LOCALES = Object.keys(l) as (keyof typeof l)[];
-
-function fillLocalizationSelect() {
-  const select = document.getElementById('localizationSelect') as HTMLSelectElement;
-
-  for (const locale of AVAILABLE_LOCALES) {
-    if (locale === 'enUS') {
-      select.add(new Option(locale, locale, true, true));
-      continue;
-    }
-
-    select.add(new Option(locale, locale));
-  }
-}
-
 interface ComponentPropsControl {
   setProps: (props: unknown) => void;
   getProps: () => any | null;
@@ -27,6 +12,10 @@ interface ScenarioControls {
   setScenario: (scenario: AvailableScenario | null) => void;
   availableScenarios: typeof AVAILABLE_SCENARIOS;
 }
+
+const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
+
+const AVAILABLE_LOCALES = Object.keys(l) as (keyof typeof l)[];
 
 const AVAILABLE_COMPONENTS = [
   'clerk', // While not a component, we want to support passing options to the Clerk class.
@@ -51,16 +40,16 @@ type AvailableComponent = (typeof AVAILABLE_COMPONENTS)[number];
 const AVAILABLE_SCENARIOS = Object.keys(scenarios) as (keyof typeof scenarios)[];
 type AvailableScenario = (typeof AVAILABLE_SCENARIOS)[number];
 
-const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
+function fillLocalizationSelect() {
+  const select = document.getElementById('localizationSelect') as HTMLSelectElement;
 
-const urlParams = new URL(window.location.href).searchParams;
-for (const [component, encodedProps] of urlParams.entries()) {
-  if (AVAILABLE_COMPONENTS.includes(component as AvailableComponent)) {
-    localStorage.setItem(`${COMPONENT_PROPS_NAMESPACE}-${component}`, encodedProps);
-  }
+  for (const locale of AVAILABLE_LOCALES) {
+    if (locale === 'enUS') {
+      select.add(new Option(locale, locale, true, true));
+      continue;
+    }
 
-  if (component === 'scenario' && AVAILABLE_SCENARIOS.includes(encodedProps as AvailableScenario)) {
-    localStorage.setItem(`${COMPONENT_PROPS_NAMESPACE}-scenario`, encodedProps);
+    select.add(new Option(locale, locale));
   }
 }
 
@@ -154,11 +143,19 @@ declare global {
   interface Window {
     components: Record<AvailableComponent, ComponentPropsControl>;
     scenario: typeof scenarioControls;
+    AVAILABLE_SCENARIOS: Record<AvailableScenario, AvailableScenario>;
   }
 }
 
 window.components = componentControls;
 window.scenario = scenarioControls;
+window.AVAILABLE_SCENARIOS = AVAILABLE_SCENARIOS.reduce(
+  (acc, scenario) => {
+    acc[scenario] = scenario;
+    return acc;
+  },
+  {} as Record<AvailableScenario, AvailableScenario>,
+);
 
 const Clerk = window.Clerk;
 function assertClerkIsLoaded(c: ClerkType | undefined): asserts c is ClerkType {
@@ -166,8 +163,6 @@ function assertClerkIsLoaded(c: ClerkType | undefined): asserts c is ClerkType {
     throw new Error('Clerk is not loaded');
   }
 }
-
-const app = document.getElementById('app') as HTMLDivElement;
 
 function mountIndex(element: HTMLDivElement) {
   assertClerkIsLoaded(Clerk);
@@ -316,6 +311,17 @@ function otherOptions() {
   return { updateOtherOptions };
 }
 
+const urlParams = new URL(window.location.href).searchParams;
+for (const [component, encodedProps] of urlParams.entries()) {
+  if (AVAILABLE_COMPONENTS.includes(component as AvailableComponent)) {
+    localStorage.setItem(`${COMPONENT_PROPS_NAMESPACE}-${component}`, encodedProps);
+  }
+
+  if (component === 'scenario' && AVAILABLE_SCENARIOS.includes(encodedProps as AvailableScenario)) {
+    localStorage.setItem(`${COMPONENT_PROPS_NAMESPACE}-scenario`, encodedProps);
+  }
+}
+
 void (async () => {
   assertClerkIsLoaded(Clerk);
   fillLocalizationSelect();
@@ -328,6 +334,8 @@ void (async () => {
       sidebars.forEach(s => s.classList.toggle('hidden'));
     }
   });
+
+  const app = document.getElementById('app') as HTMLDivElement;
 
   const routes = {
     '/': () => {
