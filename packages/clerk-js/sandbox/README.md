@@ -4,7 +4,7 @@ This folder contains a sandbox environment for iterating on the Clerk UI compone
 
 ## Running the sandbox
 
-You can start the sandbox by running `pnpm dev:sandbox` **in the root of the `javascript` repo**. This will start the server on <a href="http://localhost:4000><code>http://localhost:4000</code></a>. It will also run the development server for `@clerk/ui`.
+You can start the sandbox by running `pnpm dev:sandbox` **in the root of the `javascript` repo**. This will start the server on <a href="http://localhost:4000"><code>http://localhost:4000</code></a>. It will also run the development server for `@clerk/ui`.
 
 ## Setting component props
 
