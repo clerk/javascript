@@ -461,8 +461,15 @@ export const authenticateRequest: AuthenticateRequest = (async (
         }
       }
     }
+
+    // Only trigger satellite sync handshake if we don't have session cookies.
+    // If we have cookies, the client is already linked - fall through to normal
+    // verification flow which can leverage the refresh flow for expired tokens
+    // instead of requiring a full multi-domain handshake.
+    const isLinked = authenticateContext.clientUat && authenticateContext.sessionTokenInCookie;
+
     const isRequestEligibleForMultiDomainSync =
-      authenticateContext.isSatellite && authenticateContext.secFetchDest === 'document';
+      authenticateContext.isSatellite && authenticateContext.secFetchDest === 'document' && !isLinked;
 
     /**
      * Begin multi-domain sync flows
