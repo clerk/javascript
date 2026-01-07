@@ -6,12 +6,13 @@ export { MockingController } from './MockingController';
 export { MockingProvider, useMockingContext } from './MockingProvider';
 export { MockingStatusIndicator } from './MockingStatusIndicator';
 export { OrganizationService } from './OrganizationService';
+export type { PageMockConfig, PageMockingCallbacks, PageMockingState } from './PageMocking';
+export { PageMocking } from './PageMocking';
 export { SessionService } from './SessionService';
 export { SignInService } from './SignInService';
 export { SignUpService } from './SignUpService';
 export type { MockScenario } from './types';
 export { UserService } from './UserService';
-export type { PageMockConfig } from './usePageMocking';
 export { usePageMocking } from './usePageMocking';
 
 export { http, HttpResponse } from 'msw';
