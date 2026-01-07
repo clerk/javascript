@@ -26,6 +26,11 @@
       "inputs": ["sandbox/**"],
       "outputs": ["dist/**"]
     },
+    "dev:sandbox": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "persistent": true
+    },
     "test": {
       "inputs": [
         "*.d.ts",
