@@ -10,7 +10,7 @@ import { createTestUtils } from '../../testUtils';
 test.describe('Custom Flows Waitlist @custom', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
-  let fakeEmail: string;
+  const fakeEmails: string[] = [];
 
   test.beforeAll(async () => {
     app = await appConfigs.customFlows.reactVite.clone().commit();
@@ -31,17 +31,18 @@ test.describe('Custom Flows Waitlist @custom', () => {
       apiUrl,
       dotenv: false,
     });
-
-    fakeEmail = `${hash()}+clerk_test@clerkcookie.com`;
   });
 
   test.afterAll(async () => {
     const u = createTestUtils({ app });
-    await u.services.waitlist.clearWaitlistByEmail(fakeEmail);
+    await Promise.all(fakeEmails.map(email => u.services.waitlist.clearWaitlistByEmail(email)));
     await app.teardown();
   });
 
   test('can join waitlist with email', async ({ page, context }) => {
+    const fakeEmail = `${hash()}+clerk_test@clerkcookie.com`;
+    fakeEmails.push(fakeEmail);
+
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/waitlist');
     await u.page.waitForClerkJsLoaded();
@@ -73,6 +74,9 @@ test.describe('Custom Flows Waitlist @custom', () => {
   });
 
   test('displays loading state while joining', async ({ page, context }) => {
+    const fakeEmail = `${hash()}+clerk_test@clerkcookie.com`;
+    fakeEmails.push(fakeEmail);
+
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/waitlist');
     await u.page.waitForClerkJsLoaded();
