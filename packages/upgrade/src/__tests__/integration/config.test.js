@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getOldPackageName, getTargetPackageName, loadConfig } from '../../config.js';
+import { getAvailableReleases, getOldPackageName, getTargetPackageName, loadConfig } from '../../config.js';
 
 describe('loadConfig', () => {
   it('returns config with needsUpgrade: true for nextjs v6', async () => {
@@ -126,5 +126,48 @@ describe('getOldPackageName', () => {
 
   it('returns null for nextjs sdk (no rename)', () => {
     expect(getOldPackageName('nextjs')).toBeNull();
+  });
+});
+
+describe('getAvailableReleases', () => {
+  it('returns an array of available releases', () => {
+    const releases = getAvailableReleases();
+
+    expect(Array.isArray(releases)).toBe(true);
+    expect(releases.length).toBeGreaterThan(0);
+  });
+
+  it('includes core-3 release', () => {
+    const releases = getAvailableReleases();
+
+    expect(releases).toContain('core-3');
+  });
+
+  it('includes core-2 release', () => {
+    const releases = getAvailableReleases();
+
+    expect(releases).toContain('core-2');
+  });
+
+  it('returns releases in reverse order (newest first)', () => {
+    const releases = getAvailableReleases();
+
+    expect(releases[0]).toBe('core-3');
+    expect(releases[1]).toBe('core-2');
+  });
+});
+
+describe('loadConfig with null version', () => {
+  it('returns config when release is explicitly provided', async () => {
+    const config = await loadConfig('nextjs', null, 'core-3');
+
+    expect(config).not.toBeNull();
+    expect(config.id).toBe('core-3');
+  });
+
+  it('returns null when no release is provided and version is null', async () => {
+    const config = await loadConfig('nextjs', null);
+
+    expect(config).toBeNull();
   });
 });
