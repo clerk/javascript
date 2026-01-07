@@ -105,13 +105,13 @@ export function useAPIKeys<T extends UseAPIKeysParams>(params?: T): UseAPIKeysRe
       keepPreviousData: safeValues.keepPreviousData,
       infinite: safeValues.infinite,
       enabled: isEnabled,
-      isSignedIn: Boolean(clerk.user),
+      isSignedIn: clerk.user !== null,
       initialPage: safeValues.initialPage,
       pageSize: safeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.API_KEYS_KEY,
-      authenticated: Boolean(clerk.user),
+      authenticated: true,
       tracked: {
         subject: safeValues.subject,
       },
