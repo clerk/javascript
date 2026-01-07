@@ -88,6 +88,7 @@ export class State implements StateInterface {
     }
 
     if (payload.resource instanceof Waitlist) {
+      this._waitlistInstance = payload.resource;
       this.waitlistResourceSignal({ resource: payload.resource });
     }
   };
