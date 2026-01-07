@@ -308,6 +308,57 @@ describe('OrganizationSwitcher', () => {
       expect(queryByText('Create organization')).not.toBeInTheDocument();
     });
 
+    it('does not allow creating organization if max allowed memberships is reached', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withMaxAllowedMemberships({ max: 1 });
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          create_organization_enabled: true,
+          organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+        });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { queryByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
+      expect(queryByText('Create organization')).not.toBeInTheDocument();
+    });
+
+    it('does allow creating organization if max allowed memberships is not reached', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withMaxAllowedMemberships({ max: 2 });
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          create_organization_enabled: true,
+          organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+        });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { queryByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
+      expect(queryByText('Create organization')).toBeInTheDocument();
+    });
+
+    it('does allow creating organization if max allowed memberships is unlimited', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withMaxAllowedMemberships({ max: 0 });
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          create_organization_enabled: true,
+          organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+        });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { queryByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
+      expect(queryByText('Create organization')).toBeInTheDocument();
+    });
+
     it.each([
       ['Admin', 'admin'],
       ['Member', 'basic_member'],
