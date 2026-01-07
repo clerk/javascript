@@ -20,3 +20,5 @@ export {
 } from './contexts';
 
 export * from './billing/payment-element';
+
+export { buildResourceProxy, type BuildResourceProxyOptions } from './stateProxyFactory';

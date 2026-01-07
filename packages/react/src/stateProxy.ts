@@ -1,4 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
+import { buildResourceProxy } from '@clerk/shared/react';
+import { waitlistSchema } from '@clerk/shared/resourceSchemas';
 import type {
   BillingSubscriptionPlanPeriod,
   CheckoutSignalValue,
@@ -7,8 +9,7 @@ import type {
   SignInErrors,
   SignUpErrors,
   State,
-  WaitlistErrors,
-  WaitlistResource,
+  WaitlistSignalValue,
 } from '@clerk/shared/types';
 
 import { errorThrower } from './errors/errorThrower';
@@ -35,14 +36,6 @@ const defaultSignUpErrors = (): SignUpErrors => ({
     code: null,
     captcha: null,
     legalAccepted: null,
-  },
-  raw: null,
-  global: null,
-});
-
-const defaultWaitlistErrors = (): WaitlistErrors => ({
-  fields: {
-    emailAddress: null,
   },
   raw: null,
   global: null,
@@ -277,32 +270,13 @@ export class StateProxy implements State {
     };
   }
 
-  private buildWaitlistProxy() {
-    const gateProperty = this.gateProperty.bind(this);
-    const gateMethod = this.gateMethod.bind(this);
-    const target = (): WaitlistResource => {
-      return this.state.__internal_waitlist;
-    };
-
-    return {
-      errors: defaultWaitlistErrors(),
-      fetchStatus: 'idle' as const,
-      waitlist: {
-        pathRoot: '/waitlist',
-        get id() {
-          return gateProperty(target, 'id', '');
-        },
-        get createdAt() {
-          return gateProperty(target, 'createdAt', null);
-        },
-        get updatedAt() {
-          return gateProperty(target, 'updatedAt', null);
-        },
-
-        join: gateMethod(target, 'join'),
-        reload: gateMethod(target, 'reload'),
-      },
-    };
+  private buildWaitlistProxy(): WaitlistSignalValue {
+    return buildResourceProxy({
+      schema: waitlistSchema,
+      getTarget: () => this.state.__internal_waitlist,
+      errorThrower,
+      clerk: this.isomorphicClerk as unknown as Parameters<typeof buildResourceProxy>[0]['clerk'],
+    }) as WaitlistSignalValue;
   }
 
   private buildCheckoutProxy(params: CheckoutSignalProps): CheckoutSignalValue {
