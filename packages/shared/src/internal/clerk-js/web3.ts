@@ -149,12 +149,19 @@ export function createWeb3(moduleManager: ModuleManager) {
         return null;
       }
       const sdk = coinbaseModule.createCoinbaseWalletSDK({
+        appName:
+          (typeof window !== 'undefined' &&
+            // @ts-expect-error missing types
+            (window.Clerk as any)?.__internal_environment?.displayConfig?.applicationName) ||
+          (typeof document !== 'undefined' && document.title) ||
+          'Web3 Application',
         preference: {
           options: 'all',
         },
       });
       return sdk.getProvider();
     }
+
     if (provider === 'base') {
       if (__BUILD_DISABLE_RHC__) {
         clerkUnsupportedEnvironmentWarning('Base');
