@@ -403,6 +403,13 @@ export const ptBR: LocalizationResource = {
         headerTitle__members: 'Membros',
         headerTitle__requests: 'Solicitações',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'As funções estão temporariamente bloqueadas',
+          subtitle:
+            'Estamos atualizando as funções disponíveis. Assim que isso for concluído, você poderá atualizar as funções novamente.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'Chaves de API',

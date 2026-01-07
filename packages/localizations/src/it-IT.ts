@@ -403,6 +403,13 @@ export const itIT: LocalizationResource = {
         headerTitle__members: 'Membri',
         headerTitle__requests: 'Richieste',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'I ruoli sono temporaneamente bloccati',
+          subtitle:
+            'Stiamo aggiornando i ruoli disponibili. Una volta completato, potrai aggiornare nuovamente i ruoli.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'Chiavi API',

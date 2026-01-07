@@ -397,6 +397,13 @@ export const hiIN: LocalizationResource = {
         headerTitle__members: 'सदस्य',
         headerTitle__requests: 'अनुरोध',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'भूमिकाएं अस्थायी रूप से लॉक हैं',
+          subtitle:
+            'हम उपलब्ध भूमिकाओं को अपडेट कर रहे हैं। एक बार यह हो जाने के बाद, आप फिर से भूमिकाएं अपडेट कर सकेंगे।',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
