@@ -47,7 +47,7 @@ function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOp
 
   const checkoutInstance = CheckoutSignalCache.get(checkoutKey);
   if (checkoutInstance) {
-    return checkoutInstance.signals.computedSignal() as CheckoutSignalValue;
+    return checkoutInstance.signals.computedSignal() as unknown as CheckoutSignalValue;
   }
 
   const signals = createSignals();
@@ -59,7 +59,7 @@ function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOp
   });
 
   CheckoutSignalCache.set(checkoutKey, { resource: checkout, signals });
-  return signals.computedSignal() as CheckoutSignalValue;
+  return signals.computedSignal() as unknown as CheckoutSignalValue;
 }
 
 export { createCheckoutInstance };

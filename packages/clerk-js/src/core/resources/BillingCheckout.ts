@@ -1,5 +1,6 @@
 import type { ClerkError } from '@clerk/shared/error';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { checkoutSchema } from '@clerk/shared/resourceSchemas';
 import { retry } from '@clerk/shared/retry';
 import type {
   BillingCheckoutJSON,
@@ -9,19 +10,17 @@ import type {
   BillingPaymentMethodResource,
   BillingSubscriptionPlanPeriod,
   CheckoutFlowFinalizeParams,
-  CheckoutFlowResource,
   CheckoutFlowResourceNonStrict,
-  CheckoutSignalValue,
   ConfirmCheckoutParams,
   CreateCheckoutParams,
 } from '@clerk/shared/types';
-import { computed, endBatch, signal, startBatch } from 'alien-signals';
+import { endBatch, startBatch } from 'alien-signals';
 
 import { unixEpochToDate } from '@/utils/date';
 
 import { billingTotalsFromJSON } from '../../utils';
 import { Billing } from '../modules/billing/namespace';
-import { errorsToParsedErrors } from '../signals';
+import { createResourceSignals } from '../signalFactory';
 import { BillingPayer } from './BillingPayer';
 import { BaseResource, BillingPaymentMethod, BillingPlan } from './internal';
 
@@ -100,21 +99,15 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
   };
 }
 
+/**
+ * Creates signals for the Checkout resource using the shared factory.
+ */
 export const createSignals = () => {
-  const resourceSignal = signal<{ resource: CheckoutFlow | null }>({ resource: null });
-  const errorSignal = signal<{ error: ClerkError | null }>({ error: null });
-  const fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
-  const computedSignal = computed<Omit<CheckoutSignalValue, 'checkout'> & { checkout: CheckoutFlowResource | null }>(
-    () => {
-      const resource = resourceSignal().resource;
-      const error = errorSignal().error;
-      const fetchStatus = fetchSignal().status;
-      const errors = errorsToParsedErrors(error, {});
-      return { errors: errors, fetchStatus, checkout: resource };
-    },
-  );
-
-  return { resourceSignal, errorSignal, fetchSignal, computedSignal };
+  return createResourceSignals<CheckoutFlow, typeof checkoutSchema.errorFields>({
+    name: checkoutSchema.name,
+    errorFields: checkoutSchema.errorFields,
+    // Checkout doesn't need transformation, the CheckoutFlow is already the public resource
+  });
 };
 
 type CheckoutTask = 'start' | 'confirm' | 'finalize';

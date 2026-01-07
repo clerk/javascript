@@ -100,6 +100,16 @@
         "default": "./dist/types/index.js"
       }
     },
+    "./resourceSchemas": {
+      "import": {
+        "types": "./dist/runtime/resourceSchemas/index.d.mts",
+        "default": "./dist/runtime/resourceSchemas/index.mjs"
+      },
+      "require": {
+        "types": "./dist/runtime/resourceSchemas/index.d.ts",
+        "default": "./dist/runtime/resourceSchemas/index.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "files": [
