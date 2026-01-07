@@ -397,6 +397,12 @@ export const bnIN: LocalizationResource = {
         headerTitle__members: 'সদস্য',
         headerTitle__requests: 'অনুরোধ',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'ভূমিকাগুলি সাময়িকভাবে লক করা আছে',
+          subtitle: 'আমরা উপলব্ধ ভূমিকাগুলি আপডেট করছি। এটি সম্পন্ন হলে, আপনি আবার ভূমিকা আপডেট করতে পারবেন।',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

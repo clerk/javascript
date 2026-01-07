@@ -395,6 +395,12 @@ export const ukUA: LocalizationResource = {
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Ролі тимчасово заблоковані',
+          subtitle: 'Ми оновлюємо доступні ролі. Коли це буде зроблено, ви зможете знову оновлювати ролі.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

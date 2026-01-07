@@ -17,6 +17,8 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
     return null;
   }
 
+  const textColorScheme = variant === 'danger' ? 'danger' : variant === 'warning' ? 'warning' : 'secondary';
+
   return (
     <AlertCust
       elementDescriptor={descriptors.alert}
@@ -37,14 +39,14 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
         elementDescriptor={descriptors.alertTextContainer}
         elementId={descriptors.alertTextContainer.setId(variant)}
         gap={1}
+        sx={{ textAlign: 'left' }}
       >
         <Text
           elementDescriptor={descriptors.alertText}
           elementId={descriptors.alert.setId(variant)}
-          colorScheme={variant === 'danger' ? 'danger' : variant === 'warning' ? 'warning' : 'secondary'}
-          variant='body'
+          colorScheme={textColorScheme}
+          variant={subtitle ? 'h3' : 'body'}
           localizationKey={title}
-          sx={{ textAlign: 'left' }}
         >
           {children}
         </Text>
@@ -52,7 +54,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
           <Text
             elementDescriptor={descriptors.alertText}
             elementId={descriptors.alert.setId(variant)}
-            colorScheme={variant === 'danger' ? 'danger' : 'secondary'}
+            colorScheme={textColorScheme}
             variant='body'
             localizationKey={subtitle}
           />

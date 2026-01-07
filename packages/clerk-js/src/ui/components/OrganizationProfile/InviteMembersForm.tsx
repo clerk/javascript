@@ -199,7 +199,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
 };
 
 const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
-  const { options, isLoading } = useFetchRoles();
+  const { options, isLoading, hasRoleSetMigration } = useFetchRoles();
 
   const { t } = useLocalizations();
 
@@ -212,7 +212,7 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
         <RoleSelect
           {...field.props}
           roles={options}
-          isDisabled={isLoading}
+          isDisabled={isLoading || hasRoleSetMigration}
           onChange={value => field.setValue(value)}
           triggerSx={t => ({ minWidth: t.sizes.$40, justifyContent: 'space-between', display: 'flex' })}
           optionListSx={t => ({ minWidth: t.sizes.$48 })}

@@ -401,6 +401,12 @@ export const csCZ: LocalizationResource = {
         headerTitle__members: 'Členové',
         headerTitle__requests: 'Žádosti',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Role jsou dočasně uzamčeny',
+          subtitle: 'Aktualizujeme dostupné role. Jakmile to bude hotové, budete moci role opět aktualizovat.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'API klíče',

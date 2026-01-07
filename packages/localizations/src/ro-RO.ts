@@ -403,6 +403,13 @@ export const roRO: LocalizationResource = {
         headerTitle__members: 'Membri',
         headerTitle__requests: 'Ceri de acces',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Rolurile sunt temporar blocate',
+          subtitle:
+            'Actualizăm rolurile disponibile. Odată ce acest lucru este finalizat, veți putea actualiza din nou rolurile.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'Chei API',

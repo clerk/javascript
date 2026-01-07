@@ -95,11 +95,18 @@ export class Organization extends BaseResource implements OrganizationResource {
         forceUpdateClient: true,
       },
     ).then(res => {
-      const { data: roles, total_count } = res?.response as unknown as ClerkPaginatedResponse<RoleJSON>;
+      const {
+        data: roles,
+        total_count,
+        has_role_set_migration,
+      } = res?.response as unknown as ClerkPaginatedResponse<RoleJSON> & {
+        has_role_set_migration?: boolean;
+      };
 
       return {
         total_count,
         data: roles.map(role => new Role(role)),
+        has_role_set_migration,
       };
     });
   };

@@ -387,6 +387,12 @@ export const enUS: LocalizationResource = {
         tableHeader__requested: 'Requested access',
         table__emptyRow: 'No requests to display',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roles are temporarily locked',
+          subtitle: "We are updating the available roles. Once that's done, you'll be able to update roles again.",
+        },
+      },
       start: {
         headerTitle__invitations: 'Invitations',
         headerTitle__members: 'Members',

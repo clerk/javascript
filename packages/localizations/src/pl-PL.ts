@@ -395,6 +395,12 @@ export const plPL: LocalizationResource = {
         headerTitle__members: 'Członkowie',
         headerTitle__requests: 'Prośby',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Role są tymczasowo zablokowane',
+          subtitle: 'Aktualizujemy dostępne role. Po zakończeniu będziesz mógł ponownie aktualizować role.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

@@ -395,6 +395,12 @@ export const svSE: LocalizationResource = {
         headerTitle__members: 'Medlemmar',
         headerTitle__requests: 'Förfrågningar',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roller är tillfälligt låsta',
+          subtitle: 'Vi uppdaterar tillgängliga roller. När det är klart kommer du att kunna uppdatera roller igen.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,

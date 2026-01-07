@@ -1,5 +1,19 @@
 # Change Log
 
+## 5.118.0
+
+### Minor Changes
+
+- Disable role selection in `OrganizationProfile` during role set migration ([#7541](https://github.com/clerk/javascript/pull/7541)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Add `data-variant` and `data-color` attributes to the Text component. ([#7535](https://github.com/clerk/javascript/pull/7535)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`a4e6932`](https://github.com/clerk/javascript/commit/a4e693262f734bfd3ab08ffac019168c874c2bd8)]:
+  - @clerk/localizations@3.33.0
+  - @clerk/shared@3.42.0
+
 ## 5.117.0
 
 ### Minor Changes

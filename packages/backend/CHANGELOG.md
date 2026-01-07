@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.29.1
+
+### Patch Changes
+
+- Move cookie to devDependencies and bundle it within @clerk/backend to fix module compatibility problems in TanStack Start apps. ([#7545](https://github.com/clerk/javascript/pull/7545)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`a4e6932`](https://github.com/clerk/javascript/commit/a4e693262f734bfd3ab08ffac019168c874c2bd8)]:
+  - @clerk/shared@3.42.0
+  - @clerk/types@4.101.10
+
 ## 2.29.0
 
 ### Minor Changes
