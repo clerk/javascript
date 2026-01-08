@@ -481,8 +481,8 @@ importers:
         specifier: catalog:repo
         version: 0.5.17
       '@tanstack/query-core':
-        specifier: 5.87.4
-        version: 5.87.4
+        specifier: 5.90.16
+        version: 5.90.16
       '@wallet-standard/core':
         specifier: catalog:module-manager
         version: 1.1.1
@@ -834,6 +834,9 @@ importers:
 
   packages/shared:
     dependencies:
+      '@tanstack/query-core':
+        specifier: 5.90.16
+        version: 5.90.16
       dequal:
         specifier: 2.0.3
         version: 2.0.3
@@ -852,9 +855,6 @@ importers:
       std-env:
         specifier: ^3.9.0
         version: 3.10.0
-      swr:
-        specifier: 2.3.4
-        version: 2.3.4(react@18.3.1)
     devDependencies:
       '@base-org/account':
         specifier: catalog:module-manager
@@ -877,9 +877,6 @@ importers:
       '@stripe/stripe-js':
         specifier: 5.6.0
         version: 5.6.0
-      '@tanstack/query-core':
-        specifier: 5.87.4
-        version: 5.87.4
       '@types/glob-to-regexp':
         specifier: 0.4.4
         version: 0.4.4
@@ -1008,9 +1005,6 @@ importers:
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
-      swr:
-        specifier: 2.3.4
-        version: 2.3.4(react@18.3.1)
     devDependencies:
       '@floating-ui/react-dom':
         specifier: ^2.1.6
@@ -4915,8 +4909,8 @@ packages:
     resolution: {integrity: sha512-GG2R9I6QSlbNR9fEuX2sQCigY6K28w51h2634TWmkaHXlzQw+rWuIWr4nAGM9doA+kWRi1LFSFMvAiG3cOqjXQ==}
     engines: {node: '>=12'}
 
-  '@tanstack/query-core@5.87.4':
-    resolution: {integrity: sha512-uNsg6zMxraEPDVO2Bn+F3/ctHi+Zsk+MMpcN8h6P7ozqD088F6mFY5TfGM7zuyIrL7HKpDyu6QHfLWiDxh3cuw==}
+  '@tanstack/query-core@5.90.16':
+    resolution: {integrity: sha512-MvtWckSVufs/ja463/K4PyJeqT+HMlJWtw6PrCpywznd2NSgO3m4KwO9RqbFqGg6iDE8vVMFWMeQI4Io3eEYww==}
 
   '@tanstack/react-router@1.132.0':
     resolution: {integrity: sha512-tGNmQrFc4zWQZvjqYnC8ib84H/9QokRl73hr0P2XlxCY2KAgPTk2QjdzW03LqXgQZRXg7++vKznJt4LS9/M3iA==}
@@ -14908,10 +14902,12 @@ packages:
   whatwg-encoding@2.0.0:
     resolution: {integrity: sha512-p41ogyeMUrw3jWclHWTQg1k05DSVXPLcVxRTYsXUk+ZooOCZLcoYgPZ/HL/D/N+uQPOtcp1me1WhBEaX02mhWg==}
     engines: {node: '>=12'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-fetch@3.6.20:
     resolution: {integrity: sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==}
@@ -20416,7 +20412,7 @@ snapshots:
 
   '@tanstack/history@1.132.0': {}
 
-  '@tanstack/query-core@5.87.4': {}
+  '@tanstack/query-core@5.90.16': {}
 
   '@tanstack/react-router@1.132.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
