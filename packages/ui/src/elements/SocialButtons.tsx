@@ -12,9 +12,9 @@ import {
   Flex,
   Grid,
   Icon,
-  Image,
   localizationKeys,
   SimpleButton,
+  Span,
   Spinner,
   Text,
   useAppearance,
@@ -30,6 +30,7 @@ import { distributeStrategiesIntoRows } from './utils';
 const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
 const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
 const MAX_STRATEGIES_PER_ROW = 5;
+const SUPPORTS_MASK_IMAGE = ['apple', 'github', 'okx_wallet', 'vercel'];
 
 export type SocialButtonsProps = React.PropsWithChildren<{
   enableOAuthProviders: boolean;
@@ -189,14 +190,35 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 });
 
             const imageOrInitial = strategyToDisplayData[strategy].iconUrl ? (
-              <Image
+              <Span
                 elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
                 elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
-                isLoading={card.loadingMetadata === strategy}
-                isDisabled={card.isLoading}
-                src={strategyToDisplayData[strategy].iconUrl}
-                alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
-                sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
+                aria-label={`Sign in with ${strategyToDisplayData[strategy].name}`}
+                sx={theme => ({
+                  display: 'inline-block',
+                  width: theme.sizes.$4,
+                  height: theme.sizes.$4,
+                  maxWidth: '100%',
+                  ...(SUPPORTS_MASK_IMAGE.includes(strategyToDisplayData[strategy].id)
+                    ? {
+                        '--cl-icon-fill': theme.colors.$colorForeground,
+                        backgroundColor: 'var(--cl-icon-fill)',
+                        maskImage: `url(${strategyToDisplayData[strategy].iconUrl})`,
+                        maskSize: 'cover',
+                        maskPosition: 'center',
+                        maskRepeat: 'no-repeat',
+                        WebkitMaskImage: `url(${strategyToDisplayData[strategy].iconUrl})`,
+                        WebkitMaskSize: 'cover',
+                        WebkitMaskPosition: 'center',
+                        WebkitMaskRepeat: 'no-repeat',
+                      }
+                    : {
+                        backgroundImage: `url(${strategyToDisplayData[strategy].iconUrl})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                      }),
+                })}
               />
             ) : (
               <ProviderInitialIcon
