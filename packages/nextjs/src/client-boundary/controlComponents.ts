@@ -12,9 +12,6 @@ export {
   RedirectToSignUp,
   RedirectToTasks,
   RedirectToUserProfile,
-  AuthenticateWithRedirectCallback,
-  RedirectToCreateOrganization,
-  RedirectToOrganizationProfile,
   UNSAFE_PortalProvider,
   Show,
 } from '@clerk/react';
