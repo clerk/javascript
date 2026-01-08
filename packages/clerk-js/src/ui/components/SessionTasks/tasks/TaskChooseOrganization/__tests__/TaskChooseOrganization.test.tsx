@@ -255,11 +255,11 @@ describe('TaskChooseOrganization', () => {
         });
       });
 
-      const { queryByText } = render(<TaskChooseOrganization />, { wrapper });
+      const { findByText, queryByText } = render(<TaskChooseOrganization />, { wrapper });
 
+      expect(await findByText(/you must belong to an organization/i)).toBeInTheDocument();
+      expect(await findByText(/contact your organization admin for an invitation/i)).toBeInTheDocument();
       expect(queryByText(/create new organization/i)).not.toBeInTheDocument();
-      expect(queryByText(/you must belong to an organization/i)).toBeInTheDocument();
-      expect(queryByText(/contact your organization admin for an invitation/i)).toBeInTheDocument();
     });
 
     it('with existing memberships or suggestions, displays create organization screen', async () => {
@@ -307,11 +307,11 @@ describe('TaskChooseOrganization', () => {
         }),
       );
 
-      const { findByText, queryByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
+      const { findByText, queryByText } = render(<TaskChooseOrganization />, { wrapper });
 
-      expect(await findByText('Existing Org')).toBeInTheDocument();
+      expect(await findByText('Join an existing organization')).toBeInTheDocument();
       expect(await queryByText('Create new organization')).not.toBeInTheDocument();
-      expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
+      expect(await findByText('Existing Org')).toBeInTheDocument();
     });
   });
 });

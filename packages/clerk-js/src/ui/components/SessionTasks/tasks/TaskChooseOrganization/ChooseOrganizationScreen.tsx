@@ -33,6 +33,7 @@ type ChooseOrganizationScreenProps = {
 
 export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) => {
   const card = useCardState();
+  const { user } = useUser();
   const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
@@ -50,7 +51,13 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
         sx={t => ({ padding: `${t.space.$none} ${t.space.$8}` })}
       >
         <Header.Title localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.title')} />
-        <Header.Subtitle localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.subtitle')} />
+        <Header.Subtitle
+          localizationKey={
+            user?.createOrganizationEnabled
+              ? localizationKeys('taskChooseOrganization.chooseOrganization.subtitle')
+              : localizationKeys('taskChooseOrganization.chooseOrganization.subtitle__createOrganizationDisabled')
+          }
+        />
       </Header.Root>
       <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$8}` })}>{card.error}</Card.Alert>
       <Col elementDescriptor={descriptors.main}>

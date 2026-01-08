@@ -1304,6 +1304,7 @@ export type __internal_LocalizationResource = {
     chooseOrganization: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      subtitle__createOrganizationDisabled: LocalizationValue;
       suggestionsAcceptedLabel: LocalizationValue;
       action__suggestionsAccept: LocalizationValue;
       action__createOrganization: LocalizationValue;
