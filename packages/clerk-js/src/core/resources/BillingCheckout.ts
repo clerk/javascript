@@ -15,13 +15,13 @@ import type {
   ConfirmCheckoutParams,
   CreateCheckoutParams,
 } from '@clerk/shared/types';
-import { computed, endBatch, signal, startBatch } from 'alien-signals';
+import { endBatch, startBatch } from 'alien-signals';
 
 import { unixEpochToDate } from '@/utils/date';
 
 import { billingTotalsFromJSON } from '../../utils';
 import { Billing } from '../modules/billing/namespace';
-import { errorsToParsedErrors } from '../state';
+import { createResourceSignals, type ResourceSignals } from '../signalFactory';
 import { BillingPayer } from './BillingPayer';
 import { BaseResource, BillingPaymentMethod, BillingPlan } from './internal';
 
@@ -103,36 +103,19 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
 /**
  * Checkout signal set type for use in CheckoutFlow.
  */
-interface CheckoutSignals {
-  resourceSignal: ReturnType<typeof signal<{ resource: CheckoutFlow | null }>>;
-  errorSignal: ReturnType<typeof signal<{ error: ClerkError | null }>>;
-  fetchSignal: ReturnType<typeof signal<{ status: 'idle' | 'fetching' }>>;
+type CheckoutSignals = ResourceSignals<CheckoutFlow> & {
   computedSignal: () => CheckoutSignalValue;
-}
+};
 
 /**
  * Creates signals for the Checkout resource.
- * Checkout is a "keyed" resource with its own lifecycle, so signals are created inline.
+ * Uses shared factory - Checkout is a "keyed" resource with its own lifecycle.
  */
 export const createSignals = (): CheckoutSignals => {
-  const resourceSignal = signal<{ resource: CheckoutFlow | null }>({ resource: null });
-  const errorSignal = signal<{ error: ClerkError | null }>({ error: null });
-  const fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
-
-  const computedSignal = computed(() => {
-    const resource = resourceSignal().resource;
-    const error = errorSignal().error;
-    const fetchStatus = fetchSignal().status;
-    const errors = errorsToParsedErrors(error, checkoutSchema.errorFields);
-
-    return {
-      errors,
-      fetchStatus,
-      checkout: resource,
-    } as CheckoutSignalValue;
-  });
-
-  return { resourceSignal, errorSignal, fetchSignal, computedSignal };
+  return createResourceSignals<CheckoutFlow>({
+    name: checkoutSchema.name,
+    errorFields: checkoutSchema.errorFields,
+  }) as CheckoutSignals;
 };
 
 type CheckoutTask = 'start' | 'confirm' | 'finalize';

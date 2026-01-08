@@ -3,7 +3,7 @@ import { createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shar
 import { signInSchema, signUpSchema, waitlistSchema } from '@clerk/shared/resourceSchemas';
 import type { Errors, SignInSignal, SignUpSignal, State as StateInterface, WaitlistSignal } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
-import { computed, effect, signal } from 'alien-signals';
+import { computed, effect } from 'alien-signals';
 
 import { eventBus } from './events';
 import type { BaseResource } from './resources/Base';
@@ -11,17 +11,13 @@ import type { SignIn } from './resources/SignIn';
 import type { SignUp } from './resources/SignUp';
 import { Waitlist } from './resources/Waitlist';
 import { RESOURCE_TYPE, type SignalBackedResource } from './resourceType';
+import { createResourceSignals, type CreateSignalsConfig, type ResourceSignals } from './signalFactory';
 
 /**
- * Configuration for registering a signal-backed resource.
+ * Configuration for registering a signal-backed resource in State.
+ * Extends CreateSignalsConfig with State-specific options.
  */
-interface ResourceConfig {
-  /** Resource type name (e.g., 'signIn', 'signUp', 'waitlist') */
-  name: string;
-  /** Error fields from schema for error parsing (any object shape) */
-  errorFields: object;
-  /** Transform resource before exposing in computed signal (e.g., extract __internal_future) */
-  getPublicResource?: (resource: unknown) => unknown;
+interface StateResourceConfig extends CreateSignalsConfig {
   /** If true, ignore null updates when hasBeenFinalized is false (for client-based resources) */
   ignoreNullWhenNotFinalized?: boolean;
 }
@@ -29,12 +25,8 @@ interface ResourceConfig {
 /**
  * Registry entry for a signal-backed resource.
  */
-interface ResourceRegistration {
-  resourceSignal: ReturnType<typeof signal<{ resource: unknown }>>;
-  errorSignal: ReturnType<typeof signal<{ error: ClerkError | null }>>;
-  fetchSignal: ReturnType<typeof signal<{ status: 'idle' | 'fetching' }>>;
-  computedSignal: () => unknown;
-  config: ResourceConfig;
+interface ResourceRegistration extends ResourceSignals {
+  config: StateResourceConfig;
 }
 
 export class State implements StateInterface {
@@ -51,14 +43,14 @@ export class State implements StateInterface {
     this.registerResource({
       name: signInSchema.name,
       errorFields: signInSchema.errorFields,
-      getPublicResource: (resource) => (resource as SignIn).__internal_future,
+      getPublicResource: resource => (resource as SignIn).__internal_future,
       ignoreNullWhenNotFinalized: true,
     });
 
     this.registerResource({
       name: signUpSchema.name,
       errorFields: signUpSchema.errorFields,
-      getPublicResource: (resource) => (resource as SignUp).__internal_future,
+      getPublicResource: resource => (resource as SignUp).__internal_future,
       ignoreNullWhenNotFinalized: true,
     });
 
@@ -80,77 +72,11 @@ export class State implements StateInterface {
 
   /**
    * Register a new signal-backed resource.
-   * Creates signals and computed signal from config.
+   * Uses shared factory to create signals.
    */
-  private registerResource(config: ResourceConfig): void {
-    const resourceSignal = signal<{ resource: unknown }>({ resource: null });
-    const errorSignal = signal<{ error: ClerkError | null }>({ error: null });
-    const fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
-
-    const computedSignal = computed(() => {
-      const resource = resourceSignal().resource;
-      const error = errorSignal().error;
-      const fetchStatus = fetchSignal().status;
-
-      const errors = errorsToParsedErrors(error, config.errorFields as Record<string, unknown>);
-      const publicResource = resource ? (config.getPublicResource?.(resource) ?? resource) : null;
-
-      return {
-        errors,
-        fetchStatus,
-        [config.name]: publicResource,
-      };
-    });
-
-    this.registry.set(config.name, {
-      resourceSignal,
-      errorSignal,
-      fetchSignal,
-      computedSignal,
-      config,
-    });
-  }
-
-  // Backward compatibility: expose signals as public properties
-  // These getters dynamically retrieve from the registry
-
-  get signInResourceSignal() {
-    return this.registry.get('signIn')!.resourceSignal;
-  }
-  get signInErrorSignal() {
-    return this.registry.get('signIn')!.errorSignal;
-  }
-  get signInFetchSignal() {
-    return this.registry.get('signIn')!.fetchSignal;
-  }
-  get signInSignal(): SignInSignal {
-    return this.registry.get('signIn')!.computedSignal as SignInSignal;
-  }
-
-  get signUpResourceSignal() {
-    return this.registry.get('signUp')!.resourceSignal;
-  }
-  get signUpErrorSignal() {
-    return this.registry.get('signUp')!.errorSignal;
-  }
-  get signUpFetchSignal() {
-    return this.registry.get('signUp')!.fetchSignal;
-  }
-  get signUpSignal(): SignUpSignal {
-    return this.registry.get('signUp')!.computedSignal as SignUpSignal;
-  }
-
-  get waitlistResourceSignal() {
-    return this.registry.get('waitlist')!.resourceSignal;
-  }
-  get waitlistErrorSignal() {
-    return this.registry.get('waitlist')!.errorSignal;
-  }
-  get waitlistFetchSignal() {
-    return this.registry.get('waitlist')!.fetchSignal;
-  }
-  get waitlistSignal(): WaitlistSignal {
-    return this.registry.get('waitlist')!.computedSignal as WaitlistSignal;
+  private registerResource(config: StateResourceConfig): void {
+    const signals = createResourceSignals(config);
+    this.registry.set(config.name, { ...signals, config });
   }
 
   get __internal_waitlist() {
@@ -211,7 +137,8 @@ export class State implements StateInterface {
  */
 function shouldIgnoreNullUpdate(previousResource: unknown, newResource: unknown): boolean {
   const hasNoId = !(newResource as { id?: unknown })?.id;
-  const previousFuture = (previousResource as { __internal_future?: { hasBeenFinalized?: boolean } })?.__internal_future;
+  const previousFuture = (previousResource as { __internal_future?: { hasBeenFinalized?: boolean } })
+    ?.__internal_future;
   return hasNoId && !!previousResource && previousFuture?.hasBeenFinalized === false;
 }
 

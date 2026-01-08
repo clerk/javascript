@@ -207,22 +207,7 @@ export interface SignalTypeMap {
 
 export interface State {
   /**
-   * A Signal that updates when the underlying `SignIn` resource changes, including errors.
-   */
-  signInSignal: SignInSignal;
-
-  /**
-   * A Signal that updates when the underlying `SignUp` resource changes, including errors.
-   */
-  signUpSignal: SignUpSignal;
-
-  /**
-   * A Signal that updates when the underlying `Waitlist` resource changes, including errors.
-   */
-  waitlistSignal: WaitlistSignal;
-
-  /**
-   * Get a signal by name. Enables dynamic signal lookup without switch statements.
+   * Get a signal by name. Enables dynamic signal lookup via registry.
    *
    * @param type - The signal name ('signIn', 'signUp', 'waitlist')
    * @returns The computed signal for the given resource type

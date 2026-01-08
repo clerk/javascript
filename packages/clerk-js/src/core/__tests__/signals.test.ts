@@ -62,9 +62,9 @@ describe('errorsToParsedErrors', () => {
     const result = errorsToParsedErrors(error, initialFields);
 
     expect(result.fields).toEqual({ emailAddress: null, password: null });
-    // When there are no field errors, individual ClerkAPIError instances are put in raw
-    expect(result.raw).toEqual([error.errors[0]]);
-    // Note: global is null when errors are processed individually without field errors
-    expect(result.global).toBeNull();
+    // When there are no field errors, the whole error is put in raw and global
+    expect(result.raw).toEqual([error]);
+    expect(result.global).toBeTruthy();
+    expect(result.global?.length).toBe(1);
   });
 });
