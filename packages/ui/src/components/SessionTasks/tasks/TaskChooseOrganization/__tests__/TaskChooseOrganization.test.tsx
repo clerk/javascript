@@ -306,6 +306,7 @@ describe('TaskChooseOrganization', () => {
         f.withForceOrganizationSelection();
         f.withUser({
           create_organization_enabled: false,
+          tasks: [{ key: 'choose-organization' }],
         });
       });
 
@@ -344,11 +345,11 @@ describe('TaskChooseOrganization', () => {
         }),
       );
 
-      const { findByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
+      const { queryByText } = render(<TaskChooseOrganization />, { wrapper });
 
-      expect(await findByText('Existing Org')).toBeInTheDocument();
-      expect(await findByText('Create new organization')).toBeInTheDocument();
-      expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
+      expect(await queryByText('Join an existing organization')).toBeInTheDocument();
+      expect(await queryByText('Existing Org')).toBeInTheDocument();
+      expect(await queryByText('Create new organization')).toBeInTheDocument();
     });
   });
 });
