@@ -110,24 +110,22 @@ test.describe('Keyless mode @tanstack-react-start', () => {
     });
   });
 
-  test('Claimed application with keys inside .env, on dismiss, keyless prompt is removed.', async ({
-    page,
-    context,
-  }) => {
-    await mockClaimedInstanceEnvironmentCall(page);
+  test('Keyless popover is removed after adding keys to .env and restarting.', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
 
     await u.po.keylessPopover.waitForMounted();
-    await expect(await u.po.keylessPopover.promptToUseClaimedKeys()).toBeVisible();
+    expect(await u.po.keylessPopover.isExpanded()).toBe(false);
 
+    // Copy keys from keyless.json to .env
     await app.keylessToEnv();
-    await page.waitForTimeout(5_000);
 
-    await page.reload();
-    await u.po.keylessPopover.waitForMounted();
-    await u.po.keylessPopover.promptToDismiss().click();
+    // Restart the dev server to pick up new env vars (Vite doesn't hot-reload .env)
+    await app.restart();
 
+    await u.page.goToAppHome();
+
+    // Keyless popover should no longer be present since we now have explicit keys
     await u.po.keylessPopover.waitForUnmounted();
   });
 });
