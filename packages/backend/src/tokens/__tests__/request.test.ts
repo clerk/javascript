@@ -1393,7 +1393,7 @@ describe('tokens.authenticateRequest(options)', () => {
     });
 
     describe('Array of Accepted Token Types', () => {
-      test('accepts token when it is in the acceptsToken array', async () => {
+      test('accepts machine token when it is in the acceptsToken array', async () => {
         server.use(
           http.post(mockMachineAuthResponses.api_key.endpoint, () => {
             return HttpResponse.json(mockVerificationResults.api_key);
@@ -1409,7 +1409,64 @@ describe('tokens.authenticateRequest(options)', () => {
         expect(requestState).toBeMachineAuthenticated();
       });
 
-      test('returns unauthenticated state when token type is not in the acceptsToken array', async () => {
+      test('accepts session token in header when session_token is in the acceptsToken array', async () => {
+        server.use(
+          http.get('https://api.clerk.test/v1/jwks', () => {
+            return HttpResponse.json(mockJwks);
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${mockJwt}` });
+        const requestState = await authenticateRequest(
+          request,
+          mockOptions({ acceptsToken: ['session_token', 'api_key'] }),
+        );
+
+        expect(requestState).toBeSignedIn();
+        expect(requestState.toAuth()).toBeSignedInToAuth();
+      });
+
+      test('accepts session token in cookie when session_token is in the acceptsToken array', async () => {
+        server.use(
+          http.get('https://api.clerk.test/v1/jwks', () => {
+            return HttpResponse.json(mockJwks);
+          }),
+        );
+
+        const requestState = await authenticateRequest(
+          mockRequestWithCookies(
+            {},
+            {
+              __session: mockJwt,
+              __client_uat: '12345',
+            },
+          ),
+          mockOptions({ acceptsToken: ['session_token', 'api_key'] }),
+        );
+
+        // The key assertion: session token is accepted (not rejected as invalid token)
+        // Cookie-based auth may trigger handshake flow, but should not return TokenTypeMismatch
+        expect(requestState.tokenType).not.toBeNull();
+        expect(requestState.reason).not.toBe(AuthErrorReason.TokenTypeMismatch);
+      });
+
+      test('accepts machine token when acceptsToken array contains mixed token types', async () => {
+        server.use(
+          http.post(mockMachineAuthResponses.m2m_token.endpoint, () => {
+            return HttpResponse.json(mockVerificationResults.m2m_token);
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
+        const requestState = await authenticateRequest(
+          request,
+          mockOptions({ acceptsToken: ['session_token', 'm2m_token'] }),
+        );
+
+        expect(requestState).toBeMachineAuthenticated();
+      });
+
+      test('returns unauthenticated state when machine token type is not in the acceptsToken array', async () => {
         const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
         const requestState = await authenticateRequest(
           request,
@@ -1424,6 +1481,43 @@ describe('tokens.authenticateRequest(options)', () => {
         expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: null,
           isAuthenticated: false,
+        });
+      });
+
+      test('returns unauthenticated state when session token is provided but not in the acceptsToken array', async () => {
+        const request = mockRequest({ authorization: `Bearer ${mockJwt}` });
+        const requestState = await authenticateRequest(
+          request,
+          mockOptions({ acceptsToken: ['api_key', 'oauth_token'] }),
+        );
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: null,
+          reason: AuthErrorReason.TokenTypeMismatch,
+          message: '',
+        });
+        expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
+          tokenType: null,
+          isAuthenticated: false,
+        });
+      });
+
+      test('returns unauthenticated state when no token is provided and acceptsToken array contains only machine tokens', async () => {
+        const requestState = await authenticateRequest(
+          mockRequestWithCookies(
+            {},
+            {
+              __session: mockJwt,
+              __client_uat: '12345',
+            },
+          ),
+          mockOptions({ acceptsToken: ['api_key', 'm2m_token'] }),
+        );
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: null,
+          reason: AuthErrorReason.TokenTypeMismatch,
+          message: '',
         });
       });
     });
