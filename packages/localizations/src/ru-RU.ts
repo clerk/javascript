@@ -399,6 +399,12 @@ export const ruRU: LocalizationResource = {
         headerTitle__members: 'Участники',
         headerTitle__requests: 'Заявки',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Роли временно заблокированы',
+          subtitle: 'Мы обновляем доступные роли. Как только это будет сделано, вы сможете снова обновлять роли.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -869,6 +875,7 @@ export const ruRU: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

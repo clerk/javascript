@@ -396,6 +396,12 @@ export const isIS: LocalizationResource = {
         headerTitle__members: 'Meðlimir',
         headerTitle__requests: 'Beiðnir',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Hlutverk eru tímabundið læst',
+          subtitle: 'Við erum að uppfæra tiltæk hlutverk. Þegar því er lokið geturðu uppfært hlutverk aftur.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -859,6 +865,7 @@ export const isIS: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

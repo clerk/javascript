@@ -395,6 +395,12 @@ export const arSA: LocalizationResource = {
         headerTitle__members: 'الأعضاء',
         headerTitle__requests: 'الطلبات',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'الأدوار مقفلة مؤقتًا',
+          subtitle: 'نحن نقوم بتحديث الأدوار المتاحة. بمجرد الانتهاء، ستتمكن من تحديث الأدوار مرة أخرى.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -854,6 +860,7 @@ export const arSA: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

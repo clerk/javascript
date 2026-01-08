@@ -401,6 +401,12 @@ export const viVN: LocalizationResource = {
         headerTitle__members: 'Thành viên',
         headerTitle__requests: 'Yêu cầu',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Các vai trò tạm thời bị khóa',
+          subtitle: 'Chúng tôi đang cập nhật các vai trò có sẵn. Sau khi hoàn tất, bạn sẽ có thể cập nhật vai trò lại.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'Khoá API',
@@ -865,6 +871,7 @@ export const viVN: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

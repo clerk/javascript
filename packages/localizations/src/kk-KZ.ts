@@ -392,6 +392,12 @@ export const kkKZ: LocalizationResource = {
         headerTitle__members: 'Мүшелер',
         headerTitle__requests: 'Сұраулар',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Рөлдер уақытша құлыпталған',
+          subtitle: 'Қолжетімді рөлдерді жаңартып жатырмыз. Бұл аяқталғаннан кейін рөлдерді қайта жаңарта аласыз.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -849,6 +855,7 @@ export const kkKZ: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

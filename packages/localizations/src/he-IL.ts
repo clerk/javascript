@@ -393,6 +393,12 @@ export const heIL: LocalizationResource = {
         headerTitle__members: 'חברים',
         headerTitle__requests: 'בקשות',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'התפקידים נעולים זמנית',
+          subtitle: 'אנחנו מעדכנים את התפקידים הזמינים. לאחר שזה יסתיים, תוכל לעדכן תפקידים שוב.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -848,6 +854,7 @@ export const heIL: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

@@ -396,6 +396,13 @@ export const mnMN: LocalizationResource = {
         headerTitle__members: 'Гишүүд',
         headerTitle__requests: 'Хүсэлтүүд',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Дүрүүд түр хугацаанд түгжигдсэн байна',
+          subtitle:
+            'Бид боломжтой дүрүүдийг шинэчилж байна. Дууссаны дараа та дүрүүдийг дахин шинэчлэх боломжтой болно.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -857,6 +864,7 @@ export const mnMN: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

@@ -1,5 +1,32 @@
 # Change Log
 
+## 5.119.0
+
+### Minor Changes
+
+- Fix "You must belong to an organization" screen showing when user has existing memberships, invitations or suggestions ([#7557](https://github.com/clerk/javascript/pull/7557)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- When password is enabled at the instance level, but not required allow users to add a password in the user profile. ([#7549](https://github.com/clerk/javascript/pull/7549)) by [@austincalvelage](https://github.com/austincalvelage)
+
+### Patch Changes
+
+- Updated dependencies [[`c4dbcf7`](https://github.com/clerk/javascript/commit/c4dbcf70ec9d96b74bf31f138e7da357ba89e5e7)]:
+  - @clerk/localizations@3.34.0
+
+## 5.118.0
+
+### Minor Changes
+
+- Disable role selection in `OrganizationProfile` during role set migration ([#7541](https://github.com/clerk/javascript/pull/7541)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Add `data-variant` and `data-color` attributes to the Text component. ([#7535](https://github.com/clerk/javascript/pull/7535)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`a4e6932`](https://github.com/clerk/javascript/commit/a4e693262f734bfd3ab08ffac019168c874c2bd8)]:
+  - @clerk/localizations@3.33.0
+  - @clerk/shared@3.42.0
+
 ## 5.117.0
 
 ### Minor Changes

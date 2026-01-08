@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.42.0
+
+### Minor Changes
+
+- Disable role selection in `OrganizationProfile` during role set migration ([#7541](https://github.com/clerk/javascript/pull/7541)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 3.41.1
 
 ### Patch Changes

@@ -397,6 +397,13 @@ export const msMY: LocalizationResource = {
         headerTitle__members: 'Ahli',
         headerTitle__requests: 'Permintaan',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Peranan dikunci buat sementara waktu',
+          subtitle:
+            'Kami sedang mengemas kini peranan yang tersedia. Setelah selesai, anda akan dapat mengemas kini peranan semula.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -865,6 +872,7 @@ export const msMY: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

@@ -396,6 +396,13 @@ export const idID: LocalizationResource = {
         headerTitle__members: 'Anggota',
         headerTitle__requests: 'Permintaan',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Peran untuk sementara terkunci',
+          subtitle:
+            'Kami sedang memperbarui peran yang tersedia. Setelah selesai, Anda akan dapat memperbarui peran lagi.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -863,6 +870,7 @@ export const idID: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

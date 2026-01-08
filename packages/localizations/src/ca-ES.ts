@@ -396,6 +396,12 @@ export const caES: LocalizationResource = {
         headerTitle__members: 'Membres',
         headerTitle__requests: 'Sol·licituds',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Els rols estan temporalment bloquejats',
+          subtitle: 'Estem actualitzant els rols disponibles. Un cop fet, podreu tornar a actualitzar els rols.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -857,6 +863,7 @@ export const caES: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

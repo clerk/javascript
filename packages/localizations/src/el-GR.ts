@@ -396,6 +396,13 @@ export const elGR: LocalizationResource = {
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Οι ρόλοι είναι προσωρινά κλειδωμένοι',
+          subtitle:
+            'Ενημερώνουμε τους διαθέσιμους ρόλους. Μόλις ολοκληρωθεί, θα μπορείτε να ενημερώσετε ξανά τους ρόλους.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -859,6 +866,7 @@ export const elGR: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

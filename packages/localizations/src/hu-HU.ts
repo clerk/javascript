@@ -395,6 +395,12 @@ export const huHU: LocalizationResource = {
         headerTitle__members: 'Tagok',
         headerTitle__requests: 'Kérések',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'A szerepkörök ideiglenesen zárolva vannak',
+          subtitle: 'Frissítjük az elérhető szerepköröket. Ha ez befejeződött, újra frissítheti a szerepköröket.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -856,6 +862,7 @@ export const huHU: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

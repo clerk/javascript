@@ -396,6 +396,12 @@ export const beBY: LocalizationResource = {
         headerTitle__members: 'Удзельнікі',
         headerTitle__requests: 'Заявкі',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Ролі часова заблакіраваны',
+          subtitle: 'Мы абнаўляем даступныя ролі. Калі гэта будзе зроблена, вы зможаце абнавіць ролі зноў.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -862,6 +868,7 @@ export const beBY: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

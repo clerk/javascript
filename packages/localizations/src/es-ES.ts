@@ -396,6 +396,13 @@ export const esES: LocalizationResource = {
         headerTitle__members: 'Miembros',
         headerTitle__requests: 'Solicitudes',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Los roles están temporalmente bloqueados',
+          subtitle:
+            'Estamos actualizando los roles disponibles. Una vez hecho esto, podrás actualizar los roles de nuevo.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -858,6 +865,7 @@ export const esES: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

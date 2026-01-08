@@ -395,6 +395,12 @@ export const hrHR: LocalizationResource = {
         headerTitle__members: 'Članovi',
         headerTitle__requests: 'Zahtjevi',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Uloge su privremeno zaključane',
+          subtitle: 'Ažuriramo dostupne uloge. Kada to završimo, moći ćete ponovno ažurirati uloge.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -859,6 +865,7 @@ export const hrHR: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },

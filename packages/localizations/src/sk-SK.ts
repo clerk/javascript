@@ -395,6 +395,12 @@ export const skSK: LocalizationResource = {
         headerTitle__members: 'Členovia',
         headerTitle__requests: 'Požiadavky',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Úlohy sú dočasne uzamknuté',
+          subtitle: 'Aktualizujeme dostupné úlohy. Po dokončení budete môcť úlohy opäť aktualizovať.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -862,6 +868,7 @@ export const skSK: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
