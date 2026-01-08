@@ -8,7 +8,13 @@ import { useClerkQuery } from '../clerk-rq/useQuery';
 import type { CacheSetter, ValueOrSetter } from '../types';
 import { useClearQueriesOnSignOut, withInfiniteKey } from './useClearQueriesOnSignOut';
 import type { UsePagesOrInfiniteSignature } from './usePageOrInfinite.types';
-import { useWithSafeValues } from './usePagesOrInfinite.shared';
+import {
+  calculateHasNextPage,
+  calculateHasPreviousPage,
+  calculateOffsetCount,
+  calculatePageCount,
+  useWithSafeValues,
+} from './usePagesOrInfinite.shared';
 
 export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
   const { fetcher, config, keys } = params;
@@ -198,14 +204,14 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
     setPaginatedPage(n => Math.max(0, n - 1));
   }, [triggerInfinite]);
 
-  const offsetCount = (initialPageRef.current - 1) * pageSizeRef.current;
-  const pageCount = Math.ceil((count - offsetCount) / pageSizeRef.current);
+  const offsetCount = calculateOffsetCount(initialPageRef.current, pageSizeRef.current);
+  const pageCount = calculatePageCount(count, offsetCount, pageSizeRef.current);
   const hasNextPage = triggerInfinite
     ? Boolean(infiniteQuery.hasNextPage)
-    : count - offsetCount * pageSizeRef.current > page * pageSizeRef.current;
+    : calculateHasNextPage(count, offsetCount, page, pageSizeRef.current);
   const hasPreviousPage = triggerInfinite
     ? Boolean(infiniteQuery.hasPreviousPage)
-    : (page - 1) * pageSizeRef.current > offsetCount * pageSizeRef.current;
+    : calculateHasPreviousPage(page, pageSizeRef.current, offsetCount);
 
   const setData: CacheSetter = value => {
     if (triggerInfinite) {
