@@ -1,5 +1,5 @@
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
-import { type ComponentType, useState } from 'react';
+import { useState } from 'react';
 
 import { useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { descriptors, Flex, Flow, localizationKeys, Spinner } from '@/ui/customizables';
@@ -14,10 +14,16 @@ import { ChooseOrganizationScreen } from './ChooseOrganizationScreen';
 import { CreateOrganizationScreen } from './CreateOrganizationScreen';
 
 const TaskChooseOrganizationInternal = () => {
+  const { user } = useUser();
   const { userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasExistingResources = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
+  const isOrganizationCreationDisabled = !isLoading && !user?.createOrganizationEnabled && !hasExistingResources;
+
+  if (isOrganizationCreationDisabled) {
+    return <OrganizationCreationDisabledScreen />;
+  }
 
   return (
     <Flow.Root flow='taskChooseOrganization'>
@@ -113,18 +119,6 @@ const TaskChooseOrganizationFlows = withCardStateProvider((props: TaskChooseOrga
   return <ChooseOrganizationScreen onCreateOrganizationClick={() => setCurrentFlow('create')} />;
 });
 
-export const withOrganizationCreationEnabledGuard = <T extends object>(Component: ComponentType<T>) => {
-  return (props: T) => {
-    const { user } = useUser();
-
-    if (!user?.createOrganizationEnabled) {
-      return <OrganizationCreationDisabledScreen />;
-    }
-
-    return <Component {...props} />;
-  };
-};
-
 function OrganizationCreationDisabledScreen() {
   return (
     <Flow.Root flow='taskChooseOrganization'>
@@ -149,8 +143,5 @@ function OrganizationCreationDisabledScreen() {
 }
 
 export const TaskChooseOrganization = withCoreSessionSwitchGuard(
-  withTaskGuard(
-    withCardStateProvider(withOrganizationCreationEnabledGuard(TaskChooseOrganizationInternal)),
-    'choose-organization',
-  ),
+  withTaskGuard(withCardStateProvider(TaskChooseOrganizationInternal), 'choose-organization'),
 );
