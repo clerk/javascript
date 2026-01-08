@@ -2,8 +2,11 @@ import { requireNativeModule, Platform } from 'expo-modules-core';
 import { useEffect, useState } from 'react';
 import { TouchableOpacity, View, Text, StyleSheet, ViewProps, Image } from 'react-native';
 
+// Check if native module is supported on this platform
+const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
+
 // Get the native module for modal presentation
-const ClerkExpo = Platform.OS === 'ios' ? requireNativeModule('ClerkExpo') : null;
+const ClerkExpo = isNativeSupported ? requireNativeModule('ClerkExpo') : null;
 
 interface NativeUser {
   id: string;
@@ -21,13 +24,14 @@ export interface UserButtonProps extends ViewProps {
 }
 
 /**
- * Native iOS UserButton component powered by clerk-ios SwiftUI
+ * Native UserButton component powered by clerk-ios (SwiftUI) and clerk-android (Jetpack Compose)
  *
  * Displays a button that opens the UserProfileView when tapped.
  * Shows the user's profile image, or their initials if no image is available.
  *
- * Uses the official clerk-ios package from:
- * https://github.com/clerk/clerk-ios
+ * Uses the official Clerk native packages:
+ * - iOS: https://github.com/clerk/clerk-ios
+ * - Android: https://github.com/clerk/clerk-android
  *
  * @example
  * ```tsx
@@ -47,7 +51,7 @@ export function UserButton({ onPress, style, ...props }: UserButtonProps) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (Platform.OS !== 'ios' || !ClerkExpo?.getSession) {
+      if (!isNativeSupported || !ClerkExpo?.getSession) {
         return;
       }
 
@@ -67,7 +71,7 @@ export function UserButton({ onPress, style, ...props }: UserButtonProps) {
   const handlePress = async () => {
     onPress?.();
 
-    if (Platform.OS !== 'ios' || !ClerkExpo?.presentUserProfile) {
+    if (!isNativeSupported || !ClerkExpo?.presentUserProfile) {
       return;
     }
 
@@ -91,7 +95,7 @@ export function UserButton({ onPress, style, ...props }: UserButtonProps) {
     return 'U';
   };
 
-  if (Platform.OS !== 'ios') {
+  if (!isNativeSupported) {
     return (
       <View
         style={[styles.button, style]}

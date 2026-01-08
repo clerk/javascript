@@ -4,15 +4,18 @@ import { View, Text, StyleSheet } from 'react-native';
 import type { SignInProps } from './SignIn.types';
 import { useSignIn } from '../hooks';
 
+// Check if native module is supported on this platform
+const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
+
 // Get the native module for modal presentation
-const ClerkExpo = Platform.OS === 'ios' ? requireNativeModule('ClerkExpo') : null;
+const ClerkExpo = isNativeSupported ? requireNativeModule('ClerkExpo') : null;
 
 /**
- * Native iOS SignIn component powered by clerk-ios SwiftUI
+ * Native SignIn component powered by clerk-ios (SwiftUI) and clerk-android (Jetpack Compose)
  *
- * Uses the official clerk-ios package from:
- * https://github.com/clerk/clerk-ios
- * https://swiftpackageindex.com/clerk/clerk-ios
+ * Uses the official Clerk native packages:
+ * - iOS: https://github.com/clerk/clerk-ios
+ * - Android: https://github.com/clerk/clerk-android
  *
  * This component presents the native sign-in UI modally when mounted.
  * The modal will automatically dismiss when authentication completes.
@@ -35,7 +38,7 @@ export function SignIn({ mode = 'signInOrUp', isDismissable = true, onSuccess, o
   const { setActive } = useSignIn();
 
   useEffect(() => {
-    if (Platform.OS !== 'ios' || !ClerkExpo?.presentAuth) {
+    if (!isNativeSupported || !ClerkExpo?.presentAuth) {
       return;
     }
 
@@ -64,10 +67,10 @@ export function SignIn({ mode = 'signInOrUp', isDismissable = true, onSuccess, o
   }, [mode, isDismissable, setActive, onSuccess, onError]);
 
   // Show a placeholder while modal is presented
-  if (Platform.OS !== 'ios') {
+  if (!isNativeSupported) {
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>Native SignIn is only available on iOS</Text>
+        <Text style={styles.text}>Native SignIn is only available on iOS and Android</Text>
       </View>
     );
   }

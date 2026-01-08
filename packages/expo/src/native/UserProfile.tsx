@@ -2,8 +2,11 @@ import { requireNativeModule, Platform } from 'expo-modules-core';
 import { useEffect } from 'react';
 import { View, Text, StyleSheet, ViewProps } from 'react-native';
 
+// Check if native module is supported on this platform
+const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
+
 // Get the native module for modal presentation
-const ClerkExpo = Platform.OS === 'ios' ? requireNativeModule('ClerkExpo') : null;
+const ClerkExpo = isNativeSupported ? requireNativeModule('ClerkExpo') : null;
 
 export interface UserProfileProps extends ViewProps {
   /**
@@ -20,7 +23,7 @@ export interface UserProfileProps extends ViewProps {
 }
 
 /**
- * Native iOS UserProfile component powered by clerk-ios SwiftUI
+ * Native UserProfile component powered by clerk-ios (SwiftUI) and clerk-android (Jetpack Compose)
  *
  * Provides a comprehensive profile management interface including:
  * - Profile information display and editing
@@ -36,8 +39,9 @@ export interface UserProfileProps extends ViewProps {
  *
  * This component presents the native profile UI modally when mounted.
  *
- * Uses the official clerk-ios package from:
- * https://github.com/clerk/clerk-ios
+ * Uses the official Clerk native packages:
+ * - iOS: https://github.com/clerk/clerk-ios
+ * - Android: https://github.com/clerk/clerk-android
  *
  * @example
  * ```tsx
@@ -56,7 +60,7 @@ export interface UserProfileProps extends ViewProps {
  */
 export function UserProfile({ isDismissable = true, onSignOut, style, ...props }: UserProfileProps) {
   useEffect(() => {
-    if (Platform.OS !== 'ios' || !ClerkExpo?.presentUserProfile) {
+    if (!isNativeSupported || !ClerkExpo?.presentUserProfile) {
       return;
     }
 
@@ -78,13 +82,13 @@ export function UserProfile({ isDismissable = true, onSignOut, style, ...props }
   }, [isDismissable, onSignOut]);
 
   // Show a placeholder while modal is presented
-  if (Platform.OS !== 'ios') {
+  if (!isNativeSupported) {
     return (
       <View
         style={[styles.container, style]}
         {...props}
       >
-        <Text style={styles.text}>Native UserProfile is only available on iOS</Text>
+        <Text style={styles.text}>Native UserProfile is only available on iOS and Android</Text>
       </View>
     );
   }

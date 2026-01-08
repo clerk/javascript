@@ -1,2 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <!-- Clerk Auth Activity - hosts AuthView for sign-in/sign-up flows -->
+    <activity
+      android:name="expo.modules.clerk.ClerkAuthActivity"
+      android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+      android:exported="false"
+      android:windowSoftInputMode="adjustResize" />
+
+    <!-- Clerk Profile Activity - hosts UserProfileView for account management -->
+    <activity
+      android:name="expo.modules.clerk.ClerkProfileActivity"
+      android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+      android:exported="false"
+      android:windowSoftInputMode="adjustResize" />
+  </application>
 </manifest>
