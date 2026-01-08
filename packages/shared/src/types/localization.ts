@@ -369,6 +369,11 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    web3Solana: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      noAvailableWallets: LocalizationValue;
+    };
   };
   signIn: {
     start: {
@@ -547,6 +552,10 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    web3Solana: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
   };
   reverification: {
     password: {
@@ -709,6 +718,10 @@ export type __internal_LocalizationResource = {
         primaryButton: LocalizationValue;
         destructiveAction: LocalizationValue;
         detailsAction__nonPrimary: LocalizationValue;
+        web3SelectSolanaWalletScreen: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
       };
       dangerSection: {
         title: LocalizationValue;
@@ -1115,6 +1128,12 @@ export type __internal_LocalizationResource = {
           primaryButton: LocalizationValue;
         };
       };
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
+      };
     };
     billingPage: {
       title: LocalizationValue;
@@ -1285,10 +1304,15 @@ export type __internal_LocalizationResource = {
     chooseOrganization: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      subtitle__createOrganizationDisabled: LocalizationValue;
       suggestionsAcceptedLabel: LocalizationValue;
       action__suggestionsAccept: LocalizationValue;
       action__createOrganization: LocalizationValue;
       action__invitationAccept: LocalizationValue;
+    };
+    organizationCreationDisabled: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
     };
   };
   taskResetPassword: {
@@ -1299,6 +1323,11 @@ export type __internal_LocalizationResource = {
       actionText: LocalizationValue<'identifier'>;
     };
     formButtonPrimary: LocalizationValue;
+  };
+  web3SolanaWalletButtons: {
+    connect: LocalizationValue<'walletName'>;
+    continue: LocalizationValue<'walletName'>;
+    noneAvailable: LocalizationValue<'solanaWalletsLink'>;
   };
 };
 
@@ -1320,6 +1349,8 @@ type UnstableErrors = WithParamName<{
   passkey_registration_cancelled: LocalizationValue;
   passkey_already_exists: LocalizationValue;
   web3_missing_identifier: LocalizationValue;
+  web3_solana_signature_generation_failed: LocalizationValue;
+  web3_signature_request_rejected: LocalizationValue;
   form_password_pwned: LocalizationValue;
   form_password_pwned__sign_in: LocalizationValue;
   form_new_password_matches_current: LocalizationValue;

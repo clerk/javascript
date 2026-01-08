@@ -401,6 +401,12 @@ export const viVN: LocalizationResource = {
         headerTitle__members: 'Thành viên',
         headerTitle__requests: 'Yêu cầu',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Các vai trò tạm thời bị khóa',
+          subtitle: 'Chúng tôi đang cập nhật các vai trò có sẵn. Sau khi hoàn tất, bạn sẽ có thể cập nhật vai trò lại.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'Khoá API',
@@ -756,6 +762,10 @@ export const viVN: LocalizationResource = {
       subtitle: 'Để tiếp tục, vui lòng nhập mã xác minh được tạo bởi ứng dụng xác thực của bạn',
       title: 'Xác thực hai bước',
     },
+    web3Solana: {
+      subtitle: 'Chọn ví bên dưới để đăng nhập',
+      title: 'Đăng nhập với Solana',
+    },
   },
   signInEnterPasswordTitle: 'Nhập mật khẩu',
   signUp: {
@@ -848,31 +858,40 @@ export const viVN: LocalizationResource = {
       title: 'Tạo tài khoản của bạn',
       titleCombined: 'Tạo tài khoản của bạn',
     },
+    web3Solana: {
+      subtitle: 'Chọn ví bên dưới để đăng ký',
+      title: 'Đăng ký với Solana',
+    },
   },
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Tạo tổ chức mới',
+      action__invitationAccept: 'Tham gia',
+      action__suggestionsAccept: 'Yêu cầu tham gia',
+      subtitle: 'Tham gia một tổ chức hiện có hoặc tạo mới',
+      subtitle__createOrganizationDisabled: 'Tham gia một tổ chức hiện có',
+      suggestionsAcceptedLabel: 'Đang chờ phê duyệt',
+      title: 'Chọn tổ chức',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Hủy',
+      formButtonSubmit: 'Tiếp tục',
+      formFieldInputPlaceholder__name: 'Tổ chức của tôi',
+      formFieldInputPlaceholder__slug: 'to-chuc-cua-toi',
+      formFieldLabel__name: 'Tên',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Nhập thông tin chi tiết tổ chức của bạn để tiếp tục',
+      title: 'Thiết lập tổ chức của bạn',
+    },
+    organizationCreationDisabled: {
+      title: 'Bạn phải thuộc về một tổ chức',
+      subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để nhận lời mời.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Đăng xuất',
+      actionText: 'Đã đăng nhập với {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -951,6 +970,8 @@ export const viVN: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Không tìm thấy phần mở rộng Web3 Wallet. Vui lòng cài đặt một phần mở rộng để tiếp tục.',
+    web3_signature_request_rejected: 'Bạn đã từ chối yêu cầu ký. Vui lòng thử lại để tiếp tục.',
+    web3_solana_signature_generation_failed: 'Đã xảy ra lỗi khi tạo chữ ký. Vui lòng thử lại để tiếp tục.',
     zxcvbn: {
       couldBeStronger: 'Mật khẩu của bạn hoạt động, nhưng có thể mạnh hơn. Hãy thử thêm nhiều ký tự.',
       goodPassword: 'Mật khẩu của bạn đáp ứng tất cả các yêu cầu cần thiết.',
@@ -1322,6 +1343,10 @@ export const viVN: LocalizationResource = {
         detailsAction__nonPrimary: 'Đặt làm chính',
         primaryButton: 'Kết nối ví',
         title: 'Ví Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Chọn một ví Solana để kết nối với tài khoản của bạn.',
+          title: 'Thêm ví Solana',
+        },
       },
     },
     usernamePage: {
@@ -1356,5 +1381,11 @@ export const viVN: LocalizationResource = {
       subtitle: 'Chúng tôi sẽ liên hệ khi vị trí của bạn đã sẵn sàng',
       title: 'Cảm ơn bạn đã tham gia danh sách chờ!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Kết nối với {{walletName}}',
+    continue: 'Tiếp tục với {{walletName}}',
+    noneAvailable:
+      'Không phát hiện ví Solana Web3 nào. Vui lòng cài đặt {{ solanaWalletsLink || link("wallet extension") }} hỗ trợ Web3.',
   },
 } as const;

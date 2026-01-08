@@ -1,13 +1,13 @@
 'use client';
 
 export {
-  ClerkLoaded,
-  ClerkLoading,
+  AuthenticateWithRedirectCallback,
   ClerkDegraded,
   ClerkFailed,
-  SignedOut,
-  SignedIn,
-  Protect,
+  ClerkLoaded,
+  ClerkLoading,
+  RedirectToCreateOrganization,
+  RedirectToOrganizationProfile,
   RedirectToSignIn,
   RedirectToSignUp,
   RedirectToTasks,
@@ -16,6 +16,7 @@ export {
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
   UNSAFE_PortalProvider,
+  Show,
 } from '@clerk/react';
 
 export { MultisessionAppSupport } from '@clerk/react/internal';

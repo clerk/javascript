@@ -19,5 +19,6 @@ export default {
     'transform-appearance-layout-to-options',
     'transform-themes-to-ui-themes',
     'transform-align-experimental-unstable-prefixes',
+    'transform-protect-to-show',
   ],
 };

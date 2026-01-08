@@ -396,6 +396,13 @@ export const mnMN: LocalizationResource = {
         headerTitle__members: 'Гишүүд',
         headerTitle__requests: 'Хүсэлтүүд',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Дүрүүд түр хугацаанд түгжигдсэн байна',
+          subtitle:
+            'Бид боломжтой дүрүүдийг шинэчилж байна. Дууссаны дараа та дүрүүдийг дахин шинэчлэх боломжтой болно.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -750,6 +757,10 @@ export const mnMN: LocalizationResource = {
       subtitle: 'Үргэлжлүүлэхийн тулд authenticator апп-аар үүсгэсэн баталгаажуулах кодыг оруулна уу',
       title: 'Two-step баталгаажуулалт',
     },
+    web3Solana: {
+      subtitle: 'Нэвтрэхийн тулд доороос түрийвч сонгоно уу',
+      title: 'Solana-аар нэвтрэх',
+    },
   },
   signInEnterPasswordTitle: 'Нууц үгээ оруулна уу',
   signUp: {
@@ -840,31 +851,40 @@ export const mnMN: LocalizationResource = {
       title: 'Бүртгэл үүсгэх',
       titleCombined: 'Бүртгэл үүсгэх',
     },
+    web3Solana: {
+      subtitle: 'Бүртгүүлэхийн тулд доороос түрийвч сонгоно уу',
+      title: 'Solana-аар бүртгүүлэх',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}}-р үргэлжлүүлэх',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Шинэ байгууллага үүсгэх',
+      action__invitationAccept: 'Нэгдэх',
+      action__suggestionsAccept: 'Нэгдэх хүсэлт илгээх',
+      subtitle: 'Одоо байгаа байгууллагад нэгдэх эсвэл шинэ үүсгэх',
+      subtitle__createOrganizationDisabled: 'Одоо байгаа байгууллагад нэгдэх',
+      suggestionsAcceptedLabel: 'Зөвшөөрөл хүлээж байна',
+      title: 'Байгууллага сонгох',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Цуцлах',
+      formButtonSubmit: 'Үргэлжлүүлэх',
+      formFieldInputPlaceholder__name: 'Миний байгууллага',
+      formFieldInputPlaceholder__slug: 'minii-baiguullaga',
+      formFieldLabel__name: 'Нэр',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Үргэлжлүүлэхийн тулд байгууллагын мэдээллийг оруулна уу',
+      title: 'Байгууллагаа тохируулах',
+    },
+    organizationCreationDisabled: {
+      title: 'Та байгууллагад харьяалагдах ёстой',
+      subtitle: 'Урилга авахын тулд байгууллагын админтай холбогдоно уу.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Гарах',
+      actionText: '{{identifier}} гэж нэвтэрсэн',
     },
   },
   taskResetPassword: {
@@ -945,6 +965,10 @@ export const mnMN: LocalizationResource = {
     phone_number_exists: 'Энэ утасны дугаарыг авсан. Өөр оролдоно уу.',
     session_exists: 'Та аль хэдийн нэвтэрсэн байна.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected:
+      'Та гарын үсгийн хүсэлтийг цуцалсан байна. Үргэлжлүүлэхийн тулд дахин оролдоно уу.',
+    web3_solana_signature_generation_failed:
+      'Гарын үсэг үүсгэх үед алдаа гарлаа. Үргэлжлүүлэхийн тулд дахин оролдоно уу.',
     zxcvbn: {
       couldBeStronger: 'Таны нууц үг ажилладаг, гэхдээ илүү хүчтэй байж болно. Илүү олон тэмдэгт нэмж үзээрэй.',
       goodPassword: 'Таны нууц үг шаардлагатай бүх шаардлагыг хангаж байна.',
@@ -1314,6 +1338,10 @@ export const mnMN: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 wallets',
         title: 'Web3 wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Өөрийн бүртгэлтэй холбох Solana түрийвч сонгоно уу.',
+          title: 'Solana түрийвч нэмэх',
+        },
       },
     },
     usernamePage: {
@@ -1337,16 +1365,22 @@ export const mnMN: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Нэвтрэх',
+      actionText: 'Та аль хэдийн нэвтрэх эрхтэй юу?',
+      formButton: 'Хүлээлгийн жагсаалтад нэгдэх',
+      subtitle: 'Имэйл хаягаа оруулаад таны байр бэлэн болоход мэдэгдэх болно',
+      title: 'Хүлээлгийн жагсаалтад нэгдэх',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Удахгүй дахин чиглүүлэх болно...',
+      subtitle: 'Таны байр бэлэн болоход бид холбогдох болно',
+      title: 'Хүлээлгийн жагсаалтад нэгдсэнд баярлалаа!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}}-аар холбох',
+    continue: '{{walletName}}-аар үргэлжлүүлэх',
+    noneAvailable:
+      'Solana Web3 түрийвч илрээгүй. Web3-ийг дэмждэг {{ solanaWalletsLink || link("wallet extension") }} суулгана уу.',
   },
 } as const;

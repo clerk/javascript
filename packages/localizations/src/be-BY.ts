@@ -396,6 +396,12 @@ export const beBY: LocalizationResource = {
         headerTitle__members: 'Удзельнікі',
         headerTitle__requests: 'Заявкі',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Ролі часова заблакіраваны',
+          subtitle: 'Мы абнаўляем даступныя ролі. Калі гэта будзе зроблена, вы зможаце абнавіць ролі зноў.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -753,6 +759,10 @@ export const beBY: LocalizationResource = {
       subtitle: 'Увядзіце код, атрыманы з вашага TOTP-генератара.',
       title: 'Двухфактарная верыфікацыя',
     },
+    web3Solana: {
+      subtitle: 'Выберыце кашалёк ніжэй, каб увайсці',
+      title: 'Увайсці з Solana',
+    },
   },
   signInEnterPasswordTitle: undefined,
   signUp: {
@@ -845,31 +855,40 @@ export const beBY: LocalizationResource = {
       title: 'Стварыце Ваш акаўнт',
       titleCombined: 'Стварыце Ваш акаўнт',
     },
+    web3Solana: {
+      subtitle: 'Выберыце кашалёк ніжэй, каб зарэгістравацца',
+      title: 'Зарэгістравацца з Solana',
+    },
   },
   socialButtonsBlockButton: 'Працягнуць з дапамогай {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Стварыць новую арганізацыю',
+      action__invitationAccept: 'Далучыцца',
+      action__suggestionsAccept: 'Запытаць далучэння',
+      subtitle: 'Далучыцеся да існуючай арганізацыі або стварыце новую',
+      subtitle__createOrganizationDisabled: 'Далучыцеся да існуючай арганізацыі',
+      suggestionsAcceptedLabel: 'Чакае зацвярджэння',
+      title: 'Выберыце арганізацыю',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Адмяніць',
+      formButtonSubmit: 'Працягнуць',
+      formFieldInputPlaceholder__name: 'Мая арганізацыя',
+      formFieldInputPlaceholder__slug: 'maya-arhanizatsyya',
+      formFieldLabel__name: 'Назва',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Увядзіце даныя вашай арганізацыі для працягу',
+      title: 'Наладзьце вашу арганізацыю',
+    },
+    organizationCreationDisabled: {
+      title: 'Вы павінны належаць да арганізацыі',
+      subtitle: 'Звярніцеся да адміністратара вашай арганізацыі для атрымання запрашэння.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Выйсці',
+      actionText: 'Увайшлі як {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -951,6 +970,9 @@ export const beBY: LocalizationResource = {
     phone_number_exists: 'Гэты нумар тэлефона ўжо заняты. Калі ласка, паспрабуйце іншы.',
     session_exists: 'Вы ўжо ўвайшлі.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Вы адхілілі запыт на подпіс. Калі ласка, паспрабуйце яшчэ раз, каб працягнуць.',
+    web3_solana_signature_generation_failed:
+      'Адбылася памылка пры стварэнні подпісу. Калі ласка, паспрабуйце яшчэ раз, каб працягнуць.',
     zxcvbn: {
       couldBeStronger: 'Ваш пароль падыходзіць, але мог бы быць надзейнейшым. Паспрабуйце дадаць больш сімвалаў.',
       goodPassword: 'Добрая праца. Гэта выдатны пароль.',
@@ -1323,6 +1345,10 @@ export const beBY: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 кашалькі',
         title: 'Web3 кашалькі',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Выберыце кашалёк Solana для падключэння да вашага акаўнта.',
+          title: 'Дадаць кашалёк Solana',
+        },
       },
     },
     usernamePage: {
@@ -1357,5 +1383,11 @@ export const beBY: LocalizationResource = {
       subtitle: 'Дзякуй за вашае терпліванне, мы паведамім вам, калі з’явяцца месцы.',
       title: 'Вы ў чакальным спісе',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Падключыцца з {{walletName}}',
+    continue: 'Працягнуць з {{walletName}}',
+    noneAvailable:
+      'Кашалькі Solana Web3 не выяўлены. Калі ласка, усталюйце {{ solanaWalletsLink || link("wallet extension") }} з падтрымкай Web3.',
   },
 } as const;

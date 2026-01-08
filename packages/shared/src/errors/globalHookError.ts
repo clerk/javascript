@@ -1,4 +1,4 @@
-import { isClerkApiResponseError } from './clerkApiResponseError';
+import { isClerkAPIResponseError } from './clerkApiResponseError';
 import type { ClerkError } from './clerkError';
 import { isClerkRuntimeError } from './clerkRuntimeError';
 
@@ -9,7 +9,7 @@ import { isClerkRuntimeError } from './clerkRuntimeError';
  */
 export function createClerkGlobalHookError(error: ClerkError) {
   const predicates = {
-    isClerkApiResponseError,
+    isClerkAPIResponseError,
     isClerkRuntimeError,
   } as const;
 

@@ -14,9 +14,7 @@ export { UserButton } from './ui-components/UserButton';
 export {
   ClerkLoaded,
   ClerkLoading,
-  SignedOut,
-  SignedIn,
-  Protect,
+  Show,
   RedirectToSignIn,
   RedirectToSignUp,
   RedirectToUserProfile,

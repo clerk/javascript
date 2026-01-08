@@ -7,7 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 import { rootAuthLoader } from "@clerk/react-router/ssr.server";
-import { ClerkProvider, SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/react-router";
+import { ClerkProvider, Show, SignInButton, UserButton } from "@clerk/react-router";
 
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
@@ -52,12 +52,12 @@ export default function App({ loaderData }: Route.ComponentProps) {
   return (
     <ClerkProvider loaderData={loaderData}>
       <header className="flex items-center justify-center py-8 px-4">
-        <SignedOut>
+        <Show when="signed-out">
           <SignInButton />
-        </SignedOut>
-        <SignedIn>
+        </Show>
+        <Show when="signed-in">
           <UserButton />
-        </SignedIn>
+        </Show>
       </header>
       <main>
         <Outlet />

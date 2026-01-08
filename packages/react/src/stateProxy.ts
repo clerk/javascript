@@ -7,6 +7,8 @@ import type {
   SignInErrors,
   SignUpErrors,
   State,
+  WaitlistErrors,
+  WaitlistResource,
 } from '@clerk/shared/types';
 
 import { errorThrower } from './errors/errorThrower';
@@ -38,6 +40,14 @@ const defaultSignUpErrors = (): SignUpErrors => ({
   global: null,
 });
 
+const defaultWaitlistErrors = (): WaitlistErrors => ({
+  fields: {
+    emailAddress: null,
+  },
+  raw: null,
+  global: null,
+});
+
 type CheckoutSignalProps = {
   for?: ForPayerType;
   planPeriod: BillingSubscriptionPlanPeriod;
@@ -49,12 +59,20 @@ export class StateProxy implements State {
 
   private readonly signInSignalProxy = this.buildSignInProxy();
   private readonly signUpSignalProxy = this.buildSignUpProxy();
+  private readonly waitlistSignalProxy = this.buildWaitlistProxy();
 
   signInSignal() {
     return this.signInSignalProxy;
   }
   signUpSignal() {
     return this.signUpSignalProxy;
+  }
+  waitlistSignal() {
+    return this.waitlistSignalProxy;
+  }
+
+  get __internal_waitlist() {
+    return this.state.__internal_waitlist;
   }
 
   checkoutSignal(params: CheckoutSignalProps) {
@@ -259,6 +277,34 @@ export class StateProxy implements State {
     };
   }
 
+  private buildWaitlistProxy() {
+    const gateProperty = this.gateProperty.bind(this);
+    const gateMethod = this.gateMethod.bind(this);
+    const target = (): WaitlistResource => {
+      return this.state.__internal_waitlist;
+    };
+
+    return {
+      errors: defaultWaitlistErrors(),
+      fetchStatus: 'idle' as const,
+      waitlist: {
+        pathRoot: '/waitlist',
+        get id() {
+          return gateProperty(target, 'id', '');
+        },
+        get createdAt() {
+          return gateProperty(target, 'createdAt', null);
+        },
+        get updatedAt() {
+          return gateProperty(target, 'updatedAt', null);
+        },
+
+        join: gateMethod(target, 'join'),
+        reload: gateMethod(target, 'reload'),
+      },
+    };
+  }
+
   private buildCheckoutProxy(params: CheckoutSignalProps): CheckoutSignalValue {
     const gateProperty = this.gateProperty.bind(this);
     const targetCheckout = () => this.checkout(params);
@@ -320,6 +366,14 @@ export class StateProxy implements State {
   }
   __internal_computed<T>(_: (prev?: T) => T): () => T {
     throw new Error('__internal_computed called before Clerk is loaded');
+  }
+
+  private get state() {
+    const s = this.isomorphicClerk.__internal_state;
+    if (!s) {
+      throw new Error('Clerk state not ready');
+    }
+    return s;
   }
 
   private get client() {

@@ -49,7 +49,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       return null;
     }
 
-    const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
+    const { primaryEmailAddress, primaryPhoneNumber, primaryWeb3Wallet, username, ...userWithoutIdentifiers } = user;
 
     if (!isLoaded) {
       return null;

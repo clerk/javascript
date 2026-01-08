@@ -26,25 +26,12 @@ const appRouterQuickstart = appRouter
 
 const appRouterAPWithClerkNextLatest = appRouterQuickstart.clone().setName('next-app-router-ap-clerk-next-latest');
 
-const appRouterAPWithClerkNextV4 = appRouterQuickstart
+const appRouterQuickstartV6 = appRouter
   .clone()
-  .setName('next-app-router-ap-clerk-next-v4')
-  .addDependency('@clerk/nextjs', '4')
-  .addFile(
-    'src/middleware.ts',
-    () => `import { authMiddleware } from '@clerk/nextjs';
+  .setName('next-app-router-quickstart-v6')
+  .useTemplate(templates['next-app-router-quickstart-v6']);
 
-    export default authMiddleware({
-      publicRoutes: ['/']
-    });
-
-    export const config = {
-      matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
-    };
-    `,
-  );
-
-const appRouterAPWithClerkNextV6 = appRouterQuickstart
+const appRouterAPWithClerkNextV6 = appRouterQuickstartV6
   .clone()
   .setName('next-app-router-ap-clerk-next-v6')
   .addDependency('@clerk/nextjs', '6');
@@ -54,6 +41,6 @@ export const next = {
   appRouterTurbo,
   appRouterQuickstart,
   appRouterAPWithClerkNextLatest,
-  appRouterAPWithClerkNextV4,
   appRouterAPWithClerkNextV6,
+  appRouterQuickstartV6,
 } as const;
