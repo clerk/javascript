@@ -101,3 +101,6 @@ scripts/.env
 # typedoc
 .typedoc/docs
 .typedoc/docs.json
+
+# Personal Claude prompt
+CLAUDE.local.md
