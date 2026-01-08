@@ -875,6 +875,7 @@ export const jaJP: LocalizationResource = {
       action__invitationAccept: '参加する',
       action__suggestionsAccept: '参加をリクエストする',
       subtitle: '既存の組織に参加するか、新しい組織を作成します',
+      subtitle__createOrganizationDisabled: '既存の組織に参加する',
       suggestionsAcceptedLabel: '承認待ち',
       title: '組織を選択',
     },

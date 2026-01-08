@@ -864,6 +864,7 @@ export const trTR: LocalizationResource = {
       action__invitationAccept: 'Katıl',
       action__suggestionsAccept: 'Katılım iste',
       subtitle: 'Mevcut bir organizasyona katılın veya yeni bir tane oluşturun',
+      subtitle__createOrganizationDisabled: 'Mevcut bir organizasyona katılın',
       suggestionsAcceptedLabel: 'Onay bekleniyor',
       title: 'Bir organizasyon seçin',
     },

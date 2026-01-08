@@ -865,6 +865,7 @@ export const isIS: LocalizationResource = {
       action__invitationAccept: 'Ganga í',
       action__suggestionsAccept: 'Biðja um að ganga í',
       subtitle: 'Gangtu í fyrirliggjandi samtök eða stofnaðu ný',
+      subtitle__createOrganizationDisabled: 'Gangtu í fyrirliggjandi samtök',
       suggestionsAcceptedLabel: 'Bíður eftir samþykki',
       title: 'Veldu samtök',
     },

@@ -9,6 +9,7 @@ import {
 } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
 
 import { TaskChooseOrganization } from '..';
+import { findByText } from '@testing-library/react';
 
 const { createFixtures } = bindCreateFixtures('TaskChooseOrganization');
 
@@ -306,6 +307,7 @@ describe('TaskChooseOrganization', () => {
         f.withForceOrganizationSelection();
         f.withUser({
           create_organization_enabled: false,
+          tasks: [{ key: 'choose-organization' }],
         });
       });
 
@@ -344,11 +346,11 @@ describe('TaskChooseOrganization', () => {
         }),
       );
 
-      const { findByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
+      const { findByText, queryByText } = render(<TaskChooseOrganization />, { wrapper });
 
+      expect(await findByText('Join an existing organization')).toBeInTheDocument();
+      expect(await queryByText('Create new organization')).not.toBeInTheDocument();
       expect(await findByText('Existing Org')).toBeInTheDocument();
-      expect(await findByText('Create new organization')).toBeInTheDocument();
-      expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
     });
   });
 });

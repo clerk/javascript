@@ -855,6 +855,7 @@ export const kkKZ: LocalizationResource = {
       action__invitationAccept: 'Қосылу',
       action__suggestionsAccept: 'Қосылуды сұрау',
       subtitle: 'Мәні бар ұйымға қосылыңыз немесе жаңасын құрыңыз',
+      subtitle__createOrganizationDisabled: 'Бар ұйымға қосылыңыз',
       suggestionsAcceptedLabel: 'Мақұлдау күтілуде',
       title: 'Ұйым таңдаңыз',
     },
