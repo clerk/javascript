@@ -9,6 +9,7 @@ import {
 } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
 
 import { TaskChooseOrganization } from '..';
+import { findByText } from '@testing-library/react';
 
 const { createFixtures } = bindCreateFixtures('TaskChooseOrganization');
 
@@ -345,11 +346,11 @@ describe('TaskChooseOrganization', () => {
         }),
       );
 
-      const { queryByText } = render(<TaskChooseOrganization />, { wrapper });
+      const { findByText, queryByText } = render(<TaskChooseOrganization />, { wrapper });
 
-      expect(await queryByText('Join an existing organization')).toBeInTheDocument();
-      expect(await queryByText('Existing Org')).toBeInTheDocument();
-      expect(await queryByText('Create new organization')).toBeInTheDocument();
+      expect(await findByText('Join an existing organization')).toBeInTheDocument();
+      expect(await queryByText('Create new organization')).not.toBeInTheDocument();
+      expect(await findByText('Existing Org')).toBeInTheDocument();
     });
   });
 });

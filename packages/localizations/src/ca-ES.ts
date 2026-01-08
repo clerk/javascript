@@ -863,7 +863,7 @@ export const caES: LocalizationResource = {
       action__invitationAccept: 'Unir-se',
       action__suggestionsAccept: 'Sol·licitar unir-se',
       subtitle: 'Uniu-vos a una organització existent o creeu-ne una de nova',
-      subtitle__createOrganizationDisabled: undefined,
+      subtitle__createOrganizationDisabled: 'Uniu-vos a una organització existent',
       suggestionsAcceptedLabel: "Pendent d'aprovació",
       title: 'Trieu una organització',
     },

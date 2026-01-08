@@ -856,7 +856,7 @@ export const koKR: LocalizationResource = {
       action__invitationAccept: '참여',
       action__suggestionsAccept: '참여 요청',
       subtitle: '기존 조직에 참여하거나 새 조직을 만드세요',
-      subtitle__createOrganizationDisabled: undefined,
+      subtitle__createOrganizationDisabled: '기존 조직에 참여하세요',
       suggestionsAcceptedLabel: '승인 대기 중',
       title: '조직 선택',
     },

@@ -877,7 +877,7 @@ export const roRO: LocalizationResource = {
       action__invitationAccept: 'Alătură-te',
       action__suggestionsAccept: 'Solicită alăturarea',
       subtitle: 'Alătură-te unei organizații existente sau creează una nouă',
-      subtitle__createOrganizationDisabled: undefined,
+      subtitle__createOrganizationDisabled: 'Alătură-te unei organizații existente',
       suggestionsAcceptedLabel: 'În așteptare',
       title: 'Alege o organizație',
     },

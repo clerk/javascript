@@ -864,7 +864,7 @@ export const thTH: LocalizationResource = {
       action__invitationAccept: 'เข้าร่วม',
       action__suggestionsAccept: 'ขอเข้าร่วม',
       subtitle: 'เข้าร่วมองค์กรที่มีอยู่หรือสร้างใหม่',
-      subtitle__createOrganizationDisabled: undefined,
+      subtitle__createOrganizationDisabled: 'เข้าร่วมองค์กรที่มีอยู่',
       suggestionsAcceptedLabel: 'รออนุมัติ',
       title: 'เลือกองค์กร',
     },

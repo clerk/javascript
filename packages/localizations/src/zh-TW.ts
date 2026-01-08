@@ -851,7 +851,7 @@ export const zhTW: LocalizationResource = {
       action__invitationAccept: '加入',
       action__suggestionsAccept: '請求加入',
       subtitle: '加入現有組織或建立新組織',
-      subtitle__createOrganizationDisabled: undefined,
+      subtitle__createOrganizationDisabled: '加入現有組織',
       suggestionsAcceptedLabel: '等待批准',
       title: '選擇組織',
     },

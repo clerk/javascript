@@ -876,7 +876,7 @@ export const ptBR: LocalizationResource = {
       action__invitationAccept: 'Participar',
       action__suggestionsAccept: 'Solicitar participação',
       subtitle: 'Junte-se a uma organização existente ou crie uma nova',
-      subtitle__createOrganizationDisabled: undefined,
+      subtitle__createOrganizationDisabled: 'Junte-se a uma organização existente',
       suggestionsAcceptedLabel: 'Aprovação pendente',
       title: 'Escolha uma organização',
     },

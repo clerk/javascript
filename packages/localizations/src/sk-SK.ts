@@ -868,7 +868,7 @@ export const skSK: LocalizationResource = {
       action__invitationAccept: 'Pridať sa',
       action__suggestionsAccept: 'Požiadať o pridanie',
       subtitle: 'Pridajte sa k existujúcej organizácii alebo vytvorte novú',
-      subtitle__createOrganizationDisabled: undefined,
+      subtitle__createOrganizationDisabled: 'Pridajte sa k existujúcej organizácii',
       suggestionsAcceptedLabel: 'Čaká na schválenie',
       title: 'Vyberte organizáciu',
     },

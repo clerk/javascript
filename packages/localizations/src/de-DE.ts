@@ -879,7 +879,7 @@ export const deDE: LocalizationResource = {
       action__invitationAccept: 'Beitreten',
       action__suggestionsAccept: 'Beitritt beantragen',
       subtitle: 'Einer bestehenden Organisation beitreten oder eine neue erstellen',
-      subtitle__createOrganizationDisabled: undefined,
+      subtitle__createOrganizationDisabled: 'Einer bestehenden Organisation beitreten',
       suggestionsAcceptedLabel: 'Genehmigung ausstehend',
       title: 'Organisation auswählen',
     },

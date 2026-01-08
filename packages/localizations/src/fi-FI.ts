@@ -864,7 +864,7 @@ export const fiFI: LocalizationResource = {
       action__invitationAccept: 'Liity',
       action__suggestionsAccept: 'Pyydä liittymistä',
       subtitle: 'Liity olemassa olevaan organisaatioon tai luo uusi',
-      subtitle__createOrganizationDisabled: undefined,
+      subtitle__createOrganizationDisabled: 'Liity olemassa olevaan organisaatioon',
       suggestionsAcceptedLabel: 'Odottaa hyväksyntää',
       title: 'Valitse organisaatio',
     },

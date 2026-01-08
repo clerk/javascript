@@ -870,7 +870,7 @@ export const idID: LocalizationResource = {
       action__invitationAccept: 'Bergabung',
       action__suggestionsAccept: 'Minta bergabung',
       subtitle: 'Bergabung dengan organisasi yang ada atau buat yang baru',
-      subtitle__createOrganizationDisabled: undefined,
+      subtitle__createOrganizationDisabled: 'Bergabung dengan organisasi yang ada',
       suggestionsAcceptedLabel: 'Menunggu persetujuan',
       title: 'Pilih organisasi',
     },

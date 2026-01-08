@@ -864,7 +864,7 @@ export const nlNL: LocalizationResource = {
       action__invitationAccept: 'Deelnemen',
       action__suggestionsAccept: 'Verzoek om deel te nemen',
       subtitle: 'Deelnemen aan een bestaande organisatie of een nieuwe aanmaken',
-      subtitle__createOrganizationDisabled: undefined,
+      subtitle__createOrganizationDisabled: 'Deelnemen aan een bestaande organisatie',
       suggestionsAcceptedLabel: 'Wachten op goedkeuring',
       title: 'Kies een organisatie',
     },

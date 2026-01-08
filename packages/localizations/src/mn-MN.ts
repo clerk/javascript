@@ -864,7 +864,7 @@ export const mnMN: LocalizationResource = {
       action__invitationAccept: 'Нэгдэх',
       action__suggestionsAccept: 'Нэгдэх хүсэлт илгээх',
       subtitle: 'Одоо байгаа байгууллагад нэгдэх эсвэл шинэ үүсгэх',
-      subtitle__createOrganizationDisabled: undefined,
+      subtitle__createOrganizationDisabled: 'Одоо байгаа байгууллагад нэгдэх',
       suggestionsAcceptedLabel: 'Зөвшөөрөл хүлээж байна',
       title: 'Байгууллага сонгох',
     },
