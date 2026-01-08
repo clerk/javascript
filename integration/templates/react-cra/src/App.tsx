@@ -1,15 +1,15 @@
 // @ts-ignore
 import React from 'react';
 import './App.css';
-import { SignedIn, SignedOut, SignIn, UserButton } from '@clerk/react';
+import { Show, SignIn, UserButton } from '@clerk/react';
 
 function App() {
   return (
     <main>
-      <SignedOut>
+      <Show when='signed-out'>
         <SignIn />
-      </SignedOut>
-      <SignedIn>Signed In</SignedIn>
+      </Show>
+      <Show when='signed-in'>Signed In</Show>
       <UserButton />
     </main>
   );

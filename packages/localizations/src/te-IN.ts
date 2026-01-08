@@ -397,6 +397,13 @@ export const teIN: LocalizationResource = {
         headerTitle__members: 'సభ్యులు',
         headerTitle__requests: 'అభ్యర్థనలు',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'పాత్రలు తాత్కాలికంగా లాక్ చేయబడ్డాయి',
+          subtitle:
+            'మేము అందుబాటులో ఉన్న పాత్రలను అప్‌డేట్ చేస్తున్నాము. అది పూర్తయిన తర్వాత, మీరు మళ్ళీ పాత్రలను అప్‌డేట్ చేయగలరు.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -864,6 +871,7 @@ export const teIN: LocalizationResource = {
       action__invitationAccept: 'చేరండి',
       action__suggestionsAccept: 'చేరడానికి అభ్యర్థించండి',
       subtitle: 'ఇప్పటికే ఉన్న సంస్థలో చేరండి లేదా కొత్తదాన్ని సృష్టించండి',
+      subtitle__createOrganizationDisabled: 'ఇప్పటికే ఉన్న సంస్థలో చేరండి',
       suggestionsAcceptedLabel: 'ఆమోదం కోసం పెండింగ్‌లో ఉంది',
       title: 'ఒక సంస్థను ఎంచుకోండి',
     },

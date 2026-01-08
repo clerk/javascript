@@ -395,6 +395,12 @@ export const srRS: LocalizationResource = {
         headerTitle__members: 'Članovi',
         headerTitle__requests: 'Zahtevi',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Uloge su privremeno zaključane',
+          subtitle: 'Ažuriramo dostupne uloge. Kada to bude završeno, moći ćete ponovo da ažurirate uloge.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -855,6 +861,7 @@ export const srRS: LocalizationResource = {
       action__invitationAccept: 'Pridruži se',
       action__suggestionsAccept: 'Zatraži pridruživanje',
       subtitle: 'Pridružite se postojećoj organizaciji ili napravite novu',
+      subtitle__createOrganizationDisabled: 'Pridružite se postojećoj organizaciji',
       suggestionsAcceptedLabel: 'Čeka odobrenje',
       title: 'Izaberite organizaciju',
     },

@@ -395,6 +395,12 @@ export const nbNO: LocalizationResource = {
         headerTitle__members: 'Medlemmer',
         headerTitle__requests: 'Forespørsler',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roller er midlertidig låst',
+          subtitle: 'Vi oppdaterer tilgjengelige roller. Når det er gjort, vil du kunne oppdatere roller igjen.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -856,6 +862,7 @@ export const nbNO: LocalizationResource = {
       action__invitationAccept: 'Bli med',
       action__suggestionsAccept: 'Be om å bli med',
       subtitle: 'Bli med i en eksisterende organisasjon eller opprett en ny',
+      subtitle__createOrganizationDisabled: 'Bli med i en eksisterende organisasjon',
       suggestionsAcceptedLabel: 'Venter på godkjenning',
       title: 'Velg en organisasjon',
     },

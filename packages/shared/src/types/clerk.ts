@@ -43,7 +43,7 @@ import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel, Without } from './utils';
-import type { WaitlistResource } from './waitlist';
+import type { JoinWaitlistParams, WaitlistResource } from './waitlist';
 
 /**
  * Global appearance type registry that can be augmented by packages that depend on `@clerk/ui`.
@@ -2270,10 +2270,6 @@ export interface ClerkAuthenticateWithWeb3Params {
   secondFactorUrl?: string;
   walletName?: string;
 }
-
-export type JoinWaitlistParams = {
-  emailAddress: string;
-};
 
 export interface AuthenticateWithMetamaskParams {
   customNavigate?: (to: string) => Promise<unknown>;

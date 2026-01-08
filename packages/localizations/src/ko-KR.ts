@@ -395,6 +395,12 @@ export const koKR: LocalizationResource = {
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: '역할이 일시적으로 잠겨 있습니다',
+          subtitle: '사용 가능한 역할을 업데이트하고 있습니다. 완료되면 다시 역할을 업데이트할 수 있습니다.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -850,6 +856,7 @@ export const koKR: LocalizationResource = {
       action__invitationAccept: '참여',
       action__suggestionsAccept: '참여 요청',
       subtitle: '기존 조직에 참여하거나 새 조직을 만드세요',
+      subtitle__createOrganizationDisabled: '기존 조직에 참여하세요',
       suggestionsAcceptedLabel: '승인 대기 중',
       title: '조직 선택',
     },

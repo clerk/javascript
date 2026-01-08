@@ -391,6 +391,12 @@ export const zhCN: LocalizationResource = {
         headerTitle__members: '成员',
         headerTitle__requests: '请求',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: '角色暂时被锁定',
+          subtitle: '我们正在更新可用角色。完成后，您将能够再次更新角色。',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -844,6 +850,7 @@ export const zhCN: LocalizationResource = {
       action__invitationAccept: '加入',
       action__suggestionsAccept: '请求加入',
       subtitle: '加入现有组织或创建新组织',
+      subtitle__createOrganizationDisabled: '加入现有组织',
       suggestionsAcceptedLabel: '等待批准',
       title: '选择组织',
     },

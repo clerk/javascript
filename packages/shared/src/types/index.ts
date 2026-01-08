@@ -44,7 +44,7 @@ export type * from './passwords';
 export type * from './permission';
 export type * from './phoneCodeChannel';
 export type * from './phoneNumber';
-export type * from './protect';
+export type * from './authorization';
 export type * from './protectConfig';
 export type * from './redirects';
 export type * from './resource';

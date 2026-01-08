@@ -398,6 +398,13 @@ export const taIN: LocalizationResource = {
         headerTitle__members: 'உறுப்பினர்கள்',
         headerTitle__requests: 'கோரிக்கைகள்',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'பாத்திரங்கள் தற்காலிகமாக பூட்டப்பட்டுள்ளன',
+          subtitle:
+            'கிடைக்கக்கூடிய பாத்திரங்களை நாங்கள் புதுப்பிக்கிறோம். இது முடிந்ததும், நீங்கள் மீண்டும் பாத்திரங்களை புதுப்பிக்க முடியும்.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -864,6 +871,7 @@ export const taIN: LocalizationResource = {
       action__invitationAccept: 'சேரவும்',
       action__suggestionsAccept: 'சேர்வதற்கு கோரிக்கை',
       subtitle: 'இருக்கும் அமைப்பில் சேரவும் அல்லது புதியதை உருவாக்கவும்',
+      subtitle__createOrganizationDisabled: 'இருக்கும் அமைப்பில் சேரவும்',
       suggestionsAcceptedLabel: 'அனுமதிக்காக காத்திருக்கிறது',
       title: 'ஒரு அமைப்பைத் தேர்ந்தெடுக்கவும்',
     },

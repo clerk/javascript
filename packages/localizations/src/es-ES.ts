@@ -396,6 +396,13 @@ export const esES: LocalizationResource = {
         headerTitle__members: 'Miembros',
         headerTitle__requests: 'Solicitudes',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Los roles están temporalmente bloqueados',
+          subtitle:
+            'Estamos actualizando los roles disponibles. Una vez hecho esto, podrás actualizar los roles de nuevo.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -858,6 +865,7 @@ export const esES: LocalizationResource = {
       action__invitationAccept: 'Unirse',
       action__suggestionsAccept: 'Solicitar unirse',
       subtitle: 'Unirse a una organización existente o crear una nueva',
+      subtitle__createOrganizationDisabled: 'Unirse a una organización existente',
       suggestionsAcceptedLabel: 'Pendiente de aprobación',
       title: 'Elegir una organización',
     },

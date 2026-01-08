@@ -399,6 +399,12 @@ export const ruRU: LocalizationResource = {
         headerTitle__members: 'Участники',
         headerTitle__requests: 'Заявки',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Роли временно заблокированы',
+          subtitle: 'Мы обновляем доступные роли. Как только это будет сделано, вы сможете снова обновлять роли.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -869,6 +875,7 @@ export const ruRU: LocalizationResource = {
       action__invitationAccept: 'Присоединиться',
       action__suggestionsAccept: 'Запросить присоединение',
       subtitle: 'Присоединитесь к существующей организации или создайте новую',
+      subtitle__createOrganizationDisabled: 'Присоединитесь к существующей организации',
       suggestionsAcceptedLabel: 'Ожидает одобрения',
       title: 'Выберите организацию',
     },

@@ -395,6 +395,12 @@ export const skSK: LocalizationResource = {
         headerTitle__members: 'Členovia',
         headerTitle__requests: 'Požiadavky',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Úlohy sú dočasne uzamknuté',
+          subtitle: 'Aktualizujeme dostupné úlohy. Po dokončení budete môcť úlohy opäť aktualizovať.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -862,6 +868,7 @@ export const skSK: LocalizationResource = {
       action__invitationAccept: 'Pridať sa',
       action__suggestionsAccept: 'Požiadať o pridanie',
       subtitle: 'Pridajte sa k existujúcej organizácii alebo vytvorte novú',
+      subtitle__createOrganizationDisabled: 'Pridajte sa k existujúcej organizácii',
       suggestionsAcceptedLabel: 'Čaká na schválenie',
       title: 'Vyberte organizáciu',
     },

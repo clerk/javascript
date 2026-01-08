@@ -397,6 +397,13 @@ export const hiIN: LocalizationResource = {
         headerTitle__members: 'सदस्य',
         headerTitle__requests: 'अनुरोध',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'भूमिकाएं अस्थायी रूप से लॉक हैं',
+          subtitle:
+            'हम उपलब्ध भूमिकाओं को अपडेट कर रहे हैं। एक बार यह हो जाने के बाद, आप फिर से भूमिकाएं अपडेट कर सकेंगे।',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -862,6 +869,7 @@ export const hiIN: LocalizationResource = {
       action__invitationAccept: 'शामिल हों',
       action__suggestionsAccept: 'शामिल होने का अनुरोध करें',
       subtitle: 'मौजूदा संगठन में शामिल हों या नया बनाएं',
+      subtitle__createOrganizationDisabled: 'मौजूदा संगठन में शामिल हों',
       suggestionsAcceptedLabel: 'अनुमोदन की प्रतीक्षा',
       title: 'एक संगठन चुनें',
     },

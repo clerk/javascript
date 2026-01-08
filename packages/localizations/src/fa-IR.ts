@@ -402,6 +402,13 @@ export const faIR: LocalizationResource = {
         headerTitle__members: 'اعضا',
         headerTitle__requests: 'درخواست‌ها',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'نقش‌ها موقتاً قفل شده‌اند',
+          subtitle:
+            'ما در حال به‌روزرسانی نقش‌های موجود هستیم. پس از اتمام، می‌توانید دوباره نقش‌ها را به‌روزرسانی کنید.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'کلیدهای API',
@@ -868,6 +875,7 @@ export const faIR: LocalizationResource = {
       action__invitationAccept: 'بپیوندید',
       action__suggestionsAccept: 'درخواست عضویت',
       subtitle: 'برای ادامه، سازمانی را انتخاب کنید',
+      subtitle__createOrganizationDisabled: 'به یک سازمان موجود بپیوندید',
       suggestionsAcceptedLabel: 'در انتظار تایید',
       title: 'یک سازمان انتخاب کنید',
     },
