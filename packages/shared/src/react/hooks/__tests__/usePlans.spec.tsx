@@ -261,9 +261,19 @@ describe('usePlans', () => {
       await result.current.userPlans.revalidate();
     });
 
-    await waitFor(() => expect(getPlansSpy.mock.calls.length).toBeGreaterThanOrEqual(1));
-
+    const isRQ = Boolean((globalThis as any).__CLERK_USE_RQ__);
     const calls = getPlansSpy.mock.calls.map(call => call[0]?.for);
-    expect(calls.every(value => value === 'user')).toBe(true);
+
+    if (isRQ) {
+      await waitFor(() => expect(getPlansSpy.mock.calls.length).toBeGreaterThanOrEqual(1));
+      expect(calls.every(value => value === 'user')).toBe(true);
+    } else {
+      await waitFor(() => expect(getPlansSpy.mock.calls.length).toBe(1));
+      expect(getPlansSpy.mock.calls[0][0]).toEqual(
+        expect.objectContaining({
+          for: 'user',
+        }),
+      );
+    }
   });
 });

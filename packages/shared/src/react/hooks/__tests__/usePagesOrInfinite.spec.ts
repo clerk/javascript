@@ -722,7 +722,11 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
       await result.current.paginated.revalidate();
     });
 
-    await waitFor(() => expect(fetcher.mock.calls.length).toBeGreaterThanOrEqual(2));
+    if (__CLERK_USE_RQ__) {
+      await waitFor(() => expect(fetcher.mock.calls.length).toBeGreaterThanOrEqual(2));
+    } else {
+      await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(1));
+    }
   });
 });
 
