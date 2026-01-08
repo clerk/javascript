@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.34.0
+
+### Minor Changes
+
+- Fix "You must belong to an organization" screen showing when user has existing memberships, invitations or suggestions ([#7557](https://github.com/clerk/javascript/pull/7557)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 3.33.0
 
 ### Minor Changes
