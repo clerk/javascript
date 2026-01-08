@@ -1,6 +1,11 @@
 {
   "extends": ["//"],
   "tasks": {
+    "dev:sandbox": {
+      "cache": false,
+      "dependsOn": ["build"],
+      "persistent": true
+    },
     "build": {
       "inputs": [
         "*.d.ts",
