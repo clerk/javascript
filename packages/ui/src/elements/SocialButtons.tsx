@@ -207,10 +207,6 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                         maskSize: 'cover',
                         maskPosition: 'center',
                         maskRepeat: 'no-repeat',
-                        WebkitMaskImage: `url(${strategyToDisplayData[strategy].iconUrl})`,
-                        WebkitMaskSize: 'cover',
-                        WebkitMaskPosition: 'center',
-                        WebkitMaskRepeat: 'no-repeat',
                       }
                     : {
                         backgroundImage: `url(${strategyToDisplayData[strategy].iconUrl})`,
