@@ -22,6 +22,9 @@ function useClerkSignal(
     case 'signUp':
       clerk.telemetry?.record(eventMethodCalled('useSignUp', { apiVersion: '2025-11' }));
       break;
+    case 'waitlist':
+      clerk.telemetry?.record(eventMethodCalled('useWaitlist', { apiVersion: '2025-11' }));
+      break;
     default:
       break;
   }
@@ -73,7 +76,7 @@ function useClerkSignal(
  * This hook allows you to access the Signal-based `SignIn` resource.
  *
  * @example
- * import { useSignInSignal } from "@clerk/react/experimental";
+ * import { useSignIn } from "@clerk/react";
  *
  * function SignInForm() {
  *   const { signIn, errors, fetchStatus } = useSignInSignal();
@@ -90,7 +93,7 @@ export function useSignIn() {
  * This hook allows you to access the Signal-based `SignUp` resource.
  *
  * @example
- * import { useSignUpSignal } from "@clerk/react/experimental";
+ * import { useSignUp } from "@clerk/react";
  *
  * function SignUpForm() {
  *   const { signUp, errors, fetchStatus } = useSignUpSignal();
@@ -107,7 +110,7 @@ export function useSignUp() {
  * This hook allows you to access the Signal-based `Waitlist` resource.
  *
  * @example
- * import { useWaitlist } from "@clerk/react/experimental";
+ * import { useWaitlist } from "@clerk/react";
  *
  * function WaitlistForm() {
  *   const { waitlist, errors, fetchStatus } = useWaitlist();
