@@ -48,18 +48,9 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     label: localizationKeys('formFieldLabel__emailAddresses'),
   });
 
-  const defaultRole = useDefaultRole();
   const roleField = useFormControl('role', '', {
     label: localizationKeys('formFieldLabel__role'),
   });
-
-  useEffect(() => {
-    if (roleField.value || !defaultRole) {
-      return;
-    }
-
-    roleField.setValue(defaultRole);
-  }, [defaultRole, roleField]);
 
   if (!organization) {
     return null;
@@ -200,8 +191,21 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
 
 const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
   const { options, isLoading, hasRoleSetMigration } = useFetchRoles();
-
   const { t } = useLocalizations();
+  const defaultRole = useDefaultRole();
+
+  useEffect(() => {
+    if (field.value || !defaultRole) {
+      return;
+    }
+
+    const defaultRoleExists = options?.some(option => option.value === defaultRole);
+    if (!defaultRoleExists) {
+      return;
+    }
+
+    field.setValue(defaultRole);
+  }, [defaultRole, options, field]);
 
   return (
     <Form.ControlRow elementId={field.id}>
