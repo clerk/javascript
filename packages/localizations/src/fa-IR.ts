@@ -875,6 +875,7 @@ export const faIR: LocalizationResource = {
       action__invitationAccept: 'بپیوندید',
       action__suggestionsAccept: 'درخواست عضویت',
       subtitle: 'برای ادامه، سازمانی را انتخاب کنید',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'در انتظار تایید',
       title: 'یک سازمان انتخاب کنید',
     },

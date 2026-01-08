@@ -866,6 +866,7 @@ export const elGR: LocalizationResource = {
       action__invitationAccept: 'Συμμετοχή',
       action__suggestionsAccept: 'Αίτημα συμμετοχής',
       subtitle: 'Συμμετάσχετε σε έναν υπάρχοντα οργανισμό ή δημιουργήστε νέο',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'Σε αναμονή έγκρισης',
       title: 'Επιλέξτε οργανισμό',
     },

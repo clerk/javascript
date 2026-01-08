@@ -868,6 +868,7 @@ export const bnIN: LocalizationResource = {
       action__invitationAccept: 'যোগ দিন',
       action__suggestionsAccept: 'যোগদানের অনুরোধ করুন',
       subtitle: 'বিদ্যমান সংগঠনে যোগ দিন বা একটি নতুন তৈরি করুন',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'অনুমোদনের অপেক্ষায়',
       title: 'একটি সংগঠন নির্বাচন করুন',
     },

@@ -864,6 +864,7 @@ export const bgBG: LocalizationResource = {
       action__invitationAccept: 'Присъедини се',
       action__suggestionsAccept: 'Поискай присъединяване',
       subtitle: 'Присъедини се към съществуваща организация или създай нова',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'В очакване на одобрение',
       title: 'Избери организация',
     },

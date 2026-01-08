@@ -874,6 +874,7 @@ export const csCZ: LocalizationResource = {
       action__invitationAccept: 'Připojit se',
       action__suggestionsAccept: 'Požádat o připojení',
       subtitle: 'Připojte se k existující organizaci nebo vytvořte novou',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'Čeká na schválení',
       title: 'Vyberte organizaci',
     },

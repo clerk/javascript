@@ -865,6 +865,7 @@ export const enGB: LocalizationResource = {
       action__invitationAccept: 'Join',
       action__suggestionsAccept: 'Request to join',
       subtitle: 'Join an existing organisation or create a new one',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'Pending approval',
       title: 'Choose an organisation',
     },

@@ -871,6 +871,7 @@ export const viVN: LocalizationResource = {
       action__invitationAccept: 'Tham gia',
       action__suggestionsAccept: 'Yêu cầu tham gia',
       subtitle: 'Tham gia một tổ chức hiện có hoặc tạo mới',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'Đang chờ phê duyệt',
       title: 'Chọn tổ chức',
     },

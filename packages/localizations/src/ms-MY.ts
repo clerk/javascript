@@ -872,6 +872,7 @@ export const msMY: LocalizationResource = {
       action__invitationAccept: 'Sertai',
       action__suggestionsAccept: 'Minta untuk menyertai',
       subtitle: 'Sertai organisasi sedia ada atau cipta yang baharu',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'Menunggu kelulusan',
       title: 'Pilih organisasi',
     },

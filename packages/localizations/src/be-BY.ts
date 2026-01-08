@@ -868,6 +868,7 @@ export const beBY: LocalizationResource = {
       action__invitationAccept: 'Далучыцца',
       action__suggestionsAccept: 'Запытаць далучэння',
       subtitle: 'Далучыцеся да існуючай арганізацыі або стварыце новую',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'Чакае зацвярджэння',
       title: 'Выберыце арганізацыю',
     },

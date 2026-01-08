@@ -861,6 +861,7 @@ export const srRS: LocalizationResource = {
       action__invitationAccept: 'Pridruži se',
       action__suggestionsAccept: 'Zatraži pridruživanje',
       subtitle: 'Pridružite se postojećoj organizaciji ili napravite novu',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'Čeka odobrenje',
       title: 'Izaberite organizaciju',
     },

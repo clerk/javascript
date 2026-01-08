@@ -860,6 +860,7 @@ export const ukUA: LocalizationResource = {
       action__invitationAccept: 'Приєднатися',
       action__suggestionsAccept: 'Запросити приєднання',
       subtitle: 'Приєднайтеся до існуючої організації або створіть нову',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'Очікує схвалення',
       title: 'Виберіть організацію',
     },
