@@ -880,6 +880,7 @@ export const frFR: LocalizationResource = {
       action__invitationAccept: 'Rejoindre',
       action__suggestionsAccept: 'Demander à rejoindre',
       subtitle: 'Rejoignez une organisation existante ou créez-en une nouvelle',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'En attente d’approbation',
       title: 'Choisir une organisation',
     },
