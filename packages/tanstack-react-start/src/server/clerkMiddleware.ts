@@ -16,20 +16,29 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): AnyRequestMid
   return createMiddleware().server(async ({ request, next }) => {
     const clerkRequest = createClerkRequest(patchRequest(request));
 
+    // Load options with resolved keys
+    const loadedOptions = loadOptions(clerkRequest, {
+      ...options,
+      publishableKey: options?.publishableKey,
+      secretKey: options?.secretKey,
+    });
+
+    console.log({ loadedOptions });
+
     // Get keys - either from options, env, or keyless mode
     const {
       publishableKey,
       secretKey,
       claimUrl: keylessClaimUrl,
       apiKeysUrl: keylessApiKeysUrl,
-    } = await resolveKeysWithKeylessFallback(options?.publishableKey, options?.secretKey);
+    } = await resolveKeysWithKeylessFallback(loadedOptions.publishableKey, loadedOptions.secretKey);
 
-    // Load options with resolved keys
-    const loadedOptions = loadOptions(clerkRequest, {
-      ...options,
-      publishableKey,
-      secretKey,
-    });
+    if (publishableKey) {
+      loadedOptions.publishableKey = publishableKey;
+    }
+    if (secretKey) {
+      loadedOptions.secretKey = secretKey;
+    }
 
     const requestState = await clerkClient().authenticateRequest(clerkRequest, {
       ...loadedOptions,

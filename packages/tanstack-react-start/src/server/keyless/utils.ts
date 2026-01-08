@@ -1,4 +1,5 @@
 import type { AccountlessApplication } from '@clerk/shared/keyless';
+import { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMessage } from '@clerk/shared/keyless';
 
 import { canUseKeyless } from '../../utils/feature-flags';
 import { keyless } from './index';
@@ -26,9 +27,41 @@ export async function resolveKeysWithKeylessFallback(
   let claimUrl: string | undefined;
   let apiKeysUrl: string | undefined;
 
+  if (!canUseKeyless) {
+    return { publishableKey, secretKey, claimUrl, apiKeysUrl };
+  }
+
+  console.log({ publishableKey, configuredPublishableKey });
+  console.log({ secretKey, configuredSecretKey });
+
+  const keylessService = keyless();
+  const locallyStoredKeys = keylessService.readKeys();
+
+  // Check if running with claimed keys (configured keys match locally stored keyless keys)
+  const runningWithClaimedKeys =
+    Boolean(configuredPublishableKey) && configuredPublishableKey === locallyStoredKeys?.publishableKey;
+
+  if (runningWithClaimedKeys && locallyStoredKeys) {
+    // Complete onboarding when running with claimed keys
+    try {
+      await clerkDevelopmentCache?.run(() => keylessService.completeOnboarding(), {
+        cacheKey: `${locallyStoredKeys.publishableKey}_complete`,
+        onSuccessStale: 24 * 60 * 60 * 1000, // 24 hours
+      });
+    } catch {
+      // noop
+    }
+
+    clerkDevelopmentCache?.log({
+      cacheKey: `${locallyStoredKeys.publishableKey}_claimed`,
+      msg: createConfirmationMessage(),
+    });
+
+    return { publishableKey, secretKey, claimUrl, apiKeysUrl };
+  }
+
   // In keyless mode, try to read/create keys from the file system
-  if (canUseKeyless && (!publishableKey || !secretKey)) {
-    const keylessService = keyless();
+  if (!publishableKey || !secretKey) {
     const keylessApp: AccountlessApplication | null = await keylessService.getOrCreateKeys();
 
     if (keylessApp) {
@@ -37,7 +70,10 @@ export async function resolveKeysWithKeylessFallback(
       claimUrl = keylessApp.claimUrl;
       apiKeysUrl = keylessApp.apiKeysUrl;
 
-      keylessService.logKeylessMessage(keylessApp.claimUrl);
+      clerkDevelopmentCache?.log({
+        cacheKey: keylessApp.publishableKey,
+        msg: createKeylessModeMessage(keylessApp),
+      });
     }
   }
 
