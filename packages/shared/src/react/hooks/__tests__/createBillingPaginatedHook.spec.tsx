@@ -308,7 +308,16 @@ describe('createBillingPaginatedHook', () => {
         expect(params).toStrictEqual({ initialPage: 1, pageSize: 5 });
       });
 
-      expect(result.current.isLoading).toBe(false);
+      if (__CLERK_USE_RQ__) {
+        expect(result.current.isLoading).toBe(false);
+      } else {
+        // Attention: We are forcing fetcher to be executed instead of setting the key to null
+        // because SWR will continue to display the cached data when the key is null and `keepPreviousData` is true.
+        // This means that SWR will update the loading state to true even if the fetcher is not called,
+        // because the key changes from `{..., userId: 'user_1'}` to `{..., userId: undefined}`.
+        await waitFor(() => expect(result.current.isLoading).toBe(true));
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+      }
 
       // Data should be cleared even with keepPreviousData: true
       // The key difference here vs usePagesOrInfinite test: userId in cache key changes
@@ -534,7 +543,11 @@ describe('createBillingPaginatedHook', () => {
         await result.current.paginated.revalidate();
       });
 
-      await waitFor(() => expect(fetcherMock.mock.calls.length).toBeGreaterThanOrEqual(2));
+      if (__CLERK_USE_RQ__) {
+        await waitFor(() => expect(fetcherMock.mock.calls.length).toBeGreaterThanOrEqual(2));
+      } else {
+        await waitFor(() => expect(fetcherMock).toHaveBeenCalledTimes(1));
+      }
     });
   });
 });

@@ -12,8 +12,9 @@ import React from 'react';
 import { assertClerkSingletonExists } from './utils';
 
 type CoreClerkContextWrapperProps = {
-  children: React.ReactNode;
   clerk: Clerk;
+  children: React.ReactNode;
+  swrConfig?: any;
 };
 
 type CoreClerkContextProviderState = Resources;
@@ -50,7 +51,10 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
     <ClerkInstanceContext.Provider value={clerkCtx}>
       <ClientContext.Provider value={clientCtx}>
         <SessionContext.Provider value={sessionCtx}>
-          <OrganizationProvider {...organizationCtx.value}>
+          <OrganizationProvider
+            {...organizationCtx.value}
+            swrConfig={props.swrConfig}
+          >
             <UserContext.Provider value={userCtx}>
               <CheckoutProvider
                 // @ts-expect-error - value is not used

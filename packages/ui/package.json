@@ -86,7 +86,8 @@
     "input-otp": "1.4.2",
     "qrcode.react": "4.2.0",
     "react": "catalog:peer-react",
-    "react-dom": "catalog:peer-react"
+    "react-dom": "catalog:peer-react",
+    "swr": "2.3.4"
   },
   "devDependencies": {
     "@floating-ui/react-dom": "^2.1.6",
