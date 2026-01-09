@@ -23,11 +23,11 @@ const cli = meow(
       $ pnpm run generate-guide --version=core-3 --sdk=react > react-guide.md
 `,
   {
-    importMeta: import.meta,
     flags: {
-      version: { type: 'string', isRequired: true },
-      sdk: { type: 'string', isRequired: true },
+      sdk: { isRequired: true, type: 'string' },
+      version: { isRequired: true, type: 'string' },
     },
+    importMeta: import.meta,
   },
 );
 
@@ -50,7 +50,10 @@ function loadChanges(version, sdk) {
     return [];
   }
 
-  const files = fs.readdirSync(changesDir).filter(f => f.endsWith('.md'));
+  const files = fs
+    .readdirSync(changesDir)
+    .filter(f => f.endsWith('.md'))
+    .sort();
   const changes = [];
 
   for (const file of files) {
@@ -94,11 +97,44 @@ function groupByCategory(changes) {
 
 function getCategoryHeading(category) {
   const headings = {
+    'behavior-change': 'Behavior Change',
     breaking: 'Breaking Changes',
+    deprecation: 'Deprecations',
     'deprecation-removal': 'Deprecation Removals',
+    version: 'Version',
     warning: 'Warnings',
   };
-  return headings[category] || category;
+  if (headings[category]) {
+    return headings[category];
+  }
+
+  return category.replace(/[-_]+/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+}
+
+function normalizeSdk(sdk) {
+  return sdk.replace(/^@clerk\//, '');
+}
+
+function renderAccordionCategory(lines, category, categoryChanges) {
+  const sortedChanges = [...categoryChanges].sort((a, b) => a.title.localeCompare(b.title));
+  const titles = sortedChanges.map(change => JSON.stringify(change.title));
+
+  lines.push(`## ${getCategoryHeading(category)}`);
+  lines.push('');
+  lines.push(`<Accordion titles={[${titles.join(', ')}]}>`);
+  lines.push('');
+
+  for (const change of sortedChanges) {
+    lines.push('  <AccordionPanel>');
+    lines.push('');
+    lines.push(change.content);
+    lines.push('');
+    lines.push('  </AccordionPanel>');
+    lines.push('');
+  }
+
+  lines.push('</Accordion>');
+  lines.push('');
 }
 
 function generateMarkdown(sdk, versionConfig, changes) {
@@ -114,7 +150,8 @@ function generateMarkdown(sdk, versionConfig, changes) {
   }
 
   const grouped = groupByCategory(changes);
-  const categoryOrder = ['breaking', 'deprecation-removal', 'warning'];
+  const categoryOrder = ['breaking', 'deprecation-removal', 'deprecation', 'warning', 'version', 'behavior-change'];
+  const seenCategories = new Set();
 
   for (const category of categoryOrder) {
     const categoryChanges = grouped[category];
@@ -122,10 +159,16 @@ function generateMarkdown(sdk, versionConfig, changes) {
       continue;
     }
 
+    seenCategories.add(category);
+    if (category === 'breaking') {
+      renderAccordionCategory(lines, category, categoryChanges);
+      continue;
+    }
+
     lines.push(`## ${getCategoryHeading(category)}`);
     lines.push('');
 
-    for (const change of categoryChanges) {
+    for (const change of [...categoryChanges].sort((a, b) => a.title.localeCompare(b.title))) {
       lines.push(`### ${change.title}`);
       lines.push('');
       lines.push(change.content);
@@ -134,15 +177,20 @@ function generateMarkdown(sdk, versionConfig, changes) {
   }
 
   // Handle any categories not in the predefined order
-  for (const [category, categoryChanges] of Object.entries(grouped)) {
-    if (categoryOrder.includes(category)) {
+  for (const [category, categoryChanges] of Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b))) {
+    if (seenCategories.has(category)) {
+      continue;
+    }
+
+    if (category === 'breaking') {
+      renderAccordionCategory(lines, category, categoryChanges);
       continue;
     }
 
     lines.push(`## ${getCategoryHeading(category)}`);
     lines.push('');
 
-    for (const change of categoryChanges) {
+    for (const change of [...categoryChanges].sort((a, b) => a.title.localeCompare(b.title))) {
       lines.push(`### ${change.title}`);
       lines.push('');
       lines.push(change.content);
@@ -154,17 +202,18 @@ function generateMarkdown(sdk, versionConfig, changes) {
 }
 
 async function main() {
-  const { version, sdk } = cli.flags;
+  const { sdk, version } = cli.flags;
+  const normalizedSdk = normalizeSdk(sdk);
 
   const versionConfig = await loadVersionConfig(version);
-  const changes = loadChanges(version, sdk);
+  const changes = loadChanges(version, normalizedSdk);
 
   if (changes.length === 0) {
-    console.error(`No changes found for ${sdk} in ${version}`);
+    console.error(`No changes found for ${normalizedSdk} in ${version}`);
     process.exit(1);
   }
 
-  const markdown = generateMarkdown(sdk, versionConfig, changes);
+  const markdown = generateMarkdown(normalizedSdk, versionConfig, changes);
   console.log(markdown);
 }
 
