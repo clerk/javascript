@@ -393,16 +393,7 @@ export const SelectButton = (
 
   let show: React.ReactNode = children;
   if (!children) {
-    show = selectedOption ? (
-      buttonRenderOption(selectedOption)
-    ) : (
-      <Text
-        as='span'
-        sx={t => ({ opacity: t.opacity.$inactive })}
-      >
-        {placeholder}
-      </Text>
-    );
+    show = selectedOption ? buttonRenderOption(selectedOption) : <Text as='span'>{placeholder}</Text>;
   }
 
   return (
