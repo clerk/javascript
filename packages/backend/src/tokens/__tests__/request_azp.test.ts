@@ -3,7 +3,6 @@ import { describe, expect, test, vi } from 'vitest';
 import { TokenVerificationErrorReason } from '../../errors';
 import { decodeJwt } from '../../jwt/verifyJwt';
 import { authenticateRequest } from '../request';
-import { TokenType } from '../tokenTypes';
 import { verifyToken } from '../verify';
 
 vi.mock('../verify', () => ({
@@ -51,9 +50,9 @@ describe('authenticateRequest with cookie token', () => {
     const result = await authenticateRequest(request, options);
 
     expect(result.status).toBe('signed-out');
-    // @ts-ignore
+    // @ts-expect-error - reason is only available on signed-out state
     expect(result.reason).toBe(TokenVerificationErrorReason.TokenMissingAzp);
-    // @ts-ignore
+    // @ts-expect-error - message is only available on signed-out state
     expect(result.message).toBe(
       'Session tokens from cookies must have an azp claim. (reason=token-missing-azp, token-carrier=cookie)',
     );
