@@ -109,11 +109,34 @@ async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCre
 }
 
 /**
+ * The well-known symbol used to identify legitimate @clerk/ui exports.
+ * Uses Symbol.for() to ensure the same symbol is used across module boundaries.
+ */
+const UI_BRAND_SYMBOL = Symbol.for('clerk:ui');
+
+/**
+ * Checks if the provided ui option is a legitimate @clerk/ui export
+ */
+function isLegitimateUiExport(ui: unknown): boolean {
+  if (!ui || (typeof ui !== 'object' && typeof ui !== 'function')) {
+    return false;
+  }
+  return (ui as any).__brand === UI_BRAND_SYMBOL;
+}
+
+/**
  * Checks if the provided ui option is a ClerkUi constructor (class)
  * rather than a version pinning object
  */
 function isUiConstructor(ui: unknown): ui is ClerkUiConstructor {
-  return typeof ui === 'function' && 'version' in ui;
+  return typeof ui === 'function' && isLegitimateUiExport(ui);
+}
+
+/**
+ * Checks if the provided ui option is a version object for hot loading
+ */
+function isUiVersion(ui: unknown): ui is { version: string; url?: string } {
+  return typeof ui === 'object' && ui !== null && isLegitimateUiExport(ui) && 'version' in ui;
 }
 
 /**
@@ -128,7 +151,18 @@ async function getClerkUiEntryChunk<TUi extends Ui = Ui>(
     return options.ui;
   }
 
-  await loadClerkUiScript(options);
+  // Get version info if it's a legitimate version object
+  const uiVersion = isUiVersion(options?.ui) ? options.ui : undefined;
+
+  await loadClerkUiScript(
+    options
+      ? {
+          ...options,
+          clerkUiVersion: uiVersion?.version,
+          clerkUiUrl: uiVersion?.url,
+        }
+      : undefined,
+  );
 
   if (!window.__internal_ClerkUiCtor) {
     throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');

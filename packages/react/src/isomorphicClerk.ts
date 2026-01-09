@@ -509,11 +509,34 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   /**
+   * The well-known symbol used to identify legitimate @clerk/ui exports.
+   * Uses Symbol.for() to ensure the same symbol is used across module boundaries.
+   */
+  private static readonly UI_BRAND_SYMBOL = Symbol.for('clerk:ui');
+
+  /**
+   * Checks if the provided ui option is a legitimate @clerk/ui export
+   */
+  private isLegitimateUiExport(ui: unknown): boolean {
+    if (!ui || (typeof ui !== 'object' && typeof ui !== 'function')) {
+      return false;
+    }
+    return (ui as any).__brand === IsomorphicClerk.UI_BRAND_SYMBOL;
+  }
+
+  /**
    * Checks if the provided ui option is a ClerkUi constructor (class)
    * rather than a version pinning object
    */
   private isUiConstructor(ui: unknown): ui is ClerkUiConstructor {
-    return typeof ui === 'function' && 'version' in ui;
+    return typeof ui === 'function' && this.isLegitimateUiExport(ui);
+  }
+
+  /**
+   * Checks if the provided ui option is a version object for hot loading
+   */
+  private isUiVersion(ui: unknown): ui is { version: string; url?: string } {
+    return typeof ui === 'object' && ui !== null && this.isLegitimateUiExport(ui) && 'version' in ui;
   }
 
   private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor> {
@@ -523,7 +546,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     // Otherwise, hot load the UI script based on version/url
-    const uiVersion = typeof this.options.ui === 'object' ? this.options.ui : undefined;
+    const uiVersion = this.isUiVersion(this.options.ui) ? this.options.ui : undefined;
 
     await loadClerkUiScript({
       ...this.options,

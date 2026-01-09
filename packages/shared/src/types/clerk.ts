@@ -2374,20 +2374,23 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   nonce?: string;
   /**
    * The UI module configuration. Accepts either:
-   * - A version object `{ version: string; url?: string }` for hot loading with version pinning
-   * - The ClerkUI class constructor for direct module usage (bypasses hot loading)
+   * - The `version` export from `@clerk/ui` for hot loading with version pinning
+   * - The `ClerkUI` class constructor from `@clerk/ui` for direct module usage
+   *
+   * Note: Only legitimate exports from `@clerk/ui` are accepted (validated via symbol).
+   * Arbitrary objects or strings will be ignored.
    *
    * @example
    * // Hot loading with version pinning
-   * import { ui } from '@clerk/ui';
-   * <ClerkProvider ui={ui} />
+   * import { version } from '@clerk/ui';
+   * <ClerkProvider ui={version} />
    *
    * @example
    * // Direct module usage (bundled with your app)
    * import { ClerkUI } from '@clerk/ui';
    * <ClerkProvider ui={ClerkUI} />
    */
-  ui?: { version: string; url?: string } | ClerkUiConstructor;
+  ui?: { __brand: symbol; version: string; url?: string } | ClerkUiConstructor;
 } & MultiDomainAndOrProxy;
 
 export interface LoadedClerk extends Clerk {

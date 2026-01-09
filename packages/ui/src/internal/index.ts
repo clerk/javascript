@@ -19,12 +19,23 @@ declare const Tags: unique symbol;
 type Tagged<BaseType, Tag extends PropertyKey> = BaseType & { [Tags]: { [K in Tag]: void } };
 
 /**
+ * The well-known symbol key used to identify legitimate @clerk/ui exports.
+ * Uses Symbol.for() to ensure the same symbol is used across module boundaries.
+ * @internal
+ */
+export const UI_BRAND_SYMBOL_KEY = 'clerk:ui';
+
+/**
  * UiVersion type that carries appearance type information via phantom property
  * Tagged to ensure only official ui objects from @clerk/ui can be used
  * Used for version pinning with hot loading
  */
 export type UiVersion<A = any> = Tagged<
   {
+    /**
+     * Brand symbol to identify legitimate @clerk/ui exports at runtime
+     */
+    __brand: symbol;
     version: string;
     url?: string;
     /**
@@ -43,6 +54,10 @@ export type UiVersion<A = any> = Tagged<
  */
 export type UiModule<A = any> = Tagged<
   {
+    /**
+     * Brand symbol to identify legitimate @clerk/ui exports at runtime
+     */
+    __brand: symbol;
     /**
      * The version string of the UI module
      */
@@ -124,6 +139,7 @@ export type {
  * Do not use
  */
 export const localUiForTesting = {
+  __brand: Symbol.for(UI_BRAND_SYMBOL_KEY),
   version: PACKAGE_VERSION,
   url: 'http://localhost:4011/npm/ui.browser.js',
 } as UiVersion<Appearance & { newprop?: string }>;

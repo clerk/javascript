@@ -54,16 +54,19 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<IsomorphicClerkOption
   appearance?: ExtractAppearanceType<TUi, Appearance>;
   /**
    * Optional prop to configure the UI module. Accepts either:
-   * - A version object (e.g., `ui` export from `@clerk/ui`) for hot loading with version pinning
-   * - The ClerkUI class constructor (e.g., `ClerkUI` export from `@clerk/ui`) for direct module usage
+   * - The `version` export from `@clerk/ui` for hot loading with version pinning
+   * - The `ClerkUI` class constructor from `@clerk/ui` for direct module usage
    *
    * When using version pinning, the UI is hot-loaded from the CDN.
    * When using the ClerkUI constructor directly, the UI is bundled with your app.
    *
+   * Note: Only legitimate exports from `@clerk/ui` are accepted. Arbitrary objects
+   * or strings will be ignored.
+   *
    * @example
    * // Hot loading with version pinning
-   * import { ui } from '@clerk/ui';
-   * <ClerkProvider ui={ui} />
+   * import { version } from '@clerk/ui';
+   * <ClerkProvider ui={version} />
    *
    * @example
    * // Direct module usage (bundled with your app)

@@ -73,11 +73,34 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
     } as LoadClerkJsScriptOptions;
 
     /**
+     * The well-known symbol used to identify legitimate @clerk/ui exports.
+     * Uses Symbol.for() to ensure the same symbol is used across module boundaries.
+     */
+    const UI_BRAND_SYMBOL = Symbol.for('clerk:ui');
+
+    /**
+     * Checks if the provided ui option is a legitimate @clerk/ui export
+     */
+    const isLegitimateUiExport = (ui: unknown): boolean => {
+      if (!ui || (typeof ui !== 'object' && typeof ui !== 'function')) {
+        return false;
+      }
+      return (ui as any).__brand === UI_BRAND_SYMBOL;
+    };
+
+    /**
      * Checks if the provided ui option is a ClerkUi constructor (class)
      * rather than a version pinning object
      */
     const isUiConstructor = (ui: unknown): ui is ClerkUiConstructor => {
-      return typeof ui === 'function' && 'version' in ui;
+      return typeof ui === 'function' && isLegitimateUiExport(ui);
+    };
+
+    /**
+     * Checks if the provided ui option is a version object for hot loading
+     */
+    const isUiVersion = (ui: unknown): ui is { version: string; url?: string } => {
+      return typeof ui === 'object' && ui !== null && isLegitimateUiExport(ui) && 'version' in ui;
     };
 
     // We need this check for SSR apps like Nuxt as it will try to run this code on the server
@@ -88,10 +111,15 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           const clerkPromise = loadClerkJsScript(options);
           // If ui is a constructor (ClerkUI class), use it directly
           // Otherwise, hot load the UI script
+          const uiVersion = isUiVersion(pluginOptions.ui) ? pluginOptions.ui : undefined;
           const clerkUiCtorPromise = isUiConstructor(pluginOptions.ui)
             ? Promise.resolve(pluginOptions.ui)
             : (async () => {
-                await loadClerkUiScript(options);
+                await loadClerkUiScript({
+                  ...options,
+                  clerkUiVersion: uiVersion?.version,
+                  clerkUiUrl: uiVersion?.url,
+                });
                 if (!window.__internal_ClerkUiCtor) {
                   throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
                 }
