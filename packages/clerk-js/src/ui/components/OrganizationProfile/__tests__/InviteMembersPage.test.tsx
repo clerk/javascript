@@ -285,7 +285,7 @@ describe('InviteMembersPage', () => {
       });
 
       fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
-      const { getByRole, userEvent, getByTestId } = render(
+      const { findByText, getByRole, userEvent, getByTestId } = render(
         <Action.Root>
           <InviteMembersScreen />
         </Action.Root>,
@@ -294,7 +294,7 @@ describe('InviteMembersPage', () => {
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
       await waitFor(() => expect(getByRole('button', { name: /select role/i })).toBeInTheDocument());
       await userEvent.click(getByRole('button', { name: /select role/i }));
-      await userEvent.click(getByRole('button', { name: /admin/i }));
+      await userEvent.click(await findByText(/admin/i));
       await waitFor(() => expect(getByRole('button', { name: 'Send invitations' })).not.toBeDisabled());
     });
 
@@ -359,7 +359,9 @@ describe('InviteMembersPage', () => {
 
       expect(getByRole('button', { name: 'Send invitations' })).toBeDisabled();
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
-      expect(getByRole('button', { name: 'Send invitations' })).not.toBeDisabled();
+      await waitFor(() => {
+        expect(getByRole('button', { name: 'Send invitations' })).not.toBeDisabled();
+      });
       await userEvent.click(getByRole('button', { name: /mydefaultrole/i }));
     });
   });
