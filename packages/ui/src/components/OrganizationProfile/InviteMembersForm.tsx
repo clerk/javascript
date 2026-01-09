@@ -199,8 +199,8 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
       return;
     }
 
-    // Skip if the default role from org settings is not in the current role set.
-    // This will eventually be returned by the roles endpoint
+    // Skip if the default role from org settings is not in the current role set
+    // This will eventually be returned by the roles endpoint, and `organizationSettings.domains.defaultRole` will be deprecated
     const defaultRoleExists = options?.some(option => option.value === defaultRole);
     if (!defaultRoleExists) {
       return;
