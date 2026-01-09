@@ -1,13 +1,13 @@
 import type { PointerEventHandler } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type Corner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 const STORAGE_KEY = 'clerk-keyless-prompt-corner';
-const LERP_FACTOR = 0.15; // Smooth trailing effect
-const INERTIA_MULTIPLIER = 8; // Velocity projection multiplier
+const LERP_FACTOR = 0.15;
+const INERTIA_MULTIPLIER = 8;
 const CORNER_OFFSET = '1.25rem';
-const DRAG_THRESHOLD = 5; // Minimum pixels to move before starting drag
+const DRAG_THRESHOLD = 5;
 
 interface Position {
   x: number;
@@ -20,15 +20,13 @@ interface UseDragToCornerResult {
   style: React.CSSProperties;
   containerRef: React.RefObject<HTMLDivElement>;
   onPointerDown: PointerEventHandler;
-  preventClick: boolean; // Flag to prevent click events after drag
+  preventClick: boolean;
 }
 
-// Lerp utility for smooth interpolation
 const lerp = (start: number, end: number, factor: number): number => {
   return start + (end - start) * factor;
 };
 
-// Determine corner based on position relative to viewport center
 const getCornerFromPosition = (x: number, y: number): Corner => {
   const centerX = window.innerWidth / 2;
   const centerY = window.innerHeight / 2;
@@ -36,13 +34,18 @@ const getCornerFromPosition = (x: number, y: number): Corner => {
   const isLeft = x < centerX;
   const isTop = y < centerY;
 
-  if (isTop && isLeft) return 'top-left';
-  if (isTop && !isLeft) return 'top-right';
-  if (!isTop && isLeft) return 'bottom-left';
+  if (isTop && isLeft) {
+    return 'top-left';
+  }
+  if (isTop && !isLeft) {
+    return 'top-right';
+  }
+  if (!isTop && isLeft) {
+    return 'bottom-left';
+  }
   return 'bottom-right';
 };
 
-// Get CSS styles for a corner position
 const getCornerStyles = (corner: Corner): React.CSSProperties => {
   switch (corner) {
     case 'top-left':
@@ -56,9 +59,8 @@ const getCornerStyles = (corner: Corner): React.CSSProperties => {
   }
 };
 
-// Get corner position in pixels (for smooth transition)
 const getCornerPositionInPixels = (corner: Corner, elementWidth: number, elementHeight: number): Position => {
-  const offset = 20; // 1.25rem ≈ 20px
+  const offset = 20;
   switch (corner) {
     case 'top-left':
       return { x: offset, y: offset };
@@ -71,9 +73,10 @@ const getCornerPositionInPixels = (corner: Corner, elementWidth: number, element
   }
 };
 
-// Load corner preference from localStorage
 const loadCornerPreference = (): Corner => {
-  if (typeof window === 'undefined') return 'bottom-right';
+  if (typeof window === 'undefined') {
+    return 'bottom-right';
+  }
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(stored)) {
@@ -85,9 +88,10 @@ const loadCornerPreference = (): Corner => {
   return 'bottom-right';
 };
 
-// Save corner preference to localStorage
 const saveCornerPreference = (corner: Corner): void => {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') {
+    return;
+  }
   try {
     localStorage.setItem(STORAGE_KEY, corner);
   } catch {
@@ -103,6 +107,7 @@ export const useDragToCorner = (): UseDragToCornerResult => {
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+  const transitionTimeoutRef = useRef<number | null>(null);
   const targetPosRef = useRef<Position>({ x: 0, y: 0 });
   const currentPosRef = useRef<Position>({ x: 0, y: 0 });
   const lastPosRef = useRef<Position>({ x: 0, y: 0 });
@@ -112,55 +117,55 @@ export const useDragToCorner = (): UseDragToCornerResult => {
   const lastTimeRef = useRef<number>(0);
   const hasStartedDraggingRef = useRef<boolean>(false);
 
-  // Animation loop for lerp-based dragging
   const animate = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+
     const current = currentPosRef.current;
     const target = targetPosRef.current;
 
-    // Lerp current position towards target
     current.x = lerp(current.x, target.x, LERP_FACTOR);
     current.y = lerp(current.y, target.y, LERP_FACTOR);
 
-    // Calculate velocity from position delta
     const now = performance.now();
-    const deltaTime = Math.max(now - lastTimeRef.current, 1); // Prevent division by zero
+    const deltaTime = Math.max(now - lastTimeRef.current, 1);
     const deltaX = current.x - lastPosRef.current.x;
     const deltaY = current.y - lastPosRef.current.y;
 
-    velocityRef.current.x = deltaX / (deltaTime / 16.67); // Normalize to 60fps
+    velocityRef.current.x = deltaX / (deltaTime / 16.67);
     velocityRef.current.y = deltaY / (deltaTime / 16.67);
 
-    lastPosRef.current = { ...current };
+    lastPosRef.current.x = current.x;
+    lastPosRef.current.y = current.y;
     lastTimeRef.current = now;
 
-    // Update position style
-    setDragStyle({
-      position: 'fixed',
-      left: `${current.x}px`,
-      top: `${current.y}px`,
-      transition: 'none', // No transition during drag
-    });
+    // Direct DOM manipulation instead of setState
+    container.style.position = 'fixed';
+    container.style.left = `${current.x}px`;
+    container.style.top = `${current.y}px`;
+    container.style.transition = 'none';
 
     animationFrameRef.current = requestAnimationFrame(animate);
   }, []);
 
-  // Start drag
   const handlePointerDown: PointerEventHandler = useCallback(
     e => {
-      // Only allow dragging on the button/header area, not on links
       const target = e.target as HTMLElement;
       if (target.tagName === 'A' || target.closest('a')) {
         return;
       }
 
       const container = containerRef.current;
-      if (!container) return;
+      if (!container) {
+        return;
+      }
 
       const rect = container.getBoundingClientRect();
       const startX = e.clientX;
       const startY = e.clientY;
 
-      // Initialize positions
       startPosRef.current = { x: startX, y: startY };
       startOffsetRef.current = { x: rect.left, y: rect.top };
       currentPosRef.current = { x: rect.left, y: rect.top };
@@ -170,22 +175,18 @@ export const useDragToCorner = (): UseDragToCornerResult => {
       lastTimeRef.current = performance.now();
       hasStartedDraggingRef.current = false;
 
-      // Handle pointer move
       const handlePointerMove = (moveEvent: PointerEvent) => {
         const deltaX = moveEvent.clientX - startPosRef.current.x;
         const deltaY = moveEvent.clientY - startPosRef.current.y;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-        // Only start dragging if moved beyond threshold
         if (!hasStartedDraggingRef.current && distance < DRAG_THRESHOLD) {
           return;
         }
 
         if (!hasStartedDraggingRef.current) {
-          // Start dragging now
           hasStartedDraggingRef.current = true;
           setIsDragging(true);
-          // Start animation loop
           animationFrameRef.current = requestAnimationFrame(animate);
         }
 
@@ -196,52 +197,50 @@ export const useDragToCorner = (): UseDragToCornerResult => {
         };
       };
 
-      // Handle pointer up
       const handlePointerUp = () => {
         window.removeEventListener('pointermove', handlePointerMove);
         window.removeEventListener('pointerup', handlePointerUp);
 
-        // Stop animation loop
         if (animationFrameRef.current !== null) {
           cancelAnimationFrame(animationFrameRef.current);
           animationFrameRef.current = null;
         }
 
-        // Only process drag end if we actually started dragging
         if (hasStartedDraggingRef.current) {
           setIsDragging(false);
           setPreventClick(true);
 
-          // Project final position with inertia
           const current = currentPosRef.current;
           const velocity = velocityRef.current;
           const projectedX = current.x + velocity.x * INERTIA_MULTIPLIER;
           const projectedY = current.y + velocity.y * INERTIA_MULTIPLIER;
 
-          // Determine target corner
           const newCorner = getCornerFromPosition(projectedX, projectedY);
 
-          // Get the target corner position in pixels for smooth transition
           const rect = container.getBoundingClientRect();
           const targetPos = getCornerPositionInPixels(newCorner, rect.width, rect.height);
 
-          // Animate to corner position smoothly
           setDragStyle({
             position: 'fixed',
             left: `${targetPos.x}px`,
             top: `${targetPos.y}px`,
-            transition: 'all 400ms cubic-bezier(0.2, 0, 0.2, 1)', // Smooth ease-in-out
+            transition: 'all 400ms cubic-bezier(0.2, 0, 0.2, 1)',
           });
 
-          // Update corner and save preference
           setCorner(newCorner);
           saveCornerPreference(newCorner);
 
-          // After transition completes, switch to corner-based positioning
-          setTimeout(() => {
+          transitionTimeoutRef.current = window.setTimeout(() => {
             setDragStyle({});
             setPreventClick(false);
-          }, 400); // Match transition duration
+            // Clear inline styles to return to React-controlled positioning
+            if (container) {
+              container.style.position = '';
+              container.style.left = '';
+              container.style.top = '';
+              container.style.transition = '';
+            }
+          }, 400);
         }
 
         hasStartedDraggingRef.current = false;
@@ -253,21 +252,25 @@ export const useDragToCorner = (): UseDragToCornerResult => {
     [animate],
   );
 
-  // Cleanup animation frame on unmount
   useEffect(() => {
     return () => {
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+      if (transitionTimeoutRef.current !== null) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
     };
   }, []);
 
-  // Combine corner styles with drag styles
-  const style: React.CSSProperties = {
-    ...getCornerStyles(corner),
-    ...dragStyle, // Always apply dragStyle (empty when not dragging/snapping)
-    transition: isDragging ? 'none' : dragStyle.transition || 'all 250ms cubic-bezier(0.2, 0, 0.2, 1)', // Use dragStyle transition if present
-  };
+  const style = useMemo<React.CSSProperties>(
+    () => ({
+      ...getCornerStyles(corner),
+      ...dragStyle,
+      transition: isDragging ? 'none' : dragStyle.transition || 'all 250ms cubic-bezier(0.2, 0, 0.2, 1)',
+    }),
+    [corner, isDragging, dragStyle],
+  );
 
   return {
     corner,
