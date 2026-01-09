@@ -50,9 +50,7 @@ describe('authenticateRequest with cookie token', () => {
     const result = await authenticateRequest(request, options);
 
     expect(result.status).toBe('signed-out');
-    // @ts-expect-error - reason is only available on signed-out state
     expect(result.reason).toBe(TokenVerificationErrorReason.TokenMissingAzp);
-    // @ts-expect-error - message is only available on signed-out state
     expect(result.message).toBe(
       'Session tokens from cookies must have an azp claim. (reason=token-missing-azp, token-carrier=cookie)',
     );
