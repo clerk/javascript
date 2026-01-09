@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.119.1
+
+### Patch Changes
+
+- Fix role select being disabled on `OrganizationProfile` invite members page when default role is not in roles list ([#7569](https://github.com/clerk/javascript/pull/7569)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 5.119.0
 
 ### Minor Changes
