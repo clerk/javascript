@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.119.2
+
+### Patch Changes
+
+- Remove opacity from `Select` placeholder ([#7575](https://github.com/clerk/javascript/pull/7575)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 5.119.1
 
 ### Patch Changes
