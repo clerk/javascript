@@ -19,10 +19,11 @@ declare const Tags: unique symbol;
 type Tagged<BaseType, Tag extends PropertyKey> = BaseType & { [Tags]: { [K in Tag]: void } };
 
 /**
- * Ui type that carries appearance type information via phantom property
+ * UiVersion type that carries appearance type information via phantom property
  * Tagged to ensure only official ui objects from @clerk/ui can be used
+ * Used for version pinning with hot loading
  */
-export type Ui<A = any> = Tagged<
+export type UiVersion<A = any> = Tagged<
   {
     version: string;
     url?: string;
@@ -34,6 +35,37 @@ export type Ui<A = any> = Tagged<
   },
   'ClerkUi'
 >;
+
+/**
+ * UiModule type represents the ClerkUi class constructor
+ * Used when bundling @clerk/ui directly instead of hot loading
+ * Tagged to ensure only official ClerkUi class from @clerk/ui can be used
+ */
+export type UiModule<A = any> = Tagged<
+  {
+    /**
+     * The version string of the UI module
+     */
+    version: string;
+    /**
+     * Constructor signature - must be callable with new
+     */
+    new (...args: any[]): any;
+    /**
+     * Phantom property for type-level appearance inference
+     * This property never exists at runtime
+     */
+    __appearanceType?: A;
+  },
+  'ClerkUiModule'
+>;
+
+/**
+ * Ui type that accepts either:
+ * - UiVersion: version pinning object for hot loading
+ * - UiModule: ClerkUi class constructor for direct module usage
+ */
+export type Ui<A = any> = UiVersion<A> | UiModule<A>;
 
 export type {
   AlphaColorScale,
@@ -94,4 +126,4 @@ export type {
 export const localUiForTesting = {
   version: PACKAGE_VERSION,
   url: 'http://localhost:4011/npm/ui.browser.js',
-} as Ui<Appearance & { newprop?: string }>;
+} as UiVersion<Appearance & { newprop?: string }>;

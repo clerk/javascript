@@ -1083,7 +1083,10 @@ export type ClerkOptions = ClerkOptionsNavigation &
   AfterMultiSessionSingleSignOutUrl &
   ClerkUnsafeOptions & {
     /**
-     * Clerk UI entrypoint.
+     * @internal
+     * Clerk UI constructor. Used internally to pass the resolved UI constructor to clerk.load().
+     * For public usage, prefer the `ui` prop on ClerkProvider which accepts both version objects
+     * and the ClerkUI constructor.
      */
     clerkUiCtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
     /**
@@ -2370,11 +2373,21 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   nonce?: string;
   /**
-   * @internal
-   * This is a structural-only type for the `ui` object that can be passed
-   * to Clerk.load() and ClerkProvider
+   * The UI module configuration. Accepts either:
+   * - A version object `{ version: string; url?: string }` for hot loading with version pinning
+   * - The ClerkUI class constructor for direct module usage (bypasses hot loading)
+   *
+   * @example
+   * // Hot loading with version pinning
+   * import { ui } from '@clerk/ui';
+   * <ClerkProvider ui={ui} />
+   *
+   * @example
+   * // Direct module usage (bundled with your app)
+   * import { ClerkUI } from '@clerk/ui';
+   * <ClerkProvider ui={ClerkUI} />
    */
-  ui?: { version: string; url?: string };
+  ui?: { version: string; url?: string } | ClerkUiConstructor;
 } & MultiDomainAndOrProxy;
 
 export interface LoadedClerk extends Clerk {

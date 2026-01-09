@@ -109,14 +109,23 @@ async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCre
 }
 
 /**
+ * Checks if the provided ui option is a ClerkUi constructor (class)
+ * rather than a version pinning object
+ */
+function isUiConstructor(ui: unknown): ui is ClerkUiConstructor {
+  return typeof ui === 'function' && 'version' in ui;
+}
+
+/**
  * Gets the ClerkUI constructor, either from options or by loading the script.
  * Returns early if window.__internal_ClerkUiCtor already exists.
  */
 async function getClerkUiEntryChunk<TUi extends Ui = Ui>(
   options?: AstroClerkCreateInstanceParams<TUi>,
 ): Promise<ClerkUiConstructor> {
-  if (options?.clerkUiCtor) {
-    return options.clerkUiCtor;
+  // If ui is a constructor (ClerkUI class), use it directly
+  if (isUiConstructor(options?.ui)) {
+    return options.ui;
   }
 
   await loadClerkUiScript(options);

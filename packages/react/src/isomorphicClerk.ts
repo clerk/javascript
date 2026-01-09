@@ -508,15 +508,27 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return global.Clerk;
   }
 
+  /**
+   * Checks if the provided ui option is a ClerkUi constructor (class)
+   * rather than a version pinning object
+   */
+  private isUiConstructor(ui: unknown): ui is ClerkUiConstructor {
+    return typeof ui === 'function' && 'version' in ui;
+  }
+
   private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor> {
-    if (this.options.clerkUiCtor) {
-      return this.options.clerkUiCtor;
+    // If ui is a constructor (ClerkUI class), use it directly
+    if (this.isUiConstructor(this.options.ui)) {
+      return this.options.ui;
     }
+
+    // Otherwise, hot load the UI script based on version/url
+    const uiVersion = typeof this.options.ui === 'object' ? this.options.ui : undefined;
 
     await loadClerkUiScript({
       ...this.options,
-      clerkUiVersion: this.options.ui?.version,
-      clerkUiUrl: this.options.ui?.url || this.options.clerkUiUrl,
+      clerkUiVersion: uiVersion?.version,
+      clerkUiUrl: uiVersion?.url || this.options.clerkUiUrl,
       publishableKey: this.#publishableKey,
       proxyUrl: this.proxyUrl,
       domain: this.domain,

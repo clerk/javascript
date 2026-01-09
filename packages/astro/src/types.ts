@@ -36,6 +36,12 @@ type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
      * The URL that `@clerk/ui` should be hot-loaded from.
      */
     clerkUiUrl?: string;
+    /**
+     * The UI module configuration. Accepts either:
+     * - A version object for hot loading with version pinning
+     * - The ClerkUI class constructor for direct module usage
+     */
+    ui?: TUi;
   };
 
 type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegrationParams<TUi> & {

@@ -72,14 +72,24 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
       sdkMetadata: pluginOptions.sdkMetadata || SDK_METADATA,
     } as LoadClerkJsScriptOptions;
 
+    /**
+     * Checks if the provided ui option is a ClerkUi constructor (class)
+     * rather than a version pinning object
+     */
+    const isUiConstructor = (ui: unknown): ui is ClerkUiConstructor => {
+      return typeof ui === 'function' && 'version' in ui;
+    };
+
     // We need this check for SSR apps like Nuxt as it will try to run this code on the server
     // and loadClerkJsScript contains browser-specific code
     if (inBrowser()) {
       void (async () => {
         try {
           const clerkPromise = loadClerkJsScript(options);
-          const clerkUiCtorPromise = pluginOptions.clerkUiCtor
-            ? Promise.resolve(pluginOptions.clerkUiCtor)
+          // If ui is a constructor (ClerkUI class), use it directly
+          // Otherwise, hot load the UI script
+          const clerkUiCtorPromise = isUiConstructor(pluginOptions.ui)
+            ? Promise.resolve(pluginOptions.ui)
             : (async () => {
                 await loadClerkUiScript(options);
                 if (!window.__internal_ClerkUiCtor) {
