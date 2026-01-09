@@ -43,7 +43,7 @@ function withLastActiveFallback(cb: () => string): string {
 const KeylessPromptInternal = (_props: KeylessPromptProps) => {
   const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
-  const { isDragging, cornerStyle, containerRef, onPointerDown, preventClick } = useDragToCorner();
+  const { isDragging, cornerStyle, containerRef, onPointerDown, preventClick, isInitialized } = useDragToCorner();
 
   useEffect(() => {
     if (isSignedIn) {
@@ -122,6 +122,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
         style={{
           ...cornerStyle,
           position: 'fixed',
+          opacity: isInitialized ? undefined : 0,
         }}
         sx={t => ({
           height: `${t.sizes.$10}`,
@@ -133,8 +134,8 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           transition: isDragging
             ? 'none'
             : isForcedExpanded
-              ? 'height 230ms cubic-bezier(0.28, 1, 0.32, 1), width 230ms cubic-bezier(0.28, 1, 0.32, 1), padding 230ms cubic-bezier(0.28, 1, 0.32, 1), border-radius 230ms cubic-bezier(0.28, 1, 0.32, 1)'
-              : 'height 195ms cubic-bezier(0.2, 0.61, 0.1, 1), width 195ms cubic-bezier(0.2, 0.61, 0.1, 1), padding 195ms cubic-bezier(0.2, 0.61, 0.1, 1), border-radius 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
+              ? 'opacity 150ms ease-out, height 230ms cubic-bezier(0.28, 1, 0.32, 1), width 230ms cubic-bezier(0.28, 1, 0.32, 1), padding 230ms cubic-bezier(0.28, 1, 0.32, 1), border-radius 230ms cubic-bezier(0.28, 1, 0.32, 1)'
+              : 'opacity 150ms ease-out, height 195ms cubic-bezier(0.2, 0.61, 0.1, 1), width 195ms cubic-bezier(0.2, 0.61, 0.1, 1), padding 195ms cubic-bezier(0.2, 0.61, 0.1, 1), border-radius 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
 
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',

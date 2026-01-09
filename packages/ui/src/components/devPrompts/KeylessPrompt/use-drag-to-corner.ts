@@ -1,5 +1,5 @@
 import type { PointerEventHandler } from 'react';
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 type Corner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
@@ -33,6 +33,7 @@ interface UseDragToCornerResult {
   containerRef: React.RefObject<HTMLDivElement>;
   onPointerDown: PointerEventHandler;
   preventClick: boolean;
+  isInitialized: boolean;
 }
 
 const getCornerFromPosition = (x: number, y: number): Corner => {
@@ -119,10 +120,33 @@ const calculateVelocity = (history: Velocity[]): Point => {
 };
 
 export const useDragToCorner = (): UseDragToCornerResult => {
-  const [corner, setCorner] = useState<Corner>(loadCornerPreference);
+  // Initialize with deterministic server-safe value to avoid SSR/hydration mismatch
+  const [corner, setCorner] = useState<Corner>('bottom-right');
   const [isDragging, setIsDragging] = useState(false);
   const [preventClick, setPreventClick] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const pendingCornerUpdate = useRef<Corner | null>(null);
+
+  // Defer localStorage read to client-side only after mount
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      setIsInitialized(true);
+      return;
+    }
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored && ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(stored)) {
+        const storedCorner = stored as Corner;
+        // Set corner before making visible to prevent flash
+        setCorner(storedCorner);
+      }
+    } catch {
+      // Ignore localStorage errors
+    } finally {
+      // Mark as initialized after reading localStorage (or if it fails)
+      setIsInitialized(true);
+    }
+  }, []);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const machine = useRef<{ state: 'idle' | 'press' | 'animating' } | { state: 'drag'; pointerId: number }>({
@@ -386,5 +410,6 @@ export const useDragToCorner = (): UseDragToCornerResult => {
     containerRef,
     onPointerDown: handlePointerDown,
     preventClick,
+    isInitialized,
   };
 };
