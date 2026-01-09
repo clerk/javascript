@@ -71,10 +71,16 @@ test.describe('next start - missing middleware @quickstart', () => {
   });
 
   test('Display error for missing middleware', async ({ page, context }) => {
+    const { version } = await detectNext(app);
+    const major = parseSemverMajor(version) ?? 0;
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
 
-    expect(app.serveOutput).toContain('Your Middleware exists at ./src/middleware.(ts|js)');
+    const expectedMessage =
+      major >= 16
+        ? 'Your Middleware exists at ./src/middleware.(ts|js) or proxy.(ts|js)'
+        : 'Your Middleware exists at ./src/middleware.(ts|js)';
+    expect(app.serveOutput).toContain(expectedMessage);
   });
 });
 
@@ -105,10 +111,16 @@ test.describe('next start - invalid middleware at root on src/ @quickstart', () 
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
 
-    expect(app.serveOutput).not.toContain('Your Middleware exists at ./src/middleware.(ts|js)');
-    expect(app.serveOutput).toContain(
-      'Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./src/middleware.ts. Currently located at ./middleware.ts',
-    );
+    const expectedMessage =
+      major >= 16
+        ? 'Your Middleware exists at ./src/middleware.(ts|js) or proxy.(ts|js)'
+        : 'Your Middleware exists at ./src/middleware.(ts|js)';
+    expect(app.serveOutput).not.toContain(expectedMessage);
+    const expectedError =
+      major >= 16
+        ? 'Clerk: clerkMiddleware() was not run, your middleware or proxy file might be misplaced. Move your middleware or proxy file to ./src/middleware.ts. Currently located at ./middleware.ts'
+        : 'Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./src/middleware.ts. Currently located at ./middleware.ts';
+    expect(app.serveOutput).toContain(expectedError);
   });
 
   test('Does not display misplaced middleware error on Next 16+', async ({ page, context }) => {
@@ -142,11 +154,19 @@ test.describe('next start - invalid middleware inside app on src/ @quickstart', 
     page,
     context,
   }) => {
+    const { version } = await detectNext(app);
+    const major = parseSemverMajor(version) ?? 0;
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
-    expect(app.serveOutput).not.toContain('Your Middleware exists at ./src/middleware.(ts|js)');
-    expect(app.serveOutput).toContain(
-      'Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./src/middleware.ts. Currently located at ./src/app/middleware.ts',
-    );
+    const expectedMessage =
+      major >= 16
+        ? 'Your Middleware exists at ./src/middleware.(ts|js) or proxy.(ts|js)'
+        : 'Your Middleware exists at ./src/middleware.(ts|js)';
+    expect(app.serveOutput).not.toContain(expectedMessage);
+    const expectedError =
+      major >= 16
+        ? 'Clerk: clerkMiddleware() was not run, your middleware or proxy file might be misplaced. Move your middleware or proxy file to ./src/middleware.ts. Currently located at ./src/app/middleware.ts'
+        : 'Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./src/middleware.ts. Currently located at ./src/app/middleware.ts';
+    expect(app.serveOutput).toContain(expectedError);
   });
 });
