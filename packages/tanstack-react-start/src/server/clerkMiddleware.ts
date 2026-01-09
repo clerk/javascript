@@ -23,8 +23,6 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): AnyRequestMid
       secretKey: options?.secretKey,
     });
 
-    console.log({ loadedOptions });
-
     // Get keys - either from options, env, or keyless mode
     const {
       publishableKey,

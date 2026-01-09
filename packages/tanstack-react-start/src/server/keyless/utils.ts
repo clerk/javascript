@@ -31,9 +31,6 @@ export async function resolveKeysWithKeylessFallback(
     return { publishableKey, secretKey, claimUrl, apiKeysUrl };
   }
 
-  console.log({ publishableKey, configuredPublishableKey });
-  console.log({ secretKey, configuredSecretKey });
-
   const keylessService = keyless();
   const locallyStoredKeys = keylessService.readKeys();
 
