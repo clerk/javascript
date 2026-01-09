@@ -394,6 +394,13 @@ export const ptPT: LocalizationResource = {
         headerTitle__members: 'Membros',
         headerTitle__requests: 'Pedidos',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'As funções estão temporariamente bloqueadas',
+          subtitle:
+            'Estamos a atualizar as funções disponíveis. Assim que terminar, poderá atualizar as funções novamente.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -747,6 +754,10 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Insira o código de verificação enviado para o seu dispositivo.',
       title: 'Verificação de duas etapas',
     },
+    web3Solana: {
+      subtitle: 'Selecione uma carteira abaixo para iniciar sessão',
+      title: 'Iniciar sessão com Solana',
+    },
   },
   signInEnterPasswordTitle: 'Insira a sua palavra-passe',
   signUp: {
@@ -838,6 +849,10 @@ export const ptPT: LocalizationResource = {
       title: 'Criar a sua conta',
       titleCombined: 'Criar a sua conta',
     },
+    web3Solana: {
+      subtitle: 'Selecione uma carteira abaixo para se registar',
+      title: 'Registar-se com Solana',
+    },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
@@ -847,6 +862,7 @@ export const ptPT: LocalizationResource = {
       action__invitationAccept: 'Participar',
       action__suggestionsAccept: 'Solicitar participação',
       subtitle: 'Junte-se a uma organização existente ou crie uma nova',
+      subtitle__createOrganizationDisabled: 'Junte-se a uma organização existente',
       suggestionsAcceptedLabel: 'Aprovação pendente',
       title: 'Escolha uma organização',
     },
@@ -859,6 +875,10 @@ export const ptPT: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Introduza os detalhes da sua organização para continuar',
       title: 'Configurar a sua organização',
+    },
+    organizationCreationDisabled: {
+      title: 'Deve pertencer a uma organização',
+      subtitle: 'Contacte o administrador da sua organização para obter um convite.',
     },
     signOut: {
       actionLink: 'Terminar sessão',
@@ -945,6 +965,8 @@ export const ptPT: LocalizationResource = {
     phone_number_exists: 'Este número de telemóvel já está em uso. Por favor, tente outro.',
     session_exists: 'Já está conectado.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Rejeitou o pedido de assinatura. Tente novamente para continuar.',
+    web3_solana_signature_generation_failed: 'Ocorreu um erro ao gerar a assinatura. Tente novamente para continuar.',
     zxcvbn: {
       couldBeStronger: 'A sua palavra-passe funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
       goodPassword: 'A sua palavra-passe atende a todos os requisitos necessários.',
@@ -1313,6 +1335,10 @@ export const ptPT: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Carteiras Web3',
         title: 'Carteiras Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selecione uma carteira Solana para ligar à sua conta.',
+          title: 'Adicionar uma carteira Solana',
+        },
       },
     },
     usernamePage: {
@@ -1347,5 +1373,11 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Aguarde enquanto processamos o seu pedido.',
       title: 'Inscrição bem-sucedida na lista de espera',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Conectar com {{walletName}}',
+    continue: 'Continuar com {{walletName}}',
+    noneAvailable:
+      'Não foram detetadas carteiras Solana Web3. Instale uma {{ solanaWalletsLink || link("wallet extension") }} com suporte Web3.',
   },
 } as const;

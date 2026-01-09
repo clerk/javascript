@@ -29,7 +29,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
       return null;
     }
 
-    const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
+    const { primaryEmailAddress, primaryPhoneNumber, primaryWeb3Wallet, username, ...userWithoutIdentifiers } = user;
 
     return (
       <Button

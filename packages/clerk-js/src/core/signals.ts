@@ -1,11 +1,20 @@
 import type { ClerkAPIError, ClerkError } from '@clerk/shared/error';
 import { createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
-import type { Errors, SignInErrors, SignInSignal, SignUpErrors, SignUpSignal } from '@clerk/shared/types';
+import type {
+  Errors,
+  SignInErrors,
+  SignInSignal,
+  SignUpErrors,
+  SignUpSignal,
+  WaitlistErrors,
+  WaitlistSignal,
+} from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 import { computed, signal } from 'alien-signals';
 
 import type { SignIn } from './resources/SignIn';
 import type { SignUp } from './resources/SignUp';
+import type { Waitlist } from './resources/Waitlist';
 
 export const signInResourceSignal = signal<{ resource: SignIn | null }>({ resource: null });
 export const signInErrorSignal = signal<{ error: ClerkError | null }>({ error: null });
@@ -33,6 +42,20 @@ export const signUpComputedSignal: SignUpSignal = computed(() => {
   const errors = errorsToSignUpErrors(error);
 
   return { errors, fetchStatus, signUp: signUp ? signUp.__internal_future : null };
+});
+
+export const waitlistResourceSignal = signal<{ resource: Waitlist | null }>({ resource: null });
+export const waitlistErrorSignal = signal<{ error: ClerkError | null }>({ error: null });
+export const waitlistFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+
+export const waitlistComputedSignal: WaitlistSignal = computed(() => {
+  const waitlist = waitlistResourceSignal().resource;
+  const error = waitlistErrorSignal().error;
+  const fetchStatus = waitlistFetchSignal().status;
+
+  const errors = errorsToWaitlistErrors(error);
+
+  return { errors, fetchStatus, waitlist };
 });
 
 /**
@@ -109,5 +132,11 @@ function errorsToSignUpErrors(error: ClerkError | null): SignUpErrors {
     code: null,
     captcha: null,
     legalAccepted: null,
+  });
+}
+
+function errorsToWaitlistErrors(error: ClerkError | null): WaitlistErrors {
+  return errorsToParsedErrors(error, {
+    emailAddress: null,
   });
 }

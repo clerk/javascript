@@ -397,6 +397,13 @@ export const msMY: LocalizationResource = {
         headerTitle__members: 'Ahli',
         headerTitle__requests: 'Permintaan',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Peranan dikunci buat sementara waktu',
+          subtitle:
+            'Kami sedang mengemas kini peranan yang tersedia. Setelah selesai, anda akan dapat mengemas kini peranan semula.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -754,6 +761,10 @@ export const msMY: LocalizationResource = {
       subtitle: 'Untuk meneruskan, sila masukkan kod pengesahan yang dijana oleh aplikasi pengesah anda',
       title: 'Pengesahan dua langkah',
     },
+    web3Solana: {
+      subtitle: 'Pilih dompet di bawah untuk log masuk',
+      title: 'Log masuk dengan Solana',
+    },
   },
   signInEnterPasswordTitle: 'Masukkan kata laluan anda',
   signUp: {
@@ -848,6 +859,10 @@ export const msMY: LocalizationResource = {
       title: 'Cipta akaun anda',
       titleCombined: 'Cipta akaun anda',
     },
+    web3Solana: {
+      subtitle: 'Pilih dompet di bawah untuk mendaftar',
+      title: 'Daftar dengan Solana',
+    },
   },
   socialButtonsBlockButton: 'Teruskan dengan {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -857,6 +872,7 @@ export const msMY: LocalizationResource = {
       action__invitationAccept: 'Sertai',
       action__suggestionsAccept: 'Minta untuk menyertai',
       subtitle: 'Sertai organisasi sedia ada atau cipta yang baharu',
+      subtitle__createOrganizationDisabled: 'Sertai organisasi sedia ada',
       suggestionsAcceptedLabel: 'Menunggu kelulusan',
       title: 'Pilih organisasi',
     },
@@ -869,6 +885,10 @@ export const msMY: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Masukkan butiran organisasi anda untuk meneruskan',
       title: 'Sediakan organisasi anda',
+    },
+    organizationCreationDisabled: {
+      title: 'Anda mesti menjadi ahli organisasi',
+      subtitle: 'Hubungi pentadbir organisasi anda untuk jemputan.',
     },
     signOut: {
       actionLink: 'Daftar keluar',
@@ -960,6 +980,9 @@ export const msMY: LocalizationResource = {
     phone_number_exists: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     session_exists: undefined,
     web3_missing_identifier: 'Sambungan Dompet Web3 tidak dapat dijumpai. Sila pasang satu untuk meneruskan.',
+    web3_signature_request_rejected: 'Anda telah menolak permintaan tandatangan. Sila cuba lagi untuk meneruskan.',
+    web3_solana_signature_generation_failed:
+      'Ralat berlaku semasa menjana tandatangan. Sila cuba lagi untuk meneruskan.',
     zxcvbn: {
       couldBeStronger: 'Kata laluan anda berfungsi, tetapi boleh lebih kuat. Cuba tambah lebih banyak aksara.',
       goodPassword: 'Kata laluan anda memenuhi semua keperluan yang diperlukan.',
@@ -1332,6 +1355,10 @@ export const msMY: LocalizationResource = {
         detailsAction__nonPrimary: 'Tetapkan sebagai utama',
         primaryButton: 'Sambung dompet',
         title: 'Dompet web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Pilih dompet Solana untuk disambungkan ke akaun anda.',
+          title: 'Tambah dompet Solana',
+        },
       },
     },
     usernamePage: {
@@ -1366,5 +1393,11 @@ export const msMY: LocalizationResource = {
       subtitle: 'Kami akan menghubungi anda apabila tempat anda sudah bersedia',
       title: 'Terima kasih kerana menyertai senarai menunggu!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Sambung dengan {{walletName}}',
+    continue: 'Teruskan dengan {{walletName}}',
+    noneAvailable:
+      'Tiada dompet Solana Web3 dikesan. Sila pasang {{ solanaWalletsLink || link("wallet extension") }} yang menyokong Web3.',
   },
 } as const;

@@ -1,20 +1,18 @@
 'use client';
 
 export {
-  ClerkLoaded,
-  ClerkLoading,
+  AuthenticateWithRedirectCallback,
   ClerkDegraded,
   ClerkFailed,
-  SignedOut,
-  SignedIn,
-  Protect,
+  ClerkLoaded,
+  ClerkLoading,
+  RedirectToCreateOrganization,
+  RedirectToOrganizationProfile,
   RedirectToSignIn,
   RedirectToSignUp,
   RedirectToTasks,
   RedirectToUserProfile,
-  AuthenticateWithRedirectCallback,
-  RedirectToCreateOrganization,
-  RedirectToOrganizationProfile,
+  Show,
 } from '@clerk/react';
 
 export { MultisessionAppSupport } from '@clerk/react/internal';

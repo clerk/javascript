@@ -82,7 +82,7 @@ export const PersonalAccountPreview = withCardStateProvider(() => {
     return null;
   }
 
-  const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
+  const { primaryEmailAddress, primaryPhoneNumber, primaryWeb3Wallet, username, ...userWithoutIdentifiers } = user;
 
   const handlePersonalClicked = () => {
     if (!isLoaded) {

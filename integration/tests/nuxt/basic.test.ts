@@ -69,7 +69,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await expect(u.page.getByText('You are signed in!')).toBeVisible();
   });
 
-  test('renders <Protect /> component contents to admin', async ({ page, context }) => {
+  test('renders <Show /> component contents to admin', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/sign-in');

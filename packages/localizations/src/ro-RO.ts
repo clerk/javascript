@@ -403,6 +403,13 @@ export const roRO: LocalizationResource = {
         headerTitle__members: 'Membri',
         headerTitle__requests: 'Ceri de acces',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Rolurile sunt temporar blocate',
+          subtitle:
+            'Actualizăm rolurile disponibile. Odată ce acest lucru este finalizat, veți putea actualiza din nou rolurile.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'Chei API',
@@ -760,6 +767,10 @@ export const roRO: LocalizationResource = {
       subtitle: 'Pentru a continua, introdu codul generat de aplicația ta de autentificare',
       title: 'Verificare în doi pași',
     },
+    web3Solana: {
+      subtitle: 'Selectați un portofel mai jos pentru a vă conecta',
+      title: 'Conectare cu Solana',
+    },
   },
   signInEnterPasswordTitle: 'Introdu parola',
   signUp: {
@@ -853,6 +864,10 @@ export const roRO: LocalizationResource = {
       title: 'Creează-ți contul',
       titleCombined: 'Creează-ți contul',
     },
+    web3Solana: {
+      subtitle: 'Selectați un portofel mai jos pentru a vă înregistra',
+      title: 'Înregistrare cu Solana',
+    },
   },
   socialButtonsBlockButton: 'Continuă cu {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -862,6 +877,7 @@ export const roRO: LocalizationResource = {
       action__invitationAccept: 'Alătură-te',
       action__suggestionsAccept: 'Solicită alăturarea',
       subtitle: 'Alătură-te unei organizații existente sau creează una nouă',
+      subtitle__createOrganizationDisabled: 'Alătură-te unei organizații existente',
       suggestionsAcceptedLabel: 'În așteptare',
       title: 'Alege o organizație',
     },
@@ -874,6 +890,10 @@ export const roRO: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Introdu detaliile organizației pentru a continua',
       title: 'Configurează-ți organizația',
+    },
+    organizationCreationDisabled: {
+      title: 'Trebuie să aparții unei organizații',
+      subtitle: 'Contactează administratorul organizației tale pentru o invitație.',
     },
     signOut: {
       actionLink: 'Deconectează-te',
@@ -962,6 +982,9 @@ export const roRO: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Nu am găsit o extensie pentru portofel Web3. Te rugăm instalează una pentru a continua.',
+    web3_signature_request_rejected: 'Ați respins solicitarea de semnătură. Încercați din nou pentru a continua.',
+    web3_solana_signature_generation_failed:
+      'A apărut o eroare la generarea semnăturii. Încercați din nou pentru a continua.',
     zxcvbn: {
       couldBeStronger: 'Parola ta funcționează, dar ar putea fi mai puternică. Încearcă să adaugi mai multe caractere.',
       goodPassword: 'Parola ta îndeplinește toate cerințele necesare.',
@@ -1330,6 +1353,10 @@ export const roRO: LocalizationResource = {
         detailsAction__nonPrimary: 'Setează ca principal',
         primaryButton: 'Conectează portofel',
         title: 'Portofele Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selectați un portofel Solana pentru a-l conecta la contul dvs.',
+          title: 'Adăugați un portofel Solana',
+        },
       },
     },
     usernamePage: {
@@ -1364,5 +1391,11 @@ export const roRO: LocalizationResource = {
       subtitle: 'Te vom contacta când îți vine rândul',
       title: 'Mulțumim pentru înscriere!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Conectează cu {{walletName}}',
+    continue: 'Continuă cu {{walletName}}',
+    noneAvailable:
+      'Nu s-au detectat portofele Solana Web3. Instalați un {{ solanaWalletsLink || link("wallet extension") }} compatibil cu Web3.',
   },
 } as const;

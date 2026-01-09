@@ -1,5 +1,5 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { ClerkWebAuthnError, is4xxError } from '@clerk/shared/error';
+import { ClerkWebAuthnError, is4xxError, MissingExpiredTokenError } from '@clerk/shared/error';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -372,7 +372,7 @@ export class Session extends BaseResource implements SessionResource {
       // If caller requests refresh when stale (e.g., poller), fetch fresh token instead of returning cached
       if (cacheResult.needsRefresh && refreshIfStale) {
         debugLogger.debug('Token is stale, refreshing as requested', { tokenId }, 'session');
-        return this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate);
+        return this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
       }
 
       debugLogger.debug('Using cached token', { tokenId }, 'session');
@@ -386,17 +386,25 @@ export class Session extends BaseResource implements SessionResource {
       return cachedToken.getRawString() || null;
     }
 
-    return this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate);
+    return this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
   }
 
   #createTokenResolver(
     template: string | undefined,
     organizationId: string | undefined | null,
+    skipCache: boolean,
   ): Promise<TokenResource> {
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     // TODO: update template endpoint to accept organizationId
     const params: Record<string, string | null> = template ? {} : { organizationId: organizationId ?? null };
-    return Token.create(path, params, false);
+    const lastActiveToken = this.lastActiveToken?.getRawString();
+
+    return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+      if (MissingExpiredTokenError.is(e) && lastActiveToken) {
+        return Token.create(path, { ...params }, { expired_token: lastActiveToken });
+      }
+      throw e;
+    });
   }
 
   #dispatchTokenEvents(token: TokenResource, shouldDispatch: boolean): void {
@@ -417,12 +425,11 @@ export class Session extends BaseResource implements SessionResource {
     organizationId: string | undefined | null,
     tokenId: string,
     shouldDispatchTokenUpdate: boolean,
+    skipCache: boolean,
   ): Promise<string | null> {
     debugLogger.info('Fetching new token from API', { organizationId, template, tokenId }, 'session');
 
-    const tokenResolver = this.#createTokenResolver(template, organizationId);
-
-    // Cache the promise immediately to prevent concurrent calls from triggering duplicate requests
+    const tokenResolver = this.#createTokenResolver(template, organizationId, skipCache);
     SessionTokenCache.set({ tokenId, tokenResolver });
 
     return tokenResolver.then(token => {

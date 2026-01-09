@@ -18,41 +18,57 @@ type WithOptionalOrgType<T> = T & {
  */
 export interface BillingNamespace {
   /**
+   * Returns a list of payment attempts for the current user or supplied organization.
+   *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getPaymentAttempts: (params: GetPaymentAttemptsParams) => Promise<ClerkPaginatedResponse<BillingPaymentResource>>;
 
   /**
+   * Returns details of a specific payment attempt for the current user or supplied organization.
+   *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getPaymentAttempt: (params: { id: string; orgId?: string }) => Promise<BillingPaymentResource>;
 
   /**
+   * Returns a list of all publically visible billing plans.
+   *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getPlans: (params?: GetPlansParams) => Promise<ClerkPaginatedResponse<BillingPlanResource>>;
 
   /**
+   * Returns a billing plan by ID.
+   *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getPlan: (params: { id: string }) => Promise<BillingPlanResource>;
 
   /**
+   * Returns the main billing subscription for the current user or supplied organization.
+   *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getSubscription: (params: GetSubscriptionParams) => Promise<BillingSubscriptionResource>;
 
   /**
+   * Returns a list of billing statements for the current user or supplied organization.
+   *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getStatements: (params: GetStatementsParams) => Promise<ClerkPaginatedResponse<BillingStatementResource>>;
 
   /**
+   * Returns a billing statement by ID.
+   *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getStatement: (params: { id: string; orgId?: string }) => Promise<BillingStatementResource>;
 
   /**
+   * Creates a new billing checkout for the current user or supplied organization.
+   *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   startCheckout: (params: CreateCheckoutParams) => Promise<BillingCheckoutResource>;

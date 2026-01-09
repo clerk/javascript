@@ -36,6 +36,7 @@ const QueryParameters = {
   HandshakeReason: '__clerk_hs_reason',
   HandshakeNonce: Cookies.HandshakeNonce,
   HandshakeFormat: 'format',
+  Session: '__session',
 } as const;
 
 const Headers = {
