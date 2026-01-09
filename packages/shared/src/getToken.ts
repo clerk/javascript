@@ -1,60 +1,36 @@
 import { inBrowser } from './browser';
 import { ClerkRuntimeError } from './errors/clerkRuntimeError';
-import { retry } from './retry';
-import type { Clerk, ClerkStatus, GetTokenOptions, LoadedClerk } from './types';
+import type { GetTokenOptions, LoadedClerk } from './types';
 
-const POLL_INTERVAL_MS = 50;
-const MAX_POLL_RETRIES = 100;
-const STATUS_TIMEOUT_MS = 10000; // 10 second timeout for status changes
+const TIMEOUT_MS = 10000; // 10 second timeout for Clerk to load
 
-function getWindowClerk(): Clerk | undefined {
-  if (inBrowser() && 'Clerk' in window) {
-    return (window as unknown as { Clerk?: Clerk }).Clerk;
-  }
-  return undefined;
+/**
+ * A promise that includes resolve/reject callbacks for external resolution.
+ * Used for coordination between getToken() and clerk-js initialization.
+ */
+interface ClerkReadyPromise extends Promise<LoadedClerk> {
+  __resolve?: (clerk: LoadedClerk) => void;
+  __reject?: (error: Error) => void;
 }
 
-function waitForClerkStatus(clerk: Clerk): Promise<LoadedClerk> {
-  return new Promise((resolve, reject) => {
-    let settled = false;
+declare global {
+  interface Window {
+    __clerk_internal_ready?: ClerkReadyPromise;
+  }
+}
 
-    const statusHandler = (status: ClerkStatus) => {
-      if (settled) {
-        return;
-      }
-
-      if (status === 'ready' || status === 'degraded') {
-        settled = true;
-        clearTimeout(timeoutId);
-        clerk.off('status', statusHandler);
-        resolve(clerk as LoadedClerk);
-      } else if (status === 'error') {
-        settled = true;
-        clearTimeout(timeoutId);
-        clerk.off('status', statusHandler);
-        reject(
-          new ClerkRuntimeError('Clerk failed to initialize.', {
-            code: 'clerk_runtime_init_error',
-          }),
-        );
-      }
-    };
-
-    const timeoutId = setTimeout(() => {
-      if (settled) {
-        return;
-      }
-      settled = true;
-      clerk.off('status', statusHandler);
-      reject(
-        new ClerkRuntimeError('Timeout waiting for Clerk to initialize.', {
-          code: 'clerk_runtime_load_timeout',
-        }),
-      );
-    }, STATUS_TIMEOUT_MS);
-
-    clerk.on('status', statusHandler, { notify: true });
-  });
+function getWindowClerk(): LoadedClerk | undefined {
+  if (inBrowser() && 'Clerk' in window) {
+    const clerk = (window as unknown as { Clerk?: LoadedClerk }).Clerk;
+    if (clerk && (clerk.status === 'ready' || clerk.status === 'degraded')) {
+      return clerk;
+    }
+    // Legacy fallback for older clerk-js versions without status
+    if (clerk?.loaded && !clerk.status) {
+      return clerk;
+    }
+  }
+  return undefined;
 }
 
 async function waitForClerk(): Promise<LoadedClerk> {
@@ -64,44 +40,49 @@ async function waitForClerk(): Promise<LoadedClerk> {
     });
   }
 
-  let clerk: Clerk;
-  try {
-    clerk = await retry(
-      () => {
-        const clerk = getWindowClerk();
-        if (!clerk) {
-          throw new Error('Clerk not found');
-        }
-        return clerk;
-      },
-      {
-        initialDelay: POLL_INTERVAL_MS,
-        factor: 1,
-        jitter: false,
-        shouldRetry: (_, iterations) => iterations < MAX_POLL_RETRIES,
-      },
-    );
-  } catch {
-    throw new ClerkRuntimeError('Timeout waiting for Clerk to load.', {
-      code: 'clerk_runtime_load_timeout',
-    });
+  const clerk = getWindowClerk();
+  if (clerk) {
+    return clerk;
   }
 
-  if (clerk.status === 'ready' || clerk.status === 'degraded') {
-    return clerk as LoadedClerk;
+  // Get or create the coordination promise
+  if (!window.__clerk_internal_ready) {
+    let resolve: (clerk: LoadedClerk) => void;
+    let reject: (error: Error) => void;
+    const promise = new Promise<LoadedClerk>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    }) as ClerkReadyPromise;
+    promise.__resolve = resolve!;
+    promise.__reject = reject!;
+    window.__clerk_internal_ready = promise;
   }
 
-  if (clerk.loaded && !clerk.status) {
-    return clerk as LoadedClerk;
-  }
-
-  return waitForClerkStatus(clerk);
+  return Promise.race([
+    window.__clerk_internal_ready,
+    new Promise<never>((_, reject) =>
+      setTimeout(
+        () =>
+          reject(
+            new ClerkRuntimeError('Timeout waiting for Clerk to load.', {
+              code: 'clerk_runtime_load_timeout',
+            }),
+          ),
+        TIMEOUT_MS,
+      ),
+    ),
+  ]);
 }
 
 /**
  * Retrieves the current session token, waiting for Clerk to initialize if necessary.
  *
- * This function is safe to call from anywhere in the browser
+ * This function is safe to call from anywhere in the browser, such as API interceptors,
+ * data fetching layers, or vanilla JavaScript code.
+ *
+ * **Note:** In frameworks with concurrent rendering (e.g., React 18+), a global token read
+ * may not correspond to the currently committed UI during transitions. This is a coherence
+ * consideration, not an auth safety issue.
  *
  * @param options - Optional configuration for token retrieval
  * @param options.template - The name of a JWT template to use
@@ -113,8 +94,6 @@ async function waitForClerk(): Promise<LoadedClerk> {
  * @throws {ClerkRuntimeError} When called in a non-browser environment (code: `clerk_runtime_not_browser`)
  *
  * @throws {ClerkRuntimeError} When Clerk fails to load within timeout (code: `clerk_runtime_load_timeout`)
- *
- * @throws {ClerkRuntimeError} When Clerk fails to initialize (code: `clerk_runtime_init_error`)
  *
  * @example
  * ```typescript

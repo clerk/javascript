@@ -3,8 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClerkRuntimeError } from '../errors/clerkRuntimeError';
 import { getToken } from '../getToken';
 
-type StatusHandler = (status: string) => void;
-
 describe('getToken', () => {
   const originalWindow = global.window;
 
@@ -64,97 +62,72 @@ describe('getToken', () => {
     });
   });
 
-  describe('when Clerk is loading', () => {
-    it('should wait for ready status via event listener', async () => {
+  describe('when Clerk is not yet ready', () => {
+    it('should wait for promise resolution when clerk-js resolves the global promise', async () => {
       const mockToken = 'delayed-token';
-      let statusHandler: StatusHandler | null = null;
-
       const mockClerk = {
-        status: 'loading' as string,
-        on: vi.fn((event: string, handler: StatusHandler) => {
-          if (event === 'status') {
-            statusHandler = handler;
-          }
-        }),
-        off: vi.fn(),
-        session: {
-          getToken: vi.fn().mockResolvedValue(mockToken),
-        },
-      };
-
-      global.window = { Clerk: mockClerk } as any;
-
-      const tokenPromise = getToken();
-
-      // Simulate Clerk becoming ready
-      await vi.advanceTimersByTimeAsync(100);
-      mockClerk.status = 'ready';
-      if (statusHandler) {
-        (statusHandler as StatusHandler)('ready');
-      }
-
-      const token = await tokenPromise;
-      expect(token).toBe(mockToken);
-    });
-
-    it('should resolve when status changes to degraded', async () => {
-      const mockToken = 'degraded-token';
-      let statusHandler: StatusHandler | null = null;
-
-      const mockClerk = {
-        status: 'loading' as string,
-        on: vi.fn((event: string, handler: StatusHandler) => {
-          if (event === 'status') {
-            statusHandler = handler;
-          }
-        }),
-        off: vi.fn(),
-        session: {
-          getToken: vi.fn().mockResolvedValue(mockToken),
-        },
-      };
-
-      global.window = { Clerk: mockClerk } as any;
-
-      const tokenPromise = getToken();
-
-      // Simulate Clerk becoming degraded
-      await vi.advanceTimersByTimeAsync(100);
-      mockClerk.status = 'degraded';
-      if (statusHandler) {
-        (statusHandler as StatusHandler)('degraded');
-      }
-
-      const token = await tokenPromise;
-      expect(token).toBe(mockToken);
-    });
-  });
-
-  describe('when window.Clerk does not exist', () => {
-    it('should poll until Clerk is available', async () => {
-      const mockToken = 'polled-token';
-
-      global.window = {} as any;
-
-      const tokenPromise = getToken();
-
-      // Simulate Clerk loading after 200ms
-      await vi.advanceTimersByTimeAsync(200);
-
-      (global.window as any).Clerk = {
         status: 'ready',
         session: {
           getToken: vi.fn().mockResolvedValue(mockToken),
         },
       };
 
+      // Start with empty window (no Clerk)
+      global.window = {} as any;
+
+      const tokenPromise = getToken();
+
+      // Simulate clerk-js loading and resolving the promise
       await vi.advanceTimersByTimeAsync(100);
+
+      // Resolve the promise that getToken created
+      const readyPromise = (global.window as any).__clerk_internal_ready;
+      expect(readyPromise).toBeDefined();
+      expect(readyPromise.__resolve).toBeDefined();
+
+      // Simulate clerk-js calling __resolve
+      readyPromise.__resolve(mockClerk);
 
       const token = await tokenPromise;
       expect(token).toBe(mockToken);
     });
 
-    it('should throw ClerkRuntimeError if Clerk never loads', async () => {
+    it('should resolve when clerk-js resolves with degraded status', async () => {
+      const mockToken = 'degraded-token';
+      const mockClerk = {
+        status: 'degraded',
+        session: {
+          getToken: vi.fn().mockResolvedValue(mockToken),
+        },
+      };
+
+      global.window = {} as any;
+
+      const tokenPromise = getToken();
+
+      await vi.advanceTimersByTimeAsync(100);
+
+      const readyPromise = (global.window as any).__clerk_internal_ready;
+      readyPromise.__resolve(mockClerk);
+
+      const token = await tokenPromise;
+      expect(token).toBe(mockToken);
+    });
+
+    it('should reject when clerk-js rejects the global promise', async () => {
+      global.window = {} as any;
+
+      const tokenPromise = getToken();
+
+      await vi.advanceTimersByTimeAsync(100);
+
+      const readyPromise = (global.window as any).__clerk_internal_ready;
+      readyPromise.__reject(new Error('Clerk failed to initialize'));
+
+      await expect(tokenPromise).rejects.toThrow('Clerk failed to initialize');
+    });
+
+    it('should throw ClerkRuntimeError if promise is never resolved (timeout)', async () => {
       global.window = {} as any;
 
       let caughtError: unknown;
@@ -168,6 +141,36 @@ describe('getToken', () => {
 
       expect(caughtError).toBeInstanceOf(ClerkRuntimeError);
       expect((caughtError as ClerkRuntimeError).code).toBe('clerk_runtime_load_timeout');
+    });
+  });
+
+  describe('multiple concurrent getToken calls', () => {
+    it('should share the same promise for concurrent calls', async () => {
+      const mockToken = 'shared-token';
+      const mockClerk = {
+        status: 'ready',
+        session: {
+          getToken: vi.fn().mockResolvedValue(mockToken),
+        },
+      };
+
+      global.window = {} as any;
+
+      const tokenPromise1 = getToken();
+      const tokenPromise2 = getToken();
+      const tokenPromise3 = getToken();
+
+      await vi.advanceTimersByTimeAsync(100);
+
+      const readyPromise = (global.window as any).__clerk_internal_ready;
+      readyPromise.__resolve(mockClerk);
+
+      const [token1, token2, token3] = await Promise.all([tokenPromise1, tokenPromise2, tokenPromise3]);
+
+      expect(token1).toBe(mockToken);
+      expect(token2).toBe(mockToken);
+      expect(token3).toBe(mockToken);
+      expect(mockClerk.session.getToken).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -225,39 +228,6 @@ describe('getToken', () => {
     });
   });
 
-  describe('when Clerk enters error status', () => {
-    it('should throw ClerkRuntimeError', async () => {
-      let statusHandler: StatusHandler | null = null;
-
-      const mockClerk = {
-        status: 'loading' as string,
-        on: vi.fn((event: string, handler: StatusHandler) => {
-          if (event === 'status') {
-            statusHandler = handler;
-          }
-        }),
-        off: vi.fn(),
-        session: null,
-      };
-
-      global.window = { Clerk: mockClerk } as any;
-
-      const tokenPromise = getToken();
-
-      // Simulate Clerk entering error state
-      await vi.advanceTimersByTimeAsync(100);
-      mockClerk.status = 'error';
-      if (statusHandler) {
-        (statusHandler as StatusHandler)('error');
-      }
-
-      await expect(tokenPromise).rejects.toThrow(ClerkRuntimeError);
-      await expect(tokenPromise).rejects.toMatchObject({
-        code: 'clerk_runtime_init_error',
-      });
-    });
-  });
-
   describe('when session.getToken throws', () => {
     it('should propagate the error', async () => {
       const mockClerk = {
@@ -288,41 +258,6 @@ describe('getToken', () => {
 
       const token = await getToken();
       expect(token).toBe(mockToken);
-    });
-  });
-
-  describe('cleanup', () => {
-    it('should unsubscribe from status listener on success', async () => {
-      const mockToken = 'cleanup-token';
-      let statusHandler: StatusHandler | null = null;
-
-      const mockClerk = {
-        status: 'loading' as string,
-        on: vi.fn((event: string, handler: StatusHandler) => {
-          if (event === 'status') {
-            statusHandler = handler;
-          }
-        }),
-        off: vi.fn(),
-        session: {
-          getToken: vi.fn().mockResolvedValue(mockToken),
-        },
-      };
-
-      global.window = { Clerk: mockClerk } as any;
-
-      const tokenPromise = getToken();
-
-      await vi.advanceTimersByTimeAsync(50);
-      mockClerk.status = 'ready';
-      if (statusHandler) {
-        (statusHandler as StatusHandler)('ready');
-      }
-
-      await tokenPromise;
-
-      // Verify cleanup was called
-      expect(mockClerk.off).toHaveBeenCalledWith('status', statusHandler);
     });
   });
 });
