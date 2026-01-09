@@ -10,21 +10,17 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
   const proxyUrl = getSafeEnv(locals).proxyUrl!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const domain = getSafeEnv(locals).domain!;
+  const clerkJsVariant = getSafeEnv(locals).clerkJsVariant;
   const clerkJsScriptSrc = clerkJsScriptUrl({
     clerkJSUrl: getSafeEnv(locals).clerkJsUrl,
-    clerkJSVariant: getSafeEnv(locals).clerkJsVariant,
+    clerkJSVariant: clerkJsVariant,
     clerkJSVersion: getSafeEnv(locals).clerkJsVersion,
     domain,
     proxyUrl,
     publishableKey,
   });
-  const clerkUiScriptSrc = clerkUiScriptUrl({
-    clerkUiUrl: getSafeEnv(locals).clerkUiUrl,
-    domain,
-    proxyUrl,
-    publishableKey,
-  });
-  return `
+
+  const clerkJsScript = `
   <script src="${clerkJsScriptSrc}"
   data-clerk-js-script
   async
@@ -32,7 +28,21 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
   ${publishableKey ? `data-clerk-publishable-key="${publishableKey}"` : ``}
   ${proxyUrl ? `data-clerk-proxy-url="${proxyUrl}"` : ``}
   ${domain ? `data-clerk-domain="${domain}"` : ``}
-  ></script>
+  ></script>`;
+
+  // Skip clerk-ui script for headless variant
+  if (clerkJsVariant === 'headless') {
+    return clerkJsScript + '\n';
+  }
+
+  const clerkUiScriptSrc = clerkUiScriptUrl({
+    clerkUiUrl: getSafeEnv(locals).clerkUiUrl,
+    domain,
+    proxyUrl,
+    publishableKey,
+  });
+
+  const clerkUiScript = `
   <script src="${clerkUiScriptSrc}"
   data-clerk-ui-script
   async
@@ -40,7 +50,9 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
   ${publishableKey ? `data-clerk-publishable-key="${publishableKey}"` : ``}
   ${proxyUrl ? `data-clerk-proxy-url="${proxyUrl}"` : ``}
   ${domain ? `data-clerk-domain="${domain}"` : ``}
-  ></script>\n`;
+  ></script>`;
+
+  return clerkJsScript + clerkUiScript + '\n';
 }
 
 export { buildClerkHotloadScript };
