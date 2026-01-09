@@ -43,7 +43,7 @@ function withLastActiveFallback(cb: () => string): string {
 const KeylessPromptInternal = (_props: KeylessPromptProps) => {
   const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
-  const { corner, isDragging, style: positionStyle, containerRef, onPointerDown, preventClick } = useDragToCorner();
+  const { isDragging, cornerStyle, containerRef, onPointerDown, preventClick } = useDragToCorner();
 
   useEffect(() => {
     if (isSignedIn) {
@@ -118,25 +118,23 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
       <PromptContainer
         ref={containerRef}
         data-expanded={isForcedExpanded}
-        data-dragging={isDragging}
         onPointerDown={onPointerDown}
-        style={positionStyle}
-        sx={t => ({
+        style={{
+          ...cornerStyle,
           position: 'fixed',
+        }}
+        sx={t => ({
           height: `${t.sizes.$10}`,
           minWidth: '13.4rem',
           paddingLeft: `${t.space.$3}`,
           borderRadius: '1.25rem',
           touchAction: 'none', // Prevent scroll interference on mobile
           cursor: isDragging ? 'grabbing' : 'grab',
-
-          '&:hover [data-drag-handle]': {
-            opacity: 0.4,
-          },
-
-          '&[data-dragging="true"] [data-drag-handle]': {
-            opacity: 0.6,
-          },
+          transition: isDragging
+            ? 'none'
+            : isForcedExpanded
+              ? 'height 230ms cubic-bezier(0.28, 1, 0.32, 1), width 230ms cubic-bezier(0.28, 1, 0.32, 1), padding 230ms cubic-bezier(0.28, 1, 0.32, 1), border-radius 230ms cubic-bezier(0.28, 1, 0.32, 1)'
+              : 'height 195ms cubic-bezier(0.2, 0.61, 0.1, 1), width 195ms cubic-bezier(0.2, 0.61, 0.1, 1), padding 195ms cubic-bezier(0.2, 0.61, 0.1, 1), border-radius 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
 
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
@@ -180,34 +178,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             position: relative;
           `}
         >
-          {/* Drag handle indicator */}
-          <div
-            data-drag-handle
-            css={css`
-              position: absolute;
-              left: 0.5rem;
-              top: 50%;
-              transform: translateY(-50%);
-              display: flex;
-              gap: 0.125rem;
-              opacity: 0;
-              transition: opacity 150ms ease-out;
-              pointer-events: none;
-            `}
-            aria-hidden='true'
-          >
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                css={css`
-                  width: 0.1875rem;
-                  height: 0.1875rem;
-                  background-color: #8c8c8c;
-                  border-radius: 50%;
-                `}
-              />
-            ))}
-          </div>
           <Flex
             sx={t => ({
               alignItems: 'center',

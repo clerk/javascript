@@ -1,31 +1,39 @@
 import type { PointerEventHandler } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 type Corner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 const STORAGE_KEY = 'clerk-keyless-prompt-corner';
-const LERP_FACTOR = 0.15;
-const INERTIA_MULTIPLIER = 8;
 const CORNER_OFFSET = '1.25rem';
+const CORNER_OFFSET_PX = 20; // 1.25rem ≈ 20px
 const DRAG_THRESHOLD = 5;
+const VELOCITY_SAMPLE_INTERVAL_MS = 10;
+const VELOCITY_HISTORY_SIZE = 5;
+const INERTIA_DECELERATION_RATE = 0.999;
 
-interface Position {
+interface Point {
   x: number;
   y: number;
+}
+
+interface Velocity {
+  position: Point;
+  timestamp: number;
+}
+
+interface CornerTranslation {
+  corner: Corner;
+  translation: Point;
 }
 
 interface UseDragToCornerResult {
   corner: Corner;
   isDragging: boolean;
-  style: React.CSSProperties;
+  cornerStyle: React.CSSProperties;
   containerRef: React.RefObject<HTMLDivElement>;
   onPointerDown: PointerEventHandler;
   preventClick: boolean;
 }
-
-const lerp = (start: number, end: number, factor: number): number => {
-  return start + (end - start) * factor;
-};
 
 const getCornerFromPosition = (x: number, y: number): Corner => {
   const centerX = window.innerWidth / 2;
@@ -59,20 +67,6 @@ const getCornerStyles = (corner: Corner): React.CSSProperties => {
   }
 };
 
-const getCornerPositionInPixels = (corner: Corner, elementWidth: number, elementHeight: number): Position => {
-  const offset = 20;
-  switch (corner) {
-    case 'top-left':
-      return { x: offset, y: offset };
-    case 'top-right':
-      return { x: window.innerWidth - elementWidth - offset, y: offset };
-    case 'bottom-left':
-      return { x: offset, y: window.innerHeight - elementHeight - offset };
-    case 'bottom-right':
-      return { x: window.innerWidth - elementWidth - offset, y: window.innerHeight - elementHeight - offset };
-  }
-};
-
 const loadCornerPreference = (): Corner => {
   if (typeof window === 'undefined') {
     return 'bottom-right';
@@ -99,56 +93,161 @@ const saveCornerPreference = (corner: Corner): void => {
   }
 };
 
+const project = (initialVelocity: number): number => {
+  return ((initialVelocity / 1000) * INERTIA_DECELERATION_RATE) / (1 - INERTIA_DECELERATION_RATE);
+};
+
+const calculateVelocity = (history: Velocity[]): Point => {
+  if (history.length < 2) {
+    return { x: 0, y: 0 };
+  }
+
+  const oldestPoint = history[0];
+  const latestPoint = history[history.length - 1];
+  const timeDelta = latestPoint.timestamp - oldestPoint.timestamp;
+
+  if (timeDelta === 0) {
+    return { x: 0, y: 0 };
+  }
+
+  // Calculate pixels per millisecond
+  const velocityX = (latestPoint.position.x - oldestPoint.position.x) / timeDelta;
+  const velocityY = (latestPoint.position.y - oldestPoint.position.y) / timeDelta;
+
+  // Convert to pixels per second for more intuitive values
+  return { x: velocityX * 1000, y: velocityY * 1000 };
+};
+
 export const useDragToCorner = (): UseDragToCornerResult => {
   const [corner, setCorner] = useState<Corner>(loadCornerPreference);
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStyle, setDragStyle] = useState<React.CSSProperties>({});
   const [preventClick, setPreventClick] = useState(false);
+  const pendingCornerUpdate = useRef<Corner | null>(null);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
-  const transitionTimeoutRef = useRef<number | null>(null);
-  const targetPosRef = useRef<Position>({ x: 0, y: 0 });
-  const currentPosRef = useRef<Position>({ x: 0, y: 0 });
-  const lastPosRef = useRef<Position>({ x: 0, y: 0 });
-  const velocityRef = useRef<Position>({ x: 0, y: 0 });
-  const startPosRef = useRef<Position>({ x: 0, y: 0 });
-  const startOffsetRef = useRef<Position>({ x: 0, y: 0 });
-  const lastTimeRef = useRef<number>(0);
-  const hasStartedDraggingRef = useRef<boolean>(false);
+  const machine = useRef<{ state: 'idle' | 'press' | 'animating' } | { state: 'drag'; pointerId: number }>({
+    state: 'idle',
+  });
 
-  const animate = useCallback(() => {
+  const cleanup = useRef<(() => void) | null>(null);
+  const origin = useRef<Point>({ x: 0, y: 0 });
+  const translation = useRef<Point>({ x: 0, y: 0 });
+  const lastTimestamp = useRef<number>(0);
+  const velocities = useRef<Velocity[]>([]);
+
+  const set = useCallback((position: Point) => {
+    if (containerRef.current) {
+      translation.current = position;
+      containerRef.current.style.translate = `${position.x}px ${position.y}px`;
+    }
+  }, []);
+
+  const getCorners = useCallback((): Record<Corner, Point> => {
     const container = containerRef.current;
     if (!container) {
-      return;
+      return {
+        'top-left': { x: 0, y: 0 },
+        'top-right': { x: 0, y: 0 },
+        'bottom-left': { x: 0, y: 0 },
+        'bottom-right': { x: 0, y: 0 },
+      };
     }
 
-    const current = currentPosRef.current;
-    const target = targetPosRef.current;
+    const offset = CORNER_OFFSET_PX;
+    const triggerWidth = container.offsetWidth || 0;
+    const triggerHeight = container.offsetHeight || 0;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
 
-    current.x = lerp(current.x, target.x, LERP_FACTOR);
-    current.y = lerp(current.y, target.y, LERP_FACTOR);
+    const getAbsolutePosition = (corner: Corner): Point => {
+      const isRight = corner.includes('right');
+      const isBottom = corner.includes('bottom');
 
-    const now = performance.now();
-    const deltaTime = Math.max(now - lastTimeRef.current, 1);
-    const deltaX = current.x - lastPosRef.current.x;
-    const deltaY = current.y - lastPosRef.current.y;
+      const x = isRight ? window.innerWidth - scrollbarWidth - offset - triggerWidth : offset;
+      const y = isBottom ? window.innerHeight - offset - triggerHeight : offset;
 
-    velocityRef.current.x = deltaX / (deltaTime / 16.67);
-    velocityRef.current.y = deltaY / (deltaTime / 16.67);
+      return { x, y };
+    };
 
-    lastPosRef.current.x = current.x;
-    lastPosRef.current.y = current.y;
-    lastTimeRef.current = now;
+    const basePosition = getAbsolutePosition(corner);
 
-    // Direct DOM manipulation instead of setState
-    container.style.position = 'fixed';
-    container.style.left = `${current.x}px`;
-    container.style.top = `${current.y}px`;
-    container.style.transition = 'none';
+    const rel = (pos: Point): Point => {
+      return { x: pos.x - basePosition.x, y: pos.y - basePosition.y };
+    };
 
-    animationFrameRef.current = requestAnimationFrame(animate);
+    return {
+      'top-left': rel(getAbsolutePosition('top-left')),
+      'top-right': rel(getAbsolutePosition('top-right')),
+      'bottom-left': rel(getAbsolutePosition('bottom-left')),
+      'bottom-right': rel(getAbsolutePosition('bottom-right')),
+    };
+  }, [corner]);
+
+  const animate = useCallback(
+    (cornerTranslation: CornerTranslation) => {
+      const el = containerRef.current;
+      if (!el) {
+        return;
+      }
+
+      const handleAnimationEnd = (e: TransitionEvent) => {
+        if (e.propertyName === 'translate') {
+          machine.current = { state: 'animating' };
+
+          // Mark that we're waiting for corner update, then update corner state
+          // The useLayoutEffect will reset translate once cornerStyle has been applied
+          pendingCornerUpdate.current = cornerTranslation.corner;
+          setCorner(cornerTranslation.corner);
+          saveCornerPreference(cornerTranslation.corner);
+
+          el.removeEventListener('transitionend', handleAnimationEnd);
+        }
+      };
+
+      el.style.transition = 'translate 300ms cubic-bezier(0.2, 0, 0.2, 1)';
+      el.addEventListener('transitionend', handleAnimationEnd);
+      set(cornerTranslation.translation);
+    },
+    [set],
+  );
+
+  const cancel = useCallback(() => {
+    if (machine.current.state === 'drag') {
+      containerRef.current?.releasePointerCapture(machine.current.pointerId);
+    }
+    machine.current = machine.current.state === 'drag' ? { state: 'animating' } : { state: 'idle' };
+
+    if (cleanup.current !== null) {
+      cleanup.current();
+      cleanup.current = null;
+    }
+
+    velocities.current = [];
+    setIsDragging(false);
+    containerRef.current?.classList.remove('dev-tools-grabbing');
+    document.body.style.removeProperty('user-select');
+    document.body.style.removeProperty('-webkit-user-select');
   }, []);
+
+  // Reset translate after corner state has updated and cornerStyle has been applied
+  useLayoutEffect(() => {
+    if (pendingCornerUpdate.current !== null && pendingCornerUpdate.current === corner) {
+      const el = containerRef.current;
+      if (el && machine.current.state === 'animating') {
+        translation.current = { x: 0, y: 0 };
+        el.style.transition = '';
+        el.style.translate = '0px 0px';
+        machine.current = { state: 'idle' };
+        setPreventClick(false);
+        pendingCornerUpdate.current = null;
+      }
+    }
+  }, [corner]);
+
+  useLayoutEffect(() => {
+    return () => {
+      cancel();
+    };
+  }, [cancel]);
 
   const handlePointerDown: PointerEventHandler = useCallback(
     e => {
@@ -157,125 +256,133 @@ export const useDragToCorner = (): UseDragToCornerResult => {
         return;
       }
 
+      if (e.button !== 0) {
+        return; // ignore right click
+      }
+
       const container = containerRef.current;
       if (!container) {
         return;
       }
 
-      const rect = container.getBoundingClientRect();
-      const startX = e.clientX;
-      const startY = e.clientY;
-
-      startPosRef.current = { x: startX, y: startY };
-      startOffsetRef.current = { x: rect.left, y: rect.top };
-      currentPosRef.current = { x: rect.left, y: rect.top };
-      targetPosRef.current = { x: rect.left, y: rect.top };
-      lastPosRef.current = { x: rect.left, y: rect.top };
-      velocityRef.current = { x: 0, y: 0 };
-      lastTimeRef.current = performance.now();
-      hasStartedDraggingRef.current = false;
+      origin.current = { x: e.clientX, y: e.clientY };
+      machine.current = { state: 'press' };
+      velocities.current = [];
+      translation.current = { x: 0, y: 0 };
+      lastTimestamp.current = Date.now();
 
       const handlePointerMove = (moveEvent: PointerEvent) => {
-        const deltaX = moveEvent.clientX - startPosRef.current.x;
-        const deltaY = moveEvent.clientY - startPosRef.current.y;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        if (machine.current.state === 'press') {
+          const dx = moveEvent.clientX - origin.current.x;
+          const dy = moveEvent.clientY - origin.current.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (!hasStartedDraggingRef.current && distance < DRAG_THRESHOLD) {
+          if (distance >= DRAG_THRESHOLD) {
+            machine.current = { state: 'drag', pointerId: moveEvent.pointerId };
+            container.setPointerCapture(moveEvent.pointerId);
+            container.classList.add('dev-tools-grabbing');
+            document.body.style.userSelect = 'none';
+            document.body.style.webkitUserSelect = 'none';
+            setIsDragging(true);
+          } else {
+            return;
+          }
+        }
+
+        if (machine.current.state !== 'drag') {
           return;
         }
 
-        if (!hasStartedDraggingRef.current) {
-          hasStartedDraggingRef.current = true;
-          setIsDragging(true);
-          animationFrameRef.current = requestAnimationFrame(animate);
-        }
+        const currentPosition = { x: moveEvent.clientX, y: moveEvent.clientY };
+        const dx = currentPosition.x - origin.current.x;
+        const dy = currentPosition.y - origin.current.y;
 
-        moveEvent.preventDefault();
-        targetPosRef.current = {
-          x: startOffsetRef.current.x + deltaX,
-          y: startOffsetRef.current.y + deltaY,
+        origin.current = currentPosition;
+
+        const newTranslation = {
+          x: translation.current.x + dx,
+          y: translation.current.y + dy,
         };
+
+        set(newTranslation);
+
+        // Keep a history of recent positions for velocity calculation
+        const now = Date.now();
+        const shouldAddToHistory = now - lastTimestamp.current >= VELOCITY_SAMPLE_INTERVAL_MS;
+
+        if (shouldAddToHistory) {
+          velocities.current = [
+            ...velocities.current.slice(-VELOCITY_HISTORY_SIZE + 1),
+            { position: currentPosition, timestamp: now },
+          ];
+          lastTimestamp.current = now;
+        }
       };
 
       const handlePointerUp = () => {
-        window.removeEventListener('pointermove', handlePointerMove);
-        window.removeEventListener('pointerup', handlePointerUp);
+        const wasDragging = machine.current.state === 'drag';
+        const velocity = calculateVelocity(velocities.current);
+        cancel();
 
-        if (animationFrameRef.current !== null) {
-          cancelAnimationFrame(animationFrameRef.current);
-          animationFrameRef.current = null;
-        }
-
-        if (hasStartedDraggingRef.current) {
-          setIsDragging(false);
-          setPreventClick(true);
-
-          const current = currentPosRef.current;
-          const velocity = velocityRef.current;
-          const projectedX = current.x + velocity.x * INERTIA_MULTIPLIER;
-          const projectedY = current.y + velocity.y * INERTIA_MULTIPLIER;
-
-          const newCorner = getCornerFromPosition(projectedX, projectedY);
+        if (wasDragging) {
+          const container = containerRef.current;
+          if (!container) {
+            return;
+          }
 
           const rect = container.getBoundingClientRect();
-          const targetPos = getCornerPositionInPixels(newCorner, rect.width, rect.height);
+          const currentAbsoluteX = rect.left;
+          const currentAbsoluteY = rect.top;
 
-          setDragStyle({
-            position: 'fixed',
-            left: `${targetPos.x}px`,
-            top: `${targetPos.y}px`,
-            transition: 'all 400ms cubic-bezier(0.2, 0, 0.2, 1)',
-          });
+          // Project final position with inertia
+          const projectedX = currentAbsoluteX + project(velocity.x);
+          const projectedY = currentAbsoluteY + project(velocity.y);
 
-          setCorner(newCorner);
-          saveCornerPreference(newCorner);
+          // Determine target corner based on projected position
+          const newCorner = getCornerFromPosition(projectedX, projectedY);
 
-          transitionTimeoutRef.current = window.setTimeout(() => {
-            setDragStyle({});
-            setPreventClick(false);
-            // Clear inline styles to return to React-controlled positioning
-            if (container) {
-              container.style.position = '';
-              container.style.left = '';
-              container.style.top = '';
-              container.style.transition = '';
-            }
-          }, 400);
+          // Get all corner translations relative to current corner
+          const allCorners = getCorners();
+
+          // The translation to animate to is the difference between the new corner's position
+          // and the current translation
+          const targetTranslation = allCorners[newCorner];
+
+          setPreventClick(true);
+          animate({ corner: newCorner, translation: targetTranslation });
         }
+      };
 
-        hasStartedDraggingRef.current = false;
+      const handleClick = (clickEvent: MouseEvent) => {
+        if (machine.current.state === 'animating') {
+          clickEvent.preventDefault();
+          clickEvent.stopPropagation();
+          machine.current = { state: 'idle' };
+          container.removeEventListener('click', handleClick);
+        }
       };
 
       window.addEventListener('pointermove', handlePointerMove);
       window.addEventListener('pointerup', handlePointerUp, { once: true });
+      container.addEventListener('click', handleClick);
+
+      if (cleanup.current !== null) {
+        cleanup.current();
+      }
+
+      cleanup.current = () => {
+        window.removeEventListener('pointermove', handlePointerMove);
+        window.removeEventListener('pointerup', handlePointerUp);
+        container.removeEventListener('click', handleClick);
+      };
     },
-    [animate],
-  );
-
-  useEffect(() => {
-    return () => {
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      if (transitionTimeoutRef.current !== null) {
-        clearTimeout(transitionTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const style = useMemo<React.CSSProperties>(
-    () => ({
-      ...getCornerStyles(corner),
-      ...dragStyle,
-      transition: isDragging ? 'none' : dragStyle.transition || 'all 250ms cubic-bezier(0.2, 0, 0.2, 1)',
-    }),
-    [corner, isDragging, dragStyle],
+    [cancel, set, animate, getCorners],
   );
 
   return {
     corner,
     isDragging,
-    style,
+    cornerStyle: getCornerStyles(corner),
     containerRef,
     onPointerDown: handlePointerDown,
     preventClick,
