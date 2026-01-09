@@ -16,6 +16,7 @@ import {
   PromptSuccessIcon,
 } from '../shared';
 import { KeySlashIcon } from './KeySlashIcon';
+import { useDragToCorner } from './use-drag-to-corner';
 import { useRevalidateEnvironment } from './use-revalidate-environment';
 
 type KeylessPromptProps = {
@@ -42,6 +43,7 @@ function withLastActiveFallback(cb: () => string): string {
 const KeylessPromptInternal = (_props: KeylessPromptProps) => {
   const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
+  const { corner, isDragging, style: positionStyle, containerRef, onPointerDown, preventClick } = useDragToCorner();
 
   useEffect(() => {
     if (isSignedIn) {
@@ -114,16 +116,27 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
   return (
     <Portal>
       <PromptContainer
+        ref={containerRef}
         data-expanded={isForcedExpanded}
+        data-dragging={isDragging}
+        onPointerDown={onPointerDown}
+        style={positionStyle}
         sx={t => ({
           position: 'fixed',
-          bottom: '1.25rem',
-          right: '1.25rem',
           height: `${t.sizes.$10}`,
           minWidth: '13.4rem',
           paddingLeft: `${t.space.$3}`,
           borderRadius: '1.25rem',
-          transition: 'all 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
+          touchAction: 'none', // Prevent scroll interference on mobile
+          cursor: isDragging ? 'grabbing' : 'grab',
+
+          '&:hover [data-drag-handle]': {
+            opacity: 0.4,
+          },
+
+          '&[data-dragging="true"] [data-drag-handle]': {
+            opacity: 0.6,
+          },
 
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
@@ -140,7 +153,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             gap: `${t.space.$1x5}`,
             padding: `${t.space.$2x5} ${t.space.$3} ${t.space.$3} ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
-            transition: 'all 230ms cubic-bezier(0.28, 1, 0.32, 1)',
           },
         })}
       >
@@ -149,15 +161,53 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           aria-expanded={isForcedExpanded}
           aria-controls={contentIdentifier}
           id={buttonIdentifier}
-          onClick={() => !claimed && setIsExpanded(prev => !prev)}
+          onClick={e => {
+            if (preventClick) {
+              e.preventDefault();
+              e.stopPropagation();
+              return;
+            }
+            if (!claimed) {
+              setIsExpanded(prev => !prev);
+            }
+          }}
           css={css`
             ${basePromptElementStyles};
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
           `}
         >
+          {/* Drag handle indicator */}
+          <div
+            data-drag-handle
+            css={css`
+              position: absolute;
+              left: 0.5rem;
+              top: 50%;
+              transform: translateY(-50%);
+              display: flex;
+              gap: 0.125rem;
+              opacity: 0;
+              transition: opacity 150ms ease-out;
+              pointer-events: none;
+            `}
+            aria-hidden='true'
+          >
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                css={css`
+                  width: 0.1875rem;
+                  height: 0.1875rem;
+                  background-color: #8c8c8c;
+                  border-radius: 50%;
+                `}
+              />
+            ))}
+          </div>
           <Flex
             sx={t => ({
               alignItems: 'center',
