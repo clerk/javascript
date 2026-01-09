@@ -31,6 +31,8 @@ export function SafeLock(key: string) {
         await lock.releaseLock(key);
       }
     }
+
+    return false;
   };
 
   return { acquireLockAndRun };
