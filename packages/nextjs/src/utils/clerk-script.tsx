@@ -50,6 +50,9 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
     return null;
   }
 
+  // Only version objects have url property, constructors don't
+  const uiVersionUrl = ui && typeof ui === 'object' && 'url' in ui ? ui.url : undefined;
+
   const opts = {
     publishableKey,
     clerkJSUrl,
@@ -59,7 +62,7 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
     domain,
     proxyUrl,
     clerkUiVersion: ui?.version,
-    clerkUiUrl: ui?.url || clerkUiUrl,
+    clerkUiUrl: uiVersionUrl || clerkUiUrl,
   };
 
   return (

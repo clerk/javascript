@@ -15,9 +15,6 @@ export type ExtractAppearanceType<T, Default> = T extends { __appearanceType?: i
     : A
   : Default;
 
-declare const Tags: unique symbol;
-type Tagged<BaseType, Tag extends PropertyKey> = BaseType & { [Tags]: { [K in Tag]: void } };
-
 /**
  * The well-known symbol key used to identify legitimate @clerk/ui exports.
  * Uses Symbol.for() to ensure the same symbol is used across module boundaries.
@@ -27,53 +24,45 @@ export const UI_BRAND_SYMBOL_KEY = 'clerk:ui';
 
 /**
  * UiVersion type that carries appearance type information via phantom property
- * Tagged to ensure only official ui objects from @clerk/ui can be used
  * Used for version pinning with hot loading
  */
-export type UiVersion<A = any> = Tagged<
-  {
-    /**
-     * Brand symbol to identify legitimate @clerk/ui exports at runtime
-     */
-    __brand: symbol;
-    version: string;
-    url?: string;
-    /**
-     * Phantom property for type-level appearance inference
-     * This property never exists at runtime
-     */
-    __appearanceType?: A;
-  },
-  'ClerkUi'
->;
+export type UiVersion<A = any> = {
+  /**
+   * Brand symbol to identify legitimate @clerk/ui exports at runtime
+   */
+  __brand: symbol;
+  version: string;
+  url?: string;
+  /**
+   * Phantom property for type-level appearance inference
+   * This property never exists at runtime
+   */
+  __appearanceType?: A;
+};
 
 /**
  * UiModule type represents the ClerkUi class constructor
  * Used when bundling @clerk/ui directly instead of hot loading
- * Tagged to ensure only official ClerkUi class from @clerk/ui can be used
  */
-export type UiModule<A = any> = Tagged<
-  {
-    /**
-     * Brand symbol to identify legitimate @clerk/ui exports at runtime
-     */
-    __brand: symbol;
-    /**
-     * The version string of the UI module
-     */
-    version: string;
-    /**
-     * Constructor signature - must be callable with new
-     */
-    new (...args: any[]): any;
-    /**
-     * Phantom property for type-level appearance inference
-     * This property never exists at runtime
-     */
-    __appearanceType?: A;
-  },
-  'ClerkUiModule'
->;
+export type UiModule<A = any> = {
+  /**
+   * Brand symbol to identify legitimate @clerk/ui exports at runtime
+   */
+  __brand: symbol;
+  /**
+   * The version string of the UI module
+   */
+  version: string;
+  /**
+   * Constructor signature - must be callable with new
+   */
+  new (...args: any[]): any;
+  /**
+   * Phantom property for type-level appearance inference
+   * This property never exists at runtime
+   */
+  __appearanceType?: A;
+};
 
 /**
  * Ui type that accepts either:
