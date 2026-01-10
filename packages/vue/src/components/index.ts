@@ -28,3 +28,4 @@ export { default as SignInButton } from './SignInButton.vue';
 export { default as SignUpButton } from './SignUpButton.vue';
 export { default as SignOutButton } from './SignOutButton.vue';
 export { default as SignInWithMetamaskButton } from './SignInWithMetamaskButton.vue';
+export { UNSAFE_PortalProvider } from './PortalProvider';

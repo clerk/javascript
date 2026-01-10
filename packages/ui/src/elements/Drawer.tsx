@@ -1,4 +1,4 @@
-import { useSafeLayoutEffect } from '@clerk/shared/react/index';
+import { usePortalRoot, useSafeLayoutEffect } from '@clerk/shared/react/index';
 import type { UseDismissProps, UseFloatingOptions, UseRoleProps } from '@floating-ui/react';
 import {
   FloatingFocusManager,
@@ -88,6 +88,8 @@ function Root({
   dismissProps,
 }: RootProps) {
   const direction = useDirection();
+  const portalRoot = usePortalRoot();
+  const effectivePortalRoot = portalProps?.root ?? portalRoot?.() ?? undefined;
 
   const { refs, context } = useFloating({
     open,
@@ -110,14 +112,19 @@ function Root({
         isOpen: open,
         setIsOpen: onOpenChange,
         strategy,
-        portalProps: portalProps || {},
+        portalProps: { ...portalProps, root: effectivePortalRoot },
         refs,
         context,
         getFloatingProps,
         direction,
       }}
     >
-      <FloatingPortal {...portalProps}>{children}</FloatingPortal>
+      <FloatingPortal
+        {...portalProps}
+        root={effectivePortalRoot}
+      >
+        {children}
+      </FloatingPortal>
     </DrawerContext.Provider>
   );
 }

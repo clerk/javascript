@@ -1,6 +1,7 @@
 import type { PropType } from 'vue';
 import { defineComponent, h, onUnmounted, ref, watch, watchEffect } from 'vue';
 
+import { usePortalRoot } from '../composables/usePortalRoot';
 import type { CustomPortalsRendererProps } from '../types';
 import { ClerkLoaded } from './controlComponents';
 
@@ -44,6 +45,7 @@ export const ClerkHostRenderer = defineComponent({
   },
   setup(props) {
     const portalRef = ref<HTMLDivElement | null>(null);
+    const getContainer = usePortalRoot();
     let isPortalMounted = false;
 
     watchEffect(() => {
@@ -52,11 +54,16 @@ export const ClerkHostRenderer = defineComponent({
         return;
       }
 
+      const propsWithContainer = {
+        ...props.props,
+        getContainer,
+      };
+
       if (props.mount) {
-        props.mount(portalRef.value, props.props);
+        props.mount(portalRef.value, propsWithContainer);
       }
       if (props.open) {
-        props.open(props.props);
+        props.open(propsWithContainer);
       }
       isPortalMounted = true;
     });
@@ -65,7 +72,11 @@ export const ClerkHostRenderer = defineComponent({
       () => props.props,
       newProps => {
         if (isPortalMounted && props.updateProps && portalRef.value) {
-          props.updateProps({ node: portalRef.value, props: newProps });
+          const propsWithContainer = {
+            ...newProps,
+            getContainer,
+          };
+          props.updateProps({ node: portalRef.value, props: propsWithContainer });
         }
       },
       { deep: true },

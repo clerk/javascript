@@ -16,6 +16,8 @@ import {
 } from '@floating-ui/react';
 import * as React from 'react';
 
+import { usePortalRoot } from '@clerk/shared/react';
+
 import { Box, descriptors, type LocalizationKey, Span, Text, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
@@ -192,13 +194,15 @@ const Content = React.forwardRef<
 >(function TooltipContent({ style, text, sx, ...props }, propRef) {
   const context = useTooltipContext();
   const ref = useMergeRefs([context.refs.setFloating, propRef]);
+  const portalRoot = usePortalRoot();
+  const effectiveRoot = portalRoot?.() ?? undefined;
 
   if (!context.isMounted) {
     return null;
   }
 
   return (
-    <FloatingPortal>
+    <FloatingPortal root={effectiveRoot}>
       <Box
         ref={ref}
         elementDescriptor={descriptors.tooltip}
