@@ -8,9 +8,13 @@ import { Col, descriptors, Text } from '../../customizables';
 import { localizationKeys } from '../../localization';
 
 export const OrganizationProfileAvatarUploader = (
-  props: Omit<AvatarUploaderProps, 'avatarPreview' | 'title'> & { organization: Partial<OrganizationResource> },
+  props: Omit<AvatarUploaderProps, 'avatarPreview' | 'title'> & {
+    organization: Partial<OrganizationResource>;
+    /** Shows a loading spinner while the image is loading */
+    showLoadingSpinner?: boolean;
+  },
 ) => {
-  const { organization, ...rest } = props;
+  const { organization, showLoadingSpinner, ...rest } = props;
 
   return (
     <Col elementDescriptor={descriptors.organizationAvatarUploaderContainer}>
@@ -28,6 +32,7 @@ export const OrganizationProfileAvatarUploader = (
         avatarPreview={
           <OrganizationAvatar
             size={theme => theme.sizes.$16}
+            showLoadingSpinner={showLoadingSpinner}
             {...organization}
           />
         }

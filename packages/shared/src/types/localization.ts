@@ -1314,6 +1314,9 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    alerts: {
+      organizationAlreadyExists: LocalizationValue<'email'>;
+    };
   };
   taskResetPassword: {
     title: LocalizationValue;
