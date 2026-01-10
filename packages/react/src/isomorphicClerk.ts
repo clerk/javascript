@@ -508,15 +508,50 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return global.Clerk;
   }
 
-  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor> {
-    if (this.options.clerkUiCtor) {
-      return this.options.clerkUiCtor;
+  /**
+   * The well-known symbol used to identify legitimate @clerk/ui exports.
+   * Uses Symbol.for() to ensure the same symbol is used across module boundaries.
+   */
+  private static readonly UI_BRAND_SYMBOL = Symbol.for('clerk:ui');
+
+  /**
+   * Checks if the provided ui option is a legitimate @clerk/ui export
+   */
+  private isLegitimateUiExport(ui: unknown): boolean {
+    if (!ui || (typeof ui !== 'object' && typeof ui !== 'function')) {
+      return false;
     }
+    return (ui as any).__brand === IsomorphicClerk.UI_BRAND_SYMBOL;
+  }
+
+  /**
+   * Checks if the provided ui option is a ClerkUi constructor (class)
+   * rather than a version pinning object
+   */
+  private isUiConstructor(ui: unknown): ui is ClerkUiConstructor {
+    return typeof ui === 'function' && this.isLegitimateUiExport(ui);
+  }
+
+  /**
+   * Checks if the provided ui option is a version object for hot loading
+   */
+  private isUiVersion(ui: unknown): ui is { version: string; url?: string } {
+    return typeof ui === 'object' && ui !== null && this.isLegitimateUiExport(ui) && 'version' in ui;
+  }
+
+  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor> {
+    // If ui is a constructor (ClerkUI class), use it directly
+    if (this.isUiConstructor(this.options.ui)) {
+      return this.options.ui;
+    }
+
+    // Otherwise, hot load the UI script based on version/url
+    const uiVersion = this.isUiVersion(this.options.ui) ? this.options.ui : undefined;
 
     await loadClerkUiScript({
       ...this.options,
-      clerkUiVersion: this.options.ui?.version,
-      clerkUiUrl: this.options.ui?.url || this.options.clerkUiUrl,
+      clerkUiVersion: uiVersion?.version,
+      clerkUiUrl: uiVersion?.url || this.options.clerkUiUrl,
       publishableKey: this.#publishableKey,
       proxyUrl: this.proxyUrl,
       domain: this.domain,

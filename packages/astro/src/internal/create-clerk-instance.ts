@@ -109,17 +109,61 @@ async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCre
 }
 
 /**
+ * The well-known symbol used to identify legitimate @clerk/ui exports.
+ * Uses Symbol.for() to ensure the same symbol is used across module boundaries.
+ */
+const UI_BRAND_SYMBOL = Symbol.for('clerk:ui');
+
+/**
+ * Checks if the provided ui option is a legitimate @clerk/ui export
+ */
+function isLegitimateUiExport(ui: unknown): boolean {
+  if (!ui || (typeof ui !== 'object' && typeof ui !== 'function')) {
+    return false;
+  }
+  return (ui as any).__brand === UI_BRAND_SYMBOL;
+}
+
+/**
+ * Checks if the provided ui option is a ClerkUi constructor (class)
+ * rather than a version pinning object
+ */
+function isUiConstructor(ui: unknown): ui is ClerkUiConstructor {
+  return typeof ui === 'function' && isLegitimateUiExport(ui);
+}
+
+/**
+ * Checks if the provided ui option is a version object for hot loading
+ */
+function isUiVersion(ui: unknown): ui is { version: string; url?: string } {
+  return typeof ui === 'object' && ui !== null && isLegitimateUiExport(ui) && 'version' in ui;
+}
+
+/**
  * Gets the ClerkUI constructor, either from options or by loading the script.
  * Returns early if window.__internal_ClerkUiCtor already exists.
  */
 async function getClerkUiEntryChunk<TUi extends Ui = Ui>(
   options?: AstroClerkCreateInstanceParams<TUi>,
 ): Promise<ClerkUiConstructor> {
-  if (options?.clerkUiCtor) {
-    return options.clerkUiCtor;
+  // If ui is a constructor (ClerkUI class), use it directly
+  if (isUiConstructor(options?.ui)) {
+    return options.ui;
   }
 
-  await loadClerkUiScript(options);
+  // Get version info if it's a legitimate version object
+  const uiVersion = isUiVersion(options?.ui) ? options.ui : undefined;
+
+  await loadClerkUiScript(
+    options
+      ? {
+          ...options,
+          clerkUiVersion: uiVersion?.version,
+          // Only override clerkUiUrl if uiVersion provides a url, otherwise keep existing
+          clerkUiUrl: uiVersion?.url || options.clerkUiUrl,
+        }
+      : undefined,
+  );
 
   if (!window.__internal_ClerkUiCtor) {
     throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
