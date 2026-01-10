@@ -6,11 +6,11 @@ export type { WithInternalRouting } from './routing';
 /**
  * Extracts the appearance type from a Ui object. We got 3 cases:
  * - If the Ui type has __appearanceType with a specific type, extract it
- * - If __appearanceType is 'any', fallback to base Appearance type
+ * - If __appearanceType is 'any' or 'unknown', fallback to base Appearance type
  * - Otherwise, fallback to the base Appearance type
  */
 export type ExtractAppearanceType<T, Default> = T extends { __appearanceType?: infer A }
-  ? 0 extends 1 & A // Check if A is 'any' (this trick works because 1 & any = any, and 0 extends any)
+  ? unknown extends A // If A is 'any' or 'unknown', fallback to Default
     ? Default
     : A
   : Default;
