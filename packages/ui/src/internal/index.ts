@@ -25,8 +25,10 @@ export const UI_BRAND_SYMBOL_KEY = 'clerk:ui';
 /**
  * UiVersion type that carries appearance type information via phantom property
  * Used for version pinning with hot loading
+ *
+ * @typeParam A - The appearance type for styling customization
  */
-export type UiVersion<A = any> = {
+export type UiVersion<A = unknown> = {
   /**
    * Brand symbol to identify legitimate @clerk/ui exports at runtime
    */
@@ -43,8 +45,11 @@ export type UiVersion<A = any> = {
 /**
  * UiModule type represents the ClerkUi class constructor
  * Used when bundling @clerk/ui directly instead of hot loading
+ *
+ * @typeParam A - The appearance type for styling customization
+ * @typeParam I - The instance type returned by the constructor (defaults to unknown for external consumers)
  */
-export type UiModule<A = any> = {
+export type UiModule<A = unknown, I = unknown> = {
   /**
    * Brand symbol to identify legitimate @clerk/ui exports at runtime
    */
@@ -56,7 +61,7 @@ export type UiModule<A = any> = {
   /**
    * Constructor signature - must be callable with new
    */
-  new (...args: any[]): any;
+  new (...args: unknown[]): I;
   /**
    * Phantom property for type-level appearance inference
    * This property never exists at runtime
@@ -68,8 +73,10 @@ export type UiModule<A = any> = {
  * Ui type that accepts either:
  * - UiVersion: version pinning object for hot loading
  * - UiModule: ClerkUi class constructor for direct module usage
+ *
+ * @typeParam A - The appearance type for styling customization
  */
-export type Ui<A = any> = UiVersion<A> | UiModule<A>;
+export type Ui<A = unknown> = UiVersion<A> | UiModule<A>;
 
 export type {
   AlphaColorScale,
