@@ -70,12 +70,14 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
         dataAttribute='data-clerk-js-script'
         router={router}
       />
-      <ClerkScript
-        scriptUrl={clerkUiScriptUrl(opts)}
-        attributes={buildClerkUiScriptAttributes(opts)}
-        dataAttribute='data-clerk-ui-script'
-        router={router}
-      />
+      {clerkJSVariant !== 'headless' && (
+        <ClerkScript
+          scriptUrl={clerkUiScriptUrl(opts)}
+          attributes={buildClerkUiScriptAttributes(opts)}
+          dataAttribute='data-clerk-ui-script'
+          router={router}
+        />
+      )}
     </>
   );
 }

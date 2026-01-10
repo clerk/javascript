@@ -12,6 +12,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider
+      clerkJSVariant={process.env.NEXT_PUBLIC_CLERK_JS_VARIANT === 'headless' ? 'headless' : undefined}
       appearance={{
         options: {
           showOptionalFields: true,

@@ -508,7 +508,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return global.Clerk;
   }
 
-  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor> {
+  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor | undefined> {
+    // Skip UI loading for headless variant
+    if (this.options.clerkJSVariant === 'headless') {
+      return undefined;
+    }
+
     if (this.options.clerkUiCtor) {
       return this.options.clerkUiCtor;
     }
