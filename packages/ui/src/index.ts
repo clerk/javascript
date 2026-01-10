@@ -1,7 +1,6 @@
+import { ClerkUi as ClerkUiClass } from './ClerkUi';
 import type { UiModule, UiVersion } from './internal';
 import type { Appearance } from './internal/appearance';
-
-import { ClerkUi as ClerkUiClass } from './ClerkUi';
 
 declare const PACKAGE_VERSION: string;
 
