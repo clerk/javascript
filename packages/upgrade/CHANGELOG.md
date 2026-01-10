@@ -1,5 +1,44 @@
 # @clerk/upgrade
 
+## 2.0.0
+
+### Major Changes
+
+- Updates the upgrade CLI to support Core 3 changes. If you need to upgrade to an older release, use the previous major version of this package. ([#7385](https://github.com/clerk/javascript/pull/7385)) by [@brkalow](https://github.com/brkalow)
+
+- Require Node.js 20.9.0 in all packages ([#7262](https://github.com/clerk/javascript/pull/7262)) by [@jacekradko](https://github.com/jacekradko)
+
+### Minor Changes
+
+- Add support for the latest versions of the following packages: ([#6939](https://github.com/clerk/javascript/pull/6939)) by [@dstaley](https://github.com/dstaley)
+  - `@clerk/react` (replacement for `@clerk/react`)
+  - `@clerk/expo` (replacement for `@clerk/expo`)
+  - `@clerk/nextjs`
+  - `@clerk/react-router`
+  - `@clerk/tanstack-start-react`
+
+  During the upgrade, imports of the `useSignIn()` and `useSignUp()` hooks will be updated to import from the `/legacy` subpath.
+
+- Add a `transform-protect-to-show` codemod that migrates `<Protect>`, `<SignedIn>`, `<SignedOut>` usages to `<Show>` with automatic prop and import updates. ([#7373](https://github.com/clerk/javascript/pull/7373)) by [@jacekradko](https://github.com/jacekradko)
+
+- Add a migration guide generator and improve scan output. ([#7397](https://github.com/clerk/javascript/pull/7397)) by [@brkalow](https://github.com/brkalow)
+
+- Update `ClerkAPIError.kind` value to match class name ([#7509](https://github.com/clerk/javascript/pull/7509)) by [@kduprey](https://github.com/kduprey)
+
+### Patch Changes
+
+- Add back the CLI header with gradient. ([#7465](https://github.com/clerk/javascript/pull/7465)) by [@jacekradko](https://github.com/jacekradko)
+
+- Update transform-align-experimental-unstable-prefixes to avoid prototype pollution ([#7414](https://github.com/clerk/javascript/pull/7414)) by [@jacekradko](https://github.com/jacekradko)
+
+- Update README.md ([#7413](https://github.com/clerk/javascript/pull/7413)) by [@jacekradko](https://github.com/jacekradko)
+
+- Default Ready to upgrade? to yes ([#7425](https://github.com/clerk/javascript/pull/7425)) by [@jacekradko](https://github.com/jacekradko)
+
+- Handle `catalog:` protocol and other non-standard version specifiers ([#7540](https://github.com/clerk/javascript/pull/7540)) by [@jacekradko](https://github.com/jacekradko)
+
+- Replace `globby` dependency with `tinyglobby` for smaller bundle size and faster installation ([#7415](https://github.com/clerk/javascript/pull/7415)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 1.2.4
 
 ### Patch Changes
