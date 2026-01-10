@@ -32,9 +32,5 @@ export const shadcn = createTheme({
         display: 'none',
       },
     },
-    providerIcon__apple: 'dark:invert',
-    providerIcon__github: 'dark:invert',
-    providerIcon__okx_wallet: 'dark:invert',
-    providerIcon__vercel: 'dark:invert',
   },
 });
