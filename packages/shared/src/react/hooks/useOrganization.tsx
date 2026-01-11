@@ -366,13 +366,13 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       keepPreviousData: domainSafeValues.keepPreviousData,
       infinite: domainSafeValues.infinite,
       enabled: !!domainParams,
-      isSignedIn: Boolean(organization),
+      isSignedIn: organization !== null,
       initialPage: domainSafeValues.initialPage,
       pageSize: domainSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.DOMAINS_KEY,
-      authenticated: Boolean(organization),
+      authenticated: true,
       tracked: {
         organizationId: organization?.id,
       },
@@ -388,13 +388,13 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       keepPreviousData: membershipRequestSafeValues.keepPreviousData,
       infinite: membershipRequestSafeValues.infinite,
       enabled: !!membershipRequestParams,
-      isSignedIn: Boolean(organization),
+      isSignedIn: organization !== null,
       initialPage: membershipRequestSafeValues.initialPage,
       pageSize: membershipRequestSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.MEMBERSHIP_REQUESTS_KEY,
-      authenticated: Boolean(organization),
+      authenticated: true,
       tracked: {
         organizationId: organization?.id,
       },
@@ -410,13 +410,13 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       keepPreviousData: membersSafeValues.keepPreviousData,
       infinite: membersSafeValues.infinite,
       enabled: !!membersParams,
-      isSignedIn: Boolean(organization),
+      isSignedIn: organization !== null,
       initialPage: membersSafeValues.initialPage,
       pageSize: membersSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.MEMBERSHIPS_KEY,
-      authenticated: Boolean(organization),
+      authenticated: true,
       tracked: {
         organizationId: organization?.id,
       },
@@ -432,13 +432,13 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       keepPreviousData: invitationsSafeValues.keepPreviousData,
       infinite: invitationsSafeValues.infinite,
       enabled: !!invitationsParams,
-      isSignedIn: Boolean(organization),
+      isSignedIn: organization !== null,
       initialPage: invitationsSafeValues.initialPage,
       pageSize: invitationsSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.INVITATIONS_KEY,
-      authenticated: Boolean(organization),
+      authenticated: true,
       tracked: {
         organizationId: organization?.id,
       },

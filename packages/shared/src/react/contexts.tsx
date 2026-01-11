@@ -14,7 +14,6 @@ import type {
   UserResource,
 } from '../types';
 import { createContextAndHook } from './hooks/createContextAndHook';
-import { SWRConfigCompat } from './providers/SWRConfigCompat';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
@@ -69,26 +68,15 @@ const [OrganizationContextInternal, useOrganizationContext] = createContextAndHo
   organization: OrganizationResource | null | undefined;
 }>('OrganizationContext');
 
-const OrganizationProvider = ({
-  children,
-  organization,
-  swrConfig,
-}: PropsWithChildren<
-  OrganizationContextProps & {
-    // Exporting inferred types  directly from SWR will result in error while building declarations
-    swrConfig?: any;
-  }
->) => {
+const OrganizationProvider = ({ children, organization }: PropsWithChildren<OrganizationContextProps>) => {
   return (
-    <SWRConfigCompat swrConfig={swrConfig}>
-      <OrganizationContextInternal.Provider
-        value={{
-          value: { organization },
-        }}
-      >
-        {children}
-      </OrganizationContextInternal.Provider>
-    </SWRConfigCompat>
+    <OrganizationContextInternal.Provider
+      value={{
+        value: { organization },
+      }}
+    >
+      {children}
+    </OrganizationContextInternal.Provider>
   );
 };
 
