@@ -99,6 +99,37 @@ describe('createClerkRequest', () => {
       expect(createClerkRequest(req).clerkUrl.toString()).toBe('https://example.com/path');
     });
 
+    it('with forwarded proto / host headers overridden via env vars', () => {
+      const originalForwardedProto = process.env.CLERK_PROXY_FORWARDED_PROTO_HEADER;
+      const originalForwardedHost = process.env.CLERK_PROXY_FORWARDED_HOST_HEADER;
+
+      process.env.CLERK_PROXY_FORWARDED_PROTO_HEADER = 'x-my-forwarded-proto';
+      process.env.CLERK_PROXY_FORWARDED_HOST_HEADER = 'x-my-forwarded-host';
+
+      const req = new Request('http://localhost:3000/path', {
+        headers: {
+          'x-my-forwarded-host': 'example.com',
+          'x-my-forwarded-proto': 'https',
+        },
+      });
+
+      try {
+        expect(createClerkRequest(req).clerkUrl.toString()).toBe('https://example.com/path');
+      } finally {
+        if (originalForwardedProto === undefined) {
+          delete process.env.CLERK_PROXY_FORWARDED_PROTO_HEADER;
+        } else {
+          process.env.CLERK_PROXY_FORWARDED_PROTO_HEADER = originalForwardedProto;
+        }
+
+        if (originalForwardedHost === undefined) {
+          delete process.env.CLERK_PROXY_FORWARDED_HOST_HEADER;
+        } else {
+          process.env.CLERK_PROXY_FORWARDED_HOST_HEADER = originalForwardedHost;
+        }
+      }
+    });
+
     it('with path in request', () => {
       const req = new Request('http://localhost:3000/path');
       expect(createClerkRequest(req).clerkUrl.toString()).toBe('http://localhost:3000/path');
