@@ -13,4 +13,10 @@ export default defineConfig({
     tailwindcss(),
     viteReact(),
   ],
+  resolve: {
+    dedupe: ['react', 'react-dom'],
+  },
+  ssr: {
+    noExternal: [/@clerk\/.*/, 'swr'],
+  },
 });
