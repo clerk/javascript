@@ -891,6 +891,10 @@ export const hiIN: LocalizationResource = {
       actionLink: 'साइन आउट',
       actionText: '{{identifier}} के रूप में साइन इन किया गया',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'पता लगाई गई कंपनी के नाम ({{organizationName}}) और {{organizationDomain}} के लिए एक संगठन पहले से मौजूद है। आमंत्रण द्वारा शामिल हों।',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

@@ -886,7 +886,7 @@ export const enUS: LocalizationResource = {
     },
     alerts: {
       organizationAlreadyExists:
-        'An organization already exists for the detected company name and {{email}}. Join by invitation.',
+        'An organization already exists for the detected company name ({{organizationName}}) and {{organizationDomain}}. Join by invitation.',
     },
   },
   taskResetPassword: {
