@@ -576,6 +576,165 @@ describe('Session', () => {
         expect(freshToken).toEqual(newMockJwt);
         expect(requestSpy).not.toHaveBeenCalled();
       });
+
+      it('forces synchronous refresh when refreshIfStale is true and token is stale', async () => {
+        BaseResource.clerk = clerkMock();
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+        const newMockJwt =
+          'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjY2NDg0MDAsImlhdCI6MTY2NjY0ODM0MCwiaXNzIjoiaHR0cHM6Ly9jbGVyay5leGFtcGxlLmNvbSIsImp0aSI6Im5ld3Rva2VuIiwibmJmIjoxNjY2NjQ4MzQwLCJzaWQiOiJzZXNzXzFxcTlveTVHaU5IeGRSMlhXVTZnRzZtSWNCWCIsInN1YiI6InVzZXJfMXFxOW95NUdpTkh4ZFIyWFdVNmdHNm1JY0JYIn0.mock';
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        await Promise.resolve();
+
+        // Advance time so token needs refresh (< 15s remaining of 60s TTL)
+        vi.advanceTimersByTime(46 * 1000);
+
+        // With refreshIfStale: true, should fetch fresh token synchronously
+        requestSpy.mockClear();
+        requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: newMockJwt }, status: 200 });
+
+        const token = await session.getToken({ refreshIfStale: true });
+
+        // Should return the NEW token (synchronous refresh), not the stale one
+        expect(token).toEqual(newMockJwt);
+        expect(requestSpy).toHaveBeenCalledTimes(1);
+      });
+
+      it('returns cached token without refresh when refreshIfStale is true but token is fresh', async () => {
+        BaseResource.clerk = clerkMock();
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        await Promise.resolve();
+
+        // Advance only 10s - token still has 50s remaining, not stale yet
+        vi.advanceTimersByTime(10 * 1000);
+
+        requestSpy.mockClear();
+        const token = await session.getToken({ refreshIfStale: true });
+
+        // Should return cached token, no API call
+        expect(token).toEqual(mockJwt);
+        expect(requestSpy).not.toHaveBeenCalled();
+      });
+
+      it('respects leewayInSeconds for earlier background refresh (minimum 15s)', async () => {
+        BaseResource.clerk = clerkMock();
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        await Promise.resolve();
+
+        // With 30s leeway and 25s remaining (< 30), token should trigger background refresh
+        vi.advanceTimersByTime(35 * 1000); // 25s remaining
+
+        requestSpy.mockClear();
+        requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
+
+        const token = await session.getToken({ leewayInSeconds: 30 });
+
+        // Should return stale token immediately (SWR behavior)
+        expect(token).toEqual(mockJwt);
+        // Should trigger background refresh because 25s < 30s leeway
+        expect(requestSpy).toHaveBeenCalledTimes(1);
+      });
+
+      it('enforces minimum 15s leeway (ignores lower values)', async () => {
+        BaseResource.clerk = clerkMock();
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        await Promise.resolve();
+
+        // With 10s remaining, regardless of leewayInSeconds: 5 being passed,
+        // the minimum 15s threshold should apply and trigger background refresh
+        vi.advanceTimersByTime(50 * 1000); // 10s remaining (within 15s minimum threshold)
+
+        requestSpy.mockClear();
+        requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
+
+        const token = await session.getToken({ leewayInSeconds: 5 });
+
+        // Should return cached token immediately (SWR behavior)
+        expect(token).toEqual(mockJwt);
+
+        // Background refresh should be triggered because 10s < 15s minimum
+        // (leewayInSeconds: 5 is ignored, minimum 15s is enforced)
+        expect(requestSpy).toHaveBeenCalledTimes(1);
+      });
+
+      it('does not trigger background refresh when token has more than leeway remaining', async () => {
+        BaseResource.clerk = clerkMock();
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        await Promise.resolve();
+
+        // With 40s remaining and default 15s leeway, token is fresh
+        vi.advanceTimersByTime(20 * 1000); // 40s remaining
+
+        requestSpy.mockClear();
+        const token = await session.getToken();
+
+        expect(token).toEqual(mockJwt);
+        expect(requestSpy).not.toHaveBeenCalled();
+      });
     });
   });
 
