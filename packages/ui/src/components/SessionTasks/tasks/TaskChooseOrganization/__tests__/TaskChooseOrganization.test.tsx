@@ -9,7 +9,6 @@ import {
 } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
 
 import { TaskChooseOrganization } from '..';
-import { findByText } from '@testing-library/react';
 
 const { createFixtures } = bindCreateFixtures('TaskChooseOrganization');
 
@@ -373,7 +372,7 @@ describe('TaskChooseOrganization', () => {
             advisory: {
               code: 'organization_already_exists',
               severity: 'warning',
-              meta: { email: 'test@clerk.com' },
+              meta: { organizationDomain: 'test@clerk.com', organizationName: 'Clerk' },
             },
           }),
         );
@@ -381,7 +380,7 @@ describe('TaskChooseOrganization', () => {
         const { findByText } = render(<TaskChooseOrganization />, { wrapper });
 
         expect(
-          await findByText(/an organization already exists for the detected company name and test@clerk\.com/i),
+          await findByText(/an organization already exists for the detected company name (Clerk) and test@clerk\.com/i),
         ).toBeInTheDocument();
       });
 

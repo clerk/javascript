@@ -24,7 +24,11 @@ const TaskChooseOrganizationInternal = () => {
     'organization-creation-defaults',
   );
 
-  const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
+  const isLoading =
+    userMemberships?.isLoading ||
+    userInvitations?.isLoading ||
+    userSuggestions?.isLoading ||
+    organizationCreationDefaults?.isLoading;
   const hasExistingResources = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
   const isOrganizationCreationDisabled = !isLoading && !user?.createOrganizationEnabled && !hasExistingResources;
 
