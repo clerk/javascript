@@ -81,26 +81,6 @@ const withEmailCodesQuickstart = withEmailCodes
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '');
 
-const withAPCore1ClerkV4 = environmentConfig()
-  .setId('withAPCore1ClerkV4')
-  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk);
-
-// Uses staging instance which runs Core 3
-const withAPCore3ClerkV4 = environmentConfig()
-  .setId('withAPCore3ClerkV4')
-  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk);
-
-const withAPCore1ClerkV6 = environmentConfig()
-  .setId('withAPCore1ClerkV6')
-  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk);
-
 // Uses staging instance which runs Core 3
 const withAPCore3ClerkV6 = environmentConfig()
   .setId('withAPCore3ClerkV6')
@@ -137,9 +117,9 @@ const withLegalConsent = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-legal-consent').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-legal-consent').pk);
 
-const withWaitlistdMode = withEmailCodes
+const withWaitlistMode = withEmailCodes
   .clone()
-  .setId('withWaitlistdMode')
+  .setId('withWaitlistMode')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-waitlist-mode').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-waitlist-mode').pk);
 
@@ -213,9 +193,6 @@ export const envs = {
   base,
   sessionsProd1,
   withAPIKeys,
-  withAPCore1ClerkV4,
-  withAPCore1ClerkV6,
-  withAPCore3ClerkV4,
   withAPCore3ClerkLatest,
   withAPCore3ClerkV6,
   withBilling,
@@ -236,7 +213,7 @@ export const envs = {
   withSignInOrUpEmailLinksFlow,
   withSignInOrUpFlow,
   withSignInOrUpwithRestrictedModeFlow,
-  withWaitlistdMode,
+  withWaitlistMode,
   withWhatsappPhoneCode,
   withProtectService,
 } as const;

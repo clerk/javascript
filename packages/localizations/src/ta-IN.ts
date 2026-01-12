@@ -398,6 +398,13 @@ export const taIN: LocalizationResource = {
         headerTitle__members: 'உறுப்பினர்கள்',
         headerTitle__requests: 'கோரிக்கைகள்',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'பாத்திரங்கள் தற்காலிகமாக பூட்டப்பட்டுள்ளன',
+          subtitle:
+            'கிடைக்கக்கூடிய பாத்திரங்களை நாங்கள் புதுப்பிக்கிறோம். இது முடிந்ததும், நீங்கள் மீண்டும் பாத்திரங்களை புதுப்பிக்க முடியும்.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -754,6 +761,10 @@ export const taIN: LocalizationResource = {
       subtitle: 'தொடர, உங்கள் அங்கீகாரி பயன்பாட்டால் உருவாக்கப்பட்ட சரிபார்ப்புக் குறியீட்டை உள்ளிடவும்',
       title: 'இரண்டு-படி சரிபார்ப்பு',
     },
+    web3Solana: {
+      subtitle: 'உள்நுழைய கீழே ஒரு வாலெட்டைத் தேர்ந்தெடுக்கவும்',
+      title: 'Solana மூலம் உள்நுழையவும்',
+    },
   },
   signInEnterPasswordTitle: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
   signUp: {
@@ -847,6 +858,10 @@ export const taIN: LocalizationResource = {
       title: 'உங்கள் கணக்கை உருவாக்கவும்',
       titleCombined: 'உங்கள் கணக்கை உருவாக்கவும்',
     },
+    web3Solana: {
+      subtitle: 'பதிவு செய்ய கீழே ஒரு வாலெட்டைத் தேர்ந்தெடுக்கவும்',
+      title: 'Solana மூலம் பதிவு செய்யவும்',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}} மூலம் தொடரவும்',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -856,6 +871,7 @@ export const taIN: LocalizationResource = {
       action__invitationAccept: 'சேரவும்',
       action__suggestionsAccept: 'சேர்வதற்கு கோரிக்கை',
       subtitle: 'இருக்கும் அமைப்பில் சேரவும் அல்லது புதியதை உருவாக்கவும்',
+      subtitle__createOrganizationDisabled: 'இருக்கும் அமைப்பில் சேரவும்',
       suggestionsAcceptedLabel: 'அனுமதிக்காக காத்திருக்கிறது',
       title: 'ஒரு அமைப்பைத் தேர்ந்தெடுக்கவும்',
     },
@@ -868,6 +884,10 @@ export const taIN: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'தொடர உங்கள் அமைப்பு விவரங்களை உள்ளிடவும்',
       title: 'உங்கள் அமைப்பை அமைக்கவும்',
+    },
+    organizationCreationDisabled: {
+      title: 'நீங்கள் ஒரு அமைப்பில் உறுப்பினராக இருக்க வேண்டும்',
+      subtitle: 'அழைப்புக்கு உங்கள் அமைப்பின் நிர்வாகியைத் தொடர்பு கொள்ளவும்.',
     },
     signOut: {
       actionLink: 'வெளியேறு',
@@ -959,6 +979,9 @@ export const taIN: LocalizationResource = {
     phone_number_exists: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 வாலட் நீட்டிப்பு காணப்படவில்லை. தொடர ஒன்றை நிறுவவும்.',
+    web3_signature_request_rejected: 'நீங்கள் கையொப்ப கோரிக்கையை நிராகரித்துவிட்டீர்கள். தொடர மீண்டும் முயற்சிக்கவும்.',
+    web3_solana_signature_generation_failed:
+      'கையொப்பத்தை உருவாக்கும் போது பிழை ஏற்பட்டது. தொடர மீண்டும் முயற்சிக்கவும்.',
     zxcvbn: {
       couldBeStronger:
         'உங்கள் கடவுச்சொல் செயல்படுகிறது, ஆனால் மேலும் வலுவாக இருக்கலாம். மேலும் எழுத்துகளைச் சேர்க்க முயற்சிக்கவும்.',
@@ -1330,6 +1353,10 @@ export const taIN: LocalizationResource = {
         detailsAction__nonPrimary: 'முதன்மையாக அமைக்கவும்',
         primaryButton: 'வாலட்டை இணைக்கவும்',
         title: 'Web3 வாலட்டுகள்',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'உங்கள் கணக்குடன் இணைக்க Solana வாலெட்டைத் தேர்ந்தெடுக்கவும்.',
+          title: 'Solana வாலெட்டை சேர்க்கவும்',
+        },
       },
     },
     usernamePage: {
@@ -1364,5 +1391,11 @@ export const taIN: LocalizationResource = {
       subtitle: 'உங்கள் இடம் தயாராகும் போது உங்களுடன் தொடர்பில் இருப்போம்',
       title: 'காத்திருப்பில் சேர்ந்ததற்கு நன்றி!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} மூலம் இணைக்கவும்',
+    continue: '{{walletName}} மூலம் தொடரவும்',
+    noneAvailable:
+      'Solana Web3 வாலெட்டுகள் எதுவும் கண்டறியப்படவில்லை. Web3 ஆதரிக்கும் {{ solanaWalletsLink || link("wallet extension") }} ஐ நிறுவவும்.',
   },
 } as const;

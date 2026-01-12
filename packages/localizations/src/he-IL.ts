@@ -393,6 +393,12 @@ export const heIL: LocalizationResource = {
         headerTitle__members: 'חברים',
         headerTitle__requests: 'בקשות',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'התפקידים נעולים זמנית',
+          subtitle: 'אנחנו מעדכנים את התפקידים הזמינים. לאחר שזה יסתיים, תוכל לעדכן תפקידים שוב.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -741,6 +747,10 @@ export const heIL: LocalizationResource = {
       subtitle: 'להמשך, אנא הכנס את קוד האימות שנוצר על ידי אפליקציית האימות שלך',
       title: 'אימות שני שלבים',
     },
+    web3Solana: {
+      subtitle: 'בחר/י ארנק למטה כדי להתחבר',
+      title: 'התחברות עם Solana',
+    },
   },
   signInEnterPasswordTitle: 'הזן את הסיסמה שלך',
   signUp: {
@@ -831,6 +841,10 @@ export const heIL: LocalizationResource = {
       title: 'צור את החשבון שלך',
       titleCombined: 'צור את החשבון שלך',
     },
+    web3Solana: {
+      subtitle: 'בחר/י ארנק למטה כדי להירשם',
+      title: 'הרשמה עם Solana',
+    },
   },
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -840,6 +854,7 @@ export const heIL: LocalizationResource = {
       action__invitationAccept: 'הצטרף',
       action__suggestionsAccept: 'בקש להצטרף',
       subtitle: 'הצטרף לארגון קיים או צור חדש',
+      subtitle__createOrganizationDisabled: 'הצטרף לארגון קיים',
       suggestionsAcceptedLabel: 'ממתין לאישור',
       title: 'בחר ארגון',
     },
@@ -852,6 +867,10 @@ export const heIL: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'הזן את פרטי הארגון שלך כדי להמשיך',
       title: 'הגדר את הארגון שלך',
+    },
+    organizationCreationDisabled: {
+      title: 'עליך להשתייך לארגון',
+      subtitle: 'פנה למנהל הארגון שלך לקבלת הזמנה.',
     },
     signOut: {
       actionLink: 'התנתק',
@@ -933,6 +952,8 @@ export const heIL: LocalizationResource = {
     phone_number_exists: 'מספר הטלפון הזה כבר בשימוש. אנא נסה מספר אחר.',
     session_exists: 'אתה כבר מחובר לחשבון.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'דחית את בקשת החתימה. נסה/י שוב כדי להמשיך.',
+    web3_solana_signature_generation_failed: 'אירעה שגיאה בעת יצירת החתימה. נסה/י שוב כדי להמשיך.',
     zxcvbn: {
       couldBeStronger: 'הסיסמה שלך תקפה, אך יכולה להיות חזקה יותר. נסה להוסיף יותר תווים.',
       goodPassword: 'עבודה טובה. זו סיסמה מצוינת.',
@@ -1291,6 +1312,10 @@ export const heIL: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'ארנקי Web3',
         title: 'ארנקי Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'בחר/י ארנק Solana כדי לחבר לחשבון שלך.',
+          title: 'הוסף/י ארנק Solana',
+        },
       },
     },
     usernamePage: {
@@ -1325,5 +1350,11 @@ export const heIL: LocalizationResource = {
       subtitle: 'אנו ניצור איתך קשר כשהמקום שלך יהיה מוכן',
       title: 'תודה שהצטרפת לרשימת ההמתנה!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'התחבר/י עם {{walletName}}',
+    continue: 'המשך/י עם {{walletName}}',
+    noneAvailable:
+      'לא זוהו ארנקי Solana Web3. נא להתקין {{ solanaWalletsLink || link("wallet extension") }} התומך ב‑Web3.',
   },
 } as const;

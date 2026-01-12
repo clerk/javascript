@@ -396,6 +396,12 @@ export const fiFI: LocalizationResource = {
         headerTitle__members: 'Jäsenet',
         headerTitle__requests: 'Pyyntöjä',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roolit on tilapäisesti lukittu',
+          subtitle: 'Päivitämme käytettävissä olevia rooleja. Kun se on tehty, voit päivittää rooleja uudelleen.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -750,6 +756,10 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Syötä todennuskoodi autentikointisovelluksestasi',
       title: 'Kaksivaiheinen todennus',
     },
+    web3Solana: {
+      subtitle: 'Valitse alta lompakko kirjautumista varten',
+      title: 'Kirjaudu sisään Solanalla',
+    },
   },
   signInEnterPasswordTitle: 'Syötä salasanasi',
   signUp: {
@@ -841,6 +851,10 @@ export const fiFI: LocalizationResource = {
       title: 'Luo tili',
       titleCombined: 'Luo tili',
     },
+    web3Solana: {
+      subtitle: 'Valitse alta lompakko rekisteröitymistä varten',
+      title: 'Rekisteröidy Solanalla',
+    },
   },
   socialButtonsBlockButton: 'Jatka palvelun {{provider|titleize}} avulla',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -850,6 +864,7 @@ export const fiFI: LocalizationResource = {
       action__invitationAccept: 'Liity',
       action__suggestionsAccept: 'Pyydä liittymistä',
       subtitle: 'Liity olemassa olevaan organisaatioon tai luo uusi',
+      subtitle__createOrganizationDisabled: 'Liity olemassa olevaan organisaatioon',
       suggestionsAcceptedLabel: 'Odottaa hyväksyntää',
       title: 'Valitse organisaatio',
     },
@@ -862,6 +877,10 @@ export const fiFI: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Syötä organisaatiosi tiedot jatkaaksesi',
       title: 'Aseta organisaatiosi',
+    },
+    organizationCreationDisabled: {
+      title: 'Sinun täytyy kuulua organisaatioon',
+      subtitle: 'Ota yhteyttä organisaatiosi ylläpitäjään saadaksesi kutsun.',
     },
     signOut: {
       actionLink: 'Kirjaudu ulos',
@@ -945,6 +964,8 @@ export const fiFI: LocalizationResource = {
     phone_number_exists: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     session_exists: 'Olet jo kirjautunut sisään.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Hylkäsit allekirjoituspyynnön. Yritä uudelleen jatkaaksesi.',
+    web3_solana_signature_generation_failed: 'Allekirjoitusta luotaessa tapahtui virhe. Yritä uudelleen jatkaaksesi.',
     zxcvbn: {
       couldBeStronger: 'Salasanasi toimii, mutta se voisi olla vahvempi. Kokeile lisätä erikoismerkkejä tai numeroita.',
       goodPassword: 'Salasanasi täyttää kaikki tarvittavat vaatimukset.',
@@ -1316,6 +1337,10 @@ export const fiFI: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3-lompakot',
         title: 'Web3-lompakot',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Valitse Solana-lompakko yhdistettäväksi tiliisi.',
+          title: 'Lisää Solana-lompakko',
+        },
       },
     },
     usernamePage: {
@@ -1339,16 +1364,22 @@ export const fiFI: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Kirjaudu sisään',
+      actionText: 'Onko sinulla jo pääsy?',
+      formButton: 'Liity jonoon',
+      subtitle: 'Syötä sähköpostiosoitteesi ja ilmoitamme sinulle, kun paikkasi on valmis',
+      title: 'Liity jonoon',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Sinut ohjataan pian...',
+      subtitle: 'Olemme yhteydessä, kun paikkasi on valmis',
+      title: 'Kiitos liittymisestä jonoon!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Yhdistä {{walletName}}',
+    continue: 'Jatka {{walletName}}',
+    noneAvailable:
+      'Solana Web3 -lompakoita ei havaittu. Asenna Web3-yhteensopiva {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

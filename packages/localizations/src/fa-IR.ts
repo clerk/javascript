@@ -402,6 +402,13 @@ export const faIR: LocalizationResource = {
         headerTitle__members: 'اعضا',
         headerTitle__requests: 'درخواست‌ها',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'نقش‌ها موقتاً قفل شده‌اند',
+          subtitle:
+            'ما در حال به‌روزرسانی نقش‌های موجود هستیم. پس از اتمام، می‌توانید دوباره نقش‌ها را به‌روزرسانی کنید.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'کلیدهای API',
@@ -758,6 +765,10 @@ export const faIR: LocalizationResource = {
       subtitle: 'برای ادامه، لطفاً کد تأیید تولید شده توسط برنامه تأیید هویت خود را وارد کنید',
       title: 'تأیید  دو مرحله‌ای',
     },
+    web3Solana: {
+      subtitle: 'برای ورود، یک کیف پول را در زیر انتخاب کنید',
+      title: 'ورود با Solana',
+    },
   },
   signInEnterPasswordTitle: 'رمز عبور خود را وارد کنید',
   signUp: {
@@ -851,6 +862,10 @@ export const faIR: LocalizationResource = {
       title: 'حساب کاربری خود را ایجاد کنید',
       titleCombined: 'حساب کاربری خود را ایجاد کنید',
     },
+    web3Solana: {
+      subtitle: 'برای ثبت‌نام، یک کیف پول را در زیر انتخاب کنید',
+      title: 'ثبت‌نام با Solana',
+    },
   },
   socialButtonsBlockButton: 'ادامه با {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -860,6 +875,7 @@ export const faIR: LocalizationResource = {
       action__invitationAccept: 'بپیوندید',
       action__suggestionsAccept: 'درخواست عضویت',
       subtitle: 'برای ادامه، سازمانی را انتخاب کنید',
+      subtitle__createOrganizationDisabled: 'به یک سازمان موجود بپیوندید',
       suggestionsAcceptedLabel: 'در انتظار تایید',
       title: 'یک سازمان انتخاب کنید',
     },
@@ -872,6 +888,10 @@ export const faIR: LocalizationResource = {
       formFieldLabel__slug: undefined,
       subtitle: 'سازمان جدیدی برای شروع کار ایجاد کنید',
       title: 'ایجاد سازمان جدید',
+    },
+    organizationCreationDisabled: {
+      title: 'شما باید عضو یک سازمان باشید',
+      subtitle: 'برای دریافت دعوتنامه با مدیر سازمان خود تماس بگیرید.',
     },
     signOut: {
       actionLink: 'خروج از همه حساب‌ها',
@@ -954,6 +974,8 @@ export const faIR: LocalizationResource = {
     phone_number_exists: 'این شماره تلفن قبلاً استفاده شده است.',
     session_exists: 'جلسه از قبل وجود دارد.',
     web3_missing_identifier: 'افزونه‌ی کیف پول وب۳ پیدا نشد. برای ادامه، لطفاً یکی نصب کنید.',
+    web3_signature_request_rejected: 'درخواست امضا را رد کرده‌اید. برای ادامه دوباره تلاش کنید.',
+    web3_solana_signature_generation_failed: 'هنگام ایجاد امضا خطایی رخ داد. برای ادامه دوباره تلاش کنید.',
     zxcvbn: {
       couldBeStronger: 'رمز عبور شما کار می‌کند، اما می‌توانست قوی‌تر باشد. سعی کنید کاراکترهای بیشتری اضافه کنید.',
       goodPassword: 'رمز عبور شما تمام شرایط لازم را برآورده می‌کند.',
@@ -1323,6 +1345,10 @@ export const faIR: LocalizationResource = {
         detailsAction__nonPrimary: 'به عنوان اصلی تنظیم کنید',
         primaryButton: 'اتصال کیف پول',
         title: 'کیف پول های Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'یک کیف پول Solana را برای اتصال به حساب خود انتخاب کنید.',
+          title: 'افزودن کیف پول Solana',
+        },
       },
     },
     usernamePage: {
@@ -1357,5 +1383,11 @@ export const faIR: LocalizationResource = {
       subtitle: 'وقتی رزرو شما آماده شد، با شما تماس خواهیم گرفت',
       title: 'ممنون که به لیست انتظار پیوستید!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'اتصال با {{walletName}}',
+    continue: 'ادامه با {{walletName}}',
+    noneAvailable:
+      'هیچ کیف پول Solana Web3 شناسایی نشد. لطفاً یک {{ solanaWalletsLink || link("wallet extension") }} پشتیبانی‌شده از Web3 نصب کنید.',
   },
 } as const;

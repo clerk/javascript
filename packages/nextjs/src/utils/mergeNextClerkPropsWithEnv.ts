@@ -33,5 +33,8 @@ export const mergeNextClerkPropsWithEnv = <TUi extends Ui = Ui>(
       debug: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DEBUG),
     },
     sdkMetadata: SDK_METADATA,
+    unsafe_disableDevelopmentModeConsoleWarning: isTruthy(
+      process.env.NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING,
+    ),
   } satisfies Omit<NextClerkProviderProps<TUi>, 'children'>;
 };

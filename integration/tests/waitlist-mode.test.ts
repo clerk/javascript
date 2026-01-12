@@ -78,7 +78,7 @@ test.describe('Waitlist mode', () => {
       )
       .commit();
     await app.setup();
-    await app.withEnv(appConfigs.envs.withWaitlistdMode);
+    await app.withEnv(appConfigs.envs.withWaitlistMode);
     await app.dev();
 
     const m = createTestUtils({ app });

@@ -395,6 +395,12 @@ export const skSK: LocalizationResource = {
         headerTitle__members: 'Členovia',
         headerTitle__requests: 'Požiadavky',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Úlohy sú dočasne uzamknuté',
+          subtitle: 'Aktualizujeme dostupné úlohy. Po dokončení budete môcť úlohy opäť aktualizovať.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -751,6 +757,10 @@ export const skSK: LocalizationResource = {
       subtitle: 'Pre pokračovanie zadajte overovací kód z vašej autentifikačnej aplikácie',
       title: 'Dvojfaktorové overenie',
     },
+    web3Solana: {
+      subtitle: 'Vyberte nižšie peňaženku na prihlásenie',
+      title: 'Prihlásiť sa cez Solana',
+    },
   },
   signInEnterPasswordTitle: 'Zadajte svoje heslo',
   signUp: {
@@ -845,6 +855,10 @@ export const skSK: LocalizationResource = {
       title: 'Vytvorte si účet',
       titleCombined: 'Vytvorte si účet',
     },
+    web3Solana: {
+      subtitle: 'Vyberte nižšie peňaženku na registráciu',
+      title: 'Zaregistrovať sa cez Solana',
+    },
   },
   socialButtonsBlockButton: 'Pokračovať s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
@@ -854,6 +868,7 @@ export const skSK: LocalizationResource = {
       action__invitationAccept: 'Pridať sa',
       action__suggestionsAccept: 'Požiadať o pridanie',
       subtitle: 'Pridajte sa k existujúcej organizácii alebo vytvorte novú',
+      subtitle__createOrganizationDisabled: 'Pridajte sa k existujúcej organizácii',
       suggestionsAcceptedLabel: 'Čaká na schválenie',
       title: 'Vyberte organizáciu',
     },
@@ -866,6 +881,10 @@ export const skSK: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Zadajte údaje o vašej organizácii pre pokračovanie',
       title: 'Nastavte svoju organizáciu',
+    },
+    organizationCreationDisabled: {
+      title: 'Musíte patriť do organizácie',
+      subtitle: 'Kontaktujte administrátora vašej organizácie pre pozvánku.',
     },
     signOut: {
       actionLink: 'Odhlásiť sa',
@@ -952,6 +971,9 @@ export const skSK: LocalizationResource = {
     phone_number_exists: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     session_exists: 'Jste už přihlášen.',
     web3_missing_identifier: 'Rozšírenie Web3 Peňaženky nebolo nájdené. Je potrebné ho nainštalovať.',
+    web3_signature_request_rejected: 'Odmietli ste žiadosť o podpis. Skúste to znova, aby ste mohli pokračovať.',
+    web3_solana_signature_generation_failed:
+      'Pri generovaní podpisu sa vyskytla chyba. Skúste to znova, aby ste mohli pokračovať.',
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by byť silnejšie. Skúste pridať viac znakov.',
       goodPassword: 'Dobrá práca. Toto je vynikajúce heslo.',
@@ -1320,6 +1342,10 @@ export const skSK: LocalizationResource = {
         detailsAction__nonPrimary: 'Nastaiť ako hlavnú',
         primaryButton: 'Web3 peňaženky',
         title: 'Web3 peňaženky',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Vyberte Solana peňaženku na pripojenie k vášmu účtu.',
+          title: 'Pridať Solana peňaženku',
+        },
       },
     },
     usernamePage: {
@@ -1354,5 +1380,11 @@ export const skSK: LocalizationResource = {
       subtitle: 'Budeme vás informovať, keď bude prístup povolený.',
       title: 'Ďakujeme, že ste sa pridali na waitlist!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Pripojiť pomocou {{walletName}}',
+    continue: 'Pokračovať pomocou {{walletName}}',
+    noneAvailable:
+      'Neboli zistené žiadne Solana Web3 peňaženky. Nainštalujte si {{ solanaWalletsLink || link("wallet extension") }} s podporou Web3.',
   },
 } as const;
