@@ -1,0 +1,27 @@
+{
+  "disableBypassPermissionsMode": true,
+  "permissions": {
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(secrets/**)",
+      "Read(**/credentials.json)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/.keys.json)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Edit(secrets/**)",
+      "Edit(**/credentials.json)",
+      "Edit(**/*.pem)",
+      "Edit(**/*.key)",
+      "Edit(**/.keys.json)",
+      "Bash(cat .env*)",
+      "Bash(cat **/credentials.json)",
+      "Bash(cat **/*.pem)",
+      "Bash(cat **/*.key)",
+      "Bash(cat secrets/**)",
+      "Bash(cat **/.keys.json)"
+    ]
+  }
+}
