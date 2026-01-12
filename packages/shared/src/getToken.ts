@@ -8,14 +8,17 @@ const TIMEOUT_MS = 10000; // 10 second timeout for Clerk to load
  * A promise that includes resolve/reject callbacks for external resolution.
  * Used for coordination between getToken() and clerk-js initialization.
  */
-interface ClerkReadyPromise extends Promise<LoadedClerk> {
+type ClerkReadyPromise = Promise<LoadedClerk> & {
   __resolve?: (clerk: LoadedClerk) => void;
   __reject?: (error: Error) => void;
-}
+};
 
 declare global {
   interface Window {
-    __clerk_internal_ready?: ClerkReadyPromise;
+    __clerk_internal_ready?: Promise<LoadedClerk> & {
+      __resolve?: (clerk: LoadedClerk) => void;
+      __reject?: (error: Error) => void;
+    };
   }
 }
 
