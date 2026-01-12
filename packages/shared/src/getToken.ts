@@ -13,13 +13,12 @@ type ClerkReadyPromise = Promise<LoadedClerk> & {
   __reject?: (error: Error) => void;
 };
 
-declare global {
-  interface Window {
-    __clerk_internal_ready?: Promise<LoadedClerk> & {
-      __resolve?: (clerk: LoadedClerk) => void;
-      __reject?: (error: Error) => void;
-    };
-  }
+/**
+ * Local Window type extension for __clerk_internal_ready coordination.
+ * Avoids global augmentation to prevent declaration collisions for consumers.
+ */
+interface ClerkWindow extends Window {
+  __clerk_internal_ready?: ClerkReadyPromise;
 }
 
 function getWindowClerk(): LoadedClerk | undefined {
@@ -48,21 +47,25 @@ async function waitForClerk(): Promise<LoadedClerk> {
     return clerk;
   }
 
+  const clerkWindow = window as ClerkWindow;
+
   // Get or create the coordination promise
-  if (!window.__clerk_internal_ready) {
-    let resolveRef: ((clerk: LoadedClerk) => void) | undefined;
-    let rejectRef: ((error: Error) => void) | undefined;
+  if (!clerkWindow.__clerk_internal_ready) {
+    let resolve!: (clerk: LoadedClerk) => void;
+    let reject!: (error: Error) => void;
     const promise = new Promise<LoadedClerk>((res, rej) => {
-      resolveRef = res;
-      rejectRef = rej;
+      resolve = res;
+      reject = rej;
     }) as ClerkReadyPromise;
-    promise.__resolve = resolveRef;
-    promise.__reject = rejectRef;
-    window.__clerk_internal_ready = promise;
+    promise.__resolve = resolve;
+    promise.__reject = reject;
+    clerkWindow.__clerk_internal_ready = promise;
   }
 
+  const readyPromise = clerkWindow.__clerk_internal_ready;
+
   return Promise.race([
-    window.__clerk_internal_ready,
+    readyPromise,
     new Promise<never>((_, reject) =>
       setTimeout(
         () =>
