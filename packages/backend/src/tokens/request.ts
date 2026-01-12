@@ -789,7 +789,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
   }
 
   if (authenticateContext.tokenInHeader) {
-    if (acceptsToken === 'any') {
+    if (acceptsToken === 'any' || Array.isArray(acceptsToken)) {
       return authenticateAnyRequestWithTokenInHeader();
     }
     if (acceptsToken === TokenType.SessionToken) {
