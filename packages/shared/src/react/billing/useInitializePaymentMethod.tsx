@@ -6,6 +6,7 @@ import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useOrganizationContext, useUserContext } from '../contexts';
 import { useBillingHookEnabled } from '../hooks/useBillingHookEnabled';
+import { useClearQueriesOnSignOut } from '../hooks/useClearQueriesOnSignOut';
 
 type InitializePaymentMethodOptions = {
   for?: ForPayerType;
@@ -28,11 +29,20 @@ function useInitializePaymentMethod(options?: InitializePaymentMethodOptions): U
 
   const billingEnabled = useBillingHookEnabled(options);
 
+  const stableKey = 'billing-payment-method-initialize';
+  const authenticated = true;
+
   const queryKey = useMemo(() => {
-    return ['billing-payment-method-initialize', { resourceId: resource?.id }] as const;
+    return [stableKey, authenticated, { resourceId: resource?.id }, {}] as const;
   }, [resource?.id]);
 
   const isEnabled = Boolean(resource?.id) && billingEnabled;
+
+  useClearQueriesOnSignOut({
+    isSignedOut: user === null,
+    authenticated,
+    stableKeys: stableKey,
+  });
 
   const query = useClerkQuery({
     queryKey,
@@ -48,7 +58,7 @@ function useInitializePaymentMethod(options?: InitializePaymentMethodOptions): U
     enabled: isEnabled,
     staleTime: 1_000 * 60,
     refetchOnWindowFocus: false,
-    placeholderData: defineKeepPreviousDataFn(true),
+    placeholderData: defineKeepPreviousDataFn(isEnabled),
   });
 
   const [queryClient] = useClerkQueryClient();
