@@ -25,6 +25,7 @@ const EnableOrganizationsPromptInternal = ({
   const clerk = useClerk();
   const [isLoading, setIsLoading] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
+  const [defaultOrganizationName, setDefaultOrganizationName] = useState<string | null>(null);
   const [allowPersonalAccount, setAllowPersonalAccount] = useState(false);
 
   const initialFocusRef = useRef<HTMLHeadingElement>(null);
@@ -50,7 +51,11 @@ const EnableOrganizationsPromptInternal = ({
 
     void new DevTools()
       .__internal_enableEnvironmentSetting(params)
-      .then(() => {
+      .then(async () => {
+        const memberships = await clerk.user?.getOrganizationMemberships();
+        const defaultOrganizationName = memberships?.data[0]?.organization.name ?? null;
+        setDefaultOrganizationName(defaultOrganizationName);
+
         setIsEnabled(true);
         setIsLoading(false);
       })
@@ -127,8 +132,8 @@ const EnableOrganizationsPromptInternal = ({
                     `,
                   ]}
                 >
-                  {clerk.user
-                    ? `The Organizations feature has been enabled for your application. A default organization named "My Organization" was created automatically. You can manage or rename it in your`
+                  {clerk.user && defaultOrganizationName
+                    ? `The Organizations feature has been enabled for your application. A default organization named "${defaultOrganizationName}" was created automatically. You can manage or rename it in your`
                     : `The Organizations feature has been enabled for your application. You can manage it in your`}{' '}
                   <Link
                     href={organizationsDashboardUrl}
