@@ -439,6 +439,9 @@ export class Clerk implements ClerkInterface {
     this.#publicEventBus.prioritizedOn(clerkEvents.Status, s => (this.#status = s));
 
     this.#publicEventBus.on(clerkEvents.Status, status => {
+      if (!inBrowser()) {
+        return;
+      }
       if (status === 'ready' || status === 'degraded') {
         if (window.__clerk_internal_ready?.__resolve && this.#isLoaded()) {
           window.__clerk_internal_ready.__resolve(this);
