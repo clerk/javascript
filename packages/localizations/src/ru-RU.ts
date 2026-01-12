@@ -875,6 +875,7 @@ export const ruRU: LocalizationResource = {
       action__invitationAccept: 'Присоединиться',
       action__suggestionsAccept: 'Запросить присоединение',
       subtitle: 'Присоединитесь к существующей организации или создайте новую',
+      subtitle__createOrganizationDisabled: 'Присоединитесь к существующей организации',
       suggestionsAcceptedLabel: 'Ожидает одобрения',
       title: 'Выберите организацию',
     },

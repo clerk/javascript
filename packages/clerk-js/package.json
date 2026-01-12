@@ -78,6 +78,7 @@
     "dequal": "2.0.3"
   },
   "devDependencies": {
+    "@clerk/msw": "workspace:^",
     "@clerk/testing": "workspace:^",
     "@rsdoctor/rspack-plugin": "^0.4.13",
     "@rspack/cli": "^1.6.0",

@@ -1,0 +1,21 @@
+{
+  "name": "@clerk/msw",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./index.ts"
+    }
+  },
+  "dependencies": {
+    "@clerk/shared": "workspace:^",
+    "msw": "2.11.3"
+  },
+  "peerDependencies": {
+    "next": ">=15.0.0",
+    "react": "catalog:peer-react"
+  }
+}

@@ -872,6 +872,7 @@ export const itIT: LocalizationResource = {
       action__invitationAccept: 'Unisciti',
       action__suggestionsAccept: 'Richiedi di unirti',
       subtitle: "Unisciti a un'organizzazione esistente o creane una nuova",
+      subtitle__createOrganizationDisabled: "Unisciti a un'organizzazione esistente",
       suggestionsAcceptedLabel: 'In attesa di approvazione',
       title: "Scegli un'organizzazione",
     },

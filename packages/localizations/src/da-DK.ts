@@ -861,6 +861,7 @@ export const daDK: LocalizationResource = {
       action__invitationAccept: 'Deltag',
       action__suggestionsAccept: 'Anmod om at deltage',
       subtitle: 'Deltag i en eksisterende organisation eller opret en ny',
+      subtitle__createOrganizationDisabled: 'Deltag i en eksisterende organisation',
       suggestionsAcceptedLabel: 'Afventer godkendelse',
       title: 'Vælg en organisation',
     },

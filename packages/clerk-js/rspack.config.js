@@ -501,6 +501,7 @@ const devConfig = ({ mode, env }) => {
         ...(isSandbox
           ? {
               historyApiFallback: true,
+              static: ['sandbox/public'],
             }
           : {}),
       },

@@ -871,6 +871,7 @@ export const esUY: LocalizationResource = {
       action__invitationAccept: 'Unirse',
       action__suggestionsAccept: 'Solicitar unirse',
       subtitle: 'Unirse a una organización existente o crear una nueva',
+      subtitle__createOrganizationDisabled: 'Unirse a una organización existente',
       suggestionsAcceptedLabel: 'Pendiente de aprobación',
       title: 'Elegir una organización',
     },
