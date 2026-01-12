@@ -1,7 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { __internal_useInitializePaymentMethod as useInitializePaymentMethod } from '../useInitializePaymentMethod';
 import {
   createMockClerk,
   createMockOrganization,
@@ -9,6 +8,7 @@ import {
   createMockUser,
 } from '../../hooks/__tests__/mocks/clerk';
 import { wrapper } from '../../hooks/__tests__/wrapper';
+import { __internal_useInitializePaymentMethod as useInitializePaymentMethod } from '../useInitializePaymentMethod';
 
 // Dynamic mock state for contexts
 let mockUser: any = createMockUser();
@@ -133,9 +133,8 @@ describe('useInitializePaymentMethod', () => {
       gateway: 'stripe',
     });
 
-    let returnedResult: any;
-    await act(async () => {
-      returnedResult = await result.current.initializePaymentMethod();
+    const returnedResult = await act(async () => {
+      return result.current.initializePaymentMethod();
     });
 
     expect(initializePaymentMethodSpy).toHaveBeenCalledTimes(1);
