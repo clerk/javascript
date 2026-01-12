@@ -44,6 +44,12 @@ import { SessionVerification } from './SessionVerification';
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
 
+  /**
+   * Tracks token IDs with in-flight background refresh requests.
+   * Prevents multiple concurrent background refreshes for the same token.
+   */
+  static #backgroundRefreshInProgress = new Set<string>();
+
   id!: string;
   status!: SessionStatus;
   lastActiveAt!: Date;
@@ -375,7 +381,13 @@ export class Session extends BaseResource implements SessionResource {
         return this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
       }
 
-      debugLogger.debug('Using cached token', { tokenId }, 'session');
+      // Trigger background refresh if token is expiring soon
+      // This guarantees cache revalidation without relying solely on the poller
+      if (cacheResult.needsRefresh) {
+        this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate);
+      }
+
+      debugLogger.debug('Using cached token', { tokenId, needsRefresh: cacheResult.needsRefresh }, 'session');
 
       // Prefer synchronous read to avoid microtask overhead when token is already resolved
       const cachedToken = cacheResult.entry.resolvedToken ?? (await cacheResult.entry.tokenResolver);
@@ -437,6 +449,47 @@ export class Session extends BaseResource implements SessionResource {
       // Return null when raw string is empty to indicate signed-out state
       return token.getRawString() || null;
     });
+  }
+
+  /**
+   * Triggers a background token refresh without caching the pending promise.
+   * This allows concurrent getToken() calls to continue returning the stale cached token
+   * while the refresh is in progress. The cache is only updated after the refresh succeeds.
+   *
+   * Uses a static Set to prevent multiple concurrent background refreshes for the same token.
+   */
+  #refreshTokenInBackground(
+    template: string | undefined,
+    organizationId: string | undefined | null,
+    tokenId: string,
+    shouldDispatchTokenUpdate: boolean,
+  ): void {
+    // Prevent multiple concurrent background refreshes for the same token
+    if (Session.#backgroundRefreshInProgress.has(tokenId)) {
+      debugLogger.debug('Background refresh already in progress', { tokenId }, 'session');
+      return;
+    }
+
+    Session.#backgroundRefreshInProgress.add(tokenId);
+    debugLogger.info('Refreshing token in background', { organizationId, template, tokenId }, 'session');
+
+    const tokenResolver = this.#createTokenResolver(template, organizationId, false);
+
+    // Don't cache the promise immediately - only update cache on success
+    // This allows concurrent calls to continue using the stale token
+    tokenResolver
+      .then(token => {
+        // Cache the resolved token for future calls
+        SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(token) });
+        this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
+      })
+      .catch(error => {
+        // Log but don't propagate - callers already have stale token
+        debugLogger.warn('Background token refresh failed', { error, tokenId }, 'session');
+      })
+      .finally(() => {
+        Session.#backgroundRefreshInProgress.delete(tokenId);
+      });
   }
 
   get currentTask() {

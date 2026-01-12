@@ -76,10 +76,11 @@ export interface TokenCache {
    * Forces synchronous refresh if token has less than one poller interval remaining.
    *
    * @param cacheKeyJSON - Object containing tokenId and optional audience to identify the cached entry
-   * @param leeway - Seconds before expiration to trigger background refresh (default: 10s). Minimum is 15s.
+   * @param refreshThreshold - Seconds before expiration to trigger background refresh (default: 15s, minimum: 15s).
+   *   Higher values trigger earlier background refresh but may cause excessive requests and trip rate limiting.
    * @returns Result with entry and refresh flag, or undefined if token is missing/expired/too close to expiration
    */
-  get(cacheKeyJSON: TokenCacheKeyJSON, leeway?: number): TokenCacheGetResult | undefined;
+  get(cacheKeyJSON: TokenCacheKeyJSON, refreshThreshold?: number): TokenCacheGetResult | undefined;
 
   /**
    * Stores a token entry in the cache and broadcasts to other tabs when the token resolves.
@@ -99,13 +100,16 @@ export interface TokenCache {
 
 const KEY_PREFIX = 'clerk';
 const DELIMITER = '::';
-const DEFAULT_LEEWAY = 10;
 
 /**
- * Conservative threshold accounting for timer jitter, SafeLock contention (~5s),
- * network latency, and tolerance for missed poller ticks.
+ * Minimum seconds before token expiration to trigger background refresh via the poller.
+ * This threshold accounts for timer jitter, SafeLock contention (~5s), network latency,
+ * and tolerance for missed poller ticks.
+ *
+ * Users can increase this value to trigger background refresh earlier, but setting it
+ * too high may cause excessive token refresh requests and trip rate limiting rules.
  */
-const MIN_REMAINING_TTL_IN_SECONDS = 15;
+const BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS = 15;
 
 const BROADCAST = { broadcast: true };
 const NO_BROADCAST = { broadcast: false };
@@ -195,7 +199,10 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     cache.clear();
   };
 
-  const get = (cacheKeyJSON: TokenCacheKeyJSON, leeway = DEFAULT_LEEWAY): TokenCacheGetResult | undefined => {
+  const get = (
+    cacheKeyJSON: TokenCacheKeyJSON,
+    refreshThreshold = BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS,
+  ): TokenCacheGetResult | undefined => {
     ensureBroadcastChannel();
 
     const cacheKey = new TokenCacheKey(prefix, cacheKeyJSON);
@@ -210,6 +217,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     const remainingTtl = (value.expiresIn ?? Infinity) - elapsed;
 
     // Token expired or dangerously close to expiration - force synchronous refresh
+    // Uses poller interval as threshold since the poller might not get to it in time
     if (remainingTtl <= POLLER_INTERVAL_IN_MS / 1000) {
       if (value.timeoutId !== undefined) {
         clearTimeout(value.timeoutId);
@@ -218,10 +226,11 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       return;
     }
 
-    const effectiveLeeway = Math.max(leeway, MIN_REMAINING_TTL_IN_SECONDS);
+    // Ensure threshold is at least the minimum to account for timer jitter, network latency, etc.
+    const effectiveThreshold = Math.max(refreshThreshold, BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS);
 
-    // Token is valid but expiring soon - signal that refresh is needed
-    const needsRefresh = remainingTtl < effectiveLeeway;
+    // Token is valid but expiring soon - signal that background refresh is needed
+    const needsRefresh = remainingTtl < effectiveThreshold;
 
     // Return the valid token immediately, caller decides whether to refresh
     return { entry: value.entry, needsRefresh };
