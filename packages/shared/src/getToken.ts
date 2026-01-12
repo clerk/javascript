@@ -47,14 +47,14 @@ async function waitForClerk(): Promise<LoadedClerk> {
 
   // Get or create the coordination promise
   if (!window.__clerk_internal_ready) {
-    let resolve: (clerk: LoadedClerk) => void;
-    let reject: (error: Error) => void;
+    let resolveRef: ((clerk: LoadedClerk) => void) | undefined;
+    let rejectRef: ((error: Error) => void) | undefined;
     const promise = new Promise<LoadedClerk>((res, rej) => {
-      resolve = res;
-      reject = rej;
+      resolveRef = res;
+      rejectRef = rej;
     }) as ClerkReadyPromise;
-    promise.__resolve = resolve!;
-    promise.__reject = reject!;
+    promise.__resolve = resolveRef;
+    promise.__reject = rejectRef;
     window.__clerk_internal_ready = promise;
   }
 
