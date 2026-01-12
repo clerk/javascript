@@ -69,6 +69,12 @@ export class OrganizationCreationDefaults extends BaseResource implements Organi
             severity: this.advisory.severity,
           }
         : null,
+      form: {
+        name: this.form.name,
+        slug: this.form.slug,
+        logo: this.form.logo,
+        blur_hash: this.form.blurHash,
+      },
     } as unknown as OrganizationCreationDefaultsJSONSnapshot;
   }
 }
