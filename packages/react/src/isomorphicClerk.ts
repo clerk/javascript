@@ -461,7 +461,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
-      const clerkUiCtor = this.getClerkUiEntryChunk();
+      const clerkUiCtor = await this.getClerkUiEntryChunk();
       const clerk = await this.getClerkJsEntryChunk();
 
       if (!clerk.loaded) {
