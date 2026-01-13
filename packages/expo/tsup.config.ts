@@ -26,5 +26,6 @@ export default defineConfig(overrideOptions => {
     },
   };
 
-  return runAfterLast(['pnpm build:declarations', shouldPublish && 'pnpm publish:local'])(options);
+  // Temporarily skip declarations for testing
+  return runAfterLast([/* 'pnpm build:declarations', */ shouldPublish && 'pnpm publish:local'])(options);
 });

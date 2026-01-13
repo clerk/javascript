@@ -28,6 +28,11 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./app.plugin.js": "./app.plugin.js",
+    "./native": {
+      "types": "./dist/native/index.d.ts",
+      "default": "./dist/native/index.js"
+    },
     "./web": {
       "types": "./dist/web/index.d.ts",
       "default": "./dist/web/index.js"
@@ -59,8 +64,7 @@
     "./legacy": {
       "types": "./dist/legacy.d.ts",
       "default": "./dist/legacy.js"
-    },
-    "./app.plugin.js": "./app.plugin.js"
+    }
   },
   "main": "./dist/index.js",
   "source": "./src/index.ts",
@@ -69,6 +73,13 @@
     "dist",
     "android",
     "ios",
+    "native",
+    "web",
+    "local-credentials",
+    "passkeys",
+    "secure-store",
+    "resource-cache",
+    "token-cache",
     "expo-module.config.json",
     "app.plugin.js"
   ],
@@ -97,6 +108,7 @@
     "@clerk/expo-passkeys": "workspace:*",
     "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
+    "esbuild": "^0.19.0",
     "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "^5.4.0",
     "expo-constants": "^18.0.0",

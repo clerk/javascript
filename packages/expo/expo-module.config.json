@@ -4,6 +4,6 @@
     "modules": ["expo.modules.clerk.googlesignin.ClerkGoogleSignInModule"]
   },
   "ios": {
-    "modules": ["ClerkGoogleSignInModule"]
+    "modules": ["ClerkExpoModule", "ClerkGoogleSignInModule"]
   }
 }
