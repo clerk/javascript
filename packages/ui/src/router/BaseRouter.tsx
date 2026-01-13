@@ -3,13 +3,23 @@ import { trimTrailingSlash } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { NavigateOptions } from '@clerk/shared/types';
 import React from 'react';
-import { flushSync } from 'react-dom';
 
 import { useWindowEventListener } from '../hooks';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';
 import { Route } from './Route';
 import { RouteContext } from './RouteContext';
+
+type RouteParts = {
+  path: string;
+  queryString: string;
+};
+
+type PendingNavigation = {
+  routeParts: RouteParts;
+  result: unknown;
+  resolve: (value: unknown) => void;
+};
 
 interface BaseRouterProps {
   basePath: string;
@@ -44,10 +54,22 @@ export const BaseRouter = ({
   // eslint-disable-next-line custom-rules/no-navigate-useClerk
   const { navigate: clerkNavigate } = useClerk();
 
-  const [routeParts, setRouteParts] = React.useState({
+  const [routeParts, setRouteParts] = React.useState<RouteParts>({
     path: getPath(),
     queryString: getQueryString(),
   });
+  const [pendingNavigation, setPendingNavigation] = React.useState<PendingNavigation | null>(null);
+
+  // Resolve pending navigation after React commits the state update.
+  // This replaces flushSync by deferring the promise resolution to an effect,
+  // ensuring re-render completes before returning control to the caller.
+  React.useEffect(() => {
+    if (pendingNavigation) {
+      pendingNavigation.resolve(pendingNavigation.result);
+      setPendingNavigation(null);
+    }
+  }, [pendingNavigation]);
+
   const currentPath = routeParts.path;
   const currentQueryString = routeParts.queryString;
   const currentQueryParams = getQueryParams(routeParts.queryString);
@@ -119,14 +141,19 @@ export const BaseRouter = ({
       toURL.search = stringifyQueryParams(toQueryParams);
     }
     const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
-    // We need to flushSync to guarantee the re-render happens before handing things back to the caller,
-    // otherwise setActive might emit, and children re-render with the old navigation state.
-    // An alternative solution here could be to return a deferred promise, set that to state together
-    // with the routeParts and resolve it in an effect. That way we could avoid the flushSync performance penalty.
-    flushSync(() => {
+
+    // Use a deferred promise pattern instead of flushSync to guarantee the re-render
+    // happens before handing things back to the caller. This avoids the flushSync
+    // performance penalty while still ensuring children re-render with the new
+    // navigation state before setActive might emit.
+    return new Promise(resolve => {
       setRouteParts({ path: toURL.pathname, queryString: toURL.search });
+      setPendingNavigation({
+        routeParts: { path: toURL.pathname, queryString: toURL.search },
+        result: internalNavRes,
+        resolve,
+      });
     });
-    return internalNavRes;
   };
 
   return (
