@@ -1324,6 +1324,19 @@ export type __internal_LocalizationResource = {
     };
     formButtonPrimary: LocalizationValue;
   };
+  taskSetupMfa: {
+    title: LocalizationValue;
+    subtitle: LocalizationValue;
+    methodSelection: {
+      totpButton: LocalizationValue;
+      phoneCodeButton: LocalizationValue;
+      backupCodeButton: LocalizationValue;
+    };
+    signOut: {
+      actionText: LocalizationValue<'identifier'>;
+      actionLink: LocalizationValue;
+    };
+  };
   web3SolanaWalletButtons: {
     connect: LocalizationValue<'walletName'>;
     continue: LocalizationValue<'walletName'>;

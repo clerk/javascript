@@ -894,6 +894,19 @@ export const enUS: LocalizationResource = {
     subtitle: 'Your account requires a new password before you can continue',
     title: 'Reset your password',
   },
+  taskSetupMfa: {
+    title: 'Set up two-step verification',
+    subtitle: 'Protect your account with an extra layer of security',
+    methodSelection: {
+      totpButton: 'Authenticator app',
+      phoneCodeButton: 'SMS code',
+      backupCodeButton: 'Backup codes',
+    },
+    signOut: {
+      actionText: 'Signed in as {{identifier}}',
+      actionLink: 'Sign out',
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',

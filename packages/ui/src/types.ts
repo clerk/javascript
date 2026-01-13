@@ -20,6 +20,7 @@ import type {
   SignUpProps,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
+  TaskSetupMfaProps,
   UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
@@ -62,7 +63,8 @@ export type AvailableComponentProps =
   | __internal_PlanDetailsProps
   | APIKeysProps
   | TaskChooseOrganizationProps
-  | TaskResetPasswordProps;
+  | TaskResetPasswordProps
+  | TaskSetupMfaProps;
 
 type ComponentMode = 'modal' | 'mounted';
 type SignInMode = 'modal' | 'redirect';
@@ -156,6 +158,10 @@ export type TaskResetPasswordCtx = TaskResetPasswordProps & {
   componentName: 'TaskResetPassword';
 };
 
+export type TaskSetupMfaCtx = TaskSetupMfaProps & {
+  componentName: 'TaskSetupMfa';
+};
+
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
   componentName: 'OAuthConsent';
 };
@@ -188,5 +194,6 @@ export type AvailableComponentCtx =
   | SubscriptionDetailsCtx
   | PlanDetailsCtx
   | TaskChooseOrganizationCtx
-  | TaskResetPasswordCtx;
+  | TaskResetPasswordCtx
+  | TaskSetupMfaCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

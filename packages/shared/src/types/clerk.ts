@@ -673,6 +673,23 @@ export interface Clerk {
   unmountTaskResetPassword: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts a TaskSetupMfa component at the target element.
+   * This component allows users to set up multi-factor authentication.
+   *
+   * @param targetNode - Target node to mount the TaskSetupMfa component.
+   * @param props - configuration parameters.
+   */
+  mountTaskSetupMfa: (targetNode: HTMLDivElement, props?: TaskSetupMfaProps) => void;
+
+  /**
+   * Unmount a TaskSetupMfa component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode - Target node to unmount the TaskSetupMfa component from.
+   */
+  unmountTaskSetupMfa: (targetNode: HTMLDivElement) => void;
+
+  /**
    * @internal
    * Loads Stripe libraries for commerce functionality
    */
@@ -2229,6 +2246,14 @@ export type TaskChooseOrganizationProps = {
 };
 
 export type TaskResetPasswordProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   */
+  redirectUrlComplete: string;
+  appearance?: ClerkAppearanceTheme;
+};
+
+export type TaskSetupMfaProps = {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
    */
