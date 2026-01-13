@@ -1133,6 +1133,22 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
+     * Controls whether satellite apps automatically sync with the primary domain on initial page load.
+     *
+     * When `true` (default), satellite apps will automatically trigger a handshake redirect
+     * to sync authentication state with the primary domain, even if no session cookies exist.
+     *
+     * When `false`, satellite apps will skip the automatic handshake if no session cookies exist,
+     * and only trigger the handshake after an explicit sign-in action (when the `__clerk_sync=1`
+     * query parameter is present). This optimizes performance for satellite apps where users
+     * may not be authenticated, avoiding unnecessary redirects to the primary domain.
+     *
+     * Can be a boolean or a callback that receives the current URL and returns a boolean.
+     *
+     * @default true
+     */
+    satelliteAutoSync?: boolean | ((url: URL) => boolean);
+    /**
      * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/guides/how-clerk-works/security/clerk-telemetry). If set to `debug`, telemetry events are only logged to the console and not sent to Clerk.
      */
     telemetry?:
