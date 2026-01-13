@@ -102,12 +102,13 @@ const KEY_PREFIX = 'clerk';
 const DELIMITER = '::';
 
 /**
- * Minimum seconds before token expiration to trigger background refresh via the poller.
+ * Default seconds before token expiration to trigger background refresh.
  * This threshold accounts for timer jitter, SafeLock contention (~5s), network latency,
  * and tolerance for missed poller ticks.
  *
- * Users can increase this value to trigger background refresh earlier, but setting it
- * too high may cause excessive token refresh requests and trip rate limiting rules.
+ * Users can customize this value:
+ * - Lower values (min: 5s) delay background refresh until closer to expiration
+ * - Higher values trigger earlier background refresh but may cause more frequent requests
  */
 const BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS = 15;
 
@@ -226,8 +227,9 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       return;
     }
 
-    // Ensure threshold is at least the minimum to account for timer jitter, network latency, etc.
-    const effectiveThreshold = Math.max(refreshThreshold, BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS);
+    // Ensure threshold is at least the poller interval (values below this have no effect
+    // since tokens with less than POLLER_INTERVAL remaining force a synchronous refresh)
+    const effectiveThreshold = Math.max(refreshThreshold, POLLER_INTERVAL_IN_MS / 1000);
 
     // Token is valid but expiring soon - signal that background refresh is needed
     const needsRefresh = remainingTtl < effectiveThreshold;

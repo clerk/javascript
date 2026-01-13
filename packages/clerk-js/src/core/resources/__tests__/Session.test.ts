@@ -641,7 +641,7 @@ describe('Session', () => {
         expect(requestSpy).not.toHaveBeenCalled();
       });
 
-      it('respects leewayInSeconds for earlier background refresh (minimum 15s)', async () => {
+      it('respects backgroundRefreshThreshold for earlier background refresh', async () => {
         BaseResource.clerk = clerkMock();
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
 
@@ -659,21 +659,21 @@ describe('Session', () => {
 
         await Promise.resolve();
 
-        // With 30s leeway and 25s remaining (< 30), token should trigger background refresh
+        // With 30s threshold and 25s remaining (< 30), token should trigger background refresh
         vi.advanceTimersByTime(35 * 1000); // 25s remaining
 
         requestSpy.mockClear();
         requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
 
-        const token = await session.getToken({ leewayInSeconds: 30 });
+        const token = await session.getToken({ backgroundRefreshThreshold: 30 });
 
         // Should return stale token immediately (SWR behavior)
         expect(token).toEqual(mockJwt);
-        // Should trigger background refresh because 25s < 30s leeway
+        // Should trigger background refresh because 25s < 30s threshold
         expect(requestSpy).toHaveBeenCalledTimes(1);
       });
 
-      it('enforces minimum 15s leeway (ignores lower values)', async () => {
+      it('allows backgroundRefreshThreshold below 15s (minimum is 5s poller interval)', async () => {
         BaseResource.clerk = clerkMock();
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
 
@@ -691,24 +691,23 @@ describe('Session', () => {
 
         await Promise.resolve();
 
-        // With 10s remaining, regardless of leewayInSeconds: 5 being passed,
-        // the minimum 15s threshold should apply and trigger background refresh
-        vi.advanceTimersByTime(50 * 1000); // 10s remaining (within 15s minimum threshold)
+        // With 8s remaining and backgroundRefreshThreshold: 10, should trigger refresh
+        vi.advanceTimersByTime(52 * 1000); // 8s remaining
 
         requestSpy.mockClear();
         requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
 
-        const token = await session.getToken({ leewayInSeconds: 5 });
+        const token = await session.getToken({ backgroundRefreshThreshold: 10 });
 
         // Should return cached token immediately (SWR behavior)
         expect(token).toEqual(mockJwt);
 
-        // Background refresh should be triggered because 10s < 15s minimum
-        // (leewayInSeconds: 5 is ignored, minimum 15s is enforced)
+        // Background refresh should be triggered because 8s < 10s threshold
+        // (threshold of 10s is respected, not floored to 15s)
         expect(requestSpy).toHaveBeenCalledTimes(1);
       });
 
-      it('does not trigger background refresh when token has more than leeway remaining', async () => {
+      it('does not trigger background refresh when token has more than threshold remaining', async () => {
         BaseResource.clerk = clerkMock();
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
 
@@ -726,7 +725,7 @@ describe('Session', () => {
 
         await Promise.resolve();
 
-        // With 40s remaining and default 15s leeway, token is fresh
+        // With 40s remaining and default 15s threshold, token is fresh
         vi.advanceTimersByTime(20 * 1000); // 40s remaining
 
         requestSpy.mockClear();

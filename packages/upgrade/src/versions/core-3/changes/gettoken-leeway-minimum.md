@@ -1,38 +1,54 @@
 ---
-title: '`getToken` `leewayInSeconds` has 15s minimum'
+title: '`getToken` `leewayInSeconds` renamed to `backgroundRefreshThreshold`'
 matcher:
   - 'leewayInSeconds'
+  - 'backgroundRefreshThreshold'
   - 'getToken'
 category: 'behavior-change'
 warning: true
 ---
 
-The `leewayInSeconds` option in `session.getToken()` now has a minimum enforced value of 15 seconds. Values below this threshold are ignored and the minimum is used instead.
+The `leewayInSeconds` option in `session.getToken()` has been renamed to `backgroundRefreshThreshold` for clarity. This option controls when background token refresh is triggered before expiration.
 
-This threshold ensures reliable token refresh by accounting for timer jitter, network latency, and background task contention.
+### What changed?
 
-### Why this change?
+1. **Renamed option**: `leewayInSeconds` → `backgroundRefreshThreshold`
+2. **Lower minimum**: The minimum value is now 5 seconds (the poller interval) instead of 15 seconds
+3. **Clearer semantics**: The new name better describes what the option does
 
-Setting `leewayInSeconds` too low could result in tokens expiring before background refresh completes, causing authentication failures. The 15-second minimum provides a safety buffer.
-
-### Impact
-
-If you were using `leewayInSeconds` with a value less than 15 seconds:
+### Migration
 
 ```js
-// Before: 5s leeway (now enforced as 15s minimum)
-const token = await session.getToken({ leewayInSeconds: 5 });
+// Before
+const token = await session.getToken({ leewayInSeconds: 30 });
 
-// After: Behaves as if leewayInSeconds: 15 was passed
+// After
+const token = await session.getToken({ backgroundRefreshThreshold: 30 });
+```
+
+### How it works
+
+When a token's remaining TTL falls below the `backgroundRefreshThreshold`, `getToken()` returns the cached token immediately while triggering a background refresh.
+
+- **Minimum value**: 5 seconds (the poller interval)
+- **Default value**: 15 seconds
+
+```
+Token TTL Timeline
+──────────────────────────────────────────────────────►
+                                                     expires
+
+│←── Fresh zone ──→│←── Background refresh ──→│←─ Sync ─→│
+    (no refresh)       (SWR: return + refresh)   (force)
+
+   > threshold           5s - threshold           < 5s
 ```
 
 ### Rate Limiting Warning
 
-Setting `leewayInSeconds` higher than the default (15s) triggers earlier background token refresh. While this can reduce latency for time-sensitive operations, values that are too high may cause excessive token refresh requests and potentially trigger rate limiting.
+Setting `backgroundRefreshThreshold` higher than the default triggers earlier background refresh. While this can reduce latency for time-sensitive operations, values that are too high may cause excessive token refresh requests and potentially trigger rate limiting.
 
 ```js
-// Use with caution - triggers refresh 60s before expiration
-const token = await session.getToken({ leewayInSeconds: 60 });
+// Use with caution - triggers refresh 30s before expiration
+const token = await session.getToken({ backgroundRefreshThreshold: 30 });
 ```
-
-No code changes are required unless you want to adjust the refresh timing.

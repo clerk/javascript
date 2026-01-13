@@ -356,20 +356,20 @@ export class Session extends BaseResource implements SessionResource {
       return null;
     }
 
-    const { leewayInSeconds, refreshIfStale = false, skipCache = false, template } = options || {};
+    const { backgroundRefreshThreshold, refreshIfStale = false, skipCache = false, template } = options || {};
 
     // If no organization ID is provided, default to the selected organization in memory
     // Note: this explicitly allows passing `null` or `""`, which should select the personal workspace.
     const organizationId =
       typeof options?.organizationId === 'undefined' ? this.lastActiveOrganizationId : options?.organizationId;
 
-    if (!template && Number(leewayInSeconds) >= 60) {
-      throw new Error('Leeway can not exceed the token lifespan (60 seconds)');
+    if (!template && Number(backgroundRefreshThreshold) >= 60) {
+      throw new Error('backgroundRefreshThreshold cannot exceed the token lifespan (60 seconds)');
     }
 
     const tokenId = this.#getCacheId(template, organizationId);
 
-    const cacheResult = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
+    const cacheResult = skipCache ? undefined : SessionTokenCache.get({ tokenId }, backgroundRefreshThreshold);
 
     // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
