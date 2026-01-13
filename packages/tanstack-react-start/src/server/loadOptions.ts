@@ -21,6 +21,7 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(overrides?.proxyUrl, request.clerkUrl, commonEnv.PROXY_URL);
   const signInUrl = overrides.signInUrl || commonEnv.SIGN_IN_URL;
   const signUpUrl = overrides.signUpUrl || commonEnv.SIGN_UP_URL;
+  const satelliteAutoSync = handleValueOrFn(overrides.satelliteAutoSync, new URL(request.url));
 
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {
@@ -57,5 +58,6 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
     proxyUrl,
     signInUrl,
     signUpUrl,
+    satelliteAutoSync,
   };
 };
