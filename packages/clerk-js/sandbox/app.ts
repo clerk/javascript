@@ -34,6 +34,7 @@ const AVAILABLE_COMPONENTS = [
   'oauthConsent',
   'taskChooseOrganization',
   'taskResetPassword',
+  'taskSetupMFA',
 ] as const;
 type AvailableComponent = (typeof AVAILABLE_COMPONENTS)[number];
 
@@ -137,6 +138,7 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   oauthConsent: buildComponentControls('oauthConsent'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
   taskResetPassword: buildComponentControls('taskResetPassword'),
+  taskSetupMFA: buildComponentControls('taskSetupMFA'),
 };
 
 declare global {
@@ -415,6 +417,14 @@ void (async () => {
       Clerk.mountTaskResetPassword(
         app,
         componentControls.taskResetPassword.getProps() ?? {
+          redirectUrlComplete: '/user-profile',
+        },
+      );
+    },
+    '/task-setup-mfa': () => {
+      Clerk.mountTaskSetupMfa(
+        app,
+        componentControls.taskSetupMFA.getProps() ?? {
           redirectUrlComplete: '/user-profile',
         },
       );
