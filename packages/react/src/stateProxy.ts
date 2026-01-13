@@ -175,6 +175,8 @@ export class StateProxy implements State {
         mfa: this.wrapMethods(() => target().mfa, [
           'sendPhoneCode',
           'verifyPhoneCode',
+          'sendEmailCode',
+          'verifyEmailCode',
           'verifyTOTP',
           'verifyBackupCode',
         ] as const),

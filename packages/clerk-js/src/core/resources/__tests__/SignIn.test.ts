@@ -979,6 +979,48 @@ describe('SignIn', () => {
       });
     });
 
+    describe('sendMFAEmailCode', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+      });
+
+      it('prepares second factor with email code', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({
+          id: 'signin_123',
+          supported_second_factors: [
+            { strategy: 'email_code', email_address_id: 'email_123', safe_identifier: 'user@example.com' },
+          ],
+        } as any);
+        await signIn.__internal_future.mfa.sendEmailCode();
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins/signin_123/prepare_second_factor',
+          body: {
+            emailAddressId: 'email_123',
+            strategy: 'email_code',
+          },
+        });
+      });
+
+      it('returns error when email code factor not found', async () => {
+        const signIn = new SignIn({
+          id: 'signin_123',
+          supported_second_factors: [{ strategy: 'totp' }],
+        } as any);
+        const result = await signIn.__internal_future.mfa.sendEmailCode();
+
+        expect(result.error).toBeTruthy();
+        expect(result.error?.code).toBe('factor_not_found');
+      });
+    });
+
     describe('passkey', () => {
       afterEach(() => {
         vi.clearAllMocks();
