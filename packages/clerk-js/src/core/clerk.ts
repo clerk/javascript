@@ -21,6 +21,8 @@ import {
 import {
   CLERK_SATELLITE_URL,
   CLERK_SUFFIXED_COOKIES,
+  CLERK_SYNC,
+  CLERK_SYNC_STATUS,
   CLERK_SYNCED,
   ERROR_CODES,
 } from '@clerk/shared/internal/clerk-js/constants';
@@ -1680,20 +1682,43 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildSignInUrl(options?: SignInRedirectOptions): string {
-    return this.#buildUrl(
-      'signInUrl',
-      { ...options, redirectUrl: options?.redirectUrl || window.location.href },
-      options?.initialValues,
-    );
+    let redirectUrl = options?.redirectUrl || window.location.href;
+
+    // For satellites, add sync trigger param to redirect URL
+    // This ensures handshake is triggered when returning from primary sign-in
+    if (this.isSatellite) {
+      redirectUrl = this.#addSyncTriggerToUrl(redirectUrl);
+    }
+
+    return this.#buildUrl('signInUrl', { ...options, redirectUrl }, options?.initialValues);
   }
 
   public buildSignUpUrl(options?: SignUpRedirectOptions): string {
-    return this.#buildUrl(
-      'signUpUrl',
-      { ...options, redirectUrl: options?.redirectUrl || window.location.href },
-      options?.initialValues,
-    );
+    let redirectUrl = options?.redirectUrl || window.location.href;
+
+    // For satellites, add sync trigger param to redirect URL
+    // This ensures handshake is triggered when returning from primary sign-up
+    if (this.isSatellite) {
+      redirectUrl = this.#addSyncTriggerToUrl(redirectUrl);
+    }
+
+    return this.#buildUrl('signUpUrl', { ...options, redirectUrl }, options?.initialValues);
   }
+
+  /**
+   * Adds the __clerk_sync=1 param to a URL to trigger satellite handshake
+   * when the user returns from primary domain after sign-in/sign-up.
+   */
+  #addSyncTriggerToUrl = (urlString: string): string => {
+    try {
+      const url = new URL(urlString, window.location.origin);
+      url.searchParams.set(CLERK_SYNC, CLERK_SYNC_STATUS.NeedsSync);
+      return url.toString();
+    } catch {
+      // If URL parsing fails, return original
+      return urlString;
+    }
+  };
 
   public buildUserProfileUrl(): string {
     if (!this.environment || !this.environment.displayConfig) {
@@ -1806,8 +1831,9 @@ export class Clerk implements ClerkInterface {
     if (!inBrowser()) {
       return;
     }
+    // Use the new unified sync param with Completed status
     const searchParams = new URLSearchParams({
-      [CLERK_SYNCED]: 'true',
+      [CLERK_SYNC]: CLERK_SYNC_STATUS.Completed,
     });
 
     const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL);
@@ -2609,11 +2635,28 @@ export class Clerk implements ClerkInterface {
   };
 
   #shouldSyncWithPrimary = (): boolean => {
-    if (getClerkQueryParam(CLERK_SYNCED) === 'true') {
+    // Check if sync is already completed (new param or legacy)
+    const syncStatus = getClerkQueryParam(CLERK_SYNC);
+    const legacySynced = getClerkQueryParam(CLERK_SYNCED) === 'true';
+    if (syncStatus === CLERK_SYNC_STATUS.Completed || legacySynced) {
       return false;
     }
 
     if (!this.isSatellite) {
+      return false;
+    }
+
+    // Check if sync was triggered (e.g., after returning from primary sign-in)
+    const needsSync = syncStatus === CLERK_SYNC_STATUS.NeedsSync;
+    if (needsSync) {
+      return true;
+    }
+
+    // Check if satelliteAutoSync is disabled - if so, skip automatic sync
+    // unless explicitly triggered via __clerk_sync=1
+    const satelliteAutoSync = handleValueOrFn(this.#options.satelliteAutoSync, new URL(window.location.href), true);
+    if (!satelliteAutoSync) {
+      // Skip automatic sync when satelliteAutoSync is false
       return false;
     }
 
@@ -3095,6 +3138,7 @@ export class Clerk implements ClerkInterface {
    */
   #clearClerkQueryParams = () => {
     try {
+      removeClerkQueryParam(CLERK_SYNC);
       removeClerkQueryParam(CLERK_SYNCED);
       removeClerkQueryParam(CLERK_NETLIFY_CACHE_BUST_PARAM);
       // @nikos: we're looking into dropping this param completely
