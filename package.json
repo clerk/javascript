@@ -162,16 +162,8 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "browser-tabs-lock",
-      "bufferutil",
-      "core-js",
       "cypress",
-      "esbuild",
-      "msw",
-      "sharp",
-      "unrs-resolver",
-      "utf-8-validate"
+      "msw"
     ],
     "overrides": {
       "jest": "29.7.0",
