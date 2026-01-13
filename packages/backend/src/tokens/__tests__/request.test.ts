@@ -688,15 +688,15 @@ describe('tokens.authenticateRequest(options)', () => {
 
     const requestState = await authenticateRequest(
       mockRequestWithCookies(
-        {},
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
         {
           __client_uat: '0',
+          __clerk_db_jwt: mockJwt,
         },
       ),
       mockOptions({
-        secretKey: 'deadbeef',
+        secretKey: 'sk_test_deadbeef',
         publishableKey: PK_TEST,
-        clientUat: '0',
         isSatellite: true,
         signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
@@ -790,6 +790,84 @@ describe('tokens.authenticateRequest(options)', () => {
     expect(requestState.toAuth()).toBeSignedOutToAuth();
   });
 
+  test('cookieToken: returns signed out without handshake when satelliteAutoSync is false and no cookies', async () => {
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        { __client_uat: '0' },
+        `http://satellite.example/path`,
+      ),
+      mockOptions({
+        secretKey: 'deadbeef',
+        publishableKey: PK_LIVE,
+        signInUrl: 'https://primary.example/sign-in',
+        isSatellite: true,
+        domain: 'satellite.example',
+        satelliteAutoSync: false,
+      }),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: AuthErrorReason.SessionTokenAndUATMissing,
+      isSatellite: true,
+      domain: 'satellite.example',
+      signInUrl: 'https://primary.example/sign-in',
+    });
+    expect(requestState.toAuth()).toBeSignedOutToAuth();
+    // Should NOT have a location header (no handshake redirect)
+    expect(requestState.headers.get('location')).toBeNull();
+  });
+
+  test('cookieToken: triggers handshake when satelliteAutoSync is false but __clerk_sync=1 is present', async () => {
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        { __client_uat: '0' },
+        `http://satellite.example/path?__clerk_sync=1`,
+      ),
+      mockOptions({
+        secretKey: 'deadbeef',
+        publishableKey: PK_LIVE,
+        signInUrl: 'https://primary.example/sign-in',
+        isSatellite: true,
+        domain: 'satellite.example',
+        satelliteAutoSync: false,
+      }),
+    );
+
+    expect(requestState).toMatchHandshake({
+      reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
+      isSatellite: true,
+      domain: 'satellite.example',
+      signInUrl: 'https://primary.example/sign-in',
+    });
+  });
+
+  test('cookieToken: returns signed out when __clerk_sync=2 (completed) is present', async () => {
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        { __client_uat: '0' },
+        `http://satellite.example/path?__clerk_sync=2`,
+      ),
+      mockOptions({
+        secretKey: 'deadbeef',
+        publishableKey: PK_LIVE,
+        signInUrl: 'https://primary.example/sign-in',
+        isSatellite: true,
+        domain: 'satellite.example',
+      }),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: AuthErrorReason.SessionTokenAndUATMissing,
+      isSatellite: true,
+      domain: 'satellite.example',
+      signInUrl: 'https://primary.example/sign-in',
+    });
+    expect(requestState.toAuth()).toBeSignedOutToAuth();
+  });
+
   test('cookieToken: returns handshake when app is not satellite and responds to syncing on dev instances[12y]', async () => {
     const sp = new URLSearchParams();
     sp.set('__clerk_redirect_url', 'http://localhost:3000');
@@ -833,7 +911,35 @@ describe('tokens.authenticateRequest(options)', () => {
     const location = requestState.headers.get('location');
     expect(location).toBeTruthy();
     expect(location).toContain('localhost:3001/dashboard');
-    expect(location).toContain('__clerk_synced=true');
+    // Should contain the new sync param (with Completed status)
+    expect(location).toContain('__clerk_sync=2');
+  });
+
+  test('cookieToken: primary responds to syncing overwrites __clerk_sync=1 with __clerk_sync=2 (no duplicates)', async () => {
+    const sp = new URLSearchParams();
+    // Redirect URL already contains __clerk_sync=1 (NeedsSync)
+    sp.set('__clerk_redirect_url', 'http://localhost:3001/dashboard?__clerk_sync=1');
+    sp.set('__clerk_db_jwt', mockJwt);
+    const requestUrl = `http://localhost:3000/sign-in?${sp.toString()}`;
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        { __client_uat: '12345', __session: mockJwt, __clerk_db_jwt: mockJwt },
+        requestUrl,
+      ),
+      mockOptions({ secretKey: 'sk_test_deadbeef', isSatellite: false }),
+    );
+
+    expect(requestState).toMatchHandshake({
+      reason: AuthErrorReason.PrimaryRespondsToSyncing,
+    });
+
+    const location = requestState.headers.get('location');
+    expect(location).toBeTruthy();
+    // Should overwrite __clerk_sync=1 with __clerk_sync=2, not append
+    expect(location).toContain('__clerk_sync=2');
+    // Should NOT contain __clerk_sync=1 anymore
+    expect(location).not.toContain('__clerk_sync=1');
   });
 
   test('cookieToken: returns signed out when no cookieToken and no clientUat in production [4y]', async () => {

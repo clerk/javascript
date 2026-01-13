@@ -25,7 +25,9 @@ const Cookies = {
 } as const;
 
 const QueryParameters = {
+  /** @deprecated Use ClerkSync with ClerkSyncStatus instead */
   ClerkSynced: '__clerk_synced',
+  ClerkSync: '__clerk_sync',
   SuffixedCookies: 'suffixed_cookies',
   ClerkRedirectUrl: '__clerk_redirect_url',
   // use the reference to Cookies to indicate that it's the same value
@@ -75,6 +77,17 @@ const ContentTypes = {
 } as const;
 
 /**
+ * Sync status values for the __clerk_sync query parameter.
+ * Used to coordinate satellite domain authentication flows.
+ */
+export const ClerkSyncStatus = {
+  /** Trigger sync - satellite needs to handshake after returning from primary sign-in */
+  NeedsSync: '1',
+  /** Sync completed - prevents re-sync loop after handshake completes */
+  Completed: '2',
+} as const;
+
+/**
  * @internal
  */
 export const constants = {
@@ -83,6 +96,7 @@ export const constants = {
   Headers,
   ContentTypes,
   QueryParameters,
+  ClerkSyncStatus,
 } as const;
 
 export type Constants = typeof constants;
