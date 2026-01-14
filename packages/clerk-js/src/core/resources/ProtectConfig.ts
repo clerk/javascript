@@ -11,6 +11,7 @@ export class ProtectConfig extends BaseResource implements ProtectConfigResource
   id: string = '';
   loaders?: ProtectLoader[];
   rollout?: number;
+  protectStateTimeout: number = 0;
 
   public constructor(data: ProtectConfigJSON | ProtectConfigJSONSnapshot | null = null) {
     super();
@@ -25,6 +26,7 @@ export class ProtectConfig extends BaseResource implements ProtectConfigResource
 
     this.id = this.withDefault(data.id, this.id);
     this.loaders = this.withDefault(data.loaders, this.loaders);
+    this.protectStateTimeout = this.withDefault(data.protectStateTimeout, this.protectStateTimeout);
 
     return this;
   }

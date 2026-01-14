@@ -9,6 +9,9 @@ const baseFapiClientOptions = {
   getSessionId() {
     return 'sess_1qq9oy5GiNHxdR2XWU6gG6mIcBX';
   },
+  getProtectId() {
+    return undefined;
+  },
   instanceType: 'production' as InstanceType,
 };
 
@@ -242,6 +245,31 @@ describe('request', () => {
     });
 
     expect(resp.payload).toEqual(null);
+  });
+
+  it('includes _clerk_protect_id query parameter when protectState is available', async () => {
+    const fapiClientWithProtectState = createFapiClient({
+      ...baseFapiClientOptions,
+      getProtectId() {
+        return 'dummy_protect_state_value';
+      },
+    });
+
+    await fapiClientWithProtectState.request({
+      path: '/foo',
+    });
+
+    const fetchCall = (fetch as Mock).mock.calls[0];
+    expect(fetchCall[0].toString()).toMatch(/_clerk_protect_id=dummy_protect_state_value/);
+  });
+
+  it('does not include _clerk_protect_id query parameter when protectState is undefined', async () => {
+    await fapiClient.request({
+      path: '/foo',
+    });
+
+    const fetchCall = (fetch as Mock).mock.calls[0];
+    expect(fetchCall[0].toString()).not.toMatch(/_clerk_protect_id=/);
   });
 
   describe('for production instances', () => {

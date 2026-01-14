@@ -432,6 +432,9 @@ export class Clerk implements ClerkInterface {
       getSessionId: () => {
         return this.session?.id;
       },
+      getProtectId: () => {
+        return this.#protect?.getId();
+      },
       proxyUrl: this.proxyUrl,
     });
     this.#publicEventBus.emit(clerkEvents.Status, 'loading');
@@ -538,7 +541,7 @@ export class Clerk implements ClerkInterface {
           ...(telemetryEnabled && this.telemetry ? { telemetryCollector: this.telemetry } : {}),
         });
       }
-      this.#protect?.load(this.environment as Environment);
+      await this.#protect?.load(this.environment as Environment);
       debugLogger.info('load() complete', {}, 'clerk');
     } catch (error) {
       this.#publicEventBus.emit(clerkEvents.Status, 'error');

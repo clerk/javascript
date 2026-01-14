@@ -18,6 +18,7 @@ export type FapiRequestInit = RequestInit & {
   search?: ConstructorParameters<typeof URLSearchParams>[0];
   sessionId?: string;
   rotatingTokenNonce?: string;
+  protectId?: string;
   pathPrefix?: string;
   url?: URL;
 };
@@ -27,6 +28,7 @@ type FapiQueryStringParameters = {
   _clerk_session_id?: string;
   _clerk_js_version?: string;
   rotating_token_nonce?: string;
+  _clerk_protect_id?: string;
 };
 
 type FapiRequestOptions = {
@@ -71,6 +73,7 @@ type FapiClientOptions = {
   proxyUrl?: string;
   instanceType: InstanceType;
   getSessionId: () => string | undefined;
+  getProtectId: () => string | undefined;
   isSatellite?: boolean;
 };
 
@@ -107,7 +110,14 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
   }
 
   // TODO @userland-errors:
-  function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit): string {
+  function buildQueryString({
+    method,
+    path,
+    sessionId,
+    search,
+    rotatingTokenNonce,
+    protectId,
+  }: FapiRequestInit): string {
     const searchParams = new URLSearchParams(search as any);
     // the above will parse {key: ['val1','val2']} as key: 'val1,val2' and we need to recreate the array bellow
 
@@ -133,6 +143,10 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
 
     if (path && !unauthorizedPathPrefixes.some(p => path.startsWith(p)) && sessionId) {
       searchParams.append('_clerk_session_id', sessionId);
+    }
+
+    if (protectId) {
+      searchParams.append('_clerk_protect_id', protectId);
     }
 
     // TODO: extract to generic helper
@@ -205,6 +219,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
       ...requestInit,
       // TODO: Pass these values to the FAPI client instead of calculating them on the spot
       sessionId: options.getSessionId(),
+      protectId: options.getProtectId(),
     });
 
     // Normalize requestInit.headers

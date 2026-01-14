@@ -19,4 +19,5 @@ interface Window {
   __internal_onAfterSetActive: () => Promise<void> | void;
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   __internal_ClerkUiCtor?: import('@clerk/shared/types').ClerkUiConstructor;
+  __internal_protectState?: Promise<import('@clerk/shared/types').ProtectState>;
 }
