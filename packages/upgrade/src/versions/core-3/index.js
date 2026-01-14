@@ -20,5 +20,6 @@ export default {
     'transform-themes-to-ui-themes',
     'transform-align-experimental-unstable-prefixes',
     'transform-protect-to-show',
+    'transform-clerk-provider-inside-body',
   ],
 };
