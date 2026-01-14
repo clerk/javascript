@@ -64,20 +64,23 @@ async function waitForClerk(): Promise<LoadedClerk> {
 
   const readyPromise = clerkWindow.__clerk_internal_ready;
 
-  return Promise.race([
-    readyPromise,
-    new Promise<never>((_, reject) =>
-      setTimeout(
-        () =>
-          reject(
-            new ClerkRuntimeError('Timeout waiting for Clerk to load.', {
-              code: 'clerk_runtime_load_timeout',
-            }),
-          ),
-        TIMEOUT_MS,
-      ),
-    ),
-  ]);
+  let timeoutId: ReturnType<typeof setTimeout>;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(
+      () =>
+        reject(
+          new ClerkRuntimeError('Timeout waiting for Clerk to load.', {
+            code: 'clerk_runtime_load_timeout',
+          }),
+        ),
+      TIMEOUT_MS,
+    );
+  });
+
+  return Promise.race([readyPromise, timeoutPromise]).finally(() => {
+    clearTimeout(timeoutId);
+  });
 }
 
 /**

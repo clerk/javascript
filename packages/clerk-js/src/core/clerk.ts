@@ -455,6 +455,12 @@ export class Clerk implements ClerkInterface {
       }
     });
 
+    if (inBrowser() && (this.#status === 'ready' || this.#status === 'degraded') && this.#isLoaded()) {
+      if (window.__clerk_internal_ready?.__resolve) {
+        window.__clerk_internal_ready.__resolve(this);
+      }
+    }
+
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
     this.#protect = new Protect();
