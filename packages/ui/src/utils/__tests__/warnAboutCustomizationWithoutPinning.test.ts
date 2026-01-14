@@ -23,11 +23,9 @@ describe('warnAboutCustomizationWithoutPinning', () => {
   });
 
   describe('version pinning check', () => {
-    test('does not warn when clerkUiCtor is provided (version is pinned)', () => {
-      const mockClerkUiCtor = class MockClerkUi {};
-
+    test('does not warn when ui is provided (version is pinned)', () => {
       warnAboutCustomizationWithoutPinning({
-        clerkUiCtor: mockClerkUiCtor as any,
+        ui: { version: '1.0.0' } as any,
         appearance: {
           elements: { card: { '& > div': { color: 'red' } } },
         },
@@ -36,21 +34,21 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       expect(logger.warnOnce).not.toHaveBeenCalled();
     });
 
-    test('does not warn when clerkUiCtor is a Promise (version is pinned)', () => {
-      const mockClerkUiCtor = Promise.resolve(class MockClerkUi {});
-
+    test('warns when ui is not provided and structural customization is used', () => {
       warnAboutCustomizationWithoutPinning({
-        clerkUiCtor: mockClerkUiCtor as any,
         appearance: {
           elements: { card: { '& > div': { color: 'red' } } },
         },
       });
 
-      expect(logger.warnOnce).not.toHaveBeenCalled();
+      expect(logger.warnOnce).toHaveBeenCalledTimes(1);
     });
 
-    test('warns when clerkUiCtor is not provided and structural customization is used', () => {
+    test('still warns when clerkUiCtor is provided without ui (CDN scenario)', () => {
+      // clerkUiCtor is always set when loading from CDN, but ui is only set
+      // when the user explicitly imports @clerk/ui
       warnAboutCustomizationWithoutPinning({
+        clerkUiCtor: class MockClerkUi {} as any,
         appearance: {
           elements: { card: { '& > div': { color: 'red' } } },
         },
@@ -284,7 +282,7 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       expect(logger.warnOnce).toHaveBeenCalledTimes(1);
     });
 
-    test('does not warn for structural CSS when clerkUiCtor is provided', () => {
+    test('does not warn for structural CSS when ui is provided', () => {
       vi.mocked(detectStructuralClerkCss).mockReturnValue([
         {
           stylesheetHref: 'styles.css',
@@ -295,7 +293,7 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       ]);
 
       warnAboutCustomizationWithoutPinning({
-        clerkUiCtor: class MockClerkUi {} as any,
+        ui: { version: '1.0.0' } as any,
       });
 
       expect(logger.warnOnce).not.toHaveBeenCalled();

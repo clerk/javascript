@@ -107,12 +107,15 @@ function hasStructuralElementsUsage(elements: Record<string, unknown>): boolean 
  * Note: The caller should check clerk.instanceType === 'development' before calling.
  * This function assumes it's only called in development mode.
  *
- * If the user has explicitly imported @clerk/ui and passed it via clerkUiCtor,
+ * If the user has explicitly imported @clerk/ui and passed it via the `ui` option,
  * they have "pinned" their version and no warning is shown.
+ *
+ * Note: We check `options.ui` (not `options.clerkUiCtor`) because clerkUiCtor is
+ * always set when loading from CDN via window.__internal_ClerkUiCtor.
  */
 export function warnAboutCustomizationWithoutPinning(options?: ClerkOptions): void {
-  // If clerkUiCtor is set, the user has explicitly imported @clerk/ui (pinned version)
-  if (options?.clerkUiCtor) {
+  // If ui is explicitly provided, the user has pinned their version
+  if (options?.ui) {
     return;
   }
 
