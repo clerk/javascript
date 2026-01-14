@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkOfflineError } from '@clerk/shared/error';
 import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
@@ -269,13 +269,11 @@ describe('Session', () => {
     });
 
     describe('with offline browser and network failure', () => {
-      let warnSpy;
       beforeEach(() => {
         Object.defineProperty(window.navigator, 'onLine', {
           writable: true,
           value: false,
         });
-        warnSpy = vi.spyOn(console, 'warn').mockReturnValue();
       });
 
       afterEach(() => {
@@ -283,10 +281,9 @@ describe('Session', () => {
           writable: true,
           value: true,
         });
-        warnSpy.mockRestore();
       });
 
-      it('returns null', async () => {
+      it('throws ClerkOfflineError', async () => {
         const session = new Session({
           status: 'active',
           id: 'session_1',
@@ -301,11 +298,117 @@ describe('Session', () => {
         mockNetworkFailedFetch();
         BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
 
-        const token = await session.getToken();
+        const p = session.getToken();
+        await vi.runAllTimersAsync();
+        await expect(p).rejects.toSatisfy((error: unknown) => {
+          return ClerkOfflineError.is(error);
+        });
 
         expect(global.fetch).toHaveBeenCalled();
-        expect(dispatchSpy).toHaveBeenCalledTimes(1);
-        expect(token).toEqual(null);
+      });
+
+      it('includes cached token in offline error when available', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        mockNetworkFailedFetch();
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        // First call should use cached token successfully
+        const token1 = await session.getToken();
+        expect(token1).toEqual(mockJwt);
+
+        // Second call should throw offline error (refresh attempt) and indicate a cached token exists.
+        try {
+          const p = session.getToken({ skipCache: true });
+          await vi.runAllTimersAsync();
+          await p;
+          expect.fail('Expected getToken to throw');
+        } catch (error) {
+          expect(ClerkOfflineError.is(error)).toBe(true);
+          if (ClerkOfflineError.is(error)) {
+            expect((error as any).hasCachedToken).toBe(true);
+          }
+        }
+      });
+
+      it('does not poison cache on offline failure - preserves previous valid token', async () => {
+        BaseResource.clerk = clerkMock();
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        const token1 = await session.getToken();
+        expect(token1).toEqual(mockJwt);
+
+        mockNetworkFailedFetch();
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        try {
+          const p = session.getToken({ skipCache: true });
+          await vi.runAllTimersAsync();
+          await p;
+          expect.fail('Expected getToken to throw');
+        } catch (error) {
+          expect(ClerkOfflineError.is(error)).toBe(true);
+        }
+
+        BaseResource.clerk = clerkMock();
+
+        const token2 = await session.getToken();
+        expect(token2).toEqual(mockJwt);
+      });
+
+      it('recovers successfully after coming back online', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        mockNetworkFailedFetch();
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        const p = session.getToken();
+        await vi.runAllTimersAsync();
+        await expect(p).rejects.toSatisfy((error: unknown) => {
+          return ClerkOfflineError.is(error);
+        });
+
+        // Come back online
+        Object.defineProperty(window.navigator, 'onLine', {
+          writable: true,
+          value: true,
+        });
+        BaseResource.clerk = clerkMock();
+
+        SessionTokenCache.clear();
+
+        const token = await session.getToken();
+        expect(token).toEqual(mockJwt);
       });
     });
 

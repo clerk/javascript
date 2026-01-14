@@ -1,5 +1,5 @@
 import { isValidBrowserOnline } from '@clerk/shared/browser';
-import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkOfflineError, ClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import type {
   ClerkAPIErrorJSON,
@@ -7,8 +7,6 @@ import type {
   ClerkResourceReloadParams,
   DeletedObjectJSON,
 } from '@clerk/shared/types';
-
-import { debugLogger } from '@/utils/debug';
 
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
@@ -93,22 +91,23 @@ export abstract class BaseResource {
     try {
       fapiResponse = await BaseResource.fapiClient.request<J>(requestInit, { fetchMaxTries });
     } catch (e) {
+      if (ClerkOfflineError.is(e)) {
+        throw e;
+      }
+
+      if (isNetworkError(e) || !isValidBrowserOnline()) {
+        throw new ClerkOfflineError('Network request failed', {
+          cause: e instanceof Error ? e : undefined,
+        });
+      }
+
       // TODO: This should be the default behavior in the next major version, as long as we have a way to handle the requests more gracefully when offline
       if (this.shouldRethrowOfflineNetworkErrors()) {
         // TODO @userland-errors:
         throw new ClerkRuntimeError(e?.message || e, {
           code: 'network_error',
+          cause: e instanceof Error ? e : undefined,
         });
-      } else if (!isValidBrowserOnline()) {
-        debugLogger.warn(
-          'Network request failed while offline, returning null',
-          {
-            method: requestInit.method,
-            path: requestInit.path,
-          },
-          'baseResource',
-        );
-        return null;
       } else {
         throw e;
       }

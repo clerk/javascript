@@ -43,9 +43,33 @@ export function is4xxError(e: any): boolean {
  * @internal
  */
 export function isNetworkError(e: any): boolean {
-  // TODO: revise during error handling epic
-  const message = (`${e.message}${e.name}` || '').toLowerCase().replace(/\s+/g, '');
-  return message.includes('networkerror');
+  if (!e) {
+    return false;
+  }
+
+  const name = String(e.name || '');
+  if (name === 'AbortError') {
+    return false;
+  }
+
+  const message = String(e.message || '');
+  const haystack = `${name} ${message}`.toLowerCase();
+
+  if (haystack.includes('clerkjs: network error at')) {
+    return true;
+  }
+
+  if (haystack.includes('failed to fetch')) {
+    return true;
+  }
+  if (haystack.includes('networkerror when attempting to fetch resource')) {
+    return true;
+  }
+  if (haystack.includes('load failed')) {
+    return true;
+  }
+
+  return false;
 }
 
 /**

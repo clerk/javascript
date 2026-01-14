@@ -1,3 +1,4 @@
+import { ClerkOfflineError } from '@clerk/shared/error';
 import type { TokenResource } from '@clerk/shared/types';
 
 import { debugLogger } from '@/utils/debug';
@@ -39,6 +40,11 @@ interface TokenCacheValue {
   createdAt: Seconds;
   entry: TokenCacheEntry;
   expiresIn?: Seconds;
+  /**
+   * The last successfully resolved token for this cache key.
+   * Used to serve a valid token while a refresh is in-flight.
+   */
+  resolvedToken?: TokenResource;
   timeoutId?: ReturnType<typeof setTimeout>;
 }
 
@@ -63,6 +69,16 @@ export interface TokenCache {
    * @returns The cached TokenCacheEntry if found and valid, undefined otherwise
    */
   get(cacheKeyJSON: TokenCacheKeyJSON, leeway?: number): TokenCacheEntry | undefined;
+
+  /**
+   * Retrieves the last successfully resolved token for a cache key.
+   * This is useful for getting a valid token while a refresh is in-flight,
+   * or for attaching to error context.
+   *
+   * @param cacheKeyJSON - Object containing tokenId and optional audience
+   * @returns The resolved TokenResource if available, undefined otherwise
+   */
+  getResolvedToken(cacheKeyJSON: TokenCacheKeyJSON): TokenResource | undefined;
 
   /**
    * Stores a token entry in the cache and broadcasts to other tabs when the token resolves.
@@ -204,6 +220,18 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
   };
 
   /**
+   * Returns the last successfully resolved token for a cache key.
+   * Useful for serving a valid token while a refresh is in-flight,
+   * or for attaching to error context.
+   */
+  const getResolvedToken = (cacheKeyJSON: TokenCacheKeyJSON): TokenResource | undefined => {
+    const cacheKey = new TokenCacheKey(prefix, cacheKeyJSON);
+    const value = cache.get(cacheKey.toKey());
+
+    return value?.resolvedToken;
+  };
+
+  /**
    * Processes token updates from other tabs via BroadcastChannel.
    * Validates token ID, parses JWT, and updates cache if token is newer than existing entry.
    */
@@ -314,9 +342,18 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     const key = cacheKey.toKey();
 
+    // Store previous entry for potential rollback on offline failure
+    const previousValue = cache.get(key);
+
     const nowSeconds = Math.floor(Date.now() / 1000);
     const createdAt = entry.createdAt ?? nowSeconds;
-    const value: TokenCacheValue = { createdAt, entry, expiresIn: undefined };
+    // Preserve the previous resolved token while the new request is in-flight
+    const value: TokenCacheValue = {
+      createdAt,
+      entry,
+      expiresIn: undefined,
+      resolvedToken: previousValue?.resolvedToken,
+    };
 
     const deleteKey = () => {
       const cachedValue = cache.get(key);
@@ -325,6 +362,42 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
           clearTimeout(cachedValue.timeoutId);
         }
         cache.delete(key);
+      }
+    };
+
+    const rollbackToPrevious = () => {
+      // Only rollback if current entry is still the one we're handling
+      const cachedValue = cache.get(key);
+      if (cachedValue !== value) {
+        debugLogger.debug('Rollback skipped (entry changed)', { tokenId: entry.tokenId }, 'tokenCache');
+        return;
+      }
+
+      // Restore previous entry if it had resolved successfully.
+      // Use `resolvedToken` as the source of truth (expiresIn may be missing in edge cases).
+      if (previousValue?.resolvedToken) {
+        // Ensure the restored entry will still be cleaned up when it expires.
+        // (Its original timer might have been cleared or already fired in rare cases.)
+        if (previousValue.timeoutId === undefined && previousValue.expiresIn !== undefined) {
+          const nowSeconds = Math.floor(Date.now() / 1000);
+          const elapsed = nowSeconds - previousValue.createdAt;
+          const remainingSeconds = previousValue.expiresIn - elapsed;
+          if (remainingSeconds > 0) {
+            const timeoutId = setTimeout(() => {
+              const current = cache.get(key);
+              if (current === previousValue) {
+                cache.delete(key);
+              }
+            }, remainingSeconds * 1000);
+            previousValue.timeoutId = timeoutId;
+            if (typeof (timeoutId as any).unref === 'function') {
+              (timeoutId as any).unref();
+            }
+          }
+        }
+
+        cache.set(key, previousValue);
+      } else {
       }
     };
 
@@ -340,6 +413,8 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
         const expiresIn: Seconds = expiresAt - issuedAt;
 
         value.expiresIn = expiresIn;
+        // Store the successfully resolved token for use while future refreshes are in-flight
+        value.resolvedToken = newToken;
 
         const timeoutId = setTimeout(deleteKey, expiresIn * 1000);
         value.timeoutId = timeoutId;
@@ -389,8 +464,16 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
           }
         }
       })
-      .catch(() => {
-        deleteKey();
+      .catch(error => {
+        const isOffline = ClerkOfflineError.is(error);
+
+        if (isOffline) {
+          // Rollback to previous valid entry on offline failure
+          // This prevents cache poisoning where a rejected promise blocks recovery
+          rollbackToPrevious();
+        } else {
+          deleteKey();
+        }
       });
 
     cache.set(key, value);
@@ -407,7 +490,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     return cache.size;
   };
 
-  return { clear, close, get, set, size };
+  return { clear, close, get, getResolvedToken, set, size };
 };
 
 export const SessionTokenCache = MemoryTokenCache();
