@@ -21,6 +21,28 @@
   },
   "license": "MIT",
   "author": "Clerk",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/clerk.mjs"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/clerk.js"
+      }
+    },
+    "./headless": {
+      "import": {
+        "types": "./dist/types/index.headless.d.ts",
+        "default": "./dist/clerk.headless.mjs"
+      },
+      "require": {
+        "types": "./dist/types/index.headless.d.ts",
+        "default": "./dist/clerk.headless.js"
+      }
+    }
+  },
   "main": "dist/clerk.js",
   "jsdelivr": "dist/clerk.browser.js",
   "module": "dist/clerk.mjs",
@@ -89,7 +111,8 @@
     "bundlewatch": "^0.4.1",
     "jsdom": "26.1.0",
     "minimatch": "^10.0.3",
-    "webpack-merge": "^5.10.0"
+    "webpack-merge": "^5.10.0",
+    "yaml": "^2.7.0"
   },
   "engines": {
     "node": ">=20.9.0"
