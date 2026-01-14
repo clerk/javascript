@@ -40,11 +40,9 @@ export async function runCodemods(config, sdk, options) {
   const patterns = typeof options.glob === 'string' ? options.glob.split(/[ ,]/).filter(Boolean) : options.glob;
 
   for (const codemod of codemods) {
-    // Support both string format and object format with packages filter
     const transform = typeof codemod === 'string' ? codemod : codemod.name;
     const packages = typeof codemod === 'string' ? ['*'] : codemod.packages || ['*'];
 
-    // Skip codemod if it doesn't apply to the current SDK
     if (!packages.includes('*') && !packages.includes(sdk)) {
       continue;
     }
