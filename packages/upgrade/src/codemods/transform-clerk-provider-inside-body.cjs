@@ -75,9 +75,7 @@ module.exports = function transformClerkProviderInsideBody({ source }, { jscodes
 
       // Replace body's children with the new ClerkProvider
       // Preserve whitespace/formatting by keeping leading/trailing text nodes
-      const leadingWhitespace = bodyElement.children.find(
-        child => j.JSXText.check(child) && /^\s*$/.test(child.value),
-      );
+      const leadingWhitespace = bodyElement.children.find(child => j.JSXText.check(child) && /^\s*$/.test(child.value));
       const trailingWhitespace = [...bodyElement.children]
         .reverse()
         .find(child => j.JSXText.check(child) && /^\s*$/.test(child.value));
