@@ -878,6 +878,10 @@ export const koKR: LocalizationResource = {
       actionLink: '로그아웃',
       actionText: '{{identifier}}로 로그인됨',
     },
+    alerts: {
+      organizationAlreadyExists:
+        '감지된 회사 이름 ({{organizationName}}) 및 {{organizationDomain}}에 대한 조직이 이미 존재합니다. 초대를 통해 가입하세요.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

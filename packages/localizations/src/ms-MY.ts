@@ -894,6 +894,10 @@ export const msMY: LocalizationResource = {
       actionLink: 'Daftar keluar',
       actionText: 'Log masuk sebagai {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Organisasi sudah wujud untuk nama syarikat yang dikesan ({{organizationName}}) dan {{organizationDomain}}. Sertai melalui jemputan.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,
