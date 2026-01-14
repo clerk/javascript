@@ -90,6 +90,54 @@ describe('runCodemods', () => {
 
     expect(mockRunCodemod).not.toHaveBeenCalled();
   });
+
+  it('handles empty codemods array', async () => {
+    const config = {
+      codemods: [],
+    };
+
+    await runCodemods(config, 'nextjs', { glob: '**/*.tsx' });
+
+    expect(mockRunCodemod).not.toHaveBeenCalled();
+  });
+
+  it('handles undefined codemods', async () => {
+    const config = {};
+
+    await runCodemods(config, 'nextjs', { glob: '**/*.tsx' });
+
+    expect(mockRunCodemod).not.toHaveBeenCalled();
+  });
+
+  it('treats empty packages array as matching no SDKs', async () => {
+    const config = {
+      codemods: [{ name: 'transform-none', packages: [] }],
+    };
+
+    await runCodemods(config, 'nextjs', { glob: '**/*.tsx' });
+
+    expect(mockRunCodemod).not.toHaveBeenCalled();
+  });
+
+  it('treats undefined packages as matching all SDKs', async () => {
+    const config = {
+      codemods: [{ name: 'transform-all', packages: undefined }],
+    };
+
+    await runCodemods(config, 'expo', { glob: '**/*.tsx' });
+
+    expect(mockRunCodemod).toHaveBeenCalledTimes(1);
+  });
+
+  it('propagates errors from codemod execution', async () => {
+    mockRunCodemod.mockRejectedValueOnce(new Error('Codemod failed'));
+
+    const config = {
+      codemods: ['transform-broken'],
+    };
+
+    await expect(runCodemods(config, 'nextjs', { glob: '**/*.tsx' })).rejects.toThrow('Codemod failed');
+  });
 });
 
 describe('runScans', () => {
