@@ -48,6 +48,26 @@ export const isNextjsUseCacheError = (e: unknown): boolean => {
   return DYNAMIC_CACHE_PATTERN.test(message) && message.toLowerCase().includes('cache');
 };
 
+/**
+ * Error message for when auth()/currentUser() is called inside a "use cache" function.
+ * Exported so it can be reused in auth.ts and currentUser.ts for consistent messaging.
+ */
+export const USE_CACHE_ERROR_MESSAGE =
+  `Clerk: auth() and currentUser() cannot be called inside a "use cache" function. ` +
+  `These functions access \`headers()\` internally, which is a dynamic API not allowed in cached contexts.\n\n` +
+  `To fix this, call auth() outside the cached function and pass the userId as an argument:\n\n` +
+  `  import { auth, clerkClient } from '@clerk/nextjs/server';\n\n` +
+  `  async function getCachedUser(userId: string) {\n` +
+  `    "use cache";\n` +
+  `    const client = await clerkClient();\n` +
+  `    return client.users.getUser(userId);\n` +
+  `  }\n\n` +
+  `  // In your component/page:\n` +
+  `  const { userId } = await auth();\n` +
+  `  if (userId) {\n` +
+  `    const user = await getCachedUser(userId);\n` +
+  `  }`;
+
 export async function buildRequestLike(): Promise<NextRequest> {
   try {
     // Dynamically import next/headers, otherwise Next12 apps will break
@@ -64,23 +84,7 @@ export async function buildRequestLike(): Promise<NextRequest> {
 
     // Provide a helpful error message for "use cache" components
     if (e && isNextjsUseCacheError(e)) {
-      throw new Error(
-        `Clerk: auth() and currentUser() cannot be called inside a "use cache" function. ` +
-          `These functions access \`headers()\` internally, which is a dynamic API not allowed in cached contexts.\n\n` +
-          `To fix this, call auth() outside the cached function and pass the userId as an argument:\n\n` +
-          `  import { auth, clerkClient } from '@clerk/nextjs/server';\n\n` +
-          `  async function getCachedUser(userId: string) {\n` +
-          `    "use cache";\n` +
-          `    const client = await clerkClient();\n` +
-          `    return client.users.getUser(userId);\n` +
-          `  }\n\n` +
-          `  // In your component/page:\n` +
-          `  const { userId } = await auth();\n` +
-          `  if (userId) {\n` +
-          `    const user = await getCachedUser(userId);\n` +
-          `  }\n\n` +
-          `Original error: ${e.message}`,
-      );
+      throw new Error(`${USE_CACHE_ERROR_MESSAGE}\n\nOriginal error: ${e.message}`);
     }
 
     throw new Error(

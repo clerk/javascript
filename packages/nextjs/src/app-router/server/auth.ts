@@ -11,7 +11,7 @@ import { unauthorized } from '../../server/nextErrors';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData } from '../../server/utils';
-import { buildRequestLike } from './utils';
+import { buildRequestLike, isNextjsUseCacheError, USE_CACHE_ERROR_MESSAGE } from './utils';
 
 /**
  * `Auth` object of the currently active user and the `redirectToSignIn()` method.
@@ -71,68 +71,76 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
 
-  const request = await buildRequestLike();
+  try {
+    const request = await buildRequestLike();
 
-  const stepsBasedOnSrcDirectory = async () => {
-    try {
-      const isSrcAppDir = await import('../../server/fs/middleware-location.js').then(m => m.hasSrcAppDir());
-      return [`Your Middleware exists at ./${isSrcAppDir ? 'src/' : ''}middleware.(ts|js)`];
-    } catch {
-      return [];
+    const stepsBasedOnSrcDirectory = async () => {
+      try {
+        const isSrcAppDir = await import('../../server/fs/middleware-location.js').then(m => m.hasSrcAppDir());
+        return [`Your Middleware exists at ./${isSrcAppDir ? 'src/' : ''}middleware.(ts|js)`];
+      } catch {
+        return [];
+      }
+    };
+    const authObject = await createAsyncGetAuth({
+      debugLoggerName: 'auth()',
+      noAuthStatusMessage: authAuthHeaderMissing('auth', await stepsBasedOnSrcDirectory()),
+    })(request, {
+      treatPendingAsSignedOut: options?.treatPendingAsSignedOut,
+      acceptsToken: options?.acceptsToken ?? TokenType.SessionToken,
+    });
+
+    const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
+
+    const createRedirectForRequest = (...args: Parameters<RedirectFun<never>>) => {
+      const { returnBackUrl } = args[0] || {};
+      const clerkRequest = createClerkRequest(request);
+      const devBrowserToken =
+        clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
+        clerkRequest.cookies.get(constants.Cookies.DevBrowser);
+
+      const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
+      const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
+      return [
+        createRedirect({
+          redirectAdapter: redirect,
+          devBrowserToken: devBrowserToken,
+          baseUrl: clerkRequest.clerkUrl.toString(),
+          publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
+          signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
+          signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
+          sessionStatus: authObject.tokenType === TokenType.SessionToken ? authObject.sessionStatus : null,
+        }),
+        returnBackUrl === null ? '' : returnBackUrl || clerkUrl?.toString(),
+      ] as const;
+    };
+
+    const redirectToSignIn: RedirectFun<never> = (opts = {}) => {
+      const [r, returnBackUrl] = createRedirectForRequest(opts);
+      return r.redirectToSignIn({
+        returnBackUrl,
+      });
+    };
+
+    const redirectToSignUp: RedirectFun<never> = (opts = {}) => {
+      const [r, returnBackUrl] = createRedirectForRequest(opts);
+      return r.redirectToSignUp({
+        returnBackUrl,
+      });
+    };
+
+    if (authObject.tokenType === TokenType.SessionToken) {
+      return Object.assign(authObject, { redirectToSignIn, redirectToSignUp });
     }
-  };
-  const authObject = await createAsyncGetAuth({
-    debugLoggerName: 'auth()',
-    noAuthStatusMessage: authAuthHeaderMissing('auth', await stepsBasedOnSrcDirectory()),
-  })(request, {
-    treatPendingAsSignedOut: options?.treatPendingAsSignedOut,
-    acceptsToken: options?.acceptsToken ?? TokenType.SessionToken,
-  });
 
-  const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
-
-  const createRedirectForRequest = (...args: Parameters<RedirectFun<never>>) => {
-    const { returnBackUrl } = args[0] || {};
-    const clerkRequest = createClerkRequest(request);
-    const devBrowserToken =
-      clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
-      clerkRequest.cookies.get(constants.Cookies.DevBrowser);
-
-    const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
-    const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
-    return [
-      createRedirect({
-        redirectAdapter: redirect,
-        devBrowserToken: devBrowserToken,
-        baseUrl: clerkRequest.clerkUrl.toString(),
-        publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
-        signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
-        signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
-        sessionStatus: authObject.tokenType === TokenType.SessionToken ? authObject.sessionStatus : null,
-      }),
-      returnBackUrl === null ? '' : returnBackUrl || clerkUrl?.toString(),
-    ] as const;
-  };
-
-  const redirectToSignIn: RedirectFun<never> = (opts = {}) => {
-    const [r, returnBackUrl] = createRedirectForRequest(opts);
-    return r.redirectToSignIn({
-      returnBackUrl,
-    });
-  };
-
-  const redirectToSignUp: RedirectFun<never> = (opts = {}) => {
-    const [r, returnBackUrl] = createRedirectForRequest(opts);
-    return r.redirectToSignUp({
-      returnBackUrl,
-    });
-  };
-
-  if (authObject.tokenType === TokenType.SessionToken) {
-    return Object.assign(authObject, { redirectToSignIn, redirectToSignUp });
+    return authObject;
+  } catch (e: any) {
+    // Catch "use cache" errors that bubble up from Next.js cache boundary
+    if (isNextjsUseCacheError(e)) {
+      throw new Error(`${USE_CACHE_ERROR_MESSAGE}\n\nOriginal error: ${e.message}`);
+    }
+    throw e;
   }
-
-  return authObject;
 }) as AuthFn;
 
 auth.protect = async (...args: any[]) => {
