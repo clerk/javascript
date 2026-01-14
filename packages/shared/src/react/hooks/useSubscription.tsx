@@ -72,8 +72,8 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
 
   return {
     data: query.data,
-    // Our existing types for SWR return undefined when there is no error, but React Query returns null.
-    // So we need to convert the error to undefined, for backwards compatibility.
+    // React Query returns null for no error, but our types expect undefined.
+    // Convert to undefined for type compatibility.
     error: query.error ?? undefined,
     isLoading: query.isLoading,
     isFetching: query.isFetching,
