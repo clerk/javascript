@@ -90,7 +90,6 @@
     "jsdom": "26.1.0",
     "minimatch": "^10.0.3",
     "webpack-merge": "^5.10.0",
-    "yaml": "^2.7.0"
   },
   "engines": {
     "node": ">=20.9.0"
