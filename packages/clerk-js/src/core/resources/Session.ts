@@ -467,12 +467,12 @@ export class Session extends BaseResource implements SessionResource {
   ): void {
     // Prevent multiple concurrent background refreshes for the same token
     if (Session.#backgroundRefreshInProgress.has(tokenId)) {
-      debugLogger.debug('Background refresh already in progress', { tokenId }, 'session');
+      debugLogger.debug('SWR: skipped - refresh already in progress', { tokenId }, 'session');
       return;
     }
 
     Session.#backgroundRefreshInProgress.add(tokenId);
-    debugLogger.info('Refreshing token in background', { organizationId, template, tokenId }, 'session');
+    debugLogger.info('SWR: starting background refresh', { inProgressCount: Session.#backgroundRefreshInProgress.size, organizationId, template, tokenId }, 'session');
 
     const tokenResolver = this.#createTokenResolver(template, organizationId, false);
 
@@ -483,13 +483,15 @@ export class Session extends BaseResource implements SessionResource {
         // Cache the resolved token for future calls
         SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(token) });
         this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
+        debugLogger.info('SWR: background refresh completed', { tokenId }, 'session');
       })
       .catch(error => {
         // Log but don't propagate - callers already have stale token
-        debugLogger.warn('Background token refresh failed', { error, tokenId }, 'session');
+        debugLogger.warn('SWR: background refresh failed', { error, tokenId }, 'session');
       })
       .finally(() => {
         Session.#backgroundRefreshInProgress.delete(tokenId);
+        debugLogger.debug('SWR: cleared from in-progress set', { inProgressCount: Session.#backgroundRefreshInProgress.size, tokenId }, 'session');
       });
   }
 
