@@ -894,6 +894,10 @@ export const itIT: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        "Un'organizzazione esiste già per il nome dell'azienda rilevato ({{organizationName}}) e {{organizationDomain}}. Unisciti tramite invito.",
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

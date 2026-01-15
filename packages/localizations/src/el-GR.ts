@@ -888,6 +888,10 @@ export const elGR: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Υπάρχει ήδη οργανισμός για το ανιχνευμένο όνομα εταιρείας ({{organizationName}}) και {{organizationDomain}}. Εγγραφείτε μέσω πρόσκλησης.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

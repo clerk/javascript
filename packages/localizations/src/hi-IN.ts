@@ -891,6 +891,10 @@ export const hiIN: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'पता लगाई गई कंपनी के नाम ({{organizationName}}) और {{organizationDomain}} के लिए एक संगठन पहले से मौजूद है। आमंत्रण द्वारा शामिल हों।',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

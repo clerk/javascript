@@ -886,6 +886,10 @@ export const bgBG: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Организация вече съществува за откритото име на компанията ({{organizationName}}) и {{organizationDomain}}. Присъединете се чрез покана.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

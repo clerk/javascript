@@ -897,6 +897,10 @@ export const faIR: LocalizationResource = {
       actionLink: 'خروج از همه حساب‌ها',
       actionText: 'می‌خواهید خارج شوید؟',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'سازمانی برای نام شرکت شناسایی شده ({{organizationName}}) و {{organizationDomain}} از قبل وجود دارد. از طریق دعوتنامه بپیوندید.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

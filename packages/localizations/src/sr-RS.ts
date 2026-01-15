@@ -883,6 +883,10 @@ export const srRS: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Organizacija već postoji za otkriveno ime kompanije ({{organizationName}}) i {{organizationDomain}}. Pridružite se putem pozivnice.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

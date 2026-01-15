@@ -877,6 +877,10 @@ export const kkKZ: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Анықталған компания атауы ({{organizationName}}) және {{organizationDomain}} үшін ұйым бұрыннан бар. Шақыру арқылы қосылыңыз.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,
