@@ -9,7 +9,6 @@ import {
 } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
 
 import { TaskChooseOrganization } from '..';
-import { findByText } from '@testing-library/react';
 
 const { createFixtures } = bindCreateFixtures('TaskChooseOrganization');
 

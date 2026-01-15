@@ -26,6 +26,7 @@ import type {
   UserProfileProps,
   WaitlistProps,
 } from '@clerk/shared/types';
+import type { MutableRefObject, Ref } from 'react';
 
 import type { WithInternalRouting } from './internal';
 
@@ -148,6 +149,7 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 
 export type SessionTasksCtx = {
   redirectUrlComplete: string;
+  shouldAutoNavigateAway: MutableRefObject<boolean>;
 };
 
 export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {

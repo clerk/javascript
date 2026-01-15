@@ -23,7 +23,7 @@ describe('MfaMethodSelectionScreen', () => {
       const { findByText } = render(
         <MfaMethodSelectionScreen
           availableMethods={['totp', 'phone_code']}
-          onMethodSelect={onMethodSelect}
+          onMethodSelect={() => onMethodSelect()}
         />,
         { wrapper },
       );
