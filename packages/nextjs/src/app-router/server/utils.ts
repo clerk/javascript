@@ -23,7 +23,9 @@ export const isPrerenderingBailout = (e: unknown) => {
   // Error: "During prerendering, `headers()` rejects when the prerender is complete"
   const headersRejectsDuringPrerendering = lowerCaseInput.includes('during prerendering');
 
-  return ROUTE_BAILOUT_PATTERN.test(message) || dynamicServerUsage || bailOutPrerendering || headersRejectsDuringPrerendering;
+  return (
+    ROUTE_BAILOUT_PATTERN.test(message) || dynamicServerUsage || bailOutPrerendering || headersRejectsDuringPrerendering
+  );
 };
 
 /**
