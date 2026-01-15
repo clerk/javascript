@@ -41,6 +41,19 @@
         "types": "./dist/types/index.headless.d.ts",
         "default": "./dist/clerk.headless.js"
       }
+    },
+    "./internal/fapi": {
+      "types": "./dist/types/core/fapiClient.d.ts"
+    },
+    "./no-rhc": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/clerk.no-rhc.mjs"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/clerk.no-rhc.js"
+      }
     }
   },
   "main": "dist/clerk.js",

@@ -1,4 +1,4 @@
-import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/core/fapiClient';
+import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/internal/fapi';
 import { type Clerk, isClerkRuntimeError } from '@clerk/clerk-js/headless';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/react';
 import { is4xxError } from '@clerk/shared/error';
