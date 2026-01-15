@@ -1,17 +1,7 @@
-import {
-  clerkCoreErrorContextProviderNotFound,
-  clerkCoreErrorNoClerkSingleton,
-} from '@clerk/shared/internal/clerk-js/errors';
-import type { Clerk } from '@clerk/shared/types';
+import { clerkCoreErrorContextProviderNotFound } from '@clerk/shared/internal/clerk-js/errors';
 import { snakeToCamel } from '@clerk/shared/underscore';
 
 import { createDynamicParamParser } from '../utils/dynamicParamParser';
-
-export function assertClerkSingletonExists(clerk: Clerk | undefined): asserts clerk is Clerk {
-  if (!clerk) {
-    clerkCoreErrorNoClerkSingleton();
-  }
-}
 
 export function assertContextExists(contextVal: unknown, providerName: string): asserts contextVal {
   if (!contextVal) {
