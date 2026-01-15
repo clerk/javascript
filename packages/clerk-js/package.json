@@ -80,6 +80,7 @@
   "devDependencies": {
     "@clerk/msw": "workspace:^",
     "@clerk/testing": "workspace:^",
+    "@emotion/react": "11.11.1",
     "@rsdoctor/rspack-plugin": "^0.4.13",
     "@rspack/cli": "^1.6.0",
     "@rspack/core": "^1.6.0",
