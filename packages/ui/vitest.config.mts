@@ -51,15 +51,20 @@ export default defineConfig({
       // UI package paths (local to this package)
       { find: /^@\/ui\//, replacement: `${uiPath}/` },
       { find: /^@\/ui$/, replacement: `${uiPath}` },
-      // Test utilities from clerk-js
-      { find: /^@\/test\//, replacement: `${clerkJsPath}/test/` },
-      { find: /^@\/test$/, replacement: `${clerkJsPath}/test` },
+      // Test utilities - local to UI package
+      { find: /^@\/test\//, replacement: `${uiPath}/test/` },
+      { find: /^@\/test$/, replacement: `${uiPath}/test` },
       // Core modules from clerk-js
       { find: /^@\/core\//, replacement: `${clerkJsPath}/core/` },
       { find: /^@\/core$/, replacement: `${clerkJsPath}/core` },
-      // Utils from clerk-js (for debug, etc. that clerk-js core depends on)
-      { find: /^@\/utils\//, replacement: `${clerkJsPath}/utils/` },
-      { find: /^@\/utils$/, replacement: `${clerkJsPath}/utils` },
+      // UI package utils (must come before clerk-js utils)
+      { find: '@/utils/errorHandler', replacement: `${uiPath}/utils/errorHandler` },
+      { find: '@/utils/factorSorting', replacement: `${uiPath}/utils/factorSorting` },
+      { find: '@/utils/formatSafeIdentifier', replacement: `${uiPath}/utils/formatSafeIdentifier` },
+      { find: '@/utils/intl', replacement: `${uiPath}/utils/intl` },
+      { find: '@/utils/normalizeRoutingOptions', replacement: `${uiPath}/utils/normalizeRoutingOptions` },
+      // Utils from clerk-js (needed by clerk-js core modules)
+      { find: '@/utils', replacement: `${clerkJsPath}/utils` },
       // Catch-all for other @/ imports - UI package
       { find: /^@\//, replacement: `${uiPath}/` },
     ],
