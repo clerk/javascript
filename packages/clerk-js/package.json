@@ -51,7 +51,7 @@
     "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports",
     "lint:publint": "publint || true",
     "postbuild:disabled": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs",
-    "test:disabled": "vitest --watch=false",
+    "test": "vitest --watch=false",
     "test:sandbox:integration": "playwright test",
     "test:sandbox:integration:ui": "playwright test --ui",
     "test:sandbox:integration:update-snapshots": "playwright test --update-snapshots",
