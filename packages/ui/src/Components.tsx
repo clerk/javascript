@@ -53,6 +53,7 @@ import type { AvailableComponentProps } from './types';
 import { buildVirtualRouterUrl } from './utils/buildVirtualRouterUrl';
 import { disambiguateRedirectOptions } from './utils/disambiguateRedirectOptions';
 import { extractCssLayerNameFromAppearance } from './utils/extractCssLayerNameFromAppearance';
+import { warnAboutCustomizationWithoutPinning } from './utils/warnAboutCustomizationWithoutPinning';
 
 // Re-export for ClerkUi
 export { extractCssLayerNameFromAppearance };
@@ -236,7 +237,14 @@ export const mountComponentRenderer = (
               getClerk={getClerk}
               getEnvironment={getEnvironment}
               options={options}
-              onComponentsMounted={deferredPromise.resolve}
+              onComponentsMounted={() => {
+                // Defer warning check to avoid blocking component mount
+                // Only check in development mode (based on publishable key, not NODE_ENV)
+                if (getClerk().instanceType === 'development') {
+                  setTimeout(() => warnAboutCustomizationWithoutPinning(options), 0);
+                }
+                deferredPromise.resolve();
+              }}
               moduleManager={moduleManager}
             />,
           );

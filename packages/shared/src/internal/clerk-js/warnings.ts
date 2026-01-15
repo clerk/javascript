@@ -53,6 +53,13 @@ const warnings = {
     'The <APIKeys/> component cannot be rendered when user API keys are disabled. Since user API keys are disabled, this is no-op.',
   cannotRenderAPIKeysComponentForOrgWhenDisabled:
     'The <APIKeys/> component cannot be rendered when organization API keys are disabled. Since organization API keys are disabled, this is no-op.',
+  advancedCustomizationWithoutVersionPinning:
+    'You are using appearance customization (elements or .cl- CSS selectors) that may rely on internal DOM structure. ' +
+    'This structure may change between versions, which could break your customizations.\n\n' +
+    'To ensure stability, install @clerk/ui and pass it to ClerkProvider:\n\n' +
+    "  import { ui } from '@clerk/ui';\n\n" +
+    '  <ClerkProvider ui={ui}>...</ClerkProvider>\n\n' +
+    'Learn more: https://clerk.com/docs/customization/versioning',
 };
 
 type SerializableWarnings = Serializable<typeof warnings>;
