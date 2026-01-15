@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { eventBus } from '../../events';
 import { BaseResource } from '../internal';
 import { SignUp } from '../SignUp';
 
@@ -699,6 +700,130 @@ describe('SignUp', () => {
         const result = await signUp.__internal_future.finalize();
 
         expect(result.error).toBeInstanceOf(Error);
+      });
+    });
+
+    describe('reset', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.restoreAllMocks();
+      });
+
+      it('creates a new signup by POSTing to /client/sign_ups with empty body', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_new', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
+        await signUp.__internal_future.reset();
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: {},
+          }),
+        );
+      });
+
+      it('does NOT emit resource:fetch with status fetching', async () => {
+        const emitSpy = vi.spyOn(eventBus, 'emit');
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_new', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
+        await signUp.__internal_future.reset();
+
+        // Verify that resource:fetch was NOT called with status: 'fetching'
+        const fetchingCalls = emitSpy.mock.calls.filter(
+          call => call[0] === 'resource:fetch' && call[1]?.status === 'fetching',
+        );
+        expect(fetchingCalls).toHaveLength(0);
+      });
+
+      it('clears any previous errors by emitting resource:error with null', async () => {
+        const emitSpy = vi.spyOn(eventBus, 'emit');
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_new', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
+        await signUp.__internal_future.reset();
+
+        // Verify that resource:error was called to clear previous errors
+        expect(emitSpy).toHaveBeenCalledWith('resource:error', {
+          resource: signUp,
+          error: null,
+        });
+      });
+
+      it('returns error: null on success', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_new', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
+        const result = await signUp.__internal_future.reset();
+
+        expect(result).toHaveProperty('error', null);
+      });
+
+      it('returns error and emits resource:error on failure', async () => {
+        const emitSpy = vi.spyOn(eventBus, 'emit');
+        const mockError = new Error('API error');
+        const mockFetch = vi.fn().mockRejectedValue(mockError);
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
+        const result = await signUp.__internal_future.reset();
+
+        expect(result.error).toBe(mockError);
+        expect(emitSpy).toHaveBeenCalledWith('resource:error', {
+          resource: signUp,
+          error: mockError,
+        });
+      });
+
+      it('resets an existing signup with data to a fresh state', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_new',
+            status: 'missing_requirements',
+            email_address: null,
+            phone_number: null,
+            first_name: null,
+            last_name: null,
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({
+          id: 'signup_123',
+          status: 'missing_requirements',
+          email_address: 'user@example.com',
+          first_name: 'John',
+        } as any);
+
+        // Verify initial state
+        expect(signUp.emailAddress).toBe('user@example.com');
+        expect(signUp.firstName).toBe('John');
+
+        await signUp.__internal_future.reset();
+
+        // After reset, the signup should have new values from the response
+        expect(signUp.id).toBe('signup_new');
+        expect(signUp.emailAddress).toBeNull();
+        expect(signUp.firstName).toBeNull();
       });
     });
   });

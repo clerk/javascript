@@ -975,6 +975,24 @@ class SignUpFuture implements SignUpFutureResource {
       await SignUp.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
   }
+
+  /**
+   * Resets the current sign-up attempt by creating a new empty sign-up.
+   * Unlike other methods, this does NOT emit resource:fetch with 'fetching' status,
+   * allowing for smooth UI transitions without loading states.
+   */
+  async reset(): Promise<{ error: ClerkError | null }> {
+    // Clear any previous errors
+    eventBus.emit('resource:error', { resource: this.#resource, error: null });
+
+    try {
+      await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body: {} });
+      return { error: null };
+    } catch (err) {
+      eventBus.emit('resource:error', { resource: this.#resource, error: err });
+      return { error: err };
+    }
+  }
 }
 
 class SignUpEnterpriseConnection extends BaseResource implements SignUpEnterpriseConnectionResource {
