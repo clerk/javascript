@@ -20,6 +20,9 @@ export interface OrganizationSettingsJSON extends ClerkResourceJSON {
   slug: {
     disabled: boolean;
   };
+  organizationCreationDefaults: {
+    enabled: boolean;
+  };
 }
 
 export interface OrganizationSettingsResource extends ClerkResource {

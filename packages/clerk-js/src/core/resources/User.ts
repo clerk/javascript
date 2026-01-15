@@ -280,6 +280,8 @@ export class User extends BaseResource implements UserResource {
   getOrganizationMemberships: GetOrganizationMemberships = retrieveMembership =>
     OrganizationMembership.retrieve(retrieveMembership);
 
+  getOrganizationCreationDefaults = () => OrganizationCreationDefaults.retrieve();
+
   leaveOrganization = async (organizationId: string): Promise<DeletedObjectResource> => {
     const json = (
       await BaseResource._fetch<DeletedObjectJSON>({
