@@ -377,18 +377,14 @@ export class Session extends BaseResource implements SessionResource {
     if (cacheResult) {
       // If caller requests refresh when stale (e.g., poller), fetch fresh token instead of returning cached
       if (cacheResult.needsRefresh && refreshIfStale) {
-        debugLogger.debug('Token is stale, refreshing as requested', { tokenId }, 'session');
         return this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
       }
 
       // Trigger background refresh if token is expiring soon
       // This guarantees cache revalidation without relying solely on the poller
       if (cacheResult.needsRefresh) {
-        debugLogger.debug('SWR: triggering background refresh', { backgroundRefreshThreshold, tokenId }, 'session');
         this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate);
       }
-
-      debugLogger.debug('Using cached token', { backgroundRefreshThreshold, needsRefresh: cacheResult.needsRefresh, tokenId }, 'session');
 
       // Prefer synchronous read to avoid microtask overhead when token is already resolved
       const cachedToken = cacheResult.entry.resolvedToken ?? (await cacheResult.entry.tokenResolver);
@@ -467,12 +463,10 @@ export class Session extends BaseResource implements SessionResource {
   ): void {
     // Prevent multiple concurrent background refreshes for the same token
     if (Session.#backgroundRefreshInProgress.has(tokenId)) {
-      debugLogger.debug('SWR: skipped - refresh already in progress', { tokenId }, 'session');
       return;
     }
 
     Session.#backgroundRefreshInProgress.add(tokenId);
-    debugLogger.info('SWR: starting background refresh', { inProgressCount: Session.#backgroundRefreshInProgress.size, organizationId, template, tokenId }, 'session');
 
     const tokenResolver = this.#createTokenResolver(template, organizationId, false);
 
@@ -483,15 +477,13 @@ export class Session extends BaseResource implements SessionResource {
         // Cache the resolved token for future calls
         SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(token) });
         this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
-        debugLogger.info('SWR: background refresh completed', { tokenId }, 'session');
       })
       .catch(error => {
         // Log but don't propagate - callers already have stale token
-        debugLogger.warn('SWR: background refresh failed', { error, tokenId }, 'session');
+        debugLogger.warn('Background token refresh failed', { error, tokenId }, 'session');
       })
       .finally(() => {
         Session.#backgroundRefreshInProgress.delete(tokenId);
-        debugLogger.debug('SWR: cleared from in-progress set', { inProgressCount: Session.#backgroundRefreshInProgress.size, tokenId }, 'session');
       });
   }
 

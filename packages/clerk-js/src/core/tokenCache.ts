@@ -234,21 +234,6 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     // Token is valid but expiring soon - signal that background refresh is needed
     const needsRefresh = remainingTtl < effectiveThreshold;
 
-    debugLogger.debug(
-      'SWR cache check',
-      {
-        createdAt: value.createdAt,
-        effectiveThreshold,
-        elapsed,
-        expiresIn: value.expiresIn,
-        needsRefresh,
-        nowSeconds,
-        refreshThreshold,
-        remainingTtl: Math.floor(remainingTtl),
-      },
-      'tokenCache',
-    );
-
     // Return the valid token immediately, caller decides whether to refresh
     return { entry: value.entry, needsRefresh };
   };
