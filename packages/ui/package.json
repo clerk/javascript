@@ -47,8 +47,8 @@
         "default": "./register/index.mjs"
       },
       "require": {
-        "types": "./register/index.d.ts",
-        "default": "./register/index.js"
+        "types": "./register/index.d.cts",
+        "default": "./register/index.cjs"
       }
     },
     "./package.json": "./package.json"
