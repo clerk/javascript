@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
@@ -7,12 +7,17 @@ import {
   createFakeUserOrganizationMembership,
   createFakeUserOrganizationSuggestion,
 } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
+import { clearFetchCache } from '@/ui/hooks';
 
 import { TaskChooseOrganization } from '..';
 
 const { createFixtures } = bindCreateFixtures('TaskChooseOrganization');
 
 describe('TaskChooseOrganization', () => {
+  beforeEach(() => {
+    clearFetchCache();
+  });
+
   it('does not render component without existing session task', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
@@ -334,7 +339,7 @@ describe('TaskChooseOrganization', () => {
             advisory: {
               code: 'organization_already_exists',
               severity: 'warning',
-              meta: { organizationDomain: 'test@clerk.com', organizationName: 'Clerk' },
+              meta: { organization_domain: 'test@clerk.com', organization_name: 'Clerk' },
             },
           }),
         );
@@ -342,13 +347,16 @@ describe('TaskChooseOrganization', () => {
         const { findByText } = render(<TaskChooseOrganization />, { wrapper });
 
         expect(
-          await findByText(/an organization already exists for the detected company name (Clerk) and test@clerk\.com/i),
+          await findByText(
+            /an organization already exists for the detected company name \(Clerk\) and test@clerk\.com/i,
+          ),
         ).toBeInTheDocument();
       });
 
       it('prefills create organization form with defaults', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withOrganizations();
+          f.withOrganizationSlug(true);
           f.withForceOrganizationSelection();
           f.withOrganizationCreationDefaults(true);
           f.withUser({
@@ -368,10 +376,10 @@ describe('TaskChooseOrganization', () => {
           }),
         );
 
-        const { findByText } = render(<TaskChooseOrganization />, { wrapper });
+        const { findByRole } = render(<TaskChooseOrganization />, { wrapper });
 
-        expect(await findByText('Test Org')).toBeInTheDocument();
-        expect(await findByText('test-org')).toBeInTheDocument();
+        expect(await findByRole('textbox', { name: /name/i })).toHaveValue('Test Org');
+        expect(await findByRole('textbox', { name: /slug/i })).toHaveValue('test-org');
       });
     });
 

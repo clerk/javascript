@@ -6,7 +6,7 @@ import { Alert } from '@/ui/primitives';
 export function OrganizationCreationDefaultsAlert({
   organizationCreationDefaults,
 }: {
-  organizationCreationDefaults?: OrganizationCreationDefaultsResource;
+  organizationCreationDefaults?: OrganizationCreationDefaultsResource | null;
 }) {
   const localizationKey = advisoryToLocalizationKey(organizationCreationDefaults?.advisory);
   if (!localizationKey) {

@@ -40,5 +40,8 @@ export interface OrganizationSettingsResource extends ClerkResource {
   slug: {
     disabled: boolean;
   };
+  organizationCreationDefaults: {
+    enabled: boolean;
+  };
   __internal_toSnapshot: () => OrganizationSettingsJSONSnapshot;
 }
