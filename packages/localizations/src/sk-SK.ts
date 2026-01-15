@@ -890,6 +890,10 @@ export const skSK: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Organizácia už existuje pre zistený názov spoločnosti ({{organizationName}}) a {{organizationDomain}}. Pripojte sa prostredníctvom pozvánky.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

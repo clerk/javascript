@@ -886,6 +886,10 @@ export const nlNL: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Er bestaat al een organisatie voor de gedetecteerde bedrijfsnaam ({{organizationName}}) en {{organizationDomain}}. Word lid via uitnodiging.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

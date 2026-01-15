@@ -884,6 +884,10 @@ export const huHU: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Már létezik szervezet az észlelt cégnévhez ({{organizationName}}) és {{organizationDomain}}. Csatlakozz meghívással.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

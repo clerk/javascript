@@ -892,6 +892,10 @@ export const idID: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Organisasi sudah ada untuk nama perusahaan yang terdeteksi ({{organizationName}}) dan {{organizationDomain}}. Bergabung melalui undangan.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

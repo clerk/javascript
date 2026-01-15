@@ -888,6 +888,10 @@ export const svSE: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'En organisation finns redan för det upptäckta företagsnamnet ({{organizationName}}) och {{organizationDomain}}. Gå med via inbjudan.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

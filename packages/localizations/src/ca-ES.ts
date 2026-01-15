@@ -885,6 +885,10 @@ export const caES: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        "Ja existeix una organització per al nom d'empresa detectat ({{organizationName}}) i {{organizationDomain}}. Uneix-te per invitació.",
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

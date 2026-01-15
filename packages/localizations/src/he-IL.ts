@@ -876,6 +876,10 @@ export const heIL: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'ארגון כבר קיים עבור שם החברה שזוהה ({{organizationName}}) ו-{{organizationDomain}}. הצטרף באמצעות הזמנה.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,
