@@ -11,3 +11,17 @@ export type RequestLike = NextRequest | NextApiRequest | GsspRequest;
 export type NextMiddlewareRequestParam = Parameters<NextMiddleware>['0'];
 export type NextMiddlewareEvtParam = Parameters<NextMiddleware>['1'];
 export type NextMiddlewareReturn = ReturnType<NextMiddleware>;
+
+/**
+ * Options for configuring Frontend API proxy in clerkMiddleware
+ */
+export interface FrontendApiProxyOptions {
+  /**
+   * Enable proxy handling in middleware
+   */
+  enabled: boolean;
+  /**
+   * The path prefix for proxy requests. Defaults to `/__clerk`.
+   */
+  path?: string;
+}

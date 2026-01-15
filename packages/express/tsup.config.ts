@@ -6,7 +6,7 @@ export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
 
   return {
-    entry: ['./src/index.ts', './src/webhooks.ts'],
+    entry: ['./src/index.ts', './src/webhooks.ts', './src/proxy.ts'],
     format: ['cjs', 'esm'],
     bundle: true,
     clean: true,

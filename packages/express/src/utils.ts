@@ -1,3 +1,5 @@
+import { Readable } from 'stream';
+
 import { isTruthy } from '@clerk/shared/underscore';
 import type { Request as ExpressRequest } from 'express';
 
@@ -49,5 +51,32 @@ export const incomingMessageToRequest = (req: ExpressRequest): Request => {
   return new Request(dummyOriginReqUrl, {
     method: req.method,
     headers: new Headers(headers),
+  });
+};
+
+/**
+ * Converts an Express request to a Fetch API Request with body streaming support.
+ * This is used for proxying requests where the body needs to be forwarded.
+ */
+export const requestToProxyRequest = (req: ExpressRequest): Request => {
+  const headers = new Headers();
+  Object.entries(req.headers).forEach(([key, value]) => {
+    if (value) {
+      headers.set(key, Array.isArray(value) ? value.join(', ') : value);
+    }
+  });
+
+  const protocol = req.protocol || (req.secure ? 'https' : 'http');
+  const host = req.get('host') || 'localhost';
+  const url = new URL(req.originalUrl || req.url, `${protocol}://${host}`);
+
+  const hasBody = ['POST', 'PUT', 'PATCH'].includes(req.method);
+
+  return new Request(url.toString(), {
+    method: req.method,
+    headers,
+    body: hasBody ? (Readable.toWeb(req) as ReadableStream) : undefined,
+    // @ts-expect-error - duplex required for streaming bodies but not in all TS definitions
+    duplex: hasBody ? 'half' : undefined,
   });
 };
