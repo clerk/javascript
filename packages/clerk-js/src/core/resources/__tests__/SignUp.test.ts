@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../events';
+import { signUpErrorSignal, signUpResourceSignal } from '../../signals';
 import { BaseResource } from '../internal';
 import { SignUp } from '../SignUp';
 
@@ -707,33 +708,14 @@ describe('SignUp', () => {
       afterEach(() => {
         vi.clearAllMocks();
         vi.restoreAllMocks();
-      });
-
-      it('creates a new signup by POSTing to /client/sign_ups with empty body', async () => {
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signup_new', status: 'missing_requirements' },
-        });
-        BaseResource._fetch = mockFetch;
-
-        const signUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
-        await signUp.__internal_future.reset();
-
-        expect(mockFetch).toHaveBeenCalledWith(
-          expect.objectContaining({
-            method: 'POST',
-            path: '/client/sign_ups',
-            body: {},
-          }),
-        );
+        // Reset signals to initial state
+        signUpResourceSignal({ resource: null });
+        signUpErrorSignal({ error: null });
       });
 
       it('does NOT emit resource:fetch with status fetching', async () => {
         const emitSpy = vi.spyOn(eventBus, 'emit');
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signup_new', status: 'missing_requirements' },
-        });
+        const mockFetch = vi.fn();
         BaseResource._fetch = mockFetch;
 
         const signUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
@@ -744,69 +726,30 @@ describe('SignUp', () => {
           call => call[0] === 'resource:fetch' && call[1]?.status === 'fetching',
         );
         expect(fetchingCalls).toHaveLength(0);
+        // Verify no API calls were made
+        expect(mockFetch).not.toHaveBeenCalled();
       });
 
-      it('clears any previous errors by emitting resource:error with null', async () => {
-        const emitSpy = vi.spyOn(eventBus, 'emit');
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signup_new', status: 'missing_requirements' },
-        });
-        BaseResource._fetch = mockFetch;
+      it('clears any previous errors by updating signUpErrorSignal', async () => {
+        // Set an initial error
+        signUpErrorSignal({ error: new Error('Previous error') });
+        expect(signUpErrorSignal().error).toBeTruthy();
 
         const signUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
         await signUp.__internal_future.reset();
 
-        // Verify that resource:error was called to clear previous errors
-        expect(emitSpy).toHaveBeenCalledWith('resource:error', {
-          resource: signUp,
-          error: null,
-        });
+        // Verify that error signal was cleared
+        expect(signUpErrorSignal().error).toBeNull();
       });
 
       it('returns error: null on success', async () => {
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signup_new', status: 'missing_requirements' },
-        });
-        BaseResource._fetch = mockFetch;
-
         const signUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
         const result = await signUp.__internal_future.reset();
 
         expect(result).toHaveProperty('error', null);
       });
 
-      it('returns error and emits resource:error on failure', async () => {
-        const emitSpy = vi.spyOn(eventBus, 'emit');
-        const mockError = new Error('API error');
-        const mockFetch = vi.fn().mockRejectedValue(mockError);
-        BaseResource._fetch = mockFetch;
-
-        const signUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
-        const result = await signUp.__internal_future.reset();
-
-        expect(result.error).toBe(mockError);
-        expect(emitSpy).toHaveBeenCalledWith('resource:error', {
-          resource: signUp,
-          error: mockError,
-        });
-      });
-
-      it('resets an existing signup with data to a fresh state', async () => {
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: {
-            id: 'signup_new',
-            status: 'missing_requirements',
-            email_address: null,
-            phone_number: null,
-            first_name: null,
-            last_name: null,
-          },
-        });
-        BaseResource._fetch = mockFetch;
-
+      it('resets an existing signup with data to a fresh null state', async () => {
         const signUp = new SignUp({
           id: 'signup_123',
           status: 'missing_requirements',
@@ -815,15 +758,21 @@ describe('SignUp', () => {
         } as any);
 
         // Verify initial state
+        expect(signUp.id).toBe('signup_123');
         expect(signUp.emailAddress).toBe('user@example.com');
         expect(signUp.firstName).toBe('John');
 
         await signUp.__internal_future.reset();
 
-        // After reset, the signup should have new values from the response
-        expect(signUp.id).toBe('signup_new');
-        expect(signUp.emailAddress).toBeNull();
-        expect(signUp.firstName).toBeNull();
+        // Verify that signUpResourceSignal was updated with a new SignUp(null) instance
+        const updatedSignUp = signUpResourceSignal().resource;
+        expect(updatedSignUp).toBeInstanceOf(SignUp);
+        expect(updatedSignUp?.id).toBeUndefined();
+        expect(updatedSignUp?.status).toBeNull();
+        expect(updatedSignUp?.emailAddress).toBeNull();
+        expect(updatedSignUp?.firstName).toBeNull();
+        expect(updatedSignUp?.lastName).toBeNull();
+        expect(updatedSignUp?.phoneNumber).toBeNull();
       });
     });
   });

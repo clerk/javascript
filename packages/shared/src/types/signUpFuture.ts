@@ -465,11 +465,12 @@ export interface SignUpFutureResource {
   finalize: (params?: SignUpFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Resets the current sign-up attempt by creating a new empty sign-up. This is useful when you want to allow users
-   * to go back to the beginning of the sign-up flow (e.g., to change their email address during verification).
+   * Resets the current sign-up attempt by clearing all local state back to null.
+   * This is useful when you want to allow users to go back to the beginning of
+   * the sign-up flow (e.g., to change their email address during verification).
    *
-   * Unlike other methods, `reset()` does not trigger the `fetchStatus` to change to `'fetching'`, allowing for
-   * smooth UI transitions without loading states.
+   * Unlike other methods, `reset()` does not trigger the `fetchStatus` to change
+   * to `'fetching'` and does not make any API calls - it only clears local state.
    */
   reset: () => Promise<{ error: ClerkError | null }>;
 }
