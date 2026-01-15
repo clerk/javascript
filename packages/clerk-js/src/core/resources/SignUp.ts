@@ -62,7 +62,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
-import { signUpResourceSignal, signUpErrorSignal } from '../signals';
+import { signUpErrorSignal, signUpResourceSignal } from '../signals';
 import { BaseResource, SignUpVerifications } from './internal';
 
 declare global {
@@ -982,7 +982,7 @@ class SignUpFuture implements SignUpFutureResource {
    * Unlike other methods, this does NOT emit resource:fetch with 'fetching' status,
    * allowing for smooth UI transitions without loading states.
    */
-  async reset(): Promise<{ error: ClerkError | null }> {
+  reset(): Promise<{ error: ClerkError | null }> {
     // Clear errors
     signUpErrorSignal({ error: null });
 
@@ -990,7 +990,7 @@ class SignUpFuture implements SignUpFutureResource {
     const freshSignUp = new SignUp(null);
     signUpResourceSignal({ resource: freshSignUp });
 
-    return { error: null };
+    return Promise.resolve({ error: null });
   }
 }
 
