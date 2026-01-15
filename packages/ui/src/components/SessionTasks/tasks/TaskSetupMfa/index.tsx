@@ -4,8 +4,8 @@ import { useEffect, useMemo } from 'react';
 import { useSessionTasksContext } from '@/contexts/components/SessionTasks';
 import { useEnvironment, withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { withCardStateProvider } from '@/ui/elements/contexts';
+import { getSecondFactorsAvailableToAdd } from '@/ui/utils/mfa';
 
-import { getSecondFactorsAvailableToAdd } from '../../../UserProfile/utils';
 import { MfaMethodSelectionScreen } from './MfaMethodSelectionScreen';
 
 const TaskSetupMfaInternal = () => {
