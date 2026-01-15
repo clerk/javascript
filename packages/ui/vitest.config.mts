@@ -50,12 +50,16 @@ export default defineConfig({
     alias: [
       // UI package paths (local to this package)
       { find: /^@\/ui\//, replacement: `${uiPath}/` },
+      { find: /^@\/ui$/, replacement: `${uiPath}` },
       // Test utilities from clerk-js
       { find: /^@\/test\//, replacement: `${clerkJsPath}/test/` },
+      { find: /^@\/test$/, replacement: `${clerkJsPath}/test` },
       // Core modules from clerk-js
       { find: /^@\/core\//, replacement: `${clerkJsPath}/core/` },
+      { find: /^@\/core$/, replacement: `${clerkJsPath}/core` },
       // Utils from clerk-js (for debug, etc. that clerk-js core depends on)
       { find: /^@\/utils\//, replacement: `${clerkJsPath}/utils/` },
+      { find: /^@\/utils$/, replacement: `${clerkJsPath}/utils` },
       // Catch-all for other @/ imports - UI package
       { find: /^@\//, replacement: `${uiPath}/` },
     ],
