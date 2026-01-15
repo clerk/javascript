@@ -377,6 +377,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
         const issuedAt = claims.iat;
         const expiresIn: Seconds = expiresAt - issuedAt;
 
+        value.createdAt = issuedAt;
         value.expiresIn = expiresIn;
 
         const timeoutId = setTimeout(deleteKey, expiresIn * 1000);
