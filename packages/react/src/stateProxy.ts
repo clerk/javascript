@@ -257,9 +257,6 @@ export class StateProxy implements State {
         get isTransferable() {
           return gateProperty(target, 'isTransferable', false);
         },
-        get existingSession() {
-          return gateProperty(target, 'existingSession', undefined);
-        },
         get hasBeenFinalized() {
           return gateProperty(target, 'hasBeenFinalized', false);
         },
