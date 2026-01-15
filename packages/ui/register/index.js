@@ -19,7 +19,22 @@ const jsxRuntime = require('react/jsx-runtime');
 
 // Only register if not already registered to avoid overwriting with potentially
 // different React versions in complex module resolution scenarios.
-if (!globalThis.__clerkSharedModules) {
+if (globalThis.__clerkSharedModules) {
+  // Warn if the already-registered React version differs from this import.
+  // This could indicate multiple React versions in the bundle, which may cause issues.
+  const existingVersion = globalThis.__clerkSharedModules.react?.version;
+  if (existingVersion && existingVersion !== react.version) {
+    console.warn(
+      '[@clerk/ui/register] React version mismatch detected. ' +
+        'Already registered: ' +
+        existingVersion +
+        ', current import: ' +
+        react.version +
+        '. ' +
+        'This may cause issues with the shared @clerk/ui variant.',
+    );
+  }
+} else {
   globalThis.__clerkSharedModules = {
     react,
     'react-dom': reactDom,

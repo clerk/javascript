@@ -11,49 +11,9 @@ import React from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
+import { IS_REACT_SHARED_VARIANT_COMPATIBLE } from '../utils/versionCheck';
 import { AuthContext } from './AuthContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
-
-// Version bounds format: [major, minMinor, maxMinor, minPatch]
-// - maxMinor === -1 means "any minor" (caret range, e.g., ^18.0.0)
-// - maxMinor === minMinor means "same minor only" (tilde range, e.g., ~19.0.3)
-declare const __CLERK_UI_SUPPORTED_REACT_BOUNDS__: Array<
-  [major: number, minMinor: number, maxMinor: number, minPatch: number]
->;
-
-/**
- * Checks if the host application's React version is compatible with @clerk/ui's shared variant.
- * The shared variant expects React to be provided via globalThis.__clerkSharedModules,
- * so we need to ensure the host's React version matches what @clerk/ui was built against.
- */
-function isReactVersionCompatibleWithSharedVariant(): boolean {
-  try {
-    // Parse version string (e.g., "18.3.1" or "19.0.0-rc.1")
-    const match = React.version.match(/^(\d+)\.(\d+)\.(\d+)/);
-    if (!match) return false;
-
-    const [, majorStr, minorStr, patchStr] = match;
-    const major = parseInt(majorStr, 10);
-    const minor = parseInt(minorStr, 10);
-    const patch = parseInt(patchStr, 10);
-
-    // Check against pre-computed bounds
-    return __CLERK_UI_SUPPORTED_REACT_BOUNDS__.some(([bMajor, minMinor, maxMinor, minPatch]) => {
-      if (major !== bMajor) return false;
-
-      if (maxMinor === -1) {
-        // Caret range: any minor >= minMinor, with patch check for minMinor
-        return minor > minMinor || (minor === minMinor && patch >= minPatch);
-      } else {
-        // Tilde range: specific minor only
-        return minor === maxMinor && patch >= minPatch;
-      }
-    });
-  } catch {
-    // If we can't determine compatibility, fall back to non-shared variant
-    return false;
-  }
-}
 
 type ClerkContextProvider = {
   isomorphicClerkOptions: IsomorphicClerkOptions;
@@ -152,22 +112,21 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
   );
 }
 
+// Default clerkUiVariant based on React version compatibility.
+// Computed once at module level for optimal performance.
+const DEFAULT_CLERK_UI_VARIANT = IS_REACT_SHARED_VARIANT_COMPATIBLE ? ('shared' as const) : ('' as const);
+
 const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
-  // Default to 'shared' variant for @clerk/ui if the host's React version is compatible.
-  // The shared variant expects React to be provided via globalThis.__clerkSharedModules
-  // (set up by @clerk/ui/register import), which reduces bundle size.
-  const defaultClerkUiVariant = React.useMemo(
-    () => (isReactVersionCompatibleWithSharedVariant() ? ('shared' as const) : ('' as const)),
-    [],
-  );
   // Merge default clerkUiVariant with user options.
   // User-provided options spread last to allow explicit overrides.
+  // The shared variant expects React to be provided via globalThis.__clerkSharedModules
+  // (set up by @clerk/ui/register import), which reduces bundle size.
   const optionsWithDefaults = React.useMemo(
     () => ({
-      clerkUiVariant: defaultClerkUiVariant,
+      clerkUiVariant: DEFAULT_CLERK_UI_VARIANT,
       ...options,
     }),
-    [defaultClerkUiVariant, options],
+    [options],
   );
   const isomorphicClerkRef = React.useRef(IsomorphicClerk.getOrCreateInstance(optionsWithDefaults));
   const [clerkStatus, setClerkStatus] = React.useState(isomorphicClerkRef.current.status);

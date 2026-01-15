@@ -15,15 +15,28 @@ type VersionBounds = [major: number, minMinor: number, maxMinor: number, minPatc
 
 // Read supported React range from pnpm-workspace.yaml catalogs and parse into bounds
 function getClerkUiSupportedReactBounds(): VersionBounds[] {
-  let rangeStr = '^18.0.0 || ^19.0.0';
+  const fallbackRange = '^18.0.0 || ^19.0.0';
+  let rangeStr = fallbackRange;
+  let usedFallback = false;
 
   try {
     const workspaceYamlPath = resolve(__dirname, '../../pnpm-workspace.yaml');
     const workspaceYaml = readFileSync(workspaceYamlPath, 'utf-8');
     const workspace = parseYaml(workspaceYaml);
-    rangeStr = workspace?.catalogs?.['peer-react']?.react || rangeStr;
+    const catalogRange = workspace?.catalogs?.['peer-react']?.react;
+    if (catalogRange) {
+      rangeStr = catalogRange;
+    } else {
+      usedFallback = true;
+    }
   } catch {
-    // Use fallback range
+    usedFallback = true;
+  }
+
+  if (usedFallback) {
+    console.warn(
+      `[@clerk/react] Could not read React peer dependency range from pnpm-workspace.yaml, using fallback: ${fallbackRange}`,
+    );
   }
 
   // Parse the range string into bounds
