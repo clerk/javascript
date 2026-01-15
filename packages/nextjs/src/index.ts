@@ -57,6 +57,7 @@ export {
   useSessionList,
   useSignIn,
   useSignUp,
+  useWaitlist,
   useUser,
 } from './client-boundary/hooks';
 
