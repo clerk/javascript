@@ -55,6 +55,7 @@ import {
   UserOrganizationInvitation,
   Web3Wallet,
 } from './internal';
+import { OrganizationCreationDefaults } from './OrganizationCreationDefaults';
 
 export class User extends BaseResource implements UserResource {
   pathRoot = '/me';
