@@ -21,6 +21,9 @@ const TaskSetupMfaInternal = () => {
     [attributes, user],
   );
 
+  // Making sure we don't auto navigate away from the setup MFA task even if the current task is not `setup-mfa`.
+  // This is to prevent the user from being redirected to the home page after setting up MFA
+  // as if backup codes are enabled, the user will be redirected without seeing the backup codes
   useEffect(() => {
     const currentTask = session?.currentTask;
     if (currentTask && currentTask.key === 'setup-mfa') {
@@ -28,7 +31,6 @@ const TaskSetupMfaInternal = () => {
     }
   }, [session?.currentTask, ctx.shouldAutoNavigateAway]);
 
-  // Show method selection screen
   return <MfaMethodSelectionScreen availableMethods={secondFactorsAvailableToAdd} />;
 };
 

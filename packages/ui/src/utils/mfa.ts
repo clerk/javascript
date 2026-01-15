@@ -1,9 +1,9 @@
-import type { Attributes, PhoneNumberResource, UserResource } from '@clerk/shared/types';
+import type { Attributes, PhoneNumberResource, UserResource, VerificationStrategy } from '@clerk/shared/types';
 
 export const defaultFirst = (a: PhoneNumberResource) => (a.defaultSecondFactor ? -1 : 1);
 
-export function getSecondFactors(attributes: Partial<Attributes>): string[] {
-  const secondFactors: string[] = [];
+export function getSecondFactors(attributes: Partial<Attributes>): VerificationStrategy[] {
+  const secondFactors: VerificationStrategy[] = [];
 
   Object.entries(attributes).forEach(([, attr]) => {
     if (attr.used_for_second_factor) {
@@ -14,7 +14,10 @@ export function getSecondFactors(attributes: Partial<Attributes>): string[] {
   return secondFactors;
 }
 
-export function getSecondFactorsAvailableToAdd(attributes: Partial<Attributes>, user: UserResource): string[] {
+export function getSecondFactorsAvailableToAdd(
+  attributes: Partial<Attributes>,
+  user: UserResource,
+): VerificationStrategy[] {
   let sfs = getSecondFactors(attributes);
 
   if (user.totpEnabled) {
