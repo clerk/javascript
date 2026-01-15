@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { ErrorThrowerOptions } from '../error';
-import { buildErrorThrower, ClerkRuntimeError, isClerkRuntimeError } from '../error';
+import { buildErrorThrower, ClerkOfflineError, ClerkRuntimeError, isClerkRuntimeError } from '../error';
 
 describe('ErrorThrower', () => {
   const errorThrower = buildErrorThrower({ packageName: '@clerk/test-package' });
@@ -60,5 +60,59 @@ describe('ClerkRuntimeError', () => {
 
   it('helper recognises error', () => {
     expect(isClerkRuntimeError(clerkRuntimeError)).toEqual(true);
+  });
+});
+
+describe('ClerkOfflineError', () => {
+  it('has the correct error code constant', () => {
+    expect(ClerkOfflineError.ERROR_CODE).toEqual('clerk_offline');
+  });
+
+  it('can be instantiated with message', () => {
+    const offlineError = new ClerkOfflineError('Network request failed while offline');
+    expect(offlineError.message).toContain('Network request failed while offline');
+    expect(offlineError.message).toContain('clerk_offline');
+    expect(offlineError.code).toBe('clerk_offline');
+  });
+
+  it('identifies ClerkOfflineError instances', () => {
+    const offlineError = new ClerkOfflineError('Network request failed while offline');
+    expect(ClerkOfflineError.is(offlineError)).toBe(true);
+  });
+
+  it('does not identify ClerkRuntimeError with different code', () => {
+    const otherError = new ClerkRuntimeError('Some other error', {
+      code: 'other_error',
+    });
+    expect(ClerkOfflineError.is(otherError)).toBe(false);
+  });
+
+  it('does not identify non-ClerkOfflineError', () => {
+    expect(ClerkOfflineError.is(new Error('regular error'))).toBe(false);
+    expect(ClerkOfflineError.is({ code: 'clerk_offline' })).toBe(false);
+    expect(ClerkOfflineError.is(null)).toBe(false);
+    expect(ClerkOfflineError.is(undefined)).toBe(false);
+  });
+
+  it('supports non-sensitive context properties', () => {
+    const offlineError = new ClerkOfflineError('Network request failed while offline', {
+      hasCachedToken: true,
+      tokenId: 'sess_123',
+    });
+
+    expect(ClerkOfflineError.is(offlineError)).toBe(true);
+    expect(offlineError.hasCachedToken).toBe(true);
+    expect(offlineError.tokenId).toBe('sess_123');
+    expect(offlineError.code).toEqual('clerk_offline');
+  });
+
+  it('preserves cause from original error', () => {
+    const originalError = new Error('Original network error');
+    const offlineError = new ClerkOfflineError('Network request failed while offline', {
+      cause: originalError,
+    });
+
+    expect(ClerkOfflineError.is(offlineError)).toBe(true);
+    expect(offlineError.cause).toBe(originalError);
   });
 });

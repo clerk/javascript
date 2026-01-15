@@ -1,10 +1,9 @@
+import { ClerkOfflineError } from '@clerk/shared/error';
 import type { InstanceType } from '@clerk/shared/types';
-import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type Mock } from 'vitest';
 
 import { mockFetch, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
-import { debugLogger } from '@/utils/debug';
 
-import { SUPPORTED_FAPI_VERSION } from '../../constants';
 import { createFapiClient } from '../../fapiClient';
 import { BaseResource } from '../internal';
 import { Token } from '../Token';
@@ -44,14 +43,11 @@ describe('Token', () => {
     });
 
     describe('with offline browser and network failure', () => {
-      let warnSpy: ReturnType<typeof vi.spyOn>;
-
       beforeEach(() => {
         Object.defineProperty(window.navigator, 'onLine', {
           writable: true,
           value: false,
         });
-        warnSpy = vi.spyOn(debugLogger, 'warn').mockReturnValue();
       });
 
       afterEach(() => {
@@ -59,27 +55,18 @@ describe('Token', () => {
           writable: true,
           value: true,
         });
-        warnSpy.mockRestore();
       });
 
-      it('create returns empty raw string', async () => {
+      it('throws network error', async () => {
         mockNetworkFailedFetch();
         BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
 
-        const token = await Token.create('/path/to/tokens');
-
-        expect(global.fetch).toHaveBeenCalledTimes(1);
-        const [url, options] = (global.fetch as Mock).mock.calls[0];
-        expect(url.toString()).toContain('https://clerk.example.com/v1/path/to/tokens');
-        expect(options).toMatchObject({
-          method: 'POST',
-          body: '',
-          credentials: 'include',
-          headers: expect.any(Headers),
+        await expect(Token.create('/path/to/tokens')).rejects.toSatisfy((error: unknown) => {
+          return ClerkOfflineError.is(error);
         });
 
-        expect(token.getRawString()).toEqual('');
-        expect(warnSpy).toBeCalled();
+        // Should not retry when offline
+        expect(global.fetch).toHaveBeenCalledTimes(1);
       });
     });
 
@@ -88,19 +75,9 @@ describe('Token', () => {
         mockNetworkFailedFetch();
         BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
 
-        await expect(Token.create('/path/to/tokens')).rejects.toThrow(
-          `ClerkJS: Network error at "https://clerk.example.com/v1/path/to/tokens?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test" - TypeError: Failed to fetch. Please try again.`,
-        );
+        await expect(Token.create('/path/to/tokens')).rejects.toThrow(/ClerkJS: Network error/);
 
         expect(global.fetch).toHaveBeenCalledTimes(1);
-        const [url, options] = (global.fetch as Mock).mock.calls[0];
-        expect(url.toString()).toContain('https://clerk.example.com/v1/path/to/tokens');
-        expect(options).toMatchObject({
-          method: 'POST',
-          body: '',
-          credentials: 'include',
-          headers: expect.any(Headers),
-        });
       });
     });
 

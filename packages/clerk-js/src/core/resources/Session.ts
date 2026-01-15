@@ -1,5 +1,12 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { ClerkWebAuthnError, is4xxError, MissingExpiredTokenError } from '@clerk/shared/error';
+import { isValidBrowserOnline } from '@clerk/shared/browser';
+import {
+  ClerkOfflineError,
+  ClerkWebAuthnError,
+  is4xxError,
+  isNetworkError,
+  MissingExpiredTokenError,
+} from '@clerk/shared/error';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -111,6 +118,14 @@ export class Session extends BaseResource implements SessionResource {
       maxDelayBetweenRetries: 50 * 1_000,
       jitter: false,
       shouldRetry: (error, iterationsCount) => {
+        // Don't retry offline errors - fapiClient already retried with a short window.
+        // Let the error propagate so the user can handle the offline state.
+        // Use code check for robustness across module boundaries.
+        const isOffline =
+          ClerkOfflineError.is(error) || (error as { code?: string })?.code === ClerkOfflineError.ERROR_CODE;
+        if (isOffline) {
+          return false;
+        }
         return !is4xxError(error) && iterationsCount <= 8;
       },
     });
@@ -401,9 +416,37 @@ export class Session extends BaseResource implements SessionResource {
 
     const lastActiveToken = this.lastActiveToken?.getRawString();
 
-    const tokenResolver = Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+    const tokenResolver = retry(() => Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined), {
+      retryImmediately: true,
+      initialDelay: 500,
+      maxDelayBetweenRetries: 2_000,
+      factor: 2,
+      jitter: false,
+      shouldRetry: (error, iterations) => {
+        return (ClerkOfflineError.is(error) || isNetworkError(error)) && iterations < 5;
+      },
+    }).catch(e => {
       if (MissingExpiredTokenError.is(e) && lastActiveToken) {
         return Token.create(path, { ...params }, { expired_token: lastActiveToken });
+      }
+      // Detect offline/network errors and throw ClerkOfflineError
+      // Check both current online status AND if error is a network error.
+      // This handles the race condition where browser goes offline, request fails,
+      // then browser comes back online before we reach this catch block.
+      const networkError = isNetworkError(e);
+      const browserOnline = isValidBrowserOnline();
+
+      if (networkError || !browserOnline) {
+        const resolvedToken = SessionTokenCache.getResolvedToken({ tokenId });
+        const hasCachedTokenForId = !!resolvedToken?.getRawString();
+
+        const offlineError = new ClerkOfflineError('Network request failed while offline', {
+          cause: e instanceof Error ? e : undefined,
+        });
+        // Attach safe, non-sensitive context for consumers without leaking raw tokens.
+        (offlineError as any).hasCachedToken = hasCachedTokenForId;
+        (offlineError as any).tokenId = tokenId;
+        throw offlineError;
       }
       throw e;
     });
