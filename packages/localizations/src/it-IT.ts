@@ -894,6 +894,10 @@ export const itIT: LocalizationResource = {
       actionLink: 'Esci',
       actionText: 'Accesso effettuato come {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        "Un'organizzazione esiste già per il nome dell'azienda rilevato ({{organizationName}}) e {{organizationDomain}}. Unisciti tramite invito.",
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

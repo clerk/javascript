@@ -1,8 +1,8 @@
 {
   "files": [
     { "path": "./dist/clerk.js", "maxSize": "538KB" },
-    { "path": "./dist/clerk.browser.js", "maxSize": "63.5KB" },
-    { "path": "./dist/clerk.chips.browser.js", "maxSize": "63.5KB" },
+    { "path": "./dist/clerk.browser.js", "maxSize": "66KB" },
+    { "path": "./dist/clerk.chips.browser.js", "maxSize": "66KB" },
     { "path": "./dist/clerk.legacy.browser.js", "maxSize": "105KB" },
     { "path": "./dist/clerk.no-rhc.js", "maxSize": "305KB" },
     { "path": "./dist/clerk.headless*.js", "maxSize": "65KB" },

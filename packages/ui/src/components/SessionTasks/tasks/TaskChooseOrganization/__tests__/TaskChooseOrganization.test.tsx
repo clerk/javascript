@@ -9,7 +9,6 @@ import {
 } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
 
 import { TaskChooseOrganization } from '..';
-import { findByText } from '@testing-library/react';
 
 const { createFixtures } = bindCreateFixtures('TaskChooseOrganization');
 
@@ -351,6 +350,86 @@ describe('TaskChooseOrganization', () => {
       expect(await findByText('Join an existing organization')).toBeInTheDocument();
       expect(await queryByText('Create new organization')).not.toBeInTheDocument();
       expect(await findByText('Existing Org')).toBeInTheDocument();
+    });
+  });
+
+  describe('with organization creation defaults', () => {
+    describe('when enabled on environment', () => {
+      it('displays warning when organization already exists for user email domain', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withOrganizations();
+          f.withForceOrganizationSelection();
+          f.withOrganizationCreationDefaults(true);
+          f.withUser({
+            email_addresses: ['test@clerk.com'],
+            create_organization_enabled: true,
+            tasks: [{ key: 'choose-organization' }],
+          });
+        });
+
+        fixtures.clerk.user?.getOrganizationCreationDefaults.mockReturnValueOnce(
+          Promise.resolve({
+            advisory: {
+              code: 'organization_already_exists',
+              severity: 'warning',
+              meta: { organizationDomain: 'test@clerk.com', organizationName: 'Clerk' },
+            },
+          }),
+        );
+
+        const { findByText } = render(<TaskChooseOrganization />, { wrapper });
+
+        expect(
+          await findByText(/an organization already exists for the detected company name (Clerk) and test@clerk\.com/i),
+        ).toBeInTheDocument();
+      });
+
+      it('prefills create organization form with defaults', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withOrganizations();
+          f.withForceOrganizationSelection();
+          f.withOrganizationCreationDefaults(true);
+          f.withUser({
+            email_addresses: ['test@clerk.com'],
+            create_organization_enabled: true,
+            tasks: [{ key: 'choose-organization' }],
+          });
+        });
+
+        fixtures.clerk.user?.getOrganizationCreationDefaults.mockReturnValueOnce(
+          Promise.resolve({
+            form: {
+              name: 'Test Org',
+              slug: 'test-org',
+              logo: null,
+            },
+          }),
+        );
+
+        const { findByText } = render(<TaskChooseOrganization />, { wrapper });
+
+        expect(await findByText('Test Org')).toBeInTheDocument();
+        expect(await findByText('test-org')).toBeInTheDocument();
+      });
+    });
+
+    describe('when disabled on environment', () => {
+      it('does not fetch for creation defaults', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withOrganizations();
+          f.withForceOrganizationSelection();
+          f.withOrganizationCreationDefaults(false);
+          f.withUser({
+            email_addresses: ['test@clerk.com'],
+            create_organization_enabled: true,
+            tasks: [{ key: 'choose-organization' }],
+          });
+        });
+
+        render(<TaskChooseOrganization />, { wrapper });
+
+        expect(fixtures.clerk.user?.getOrganizationCreationDefaults).not.toHaveBeenCalled();
+      });
     });
   });
 });
