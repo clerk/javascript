@@ -864,6 +864,7 @@ export const thTH: LocalizationResource = {
       action__invitationAccept: 'เข้าร่วม',
       action__suggestionsAccept: 'ขอเข้าร่วม',
       subtitle: 'เข้าร่วมองค์กรที่มีอยู่หรือสร้างใหม่',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'รออนุมัติ',
       title: 'เลือกองค์กร',
     },
@@ -884,6 +885,10 @@ export const thTH: LocalizationResource = {
     signOut: {
       actionLink: 'ออกจากระบบ',
       actionText: 'เข้าสู่ระบบในนาม {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'องค์กรสำหรับชื่อบริษัทที่ตรวจพบ ({{organizationName}}) และ {{organizationDomain}} มีอยู่แล้ว เข้าร่วมโดยการเชิญ',
     },
   },
   taskResetPassword: {

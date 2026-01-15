@@ -862,6 +862,7 @@ export const nbNO: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -882,6 +883,10 @@ export const nbNO: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'En organisasjon eksisterer allerede for det oppdagede firmanavnet ({{organizationName}}) og {{organizationDomain}}. Bli med via invitasjon.',
     },
   },
   taskResetPassword: {

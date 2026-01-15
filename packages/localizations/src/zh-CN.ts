@@ -850,6 +850,7 @@ export const zhCN: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -870,6 +871,10 @@ export const zhCN: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        '检测到的公司名称 ({{organizationName}}) 和 {{organizationDomain}} 已存在一个组织。请通过邀请加入。',
     },
   },
   taskResetPassword: {

@@ -871,6 +871,7 @@ export const viVN: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -891,6 +892,10 @@ export const viVN: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Một tổ chức đã tồn tại cho tên công ty được phát hiện ({{organizationName}}) và {{organizationDomain}}. Tham gia bằng lời mời.',
     },
   },
   taskResetPassword: {

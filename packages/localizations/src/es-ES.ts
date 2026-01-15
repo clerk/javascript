@@ -865,6 +865,7 @@ export const esES: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -885,6 +886,10 @@ export const esES: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Ya existe una organización para el nombre de empresa detectado ({{organizationName}}) y {{organizationDomain}}. Únete por invitación.',
     },
   },
   taskResetPassword: {

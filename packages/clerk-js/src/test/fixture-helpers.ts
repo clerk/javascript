@@ -346,6 +346,9 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
   const withOrganizationSlug = (enabled = false) => {
     os.slug.disabled = !enabled;
   };
+  const withOrganizationCreationDefaults = (enabled = false) => {
+    os.organization_creation_defaults.enabled = enabled;
+  };
 
   const withOrganizationDomains = (modes?: OrganizationEnrollmentMode[], defaultRole?: string) => {
     os.domains.enabled = true;
@@ -358,6 +361,7 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
     withOrganizationDomains,
     withForceOrganizationSelection,
     withOrganizationSlug,
+    withOrganizationCreationDefaults,
   };
 };
 

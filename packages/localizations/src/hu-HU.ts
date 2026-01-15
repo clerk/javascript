@@ -862,6 +862,7 @@ export const huHU: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -882,6 +883,10 @@ export const huHU: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Már létezik szervezet az észlelt cégnévhez ({{organizationName}}) és {{organizationDomain}}. Csatlakozz meghívással.',
     },
   },
   taskResetPassword: {

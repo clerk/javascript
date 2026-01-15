@@ -856,6 +856,7 @@ export const koKR: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -876,6 +877,10 @@ export const koKR: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        '감지된 회사 이름 ({{organizationName}}) 및 {{organizationDomain}}에 대한 조직이 이미 존재합니다. 초대를 통해 가입하세요.',
     },
   },
   taskResetPassword: {

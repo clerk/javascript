@@ -871,6 +871,7 @@ export const teIN: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -891,6 +892,10 @@ export const teIN: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'గుర్తించిన కంపెనీ పేరు ({{organizationName}}) మరియు {{organizationDomain}} కోసం ఒక సంస్థ ఇప్పటికే ఉంది. ఆహ్వానం ద్వారా చేరండి.',
     },
   },
   taskResetPassword: {

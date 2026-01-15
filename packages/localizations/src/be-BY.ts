@@ -868,6 +868,7 @@ export const beBY: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -888,6 +889,10 @@ export const beBY: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Арганізацыя ўжо існуе для выяўленай назвы кампаніі ({{organizationName}}) і {{organizationDomain}}. Далучайцеся па запрашэнні.',
     },
   },
   taskResetPassword: {

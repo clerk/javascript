@@ -851,6 +851,7 @@ export const zhTW: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -871,6 +872,10 @@ export const zhTW: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        '偵測到的公司名稱 ({{organizationName}}) 和 {{organizationDomain}} 已存在一個組織。請透過邀請加入。',
     },
   },
   taskResetPassword: {

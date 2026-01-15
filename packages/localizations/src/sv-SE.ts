@@ -866,6 +866,7 @@ export const svSE: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -886,6 +887,10 @@ export const svSE: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'En organisation finns redan för det upptäckta företagsnamnet ({{organizationName}}) och {{organizationDomain}}. Gå med via inbjudan.',
     },
   },
   taskResetPassword: {

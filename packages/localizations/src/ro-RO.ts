@@ -877,6 +877,7 @@ export const roRO: LocalizationResource = {
       action__invitationAccept: 'Alătură-te',
       action__suggestionsAccept: 'Solicită alăturarea',
       subtitle: 'Alătură-te unei organizații existente sau creează una nouă',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'În așteptare',
       title: 'Alege o organizație',
     },
@@ -897,6 +898,10 @@ export const roRO: LocalizationResource = {
     signOut: {
       actionLink: 'Deconectează-te',
       actionText: 'Autentificat ca {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Există deja o organizație pentru numele companiei detectate ({{organizationName}}) și {{organizationDomain}}. Alătură-te prin invitație.',
     },
   },
   taskResetPassword: {

@@ -864,6 +864,7 @@ export const mnMN: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -884,6 +885,10 @@ export const mnMN: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Илрүүлсэн компанийн нэр ({{organizationName}}) болон {{organizationDomain}}-д байгууллага аль хэдийн байна. Урилгаар нэгдэнэ үү.',
     },
   },
   taskResetPassword: {

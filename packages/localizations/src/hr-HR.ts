@@ -865,6 +865,7 @@ export const hrHR: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -885,6 +886,10 @@ export const hrHR: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Organizacija već postoji za otkriveni naziv tvrtke ({{organizationName}}) i {{organizationDomain}}. Pridružite se putem pozivnice.',
     },
   },
   taskResetPassword: {

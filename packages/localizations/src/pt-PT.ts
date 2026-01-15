@@ -862,6 +862,7 @@ export const ptPT: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -882,6 +883,10 @@ export const ptPT: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Já existe uma organização para o nome da empresa detetado ({{organizationName}}) e {{organizationDomain}}. Adira por convite.',
     },
   },
   taskResetPassword: {

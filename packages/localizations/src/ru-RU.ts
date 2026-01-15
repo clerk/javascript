@@ -875,6 +875,7 @@ export const ruRU: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -895,6 +896,10 @@ export const ruRU: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Организация уже существует для обнаруженного названия компании ({{organizationName}}) и {{organizationDomain}}. Присоединяйтесь по приглашению.',
     },
   },
   taskResetPassword: {

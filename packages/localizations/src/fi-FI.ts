@@ -864,6 +864,7 @@ export const fiFI: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -884,6 +885,10 @@ export const fiFI: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Organisaatio on jo olemassa havaitulle yrityksen nimelle ({{organizationName}}) ja {{organizationDomain}}. Liity kutsulla.',
     },
   },
   taskResetPassword: {

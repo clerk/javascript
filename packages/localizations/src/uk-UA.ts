@@ -860,6 +860,7 @@ export const ukUA: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -880,6 +881,10 @@ export const ukUA: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Організація вже існує для виявленої назви компанії ({{organizationName}}) та {{organizationDomain}}. Приєднуйтесь за запрошенням.',
     },
   },
   taskResetPassword: {

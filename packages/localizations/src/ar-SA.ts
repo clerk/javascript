@@ -860,6 +860,7 @@ export const arSA: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -880,6 +881,10 @@ export const arSA: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'توجد منظمة بالفعل لاسم الشركة المكتشف ({{organizationName}}) و {{organizationDomain}}. انضم عن طريق الدعوة.',
     },
   },
   taskResetPassword: {

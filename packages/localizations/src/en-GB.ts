@@ -865,6 +865,7 @@ export const enGB: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -885,6 +886,10 @@ export const enGB: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'An organisation already exists for the detected company name ({{organizationName}}) and {{organizationDomain}}. Join by invitation.',
     },
   },
   taskResetPassword: {

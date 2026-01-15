@@ -879,6 +879,7 @@ export const deDE: LocalizationResource = {
       action__invitationAccept: 'Beitreten',
       action__suggestionsAccept: 'Beitritt beantragen',
       subtitle: 'Einer bestehenden Organisation beitreten oder eine neue erstellen',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: 'Genehmigung ausstehend',
       title: 'Organisation auswählen',
     },
@@ -899,6 +900,10 @@ export const deDE: LocalizationResource = {
     signOut: {
       actionLink: 'Abmelden',
       actionText: 'Angemeldet als {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Für den erkannten Firmennamen ({{organizationName}}) und {{organizationDomain}} existiert bereits eine Organisation. Treten Sie per Einladung bei.',
     },
   },
   taskResetPassword: {

@@ -875,6 +875,7 @@ export const jaJP: LocalizationResource = {
       action__invitationAccept: '参加する',
       action__suggestionsAccept: '参加をリクエストする',
       subtitle: '既存の組織に参加するか、新しい組織を作成します',
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: '承認待ち',
       title: '組織を選択',
     },
@@ -895,6 +896,10 @@ export const jaJP: LocalizationResource = {
     signOut: {
       actionLink: 'サインアウト',
       actionText: '{{identifier}} としてサインイン中',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        '検出された会社名 ({{organizationName}}) と {{organizationDomain}} の組織がすでに存在します。招待を通じて参加してください。',
     },
   },
   taskResetPassword: {

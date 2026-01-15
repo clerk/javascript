@@ -861,6 +861,7 @@ export const daDK: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -881,6 +882,10 @@ export const daDK: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Der findes allerede en organisation for det registrerede firmanavn ({{organizationName}}) og {{organizationDomain}}. Tilmeld dig via invitation.',
     },
   },
   taskResetPassword: {

@@ -864,6 +864,7 @@ export const nlNL: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -884,6 +885,10 @@ export const nlNL: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Er bestaat al een organisatie voor de gedetecteerde bedrijfsnaam ({{organizationName}}) en {{organizationDomain}}. Word lid via uitnodiging.',
     },
   },
   taskResetPassword: {

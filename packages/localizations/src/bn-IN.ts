@@ -868,6 +868,7 @@ export const bnIN: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -888,6 +889,10 @@ export const bnIN: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'শনাক্ত করা কোম্পানির নাম ({{organizationName}}) এবং {{organizationDomain}}-এর জন্য একটি সংস্থা ইতিমধ্যেই বিদ্যমান। আমন্ত্রণের মাধ্যমে যোগ দিন।',
     },
   },
   taskResetPassword: {

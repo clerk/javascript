@@ -863,6 +863,7 @@ export const caES: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -883,6 +884,10 @@ export const caES: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        "Ja existeix una organització per al nom d'empresa detectat ({{organizationName}}) i {{organizationDomain}}. Uneix-te per invitació.",
     },
   },
   taskResetPassword: {

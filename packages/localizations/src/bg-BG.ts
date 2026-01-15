@@ -864,6 +864,7 @@ export const bgBG: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -884,6 +885,10 @@ export const bgBG: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Организация вече съществува за откритото име на компанията ({{organizationName}}) и {{organizationDomain}}. Присъединете се чрез покана.',
     },
   },
   taskResetPassword: {

@@ -865,6 +865,7 @@ export const isIS: LocalizationResource = {
       action__invitationAccept: undefined,
       action__suggestionsAccept: undefined,
       subtitle: undefined,
+      subtitle__createOrganizationDisabled: undefined,
       suggestionsAcceptedLabel: undefined,
       title: undefined,
     },
@@ -885,6 +886,10 @@ export const isIS: LocalizationResource = {
     signOut: {
       actionLink: undefined,
       actionText: undefined,
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Fyrirtæki er þegar til fyrir uppgötvaða fyrirtækjanafnið ({{organizationName}}) og {{organizationDomain}}. Skráðu þig með boði.',
     },
   },
   taskResetPassword: {

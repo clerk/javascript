@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.29.2
+
+### Patch Changes
+
+- Fixed an issue when using multiple `acceptsToken` values in `authenticateRequest`. When `acceptsToken` is an array containing both session and machine token types (e.g., `['session_token', 'api_key']`), the function now correctly routes to the appropriate authentication handler based on the actual token type, instead of always treating them as machine tokens. ([#7556](https://github.com/clerk/javascript/pull/7556)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 2.29.1
 
 ### Patch Changes
