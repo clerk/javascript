@@ -83,7 +83,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports false-cjs",
+    "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports",
     "lint:publint": "publint || true",
     "postbuild:disabled": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs",
     "test:disabled": "vitest --watch=false",
