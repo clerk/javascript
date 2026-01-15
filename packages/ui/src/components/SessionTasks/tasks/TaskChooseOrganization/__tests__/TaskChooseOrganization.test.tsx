@@ -1,6 +1,7 @@
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
+import { clearFetchCache } from '@/hooks';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
 import {
@@ -13,6 +14,9 @@ import { TaskChooseOrganization } from '..';
 const { createFixtures } = bindCreateFixtures('TaskChooseOrganization');
 
 describe('TaskChooseOrganization', () => {
+  beforeEach(() => {
+    clearFetchCache();
+  });
   it('does not render component without existing session task', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
@@ -389,6 +393,7 @@ describe('TaskChooseOrganization', () => {
           f.withOrganizations();
           f.withForceOrganizationSelection();
           f.withOrganizationCreationDefaults(true);
+          f.withOrganizationSlug(true);
           f.withUser({
             email_addresses: ['test@clerk.com'],
             create_organization_enabled: true,
@@ -406,10 +411,10 @@ describe('TaskChooseOrganization', () => {
           }),
         );
 
-        const { findByText } = render(<TaskChooseOrganization />, { wrapper });
+        const { findByDisplayValue } = render(<TaskChooseOrganization />, { wrapper });
 
-        expect(await findByText('Test Org')).toBeInTheDocument();
-        expect(await findByText('test-org')).toBeInTheDocument();
+        expect(await findByDisplayValue('Test Org')).toBeInTheDocument();
+        expect(await findByDisplayValue('test-org')).toBeInTheDocument();
       });
     });
 
