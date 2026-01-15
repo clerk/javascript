@@ -384,10 +384,11 @@ export class Session extends BaseResource implements SessionResource {
       // Trigger background refresh if token is expiring soon
       // This guarantees cache revalidation without relying solely on the poller
       if (cacheResult.needsRefresh) {
+        debugLogger.debug('SWR: triggering background refresh', { backgroundRefreshThreshold, tokenId }, 'session');
         this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate);
       }
 
-      debugLogger.debug('Using cached token', { tokenId, needsRefresh: cacheResult.needsRefresh }, 'session');
+      debugLogger.debug('Using cached token', { backgroundRefreshThreshold, needsRefresh: cacheResult.needsRefresh, tokenId }, 'session');
 
       // Prefer synchronous read to avoid microtask overhead when token is already resolved
       const cachedToken = cacheResult.entry.resolvedToken ?? (await cacheResult.entry.tokenResolver);
