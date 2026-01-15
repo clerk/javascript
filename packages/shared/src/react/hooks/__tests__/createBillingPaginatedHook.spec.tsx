@@ -95,7 +95,7 @@ describe('createBillingPaginatedHook', () => {
     expect(useFetcherMock).toHaveBeenCalledWith('user');
 
     expect(fetcherMock).not.toHaveBeenCalled();
-    // Ensures that SWR does not update the loading state even if the fetcher is not called.
+    // Ensures that React Query does not update the loading state even if the fetcher is not called.
     expect(result.current.isLoading).toBe(false);
     expect(result.current.isFetching).toBe(false);
   });
