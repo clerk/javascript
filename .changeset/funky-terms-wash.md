@@ -1,5 +1,7 @@
 ---
 '@clerk/nextjs': patch
+'@clerk/expo': patch
+'@clerk/chrome-extension'
 ---
 
-Export `useWaitlist` to be accessible from `@clerk/nextjs`.
+Add exports for `useWaitlist` hook.
