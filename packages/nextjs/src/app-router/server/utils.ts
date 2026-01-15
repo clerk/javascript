@@ -1,8 +1,12 @@
 import { NextRequest } from 'next/server';
 
-// Pre-compiled regex patterns for cache error detection
+// Pre-compiled regex patterns for error detection
 const USE_CACHE_PATTERN = /use cache|cache scope/i;
 const DYNAMIC_CACHE_PATTERN = /dynamic data source/i;
+// note: new error message syntax introduced in next@14.1.1-canary.21
+// but we still want to support older versions.
+// https://github.com/vercel/next.js/pull/61332 (dynamic-rendering.ts:153)
+const ROUTE_BAILOUT_PATTERN = /Route .*? needs to bail out of prerendering at this point because it used .*?./;
 
 export const isPrerenderingBailout = (e: unknown) => {
   if (!(e instanceof Error) || !('message' in e)) {
@@ -19,12 +23,7 @@ export const isPrerenderingBailout = (e: unknown) => {
   // Error: "During prerendering, `headers()` rejects when the prerender is complete"
   const headersRejectsDuringPrerendering = lowerCaseInput.includes('during prerendering');
 
-  // note: new error message syntax introduced in next@14.1.1-canary.21
-  // but we still want to support older versions.
-  // https://github.com/vercel/next.js/pull/61332 (dynamic-rendering.ts:153)
-  const routeRegex = /Route .*? needs to bail out of prerendering at this point because it used .*?./;
-
-  return routeRegex.test(message) || dynamicServerUsage || bailOutPrerendering || headersRejectsDuringPrerendering;
+  return ROUTE_BAILOUT_PATTERN.test(message) || dynamicServerUsage || bailOutPrerendering || headersRejectsDuringPrerendering;
 };
 
 /**
