@@ -257,6 +257,9 @@ export class StateProxy implements State {
         get isTransferable() {
           return gateProperty(target, 'isTransferable', false);
         },
+        get existingSession() {
+          return gateProperty(target, 'existingSession', undefined);
+        },
         get hasBeenFinalized() {
           return gateProperty(target, 'hasBeenFinalized', false);
         },
@@ -268,6 +271,7 @@ export class StateProxy implements State {
         ticket: gateMethod(target, 'ticket'),
         web3: gateMethod(target, 'web3'),
         finalize: gateMethod(target, 'finalize'),
+        reset: gateMethod(target, 'reset'),
 
         verifications: wrapMethods(() => target().verifications, [
           'sendEmailCode',
