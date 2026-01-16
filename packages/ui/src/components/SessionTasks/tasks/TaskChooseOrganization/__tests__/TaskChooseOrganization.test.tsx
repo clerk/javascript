@@ -222,6 +222,8 @@ describe('TaskChooseOrganization', () => {
         email_addresses: ['test@clerk.com'],
         create_organization_enabled: true,
         tasks: [{ key: 'choose-organization' }],
+        // Include an organization membership so user has reached max memberships
+        organization_memberships: [{ name: 'Existing Org', slug: 'org1' }],
       });
     });
 
