@@ -3,6 +3,8 @@ import type { NextApiRequest } from 'next';
 import type { NextApiRequestCookies } from 'next/dist/server/api-utils';
 import type { NextMiddleware, NextRequest } from 'next/server';
 
+import type { ShouldProxyFn } from '@clerk/shared/proxy';
+
 // Request contained in GetServerSidePropsContext, has cookies but not query
 type GsspRequest = IncomingMessage & { cookies: NextApiRequestCookies };
 
@@ -17,9 +19,12 @@ export type NextMiddlewareReturn = ReturnType<NextMiddleware>;
  */
 export interface FrontendApiProxyOptions {
   /**
-   * Enable proxy handling in middleware
+   * Enable proxy handling. Can be:
+   * - `true` - enable for all domains
+   * - `false` - disable for all domains
+   * - A function: (url: URL) => boolean - enable based on the request URL
    */
-  enabled: boolean;
+  enabled: boolean | ShouldProxyFn;
   /**
    * The path prefix for proxy requests. Defaults to `/__clerk`.
    */

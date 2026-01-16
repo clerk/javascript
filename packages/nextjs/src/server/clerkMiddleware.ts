@@ -158,9 +158,15 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       );
 
       // Handle Frontend API proxy requests early, before authentication
-      if (resolvedParams.frontendApiProxy?.enabled) {
-        const proxyPath = resolvedParams.frontendApiProxy.path || DEFAULT_PROXY_PATH;
-        if (matchProxyPath(request, { proxyPath })) {
+      const frontendApiProxyConfig = resolvedParams.frontendApiProxy;
+      if (frontendApiProxyConfig) {
+        const { enabled, path: proxyPath = DEFAULT_PROXY_PATH } = frontendApiProxyConfig;
+
+        // Resolve enabled - either boolean or function
+        const requestUrl = new URL(request.url);
+        const isEnabled = typeof enabled === 'function' ? enabled(requestUrl) : enabled;
+
+        if (isEnabled && matchProxyPath(request, { proxyPath })) {
           return clerkFrontendApiProxy(request, {
             proxyPath,
             publishableKey,
