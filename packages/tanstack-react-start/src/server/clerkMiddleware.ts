@@ -7,13 +7,20 @@ import { createMiddleware, json } from '@tanstack/react-start';
 
 import { clerkClient } from './clerkClient';
 import { loadOptions } from './loadOptions';
-import type { ClerkMiddlewareOptions } from './types';
+import type { ClerkMiddlewareOptions, ClerkMiddlewareOptionsCallback } from './types';
 import { getResponseClerkState, patchRequest } from './utils';
 
-export const clerkMiddleware = (options?: ClerkMiddlewareOptions): AnyRequestMiddleware => {
+export const clerkMiddleware = (
+  options?: ClerkMiddlewareOptions | ClerkMiddlewareOptionsCallback,
+): AnyRequestMiddleware => {
   return createMiddleware().server(async args => {
     const clerkRequest = createClerkRequest(patchRequest(args.request));
-    const loadedOptions = loadOptions(clerkRequest, options);
+
+    // Resolve options: if function, call it with context object; otherwise use as-is
+    const resolvedOptions = typeof options === 'function' ? await options({ url: clerkRequest.clerkUrl }) : options;
+
+    const loadedOptions = loadOptions(clerkRequest, resolvedOptions);
+
     const requestState = await clerkClient().authenticateRequest(clerkRequest, {
       ...loadedOptions,
       acceptsToken: 'any',
