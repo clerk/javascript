@@ -6,6 +6,8 @@ import { redirect, RedirectType } from 'next/navigation';
 import { errorThrower } from '../server/errorThrower';
 import { detectClerkMiddleware } from '../server/headers-utils';
 import { getKeylessCookieName, getKeylessCookieValue } from '../server/keyless';
+import { clerkDevelopmentCache, createKeylessModeMessage } from '../server/keyless-log-cache';
+import { keyless } from '../server/keyless-node';
 import { canUseKeyless } from '../utils/feature-flags';
 
 type SetCookieOptions = Parameters<Awaited<ReturnType<typeof cookies>>['set']>[2];
@@ -21,9 +23,9 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
   const cookieStore = await cookies();
   const request = new Request('https://placeholder.com', { headers: await headers() });
 
-  const keyless = await getKeylessCookieValue(name => cookieStore.get(name)?.value);
-  const pksMatch = keyless?.publishableKey === publishableKey;
-  const sksMatch = keyless?.secretKey === secretKey;
+  const keylessCookie = await getKeylessCookieValue(name => cookieStore.get(name)?.value);
+  const pksMatch = keylessCookie?.publishableKey === publishableKey;
+  const sksMatch = keylessCookie?.secretKey === secretKey;
   if (pksMatch && sksMatch) {
     // Return early, syncing in not needed.
     return;
@@ -36,9 +38,8 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
     keylessCookieConfig,
   );
 
-  // We cannot import `NextRequest` due to a bundling issue with server actions in Next.js 13.
-  // @ts-expect-error Request will work as well
-  if (detectClerkMiddleware(request)) {
+  // Request works at runtime since detectClerkMiddleware checks for Request via isRequestWebAPI
+  if (detectClerkMiddleware(request as Parameters<typeof detectClerkMiddleware>[0])) {
     /**
      * Force middleware to execute to read the new keys from the cookies and populate the authentication state correctly.
      */
@@ -53,14 +54,17 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
     return null;
   }
 
-  const result = await import('../server/keyless-node.js').then(m => m.keyless().getOrCreateKeys()).catch(() => null);
+  let result;
+  try {
+    result = await keyless().getOrCreateKeys();
+  } catch {
+    result = null;
+  }
 
   if (!result) {
     errorThrower.throwMissingPublishableKeyError();
     return null;
   }
-
-  const { clerkDevelopmentCache, createKeylessModeMessage } = await import('../server/keyless-log-cache.js');
 
   /**
    * Notify developers.
@@ -89,6 +93,9 @@ export async function deleteKeylessAction() {
     return;
   }
 
-  await import('../server/keyless-node.js').then(m => m.keyless().removeKeys()).catch(() => {});
-  return;
+  try {
+    await keyless().removeKeys();
+  } catch {
+    // Ignore errors during key removal
+  }
 }
