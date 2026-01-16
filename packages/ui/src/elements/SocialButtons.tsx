@@ -30,7 +30,7 @@ import { distributeStrategiesIntoRows } from './utils';
 const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
 const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
 const MAX_STRATEGIES_PER_ROW = 5;
-const SUPPORTS_MASK_IMAGE = ['apple', 'github', 'okx_wallet', 'vercel'];
+const SUPPORTS_MASK_IMAGE = ['apple', 'github', 'okx_wallet', 'vercel'] as const;
 
 export type SocialButtonsProps = React.PropsWithChildren<{
   enableOAuthProviders: boolean;
