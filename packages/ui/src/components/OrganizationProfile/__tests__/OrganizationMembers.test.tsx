@@ -712,7 +712,9 @@ describe('OrganizationMembers', () => {
     expect(await findByText('Roles are temporarily locked')).toBeInTheDocument();
     // Use regex to match both curly and straight apostrophes
     expect(
-      await findByText(/We are updating the available roles\. Once that.s done, you.ll be able to update roles again\./),
+      await findByText(
+        /We are updating the available roles\. Once that.s done, you.ll be able to update roles again\./,
+      ),
     ).toBeInTheDocument();
   });
 
