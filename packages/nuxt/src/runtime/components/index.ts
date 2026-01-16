@@ -23,4 +23,5 @@ export {
   SignOutButton,
   SignInWithMetamaskButton,
   PricingTable,
+  UNSAFE_PortalProvider,
 } from '@clerk/vue';

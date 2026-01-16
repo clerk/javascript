@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, usePortalRoot } from '@clerk/shared/react';
 import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/shared/types';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -10,6 +10,7 @@ import { PricingTableMatrix } from './PricingTableMatrix';
 
 const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
+  const getContainer = usePortalRoot();
   const { mode = 'mounted', signInMode = 'redirect' } = usePricingTableContext();
   const isCompact = mode === 'modal';
   const { data: subscription, subscriptionItems } = useSubscription();
@@ -52,7 +53,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const selectPlan = (plan: BillingPlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
       if (signInMode === 'modal') {
-        return clerk.openSignIn();
+        return clerk.openSignIn({ getContainer });
       }
       return clerk.redirectToSignIn();
     }
