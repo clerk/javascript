@@ -1,6 +1,7 @@
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
+import { clearFetchCache } from '@/ui/hooks/useFetch';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
 import {
@@ -9,7 +10,6 @@ import {
 } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
 
 import { TaskChooseOrganization } from '..';
-import { clearFetchCache } from '../../../../../hooks';
 
 const { createFixtures } = bindCreateFixtures('TaskChooseOrganization');
 
