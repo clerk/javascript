@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.101.11
+
+### Patch Changes
+
+- Updated dependencies [[`271ddeb`](https://github.com/clerk/javascript/commit/271ddeb0b47357f7da316eef389ae46b180c36da)]:
+  - @clerk/shared@3.43.0
+
 ## 4.101.10
 
 ### Patch Changes
