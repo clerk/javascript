@@ -1,5 +1,7 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
+import { eventBus } from '../../events';
+import { signInErrorSignal, signInResourceSignal } from '../../signals';
 import { BaseResource } from '../internal';
 import { SignIn } from '../SignIn';
 
@@ -1888,6 +1890,74 @@ describe('SignIn', () => {
         const signIn = new SignIn({ id: 'signin_123' } as any);
 
         await expect(signIn.__internal_future.finalize()).rejects.toThrow();
+      });
+    });
+
+    describe('reset', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.restoreAllMocks();
+        // Reset signals to initial state
+        signInResourceSignal({ resource: null });
+        signInErrorSignal({ error: null });
+      });
+
+      it('does NOT emit resource:fetch with status fetching', async () => {
+        const emitSpy = vi.spyOn(eventBus, 'emit');
+        const mockFetch = vi.fn();
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({ id: 'signin_123', status: 'needs_first_factor' } as any);
+        await signIn.__internal_future.reset();
+
+        // Verify that resource:fetch was NOT called with status: 'fetching'
+        const fetchingCalls = emitSpy.mock.calls.filter(
+          call => call[0] === 'resource:fetch' && call[1]?.status === 'fetching',
+        );
+        expect(fetchingCalls).toHaveLength(0);
+        // Verify no API calls were made
+        expect(mockFetch).not.toHaveBeenCalled();
+      });
+
+      it('clears any previous errors by updating signInErrorSignal', async () => {
+        // Set an initial error
+        signInErrorSignal({ error: new Error('Previous error') });
+        expect(signInErrorSignal().error).toBeTruthy();
+
+        const signIn = new SignIn({ id: 'signin_123', status: 'needs_first_factor' } as any);
+        await signIn.__internal_future.reset();
+
+        // Verify that error signal was cleared
+        expect(signInErrorSignal().error).toBeNull();
+      });
+
+      it('returns error: null on success', async () => {
+        const signIn = new SignIn({ id: 'signin_123', status: 'needs_first_factor' } as any);
+        const result = await signIn.__internal_future.reset();
+
+        expect(result).toHaveProperty('error', null);
+      });
+
+      it('resets an existing signin with data to a fresh null state', async () => {
+        const signIn = new SignIn({
+          id: 'signin_123',
+          status: 'needs_first_factor',
+          identifier: 'user@example.com',
+        } as any);
+
+        // Verify initial state
+        expect(signIn.id).toBe('signin_123');
+        expect(signIn.status).toBe('needs_first_factor');
+        expect(signIn.identifier).toBe('user@example.com');
+
+        await signIn.__internal_future.reset();
+
+        // Verify that signInResourceSignal was updated with a new SignIn(null) instance
+        const updatedSignIn = signInResourceSignal().resource;
+        expect(updatedSignIn).toBeInstanceOf(SignIn);
+        expect(updatedSignIn?.id).toBeUndefined();
+        expect(updatedSignIn?.status).toBeNull();
+        expect(updatedSignIn?.identifier).toBeNull();
       });
     });
   });

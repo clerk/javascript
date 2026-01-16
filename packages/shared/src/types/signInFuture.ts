@@ -519,4 +519,14 @@ export interface SignInFutureResource {
    * session state (such as the `useUser()` hook) to update automatically.
    */
   finalize: (params?: SignInFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Resets the current sign-in attempt by clearing all local state back to null.
+   * This is useful when you want to allow users to go back to the beginning of
+   * the sign-in flow (e.g., to change their identifier during verification).
+   *
+   * Unlike other methods, `reset()` does not trigger the `fetchStatus` to change
+   * to `'fetching'` and does not make any API calls - it only clears local state.
+   */
+  reset: () => Promise<{ error: ClerkError | null }>;
 }

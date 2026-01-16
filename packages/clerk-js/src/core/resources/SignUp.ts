@@ -62,6 +62,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
+import { signUpErrorSignal, signUpResourceSignal } from '../signals';
 import { BaseResource, SignUpVerifications } from './internal';
 
 declare global {
@@ -974,6 +975,22 @@ class SignUpFuture implements SignUpFutureResource {
       this.#hasBeenFinalized = true;
       await SignUp.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
+  }
+
+  /**
+   * Resets the current sign-up attempt by clearing all local state back to null.
+   * Unlike other methods, this does NOT emit resource:fetch with 'fetching' status,
+   * allowing for smooth UI transitions without loading states.
+   */
+  reset(): Promise<{ error: ClerkError | null }> {
+    // Clear errors
+    signUpErrorSignal({ error: null });
+
+    // Create a fresh null SignUp instance and update the signal directly
+    const freshSignUp = new SignUp(null);
+    signUpResourceSignal({ resource: freshSignUp });
+
+    return Promise.resolve({ error: null });
   }
 }
 

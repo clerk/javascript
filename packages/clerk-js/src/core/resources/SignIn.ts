@@ -92,6 +92,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
+import { signInErrorSignal, signInResourceSignal } from '../signals';
 import { BaseResource, UserData, Verification } from './internal';
 
 export class SignIn extends BaseResource implements SignInResource {
@@ -1245,6 +1246,22 @@ class SignInFuture implements SignInFutureResource {
       this.#hasBeenFinalized = true;
       await SignIn.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
+  }
+
+  /**
+   * Resets the current sign-in attempt by clearing all local state back to null.
+   * Unlike other methods, this does NOT emit resource:fetch with 'fetching' status,
+   * allowing for smooth UI transitions without loading states.
+   */
+  reset(): Promise<{ error: ClerkError | null }> {
+    // Clear errors
+    signInErrorSignal({ error: null });
+
+    // Create a fresh null SignIn instance and update the signal directly
+    const freshSignIn = new SignIn(null);
+    signInResourceSignal({ resource: freshSignIn });
+
+    return Promise.resolve({ error: null });
   }
 
   private selectFirstFactor(

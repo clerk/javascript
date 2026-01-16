@@ -158,6 +158,7 @@ export class StateProxy implements State {
         password: this.gateMethod(target, 'password'),
         sso: this.gateMethod(target, 'sso'),
         finalize: this.gateMethod(target, 'finalize'),
+        reset: this.gateMethod(target, 'reset'),
 
         emailCode: this.wrapMethods(() => target().emailCode, ['sendCode', 'verifyCode'] as const),
         emailLink: this.wrapStruct(
@@ -268,6 +269,7 @@ export class StateProxy implements State {
         ticket: gateMethod(target, 'ticket'),
         web3: gateMethod(target, 'web3'),
         finalize: gateMethod(target, 'finalize'),
+        reset: gateMethod(target, 'reset'),
 
         verifications: wrapMethods(() => target().verifications, [
           'sendEmailCode',
