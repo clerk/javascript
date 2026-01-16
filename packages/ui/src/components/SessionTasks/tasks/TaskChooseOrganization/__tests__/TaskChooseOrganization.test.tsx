@@ -300,11 +300,12 @@ describe('TaskChooseOrganization', () => {
         });
       });
 
-      const { queryByText } = render(<TaskChooseOrganization />, { wrapper });
+      const { queryByText, findByText } = render(<TaskChooseOrganization />, { wrapper });
 
+      // Wait for loading to complete and the disabled screen to render
+      expect(await findByText(/you must belong to an organization/i)).toBeInTheDocument();
+      expect(await findByText(/contact your organization admin for an invitation/i)).toBeInTheDocument();
       expect(queryByText(/create new organization/i)).not.toBeInTheDocument();
-      expect(queryByText(/you must belong to an organization/i)).toBeInTheDocument();
-      expect(queryByText(/contact your organization admin for an invitation/i)).toBeInTheDocument();
     });
 
     it('with existing memberships or suggestions, displays create organization screen', async () => {
