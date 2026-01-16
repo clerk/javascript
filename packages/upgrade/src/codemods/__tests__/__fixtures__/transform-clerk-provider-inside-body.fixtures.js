@@ -127,13 +127,11 @@ import { ClerkProvider } from '@clerk/nextjs'
 export default function RootLayout({ children }) {
   return (
     <html>
-      <body>
-        <ClerkProvider>
+      <body><ClerkProvider>
           <Header />
           <main>{children}</main>
           <Footer />
-        </ClerkProvider>
-      </body>
+        </ClerkProvider></body>
     </html>
   );
 }
@@ -167,6 +165,100 @@ export default function RootLayout({ children }) {
         <title>My App</title>
       </head>
       <body><ClerkProvider>{children}</ClerkProvider></body>
+    </html>
+  );
+}
+      `,
+  },
+  {
+    name: 'Handles import alias (ClerkProvider as CP)',
+    source: `
+import { ClerkProvider as CP } from '@clerk/nextjs'
+
+export default function RootLayout({ children }) {
+  return (
+    <CP dynamic>
+      <html>
+        <body>{children}</body>
+      </html>
+    </CP>
+  );
+}
+      `,
+    output: `
+import { ClerkProvider as CP } from '@clerk/nextjs'
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body><CP dynamic>{children}</CP></body>
+    </html>
+  );
+}
+      `,
+  },
+  {
+    name: 'Does not transform unrelated component when ClerkProvider is aliased but not used to wrap html',
+    source: `
+import { ClerkProvider as CP } from '@clerk/nextjs'
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <CP>{children}</CP>
+      </body>
+    </html>
+  );
+}
+      `,
+    output: '',
+  },
+  {
+    name: 'Does not transform when only other specifiers are imported (no ClerkProvider)',
+    source: `
+import { SignIn, SignUp } from '@clerk/nextjs'
+
+export default function Page() {
+  return (
+    <div>
+      <SignIn />
+    </div>
+  );
+}
+      `,
+    output: '',
+  },
+  {
+    name: 'Handles multiple ClerkProviders - only transforms those wrapping html',
+    source: `
+import { ClerkProvider } from '@clerk/nextjs'
+
+export default function RootLayout({ children }) {
+  return (
+    <ClerkProvider>
+      <html>
+        <body>
+          <ClerkProvider afterSignInUrl="/inner">
+            <div>{children}</div>
+          </ClerkProvider>
+        </body>
+      </html>
+    </ClerkProvider>
+  );
+}
+      `,
+    output: `
+import { ClerkProvider } from '@clerk/nextjs'
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body><ClerkProvider>
+          <ClerkProvider afterSignInUrl="/inner">
+            <div>{children}</div>
+          </ClerkProvider>
+        </ClerkProvider></body>
     </html>
   );
 }

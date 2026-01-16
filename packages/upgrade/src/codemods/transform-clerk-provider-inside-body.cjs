@@ -29,21 +29,42 @@ module.exports = function transformClerkProviderInsideBody({ source }, { jscodes
   const root = j(source);
   let dirtyFlag = false;
 
+  // Find the import from '@clerk/nextjs' and get the local name for ClerkProvider
+  const clerkNextjsImport = root.find(j.ImportDeclaration, {
+    source: { value: '@clerk/nextjs' },
+  });
+
   // Short-circuit if the import from '@clerk/nextjs' is not found
-  if (
-    root
-      .find(j.ImportDeclaration, {
-        source: { value: '@clerk/nextjs' },
-      })
-      .size() === 0
-  ) {
+  if (clerkNextjsImport.size() === 0) {
     return undefined;
   }
 
-  // Find all JSXElements with the name ClerkProvider
+  // Find the local name for ClerkProvider (handles aliases like `import { ClerkProvider as CP }`)
+  let clerkProviderLocalName = null;
+  clerkNextjsImport.forEach(importPath => {
+    const specifiers = importPath.node.specifiers || [];
+    for (const specifier of specifiers) {
+      if (
+        j.ImportSpecifier.check(specifier) &&
+        specifier.imported &&
+        specifier.imported.name === 'ClerkProvider'
+      ) {
+        // Use the local name (will be different if aliased)
+        clerkProviderLocalName = specifier.local.name;
+        break;
+      }
+    }
+  });
+
+  // Short-circuit if ClerkProvider is not imported
+  if (!clerkProviderLocalName) {
+    return undefined;
+  }
+
+  // Find all JSXElements with the name ClerkProvider (using local name to handle aliases)
   root
     .find(j.JSXElement, {
-      openingElement: { name: { name: 'ClerkProvider' } },
+      openingElement: { name: { name: clerkProviderLocalName } },
     })
     .forEach(path => {
       const clerkProvider = path.node;
@@ -66,30 +87,16 @@ module.exports = function transformClerkProviderInsideBody({ source }, { jscodes
       // Get body's original children
       const bodyChildren = [...bodyElement.children];
 
-      // Create new ClerkProvider that will go inside body
+      // Create new ClerkProvider that will go inside body (using local name to preserve alias)
       const newClerkProvider = j.jsxElement(
-        j.jsxOpeningElement(j.jsxIdentifier('ClerkProvider'), clerkProviderAttributes, false),
-        j.jsxClosingElement(j.jsxIdentifier('ClerkProvider')),
+        j.jsxOpeningElement(j.jsxIdentifier(clerkProviderLocalName), clerkProviderAttributes, false),
+        j.jsxClosingElement(j.jsxIdentifier(clerkProviderLocalName)),
         bodyChildren,
       );
 
       // Replace body's children with the new ClerkProvider
-      // Preserve whitespace/formatting by keeping leading/trailing text nodes
-      const leadingWhitespace = bodyElement.children.find(child => j.JSXText.check(child) && /^\s*$/.test(child.value));
-      const trailingWhitespace = [...bodyElement.children]
-        .reverse()
-        .find(child => j.JSXText.check(child) && /^\s*$/.test(child.value));
-
-      const newBodyChildren = [];
-      if (leadingWhitespace) {
-        newBodyChildren.push(j.jsxText('\n        '));
-      }
-      newBodyChildren.push(newClerkProvider);
-      if (trailingWhitespace) {
-        newBodyChildren.push(j.jsxText('\n      '));
-      }
-
-      bodyElement.children = newBodyChildren;
+      // Note: We don't worry about whitespace/formatting - most projects use formatters like Prettier
+      bodyElement.children = [newClerkProvider];
 
       // Replace the outer ClerkProvider with just the html element
       j(path).replaceWith(htmlElement);
