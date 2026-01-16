@@ -3,6 +3,7 @@ if (typeof window !== 'undefined' && typeof (window as any).global === 'undefine
 }
 
 export * from './client';
+export { getToken } from '@clerk/shared/getToken';
 
 // Override Clerk React error thrower to show that errors come from @clerk/react-router
 import { setErrorThrowerOptions } from '@clerk/react/internal';
