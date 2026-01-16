@@ -16,14 +16,34 @@ const __dirname = path.dirname(__filename);
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
 
+/**
+ * Externals handler for the shared variant that reads React from globalThis.__clerkSharedModules.
+ * This allows the host application's React to be shared with @clerk/ui.
+ * @type {import('@rspack/core').ExternalItemFunctionData}
+ */
+const sharedReactExternalsHandler = ({ request }, callback) => {
+  if (request === 'react') {
+    return callback(null, ['__clerkSharedModules', 'react'], 'root');
+  }
+  if (request === 'react-dom') {
+    return callback(null, ['__clerkSharedModules', 'react-dom'], 'root');
+  }
+  if (request === 'react/jsx-runtime') {
+    return callback(null, ['__clerkSharedModules', 'react/jsx-runtime'], 'root');
+  }
+  callback();
+};
+
 const variants = {
   uiBrowser: 'ui.browser',
   uiLegacyBrowser: 'ui.legacy.browser',
+  uiSharedBrowser: 'ui.shared.browser',
 };
 
 const variantToSourceFile = {
   [variants.uiBrowser]: './src/index.browser.ts',
   [variants.uiLegacyBrowser]: './src/index.legacy.browser.ts',
+  [variants.uiSharedBrowser]: './src/index.browser.ts', // Same entry, different externals
 };
 
 /**
@@ -197,18 +217,32 @@ const prodConfig = mode => {
     commonForProdBrowser({ targets: packageJSON.browserslistLegacy, useCoreJs: true }),
   );
 
-  return [uiBrowser, uiLegacyBrowser];
+  // Shared variant - externalizes react/react-dom to use host app's versions
+  // Expects host to provide these via globalThis.__clerkSharedModules
+  const uiSharedBrowser = merge(
+    entryForVariant(variants.uiSharedBrowser),
+    common({ mode, variant: variants.uiSharedBrowser }),
+    commonForProdBrowser(),
+    {
+      externals: [sharedReactExternalsHandler],
+    },
+  );
+
+  return [uiBrowser, uiLegacyBrowser, uiSharedBrowser];
 };
 
 /**
  * Development configuration - only builds browser bundle with dev server
  * @param {'development'|'production'} mode
  * @param {object} env
+ * @param {boolean} [env.shared] - If true, externalize React to globalThis.__clerkSharedModules (for use with @clerk/react).
+ *                                  If false/unset, bundle React normally (for standalone or non-React framework usage).
  * @returns {import('@rspack/core').Configuration}
  */
 const devConfig = (mode, env) => {
   const devUrl = new URL(env.devOrigin || 'https://ui.lclclerk.com');
   const port = Number(new URL(env.devOrigin ?? 'http://localhost:4011').port || 4011);
+  const useSharedReact = Boolean(env.shared);
 
   return merge(entryForVariant(variants.uiBrowser), common({ mode, variant: variants.uiBrowser }), {
     module: {
@@ -242,6 +276,9 @@ const devConfig = (mode, env) => {
         type: 'memory',
       },
     },
+    // Only externalize React when using the shared variant (e.g., with @clerk/react).
+    // For standalone usage or non-React frameworks, bundle React normally.
+    ...(useSharedReact ? { externals: [sharedReactExternalsHandler] } : {}),
   });
 };
 

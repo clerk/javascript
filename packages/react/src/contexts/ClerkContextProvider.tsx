@@ -11,6 +11,7 @@ import React from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
+import { IS_REACT_SHARED_VARIANT_COMPATIBLE } from '../utils/versionCheck';
 import { AuthContext } from './AuthContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
 
@@ -111,8 +112,23 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
   );
 }
 
+// Default clerkUiVariant based on React version compatibility.
+// Computed once at module level for optimal performance.
+const DEFAULT_CLERK_UI_VARIANT = IS_REACT_SHARED_VARIANT_COMPATIBLE ? ('shared' as const) : ('' as const);
+
 const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
-  const isomorphicClerkRef = React.useRef(IsomorphicClerk.getOrCreateInstance(options));
+  // Merge default clerkUiVariant with user options.
+  // User-provided options spread last to allow explicit overrides.
+  // The shared variant expects React to be provided via globalThis.__clerkSharedModules
+  // (set up by @clerk/ui/register import), which reduces bundle size.
+  const optionsWithDefaults = React.useMemo(
+    () => ({
+      clerkUiVariant: DEFAULT_CLERK_UI_VARIANT,
+      ...options,
+    }),
+    [options],
+  );
+  const isomorphicClerkRef = React.useRef(IsomorphicClerk.getOrCreateInstance(optionsWithDefaults));
   const [clerkStatus, setClerkStatus] = React.useState(isomorphicClerkRef.current.status);
 
   React.useEffect(() => {

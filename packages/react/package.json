@@ -101,7 +101,9 @@
   "devDependencies": {
     "@clerk/localizations": "workspace:*",
     "@clerk/ui": "workspace:*",
-    "@types/semver": "^7.7.1"
+    "@types/semver": "^7.7.1",
+    "semver": "^7.7.1",
+    "yaml": "^2.8.0"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",
