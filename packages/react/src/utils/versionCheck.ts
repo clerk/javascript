@@ -18,7 +18,9 @@ declare const __CLERK_UI_SUPPORTED_REACT_BOUNDS__: VersionBounds[];
  */
 export function parseVersion(version: string): { major: number; minor: number; patch: number } | null {
   const match = version.match(/^(\d+)\.(\d+)\.(\d+)/);
-  if (!match) return null;
+  if (!match) {
+    return null;
+  }
 
   const [, majorStr, minorStr, patchStr] = match;
   return {
@@ -42,7 +44,9 @@ export function checkVersionAgainstBounds(
   const { major, minor, patch } = version;
 
   return bounds.some(([bMajor, minMinor, maxMinor, minPatch]) => {
-    if (major !== bMajor) return false;
+    if (major !== bMajor) {
+      return false;
+    }
 
     if (maxMinor === -1) {
       // Caret range: any minor >= minMinor, with patch check for minMinor
@@ -64,7 +68,9 @@ export function checkVersionAgainstBounds(
  */
 export function isVersionCompatible(version: string, bounds: VersionBounds[]): boolean {
   const parsed = parseVersion(version);
-  if (!parsed) return false;
+  if (!parsed) {
+    return false;
+  }
   return checkVersionAgainstBounds(parsed, bounds);
 }
 
