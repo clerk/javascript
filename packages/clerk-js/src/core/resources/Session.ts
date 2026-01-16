@@ -135,8 +135,46 @@ export class Session extends BaseResource implements SessionResource {
       SessionTokenCache.set({
         tokenId: this.#getCacheId(),
         tokenResolver: Promise.resolve(token),
+        onExpiringSoon: () => this.#proactiveRefresh(),
       });
     }
+  };
+
+  /**
+   * Proactively refreshes a token in the background without blocking getToken() calls.
+   * Unlike _getToken({ skipCache: true }), this does NOT replace the cache entry until
+   * the new token is actually fetched. This allows concurrent getToken() calls to return
+   * the existing (still valid) cached token while the refresh is in progress.
+   */
+  #proactiveRefresh = (template?: string, organizationId?: string | null) => {
+    const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
+    const resolvedOrgId = typeof organizationId === 'undefined' ? this.lastActiveOrganizationId : organizationId;
+    const params: Record<string, string | null> = template ? {} : { organizationId: resolvedOrgId };
+    const tokenId = this.#getCacheId(template, organizationId);
+
+    void Token.create(path, params)
+      .then(newToken => {
+        // Only update cache AFTER fetch completes - this is the key difference from _getToken
+        SessionTokenCache.set({
+          tokenId,
+          tokenResolver: Promise.resolve(newToken),
+          onExpiringSoon: () => this.#proactiveRefresh(template, organizationId),
+        });
+
+        // Dispatch events if this is a session token for the active organization
+        const shouldDispatchTokenUpdate = !template && resolvedOrgId === this.lastActiveOrganizationId;
+        if (shouldDispatchTokenUpdate) {
+          eventBus.emit(events.TokenUpdate, { token: newToken });
+
+          if (newToken.jwt) {
+            this.lastActiveToken = newToken;
+            eventBus.emit(events.SessionTokenResolved, null);
+          }
+        }
+      })
+      .catch(() => {
+        // Ignore errors - the regular getToken flow will handle them when called
+      });
   };
 
   // If it's a session token, retrieve it with their session id, otherwise it's a jwt template token
@@ -407,7 +445,11 @@ export class Session extends BaseResource implements SessionResource {
       }
       throw e;
     });
-    SessionTokenCache.set({ tokenId, tokenResolver });
+    SessionTokenCache.set({
+      tokenId,
+      tokenResolver,
+      onExpiringSoon: () => this.#proactiveRefresh(template, organizationId),
+    });
 
     return tokenResolver.then(token => {
       if (shouldDispatchTokenUpdate) {

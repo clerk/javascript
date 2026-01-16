@@ -762,6 +762,221 @@ describe('SessionTokenCache', () => {
     });
   });
 
+  describe('proactive refresh timer', () => {
+    it('fires onExpiringSoon callback at REFRESH_BUFFER seconds before leeway zone', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'proactive-refresh-token',
+        jwt,
+        object: 'token',
+      });
+
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const onExpiringSoon = vi.fn();
+      const key = { tokenId: 'proactive-refresh-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver, onExpiringSoon });
+      await tokenResolver;
+
+      // Timer should fire at: expiresIn - LEEWAY - SYNC_LEEWAY - REFRESH_BUFFER = 60 - 10 - 5 - 2 = 43s
+      expect(onExpiringSoon).not.toHaveBeenCalled();
+
+      // Advance to just before the timer (42s)
+      vi.advanceTimersByTime(42 * 1000);
+      expect(onExpiringSoon).not.toHaveBeenCalled();
+
+      // Advance 1 more second to hit the timer (43s)
+      vi.advanceTimersByTime(1 * 1000);
+      expect(onExpiringSoon).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not call onExpiringSoon if entry was replaced before timer fires', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt1 = createJwtWithTtl(nowSeconds, 60);
+      const jwt2 = createJwtWithTtl(nowSeconds, 60);
+
+      const token1 = new Token({ id: 'replaced-token', jwt: jwt1, object: 'token' });
+      const token2 = new Token({ id: 'replaced-token', jwt: jwt2, object: 'token' });
+
+      const resolver1 = Promise.resolve<TokenResource>(token1);
+      const resolver2 = Promise.resolve<TokenResource>(token2);
+      const onExpiringSoon1 = vi.fn();
+      const onExpiringSoon2 = vi.fn();
+      const key = { tokenId: 'replaced-token' };
+
+      // Set first entry
+      SessionTokenCache.set({ ...key, tokenResolver: resolver1, onExpiringSoon: onExpiringSoon1 });
+      await resolver1;
+
+      // Advance time partway (20s)
+      vi.advanceTimersByTime(20 * 1000);
+
+      // Replace with new entry before timer fires
+      SessionTokenCache.set({ ...key, tokenResolver: resolver2, onExpiringSoon: onExpiringSoon2 });
+      await resolver2;
+
+      // Advance to when original timer would fire (23s more = 43s total from first set)
+      vi.advanceTimersByTime(23 * 1000);
+
+      // Original callback should NOT be called (entry was replaced)
+      expect(onExpiringSoon1).not.toHaveBeenCalled();
+
+      // New callback should NOT be called yet (only 23s since second set, need 43s)
+      expect(onExpiringSoon2).not.toHaveBeenCalled();
+
+      // Advance 20 more seconds (43s from second set)
+      vi.advanceTimersByTime(20 * 1000);
+      expect(onExpiringSoon2).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns old token while proactive refresh is in progress (fetch not complete)', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt1 = createJwtWithTtl(nowSeconds, 60);
+
+      const token1 = new Token({ id: 'proactive-test', jwt: jwt1, object: 'token' });
+      const resolver1 = Promise.resolve<TokenResource>(token1);
+      const key = { tokenId: 'proactive-test' };
+
+      let refreshTriggered = false;
+      let resolveNewToken: (token: TokenResource) => void;
+      const newTokenPromise = new Promise<TokenResource>(resolve => {
+        resolveNewToken = resolve;
+      });
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: resolver1,
+        onExpiringSoon: () => {
+          refreshTriggered = true;
+          // Simulate background refresh that takes time - DON'T update cache yet
+          // In real code, Session.#proactiveRefresh only updates cache after fetch completes
+        },
+      });
+      await resolver1;
+
+      // Advance to timer fire time (43s)
+      vi.advanceTimersByTime(43 * 1000);
+      expect(refreshTriggered).toBe(true);
+
+      // At t=44 (between timer at 43s and leeway at 45s)
+      // The old token is still in cache because proactive refresh hasn't completed yet
+      vi.advanceTimersByTime(1 * 1000);
+
+      const cached = SessionTokenCache.get(key);
+      expect(cached).toBeDefined();
+
+      // Should still be the OLD token (iat = nowSeconds, not nowSeconds + 44)
+      const resolvedToken = await cached!.tokenResolver;
+      expect(resolvedToken.jwt?.claims?.iat).toBe(nowSeconds);
+    });
+
+    it('returns new token after proactive refresh completes', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt1 = createJwtWithTtl(nowSeconds, 60);
+
+      const token1 = new Token({ id: 'proactive-complete', jwt: jwt1, object: 'token' });
+      const resolver1 = Promise.resolve<TokenResource>(token1);
+      const key = { tokenId: 'proactive-complete' };
+
+      let refreshTriggered = false;
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: resolver1,
+        onExpiringSoon: () => {
+          refreshTriggered = true;
+          // Simulate proactive refresh completing - update cache with new token
+          const newJwt = createJwtWithTtl(nowSeconds + 43, 60);
+          const newToken = new Token({ id: 'proactive-complete', jwt: newJwt, object: 'token' });
+          SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve(newToken) });
+        },
+      });
+      await resolver1;
+
+      // Advance to timer fire time (43s) - refresh completes immediately in this test
+      vi.advanceTimersByTime(43 * 1000);
+      expect(refreshTriggered).toBe(true);
+
+      // At t=44, the new token should be in cache
+      vi.advanceTimersByTime(1 * 1000);
+
+      const cached = SessionTokenCache.get(key);
+      expect(cached).toBeDefined();
+
+      // Should be the NEW token
+      const resolvedToken = await cached!.tokenResolver;
+      expect(resolvedToken.jwt?.claims?.iat).toBe(nowSeconds + 43);
+    });
+
+    it('does not schedule refresh timer when refreshDelay would be negative', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      // Token with only 10s TTL - refreshDelay = 10 - 10 - 5 - 2 = -7 (negative)
+      const jwt = createJwtWithTtl(nowSeconds, 10);
+
+      const token = new Token({ id: 'short-lived-token', jwt, object: 'token' });
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const onExpiringSoon = vi.fn();
+      const key = { tokenId: 'short-lived-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver, onExpiringSoon });
+      await tokenResolver;
+
+      // Advance past token expiration
+      vi.advanceTimersByTime(15 * 1000);
+
+      // Callback should never be called for tokens that expire too soon
+      expect(onExpiringSoon).not.toHaveBeenCalled();
+    });
+
+    it('clears refresh timer when entry is deleted via clear()', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({ id: 'cleared-token', jwt, object: 'token' });
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const onExpiringSoon = vi.fn();
+      const key = { tokenId: 'cleared-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver, onExpiringSoon });
+      await tokenResolver;
+
+      // Clear the cache
+      SessionTokenCache.clear();
+
+      // Advance to when timer would have fired
+      vi.advanceTimersByTime(43 * 1000);
+
+      // Callback should NOT be called (timer was cleared)
+      expect(onExpiringSoon).not.toHaveBeenCalled();
+    });
+
+    it('refresh timer fires before token enters leeway zone', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({ id: 'timing-token', jwt, object: 'token' });
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const onExpiringSoon = vi.fn();
+      const key = { tokenId: 'timing-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver, onExpiringSoon });
+      await tokenResolver;
+
+      // At t=43, callback fires (before leeway zone at t=45)
+      // At t=46, token is in leeway zone and get() returns undefined
+      vi.advanceTimersByTime(46 * 1000);
+
+      // The callback WAS called at t=43
+      expect(onExpiringSoon).toHaveBeenCalledTimes(1);
+
+      // But now the token is in leeway zone
+      const cached = SessionTokenCache.get(key);
+      expect(cached).toBeUndefined();
+    });
+  });
+
   describe('multi-session isolation', () => {
     it('stores tokens from different session IDs separately without interference', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
