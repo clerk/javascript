@@ -2084,7 +2084,7 @@ export class Clerk implements ClerkInterface {
         buildURL({ base: displayConfig.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
     );
 
-    const redirectUrls = new RedirectUrls(this.#options, params);
+    const redirectUrls = new RedirectUrls(this.#options, params, new URLSearchParams(window.location.search));
 
     const navigateToContinueSignUp = makeNavigate(
       params.continueSignUpUrl ||
