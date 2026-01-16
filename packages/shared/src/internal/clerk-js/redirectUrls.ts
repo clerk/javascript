@@ -74,7 +74,7 @@ export class RedirectUrls {
       this.fromSearchParams.signInFallbackRedirectUrl ||
       this.fromProps.signInFallbackRedirectUrl ||
       this.fromOptions.signInFallbackRedirectUrl;
-    const redirectUrl = this.fromSearchParams.redirectUrl || this.fromProps.redirectUrl;
+    const redirectUrl = this.fromSearchParams.redirectUrl;
 
     const res: RedirectOptions & { redirectUrl?: string | null } = {
       signUpForceRedirectUrl,

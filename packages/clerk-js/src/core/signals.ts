@@ -107,8 +107,8 @@ export function errorsToParsedErrors<T extends Record<string, unknown>>(
   }
 
   // At this point, we know that `error` is a ClerkAPIResponseError and that it has no field errors.
-  parsedErrors.raw = [...error.errors];
-  parsedErrors.global = null;
+  parsedErrors.raw = [error];
+  parsedErrors.global = [createClerkGlobalHookError(error)];
 
   return parsedErrors;
 }
