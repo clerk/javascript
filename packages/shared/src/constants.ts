@@ -17,6 +17,12 @@ export const LOCAL_API_URL = 'https://api.lclclerk.com';
 export const STAGING_API_URL = 'https://api.clerkstage.dev';
 export const PROD_API_URL = 'https://api.clerk.com';
 
+export const LOCAL_FAPI_URL = 'https://frontend-api.lclclerk.com';
+export const STAGING_FAPI_URL = 'https://frontend-api.clerkstage.dev';
+export const PROD_FAPI_URL = 'https://frontend-api.clerk.dev';
+
+export const DEFAULT_PROXY_PATH = '/__clerk';
+
 /**
  * Returns the URL for a static image
  * using the new img.clerk.com service
