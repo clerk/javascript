@@ -3,6 +3,7 @@ import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { useClerk } from '@clerk/shared/react';
 import type { SignedInSessionResource, UserButtonProps, UserResource } from '@clerk/shared/types';
 
+import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { useEnvironment } from '@/ui/contexts';
 import { useCardState } from '@/ui/elements/contexts';
 import { sleep } from '@/ui/utils/sleep';
@@ -25,7 +26,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const { setActive, signOut, openUserProfile } = useClerk();
   const card = useCardState();
   const { signedInSessions, otherSessions } = useMultipleSessions({ user: opts.user });
-  const { navigate } = useRouter();
+  const { navigate, queryParams } = useRouter();
   const { displayConfig } = useEnvironment();
 
   const handleSignOutSessionClicked = (session: SignedInSessionResource) => () => {
@@ -99,7 +100,15 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   };
 
   const handleAddAccountClicked = () => {
-    windowNavigate(opts.signInUrl || window.location.href);
+    const baseUrl = opts.signInUrl || (typeof window !== 'undefined' ? window.location.href : '');
+    const url = buildURL(
+      {
+        base: baseUrl,
+        searchParams: new URLSearchParams({ ...queryParams, __clerk_add_account: 'true' }),
+      },
+      { stringify: true },
+    );
+    windowNavigate(url);
     return sleep(2000);
   };
 

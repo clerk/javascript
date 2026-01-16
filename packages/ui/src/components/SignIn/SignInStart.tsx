@@ -11,31 +11,20 @@ import type {
   SignInResource,
 } from '@clerk/shared/types';
 import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-
-import { Card } from '@/ui/elements/Card';
-import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { Form } from '@/ui/elements/Form';
-import { Header } from '@/ui/elements/Header';
-import { LoadingCard } from '@/ui/elements/LoadingCard';
-import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
-import { handleError } from '@/ui/utils/errorHandler';
-import { isMobileDevice } from '@/ui/utils/isMobileDevice';
-import type { FormControlState } from '@/ui/utils/useFormControl';
-import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import type { SignInStartIdentifier } from '../../common';
-import {
-  buildSSOCallbackURL,
-  getIdentifierControlDisplayValues,
-  groupIdentifiers,
-  withRedirectToAfterSignIn,
-  withRedirectToSignInTask,
-} from '../../common';
+import { buildSSOCallbackURL, getIdentifierControlDisplayValues, groupIdentifiers } from '../../common';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
-import { useLoadingStatus } from '../../hooks';
+import { Card } from '../../elements/Card';
+import { useCardState, withCardStateProvider } from '../../elements/contexts';
+import { Form } from '../../elements/Form';
+import { Header } from '../../elements/Header';
+import { LoadingCard } from '../../elements/LoadingCard';
+import { SocialButtonsReversibleContainerWithDivider } from '../../elements/ReversibleContainer';
+import { useLoadingStatus, useSignInRedirect } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
@@ -48,6 +37,10 @@ import {
   getPreferredAlternativePhoneChannelForCombinedFlow,
   getSignUpAttributeFromIdentifier,
 } from './utils';
+import { handleError } from '@/ui/utils/errorHandler';
+import { isMobileDevice } from '@/ui/utils/isMobileDevice';
+import type { FormControlState } from '@/ui/utils/useFormControl';
+import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
@@ -527,7 +520,12 @@ function SignInStartInternal(): JSX.Element {
     return components[identifierField.type as keyof typeof components];
   }, [identifierField.type]);
 
-  if (status.isLoading || clerkStatus === 'sign_up') {
+  const { isRedirecting } = useSignInRedirect({
+    afterSignInUrl,
+    organizationTicket,
+  });
+
+  if (isRedirecting || status.isLoading || clerkStatus === 'sign_up') {
     // clerkStatus being sign_up will trigger a navigation to the sign up flow, so show a loading card instead of
     // rendering the sign in flow.
     return <LoadingCard />;
@@ -712,6 +710,4 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToSignInTask(
-  withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal)),
-);
+export const SignInStart = withCardStateProvider(SignInStartInternal);
