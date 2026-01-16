@@ -886,6 +886,10 @@ export const nlBE: LocalizationResource = {
       actionLink: 'Uitloggen',
       actionText: 'Ingelogd als {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Er bestaat al een organisatie voor de gedetecteerde bedrijfsnaam ({{organizationName}}) en {{organizationDomain}}. Word lid via uitnodiging.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

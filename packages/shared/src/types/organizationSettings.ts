@@ -20,6 +20,9 @@ export interface OrganizationSettingsJSON extends ClerkResourceJSON {
   slug: {
     disabled: boolean;
   };
+  organization_creation_defaults: {
+    enabled: boolean;
+  };
 }
 
 export interface OrganizationSettingsResource extends ClerkResource {
@@ -36,6 +39,9 @@ export interface OrganizationSettingsResource extends ClerkResource {
   };
   slug: {
     disabled: boolean;
+  };
+  organizationCreationDefaults: {
+    enabled: boolean;
   };
   __internal_toSnapshot: () => OrganizationSettingsJSONSnapshot;
 }

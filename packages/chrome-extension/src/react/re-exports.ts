@@ -36,5 +36,6 @@ export {
   useSessionList,
   useSignIn,
   useSignUp,
+  useWaitlist,
   useUser,
 } from '@clerk/react';

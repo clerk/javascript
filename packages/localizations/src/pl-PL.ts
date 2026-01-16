@@ -890,6 +890,10 @@ export const plPL: LocalizationResource = {
       actionLink: 'Wyloguj',
       actionText: 'Zalogowano jako {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Organizacja już istnieje dla wykrytej nazwy firmy ({{organizationName}}) i {{organizationDomain}}. Dołącz przez zaproszenie.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: 'Zresetuj hasło',

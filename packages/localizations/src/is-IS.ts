@@ -887,6 +887,10 @@ export const isIS: LocalizationResource = {
       actionLink: 'Skrá út',
       actionText: 'Skráður inn sem {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Fyrirtæki er þegar til fyrir uppgötvaða fyrirtækjanafnið ({{organizationName}}) og {{organizationDomain}}. Skráðu þig með boði.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,
