@@ -39,7 +39,7 @@ function RedirectToSignIn() {
   const clerk = useClerk();
   React.useEffect(() => {
     void clerk.redirectToSignIn();
-  }, []);
+  }, [clerk]);
   return null;
 }
 
