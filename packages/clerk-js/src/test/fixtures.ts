@@ -101,6 +101,9 @@ const createBaseOrganizationSettings = (): OrganizationSettingsJSON => {
     slug: {
       disabled: true,
     },
+    organization_creation_defaults: {
+      enabled: false,
+    },
   } as unknown as OrganizationSettingsJSON;
 };
 
