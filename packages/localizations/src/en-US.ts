@@ -895,12 +895,13 @@ export const enUS: LocalizationResource = {
     title: 'Reset your password',
   },
   taskSetupMfa: {
-    title: 'Set up two-step verification',
-    subtitle: 'Protect your account with an extra layer of security',
-    methodSelection: {
-      totpButton: 'Authenticator app',
-      phoneCodeButton: 'SMS code',
-      backupCodeButton: 'Backup codes',
+    start: {
+      title: 'Set up two-step verification',
+      subtitle: 'Choose which method you prefer to protect your account with an extra layer of security',
+      methodSelection: {
+        totp: 'Authenticator application',
+        phoneCode: 'SMS code',
+      },
     },
     signOut: {
       actionText: 'Signed in as {{identifier}}',

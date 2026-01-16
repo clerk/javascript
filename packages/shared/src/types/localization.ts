@@ -1325,12 +1325,13 @@ export type __internal_LocalizationResource = {
     formButtonPrimary: LocalizationValue;
   };
   taskSetupMfa: {
-    title: LocalizationValue;
-    subtitle: LocalizationValue;
-    methodSelection: {
-      totpButton: LocalizationValue;
-      phoneCodeButton: LocalizationValue;
-      backupCodeButton: LocalizationValue;
+    start: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      methodSelection: {
+        totp: LocalizationValue;
+        phoneCode: LocalizationValue;
+      };
     };
     signOut: {
       actionText: LocalizationValue<'identifier'>;
