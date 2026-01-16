@@ -58,8 +58,11 @@ export {
   useSessionList,
   useSignIn,
   useSignUp,
+  useWaitlist,
   useUser,
 } from './client-boundary/hooks';
+
+export { getToken } from '@clerk/shared/getToken';
 
 /**
  * Conditionally export components that exhibit different behavior

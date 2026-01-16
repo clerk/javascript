@@ -886,6 +886,10 @@ export const thTH: LocalizationResource = {
       actionLink: 'ออกจากระบบ',
       actionText: 'เข้าสู่ระบบในนาม {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'องค์กรสำหรับชื่อบริษัทที่ตรวจพบ ({{organizationName}}) และ {{organizationDomain}} มีอยู่แล้ว เข้าร่วมโดยการเชิญ',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,
