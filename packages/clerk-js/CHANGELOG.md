@@ -1,5 +1,23 @@
 # Change Log
 
+## 5.120.0
+
+### Minor Changes
+
+- Surface organization creation defaults with prefilled form fields and advisory warnings ([#7603](https://github.com/clerk/javascript/pull/7603)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Fix redirect conflicts when SignIn and SignUp components are used together on the same page. Added missing dependency arrays to useEffect hooks in redirect functions to prevent unwanted redirects during other component flows. ([#7614](https://github.com/clerk/javascript/pull/7614)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove opacity from `Select` placeholder ([#7575](https://github.com/clerk/javascript/pull/7575)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Display actual organization membership name in in-app enable organization prompt success message ([#7582](https://github.com/clerk/javascript/pull/7582)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`271ddeb`](https://github.com/clerk/javascript/commit/271ddeb0b47357f7da316eef389ae46b180c36da)]:
+  - @clerk/localizations@3.35.0
+  - @clerk/shared@3.43.0
+
 ## 5.119.1
 
 ### Patch Changes

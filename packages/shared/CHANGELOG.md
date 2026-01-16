@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.43.0
+
+### Minor Changes
+
+- Surface organization creation defaults with prefilled form fields and advisory warnings ([#7603](https://github.com/clerk/javascript/pull/7603)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 3.42.0
 
 ### Minor Changes

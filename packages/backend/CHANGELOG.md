@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.29.3
+
+### Patch Changes
+
+- Add optional `idToken` member to `OauthAccessToken` returned by `getUserOauthAccessToken`. The ID token is retrieved from OIDC providers and is only present for OIDC-compliant OAuth 2.0 providers when available. ([#7599](https://github.com/clerk/javascript/pull/7599)) by [@jfoshee](https://github.com/jfoshee)
+
+- Updated dependencies [[`271ddeb`](https://github.com/clerk/javascript/commit/271ddeb0b47357f7da316eef389ae46b180c36da)]:
+  - @clerk/shared@3.43.0
+  - @clerk/types@4.101.11
+
 ## 2.29.2
 
 ### Patch Changes
