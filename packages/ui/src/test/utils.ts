@@ -10,21 +10,6 @@ const render = (ui: React.ReactElement, options?: RenderOptions) => {
   return { ..._render(ui, { ...options }), userEvent: user };
 };
 
-/**
- * Helper method to mock a native runtime environment for specific test cases, currently targeted at React Native.
- * Makes some assumptions about our runtime detection utilities in `packages/clerk-js/src/utils/runtime.ts`.
- *
- * Usage:
- *
- * ```js
- * mockNativeRuntime(() => {
- *  // test cases
- *  it('simulates native', () => {
- *    expect(typeof document).toBe('undefined');
- *  });
- * });
- * ```
- */
 export const mockNativeRuntime = (fn: () => void) => {
   describe('native runtime', () => {
     let spyDocument: ReturnType<typeof vi.spyOn>;
@@ -66,6 +51,9 @@ export const mockWebAuthn = (fn: () => void) => {
   });
 };
 
+// Re-export create-fixtures utilities
+export * from './create-fixtures';
+
 // Export everything from @testing-library/react except render, then export our custom render
 export {
   screen,
@@ -79,5 +67,6 @@ export {
   type RenderHookResult,
   type RenderResult,
 } from '@testing-library/react';
+
 // Export our custom render function that includes userEvent
 export { render };

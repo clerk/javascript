@@ -94,9 +94,13 @@ const createBaseOrganizationSettings = (): OrganizationSettingsJSON => {
     enabled: false,
     max_allowed_memberships: 5,
     force_organization_selection: false,
+    actions: {
+      admin_delete: false,
+    },
     domains: {
       enabled: false,
       enrollment_modes: [],
+      default_role: null,
     },
     slug: {
       disabled: true,

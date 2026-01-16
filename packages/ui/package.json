@@ -63,9 +63,9 @@
     "lint:disabled": "eslint src",
     "lint:publint": "publint",
     "showerrors": "tsc",
+    "test": "vitest",
     "test:ci": "vitest --maxWorkers=70%",
     "test:coverage": "vitest --collectCoverage && open coverage/lcov-report/index.html",
-    "test:disabled": "vitest",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

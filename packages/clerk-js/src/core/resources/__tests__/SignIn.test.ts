@@ -1857,7 +1857,7 @@ describe('SignIn', () => {
         const mockSetActive = vi.fn().mockResolvedValue({});
 
         SignIn.clerk = {
-          client: { reload: mockReload },
+          client: { reload: mockReload, sessions: [] },
           setActive: mockSetActive,
         } as any;
 
@@ -1874,7 +1874,7 @@ describe('SignIn', () => {
         const mockNavigate = vi.fn();
 
         SignIn.clerk = {
-          client: { reload: mockReload },
+          client: { reload: mockReload, sessions: [] },
           setActive: mockSetActive,
         } as any;
 
