@@ -75,6 +75,17 @@ const ContentTypes = {
 } as const;
 
 /**
+ * Sync status values for the __clerk_synced query parameter.
+ * Used to coordinate satellite domain authentication flows.
+ */
+export const ClerkSyncStatus = {
+  /** Not synced - satellite needs handshake after returning from primary sign-in */
+  NeedsSync: 'false',
+  /** Sync completed - prevents re-sync loop after handshake completes */
+  Completed: 'true',
+} as const;
+
+/**
  * @internal
  */
 export const constants = {
@@ -83,6 +94,7 @@ export const constants = {
   Headers,
   ContentTypes,
   QueryParameters,
+  ClerkSyncStatus,
 } as const;
 
 export type Constants = typeof constants;

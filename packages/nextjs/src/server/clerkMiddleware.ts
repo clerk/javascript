@@ -506,6 +506,7 @@ const handleControlFlowErrors = (
       signUpUrl: requestState.signUpUrl,
       publishableKey: requestState.publishableKey,
       sessionStatus: requestState.toAuth()?.sessionStatus,
+      isSatellite: requestState.isSatellite,
     });
 
     const { returnBackUrl } = e;

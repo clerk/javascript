@@ -72,6 +72,20 @@ export type AuthenticateRequestOptions = {
    * This will override the Clerk secret key.
    */
   machineSecretKey?: string;
+  /**
+   * Controls whether satellite apps automatically sync with the primary domain on initial page load.
+   *
+   * When `true` (default), satellite apps will automatically trigger a handshake redirect
+   * to sync authentication state with the primary domain, even if no session cookies exist.
+   *
+   * When `false`, satellite apps will skip the automatic handshake if no session cookies exist,
+   * and only trigger the handshake after an explicit sign-in action (when the `__clerk_synced=false`
+   * query parameter is present). This optimizes performance for satellite apps where users
+   * may not be authenticated, avoiding unnecessary redirects to the primary domain.
+   *
+   * @default true
+   */
+  satelliteAutoSync?: boolean;
 } & VerifyTokenOptions;
 
 /**

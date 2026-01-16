@@ -109,6 +109,7 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
         signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
         signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
         sessionStatus: authObject.tokenType === TokenType.SessionToken ? authObject.sessionStatus : null,
+        isSatellite: decryptedRequestData.isSatellite,
       }),
       returnBackUrl === null ? '' : returnBackUrl || clerkUrl?.toString(),
     ] as const;
