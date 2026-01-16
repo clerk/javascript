@@ -228,7 +228,7 @@ export const UserInvitationSuggestionList = (props: UserInvitationSuggestionList
   const isLoading = userInvitations.isLoading || userSuggestions.isLoading;
   const hasNextPage = userInvitations.hasNextPage || userSuggestions.hasNextPage;
 
-  // Solve weird bug with swr while running unit tests
+  // Filter out falsy values that can occur when infinite loading resolves pages out of order
   const userInvitationsData = userInvitations.data?.filter(a => !!a) || [];
   const userSuggestionsData = userSuggestions.data?.filter(a => !!a) || [];
   const hasAnyData = userInvitationsData.length > 0 || userSuggestionsData.length > 0;

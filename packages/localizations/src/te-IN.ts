@@ -893,6 +893,10 @@ export const teIN: LocalizationResource = {
       actionLink: 'సైన్ అవుట్',
       actionText: '{{identifier}}గా సైన్ ఇన్ చేయబడింది',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'గుర్తించిన కంపెనీ పేరు ({{organizationName}}) మరియు {{organizationDomain}} కోసం ఒక సంస్థ ఇప్పటికే ఉంది. ఆహ్వానం ద్వారా చేరండి.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

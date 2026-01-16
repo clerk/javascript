@@ -873,6 +873,10 @@ export const zhTW: LocalizationResource = {
       actionLink: '登出',
       actionText: '已登入為 {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        '偵測到的公司名稱 ({{organizationName}}) 和 {{organizationDomain}} 已存在一個組織。請透過邀請加入。',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

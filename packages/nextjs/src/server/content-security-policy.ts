@@ -101,6 +101,8 @@ class ContentSecurityPolicyDirectiveManager {
       'https://*.clerk-telemetry.com',
       'https://api.stripe.com',
       'https://maps.googleapis.com',
+      'https://img.clerk.com',
+      'https://images.clerkstage.dev',
     ],
     'default-src': ['self'],
     'form-action': ['self'],
