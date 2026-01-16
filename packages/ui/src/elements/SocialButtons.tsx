@@ -32,6 +32,12 @@ const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
 const MAX_STRATEGIES_PER_ROW = 5;
 const SUPPORTS_MASK_IMAGE = ['apple', 'github', 'okx_wallet', 'vercel'] as const;
 
+type SupportsMaskImageProvider = (typeof SUPPORTS_MASK_IMAGE)[number];
+
+const supportsMaskImage = (id: OAuthProvider | Web3Provider | PhoneCodeChannel): id is SupportsMaskImageProvider => {
+  return (SUPPORTS_MASK_IMAGE as readonly string[]).includes(id);
+};
+
 export type SocialButtonsProps = React.PropsWithChildren<{
   enableOAuthProviders: boolean;
   enableWeb3Providers: boolean;
@@ -199,7 +205,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                   width: theme.sizes.$4,
                   height: theme.sizes.$4,
                   maxWidth: '100%',
-                  ...(SUPPORTS_MASK_IMAGE.includes(strategyToDisplayData[strategy].id)
+                  ...(supportsMaskImage(strategyToDisplayData[strategy].id)
                     ? {
                         '--cl-icon-fill': theme.colors.$colorForeground,
                         backgroundColor: 'var(--cl-icon-fill)',
