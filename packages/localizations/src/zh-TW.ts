@@ -851,6 +851,7 @@ export const zhTW: LocalizationResource = {
       action__invitationAccept: '加入',
       action__suggestionsAccept: '請求加入',
       subtitle: '加入現有組織或建立新組織',
+      subtitle__createOrganizationDisabled: '加入現有組織',
       suggestionsAcceptedLabel: '等待批准',
       title: '選擇組織',
     },
@@ -871,6 +872,10 @@ export const zhTW: LocalizationResource = {
     signOut: {
       actionLink: '登出',
       actionText: '已登入為 {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        '偵測到的公司名稱 ({{organizationName}}) 和 {{organizationDomain}} 已存在一個組織。請透過邀請加入。',
     },
   },
   taskResetPassword: {

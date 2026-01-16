@@ -880,6 +880,7 @@ export const frFR: LocalizationResource = {
       action__invitationAccept: 'Rejoindre',
       action__suggestionsAccept: 'Demander à rejoindre',
       subtitle: 'Rejoignez une organisation existante ou créez-en une nouvelle',
+      subtitle__createOrganizationDisabled: 'Rejoignez une organisation existante',
       suggestionsAcceptedLabel: 'En attente d’approbation',
       title: 'Choisir une organisation',
     },
@@ -900,6 +901,10 @@ export const frFR: LocalizationResource = {
     signOut: {
       actionLink: 'Se déconnecter',
       actionText: 'Connecté en tant que {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        "Une organisation existe déjà pour le nom d'entreprise détecté ({{organizationName}}) et {{organizationDomain}}. Rejoignez par invitation.",
     },
   },
   taskResetPassword: {

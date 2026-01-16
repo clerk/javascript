@@ -875,6 +875,7 @@ export const faIR: LocalizationResource = {
       action__invitationAccept: 'بپیوندید',
       action__suggestionsAccept: 'درخواست عضویت',
       subtitle: 'برای ادامه، سازمانی را انتخاب کنید',
+      subtitle__createOrganizationDisabled: 'به یک سازمان موجود بپیوندید',
       suggestionsAcceptedLabel: 'در انتظار تایید',
       title: 'یک سازمان انتخاب کنید',
     },
@@ -895,6 +896,10 @@ export const faIR: LocalizationResource = {
     signOut: {
       actionLink: 'خروج از همه حساب‌ها',
       actionText: 'می‌خواهید خارج شوید؟',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'سازمانی برای نام شرکت شناسایی شده ({{organizationName}}) و {{organizationDomain}} از قبل وجود دارد. از طریق دعوتنامه بپیوندید.',
     },
   },
   taskResetPassword: {

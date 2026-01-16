@@ -856,6 +856,7 @@ export const koKR: LocalizationResource = {
       action__invitationAccept: '참여',
       action__suggestionsAccept: '참여 요청',
       subtitle: '기존 조직에 참여하거나 새 조직을 만드세요',
+      subtitle__createOrganizationDisabled: '기존 조직에 참여하세요',
       suggestionsAcceptedLabel: '승인 대기 중',
       title: '조직 선택',
     },
@@ -876,6 +877,10 @@ export const koKR: LocalizationResource = {
     signOut: {
       actionLink: '로그아웃',
       actionText: '{{identifier}}로 로그인됨',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        '감지된 회사 이름 ({{organizationName}}) 및 {{organizationDomain}}에 대한 조직이 이미 존재합니다. 초대를 통해 가입하세요.',
     },
   },
   taskResetPassword: {

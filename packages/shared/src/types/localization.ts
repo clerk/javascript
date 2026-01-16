@@ -1304,6 +1304,7 @@ export type __internal_LocalizationResource = {
     chooseOrganization: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      subtitle__createOrganizationDisabled: LocalizationValue;
       suggestionsAcceptedLabel: LocalizationValue;
       action__suggestionsAccept: LocalizationValue;
       action__createOrganization: LocalizationValue;
@@ -1312,6 +1313,9 @@ export type __internal_LocalizationResource = {
     organizationCreationDisabled: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+    };
+    alerts: {
+      organizationAlreadyExists: LocalizationValue<'organizationDomain' | 'organizationName'>;
     };
   };
   taskResetPassword: {

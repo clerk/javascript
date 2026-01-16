@@ -1,7 +1,6 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { OrganizationInvitationResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
-import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -244,6 +243,59 @@ describe('InviteMembersPage', () => {
       );
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
       await waitFor(() => expect(getByRole('button', { name: /select role/i })).toBeInTheDocument());
+    });
+
+    it('enables selecting other options if default role is not available', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationDomains(undefined, 'mydefaultrole');
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 1,
+        data: [
+          {
+            pathRoot: '',
+            reload: vi.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            pathRoot: '',
+            reload: vi.fn(),
+            id: 'admin',
+            key: 'admin',
+            name: 'admin',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
+      fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
+      const { getByRole, userEvent, getByTestId } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
+      await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
+      await waitFor(() => expect(getByRole('button', { name: /select role/i })).toBeInTheDocument());
+      await userEvent.click(getByRole('button', { name: /select role/i }));
+      await userEvent.click(getByRole('button', { name: /admin/i }));
+      await waitFor(() => expect(getByRole('button', { name: 'Send invitations' })).not.toBeDisabled());
     });
 
     it('enables send button with default role once email address has been entered', async () => {

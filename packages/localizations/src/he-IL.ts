@@ -854,6 +854,7 @@ export const heIL: LocalizationResource = {
       action__invitationAccept: 'הצטרף',
       action__suggestionsAccept: 'בקש להצטרף',
       subtitle: 'הצטרף לארגון קיים או צור חדש',
+      subtitle__createOrganizationDisabled: 'הצטרף לארגון קיים',
       suggestionsAcceptedLabel: 'ממתין לאישור',
       title: 'בחר ארגון',
     },
@@ -874,6 +875,10 @@ export const heIL: LocalizationResource = {
     signOut: {
       actionLink: 'התנתק',
       actionText: 'מחובר כ-{{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'ארגון כבר קיים עבור שם החברה שזוהה ({{organizationName}}) ו-{{organizationDomain}}. הצטרף באמצעות הזמנה.',
     },
   },
   taskResetPassword: {

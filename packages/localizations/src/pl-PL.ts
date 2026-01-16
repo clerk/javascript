@@ -868,6 +868,7 @@ export const plPL: LocalizationResource = {
       action__invitationAccept: 'Dołącz',
       action__suggestionsAccept: 'Poproś o dołączenie',
       subtitle: 'Dołącz do istniejącej organizacji lub utwórz nową',
+      subtitle__createOrganizationDisabled: 'Dołącz do istniejącej organizacji',
       suggestionsAcceptedLabel: 'Oczekiwanie na dołączenie',
       title: 'Wybierz organizację',
     },
@@ -888,6 +889,10 @@ export const plPL: LocalizationResource = {
     signOut: {
       actionLink: 'Wyloguj',
       actionText: 'Zalogowano jako {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Organizacja już istnieje dla wykrytej nazwy firmy ({{organizationName}}) i {{organizationDomain}}. Dołącz przez zaproszenie.',
     },
   },
   taskResetPassword: {

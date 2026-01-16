@@ -875,6 +875,7 @@ export const ruRU: LocalizationResource = {
       action__invitationAccept: 'Присоединиться',
       action__suggestionsAccept: 'Запросить присоединение',
       subtitle: 'Присоединитесь к существующей организации или создайте новую',
+      subtitle__createOrganizationDisabled: 'Присоединитесь к существующей организации',
       suggestionsAcceptedLabel: 'Ожидает одобрения',
       title: 'Выберите организацию',
     },
@@ -895,6 +896,10 @@ export const ruRU: LocalizationResource = {
     signOut: {
       actionLink: 'Выйти',
       actionText: 'Вошли как {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Организация уже существует для обнаруженного названия компании ({{organizationName}}) и {{organizationDomain}}. Присоединяйтесь по приглашению.',
     },
   },
   taskResetPassword: {

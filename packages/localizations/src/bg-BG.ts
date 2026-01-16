@@ -864,6 +864,7 @@ export const bgBG: LocalizationResource = {
       action__invitationAccept: 'Присъедини се',
       action__suggestionsAccept: 'Поискай присъединяване',
       subtitle: 'Присъедини се към съществуваща организация или създай нова',
+      subtitle__createOrganizationDisabled: 'Присъедини се към съществуваща организация',
       suggestionsAcceptedLabel: 'В очакване на одобрение',
       title: 'Избери организация',
     },
@@ -884,6 +885,10 @@ export const bgBG: LocalizationResource = {
     signOut: {
       actionLink: 'Изход',
       actionText: 'Влязъл като {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Организация вече съществува за откритото име на компанията ({{organizationName}}) и {{organizationDomain}}. Присъединете се чрез покана.',
     },
   },
   taskResetPassword: {

@@ -861,6 +861,7 @@ export const srRS: LocalizationResource = {
       action__invitationAccept: 'Pridruži se',
       action__suggestionsAccept: 'Zatraži pridruživanje',
       subtitle: 'Pridružite se postojećoj organizaciji ili napravite novu',
+      subtitle__createOrganizationDisabled: 'Pridružite se postojećoj organizaciji',
       suggestionsAcceptedLabel: 'Čeka odobrenje',
       title: 'Izaberite organizaciju',
     },
@@ -881,6 +882,10 @@ export const srRS: LocalizationResource = {
     signOut: {
       actionLink: 'Odjavi se',
       actionText: 'Prijavljen kao {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Organizacija već postoji za otkriveno ime kompanije ({{organizationName}}) i {{organizationDomain}}. Pridružite se putem pozivnice.',
     },
   },
   taskResetPassword: {

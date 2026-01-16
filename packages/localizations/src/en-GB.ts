@@ -865,6 +865,7 @@ export const enGB: LocalizationResource = {
       action__invitationAccept: 'Join',
       action__suggestionsAccept: 'Request to join',
       subtitle: 'Join an existing organisation or create a new one',
+      subtitle__createOrganizationDisabled: 'Join an existing organisation',
       suggestionsAcceptedLabel: 'Pending approval',
       title: 'Choose an organisation',
     },
@@ -885,6 +886,10 @@ export const enGB: LocalizationResource = {
     signOut: {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'An organisation already exists for the detected company name ({{organizationName}}) and {{organizationDomain}}. Join by invitation.',
     },
   },
   taskResetPassword: {

@@ -300,6 +300,8 @@ export interface OauthAccessTokenJSON {
   // Only set in OAuth 1.0 tokens
   token_secret?: string;
   expires_at?: number;
+  // Only present for OIDC-compliant OAuth 2.0 providers when available
+  id_token?: string;
 }
 
 export interface OAuthApplicationJSON extends ClerkResourceJSON {
