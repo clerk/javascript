@@ -44,11 +44,7 @@ module.exports = function transformClerkProviderInsideBody({ source }, { jscodes
   clerkNextjsImport.forEach(importPath => {
     const specifiers = importPath.node.specifiers || [];
     for (const specifier of specifiers) {
-      if (
-        j.ImportSpecifier.check(specifier) &&
-        specifier.imported &&
-        specifier.imported.name === 'ClerkProvider'
-      ) {
+      if (j.ImportSpecifier.check(specifier) && specifier.imported && specifier.imported.name === 'ClerkProvider') {
         // Use the local name (will be different if aliased)
         clerkProviderLocalName = specifier.local.name;
         break;
