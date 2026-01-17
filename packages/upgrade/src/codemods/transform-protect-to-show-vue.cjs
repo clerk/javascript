@@ -197,21 +197,27 @@ function transformTemplate(templateContent, importedComponents) {
   // Transform Protect components (only if Protect was imported)
   if (importedComponents.has('Protect')) {
     result = transformProtectElements(result, wasModified => {
-      if (wasModified) dirtyFlag = true;
+      if (wasModified) {
+        dirtyFlag = true;
+      }
     });
   }
 
   // Transform SignedIn components (only if SignedIn was imported)
   if (importedComponents.has('SignedIn')) {
     result = transformSignedStateElements(result, 'SignedIn', 'signed-in', wasModified => {
-      if (wasModified) dirtyFlag = true;
+      if (wasModified) {
+        dirtyFlag = true;
+      }
     });
   }
 
   // Transform SignedOut components (only if SignedOut was imported)
   if (importedComponents.has('SignedOut')) {
     result = transformSignedStateElements(result, 'SignedOut', 'signed-out', wasModified => {
-      if (wasModified) dirtyFlag = true;
+      if (wasModified) {
+        dirtyFlag = true;
+      }
     });
   }
 
