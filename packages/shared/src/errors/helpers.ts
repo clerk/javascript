@@ -103,6 +103,15 @@ export function isPasswordCompromisedError(err: any) {
 }
 
 /**
+ * Checks if the provided error is a clerk api response error indicating a password is too long to migrate.
+ *
+ * @internal
+ */
+export function isPasswordTooLongError(err: any) {
+  return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'password_too_long_needs_reset';
+}
+
+/**
  * Checks if the provided error is an EmailLinkError.
  *
  * @internal

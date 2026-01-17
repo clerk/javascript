@@ -59,6 +59,10 @@ function determineAlternativeMethodsMode(
     return 'passwordCompromised';
   }
 
+  if (passwordErrorCode === 'passwordTooLong') {
+    return 'passwordTooLong';
+  }
+
   return 'forgot';
 }
 

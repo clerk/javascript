@@ -353,6 +353,138 @@ describe('SignInFactorOne', () => {
         ).not.toBeInTheDocument();
       });
 
+      it('Prompts the user to reset their password via email if it is too long', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithEmailAddress({
+            supportPassword: true,
+            supportEmailCode: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'password_too_long_needs_reset',
+          long_message: 'The existing imported password is too long and cannot be used, please reset your password.',
+          message: 'The existing imported password is too long and cannot be used, please reset your password.',
+          meta: { param_name: 'password' },
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText('Password'), '123456');
+        await userEvent.click(screen.getByText('Continue'));
+
+        await screen.findByText('Password too long');
+        await screen.findByText(
+          'The existing imported password is too long and cannot be used, please reset your password.',
+        );
+        await screen.findByText('Or, sign in with another method');
+
+        await userEvent.click(screen.getByText('Reset your password'));
+        await screen.findByText('First, enter the code sent to your email address');
+      });
+
+      it('Prompts the user to reset their password via phone if it is too long', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithPhoneNumber({
+            supportPassword: true,
+            supportPhoneCode: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'password_too_long_needs_reset',
+          long_message: 'The existing imported password is too long and cannot be used, please reset your password.',
+          message: 'The existing imported password is too long and cannot be used, please reset your password.',
+          meta: { param_name: 'password' },
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText('Password'), '123456');
+        await userEvent.click(screen.getByText('Continue'));
+
+        await screen.findByText('Password too long');
+        await screen.findByText(
+          'The existing imported password is too long and cannot be used, please reset your password.',
+        );
+        await screen.findByText('Or, sign in with another method');
+
+        await userEvent.click(screen.getByText('Reset your password'));
+        await screen.findByText('First, enter the code sent to your phone');
+      });
+
+      it('entering a password that is too long, then going back and clicking forgot password should result in the correct title', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithEmailAddress({
+            supportPassword: true,
+            supportEmailCode: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'password_too_long_needs_reset',
+          long_message: 'The existing imported password is too long and cannot be used, please reset your password.',
+          message: 'The existing imported password is too long and cannot be used, please reset your password.',
+          meta: { param_name: 'password' },
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText('Password'), '123456');
+        await userEvent.click(screen.getByText('Continue'));
+
+        await screen.findByText('Password too long');
+        await screen.findByText(
+          'The existing imported password is too long and cannot be used, please reset your password.',
+        );
+        await screen.findByText('Or, sign in with another method');
+
+        // Go back
+        await userEvent.click(screen.getByText('Back'));
+
+        // Choose to reset password via "Forgot password" instead
+        await userEvent.click(screen.getByText(/Forgot password/i));
+        await screen.findByText('Forgot Password?');
+        expect(
+          screen.queryByText(
+            'The existing imported password is too long and cannot be used, please reset your password.',
+          ),
+        ).not.toBeInTheDocument();
+      });
+
       it('using an compromised password should show the compromised password screen', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
