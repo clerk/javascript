@@ -20,7 +20,10 @@ export default {
     'transform-themes-to-ui-themes',
     'transform-align-experimental-unstable-prefixes',
     // React/JSX version of Protect→Show (handles .tsx, .jsx, .ts, .js files)
-    { name: 'transform-protect-to-show', packages: ['nextjs', 'react', 'expo', 'react-router', 'tanstack-react-start', 'astro'] },
+    {
+      name: 'transform-protect-to-show',
+      packages: ['nextjs', 'react', 'expo', 'react-router', 'tanstack-react-start', 'astro'],
+    },
     // Vue SFC version of Protect→Show (handles .vue files)
     { name: 'transform-protect-to-show-vue', packages: ['vue', 'nuxt'] },
     { name: 'transform-clerk-provider-inside-body', packages: ['nextjs'] },
