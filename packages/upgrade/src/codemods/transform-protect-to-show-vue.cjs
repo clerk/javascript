@@ -37,7 +37,8 @@ module.exports = function transformProtectToShowVue(fileInfo, { jscodeshift: j }
   const importedComponents = new Set();
 
   // Extract and transform <script> block
-  const scriptMatch = result.match(/(<script[^>]*>)([\s\S]*?)(<\/script>)/i);
+  // Use \b word boundary and [^>]* to handle closing tags with whitespace/attributes like </script >
+  const scriptMatch = result.match(/(<script[^>]*>)([\s\S]*?)(<\/script\b[^>]*>)/i);
   if (scriptMatch) {
     const [fullMatch, openTag, scriptContent, closeTag] = scriptMatch;
     const scriptResult = transformScript(scriptContent, j);
@@ -56,7 +57,8 @@ module.exports = function transformProtectToShowVue(fileInfo, { jscodeshift: j }
   // Only transform template if we found clerk imports
   if (importedComponents.size > 0) {
     // Extract and transform <template> block
-    const templateMatch = result.match(/(<template[^>]*>)([\s\S]*?)(<\/template>)/i);
+    // Use \b word boundary and [^>]* to handle closing tags with whitespace/attributes
+    const templateMatch = result.match(/(<template[^>]*>)([\s\S]*?)(<\/template\b[^>]*>)/i);
     if (templateMatch) {
       const [fullMatch, openTag, templateContent, closeTag] = templateMatch;
       const transformedTemplate = transformTemplate(templateContent, importedComponents);
