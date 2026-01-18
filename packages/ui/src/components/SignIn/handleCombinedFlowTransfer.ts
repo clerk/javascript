@@ -1,5 +1,6 @@
 import { SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
+  DecorateUrl,
   LoadedClerk,
   PhoneCodeChannel,
   PhoneCodeStrategy,
@@ -24,7 +25,11 @@ type HandleCombinedFlowTransferProps = {
   redirectUrlComplete?: string;
   passwordEnabled: boolean;
   alternativePhoneCodeChannel?: PhoneCodeChannel | null;
-  navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
+  navigateOnSetActive: (opts: {
+    session: SessionResource;
+    redirectUrl: string;
+    decorateUrl: DecorateUrl;
+  }) => Promise<unknown>;
 };
 
 /**
@@ -95,8 +100,8 @@ export function handleCombinedFlowTransfer({
           handleComplete: () =>
             clerk.setActive({
               session: res.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
               },
             }),
           navigate,

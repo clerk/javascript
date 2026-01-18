@@ -1,5 +1,5 @@
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
-import type { SessionResource } from '@clerk/shared/types';
+import type { DecorateUrl, SessionResource } from '@clerk/shared/types';
 import { createContext, useContext } from 'react';
 
 import { useRouter } from '@/ui/router';
@@ -9,7 +9,11 @@ import type { SessionTasksCtx, TaskChooseOrganizationCtx, TaskResetPasswordCtx }
 export const SessionTasksContext = createContext<SessionTasksCtx | null>(null);
 
 type SessionTasksContextType = SessionTasksCtx & {
-  navigateOnSetActive: (opts: { session: SessionResource; redirectUrlComplete: string }) => Promise<unknown>;
+  navigateOnSetActive: (opts: {
+    session: SessionResource;
+    redirectUrlComplete: string;
+    decorateUrl: DecorateUrl;
+  }) => Promise<unknown>;
 };
 
 export const useSessionTasksContext = (): SessionTasksContextType => {
@@ -23,12 +27,23 @@ export const useSessionTasksContext = (): SessionTasksContextType => {
   const navigateOnSetActive = async ({
     session,
     redirectUrlComplete,
+    decorateUrl,
   }: {
     session: SessionResource;
     redirectUrlComplete: string;
+    decorateUrl: DecorateUrl;
   }) => {
     const currentTask = session.currentTask;
     if (!currentTask) {
+      // Use decorateUrl to enable Safari ITP cookie refresh when needed
+      const decoratedUrl = decorateUrl(redirectUrlComplete);
+
+      // If decorateUrl returns an external URL (Safari ITP fix), do a full page navigation
+      if (decoratedUrl.startsWith('https://')) {
+        window.location.href = decoratedUrl;
+        return;
+      }
+
       return navigate(redirectUrlComplete);
     }
 
