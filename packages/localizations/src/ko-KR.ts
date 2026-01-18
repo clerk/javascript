@@ -781,8 +781,8 @@ export const koKR: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: '계속하려면 가입을 시작한 기기와 브라우저에서 링크를 열어 주세요.',
+        title: '이 기기에서는 인증 링크를 사용할 수 없어요',
       },
       formSubtitle: '이메일 주소로 전송된 인증 링크를 사용합니다.',
       formTitle: '인증 링크',
@@ -872,7 +872,7 @@ export const koKR: LocalizationResource = {
       formFieldInputPlaceholder__name: '내 조직',
       formFieldInputPlaceholder__slug: 'nae-jigug',
       formFieldLabel__name: '이름',
-      formFieldLabel__slug: 'Slug',
+      formFieldLabel__slug: '슬러그',
       subtitle: '조직 세부 정보를 입력하여 계속하세요',
       title: '조직 설정',
     },
