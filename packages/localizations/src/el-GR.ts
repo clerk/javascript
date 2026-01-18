@@ -22,7 +22,7 @@ export const elGR: LocalizationResource = {
       formHint: 'Για λόγους ασφαλείας, δεν θα σας επιτρέψουμε να το δείτε ξανά αργότερα.',
       formTitle: 'Αντιγράψτε το κλειδί API "{{name}}" σας τώρα',
     },
-    createdAndExpirationStatus__expiresOn: 'Λήγει στις {{expirationDate}}',
+    createdAndExpirationStatus__expiresOn: 'Λήγει στις {{expiresDate}}',
     createdAndExpirationStatus__never: 'Δεν λήγει ποτέ',
     detailsTitle__emptyRow: 'Δεν υπάρχουν κλειδιά API προς εμφάνιση',
     formButtonPrimary__add: 'Προσθήκη κλειδιού',
