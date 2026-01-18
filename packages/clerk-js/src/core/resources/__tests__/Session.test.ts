@@ -4,6 +4,16 @@ import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vite
 
 import { clerkMock, createUser, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
 
+/**
+ * Creates a JWT string with the specified iat (issued at) and ttl (time to live).
+ * The token will expire at iat + ttl seconds.
+ */
+function createJwtWithTtl(iatSeconds: number, ttlSeconds: number): string {
+  const payload = { exp: iatSeconds + ttlSeconds, iat: iatSeconds, sid: 'session_1', sub: 'user_1' };
+  const payloadB64 = btoa(JSON.stringify(payload)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  return `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${payloadB64}.signature`;
+}
+
 import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
 import { SessionTokenCache } from '../../tokenCache';
@@ -1230,6 +1240,281 @@ describe('Session', () => {
         errors: [{ code: 'validation_error' }],
       });
 
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  /**
+   * Proactive Token Refresh Tests
+   *
+   * Token timing (for 60-second tokens):
+   * - LEEWAY = 10s (token considered "expiring soon")
+   * - SYNC_LEEWAY = 5s (buffer for cookie polling)
+   * - REFRESH_BUFFER = 2s (buffer before leeway)
+   * - Leeway zone starts at: 60 - 10 - 5 = 45 seconds
+   * - Proactive timer fires at: 60 - 10 - 5 - 2 = 43 seconds
+   */
+  describe('proactive token refresh behavior', () => {
+    let fetchSpy: ReturnType<typeof vi.spyOn>;
+    let dispatchSpy: ReturnType<typeof vi.spyOn>;
+
+    // Use a fixed timestamp for predictable timing
+    const BASE_TIME_SECONDS = 1700000000;
+    const TOKEN_TTL = 60;
+
+    beforeEach(() => {
+      SessionTokenCache.clear();
+      dispatchSpy = vi.spyOn(eventBus, 'emit');
+      fetchSpy = vi.spyOn(BaseResource, '_fetch' as any);
+      BaseResource.clerk = clerkMock() as any;
+    });
+
+    afterEach(() => {
+      dispatchSpy?.mockRestore();
+      fetchSpy?.mockRestore();
+      BaseResource.clerk = null as any;
+    });
+
+    it('returns cached token before proactive timer fires (t < 43)', async () => {
+      // Token issued at BASE_TIME, expires at BASE_TIME + 60
+      const jwt = createJwtWithTtl(BASE_TIME_SECONDS, TOKEN_TTL);
+      vi.setSystemTime(new Date(BASE_TIME_SECONDS * 1000));
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      fetchSpy.mockClear();
+
+      // Advance to t=40 (before the proactive timer at t=43)
+      vi.advanceTimersByTime(40 * 1000);
+
+      const token = await session.getToken();
+
+      expect(token).toEqual(jwt);
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('returns OLD token while proactive fetch is in progress (43 < t < 45)', async () => {
+      const jwt = createJwtWithTtl(BASE_TIME_SECONDS, TOKEN_TTL);
+      vi.setSystemTime(new Date(BASE_TIME_SECONDS * 1000));
+
+      // Create a promise that never resolves during this test (simulating slow network)
+      let resolveProactiveFetch: (value: any) => void;
+      const pendingPromise = new Promise(resolve => {
+        resolveProactiveFetch = resolve;
+      });
+      fetchSpy.mockReturnValue(pendingPromise);
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      // Allow the initial cache hydration to set up the timer
+      await Promise.resolve();
+
+      fetchSpy.mockClear();
+      fetchSpy.mockReturnValue(pendingPromise);
+
+      // Advance to t=43 - proactive timer fires, starting background fetch
+      vi.advanceTimersByTime(43 * 1000);
+
+      // Advance to t=44 (still before leeway at t=45)
+      vi.advanceTimersByTime(1 * 1000);
+
+      // Call getToken - should return OLD token instantly (non-blocking)
+      const token = await session.getToken();
+
+      expect(token).toEqual(jwt);
+      // Only the proactive fetch should have been triggered
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+      // Clean up the pending promise
+      resolveProactiveFetch!({ object: 'token', jwt: createJwtWithTtl(BASE_TIME_SECONDS + 43, TOKEN_TTL) });
+    });
+
+    it('returns NEW token after proactive fetch completes (43 < t < 45)', async () => {
+      const oldJwt = createJwtWithTtl(BASE_TIME_SECONDS, TOKEN_TTL);
+      const newJwt = createJwtWithTtl(BASE_TIME_SECONDS + 43, TOKEN_TTL);
+      vi.setSystemTime(new Date(BASE_TIME_SECONDS * 1000));
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: oldJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      // Allow the initial cache hydration to set up the timer
+      await Promise.resolve();
+
+      fetchSpy.mockClear();
+
+      // Mock the proactive fetch to return new token immediately
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: newJwt });
+
+      // Advance to t=43 - proactive timer fires, fetch completes immediately
+      vi.advanceTimersByTime(43 * 1000);
+
+      // Allow the proactive fetch promise to resolve and cache update to complete
+      await Promise.resolve();
+      await Promise.resolve();
+
+      fetchSpy.mockClear();
+
+      // Advance to t=44
+      vi.advanceTimersByTime(1 * 1000);
+
+      // Call getToken - should return NEW token from cache
+      const token = await session.getToken();
+
+      expect(token).toEqual(newJwt);
+      // No additional API call should be made
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('returns NEW token in leeway zone when proactive fetch completed (t >= 45)', async () => {
+      const oldJwt = createJwtWithTtl(BASE_TIME_SECONDS, TOKEN_TTL);
+      const newJwt = createJwtWithTtl(BASE_TIME_SECONDS + 43, TOKEN_TTL);
+      vi.setSystemTime(new Date(BASE_TIME_SECONDS * 1000));
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: oldJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      // Allow the initial cache hydration to set up the timer
+      await Promise.resolve();
+
+      fetchSpy.mockClear();
+
+      // Mock the proactive fetch to return new token
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: newJwt });
+
+      // Advance to t=43 - proactive timer fires
+      vi.advanceTimersByTime(43 * 1000);
+
+      // Allow the proactive fetch promise to resolve and cache update to complete
+      await Promise.resolve();
+      await Promise.resolve();
+
+      fetchSpy.mockClear();
+
+      // Advance to t=46 (old token would be in leeway zone, but new token is fresh)
+      vi.advanceTimersByTime(3 * 1000);
+
+      const token = await session.getToken();
+
+      expect(token).toEqual(newJwt);
+      // No additional API call needed - new token is still fresh
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('blocks and fetches new token in leeway zone when proactive fetch failed (t >= 45)', async () => {
+      const oldJwt = createJwtWithTtl(BASE_TIME_SECONDS, TOKEN_TTL);
+      const newJwt = createJwtWithTtl(BASE_TIME_SECONDS + 46, TOKEN_TTL);
+      vi.setSystemTime(new Date(BASE_TIME_SECONDS * 1000));
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: oldJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      fetchSpy.mockClear();
+
+      // Proactive fetch fails silently
+      fetchSpy.mockRejectedValueOnce(new Error('Network error'));
+
+      // Advance to t=43 - proactive timer fires, fetch fails
+      vi.advanceTimersByTime(43 * 1000);
+
+      // Allow the proactive fetch promise to reject
+      await vi.runAllTimersAsync();
+
+      // Second call (from getToken) succeeds
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: newJwt });
+
+      // Advance to t=46 (in leeway zone)
+      vi.advanceTimersByTime(3 * 1000);
+
+      const token = await session.getToken();
+
+      expect(token).toEqual(newJwt);
+      // Two API calls: proactive fetch (failed) + getToken fetch (success)
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('blocks and fetches new token when timer did not fire (background tab scenario, t >= 45)', async () => {
+      const oldJwt = createJwtWithTtl(BASE_TIME_SECONDS, TOKEN_TTL);
+      const newJwt = createJwtWithTtl(BASE_TIME_SECONDS + 46, TOKEN_TTL);
+      vi.setSystemTime(new Date(BASE_TIME_SECONDS * 1000));
+
+      // Create session which hydrates the cache with onExpiringSoon callback
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: oldJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      // Allow the initial cache hydration to complete
+      await Promise.resolve();
+
+      // Simulate background tab scenario: clear cache completely
+      // This simulates what happens when the tab was suspended and the cache is empty
+      SessionTokenCache.clear();
+
+      fetchSpy.mockClear();
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: newJwt });
+
+      // Advance to t=46 (timer never fired because cache was cleared)
+      vi.advanceTimersByTime(46 * 1000);
+
+      // getToken() with no cache entry should make an API call
+      const token = await session.getToken();
+
+      expect(token).toEqual(newJwt);
+      // Should make an API call since there's no cache entry
       expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
   });
