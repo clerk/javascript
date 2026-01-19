@@ -6,14 +6,12 @@ import {
   ClerkInstanceContext,
   InitialStateProvider,
 } from './contexts';
-import { SWRConfigCompat } from './providers/SWRConfigCompat';
 import { assertClerkSingletonExists } from './utils';
 
 type ClerkContextProps = {
   clerk: Clerk;
   clerkStatus?: ClerkStatus;
   children: React.ReactNode;
-  swrConfig?: any;
   initialState?: InitialState;
 };
 
@@ -33,14 +31,12 @@ export function ClerkContextProvider(props: ClerkContextProps): JSX.Element | nu
   return (
     <InitialStateProvider initialState={props.initialState}>
       <ClerkInstanceContext.Provider value={clerkCtx}>
-        <SWRConfigCompat swrConfig={props.swrConfig}>
-          <CheckoutProvider
-            // @ts-expect-error - value is not used
-            value={undefined}
-          >
-            {props.children}
-          </CheckoutProvider>
-        </SWRConfigCompat>
+        <CheckoutProvider
+          // @ts-expect-error - value is not used
+          value={undefined}
+        >
+          {props.children}
+        </CheckoutProvider>
       </ClerkInstanceContext.Provider>
     </InitialStateProvider>
   );

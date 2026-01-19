@@ -17,7 +17,7 @@ export const application = (
 ) => {
   const { name, scripts, envWriter, copyKeylessToEnv } = config;
   const logger = createLogger({ prefix: `${appDirName}` });
-  const state = { completedSetup: false, serverUrl: '', env: {} as EnvironmentConfig };
+  const state = { completedSetup: false, serverUrl: '', env: {} as EnvironmentConfig, lastDevPort: 0 };
   const cleanupFns: { (): unknown }[] = [];
   const now = Date.now();
   const stdoutFilePath = path.resolve(appDirPath, `e2e.${now}.log`);
@@ -119,7 +119,14 @@ export const application = (
         }
       }
 
+      state.lastDevPort = port;
       return { port, serverUrl: runtimeServerUrl, pid: proc.pid };
+    },
+    restart: async () => {
+      const log = logger.child({ prefix: 'restart' }).info;
+      log('Restarting dev server...');
+      await self.stop();
+      return self.dev({ port: state.lastDevPort });
     },
     build: async () => {
       const log = logger.child({ prefix: 'build' }).info;

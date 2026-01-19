@@ -33,6 +33,11 @@ export function useClearQueriesOnSignOut(options: ClearQueriesOnSignOutOptions) 
   const previousIsSignedIn = usePreviousValue(!isSignedOut);
 
   useEffect(() => {
+    // If this hook's cache keys are not authenticated, skip all cleanup logic.
+    if (authenticated !== true) {
+      return;
+    }
+
     const isNowSignedOut = isSignedOut === true;
 
     if (previousIsSignedIn && isNowSignedOut && authenticated === true) {
@@ -52,5 +57,5 @@ export function useClearQueriesOnSignOut(options: ClearQueriesOnSignOutOptions) 
 
       onCleanup?.();
     }
-  }, [isSignedOut, previousIsSignedIn, queryClient, authenticated]);
+  }, [authenticated, isSignedOut, previousIsSignedIn, queryClient]);
 }

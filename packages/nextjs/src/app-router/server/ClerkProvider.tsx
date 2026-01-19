@@ -42,15 +42,6 @@ export async function ClerkProvider<TUi extends Ui = Ui>(
 
   const { shouldRunAsKeyless, runningWithClaimedKeys } = await getKeylessStatus(propsWithEnvs);
 
-  try {
-    const detectKeylessEnvDrift = await import('../../server/keyless-telemetry.js').then(
-      mod => mod.detectKeylessEnvDrift,
-    );
-    await detectKeylessEnvDrift();
-  } catch {
-    // ignore
-  }
-
   if (shouldRunAsKeyless) {
     return (
       <KeylessProvider

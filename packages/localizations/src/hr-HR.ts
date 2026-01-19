@@ -887,6 +887,10 @@ export const hrHR: LocalizationResource = {
       actionLink: 'Odjavi se',
       actionText: 'Prijavljen kao {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Organizacija već postoji za otkriveni naziv tvrtke ({{organizationName}}) i {{organizationDomain}}. Pridružite se putem pozivnice.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

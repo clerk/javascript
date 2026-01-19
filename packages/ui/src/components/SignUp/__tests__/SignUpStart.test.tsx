@@ -89,12 +89,24 @@ describe('SignUpStart', () => {
     });
 
     it('should keep email optional when phone is primary with password', async () => {
-      const { wrapper } = await createFixtures(f => {
+      const { wrapper: Wrapper } = await createFixtures(f => {
         f.withEmailAddress({ required: false });
         f.withPhoneNumber({ required: true });
         f.withPassword({ required: true });
       });
-      render(<SignUpStart />, { wrapper });
+
+      const wrapperWithOptionalFields = ({ children }: { children: React.ReactNode }) => (
+        <Wrapper>
+          <AppearanceProvider
+            appearanceKey={'signUp'}
+            appearance={{ options: { showOptionalFields: true } }}
+          >
+            {children}
+          </AppearanceProvider>
+        </Wrapper>
+      );
+
+      render(<SignUpStart />, { wrapper: wrapperWithOptionalFields });
 
       const emailAddress = screen.getByLabelText('Email address', { selector: 'input' });
       expect(emailAddress.ariaRequired).toBe('false');
@@ -168,12 +180,24 @@ describe('SignUpStart', () => {
     });
 
     it('enables optional phone number', async () => {
-      const { wrapper } = await createFixtures(f => {
+      const { wrapper: Wrapper } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
         f.withPhoneNumber({ required: false });
         f.withPassword({ required: true });
       });
-      render(<SignUpStart />, { wrapper });
+
+      const wrapperWithOptionalFields = ({ children }: { children: React.ReactNode }) => (
+        <Wrapper>
+          <AppearanceProvider
+            appearanceKey={'signUp'}
+            appearance={{ options: { showOptionalFields: true } }}
+          >
+            {children}
+          </AppearanceProvider>
+        </Wrapper>
+      );
+
+      render(<SignUpStart />, { wrapper: wrapperWithOptionalFields });
       expect(screen.getByText('Phone number').nextElementSibling?.textContent).toBe('Optional');
     });
 
@@ -287,7 +311,7 @@ describe('SignUpStart', () => {
   describe('initialValues', () => {
     it('prefills the emailAddress field with the correct initial value', async () => {
       const { wrapper, props } = await createFixtures(f => {
-        f.withEmailAddress();
+        f.withEmailAddress({ required: true });
       });
       props.setProps({ initialValues: { emailAddress: 'foo@clerk.com' } });
 
@@ -297,7 +321,7 @@ describe('SignUpStart', () => {
 
     it('prefills the phoneNumber field with the correct initial value', async () => {
       const { wrapper, props } = await createFixtures(f => {
-        f.withPhoneNumber();
+        f.withPhoneNumber({ required: true });
       });
       props.setProps({ initialValues: { phoneNumber: '+306911111111' } });
 
@@ -307,7 +331,7 @@ describe('SignUpStart', () => {
 
     it('prefills the username field with the correct initial value', async () => {
       const { wrapper, props } = await createFixtures(f => {
-        f.withUsername();
+        f.withUsername({ required: true });
       });
 
       props.setProps({ initialValues: { username: 'foo' } });
