@@ -874,6 +874,7 @@ export const elGR: LocalizationResource = {
       action__invitationAccept: 'Συμμετοχή',
       action__suggestionsAccept: 'Αίτημα συμμετοχής',
       subtitle: 'Συμμετάσχετε σε έναν υπάρχοντα οργανισμό ή δημιουργήστε νέο',
+      subtitle__createOrganizationDisabled: 'Συμμετάσχετε σε έναν υπάρχοντα οργανισμό',
       suggestionsAcceptedLabel: 'Σε αναμονή έγκρισης',
       title: 'Επιλέξτε οργανισμό',
     },
@@ -894,6 +895,10 @@ export const elGR: LocalizationResource = {
     signOut: {
       actionLink: 'Αποσύνδεση',
       actionText: 'Συνδεδεμένος ως {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Υπάρχει ήδη οργανισμός για το ανιχνευμένο όνομα εταιρείας ({{organizationName}}) και {{organizationDomain}}. Εγγραφείτε μέσω πρόσκλησης.',
     },
   },
   taskResetPassword: {
