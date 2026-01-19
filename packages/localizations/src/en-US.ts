@@ -903,6 +903,12 @@ export const enUS: LocalizationResource = {
         phoneCode: 'SMS code',
       },
     },
+    smsCode: {
+      title: 'Add sms code verification',
+      subtitle: 'Choose phone number you want to use for SMS code two-step verification',
+      addPhoneNumber: 'Add phone number',
+      cancel: 'Cancel',
+    },
     signOut: {
       actionText: 'Signed in as {{identifier}}',
       actionLink: 'Sign out',

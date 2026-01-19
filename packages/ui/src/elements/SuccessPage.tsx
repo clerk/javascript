@@ -15,10 +15,11 @@ type SuccessPageProps = Omit<PropsOfComponent<typeof Flex>, 'headerTitle' | 'tit
   finishLabel?: LocalizationKey;
   contents?: React.ReactNode;
   onFinish?: () => void;
+  finishButtonProps?: PropsOfComponent<typeof Button>;
 };
 
 export const SuccessPage = (props: SuccessPageProps) => {
-  const { text, title, finishLabel, onFinish, contents, ...rest } = props;
+  const { text, title, finishLabel, onFinish, contents, finishButtonProps, ...rest } = props;
   const { navigateToFlowStart } = useNavigateToFlowStart();
 
   return (
@@ -62,6 +63,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
           localizationKey={finishLabel || localizationKeys('userProfile.formButtonPrimary__finish')}
           elementDescriptor={descriptors.formButtonPrimary}
           onClick={onFinish || navigateToFlowStart}
+          {...finishButtonProps}
         />
       </FormButtonContainer>
     </Col>

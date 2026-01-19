@@ -11,6 +11,7 @@ import { getSecondFactorsAvailableToAdd } from '@/ui/utils/mfa';
 import { MFA_METHODS_TO_ROUTES_PATH } from './constants';
 import { MfaFormForSessionTasks } from './MethodSelectionScreen';
 import { SetupMfaStartScreen } from './SetupMfaStartScreen';
+import { SmsCodeFlow } from './SmsCodeFlow';
 
 const TaskSetupMfaInternal = () => {
   const { user } = useUser();
@@ -47,7 +48,7 @@ const TaskSetupMfaInternal = () => {
             path={MFA_METHODS_TO_ROUTES_PATH[method]}
           >
             <Flow.Part part='setupMfa'>
-              <MfaFormForSessionTasks verificationStrategy={method} />
+              {method === 'phone_code' ? <SmsCodeFlow /> : <MfaFormForSessionTasks verificationStrategy={method} />}
             </Flow.Part>
           </Route>
         ))}

@@ -1333,6 +1333,12 @@ export type __internal_LocalizationResource = {
         phoneCode: LocalizationValue;
       };
     };
+    smsCode: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      addPhoneNumber: LocalizationValue;
+      cancel: LocalizationValue;
+    };
     signOut: {
       actionText: LocalizationValue<'identifier'>;
       actionLink: LocalizationValue;
