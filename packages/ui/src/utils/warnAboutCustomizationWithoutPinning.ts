@@ -10,12 +10,12 @@ function formatStructuralCssWarning(patterns: string[]): string {
   const truncated = patterns.length > 5 ? `\n  (+${patterns.length - 5} more)` : '';
 
   return [
-    `Clerk: Structural CSS may break on updates`,
+    `Clerk: Structural CSS detected that may break on updates.`,
     ``,
     `Found:`,
     patternsList + truncated,
     ``,
-    `These selectors depend on internal DOM structure that may change between versions.`,
+    `These selectors depend on the internal DOM structure of Clerk's components, which may change when Clerk deploys component updates.`,
     `To prevent breaking changes, install @clerk/ui and pass it to ClerkProvider:`,
     ``,
     `  import { ui } from '@clerk/ui'`,
