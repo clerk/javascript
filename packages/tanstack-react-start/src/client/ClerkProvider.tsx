@@ -33,12 +33,22 @@ export function ClerkProvider<TUi extends Ui = Ui>({
 
   const clerkInitState = isClient() ? (window as any).__clerk_init_state : clerkInitialState;
 
-  const { clerkSsrState, ...restInitState } = pickFromClerkInitState(clerkInitState?.__internal_clerk_state);
+  const { clerkSsrState, __keylessClaimUrl, __keylessApiKeysUrl, ...restInitState } = pickFromClerkInitState(
+    clerkInitState?.__internal_clerk_state,
+  );
 
   const mergedProps = {
     ...mergeWithPublicEnvs(restInitState),
     ...providerProps,
   };
+
+  // Add keyless mode props if present
+  const keylessProps = __keylessClaimUrl
+    ? {
+        __internal_keyless_claimKeylessApplicationUrl: __keylessClaimUrl,
+        __internal_keyless_copyInstanceKeysUrl: __keylessApiKeysUrl,
+      }
+    : {};
 
   return (
     <>
@@ -60,6 +70,7 @@ export function ClerkProvider<TUi extends Ui = Ui>({
             })
           }
           {...mergedProps}
+          {...keylessProps}
         >
           {children}
         </ReactClerkProvider>

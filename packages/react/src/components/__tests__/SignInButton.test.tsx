@@ -105,4 +105,18 @@ describe('<SignInButton/>', () => {
       );
     }).toThrow();
   });
+
+  it('does not pass appearance prop to child element', () => {
+    const { container } = render(
+      <SignInButton
+        mode='modal'
+        appearance={{ elements: { rootBox: 'test' } }}
+      >
+        <button type='button'>Sign in</button>
+      </SignInButton>,
+    );
+
+    const button = container.querySelector('button');
+    expect(button?.hasAttribute('appearance')).toBe(false);
+  });
 });

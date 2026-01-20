@@ -893,6 +893,10 @@ export const viVN: LocalizationResource = {
       actionLink: 'Đăng xuất',
       actionText: 'Đã đăng nhập với {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Một tổ chức đã tồn tại cho tên công ty được phát hiện ({{organizationName}}) và {{organizationDomain}}. Tham gia bằng lời mời.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

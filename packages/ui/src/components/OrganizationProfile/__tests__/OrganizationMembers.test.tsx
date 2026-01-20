@@ -697,13 +697,24 @@ describe('OrganizationMembers', () => {
       ],
     });
 
-    const { container, getByText } = render(<OrganizationMembers />, { wrapper });
+    const { container, findByText, queryAllByRole } = render(<OrganizationMembers />, { wrapper });
 
     await waitForLoadingCompleted(container);
 
-    expect(getByText('Roles are temporarily locked')).toBeInTheDocument();
+    // Wait for roles to be fetched (buttons becoming disabled indicates roles have loaded)
+    await waitFor(() => {
+      const adminButtons = queryAllByRole('button', { name: 'Admin' });
+      expect(adminButtons.length).toBeGreaterThan(0);
+      adminButtons.forEach(button => expect(button).toBeDisabled());
+    });
+
+    // Now check for the alert
+    expect(await findByText('Roles are temporarily locked')).toBeInTheDocument();
+    // Use regex to match both curly and straight apostrophes
     expect(
-      getByText("We are updating the available roles. Once that's done, you'll be able to update roles again."),
+      await findByText(
+        /We are updating the available roles\. Once that.s done, you.ll be able to update roles again\./,
+      ),
     ).toBeInTheDocument();
   });
 

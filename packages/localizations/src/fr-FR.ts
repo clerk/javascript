@@ -902,6 +902,10 @@ export const frFR: LocalizationResource = {
       actionLink: 'Se déconnecter',
       actionText: 'Connecté en tant que {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        "Une organisation existe déjà pour le nom d'entreprise détecté ({{organizationName}}) et {{organizationDomain}}. Rejoignez par invitation.",
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

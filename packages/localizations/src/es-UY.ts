@@ -893,6 +893,10 @@ export const esUY: LocalizationResource = {
       actionLink: 'Cerrar sesión',
       actionText: 'Logueado como {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Ya existe una organización para el nombre de empresa detectado ({{organizationName}}) y {{organizationDomain}}. Únete por invitación.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,
