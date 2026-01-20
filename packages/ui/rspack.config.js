@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import { merge } from 'webpack-merge';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
+import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 import { svgLoader, typescriptLoaderProd, typescriptLoaderDev } from '../../scripts/rspack-common.js';
 
 const require = createRequire(import.meta.url);
@@ -54,6 +55,14 @@ const common = ({ mode, variant }) => {
       new rspack.EnvironmentPlugin({
         NODE_ENV: mode,
       }),
+      process.env.RSDOCTOR &&
+        new RsdoctorRspackPlugin({
+          mode: process.env.RSDOCTOR === 'brief' ? 'brief' : 'normal',
+          disableClientServer: process.env.RSDOCTOR === 'brief',
+          supports: {
+            generateTileGraph: true,
+          },
+        }),
     ].filter(Boolean),
     output: {
       chunkFilename: `[name]_ui_[fullhash:6]_${packageJSON.version}.js`,
@@ -179,10 +188,12 @@ const commonForProdBrowser = ({ targets = 'last 2 years', useCoreJs = false } = 
 
 /**
  * Production configuration - builds UMD browser variants
- * @param {'development'|'production'} mode
+ * @param {object} config
+ * @param {'development'|'production'} config.mode
+ * @param {boolean} config.analysis
  * @returns {import('@rspack/core').Configuration[]}
  */
-const prodConfig = mode => {
+const prodConfig = ({ mode, analysis }) => {
   // Browser bundle with chunks (UMD)
   const uiBrowser = merge(
     entryForVariant(variants.uiBrowser),
@@ -196,6 +207,11 @@ const prodConfig = mode => {
     common({ mode, variant: variants.uiLegacyBrowser }),
     commonForProdBrowser({ targets: packageJSON.browserslistLegacy, useCoreJs: true }),
   );
+
+  // webpack-bundle-analyzer only supports a single build, use uiBrowser as that's the default build we serve
+  if (analysis) {
+    return [uiBrowser];
+  }
 
   return [uiBrowser, uiLegacyBrowser];
 };
@@ -247,5 +263,6 @@ const devConfig = (mode, env) => {
 
 export default env => {
   const mode = env.production ? 'production' : 'development';
-  return isProduction(mode) ? prodConfig(mode) : devConfig(mode, env);
+  const analysis = !!env.analyze;
+  return isProduction(mode) ? prodConfig({ mode, analysis }) : devConfig(mode, env);
 };
