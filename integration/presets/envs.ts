@@ -117,9 +117,9 @@ const withLegalConsent = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-legal-consent').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-legal-consent').pk);
 
-const withWaitlistdMode = withEmailCodes
+const withWaitlistMode = withEmailCodes
   .clone()
-  .setId('withWaitlistdMode')
+  .setId('withWaitlistMode')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-waitlist-mode').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-waitlist-mode').pk);
 
@@ -213,7 +213,7 @@ export const envs = {
   withSignInOrUpEmailLinksFlow,
   withSignInOrUpFlow,
   withSignInOrUpwithRestrictedModeFlow,
-  withWaitlistdMode,
+  withWaitlistMode,
   withWhatsappPhoneCode,
   withProtectService,
 } as const;

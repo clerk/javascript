@@ -901,6 +901,10 @@ export const deDE: LocalizationResource = {
       actionLink: 'Abmelden',
       actionText: 'Angemeldet als {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Für den erkannten Firmennamen ({{organizationName}}) und {{organizationDomain}} existiert bereits eine Organisation. Treten Sie per Einladung bei.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

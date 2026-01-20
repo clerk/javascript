@@ -378,7 +378,13 @@ function SignUpStartInternal(): JSX.Element {
   }
 
   const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
-  const visibleFields = Object.entries(fields).filter(([_, opts]) => showOptionalFields || opts?.required);
+  const visibleFields = Object.entries(fields).filter(([key, opts]) => {
+    // In case both email & phone are optional (emailOrPhone case), always show the active identifier
+    if ((key === 'emailAddress' || key === 'phoneNumber') && canToggleEmailPhone) {
+      return !!opts;
+    }
+    return showOptionalFields || opts?.required;
+  });
   const shouldShowForm = showFormFields(userSettings) && visibleFields.length > 0;
 
   const showOauthProviders =

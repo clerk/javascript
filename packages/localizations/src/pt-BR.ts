@@ -898,6 +898,10 @@ export const ptBR: LocalizationResource = {
       actionLink: 'Sair',
       actionText: 'Conectado como {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Uma organização já existe para o nome da empresa detectado ({{organizationName}}) e {{organizationDomain}}. Entre por convite.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: 'Resetar Senha',

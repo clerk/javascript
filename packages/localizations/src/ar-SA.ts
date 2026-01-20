@@ -882,6 +882,10 @@ export const arSA: LocalizationResource = {
       actionLink: 'تسجيل الخروج',
       actionText: 'تم تسجيل الدخول كـ {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'توجد منظمة بالفعل لاسم الشركة المكتشف ({{organizationName}}) و {{organizationDomain}}. انضم عن طريق الدعوة.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

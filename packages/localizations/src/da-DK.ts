@@ -883,6 +883,10 @@ export const daDK: LocalizationResource = {
       actionLink: 'Log ud',
       actionText: 'Logget ind som {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Der findes allerede en organisation for det registrerede firmanavn ({{organizationName}}) og {{organizationDomain}}. Tilmeld dig via invitation.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,
