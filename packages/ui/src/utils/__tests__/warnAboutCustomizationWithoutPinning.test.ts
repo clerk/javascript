@@ -14,7 +14,10 @@ vi.mock('../detectClerkStylesheetUsage', () => ({
 import { logger } from '@clerk/shared/logger';
 
 import { detectStructuralClerkCss } from '../detectClerkStylesheetUsage';
-import { warnAboutCustomizationWithoutPinning } from '../warnAboutCustomizationWithoutPinning';
+import {
+  warnAboutComponentAppearance,
+  warnAboutCustomizationWithoutPinning,
+} from '../warnAboutCustomizationWithoutPinning';
 
 const getWarningMessage = () => {
   const calls = vi.mocked(logger.warnOnce).mock.calls;
@@ -347,5 +350,47 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       const message = getWarningMessage();
       expect(message).toContain('https://clerk.com/docs/reference/components/versioning');
     });
+  });
+});
+
+describe('warnAboutComponentAppearance', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  test('does not warn when uiPinned is true', () => {
+    warnAboutComponentAppearance(
+      {
+        elements: { card: { '& > div': { color: 'red' } } },
+      },
+      true,
+    );
+
+    expect(logger.warnOnce).not.toHaveBeenCalled();
+  });
+
+  test('warns when uiPinned is false and structural customization is used', () => {
+    warnAboutComponentAppearance(
+      {
+        elements: { card: { '& > div': { color: 'red' } } },
+      },
+      false,
+    );
+
+    expect(logger.warnOnce).toHaveBeenCalledTimes(1);
+    const message = getWarningMessage();
+    expect(message).toContain('(code=structural_css_pin_clerk_ui)');
+    expect(message).toContain('elements.card "& > div"');
+  });
+
+  test('does not call detectStructuralClerkCss (only checks elements, not stylesheets)', () => {
+    warnAboutComponentAppearance(
+      {
+        elements: { card: { '& > div': { color: 'red' } } },
+      },
+      false,
+    );
+
+    expect(detectStructuralClerkCss).not.toHaveBeenCalled();
   });
 });

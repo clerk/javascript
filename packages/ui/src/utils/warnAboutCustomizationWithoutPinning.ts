@@ -1,6 +1,7 @@
 import { logger } from '@clerk/shared/logger';
 import type { ClerkOptions } from '@clerk/shared/types';
 
+import type { Appearance } from '../internal/appearance';
 import { CLERK_CLASS_RE, HAS_RE, POSITIONAL_PSEUDO_RE } from './cssPatterns';
 import { detectStructuralClerkCss } from './detectClerkStylesheetUsage';
 
@@ -122,6 +123,37 @@ function collectElementPatterns(elements: Record<string, unknown>): string[] {
   }
 
   return patterns;
+}
+
+/**
+ * Checks component-level appearance.elements for structural CSS patterns
+ * and warns if found (when version is not pinned).
+ *
+ * This is called when individual components mount with their own appearance,
+ * to catch structural CSS that wasn't passed through ClerkProvider.
+ *
+ * Note: The caller should check clerk.instanceType === 'development' before calling.
+ * This function assumes it's only called in development mode.
+ *
+ * @param appearance - The component-level appearance to check
+ * @param uiPinned - Whether the user has pinned their @clerk/ui version via options.ui
+ */
+export function warnAboutComponentAppearance(appearance: Appearance | undefined, uiPinned: boolean): void {
+  // If ui is explicitly provided, the user has pinned their version
+  if (uiPinned) {
+    return;
+  }
+
+  // No appearance to check
+  if (!appearance?.elements || Object.keys(appearance.elements).length === 0) {
+    return;
+  }
+
+  const patterns = collectElementPatterns(appearance.elements as Record<string, unknown>);
+
+  if (patterns.length > 0) {
+    logger.warnOnce(formatStructuralCssWarning(patterns));
+  }
 }
 
 /**
