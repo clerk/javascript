@@ -1,9 +1,8 @@
+import { UNSAFE_PortalProvider } from '@clerk/shared/react';
 import type { MembershipRole } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 import React from 'react';
-
-import { UNSAFE_PortalProvider } from '@clerk/react';
+import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { act, render } from '@/test/utils';

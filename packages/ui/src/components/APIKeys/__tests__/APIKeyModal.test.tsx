@@ -1,8 +1,7 @@
-import { describe, expect, it } from 'vitest';
-import React from 'react';
+import { UNSAFE_PortalProvider } from '@clerk/shared/react';
 import { render } from '@testing-library/react';
-
-import { UNSAFE_PortalProvider } from '@clerk/react';
+import React from 'react';
+import { describe, expect, it } from 'vitest';
 
 import { APIKeyModal } from '../APIKeyModal';
 
@@ -18,7 +17,7 @@ describe('APIKeyModal modalRoot behavior', () => {
         modalRoot={modalRoot}
         handleOpen={() => {}}
         handleClose={() => {}}
-        canCloseModal={true}
+        canCloseModal
       >
         <div data-testid='modal-content'>Test Content</div>
       </APIKeyModal>,
@@ -42,7 +41,7 @@ describe('APIKeyModal modalRoot behavior', () => {
         modalRoot={modalRoot}
         handleOpen={() => {}}
         handleClose={() => {}}
-        canCloseModal={true}
+        canCloseModal
       >
         <div>Test</div>
       </APIKeyModal>,
@@ -71,7 +70,7 @@ describe('APIKeyModal modalRoot behavior', () => {
           modalRoot={modalRoot}
           handleOpen={() => {}}
           handleClose={() => {}}
-          canCloseModal={true}
+          canCloseModal
         >
           <div data-testid='modal-content'>Test Content</div>
         </APIKeyModal>

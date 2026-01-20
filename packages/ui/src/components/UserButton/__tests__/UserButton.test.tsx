@@ -1,7 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { UNSAFE_PortalProvider } from '@clerk/shared/react';
 import React from 'react';
-
-import { UNSAFE_PortalProvider } from '@clerk/react';
+import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
