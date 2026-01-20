@@ -384,7 +384,7 @@ describe('SignInFactorOne', () => {
         await userEvent.type(screen.getByLabelText('Password'), '123456');
         await userEvent.click(screen.getByText('Continue'));
 
-        await screen.findByText('Password too long');
+        await screen.findByText('Password must be reset');
         await screen.findByText(
           'The existing imported password is too long and cannot be used, please reset your password.',
         );
@@ -425,7 +425,7 @@ describe('SignInFactorOne', () => {
         await userEvent.type(screen.getByLabelText('Password'), '123456');
         await userEvent.click(screen.getByText('Continue'));
 
-        await screen.findByText('Password too long');
+        await screen.findByText('Password must be reset');
         await screen.findByText(
           'The existing imported password is too long and cannot be used, please reset your password.',
         );
@@ -466,7 +466,7 @@ describe('SignInFactorOne', () => {
         await userEvent.type(screen.getByLabelText('Password'), '123456');
         await userEvent.click(screen.getByText('Continue'));
 
-        await screen.findByText('Password too long');
+        await screen.findByText('Password must be reset');
         await screen.findByText(
           'The existing imported password is too long and cannot be used, please reset your password.',
         );
