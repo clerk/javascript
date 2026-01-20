@@ -1,6 +1,6 @@
 import { navigateIfTaskExists } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, usePortalRoot } from '@clerk/shared/react';
 import type { SignedInSessionResource, UserButtonProps, UserResource } from '@clerk/shared/types';
 
 import { useEnvironment } from '@/ui/contexts';
@@ -27,6 +27,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const { signedInSessions, otherSessions } = useMultipleSessions({ user: opts.user });
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
+  const getContainer = usePortalRoot();
 
   const handleSignOutSessionClicked = (session: SignedInSessionResource) => () => {
     if (otherSessions.length === 0) {
@@ -46,7 +47,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
         })();
       });
     }
-    openUserProfile(opts.userProfileProps);
+    openUserProfile({ getContainer, ...opts.userProfileProps });
     return opts.actionCompleteCallback?.();
   };
 
@@ -60,6 +61,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
       });
     }
     openUserProfile({
+      getContainer,
       ...opts.userProfileProps,
       ...(__experimental_startPath && { __experimental_startPath }),
     });
