@@ -403,6 +403,13 @@ export const roRO: LocalizationResource = {
         headerTitle__members: 'Membri',
         headerTitle__requests: 'Ceri de acces',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Rolurile sunt temporar blocate',
+          subtitle:
+            'Actualizăm rolurile disponibile. Odată ce acest lucru este finalizat, veți putea actualiza din nou rolurile.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'Chei API',
@@ -870,6 +877,7 @@ export const roRO: LocalizationResource = {
       action__invitationAccept: 'Alătură-te',
       action__suggestionsAccept: 'Solicită alăturarea',
       subtitle: 'Alătură-te unei organizații existente sau creează una nouă',
+      subtitle__createOrganizationDisabled: 'Alătură-te unei organizații existente',
       suggestionsAcceptedLabel: 'În așteptare',
       title: 'Alege o organizație',
     },
@@ -890,6 +898,10 @@ export const roRO: LocalizationResource = {
     signOut: {
       actionLink: 'Deconectează-te',
       actionText: 'Autentificat ca {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Există deja o organizație pentru numele companiei detectate ({{organizationName}}) și {{organizationDomain}}. Alătură-te prin invitație.',
     },
   },
   taskResetPassword: {

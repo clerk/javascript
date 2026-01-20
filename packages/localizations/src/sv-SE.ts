@@ -395,6 +395,12 @@ export const svSE: LocalizationResource = {
         headerTitle__members: 'Medlemmar',
         headerTitle__requests: 'Förfrågningar',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roller är tillfälligt låsta',
+          subtitle: 'Vi uppdaterar tillgängliga roller. När det är klart kommer du att kunna uppdatera roller igen.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -860,6 +866,7 @@ export const svSE: LocalizationResource = {
       action__invitationAccept: 'Gå med',
       action__suggestionsAccept: 'Begär att gå med',
       subtitle: 'Gå med i en befintlig organisation eller skapa en ny',
+      subtitle__createOrganizationDisabled: 'Gå med i en befintlig organisation',
       suggestionsAcceptedLabel: 'Väntar på godkännande',
       title: 'Välj en organisation',
     },
@@ -880,6 +887,10 @@ export const svSE: LocalizationResource = {
     signOut: {
       actionLink: 'Logga ut',
       actionText: 'Inloggad som {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'En organisation finns redan för det upptäckta företagsnamnet ({{organizationName}}) och {{organizationDomain}}. Gå med via inbjudan.',
     },
   },
   taskResetPassword: {

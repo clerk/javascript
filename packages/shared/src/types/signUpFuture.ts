@@ -4,7 +4,7 @@ import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUpCommon';
 import type { Web3Strategy } from './strategies';
 
-interface SignUpFutureAdditionalParams {
+export interface SignUpFutureAdditionalParams {
   /**
    * The user's first name. Only supported if
    * [First and last name](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#user-model)

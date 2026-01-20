@@ -6,7 +6,7 @@ import React from 'react';
  */
 export const sanitizeDomProps = <P extends React.FunctionComponent<any>>(Component: P): P => {
   const component = React.forwardRef((props: any, ref) => {
-    const { elementId, elementDescriptor, localizationKey, ...restProps } = props;
+    const { elementId, elementDescriptor, localizationKey, getContainer, ...restProps } = props;
     return (
       <Component
         {...restProps}

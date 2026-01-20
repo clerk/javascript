@@ -396,6 +396,12 @@ export const beBY: LocalizationResource = {
         headerTitle__members: 'Удзельнікі',
         headerTitle__requests: 'Заявкі',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Ролі часова заблакіраваны',
+          subtitle: 'Мы абнаўляем даступныя ролі. Калі гэта будзе зроблена, вы зможаце абнавіць ролі зноў.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -862,6 +868,7 @@ export const beBY: LocalizationResource = {
       action__invitationAccept: 'Далучыцца',
       action__suggestionsAccept: 'Запытаць далучэння',
       subtitle: 'Далучыцеся да існуючай арганізацыі або стварыце новую',
+      subtitle__createOrganizationDisabled: 'Далучыцеся да існуючай арганізацыі',
       suggestionsAcceptedLabel: 'Чакае зацвярджэння',
       title: 'Выберыце арганізацыю',
     },
@@ -882,6 +889,10 @@ export const beBY: LocalizationResource = {
     signOut: {
       actionLink: 'Выйсці',
       actionText: 'Увайшлі як {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Арганізацыя ўжо існуе для выяўленай назвы кампаніі ({{organizationName}}) і {{organizationDomain}}. Далучайцеся па запрашэнні.',
     },
   },
   taskResetPassword: {

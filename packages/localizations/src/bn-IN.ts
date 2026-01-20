@@ -397,6 +397,12 @@ export const bnIN: LocalizationResource = {
         headerTitle__members: 'সদস্য',
         headerTitle__requests: 'অনুরোধ',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'ভূমিকাগুলি সাময়িকভাবে লক করা আছে',
+          subtitle: 'আমরা উপলব্ধ ভূমিকাগুলি আপডেট করছি। এটি সম্পন্ন হলে, আপনি আবার ভূমিকা আপডেট করতে পারবেন।',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -862,6 +868,7 @@ export const bnIN: LocalizationResource = {
       action__invitationAccept: 'যোগ দিন',
       action__suggestionsAccept: 'যোগদানের অনুরোধ করুন',
       subtitle: 'বিদ্যমান সংগঠনে যোগ দিন বা একটি নতুন তৈরি করুন',
+      subtitle__createOrganizationDisabled: 'বিদ্যমান সংগঠনে যোগ দিন',
       suggestionsAcceptedLabel: 'অনুমোদনের অপেক্ষায়',
       title: 'একটি সংগঠন নির্বাচন করুন',
     },
@@ -882,6 +889,10 @@ export const bnIN: LocalizationResource = {
     signOut: {
       actionLink: 'সাইন আউট',
       actionText: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'শনাক্ত করা কোম্পানির নাম ({{organizationName}}) এবং {{organizationDomain}}-এর জন্য একটি সংস্থা ইতিমধ্যেই বিদ্যমান। আমন্ত্রণের মাধ্যমে যোগ দিন।',
     },
   },
   taskResetPassword: {

@@ -395,6 +395,12 @@ export const arSA: LocalizationResource = {
         headerTitle__members: 'الأعضاء',
         headerTitle__requests: 'الطلبات',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'الأدوار مقفلة مؤقتًا',
+          subtitle: 'نحن نقوم بتحديث الأدوار المتاحة. بمجرد الانتهاء، ستتمكن من تحديث الأدوار مرة أخرى.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -854,6 +860,7 @@ export const arSA: LocalizationResource = {
       action__invitationAccept: 'انضم',
       action__suggestionsAccept: 'طلب الانضمام',
       subtitle: 'انضم إلى منظمة موجودة أو أنشئ واحدة جديدة',
+      subtitle__createOrganizationDisabled: 'انضم إلى منظمة موجودة',
       suggestionsAcceptedLabel: 'في انتظار الموافقة',
       title: 'اختر منظمة',
     },
@@ -874,6 +881,10 @@ export const arSA: LocalizationResource = {
     signOut: {
       actionLink: 'تسجيل الخروج',
       actionText: 'تم تسجيل الدخول كـ {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'توجد منظمة بالفعل لاسم الشركة المكتشف ({{organizationName}}) و {{organizationDomain}}. انضم عن طريق الدعوة.',
     },
   },
   taskResetPassword: {

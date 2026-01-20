@@ -1,4 +1,4 @@
-import { useClerk, useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization, useOrganizationList, usePortalRoot, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/shared/types';
 import React from 'react';
 
@@ -25,6 +25,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const card = useCardState();
     const { __experimental_asStandalone } = useOrganizationSwitcherContext();
     const { openOrganizationProfile, openCreateOrganization } = useClerk();
+    const getContainer = usePortalRoot();
     const { organization: currentOrg } = useOrganization();
     const { isLoaded, setActive } = useOrganizationList();
     const {
@@ -48,7 +49,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       return null;
     }
 
-    const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
+    const { primaryEmailAddress, primaryPhoneNumber, primaryWeb3Wallet, username, ...userWithoutIdentifiers } = user;
 
     if (!isLoaded) {
       return null;
@@ -76,7 +77,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       if (createOrganizationMode === 'navigation') {
         return navigateCreateOrganization();
       }
-      return openCreateOrganization({ afterCreateOrganizationUrl, skipInvitationScreen });
+      return openCreateOrganization({ afterCreateOrganizationUrl, skipInvitationScreen, getContainer });
     };
 
     const handleItemClick = () => {
@@ -88,6 +89,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       return openOrganizationProfile({
         ...organizationProfileProps,
         afterLeaveOrganizationUrl,
+        getContainer,
       });
     };
 

@@ -59,13 +59,18 @@
     "./legacy": {
       "types": "./dist/legacy.d.ts",
       "default": "./dist/legacy.js"
-    }
+    },
+    "./app.plugin.js": "./app.plugin.js"
   },
   "main": "./dist/index.js",
   "source": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "android",
+    "ios",
+    "expo-module.config.json",
+    "app.plugin.js"
   ],
   "scripts": {
     "build": "tsup",
@@ -90,11 +95,14 @@
   },
   "devDependencies": {
     "@clerk/expo-passkeys": "workspace:*",
+    "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
     "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "^5.4.0",
+    "expo-constants": "^18.0.0",
     "expo-crypto": "^15.0.7",
     "expo-local-authentication": "^13.8.0",
+    "expo-modules-core": "^3.0.0",
     "expo-secure-store": "^12.8.1",
     "expo-web-browser": "^12.8.2",
     "react-native": "^0.81.4"
@@ -104,12 +112,14 @@
     "expo": ">=53 <55",
     "expo-apple-authentication": ">=7.0.0",
     "expo-auth-session": ">=5",
+    "expo-constants": ">=12",
     "expo-crypto": ">=12",
     "expo-local-authentication": ">=13.5.0",
+    "expo-modules-core": ">=3.0.0",
     "expo-secure-store": ">=12.4.0",
     "expo-web-browser": ">=12.5.0",
-    "react": "catalog:peer-react",
-    "react-dom": "catalog:peer-react",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
     "react-native": ">=0.73"
   },
   "peerDependenciesMeta": {
@@ -117,6 +127,9 @@
       "optional": true
     },
     "expo-apple-authentication": {
+      "optional": true
+    },
+    "expo-constants": {
       "optional": true
     },
     "expo-crypto": {

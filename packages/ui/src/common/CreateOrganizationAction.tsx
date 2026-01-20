@@ -11,7 +11,8 @@ export const CreateOrganizationAction = (props: CreateOrganizationActionProps) =
   const { organizationSettings } = useEnvironment();
 
   const currentMembershipCount = (user?.organizationMemberships ?? []).length;
-  const canCreateAdditionalMembership = currentMembershipCount < organizationSettings.maxAllowedMemberships;
+  const canCreateAdditionalMembership =
+    !organizationSettings.maxAllowedMemberships || currentMembershipCount < organizationSettings.maxAllowedMemberships;
 
   if (!user?.createOrganizationEnabled || !canCreateAdditionalMembership) {
     return null;

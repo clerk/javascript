@@ -1,6 +1,7 @@
 import type { ClerkGlobalHookError } from '../errors/globalHookError';
 import type { SignInFutureResource } from './signInFuture';
 import type { SignUpFutureResource } from './signUpFuture';
+import type { WaitlistResource } from './waitlist';
 
 /**
  * Represents an error on a specific field.
@@ -100,6 +101,16 @@ export interface SignUpFields {
 }
 
 /**
+ * Fields available for Waitlist errors.
+ */
+export interface WaitlistFields {
+  /**
+   * The error for the email address field.
+   */
+  emailAddress: FieldError | null;
+}
+
+/**
  * Errors type for SignIn operations.
  */
 export type SignInErrors = Errors<SignInFields>;
@@ -108,6 +119,11 @@ export type SignInErrors = Errors<SignInFields>;
  * Errors type for SignUp operations.
  */
 export type SignUpErrors = Errors<SignUpFields>;
+
+/**
+ * Errors type for Waitlist operations.
+ */
+export type WaitlistErrors = Errors<WaitlistFields>;
 
 /**
  * The value returned by the `useSignInSignal` hook.
@@ -154,6 +170,27 @@ export interface SignUpSignal {
   (): NullableSignUpSignal;
 }
 
+export interface WaitlistSignalValue {
+  /**
+   * The errors that occurred during the last fetch of the underlying `Waitlist` resource.
+   */
+  errors: WaitlistErrors;
+  /**
+   * The fetch status of the underlying `Waitlist` resource.
+   */
+  fetchStatus: 'idle' | 'fetching';
+  /**
+   * The underlying `Waitlist` resource.
+   */
+  waitlist: WaitlistResource;
+}
+export type NullableWaitlistSignal = Omit<WaitlistSignalValue, 'waitlist'> & {
+  waitlist: WaitlistResource | null;
+};
+export interface WaitlistSignal {
+  (): NullableWaitlistSignal;
+}
+
 export interface State {
   /**
    * A Signal that updates when the underlying `SignIn` resource changes, including errors.
@@ -164,6 +201,11 @@ export interface State {
    * A Signal that updates when the underlying `SignUp` resource changes, including errors.
    */
   signUpSignal: SignUpSignal;
+
+  /**
+   * A Signal that updates when the underlying `Waitlist` resource changes, including errors.
+   */
+  waitlistSignal: WaitlistSignal;
 
   /**
    * An alias for `effect()` from `alien-signals`, which can be used to subscribe to changes from Signals.
@@ -183,4 +225,8 @@ export interface State {
    * @experimental This experimental API is subject to change.
    */
   __internal_computed: <T>(getter: (previousValue?: T) => T) => () => T;
+  /**
+   * An instance of the Waitlist resource.
+   */
+  __internal_waitlist: WaitlistResource;
 }

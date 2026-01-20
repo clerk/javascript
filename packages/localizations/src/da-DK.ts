@@ -395,6 +395,12 @@ export const daDK: LocalizationResource = {
         headerTitle__members: 'Medlemmer',
         headerTitle__requests: 'Anmodninger',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roller er midlertidigt låst',
+          subtitle: 'Vi opdaterer de tilgængelige roller. Når det er gjort, vil du kunne opdatere roller igen.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -855,6 +861,7 @@ export const daDK: LocalizationResource = {
       action__invitationAccept: 'Deltag',
       action__suggestionsAccept: 'Anmod om at deltage',
       subtitle: 'Deltag i en eksisterende organisation eller opret en ny',
+      subtitle__createOrganizationDisabled: 'Deltag i en eksisterende organisation',
       suggestionsAcceptedLabel: 'Afventer godkendelse',
       title: 'Vælg en organisation',
     },
@@ -875,6 +882,10 @@ export const daDK: LocalizationResource = {
     signOut: {
       actionLink: 'Log ud',
       actionText: 'Logget ind som {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Der findes allerede en organisation for det registrerede firmanavn ({{organizationName}}) og {{organizationDomain}}. Tilmeld dig via invitation.',
     },
   },
   taskResetPassword: {

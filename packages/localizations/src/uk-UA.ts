@@ -395,6 +395,12 @@ export const ukUA: LocalizationResource = {
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Ролі тимчасово заблоковані',
+          subtitle: 'Ми оновлюємо доступні ролі. Коли це буде зроблено, ви зможете знову оновлювати ролі.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -854,6 +860,7 @@ export const ukUA: LocalizationResource = {
       action__invitationAccept: 'Приєднатися',
       action__suggestionsAccept: 'Запросити приєднання',
       subtitle: 'Приєднайтеся до існуючої організації або створіть нову',
+      subtitle__createOrganizationDisabled: 'Приєднайтеся до існуючої організації',
       suggestionsAcceptedLabel: 'Очікує схвалення',
       title: 'Виберіть організацію',
     },
@@ -874,6 +881,10 @@ export const ukUA: LocalizationResource = {
     signOut: {
       actionLink: 'Вийти',
       actionText: 'Увійшли як {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Організація вже існує для виявленої назви компанії ({{organizationName}}) та {{organizationDomain}}. Приєднуйтесь за запрошенням.',
     },
   },
   taskResetPassword: {

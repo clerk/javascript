@@ -403,6 +403,12 @@ export const jaJP: LocalizationResource = {
         headerTitle__members: 'メンバー',
         headerTitle__requests: 'リクエスト',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'ロールは一時的にロックされています',
+          subtitle: '利用可能なロールを更新しています。完了次第、ロールを再度更新できるようになります。',
+        },
+      },
     },
     navbar: {
       apiKeys: 'APIキー',
@@ -869,6 +875,7 @@ export const jaJP: LocalizationResource = {
       action__invitationAccept: '参加する',
       action__suggestionsAccept: '参加をリクエストする',
       subtitle: '既存の組織に参加するか、新しい組織を作成します',
+      subtitle__createOrganizationDisabled: '既存の組織に参加する',
       suggestionsAcceptedLabel: '承認待ち',
       title: '組織を選択',
     },
@@ -889,6 +896,10 @@ export const jaJP: LocalizationResource = {
     signOut: {
       actionLink: 'サインアウト',
       actionText: '{{identifier}} としてサインイン中',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        '検出された会社名 ({{organizationName}}) と {{organizationDomain}} の組織がすでに存在します。招待を通じて参加してください。',
     },
   },
   taskResetPassword: {

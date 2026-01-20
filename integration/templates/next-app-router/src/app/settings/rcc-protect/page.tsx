@@ -1,14 +1,13 @@
 'use client';
-import { Protect } from '@clerk/nextjs';
+import { Show } from '@clerk/nextjs';
 
 export default function Page() {
   return (
-    <Protect
-      permission='org:posts:manage'
-      /* @ts-ignore Need to take a look at the TS files, might be a types/react version thing */
+    <Show
       fallback={<p>User is missing permissions</p>}
+      when={{ permission: 'org:posts:manage' }}
     >
       <p>User has access</p>
-    </Protect>
+    </Show>
   );
 }

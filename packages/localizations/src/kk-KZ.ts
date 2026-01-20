@@ -392,6 +392,12 @@ export const kkKZ: LocalizationResource = {
         headerTitle__members: 'Мүшелер',
         headerTitle__requests: 'Сұраулар',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Рөлдер уақытша құлыпталған',
+          subtitle: 'Қолжетімді рөлдерді жаңартып жатырмыз. Бұл аяқталғаннан кейін рөлдерді қайта жаңарта аласыз.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -849,6 +855,7 @@ export const kkKZ: LocalizationResource = {
       action__invitationAccept: 'Қосылу',
       action__suggestionsAccept: 'Қосылуды сұрау',
       subtitle: 'Мәні бар ұйымға қосылыңыз немесе жаңасын құрыңыз',
+      subtitle__createOrganizationDisabled: 'Бар ұйымға қосылыңыз',
       suggestionsAcceptedLabel: 'Мақұлдау күтілуде',
       title: 'Ұйым таңдаңыз',
     },
@@ -869,6 +876,10 @@ export const kkKZ: LocalizationResource = {
     signOut: {
       actionLink: 'Шығу',
       actionText: '{{identifier}} ретінде кірді',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Анықталған компания атауы ({{organizationName}}) және {{organizationDomain}} үшін ұйым бұрыннан бар. Шақыру арқылы қосылыңыз.',
     },
   },
   taskResetPassword: {

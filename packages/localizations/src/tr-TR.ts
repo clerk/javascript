@@ -395,6 +395,12 @@ export const trTR: LocalizationResource = {
         headerTitle__members: 'Üyeler',
         headerTitle__requests: 'İstekler',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roller geçici olarak kilitlendi',
+          subtitle: 'Mevcut rolleri güncelliyoruz. Bu tamamlandığında rolleri tekrar güncelleyebileceksiniz.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -858,6 +864,7 @@ export const trTR: LocalizationResource = {
       action__invitationAccept: 'Katıl',
       action__suggestionsAccept: 'Katılım iste',
       subtitle: 'Mevcut bir organizasyona katılın veya yeni bir tane oluşturun',
+      subtitle__createOrganizationDisabled: 'Mevcut bir organizasyona katılın',
       suggestionsAcceptedLabel: 'Onay bekleniyor',
       title: 'Bir organizasyon seçin',
     },
@@ -878,6 +885,10 @@ export const trTR: LocalizationResource = {
     signOut: {
       actionLink: 'Çıkış yap',
       actionText: '{{identifier}} olarak giriş yapıldı',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Tespit edilen şirket adı ({{organizationName}}) ve {{organizationDomain}} için bir organizasyon zaten mevcut. Davetiye ile katılın.',
     },
   },
   taskResetPassword: {

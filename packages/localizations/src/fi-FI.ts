@@ -403,6 +403,12 @@ export const fiFI: LocalizationResource = {
         headerTitle__members: 'Jäsenet',
         headerTitle__requests: 'Pyyntöjä',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roolit on tilapäisesti lukittu',
+          subtitle: 'Päivitämme käytettävissä olevia rooleja. Kun se on tehty, voit päivittää rooleja uudelleen.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'API-avaimet',
@@ -869,6 +875,7 @@ export const fiFI: LocalizationResource = {
       action__invitationAccept: 'Liity',
       action__suggestionsAccept: 'Pyydä liittymistä',
       subtitle: 'Liity olemassa olevaan organisaatioon tai luo uusi',
+      subtitle__createOrganizationDisabled: 'Liity olemassa olevaan organisaatioon',
       suggestionsAcceptedLabel: 'Odottaa hyväksyntää',
       title: 'Valitse organisaatio',
     },
@@ -885,6 +892,10 @@ export const fiFI: LocalizationResource = {
     signOut: {
       actionLink: 'Kirjaudu ulos',
       actionText: 'Kirjautuneena käyttäjänä {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Organisaatio on jo olemassa havaitulle yrityksen nimelle ({{organizationName}}) ja {{organizationDomain}}. Liity kutsulla.',
     },
   },
   taskResetPassword: {

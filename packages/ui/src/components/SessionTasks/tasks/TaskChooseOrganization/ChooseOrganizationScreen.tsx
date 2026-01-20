@@ -33,12 +33,13 @@ type ChooseOrganizationScreenProps = {
 
 export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) => {
   const card = useCardState();
+  const { user } = useUser();
   const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
 
-  // Filter out falsy values that can occur when SWR infinite loading resolves pages out of order
+  // Filter out falsy values that can occur when infinite loading resolves pages out of order
   // This happens when concurrent requests resolve in unexpected order, leaving undefined/null items in the data array
   const userInvitationsData = userInvitations.data?.filter(a => !!a);
   const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
@@ -50,7 +51,13 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
         sx={t => ({ padding: `${t.space.$none} ${t.space.$8}` })}
       >
         <Header.Title localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.title')} />
-        <Header.Subtitle localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.subtitle')} />
+        <Header.Subtitle
+          localizationKey={
+            user?.createOrganizationEnabled
+              ? localizationKeys('taskChooseOrganization.chooseOrganization.subtitle')
+              : localizationKeys('taskChooseOrganization.chooseOrganization.subtitle__createOrganizationDisabled')
+          }
+        />
       </Header.Root>
       <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$8}` })}>{card.error}</Card.Alert>
       <Col elementDescriptor={descriptors.main}>

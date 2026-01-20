@@ -391,6 +391,12 @@ export const zhTW: LocalizationResource = {
         headerTitle__members: '成員',
         headerTitle__requests: '請求',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: '角色暫時被鎖定',
+          subtitle: '我們正在更新可用角色。完成後，您將能夠再次更新角色。',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -845,6 +851,7 @@ export const zhTW: LocalizationResource = {
       action__invitationAccept: '加入',
       action__suggestionsAccept: '請求加入',
       subtitle: '加入現有組織或建立新組織',
+      subtitle__createOrganizationDisabled: '加入現有組織',
       suggestionsAcceptedLabel: '等待批准',
       title: '選擇組織',
     },
@@ -865,6 +872,10 @@ export const zhTW: LocalizationResource = {
     signOut: {
       actionLink: '登出',
       actionText: '已登入為 {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        '偵測到的公司名稱 ({{organizationName}}) 和 {{organizationDomain}} 已存在一個組織。請透過邀請加入。',
     },
   },
   taskResetPassword: {

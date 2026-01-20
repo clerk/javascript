@@ -403,6 +403,13 @@ export const itIT: LocalizationResource = {
         headerTitle__members: 'Membri',
         headerTitle__requests: 'Richieste',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'I ruoli sono temporaneamente bloccati',
+          subtitle:
+            'Stiamo aggiornando i ruoli disponibili. Una volta completato, potrai aggiornare nuovamente i ruoli.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'Chiavi API',
@@ -865,6 +872,7 @@ export const itIT: LocalizationResource = {
       action__invitationAccept: 'Unisciti',
       action__suggestionsAccept: 'Richiedi di unirti',
       subtitle: "Unisciti a un'organizzazione esistente o creane una nuova",
+      subtitle__createOrganizationDisabled: "Unisciti a un'organizzazione esistente",
       suggestionsAcceptedLabel: 'In attesa di approvazione',
       title: "Scegli un'organizzazione",
     },
@@ -885,6 +893,10 @@ export const itIT: LocalizationResource = {
     signOut: {
       actionLink: 'Esci',
       actionText: 'Accesso effettuato come {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        "Un'organizzazione esiste già per il nome dell'azienda rilevato ({{organizationName}}) e {{organizationDomain}}. Unisciti tramite invito.",
     },
   },
   taskResetPassword: {

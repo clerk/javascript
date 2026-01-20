@@ -401,6 +401,12 @@ export const csCZ: LocalizationResource = {
         headerTitle__members: 'Členové',
         headerTitle__requests: 'Žádosti',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Role jsou dočasně uzamčeny',
+          subtitle: 'Aktualizujeme dostupné role. Jakmile to bude hotové, budete moci role opět aktualizovat.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'API klíče',
@@ -868,6 +874,7 @@ export const csCZ: LocalizationResource = {
       action__invitationAccept: 'Připojit se',
       action__suggestionsAccept: 'Požádat o připojení',
       subtitle: 'Připojte se k existující organizaci nebo vytvořte novou',
+      subtitle__createOrganizationDisabled: 'Připojte se k existující organizaci',
       suggestionsAcceptedLabel: 'Čeká na schválení',
       title: 'Vyberte organizaci',
     },
@@ -888,6 +895,10 @@ export const csCZ: LocalizationResource = {
     signOut: {
       actionLink: 'Odhlásit se',
       actionText: 'Přihlášen jako {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Organizace již existuje pro detekovaný název společnosti ({{organizationName}}) a {{organizationDomain}}. Připojte se prostřednictvím pozvánky.',
     },
   },
   taskResetPassword: {

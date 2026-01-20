@@ -396,6 +396,12 @@ export const caES: LocalizationResource = {
         headerTitle__members: 'Membres',
         headerTitle__requests: 'Sol·licituds',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Els rols estan temporalment bloquejats',
+          subtitle: 'Estem actualitzant els rols disponibles. Un cop fet, podreu tornar a actualitzar els rols.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -857,6 +863,7 @@ export const caES: LocalizationResource = {
       action__invitationAccept: 'Unir-se',
       action__suggestionsAccept: 'Sol·licitar unir-se',
       subtitle: 'Uniu-vos a una organització existent o creeu-ne una de nova',
+      subtitle__createOrganizationDisabled: 'Uniu-vos a una organització existent',
       suggestionsAcceptedLabel: "Pendent d'aprovació",
       title: 'Trieu una organització',
     },
@@ -877,6 +884,10 @@ export const caES: LocalizationResource = {
     signOut: {
       actionLink: 'Tancar sessió',
       actionText: 'Sessió iniciada com a {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        "Ja existeix una organització per al nom d'empresa detectat ({{organizationName}}) i {{organizationDomain}}. Uneix-te per invitació.",
     },
   },
   taskResetPassword: {

@@ -395,6 +395,12 @@ export const huHU: LocalizationResource = {
         headerTitle__members: 'Tagok',
         headerTitle__requests: 'Kérések',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'A szerepkörök ideiglenesen zárolva vannak',
+          subtitle: 'Frissítjük az elérhető szerepköröket. Ha ez befejeződött, újra frissítheti a szerepköröket.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -856,6 +862,7 @@ export const huHU: LocalizationResource = {
       action__invitationAccept: 'Csatlakozás',
       action__suggestionsAccept: 'Csatlakozás kérése',
       subtitle: 'Csatlakozz egy meglévő szervezethez vagy hozz létre újat',
+      subtitle__createOrganizationDisabled: 'Csatlakozz egy meglévő szervezethez',
       suggestionsAcceptedLabel: 'Elfogadásra vár',
       title: 'Válassz szervezetet',
     },
@@ -876,6 +883,10 @@ export const huHU: LocalizationResource = {
     signOut: {
       actionLink: 'Kijelentkezés',
       actionText: 'Bejelentkezve: {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Már létezik szervezet az észlelt cégnévhez ({{organizationName}}) és {{organizationDomain}}. Csatlakozz meghívással.',
     },
   },
   taskResetPassword: {

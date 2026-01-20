@@ -1,7 +1,7 @@
 import type { VerificationJSON } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
-import { EmailAddress, PhoneNumber } from '../../../../core/resources';
+import { EmailAddress, PhoneNumber } from '@/core/resources';
 import { sortIdentificationBasedOnVerification } from '../utils';
 
 describe('UserProfile utils', () => {
