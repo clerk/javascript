@@ -1,7 +1,9 @@
-import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
+import createDeepmerge from '@fastify/deepmerge';
 
 import { createInfiniteAccessProxy } from '../utils/createInfiniteAccessProxy';
 import type { InternalTheme, StyleRule } from './types';
+
+const deepmerge = createDeepmerge();
 
 type UnwrapBooleanVariant<T> = T extends 'true' | 'false' ? boolean : T;
 
@@ -52,10 +54,9 @@ export const createVariants: CreateVariants = configFn => {
     (theme: any) => {
       const { base, variants = {}, compoundVariants = [], defaultVariants = {} } = configFn(theme, props);
       const variantsToApply = calculateVariantsToBeApplied(variants, props, defaultVariants);
-      const computedStyles = {};
-      applyBaseRules(computedStyles, base);
-      applyVariantRules(computedStyles, variantsToApply, variants);
-      applyCompoundVariantRules(computedStyles, variantsToApply, compoundVariants);
+      let computedStyles = applyBaseRules(base);
+      computedStyles = applyVariantRules(computedStyles, variantsToApply, variants);
+      computedStyles = applyCompoundVariantRules(computedStyles, variantsToApply, compoundVariants);
       sanitizeCssVariables(computedStyles);
       return computedStyles;
     };
@@ -78,29 +79,34 @@ const getPropsWithoutVariants = (props: Record<string, any>, variants: string[])
   return res;
 };
 
-const applyBaseRules = (computedStyles: any, base?: StyleRule) => {
+const applyBaseRules = (base?: StyleRule): any => {
   if (base && typeof base === 'object') {
-    Object.assign(computedStyles, base);
+    return { ...base };
   }
+  return {};
 };
 
-const applyVariantRules = (computedStyles: any, variantsToApply: Variants, variants: Variants) => {
+const applyVariantRules = (computedStyles: any, variantsToApply: Variants, variants: Variants): any => {
+  let result = computedStyles;
   for (const key in variantsToApply) {
     // @ts-ignore
-    fastDeepMergeAndReplace(variants[key][variantsToApply[key]], computedStyles);
+    result = deepmerge(result, variants[key][variantsToApply[key]] || {});
   }
+  return result;
 };
 
 const applyCompoundVariantRules = (
   computedStyles: any,
   variantsToApply: Variants,
   compoundVariants: Array<CompoundVariant<any>>,
-) => {
+): any => {
+  let result = computedStyles;
   for (const compoundVariant of compoundVariants) {
     if (conditionMatches(compoundVariant, variantsToApply)) {
-      fastDeepMergeAndReplace(compoundVariant.styles, computedStyles);
+      result = deepmerge(result, compoundVariant.styles || {});
     }
   }
+  return result;
 };
 
 const sanitizeCssVariables = (computedStyles: any) => {

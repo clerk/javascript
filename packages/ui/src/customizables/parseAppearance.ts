@@ -1,7 +1,9 @@
 import type { DeepPartial } from '@clerk/shared/types';
-import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
+import createDeepmerge from '@fastify/deepmerge';
 
 import { baseTheme, getBaseTheme } from '../baseTheme';
+
+const deepmerge = createDeepmerge({ all: true });
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
 import type { Appearance, CaptchaAppearanceOptions, Elements, Options, Theme } from '../internal/appearance';
 import type { InternalTheme } from '../styledSystem';
@@ -147,12 +149,8 @@ const parseCaptcha = (appearanceList: Appearance[]) => {
 };
 
 const parseVariables = (appearances: Appearance[]) => {
-  const res = {} as DeepPartial<InternalTheme>;
-  fastDeepMergeAndReplace({ ...defaultInternalTheme }, res);
-  appearances.forEach(appearance => {
-    fastDeepMergeAndReplace(createInternalThemeFromVariables(appearance), res);
-  });
-  return res as ParsedInternalTheme;
+  const internalThemes = appearances.map(appearance => createInternalThemeFromVariables(appearance));
+  return deepmerge({ ...defaultInternalTheme }, ...internalThemes) as ParsedInternalTheme;
 };
 
 const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial<InternalTheme> => {

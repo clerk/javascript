@@ -134,6 +134,7 @@
     "test:coverage": "vitest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
+    "@fastify/deepmerge": "^3.1.0",
     "@tanstack/query-core": "5.90.16",
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
