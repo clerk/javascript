@@ -48,6 +48,8 @@ export const UNSAFE_PortalProvider = ({ children, getContainer }: PortalProvider
   return <PortalContext.Provider value={contextValue}>{children}</PortalContext.Provider>;
 };
 
+UNSAFE_PortalProvider.displayName = 'UNSAFE_PortalProvider';
+
 /**
  * Hook to get the current portal root container.
  * Returns the getContainer function from context if inside a PortalProvider,
