@@ -8,6 +8,7 @@ import { SubscriptionDetailsButton, type SubscriptionDetailsButtonProps } from '
 export * from './uiComponents';
 export * from './controlComponents';
 export * from './hooks';
+export { UNSAFE_PortalProvider } from '@clerk/shared/react';
 export { SignInButton, SignOutButton, SignUpButton };
 export {
   SubscriptionDetailsButton as __experimental_SubscriptionDetailsButton,

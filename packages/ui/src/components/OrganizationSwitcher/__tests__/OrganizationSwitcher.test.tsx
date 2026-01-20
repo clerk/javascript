@@ -1,9 +1,11 @@
+import { UNSAFE_PortalProvider } from '@clerk/shared/react';
 import type { MembershipRole } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
+import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { act, render } from '@/test/utils';
+import { act, render, screen } from '@/test/utils';
 
 import { OrganizationSwitcher } from '../';
 import {
@@ -610,6 +612,67 @@ describe('OrganizationSwitcher', () => {
           organization: null,
         }),
       );
+    });
+  });
+
+  describe('OrganizationSwitcher with PortalProvider', () => {
+    it('passes getContainer to openOrganizationProfile', async () => {
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      const getContainer = () => container;
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
+        });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { getByRole, userEvent } = render(
+        <UNSAFE_PortalProvider getContainer={getContainer}>
+          <OrganizationSwitcher />
+        </UNSAFE_PortalProvider>,
+        { wrapper },
+      );
+
+      await userEvent.click(getByRole('button'));
+      const manageButton = await waitFor(() => screen.getByRole('menuitem', { name: /manage/i }));
+      await userEvent.click(manageButton);
+
+      expect(fixtures.clerk.openOrganizationProfile).toHaveBeenCalledWith(expect.objectContaining({ getContainer }));
+
+      document.body.removeChild(container);
+    });
+
+    it('passes getContainer to openCreateOrganization', async () => {
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      const getContainer = () => container;
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
+          create_organization_enabled: true,
+        });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { getByRole, userEvent } = render(
+        <UNSAFE_PortalProvider getContainer={getContainer}>
+          <OrganizationSwitcher />
+        </UNSAFE_PortalProvider>,
+        { wrapper },
+      );
+
+      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
+      const createButton = await waitFor(() => screen.getByRole('menuitem', { name: 'Create organization' }));
+      await userEvent.click(createButton);
+
+      expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalledWith(expect.objectContaining({ getContainer }));
+
+      document.body.removeChild(container);
     });
   });
 });

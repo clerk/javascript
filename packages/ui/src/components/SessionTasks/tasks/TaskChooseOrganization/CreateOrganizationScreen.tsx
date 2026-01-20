@@ -35,12 +35,12 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
   const { organizationSettings } = useEnvironment();
   const [file, setFile] = useState<File | null>();
 
-  const nameField = useFormControl('name', props.organizationCreationDefaults?.form.name ?? '', {
+  const nameField = useFormControl('name', props.organizationCreationDefaults?.form?.name ?? '', {
     type: 'text',
     label: localizationKeys('taskChooseOrganization.createOrganization.formFieldLabel__name'),
     placeholder: localizationKeys('taskChooseOrganization.createOrganization.formFieldInputPlaceholder__name'),
   });
-  const slugField = useFormControl('slug', props.organizationCreationDefaults?.form.slug ?? '', {
+  const slugField = useFormControl('slug', props.organizationCreationDefaults?.form?.slug ?? '', {
     type: 'text',
     label: localizationKeys('taskChooseOrganization.createOrganization.formFieldLabel__slug'),
     placeholder: localizationKeys('taskChooseOrganization.createOrganization.formFieldInputPlaceholder__slug'),
@@ -99,7 +99,7 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
   };
 
   const isSubmitButtonDisabled = !nameField.value || !isLoaded;
-  const defaultLogoUrl = file === undefined ? props.organizationCreationDefaults?.form.logo : undefined;
+  const defaultLogoUrl = file === undefined ? props.organizationCreationDefaults?.form?.logo : undefined;
 
   return (
     <>
