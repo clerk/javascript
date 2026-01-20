@@ -241,7 +241,11 @@ export const mountComponentRenderer = (
                 // Defer warning check to avoid blocking component mount
                 // Only check in development mode (based on publishable key, not NODE_ENV)
                 if (getClerk().instanceType === 'development') {
-                  setTimeout(() => warnAboutCustomizationWithoutPinning(options), 0);
+                  const scheduleWarningCheck =
+                    typeof requestIdleCallback === 'function'
+                      ? requestIdleCallback
+                      : (cb: () => void) => setTimeout(cb, 0);
+                  scheduleWarningCheck(() => warnAboutCustomizationWithoutPinning(options));
                 }
                 deferredPromise.resolve();
               }}

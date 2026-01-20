@@ -58,45 +58,49 @@ function isStructuralSelector(selector: string): boolean {
 }
 
 /**
- * Recursively checks if a CSS-in-JS value contains structural selectors.
+ * Recursively collects structural selectors from a CSS-in-JS value.
  */
-function hasStructuralSelectors(value: unknown): boolean {
+function collectStructuralSelectors(value: unknown): string[] {
   if (!value || typeof value !== 'object') {
-    return false;
+    return [];
   }
+
+  const selectors: string[] = [];
 
   for (const [key, nestedValue] of Object.entries(value)) {
     // Check if this key is a structural selector
     if (isStructuralSelector(key)) {
-      return true;
+      selectors.push(key);
     }
 
     // Recursively check nested objects
-    if (hasStructuralSelectors(nestedValue)) {
-      return true;
-    }
+    selectors.push(...collectStructuralSelectors(nestedValue));
   }
 
-  return false;
+  return selectors;
 }
 
 /**
- * Detects if appearance.elements contains structural CSS patterns.
+ * Collects structural CSS patterns from appearance.elements.
+ * Returns patterns in format: elements.{key} "{selector}"
  */
-function hasStructuralElementsUsage(elements: Record<string, unknown>): boolean {
-  for (const value of Object.values(elements)) {
+function collectElementPatterns(elements: Record<string, unknown>): string[] {
+  const patterns: string[] = [];
+
+  for (const [elementKey, value] of Object.entries(elements)) {
     // String values (classNames) are safe - no structural assumptions
     if (typeof value === 'string') {
       continue;
     }
 
-    // Check CSS objects for structural selectors
-    if (hasStructuralSelectors(value)) {
-      return true;
+    // Collect structural selectors from CSS objects
+    const selectors = collectStructuralSelectors(value);
+    for (const selector of selectors) {
+      patterns.push(`elements.${elementKey} "${selector}"`);
     }
   }
 
-  return false;
+  return patterns;
 }
 
 /**
@@ -119,22 +123,21 @@ export function warnAboutCustomizationWithoutPinning(options?: ClerkOptions): vo
     return;
   }
 
-  const appearance = options?.appearance;
-  const hasStructuralElements =
-    appearance?.elements &&
-    Object.keys(appearance.elements).length > 0 &&
-    hasStructuralElementsUsage(appearance.elements as Record<string, unknown>);
+  const patterns: string[] = [];
 
-  // Early return if we already found structural usage - no need to scan stylesheets
-  if (hasStructuralElements) {
-    logger.warnOnce(warnings.advancedCustomizationWithoutVersionPinning);
-    return;
+  // Collect patterns from appearance.elements
+  const appearance = options?.appearance;
+  if (appearance?.elements && Object.keys(appearance.elements).length > 0) {
+    patterns.push(...collectElementPatterns(appearance.elements as Record<string, unknown>));
   }
 
-  // Only scan stylesheets if appearance.elements didn't trigger warning
+  // Collect patterns from stylesheets
   const structuralCssHits = detectStructuralClerkCss();
+  for (const hit of structuralCssHits) {
+    patterns.push(`CSS "${hit.selector}"`);
+  }
 
-  if (structuralCssHits.length > 0) {
-    logger.warnOnce(warnings.advancedCustomizationWithoutVersionPinning);
+  if (patterns.length > 0) {
+    logger.warnOnce(warnings.advancedCustomizationWithoutVersionPinning(patterns));
   }
 }
