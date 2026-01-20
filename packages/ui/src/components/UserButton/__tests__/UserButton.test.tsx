@@ -3,7 +3,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, waitFor } from '@/test/utils';
+import { render, screen, waitFor } from '@/test/utils';
 
 import { UserButton } from '../';
 
@@ -89,6 +89,7 @@ describe('UserButton', () => {
   describe('UserButton with PortalProvider', () => {
     it('passes getContainer to openUserProfile when wrapped in PortalProvider', async () => {
       const container = document.createElement('div');
+      document.body.appendChild(container);
       const getContainer = () => container;
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({
@@ -107,9 +108,14 @@ describe('UserButton', () => {
       );
 
       await userEvent.click(getByRole('button', { name: 'Open user menu' }));
-      await userEvent.click(getByText('Manage account'));
+      await waitFor(() => {
+        expect(screen.getByText('Manage account')).toBeInTheDocument();
+      });
+      await userEvent.click(screen.getByText('Manage account'));
 
       expect(fixtures.clerk.openUserProfile).toHaveBeenCalledWith(expect.objectContaining({ getContainer }));
+
+      document.body.removeChild(container);
     });
   });
 

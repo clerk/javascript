@@ -3,6 +3,9 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { AppearanceProvider } from '@/ui/customizables';
+import { InternalThemeProvider } from '@/ui/styledSystem';
+
 import { APIKeyModal } from '../APIKeyModal';
 
 describe('APIKeyModal modalRoot behavior', () => {
@@ -13,14 +16,18 @@ describe('APIKeyModal modalRoot behavior', () => {
     document.body.appendChild(container);
 
     const { container: testContainer } = render(
-      <APIKeyModal
-        modalRoot={modalRoot}
-        handleOpen={() => {}}
-        handleClose={() => {}}
-        canCloseModal
-      >
-        <div data-testid='modal-content'>Test Content</div>
-      </APIKeyModal>,
+      <AppearanceProvider appearanceKey='signIn'>
+        <InternalThemeProvider>
+          <APIKeyModal
+            modalRoot={modalRoot}
+            handleOpen={() => {}}
+            handleClose={() => {}}
+            canCloseModal
+          >
+            <div data-testid='modal-content'>Test Content</div>
+          </APIKeyModal>
+        </InternalThemeProvider>
+      </AppearanceProvider>,
     );
 
     // The modal should render inside the modalRoot container, not document.body
@@ -37,18 +44,23 @@ describe('APIKeyModal modalRoot behavior', () => {
     document.body.appendChild(container);
 
     const { container: testContainer } = render(
-      <APIKeyModal
-        modalRoot={modalRoot}
-        handleOpen={() => {}}
-        handleClose={() => {}}
-        canCloseModal
-      >
-        <div>Test</div>
-      </APIKeyModal>,
+      <AppearanceProvider appearanceKey='signIn'>
+        <InternalThemeProvider>
+          <APIKeyModal
+            modalRoot={modalRoot}
+            handleOpen={() => {}}
+            handleClose={() => {}}
+            canCloseModal
+          >
+            <div>Test</div>
+          </APIKeyModal>
+        </InternalThemeProvider>
+      </AppearanceProvider>,
     );
 
     // The modal should have scoped styles (position: absolute) when modalRoot is provided
-    const modalElement = container.querySelector('[data-clerk-element="modalBackdrop"]');
+    // The backdrop element should be rendered with the modalBackdrop class
+    const modalElement = container.querySelector('.cl-modalBackdrop');
     expect(modalElement).toBeTruthy();
 
     document.body.removeChild(container);
@@ -65,16 +77,20 @@ describe('APIKeyModal modalRoot behavior', () => {
     const getContainer = () => container2;
 
     const { container: testContainer } = render(
-      <UNSAFE_PortalProvider getContainer={getContainer}>
-        <APIKeyModal
-          modalRoot={modalRoot}
-          handleOpen={() => {}}
-          handleClose={() => {}}
-          canCloseModal
-        >
-          <div data-testid='modal-content'>Test Content</div>
-        </APIKeyModal>
-      </UNSAFE_PortalProvider>,
+      <AppearanceProvider appearanceKey='signIn'>
+        <InternalThemeProvider>
+          <UNSAFE_PortalProvider getContainer={getContainer}>
+            <APIKeyModal
+              modalRoot={modalRoot}
+              handleOpen={() => {}}
+              handleClose={() => {}}
+              canCloseModal
+            >
+              <div data-testid='modal-content'>Test Content</div>
+            </APIKeyModal>
+          </UNSAFE_PortalProvider>
+        </InternalThemeProvider>
+      </AppearanceProvider>,
     );
 
     // The modal should render in container1 (modalRoot), not container2 (PortalProvider)
