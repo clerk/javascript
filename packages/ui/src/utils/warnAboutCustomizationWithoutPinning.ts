@@ -1,9 +1,24 @@
-import { warnings } from '@clerk/shared/internal/clerk-js/warnings';
 import { logger } from '@clerk/shared/logger';
 import type { ClerkOptions } from '@clerk/shared/types';
 
 import { CLERK_CLASS_RE, HAS_RE, POSITIONAL_PSEUDO_RE } from './cssPatterns';
 import { detectStructuralClerkCss } from './detectClerkStylesheetUsage';
+
+function formatStructuralCssWarning(patterns: string[]): string {
+  const patternsDisplay = patterns.length > 0 ? patterns.slice(0, 3).join(', ') : 'structural CSS';
+  const truncated = patterns.length > 3 ? ` (+${patterns.length - 3} more)` : '';
+
+  return (
+    `🔒 Clerk:\n` +
+    `[CLERK_W001] Structural CSS detected\n\n` +
+    `Found: ${patternsDisplay}${truncated}\n\n` +
+    `May break on updates. Pin your version:\n` +
+    `  npm install @clerk/ui && import { ui } from '@clerk/ui'\n` +
+    `  <ClerkProvider ui={ui} />\n\n` +
+    `https://clerk.com/docs/customization/versioning\n` +
+    `(This notice only appears in development)`
+  );
+}
 
 /**
  * Checks if a CSS-in-JS selector has adjacency with another selector.
@@ -138,6 +153,6 @@ export function warnAboutCustomizationWithoutPinning(options?: ClerkOptions): vo
   }
 
   if (patterns.length > 0) {
-    logger.warnOnce(warnings.advancedCustomizationWithoutVersionPinning(patterns));
+    logger.warnOnce(formatStructuralCssWarning(patterns));
   }
 }

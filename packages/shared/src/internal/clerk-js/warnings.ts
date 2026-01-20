@@ -22,19 +22,6 @@ const createMessageForDisabledBilling = (componentName: 'PricingTable' | 'Checko
   );
 };
 
-const createMessageForAdvancedCustomization = (patterns: string[]) => {
-  const patternsDisplay = patterns.length > 0 ? patterns.slice(0, 3).join(', ') : 'structural CSS';
-  const truncated = patterns.length > 3 ? ` (+${patterns.length - 3} more)` : '';
-
-  return formatWarning(
-    `[CLERK_W001] Structural CSS detected\n\n` +
-      `Found: ${patternsDisplay}${truncated}\n\n` +
-      `May break on updates. Pin your version:\n` +
-      `  npm install @clerk/ui && import { ui } from '@clerk/ui'\n` +
-      `  <ClerkProvider ui={ui} />\n\n` +
-      `https://clerk.com/docs/customization/versioning`,
-  );
-};
 const warnings = {
   cannotRenderComponentWhenSessionExists:
     'The <SignUp/> and <SignIn/> components cannot render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the Home URL instead.',
@@ -67,7 +54,6 @@ const warnings = {
     'The <APIKeys/> component cannot be rendered when user API keys are disabled. Since user API keys are disabled, this is no-op.',
   cannotRenderAPIKeysComponentForOrgWhenDisabled:
     'The <APIKeys/> component cannot be rendered when organization API keys are disabled. Since organization API keys are disabled, this is no-op.',
-  advancedCustomizationWithoutVersionPinning: createMessageForAdvancedCustomization,
 };
 
 type SerializableWarnings = Serializable<typeof warnings>;
