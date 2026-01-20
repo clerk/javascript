@@ -890,6 +890,10 @@ export const bnIN: LocalizationResource = {
       actionLink: 'সাইন আউট',
       actionText: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'শনাক্ত করা কোম্পানির নাম ({{organizationName}}) এবং {{organizationDomain}}-এর জন্য একটি সংস্থা ইতিমধ্যেই বিদ্যমান। আমন্ত্রণের মাধ্যমে যোগ দিন।',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

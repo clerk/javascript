@@ -42,6 +42,7 @@ import type {
   SignInFutureEmailCodeVerifyParams,
   SignInFutureEmailLinkSendParams,
   SignInFutureFinalizeParams,
+  SignInFutureMFAEmailCodeVerifyParams,
   SignInFutureMFAPhoneCodeVerifyParams,
   SignInFuturePasskeyParams,
   SignInFuturePasswordParams,
@@ -643,6 +644,8 @@ class SignInFuture implements SignInFutureResource {
   mfa = {
     sendPhoneCode: this.sendMFAPhoneCode.bind(this),
     verifyPhoneCode: this.verifyMFAPhoneCode.bind(this),
+    sendEmailCode: this.sendMFAEmailCode.bind(this),
+    verifyEmailCode: this.verifyMFAEmailCode.bind(this),
     verifyTOTP: this.verifyTOTP.bind(this),
     verifyBackupCode: this.verifyBackupCode.bind(this),
   };
@@ -1169,6 +1172,32 @@ class SignInFuture implements SignInFutureResource {
     return runAsyncResourceTask(this.#resource, async () => {
       await this.#resource.__internal_basePost({
         body: { code, strategy: 'phone_code' },
+        action: 'attempt_second_factor',
+      });
+    });
+  }
+
+  async sendMFAEmailCode(): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
+      const emailCodeFactor = this.#resource.supportedSecondFactors?.find(f => f.strategy === 'email_code');
+
+      if (!emailCodeFactor) {
+        throw new ClerkRuntimeError('Email code factor not found', { code: 'factor_not_found' });
+      }
+
+      const { emailAddressId } = emailCodeFactor;
+      await this.#resource.__internal_basePost({
+        body: { emailAddressId, strategy: 'email_code' },
+        action: 'prepare_second_factor',
+      });
+    });
+  }
+
+  async verifyMFAEmailCode(params: SignInFutureMFAEmailCodeVerifyParams): Promise<{ error: ClerkError | null }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePost({
+        body: { code, strategy: 'email_code' },
         action: 'attempt_second_factor',
       });
     });
