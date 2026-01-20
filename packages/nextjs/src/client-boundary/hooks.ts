@@ -9,6 +9,7 @@ export {
   useSessionList,
   useSignIn,
   useSignUp,
+  useWaitlist,
   useUser,
   useReverification,
 } from '@clerk/react';

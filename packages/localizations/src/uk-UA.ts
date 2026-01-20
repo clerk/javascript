@@ -882,6 +882,10 @@ export const ukUA: LocalizationResource = {
       actionLink: 'Вийти',
       actionText: 'Увійшли як {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Організація вже існує для виявленої назви компанії ({{organizationName}}) та {{organizationDomain}}. Приєднуйтесь за запрошенням.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,
