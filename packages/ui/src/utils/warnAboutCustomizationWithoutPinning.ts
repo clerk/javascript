@@ -5,19 +5,25 @@ import { CLERK_CLASS_RE, HAS_RE, POSITIONAL_PSEUDO_RE } from './cssPatterns';
 import { detectStructuralClerkCss } from './detectClerkStylesheetUsage';
 
 function formatStructuralCssWarning(patterns: string[]): string {
-  const patternsDisplay = patterns.length > 0 ? patterns.slice(0, 3).join(', ') : 'structural CSS';
-  const truncated = patterns.length > 3 ? ` (+${patterns.length - 3} more)` : '';
+  const displayPatterns = patterns.slice(0, 5);
+  const patternsList = displayPatterns.map(p => `  - ${p}`).join('\n');
+  const truncated = patterns.length > 5 ? `\n  (+${patterns.length - 5} more)` : '';
 
-  return (
-    `🔒 Clerk:\n` +
-    `[CLERK_W001] Structural CSS detected\n\n` +
-    `Found: ${patternsDisplay}${truncated}\n\n` +
-    `May break on updates. Pin your version:\n` +
-    `  npm install @clerk/ui && import { ui } from '@clerk/ui'\n` +
-    `  <ClerkProvider ui={ui} />\n\n` +
-    `https://clerk.com/docs/customization/versioning\n` +
-    `(This notice only appears in development)`
-  );
+  return [
+    `Clerk: Structural CSS may break on updates`,
+    ``,
+    `Found:`,
+    patternsList + truncated,
+    ``,
+    `These selectors depend on internal DOM structure that may change between versions.`,
+    `To prevent breaking changes, install @clerk/ui and pass it to ClerkProvider:`,
+    ``,
+    `  import { ui } from '@clerk/ui'`,
+    `  <ClerkProvider ui={ui}>`,
+    ``,
+    `Learn more: https://clerk.com/docs/reference/components/versioning`,
+    `(code=structural_css_pin_clerk_ui)`,
+  ].join('\n');
 }
 
 /**

@@ -48,7 +48,7 @@ describe('warnAboutCustomizationWithoutPinning', () => {
 
       expect(logger.warnOnce).toHaveBeenCalledTimes(1);
       const message = getWarningMessage();
-      expect(message).toContain('[CLERK_W001]');
+      expect(message).toContain('(code=structural_css_pin_clerk_ui)');
       expect(message).toContain('elements.card "& > div"');
     });
 
@@ -269,7 +269,7 @@ describe('warnAboutCustomizationWithoutPinning', () => {
 
       expect(logger.warnOnce).toHaveBeenCalledTimes(1);
       const message = getWarningMessage();
-      expect(message).toContain('[CLERK_W001]');
+      expect(message).toContain('(code=structural_css_pin_clerk_ui)');
       expect(message).toContain('CSS ".cl-card > div"');
     });
 
@@ -315,13 +315,15 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       expect(logger.warnOnce).not.toHaveBeenCalled();
     });
 
-    test('truncates pattern list when more than 3 patterns are found', () => {
+    test('truncates pattern list when more than 5 patterns are found', () => {
       vi.mocked(detectStructuralClerkCss).mockReturnValue([
         { stylesheetHref: null, selector: '.cl-a > div', cssText: '', reason: [] },
         { stylesheetHref: null, selector: '.cl-b > div', cssText: '', reason: [] },
         { stylesheetHref: null, selector: '.cl-c > div', cssText: '', reason: [] },
         { stylesheetHref: null, selector: '.cl-d > div', cssText: '', reason: [] },
         { stylesheetHref: null, selector: '.cl-e > div', cssText: '', reason: [] },
+        { stylesheetHref: null, selector: '.cl-f > div', cssText: '', reason: [] },
+        { stylesheetHref: null, selector: '.cl-g > div', cssText: '', reason: [] },
       ]);
 
       warnAboutCustomizationWithoutPinning({});
@@ -329,11 +331,10 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       expect(logger.warnOnce).toHaveBeenCalledTimes(1);
       const message = getWarningMessage();
       expect(message).toContain('(+2 more)');
-      // Should only show first 3 patterns
-      expect(message).toContain('CSS ".cl-a > div"');
-      expect(message).toContain('CSS ".cl-b > div"');
-      expect(message).toContain('CSS ".cl-c > div"');
-      expect(message).not.toContain('.cl-d > div');
+      // Should show first 5 patterns as bullet points
+      expect(message).toContain('- CSS ".cl-a > div"');
+      expect(message).toContain('- CSS ".cl-e > div"');
+      expect(message).not.toContain('.cl-f > div');
     });
 
     test('warning message includes documentation link', () => {
@@ -344,7 +345,7 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       });
 
       const message = getWarningMessage();
-      expect(message).toContain('https://clerk.com/docs/customization/versioning');
+      expect(message).toContain('https://clerk.com/docs/reference/components/versioning');
     });
   });
 });
