@@ -59,7 +59,7 @@ const warnings = {
     'To ensure stability, install @clerk/ui and pass it to ClerkProvider:\n\n' +
     "  import { ui } from '@clerk/ui';\n\n" +
     '  <ClerkProvider ui={ui}>...</ClerkProvider>\n\n' +
-    'Learn more: https://clerk.com/docs/customization/versioning',
+    'Learn more: https://clerk.com/docs/reference/components/versioning,
 };
 
 type SerializableWarnings = Serializable<typeof warnings>;
