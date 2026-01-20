@@ -1,6 +1,7 @@
 import { colors as colorUtils } from '../utils/colors';
 import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from '../utils/colors/scales';
 import { clerkCssVar } from '../utils/cssVariables';
+import { lightDark } from '../utils/lightDark';
 
 const whiteAlpha = Object.freeze({
   whiteAlpha25: 'hsla(0, 0%, 100%, 0.02)',
@@ -34,14 +35,14 @@ type AlphaScale<T extends string> = NonNullable<ReturnType<typeof colorOptionToT
  * Therefore, it's safe to assert these as NonNullable.
  */
 
-const defaultColorNeutral = clerkCssVar('color-neutral', '#000000');
+const defaultColorNeutral = clerkCssVar('color-neutral', lightDark('#000000', '#ffffff'));
 
 const dangerScale = colorOptionToThemedLightnessScale(
   clerkCssVar('color-danger', '#EF4444'),
   'danger',
 ) as LightnessScale<'danger'>;
 const primaryScale = colorOptionToThemedLightnessScale(
-  clerkCssVar('color-primary', '#2F3037'),
+  clerkCssVar('color-primary', lightDark('#2F3037', '#ffffff')),
   'primary',
 ) as LightnessScale<'primary'>;
 const successScale = colorOptionToThemedLightnessScale(
@@ -62,7 +63,7 @@ const neutralAlphaScale = colorOptionToThemedAlphaScale(
   'neutralAlpha',
 ) as AlphaScale<'neutralAlpha'>;
 const primaryAlphaScale = colorOptionToThemedAlphaScale(
-  clerkCssVar('color-primary', '#2F3037'),
+  clerkCssVar('color-primary', lightDark('#2F3037', '#ffffff')),
   'primaryAlpha',
 ) as AlphaScale<'primaryAlpha'>;
 const successAlphaScale = colorOptionToThemedAlphaScale(
@@ -79,7 +80,7 @@ const borderAlphaScale = colorOptionToThemedAlphaScale(
   'borderAlpha',
 ) as AlphaScale<'borderAlpha'>;
 
-const colorForeground = clerkCssVar('color-foreground', '#212126');
+const colorForeground = clerkCssVar('color-foreground', lightDark('#212126', 'white'));
 const colorMutedForeground = clerkCssVar(
   'color-muted-foreground',
   colorUtils.makeTransparent(colorForeground, 0.35) || '#747686',
@@ -92,8 +93,8 @@ const colors = Object.freeze({
     'color-modal-backdrop',
     colorUtils.makeTransparent(defaultColorNeutral, 0.27) || neutralAlphaScale.neutralAlpha700,
   ),
-  colorBackground: clerkCssVar('color-background', 'white'),
-  colorInput: clerkCssVar('color-input', 'white'),
+  colorBackground: clerkCssVar('color-background', lightDark('#ffffff', '#212126')),
+  colorInput: clerkCssVar('color-input', lightDark('white', '#26262B')),
   colorForeground,
   colorMutedForeground,
   colorMuted: undefined,
@@ -101,8 +102,8 @@ const colors = Object.freeze({
     'color-ring',
     colorUtils.makeTransparent(defaultColorNeutral, 0.85) || neutralAlphaScale.neutralAlpha200,
   ),
-  colorInputForeground: clerkCssVar('color-input-foreground', '#131316'),
-  colorPrimaryForeground: clerkCssVar('color-primary-foreground', 'white'),
+  colorInputForeground: clerkCssVar('color-input-foreground', lightDark('#131316', 'white')),
+  colorPrimaryForeground: clerkCssVar('color-primary-foreground', lightDark('white', 'black')),
   colorShimmer: clerkCssVar('color-shimmer', 'rgba(255, 255, 255, 0.36)'),
   transparent: 'transparent',
   white: 'white',
