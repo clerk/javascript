@@ -14,6 +14,7 @@
 
 import * as react from 'react';
 import * as reactDom from 'react-dom';
+import * as reactDomClient from 'react-dom/client';
 import * as jsxRuntime from 'react/jsx-runtime';
 
 // Only register if not already registered to avoid overwriting with potentially
@@ -33,6 +34,7 @@ if (globalThis.__clerkSharedModules) {
   globalThis.__clerkSharedModules = {
     react,
     'react-dom': reactDom,
+    'react-dom/client': reactDomClient,
     'react/jsx-runtime': jsxRuntime,
   };
 }

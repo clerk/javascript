@@ -29,6 +29,9 @@ const sharedReactExternalsHandler = ({ request }, callback) => {
   if (request === 'react-dom') {
     return callback(null, ['__clerkSharedModules', 'react-dom'], 'root');
   }
+  if (request === 'react-dom/client') {
+    return callback(null, ['__clerkSharedModules', 'react-dom/client'], 'root');
+  }
   if (request === 'react/jsx-runtime') {
     return callback(null, ['__clerkSharedModules', 'react/jsx-runtime'], 'root');
   }
@@ -238,7 +241,7 @@ const prodConfig = ({ mode, analysis }) => {
       externals: [sharedReactExternalsHandler],
     },
   );
-  
+
   // webpack-bundle-analyzer only supports a single build, use uiBrowser as that's the default build we serve
   if (analysis) {
     return [uiBrowser];

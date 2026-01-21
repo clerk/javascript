@@ -15,6 +15,7 @@
 
 const react = require('react');
 const reactDom = require('react-dom');
+const reactDomClient = require('react-dom/client');
 const jsxRuntime = require('react/jsx-runtime');
 
 // Only register if not already registered to avoid overwriting with potentially
@@ -38,6 +39,7 @@ if (globalThis.__clerkSharedModules) {
   globalThis.__clerkSharedModules = {
     react,
     'react-dom': reactDom,
+    'react-dom/client': reactDomClient,
     'react/jsx-runtime': jsxRuntime,
   };
 }
