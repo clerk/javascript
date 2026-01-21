@@ -7,7 +7,8 @@ import { Header } from '@/ui/elements/Header';
 import { LegalCheckbox } from '@/ui/elements/LegalConsentCheckbox';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 
-import { Button, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
+import { ProviderIcon } from '../../common';
+import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import type { Fields } from './signUpFormHelpers';
@@ -39,16 +40,18 @@ export const SignUpStartAlternativePhoneCodePhoneNumberCard = (props: SignUpForm
           showDivider
         >
           <Col center>
-            <Image
-              src={providerToDisplayData[phoneCodeProvider.channel]?.iconUrl}
-              alt={`${strategyToDisplayData[channel].name} logo`}
-              sx={theme => ({
-                width: theme.sizes.$7,
-                height: theme.sizes.$7,
-                maxWidth: '100%',
-                marginBottom: theme.sizes.$6,
-              })}
-            />
+            {providerToDisplayData[phoneCodeProvider.channel] && (
+              <ProviderIcon
+                id={phoneCodeProvider.channel}
+                iconUrl={providerToDisplayData[phoneCodeProvider.channel].iconUrl}
+                name={strategyToDisplayData[channel].name}
+                alt={`${strategyToDisplayData[channel].name} logo`}
+                size='$7'
+                sx={theme => ({
+                  marginBottom: theme.sizes.$6,
+                })}
+              />
+            )}
           </Col>
           <Header.Title
             localizationKey={localizationKeys('signUp.start.alternativePhoneCodeProvider.title', {

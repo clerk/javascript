@@ -6,7 +6,8 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 
-import { Button, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
+import { ProviderIcon } from '../../common';
+import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 
@@ -32,16 +33,18 @@ export const SignInAlternativePhoneCodePhoneNumberCard = (props: SignUpAlternati
           showDivider
         >
           <Col center>
-            <Image
-              src={providerToDisplayData[channel]?.iconUrl}
-              alt={`${strategyToDisplayData[channel].name} logo`}
-              sx={theme => ({
-                width: theme.sizes.$7,
-                height: theme.sizes.$7,
-                maxWidth: '100%',
-                marginBottom: theme.sizes.$6,
-              })}
-            />
+            {providerToDisplayData[channel] && (
+              <ProviderIcon
+                id={channel}
+                iconUrl={providerToDisplayData[channel].iconUrl}
+                name={strategyToDisplayData[channel].name}
+                alt={`${strategyToDisplayData[channel].name} logo`}
+                size='$7'
+                sx={theme => ({
+                  marginBottom: theme.sizes.$6,
+                })}
+              />
+            )}
           </Col>
           <Header.Title
             localizationKey={localizationKeys('signIn.start.alternativePhoneCodeProvider.title', {
