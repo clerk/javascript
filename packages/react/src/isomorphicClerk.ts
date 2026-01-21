@@ -73,16 +73,7 @@ import type {
   HeadlessBrowserClerkConstructor,
   IsomorphicClerkOptions,
 } from './types';
-import {
-  getPublishableKeyFromEnv,
-  getSignInFallbackRedirectUrlFromEnv,
-  getSignInForceRedirectUrlFromEnv,
-  getSignInUrlFromEnv,
-  getSignUpFallbackRedirectUrlFromEnv,
-  getSignUpForceRedirectUrlFromEnv,
-  getSignUpUrlFromEnv,
-  isConstructor,
-} from './utils';
+import { isConstructor, mergeWithEnv } from './utils';
 
 if (typeof globalThis.__BUILD_DISABLE_RHC__ === 'undefined') {
   globalThis.__BUILD_DISABLE_RHC__ = false;
@@ -215,34 +206,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // During CSR: use the cached instance for the whole lifetime of the app
     // Also will recreate the instance if the provided Clerk instance changes
     // This method should be idempotent in both scenarios
-
-    // If options are not explicitly provided, fall back to environment variables.
-    // This supports Vite users who set VITE_CLERK_* or CLERK_* env vars.
-    // Passed-in options always take priority over environment variables.
-    // We check for undefined specifically (not falsy) to avoid conflicting with framework SDKs
-    // that may pass an empty string when their env var is not set.
-    const mergedOptions = {
-      ...options,
-      publishableKey: options.publishableKey !== undefined ? options.publishableKey : getPublishableKeyFromEnv(),
-      signInUrl: options.signInUrl !== undefined ? options.signInUrl : getSignInUrlFromEnv(),
-      signUpUrl: options.signUpUrl !== undefined ? options.signUpUrl : getSignUpUrlFromEnv(),
-      signInForceRedirectUrl:
-        options.signInForceRedirectUrl !== undefined
-          ? options.signInForceRedirectUrl
-          : getSignInForceRedirectUrlFromEnv(),
-      signUpForceRedirectUrl:
-        options.signUpForceRedirectUrl !== undefined
-          ? options.signUpForceRedirectUrl
-          : getSignUpForceRedirectUrlFromEnv(),
-      signInFallbackRedirectUrl:
-        options.signInFallbackRedirectUrl !== undefined
-          ? options.signInFallbackRedirectUrl
-          : getSignInFallbackRedirectUrlFromEnv(),
-      signUpFallbackRedirectUrl:
-        options.signUpFallbackRedirectUrl !== undefined
-          ? options.signUpFallbackRedirectUrl
-          : getSignUpFallbackRedirectUrlFromEnv(),
-    };
+    const mergedOptions = mergeWithEnv(options);
 
     if (
       !inBrowser() ||

@@ -1,13 +1,15 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 
+import type { IsomorphicClerkOptions } from '../types';
+
 /**
  * Gets an environment variable value, checking for Vite's VITE_ prefix first.
- * This allows React SDK users with Vite to use VITE_CLERK_PUBLISHABLE_KEY
+ * This allows React SDK users with Vite to use VITE_CLERK_* env vars
  * (which Vite exposes client-side) without manual configuration.
  *
  * Note: Empty string values are treated as "not set" and will fall through to
- * the next env var in the chain. This is intentional since empty publishable
- * keys are invalid anyway.
+ * the next env var in the chain. This is intentional since empty values are
+ * typically invalid for these options.
  *
  * @param name - The environment variable name without prefix (e.g., 'CLERK_PUBLISHABLE_KEY')
  * @returns The value of the environment variable, or empty string if not found
@@ -20,71 +22,46 @@ const getEnvVar = (name: string): string => {
 };
 
 /**
- * Retrieves the publishable key from environment variables.
- * Checks VITE_CLERK_PUBLISHABLE_KEY first (for Vite), then CLERK_PUBLISHABLE_KEY.
- *
- * @returns The publishable key or empty string if not found
+ * Helper to get env fallback only when the option is undefined.
+ * We check for undefined specifically (not falsy) to avoid conflicting with framework SDKs
+ * that may pass an empty string when their env var is not set.
  */
-export const getPublishableKeyFromEnv = (): string => {
-  return getEnvVar('CLERK_PUBLISHABLE_KEY');
+const withEnvFallback = (value: string | undefined, envVarName: string): string => {
+  return value !== undefined ? value : getEnvVar(envVarName);
 };
 
 /**
- * Retrieves the sign-in URL from environment variables.
- * Checks VITE_CLERK_SIGN_IN_URL first (for Vite), then CLERK_SIGN_IN_URL.
+ * Merges ClerkProvider options with environment variable fallbacks.
+ * This supports Vite users who set VITE_CLERK_* or CLERK_* env vars.
+ * Passed-in options always take priority over environment variables.
  *
- * @returns The sign-in URL or empty string if not found
- */
-export const getSignInUrlFromEnv = (): string => {
-  return getEnvVar('CLERK_SIGN_IN_URL');
-};
-
-/**
- * Retrieves the sign-up URL from environment variables.
- * Checks VITE_CLERK_SIGN_UP_URL first (for Vite), then CLERK_SIGN_UP_URL.
+ * Supported environment variables:
+ * - VITE_CLERK_PUBLISHABLE_KEY / CLERK_PUBLISHABLE_KEY
+ * - VITE_CLERK_SIGN_IN_URL / CLERK_SIGN_IN_URL
+ * - VITE_CLERK_SIGN_UP_URL / CLERK_SIGN_UP_URL
+ * - VITE_CLERK_SIGN_IN_FORCE_REDIRECT_URL / CLERK_SIGN_IN_FORCE_REDIRECT_URL
+ * - VITE_CLERK_SIGN_UP_FORCE_REDIRECT_URL / CLERK_SIGN_UP_FORCE_REDIRECT_URL
+ * - VITE_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL / CLERK_SIGN_IN_FALLBACK_REDIRECT_URL
+ * - VITE_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL / CLERK_SIGN_UP_FALLBACK_REDIRECT_URL
  *
- * @returns The sign-up URL or empty string if not found
+ * @param options - The options passed to ClerkProvider
+ * @returns Options with environment variable fallbacks applied
  */
-export const getSignUpUrlFromEnv = (): string => {
-  return getEnvVar('CLERK_SIGN_UP_URL');
-};
-
-/**
- * Retrieves the sign-in force redirect URL from environment variables.
- * Checks VITE_CLERK_SIGN_IN_FORCE_REDIRECT_URL first, then CLERK_SIGN_IN_FORCE_REDIRECT_URL.
- *
- * @returns The sign-in force redirect URL or empty string if not found
- */
-export const getSignInForceRedirectUrlFromEnv = (): string => {
-  return getEnvVar('CLERK_SIGN_IN_FORCE_REDIRECT_URL');
-};
-
-/**
- * Retrieves the sign-up force redirect URL from environment variables.
- * Checks VITE_CLERK_SIGN_UP_FORCE_REDIRECT_URL first, then CLERK_SIGN_UP_FORCE_REDIRECT_URL.
- *
- * @returns The sign-up force redirect URL or empty string if not found
- */
-export const getSignUpForceRedirectUrlFromEnv = (): string => {
-  return getEnvVar('CLERK_SIGN_UP_FORCE_REDIRECT_URL');
-};
-
-/**
- * Retrieves the sign-in fallback redirect URL from environment variables.
- * Checks VITE_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL first, then CLERK_SIGN_IN_FALLBACK_REDIRECT_URL.
- *
- * @returns The sign-in fallback redirect URL or empty string if not found
- */
-export const getSignInFallbackRedirectUrlFromEnv = (): string => {
-  return getEnvVar('CLERK_SIGN_IN_FALLBACK_REDIRECT_URL');
-};
-
-/**
- * Retrieves the sign-up fallback redirect URL from environment variables.
- * Checks VITE_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL first, then CLERK_SIGN_UP_FALLBACK_REDIRECT_URL.
- *
- * @returns The sign-up fallback redirect URL or empty string if not found
- */
-export const getSignUpFallbackRedirectUrlFromEnv = (): string => {
-  return getEnvVar('CLERK_SIGN_UP_FALLBACK_REDIRECT_URL');
+export const mergeWithEnv = (options: IsomorphicClerkOptions): IsomorphicClerkOptions => {
+  return {
+    ...options,
+    publishableKey: withEnvFallback(options.publishableKey, 'CLERK_PUBLISHABLE_KEY'),
+    signInUrl: withEnvFallback(options.signInUrl, 'CLERK_SIGN_IN_URL'),
+    signUpUrl: withEnvFallback(options.signUpUrl, 'CLERK_SIGN_UP_URL'),
+    signInForceRedirectUrl: withEnvFallback(options.signInForceRedirectUrl, 'CLERK_SIGN_IN_FORCE_REDIRECT_URL'),
+    signUpForceRedirectUrl: withEnvFallback(options.signUpForceRedirectUrl, 'CLERK_SIGN_UP_FORCE_REDIRECT_URL'),
+    signInFallbackRedirectUrl: withEnvFallback(
+      options.signInFallbackRedirectUrl,
+      'CLERK_SIGN_IN_FALLBACK_REDIRECT_URL',
+    ),
+    signUpFallbackRedirectUrl: withEnvFallback(
+      options.signUpFallbackRedirectUrl,
+      'CLERK_SIGN_UP_FALLBACK_REDIRECT_URL',
+    ),
+  };
 };
