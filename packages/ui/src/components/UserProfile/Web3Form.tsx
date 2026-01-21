@@ -99,7 +99,6 @@ export const AddWeb3WalletActionMenu = () => {
                   isLoading={card.loadingMetadata === strategy}
                   isDisabled={card.isLoading}
                   alt={`Connect ${strategyToDisplayData[strategy].name}`}
-                  size='$5'
                   elementDescriptor={descriptors.providerIcon}
                   elementId={descriptors.providerIcon.setId(strategyToDisplayData[strategy].id)}
                 />
