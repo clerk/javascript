@@ -76,14 +76,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
     });
   }, [_props.copyKeysUrl]);
 
-  const getKeysUrlFromLastActive = useMemo(() => {
-    return withLastActiveFallback(() => {
-      const redirectUrlParts = handleDashboardUrlParsing(_props.copyKeysUrl);
-      const url = new URL(`${redirectUrlParts.baseDomain}/last-active?path=api-keys`);
-      return url.href;
-    });
-  }, [_props.copyKeysUrl]);
-
   const mainCTAStyles = css`
     ${basePromptElementStyles};
     display: flex;
