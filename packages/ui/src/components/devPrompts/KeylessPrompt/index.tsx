@@ -425,7 +425,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                       text-wrap: pretty;
                     `}
                   >
-                    We generated temporary API keys so you can quickly test out Clerk.
+                    Temporary API keys are enabled so you can get started immediately.
                   </p>
                   <p
                     css={css`
@@ -437,8 +437,8 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                       text-wrap: pretty;
                     `}
                   >
-                    Claim this application to access the Clerk dashboard where you can configure changes (e.g. add
-                    Google SSO).
+                    Claim this application to access the Clerk Dashboard where you can manage auth settings and explore
+                    more Clerk features.
                   </p>
                 </>
               )}
