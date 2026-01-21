@@ -4,11 +4,9 @@ import { Box, descriptors, Text } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { common } from '../styledSystem';
 
-type ProviderId = OAuthProvider | Web3Provider | PhoneCodeProvider;
-
 type ProviderInitialIconProps = PropsOfComponent<typeof Box> & {
   value: string;
-  id: ProviderId;
+  id: Web3Provider | OAuthProvider | PhoneCodeProvider;
 };
 
 export const ProviderInitialIcon = (props: ProviderInitialIconProps) => {
