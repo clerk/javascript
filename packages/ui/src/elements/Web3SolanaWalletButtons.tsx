@@ -134,6 +134,7 @@ const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsPro
               <Image
                 elementDescriptor={[descriptors.walletIcon, descriptors.web3SolanaWalletButtonsWalletInitialIcon]}
                 isDisabled={card.isLoading}
+                isLoading={card.loadingMetadata === w.name}
                 src={w.icon}
                 alt={t(localizationKeys('web3SolanaWalletButtons.connect', { walletName: w.name }))}
                 sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
