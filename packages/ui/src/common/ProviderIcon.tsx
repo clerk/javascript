@@ -1,4 +1,4 @@
-import type { OAuthProvider, PhoneCodeChannel, PhoneCodeProvider, Web3Provider } from '@clerk/shared/types';
+import type { OAuthProvider, PhoneCodeChannel, Web3Provider } from '@clerk/shared/types';
 
 import { descriptors, Span } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';

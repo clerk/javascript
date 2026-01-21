@@ -153,15 +153,17 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
     }
   };
 
+  const providerData = providerToDisplayData[account.provider];
+
   return (
     <Fragment key={account.id}>
       <ProfileSection.Item id='connectedAccounts'>
         <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
           <ProviderIcon
             id={account.provider}
-            iconUrl={providerToDisplayData[account.provider].iconUrl}
-            name={providerToDisplayData[account.provider].name}
-            alt={providerToDisplayData[account.provider].name}
+            iconUrl={providerData?.iconUrl}
+            name={providerData?.name || account.provider}
+            alt={providerData?.name || account.provider}
             elementDescriptor={descriptors.providerIcon}
             elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
             sx={{ flexShrink: 0 }}
@@ -172,7 +174,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
               center
             >
               <Text sx={t => ({ color: t.colors.$colorForeground })}>{`${
-                providerToDisplayData[account.provider].name
+                providerData?.name || account.provider
               }`}</Text>
               <Text
                 truncate
