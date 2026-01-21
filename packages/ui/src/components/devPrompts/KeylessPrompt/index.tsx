@@ -425,7 +425,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                       text-wrap: pretty;
                     `}
                   >
-                    We generated temporary API keys so you can quickly test our Clerk.
+                    We generated temporary API keys so you can quickly test out Clerk.
                   </p>
                   <p
                     css={css`
