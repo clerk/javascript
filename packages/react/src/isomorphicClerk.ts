@@ -73,7 +73,7 @@ import type {
   HeadlessBrowserClerkConstructor,
   IsomorphicClerkOptions,
 } from './types';
-import { isConstructor, mergeWithEnv } from './utils';
+import { isConstructor } from './utils';
 
 if (typeof globalThis.__BUILD_DISABLE_RHC__ === 'undefined') {
   globalThis.__BUILD_DISABLE_RHC__ = false;
@@ -206,16 +206,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // During CSR: use the cached instance for the whole lifetime of the app
     // Also will recreate the instance if the provided Clerk instance changes
     // This method should be idempotent in both scenarios
-    const mergedOptions = mergeWithEnv(options);
-
     if (
       !inBrowser() ||
       !this.#instance ||
-      (mergedOptions.Clerk && this.#instance.Clerk !== mergedOptions.Clerk) ||
+      (options.Clerk && this.#instance.Clerk !== options.Clerk) ||
       // Allow hot swapping PKs on the client
-      this.#instance.publishableKey !== mergedOptions.publishableKey
+      this.#instance.publishableKey !== options.publishableKey
     ) {
-      this.#instance = new IsomorphicClerk(mergedOptions);
+      this.#instance = new IsomorphicClerk(options);
     }
     return this.#instance;
   }
