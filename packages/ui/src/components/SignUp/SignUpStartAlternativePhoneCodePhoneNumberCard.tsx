@@ -27,6 +27,7 @@ export const SignUpStartAlternativePhoneCodePhoneNumberCard = (props: SignUpForm
   const provider = phoneCodeProvider.name;
   const channel = phoneCodeProvider.channel;
   const card = useCardState();
+  const strategyData = strategyToDisplayData[channel];
 
   const shouldShow = (name: keyof typeof fields) => {
     return !!fields[name] && fields[name]?.required;
@@ -44,8 +45,8 @@ export const SignUpStartAlternativePhoneCodePhoneNumberCard = (props: SignUpForm
               <ProviderIcon
                 id={phoneCodeProvider.channel}
                 iconUrl={providerToDisplayData[phoneCodeProvider.channel].iconUrl}
-                name={strategyToDisplayData[channel].name}
-                alt={`${strategyToDisplayData[channel].name} logo`}
+                name={strategyData?.name || channel || provider}
+                alt={`${strategyData?.name || channel || provider} logo`}
                 size='$7'
                 sx={theme => ({
                   marginBottom: theme.sizes.$6,

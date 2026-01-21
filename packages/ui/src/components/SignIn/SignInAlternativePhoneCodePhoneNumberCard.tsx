@@ -24,6 +24,7 @@ export const SignInAlternativePhoneCodePhoneNumberCard = (props: SignUpAlternati
   const provider = phoneCodeProvider.name;
   const channel = phoneCodeProvider.channel;
   const card = useCardState();
+  const strategyData = strategyToDisplayData[channel];
 
   return (
     <Card.Root>
@@ -37,8 +38,8 @@ export const SignInAlternativePhoneCodePhoneNumberCard = (props: SignUpAlternati
               <ProviderIcon
                 id={channel}
                 iconUrl={providerToDisplayData[channel].iconUrl}
-                name={strategyToDisplayData[channel].name}
-                alt={`${strategyToDisplayData[channel].name} logo`}
+                name={strategyData?.name || channel || provider}
+                alt={`${strategyData?.name || channel || provider} logo`}
                 size='$7'
                 sx={theme => ({
                   marginBottom: theme.sizes.$6,
