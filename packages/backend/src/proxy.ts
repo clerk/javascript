@@ -201,9 +201,21 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
   headers.set('Clerk-Secret-Key', secretKey);
 
   // Set the host header to the FAPI host
-  headers.set('Host', new URL(fapiBaseUrl).host);
+  const fapiHost = new URL(fapiBaseUrl).host;
+  headers.set('Host', fapiHost);
 
-  // Forward client IP
+  // Set X-Forwarded-* headers for proxy awareness
+  // Only set these if not already present (preserve values from upstream proxies)
+  if (!headers.has('X-Forwarded-Host')) {
+    headers.set('X-Forwarded-Host', requestUrl.host);
+  }
+  if (!headers.has('X-Forwarded-Proto')) {
+    headers.set('X-Forwarded-Proto', requestUrl.protocol.replace(':', ''));
+  }
+
+  // Set X-Forwarded-For to the client IP
+  // In multi-proxy scenarios, we prefer authoritative headers (CF-Connecting-IP, X-Real-IP)
+  // over the existing X-Forwarded-For chain, as they provide the true client IP
   const clientIp = getClientIp(request);
   if (clientIp) {
     headers.set('X-Forwarded-For', clientIp);
@@ -235,6 +247,22 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
         responseHeaders.set(key, value);
       }
     });
+
+    // Rewrite Location header for redirects to go through the proxy
+    const locationHeader = response.headers.get('location');
+    if (locationHeader) {
+      try {
+        const locationUrl = new URL(locationHeader, fapiBaseUrl);
+        // Check if the redirect points to the FAPI host
+        if (locationUrl.host === fapiHost) {
+          // Rewrite to go through the proxy
+          const rewrittenLocation = `${proxyUrl}${locationUrl.pathname}${locationUrl.search}${locationUrl.hash}`;
+          responseHeaders.set('Location', rewrittenLocation);
+        }
+      } catch {
+        // If URL parsing fails, leave the Location header as-is (could be a relative URL)
+      }
+    }
 
     return new Response(response.body, {
       status: response.status,

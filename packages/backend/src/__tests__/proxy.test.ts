@@ -319,5 +319,105 @@ describe('proxy', () => {
       expect(url).toBe('https://frontend-api.clerk.dev/v1/client');
       expect(options.headers.get('Clerk-Proxy-Url')).toBe('https://example.com/custom-clerk');
     });
+
+    it('sets X-Forwarded-Host and X-Forwarded-Proto headers', async () => {
+      const mockResponse = new Response(JSON.stringify({}), { status: 200 });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/client');
+
+      await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      const [, options] = mockFetch.mock.calls[0];
+      expect(options.headers.get('X-Forwarded-Host')).toBe('example.com');
+      expect(options.headers.get('X-Forwarded-Proto')).toBe('https');
+    });
+
+    it('preserves X-Forwarded-Host and X-Forwarded-Proto from upstream proxies', async () => {
+      const mockResponse = new Response(JSON.stringify({}), { status: 200 });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      // Simulate request that already passed through an upstream proxy (e.g., CDN)
+      const request = new Request('https://internal-server.local/__clerk/v1/client', {
+        headers: {
+          'X-Forwarded-Host': 'myapp.example.com',
+          'X-Forwarded-Proto': 'https',
+        },
+      });
+
+      await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      const [, options] = mockFetch.mock.calls[0];
+      // Should preserve the original values from upstream proxy, not overwrite with internal-server.local
+      expect(options.headers.get('X-Forwarded-Host')).toBe('myapp.example.com');
+      expect(options.headers.get('X-Forwarded-Proto')).toBe('https');
+    });
+
+    it('rewrites Location header for redirects pointing to FAPI', async () => {
+      const mockResponse = new Response(null, {
+        status: 302,
+        headers: {
+          Location: 'https://frontend-api.clerk.dev/v1/oauth/callback?code=123',
+        },
+      });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/oauth/authorize');
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      expect(response.status).toBe(302);
+      expect(response.headers.get('Location')).toBe('https://example.com/__clerk/v1/oauth/callback?code=123');
+    });
+
+    it('does not rewrite Location header for external redirects', async () => {
+      const mockResponse = new Response(null, {
+        status: 302,
+        headers: {
+          Location: 'https://accounts.google.com/oauth/authorize',
+        },
+      });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/oauth/authorize');
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      expect(response.status).toBe(302);
+      expect(response.headers.get('Location')).toBe('https://accounts.google.com/oauth/authorize');
+    });
+
+    it('preserves relative Location headers', async () => {
+      const mockResponse = new Response(null, {
+        status: 302,
+        headers: {
+          Location: '/v1/client',
+        },
+      });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/oauth/authorize');
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      expect(response.status).toBe(302);
+      // Relative URL resolves against FAPI, and since the host matches, it gets rewritten
+      expect(response.headers.get('Location')).toBe('https://example.com/__clerk/v1/client');
+    });
   });
 });
