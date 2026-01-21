@@ -1,68 +1,52 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { coerce } from 'semver';
 import { parse as parseYaml } from 'yaml';
 import { defineConfig } from 'tsup';
 
 import { version as clerkJsVersion } from '../clerk-js/package.json';
-import { name, version } from './package.json';
+import { name, version, peerDependencies } from './package.json';
+import { parseRangeToBounds } from './build-utils/parseVersionRange';
 
-// Version bounds format: [major, minMinor, maxMinor, minPatch]
-// - maxMinor === -1 means "any minor" (caret range, e.g., ^18.0.0)
-// - maxMinor === minMinor means "same minor only" (tilde range, e.g., ~19.0.3)
-type VersionBounds = [major: number, minMinor: number, maxMinor: number, minPatch: number];
-
-// Read supported React range from pnpm-workspace.yaml catalogs and parse into bounds
+/**
+ * Resolves the React peer dependency range from package.json.
+ * If it's a catalog reference (catalog:XXX), looks it up in pnpm-workspace.yaml.
+ * Otherwise, parses the range string directly.
+ */
 function getClerkUiSupportedReactBounds(): VersionBounds[] {
-  const fallbackRange = '^18.0.0 || ^19.0.0';
-  let rangeStr = fallbackRange;
-  let usedFallback = false;
+  const reactPeerDep = peerDependencies.react;
 
-  try {
+  let rangeStr: string;
+
+  // Check if it's a catalog reference (e.g., "catalog:peer-react")
+  const catalogMatch = reactPeerDep.match(/^catalog:(.+)$/);
+  if (catalogMatch) {
+    const catalogName = catalogMatch[1];
+
+    // Read the version range from pnpm-workspace.yaml
     const workspaceYamlPath = resolve(__dirname, '../../pnpm-workspace.yaml');
-    const workspaceYaml = readFileSync(workspaceYamlPath, 'utf-8');
+    let workspaceYaml: string;
+    try {
+      workspaceYaml = readFileSync(workspaceYamlPath, 'utf-8');
+    } catch (err) {
+      throw new Error(`[@clerk/react] Failed to read pnpm-workspace.yaml: ${err}`);
+    }
+
     const workspace = parseYaml(workspaceYaml);
-    const catalogRange = workspace?.catalogs?.['peer-react']?.react;
-    if (catalogRange) {
-      rangeStr = catalogRange;
-    } else {
-      usedFallback = true;
+    const catalogRange = workspace?.catalogs?.[catalogName]?.react;
+    if (!catalogRange) {
+      throw new Error(`[@clerk/react] Could not find react version in catalog "${catalogName}" in pnpm-workspace.yaml`);
     }
-  } catch {
-    usedFallback = true;
+    rangeStr = catalogRange;
+  } else {
+    // Not a catalog reference - use the value directly as a version range
+    rangeStr = reactPeerDep;
   }
 
-  if (usedFallback) {
-    console.warn(
-      `[@clerk/react] Could not read React peer dependency range from pnpm-workspace.yaml, using fallback: ${fallbackRange}`,
-    );
-  }
+  const bounds = parseRangeToBounds(rangeStr);
 
-  // Parse the range string into bounds
-  const bounds: VersionBounds[] = [];
-  const parts = rangeStr.split('||').map(s => s.trim());
-
-  for (const part of parts) {
-    if (part.startsWith('^')) {
-      // Caret range: ^X.Y.Z means >= X.Y.Z and < (X+1).0.0
-      const ver = coerce(part.slice(1));
-      if (ver) {
-        bounds.push([ver.major, ver.minor, -1, ver.patch]);
-      }
-    } else if (part.startsWith('~')) {
-      // Tilde range: ~X.Y.Z means >= X.Y.Z and < X.(Y+1).0
-      const ver = coerce(part.slice(1));
-      if (ver) {
-        bounds.push([ver.major, ver.minor, ver.minor, ver.patch]);
-      }
-    } else {
-      // Exact version or other format - try to parse as caret
-      const ver = coerce(part);
-      if (ver) {
-        bounds.push([ver.major, ver.minor, -1, ver.patch]);
-      }
-    }
+  if (bounds.length === 0) {
+    throw new Error(`[@clerk/react] Failed to parse any version bounds from range: ${rangeStr}`);
   }
 
   return bounds;
