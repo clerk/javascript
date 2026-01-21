@@ -437,7 +437,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                       text-wrap: pretty;
                     `}
                   >
-                    Claim this application to access the Clerk dashboard where you can configure changes (e.g. Add
+                    Claim this application to access the Clerk dashboard where you can configure changes (e.g. add
                     Google SSO).
                   </p>
                 </>
