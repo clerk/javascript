@@ -4,7 +4,7 @@ import type { OAuthProvider, OAuthStrategy, PhoneCodeChannel, Web3Provider, Web3
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement } from 'react';
 
-import { ProviderInitialIcon } from '../common';
+import { ProviderIcon } from '../common';
 import type { LocalizationKey } from '../customizables';
 import {
   Button,
@@ -14,7 +14,6 @@ import {
   Icon,
   localizationKeys,
   SimpleButton,
-  Span,
   Spinner,
   Text,
   useAppearance,
@@ -30,13 +29,6 @@ import { distributeStrategiesIntoRows } from './utils';
 const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
 const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
 const MAX_STRATEGIES_PER_ROW = 5;
-const SUPPORTS_MASK_IMAGE = ['apple', 'github', 'okx_wallet', 'vercel'] as const;
-
-type SupportsMaskImageProvider = (typeof SUPPORTS_MASK_IMAGE)[number];
-
-const supportsMaskImage = (id: OAuthProvider | Web3Provider | PhoneCodeChannel): id is SupportsMaskImageProvider => {
-  return (SUPPORTS_MASK_IMAGE as readonly string[]).includes(id);
-};
 
 export type SocialButtonsProps = React.PropsWithChildren<{
   enableOAuthProviders: boolean;
@@ -195,39 +187,16 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                   provider: strategyToDisplayData[strategy].name,
                 });
 
-            const imageOrInitial = strategyToDisplayData[strategy].iconUrl ? (
-              <Span
-                elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
-                elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
-                aria-label={`Sign in with ${strategyToDisplayData[strategy].name}`}
-                sx={theme => ({
-                  display: 'inline-block',
-                  width: theme.sizes.$4,
-                  height: theme.sizes.$4,
-                  maxWidth: '100%',
-                  ...(supportsMaskImage(strategyToDisplayData[strategy].id)
-                    ? {
-                        '--cl-icon-fill': theme.colors.$colorForeground,
-                        backgroundColor: 'var(--cl-icon-fill)',
-                        maskImage: `url(${strategyToDisplayData[strategy].iconUrl})`,
-                        maskSize: 'cover',
-                        maskPosition: 'center',
-                        maskRepeat: 'no-repeat',
-                      }
-                    : {
-                        backgroundImage: `url(${strategyToDisplayData[strategy].iconUrl})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        backgroundRepeat: 'no-repeat',
-                      }),
-                })}
-              />
-            ) : (
-              <ProviderInitialIcon
+            const imageOrInitial = (
+              <ProviderIcon
                 id={strategyToDisplayData[strategy].id}
-                value={strategyToDisplayData[strategy].name}
+                iconUrl={strategyToDisplayData[strategy].iconUrl}
+                name={strategyToDisplayData[strategy].name}
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}
+                alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
+                elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon] as any}
+                elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id) as any}
               />
             );
 

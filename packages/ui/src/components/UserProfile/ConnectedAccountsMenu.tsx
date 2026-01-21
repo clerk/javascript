@@ -7,9 +7,9 @@ import { ProfileSection } from '@/ui/elements/Section';
 import { handleError } from '@/ui/utils/errorHandler';
 import { sleep } from '@/ui/utils/sleep';
 
-import { ProviderInitialIcon } from '../../common';
+import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
-import { descriptors, Image, localizationKeys } from '../../customizables';
+import { descriptors, localizationKeys } from '../../customizables';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 
@@ -36,22 +36,16 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
     });
   });
 
-  const imageOrInitial = strategyToDisplayData[strategy].iconUrl ? (
-    <Image
+  const imageOrInitial = (
+    <ProviderIcon
+      id={strategyToDisplayData[strategy].id}
+      iconUrl={strategyToDisplayData[strategy].iconUrl}
+      name={strategyToDisplayData[strategy].name}
       isLoading={card.loadingMetadata === strategy}
       isDisabled={card.isLoading}
+      alt={`Connect ${strategyToDisplayData[strategy].name} account`}
       elementDescriptor={descriptors.providerIcon}
       elementId={descriptors.providerIcon.setId(strategyToDisplayData[strategy].id)}
-      src={strategyToDisplayData[strategy].iconUrl}
-      alt={`Connect ${strategyToDisplayData[strategy].name} account`}
-      sx={theme => ({ width: theme.sizes.$4 })}
-    />
-  ) : (
-    <ProviderInitialIcon
-      id={strategyToDisplayData[strategy].id}
-      value={strategyToDisplayData[strategy].name}
-      isLoading={card.loadingMetadata === strategy}
-      isDisabled={card.isLoading}
     />
   );
 

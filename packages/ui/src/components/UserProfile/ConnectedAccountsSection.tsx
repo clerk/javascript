@@ -9,9 +9,9 @@ import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { ProviderInitialIcon } from '../../common';
+import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
-import { Box, Button, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
+import { Box, Button, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
@@ -153,21 +153,23 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
     }
   };
 
-  const ImageOrInitial = () =>
-    providerToDisplayData[account.provider].iconUrl ? (
-      <Image
-        elementDescriptor={[descriptors.providerIcon]}
-        elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
-        alt={providerToDisplayData[account.provider].name}
-        src={providerToDisplayData[account.provider].iconUrl}
-        sx={theme => ({ width: theme.sizes.$4, flexShrink: 0 })}
-      />
-    ) : (
-      <ProviderInitialIcon
+  const ImageOrInitial = () => {
+    const providerData = providerToDisplayData[account.provider];
+    if (!providerData) {
+      return null;
+    }
+    return (
+      <ProviderIcon
         id={account.provider}
-        value={providerToDisplayData[account.provider].name}
+        iconUrl={providerData.iconUrl}
+        name={providerData.name}
+        alt={providerData.name}
+        elementDescriptor={descriptors.providerIcon}
+        elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
+        sx={theme => ({ flexShrink: 0 })}
       />
     );
+  };
 
   return (
     <Fragment key={account.id}>

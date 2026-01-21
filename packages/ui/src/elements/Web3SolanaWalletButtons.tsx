@@ -4,6 +4,7 @@ import { MAINNET_ENDPOINT } from '@solana/wallet-standard';
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement, useMemo } from 'react';
 
+import { ProviderIcon } from '@/ui/common/ProviderIcon';
 import { WalletInitialIcon } from '@/ui/common/WalletInitialIcon';
 import {
   Button,
@@ -11,7 +12,6 @@ import {
   Flex,
   Grid,
   Icon,
-  Image,
   localizationKeys,
   SimpleButton,
   Spinner,
@@ -130,22 +130,26 @@ const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsPro
               ? localizationKeys('web3SolanaWalletButtons.continue', { walletName: w.name })
               : w.name;
 
-            const imageOrInitial = w.icon ? (
-              <Image
-                elementDescriptor={[descriptors.walletIcon, descriptors.web3SolanaWalletButtonsWalletInitialIcon]}
-                isDisabled={card.isLoading}
-                isLoading={card.loadingMetadata === w.name}
-                src={w.icon}
-                alt={t(localizationKeys('web3SolanaWalletButtons.connect', { walletName: w.name }))}
-                sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
-              />
-            ) : (
-              <WalletInitialIcon
-                value={w.name}
-                isDisabled={card.isLoading}
-                id={w.name}
-              />
-            );
+            const imageOrInitial =
+              w.icon && w.icon.trim() !== '' ? (
+                <ProviderIcon
+                  id={w.name as any}
+                  iconUrl={w.icon}
+                  name={w.name}
+                  isLoading={card.loadingMetadata === w.name}
+                  isDisabled={card.isLoading}
+                  alt={t(localizationKeys('web3SolanaWalletButtons.connect', { walletName: w.name }))}
+                  elementDescriptor={[descriptors.walletIcon, descriptors.web3SolanaWalletButtonsWalletIcon]}
+                  elementId={descriptors.web3SolanaWalletButtonsWalletIcon.setId(w.name)}
+                  sx={theme => ({ width: theme.sizes.$4, height: theme.sizes.$4, maxWidth: '100%' })}
+                />
+              ) : (
+                <WalletInitialIcon
+                  value={w.name}
+                  isDisabled={card.isLoading}
+                  id={w.name}
+                />
+              );
 
             return (
               <ButtonElement

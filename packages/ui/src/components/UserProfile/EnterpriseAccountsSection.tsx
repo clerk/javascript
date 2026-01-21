@@ -3,8 +3,8 @@ import type { EnterpriseAccountResource, OAuthProvider } from '@clerk/shared/typ
 
 import { ProfileSection } from '@/ui/elements/Section';
 
-import { ProviderInitialIcon } from '../../common';
-import { Badge, Box, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
+import { ProviderIcon } from '../../common';
+import { Badge, Box, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 
 export const EnterpriseAccountsSection = () => {
   const { user } = useUser();
@@ -86,25 +86,14 @@ const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccount
   const providerWithoutPrefix = provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider;
   const connectionName = enterpriseConnection?.name ?? providerWithoutPrefix;
 
-  const commonImageProps = {
-    elementDescriptor: [descriptors.providerIcon],
-    alt: connectionName,
-    sx: (theme: any) => ({ width: theme.sizes.$4 }),
-    elementId: descriptors.enterpriseButtonsProviderIcon.setId(account.provider),
-  };
-
-  return enterpriseConnection?.logoPublicUrl ? (
-    <Image
-      {...commonImageProps}
-      src={enterpriseConnection.logoPublicUrl}
-    />
-  ) : (
-    <ProviderInitialIcon
+  return (
+    <ProviderIcon
       id={providerWithoutPrefix}
-      value={connectionName}
-      aria-label={`${connectionName}'s icon`}
-      elementDescriptor={[descriptors.providerIcon, descriptors.providerInitialIcon]}
-      elementId={descriptors.providerInitialIcon.setId(providerWithoutPrefix)}
+      iconUrl={enterpriseConnection?.logoPublicUrl}
+      name={connectionName}
+      alt={`${connectionName}'s icon`}
+      elementDescriptor={[descriptors.providerIcon]}
+      elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
     />
   );
 };
