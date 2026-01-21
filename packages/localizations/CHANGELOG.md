@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.35.1
+
+### Patch Changes
+
+- Improved Greek (el-GR), French (fr-FR), and Korean (ko-KR) translations. ([#7619](https://github.com/clerk/javascript/pull/7619)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.12
+
 ## 3.35.0
 
 ### Minor Changes
