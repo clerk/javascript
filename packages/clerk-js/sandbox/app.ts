@@ -1,5 +1,4 @@
 import { PageMocking, type MockScenario } from '@clerk/msw';
-
 import * as l from '../../localizations';
 import type { Clerk as ClerkType } from '../';
 import * as scenarios from './scenarios';
