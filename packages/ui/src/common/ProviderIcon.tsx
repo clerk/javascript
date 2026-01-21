@@ -1,15 +1,14 @@
-import type { OAuthProvider, PhoneCodeChannel, Web3Provider } from '@clerk/shared/types';
+import type { OAuthProvider, PhoneCodeChannel, PhoneCodeProvider, Web3Provider } from '@clerk/shared/types';
 
 import { descriptors, Span } from '../customizables';
+import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import type { InternalTheme, PropsOfComponent } from '../styledSystem';
 import { supportsMaskImage } from './providerIconUtils';
 import { ProviderInitialIcon } from './ProviderInitialIcon';
 
-const getIconImageStyles = (
-  theme: InternalTheme,
-  id: OAuthProvider | Web3Provider | PhoneCodeChannel,
-  iconUrl: string,
-) => {
+type ProviderId = OAuthProvider | Web3Provider | PhoneCodeChannel;
+
+const getIconImageStyles = (theme: InternalTheme, id: ProviderId, iconUrl: string) => {
   if (supportsMaskImage(id)) {
     return {
       '--cl-icon-fill': theme.colors.$colorForeground,
@@ -37,15 +36,15 @@ export type ProviderIconProps = Omit<
   PropsOfComponent<typeof Span>,
   'elementDescriptor' | 'elementId' | 'aria-label'
 > & {
-  id: OAuthProvider | Web3Provider | PhoneCodeChannel;
+  id: ProviderId;
   iconUrl?: string | null;
   name: string;
   size?: string;
   isLoading?: boolean;
   isDisabled?: boolean;
   alt?: string;
-  elementDescriptor?: any;
-  elementId?: any;
+  elementDescriptor?: ElementDescriptor | Array<ElementDescriptor | undefined>;
+  elementId?: ElementId;
 };
 
 export const ProviderIcon = (props: ProviderIconProps) => {
@@ -63,7 +62,6 @@ export const ProviderIcon = (props: ProviderIconProps) => {
     ...rest
   } = props;
 
-  // If no iconUrl or empty string, fallback to ProviderInitialIcon
   if (!iconUrl || iconUrl.trim() === '') {
     const { ref, ...initialIconProps } = rest;
     return (
@@ -78,13 +76,9 @@ export const ProviderIcon = (props: ProviderIconProps) => {
     );
   }
 
-  // Normalize elementDescriptor to array
-  const normalizedElementDescriptor = Array.isArray(elementDescriptor) ? elementDescriptor : [elementDescriptor];
-
-  // Use Span with maskImage or backgroundImage based on provider support
   return (
     <Span
-      elementDescriptor={normalizedElementDescriptor as any}
+      elementDescriptor={elementDescriptor}
       elementId={elementId}
       aria-label={alt || `${name} icon`}
       sx={theme => {

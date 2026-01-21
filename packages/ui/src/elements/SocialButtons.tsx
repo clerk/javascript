@@ -195,8 +195,8 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}
                 alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
-                elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon] as any}
-                elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id) as any}
+                elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
+                elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
               />
             );
 

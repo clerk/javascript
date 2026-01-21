@@ -117,11 +117,11 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
     }),
   );
 
+  const { providerToDisplayData } = useEnabledThirdPartyProviders();
+
   if (!user) {
     return null;
   }
-
-  const { providerToDisplayData } = useEnabledThirdPartyProviders();
   const label = account.username || account.emailAddress;
   const fallbackErrorMessage = account.verification?.error?.longMessage;
   const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
@@ -153,29 +153,19 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
     }
   };
 
-  const ImageOrInitial = () => {
-    const providerData = providerToDisplayData[account.provider];
-    if (!providerData) {
-      return null;
-    }
-    return (
-      <ProviderIcon
-        id={account.provider}
-        iconUrl={providerData.iconUrl}
-        name={providerData.name}
-        alt={providerData.name}
-        elementDescriptor={descriptors.providerIcon}
-        elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
-        sx={theme => ({ flexShrink: 0 })}
-      />
-    );
-  };
-
   return (
     <Fragment key={account.id}>
       <ProfileSection.Item id='connectedAccounts'>
         <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
-          <ImageOrInitial />
+          <ProviderIcon
+            id={account.provider}
+            iconUrl={providerToDisplayData[account.provider].iconUrl}
+            name={providerToDisplayData[account.provider].name}
+            alt={providerToDisplayData[account.provider].name}
+            elementDescriptor={descriptors.providerIcon}
+            elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
+            sx={{ flexShrink: 0 }}
+          />
           <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
             <Flex
               gap={1}
