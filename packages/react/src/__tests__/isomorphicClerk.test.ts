@@ -3,7 +3,15 @@ import type { Resources, UnsubscribeCallback } from '@clerk/shared/types';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
-import { getPublishableKeyFromEnv } from '../utils/envVariables';
+import {
+  getPublishableKeyFromEnv,
+  getSignInFallbackRedirectUrlFromEnv,
+  getSignInForceRedirectUrlFromEnv,
+  getSignInUrlFromEnv,
+  getSignUpFallbackRedirectUrlFromEnv,
+  getSignUpForceRedirectUrlFromEnv,
+  getSignUpUrlFromEnv,
+} from '../utils/envVariables';
 
 // Mock the script loading functions to prevent unhandled promise rejections in tests
 vi.mock('@clerk/shared/loadClerkJsScript', () => ({
@@ -271,5 +279,113 @@ describe('getPublishableKeyFromEnv', () => {
     mockedGetEnvVariable.mockReturnValue('');
 
     expect(getPublishableKeyFromEnv()).toBe('');
+  });
+});
+
+describe('URL env var getters', () => {
+  const mockedGetEnvVariable = vi.mocked(getEnvVariableModule.getEnvVariable);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('getSignInUrlFromEnv', () => {
+    it('returns VITE_CLERK_SIGN_IN_URL when set', () => {
+      mockedGetEnvVariable.mockImplementation((name: string) => {
+        if (name === 'VITE_CLERK_SIGN_IN_URL') {
+          return '/sign-in-vite';
+        }
+        return '';
+      });
+
+      expect(getSignInUrlFromEnv()).toBe('/sign-in-vite');
+    });
+
+    it('falls back to CLERK_SIGN_IN_URL when VITE_ prefix not set', () => {
+      mockedGetEnvVariable.mockImplementation((name: string) => {
+        if (name === 'CLERK_SIGN_IN_URL') {
+          return '/sign-in';
+        }
+        return '';
+      });
+
+      expect(getSignInUrlFromEnv()).toBe('/sign-in');
+    });
+  });
+
+  describe('getSignUpUrlFromEnv', () => {
+    it('returns VITE_CLERK_SIGN_UP_URL when set', () => {
+      mockedGetEnvVariable.mockImplementation((name: string) => {
+        if (name === 'VITE_CLERK_SIGN_UP_URL') {
+          return '/sign-up-vite';
+        }
+        return '';
+      });
+
+      expect(getSignUpUrlFromEnv()).toBe('/sign-up-vite');
+    });
+
+    it('falls back to CLERK_SIGN_UP_URL when VITE_ prefix not set', () => {
+      mockedGetEnvVariable.mockImplementation((name: string) => {
+        if (name === 'CLERK_SIGN_UP_URL') {
+          return '/sign-up';
+        }
+        return '';
+      });
+
+      expect(getSignUpUrlFromEnv()).toBe('/sign-up');
+    });
+  });
+
+  describe('getSignInForceRedirectUrlFromEnv', () => {
+    it('returns VITE_CLERK_SIGN_IN_FORCE_REDIRECT_URL when set', () => {
+      mockedGetEnvVariable.mockImplementation((name: string) => {
+        if (name === 'VITE_CLERK_SIGN_IN_FORCE_REDIRECT_URL') {
+          return '/dashboard';
+        }
+        return '';
+      });
+
+      expect(getSignInForceRedirectUrlFromEnv()).toBe('/dashboard');
+    });
+  });
+
+  describe('getSignUpForceRedirectUrlFromEnv', () => {
+    it('returns VITE_CLERK_SIGN_UP_FORCE_REDIRECT_URL when set', () => {
+      mockedGetEnvVariable.mockImplementation((name: string) => {
+        if (name === 'VITE_CLERK_SIGN_UP_FORCE_REDIRECT_URL') {
+          return '/onboarding';
+        }
+        return '';
+      });
+
+      expect(getSignUpForceRedirectUrlFromEnv()).toBe('/onboarding');
+    });
+  });
+
+  describe('getSignInFallbackRedirectUrlFromEnv', () => {
+    it('returns VITE_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL when set', () => {
+      mockedGetEnvVariable.mockImplementation((name: string) => {
+        if (name === 'VITE_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL') {
+          return '/home';
+        }
+        return '';
+      });
+
+      expect(getSignInFallbackRedirectUrlFromEnv()).toBe('/home');
+    });
+  });
+
+  describe('getSignUpFallbackRedirectUrlFromEnv', () => {
+    it('returns VITE_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL when set', () => {
+      mockedGetEnvVariable.mockImplementation((name: string) => {
+        if (name === 'VITE_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL') {
+          return '/welcome';
+        }
+        return '';
+      });
+
+      expect(getSignUpFallbackRedirectUrlFromEnv()).toBe('/welcome');
+    });
   });
 });

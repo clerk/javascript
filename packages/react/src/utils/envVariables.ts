@@ -28,3 +28,63 @@ const getEnvVar = (name: string): string => {
 export const getPublishableKeyFromEnv = (): string => {
   return getEnvVar('CLERK_PUBLISHABLE_KEY');
 };
+
+/**
+ * Retrieves the sign-in URL from environment variables.
+ * Checks VITE_CLERK_SIGN_IN_URL first (for Vite), then CLERK_SIGN_IN_URL.
+ *
+ * @returns The sign-in URL or empty string if not found
+ */
+export const getSignInUrlFromEnv = (): string => {
+  return getEnvVar('CLERK_SIGN_IN_URL');
+};
+
+/**
+ * Retrieves the sign-up URL from environment variables.
+ * Checks VITE_CLERK_SIGN_UP_URL first (for Vite), then CLERK_SIGN_UP_URL.
+ *
+ * @returns The sign-up URL or empty string if not found
+ */
+export const getSignUpUrlFromEnv = (): string => {
+  return getEnvVar('CLERK_SIGN_UP_URL');
+};
+
+/**
+ * Retrieves the sign-in force redirect URL from environment variables.
+ * Checks VITE_CLERK_SIGN_IN_FORCE_REDIRECT_URL first, then CLERK_SIGN_IN_FORCE_REDIRECT_URL.
+ *
+ * @returns The sign-in force redirect URL or empty string if not found
+ */
+export const getSignInForceRedirectUrlFromEnv = (): string => {
+  return getEnvVar('CLERK_SIGN_IN_FORCE_REDIRECT_URL');
+};
+
+/**
+ * Retrieves the sign-up force redirect URL from environment variables.
+ * Checks VITE_CLERK_SIGN_UP_FORCE_REDIRECT_URL first, then CLERK_SIGN_UP_FORCE_REDIRECT_URL.
+ *
+ * @returns The sign-up force redirect URL or empty string if not found
+ */
+export const getSignUpForceRedirectUrlFromEnv = (): string => {
+  return getEnvVar('CLERK_SIGN_UP_FORCE_REDIRECT_URL');
+};
+
+/**
+ * Retrieves the sign-in fallback redirect URL from environment variables.
+ * Checks VITE_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL first, then CLERK_SIGN_IN_FALLBACK_REDIRECT_URL.
+ *
+ * @returns The sign-in fallback redirect URL or empty string if not found
+ */
+export const getSignInFallbackRedirectUrlFromEnv = (): string => {
+  return getEnvVar('CLERK_SIGN_IN_FALLBACK_REDIRECT_URL');
+};
+
+/**
+ * Retrieves the sign-up fallback redirect URL from environment variables.
+ * Checks VITE_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL first, then CLERK_SIGN_UP_FALLBACK_REDIRECT_URL.
+ *
+ * @returns The sign-up fallback redirect URL or empty string if not found
+ */
+export const getSignUpFallbackRedirectUrlFromEnv = (): string => {
+  return getEnvVar('CLERK_SIGN_UP_FALLBACK_REDIRECT_URL');
+};
