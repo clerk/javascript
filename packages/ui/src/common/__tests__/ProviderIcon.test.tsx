@@ -46,7 +46,7 @@ describe('ProviderIcon', () => {
     it('applies mask-image styles for supported providers (apple)', async () => {
       const { wrapper } = await createFixtures();
 
-      const { container } = render(
+      render(
         <ProviderIcon
           id='apple'
           iconUrl='https://example.com/apple-icon.svg'
@@ -234,7 +234,7 @@ describe('ProviderIcon', () => {
     it('applies opacity 0.5 when isLoading is true', async () => {
       const { wrapper } = await createFixtures();
 
-      const { container } = render(
+      render(
         <ProviderIcon
           id='google'
           iconUrl='https://example.com/google-icon.svg'
@@ -252,7 +252,7 @@ describe('ProviderIcon', () => {
     it('applies opacity 0.5 when isDisabled is true', async () => {
       const { wrapper } = await createFixtures();
 
-      const { container } = render(
+      render(
         <ProviderIcon
           id='google'
           iconUrl='https://example.com/google-icon.svg'
@@ -270,7 +270,7 @@ describe('ProviderIcon', () => {
     it('applies opacity 1 when neither isLoading nor isDisabled is true', async () => {
       const { wrapper } = await createFixtures();
 
-      const { container } = render(
+      render(
         <ProviderIcon
           id='google'
           iconUrl='https://example.com/google-icon.svg'
@@ -291,7 +291,7 @@ describe('ProviderIcon', () => {
     it('uses default size $4 when not provided', async () => {
       const { wrapper } = await createFixtures();
 
-      const { container } = render(
+      render(
         <ProviderIcon
           id='google'
           iconUrl='https://example.com/google-icon.svg'
@@ -361,7 +361,7 @@ describe('ProviderIcon', () => {
     it('uses correct elementDescriptor', async () => {
       const { wrapper } = await createFixtures();
 
-      const { container } = render(
+      render(
         <ProviderIcon
           id='google'
           iconUrl='https://example.com/google-icon.svg'
