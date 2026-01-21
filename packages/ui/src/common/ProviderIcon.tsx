@@ -3,10 +3,15 @@ import type { OAuthProvider, PhoneCodeChannel, Web3Provider } from '@clerk/share
 import { descriptors, Span } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import type { InternalTheme, PropsOfComponent } from '../styledSystem';
-import { supportsMaskImage } from './providerIconUtils';
 import { ProviderInitialIcon } from './ProviderInitialIcon';
 
 type ProviderId = OAuthProvider | Web3Provider | PhoneCodeChannel;
+
+const SUPPORTS_MASK_IMAGE = ['apple', 'github', 'okx_wallet', 'vercel'] as const;
+
+const supportsMaskImage = (id: ProviderId): boolean => {
+  return (SUPPORTS_MASK_IMAGE as readonly string[]).includes(id);
+};
 
 const getIconImageStyles = (theme: InternalTheme, id: ProviderId, iconUrl: string) => {
   if (supportsMaskImage(id)) {
