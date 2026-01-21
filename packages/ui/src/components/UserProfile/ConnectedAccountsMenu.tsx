@@ -36,19 +36,6 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
     });
   });
 
-  const imageOrInitial = (
-    <ProviderIcon
-      id={strategyToDisplayData[strategy].id}
-      iconUrl={strategyToDisplayData[strategy].iconUrl}
-      name={strategyToDisplayData[strategy].name}
-      isLoading={card.loadingMetadata === strategy}
-      isDisabled={card.isLoading}
-      alt={`Connect ${strategyToDisplayData[strategy].name} account`}
-      elementDescriptor={descriptors.providerIcon}
-      elementId={descriptors.providerIcon.setId(strategyToDisplayData[strategy].id)}
-    />
-  );
-
   const connect = () => {
     if (!user) {
       return;
@@ -87,7 +74,18 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
         justifyContent: 'start',
         gap: t.space.$2,
       })}
-      leftIcon={imageOrInitial}
+      leftIcon={
+        <ProviderIcon
+          id={strategyToDisplayData[strategy].id}
+          iconUrl={strategyToDisplayData[strategy].iconUrl}
+          name={strategyToDisplayData[strategy].name}
+          isLoading={card.loadingMetadata === strategy}
+          isDisabled={card.isLoading}
+          alt={`Connect ${strategyToDisplayData[strategy].name} account`}
+          elementDescriptor={descriptors.providerIcon}
+          elementId={descriptors.providerIcon.setId(strategyToDisplayData[strategy].id)}
+        />
+      }
     />
   );
 };
