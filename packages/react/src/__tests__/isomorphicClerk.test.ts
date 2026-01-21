@@ -1,12 +1,19 @@
+import * as getEnvVariableModule from '@clerk/shared/getEnvVariable';
 import type { Resources, UnsubscribeCallback } from '@clerk/shared/types';
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
+import { getPublishableKeyFromEnv } from '../utils/envVariables';
 
 // Mock the script loading functions to prevent unhandled promise rejections in tests
 vi.mock('@clerk/shared/loadClerkJsScript', () => ({
   loadClerkJsScript: vi.fn().mockResolvedValue(null),
   loadClerkUiScript: vi.fn().mockResolvedValue(null),
+}));
+
+// Mock getEnvVariable to control env var behavior in tests
+vi.mock('@clerk/shared/getEnvVariable', () => ({
+  getEnvVariable: vi.fn(() => ''),
 }));
 
 describe('isomorphicClerk', () => {
@@ -116,5 +123,153 @@ describe('isomorphicClerk', () => {
 
     expect(listenerCallHistory).toEqual([]);
     expect(listenerCallHistory.length).toBe(0);
+  });
+
+  describe('getOrCreateInstance with env fallback', () => {
+    const mockedGetEnvVariable = vi.mocked(getEnvVariableModule.getEnvVariable);
+
+    beforeEach(() => {
+      IsomorphicClerk.clearInstance();
+      vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+      IsomorphicClerk.clearInstance();
+    });
+
+    // Note: We use `{} as any` in tests below to simulate the case where publishableKey
+    // is not provided (undefined). This is a valid runtime scenario for Vite users who
+    // rely on env var fallback, but the type system requires publishableKey to be present.
+
+    it('uses passed-in publishableKey when provided', () => {
+      mockedGetEnvVariable.mockReturnValue('');
+
+      const instance = IsomorphicClerk.getOrCreateInstance({
+        publishableKey: 'pk_test_explicit',
+      });
+
+      expect(instance.publishableKey).toBe('pk_test_explicit');
+    });
+
+    it('falls back to VITE_CLERK_PUBLISHABLE_KEY when publishableKey is undefined', () => {
+      mockedGetEnvVariable.mockImplementation((name: string) => {
+        if (name === 'VITE_CLERK_PUBLISHABLE_KEY') {
+          return 'pk_test_from_vite_env';
+        }
+        return '';
+      });
+
+      const instance = IsomorphicClerk.getOrCreateInstance({} as any);
+
+      expect(instance.publishableKey).toBe('pk_test_from_vite_env');
+    });
+
+    it('falls back to CLERK_PUBLISHABLE_KEY when VITE_ prefixed not found', () => {
+      mockedGetEnvVariable.mockImplementation((name: string) => {
+        if (name === 'CLERK_PUBLISHABLE_KEY') {
+          return 'pk_test_from_env';
+        }
+        return '';
+      });
+
+      const instance = IsomorphicClerk.getOrCreateInstance({} as any);
+
+      expect(instance.publishableKey).toBe('pk_test_from_env');
+    });
+
+    it('does NOT fall back when publishableKey is empty string (framework SDK behavior)', () => {
+      mockedGetEnvVariable.mockImplementation((name: string) => {
+        if (name === 'VITE_CLERK_PUBLISHABLE_KEY') {
+          return 'pk_test_from_vite_env';
+        }
+        return '';
+      });
+
+      // Framework SDKs like Next.js pass empty string when env var is not set
+      const instance = IsomorphicClerk.getOrCreateInstance({
+        publishableKey: '',
+      });
+
+      // Should use the empty string, not fall back to env var
+      expect(instance.publishableKey).toBe('');
+    });
+
+    it('prioritizes passed-in publishableKey over env vars', () => {
+      mockedGetEnvVariable.mockImplementation((name: string) => {
+        if (name === 'VITE_CLERK_PUBLISHABLE_KEY') {
+          return 'pk_test_from_vite_env';
+        }
+        if (name === 'CLERK_PUBLISHABLE_KEY') {
+          return 'pk_test_from_env';
+        }
+        return '';
+      });
+
+      const instance = IsomorphicClerk.getOrCreateInstance({
+        publishableKey: 'pk_test_explicit',
+      });
+
+      expect(instance.publishableKey).toBe('pk_test_explicit');
+    });
+
+    it('prioritizes VITE_ prefixed env var over non-prefixed', () => {
+      mockedGetEnvVariable.mockImplementation((name: string) => {
+        if (name === 'VITE_CLERK_PUBLISHABLE_KEY') {
+          return 'pk_test_from_vite_env';
+        }
+        if (name === 'CLERK_PUBLISHABLE_KEY') {
+          return 'pk_test_from_env';
+        }
+        return '';
+      });
+
+      const instance = IsomorphicClerk.getOrCreateInstance({} as any);
+
+      expect(instance.publishableKey).toBe('pk_test_from_vite_env');
+    });
+
+    it('degrades gracefully when no env vars are set and publishableKey is undefined', () => {
+      mockedGetEnvVariable.mockReturnValue('');
+
+      const instance = IsomorphicClerk.getOrCreateInstance({} as any);
+
+      expect(instance.publishableKey).toBe('');
+    });
+  });
+});
+
+describe('getPublishableKeyFromEnv', () => {
+  const mockedGetEnvVariable = vi.mocked(getEnvVariableModule.getEnvVariable);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns VITE_CLERK_PUBLISHABLE_KEY when set', () => {
+    mockedGetEnvVariable.mockImplementation((name: string) => {
+      if (name === 'VITE_CLERK_PUBLISHABLE_KEY') {
+        return 'pk_test_vite';
+      }
+      return '';
+    });
+
+    expect(getPublishableKeyFromEnv()).toBe('pk_test_vite');
+  });
+
+  it('falls back to CLERK_PUBLISHABLE_KEY when VITE_ prefix not set', () => {
+    mockedGetEnvVariable.mockImplementation((name: string) => {
+      if (name === 'CLERK_PUBLISHABLE_KEY') {
+        return 'pk_test_node';
+      }
+      return '';
+    });
+
+    expect(getPublishableKeyFromEnv()).toBe('pk_test_node');
+  });
+
+  it('returns empty string when neither env var is set', () => {
+    mockedGetEnvVariable.mockReturnValue('');
+
+    expect(getPublishableKeyFromEnv()).toBe('');
   });
 });

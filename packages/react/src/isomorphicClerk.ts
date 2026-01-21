@@ -73,7 +73,7 @@ import type {
   HeadlessBrowserClerkConstructor,
   IsomorphicClerkOptions,
 } from './types';
-import { isConstructor } from './utils';
+import { getPublishableKeyFromEnv, isConstructor } from './utils';
 
 if (typeof globalThis.__BUILD_DISABLE_RHC__ === 'undefined') {
   globalThis.__BUILD_DISABLE_RHC__ = false;
@@ -206,14 +206,23 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // During CSR: use the cached instance for the whole lifetime of the app
     // Also will recreate the instance if the provided Clerk instance changes
     // This method should be idempotent in both scenarios
+
+    // If publishableKey is not explicitly provided, fall back to environment variables.
+    // This supports Vite users who set VITE_CLERK_PUBLISHABLE_KEY or CLERK_PUBLISHABLE_KEY.
+    // Passed-in options always take priority over environment variables.
+    // We check for undefined specifically (not falsy) to avoid conflicting with framework SDKs
+    // that may pass an empty string when their env var is not set.
+    const publishableKey = options.publishableKey !== undefined ? options.publishableKey : getPublishableKeyFromEnv();
+    const mergedOptions = { ...options, publishableKey };
+
     if (
       !inBrowser() ||
       !this.#instance ||
-      (options.Clerk && this.#instance.Clerk !== options.Clerk) ||
+      (mergedOptions.Clerk && this.#instance.Clerk !== mergedOptions.Clerk) ||
       // Allow hot swapping PKs on the client
-      this.#instance.publishableKey !== options.publishableKey
+      this.#instance.publishableKey !== mergedOptions.publishableKey
     ) {
-      this.#instance = new IsomorphicClerk(options);
+      this.#instance = new IsomorphicClerk(mergedOptions);
     }
     return this.#instance;
   }
