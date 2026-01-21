@@ -1,5 +1,19 @@
 # Change Log
 
+## 5.121.0
+
+### Minor Changes
+
+- Handle `offline_access` scope in OAuth consent screen by filtering it from the displayed scopes list (as it describes access duration rather than what can be accessed) and appending informational text about staying signed in when the scope is present. ([#7631](https://github.com/clerk/javascript/pull/7631)) by [@jfoshee](https://github.com/jfoshee)
+
+### Patch Changes
+
+- Fix `TaskChooseOrganization` to complete organization activation when logo upload fails ([#7635](https://github.com/clerk/javascript/pull/7635)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`c650a04`](https://github.com/clerk/javascript/commit/c650a04e624e7da5b81f2bdc12af0b6940c20f82), [`e995cc3`](https://github.com/clerk/javascript/commit/e995cc3572f85aa47bdee8f7b56130a383488a7f)]:
+  - @clerk/localizations@3.35.1
+  - @clerk/shared@3.43.1
+
 ## 5.120.0
 
 ### Minor Changes

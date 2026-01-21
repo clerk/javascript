@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.43.1
+
+### Patch Changes
+
+- Fix prototype pollution vulnerability in `fastDeepMergeAndReplace` and `fastDeepMergeAndKeep` utilities by blocking dangerous keys (`__proto__`, `constructor`, `prototype`) during object merging. ([#7625](https://github.com/clerk/javascript/pull/7625)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 3.43.0
 
 ### Minor Changes
