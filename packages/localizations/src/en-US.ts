@@ -703,6 +703,9 @@ export const enUS: LocalizationResource = {
     passwordPwned: {
       title: 'Password compromised',
     },
+    passwordTooLong: {
+      title: 'Password must be reset',
+    },
     passwordUntrusted: {
       title: 'Password untrusted',
     },
@@ -933,6 +936,8 @@ export const enUS: LocalizationResource = {
       'This password has been found as part of a breach and can not be used, please reset your password.',
     form_password_size_in_bytes_exceeded: undefined,
     form_password_compromised__sign_in: undefined,
+    password_too_long_needs_reset__sign_in:
+      'The existing imported password is too long and cannot be used, please reset your password.',
     form_password_untrusted__sign_in:
       'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
     form_password_validation_failed: undefined,

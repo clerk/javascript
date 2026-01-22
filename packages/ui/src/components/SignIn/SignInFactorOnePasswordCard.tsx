@@ -1,4 +1,9 @@
-import { isPasswordCompromisedError, isPasswordPwnedError, isUserLockedError } from '@clerk/shared/error';
+import {
+  isPasswordCompromisedError,
+  isPasswordPwnedError,
+  isPasswordTooLongError,
+  isUserLockedError,
+} from '@clerk/shared/error';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
@@ -18,7 +23,7 @@ import { useRouter } from '../../router/RouteContext';
 import { HavingTrouble } from './HavingTrouble';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 
-export type PasswordErrorCode = 'compromised' | 'pwned';
+export type PasswordErrorCode = 'compromised' | 'pwned' | 'passwordTooLong';
 
 type SignInFactorOnePasswordProps = {
   onForgotPasswordMethodClick: React.MouseEventHandler | undefined;
@@ -106,6 +111,12 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           if (isPasswordCompromisedError(err)) {
             card.setError({ ...err.errors[0], code: 'form_password_compromised__sign_in' });
             onPasswordError('compromised');
+            return;
+          }
+
+          if (isPasswordTooLongError(err)) {
+            card.setError({ ...err.errors[0], code: 'password_too_long_needs_reset__sign_in' });
+            onPasswordError('passwordTooLong');
             return;
           }
         }
