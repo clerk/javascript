@@ -170,8 +170,8 @@ function SignUpStartInternal(): JSX.Element {
             removeClerkQueryParam('__clerk_invitation_token');
             return setActive({
               session: signUp.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
               },
             });
           },
@@ -347,8 +347,8 @@ function SignUpStartInternal(): JSX.Element {
           handleComplete: () =>
             setActive({
               session: res.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
               },
             }),
           navigate,

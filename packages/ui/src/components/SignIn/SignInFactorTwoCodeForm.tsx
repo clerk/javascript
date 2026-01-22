@@ -93,8 +93,8 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
             }
             return setActive({
               session: res.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
               },
             });
           default:

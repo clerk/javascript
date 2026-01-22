@@ -3,7 +3,7 @@ import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
-import type { SessionResource } from '@clerk/shared/types';
+import type { DecorateUrl, SessionResource } from '@clerk/shared/types';
 import { isAbsoluteUrl } from '@clerk/shared/url';
 import { createContext, useContext, useMemo } from 'react';
 
@@ -27,7 +27,11 @@ export type SignUpContextType = Omit<SignUpCtx, 'fallbackRedirectUrl' | 'forceRe
   isCombinedFlow: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
-  navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
+  navigateOnSetActive: (opts: {
+    session: SessionResource;
+    redirectUrl: string;
+    decorateUrl: DecorateUrl;
+  }) => Promise<unknown>;
   taskUrl: string | null;
 };
 
@@ -114,9 +118,26 @@ export const useSignUpContext = (): SignUpContextType => {
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
 
-  const navigateOnSetActive = async ({ session, redirectUrl }: { session: SessionResource; redirectUrl: string }) => {
+  const navigateOnSetActive = async ({
+    session,
+    redirectUrl,
+    decorateUrl,
+  }: {
+    session: SessionResource;
+    redirectUrl: string;
+    decorateUrl: DecorateUrl;
+  }) => {
     const currentTask = session.currentTask;
     if (!currentTask) {
+      // Use decorateUrl to enable Safari ITP cookie refresh when needed
+      const decoratedUrl = decorateUrl(redirectUrl);
+
+      // If decorateUrl returns an external URL (Safari ITP fix), do a full page navigation
+      if (decoratedUrl.startsWith('https://')) {
+        window.location.href = decoratedUrl;
+        return;
+      }
+
       return navigate(redirectUrl);
     }
 
