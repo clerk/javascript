@@ -93,12 +93,12 @@ const noGlobalObject = {
   meta: {
     type: 'problem',
     docs: {
-      description: "Disallow direct usage of `global.` - use `globalThis` instead for cross-platform compatibility",
+      description: 'Disallow direct usage of `global.` - use `globalThis` instead for cross-platform compatibility',
       recommended: false,
     },
     messages: {
       noGlobal:
-        "Use `globalThis` instead of `global` for cross-platform compatibility. The `global` object is Node.js-specific and may not exist in browser or other environments.",
+        'Use `globalThis` instead of `global` for cross-platform compatibility. The `global` object is Node.js-specific and may not exist in browser or other environments.',
     },
     schema: [],
   },
