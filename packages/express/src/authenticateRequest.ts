@@ -104,9 +104,9 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
   const clerkClient = options.clerkClient || defaultClerkClient;
   const enableHandshake = options.enableHandshake ?? true;
 
-  // Extract proxy configuration with defaults
+  // Extract proxy configuration
   const frontendApiProxy = options.frontendApiProxy;
-  const proxyEnabled = frontendApiProxy?.enabled ?? true;
+  const proxyEnabled = frontendApiProxy?.enabled === true;
   const proxyPath = frontendApiProxy?.path ?? DEFAULT_PROXY_PATH;
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises

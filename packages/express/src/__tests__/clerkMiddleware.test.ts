@@ -119,7 +119,7 @@ describe('clerkMiddleware', () => {
     it('authenticates default path when custom proxy path is set', async () => {
       // When using a custom path, the default /__clerk should be authenticated
       const response = await runMiddlewareOnPath(
-        clerkMiddleware({ frontendApiProxy: { path: '/custom-clerk-proxy' } }),
+        clerkMiddleware({ frontendApiProxy: { enabled: true, path: '/custom-clerk-proxy' } }),
         '/__clerk/v1/client',
         {
           Cookie: '__client_uat=1711618859;',
@@ -154,10 +154,14 @@ describe('clerkMiddleware', () => {
     });
 
     it('still authenticates requests to other paths when proxy is configured', async () => {
-      const response = await runMiddlewareOnPath(clerkMiddleware({ frontendApiProxy: {} }), '/api/users', {
-        Cookie: '__client_uat=1711618859;',
-        'Sec-Fetch-Dest': 'document',
-      }).expect(307);
+      const response = await runMiddlewareOnPath(
+        clerkMiddleware({ frontendApiProxy: { enabled: true } }),
+        '/api/users',
+        {
+          Cookie: '__client_uat=1711618859;',
+          'Sec-Fetch-Dest': 'document',
+        },
+      ).expect(307);
 
       expect(response.header).toHaveProperty('x-clerk-auth-status', 'handshake');
     });

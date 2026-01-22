@@ -12,10 +12,8 @@ export type ExpressRequestWithAuth = ExpressRequest & {
  */
 export interface FrontendApiProxyOptions {
   /**
-   * Enable proxy path skipping. When true, requests to the proxy path will
-   * bypass authentication to avoid redirect loops.
-   *
-   * @default true
+   * Enable Frontend API proxy handling. When true, requests to the proxy path
+   * will be proxied to Clerk's Frontend API and the proxyUrl will be auto-derived.
    */
   enabled?: boolean;
   /**
