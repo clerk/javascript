@@ -48,8 +48,9 @@
   ],
   "scripts": {
     "build": "pnpm build:umd && pnpm build:esm",
-    "build:analyze": "rspack build --config rspack.config.js --env production --analyze",
+    "build:analyze": "rspack build --config rspack.config.js --env production --env analyze --analyze",
     "build:esm": "tsdown",
+    "build:rsdoctor": "RSDOCTOR=true rspack build --config rspack.config.js --env production",
     "build:umd": "rspack build --config rspack.config.js --env production",
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
@@ -90,6 +91,7 @@
   },
   "devDependencies": {
     "@floating-ui/react-dom": "^2.1.6",
+    "@rsdoctor/rspack-plugin": "^0.4.13",
     "@rspack/cli": "^1.6.0",
     "@rspack/core": "^1.6.0",
     "@rspack/plugin-react-refresh": "^1.5.2",
