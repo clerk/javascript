@@ -774,6 +774,37 @@ describe('SignUp', () => {
         expect(updatedSignUp?.lastName).toBeNull();
         expect(updatedSignUp?.phoneNumber).toBeNull();
       });
+
+      it('updates clerk.client.signUp with the fresh null instance', async () => {
+        const originalSignUp = new SignUp({
+          id: 'signup_123',
+          status: 'missing_requirements',
+          email_address: 'user@example.com',
+          first_name: 'John',
+        } as any);
+
+        // Set up mock clerk.client
+        const mockClient = {
+          signUp: originalSignUp,
+        };
+        SignUp.clerk = {
+          client: mockClient,
+        } as any;
+
+        // Verify initial state
+        expect(mockClient.signUp.id).toBe('signup_123');
+        expect(mockClient.signUp.status).toBe('missing_requirements');
+        expect(mockClient.signUp.emailAddress).toBe('user@example.com');
+
+        await originalSignUp.__internal_future.reset();
+
+        // Verify that clerk.client.signUp was updated with a new SignUp(null) instance
+        expect(mockClient.signUp).toBeInstanceOf(SignUp);
+        expect(mockClient.signUp.id).toBeUndefined();
+        expect(mockClient.signUp.status).toBeNull();
+        expect(mockClient.signUp.emailAddress).toBeNull();
+        expect(mockClient.signUp.firstName).toBeNull();
+      });
     });
   });
 });

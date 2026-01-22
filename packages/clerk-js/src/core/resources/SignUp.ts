@@ -990,6 +990,11 @@ class SignUpFuture implements SignUpFutureResource {
     const freshSignUp = new SignUp(null);
     signUpResourceSignal({ resource: freshSignUp });
 
+    // Also update clerk.client.signUp
+    if (SignUp.clerk?.client) {
+      SignUp.clerk.client.signUp = freshSignUp;
+    }
+
     return Promise.resolve({ error: null });
   }
 }

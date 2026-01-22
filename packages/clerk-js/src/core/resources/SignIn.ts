@@ -1261,6 +1261,11 @@ class SignInFuture implements SignInFutureResource {
     const freshSignIn = new SignIn(null);
     signInResourceSignal({ resource: freshSignIn });
 
+    // Also update clerk.client.signIn
+    if (SignIn.clerk?.client) {
+      SignIn.clerk.client.signIn = freshSignIn;
+    }
+
     return Promise.resolve({ error: null });
   }
 

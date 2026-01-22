@@ -1959,6 +1959,34 @@ describe('SignIn', () => {
         expect(updatedSignIn?.status).toBeNull();
         expect(updatedSignIn?.identifier).toBeNull();
       });
+
+      it('updates clerk.client.signIn with the fresh null instance', async () => {
+        const originalSignIn = new SignIn({
+          id: 'signin_123',
+          status: 'needs_first_factor',
+          identifier: 'user@example.com',
+        } as any);
+
+        // Set up mock clerk.client
+        const mockClient = {
+          signIn: originalSignIn,
+        };
+        SignIn.clerk = {
+          client: mockClient,
+        } as any;
+
+        // Verify initial state
+        expect(mockClient.signIn.id).toBe('signin_123');
+        expect(mockClient.signIn.status).toBe('needs_first_factor');
+
+        await originalSignIn.__internal_future.reset();
+
+        // Verify that clerk.client.signIn was updated with a new SignIn(null) instance
+        expect(mockClient.signIn).toBeInstanceOf(SignIn);
+        expect(mockClient.signIn.id).toBeUndefined();
+        expect(mockClient.signIn.status).toBeNull();
+        expect(mockClient.signIn.identifier).toBeNull();
+      });
     });
   });
 });
