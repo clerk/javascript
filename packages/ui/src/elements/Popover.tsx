@@ -1,3 +1,4 @@
+import { usePortalRoot } from '@clerk/shared/react';
 import type { FloatingContext, ReferenceType } from '@floating-ui/react';
 import { FloatingFocusManager, FloatingNode, FloatingPortal } from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
@@ -35,10 +36,13 @@ export const Popover = (props: PopoverProps) => {
     children,
   } = props;
 
+  const portalRoot = usePortalRoot();
+  const effectiveRoot = root ?? portalRoot?.() ?? undefined;
+
   if (portal) {
     return (
       <FloatingNode id={nodeId}>
-        <FloatingPortal root={root}>
+        <FloatingPortal root={effectiveRoot}>
           {isOpen && (
             <FloatingFocusManager
               context={context}

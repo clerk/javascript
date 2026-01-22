@@ -199,6 +199,7 @@ export const MenuItem = (props: MenuItemProps) => {
           justifyContent: 'start',
           borderRadius: theme.radii.$sm,
           padding: `${theme.space.$1} ${theme.space.$3}`,
+          whiteSpace: 'nowrap',
         }),
         sx,
       ]}
