@@ -864,6 +864,7 @@ export const nlBE: LocalizationResource = {
       action__invitationAccept: 'Deelnemen',
       action__suggestionsAccept: 'Verzoek om deel te nemen',
       subtitle: 'Deelnemen aan een bestaande organisatie of een nieuwe aanmaken',
+      subtitle__createOrganizationDisabled: 'Deelnemen aan een bestaande organisatie',
       suggestionsAcceptedLabel: 'Wachten op goedkeuring',
       title: 'Kies een organisatie',
     },
@@ -884,6 +885,10 @@ export const nlBE: LocalizationResource = {
     signOut: {
       actionLink: 'Uitloggen',
       actionText: 'Ingelogd als {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Er bestaat al een organisatie voor de gedetecteerde bedrijfsnaam ({{organizationName}}) en {{organizationDomain}}. Word lid via uitnodiging.',
     },
   },
   taskResetPassword: {

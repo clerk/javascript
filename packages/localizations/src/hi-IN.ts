@@ -869,6 +869,7 @@ export const hiIN: LocalizationResource = {
       action__invitationAccept: 'शामिल हों',
       action__suggestionsAccept: 'शामिल होने का अनुरोध करें',
       subtitle: 'मौजूदा संगठन में शामिल हों या नया बनाएं',
+      subtitle__createOrganizationDisabled: 'मौजूदा संगठन में शामिल हों',
       suggestionsAcceptedLabel: 'अनुमोदन की प्रतीक्षा',
       title: 'एक संगठन चुनें',
     },
@@ -889,6 +890,10 @@ export const hiIN: LocalizationResource = {
     signOut: {
       actionLink: 'साइन आउट',
       actionText: '{{identifier}} के रूप में साइन इन किया गया',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'पता लगाई गई कंपनी के नाम ({{organizationName}}) और {{organizationDomain}} के लिए एक संगठन पहले से मौजूद है। आमंत्रण द्वारा शामिल हों।',
     },
   },
   taskResetPassword: {

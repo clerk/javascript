@@ -862,6 +862,7 @@ export const enUS: LocalizationResource = {
       action__invitationAccept: 'Join',
       action__suggestionsAccept: 'Request to join',
       subtitle: 'Join an existing organization or create a new one',
+      subtitle__createOrganizationDisabled: 'Join an existing organization',
       suggestionsAcceptedLabel: 'Pending approval',
       title: 'Choose an organization',
     },
@@ -882,6 +883,10 @@ export const enUS: LocalizationResource = {
     signOut: {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'An organization already exists for the detected company name ({{organizationName}}) and {{organizationDomain}}. Join by invitation.',
     },
   },
   taskResetPassword: {

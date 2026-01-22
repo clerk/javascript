@@ -850,6 +850,7 @@ export const zhCN: LocalizationResource = {
       action__invitationAccept: '加入',
       action__suggestionsAccept: '请求加入',
       subtitle: '加入现有组织或创建新组织',
+      subtitle__createOrganizationDisabled: '加入现有组织',
       suggestionsAcceptedLabel: '等待批准',
       title: '选择组织',
     },
@@ -870,6 +871,10 @@ export const zhCN: LocalizationResource = {
     signOut: {
       actionLink: '退出',
       actionText: '已登录为 {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        '检测到的公司名称 ({{organizationName}}) 和 {{organizationDomain}} 已存在一个组织。请通过邀请加入。',
     },
   },
   taskResetPassword: {

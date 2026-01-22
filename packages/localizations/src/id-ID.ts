@@ -870,6 +870,7 @@ export const idID: LocalizationResource = {
       action__invitationAccept: 'Bergabung',
       action__suggestionsAccept: 'Minta bergabung',
       subtitle: 'Bergabung dengan organisasi yang ada atau buat yang baru',
+      subtitle__createOrganizationDisabled: 'Bergabung dengan organisasi yang ada',
       suggestionsAcceptedLabel: 'Menunggu persetujuan',
       title: 'Pilih organisasi',
     },
@@ -890,6 +891,10 @@ export const idID: LocalizationResource = {
     signOut: {
       actionLink: 'Keluar',
       actionText: 'Masuk sebagai {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Organisasi sudah ada untuk nama perusahaan yang terdeteksi ({{organizationName}}) dan {{organizationDomain}}. Bergabung melalui undangan.',
     },
   },
   taskResetPassword: {

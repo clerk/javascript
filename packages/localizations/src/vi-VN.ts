@@ -871,6 +871,7 @@ export const viVN: LocalizationResource = {
       action__invitationAccept: 'Tham gia',
       action__suggestionsAccept: 'Yêu cầu tham gia',
       subtitle: 'Tham gia một tổ chức hiện có hoặc tạo mới',
+      subtitle__createOrganizationDisabled: 'Tham gia một tổ chức hiện có',
       suggestionsAcceptedLabel: 'Đang chờ phê duyệt',
       title: 'Chọn tổ chức',
     },
@@ -891,6 +892,10 @@ export const viVN: LocalizationResource = {
     signOut: {
       actionLink: 'Đăng xuất',
       actionText: 'Đã đăng nhập với {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Một tổ chức đã tồn tại cho tên công ty được phát hiện ({{organizationName}}) và {{organizationDomain}}. Tham gia bằng lời mời.',
     },
   },
   taskResetPassword: {

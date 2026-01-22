@@ -866,6 +866,7 @@ export const svSE: LocalizationResource = {
       action__invitationAccept: 'Gå med',
       action__suggestionsAccept: 'Begär att gå med',
       subtitle: 'Gå med i en befintlig organisation eller skapa en ny',
+      subtitle__createOrganizationDisabled: 'Gå med i en befintlig organisation',
       suggestionsAcceptedLabel: 'Väntar på godkännande',
       title: 'Välj en organisation',
     },
@@ -886,6 +887,10 @@ export const svSE: LocalizationResource = {
     signOut: {
       actionLink: 'Logga ut',
       actionText: 'Inloggad som {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'En organisation finns redan för det upptäckta företagsnamnet ({{organizationName}}) och {{organizationDomain}}. Gå med via inbjudan.',
     },
   },
   taskResetPassword: {

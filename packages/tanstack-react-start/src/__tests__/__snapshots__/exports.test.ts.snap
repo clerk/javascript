@@ -49,6 +49,7 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "SignUpButton",
   "TaskChooseOrganization",
   "TaskResetPassword",
+  "UNSAFE_PortalProvider",
   "UserAvatar",
   "UserButton",
   "UserProfile",
@@ -58,6 +59,7 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "__experimental_PaymentElementProvider",
   "__experimental_useCheckout",
   "__experimental_usePaymentElement",
+  "getToken",
   "useAuth",
   "useClerk",
   "useEmailLink",
@@ -69,6 +71,7 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "useSignIn",
   "useSignUp",
   "useUser",
+  "useWaitlist",
 ]
 `;
 

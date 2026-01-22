@@ -8,6 +8,7 @@ import { createInvitationService } from './invitationsService';
 import { createOrganizationsService } from './organizationsService';
 import type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail } from './usersService';
 import { createUserService } from './usersService';
+import { createWaitlistService } from './waitlistService';
 
 export type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail };
 
@@ -40,6 +41,7 @@ export const createTestUtils = <
     users: createUserService(clerkClient),
     invitations: createInvitationService(clerkClient),
     organizations: createOrganizationsService(clerkClient),
+    waitlist: createWaitlistService(clerkClient),
   };
 
   if (!params.page) {

@@ -1,0 +1,598 @@
+---
+description: Styling and theming architecture for @clerk/ui package
+globs: packages/ui/src/**/*.ts,packages/ui/src/**/*.tsx
+alwaysApply: false
+---
+# @clerk/ui Styling and Theming Architecture
+
+This document describes the complete styling and theming system for the `@clerk/ui` package - an internal package containing UI components for Clerk frontend SDKs.
+
+## Architecture Overview
+
+```mermaid
+flowchart TD
+    AppConfig[Appearance Configuration] --> AppearanceProvider
+    AppearanceProvider --> parseAppearance
+    parseAppearance --> ParsedElements
+    parseAppearance --> ParsedInternalTheme
+    parseAppearance --> ParsedOptions
+    
+    ParsedInternalTheme --> InternalThemeProvider
+    InternalThemeProvider --> EmotionThemeProvider[Emotion ThemeProvider]
+    
+    ParsedElements --> makeCustomizable
+    makeCustomizable --> Primitives
+    
+    Primitives --> createVariants
+    createVariants --> FinalStyles[Final CSS Styles]
+    
+    subgraph ThemeSources[Theme Sources]
+        BaseTheme[baseTheme]
+        PrebuiltThemes[Prebuilt Themes: dark, shadcn, neobrutalism]
+        UserTheme[User Appearance Config]
+    end
+    
+    ThemeSources --> AppConfig
+```
+
+## Core Concepts
+
+### 1. Internal Theme (Design Tokens)
+
+The internal theme is a strongly-typed design token system defined in `packages/ui/src/foundations/`.
+
+**Key Files:**
+- `packages/ui/src/foundations/defaultFoundations.ts` - Combines all foundation modules
+- `packages/ui/src/foundations/colors.ts` - Color scales with light-dark support
+- `packages/ui/src/foundations/sizes.ts` - Spacing, sizes, and border radius
+- `packages/ui/src/foundations/shadows.ts` - Shadow definitions
+- `packages/ui/src/foundations/typography.ts` - Font scales
+
+**Token Structure:**
+
+```typescript
+const defaultInternalThemeFoundations = {
+  colors,      // Primary, danger, success, warning + alpha scales
+  fonts,       // Font family definitions
+  fontSizes,   // xs, sm, md, lg, xl scale
+  fontWeights, // normal, medium, semibold, bold
+  radii,       // none, sm, md, lg, xl, circle
+  sizes,       // Static spacing values
+  space,       // Dynamic spacing with CSS variables
+  shadows,     // Menu, card, button, input shadows
+  // ... transitions, borders, zIndices, opacity
+};
+```
+
+**Token Access Pattern:**
+
+```typescript
+// Tokens are prefixed with $ for type safety
+theme.colors.$primary500
+theme.space.$4
+theme.radii.$md
+theme.shadows.$cardBoxShadow
+```
+
+### 2. Appearance API (Public)
+
+Users configure theming via the `Appearance` type defined in `packages/ui/src/internal/appearance.ts`.
+
+**Three Customization Layers:**
+
+```typescript
+interface Theme {
+  theme?: BaseTheme | BaseTheme[];  // Base theme(s)
+  variables?: Variables;             // Design token overrides
+  elements?: Elements;               // Per-element CSS overrides
+  options?: Options;                 // Layout/behavior options
+}
+```
+
+**Variables (Design Tokens):**
+
+```typescript
+interface Variables {
+  colorPrimary?: CssColorOrScale;     // Brand color
+  colorPrimaryForeground?: CssColor;  // Text on primary
+  colorDanger?: CssColorOrScale;      // Error states
+  colorSuccess?: CssColorOrScale;     // Success states
+  colorWarning?: CssColorOrScale;     // Warning states
+  colorNeutral?: CssColorOrAlphaScale;// Borders, backgrounds
+  colorBackground?: CssColor;         // Card background
+  colorForeground?: CssColor;         // Default text
+  colorInput?: CssColor;              // Input background
+  fontFamily?: FontFamily;            // Main font
+  fontSize?: CssLengthUnit | FontSizeScale;
+  fontWeight?: FontWeightScale;
+  borderRadius?: CssLengthUnit;       // Base radius
+  spacing?: CssLengthUnit;            // Base spacing unit
+}
+```
+
+### 3. Element Descriptors
+
+Element descriptors are the foundation of per-element styling. Defined in `packages/ui/src/customizables/elementDescriptors.ts`.
+
+**How Descriptors Work:**
+
+```typescript
+// Descriptor creates targettable classnames
+const descriptor = descriptors.button;
+// -> { targettableClassname: 'cl-button', objectKey: 'button', ... }
+
+// Usage in components
+<Box elementDescriptor={descriptors.button} />
+// Generates: class="cl-button"
+
+// With ID
+<Box 
+  elementDescriptor={descriptors.socialButtonsIconButton}
+  elementId={descriptors.socialButtonsIconButton.setId('google')}
+/>
+// Generates: class="cl-socialButtonsIconButton cl-socialButtonsIconButton__google"
+```
+
+**State Classes (automatic):**
+
+```typescript
+<Box elementDescriptor={descriptors.button} isLoading={true} />
+// Generates: class="cl-button cl-loading"
+```
+
+Available states: `loading`, `error`, `open`, `active`
+
+**Element Descriptor Structure:**
+
+```typescript
+type ElementDescriptor<K extends keyof ElementsConfig> = {
+  targettableClassname: TargettableClassname<K>;  // e.g., 'cl-button'
+  objectKey: ElementObjectKey<K>;                 // e.g., 'button'
+  getTargettableIdClassname: (params: { id: AllowedIds<K> }) => string;
+  getObjectKeyWithState: (state: AllowedStates<K>) => ObjectKeyWithState<K>;
+  getObjectKeyWithId: (id: ElementId<AllowedIds<K>>) => ObjectKeyWithIds<K>;
+  getObjectKeyWithIdAndState: (id: ElementId<AllowedIds<K>>, state: AllowedStates<K>) => ObjectKeyWithIdAndState<K>;
+  setId: <Id extends AllowedIds<K>>(id?: Id) => ElementId<Id> | undefined;
+};
+```
+
+### 4. Styled System
+
+#### createVariants
+
+The `createVariants` function (`packages/ui/src/styledSystem/createVariants.ts`) creates type-safe variant-based styling:
+
+```typescript
+const { applyVariants } = createVariants((theme) => ({
+  base: { boxSizing: 'border-box' },
+  variants: {
+    size: {
+      sm: { padding: theme.space.$2 },
+      md: { padding: theme.space.$4 },
+    },
+    color: {
+      primary: { backgroundColor: theme.colors.$primary500 },
+      danger: { backgroundColor: theme.colors.$danger500 },
+    },
+  },
+  defaultVariants: { size: 'md', color: 'primary' },
+  compoundVariants: [
+    { condition: { size: 'sm', color: 'danger' }, styles: { border: '2px solid red' } }
+  ],
+}));
+
+// Usage
+<Button size="sm" color="primary" />
+```
+
+#### sx Prop (Theme-aware CSS)
+
+```typescript
+<Box
+  sx={theme => ({
+    backgroundColor: theme.colors.$primary100,
+    padding: theme.space.$4,
+    borderRadius: theme.radii.$md,
+  })}
+/>
+```
+
+The `sx` prop accepts either:
+- A function that receives the theme: `(theme: InternalTheme) => StyleRule`
+- A static style object: `StyleRule`
+
+### 5. Theme Cascade
+
+Themes are merged in order of specificity via `packages/ui/src/customizables/parseAppearance.ts`:
+
+```
+1. Base Theme (clerk or simple)
+2. Prebuilt Theme (dark, shadcn, neobrutalism)
+3. Global Appearance
+4. Component-specific Appearance (e.g., signIn: { ... })
+```
+
+**Parsing Flow:**
+
+```typescript
+// parseAppearance processes the cascade
+const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance => {
+  // 1. Expand theme references (resolve string themes like 'clerk' to actual theme objects)
+  // 2. Parse variables into InternalTheme
+  // 3. Parse elements into ParsedElements array
+  // 4. Parse options with defaults
+  // 5. Return combined result
+};
+```
+
+## Creating Custom Themes
+
+Use `createTheme` from `packages/ui/src/themes/createTheme.ts`:
+
+```typescript
+import { createTheme } from '@clerk/ui/themes';
+
+export const myTheme = createTheme({
+  name: 'my-custom-theme',
+  cssLayerName: 'components',  // Optional CSS @layer
+  variables: {
+    colorPrimary: '#0066CC',
+    colorBackground: '#FAFAFA',
+    fontFamily: 'Inter, sans-serif',
+  },
+  elements: {
+    // Static CSS object
+    button: { borderRadius: '8px' },
+    
+    // Theme-aware function
+    cardBox: ({ theme }) => ({
+      boxShadow: theme.shadows.$cardBoxShadow,
+      border: `1px solid ${theme.colors.$borderAlpha100}`,
+    }),
+    
+    // With state selectors
+    formButtonPrimary: {
+      '&[data-loading="true"]': {
+        opacity: 0.6,
+      },
+    },
+    
+    // With ID selectors
+    socialButtonsIconButton: {
+      '&[data-id="google"]': {
+        backgroundColor: '#4285F4',
+      },
+    },
+  },
+});
+```
+
+**Theme Function Signature:**
+
+```typescript
+elements?: Elements | ((params: { theme: InternalTheme }) => Elements);
+```
+
+## CSS Variables System
+
+### Clerk CSS Variables
+
+The package uses CSS custom properties with fallbacks via `clerkCssVar`:
+
+```typescript
+import { clerkCssVar } from '../utils/cssVariables';
+
+// Creates: var(--clerk-color-primary, #2F3037)
+clerkCssVar('color-primary', '#2F3037');
+```
+
+**Available Variables:**
+- `--clerk-color-primary`, `--clerk-color-danger`, `--clerk-color-success`, `--clerk-color-warning`
+- `--clerk-color-neutral`, `--clerk-color-background`, `--clerk-color-foreground`
+- `--clerk-color-input`, `--clerk-color-input-foreground`
+- `--clerk-spacing` - Base spacing unit (default: 1rem)
+- `--clerk-border-radius` - Base border radius (default: 0.375rem)
+- `--clerk-color-shadow` - Base shadow color (default: #000000)
+
+### Light-Dark Mode Support
+
+Uses CSS `light-dark()` function with fallback:
+
+```typescript
+import { lightDark } from '../utils/lightDark';
+
+// Modern browsers: light-dark(#ffffff, #212126)
+// Legacy: #ffffff (light value)
+lightDark('#ffffff', '#212126');
+```
+
+The `lightDark` utility checks for browser support:
+- If `light-dark()` and modern color functions are supported: returns `light-dark(light, dark)`
+- Otherwise: returns the light value as fallback
+
+## Color Scale Generation
+
+Colors automatically generate full scales (`packages/ui/src/utils/colors/scales.ts`):
+
+- **Lightness scales**: 25, 50, 100, 150, 200, 300, 400, 500, 600, 700, 750, 800, 850, 900, 950
+- **Alpha scales**: Same shades with transparency
+
+```typescript
+// Input
+variables: { colorPrimary: '#2F3037' }
+
+// Generated
+theme.colors.$primary25   // Lightest
+theme.colors.$primary500  // Base
+theme.colors.$primary950  // Darkest
+theme.colors.$primaryAlpha200 // With transparency
+```
+
+**Color Scale Generation Process:**
+
+1. **Input Processing**: Accepts string color or partial color scale object
+2. **Base Color Extraction**: Extracts base color (500 shade) if scale provided
+3. **Scale Generation**: 
+   - Modern browsers: Uses CSS `color-mix()` and relative colors
+   - Legacy browsers: Uses HSLA manipulation
+4. **Prefix Application**: Applies prefix (e.g., `primary`, `danger`) to all shades
+5. **Merge with User Scale**: Merges generated scale with any user-provided overrides
+
+**Alpha Scale Generation:**
+
+```typescript
+// Generates alpha variations using color-mix() or HSLA
+colorOptionToThemedAlphaScale('#2F3037', 'primaryAlpha')
+// Returns: { primaryAlpha25: '...', primaryAlpha50: '...', ... }
+```
+
+## makeCustomizable HOC
+
+The `makeCustomizable` higher-order component (`packages/ui/src/customizables/makeCustomizable.tsx`) wraps primitives to enable theming:
+
+```typescript
+export const makeCustomizable = <P,>(
+  Component: React.FunctionComponent<P>,
+  options?: MakeCustomizableOptions,
+): CustomizablePrimitive<P>
+```
+
+**How it Works:**
+
+1. Extracts `elementDescriptor`, `elementId`, and `sx` props
+2. Generates CSS classes via `generateClassName()`
+3. Merges user-provided styles from `parsedElements`
+4. Applies default styles and `sx` prop
+5. Returns component with generated className and CSS
+
+**Example:**
+
+```typescript
+export const Button = makeCustomizable(Primitives.Button, {
+  defaultDescriptor: descriptors.button,
+  defaultStyles: { /* base styles */ },
+});
+```
+
+## Class Generation
+
+Class names are generated in `packages/ui/src/customizables/classGeneration.ts`:
+
+**Classname Structure:**
+
+```
+[cl-elementName] [cl-elementName__id] [cl-state] [user-classes] 🔒️
+```
+
+**Generation Process:**
+
+1. **Base Class**: `cl-{elementName}` from descriptor
+2. **ID Class**: `cl-{elementName}__{id}` if elementId provided
+3. **State Class**: `cl-{state}` if state prop present (loading, error, open, active)
+4. **User Classes**: From `elements` configuration
+5. **Emoji Separator**: `🔒️` appended for visual identification
+
+**Style Application:**
+
+- CSS objects from `elements` are merged into the `css` array
+- State-specific styles use higher specificity (`&&&` for state selectors)
+- Styles are applied via Emotion's `css` prop
+
+## Base Theme
+
+The base theme (`packages/ui/src/baseTheme.ts`) provides default element styles:
+
+```typescript
+const clerkTheme: Appearance = {
+  elements: ({ theme }: { theme: InternalTheme }): Elements => {
+    return {
+      button: {
+        '&[data-variant="solid"]': { /* solid button styles */ },
+        '&[data-variant="outline"]': { /* outline button styles */ },
+      },
+      input: { /* input styles */ },
+      cardBox: { /* card styles */ },
+      // ... more elements
+    };
+  },
+};
+```
+
+**Simple Theme:**
+
+```typescript
+const simpleTheme: Appearance = {
+  // @ts-expect-error Internal API for simple theme detection
+  simpleStyles: true,
+  elements: {},
+};
+```
+
+## Prebuilt Themes
+
+Located in `packages/ui/src/themes/`:
+
+- **dark.ts**: Dark mode theme with inverted colors
+- **shadcn.ts**: Integration with shadcn/ui design system
+- **neobrutalism.ts**: Bold, high-contrast design
+- **lightDark.ts**: Automatic light/dark mode using CSS `light-dark()`
+- **shadesOfPurple.ts**: Purple-themed variant
+
+**Theme Export:**
+
+```typescript
+// packages/ui/src/themes/index.ts
+export * from './dark';
+export * from './shadcn';
+export * from './neobrutalism';
+// ...
+```
+
+## Key Files Reference
+
+| Purpose | Path |
+|---------|------|
+| Appearance Types | `packages/ui/src/internal/appearance.ts` |
+| Base Theme | `packages/ui/src/baseTheme.ts` |
+| Theme Creator | `packages/ui/src/themes/createTheme.ts` |
+| Element Descriptors | `packages/ui/src/customizables/elementDescriptors.ts` |
+| Appearance Parsing | `packages/ui/src/customizables/parseAppearance.ts` |
+| Variables Parsing | `packages/ui/src/customizables/parseVariables.ts` |
+| Class Generation | `packages/ui/src/customizables/classGeneration.ts` |
+| Design Foundations | `packages/ui/src/foundations/` |
+| Variant System | `packages/ui/src/styledSystem/createVariants.ts` |
+| Prebuilt Themes | `packages/ui/src/themes/` |
+| Color Utilities | `packages/ui/src/utils/colors/` |
+| CSS Variables | `packages/ui/src/utils/cssVariables.ts` |
+
+## Adding New Element Descriptors
+
+1. **Add Type Definition**: Add to `ElementsConfig` in `packages/shared/src/types/appearance.ts` or `packages/ui/src/internal/appearance.ts`
+2. **Build Types Package**: `cd packages/types && pnpm build` (if using shared types)
+3. **Add to APPEARANCE_KEYS**: Append to `APPEARANCE_KEYS` array in `packages/ui/src/customizables/elementDescriptors.ts`
+4. **Use in Component**: Apply descriptor in component: `elementDescriptor={descriptors.myNewElement}`
+
+**Example:**
+
+```typescript
+// 1. Add to ElementsConfig
+export type ElementsConfig = {
+  // ... existing
+  myNewElement: WithOptions;
+};
+
+// 2. Add to APPEARANCE_KEYS
+export const APPEARANCE_KEYS = [
+  // ... existing
+  'myNewElement',
+] as const;
+
+// 3. Use in component
+<Box elementDescriptor={descriptors.myNewElement} />
+```
+
+## Emotion Integration
+
+The package uses Emotion for CSS-in-JS:
+
+- **@emotion/react**: Provides the `css` prop and `ThemeProvider`
+- **@emotion/cache**: Used for style isolation (if needed)
+- **Theme Provider**: Wraps components via `InternalThemeProvider` (`packages/ui/src/styledSystem/InternalThemeProvider.tsx`)
+
+**Theme Provider Setup:**
+
+```typescript
+<InternalThemeProvider theme={parsedInternalTheme}>
+  <ThemeProvider theme={parsedInternalTheme}>
+    {children}
+  </ThemeProvider>
+</InternalThemeProvider>
+```
+
+**CSS Prop Usage:**
+
+```typescript
+// In primitives
+<Box css={applyVariants(props)} />
+
+// In customizable components
+<Box css={[defaultStyles, sx, ...generatedStyles]} />
+```
+
+## Responsive Design
+
+Responsive utilities are available via `makeResponsive` (`packages/ui/src/customizables/makeResponsive.tsx`):
+
+```typescript
+// Responsive values
+<Flex direction={['column', 'row']} gap={[2, 4, 6]} />
+```
+
+Breakpoints are defined in `packages/ui/src/styledSystem/breakpoints.tsx`.
+
+## Best Practices
+
+1. **Use Element Descriptors**: Always use descriptors for themable elements
+2. **Theme Functions**: Use theme-aware functions in `elements` when accessing design tokens
+3. **CSS Variables**: Prefer CSS variables for runtime customization
+4. **Color Scales**: Let the system generate color scales automatically
+5. **State Classes**: Use state props (`isLoading`, `hasError`, etc.) for automatic state styling
+6. **Type Safety**: Leverage TypeScript types for element keys and variants
+7. **Performance**: Use `useDeepEqualMemo` in AppearanceProvider to prevent unnecessary re-renders
+
+## Common Patterns
+
+### Customizing a Single Element
+
+```typescript
+appearance={{
+  elements: {
+    formButtonPrimary: {
+      backgroundColor: 'blue',
+      borderRadius: '8px',
+    },
+  },
+}}
+```
+
+### Theme-Aware Element Styles
+
+```typescript
+appearance={{
+  elements: {
+    cardBox: ({ theme }) => ({
+      backgroundColor: theme.colors.$colorBackground,
+      boxShadow: theme.shadows.$cardBoxShadow,
+    }),
+  },
+}}
+```
+
+### Component-Specific Theming
+
+```typescript
+appearance={{
+  signIn: {
+    variables: { colorPrimary: '#0066CC' },
+  },
+  signUp: {
+    variables: { colorPrimary: '#00CC66' },
+  },
+}}
+```
+
+### Using Prebuilt Themes
+
+```typescript
+import { dark } from '@clerk/ui/themes';
+
+appearance={{ theme: dark }}
+```
+
+### Combining Multiple Themes
+
+```typescript
+import { dark, neobrutalism } from '@clerk/ui/themes';
+
+appearance={{ theme: [dark, neobrutalism] }}
+```

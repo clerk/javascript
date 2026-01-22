@@ -871,6 +871,7 @@ export const teIN: LocalizationResource = {
       action__invitationAccept: 'చేరండి',
       action__suggestionsAccept: 'చేరడానికి అభ్యర్థించండి',
       subtitle: 'ఇప్పటికే ఉన్న సంస్థలో చేరండి లేదా కొత్తదాన్ని సృష్టించండి',
+      subtitle__createOrganizationDisabled: 'ఇప్పటికే ఉన్న సంస్థలో చేరండి',
       suggestionsAcceptedLabel: 'ఆమోదం కోసం పెండింగ్‌లో ఉంది',
       title: 'ఒక సంస్థను ఎంచుకోండి',
     },
@@ -891,6 +892,10 @@ export const teIN: LocalizationResource = {
     signOut: {
       actionLink: 'సైన్ అవుట్',
       actionText: '{{identifier}}గా సైన్ ఇన్ చేయబడింది',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'గుర్తించిన కంపెనీ పేరు ({{organizationName}}) మరియు {{organizationDomain}} కోసం ఒక సంస్థ ఇప్పటికే ఉంది. ఆహ్వానం ద్వారా చేరండి.',
     },
   },
   taskResetPassword: {

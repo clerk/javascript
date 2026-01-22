@@ -864,6 +864,7 @@ export const fiFI: LocalizationResource = {
       action__invitationAccept: 'Liity',
       action__suggestionsAccept: 'Pyydä liittymistä',
       subtitle: 'Liity olemassa olevaan organisaatioon tai luo uusi',
+      subtitle__createOrganizationDisabled: 'Liity olemassa olevaan organisaatioon',
       suggestionsAcceptedLabel: 'Odottaa hyväksyntää',
       title: 'Valitse organisaatio',
     },
@@ -884,6 +885,10 @@ export const fiFI: LocalizationResource = {
     signOut: {
       actionLink: 'Kirjaudu ulos',
       actionText: 'Kirjautuneena käyttäjänä {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Organisaatio on jo olemassa havaitulle yrityksen nimelle ({{organizationName}}) ja {{organizationDomain}}. Liity kutsulla.',
     },
   },
   taskResetPassword: {

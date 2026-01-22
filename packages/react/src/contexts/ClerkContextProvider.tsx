@@ -11,6 +11,7 @@ import React from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
+import { mergeWithEnv } from '../utils';
 import { AuthContext } from './AuthContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
 
@@ -24,7 +25,9 @@ export type ClerkContextProviderState = Resources;
 
 export function ClerkContextProvider(props: ClerkContextProvider) {
   const { isomorphicClerkOptions, initialState, children } = props;
-  const { isomorphicClerk: clerk, clerkStatus } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
+  // Merge options with environment variable fallbacks (supports Vite's VITE_CLERK_* env vars)
+  const mergedOptions = mergeWithEnv(isomorphicClerkOptions);
+  const { isomorphicClerk: clerk, clerkStatus } = useLoadedIsomorphicClerk(mergedOptions);
 
   const [state, setState] = React.useState<ClerkContextProviderState>({
     client: clerk.client as ClientResource,
@@ -111,17 +114,17 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
   );
 }
 
-const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
-  const isomorphicClerkRef = React.useRef(IsomorphicClerk.getOrCreateInstance(options));
+const useLoadedIsomorphicClerk = (mergedOptions: IsomorphicClerkOptions) => {
+  const isomorphicClerkRef = React.useRef(IsomorphicClerk.getOrCreateInstance(mergedOptions));
   const [clerkStatus, setClerkStatus] = React.useState(isomorphicClerkRef.current.status);
 
   React.useEffect(() => {
-    void isomorphicClerkRef.current.__internal_updateProps({ appearance: options.appearance });
-  }, [options.appearance]);
+    void isomorphicClerkRef.current.__internal_updateProps({ appearance: mergedOptions.appearance });
+  }, [mergedOptions.appearance]);
 
   React.useEffect(() => {
-    void isomorphicClerkRef.current.__internal_updateProps({ options });
-  }, [options.localization]);
+    void isomorphicClerkRef.current.__internal_updateProps({ options: mergedOptions });
+  }, [mergedOptions.localization]);
 
   React.useEffect(() => {
     isomorphicClerkRef.current.on('status', setClerkStatus);

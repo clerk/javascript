@@ -862,6 +862,7 @@ export const ptPT: LocalizationResource = {
       action__invitationAccept: 'Participar',
       action__suggestionsAccept: 'Solicitar participação',
       subtitle: 'Junte-se a uma organização existente ou crie uma nova',
+      subtitle__createOrganizationDisabled: 'Junte-se a uma organização existente',
       suggestionsAcceptedLabel: 'Aprovação pendente',
       title: 'Escolha uma organização',
     },
@@ -882,6 +883,10 @@ export const ptPT: LocalizationResource = {
     signOut: {
       actionLink: 'Terminar sessão',
       actionText: 'Sessão iniciada como {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Já existe uma organização para o nome da empresa detetado ({{organizationName}}) e {{organizationDomain}}. Adira por convite.',
     },
   },
   taskResetPassword: {

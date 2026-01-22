@@ -868,6 +868,7 @@ export const skSK: LocalizationResource = {
       action__invitationAccept: 'Pridať sa',
       action__suggestionsAccept: 'Požiadať o pridanie',
       subtitle: 'Pridajte sa k existujúcej organizácii alebo vytvorte novú',
+      subtitle__createOrganizationDisabled: 'Pridajte sa k existujúcej organizácii',
       suggestionsAcceptedLabel: 'Čaká na schválenie',
       title: 'Vyberte organizáciu',
     },
@@ -888,6 +889,10 @@ export const skSK: LocalizationResource = {
     signOut: {
       actionLink: 'Odhlásiť sa',
       actionText: 'Prihlásený ako {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Organizácia už existuje pre zistený názov spoločnosti ({{organizationName}}) a {{organizationDomain}}. Pripojte sa prostredníctvom pozvánky.',
     },
   },
   taskResetPassword: {

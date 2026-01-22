@@ -865,6 +865,7 @@ export const esES: LocalizationResource = {
       action__invitationAccept: 'Unirse',
       action__suggestionsAccept: 'Solicitar unirse',
       subtitle: 'Unirse a una organización existente o crear una nueva',
+      subtitle__createOrganizationDisabled: 'Unirse a una organización existente',
       suggestionsAcceptedLabel: 'Pendiente de aprobación',
       title: 'Elegir una organización',
     },
@@ -885,6 +886,10 @@ export const esES: LocalizationResource = {
     signOut: {
       actionLink: 'Cerrar sesión',
       actionText: 'Sesión iniciada como {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Ya existe una organización para el nombre de empresa detectado ({{organizationName}}) y {{organizationDomain}}. Únete por invitación.',
     },
   },
   taskResetPassword: {

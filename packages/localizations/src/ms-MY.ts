@@ -872,6 +872,7 @@ export const msMY: LocalizationResource = {
       action__invitationAccept: 'Sertai',
       action__suggestionsAccept: 'Minta untuk menyertai',
       subtitle: 'Sertai organisasi sedia ada atau cipta yang baharu',
+      subtitle__createOrganizationDisabled: 'Sertai organisasi sedia ada',
       suggestionsAcceptedLabel: 'Menunggu kelulusan',
       title: 'Pilih organisasi',
     },
@@ -892,6 +893,10 @@ export const msMY: LocalizationResource = {
     signOut: {
       actionLink: 'Daftar keluar',
       actionText: 'Log masuk sebagai {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Organisasi sudah wujud untuk nama syarikat yang dikesan ({{organizationName}}) dan {{organizationDomain}}. Sertai melalui jemputan.',
     },
   },
   taskResetPassword: {

@@ -871,6 +871,7 @@ export const taIN: LocalizationResource = {
       action__invitationAccept: 'சேரவும்',
       action__suggestionsAccept: 'சேர்வதற்கு கோரிக்கை',
       subtitle: 'இருக்கும் அமைப்பில் சேரவும் அல்லது புதியதை உருவாக்கவும்',
+      subtitle__createOrganizationDisabled: 'இருக்கும் அமைப்பில் சேரவும்',
       suggestionsAcceptedLabel: 'அனுமதிக்காக காத்திருக்கிறது',
       title: 'ஒரு அமைப்பைத் தேர்ந்தெடுக்கவும்',
     },
@@ -891,6 +892,10 @@ export const taIN: LocalizationResource = {
     signOut: {
       actionLink: 'வெளியேறு',
       actionText: '{{identifier}} என உள்நுழைந்துள்ளீர்கள்',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'கண்டறியப்பட்ட நிறுவன பெயர் ({{organizationName}}) மற்றும் {{organizationDomain}} க்கு ஒரு அமைப்பு ஏற்கனவே உள்ளது. அழைப்பின் மூலம் சேரவும்.',
     },
   },
   taskResetPassword: {

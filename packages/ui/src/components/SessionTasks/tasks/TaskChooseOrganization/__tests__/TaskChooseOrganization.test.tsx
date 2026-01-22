@@ -1,15 +1,74 @@
+import type { OrganizationResource } from '@clerk/shared/src/types';
+import { waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
-import { createFakeUserOrganizationMembership } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
+import {
+  createFakeUserOrganizationMembership,
+  createFakeUserOrganizationSuggestion,
+} from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
+import { clearFetchCache } from '@/ui/hooks/useFetch';
 
 import { TaskChooseOrganization } from '..';
+import type { FakeOrganizationParams } from '../../../../CreateOrganization/__tests__/CreateOrganization.test';
+
+type FakeOrganizationParams = {
+  id: string;
+  createdAt?: Date;
+  imageUrl?: string;
+  slug: string;
+  name: string;
+  membersCount: number;
+  pendingInvitationsCount: number;
+  adminDeleteEnabled: boolean;
+  maxAllowedMemberships: number;
+};
+
+const createFakeOrganization = (params: FakeOrganizationParams): OrganizationResource => {
+  return {
+    pathRoot: '',
+    id: params.id,
+    name: params.name,
+    slug: params.slug,
+    hasImage: !!params.imageUrl,
+    imageUrl: params.imageUrl || '',
+    membersCount: params.membersCount,
+    pendingInvitationsCount: params.pendingInvitationsCount,
+    publicMetadata: {},
+    adminDeleteEnabled: params.adminDeleteEnabled,
+    maxAllowedMemberships: params?.maxAllowedMemberships,
+    createdAt: params?.createdAt || new Date(),
+    updatedAt: new Date(),
+    update: vi.fn() as any,
+    getMemberships: vi.fn() as any,
+    getInvitations: vi.fn() as any,
+    getRoles: vi.fn() as any,
+    addMember: vi.fn() as any,
+    inviteMember: vi.fn() as any,
+    inviteMembers: vi.fn() as any,
+    updateMember: vi.fn() as any,
+    removeMember: vi.fn() as any,
+    createDomain: vi.fn() as any,
+    getDomain: vi.fn() as any,
+    getDomains: vi.fn() as any,
+    getMembershipRequests: vi.fn() as any,
+    destroy: vi.fn() as any,
+    setLogo: vi.fn() as any,
+    reload: vi.fn() as any,
+    __internal_toSnapshot: vi.fn() as any,
+    initializePaymentMethod: vi.fn() as any,
+  } as OrganizationResource;
+};
 
 const { createFixtures } = bindCreateFixtures('TaskChooseOrganization');
 
 describe('TaskChooseOrganization', () => {
+  beforeEach(() => {
+    clearFetchCache();
+  });
+
   it('does not render component without existing session task', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
@@ -214,6 +273,8 @@ describe('TaskChooseOrganization', () => {
         email_addresses: ['test@clerk.com'],
         create_organization_enabled: true,
         tasks: [{ key: 'choose-organization' }],
+        // Include an organization membership so user has reached max memberships
+        organization_memberships: [{ name: 'Existing Org', slug: 'org1' }],
       });
     });
 
@@ -290,11 +351,192 @@ describe('TaskChooseOrganization', () => {
         });
       });
 
-      const { queryByText } = render(<TaskChooseOrganization />, { wrapper });
+      const { queryByText, findByText } = render(<TaskChooseOrganization />, { wrapper });
 
+      // Wait for loading to complete and the disabled screen to render
+      expect(await findByText(/you must belong to an organization/i)).toBeInTheDocument();
+      expect(await findByText(/contact your organization admin for an invitation/i)).toBeInTheDocument();
       expect(queryByText(/create new organization/i)).not.toBeInTheDocument();
-      expect(queryByText(/you must belong to an organization/i)).toBeInTheDocument();
-      expect(queryByText(/contact your organization admin for an invitation/i)).toBeInTheDocument();
+    });
+
+    it('with existing memberships or suggestions, displays create organization screen', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withForceOrganizationSelection();
+        f.withUser({
+          create_organization_enabled: false,
+          tasks: [{ key: 'choose-organization' }],
+        });
+      });
+
+      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+        Promise.resolve({
+          data: [
+            createFakeUserOrganizationMembership({
+              id: '1',
+              organization: {
+                id: '1',
+                name: 'Existing Org',
+                slug: 'org1',
+                membersCount: 1,
+                adminDeleteEnabled: false,
+                maxAllowedMemberships: 1,
+                pendingInvitationsCount: 1,
+              },
+            }),
+          ],
+          total_count: 1,
+        }),
+      );
+
+      fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValueOnce(
+        Promise.resolve({
+          data: [
+            createFakeUserOrganizationSuggestion({
+              id: '2',
+              emailAddress: 'two@clerk.com',
+              publicOrganizationData: {
+                name: 'OrgTwoSuggestion',
+              },
+            }),
+          ],
+          total_count: 1,
+        }),
+      );
+
+      const { findByText, queryByText } = render(<TaskChooseOrganization />, { wrapper });
+
+      expect(await findByText('Join an existing organization')).toBeInTheDocument();
+      expect(await queryByText('Create new organization')).not.toBeInTheDocument();
+      expect(await findByText('Existing Org')).toBeInTheDocument();
+    });
+  });
+
+  describe('with organization creation defaults', () => {
+    describe('when enabled on environment', () => {
+      it('displays warning when organization already exists for user email domain', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withOrganizations();
+          f.withForceOrganizationSelection();
+          f.withOrganizationCreationDefaults(true);
+          f.withUser({
+            email_addresses: ['test@clerk.com'],
+            create_organization_enabled: true,
+            tasks: [{ key: 'choose-organization' }],
+          });
+        });
+
+        fixtures.clerk.user?.getOrganizationCreationDefaults.mockReturnValueOnce(
+          Promise.resolve({
+            advisory: {
+              code: 'organization_already_exists',
+              severity: 'warning',
+              meta: { organization_domain: 'test@clerk.com', organization_name: 'Clerk' },
+            },
+          }),
+        );
+
+        const { findByText } = render(<TaskChooseOrganization />, { wrapper });
+
+        expect(
+          await findByText(
+            /an organization already exists for the detected company name \(Clerk\) and test@clerk\.com/i,
+          ),
+        ).toBeInTheDocument();
+      });
+
+      it('prefills create organization form with defaults', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withOrganizations();
+          f.withOrganizationSlug(true);
+          f.withForceOrganizationSelection();
+          f.withOrganizationCreationDefaults(true);
+          f.withUser({
+            email_addresses: ['test@clerk.com'],
+            create_organization_enabled: true,
+            tasks: [{ key: 'choose-organization' }],
+          });
+        });
+
+        fixtures.clerk.user?.getOrganizationCreationDefaults.mockReturnValueOnce(
+          Promise.resolve({
+            form: {
+              name: 'Test Org',
+              slug: 'test-org',
+              logo: null,
+            },
+          }),
+        );
+
+        const { findByRole } = render(<TaskChooseOrganization />, { wrapper });
+
+        expect(await findByRole('textbox', { name: /name/i })).toHaveValue('Test Org');
+        expect(await findByRole('textbox', { name: /slug/i })).toHaveValue('test-org');
+      });
+    });
+
+    describe('when disabled on environment', () => {
+      it('does not fetch for creation defaults', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withOrganizations();
+          f.withForceOrganizationSelection();
+          f.withOrganizationCreationDefaults(false);
+          f.withUser({
+            email_addresses: ['test@clerk.com'],
+            create_organization_enabled: true,
+            tasks: [{ key: 'choose-organization' }],
+          });
+        });
+
+        render(<TaskChooseOrganization />, { wrapper });
+
+        expect(fixtures.clerk.user?.getOrganizationCreationDefaults).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('on create organization submit', () => {
+    it('calls setActive even when logo upload fails', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withForceOrganizationSelection();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          create_organization_enabled: true,
+          tasks: [{ key: 'choose-organization' }],
+        });
+      });
+
+      const createdOrg = createFakeOrganization({
+        id: '1',
+        adminDeleteEnabled: false,
+        maxAllowedMemberships: 1,
+        membersCount: 1,
+        name: 'new org',
+        pendingInvitationsCount: 0,
+        slug: 'new-org',
+      });
+
+      // Mock setLogo to reject with an error
+      createdOrg.setLogo = vi.fn().mockRejectedValue(new Error('Logo upload failed'));
+
+      fixtures.clerk.createOrganization.mockReturnValue(Promise.resolve(createdOrg));
+
+      const { findByRole, findByLabelText } = render(<TaskChooseOrganization />, { wrapper });
+
+      const nameInput = await findByLabelText(/name/i);
+      await userEvent.type(nameInput, 'new org');
+
+      const submitButton = await findByRole('button', { name: /continue/i });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
+          expect.objectContaining({
+            organization: createdOrg,
+          }),
+        );
+      });
     });
   });
 });

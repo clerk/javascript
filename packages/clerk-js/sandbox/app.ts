@@ -1,25 +1,21 @@
+import { PageMocking, type MockScenario } from '@clerk/msw';
 import * as l from '../../localizations';
 import type { Clerk as ClerkType } from '../';
-
-const AVAILABLE_LOCALES = Object.keys(l) as (keyof typeof l)[];
-
-function fillLocalizationSelect() {
-  const select = document.getElementById('localizationSelect') as HTMLSelectElement;
-
-  for (const locale of AVAILABLE_LOCALES) {
-    if (locale === 'enUS') {
-      select.add(new Option(locale, locale, true, true));
-      continue;
-    }
-
-    select.add(new Option(locale, locale));
-  }
-}
+import * as scenarios from './scenarios';
 
 interface ComponentPropsControl {
   setProps: (props: unknown) => void;
   getProps: () => any | null;
 }
+
+interface ScenarioControls {
+  setScenario: (scenario: AvailableScenario | null) => void;
+  availableScenarios: typeof AVAILABLE_SCENARIOS;
+}
+
+const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
+
+const AVAILABLE_LOCALES = Object.keys(l) as (keyof typeof l)[];
 
 const AVAILABLE_COMPONENTS = [
   'clerk', // While not a component, we want to support passing options to the Clerk class.
@@ -39,17 +35,57 @@ const AVAILABLE_COMPONENTS = [
   'taskChooseOrganization',
   'taskResetPassword',
 ] as const;
+type AvailableComponent = (typeof AVAILABLE_COMPONENTS)[number];
 
-const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
+const AVAILABLE_SCENARIOS = Object.keys(scenarios) as (keyof typeof scenarios)[];
+type AvailableScenario = (typeof AVAILABLE_SCENARIOS)[number];
 
-const urlParams = new URL(window.location.href).searchParams;
-for (const [component, encodedProps] of urlParams.entries()) {
-  if (AVAILABLE_COMPONENTS.includes(component as (typeof AVAILABLE_COMPONENTS)[number])) {
-    localStorage.setItem(`${COMPONENT_PROPS_NAMESPACE}-${component}`, encodedProps);
+function fillLocalizationSelect() {
+  const select = document.getElementById('localizationSelect') as HTMLSelectElement;
+
+  for (const locale of AVAILABLE_LOCALES) {
+    if (locale === 'enUS') {
+      select.add(new Option(locale, locale, true, true));
+      continue;
+    }
+
+    select.add(new Option(locale, locale));
   }
 }
 
-function setComponentProps(component: (typeof AVAILABLE_COMPONENTS)[number], props: unknown) {
+function getScenario(): (() => MockScenario) | null {
+  const scenarioName = localStorage.getItem(`${COMPONENT_PROPS_NAMESPACE}-scenario`);
+  if (scenarioName && AVAILABLE_SCENARIOS.includes(scenarioName as AvailableScenario)) {
+    return scenarios[scenarioName as AvailableScenario];
+  }
+  return null;
+}
+
+function setScenario(scenario: AvailableScenario | null) {
+  if (!scenario) {
+    localStorage.removeItem(`${COMPONENT_PROPS_NAMESPACE}-scenario`);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('scenario');
+    window.location.href = url.toString();
+    return;
+  }
+
+  if (!AVAILABLE_SCENARIOS.includes(scenario)) {
+    throw new Error(`Invalid scenario: "${scenario}". Available scenarios: ${AVAILABLE_SCENARIOS.join(', ')}`);
+  }
+  localStorage.setItem(`${COMPONENT_PROPS_NAMESPACE}-scenario`, scenario);
+
+  const url = new URL(window.location.href);
+  url.searchParams.set('scenario', scenario);
+  window.location.href = url.toString();
+}
+
+const scenarioControls: ScenarioControls = {
+  setScenario,
+  availableScenarios: AVAILABLE_SCENARIOS,
+};
+
+function setComponentProps(component: AvailableComponent, props: unknown) {
   const encodedProps = JSON.stringify(props);
 
   const url = new URL(window.location.href);
@@ -58,7 +94,7 @@ function setComponentProps(component: (typeof AVAILABLE_COMPONENTS)[number], pro
   window.location.href = url.toString();
 }
 
-function getComponentProps(component: (typeof AVAILABLE_COMPONENTS)[number]): unknown | null {
+function getComponentProps(component: AvailableComponent): unknown | null {
   const url = new URL(window.location.href);
   const encodedProps = url.searchParams.get(component);
   if (encodedProps) {
@@ -73,7 +109,7 @@ function getComponentProps(component: (typeof AVAILABLE_COMPONENTS)[number]): un
   return null;
 }
 
-function buildComponentControls(component: (typeof AVAILABLE_COMPONENTS)[number]): ComponentPropsControl {
+function buildComponentControls(component: AvailableComponent): ComponentPropsControl {
   return {
     setProps(props) {
       setComponentProps(component, props);
@@ -84,7 +120,7 @@ function buildComponentControls(component: (typeof AVAILABLE_COMPONENTS)[number]
   };
 }
 
-const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], ComponentPropsControl> = {
+const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   clerk: buildComponentControls('clerk'),
   signIn: buildComponentControls('signIn'),
   signUp: buildComponentControls('signUp'),
@@ -105,11 +141,21 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
 
 declare global {
   interface Window {
-    components: Record<(typeof AVAILABLE_COMPONENTS)[number], ComponentPropsControl>;
+    components: Record<AvailableComponent, ComponentPropsControl>;
+    scenario: typeof scenarioControls;
+    AVAILABLE_SCENARIOS: Record<AvailableScenario, AvailableScenario>;
   }
 }
 
 window.components = componentControls;
+window.scenario = scenarioControls;
+window.AVAILABLE_SCENARIOS = AVAILABLE_SCENARIOS.reduce(
+  (acc, scenario) => {
+    acc[scenario] = scenario;
+    return acc;
+  },
+  {} as Record<AvailableScenario, AvailableScenario>,
+);
 
 const Clerk = window.Clerk;
 function assertClerkIsLoaded(c: ClerkType | undefined): asserts c is ClerkType {
@@ -117,8 +163,6 @@ function assertClerkIsLoaded(c: ClerkType | undefined): asserts c is ClerkType {
     throw new Error('Clerk is not loaded');
   }
 }
-
-const app = document.getElementById('app') as HTMLDivElement;
 
 function mountIndex(element: HTMLDivElement) {
   assertClerkIsLoaded(Clerk);
@@ -267,6 +311,17 @@ function otherOptions() {
   return { updateOtherOptions };
 }
 
+const urlParams = new URL(window.location.href).searchParams;
+for (const [component, encodedProps] of urlParams.entries()) {
+  if (AVAILABLE_COMPONENTS.includes(component as AvailableComponent)) {
+    localStorage.setItem(`${COMPONENT_PROPS_NAMESPACE}-${component}`, encodedProps);
+  }
+
+  if (component === 'scenario' && AVAILABLE_SCENARIOS.includes(encodedProps as AvailableScenario)) {
+    localStorage.setItem(`${COMPONENT_PROPS_NAMESPACE}-scenario`, encodedProps);
+  }
+}
+
 void (async () => {
   assertClerkIsLoaded(Clerk);
   fillLocalizationSelect();
@@ -279,6 +334,8 @@ void (async () => {
       sidebars.forEach(s => s.classList.toggle('hidden'));
     }
   });
+
+  const app = document.getElementById('app') as HTMLDivElement;
 
   const routes = {
     '/': () => {
@@ -332,7 +389,8 @@ void (async () => {
       const searchParams = new URLSearchParams(window.location.search);
       const scopes = (searchParams.get('scopes')?.split(',') ?? []).map(scope => ({
         scope,
-        description: `Grants access to your ${scope}`,
+        description: scope === 'offline_access' ? null : `Grants access to your ${scope}`,
+        requires_consent: true,
       }));
       Clerk.__internal_mountOAuthConsent(
         app,
@@ -373,6 +431,17 @@ void (async () => {
   if (route in routes) {
     const renderCurrentRoute = routes[route];
     addCurrentRouteIndicator(route);
+
+    const scenario = getScenario();
+    if (scenario) {
+      const mocking = new PageMocking({
+        onStateChange: state => {
+          console.log('Mocking state changed:', state);
+        },
+      });
+      await mocking.initialize(route, { scenario });
+    }
+
     await Clerk.load({
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
