@@ -6,15 +6,23 @@
 '@clerk/vue': major
 '@clerk/expo': major
 '@clerk/ui': major
+'@clerk/testing': major
 ---
 
-Split `setActive` into purpose-specific methods: `selectSession` and `selectOrganization`
+Replace `setActive` with purpose-specific methods: `selectSession` and `selectOrganization`
 
 ## Breaking Changes
 
+### `setActive` Removed from Public API
+
+The `setActive` method has been removed from the Clerk object and all hooks. Use the new purpose-specific methods instead:
+
+- `clerk.selectSession(session, options?)` - For session selection
+- `clerk.selectOrganization(organization, options?)` - For organization selection
+
 ### Hook Return Types
 
-The following hooks no longer return `setActive`. Use the new purpose-specific methods instead:
+The following hooks no longer return `setActive`:
 
 - `useSignIn()` - now returns `selectSession` instead of `setActive`
 - `useSignUp()` - now returns `selectSession` instead of `setActive`
@@ -66,8 +74,19 @@ await selectOrganization(organization, {
 });
 ```
 
+### Expo Hooks
+
+The `StartGoogleAuthenticationFlowReturnType` and `StartAppleAuthenticationFlowReturnType` types now return `selectSession` instead of `setActive`.
+
 ### Internal Window Hooks (Next.js)
 
 The internal window hooks have been renamed:
 - `__internal_onBeforeSetActive` → `__internal_onBeforeSelectSession`
 - `__internal_onAfterSetActive` → `__internal_onAfterSelectSession`
+
+### Types Removed
+
+The following types have been removed from the public API:
+- `SetActive`
+- `SetActiveParams`
+- `SetActiveNavigate` (use `SelectSessionNavigate` instead)
