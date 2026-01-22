@@ -1,5 +1,5 @@
 import { logger } from '../../logger';
-import type { ClerkOptions, SessionResource, SessionTask, SetActiveParams } from '../../types';
+import type { ClerkOptions, SessionResource, SessionTask, SetSelectedParams } from '../../types';
 import { forwardClerkQueryParams } from './queryParams';
 import { buildURL } from './url';
 
@@ -55,7 +55,7 @@ export function navigateIfTaskExists(
 
 export function warnMissingPendingTaskHandlers(options: Record<string, unknown>) {
   const taskOptions = ['taskUrls', 'navigate'] as Array<
-    keyof (Pick<SetActiveParams, 'navigate'> & Pick<ClerkOptions, 'taskUrls'>)
+    keyof (Pick<SetSelectedParams, 'navigate'> & Pick<ClerkOptions, 'taskUrls'>)
   >;
 
   const hasAtLeastOneOption = Object.keys(options).some(option => taskOptions.includes(option as any));
