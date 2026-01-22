@@ -16,7 +16,7 @@ import type { CustomPage } from './customPages';
 import type { ClerkAPIResponseError } from './errors';
 import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
-import type { LocalizationResource } from './localization';
+import type { LocalizationInput } from './localization';
 import type { DomainOrProxyUrl, MultiDomainAndOrProxy } from './multiDomain';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
@@ -1093,8 +1093,12 @@ export type ClerkOptions = ClerkOptionsNavigation &
     appearance?: any;
     /**
      * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
+     *
+     * Accepts either nested format (e.g., `{ signIn: { start: { title: "..." } } }`)
+     * or flattened format (e.g., `{ "signIn.start.title": "..." }`).
+     * Cannot mix both formats in the same object.
      */
-    localization?: LocalizationResource;
+    localization?: LocalizationInput;
     polling?: boolean;
     /**
      * By default, the last signed-in session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.

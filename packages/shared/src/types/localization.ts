@@ -1,5 +1,5 @@
 import type { FieldId } from './elementIds';
-import type { CamelToSnake, DeepPartial } from './utils';
+import type { CamelToSnake, DeepPartial, RecordToPath } from './utils';
 
 /**
  * @internal
@@ -64,6 +64,41 @@ type DeepLocalizationWithoutObjects<T> = {
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Needs to be an interface for typedoc to link correctly
 export interface LocalizationResource
   extends DeepPartial<DeepLocalizationWithoutObjects<__internal_LocalizationResource>> {}
+
+/**
+ * All valid dot-notation paths for localization keys.
+ * Generated from the internal resource type using existing RecordToPath.
+ */
+export type LocalizationPath = RecordToPath<__internal_LocalizationResource>;
+
+/**
+ * Flattened version of LocalizationResource using dot-notation keys.
+ * Example: "signIn.start.title" instead of { signIn: { start: { title: ... } } }
+ *
+ * Cannot be mixed with nested format - must use one or the other.
+ */
+export type FlattenedLocalizationResource = {
+  [K in LocalizationPath]?: string;
+};
+
+/**
+ * Accepts either nested OR flattened localization format (not mixed).
+ * TypeScript will enforce that you use one format consistently.
+ *
+ * @example
+ * // Nested format (existing):
+ * const nested: LocalizationInput = {
+ *   signIn: { start: { title: "Welcome back" } }
+ * };
+ *
+ * @example
+ * // Flattened format (new):
+ * const flat: LocalizationInput = {
+ *   "signIn.start.title": "Welcome back",
+ *   "signIn.start.subtitle": "Please sign in to continue"
+ * };
+ */
+export type LocalizationInput = LocalizationResource | FlattenedLocalizationResource;
 
 export type __internal_LocalizationResource = {
   locale: string;
