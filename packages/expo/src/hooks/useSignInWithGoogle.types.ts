@@ -1,4 +1,4 @@
-import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
+import type { SelectSessionHook, SignInResource, SignUpResource } from '@clerk/shared/types';
 
 export type StartGoogleAuthenticationFlowParams = {
   unsafeMetadata?: SignUpUnsafeMetadata;
@@ -6,7 +6,7 @@ export type StartGoogleAuthenticationFlowParams = {
 
 export type StartGoogleAuthenticationFlowReturnType = {
   createdSessionId: string | null;
-  setActive?: SetActive;
+  selectSession?: SelectSessionHook;
   signIn?: SignInResource;
   signUp?: SignUpResource;
 };

@@ -770,16 +770,6 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
-   * Set the active session and Organization explicitly.
-   *
-   * If the session param is `null`, the active session is deleted.
-   * In a similar fashion, if the organization param is `null`, the current organization is removed as active.
-   *
-   * @deprecated Use `selectSession()` or `selectOrganization()` instead.
-   */
-  setActive: SetActive;
-
-  /**
    * Select a session to make active.
    *
    * Use this method after sign-in or sign-up to activate the created session,

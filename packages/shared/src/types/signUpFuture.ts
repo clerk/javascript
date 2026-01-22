@@ -1,5 +1,5 @@
 import type { ClerkError } from '../errors/clerkError';
-import type { SetActiveNavigate } from './clerk';
+import type { SelectSessionNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUpCommon';
 import type { Web3Strategy } from './strategies';
@@ -249,7 +249,7 @@ export interface SignUpFutureWeb3Params extends SignUpFutureAdditionalParams {
 }
 
 export interface SignUpFutureFinalizeParams {
-  navigate?: SetActiveNavigate;
+  navigate?: SelectSessionNavigate;
 }
 
 /**

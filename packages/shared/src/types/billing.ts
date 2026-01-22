@@ -1,6 +1,6 @@
 import type { ClerkError } from '@/errors/clerkError';
 
-import type { SetActiveNavigate } from './clerk';
+import type { SelectSessionNavigate } from './clerk';
 import type { DeletedObjectResource } from './deletedObject';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
@@ -983,7 +983,7 @@ type CheckoutFlowInitialized = {
 type CheckoutPropertiesPerStatus = CheckoutFlowUninitialized | CheckoutFlowInitialized;
 
 export interface CheckoutFlowFinalizeParams {
-  navigate: SetActiveNavigate;
+  navigate: SelectSessionNavigate;
 }
 
 /**

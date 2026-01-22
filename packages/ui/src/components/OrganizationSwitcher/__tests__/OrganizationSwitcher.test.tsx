@@ -564,7 +564,7 @@ describe('OrganizationSwitcher', () => {
         }),
       );
 
-      fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+      fixtures.clerk.selectOrganization.mockReturnValueOnce(Promise.resolve());
 
       props.setProps({ hidePersonal: true });
       const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
@@ -576,12 +576,11 @@ describe('OrganizationSwitcher', () => {
       });
       await userEvent.click(getByText('Org2'));
 
-      expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
+      expect(fixtures.clerk.selectOrganization).toHaveBeenCalledWith(
         expect.objectContaining({
-          organization: expect.objectContaining({
-            name: 'Org2',
-          }),
+          name: 'Org2',
         }),
+        expect.anything(),
       );
     });
 
@@ -597,7 +596,7 @@ describe('OrganizationSwitcher', () => {
         });
       });
 
-      fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+      fixtures.clerk.selectOrganization.mockReturnValueOnce(Promise.resolve());
       const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
       expect(fixtures.clerk.user?.getOrganizationMemberships).toHaveBeenCalledTimes(1);
@@ -607,11 +606,7 @@ describe('OrganizationSwitcher', () => {
       });
       await userEvent.click(getByText(/Personal account/i));
 
-      expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
-        expect.objectContaining({
-          organization: null,
-        }),
-      );
+      expect(fixtures.clerk.selectOrganization).toHaveBeenCalledWith(null, expect.anything());
     });
   });
 

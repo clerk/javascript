@@ -972,7 +972,7 @@ class SignUpFuture implements SignUpFutureResource {
       }
 
       this.#hasBeenFinalized = true;
-      await SignUp.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
+      await SignUp.clerk.selectSession(this.#resource.createdSessionId, { navigate });
     });
   }
 }

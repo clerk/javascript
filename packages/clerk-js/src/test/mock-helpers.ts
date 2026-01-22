@@ -99,7 +99,8 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedCle
   });
 
   mockProp(clerkAny, 'navigate');
-  mockProp(clerkAny, 'setActive');
+  mockProp(clerkAny, 'selectSession');
+  mockProp(clerkAny, 'selectOrganization');
   mockProp(clerkAny, 'redirectWithAuth');
   mockProp(clerkAny, '__internal_navigateWithError');
   return clerkAny as DeepVitestMocked<LoadedClerk>;
