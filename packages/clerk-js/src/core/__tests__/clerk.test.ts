@@ -1094,7 +1094,67 @@ describe('Clerk singleton', () => {
       await sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
+        expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined });
+        expect(mockSetActive).toHaveBeenCalled();
+      });
+    });
+
+    it('passes unsafeMetadata to signUp.create during OAuth transfer flow', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_identifier',
+            first_factor_verification: {
+              status: 'transferable',
+              strategy: 'oauth_google',
+              external_verification_redirect_url: '',
+              error: {
+                code: 'external_account_not_found',
+                long_message: 'The External Account was not found.',
+                message: 'Invalid external account',
+              },
+            },
+            second_factor_verification: null,
+            identifier: '',
+            user_data: null,
+            created_session_id: null,
+            created_user_id: null,
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const mockSetActive = vi.fn();
+      const mockSignUpCreate = vi
+        .fn()
+        .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      if (!sut.client) {
+        fail('we should always have a client');
+      }
+      sut.client.signUp.create = mockSignUpCreate;
+      sut.setActive = mockSetActive;
+
+      const unsafeMetadata = { foo: 'bar', nested: { value: 123 } };
+      await sut.handleRedirectCallback({ unsafeMetadata });
+
+      await waitFor(() => {
+        expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata });
         expect(mockSetActive).toHaveBeenCalled();
       });
     });
