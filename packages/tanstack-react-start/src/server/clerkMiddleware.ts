@@ -9,18 +9,23 @@ import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import { loadOptions } from './loadOptions';
-import type { ClerkMiddlewareOptions } from './types';
+import type { ClerkMiddlewareOptions, ClerkMiddlewareOptionsCallback } from './types';
 import { getResponseClerkState, patchRequest } from './utils';
 
-export const clerkMiddleware = (options?: ClerkMiddlewareOptions): AnyRequestMiddleware => {
+export const clerkMiddleware = (
+  options?: ClerkMiddlewareOptions | ClerkMiddlewareOptionsCallback,
+): AnyRequestMiddleware => {
   return createMiddleware().server(async ({ request, next }) => {
     const clerkRequest = createClerkRequest(patchRequest(request));
 
+    // Resolve options: if function, call it with context object; otherwise use as-is
+    const resolvedOptions = typeof options === 'function' ? await options({ url: clerkRequest.clerkUrl }) : options;
+
     // Load options with resolved keys
     const loadedOptions = loadOptions(clerkRequest, {
-      ...options,
-      publishableKey: options?.publishableKey,
-      secretKey: options?.secretKey,
+      ...resolvedOptions,
+      publishableKey: resolvedOptions?.publishableKey,
+      secretKey: resolvedOptions?.secretKey,
     });
 
     // Get keys - either from options, env, or keyless mode
