@@ -16,7 +16,6 @@ type RouteParts = {
 };
 
 type PendingNavigation = {
-  routeParts: RouteParts;
   result: unknown;
   resolve: (value: unknown) => void;
 };
@@ -58,17 +57,18 @@ export const BaseRouter = ({
     path: getPath(),
     queryString: getQueryString(),
   });
-  const [pendingNavigation, setPendingNavigation] = React.useState<PendingNavigation | null>(null);
+  const [pendingNavigations, setPendingNavigations] = React.useState<PendingNavigation[]>([]);
 
-  // Resolve pending navigation after React commits the state update.
+  // Resolve pending navigations after React commits the state update.
   // This replaces flushSync by deferring the promise resolution to an effect,
   // ensuring re-render completes before returning control to the caller.
+  // Using an array ensures multiple rapid navigations all resolve correctly.
   React.useEffect(() => {
-    if (pendingNavigation) {
-      pendingNavigation.resolve(pendingNavigation.result);
-      setPendingNavigation(null);
+    if (pendingNavigations.length > 0) {
+      pendingNavigations.forEach(nav => nav.resolve(nav.result));
+      setPendingNavigations([]);
     }
-  }, [pendingNavigation]);
+  }, [pendingNavigations]);
 
   const currentPath = routeParts.path;
   const currentQueryString = routeParts.queryString;
@@ -148,11 +148,7 @@ export const BaseRouter = ({
     // navigation state before setActive might emit.
     return new Promise(resolve => {
       setRouteParts({ path: toURL.pathname, queryString: toURL.search });
-      setPendingNavigation({
-        routeParts: { path: toURL.pathname, queryString: toURL.search },
-        result: internalNavRes,
-        resolve,
-      });
+      setPendingNavigations(prev => [...prev, { result: internalNavRes, resolve }]);
     });
   };
 
