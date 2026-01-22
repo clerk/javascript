@@ -14,17 +14,10 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<
   'publishableKey'
 > & {
   /**
-   * Your Clerk publishable key, available in the Clerk Dashboard.
-   * This is required for React Native / Expo apps. Environment variables inside node_modules
-   * are not inlined during production builds, so the key must be passed explicitly.
-   *
-   * @example
-   * ```tsx
-   * const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
-   * <ClerkProvider publishableKey={publishableKey}>
-   * ```
+   * Used to override the default EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY env variable if needed.
+   * This is optional for Expo as the ClerkProvider will automatically use the EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY env variable if it exists.
    */
-  publishableKey: string;
+  publishableKey?: string;
   /**
    * The token cache is used to persist the active user's session token. Clerk stores this token in memory by default, however it is recommended to use a token cache for production applications.
    * @see https://clerk.com/docs/quickstarts/expo#configure-the-token-cache-with-expo
@@ -60,7 +53,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     __experimental_resourceCache,
     ...rest
   } = props;
-  const pk = publishableKey;
+  const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
 
   if (isWeb()) {
     // This is needed in order for useOAuth to work correctly on web.
