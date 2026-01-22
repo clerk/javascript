@@ -1,5 +1,8 @@
+import { Readable } from 'stream';
+
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
+import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH } from '@clerk/backend/proxy';
 import { deprecated } from '@clerk/shared/deprecated';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
@@ -9,7 +12,7 @@ import type { RequestHandler, Response } from 'express';
 import { clerkClient as defaultClerkClient } from './clerkClient';
 import { satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from './errors';
 import type { AuthenticateRequestParams, ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
-import { incomingMessageToRequest, loadApiEnv, loadClientEnv } from './utils';
+import { incomingMessageToRequest, loadApiEnv, loadClientEnv, requestToProxyRequest } from './utils';
 
 /**
  * @internal
@@ -101,17 +104,79 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
   const clerkClient = options.clerkClient || defaultClerkClient;
   const enableHandshake = options.enableHandshake ?? true;
 
+  // Extract proxy configuration with defaults
+  const frontendApiProxy = options.frontendApiProxy;
+  const proxyEnabled = frontendApiProxy?.enabled ?? true;
+  const proxyPath = frontendApiProxy?.path ?? DEFAULT_PROXY_PATH;
+
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const middleware: RequestHandler = async (request, response, next) => {
     if ((request as ExpressRequestWithAuth).auth) {
       return next();
     }
 
+    const env = { ...loadApiEnv(), ...loadClientEnv() };
+    const publishableKey = options.publishableKey || env.publishableKey;
+    const secretKey = options.secretKey || env.secretKey;
+
+    // Handle Frontend API proxy requests early, before authentication
+    if (frontendApiProxy && proxyEnabled) {
+      const requestPath = request.originalUrl || request.url;
+      if (requestPath.startsWith(proxyPath)) {
+        // Convert Express request to Fetch API Request
+        const proxyRequest = requestToProxyRequest(request);
+
+        // Call the core proxy function
+        const proxyResponse = await clerkFrontendApiProxy(proxyRequest, {
+          proxyPath,
+          publishableKey,
+          secretKey,
+        });
+
+        // Send the proxy response back to the client
+        response.status(proxyResponse.status);
+        proxyResponse.headers.forEach((value, key) => {
+          response.setHeader(key, value);
+        });
+
+        if (proxyResponse.body) {
+          const reader = proxyResponse.body.getReader();
+          const stream = new Readable({
+            async read() {
+              try {
+                const { done, value } = await reader.read();
+                if (done) {
+                  this.push(null);
+                } else {
+                  this.push(Buffer.from(value));
+                }
+              } catch (error) {
+                this.destroy(error instanceof Error ? error : new Error(String(error)));
+              }
+            },
+          });
+          stream.pipe(response);
+        } else {
+          response.end();
+        }
+        return;
+      }
+    }
+
+    // Auto-derive proxyUrl from frontendApiProxy config if not explicitly set
+    let resolvedOptions = options;
+    if (frontendApiProxy && proxyEnabled && !options.proxyUrl) {
+      const protocol = request.secure || request.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+      const host = request.headers['x-forwarded-host'] || request.headers.host || 'localhost';
+      const derivedProxyUrl = `${protocol}://${host}${proxyPath}`;
+      resolvedOptions = { ...options, proxyUrl: derivedProxyUrl };
+    }
+
     try {
       const requestState = await authenticateRequest({
         clerkClient,
         request,
-        options,
+        options: resolvedOptions,
       });
 
       if (enableHandshake) {

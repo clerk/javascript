@@ -393,9 +393,22 @@ export const createAuthenticateRequestOptions = (
   clerkRequest: ClerkRequest,
   options: ClerkMiddlewareOptions,
 ): Parameters<AuthenticateRequest>[1] => {
+  // Auto-derive proxyUrl from frontendApiProxy config if not explicitly set
+  let resolvedOptions = options;
+  if (options.frontendApiProxy && !options.proxyUrl) {
+    const { enabled, path: proxyPath = DEFAULT_PROXY_PATH } = options.frontendApiProxy;
+    const requestUrl = new URL(clerkRequest.url);
+    const isEnabled = typeof enabled === 'function' ? enabled(requestUrl) : enabled;
+
+    if (isEnabled) {
+      const derivedProxyUrl = `${requestUrl.origin}${proxyPath}`;
+      resolvedOptions = { ...options, proxyUrl: derivedProxyUrl };
+    }
+  }
+
   return {
-    ...options,
-    ...handleMultiDomainAndProxy(clerkRequest, options),
+    ...resolvedOptions,
+    ...handleMultiDomainAndProxy(clerkRequest, resolvedOptions),
     // TODO: Leaving the acceptsToken as 'any' opens up the possibility of
     // an economic attack. We should revisit this and only verify a token
     // when auth() or auth.protect() is invoked.

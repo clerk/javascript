@@ -1,14 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, fapiUrlFromPublishableKey, matchProxyPath } from '../proxy';
+import { clerkFrontendApiProxy, fapiUrlFromPublishableKey, matchProxyPath } from '../proxy';
 
 describe('proxy', () => {
-  describe('DEFAULT_PROXY_PATH', () => {
-    it('should be /__clerk', () => {
-      expect(DEFAULT_PROXY_PATH).toBe('/__clerk');
-    });
-  });
-
   describe('fapiUrlFromPublishableKey', () => {
     it('returns production FAPI URL for production publishable keys', () => {
       const pk = 'pk_live_Y2xlcmsuZXhhbXBsZS5jb20k'; // clerk.example.com

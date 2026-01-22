@@ -1100,4 +1100,67 @@ describe('frontendApiProxy multi-domain support', () => {
     await clerkMiddleware({ frontendApiProxy: { enabled: shouldProxy } })(req2, {} as NextFetchEvent);
     expect((await clerkClient()).authenticateRequest).not.toBeCalled();
   });
+
+  it('auto-derives proxyUrl from frontendApiProxy config for handshake redirects', async () => {
+    // Request to a non-proxy path should go through auth with derived proxyUrl
+    const req = new NextRequest('https://myapp.example.com/dashboard');
+
+    await clerkMiddleware({
+      frontendApiProxy: { enabled: true, path: '/__clerk' },
+    })(req, {} as NextFetchEvent);
+
+    // authenticateRequest should be called with the derived proxyUrl
+    expect((await clerkClient()).authenticateRequest).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        proxyUrl: 'https://myapp.example.com/__clerk',
+      }),
+    );
+  });
+
+  it('auto-derives proxyUrl with custom proxy path', async () => {
+    const req = new NextRequest('https://myapp.example.com/dashboard');
+
+    await clerkMiddleware({
+      frontendApiProxy: { enabled: true, path: '/custom-clerk-proxy' },
+    })(req, {} as NextFetchEvent);
+
+    expect((await clerkClient()).authenticateRequest).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        proxyUrl: 'https://myapp.example.com/custom-clerk-proxy',
+      }),
+    );
+  });
+
+  it('does not derive proxyUrl when frontendApiProxy is not configured', async () => {
+    const req = new NextRequest('https://myapp.example.com/dashboard');
+
+    await clerkMiddleware()(req, {} as NextFetchEvent);
+
+    // authenticateRequest should be called without proxyUrl
+    expect((await clerkClient()).authenticateRequest).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.not.objectContaining({
+        proxyUrl: expect.any(String),
+      }),
+    );
+  });
+
+  it('does not override explicit proxyUrl option', async () => {
+    const req = new NextRequest('https://myapp.example.com/dashboard');
+
+    await clerkMiddleware({
+      frontendApiProxy: { enabled: true, path: '/__clerk' },
+      proxyUrl: 'https://custom-proxy.example.com/__clerk',
+    })(req, {} as NextFetchEvent);
+
+    // Should use the explicit proxyUrl, not the derived one
+    expect((await clerkClient()).authenticateRequest).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        proxyUrl: 'https://custom-proxy.example.com/__clerk',
+      }),
+    );
+  });
 });

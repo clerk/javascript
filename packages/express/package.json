@@ -43,16 +43,6 @@
         "default": "./dist/webhooks.js"
       }
     },
-    "./proxy": {
-      "import": {
-        "types": "./dist/proxy.d.mts",
-        "default": "./dist/proxy.mjs"
-      },
-      "require": {
-        "types": "./dist/proxy.d.ts",
-        "default": "./dist/proxy.js"
-      }
-    },
     "./env": "./env.d.ts",
     "./package.json": "./package.json"
   },

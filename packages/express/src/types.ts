@@ -7,6 +7,25 @@ export type ExpressRequestWithAuth = ExpressRequest & {
   auth: (options?: PendingSessionOptions) => SignedInAuthObject | SignedOutAuthObject;
 };
 
+/**
+ * Options for configuring Frontend API proxy in clerkMiddleware
+ */
+export interface FrontendApiProxyOptions {
+  /**
+   * Enable proxy path skipping. When true, requests to the proxy path will
+   * bypass authentication to avoid redirect loops.
+   *
+   * @default true
+   */
+  enabled?: boolean;
+  /**
+   * The path prefix for proxy requests.
+   *
+   * @default '/__clerk'
+   */
+  path?: string;
+}
+
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;
   clerkClient?: ClerkClient;
@@ -18,6 +37,24 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
    * @default true
    */
   enableHandshake?: boolean;
+  /**
+   * Configure Frontend API proxy handling. When set, requests to the proxy path
+   * will skip authentication, and the proxyUrl will be automatically derived
+   * for handshake redirects.
+   *
+   * @example
+   * // Use defaults (path: '/__clerk', enabled: true)
+   * clerkMiddleware({ frontendApiProxy: {} })
+   *
+   * @example
+   * // Custom path
+   * clerkMiddleware({ frontendApiProxy: { path: '/my-proxy' } })
+   *
+   * @example
+   * // Disable proxy handling
+   * clerkMiddleware({ frontendApiProxy: { enabled: false } })
+   */
+  frontendApiProxy?: FrontendApiProxyOptions;
 };
 
 type ClerkClient = ReturnType<typeof createClerkClient>;

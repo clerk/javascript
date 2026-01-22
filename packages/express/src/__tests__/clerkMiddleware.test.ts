@@ -3,7 +3,7 @@ import { vi } from 'vitest';
 
 import { clerkMiddleware } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
-import { assertNoDebugHeaders, assertSignedOutDebugHeaders, runMiddleware } from './helpers';
+import { assertNoDebugHeaders, assertSignedOutDebugHeaders, runMiddleware, runMiddlewareOnPath } from './helpers';
 
 describe('clerkMiddleware', () => {
   // TODO(dimkl): Fix issue that makes test order matter, until then keep this test suite first
@@ -113,6 +113,54 @@ describe('clerkMiddleware', () => {
     }).expect(200);
 
     assertNoDebugHeaders(response);
+  });
+
+  describe('Frontend API proxy handling', () => {
+    it('authenticates default path when custom proxy path is set', async () => {
+      // When using a custom path, the default /__clerk should be authenticated
+      const response = await runMiddlewareOnPath(
+        clerkMiddleware({ frontendApiProxy: { path: '/custom-clerk-proxy' } }),
+        '/__clerk/v1/client',
+        {
+          Cookie: '__client_uat=1711618859;',
+          'Sec-Fetch-Dest': 'document',
+        },
+      ).expect(307);
+
+      expect(response.header).toHaveProperty('x-clerk-auth-status', 'handshake');
+    });
+
+    it('authenticates proxy paths when enabled is false', async () => {
+      const response = await runMiddlewareOnPath(
+        clerkMiddleware({ frontendApiProxy: { enabled: false } }),
+        '/__clerk/v1/client',
+        {
+          Cookie: '__client_uat=1711618859;',
+          'Sec-Fetch-Dest': 'document',
+        },
+      ).expect(307);
+
+      expect(response.header).toHaveProperty('x-clerk-auth-status', 'handshake');
+    });
+
+    it('does not handle proxy paths when frontendApiProxy is not configured', async () => {
+      // Without frontendApiProxy option, proxy paths go through normal auth
+      const response = await runMiddlewareOnPath(clerkMiddleware(), '/__clerk/v1/client', {
+        Cookie: '__client_uat=1711618859;',
+        'Sec-Fetch-Dest': 'document',
+      }).expect(307);
+
+      expect(response.header).toHaveProperty('x-clerk-auth-status', 'handshake');
+    });
+
+    it('still authenticates requests to other paths when proxy is configured', async () => {
+      const response = await runMiddlewareOnPath(clerkMiddleware({ frontendApiProxy: {} }), '/api/users', {
+        Cookie: '__client_uat=1711618859;',
+        'Sec-Fetch-Dest': 'document',
+      }).expect(307);
+
+      expect(response.header).toHaveProperty('x-clerk-auth-status', 'handshake');
+    });
   });
 
   it('calls next with an error when request URL is invalid', () => {
