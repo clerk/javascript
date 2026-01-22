@@ -43,12 +43,12 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
    * for handshake redirects.
    *
    * @example
-   * // Use defaults (path: '/__clerk', enabled: true)
-   * clerkMiddleware({ frontendApiProxy: {} })
+   * // Enable with defaults (path: '/__clerk')
+   * clerkMiddleware({ frontendApiProxy: { enabled: true } })
    *
    * @example
    * // Custom path
-   * clerkMiddleware({ frontendApiProxy: { path: '/my-proxy' } })
+   * clerkMiddleware({ frontendApiProxy: { enabled: true, path: '/my-proxy' } })
    *
    * @example
    * // Disable proxy handling
