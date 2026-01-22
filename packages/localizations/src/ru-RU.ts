@@ -897,6 +897,10 @@ export const ruRU: LocalizationResource = {
       actionLink: 'Выйти',
       actionText: 'Вошли как {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Организация уже существует для обнаруженного названия компании ({{organizationName}}) и {{organizationDomain}}. Присоединяйтесь по приглашению.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,
