@@ -25,9 +25,16 @@ const getEnvVar = (name: string): string => {
  * Helper to get env fallback only when the option is undefined.
  * We check for undefined specifically (not falsy) to avoid conflicting with framework SDKs
  * that may pass an empty string when their env var is not set.
+ *
+ * Returns the env var value only if it's non-empty, otherwise returns undefined
+ * to preserve the original behavior when no env var is set.
  */
-const withEnvFallback = (value: string | undefined, envVarName: string): string => {
-  return value !== undefined ? value : getEnvVar(envVarName);
+const withEnvFallback = (value: string | undefined, envVarName: string): string | undefined => {
+  if (value !== undefined) {
+    return value;
+  }
+  const envValue = getEnvVar(envVarName);
+  return envValue || undefined;
 };
 
 /**

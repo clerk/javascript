@@ -113,14 +113,15 @@ describe('mergeWithEnv', () => {
     expect(result.signInUrl).toBe('');
   });
 
-  it('returns empty strings when neither options nor env vars are set', () => {
+  it('returns undefined when neither options nor env vars are set', () => {
     mockedGetEnvVariable.mockReturnValue('');
 
     const result = mergeWithEnv({} as any);
 
-    expect(result.publishableKey).toBe('');
-    expect(result.signInUrl).toBe('');
-    expect(result.signUpUrl).toBe('');
+    // When env vars are not set, we return undefined to avoid overriding downstream defaults
+    expect(result.publishableKey).toBeUndefined();
+    expect(result.signInUrl).toBeUndefined();
+    expect(result.signUpUrl).toBeUndefined();
   });
 
   it('preserves other options that are not env-var backed', () => {
