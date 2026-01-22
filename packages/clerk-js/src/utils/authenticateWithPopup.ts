@@ -53,7 +53,7 @@ export async function _authenticateWithPopup(
           console.error(e);
         }
       }
-      await client.setActive({
+      await client.setSelected({
         session: event.data.session,
         redirectUrl: params.redirectUrlComplete,
       });

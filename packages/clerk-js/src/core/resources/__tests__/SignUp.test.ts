@@ -666,11 +666,11 @@ describe('SignUp', () => {
         vi.clearAllMocks();
       });
 
-      it('calls setActive with created session ID', async () => {
+      it('calls setSelected with created session ID', async () => {
         const mockSetActive = vi.fn().mockResolvedValue({});
 
         SignUp.clerk = {
-          setActive: mockSetActive,
+          setSelected: mockSetActive,
         } as any;
 
         const signUp = new SignUp({ id: 'signup_123', created_session_id: 'session_123' } as any);
@@ -679,12 +679,12 @@ describe('SignUp', () => {
         expect(mockSetActive).toHaveBeenCalledWith({ session: 'session_123', navigate: undefined });
       });
 
-      it('passes navigate parameter to setActive', async () => {
+      it('passes navigate parameter to setSelected', async () => {
         const mockSetActive = vi.fn().mockResolvedValue({});
         const mockNavigate = vi.fn();
 
         SignUp.clerk = {
-          setActive: mockSetActive,
+          setSelected: mockSetActive,
         } as any;
 
         const signUp = new SignUp({ id: 'signup_123', created_session_id: 'session_123' } as any);

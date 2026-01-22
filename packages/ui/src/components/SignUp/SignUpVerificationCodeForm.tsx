@@ -26,7 +26,7 @@ type SignInFactorOneCodeFormProps = {
 
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
   const { afterSignUpUrl, navigateOnSetActive, isCombinedFlow: _isCombinedFlow } = useSignUpContext();
-  const { setActive } = useClerk();
+  const { setSelected } = useClerk();
   const { navigate } = useRouter();
 
   const isWithinSignInContext = !!React.useContext(SignInContext);
@@ -48,7 +48,7 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
           verifyPhonePath: '../verify-phone-number',
           continuePath: '../continue',
           handleComplete: () =>
-            setActive({
+            setSelected({
               session: res.createdSessionId,
               navigate: async ({ session }) => {
                 await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });

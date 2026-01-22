@@ -239,7 +239,7 @@ function SignInStartInternal(): JSX.Element {
             return navigate('client-trust');
           case 'complete':
             removeClerkQueryParam('__clerk_ticket');
-            return clerk.setActive({
+            return clerk.setSelected({
               session: res.createdSessionId,
               navigate: async ({ session }) => {
                 await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
@@ -395,7 +395,7 @@ function SignInStartInternal(): JSX.Element {
         case 'needs_client_trust':
           return navigate('client-trust');
         case 'complete':
-          return clerk.setActive({
+          return clerk.setSelected({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
               await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
@@ -449,7 +449,7 @@ function SignInStartInternal(): JSX.Element {
     if (instantPasswordError) {
       await signInWithFields(identifierField);
     } else if (sessionAlreadyExistsError) {
-      await clerk.setActive({
+      await clerk.setSelected({
         session: clerk.client.lastActiveSessionId,
         navigate: async ({ session }) => {
           await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
@@ -458,7 +458,7 @@ function SignInStartInternal(): JSX.Element {
     } else if (alreadySignedInError) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const sid = alreadySignedInError.meta!.sessionId!;
-      await clerk.setActive({
+      await clerk.setSelected({
         session: sid,
         navigate: async ({ session }) => {
           await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });

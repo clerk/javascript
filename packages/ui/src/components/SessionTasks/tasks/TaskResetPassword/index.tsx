@@ -91,7 +91,7 @@ const TaskResetPasswordInternal = () => {
         ]);
 
         // Update session to have the latest list of tasks (eg: if reset-password gets resolved)
-        await clerk.setActive({
+        await clerk.setSelected({
           session: clerk.session,
           navigate: async ({ session }) => {
             await navigateOnSetActive?.({ session, redirectUrlComplete });

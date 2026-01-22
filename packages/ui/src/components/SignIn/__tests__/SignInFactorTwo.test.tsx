@@ -61,7 +61,7 @@ describe('SignInFactorTwo', () => {
 
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
       await waitFor(() => {
-        expect(fixtures.clerk.setActive).toHaveBeenCalled();
+        expect(fixtures.clerk.setSelected).toHaveBeenCalled();
       });
     });
 
@@ -86,7 +86,7 @@ describe('SignInFactorTwo', () => {
 
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
       await waitFor(() => {
-        expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+        expect(fixtures.clerk.setSelected).not.toHaveBeenCalled();
         expect(fixtures.router.navigate).toHaveBeenCalledWith(
           '../reset-password-success?createdSessionId=1234_session_id',
         );

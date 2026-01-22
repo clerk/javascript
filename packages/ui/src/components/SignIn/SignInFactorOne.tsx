@@ -63,7 +63,7 @@ function determineAlternativeMethodsMode(
 }
 
 function SignInFactorOneInternal(): JSX.Element {
-  const { __internal_setActiveInProgress } = useClerk();
+  const { __internal_setSelectedInProgress } = useClerk();
   const signIn = useCoreSignIn();
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
   const availableFactors = signIn.supportedFirstFactors;
@@ -108,7 +108,7 @@ function SignInFactorOneInternal(): JSX.Element {
   const [passwordErrorCode, setPasswordErrorCode] = React.useState<PasswordErrorCode | null>(null);
 
   React.useEffect(() => {
-    if (__internal_setActiveInProgress) {
+    if (__internal_setSelectedInProgress) {
       return;
     }
 
@@ -118,7 +118,7 @@ function SignInFactorOneInternal(): JSX.Element {
     if (signIn.status === 'needs_identifier' || signIn.status === null) {
       void router.navigate('../');
     }
-  }, [__internal_setActiveInProgress]);
+  }, [__internal_setSelectedInProgress]);
 
   if (!currentFactor) {
     return signIn.status ? (

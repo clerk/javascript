@@ -117,7 +117,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
               password: password,
             });
 
-            await clerk.setActive({
+            await clerk.setSelected({
               session: signIn.createdSessionId,
             });
 
@@ -191,10 +191,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
         async ({ user1SessionId, user2SessionId }) => {
           const clerk = (window as any).Clerk;
 
-          await clerk.setActive({ session: user1SessionId });
+          await clerk.setSelected({ session: user1SessionId });
           const user1Token = await clerk.session?.getToken();
 
-          await clerk.setActive({ session: user2SessionId });
+          await clerk.setSelected({ session: user2SessionId });
           const user2Token = await clerk.session?.getToken();
 
           return {

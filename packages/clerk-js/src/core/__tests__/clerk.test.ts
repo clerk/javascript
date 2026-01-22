@@ -157,7 +157,7 @@ describe('Clerk singleton', () => {
     });
   });
 
-  describe('.setActive', () => {
+  describe('.setSelected', () => {
     describe('with `active` session status', () => {
       const mockSession = {
         id: '1',
@@ -190,7 +190,7 @@ describe('Clerk singleton', () => {
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
-        await sut.setActive({ session: null });
+        await sut.setSelected({ session: null });
         await waitFor(() => {
           expect(mockSession.touch).not.toHaveBeenCalled();
           expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: null });
@@ -203,7 +203,7 @@ describe('Clerk singleton', () => {
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        await sut.setSelected({ session: mockSession as any as ActiveSessionResource });
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
@@ -214,7 +214,7 @@ describe('Clerk singleton', () => {
 
           const sut = new Clerk(productionPublishableKey);
           await sut.load({ touchSession: false });
-          await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+          await sut.setSelected({ session: mockSession as any as ActiveSessionResource });
           expect(mockSession.touch).toHaveBeenCalled();
         });
       });
@@ -229,7 +229,7 @@ describe('Clerk singleton', () => {
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        await sut.setSelected({ session: mockSession as any as ActiveSessionResource });
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
@@ -243,7 +243,7 @@ describe('Clerk singleton', () => {
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        await sut.setSelected({ session: mockSession as any as ActiveSessionResource });
       });
 
       it('sets active organization by slug', async () => {
@@ -274,7 +274,7 @@ describe('Clerk singleton', () => {
         });
         mockSession2.getToken.mockImplementation(() => 'mocked-token');
 
-        await sut.setActive({ organization: 'some-org-slug' });
+        await sut.setSelected({ organization: 'some-org-slug' });
 
         await waitFor(() => {
           expect(mockSession2.touch).toHaveBeenCalled();
@@ -299,7 +299,7 @@ describe('Clerk singleton', () => {
         const sut = new Clerk(productionPublishableKey);
         sut.navigate = vi.fn();
         await sut.load();
-        await sut.setActive({
+        await sut.setSelected({
           session: mockSession as any as ActiveSessionResource,
           redirectUrl: '/redirect-url-path',
         });
@@ -323,7 +323,7 @@ describe('Clerk singleton', () => {
         const sut = new Clerk(productionPublishableKey);
         sut.navigate = vi.fn();
         await sut.load();
-        await sut.setActive({
+        await sut.setSelected({
           session: mockSession as any as ActiveSessionResource,
           redirectUrl: '/redirect-url-path',
         });
@@ -345,7 +345,7 @@ describe('Clerk singleton', () => {
         const sut = new Clerk(productionPublishableKey);
         sut.navigate = vi.fn();
         await sut.load();
-        await sut.setActive({
+        await sut.setSelected({
           session: mockSession as any as ActiveSessionResource,
           redirectUrl: '/redirect-url-path',
         });
@@ -359,7 +359,7 @@ describe('Clerk singleton', () => {
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
-        await sut.setActive({ session: mockSession as any as PendingSessionResource, navigate });
+        await sut.setSelected({ session: mockSession as any as PendingSessionResource, navigate });
         expect(mockSession.touch).toHaveBeenCalled();
         expect(navigate).toHaveBeenCalled();
       });
@@ -376,7 +376,7 @@ describe('Clerk singleton', () => {
             return Promise.resolve();
           });
 
-          await sut.setActive({ organization: { id: 'org_id' } as Organization });
+          await sut.setSelected({ organization: { id: 'org_id' } as Organization });
 
           expect(mockSession.touch).toHaveBeenCalled();
           expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
@@ -431,7 +431,7 @@ describe('Clerk singleton', () => {
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
-        await sut.setActive({ session: mockSession as any as PendingSessionResource });
+        await sut.setSelected({ session: mockSession as any as PendingSessionResource });
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
@@ -444,7 +444,7 @@ describe('Clerk singleton', () => {
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        await sut.setSelected({ session: mockSession as any as ActiveSessionResource });
         expect(onBeforeSetActive).not.toHaveBeenCalled();
       });
 
@@ -457,7 +457,7 @@ describe('Clerk singleton', () => {
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        await sut.setSelected({ session: mockSession as any as ActiveSessionResource });
         expect(onAfterSetActive).not.toHaveBeenCalled();
       });
 
@@ -472,7 +472,7 @@ describe('Clerk singleton', () => {
             'choose-organization': '/choose-organization',
           },
         });
-        await sut.setActive({ session: mockSession as any as PendingSessionResource });
+        await sut.setSelected({ session: mockSession as any as PendingSessionResource });
         expect(mockSession.touch).toHaveBeenCalled();
         expect(sut.navigate).toHaveBeenCalledWith('/choose-organization');
       });
@@ -484,7 +484,7 @@ describe('Clerk singleton', () => {
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
-        await sut.setActive({ session: mockSession as any as PendingSessionResource, navigate });
+        await sut.setSelected({ session: mockSession as any as PendingSessionResource, navigate });
         expect(mockSession.touch).toHaveBeenCalled();
         expect(navigate).toHaveBeenCalled();
       });
@@ -555,7 +555,7 @@ describe('Clerk singleton', () => {
         });
         mockSessionWithOrganization.getToken.mockImplementation(() => 'mocked-token');
 
-        await sut.setActive({ organization: 'some-org-slug' });
+        await sut.setSelected({ organization: 'some-org-slug' });
 
         await waitFor(() => {
           expect(mockSessionWithOrganization.touch).toHaveBeenCalled();
@@ -566,7 +566,7 @@ describe('Clerk singleton', () => {
           expect(sut.session).toMatchObject(mockSessionWithOrganization);
         });
 
-        await sut.setActive({ organization: null });
+        await sut.setSelected({ organization: null });
         expect(sut.session).toMatchObject(mockSessionWithOrganization);
       });
     });
@@ -938,7 +938,7 @@ describe('Clerk singleton', () => {
       });
     });
 
-    it('creates a new user and calls setActive if the user was not found during sso signup', async () => {
+    it('creates a new user and calls setSelected if the user was not found during sso signup', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -987,7 +987,7 @@ describe('Clerk singleton', () => {
         fail('we should always have a client');
       }
       sut.client.signUp.create = mockSignUpCreate;
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
 
       await sut.handleRedirectCallback();
 
@@ -1046,7 +1046,7 @@ describe('Clerk singleton', () => {
         fail('we should always have a client');
       }
       sut.client.signUp.create = mockSignUpCreate;
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
 
       await sut.handleRedirectCallback({ transferable: false });
 
@@ -1178,7 +1178,7 @@ describe('Clerk singleton', () => {
         fail('we should always have a client');
       }
       sut.client.signIn.create = mockSignInCreate;
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
 
       await sut.handleRedirectCallback();
 
@@ -1188,7 +1188,7 @@ describe('Clerk singleton', () => {
       });
     });
 
-    it('signs the user by calling setActive if the user was already signed in during sign up', async () => {
+    it('signs the user by calling setSelected if the user was already signed in during sign up', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -1230,7 +1230,7 @@ describe('Clerk singleton', () => {
       const mockSetActive = vi.fn();
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
 
       await sut.handleRedirectCallback();
 
@@ -1239,7 +1239,7 @@ describe('Clerk singleton', () => {
       });
     });
 
-    it('creates a new user and calls setActive in if the user was found during sign in', async () => {
+    it('creates a new user and calls setSelected in if the user was found during sign in', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -1284,7 +1284,7 @@ describe('Clerk singleton', () => {
         fail('we should always have a client');
       }
       sut.client.signUp.create = mockSignUpCreate;
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
 
       await sut.handleRedirectCallback();
 
@@ -1950,7 +1950,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
 
       const redirectUrlComplete = '/redirect-to';
       await sut.handleEmailLinkVerification({ redirectUrlComplete });
@@ -1979,7 +1979,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
 
       const redirectUrl = '/2fa';
       sut.handleEmailLinkVerification({ redirectUrl });
@@ -2010,7 +2010,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
 
       const redirectUrlComplete = '/redirect-to';
       await sut.handleEmailLinkVerification({ redirectUrlComplete });
@@ -2039,7 +2039,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
 
       const redirectUrl = '/next-up';
       sut.handleEmailLinkVerification({ redirectUrl });
@@ -2064,7 +2064,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
 
       await expect(async () => {
         await sut.handleEmailLinkVerification({});
@@ -2086,7 +2086,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
 
       await expect(async () => {
         await sut.handleEmailLinkVerification({});
@@ -2110,7 +2110,7 @@ describe('Clerk singleton', () => {
       const mockSetActive = vi.fn();
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
       const res = { ping: 'ping' };
       const cb = () => {
         res.ping = 'pong';
@@ -2133,7 +2133,7 @@ describe('Clerk singleton', () => {
       const mockSetActive = vi.fn();
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
       await expect(async () => {
         await sut.handleEmailLinkVerification({});
       }).rejects.toThrow(EmailLinkErrorCodeStatus.Failed);
@@ -2158,7 +2158,7 @@ describe('Clerk singleton', () => {
       const mockSetActive = vi.fn();
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
-      sut.setActive = mockSetActive;
+      sut.setSelected = mockSetActive;
 
       await expect(async () => {
         await sut.handleEmailLinkVerification({});
@@ -2391,7 +2391,7 @@ describe('Clerk singleton', () => {
       const sut = new Clerk(productionPublishableKey);
 
       // Manually set the initial client and session state to simulate active session
-      // without going through load() or setActive()
+      // without going through load() or setSelected()
       sut.updateClient(mockInitialClient as any);
 
       // Verify we start with an active session

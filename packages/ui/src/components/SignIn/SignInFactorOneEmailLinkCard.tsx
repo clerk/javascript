@@ -29,7 +29,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const { signInUrl } = signInContext;
   const { navigate } = useRouter();
   const { afterSignInUrl } = useSignInContext();
-  const { setActive } = useClerk();
+  const { setSelected } = useClerk();
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signIn);
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
   const clerk = useClerk();
@@ -72,7 +72,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
 
   const completeSignInFlow = async (si: SignInResource) => {
     if (si.status === 'complete') {
-      return setActive({
+      return setSelected({
         session: si.createdSessionId,
         redirectUrl: afterSignInUrl,
       });

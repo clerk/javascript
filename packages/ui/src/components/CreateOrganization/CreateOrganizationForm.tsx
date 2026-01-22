@@ -41,7 +41,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
   const lastCreatedOrganizationRef = React.useRef<OrganizationResource | null>(null);
-  const { createOrganization, isLoaded, setActive, userMemberships } = useOrganizationList({
+  const { createOrganization, isLoaded, setSelected, userMemberships } = useOrganizationList({
     userMemberships: organizationListParams.userMemberships,
   });
   const { organization } = useOrganization();
@@ -89,7 +89,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
       }
 
       lastCreatedOrganizationRef.current = organization;
-      await setActive({ organization });
+      await setSelected({ organization });
 
       void userMemberships.revalidate?.();
 

@@ -36,7 +36,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const card = useCardState();
   const { navigate } = useRouter();
   const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
-  const { setActive } = useClerk();
+  const { setSelected } = useClerk();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
 
@@ -96,7 +96,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
 
         switch (res.status) {
           case 'complete':
-            return setActive({
+            return setSelected({
               session: res.createdSessionId,
               navigate: async ({ session }) => {
                 await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });

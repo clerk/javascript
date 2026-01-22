@@ -31,7 +31,7 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
   const signInContext = useSignInContext();
   const { signInUrl } = signInContext;
   const { afterSignInUrl } = useSignInContext();
-  const { setActive } = useClerk();
+  const { setSelected } = useClerk();
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signIn);
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
   const clerk = useClerk();
@@ -68,7 +68,7 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
     } else if (ver.verifiedFromTheSameClient()) {
       setShowVerifyModal(true);
     } else {
-      await setActive({
+      await setSelected({
         session: si.createdSessionId,
         redirectUrl: afterSignInUrl,
       });

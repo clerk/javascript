@@ -20,7 +20,7 @@ export const SignUpEmailLinkCard = () => {
   const { afterSignUpUrl, navigateOnSetActive } = signUpContext;
   const card = useCardState();
   const { navigate } = useRouter();
-  const { setActive } = useClerk();
+  const { setSelected } = useClerk();
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
 
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signUp);
@@ -57,7 +57,7 @@ export const SignUpEmailLinkCard = () => {
         verifyEmailPath: '../verify-email-address',
         verifyPhonePath: '../verify-phone-number',
         handleComplete: () =>
-          setActive({
+          setSelected({
             session: su.createdSessionId,
             navigate: async ({ session }) => {
               await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });

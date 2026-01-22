@@ -25,7 +25,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
   const { onShowAlternativeMethodsClicked } = props;
   const signIn = useCoreSignIn();
   const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
-  const { setActive } = useClerk();
+  const { setSelected } = useClerk();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
   const card = useCardState();
@@ -52,7 +52,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
               queryParams.set('createdSessionId', res.createdSessionId);
               return navigate(`../reset-password-success?${queryParams.toString()}`);
             }
-            return setActive({
+            return setSelected({
               session: res.createdSessionId,
               navigate: async ({ session }) => {
                 await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });

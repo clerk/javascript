@@ -41,7 +41,7 @@ function SignUpStartInternal(): JSX.Element {
   const { userSettings, authConfig } = useEnvironment();
   const { navigate } = useRouter();
   const { attributes } = userSettings;
-  const { setActive } = useClerk();
+  const { setSelected } = useClerk();
   const ctx = useSignUpContext();
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const { afterSignUpUrl, signInUrl, unsafeMetadata, navigateOnSetActive } = ctx;
@@ -168,7 +168,7 @@ function SignUpStartInternal(): JSX.Element {
           handleComplete: () => {
             removeClerkQueryParam('__clerk_ticket');
             removeClerkQueryParam('__clerk_invitation_token');
-            return setActive({
+            return setSelected({
               session: signUp.createdSessionId,
               navigate: async ({ session }) => {
                 await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
@@ -345,7 +345,7 @@ function SignUpStartInternal(): JSX.Element {
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
           handleComplete: () =>
-            setActive({
+            setSelected({
               session: res.createdSessionId,
               navigate: async ({ session }) => {
                 await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });

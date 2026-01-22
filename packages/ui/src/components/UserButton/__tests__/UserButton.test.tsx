@@ -156,11 +156,11 @@ describe('UserButton', () => {
 
     it('changes the active session when clicking another session', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
-      fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+      fixtures.clerk.setSelected.mockReturnValueOnce(Promise.resolve());
       const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Open user menu' }));
       await userEvent.click(getByText('First3 Last3'));
-      expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
+      expect(fixtures.clerk.setSelected).toHaveBeenCalledWith(
         expect.objectContaining({ session: expect.objectContaining({ user: expect.objectContaining({ id: '3' }) }) }),
       );
     });

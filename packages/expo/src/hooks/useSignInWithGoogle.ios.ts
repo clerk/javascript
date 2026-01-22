@@ -27,10 +27,10 @@ export type {
  *
  *   const onPress = async () => {
  *     try {
- *       const { createdSessionId, setActive } = await startGoogleAuthenticationFlow();
+ *       const { createdSessionId, setSelected } = await startGoogleAuthenticationFlow();
  *
- *       if (createdSessionId && setActive) {
- *         await setActive({ session: createdSessionId });
+ *       if (createdSessionId && setSelected) {
+ *         await setSelected({ session: createdSessionId });
  *       }
  *     } catch (err) {
  *       console.error('Google Authentication error:', err);

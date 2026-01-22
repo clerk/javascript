@@ -27,7 +27,7 @@ export const withTaskGuard = <P extends AvailableComponentProps>(
       Component,
       clerk =>
         !clerk.session?.currentTask ||
-        (clerk.session.currentTask.key !== taskKey && !clerk.__internal_setActiveInProgress),
+        (clerk.session.currentTask.key !== taskKey && !clerk.__internal_setSelectedInProgress),
       ({ clerk }) =>
         !clerk.session ? clerk.buildSignInUrl() : (ctx.redirectUrlComplete ?? clerk.buildAfterSignInUrl()),
       warnings.cannotRenderComponentWhenTaskDoesNotExist,

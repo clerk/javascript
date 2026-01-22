@@ -136,7 +136,7 @@ export type SDKMetadata = {
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
-export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
+export type SetSelectedNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -719,12 +719,12 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
-   * Set the active session and Organization explicitly.
+   * Set the selected session and Organization explicitly.
    *
-   * If the session param is `null`, the active session is deleted.
-   * In a similar fashion, if the organization param is `null`, the current organization is removed as active.
+   * If the session param is `null`, the selected session is deleted.
+   * In a similar fashion, if the organization param is `null`, the current organization is removed as selected.
    */
-  setActive: SetActive;
+  setSelected: SetSelected;
 
   /**
    * Function used to commit a navigation after certain steps in the Clerk processes.
@@ -965,10 +965,10 @@ export interface Clerk {
   __internal_reloadInitialResources: () => Promise<void>;
 
   /**
-   * Internal flag indicating whether a `setActive` call is in progress. Used to prevent navigations from being
+   * Internal flag indicating whether a `setSelected` call is in progress. Used to prevent navigations from being
    * initiated outside of the Clerk class.
    */
-  __internal_setActiveInProgress: boolean;
+  __internal_setSelectedInProgress: boolean;
 
   /**
    * API Keys Object
@@ -1311,18 +1311,18 @@ export type SignUpRedirectOptions = RedirectOptions &
   };
 
 /**
- * The parameters for the `setActive()` method.
+ * The parameters for the `setSelected()` method.
  *
  * @interface
  */
-export type SetActiveParams = {
+export type SetSelectedParams = {
   /**
-   * The session resource or session ID (string version) to be set as active. If `null`, the current session is deleted.
+   * The session resource or session ID (string version) to be set as selected. If `null`, the current session is deleted.
    */
   session?: SignedInSessionResource | string | null;
 
   /**
-   * The Organization resource or Organization ID/slug (string version) to be set as active in the current session. If `null`, the currently Active Organization is removed as active.
+   * The Organization resource or Organization ID/slug (string version) to be set as selected in the current session. If `null`, the currently selected Organization is removed.
    */
   organization?: OrganizationResource | string | null;
 
@@ -1338,7 +1338,7 @@ export type SetActiveParams = {
    *
    * @example
    * ```typescript
-   * await clerk.setActive({
+   * await clerk.setSelected({
    *   session,
    *   navigate: async ({ session }) => {
    *     const currentTask = session.currentTask;
@@ -1352,13 +1352,13 @@ export type SetActiveParams = {
    * });
    * ```
    */
-  navigate?: SetActiveNavigate;
+  navigate?: SetSelectedNavigate;
 };
 
 /**
  * @inline
  */
-export type SetActive = (setActiveParams: SetActiveParams) => Promise<void>;
+export type SetSelected = (setSelectedParams: SetSelectedParams) => Promise<void>;
 
 export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }

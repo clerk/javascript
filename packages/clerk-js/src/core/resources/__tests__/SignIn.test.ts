@@ -1858,7 +1858,7 @@ describe('SignIn', () => {
 
         SignIn.clerk = {
           client: { reload: mockReload, sessions: [] },
-          setActive: mockSetActive,
+          setSelected: mockSetActive,
         } as any;
 
         const signIn = new SignIn({ id: 'signin_123', created_session_id: 'session_123' } as any);
@@ -1868,14 +1868,14 @@ describe('SignIn', () => {
         expect(mockSetActive).toHaveBeenCalledWith({ session: 'session_123', navigate: undefined });
       });
 
-      it('passes navigate parameter to setActive', async () => {
+      it('passes navigate parameter to setSelected', async () => {
         const mockReload = vi.fn().mockResolvedValue({});
         const mockSetActive = vi.fn().mockResolvedValue({});
         const mockNavigate = vi.fn();
 
         SignIn.clerk = {
           client: { reload: mockReload, sessions: [] },
-          setActive: mockSetActive,
+          setSelected: mockSetActive,
         } as any;
 
         const signIn = new SignIn({ id: 'signin_123', created_session_id: 'session_123' } as any);

@@ -28,9 +28,9 @@ describe('ResetPasswordSuccess', () => {
     try {
       render(<ResetPasswordSuccess />, { wrapper });
       vi.advanceTimersByTime(1000);
-      expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+      expect(fixtures.clerk.setSelected).not.toHaveBeenCalled();
       vi.advanceTimersByTime(1000);
-      expect(fixtures.clerk.setActive).toHaveBeenCalled();
+      expect(fixtures.clerk.setSelected).toHaveBeenCalled();
     } finally {
       vi.useRealTimers();
     }
@@ -42,7 +42,7 @@ describe('ResetPasswordSuccess', () => {
     try {
       render(<ResetPasswordSuccess />, { wrapper });
       vi.advanceTimersByTime(2000);
-      expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+      expect(fixtures.clerk.setSelected).not.toHaveBeenCalled();
     } finally {
       vi.useRealTimers();
     }

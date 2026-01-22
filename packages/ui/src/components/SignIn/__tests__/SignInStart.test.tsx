@@ -278,7 +278,7 @@ describe('SignInStart', () => {
       await userEvent.click(googleButton);
 
       await waitFor(() => {
-        expect(fixtures.clerk.setActive).toHaveBeenCalledWith({
+        expect(fixtures.clerk.setSelected).toHaveBeenCalledWith({
           session: 'sess_123',
           navigate: expect.any(Function),
         });
@@ -557,7 +557,7 @@ describe('SignInStart', () => {
       await userEvent.click(screen.getByText('Continue'));
 
       await waitFor(() => {
-        expect(fixtures.clerk.setActive).toHaveBeenCalledWith({
+        expect(fixtures.clerk.setSelected).toHaveBeenCalledWith({
           session: 'sess_123',
           navigate: expect.any(Function),
         });
@@ -584,7 +584,7 @@ describe('SignInStart', () => {
       fixtures.signIn.create.mockRejectedValueOnce(sessionExistsError);
 
       const mockSession = { id: 'sess_123' } as any;
-      (fixtures.clerk.setActive as any).mockImplementation(
+      (fixtures.clerk.setSelected as any).mockImplementation(
         async ({ navigate }: { navigate: ({ session }: { session: any }) => Promise<void> }) => {
           await navigate({ session: mockSession });
         },
@@ -596,7 +596,7 @@ describe('SignInStart', () => {
       await userEvent.click(screen.getByText('Continue'));
 
       await waitFor(() => {
-        expect(fixtures.clerk.setActive).toHaveBeenCalled();
+        expect(fixtures.clerk.setSelected).toHaveBeenCalled();
       });
     });
   });

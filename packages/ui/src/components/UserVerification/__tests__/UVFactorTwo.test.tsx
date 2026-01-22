@@ -121,7 +121,7 @@ describe('UserVerificationFactorTwo', () => {
 
       await userEvent.type(getByLabelText(/Enter verification code/i), '123456');
       await waitFor(() => {
-        expect(fixtures.clerk.setActive).toHaveBeenCalled();
+        expect(fixtures.clerk.setSelected).toHaveBeenCalled();
       });
     });
   });

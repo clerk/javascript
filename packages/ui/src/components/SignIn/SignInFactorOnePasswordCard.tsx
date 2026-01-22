@@ -55,7 +55,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
   const { onShowAlternativeMethodsClick, onPasswordError } = props;
   const passwordInputRef = React.useRef<HTMLInputElement>(null);
   const card = useCardState();
-  const { setActive } = useClerk();
+  const { setSelected } = useClerk();
   const signIn = useCoreSignIn();
   const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
   const supportEmail = useSupportEmail();
@@ -76,7 +76,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
       .then(res => {
         switch (res.status) {
           case 'complete':
-            return setActive({
+            return setSelected({
               session: res.createdSessionId,
               navigate: ({ session }) => {
                 return navigateOnSetActive({ session, redirectUrl: afterSignInUrl });

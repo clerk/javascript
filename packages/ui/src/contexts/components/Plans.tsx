@@ -335,7 +335,7 @@ export const usePlansContext = () => {
         },
         onClose: () => {
           if (session?.id) {
-            void clerk.setActive({ session: session.id });
+            void clerk.setSelected({ session: session.id });
           }
         },
         appearance,

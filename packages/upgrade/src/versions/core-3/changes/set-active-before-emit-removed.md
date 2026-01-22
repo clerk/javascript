@@ -1,13 +1,13 @@
 ---
-title: '`setActive({ beforeEmit })` changed to `setActive({ navigate })`'
+title: '`setSelected({ beforeEmit })` changed to `setSelected({ navigate })`'
 matcher: 'beforeEmit'
 category: 'deprecation-removal'
 ---
 
-The `beforeEmit` callback in `setActive()` has been replaced with `navigate`. The callback signature has also changed:
+The `beforeEmit` callback in `setSelected()` (formerly `setActive()`) has been replaced with `navigate`. The callback signature has also changed:
 
 ```diff
-await setActive({
+await setSelected({
   session: sessionId,
 - beforeEmit: () => {
 -   // Called before session is set

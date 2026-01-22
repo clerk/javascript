@@ -34,7 +34,7 @@ function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOp
 
   if (forOrganization === 'organization' && clerk.organization === null) {
     throw new Error(
-      'Clerk: The current session does not have an active organization. Use `setActive` to set the organization',
+      'Clerk: The current session does not have an active organization. Use `setSelected` to set the organization',
     );
   }
 

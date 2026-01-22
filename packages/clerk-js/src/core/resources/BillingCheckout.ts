@@ -204,7 +204,7 @@ export class CheckoutFlow implements CheckoutFlowResourceNonStrict {
         throw new Error('Clerk: `confirm()` must be called before `finalize()`');
       }
 
-      await BillingCheckout.clerk.setActive({ session: BillingCheckout.clerk.session?.id, navigate });
+      await BillingCheckout.clerk.setSelected({ session: BillingCheckout.clerk.session?.id, navigate });
     });
   }
 

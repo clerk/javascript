@@ -11,7 +11,7 @@ import { useUserVerificationSession } from './useUserVerificationSession';
 const useAfterVerification = () => {
   const { afterVerification } = useUserVerification();
   const supportEmail = useSupportEmail();
-  const { setActive } = useClerk();
+  const { setSelected } = useClerk();
   const { setCache } = useUserVerificationSession();
   const { navigate } = useRouter();
 
@@ -26,7 +26,7 @@ const useAfterVerification = () => {
       });
       switch (sessionVerification.status) {
         case 'complete':
-          await setActive({ session: sessionVerification.session.id });
+          await setSelected({ session: sessionVerification.session.id });
           return afterVerification?.();
 
         case 'needs_second_factor':
@@ -35,7 +35,7 @@ const useAfterVerification = () => {
           return console.error(clerkInvalidFAPIResponse(sessionVerification.status, supportEmail));
       }
     },
-    [navigate, setActive, supportEmail],
+    [navigate, setSelected, supportEmail],
   );
 
   return {

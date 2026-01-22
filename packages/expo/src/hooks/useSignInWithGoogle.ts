@@ -1,4 +1,4 @@
-import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
+import type { SetSelected, SignInResource, SignUpResource } from '@clerk/shared/types';
 
 import { errorThrower } from '../utils/errors';
 
@@ -10,7 +10,7 @@ export type StartGoogleAuthenticationFlowParams = {
 
 export type StartGoogleAuthenticationFlowReturnType = {
   createdSessionId: string | null;
-  setActive?: SetActive;
+  setSelected?: SetSelected;
   signIn?: SignInResource;
   signUp?: SignUpResource;
 };
@@ -31,12 +31,12 @@ export type StartGoogleAuthenticationFlowReturnType = {
  *
  *   const onPress = async () => {
  *     try {
- *       const { createdSessionId, setActive } = await startSSOFlow({
+ *       const { createdSessionId, setSelected } = await startSSOFlow({
  *         strategy: 'oauth_google'
  *       });
  *
- *       if (createdSessionId && setActive) {
- *         await setActive({ session: createdSessionId });
+ *       if (createdSessionId && setSelected) {
+ *         await setSelected({ session: createdSessionId });
  *       }
  *     } catch (err) {
  *       console.error('Google Authentication error:', err);

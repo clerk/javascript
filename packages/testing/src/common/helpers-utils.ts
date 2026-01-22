@@ -15,7 +15,7 @@ export const signInHelper = async ({ signInParams, windowObject }: SignInHelperP
     switch (signInParams.strategy) {
       case 'password': {
         const res = await signIn.create(signInParams);
-        await w.Clerk.setActive({
+        await w.Clerk.setSelected({
           session: res.createdSessionId,
         });
         break;
@@ -28,7 +28,7 @@ export const signInHelper = async ({ signInParams, windowObject }: SignInHelperP
         });
 
         if (res.status === 'complete') {
-          await w.Clerk.setActive({
+          await w.Clerk.setSelected({
             session: res.createdSessionId,
           });
         } else {
@@ -66,7 +66,7 @@ export const signInHelper = async ({ signInParams, windowObject }: SignInHelperP
           });
 
           if (signInAttempt.status === 'complete') {
-            await w.Clerk.setActive({ session: signInAttempt.createdSessionId });
+            await w.Clerk.setSelected({ session: signInAttempt.createdSessionId });
           } else {
             throw new Error(`Status is ${signInAttempt.status}`);
           }
@@ -105,7 +105,7 @@ export const signInHelper = async ({ signInParams, windowObject }: SignInHelperP
           });
 
           if (signInAttempt.status === 'complete') {
-            await w.Clerk.setActive({ session: signInAttempt.createdSessionId });
+            await w.Clerk.setSelected({ session: signInAttempt.createdSessionId });
           } else {
             throw new Error(`Status is ${signInAttempt.status}`);
           }

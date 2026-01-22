@@ -93,7 +93,7 @@ export function handleCombinedFlowTransfer({
           verifyEmailPath: 'create/verify-email-address',
           verifyPhonePath: 'create/verify-phone-number',
           handleComplete: () =>
-            clerk.setActive({
+            clerk.setSelected({
               session: res.createdSessionId,
               navigate: async ({ session }) => {
                 await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });

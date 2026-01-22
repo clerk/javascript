@@ -23,11 +23,11 @@ export function ClerkProvider<TUi extends Ui = Ui>({ children, ...props }: NextC
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   useSafeLayoutEffect(() => {
-    window.__internal_onBeforeSetActive = invalidateNextRouterCache;
+    window.__internal_onBeforeSetSelected = invalidateNextRouterCache;
   }, []);
 
   useSafeLayoutEffect(() => {
-    window.__internal_onAfterSetActive = () => {
+    window.__internal_onAfterSetSelected = () => {
       // Re-run the middleware every time there auth state changes.
       // This enables complete control from a centralized place (NextJS middleware),
       // as we will invoke it every time the client-side auth state changes, eg: signing-out, switching orgs, etc.\

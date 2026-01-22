@@ -38,7 +38,7 @@ describe('useOrganizationList', () => {
 
     const { result } = renderHook(() => useOrganizationList(), { wrapper });
     expect(result.current.isLoaded).toBe(true);
-    expect(result.current.setActive).toBeDefined();
+    expect(result.current.setSelected).toBeDefined();
     expect(result.current.createOrganization).toBeDefined();
 
     expect(result.current.userInvitations).toEqual(

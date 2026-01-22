@@ -35,7 +35,7 @@ export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOne
   const card = useCardState();
   const { navigate } = useRouter();
   const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
-  const { setActive } = useClerk();
+  const { setSelected } = useClerk();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
   const channel = props.factor.channel;
@@ -65,7 +65,7 @@ export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOne
 
         switch (res.status) {
           case 'complete':
-            return setActive({
+            return setSelected({
               session: res.createdSessionId,
               navigate: async ({ session }) => {
                 await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });

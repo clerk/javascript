@@ -19,13 +19,13 @@ export const SSOCallback = withCardStateProvider<HandleOAuthCallbackParams | Han
 });
 
 export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCallbackParams) => {
-  const { handleRedirectCallback, __internal_setActiveInProgress } = useClerk();
+  const { handleRedirectCallback, __internal_setSelectedInProgress } = useClerk();
   const { navigate } = useRouter();
   const card = useCardState();
 
   React.useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
-    if (__internal_setActiveInProgress !== true) {
+    if (__internal_setSelectedInProgress !== true) {
       const intent = new URLSearchParams(window.location.search).get('intent');
       const reloadResource = intent === 'signIn' || intent === 'signUp' ? intent : undefined;
       handleRedirectCallback({ ...props, reloadResource }, navigate).catch(e => {

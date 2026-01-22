@@ -1243,7 +1243,7 @@ class SignInFuture implements SignInFutureResource {
       }
 
       this.#hasBeenFinalized = true;
-      await SignIn.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
+      await SignIn.clerk.setSelected({ session: this.#resource.createdSessionId, navigate });
     });
   }
 

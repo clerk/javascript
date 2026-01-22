@@ -22,7 +22,7 @@ type UseMultisessionActionsParams = {
 } & Pick<UserButtonProps, 'userProfileMode' | 'appearance' | 'userProfileProps'>;
 
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
-  const { setActive, signOut, openUserProfile } = useClerk();
+  const { setSelected, signOut, openUserProfile } = useClerk();
   const card = useCardState();
   const { signedInSessions, otherSessions } = useMultipleSessions({ user: opts.user });
   const { navigate } = useRouter();
@@ -76,7 +76,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const handleSessionClicked = (session: SignedInSessionResource) => async () => {
     card.setLoading();
 
-    return setActive({
+    return setSelected({
       session,
       navigate: async ({ session }) => {
         if (!session.currentTask && opts.afterSwitchSessionUrl) {

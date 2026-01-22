@@ -1,5 +1,5 @@
 import type { ClerkError } from '../errors/clerkError';
-import type { SetActiveNavigate } from './clerk';
+import type { SetSelectedNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
 import type { OAuthStrategy, PasskeyStrategy, Web3Strategy } from './strategies';
@@ -273,7 +273,7 @@ export interface SignInFuturePasskeyParams {
 }
 
 export interface SignInFutureFinalizeParams {
-  navigate?: SetActiveNavigate;
+  navigate?: SetSelectedNavigate;
 }
 
 /**

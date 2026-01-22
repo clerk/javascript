@@ -383,11 +383,11 @@ describe('OrganizationList', () => {
         });
 
         await waitFor(async () => {
-          fixtures.clerk.setActive.mockReturnValue(Promise.resolve());
+          fixtures.clerk.setSelected.mockReturnValue(Promise.resolve());
           await userEvent.click(getByText(/Personal account/i));
 
           expect(fixtures.router.navigate).toHaveBeenCalledWith(`/user/test_user_id`);
-          expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
+          expect(fixtures.clerk.setSelected).toHaveBeenCalledWith(
             expect.objectContaining({
               organization: null,
             }),
@@ -433,9 +433,9 @@ describe('OrganizationList', () => {
         });
 
         await waitFor(async () => {
-          fixtures.clerk.setActive.mockReturnValue(Promise.resolve());
+          fixtures.clerk.setSelected.mockReturnValue(Promise.resolve());
           await userEvent.click(getByRole('button', { name: /Org1/i }));
-          expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
+          expect(fixtures.clerk.setSelected).toHaveBeenCalledWith(
             expect.objectContaining({
               organization: membership.organization,
             }),
@@ -464,7 +464,7 @@ describe('OrganizationList', () => {
           wrapper,
         });
 
-        fixtures.clerk.setActive.mockReturnValue(Promise.resolve());
+        fixtures.clerk.setSelected.mockReturnValue(Promise.resolve());
         await waitFor(async () =>
           expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
         );

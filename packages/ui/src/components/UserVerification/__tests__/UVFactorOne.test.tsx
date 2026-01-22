@@ -129,7 +129,7 @@ describe('UserVerificationFactorOne', () => {
       await userEvent.click(screen.getByText('Continue'));
 
       await waitFor(() => {
-        expect(fixtures.clerk.setActive).toHaveBeenCalled();
+        expect(fixtures.clerk.setSelected).toHaveBeenCalled();
       });
       expect(fixtures.session?.attemptFirstFactorVerification).toHaveBeenCalledTimes(1);
     });

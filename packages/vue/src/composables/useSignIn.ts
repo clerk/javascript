@@ -41,13 +41,13 @@ export const useSignIn: UseSignIn = () => {
 
   const result = computed<UseSignInReturn>(() => {
     if (!clerk.value || !clientCtx.value) {
-      return { isLoaded: false, signIn: undefined, setActive: undefined };
+      return { isLoaded: false, signIn: undefined, setSelected: undefined };
     }
 
     return {
       isLoaded: true,
       signIn: clientCtx.value.signIn,
-      setActive: clerk.value.setActive,
+      setSelected: clerk.value.setSelected,
     };
   });
 

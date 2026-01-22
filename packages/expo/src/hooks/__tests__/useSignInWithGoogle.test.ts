@@ -96,7 +96,7 @@ describe('useSignInWithGoogle', () => {
 
     mocks.useClerk.mockReturnValue({
       loaded: true,
-      setActive: mockSetActive,
+      setSelected: mockSetActive,
       client: {
         signIn: mockSignIn,
         signUp: mockSignUp,
@@ -146,7 +146,7 @@ describe('useSignInWithGoogle', () => {
         token: mockIdToken,
       });
       expect(response.createdSessionId).toBe('test-session-id');
-      expect(response.setActive).toBe(mockSetActive);
+      expect(response.setSelected).toBe(mockSetActive);
     });
 
     test('should handle transfer flow for new user', async () => {
@@ -163,7 +163,7 @@ describe('useSignInWithGoogle', () => {
       const mockSignUpWithSession = { ...mockSignUp, createdSessionId: 'new-user-session-id' };
       mocks.useClerk.mockReturnValue({
         loaded: true,
-        setActive: mockSetActive,
+        setSelected: mockSetActive,
         client: {
           signIn: mockSignIn,
           signUp: mockSignUpWithSession,
@@ -199,7 +199,7 @@ describe('useSignInWithGoogle', () => {
       const response = await result.current.startGoogleAuthenticationFlow();
 
       expect(response.createdSessionId).toBe(null);
-      expect(response.setActive).toBe(mockSetActive);
+      expect(response.setSelected).toBe(mockSetActive);
     });
 
     test('should handle SIGN_IN_CANCELLED error code', async () => {
@@ -211,13 +211,13 @@ describe('useSignInWithGoogle', () => {
       const response = await result.current.startGoogleAuthenticationFlow();
 
       expect(response.createdSessionId).toBe(null);
-      expect(response.setActive).toBe(mockSetActive);
+      expect(response.setSelected).toBe(mockSetActive);
     });
 
     test('should return early when clerk is not loaded', async () => {
       mocks.useClerk.mockReturnValue({
         loaded: false,
-        setActive: mockSetActive,
+        setSelected: mockSetActive,
         client: null,
       });
 
@@ -256,7 +256,7 @@ describe('useSignInWithGoogle', () => {
       };
       mocks.useClerk.mockReturnValue({
         loaded: true,
-        setActive: mockSetActive,
+        setSelected: mockSetActive,
         client: {
           signIn: mockSignIn,
           signUp: mockSignUpWithSession,
@@ -284,7 +284,7 @@ describe('useSignInWithGoogle', () => {
 
       // Verify the session was created
       expect(response.createdSessionId).toBe('new-signup-session-id');
-      expect(response.setActive).toBe(mockSetActive);
+      expect(response.setSelected).toBe(mockSetActive);
     });
   });
 });

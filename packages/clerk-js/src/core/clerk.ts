@@ -97,7 +97,7 @@ import type {
   Resources,
   SDKMetadata,
   SessionResource,
-  SetActiveParams,
+  SetSelectedParams,
   SignedInSessionResource,
   SignInProps,
   SignInRedirectOptions,
@@ -175,7 +175,7 @@ import { Protect } from './protect';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
-type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
+type SetSelectedHook = (intent?: 'sign-out') => void | Promise<void>;
 
 declare global {
   interface Window {
@@ -296,7 +296,7 @@ export class Clerk implements ClerkInterface {
   public __internal_isWebAuthnAutofillSupported: (() => Promise<boolean>) | undefined;
   public __internal_isWebAuthnPlatformAuthenticatorSupported: (() => Promise<boolean>) | undefined;
 
-  public __internal_setActiveInProgress = false;
+  public __internal_setSelectedInProgress = false;
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -581,14 +581,14 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    const onBeforeSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__internal_onBeforeSetActive === 'function'
-        ? window.__internal_onBeforeSetActive
+    const onBeforeSetSelected: SetSelectedHook =
+      typeof window !== 'undefined' && typeof window.__internal_onBeforeSetSelected === 'function'
+        ? window.__internal_onBeforeSetSelected
         : noop;
 
-    const onAfterSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__internal_onAfterSetActive === 'function'
-        ? window.__internal_onAfterSetActive
+    const onAfterSetSelected: SetSelectedHook =
+      typeof window !== 'undefined' && typeof window.__internal_onAfterSetSelected === 'function'
+        ? window.__internal_onAfterSetSelected
         : noop;
 
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
@@ -629,15 +629,15 @@ export class Clerk implements ClerkInterface {
       this.#setAccessors();
       this.#emit();
 
-      await onAfterSetActive();
+      await onAfterSetSelected();
     };
 
     /**
      * Clears the router cache for `@clerk/nextjs` on all routes except the current one.
-     * Note: Calling `onBeforeSetActive` before signing out, allows for new RSC prefetch requests to render as signed in.
-     * Since we are calling `onBeforeSetActive` before signing out, we should NOT pass `"sign-out"`.
+     * Note: Calling `onBeforeSetSelected` before signing out, allows for new RSC prefetch requests to render as signed in.
+     * Since we are calling `onBeforeSetSelected` before signing out, we should NOT pass `"sign-out"`.
      */
-    await onBeforeSetActive();
+    await onBeforeSetSelected();
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
@@ -1440,14 +1440,14 @@ export class Clerk implements ClerkInterface {
   };
 
   /**
-   * `setActive` can be used to set the active session and/or organization.
+   * `setSelected` can be used to set the selected session and/or organization.
    */
-  public setActive = async (params: SetActiveParams): Promise<void> => {
-    const { organization, redirectUrl, navigate: setActiveNavigate } = params;
+  public setSelected = async (params: SetSelectedParams): Promise<void> => {
+    const { organization, redirectUrl, navigate: setSelectedNavigate } = params;
     let { session } = params;
-    this.__internal_setActiveInProgress = true;
+    this.__internal_setSelectedInProgress = true;
     debugLogger.debug(
-      'setActive() start',
+      'setSelected() start',
       {
         hasClient: Boolean(this.client),
         sessionTarget: typeof session === 'string' ? session : (session?.id ?? session ?? null),
@@ -1459,14 +1459,14 @@ export class Clerk implements ClerkInterface {
     );
     try {
       if (!this.client) {
-        debugLogger.warn('Clerk setActive called before client is loaded', {}, 'clerk');
-        throw new Error('setActive is being called before the client is loaded. Wait for init.');
+        debugLogger.warn('Clerk setSelected called before client is loaded', {}, 'clerk');
+        throw new Error('setSelected is being called before the client is loaded. Wait for init.');
       }
 
       if (session === undefined && !this.session) {
-        debugLogger.warn('Clerk setActive precondition not met: no target session and no active session', {}, 'clerk');
+        debugLogger.warn('Clerk setSelected precondition not met: no target session and no selected session', {}, 'clerk');
         throw new Error(
-          'setActive should either be called with a session param or there should be already an active session.',
+          'setSelected should either be called with a session param or there should be already a selected session.',
         );
       }
 
@@ -1474,14 +1474,14 @@ export class Clerk implements ClerkInterface {
         session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
       }
 
-      const onBeforeSetActive: SetActiveHook =
-        typeof window !== 'undefined' && typeof window.__internal_onBeforeSetActive === 'function'
-          ? window.__internal_onBeforeSetActive
+      const onBeforeSetSelected: SetSelectedHook =
+        typeof window !== 'undefined' && typeof window.__internal_onBeforeSetSelected === 'function'
+          ? window.__internal_onBeforeSetSelected
           : noop;
 
-      const onAfterSetActive: SetActiveHook =
-        typeof window !== 'undefined' && typeof window.__internal_onAfterSetActive === 'function'
-          ? window.__internal_onAfterSetActive
+      const onAfterSetSelected: SetSelectedHook =
+        typeof window !== 'undefined' && typeof window.__internal_onAfterSetSelected === 'function'
+          ? window.__internal_onAfterSetSelected
           : noop;
 
       let newSession = session === undefined ? this.session : session;
@@ -1523,7 +1523,7 @@ export class Clerk implements ClerkInterface {
         /**
          * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
          */
-        await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
+        await onBeforeSetSelected(newSession === null ? 'sign-out' : undefined);
       }
 
       //1. setLastActiveSession to passed user session (add a param).
@@ -1559,7 +1559,7 @@ export class Clerk implements ClerkInterface {
         newSession?.currentTask &&
         this.#options.taskUrls?.[newSession?.currentTask.key];
 
-      if (redirectUrl || taskUrl || setActiveNavigate) {
+      if (redirectUrl || taskUrl || setSelectedNavigate) {
         await tracker.track(async () => {
           if (!this.client) {
             // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
@@ -1575,8 +1575,8 @@ export class Clerk implements ClerkInterface {
               ? buildURL({ base: taskUrl, hashSearchParams: { redirectUrl } }, { stringify: true })
               : taskUrl;
             await this.navigate(taskUrlWithRedirect);
-          } else if (setActiveNavigate && newSession) {
-            await setActiveNavigate({ session: newSession });
+          } else if (setSelectedNavigate && newSession) {
+            await setSelectedNavigate({ session: newSession });
           } else if (redirectUrl) {
             if (this.client.isEligibleForTouch()) {
               const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
@@ -1601,10 +1601,10 @@ export class Clerk implements ClerkInterface {
       // Do not revalidate server cache for pending sessions to avoid unmount of `SignIn/SignUp` AIOs when navigating to task
       // newSession can be mutated by the time we get here (org change session touch)
       if (newSession?.status !== 'pending') {
-        await onAfterSetActive();
+        await onAfterSetSelected();
       }
     } finally {
-      this.__internal_setActiveInProgress = false;
+      this.__internal_setSelectedInProgress = false;
     }
   };
 
@@ -1953,7 +1953,7 @@ export class Clerk implements ClerkInterface {
     const redirectContinue = params.redirectUrl ? () => navigate(params.redirectUrl as string) : noop;
 
     if (shouldCompleteOnThisDevice) {
-      return this.setActive({
+      return this.setSelected({
         session: newSessionId,
         redirectUrl: params.redirectUrlComplete,
       });
@@ -2104,7 +2104,7 @@ export class Clerk implements ClerkInterface {
     const signInUrl = params.signInUrl || displayConfig.signInUrl;
     const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
 
-    const setActiveNavigate = async ({
+    const setSelectedNavigate = async ({
       session,
       baseUrl,
       redirectUrl,
@@ -2125,10 +2125,10 @@ export class Clerk implements ClerkInterface {
     };
 
     if (si.status === 'complete') {
-      return this.setActive({
+      return this.setSelected({
         session: si.sessionId,
         navigate: async ({ session }) => {
-          await setActiveNavigate({ session, baseUrl: signInUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
+          await setSelectedNavigate({ session, baseUrl: signInUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
         },
       });
     }
@@ -2140,10 +2140,10 @@ export class Clerk implements ClerkInterface {
       const res = await signIn.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          return this.setActive({
+          return this.setSelected({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
+              await setSelectedNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
             },
           });
         case 'needs_first_factor':
@@ -2191,10 +2191,10 @@ export class Clerk implements ClerkInterface {
       const res = await signUp.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          return this.setActive({
+          return this.setSelected({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+              await setSelectedNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
             },
           });
         case 'missing_requirements':
@@ -2205,10 +2205,10 @@ export class Clerk implements ClerkInterface {
     }
 
     if (su.status === 'complete') {
-      return this.setActive({
+      return this.setSelected({
         session: su.sessionId,
         navigate: async ({ session }) => {
-          await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+          await setSelectedNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
         },
       });
     }
@@ -2231,10 +2231,10 @@ export class Clerk implements ClerkInterface {
     if (userAlreadySignedIn) {
       const sessionId = si.firstFactorVerificationSessionId || su.externalAccountSessionId;
       if (sessionId) {
-        return this.setActive({
+        return this.setSelected({
           session: sessionId,
           navigate: async ({ session }) => {
-            await setActiveNavigate({
+            await setSelectedNavigate({
               session,
               baseUrl: suUserAlreadySignedIn ? signUpUrl : signInUrl,
               redirectUrl: redirectUrls.getAfterSignInUrl(),
@@ -2295,14 +2295,14 @@ export class Clerk implements ClerkInterface {
       if (opts.broadcast) {
         eventBus.emit(events.UserSignOut, null);
       }
-      return this.setActive({ session: null });
+      return this.setSelected({ session: null });
     } catch (err) {
       // `/client` can fail with either a 401, a 403, 500 or network errors.
       // 401 is already handled internally in our fetcher.
       // 403 means that the client is blocked, signing out the user is the only option.
       // 500 means that the client is not working, signing out the user is the only option, since the intention was to sign out the user.
       if (isClerkAPIResponseError(err) && [403, 500].includes(err.status)) {
-        return this.setActive({ session: null });
+        return this.setSelected({ session: null });
       } else {
         throw err;
       }
@@ -2462,7 +2462,7 @@ export class Clerk implements ClerkInterface {
       }
     }
 
-    const setActiveNavigate = async ({ session, redirectUrl }: { session: SessionResource; redirectUrl: string }) => {
+    const setSelectedNavigate = async ({ session, redirectUrl }: { session: SessionResource; redirectUrl: string }) => {
       if (!session.currentTask) {
         await this.navigate(redirectUrl);
         return;
@@ -2480,10 +2480,10 @@ export class Clerk implements ClerkInterface {
         break;
       case 'complete':
         if (signInOrSignUp.createdSessionId) {
-          await this.setActive({
+          await this.setSelected({
             session: signInOrSignUp.createdSessionId,
             navigate: async ({ session }) => {
-              await setActiveNavigate({ session, redirectUrl: redirectUrl ?? this.buildAfterSignInUrl() });
+              await setSelectedNavigate({ session, redirectUrl: redirectUrl ?? this.buildAfterSignInUrl() });
             },
           });
         }
@@ -2539,14 +2539,14 @@ export class Clerk implements ClerkInterface {
 
       const hasTransitionedToPendingStatus = this.session.status === 'active' && session?.status === 'pending';
       if (hasTransitionedToPendingStatus) {
-        const onAfterSetActive: SetActiveHook =
-          typeof window !== 'undefined' && typeof window.__internal_onAfterSetActive === 'function'
-            ? window.__internal_onAfterSetActive
+        const onAfterSetSelected: SetSelectedHook =
+          typeof window !== 'undefined' && typeof window.__internal_onAfterSetSelected === 'function'
+            ? window.__internal_onAfterSetSelected
             : noop;
 
         // Execute hooks to update server authentication context and trigger
         // page protections in clerkMiddleware or server components
-        void onAfterSetActive();
+        void onAfterSetSelected();
       }
 
       // Note: this might set this.session to null

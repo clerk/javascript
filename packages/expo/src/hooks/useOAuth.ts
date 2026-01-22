@@ -1,5 +1,5 @@
 import { useSignIn, useSignUp } from '@clerk/react/legacy';
-import type { OAuthStrategy, SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
+import type { OAuthStrategy, SetSelected, SignInResource, SignUpResource } from '@clerk/shared/types';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 
@@ -18,7 +18,7 @@ export type StartOAuthFlowParams = {
 
 export type StartOAuthFlowReturnType = {
   createdSessionId: string;
-  setActive?: SetActive;
+  setSelected?: SetSelected;
   signIn?: SignInResource;
   signUp?: SignUpResource;
   authSessionResult?: WebBrowser.WebBrowserAuthSessionResult;
@@ -33,7 +33,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     return errorThrower.throw('Missing oauth strategy');
   }
 
-  const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
+  const { signIn, setSelected, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 
   async function startOAuthFlow(startOAuthFlowParams?: StartOAuthFlowParams): Promise<StartOAuthFlowReturnType> {
@@ -42,7 +42,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
         createdSessionId: '',
         signIn,
         signUp,
-        setActive,
+        setSelected,
       };
     }
 
@@ -79,7 +79,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
       return {
         authSessionResult,
         createdSessionId: '',
-        setActive,
+        setSelected,
         signIn,
         signUp,
       };
@@ -108,7 +108,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     return {
       authSessionResult,
       createdSessionId,
-      setActive,
+      setSelected,
       signIn,
       signUp,
     };

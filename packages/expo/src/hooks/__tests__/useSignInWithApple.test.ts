@@ -69,7 +69,7 @@ describe('useSignInWithApple', () => {
 
     mocks.useSignIn.mockReturnValue({
       signIn: mockSignIn,
-      setActive: mockSetActive,
+      setSelected: mockSetActive,
       isLoaded: true,
     });
 
@@ -121,7 +121,7 @@ describe('useSignInWithApple', () => {
         token: mockIdentityToken,
       });
       expect(response.createdSessionId).toBe('test-session-id');
-      expect(response.setActive).toBe(mockSetActive);
+      expect(response.setSelected).toBe(mockSetActive);
     });
 
     test('should handle transfer flow for new user', async () => {
@@ -165,7 +165,7 @@ describe('useSignInWithApple', () => {
       const response = await result.current.startAppleAuthenticationFlow();
 
       expect(response.createdSessionId).toBe(null);
-      expect(response.setActive).toBe(mockSetActive);
+      expect(response.setSelected).toBe(mockSetActive);
     });
 
     test('should throw error when Apple Authentication is not available', async () => {
@@ -193,7 +193,7 @@ describe('useSignInWithApple', () => {
     test('should return early when clerk is not loaded', async () => {
       mocks.useSignIn.mockReturnValue({
         signIn: mockSignIn,
-        setActive: mockSetActive,
+        setSelected: mockSetActive,
         isLoaded: false,
       });
 

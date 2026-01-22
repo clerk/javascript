@@ -14,7 +14,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>) {
   const card = useCardState();
   // @ts-expect-error -- private method for the time being
-  const { setActive, __internal_navigateWithError } = useClerk();
+  const { setSelected, __internal_navigateWithError } = useClerk();
   const supportEmail = useSupportEmail();
   const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
   const { authenticateWithPasskey } = useCoreSignIn();
@@ -30,7 +30,7 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
       const res = await authenticateWithPasskey(...args);
       switch (res.status) {
         case 'complete':
-          return setActive({
+          return setSelected({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
               await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });

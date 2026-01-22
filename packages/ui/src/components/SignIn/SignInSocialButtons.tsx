@@ -40,7 +40,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
       );
 
       if (sessionAlreadyExistsError) {
-        return clerk.setActive({
+        return clerk.setSelected({
           session: clerk.client.lastActiveSessionId,
           navigate: async ({ session }) => {
             await ctx.navigateOnSetActive({ session, redirectUrl: ctx.afterSignInUrl });

@@ -104,7 +104,7 @@ function SignUpContinueInternal() {
 
   useEffect(() => {
     // Redirect to sign-up if there is no persisted sign-up
-    if (!signUp.id && clerk.__internal_setActiveInProgress !== true) {
+    if (!signUp.id && clerk.__internal_setSelectedInProgress !== true) {
       void navigate(displayConfig.signUpUrl);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -180,7 +180,7 @@ function SignUpContinueInternal() {
           verifyEmailPath: './verify-email-address',
           verifyPhonePath: './verify-phone-number',
           handleComplete: () =>
-            clerk.setActive({
+            clerk.setSelected({
               session: res.createdSessionId,
               navigate: async ({ session }) => {
                 await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });

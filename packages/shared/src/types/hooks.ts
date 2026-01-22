@@ -1,4 +1,4 @@
-import type { SetActive, SignOut } from './clerk';
+import type { SetSelected, SignOut } from './clerk';
 import type { ActClaim, JwtPayload } from './jwtv2';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
@@ -131,14 +131,14 @@ export type UseSignInReturn =
        */
       signIn: undefined;
       /**
-       * A function that sets the active session. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
+       * A function that sets the selected session. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-selected).
        */
-      setActive: undefined;
+      setSelected: undefined;
     }
   | {
       isLoaded: true;
       signIn: SignInResource;
-      setActive: SetActive;
+      setSelected: SetSelected;
     };
 
 /**
@@ -155,14 +155,14 @@ export type UseSignUpReturn =
        */
       signUp: undefined;
       /**
-       * A function that sets the active session. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
+       * A function that sets the selected session. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-selected).
        */
-      setActive: undefined;
+      setSelected: undefined;
     }
   | {
       isLoaded: true;
       signUp: SignUpResource;
-      setActive: SetActive;
+      setSelected: SetSelected;
     };
 
 /**
@@ -208,14 +208,14 @@ export type UseSessionListReturn =
        */
       sessions: undefined;
       /**
-       * A function that sets the active session and/or Organization. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
+       * A function that sets the selected session and/or Organization. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-selected).
        */
-      setActive: undefined;
+      setSelected: undefined;
     }
   | {
       isLoaded: true;
       sessions: SessionResource[];
-      setActive: SetActive;
+      setSelected: SetSelected;
     };
 
 /**

@@ -7,7 +7,7 @@ import type {
   OrganizationMembershipResource,
   OrganizationResource,
   OrganizationSuggestionResource,
-  SetActive,
+  SetSelected,
   UserOrganizationInvitationResource,
 } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
@@ -84,9 +84,9 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
        */
       createOrganization: undefined;
       /**
-       * A function that sets the active session and/or Organization.
+       * A function that sets the selected session and/or Organization.
        */
-      setActive: undefined;
+      setSelected: undefined;
       /**
        * Returns `PaginatedResources` which includes a list of the user's Organization memberships.
        */
@@ -103,7 +103,7 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
   | {
       isLoaded: boolean;
       createOrganization: (CreateOrganizationParams: CreateOrganizationParams) => Promise<OrganizationResource>;
-      setActive: SetActive;
+      setSelected: SetSelected;
       userMemberships: PaginatedResources<
         OrganizationMembershipResource,
         T['userMemberships'] extends { infinite: true } ? true : false
@@ -161,7 +161,7 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
  * import React from 'react'
  *
  * const JoinedOrganizations = () => {
- *   const { isLoaded, setActive, userMemberships } = useOrganizationList({
+ *   const { isLoaded, setSelected, userMemberships } = useOrganizationList({
  *     userMemberships: {
  *       infinite: true,
  *     },
@@ -177,7 +177,7 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
  *         {userMemberships.data?.map((mem) => (
  *           <li key={mem.id}>
  *             <span>{mem.organization.name}</span>
- *             <button onClick={() => setActive({ organization: mem.organization.id })}>Select</button>
+ *             <button onClick={() => setSelected({ organization: mem.organization.id })}>Select</button>
  *           </li>
  *         ))}
  *       </ul>
@@ -382,7 +382,7 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
     return {
       isLoaded: false,
       createOrganization: undefined,
-      setActive: undefined,
+      setSelected: undefined,
       userMemberships: undefinedPaginatedResource,
       userInvitations: undefinedPaginatedResource,
       userSuggestions: undefinedPaginatedResource,
@@ -391,7 +391,7 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
 
   return {
     isLoaded: isClerkLoaded,
-    setActive: clerk.setActive,
+    setSelected: clerk.setSelected,
     createOrganization: clerk.createOrganization,
     userMemberships: memberships,
     userInvitations: invitations,

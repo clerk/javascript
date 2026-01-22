@@ -1,4 +1,4 @@
-import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
+import type { SetSelected, SignInResource, SignUpResource } from '@clerk/shared/types';
 
 import { errorThrower } from '../utils/errors';
 
@@ -8,7 +8,7 @@ export type StartAppleAuthenticationFlowParams = {
 
 export type StartAppleAuthenticationFlowReturnType = {
   createdSessionId: string | null;
-  setActive?: SetActive;
+  setSelected?: SetSelected;
   signIn?: SignInResource;
   signUp?: SignUpResource;
 };
@@ -29,12 +29,12 @@ export type StartAppleAuthenticationFlowReturnType = {
  *
  *   const onPress = async () => {
  *     try {
- *       const { createdSessionId, setActive } = await startSSOFlow({
+ *       const { createdSessionId, setSelected } = await startSSOFlow({
  *         strategy: 'oauth_apple'
  *       });
  *
- *       if (createdSessionId && setActive) {
- *         await setActive({ session: createdSessionId });
+ *       if (createdSessionId && setSelected) {
+ *         await setSelected({ session: createdSessionId });
  *       }
  *     } catch (err) {
  *       console.error('Apple Authentication error:', err);

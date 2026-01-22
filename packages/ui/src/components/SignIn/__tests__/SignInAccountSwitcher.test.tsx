@@ -30,10 +30,10 @@ describe('SignInAccountSwitcher', () => {
 
   it('sets an active session when user clicks an already logged in account from the list', async () => {
     const { wrapper, fixtures } = await createFixtures(initConfig);
-    fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+    fixtures.clerk.setSelected.mockReturnValueOnce(Promise.resolve());
     const { userEvent, getByText } = render(<SignInAccountSwitcher />, { wrapper });
     await userEvent.click(getByText('Nick Kouk'));
-    expect(fixtures.clerk.setActive).toHaveBeenCalled();
+    expect(fixtures.clerk.setSelected).toHaveBeenCalled();
   });
 
   // this one uses the windowNavigate method. we need to mock it correctly

@@ -105,6 +105,25 @@ module.exports = function transformDeprecatedProps({ source }, { jscodeshift: j,
     dirty = true;
   }
 
+  // Rename setActive to setSelected
+  if (transformSetActiveToSetSelected(root, j, stats)) {
+    dirty = true;
+  }
+
+  // Rename SetActive types to SetSelected
+  if (renameTypeReferences(root, j, 'SetActive', 'SetSelected')) {
+    dirty = true;
+  }
+  if (renameTypeReferences(root, j, 'SetActiveParams', 'SetSelectedParams')) {
+    dirty = true;
+  }
+  if (renameTypeReferences(root, j, 'SetActiveNavigate', 'SetSelectedNavigate')) {
+    dirty = true;
+  }
+  if (renameTypeReferences(root, j, 'SetActiveHook', 'SetSelectedHook')) {
+    dirty = true;
+  }
+
   if (renameTypeReferences(root, j, 'ClerkMiddlewareAuthObject', 'ClerkMiddlewareSessionAuthObject')) {
     dirty = true;
   }
@@ -378,7 +397,7 @@ function transformSetActiveBeforeEmit(root, j, stats) {
 
   root
     .find(j.CallExpression)
-    .filter(path => isSetActiveCall(path.node.callee))
+    .filter(path => isSetActiveOrSetSelectedCall(path.node.callee))
     .forEach(path => {
       const [args0] = path.node.arguments;
       if (!args0 || args0.type !== 'ObjectExpression') {
@@ -408,16 +427,75 @@ function transformSetActiveBeforeEmit(root, j, stats) {
   return changed;
 }
 
-function isSetActiveCall(callee) {
+function transformSetActiveToSetSelected(root, j, stats) {
+  let changed = false;
+
+  // Rename setActive method calls: clerk.setActive(...) -> clerk.setSelected(...)
+  root.find(j.MemberExpression, {
+    property: { type: 'Identifier', name: 'setActive' },
+    computed: false,
+  }).forEach(path => {
+    path.node.property.name = 'setSelected';
+    changed = true;
+    stats('setActiveRenamed');
+  });
+
+  root.find(j.OptionalMemberExpression, {
+    property: { type: 'Identifier', name: 'setActive' },
+    computed: false,
+  }).forEach(path => {
+    path.node.property.name = 'setSelected';
+    changed = true;
+    stats('setActiveRenamed');
+  });
+
+  // Rename setActive identifier (e.g., standalone call or destructured)
+  root.find(j.Identifier, { name: 'setActive' }).forEach(path => {
+    // Skip if it's part of a member expression property (already handled above)
+    if (path.parent && (path.parent.node.type === 'MemberExpression' || path.parent.node.type === 'OptionalMemberExpression') && path.parent.node.property === path.node) {
+      return;
+    }
+    // Skip if it's part of an import specifier (handled separately)
+    if (path.parent && path.parent.node.type === 'ImportSpecifier') {
+      return;
+    }
+    path.node.name = 'setSelected';
+    changed = true;
+    stats('setActiveRenamed');
+  });
+
+  // Rename import specifier: import { setActive } -> import { setSelected }
+  root.find(j.ImportSpecifier).forEach(path => {
+    const imported = path.node.imported;
+    if (imported && imported.type === 'Identifier' && imported.name === 'setActive') {
+      imported.name = 'setSelected';
+      if (path.node.local && path.node.local.name === 'setActive') {
+        path.node.local.name = 'setSelected';
+      }
+      changed = true;
+      stats('setActiveRenamed');
+    }
+  });
+
+  // Rename object property keys: { setActive: ... } -> { setSelected: ... }
+  if (renameObjectProperties(root, j, 'setActive', 'setSelected')) {
+    changed = true;
+    stats('setActiveRenamed');
+  }
+
+  return changed;
+}
+
+function isSetActiveOrSetSelectedCall(callee) {
   if (!callee) {
     return false;
   }
   if (callee.type === 'Identifier') {
-    return callee.name === 'setActive';
+    return callee.name === 'setActive' || callee.name === 'setSelected';
   }
   if (callee.type === 'MemberExpression' || callee.type === 'OptionalMemberExpression') {
     const property = callee.property;
-    return property && property.type === 'Identifier' && property.name === 'setActive';
+    return property && property.type === 'Identifier' && (property.name === 'setActive' || property.name === 'setSelected');
   }
   return false;
 }

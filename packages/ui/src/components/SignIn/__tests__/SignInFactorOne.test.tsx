@@ -102,7 +102,7 @@ describe('SignInFactorOne', () => {
 
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
       await waitFor(() => {
-        expect(fixtures.clerk.setActive).toHaveBeenCalled();
+        expect(fixtures.clerk.setSelected).toHaveBeenCalled();
       });
     });
   });

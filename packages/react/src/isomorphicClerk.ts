@@ -40,7 +40,7 @@ import type {
   OrganizationSwitcherProps,
   PricingTableProps,
   RedirectOptions,
-  SetActiveParams,
+  SetSelectedParams,
   SignInProps,
   SignInRedirectOptions,
   SignInResource,
@@ -115,7 +115,7 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_reloadInitialResources'
   | 'billing'
   | 'apiKeys'
-  | '__internal_setActiveInProgress'
+  | '__internal_setSelectedInProgress'
 > & {
   client: ClientResource | undefined;
   billing: BillingNamespace | undefined;
@@ -804,11 +804,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   /**
-   * `setActive` can be used to set the active session and/or organization.
+   * `setSelected` can be used to set the selected session and/or organization.
    */
-  setActive = (params: SetActiveParams): Promise<void> => {
+  setSelected = (params: SetSelectedParams): Promise<void> => {
     if (this.clerkjs) {
-      return this.clerkjs.setActive(params);
+      return this.clerkjs.setSelected(params);
     } else {
       return Promise.reject();
     }

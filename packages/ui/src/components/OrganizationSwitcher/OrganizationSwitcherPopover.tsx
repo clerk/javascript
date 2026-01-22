@@ -27,7 +27,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const { openOrganizationProfile, openCreateOrganization } = useClerk();
     const getContainer = usePortalRoot();
     const { organization: currentOrg } = useOrganization();
-    const { isLoaded, setActive } = useOrganizationList();
+    const { isLoaded, setSelected } = useOrganizationList();
     const {
       hidePersonal,
       createOrganizationMode,
@@ -58,7 +58,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const handleOrganizationClicked = (organization: OrganizationResource) => {
       return card
         .runAsync(() =>
-          setActive({
+          setSelected({
             organization,
             redirectUrl: afterSelectOrganizationUrl(organization),
           }),
@@ -68,7 +68,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
 
     const handlePersonalWorkspaceClicked = () => {
       return card
-        .runAsync(() => setActive({ organization: null, redirectUrl: afterSelectPersonalUrl(user) }))
+        .runAsync(() => setSelected({ organization: null, redirectUrl: afterSelectPersonalUrl(user) }))
         .then(close);
     };
 
