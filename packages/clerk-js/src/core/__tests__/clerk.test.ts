@@ -2352,15 +2352,15 @@ describe('Clerk singleton', () => {
   describe('updateClient', () => {
     afterEach(() => {
       // cleanup global window pollution
-      (window as any).__internal_onBeforeSetActive = null;
-      (window as any).__internal_onAfterSetActive = null;
+      (window as any).__internal_onBeforeSetSelected = null;
+      (window as any).__internal_onAfterSetSelected = null;
     });
 
     it('runs server revalidation hooks when session transitions from `active` to `pending`', async () => {
-      const mockOnBeforeSetActive = vi.fn().mockReturnValue(Promise.resolve());
-      const mockOnAfterSetActive = vi.fn().mockReturnValue(Promise.resolve());
-      (window as any).__internal_onBeforeSetActive = mockOnBeforeSetActive;
-      (window as any).__internal_onAfterSetActive = mockOnAfterSetActive;
+      const mockOnBeforeSetSelected = vi.fn().mockReturnValue(Promise.resolve());
+      const mockOnAfterSetSelected = vi.fn().mockReturnValue(Promise.resolve());
+      (window as any).__internal_onBeforeSetSelected = mockOnBeforeSetSelected;
+      (window as any).__internal_onAfterSetSelected = mockOnAfterSetSelected;
 
       const mockActiveSession = {
         id: 'session_1',
@@ -2402,7 +2402,7 @@ describe('Clerk singleton', () => {
 
       // Verify hooks were called
       await waitFor(() => {
-        expect(mockOnAfterSetActive).toHaveBeenCalledTimes(1);
+        expect(mockOnAfterSetSelected).toHaveBeenCalledTimes(1);
       });
     });
   });
