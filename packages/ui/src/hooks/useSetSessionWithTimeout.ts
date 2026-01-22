@@ -4,9 +4,9 @@ import { useEffect } from 'react';
 import { useSignInContext } from '../contexts';
 import { useRouter } from '../router';
 
-export const useSetSessionWithTimeout = (delay = 2000) => {
+export const useSelectSessionWithTimeout = (delay = 2000) => {
   const { queryString } = useRouter();
-  const { setActive } = useClerk();
+  const { selectSession } = useClerk();
   const { afterSignInUrl } = useSignInContext();
 
   useEffect(() => {
@@ -15,7 +15,7 @@ export const useSetSessionWithTimeout = (delay = 2000) => {
     const createdSessionId = queryParams.get('createdSessionId');
     if (createdSessionId) {
       timeoutId = setTimeout(() => {
-        void setActive({ session: createdSessionId, redirectUrl: afterSignInUrl });
+        void selectSession(createdSessionId, { redirectUrl: afterSignInUrl });
       }, delay);
     }
 
@@ -24,5 +24,10 @@ export const useSetSessionWithTimeout = (delay = 2000) => {
         clearTimeout(timeoutId);
       }
     };
-  }, [setActive, afterSignInUrl, queryString]);
+  }, [selectSession, afterSignInUrl, queryString]);
 };
+
+/**
+ * @deprecated Use `useSelectSessionWithTimeout` instead.
+ */
+export const useSetSessionWithTimeout = useSelectSessionWithTimeout;

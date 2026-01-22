@@ -3,7 +3,6 @@ import type {
   EnterpriseSSOStrategy,
   OAuthStrategy,
   SelectSessionHook,
-  SetActive,
   SignInResource,
   SignUpResource,
 } from '@clerk/shared/types';
@@ -30,14 +29,12 @@ export type StartSSOFlowReturnType = {
   createdSessionId: string | null;
   authSessionResult: WebBrowser.WebBrowserAuthSessionResult | null;
   selectSession?: SelectSessionHook;
-  /** @deprecated Use `selectSession` instead. */
-  setActive?: SetActive;
   signIn?: SignInResource;
   signUp?: SignUpResource;
 };
 
 export function useSSO() {
-  const { signIn, selectSession, setActive, isLoaded: isSignInLoaded } = useSignIn();
+  const { signIn, selectSession, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 
   async function startSSOFlow(startSSOFlowParams: StartSSOFlowParams): Promise<StartSSOFlowReturnType> {
@@ -48,7 +45,6 @@ export function useSSO() {
         signIn,
         signUp,
         selectSession,
-        setActive,
       };
     }
 
@@ -86,7 +82,6 @@ export function useSSO() {
       return {
         createdSessionId: null,
         selectSession,
-        setActive,
         signIn,
         signUp,
         authSessionResult,
@@ -108,7 +103,6 @@ export function useSSO() {
     return {
       createdSessionId: signUp.createdSessionId ?? signIn.createdSessionId,
       selectSession,
-      setActive,
       signIn,
       signUp,
       authSessionResult,

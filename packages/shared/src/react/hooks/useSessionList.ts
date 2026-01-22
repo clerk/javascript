@@ -56,13 +56,12 @@ export const useSessionList = (): UseSessionListReturn => {
   clerk.telemetry?.record(eventMethodCalled(hookName));
 
   if (!client) {
-    return { isLoaded: false, sessions: undefined, selectSession: undefined, setActive: undefined };
+    return { isLoaded: false, sessions: undefined, selectSession: undefined };
   }
 
   return {
     isLoaded: true,
     sessions: client.sessions,
     selectSession: isomorphicClerk.selectSession,
-    setActive: isomorphicClerk.setActive,
   };
 };

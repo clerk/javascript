@@ -1,4 +1,4 @@
-import type { SelectSessionOptions, SetActive, SignOut } from './clerk';
+import type { SelectSessionOptions, SignOut } from './clerk';
 import type { ActClaim, JwtPayload } from './jwtv2';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
@@ -142,19 +142,11 @@ export type UseSignInReturn =
        * A function that selects a session to make active. Use after sign-in completes to activate the created session.
        */
       selectSession: undefined;
-      /**
-       * @deprecated Use `selectSession` instead.
-       */
-      setActive: undefined;
     }
   | {
       isLoaded: true;
       signIn: SignInResource;
       selectSession: SelectSessionHook;
-      /**
-       * @deprecated Use `selectSession` instead.
-       */
-      setActive: SetActive;
     };
 
 /**
@@ -174,19 +166,11 @@ export type UseSignUpReturn =
        * A function that selects a session to make active. Use after sign-up completes to activate the created session.
        */
       selectSession: undefined;
-      /**
-       * @deprecated Use `selectSession` instead.
-       */
-      setActive: undefined;
     }
   | {
       isLoaded: true;
       signUp: SignUpResource;
       selectSession: SelectSessionHook;
-      /**
-       * @deprecated Use `selectSession` instead.
-       */
-      setActive: SetActive;
     };
 
 /**
@@ -235,19 +219,11 @@ export type UseSessionListReturn =
        * A function that selects a session to make active from the available sessions.
        */
       selectSession: undefined;
-      /**
-       * @deprecated Use `selectSession` instead.
-       */
-      setActive: undefined;
     }
   | {
       isLoaded: true;
       sessions: SessionResource[];
       selectSession: SelectSessionHook;
-      /**
-       * @deprecated Use `selectSession` instead.
-       */
-      setActive: SetActive;
     };
 
 /**

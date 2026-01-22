@@ -3,12 +3,12 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 
 import { Col, descriptors, localizationKeys, Spinner, Text } from '../../customizables';
-import { useSetSessionWithTimeout } from '../../hooks/useSetSessionWithTimeout';
+import { useSelectSessionWithTimeout } from '../../hooks/useSetSessionWithTimeout';
 import { Flex } from '../../primitives';
 
 const ResetPasswordSuccessInternal = () => {
   const card = useCardState();
-  useSetSessionWithTimeout();
+  useSelectSessionWithTimeout();
   return (
     <Card.Root>
       <Card.Content>

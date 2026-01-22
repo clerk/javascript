@@ -1,5 +1,5 @@
 import { useSignIn, useSignUp } from '@clerk/react/legacy';
-import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
+import type { SelectSessionHook, SignInResource, SignUpResource } from '@clerk/shared/types';
 
 import { errorThrower } from '../utils/errors';
 
@@ -9,7 +9,7 @@ export type StartAppleAuthenticationFlowParams = {
 
 export type StartAppleAuthenticationFlowReturnType = {
   createdSessionId: string | null;
-  setActive?: SetActive;
+  selectSession?: SelectSessionHook;
   signIn?: SignInResource;
   signUp?: SignUpResource;
 };
@@ -32,10 +32,10 @@ export type StartAppleAuthenticationFlowReturnType = {
  *
  *   const onPress = async () => {
  *     try {
- *       const { createdSessionId, setActive } = await startAppleAuthenticationFlow();
+ *       const { createdSessionId, selectSession } = await startAppleAuthenticationFlow();
  *
- *       if (createdSessionId && setActive) {
- *         await setActive({ session: createdSessionId });
+ *       if (createdSessionId && selectSession) {
+ *         await selectSession(createdSessionId);
  *       }
  *     } catch (err) {
  *       console.error('Apple Authentication error:', err);
@@ -52,7 +52,7 @@ export type StartAppleAuthenticationFlowReturnType = {
  * @returns An object containing the `startAppleAuthenticationFlow` function
  */
 export function useSignInWithApple() {
-  const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
+  const { signIn, selectSession, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 
   async function startAppleAuthenticationFlow(
@@ -63,7 +63,7 @@ export function useSignInWithApple() {
         createdSessionId: null,
         signIn,
         signUp,
-        setActive,
+        selectSession,
       };
     }
 
@@ -124,7 +124,7 @@ export function useSignInWithApple() {
 
         return {
           createdSessionId: signUp.createdSessionId,
-          setActive,
+          selectSession,
           signIn,
           signUp,
         };
@@ -133,7 +133,7 @@ export function useSignInWithApple() {
       // User exists - return the SignIn session
       return {
         createdSessionId: signIn.createdSessionId,
-        setActive,
+        selectSession,
         signIn,
         signUp,
       };
@@ -143,7 +143,7 @@ export function useSignInWithApple() {
         // User canceled the sign-in flow
         return {
           createdSessionId: null,
-          setActive,
+          selectSession,
           signIn,
           signUp,
         };

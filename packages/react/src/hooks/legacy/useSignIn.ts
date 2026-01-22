@@ -58,13 +58,12 @@ export const useSignIn = (): UseSignInReturn => {
   isomorphicClerk.telemetry?.record(eventMethodCalled('useSignIn'));
 
   if (!client) {
-    return { isLoaded: false, signIn: undefined, selectSession: undefined, setActive: undefined };
+    return { isLoaded: false, signIn: undefined, selectSession: undefined };
   }
 
   return {
     isLoaded: true,
     signIn: client.signIn,
     selectSession: isomorphicClerk.selectSession,
-    setActive: isomorphicClerk.setActive,
   };
 };

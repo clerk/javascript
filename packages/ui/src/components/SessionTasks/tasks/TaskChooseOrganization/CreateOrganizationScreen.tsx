@@ -29,7 +29,7 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
   const card = useCardState();
   const { navigateOnSetActive } = useSessionTasksContext();
   const { redirectUrlComplete } = useTaskChooseOrganizationContext();
-  const { createOrganization, isLoaded, setActive } = useOrganizationList({
+  const { createOrganization, isLoaded, selectOrganization } = useOrganizationList({
     userMemberships: organizationListParams.userMemberships,
   });
   const { organizationSettings } = useEnvironment();
@@ -73,8 +73,7 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
         await organization.setLogo({ file: logoFile });
       }
 
-      await setActive({
-        organization,
+      await selectOrganization(organization, {
         navigate: async ({ session }) => {
           await navigateOnSetActive?.({ session, redirectUrlComplete });
         },

@@ -8,7 +8,6 @@ import type {
   OrganizationResource,
   OrganizationSuggestionResource,
   SelectOrganizationOptions,
-  SetActive,
   UserOrganizationInvitationResource,
 } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
@@ -89,11 +88,6 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
        */
       selectOrganization: undefined;
       /**
-       * A function that sets the active session and/or Organization.
-       * @deprecated Use `selectOrganization` instead.
-       */
-      setActive: undefined;
-      /**
        * Returns `PaginatedResources` which includes a list of the user's Organization memberships.
        */
       userMemberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
@@ -113,10 +107,6 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
         organization: OrganizationResource | string | null,
         options?: SelectOrganizationOptions,
       ) => Promise<void>;
-      /**
-       * @deprecated Use `selectOrganization` instead.
-       */
-      setActive: SetActive;
       userMemberships: PaginatedResources<
         OrganizationMembershipResource,
         T['userMemberships'] extends { infinite: true } ? true : false
@@ -396,7 +386,6 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
       isLoaded: false,
       createOrganization: undefined,
       selectOrganization: undefined,
-      setActive: undefined,
       userMemberships: undefinedPaginatedResource,
       userInvitations: undefinedPaginatedResource,
       userSuggestions: undefinedPaginatedResource,
@@ -407,7 +396,6 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
     isLoaded: isClerkLoaded,
     createOrganization: clerk.createOrganization,
     selectOrganization: clerk.selectOrganization,
-    setActive: clerk.setActive,
     userMemberships: memberships,
     userInvitations: invitations,
     userSuggestions: suggestions,
