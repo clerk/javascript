@@ -776,6 +776,12 @@ importers:
         specifier: catalog:repo
         version: 3.5.24(typescript@5.8.3)
 
+  packages/platform:
+    devDependencies:
+      tslib:
+        specifier: catalog:repo
+        version: 2.8.1
+
   packages/react:
     dependencies:
       '@clerk/shared':

@@ -1,0 +1,95 @@
+{
+  "name": "@clerk/platform",
+  "version": "0.1.0",
+  "description": "Clerk Platform API Client - Lightweight JavaScript/TypeScript SDK for the Clerk Platform API",
+  "keywords": [
+    "clerk",
+    "platform",
+    "api",
+    "client",
+    "authentication",
+    "typescript"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/platform"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./applications": {
+      "import": {
+        "types": "./dist/applications.d.ts",
+        "default": "./dist/applications.js"
+      },
+      "require": {
+        "types": "./dist/applications.d.cts",
+        "default": "./dist/applications.cjs"
+      }
+    },
+    "./domains": {
+      "import": {
+        "types": "./dist/domains.d.ts",
+        "default": "./dist/domains.js"
+      },
+      "require": {
+        "types": "./dist/domains.d.cts",
+        "default": "./dist/domains.cjs"
+      }
+    },
+    "./transfers": {
+      "import": {
+        "types": "./dist/transfers.d.ts",
+        "default": "./dist/transfers.js"
+      },
+      "require": {
+        "types": "./dist/transfers.d.cts",
+        "default": "./dist/transfers.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup --env.NODE_ENV production",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "tslib": "catalog:repo"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
