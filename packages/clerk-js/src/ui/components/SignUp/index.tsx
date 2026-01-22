@@ -55,6 +55,7 @@ function SignUpRoutes(): JSX.Element {
             continueSignUpUrl='../continue'
             verifyEmailAddressUrl='../verify-email-address'
             verifyPhoneNumberUrl='../verify-phone-number'
+            unsafeMetadata={signUpContext.unsafeMetadata}
           />
         </Route>
         <Route path='verify'>
