@@ -32,19 +32,20 @@ class PresentProfileOptions : Record {
 
 // Custom exceptions
 class ClerkNotInitializedException : CodedException(
-    code = "ERR_CLERK_NOT_INITIALIZED",
-    message = "Clerk SDK is not initialized. Call configure() first."
+    "Clerk SDK is not initialized. Call configure() first."
 )
 
 class ClerkActivityUnavailableException : CodedException(
-    code = "ERR_ACTIVITY_UNAVAILABLE",
-    message = "No activity available to present Clerk UI."
+    "No activity available to present Clerk UI."
+)
+
+class ClerkAlreadySignedInException : CodedException(
+    "User is already signed in"
 )
 
 class ClerkInitializationException(cause: Throwable?) : CodedException(
-    code = "ERR_CLERK_INIT_FAILED",
-    message = "Failed to initialize Clerk SDK: ${cause?.message}",
-    cause = cause
+    "Failed to initialize Clerk SDK: ${cause?.message}",
+    cause
 )
 
 class ClerkExpoModule : Module() {
@@ -99,6 +100,12 @@ class ClerkExpoModule : Module() {
 
             if (!Clerk.isInitialized.value) {
                 promise.reject(ClerkNotInitializedException())
+                return@AsyncFunction
+            }
+
+            // Check if user is already signed in
+            if (Clerk.session != null) {
+                promise.reject(ClerkAlreadySignedInException())
                 return@AsyncFunction
             }
 
@@ -169,7 +176,6 @@ class ClerkExpoModule : Module() {
                     "primaryEmailAddress" to primaryEmail?.emailAddress,
                     "primaryPhoneNumber" to primaryPhone?.phoneNumber,
                     "passwordEnabled" to it.passwordEnabled,
-                    "mfaEnabled" to it.mfaEnabled,
                     "totpEnabled" to it.totpEnabled,
                     "createdAt" to it.createdAt,
                     "lastSignInAt" to it.lastSignInAt
@@ -188,24 +194,11 @@ class ClerkExpoModule : Module() {
 
             coroutineScope.launch {
                 try {
-                    val result = Clerk.signOut()
-                    result.fold(
-                        onSuccess = { promise.resolve(null) },
-                        onFailure = { error ->
-                            promise.reject(
-                                CodedException(
-                                    code = "ERR_SIGN_OUT_FAILED",
-                                    message = error.message ?: "Sign out failed"
-                                )
-                            )
-                        }
-                    )
+                    Clerk.signOut()
+                    promise.resolve(null)
                 } catch (e: Exception) {
                     promise.reject(
-                        CodedException(
-                            code = "ERR_SIGN_OUT_FAILED",
-                            message = e.message ?: "Sign out failed"
-                        )
+                        CodedException(e.message ?: "Sign out failed")
                     )
                 }
             }

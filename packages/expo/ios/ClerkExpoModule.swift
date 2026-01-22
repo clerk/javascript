@@ -36,6 +36,14 @@ public class ClerkExpoModule: Module {
         throw NSError(domain: "ClerkExpo", code: 1, userInfo: [NSLocalizedDescriptionKey: "Clerk not initialized"])
       }
 
+      // Check if user is already signed in
+      if let existingSession = await factory.getSession() {
+        throw NSError(domain: "ClerkExpo", code: 3, userInfo: [
+          NSLocalizedDescriptionKey: "User is already signed in",
+          "sessionId": existingSession["sessionId"] ?? ""
+        ])
+      }
+
       let mode = options["mode"] as? String ?? "signInOrUp"
       let dismissable = options["dismissable"] as? Bool ?? true
 
