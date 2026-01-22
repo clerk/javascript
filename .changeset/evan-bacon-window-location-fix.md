@@ -1,5 +1,5 @@
 ---
-"@clerk/clerk-js": patch
+"@clerk/clerk-js": major
 ---
 
 fix(clerk-js): Handle missing window.location in React Native navigation
