@@ -7,6 +7,7 @@ import type {
   OrganizationMembershipResource,
   OrganizationResource,
   OrganizationSuggestionResource,
+  SelectOrganizationOptions,
   SetActive,
   UserOrganizationInvitationResource,
 } from '../../types';
@@ -84,7 +85,12 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
        */
       createOrganization: undefined;
       /**
+       * A function that selects an organization to make active within the current session.
+       */
+      selectOrganization: undefined;
+      /**
        * A function that sets the active session and/or Organization.
+       * @deprecated Use `selectOrganization` instead.
        */
       setActive: undefined;
       /**
@@ -103,6 +109,13 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
   | {
       isLoaded: boolean;
       createOrganization: (CreateOrganizationParams: CreateOrganizationParams) => Promise<OrganizationResource>;
+      selectOrganization: (
+        organization: OrganizationResource | string | null,
+        options?: SelectOrganizationOptions,
+      ) => Promise<void>;
+      /**
+       * @deprecated Use `selectOrganization` instead.
+       */
       setActive: SetActive;
       userMemberships: PaginatedResources<
         OrganizationMembershipResource,
@@ -382,6 +395,7 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
     return {
       isLoaded: false,
       createOrganization: undefined,
+      selectOrganization: undefined,
       setActive: undefined,
       userMemberships: undefinedPaginatedResource,
       userInvitations: undefinedPaginatedResource,
@@ -391,8 +405,9 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
 
   return {
     isLoaded: isClerkLoaded,
-    setActive: clerk.setActive,
     createOrganization: clerk.createOrganization,
+    selectOrganization: clerk.selectOrganization,
+    setActive: clerk.setActive,
     userMemberships: memberships,
     userInvitations: invitations,
     userSuggestions: suggestions,

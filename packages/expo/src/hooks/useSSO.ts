@@ -2,6 +2,7 @@ import { useSignIn, useSignUp } from '@clerk/react/legacy';
 import type {
   EnterpriseSSOStrategy,
   OAuthStrategy,
+  SelectSessionHook,
   SetActive,
   SignInResource,
   SignUpResource,
@@ -28,13 +29,15 @@ export type StartSSOFlowParams = {
 export type StartSSOFlowReturnType = {
   createdSessionId: string | null;
   authSessionResult: WebBrowser.WebBrowserAuthSessionResult | null;
+  selectSession?: SelectSessionHook;
+  /** @deprecated Use `selectSession` instead. */
   setActive?: SetActive;
   signIn?: SignInResource;
   signUp?: SignUpResource;
 };
 
 export function useSSO() {
-  const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
+  const { signIn, selectSession, setActive, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 
   async function startSSOFlow(startSSOFlowParams: StartSSOFlowParams): Promise<StartSSOFlowReturnType> {
@@ -44,6 +47,7 @@ export function useSSO() {
         authSessionResult: null,
         signIn,
         signUp,
+        selectSession,
         setActive,
       };
     }
@@ -81,6 +85,7 @@ export function useSSO() {
     if (authSessionResult.type !== 'success' || !authSessionResult.url) {
       return {
         createdSessionId: null,
+        selectSession,
         setActive,
         signIn,
         signUp,
@@ -102,6 +107,7 @@ export function useSSO() {
 
     return {
       createdSessionId: signUp.createdSessionId ?? signIn.createdSessionId,
+      selectSession,
       setActive,
       signIn,
       signUp,
