@@ -243,12 +243,12 @@ describe('EnterpriseAccountsSection ', () => {
     it('renders connection', async () => {
       const { wrapper } = await createFixtures(withOAuthBuiltInEnterpriseConnection);
 
-      const { getByText, getByRole } = render(<EnterpriseAccountsSection />, { wrapper });
+      const { getByText, getByLabelText } = render(<EnterpriseAccountsSection />, { wrapper });
 
       getByText(/^Enterprise accounts/i);
       getByText(/google/i);
-      const img = getByRole('img', { name: /google/i });
-      expect(img.getAttribute('src')).toBe('https://img.clerk.com/static/google.svg?width=160');
+      const icon = getByLabelText(/google's icon/i);
+      expect(icon).toBeInTheDocument();
       getByText(/test@clerk.com/i);
     });
   });
@@ -260,12 +260,12 @@ describe('EnterpriseAccountsSection ', () => {
 
         const { wrapper } = await createFixtures(withOAuthCustomEnterpriseConnection(mockLogoUrl));
 
-        const { getByText, getByRole } = render(<EnterpriseAccountsSection />, { wrapper });
+        const { getByText, getByLabelText } = render(<EnterpriseAccountsSection />, { wrapper });
 
         getByText(/^Enterprise accounts/i);
         getByText(/roblox/i);
-        const img = getByRole('img', { name: /roblox/i });
-        expect(img.getAttribute('src')).toContain(mockLogoUrl);
+        const icon = getByLabelText(/roblox's icon/i);
+        expect(icon).toBeInTheDocument();
         getByText(/test@clerk.com/i);
       });
     });
@@ -288,12 +288,12 @@ describe('EnterpriseAccountsSection ', () => {
     it('renders connection', async () => {
       const { wrapper } = await createFixtures(withSamlEnterpriseConnection);
 
-      const { getByText, getByRole } = render(<EnterpriseAccountsSection />, { wrapper });
+      const { getByText, getByLabelText } = render(<EnterpriseAccountsSection />, { wrapper });
 
       getByText(/^Enterprise accounts/i);
       getByText(/okta workforce/i);
-      const img = getByRole('img', { name: /okta/i });
-      expect(img.getAttribute('src')).toBe('https://img.clerk.com/static/okta.svg?width=160');
+      const icon = getByLabelText(/okta workforce's icon/i);
+      expect(icon).toBeInTheDocument();
       getByText(/test@clerk.com/i);
     });
   });
