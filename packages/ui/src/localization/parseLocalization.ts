@@ -13,25 +13,20 @@ import { defaultResource } from './defaultEnglishResource';
 let cache: LocalizationResource | undefined;
 let prev: LocalizationInput | undefined;
 
-const parseLocalizationResource = (
-  userDefined: LocalizationInput,
-  base: LocalizationResource,
-): LocalizationResource => {
+function parseLocalizationResource(userDefined: LocalizationInput, base: LocalizationResource): LocalizationResource {
   if (!cache || (!!prev && prev !== userDefined && !deepEqual(userDefined, prev))) {
     prev = userDefined;
 
-    // If no user-defined localization, just return base
     if (!userDefined || Object.keys(userDefined).length === 0) {
       cache = base;
       return cache;
     }
 
-    // Validate no mixing of formats (throws if mixed)
-    validateLocalizationFormat(userDefined as Record<string, unknown>);
+    const input = userDefined as Record<string, unknown>;
+    validateLocalizationFormat(input);
 
-    // Convert flattened to nested if needed
-    const normalized = isFlattenedObject(userDefined as Record<string, unknown>)
-      ? unflattenObject<LocalizationResource>(userDefined as Record<string, unknown>)
+    const normalized = isFlattenedObject(input)
+      ? unflattenObject<LocalizationResource>(input)
       : (userDefined as LocalizationResource);
 
     const res = {} as LocalizationResource;
@@ -41,7 +36,7 @@ const parseLocalizationResource = (
     return cache;
   }
   return cache;
-};
+}
 
 export const useParsedLocalizationResource = () => {
   const { localization } = useOptions();
