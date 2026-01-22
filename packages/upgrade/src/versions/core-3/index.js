@@ -27,5 +27,7 @@ export default {
     // Vue SFC version of Protect→Show (handles .vue files)
     { name: 'transform-protect-to-show-vue', packages: ['vue', 'nuxt'] },
     { name: 'transform-clerk-provider-inside-body', packages: ['nextjs'] },
+    // Migrate @clerk/react-router/api.server → @clerk/react-router/server
+    { name: 'transform-react-router-api-server', packages: ['react-router'] },
   ],
 };
