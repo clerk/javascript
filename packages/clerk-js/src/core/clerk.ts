@@ -1464,7 +1464,11 @@ export class Clerk implements ClerkInterface {
       }
 
       if (session === undefined && !this.session) {
-        debugLogger.warn('Clerk setSelected precondition not met: no target session and no selected session', {}, 'clerk');
+        debugLogger.warn(
+          'Clerk setSelected precondition not met: no target session and no selected session',
+          {},
+          'clerk',
+        );
         throw new Error(
           'setSelected should either be called with a session param or there should be already a selected session.',
         );

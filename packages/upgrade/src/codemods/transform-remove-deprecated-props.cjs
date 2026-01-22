@@ -431,28 +431,36 @@ function transformSetActiveToSetSelected(root, j, stats) {
   let changed = false;
 
   // Rename setActive method calls: clerk.setActive(...) -> clerk.setSelected(...)
-  root.find(j.MemberExpression, {
-    property: { type: 'Identifier', name: 'setActive' },
-    computed: false,
-  }).forEach(path => {
-    path.node.property.name = 'setSelected';
-    changed = true;
-    stats('setActiveRenamed');
-  });
+  root
+    .find(j.MemberExpression, {
+      property: { type: 'Identifier', name: 'setActive' },
+      computed: false,
+    })
+    .forEach(path => {
+      path.node.property.name = 'setSelected';
+      changed = true;
+      stats('setActiveRenamed');
+    });
 
-  root.find(j.OptionalMemberExpression, {
-    property: { type: 'Identifier', name: 'setActive' },
-    computed: false,
-  }).forEach(path => {
-    path.node.property.name = 'setSelected';
-    changed = true;
-    stats('setActiveRenamed');
-  });
+  root
+    .find(j.OptionalMemberExpression, {
+      property: { type: 'Identifier', name: 'setActive' },
+      computed: false,
+    })
+    .forEach(path => {
+      path.node.property.name = 'setSelected';
+      changed = true;
+      stats('setActiveRenamed');
+    });
 
   // Rename setActive identifier (e.g., standalone call or destructured)
   root.find(j.Identifier, { name: 'setActive' }).forEach(path => {
     // Skip if it's part of a member expression property (already handled above)
-    if (path.parent && (path.parent.node.type === 'MemberExpression' || path.parent.node.type === 'OptionalMemberExpression') && path.parent.node.property === path.node) {
+    if (
+      path.parent &&
+      (path.parent.node.type === 'MemberExpression' || path.parent.node.type === 'OptionalMemberExpression') &&
+      path.parent.node.property === path.node
+    ) {
       return;
     }
     // Skip if it's part of an import specifier (handled separately)
@@ -495,7 +503,9 @@ function isSetActiveOrSetSelectedCall(callee) {
   }
   if (callee.type === 'MemberExpression' || callee.type === 'OptionalMemberExpression') {
     const property = callee.property;
-    return property && property.type === 'Identifier' && (property.name === 'setActive' || property.name === 'setSelected');
+    return (
+      property && property.type === 'Identifier' && (property.name === 'setActive' || property.name === 'setSelected')
+    );
   }
   return false;
 }
