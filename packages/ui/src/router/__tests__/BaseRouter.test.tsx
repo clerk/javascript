@@ -38,7 +38,7 @@ describe('BaseRouter', () => {
   describe('concurrent navigations', () => {
     beforeEach(() => {
       // @ts-ignore
-      window.location = new URL('https://www.example.com/virtual');
+      window.location = new URL('https://www.example.test/virtual');
     });
 
     it('resolves all promises when multiple navigations occur before effect runs', async () => {

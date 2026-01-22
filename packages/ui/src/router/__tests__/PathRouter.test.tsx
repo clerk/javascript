@@ -69,7 +69,7 @@ describe('PathRouter', () => {
   describe('when hash has a path included in it', () => {
     beforeEach(() => {
       // @ts-ignore
-      window.location = new URL('https://www.example.com/foo#/bar');
+      window.location = new URL('https://www.example.test/foo#/bar');
     });
 
     it('adds the hash path to the primary path', async () => {
@@ -84,7 +84,7 @@ describe('PathRouter', () => {
   describe('when query has a preservedParam', () => {
     beforeEach(() => {
       // @ts-ignore
-      window.location = new URL('https://www.example.com/foo/bar?preserved=1');
+      window.location = new URL('https://www.example.test/foo/bar?preserved=1');
     });
 
     it('preserves the param for internal navigation', async () => {
@@ -102,7 +102,7 @@ describe('PathRouter', () => {
       const button = screen.getByRole('button', { name: /External/i });
       await userEvent.click(button);
 
-      expect(mockNavigate).toHaveBeenNthCalledWith(1, 'https://www.example.com/');
+      expect(mockNavigate).toHaveBeenNthCalledWith(1, 'https://www.example.test/');
     });
   });
 });

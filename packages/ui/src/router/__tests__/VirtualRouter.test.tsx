@@ -74,7 +74,7 @@ describe('VirtualRouter', () => {
   describe('when mounted', () => {
     beforeEach(() => {
       // @ts-ignore
-      window.location = new URL('https://www.example.com/virtual');
+      window.location = new URL('https://www.example.test/virtual');
     });
 
     it('it loads the start path', async () => {
@@ -86,7 +86,7 @@ describe('VirtualRouter', () => {
   describe('when a preserved query param is created internally', () => {
     beforeEach(() => {
       // @ts-ignore
-      window.location = new URL('https://www.example.com/virtual');
+      window.location = new URL('https://www.example.test/virtual');
     });
 
     it('preserves the param for internal navigation', async () => {

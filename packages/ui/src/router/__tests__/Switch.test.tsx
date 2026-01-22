@@ -38,7 +38,7 @@ describe('<Switch >', () => {
   });
 
   it('ignores nodes that are not of type Route', () => {
-    setWindowOrigin('http://dashboard.example.com/#/first');
+    setWindowOrigin('http://dashboard.example.test/#/first');
     render(
       <HashRouter>
         <Switch>
@@ -53,7 +53,7 @@ describe('<Switch >', () => {
   });
 
   it('renders only the first Route that matches', () => {
-    setWindowOrigin('http://dashboard.example.com/#/first');
+    setWindowOrigin('http://dashboard.example.test/#/first');
     render(
       <HashRouter>
         <Switch>
@@ -70,7 +70,7 @@ describe('<Switch >', () => {
   });
 
   it('renders null if no route matches', () => {
-    setWindowOrigin('http://dashboard.example.com/#/cat');
+    setWindowOrigin('http://dashboard.example.test/#/cat');
     render(
       <HashRouter>
         <Switch>
@@ -87,7 +87,7 @@ describe('<Switch >', () => {
   });
 
   it('always matches a Route without path', () => {
-    setWindowOrigin('http://dashboard.example.com/#/cat');
+    setWindowOrigin('http://dashboard.example.test/#/cat');
     render(
       <HashRouter>
         <Switch>
@@ -104,7 +104,7 @@ describe('<Switch >', () => {
   });
 
   it('always matches a Route without path even when other routes match down the tree', () => {
-    setWindowOrigin('http://dashboard.example.com/#/first');
+    setWindowOrigin('http://dashboard.example.test/#/first');
     render(
       <HashRouter>
         <Switch>
@@ -119,7 +119,7 @@ describe('<Switch >', () => {
   });
 
   it('always matches a Route without path even if its an index route', () => {
-    setWindowOrigin('http://dashboard.example.com/#/first');
+    setWindowOrigin('http://dashboard.example.test/#/first');
     render(
       <HashRouter>
         <Switch>
