@@ -159,7 +159,7 @@ describe('runScans', () => {
     };
 
     const results = await runScans(config, 'nextjs', options);
-
+    expect(results.some(result => result.title === 'Upgrade Node.js to v20.9.0 or higher')).toBe(true);
     expect(results.length).toBeGreaterThan(0);
   });
 
@@ -181,7 +181,7 @@ describe('runScans', () => {
     const config = await loadConfig('nextjs', 6);
     const options = {
       dir: fixture.path,
-      ignore: ['**/src/**'],
+      ignore: ['**/src/**', '**/package.json'],
     };
 
     const results = await runScans(config, 'nextjs', options);
