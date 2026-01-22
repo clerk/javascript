@@ -19,13 +19,13 @@ const handler = client["__internal_onAfterResponse"];
   {
     name: 'Moves UI theme helpers to experimental path and renames identifiers',
     source: `
-import { __experimental_createTheme, experimental__simple, Button } from '@clerk/ui';
+import { __experimental_createTheme, experimental__simple, UntouchedImport } from '@clerk/ui';
 
 const theme = __experimental_createTheme();
 const kind = experimental__simple;
     `,
     output: `
-import { Button } from '@clerk/ui';
+import { UntouchedImport } from '@clerk/ui';
 
 import { createTheme, simple } from "@clerk/ui/themes/experimental";
 
@@ -36,11 +36,11 @@ const kind = simple;
   {
     name: 'Moves UI theme helpers required from root to experimental path',
     source: `
-const { __experimental_createTheme, experimental__simple, Card } = require('@clerk/ui');
+const { __experimental_createTheme, experimental__simple, UntouchedImport } = require('@clerk/ui');
     `,
     output: `
 const {
-  Card
+  UntouchedImport
 } = require('@clerk/ui');
 
 const {

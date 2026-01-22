@@ -83,6 +83,7 @@ import type {
   InstanceType,
   JoinWaitlistParams,
   ListenerCallback,
+  LoadedClerk,
   NavigateOptions,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -437,6 +438,29 @@ export class Clerk implements ClerkInterface {
     });
     this.#publicEventBus.emit(clerkEvents.Status, 'loading');
     this.#publicEventBus.prioritizedOn(clerkEvents.Status, s => (this.#status = s));
+
+    this.#publicEventBus.on(clerkEvents.Status, status => {
+      if (!inBrowser()) {
+        return;
+      }
+      if (status === 'ready' || status === 'degraded') {
+        if (window.__clerk_internal_ready?.__resolve && this.#isLoaded()) {
+          window.__clerk_internal_ready.__resolve(this);
+        }
+      } else if (status === 'error') {
+        if (window.__clerk_internal_ready?.__reject) {
+          window.__clerk_internal_ready.__reject(
+            new ClerkRuntimeError('Clerk failed to initialize.', { code: 'clerk_init_failed' }),
+          );
+        }
+      }
+    });
+
+    if (inBrowser() && (this.#status === 'ready' || this.#status === 'degraded') && this.#isLoaded()) {
+      if (window.__clerk_internal_ready?.__resolve) {
+        window.__clerk_internal_ready.__resolve(this);
+      }
+    }
 
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
@@ -3187,5 +3211,9 @@ export class Clerk implements ClerkInterface {
     }
 
     return allowedProtocols;
+  }
+
+  #isLoaded(): this is LoadedClerk {
+    return this.client !== undefined;
   }
 }

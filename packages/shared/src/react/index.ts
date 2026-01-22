@@ -20,3 +20,5 @@ export {
 } from './contexts';
 
 export * from './billing/payment-element';
+
+export { UNSAFE_PortalProvider, usePortalRoot } from './PortalProvider';

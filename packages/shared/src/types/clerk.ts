@@ -1454,9 +1454,22 @@ export interface TransferableOption {
   transferable?: boolean;
 }
 
-export type SignInModalProps = WithoutRouting<SignInProps>;
+export type SignInModalProps = WithoutRouting<SignInProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 export type __internal_UserVerificationProps = RoutingOptions & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
   /**
    * Non-awaitable callback for when verification is completed successfully
    */
@@ -1598,7 +1611,14 @@ export type SignUpProps = RoutingOptions & {
   SignInForceRedirectUrl &
   AfterSignOutUrl;
 
-export type SignUpModalProps = WithoutRouting<SignUpProps>;
+export type SignUpModalProps = WithoutRouting<SignUpProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 export type UserProfileProps = RoutingOptions & {
   /**
@@ -1640,7 +1660,14 @@ export type UserProfileProps = RoutingOptions & {
   };
 };
 
-export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
+export type UserProfileModalProps = WithoutRouting<UserProfileProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 export type OrganizationProfileProps = RoutingOptions & {
   /**
@@ -1683,7 +1710,14 @@ export type OrganizationProfileProps = RoutingOptions & {
   };
 };
 
-export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
+export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 export type CreateOrganizationProps = RoutingOptions & {
   /**
@@ -1709,7 +1743,14 @@ export type CreateOrganizationProps = RoutingOptions & {
   appearance?: ClerkAppearanceTheme;
 };
 
-export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
+export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 type UserProfileMode = 'modal' | 'navigation';
 type UserButtonProfileMode =
@@ -1932,7 +1973,14 @@ export type WaitlistProps = {
   signInUrl?: string;
 };
 
-export type WaitlistModalProps = WaitlistProps;
+export type WaitlistModalProps = WaitlistProps & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 type PricingTableDefaultProps = {
   /**
