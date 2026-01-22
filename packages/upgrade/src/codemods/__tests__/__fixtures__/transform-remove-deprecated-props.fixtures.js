@@ -172,7 +172,7 @@ await setActive({
 });
     `,
     output: `
-await setActive({
+await setSelected({
   session: '123',
   navigate: params => handleBeforeEmit(params.session),
 });
