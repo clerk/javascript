@@ -44,31 +44,18 @@ const withEnvFallback = (value: string | undefined, envVarName: string): string 
  *
  * Supported environment variables:
  * - VITE_CLERK_PUBLISHABLE_KEY / CLERK_PUBLISHABLE_KEY
- * - VITE_CLERK_SIGN_IN_URL / CLERK_SIGN_IN_URL
- * - VITE_CLERK_SIGN_UP_URL / CLERK_SIGN_UP_URL
- * - VITE_CLERK_SIGN_IN_FORCE_REDIRECT_URL / CLERK_SIGN_IN_FORCE_REDIRECT_URL
- * - VITE_CLERK_SIGN_UP_FORCE_REDIRECT_URL / CLERK_SIGN_UP_FORCE_REDIRECT_URL
- * - VITE_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL / CLERK_SIGN_IN_FALLBACK_REDIRECT_URL
- * - VITE_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL / CLERK_SIGN_UP_FALLBACK_REDIRECT_URL
  *
  * @param options - The options passed to ClerkProvider
  * @returns Options with environment variable fallbacks applied
  */
 export const mergeWithEnv = (options: IsomorphicClerkOptions): IsomorphicClerkOptions => {
+  // Get env fallback values (undefined if not set)
+  const publishableKey = withEnvFallback(options.publishableKey, 'CLERK_PUBLISHABLE_KEY');
+
+  // Only add publishableKey to result if it has a defined value
+  // URL fallbacks removed due to compatibility issues with @clerk/react-router
   return {
     ...options,
-    publishableKey: withEnvFallback(options.publishableKey, 'CLERK_PUBLISHABLE_KEY'),
-    signInUrl: withEnvFallback(options.signInUrl, 'CLERK_SIGN_IN_URL'),
-    signUpUrl: withEnvFallback(options.signUpUrl, 'CLERK_SIGN_UP_URL'),
-    signInForceRedirectUrl: withEnvFallback(options.signInForceRedirectUrl, 'CLERK_SIGN_IN_FORCE_REDIRECT_URL'),
-    signUpForceRedirectUrl: withEnvFallback(options.signUpForceRedirectUrl, 'CLERK_SIGN_UP_FORCE_REDIRECT_URL'),
-    signInFallbackRedirectUrl: withEnvFallback(
-      options.signInFallbackRedirectUrl,
-      'CLERK_SIGN_IN_FALLBACK_REDIRECT_URL',
-    ),
-    signUpFallbackRedirectUrl: withEnvFallback(
-      options.signUpFallbackRedirectUrl,
-      'CLERK_SIGN_UP_FALLBACK_REDIRECT_URL',
-    ),
+    ...(publishableKey !== undefined && { publishableKey }),
   };
 };

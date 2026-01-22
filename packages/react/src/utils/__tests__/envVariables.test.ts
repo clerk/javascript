@@ -16,70 +16,42 @@ describe('mergeWithEnv', () => {
     vi.clearAllMocks();
   });
 
-  it('returns passed-in options when all are provided', () => {
+  it('returns passed-in publishableKey when provided', () => {
     mockedGetEnvVariable.mockReturnValue('should_not_be_used');
 
     const options: IsomorphicClerkOptions = {
       publishableKey: 'pk_test_explicit',
-      signInUrl: '/sign-in',
-      signUpUrl: '/sign-up',
-      signInForceRedirectUrl: '/dashboard',
-      signUpForceRedirectUrl: '/onboarding',
-      signInFallbackRedirectUrl: '/home',
-      signUpFallbackRedirectUrl: '/welcome',
     };
 
     const result = mergeWithEnv(options);
 
     expect(result.publishableKey).toBe('pk_test_explicit');
-    expect(result.signInUrl).toBe('/sign-in');
-    expect(result.signUpUrl).toBe('/sign-up');
-    expect(result.signInForceRedirectUrl).toBe('/dashboard');
-    expect(result.signUpForceRedirectUrl).toBe('/onboarding');
-    expect(result.signInFallbackRedirectUrl).toBe('/home');
-    expect(result.signUpFallbackRedirectUrl).toBe('/welcome');
   });
 
-  it('falls back to VITE_ prefixed env vars when options are undefined', () => {
+  it('falls back to VITE_CLERK_PUBLISHABLE_KEY env var when option is undefined', () => {
     mockedGetEnvVariable.mockImplementation((name: string) => {
-      const envVars: Record<string, string> = {
-        VITE_CLERK_PUBLISHABLE_KEY: 'pk_test_vite',
-        VITE_CLERK_SIGN_IN_URL: '/vite-sign-in',
-        VITE_CLERK_SIGN_UP_URL: '/vite-sign-up',
-        VITE_CLERK_SIGN_IN_FORCE_REDIRECT_URL: '/vite-dashboard',
-        VITE_CLERK_SIGN_UP_FORCE_REDIRECT_URL: '/vite-onboarding',
-        VITE_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: '/vite-home',
-        VITE_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: '/vite-welcome',
-      };
-      return envVars[name] || '';
+      if (name === 'VITE_CLERK_PUBLISHABLE_KEY') {
+        return 'pk_test_vite';
+      }
+      return '';
     });
 
     const result = mergeWithEnv({} as any);
 
     expect(result.publishableKey).toBe('pk_test_vite');
-    expect(result.signInUrl).toBe('/vite-sign-in');
-    expect(result.signUpUrl).toBe('/vite-sign-up');
-    expect(result.signInForceRedirectUrl).toBe('/vite-dashboard');
-    expect(result.signUpForceRedirectUrl).toBe('/vite-onboarding');
-    expect(result.signInFallbackRedirectUrl).toBe('/vite-home');
-    expect(result.signUpFallbackRedirectUrl).toBe('/vite-welcome');
   });
 
-  it('falls back to non-prefixed env vars when VITE_ prefixed not set', () => {
+  it('falls back to CLERK_PUBLISHABLE_KEY when VITE_ prefixed not set', () => {
     mockedGetEnvVariable.mockImplementation((name: string) => {
-      const envVars: Record<string, string> = {
-        CLERK_PUBLISHABLE_KEY: 'pk_test_node',
-        CLERK_SIGN_IN_URL: '/node-sign-in',
-        CLERK_SIGN_UP_URL: '/node-sign-up',
-      };
-      return envVars[name] || '';
+      if (name === 'CLERK_PUBLISHABLE_KEY') {
+        return 'pk_test_node';
+      }
+      return '';
     });
 
     const result = mergeWithEnv({} as any);
 
     expect(result.publishableKey).toBe('pk_test_node');
-    expect(result.signInUrl).toBe('/node-sign-in');
-    expect(result.signUpUrl).toBe('/node-sign-up');
   });
 
   it('prioritizes VITE_ prefixed env var over non-prefixed', () => {
@@ -96,32 +68,24 @@ describe('mergeWithEnv', () => {
     expect(result.publishableKey).toBe('pk_test_vite');
   });
 
-  it('does NOT fall back when options are empty string (framework SDK behavior)', () => {
-    mockedGetEnvVariable.mockImplementation((name: string) => {
-      if (name === 'VITE_CLERK_SIGN_IN_URL') {
-        return '/vite-sign-in';
-      }
-      return '';
-    });
+  it('does NOT fall back when publishableKey is empty string (framework SDK behavior)', () => {
+    mockedGetEnvVariable.mockReturnValue('pk_test_vite');
 
     const result = mergeWithEnv({
-      publishableKey: 'pk_test',
-      signInUrl: '',
+      publishableKey: '',
     });
 
     // Should preserve empty string, not fall back to env var
-    expect(result.signInUrl).toBe('');
+    expect(result.publishableKey).toBe('');
   });
 
-  it('returns undefined when neither options nor env vars are set', () => {
+  it('returns undefined publishableKey when neither option nor env var is set', () => {
     mockedGetEnvVariable.mockReturnValue('');
 
     const result = mergeWithEnv({} as any);
 
-    // When env vars are not set, we return undefined to avoid overriding downstream defaults
+    // When env var is not set, we don't add the property
     expect(result.publishableKey).toBeUndefined();
-    expect(result.signInUrl).toBeUndefined();
-    expect(result.signUpUrl).toBeUndefined();
   });
 
   it('preserves other options that are not env-var backed', () => {
@@ -131,11 +95,16 @@ describe('mergeWithEnv', () => {
       publishableKey: 'pk_test',
       appearance: { variables: { colorPrimary: 'red' } },
       localization: { signIn: { start: { title: 'Hello' } } },
+      signInUrl: '/custom-sign-in',
+      signUpUrl: '/custom-sign-up',
     };
 
     const result = mergeWithEnv(options);
 
+    expect(result.publishableKey).toBe('pk_test');
     expect(result.appearance).toEqual({ variables: { colorPrimary: 'red' } });
     expect(result.localization).toEqual({ signIn: { start: { title: 'Hello' } } });
+    expect(result.signInUrl).toBe('/custom-sign-in');
+    expect(result.signUpUrl).toBe('/custom-sign-up');
   });
 });

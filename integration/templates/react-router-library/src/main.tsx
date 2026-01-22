@@ -5,6 +5,7 @@ import { ClerkProvider } from '@clerk/react-router';
 import './index.css';
 import App from './App.tsx';
 
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const CLERK_JS_URL = import.meta.env.VITE_CLERK_JS_URL;
 const CLERK_UI_URL = import.meta.env.VITE_CLERK_UI_URL;
 
@@ -12,6 +13,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <ClerkProvider
+        publishableKey={PUBLISHABLE_KEY}
         clerkJSUrl={CLERK_JS_URL}
         clerkUiUrl={CLERK_UI_URL}
         appearance={{
