@@ -4,11 +4,14 @@ import {
   buildClerkUiScriptAttributes,
   clerkJsScriptUrl,
   clerkUiScriptUrl,
+  IS_REACT_SHARED_VARIANT_COMPATIBLE,
 } from '@clerk/react/internal';
 import NextScript from 'next/script';
 import React from 'react';
 
 import { useClerkNextOptions } from '../client-boundary/NextOptionsContext';
+
+const DEFAULT_CLERK_UI_VARIANT = IS_REACT_SHARED_VARIANT_COMPATIBLE ? ('shared' as const) : ('' as const);
 
 type ClerkScriptProps = {
   scriptUrl: string;
@@ -43,7 +46,8 @@ function ClerkScript(props: ClerkScriptProps) {
 }
 
 export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] }) {
-  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant, nonce, clerkUiUrl, ui } = useClerkNextOptions();
+  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant, nonce, clerkUiUrl, clerkUiVariant, ui } =
+    useClerkNextOptions();
   const { domain, proxyUrl } = useClerk();
 
   if (!publishableKey) {
@@ -60,6 +64,7 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
     proxyUrl,
     clerkUiVersion: ui?.version,
     clerkUiUrl: ui?.url || clerkUiUrl,
+    clerkUiVariant: clerkUiVariant ?? DEFAULT_CLERK_UI_VARIANT,
   };
 
   return (
