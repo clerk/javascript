@@ -14,6 +14,7 @@ export default defineConfig(overrideOptions => {
       errors: 'src/errors.ts',
       experimental: 'src/experimental.ts',
       legacy: 'src/legacy.ts',
+      types: 'src/types/index.ts',
     },
     dts: true,
     onSuccess: shouldPublish ? 'pnpm publish:local' : undefined,

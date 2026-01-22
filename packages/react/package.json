@@ -73,6 +73,14 @@
         "default": "./dist/legacy.js"
       }
     },
+    "./types": {
+      "import": {
+        "types": "./dist/types.d.mts"
+      },
+      "require": {
+        "types": "./dist/types.d.ts"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
