@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import type { FlattenedLocalizationResource, LocalizationResource } from '@clerk/shared/types';
+import { describe, expect, it } from 'vitest';
 
 import { flatLocalization } from '../flatLocalization';
 
