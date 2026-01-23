@@ -42,6 +42,7 @@ test.describe('Client handshake @generic', () => {
         () => `import { clerkMiddleware } from '@clerk/nextjs/server';
 
     export const middleware = (req, evt) => {
+      const satelliteAutoSyncHeader = req.headers.get('x-satellite-auto-sync');
       return clerkMiddleware({
         publishableKey: req.headers.get("x-publishable-key"),
         secretKey: req.headers.get("x-secret-key"),
@@ -49,6 +50,7 @@ test.describe('Client handshake @generic', () => {
         domain: req.headers.get("x-domain"),
         isSatellite: req.headers.get('x-satellite') === 'true',
         signInUrl: req.headers.get("x-sign-in-url"),
+        satelliteAutoSync: satelliteAutoSyncHeader === null ? undefined : satelliteAutoSyncHeader === 'true',
       })(req, evt)
     };
 
@@ -565,6 +567,86 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(200);
+  });
+
+  test('signed out satellite with satelliteAutoSync=false skips handshake - prod', async () => {
+    const config = generateConfig({
+      mode: 'live',
+    });
+    const res = await fetch(app.serverUrl + '/', {
+      headers: new Headers({
+        'X-Publishable-Key': config.pk,
+        'X-Secret-Key': config.sk,
+        'X-Satellite': 'true',
+        'X-Domain': 'example.com',
+        'X-Satellite-Auto-Sync': 'false',
+        'Sec-Fetch-Dest': 'document',
+      }),
+      redirect: 'manual',
+    });
+    // Should NOT redirect to handshake when satelliteAutoSync=false and no cookies
+    expect(res.status).toBe(200);
+  });
+
+  test('signed out satellite with satelliteAutoSync=false triggers handshake when __clerk_synced=false - prod', async () => {
+    const config = generateConfig({
+      mode: 'live',
+    });
+    const res = await fetch(app.serverUrl + '/?__clerk_synced=false', {
+      headers: new Headers({
+        'X-Publishable-Key': config.pk,
+        'X-Secret-Key': config.sk,
+        'X-Satellite': 'true',
+        'X-Domain': 'example.com',
+        'X-Satellite-Auto-Sync': 'false',
+        'Sec-Fetch-Dest': 'document',
+      }),
+      redirect: 'manual',
+    });
+    // Should redirect to handshake when __clerk_synced=false is present
+    expect(res.status).toBe(307);
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe('https://clerk.example.com/v1/client/handshake');
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe('satellite-needs-syncing');
+  });
+
+  test('signed out satellite skips handshake when __clerk_synced=true (completed) - prod', async () => {
+    const config = generateConfig({
+      mode: 'live',
+    });
+    const res = await fetch(app.serverUrl + '/?__clerk_synced=true', {
+      headers: new Headers({
+        'X-Publishable-Key': config.pk,
+        'X-Secret-Key': config.sk,
+        'X-Satellite': 'true',
+        'X-Domain': 'example.com',
+        'Sec-Fetch-Dest': 'document',
+      }),
+      redirect: 'manual',
+    });
+    // Should NOT redirect when __clerk_synced=true indicates sync already completed
+    expect(res.status).toBe(200);
+  });
+
+  test('signed out satellite with satelliteAutoSync=true (default) triggers handshake - prod', async () => {
+    const config = generateConfig({
+      mode: 'live',
+    });
+    const res = await fetch(app.serverUrl + '/', {
+      headers: new Headers({
+        'X-Publishable-Key': config.pk,
+        'X-Secret-Key': config.sk,
+        'X-Satellite': 'true',
+        'X-Domain': 'example.com',
+        'X-Satellite-Auto-Sync': 'true',
+        'Sec-Fetch-Dest': 'document',
+      }),
+      redirect: 'manual',
+    });
+    // Should redirect to handshake with default/true satelliteAutoSync
+    expect(res.status).toBe(307);
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe('https://clerk.example.com/v1/client/handshake');
   });
 
   test('missing session token, missing uat (indicating signed out), missing devbrowser - dev', async () => {

@@ -18,8 +18,6 @@ const GLOBBY_IGNORE = [
   '**/build/**',
   '.next/**',
   '**/.next/**',
-  'package.json',
-  '**/package.json',
   'package-lock.json',
   '**/package-lock.json',
   'yarn.lock',
