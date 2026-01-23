@@ -403,7 +403,11 @@ describe('SignUpStart', () => {
       );
 
       await waitFor(() =>
-        expect(fixtures.signUp.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' }),
+        expect(fixtures.signUp.create).toHaveBeenCalledWith({
+          strategy: 'ticket',
+          ticket: 'test_ticket',
+          unsafeMetadata: undefined,
+        }),
       );
 
       //don't remove the query param quite yet
@@ -411,6 +415,39 @@ describe('SignUpStart', () => {
         undefined,
         '',
         expect.not.stringContaining('__clerk_ticket'),
+      );
+    });
+
+    it('passes unsafeMetadata to signUp.create when ticket is detected', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+      });
+      fixtures.signUp.create.mockResolvedValueOnce({} as SignUpResource);
+      props.setProps({ unsafeMetadata: { foo: 'bar', nested: { value: 123 } } });
+
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: { href: 'http://localhost/sign-up?__clerk_ticket=test_ticket' },
+      });
+      Object.defineProperty(window, 'history', {
+        writable: true,
+        value: { replaceState: vi.fn() },
+      });
+
+      render(
+        <CardStateProvider>
+          <SignUpStart />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await waitFor(() =>
+        expect(fixtures.signUp.create).toHaveBeenCalledWith({
+          strategy: 'ticket',
+          ticket: 'test_ticket',
+          unsafeMetadata: { foo: 'bar', nested: { value: 123 } },
+        }),
       );
     });
 
@@ -438,7 +475,11 @@ describe('SignUpStart', () => {
       );
 
       await waitFor(() =>
-        expect(fixtures.signUp.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' }),
+        expect(fixtures.signUp.create).toHaveBeenCalledWith({
+          strategy: 'ticket',
+          ticket: 'test_ticket',
+          unsafeMetadata: undefined,
+        }),
       );
 
       expect(window.history.replaceState).toHaveBeenCalledWith(

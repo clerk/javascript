@@ -7,7 +7,8 @@ import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { Badge, Box, Flex, Image, localizationKeys, Text } from '../../customizables';
+import { ProviderIcon } from '../../common';
+import { Badge, Box, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
@@ -72,10 +73,11 @@ export const Web3Section = withCardStateProvider(
                     >
                       <Flex sx={t => ({ alignItems: 'center', gap: t.space.$2, width: '100%' })}>
                         {strategyToDisplayData[strategy].iconUrl && (
-                          <Image
-                            src={strategyToDisplayData[strategy].iconUrl}
+                          <ProviderIcon
+                            id={strategyToDisplayData[strategy].id}
+                            iconUrl={strategyToDisplayData[strategy].iconUrl}
+                            name={strategyToDisplayData[strategy].name}
                             alt={strategyToDisplayData[strategy].name}
-                            sx={theme => ({ width: theme.sizes.$4 })}
                           />
                         )}
                         <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
