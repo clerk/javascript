@@ -1648,6 +1648,27 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    // In React Native, window exists but window.location does not.
+    // If we have a custom router, use it directly. Otherwise, return early.
+    if (typeof window.location === 'undefined') {
+      const customNavigate =
+        options?.replace && this.#options.routerReplace ? this.#options.routerReplace : this.#options.routerPush;
+
+      if (customNavigate) {
+        debugLogger.info(`Clerk is navigating to: ${to}`);
+        return await customNavigate(to, { windowNavigate });
+      }
+
+      // No window.location and no custom router - can't navigate
+      if (__DEV__) {
+        console.warn(
+          'Clerk: Navigation was attempted but window.location is not available and no custom router (routerPush/routerReplace) was provided. ' +
+            'If you are using React Native, please provide routerPush and routerReplace options to ClerkProvider.',
+        );
+      }
+      return;
+    }
+
     /**
      * Trigger all navigation listeners. In order for modal UI components to close.
      */
