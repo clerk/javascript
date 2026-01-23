@@ -1083,7 +1083,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
   AfterMultiSessionSingleSignOutUrl &
   ClerkUnsafeOptions & {
     /**
-     * Clerk UI entrypoint.
+     * @internal
+     * Clerk UI entrypoint. Used internally by SDKs to pass the UI constructor to clerk-js.
      */
     clerkUiCtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
     /**
@@ -2405,7 +2406,7 @@ export type ClerkProp =
   | undefined
   | null;
 
-export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
+export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite' | 'clerkUiCtor'> & {
   Clerk?: ClerkProp;
   /**
    * The URL that `@clerk/clerk-js` should be hot-loaded from.
@@ -2444,6 +2445,12 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
      * loading the UI from CDN. This is useful for bundling the UI with your app.
      */
     ctor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
+    /**
+     * @internal
+     * Force using the bundled UI constructor instead of loading from CDN.
+     * Used internally by SDKs that must bundle the UI (e.g., Chrome Extension).
+     */
+    __internal_forceBundledUI?: boolean;
   };
 } & MultiDomainAndOrProxy;
 

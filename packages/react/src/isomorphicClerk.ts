@@ -509,14 +509,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor> {
-    // Use bundled UI constructor if provided via ui.ctor or clerkUiCtor
-    if (this.options.ui?.ctor) {
+    // Use bundled UI constructor if forced (e.g., Chrome Extension) and ui.ctor is available
+    if (this.options.ui?.__internal_forceBundledUI && this.options.ui.ctor) {
       return this.options.ui.ctor;
     }
-    if (this.options.clerkUiCtor) {
-      return this.options.clerkUiCtor;
-    }
 
+    // Default: load from CDN, using ui.version if available for version pinning
     await loadClerkUiScript({
       ...this.options,
       clerkUiVersion: this.options.ui?.version,

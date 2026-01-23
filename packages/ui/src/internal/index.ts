@@ -34,6 +34,12 @@ export type Ui<A = any> = Tagged<
      */
     ctor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
     /**
+     * @internal
+     * Force using the bundled UI constructor instead of loading from CDN.
+     * Used internally by SDKs that must bundle the UI (e.g., Chrome Extension).
+     */
+    __internal_forceBundledUI?: boolean;
+    /**
      * Phantom property for type-level appearance inference
      * This property never exists at runtime
      */

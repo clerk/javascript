@@ -109,12 +109,21 @@ async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCre
 }
 
 /**
- * Gets the ClerkUI constructor by loading from CDN.
+ * Gets the ClerkUI constructor by loading from CDN with version pinning.
  */
 async function getClerkUiEntryChunk<TUi extends Ui = Ui>(
   options?: AstroClerkCreateInstanceParams<TUi>,
 ): Promise<ClerkUiConstructor> {
-  await loadClerkUiScript(options);
+  // Load UI from CDN with version pinning from ui.version
+  await loadClerkUiScript(
+    options
+      ? {
+          ...options,
+          clerkUiVersion: options.ui?.version,
+          clerkUiUrl: options.ui?.url,
+        }
+      : undefined,
+  );
 
   if (!window.__internal_ClerkUiCtor) {
     throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');

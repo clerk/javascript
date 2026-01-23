@@ -78,8 +78,13 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
       void (async () => {
         try {
           const clerkPromise = loadClerkJsScript(options);
+          // Load UI from CDN with version pinning from ui.version
           const clerkUiCtorPromise = (async () => {
-            await loadClerkUiScript(options);
+            await loadClerkUiScript({
+              ...options,
+              clerkUiVersion: pluginOptions.ui?.version,
+              clerkUiUrl: pluginOptions.ui?.url,
+            });
             if (!window.__internal_ClerkUiCtor) {
               throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
             }
@@ -93,7 +98,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           }
 
           clerk.value = window.Clerk;
-          const loadOptions = { ...options, clerkUiCtor: clerkUiCtorPromise } as unknown as ClerkOptions;
+          const loadOptions = { ...options, clerkUiCtor: clerkUiCtorPromise } as ClerkOptions;
           await window.Clerk.load(loadOptions);
           loaded.value = true;
 
