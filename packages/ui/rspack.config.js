@@ -17,23 +17,16 @@ const __dirname = path.dirname(__filename);
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
 
+const SHARED_REACT_MODULES = ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime'];
+
 /**
  * Externals handler for the shared variant that reads React from globalThis.__clerkSharedModules.
  * This allows the host application's React to be shared with @clerk/ui.
  * @type {import('@rspack/core').ExternalItemFunctionData}
  */
 const sharedReactExternalsHandler = ({ request }, callback) => {
-  if (request === 'react') {
-    return callback(null, ['__clerkSharedModules', 'react'], 'root');
-  }
-  if (request === 'react-dom') {
-    return callback(null, ['__clerkSharedModules', 'react-dom'], 'root');
-  }
-  if (request === 'react-dom/client') {
-    return callback(null, ['__clerkSharedModules', 'react-dom/client'], 'root');
-  }
-  if (request === 'react/jsx-runtime') {
-    return callback(null, ['__clerkSharedModules', 'react/jsx-runtime'], 'root');
+  if (SHARED_REACT_MODULES.includes(request)) {
+    return callback(null, ['__clerkSharedModules', request], 'root');
   }
   callback();
 };
