@@ -68,8 +68,8 @@
     "@clerk/shared": "workspace:^"
   },
   "devDependencies": {
-    "@vitest/ui": "catalog:",
-    "vitest": "catalog:"
+    "@vitest/ui": "3.2.4",
+    "vitest": "3.2.4"
   },
   "engines": {
     "node": ">=20.9.0"
