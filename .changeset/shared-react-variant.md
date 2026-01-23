@@ -10,8 +10,8 @@ Introduces a new `ui.shared.browser.js` build variant that externalizes React de
 
 **New features:**
 - `@clerk/ui/register` module: Import this to register React on `globalThis.__clerkSharedModules` for sharing with `@clerk/ui`
-- `clerkUiVariant` option: Set to `'shared'` to use the shared variant (automatically detected and enabled for compatible React versions in `@clerk/react`)
+- `clerkUIVariant` option: Set to `'shared'` to use the shared variant (automatically detected and enabled for compatible React versions in `@clerk/react`)
 
 **For `@clerk/react` users:** No action required. The shared variant is automatically used when your React version is compatible.
 
-**For custom integrations:** Import `@clerk/ui/register` before loading the UI bundle, then set `clerkUiVariant: 'shared'` in your configuration.
+**For custom integrations:** Import `@clerk/ui/register` before loading the UI bundle, then set `clerkUIVariant: 'shared'` in your configuration.
