@@ -36,12 +36,11 @@ public class ClerkExpoModule: Module {
         throw NSError(domain: "ClerkExpo", code: 1, userInfo: [NSLocalizedDescriptionKey: "Clerk not initialized"])
       }
 
-      // Check if user is already signed in
+      // If user is already signed in, return the existing session
+      // instead of showing the auth modal
       if let existingSession = await factory.getSession() {
-        throw NSError(domain: "ClerkExpo", code: 3, userInfo: [
-          NSLocalizedDescriptionKey: "User is already signed in",
-          "sessionId": existingSession["sessionId"] ?? ""
-        ])
+        print("📝 [ClerkExpo] User already signed in, returning existing session")
+        return existingSession
       }
 
       let mode = options["mode"] as? String ?? "signInOrUp"
