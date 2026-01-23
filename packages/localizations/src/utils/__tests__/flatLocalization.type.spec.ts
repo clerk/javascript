@@ -24,22 +24,17 @@ describe('flatLocalization type tests', () => {
     });
 
     it('rejects non-string values', () => {
-      type InvalidInput = {
-        'a.b': number;
-      };
-      expectTypeOf<InvalidInput>().not.toExtend<FlattenedLocalizationResource>();
-
       // @ts-expect-error - number is not assignable to string
-      const _test: FlattenedLocalizationResource = { 'a.b': 123 } as InvalidInput;
+      const _test: FlattenedLocalizationResource = { 'a.b': 123 };
     });
 
     it('rejects nested objects', () => {
-      type InvalidInput = {
+      flatLocalization({
+        // @ts-expect-error - nested objects are not allowed in FlattenedLocalizationResource
         nested: {
-          key: string;
-        };
-      };
-      expectTypeOf<InvalidInput>().not.toExtend<FlattenedLocalizationResource>();
+          key: 'value',
+        },
+      });
     });
   });
 
