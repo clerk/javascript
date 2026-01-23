@@ -1,4 +1,4 @@
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 
 import type { Appearance } from './appearance';
 
@@ -32,7 +32,7 @@ export type Ui<A = any> = Tagged<
      * The Clerk UI constructor. When provided, this will be used instead of
      * loading the UI from CDN. This is useful for bundling the UI with your app.
      */
-    ctor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
+    ctor?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
     /**
      * @internal
      * Force using the bundled UI constructor instead of loading from CDN.

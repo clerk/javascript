@@ -59,7 +59,7 @@ import type {
   WaitlistResource,
   Without,
 } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import { handleValueOrFn } from '@clerk/shared/utils';
 
 import { errorThrower } from './errors/errorThrower';
@@ -87,7 +87,7 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
-  __internal_ClerkUiCtor?: ClerkUiConstructor;
+  __internal_ClerkUiCtor?: ClerkUIConstructor;
 }
 
 declare const global: Global;
@@ -461,12 +461,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
-      const clerkUiCtor = this.getClerkUiEntryChunk();
+      const ClerkUI = this.getClerkUiEntryChunk();
       const clerk = await this.getClerkJsEntryChunk();
 
       if (!clerk.loaded) {
         this.beforeLoad(clerk);
-        await clerk.load({ ...this.options, clerkUiCtor });
+        await clerk.load({ ...this.options, ClerkUI });
       }
       if (clerk.loaded) {
         this.replayInterceptedInvocations(clerk);
@@ -508,7 +508,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return global.Clerk;
   }
 
-  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor> {
+  private async getClerkUiEntryChunk(): Promise<ClerkUIConstructor> {
     // Use bundled UI constructor if forced (e.g., Chrome Extension) and ui.ctor is available
     if (this.options.ui?.__internal_forceBundledUI && this.options.ui.ctor) {
       return this.options.ui.ctor;

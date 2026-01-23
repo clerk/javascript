@@ -11,7 +11,7 @@ import type {
   Resources,
   Without,
 } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { Appearance, Ui } from '@clerk/ui/internal';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
@@ -19,7 +19,7 @@ import { computed, ref, shallowRef, triggerRef } from 'vue';
 import { ClerkInjectionKey } from './keys';
 declare global {
   interface Window {
-    __internal_ClerkUiCtor?: ClerkUiConstructor;
+    __internal_ClerkUiCtor?: ClerkUIConstructor;
   }
 }
 
@@ -79,7 +79,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
         try {
           const clerkPromise = loadClerkJsScript(options);
           // Load UI from CDN with version pinning from ui.version
-          const clerkUiCtorPromise = (async () => {
+          const ClerkUIPromise = (async () => {
             await loadClerkUiScript({
               ...options,
               clerkUiVersion: pluginOptions.ui?.version,
@@ -98,7 +98,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           }
 
           clerk.value = window.Clerk;
-          const loadOptions = { ...options, clerkUiCtor: clerkUiCtorPromise } as ClerkOptions;
+          const loadOptions = { ...options, ClerkUI: ClerkUIPromise } as ClerkOptions;
           await window.Clerk.load(loadOptions);
           loaded.value = true;
 

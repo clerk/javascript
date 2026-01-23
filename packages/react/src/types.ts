@@ -8,7 +8,7 @@ import type {
   SignUpRedirectOptions,
   TasksRedirectOptions,
 } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { Appearance, ExtractAppearanceType, Ui } from '@clerk/ui/internal';
 import type React from 'react';
 
@@ -29,7 +29,7 @@ declare global {
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: Clerk['proxyUrl'];
     __clerk_domain?: Clerk['domain'];
-    __internal_ClerkUiCtor?: ClerkUiConstructor;
+    __internal_ClerkUiCtor?: ClerkUIConstructor;
   }
 }
 

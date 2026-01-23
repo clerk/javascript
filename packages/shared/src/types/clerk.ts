@@ -1,6 +1,6 @@
 import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 
-import type { ClerkUiConstructor } from '../ui/types';
+import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   BillingCheckoutResource,
@@ -1086,7 +1086,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * @internal
      * Clerk UI entrypoint. Used internally by SDKs to pass the UI constructor to clerk-js.
      */
-    clerkUiCtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
+    ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
@@ -2406,7 +2406,7 @@ export type ClerkProp =
   | undefined
   | null;
 
-export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite' | 'clerkUiCtor'> & {
+export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite' | 'ClerkUI'> & {
   Clerk?: ClerkProp;
   /**
    * The URL that `@clerk/clerk-js` should be hot-loaded from.
@@ -2444,7 +2444,7 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite' | 'cler
      * The Clerk UI constructor. When provided, this will be used instead of
      * loading the UI from CDN. This is useful for bundling the UI with your app.
      */
-    ctor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
+    ctor?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
     /**
      * @internal
      * Force using the bundled UI constructor instead of loading from CDN.

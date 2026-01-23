@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   // Use bundled UI via ui.ctor
   await clerk.load({
     ui,
-    clerkUiCtor: ui.ctor,
+    ClerkUI: ui.ctor,
   });
 
   if (clerk.isSignedIn) {

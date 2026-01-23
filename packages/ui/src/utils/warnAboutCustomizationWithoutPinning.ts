@@ -129,7 +129,7 @@ function collectElementPatterns(elements: Record<string, unknown>): string[] {
  * If the user has explicitly imported @clerk/ui and passed it via the `ui` option,
  * they have "pinned" their version and no warning is shown.
  *
- * Note: We check `options.ui` (not `options.clerkUiCtor`) because clerkUiCtor is
+ * Note: We check `options.ui` (not `options.ClerkUI`) because ClerkUI is
  * always set when loading from CDN via window.__internal_ClerkUiCtor.
  */
 export function warnAboutCustomizationWithoutPinning(options?: ClerkOptions): void {
