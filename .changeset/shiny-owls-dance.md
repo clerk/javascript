@@ -9,9 +9,7 @@
 
 Add `ui` prop to ClerkProvider for UI version metadata
 
-The `ui` object from `@clerk/ui` contains version info and the bundled constructor. Each SDK decides whether to use `ui.ctor` based on its support level:
-- Chrome Extension: Uses bundled UI via `ui.ctor`
-- React/Next.js, Vue, Astro: Uses CDN loading
+The `ui` object from `@clerk/ui` is passed to ClerkProvider. When `ui.ctor` is available, it will be used for bundled UI; otherwise, the UI is loaded from CDN.
 
 Usage:
 ```tsx

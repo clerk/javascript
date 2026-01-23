@@ -509,6 +509,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor> {
+    // Use bundled UI constructor if provided via ui.ctor or clerkUiCtor
+    if (this.options.ui?.ctor) {
+      return this.options.ui.ctor;
+    }
     if (this.options.clerkUiCtor) {
       return this.options.clerkUiCtor;
     }

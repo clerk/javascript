@@ -32,12 +32,12 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ChromeExtensionClerkPr
     return null;
   }
 
-  // Chrome extension uses bundled UI via ui.ctor
+  // Chrome extension uses bundled UI via ui prop
   return (
     <ClerkReactProvider
       {...(rest as any)}
       Clerk={clerkInstance}
-      clerkUiCtor={ui.ctor}
+      ui={ui}
       standardBrowser={!syncHost}
     >
       {children}
