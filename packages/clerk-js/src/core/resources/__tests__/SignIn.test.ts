@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../events';
 import { signInErrorSignal, signInResourceSignal } from '../../signals';
@@ -1894,6 +1894,29 @@ describe('SignIn', () => {
     });
 
     describe('reset', () => {
+      let mockClient: { signIn: SignIn; resetSignIn: ReturnType<typeof vi.fn> };
+
+      beforeEach(() => {
+        // Set up mock client with resetSignIn method that simulates what the real
+        // Client.resetSignIn does: creates a new SignIn, updates signals via events,
+        // and the State class responds by updating the actual signal values
+        mockClient = {
+          signIn: new SignIn(null),
+          resetSignIn: vi.fn().mockImplementation(function (this: typeof mockClient) {
+            const newSignIn = new SignIn(null);
+            this.signIn = newSignIn;
+            // Emit events like the real implementation
+            eventBus.emit('resource:error', { resource: newSignIn, error: null });
+            // Also update signals directly since State isn't set up in tests
+            signInResourceSignal({ resource: newSignIn });
+            signInErrorSignal({ error: null });
+          }),
+        };
+        SignIn.clerk = {
+          client: mockClient,
+        } as any;
+      });
+
       afterEach(() => {
         vi.clearAllMocks();
         vi.restoreAllMocks();
@@ -1966,14 +1989,7 @@ describe('SignIn', () => {
           status: 'needs_first_factor',
           identifier: 'user@example.com',
         } as any);
-
-        // Set up mock clerk.client
-        const mockClient = {
-          signIn: originalSignIn,
-        };
-        SignIn.clerk = {
-          client: mockClient,
-        } as any;
+        mockClient.signIn = originalSignIn;
 
         // Verify initial state
         expect(mockClient.signIn.id).toBe('signin_123');
