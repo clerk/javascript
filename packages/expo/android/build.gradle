@@ -1,24 +1,35 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'org.jetbrains.kotlin.plugin.compose'
+plugins {
+  id 'com.android.library'
+  id 'org.jetbrains.kotlin.android'
+  id 'org.jetbrains.kotlin.plugin.compose' version '2.1.20'
+}
 
 group = 'com.clerk.expo'
 version = '1.0.0'
 
 // Dependency versions - centralized for easier updates
-// See: https://docs.gradle.org/current/userguide/version_catalogs.html for app-level version catalogs
 ext {
   credentialsVersion = "1.3.0"
   googleIdVersion = "1.1.1"
   kotlinxCoroutinesVersion = "1.7.3"
-  clerkAndroidVersion = "0.1.3"
-  composeVersion = "1.7.0"
-  activityComposeVersion = "1.9.0"
-  lifecycleVersion = "2.8.0"
+  // Clerk Android SDK versions (from local Maven)
+  clerkApiVersion = "0.1.28"
+  clerkUiVersion = "0.1.3"
+  // Compose BOM version (must match clerk-android)
+  composeBomVersion = "2025.01.00"
+  // OkHttp version (required by clerk-android)
+  okhttpVersion = "4.12.0"
+  // Ktor version (must use 3.1.x which uses OkHttp 4.x, compatible with React Native)
+  // Ktor 3.3.x uses OkHttp 5.x which has incompatible internal APIs
+  ktorVersion = "3.1.3"
 }
 
 def safeExtGet(prop, fallback) {
   rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+repositories {
+  mavenLocal() // Use local Maven repository for clerk-android SDK
 }
 
 android {
@@ -39,6 +50,10 @@ android {
     }
   }
 
+  buildFeatures {
+    compose true
+  }
+
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_17
     targetCompatibility JavaVersion.VERSION_17
@@ -46,10 +61,6 @@ android {
 
   kotlinOptions {
     jvmTarget = "17"
-  }
-
-  buildFeatures {
-    compose = true
   }
 
   sourceSets {
@@ -63,6 +74,18 @@ dependencies {
   // Expo modules core
   implementation project(':expo-modules-core')
 
+  // Clerk Android SDK (from local Maven)
+  implementation "com.clerk:clerk-android-api:$clerkApiVersion"
+  implementation "com.clerk:clerk-android-ui:$clerkUiVersion"
+
+  // Compose BOM and dependencies
+  implementation platform("androidx.compose:compose-bom:$composeBomVersion")
+  implementation "androidx.compose.ui:ui"
+  implementation "androidx.compose.foundation:foundation"
+  implementation "androidx.compose.material3:material3"
+  implementation "androidx.activity:activity-compose:1.10.0"
+  implementation "androidx.lifecycle:lifecycle-runtime-compose:2.8.7"
+
   // Credential Manager for Google Sign-In with nonce support
   implementation "androidx.credentials:credentials:$credentialsVersion"
   implementation "androidx.credentials:credentials-play-services-auth:$credentialsVersion"
@@ -71,12 +94,11 @@ dependencies {
   // Coroutines for async operations
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinxCoroutinesVersion"
 
-  // Clerk Android SDK with prebuilt UI
-  implementation "com.clerk:clerk-android-ui:$clerkAndroidVersion"
+  // Ktor (required by clerk-android)
+  implementation "io.ktor:ktor-client-okhttp:$ktorVersion"
 
-  // Jetpack Compose for wrapping Clerk views
-  implementation "androidx.compose.ui:ui:$composeVersion"
-  implementation "androidx.compose.material3:material3:1.3.0"
-  implementation "androidx.activity:activity-compose:$activityComposeVersion"
-  implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion"
+  // Explicit OkHttp dependencies to ensure version consistency
+  // This fixes the okhttp3.internal.Util ClassNotFoundException
+  implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
+  implementation "com.squareup.okhttp3:okhttp-urlconnection:$okhttpVersion"
 }

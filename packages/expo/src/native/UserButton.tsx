@@ -1,12 +1,26 @@
-import { requireNativeModule, Platform } from 'expo-modules-core';
+import { useClerk } from '@clerk/react';
+import { Platform } from 'expo-modules-core';
 import { useEffect, useState } from 'react';
 import { TouchableOpacity, View, Text, StyleSheet, ViewProps, Image } from 'react-native';
 
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
-// Get the native module for modal presentation
-const ClerkExpo = isNativeSupported ? requireNativeModule('ClerkExpo') : null;
+// Get the native module for modal presentation (use optional require to avoid crash if not available)
+let ClerkExpo: {
+  getSession: () => Promise<{
+    user?: { id: string; firstName?: string; lastName?: string; imageUrl?: string; primaryEmailAddress?: string };
+  } | null>;
+  presentUserProfile: (options: { dismissable: boolean }) => Promise<{ sessionId?: string } | null>;
+} | null = null;
+if (isNativeSupported) {
+  try {
+    const { requireNativeModule } = require('expo-modules-core');
+    ClerkExpo = requireNativeModule('ClerkExpo');
+  } catch {
+    console.log('[UserButton] ClerkExpo native module not available on this platform');
+  }
+}
 
 interface NativeUser {
   id: string;
@@ -21,6 +35,11 @@ export interface UserButtonProps extends ViewProps {
    * Callback fired when the user button is pressed
    */
   onPress?: () => void;
+
+  /**
+   * Callback fired when the user signs out from the profile modal
+   */
+  onSignOut?: () => void;
 }
 
 /**
@@ -46,8 +65,9 @@ export interface UserButtonProps extends ViewProps {
  * }
  * ```
  */
-export function UserButton({ onPress, style, ...props }: UserButtonProps) {
+export function UserButton({ onPress, onSignOut, style, ...props }: UserButtonProps) {
   const [user, setUser] = useState<NativeUser | null>(null);
+  const clerk = useClerk();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -77,9 +97,29 @@ export function UserButton({ onPress, style, ...props }: UserButtonProps) {
 
     try {
       console.log('[UserButton] Presenting native profile modal');
-      await ClerkExpo.presentUserProfile({
+      const result = await ClerkExpo.presentUserProfile({
         dismissable: true,
       });
+
+      // If the modal returned a result, it means the user signed out
+      // The native SDK returns the sessionId when sign-out completes
+      if (result?.sessionId) {
+        console.log('[UserButton] Sign out event received, sessionId:', result.sessionId);
+
+        // Also sign out from JS SDK to ensure both native and JS states are cleared
+        if (clerk?.signOut) {
+          try {
+            console.log('[UserButton] Signing out from JS SDK...');
+            await clerk.signOut();
+            console.log('[UserButton] JS SDK signed out');
+          } catch (signOutErr) {
+            console.warn('[UserButton] JS SDK sign out error (may already be signed out):', signOutErr);
+          }
+        }
+
+        // Call the onSignOut callback if provided
+        onSignOut?.();
+      }
     } catch (err) {
       console.error('[UserButton] Error presenting profile:', err);
     }

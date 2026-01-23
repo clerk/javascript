@@ -1,4 +1,4 @@
-import { useAuth, useClerk } from '@clerk/clerk-react';
+import { useAuth, useClerk } from '@clerk/react';
 import { requireNativeModule, Platform } from 'expo-modules-core';
 import { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
@@ -43,14 +43,35 @@ export function SignIn({ mode = 'signInOrUp', isDismissable = true, onSuccess, o
       return;
     }
 
-    // If user is already signed in, call onSuccess immediately without presenting modal
+    // If user is already signed in (JS state), call onSuccess immediately
     if (isSignedIn) {
-      console.log('[SignIn] User is already signed in, skipping auth modal');
+      console.log('[SignIn] User is already signed in (JS state), skipping auth modal');
       onSuccess?.();
       return;
     }
 
     const presentModal = async () => {
+      // First check if native SDK has an existing session
+      // If so, sync to JS and call onSuccess without showing modal
+      if (ClerkExpo?.getSession) {
+        try {
+          const nativeSession = await ClerkExpo.getSession();
+          if (nativeSession) {
+            console.log('[SignIn] Native SDK has existing session, syncing to JS...');
+            // @ts-expect-error - This is an internal API
+            if (clerk?.__internal_reloadInitialResources) {
+              // @ts-expect-error - This is an internal API
+              await clerk.__internal_reloadInitialResources();
+              console.log('[SignIn] JS SDK state synced from native session');
+            }
+            onSuccess?.();
+            return;
+          }
+        } catch (e) {
+          console.log('[SignIn] Could not check native session:', e);
+        }
+      }
+
       try {
         console.log(`[SignIn] Presenting native auth modal with mode: ${mode}`);
         const result = await ClerkExpo.presentAuth({
@@ -62,12 +83,21 @@ export function SignIn({ mode = 'signInOrUp', isDismissable = true, onSuccess, o
 
         // After native sign-in completes, reload the JS SDK state from the backend
         // This syncs the native session with the JS ClerkProvider
+        console.log('[SignIn] clerk object:', typeof clerk, Object.keys(clerk || {}));
         // @ts-expect-error - This is an internal API
-        if (clerk.__internal_reloadInitialResources) {
+        console.log('[SignIn] __internal_reloadInitialResources exists:', !!clerk?.__internal_reloadInitialResources);
+        // @ts-expect-error - This is an internal API
+        if (clerk?.__internal_reloadInitialResources) {
           console.log('[SignIn] Reloading JS SDK state from backend...');
-          // @ts-expect-error - This is an internal API
-          await clerk.__internal_reloadInitialResources();
-          console.log('[SignIn] JS SDK state reloaded');
+          try {
+            // @ts-expect-error - This is an internal API
+            await clerk.__internal_reloadInitialResources();
+            console.log('[SignIn] JS SDK state reloaded');
+          } catch (reloadError) {
+            console.error('[SignIn] Failed to reload JS SDK state:', reloadError);
+          }
+        } else {
+          console.warn('[SignIn] __internal_reloadInitialResources not available on clerk object');
         }
 
         onSuccess?.();

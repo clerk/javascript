@@ -1,12 +1,23 @@
-import { requireNativeModule, Platform } from 'expo-modules-core';
+import { useClerk } from '@clerk/react';
+import { Platform } from 'expo-modules-core';
 import { useEffect } from 'react';
 import { View, Text, StyleSheet, ViewProps } from 'react-native';
 
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
-// Get the native module for modal presentation
-const ClerkExpo = isNativeSupported ? requireNativeModule('ClerkExpo') : null;
+// Get the native module for modal presentation (use optional require to avoid crash if not available)
+let ClerkExpo: {
+  presentUserProfile: (options: { dismissable: boolean }) => Promise<{ sessionId?: string } | null>;
+} | null = null;
+if (isNativeSupported) {
+  try {
+    const { requireNativeModule } = require('expo-modules-core');
+    ClerkExpo = requireNativeModule('ClerkExpo');
+  } catch {
+    console.log('[UserProfile] ClerkExpo native module not available on this platform');
+  }
+}
 
 export interface UserProfileProps extends ViewProps {
   /**
@@ -59,6 +70,8 @@ export interface UserProfileProps extends ViewProps {
  * ```
  */
 export function UserProfile({ isDismissable = true, onSignOut, style, ...props }: UserProfileProps) {
+  const clerk = useClerk();
+
   useEffect(() => {
     if (!isNativeSupported || !ClerkExpo?.presentUserProfile) {
       return;
@@ -72,6 +85,18 @@ export function UserProfile({ isDismissable = true, onSignOut, style, ...props }
         });
 
         console.log('[UserProfile] Sign out event received, sessionId:', result?.sessionId);
+
+        // Also sign out from JS SDK to ensure both native and JS states are cleared
+        if (clerk?.signOut) {
+          try {
+            console.log('[UserProfile] Signing out from JS SDK...');
+            await clerk.signOut();
+            console.log('[UserProfile] JS SDK signed out');
+          } catch (signOutErr) {
+            console.warn('[UserProfile] JS SDK sign out error (may already be signed out):', signOutErr);
+          }
+        }
+
         onSignOut?.();
       } catch (err) {
         console.error('[UserProfile] Error:', err);
@@ -79,7 +104,7 @@ export function UserProfile({ isDismissable = true, onSignOut, style, ...props }
     };
 
     presentModal();
-  }, [isDismissable, onSignOut]);
+  }, [isDismissable, onSignOut, clerk]);
 
   // Show a placeholder while modal is presented
   if (!isNativeSupported) {

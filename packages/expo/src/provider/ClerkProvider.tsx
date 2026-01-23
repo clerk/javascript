@@ -57,24 +57,49 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
   } = props;
   const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
 
-  // Configure Clerk iOS SDK
+  // Get the Clerk instance for syncing
+  const clerkInstance = isNative()
+    ? getClerkInstance({
+        publishableKey: pk,
+        tokenCache,
+        __experimental_passkeys,
+        __experimental_resourceCache,
+      })
+    : null;
+
+  // Configure native Clerk SDK (iOS and Android) and sync session state
   useEffect(() => {
-    if (Platform.OS === 'ios' && pk) {
-      const configureClerk = async () => {
+    if ((Platform.OS === 'ios' || Platform.OS === 'android') && pk) {
+      const configureAndSyncClerk = async () => {
         try {
           const { requireNativeModule } = require('expo-modules-core');
           const ClerkExpo = requireNativeModule('ClerkExpo');
           if (ClerkExpo?.configure) {
             await ClerkExpo.configure(pk);
-            console.log('[ClerkProvider] Configured Clerk iOS SDK');
+            console.log(`[ClerkProvider] Configured Clerk ${Platform.OS} SDK`);
+
+            // Check if native SDK has an existing session and sync to JS
+            if (ClerkExpo?.getSession) {
+              const nativeSession = await ClerkExpo.getSession();
+              if (nativeSession) {
+                console.log(`[ClerkProvider] Native session found, syncing to JS SDK...`);
+                // Reload JS SDK state from backend to pick up the session
+                // @ts-expect-error - internal API
+                if (clerkInstance?.__internal_reloadInitialResources) {
+                  // @ts-expect-error - internal API
+                  await clerkInstance.__internal_reloadInitialResources();
+                  console.log(`[ClerkProvider] JS SDK state synced`);
+                }
+              }
+            }
           }
         } catch (error) {
-          console.error('[ClerkProvider] Failed to configure Clerk iOS:', error);
+          console.error(`[ClerkProvider] Failed to configure Clerk ${Platform.OS}:`, error);
         }
       };
-      configureClerk();
+      configureAndSyncClerk();
     }
-  }, [pk]);
+  }, [pk, clerkInstance]);
 
   if (isWeb()) {
     // This is needed in order for useOAuth to work correctly on web.
@@ -89,16 +114,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       {...rest}
       publishableKey={pk}
       sdkMetadata={SDK_METADATA}
-      Clerk={
-        isNative()
-          ? getClerkInstance({
-              publishableKey: pk,
-              tokenCache,
-              __experimental_passkeys,
-              __experimental_resourceCache,
-            })
-          : null
-      }
+      Clerk={clerkInstance}
       standardBrowser={!isNative()}
       experimental={{
         ...experimental,
