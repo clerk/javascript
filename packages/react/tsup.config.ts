@@ -6,7 +6,7 @@ import { defineConfig } from 'tsup';
 
 import { version as clerkJsVersion } from '../clerk-js/package.json';
 import { name, version, peerDependencies } from './package.json';
-import { parseRangeToBounds } from './build-utils/parseVersionRange';
+import { parseRangeToBounds, type VersionBounds } from './build-utils/parseVersionRange';
 
 /**
  * Resolves the React peer dependency range from package.json.
