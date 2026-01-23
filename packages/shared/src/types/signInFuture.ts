@@ -344,11 +344,11 @@ export interface SignInFutureResource {
   readonly userData: UserData;
 
   /**
-   * Indicates that the sign-in has been finalized.
+   * Indicates that the sign-in can be discarded (has been finalized or explicitly reset).
    *
    * @internal
    */
-  readonly hasBeenFinalized: boolean;
+  readonly canBeDiscarded: boolean;
 
   /**
    * Creates a new `SignIn` instance initialized with the provided parameters. The instance maintains the sign-in

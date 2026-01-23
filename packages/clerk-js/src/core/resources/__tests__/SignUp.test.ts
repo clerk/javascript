@@ -705,6 +705,29 @@ describe('SignUp', () => {
     });
 
     describe('reset', () => {
+      let mockClient: { signUp: SignUp; resetSignUp: ReturnType<typeof vi.fn> };
+
+      beforeEach(() => {
+        // Set up mock client with resetSignUp method that simulates what the real
+        // Client.resetSignUp does: creates a new SignUp, updates signals via events,
+        // and the State class responds by updating the actual signal values
+        mockClient = {
+          signUp: new SignUp(null),
+          resetSignUp: vi.fn().mockImplementation(function (this: typeof mockClient) {
+            const newSignUp = new SignUp(null);
+            this.signUp = newSignUp;
+            // Emit events like the real implementation
+            eventBus.emit('resource:error', { resource: newSignUp, error: null });
+            // Also update signals directly since State isn't set up in tests
+            signUpResourceSignal({ resource: newSignUp });
+            signUpErrorSignal({ error: null });
+          }),
+        };
+        SignUp.clerk = {
+          client: mockClient,
+        } as any;
+      });
+
       afterEach(() => {
         vi.clearAllMocks();
         vi.restoreAllMocks();
@@ -782,14 +805,7 @@ describe('SignUp', () => {
           email_address: 'user@example.com',
           first_name: 'John',
         } as any);
-
-        // Set up mock clerk.client
-        const mockClient = {
-          signUp: originalSignUp,
-        };
-        SignUp.clerk = {
-          client: mockClient,
-        } as any;
+        mockClient.signUp = originalSignUp;
 
         // Verify initial state
         expect(mockClient.signUp.id).toBe('signup_123');

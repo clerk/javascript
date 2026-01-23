@@ -109,11 +109,11 @@ export class State implements StateInterface {
 }
 
 /**
- * Returns true if the new resource is null and the previous resource has not been finalized. This is used to prevent
- * nullifying the resource after it's been completed.
+ * Returns true if the new resource is null and the previous resource cannot be discarded. This is used to prevent
+ * nullifying the resource after it's been completed or explicitly reset.
  */
 function shouldIgnoreNullUpdate(previousResource: SignIn | null, newResource: SignIn | null): boolean;
 function shouldIgnoreNullUpdate(previousResource: SignUp | null, newResource: SignUp | null): boolean;
 function shouldIgnoreNullUpdate(previousResource: SignIn | SignUp | null, newResource: SignIn | SignUp | null) {
-  return !newResource?.id && previousResource && previousResource.__internal_future?.hasBeenFinalized === false;
+  return !newResource?.id && previousResource && previousResource.__internal_future?.canBeDiscarded === false;
 }

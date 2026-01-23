@@ -384,11 +384,11 @@ export interface SignUpFutureResource {
   readonly locale: string | null;
 
   /**
-   * Indicates that the sign-up has been finalized.
+   * Indicates that the sign-up can be discarded (has been finalized or explicitly reset).
    *
    * @internal
    */
-  readonly hasBeenFinalized: boolean;
+  readonly canBeDiscarded: boolean;
 
   /**
    * Creates a new `SignUp` instance initialized with the provided parameters. The instance maintains the sign-up

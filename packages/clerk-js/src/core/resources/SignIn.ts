@@ -92,7 +92,6 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
-import { signInErrorSignal, signInResourceSignal } from '../signals';
 import { BaseResource, UserData, Verification } from './internal';
 
 export class SignIn extends BaseResource implements SignInResource {
@@ -651,7 +650,7 @@ class SignInFuture implements SignInFutureResource {
     verifyBackupCode: this.verifyBackupCode.bind(this),
   };
 
-  #hasBeenFinalized = false;
+  #canBeDiscarded = false;
   readonly #resource: SignIn;
 
   constructor(resource: SignIn) {
@@ -711,8 +710,8 @@ class SignInFuture implements SignInFutureResource {
     return this.#resource.secondFactorVerification;
   }
 
-  get hasBeenFinalized() {
-    return this.#hasBeenFinalized;
+  get canBeDiscarded() {
+    return this.#canBeDiscarded;
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: ClerkError | null }> {
@@ -1243,7 +1242,7 @@ class SignInFuture implements SignInFutureResource {
         await SignIn.clerk.client.reload();
       }
 
-      this.#hasBeenFinalized = true;
+      this.#canBeDiscarded = true;
       await SignIn.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
   }
@@ -1254,18 +1253,11 @@ class SignInFuture implements SignInFutureResource {
    * allowing for smooth UI transitions without loading states.
    */
   reset(): Promise<{ error: ClerkError | null }> {
-    // Clear errors
-    signInErrorSignal({ error: null });
-
-    // Create a fresh null SignIn instance and update the signal directly
-    const freshSignIn = new SignIn(null);
-    signInResourceSignal({ resource: freshSignIn });
-
-    // Also update clerk.client.signIn
-    if (SignIn.clerk?.client) {
-      SignIn.clerk.client.signIn = freshSignIn;
+    if (!SignIn.clerk.client) {
+      throw new Error('Cannot reset sign-in without a client.');
     }
-
+    this.#canBeDiscarded = true;
+    SignIn.clerk.client.resetSignIn();
     return Promise.resolve({ error: null });
   }
 
