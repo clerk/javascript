@@ -1,9 +1,8 @@
 import { coerce } from 'semver';
 
-// Version bounds format: [major, minMinor, maxMinor, minPatch]
-// - maxMinor === -1 means "any minor" (caret range, e.g., ^18.0.0)
-// - maxMinor === minMinor means "same minor only" (tilde range, e.g., ~19.0.3)
-export type VersionBounds = [major: number, minMinor: number, maxMinor: number, minPatch: number];
+import type { VersionBounds } from '@clerk/shared/versionCheck';
+
+export type { VersionBounds } from '@clerk/shared/versionCheck';
 
 /**
  * Parses a semver range string (e.g., "^18.0.0 || ~19.0.3") into version bounds.
