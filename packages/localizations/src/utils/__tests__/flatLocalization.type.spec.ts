@@ -27,10 +27,8 @@ describe('flatLocalization type tests', () => {
       type InvalidInput = {
         'a.b': number;
       };
-      // TypeScript should reject this: number is not assignable to string
       expectTypeOf<InvalidInput>().not.toExtend<FlattenedLocalizationResource>();
 
-      // Verify TypeScript would error if we tried to assign it
       // @ts-expect-error - number is not assignable to string
       const _test: FlattenedLocalizationResource = { 'a.b': 123 } as InvalidInput;
     });
@@ -41,8 +39,6 @@ describe('flatLocalization type tests', () => {
           key: string;
         };
       };
-      // This should be rejected at runtime, but TypeScript allows it
-      // The validation happens at runtime
       expectTypeOf<InvalidInput>().not.toExtend<FlattenedLocalizationResource>();
     });
   });
@@ -59,7 +55,6 @@ describe('flatLocalization type tests', () => {
 
     it('preserves nested structure from flattened keys', () => {
       type Result = ReturnType<typeof flatLocalization>;
-      // The result should have nested structure matching LocalizationResource
       expectTypeOf<Result>().toExtend<LocalizationResource>();
     });
   });

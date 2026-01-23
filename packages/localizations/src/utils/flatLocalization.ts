@@ -34,7 +34,6 @@ import { unflattenObject, validateLocalizationFormat } from '@clerk/shared/utils
  * @throws {Error} If the input format is invalid or mixes flattened and nested formats
  */
 export function flatLocalization(input: FlattenedLocalizationResource): LocalizationResource {
-  // Validate first before any early returns
   validateLocalizationFormat(input as Record<string, unknown>);
 
   if (!input || Object.keys(input).length === 0) {

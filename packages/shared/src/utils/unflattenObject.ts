@@ -1,3 +1,9 @@
+const DISALLOWED_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
+
+function isDisallowedKey(key: string): boolean {
+  return DISALLOWED_KEYS.has(key);
+}
+
 /**
  * Converts a flattened object with dot-notation keys into a nested object structure.
  *
@@ -19,24 +25,17 @@ export function unflattenObject<T = Record<string, unknown>>(obj: Record<string,
   const result = {} as Record<string, unknown>;
 
   for (const [key, value] of Object.entries(obj)) {
-    // Skip prototype pollution attempts
-    if (key === '__proto__' || key === 'constructor') {
+    if (isDisallowedKey(key)) {
       continue;
     }
 
-    const keys = key.split('.');
+    const segments = key.split('.');
     let current: Record<string, unknown> = result;
 
-    for (let i = 0; i < keys.length - 1; i++) {
-      const segment = keys[i];
+    for (let i = 0; i < segments.length - 1; i++) {
+      const segment = segments[i];
 
-      // Skip empty segments (consecutive dots, leading/trailing dots)
-      if (!segment) {
-        continue;
-      }
-
-      // Skip prototype pollution attempts
-      if (segment === '__proto__' || segment === 'constructor') {
+      if (!segment || isDisallowedKey(segment)) {
         continue;
       }
 
@@ -47,8 +46,8 @@ export function unflattenObject<T = Record<string, unknown>>(obj: Record<string,
       current = current[segment] as Record<string, unknown>;
     }
 
-    const lastKey = keys[keys.length - 1];
-    if (lastKey && lastKey !== '__proto__' && lastKey !== 'constructor') {
+    const lastKey = segments[segments.length - 1];
+    if (lastKey && !isDisallowedKey(lastKey)) {
       current[lastKey] = value;
     }
   }
