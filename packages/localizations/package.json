@@ -36,6 +36,16 @@
         "default": "./dist/index.js"
       }
     },
+    "./utils": {
+      "import": {
+        "types": "./dist/utils/index.d.mts",
+        "default": "./dist/utils/index.mjs"
+      },
+      "require": {
+        "types": "./dist/utils/index.d.ts",
+        "default": "./dist/utils/index.js"
+      }
+    },
     "./*": {
       "import": {
         "types": "./dist/*.d.mts",
