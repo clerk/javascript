@@ -2428,6 +2428,11 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   clerkUiUrl?: string;
   /**
+   * If set to `'shared'`, loads a variant of `@clerk/ui` that expects React to be provided by the host application via `globalThis.__clerkSharedModules`.
+   * This reduces bundle size when using framework packages like `@clerk/react`.
+   */
+  clerkUIVariant?: 'shared' | '';
+  /**
    * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
    */
   publishableKey: string;
