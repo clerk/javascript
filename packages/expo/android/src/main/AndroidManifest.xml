@@ -7,7 +7,7 @@
       android:exported="false"
       android:windowSoftInputMode="adjustResize" />
 
-    <!-- Clerk Profile Activity - hosts UserProfileView for account management -->
+    <!-- Clerk User Profile Activity - hosts UserProfileView for account management -->
     <activity
       android:name="expo.modules.clerk.ClerkUserProfileActivity"
       android:theme="@style/Theme.AppCompat.Light.NoActionBar"
