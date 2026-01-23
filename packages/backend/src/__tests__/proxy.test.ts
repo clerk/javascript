@@ -72,6 +72,12 @@ describe('proxy', () => {
       const request = new Request('https://example.com/__clerk-admin/v1/client');
       expect(matchProxyPath(request)).toBe(false);
     });
+
+    it('normalizes proxy path with trailing slash', () => {
+      const request = new Request('https://example.com/__clerk/v1/client');
+      // Should match even when proxyPath has trailing slash
+      expect(matchProxyPath(request, { proxyPath: '/__clerk/' })).toBe(true);
+    });
   });
 
   describe('clerkFrontendApiProxy', () => {
