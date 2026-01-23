@@ -1,5 +1,51 @@
 # Change Log
 
+## 5.121.1
+
+### Patch Changes
+
+- fix: Ensure unsafeMetadata is passed with Sign Up Ticket flow ([#7657](https://github.com/clerk/javascript/pull/7657)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updates keyless prompt content. ([#7636](https://github.com/clerk/javascript/pull/7636)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix `unsafeMetadata` being lost when users are transferred between sign-in and sign-up flows during OAuth/SSO authentication ([#7647](https://github.com/clerk/javascript/pull/7647)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`b7a4e1e`](https://github.com/clerk/javascript/commit/b7a4e1eabe7aa61e7d2cb7f27cbd22671c49f2b1)]:
+  - @clerk/shared@3.43.2
+  - @clerk/localizations@3.35.2
+
+## 5.121.0
+
+### Minor Changes
+
+- Handle `offline_access` scope in OAuth consent screen by filtering it from the displayed scopes list (as it describes access duration rather than what can be accessed) and appending informational text about staying signed in when the scope is present. ([#7631](https://github.com/clerk/javascript/pull/7631)) by [@jfoshee](https://github.com/jfoshee)
+
+### Patch Changes
+
+- Fix `TaskChooseOrganization` to complete organization activation when logo upload fails ([#7635](https://github.com/clerk/javascript/pull/7635)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`c650a04`](https://github.com/clerk/javascript/commit/c650a04e624e7da5b81f2bdc12af0b6940c20f82), [`e995cc3`](https://github.com/clerk/javascript/commit/e995cc3572f85aa47bdee8f7b56130a383488a7f)]:
+  - @clerk/localizations@3.35.1
+  - @clerk/shared@3.43.1
+
+## 5.120.0
+
+### Minor Changes
+
+- Surface organization creation defaults with prefilled form fields and advisory warnings ([#7603](https://github.com/clerk/javascript/pull/7603)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Fix redirect conflicts when SignIn and SignUp components are used together on the same page. Added missing dependency arrays to useEffect hooks in redirect functions to prevent unwanted redirects during other component flows. ([#7614](https://github.com/clerk/javascript/pull/7614)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove opacity from `Select` placeholder ([#7575](https://github.com/clerk/javascript/pull/7575)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Display actual organization membership name in in-app enable organization prompt success message ([#7582](https://github.com/clerk/javascript/pull/7582)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`271ddeb`](https://github.com/clerk/javascript/commit/271ddeb0b47357f7da316eef389ae46b180c36da)]:
+  - @clerk/localizations@3.35.0
+  - @clerk/shared@3.43.0
+
 ## 5.119.1
 
 ### Patch Changes

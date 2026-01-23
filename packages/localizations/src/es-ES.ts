@@ -887,6 +887,10 @@ export const esES: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Ya existe una organización para el nombre de empresa detectado ({{organizationName}}) y {{organizationDomain}}. Únete por invitación.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

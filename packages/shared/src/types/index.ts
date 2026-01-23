@@ -34,6 +34,7 @@ export type * from './localization';
 export type * from './multiDomain';
 export type * from './oauth';
 export type * from './organization';
+export type * from './organizationCreationDefaults';
 export type * from './organizationDomain';
 export type * from './organizationInvitation';
 export type * from './organizationMembership';

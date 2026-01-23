@@ -896,6 +896,10 @@ export const csCZ: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Organizace již existuje pro detekovaný název společnosti ({{organizationName}}) a {{organizationDomain}}. Připojte se prostřednictvím pozvánky.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

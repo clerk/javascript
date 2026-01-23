@@ -884,6 +884,10 @@ export const nbNO: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'En organisasjon eksisterer allerede for det oppdagede firmanavnet ({{organizationName}}) og {{organizationDomain}}. Bli med via invitasjon.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

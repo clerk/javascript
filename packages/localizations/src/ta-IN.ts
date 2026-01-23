@@ -893,6 +893,10 @@ export const taIN: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'கண்டறியப்பட்ட நிறுவன பெயர் ({{organizationName}}) மற்றும் {{organizationDomain}} க்கு ஒரு அமைப்பு ஏற்கனவே உள்ளது. அழைப்பின் மூலம் சேரவும்.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

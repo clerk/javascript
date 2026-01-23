@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Box, descriptors, Flex, Image, Text } from '../customizables';
+import { Box, descriptors, Flex, Image, Spinner, Text } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import type { InternalTheme } from '../foundations';
 import type { PropsOfComponent } from '../styledSystem';
@@ -15,7 +15,12 @@ type AvatarProps = PropsOfComponent<typeof Flex> & {
   rounded?: boolean;
   boxElementDescriptor?: ElementDescriptor;
   imageElementDescriptor?: ElementDescriptor;
+  /** Shows a loading spinner while the image is loading */
+  showLoadingSpinner?: boolean;
 };
+
+const SPINNER_DELAY_MS = 150;
+const SPINNER_MIN_DURATION_MS = 400;
 
 export const Avatar = (props: AvatarProps) => {
   const {
@@ -28,8 +33,60 @@ export const Avatar = (props: AvatarProps) => {
     sx,
     boxElementDescriptor,
     imageElementDescriptor,
+    showLoadingSpinner = false,
   } = props;
   const [error, setError] = React.useState(false);
+  const [loaded, setLoaded] = React.useState(false);
+  const [spinnerVisible, setSpinnerVisible] = React.useState(false);
+  const spinnerShownAtRef = React.useRef<number | null>(null);
+  const loadTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  React.useEffect(() => {
+    setLoaded(false);
+    setError(false);
+    setSpinnerVisible(false);
+    spinnerShownAtRef.current = null;
+
+    return () => {
+      if (loadTimerRef.current) {
+        clearTimeout(loadTimerRef.current);
+        loadTimerRef.current = null;
+      }
+    };
+  }, [imageUrl]);
+
+  React.useEffect(() => {
+    if (!showLoadingSpinner || !imageUrl || loaded || error) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setSpinnerVisible(true);
+      spinnerShownAtRef.current = Date.now();
+    }, SPINNER_DELAY_MS);
+
+    return () => clearTimeout(timer);
+  }, [showLoadingSpinner, imageUrl, loaded, error]);
+
+  /**
+   * Prevents the loading spinner from appearing and disappearing too quickly
+   */
+  const handleImageLoad = React.useCallback(() => {
+    if (spinnerShownAtRef.current) {
+      const elapsed = Date.now() - spinnerShownAtRef.current;
+      const remaining = SPINNER_MIN_DURATION_MS - elapsed;
+      if (remaining > 0) {
+        loadTimerRef.current = setTimeout(() => {
+          loadTimerRef.current = null;
+          setLoaded(true);
+        }, remaining);
+        return;
+      }
+    }
+    setLoaded(true);
+  }, []);
+
+  const isLoading = showLoadingSpinner && spinnerVisible && imageUrl && !loaded && !error;
 
   const ImgOrFallback =
     initials && (!imageUrl || error) ? (
@@ -40,8 +97,15 @@ export const Avatar = (props: AvatarProps) => {
         title={title}
         alt={`${title}'s logo`}
         src={imageUrl || ''}
-        sx={{ objectFit: 'cover', width: '100%', height: '100%' }}
+        sx={{
+          objectFit: 'cover',
+          width: '100%',
+          height: '100%',
+          opacity: showLoadingSpinner ? (loaded ? 1 : 0) : 1,
+          transition: 'opacity 0.2s ease-in-out',
+        }}
         onError={() => setError(true)}
+        onLoad={handleImageLoad}
         size={imageFetchSize}
       />
     );
@@ -66,6 +130,24 @@ export const Avatar = (props: AvatarProps) => {
       ]}
     >
       {ImgOrFallback}
+
+      {isLoading && (
+        <Flex
+          as='span'
+          sx={t => ({
+            position: 'absolute',
+            inset: 0,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: t.colors.$avatarBackground,
+          })}
+        >
+          <Spinner
+            size='sm'
+            colorScheme='neutral'
+          />
+        </Flex>
+      )}
 
       {/* /**
        * This Box is the "shimmer" effect for the avatar.

@@ -890,6 +890,10 @@ export const beBY: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Арганізацыя ўжо існуе для выяўленай назвы кампаніі ({{organizationName}}) і {{organizationDomain}}. Далучайцеся па запрашэнні.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

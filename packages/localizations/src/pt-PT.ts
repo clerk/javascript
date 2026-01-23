@@ -884,6 +884,10 @@ export const ptPT: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Já existe uma organização para o nome da empresa detetado ({{organizationName}}) e {{organizationDomain}}. Adira por convite.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

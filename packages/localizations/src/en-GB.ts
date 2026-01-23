@@ -887,6 +887,10 @@ export const enGB: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'An organisation already exists for the detected company name ({{organizationName}}) and {{organizationDomain}}. Join by invitation.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

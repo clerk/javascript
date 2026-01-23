@@ -39,7 +39,7 @@ function RedirectToSignIn() {
   const clerk = useClerk();
   React.useEffect(() => {
     void clerk.redirectToSignIn();
-  }, []);
+  }, [clerk]);
   return null;
 }
 
@@ -73,6 +73,7 @@ function SignInRoutes(): JSX.Element {
             firstFactorUrl={'../factor-one'}
             secondFactorUrl={'../factor-two'}
             resetPasswordUrl={'../reset-password'}
+            unsafeMetadata={signInContext.unsafeMetadata}
           />
         </Route>
         <Route path='choose'>
@@ -112,6 +113,7 @@ function SignInRoutes(): JSX.Element {
                 continueSignUpUrl='../continue'
                 verifyEmailAddressUrl='../verify-email-address'
                 verifyPhoneNumberUrl='../verify-phone-number'
+                unsafeMetadata={signUpContext.unsafeMetadata}
               />
             </Route>
             <Route path='verify'>

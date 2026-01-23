@@ -10,6 +10,11 @@ export class OauthAccessToken {
     readonly scopes?: string[],
     readonly tokenSecret?: string,
     readonly expiresAt?: number,
+    /**
+     * The ID token retrieved from the OIDC provider.
+     * Only present for OIDC-compliant OAuth 2.0 providers when available.
+     */
+    readonly idToken?: string,
   ) {}
 
   static fromJSON(data: OauthAccessTokenJSON) {
@@ -22,6 +27,7 @@ export class OauthAccessToken {
       data.scopes,
       data.token_secret,
       data.expires_at,
+      data.id_token,
     );
   }
 }

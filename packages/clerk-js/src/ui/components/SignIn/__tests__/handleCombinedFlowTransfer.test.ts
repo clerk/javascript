@@ -47,6 +47,67 @@ describe('handleCombinedFlowTransfer', () => {
     expect(mockCompleteSignUpFlow).toHaveBeenCalled();
   });
 
+  it('should pass unsafeMetadata to signUp.create', async () => {
+    const mockCreate = vi.fn().mockResolvedValue({});
+    const mockClerk = {
+      client: {
+        signUp: {
+          create: mockCreate,
+          optionalFields: [],
+        },
+      },
+    };
+
+    const unsafeMetadata = { foo: 'bar', nested: { value: 123 } };
+
+    await handleCombinedFlowTransfer({
+      identifierAttribute: 'emailAddress',
+      identifierValue: 'test@test.com',
+      signUpMode: 'public',
+      navigate: mockNavigate,
+      handleError: mockHandleError,
+      clerk: mockClerk as unknown as LoadedClerk,
+      afterSignUpUrl: 'https://test.com',
+      passwordEnabled: false,
+      navigateOnSetActive: vi.fn(),
+      unsafeMetadata,
+    });
+
+    expect(mockCreate).toHaveBeenCalledWith({
+      emailAddress: 'test@test.com',
+      unsafeMetadata,
+    });
+  });
+
+  it('should pass undefined unsafeMetadata when not provided', async () => {
+    const mockCreate = vi.fn().mockResolvedValue({});
+    const mockClerk = {
+      client: {
+        signUp: {
+          create: mockCreate,
+          optionalFields: [],
+        },
+      },
+    };
+
+    await handleCombinedFlowTransfer({
+      identifierAttribute: 'emailAddress',
+      identifierValue: 'test@test.com',
+      signUpMode: 'public',
+      navigate: mockNavigate,
+      handleError: mockHandleError,
+      clerk: mockClerk as unknown as LoadedClerk,
+      afterSignUpUrl: 'https://test.com',
+      passwordEnabled: false,
+      navigateOnSetActive: vi.fn(),
+    });
+
+    expect(mockCreate).toHaveBeenCalledWith({
+      emailAddress: 'test@test.com',
+      unsafeMetadata: undefined,
+    });
+  });
+
   it('should call completeSignUpFlow with phone number if phone number is optional field.', async () => {
     const mockClerk = {
       client: {

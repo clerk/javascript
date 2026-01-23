@@ -886,6 +886,10 @@ export const fiFI: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Organisaatio on jo olemassa havaitulle yrityksen nimelle ({{organizationName}}) ja {{organizationDomain}}. Liity kutsulla.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,
