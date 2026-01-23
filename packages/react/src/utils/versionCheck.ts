@@ -1,6 +1,5 @@
-import React from 'react';
-
 import { isVersionCompatible, type VersionBounds } from '@clerk/shared/versionCheck';
+import React from 'react';
 
 export {
   checkVersionAgainstBounds,
