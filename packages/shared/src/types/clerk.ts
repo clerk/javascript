@@ -2436,7 +2436,15 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    * This is a structural-only type for the `ui` object that can be passed
    * to Clerk.load() and ClerkProvider
    */
-  ui?: { version: string; url?: string };
+  ui?: {
+    version: string;
+    url?: string;
+    /**
+     * The Clerk UI constructor. When provided, this will be used instead of
+     * loading the UI from CDN. This is useful for bundling the UI with your app.
+     */
+    ctor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
+  };
 } & MultiDomainAndOrProxy;
 
 export interface LoadedClerk extends Clerk {

@@ -109,16 +109,11 @@ async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCre
 }
 
 /**
- * Gets the ClerkUI constructor, either from options or by loading the script.
- * Returns early if window.__internal_ClerkUiCtor already exists.
+ * Gets the ClerkUI constructor by loading from CDN.
  */
 async function getClerkUiEntryChunk<TUi extends Ui = Ui>(
   options?: AstroClerkCreateInstanceParams<TUi>,
 ): Promise<ClerkUiConstructor> {
-  if (options?.clerkUiCtor) {
-    return options.clerkUiCtor;
-  }
-
   await loadClerkUiScript(options);
 
   if (!window.__internal_ClerkUiCtor) {

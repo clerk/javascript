@@ -9,6 +9,7 @@ import { ClerkContextProvider } from './ClerkContextProvider';
 
 function ClerkProviderBase<TUi extends Ui>(props: ClerkProviderProps<TUi>) {
   const { initialState, children, ...restIsomorphicClerkOptions } = props;
+
   const isomorphicClerkOptions = restIsomorphicClerkOptions as unknown as IsomorphicClerkOptions;
 
   return (

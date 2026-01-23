@@ -2,7 +2,7 @@ import type { Clerk } from '@clerk/clerk-js/no-rhc';
 import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/react';
 import { ClerkProvider as ClerkReactProvider } from '@clerk/react';
 import type { Ui } from '@clerk/react/internal';
-import { ClerkUi } from '@clerk/ui/entry';
+import { ui } from '@clerk/ui';
 import React from 'react';
 
 import { createClerkClient } from '../internal/clerk';
@@ -32,11 +32,12 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ChromeExtensionClerkPr
     return null;
   }
 
+  // Chrome extension uses bundled UI via ui.ctor
   return (
     <ClerkReactProvider
-      {...rest}
+      {...(rest as any)}
       Clerk={clerkInstance}
-      clerkUiCtor={ClerkUi}
+      clerkUiCtor={ui.ctor}
       standardBrowser={!syncHost}
     >
       {children}
