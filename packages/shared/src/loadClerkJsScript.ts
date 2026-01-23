@@ -43,7 +43,7 @@ export type LoadClerkUiScriptOptions = {
  *
  * @returns `true` if window.Clerk exists and has the expected structure with a load method.
  */
-function isClerkGlobalProperlyLoaded(prop: 'Clerk' | '__internal_ClerkUiCtor'): boolean {
+function isClerkGlobalProperlyLoaded(prop: 'Clerk' | '__internal_ClerkUICtor'): boolean {
   if (typeof window === 'undefined' || !(window as any)[prop]) {
     return false;
   }
@@ -53,7 +53,7 @@ function isClerkGlobalProperlyLoaded(prop: 'Clerk' | '__internal_ClerkUiCtor'): 
   return !!val;
 }
 const isClerkProperlyLoaded = () => isClerkGlobalProperlyLoaded('Clerk');
-const isClerkUiProperlyLoaded = () => isClerkGlobalProperlyLoaded('__internal_ClerkUiCtor');
+const isClerkUiProperlyLoaded = () => isClerkGlobalProperlyLoaded('__internal_ClerkUICtor');
 
 /**
  * Checks if an existing script has a request error using Performance API.

@@ -64,7 +64,7 @@ declare global {
     __astro_clerk_component_props: Map<string, Map<string, Record<string, unknown>>>;
     __astro_clerk_function_props: Map<string, Map<string, Record<string, unknown>>>;
     Clerk: BrowserClerk;
-    __internal_ClerkUiCtor?: ClerkUIConstructor;
+    __internal_ClerkUICtor?: ClerkUIConstructor;
   }
 }
 

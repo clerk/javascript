@@ -125,11 +125,11 @@ async function getClerkUiEntryChunk<TUi extends Ui = Ui>(
       : undefined,
   );
 
-  if (!window.__internal_ClerkUiCtor) {
+  if (!window.__internal_ClerkUICtor) {
     throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
   }
 
-  return window.__internal_ClerkUiCtor;
+  return window.__internal_ClerkUICtor;
 }
 
 export { createClerkInstance, updateClerkOptions };
