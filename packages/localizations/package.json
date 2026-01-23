@@ -61,12 +61,16 @@
     "format:check": "node ../../scripts/format-package.mjs --check",
     "generate": "tsc src/utils/generate.ts && node src/utils/generate.js && prettier --write src/*.ts",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16"
+    "lint:attw": "attw --pack . --profile node16",
+    "test": "vitest --run"
   },
   "dependencies": {
     "@clerk/shared": "workspace:^"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@vitest/ui": "catalog:",
+    "vitest": "catalog:"
+  },
   "engines": {
     "node": ">=20.9.0"
   },
