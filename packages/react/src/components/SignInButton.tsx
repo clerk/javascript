@@ -10,6 +10,8 @@ export const SignInButton = withClerk(
     const {
       // @ts-expect-error - appearance is a valid prop for SignInProps & SignInButtonPropsModal
       appearance,
+      getContainer,
+      component,
       signUpFallbackRedirectUrl,
       forceRedirectUrl,
       fallbackRedirectUrl,
@@ -35,7 +37,7 @@ export const SignInButton = withClerk(
       };
 
       if (mode === 'modal') {
-        return clerk.openSignIn({ ...opts, appearance });
+        return clerk.openSignIn({ ...opts, appearance, getContainer });
       }
       return clerk.redirectToSignIn({
         ...opts,

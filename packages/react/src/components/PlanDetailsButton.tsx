@@ -35,7 +35,7 @@ import { withClerk } from './withClerk';
  */
 export const PlanDetailsButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__experimental_PlanDetailsButtonProps>>) => {
-    const { plan, planId, initialPlanPeriod, planDetailsProps, ...rest } = props;
+    const { plan, planId, initialPlanPeriod, planDetailsProps, getContainer, component, ...rest } = props;
 
     children = normalizeWithDefaultValue(children, 'Plan details');
     const child = assertSingleChild(children)('PlanDetailsButton');
