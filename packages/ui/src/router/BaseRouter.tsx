@@ -2,8 +2,8 @@ import { getQueryParams, stringifyQueryParams } from '@clerk/shared/internal/cle
 import { trimTrailingSlash } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { NavigateOptions } from '@clerk/shared/types';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import React from 'react';
-import { flushSync } from 'react-dom';
 
 import { useWindowEventListener } from '../hooks';
 import { newPaths } from './newPaths';
@@ -51,6 +51,32 @@ export const BaseRouter = ({
   const currentPath = routeParts.path;
   const currentQueryString = routeParts.queryString;
   const currentQueryParams = getQueryParams(routeParts.queryString);
+
+  const pendingNavigationResolversRef = React.useRef<Array<() => void>>([]);
+
+  const isTornDownRef = React.useRef(false);
+  React.useEffect(() => {
+    // Reset on mount or when re-activated (e.g., after Activity becomes visible again)
+    isTornDownRef.current = false;
+    return () => {
+      isTornDownRef.current = true;
+      // Resolve all pending navigations on cleanup to prevent hanging promises
+      for (const resolve of pendingNavigationResolversRef.current) {
+        resolve();
+      }
+      pendingNavigationResolversRef.current = [];
+    };
+  }, []);
+
+  // Resolve all pending navigation promises after routeParts state has been committed.
+  React.useEffect(() => {
+    if (pendingNavigationResolversRef.current.length > 0) {
+      for (const resolve of pendingNavigationResolversRef.current) {
+        resolve();
+      }
+      pendingNavigationResolversRef.current = [];
+    }
+  }, [routeParts]);
 
   const resolve = (to: string): URL => {
     return new URL(to, window.location.origin);
@@ -119,13 +145,29 @@ export const BaseRouter = ({
       toURL.search = stringifyQueryParams(toQueryParams);
     }
     const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
-    // We need to flushSync to guarantee the re-render happens before handing things back to the caller,
-    // otherwise setActive might emit, and children re-render with the old navigation state.
-    // An alternative solution here could be to return a deferred promise, set that to state together
-    // with the routeParts and resolve it in an effect. That way we could avoid the flushSync performance penalty.
-    flushSync(() => {
-      setRouteParts({ path: toURL.pathname, queryString: toURL.search });
-    });
+
+    // Always update routeParts. This is safe because:
+    // - If unmounted: setState is a no-op
+    // - If Activity-hidden: state updates still work, ensuring correct state when visible again
+    setRouteParts({ path: toURL.pathname, queryString: toURL.search });
+
+    // If cleanup has run (unmounted or Activity-hidden), return without awaiting.
+    // - If unmounted: no component exists to have stale state
+    // - If Activity-hidden: children's effects are also cleaned up/inactive, so the original concern
+    //   about setActive emitting and children seeing old navigation state doesn't apply so there is
+    //   no need to await the promise
+    if (isTornDownRef.current) {
+      return internalNavRes;
+    }
+
+    // Component is fully active. Create a deferred promise that will resolve after the
+    // state update commits. This guarantees the re-render happens before handing things
+    // back to the caller, preventing issues where setActive might emit and children
+    // re-render and act on/redirect because of stale navigation state.
+    const { promise: navigationCommittedPromise, resolve: resolveNavigation } = createDeferredPromise();
+    pendingNavigationResolversRef.current.push(resolveNavigation);
+    await navigationCommittedPromise;
+
     return internalNavRes;
   };
 
