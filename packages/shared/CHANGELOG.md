@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.43.2
+
+### Patch Changes
+
+- Fix `unsafeMetadata` being lost when users are transferred between sign-in and sign-up flows during OAuth/SSO authentication ([#7647](https://github.com/clerk/javascript/pull/7647)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 3.43.1
 
 ### Patch Changes

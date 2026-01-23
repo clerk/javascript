@@ -1,5 +1,19 @@
 # Change Log
 
+## 5.121.1
+
+### Patch Changes
+
+- fix: Ensure unsafeMetadata is passed with Sign Up Ticket flow ([#7657](https://github.com/clerk/javascript/pull/7657)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updates keyless prompt content. ([#7636](https://github.com/clerk/javascript/pull/7636)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix `unsafeMetadata` being lost when users are transferred between sign-in and sign-up flows during OAuth/SSO authentication ([#7647](https://github.com/clerk/javascript/pull/7647)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`b7a4e1e`](https://github.com/clerk/javascript/commit/b7a4e1eabe7aa61e7d2cb7f27cbd22671c49f2b1)]:
+  - @clerk/shared@3.43.2
+  - @clerk/localizations@3.35.2
+
 ## 5.121.0
 
 ### Minor Changes
