@@ -2244,7 +2244,7 @@ export class Clerk implements ClerkInterface {
         return navigateToSignIn();
       }
 
-      const res = await signUp.create({ transfer: true });
+      const res = await signUp.create({ transfer: true, unsafeMetadata: params.unsafeMetadata });
       switch (res.status) {
         case 'complete':
           return this.setActive({
