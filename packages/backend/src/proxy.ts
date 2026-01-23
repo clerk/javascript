@@ -84,7 +84,7 @@ export function fapiUrlFromPublishableKey(publishableKey: string): string {
 export function matchProxyPath(request: Request, options?: Pick<FrontendApiProxyOptions, 'proxyPath'>): boolean {
   const proxyPath = options?.proxyPath || DEFAULT_PROXY_PATH;
   const url = new URL(request.url);
-  return url.pathname.startsWith(proxyPath);
+  return url.pathname === proxyPath || url.pathname.startsWith(proxyPath + '/');
 }
 
 /**
@@ -171,7 +171,8 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
 
   // Get the request URL and validate path
   const requestUrl = new URL(request.url);
-  if (!requestUrl.pathname.startsWith(proxyPath)) {
+  const pathMatches = requestUrl.pathname === proxyPath || requestUrl.pathname.startsWith(proxyPath + '/');
+  if (!pathMatches) {
     return createErrorResponse(
       'proxy_path_mismatch',
       `Request path "${requestUrl.pathname}" does not match proxy path "${proxyPath}"`,

@@ -120,9 +120,9 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
     const secretKey = options.secretKey || env.secretKey;
 
     // Handle Frontend API proxy requests early, before authentication
-    if (frontendApiProxy && proxyEnabled) {
+    if (proxyEnabled) {
       const requestPath = request.originalUrl || request.url;
-      if (requestPath.startsWith(proxyPath)) {
+      if (requestPath === proxyPath || requestPath.startsWith(proxyPath + '/')) {
         // Convert Express request to Fetch API Request
         const proxyRequest = requestToProxyRequest(request);
 
@@ -165,7 +165,7 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
 
     // Auto-derive proxyUrl from frontendApiProxy config if not explicitly set
     let resolvedOptions = options;
-    if (frontendApiProxy && proxyEnabled && !options.proxyUrl) {
+    if (proxyEnabled && !options.proxyUrl) {
       const protocol = request.secure || request.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
       const host = request.headers['x-forwarded-host'] || request.headers.host || 'localhost';
       const derivedProxyUrl = `${protocol}://${host}${proxyPath}`;

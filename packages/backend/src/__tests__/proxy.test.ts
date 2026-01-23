@@ -66,6 +66,12 @@ describe('proxy', () => {
       const request = new Request('https://example.com/__clerk/');
       expect(matchProxyPath(request)).toBe(true);
     });
+
+    it('does not match paths that start with proxy path but have no boundary', () => {
+      // /__clerk-admin should NOT match /__clerk proxy path
+      const request = new Request('https://example.com/__clerk-admin/v1/client');
+      expect(matchProxyPath(request)).toBe(false);
+    });
   });
 
   describe('clerkFrontendApiProxy', () => {
@@ -109,6 +115,21 @@ describe('proxy', () => {
 
     it('returns error when request path does not match proxy path', async () => {
       const request = new Request('https://example.com/api/users');
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+        proxyPath: '/__clerk',
+      });
+
+      expect(response.status).toBe(400);
+      const body = await response.json();
+      expect(body.errors[0].code).toBe('proxy_path_mismatch');
+    });
+
+    it('returns error when path starts with proxy path but has no boundary', async () => {
+      // /__clerk-admin should NOT match /__clerk proxy path
+      const request = new Request('https://example.com/__clerk-admin/v1/client');
 
       const response = await clerkFrontendApiProxy(request, {
         publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
