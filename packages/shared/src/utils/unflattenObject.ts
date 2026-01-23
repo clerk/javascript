@@ -30,6 +30,26 @@ export function validateLocalizationFormat(obj: Record<string, unknown>): void {
 }
 
 /**
+ * Checks if a value is a non-null, non-array object that can be used for nesting.
+ */
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Returns a human-readable type description for error messages.
+ */
+function getTypeDescription(value: unknown): string {
+  if (value === null) {
+    return 'null';
+  }
+  if (Array.isArray(value)) {
+    return 'array';
+  }
+  return typeof value;
+}
+
+/**
  * Converts a flattened object to nested format.
  * { "a.b.c": "value" } => { a: { b: { c: "value" } } }
  */
@@ -38,15 +58,51 @@ export function unflattenObject<T extends Record<string, unknown>>(flat: Record<
 
   for (const [key, value] of Object.entries(flat)) {
     const parts = key.split('.');
+    if (parts.some(part => part === '')) {
+      throw new Error(
+        `Clerk: Localization key '${key}' contains empty segments (consecutive dots, leading/trailing dots are not allowed)`,
+      );
+    }
+
     let current = result;
+    const pathSegments: string[] = [];
 
     for (let i = 0; i < parts.length - 1; i++) {
       const part = parts[i];
-      current[part] = current[part] || {};
-      current = current[part] as Record<string, unknown>;
+      pathSegments.push(part);
+
+      if (part in current) {
+        const existing = current[part];
+        if (!isObject(existing)) {
+          const conflictingPath = pathSegments.join('.');
+          const typeDesc = getTypeDescription(existing);
+          throw new Error(
+            `Clerk: Localization key conflict at path '${conflictingPath}': cannot set '${key}' because '${conflictingPath}' already exists as a ${typeDesc}`,
+          );
+        }
+        current = existing;
+      } else {
+        current[part] = {};
+        current = current[part] as Record<string, unknown>;
+      }
     }
 
-    current[parts[parts.length - 1]] = value;
+    const finalKey = parts[parts.length - 1];
+    if (finalKey in current) {
+      const existing = current[finalKey];
+      const existingIsObject = isObject(existing);
+      const newIsObject = isObject(value);
+
+      if (existingIsObject !== newIsObject) {
+        const finalPath = parts.join('.');
+        const typeDesc = existingIsObject ? 'nested object' : getTypeDescription(existing);
+        throw new Error(
+          `Clerk: Localization key conflict at path '${finalPath}': cannot set '${key}' because '${finalPath}' already exists as a ${typeDesc}`,
+        );
+      }
+    }
+
+    current[finalKey] = value;
   }
 
   return result as T;

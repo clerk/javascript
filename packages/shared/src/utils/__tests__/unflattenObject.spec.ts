@@ -133,4 +133,92 @@ describe('unflattenObject', () => {
       },
     });
   });
+
+  describe('conflict detection', () => {
+    test('throws error when primitive value blocks nested path', () => {
+      const flat = { a: 'x', 'a.b': 'y' };
+      expect(() => unflattenObject(flat)).toThrow();
+      expect(() => unflattenObject(flat)).toThrow(/Localization key conflict/);
+      expect(() => unflattenObject(flat)).toThrow(/path 'a'/);
+      expect(() => unflattenObject(flat)).toThrow(/cannot set 'a\.b'/);
+    });
+
+    test('throws error when nested path blocks primitive value', () => {
+      const flat = { 'a.b': 'x', a: 'y' };
+      expect(() => unflattenObject(flat)).toThrow();
+      expect(() => unflattenObject(flat)).toThrow(/Localization key conflict/);
+      expect(() => unflattenObject(flat)).toThrow(/path 'a'/);
+    });
+
+    test('throws error when nested structure blocks primitive assignment', () => {
+      const flat = { 'a.b.c': 'x', 'a.b': 'y' };
+      expect(() => unflattenObject(flat)).toThrow();
+      expect(() => unflattenObject(flat)).toThrow(/Localization key conflict/);
+      expect(() => unflattenObject(flat)).toThrow(/path 'a\.b'/);
+    });
+
+    test('throws error when primitive value blocks nested structure', () => {
+      const flat = { 'a.b': 'x', 'a.b.c': 'y' };
+      expect(() => unflattenObject(flat)).toThrow();
+      expect(() => unflattenObject(flat)).toThrow(/Localization key conflict/);
+      expect(() => unflattenObject(flat)).toThrow(/path 'a\.b'/);
+    });
+
+    test('throws error for deep nested conflict', () => {
+      const flat = { 'a.b.c.d': 'x', 'a.b': 'y' };
+      expect(() => unflattenObject(flat)).toThrow();
+      expect(() => unflattenObject(flat)).toThrow(/Localization key conflict/);
+      expect(() => unflattenObject(flat)).toThrow(/path 'a\.b'/);
+    });
+
+    test('successfully merges keys at same level (no conflict)', () => {
+      const flat = { 'a.b': 'x', 'a.c': 'y' };
+      expect(unflattenObject(flat)).toEqual({ a: { b: 'x', c: 'y' } });
+    });
+
+    test('throws error when null value blocks nested path', () => {
+      const flat = { a: null, 'a.b': 'x' };
+      expect(() => unflattenObject(flat)).toThrow();
+      expect(() => unflattenObject(flat)).toThrow(/Localization key conflict/);
+      expect(() => unflattenObject(flat)).toThrow(/path 'a'/);
+      expect(() => unflattenObject(flat)).toThrow(/null/);
+    });
+
+    test('throws error when array value blocks nested path', () => {
+      const flat = { a: [1, 2], 'a.b': 'x' };
+      expect(() => unflattenObject(flat)).toThrow();
+      expect(() => unflattenObject(flat)).toThrow(/Localization key conflict/);
+      expect(() => unflattenObject(flat)).toThrow(/path 'a'/);
+      expect(() => unflattenObject(flat)).toThrow(/array/);
+    });
+  });
+
+  describe('edge cases', () => {
+    test('throws error for empty string segments (consecutive dots)', () => {
+      const flat = { 'a..b': 'value' };
+      expect(() => unflattenObject(flat)).toThrow();
+      expect(() => unflattenObject(flat)).toThrow(/empty segments/);
+      expect(() => unflattenObject(flat)).toThrow(/key 'a\.\.b'/);
+    });
+
+    test('throws error for leading dot', () => {
+      const flat = { '.a': 'value' };
+      expect(() => unflattenObject(flat)).toThrow();
+      expect(() => unflattenObject(flat)).toThrow(/empty segments/);
+      expect(() => unflattenObject(flat)).toThrow(/key '\.a'/);
+    });
+
+    test('throws error for trailing dot', () => {
+      const flat = { 'a.': 'value' };
+      expect(() => unflattenObject(flat)).toThrow();
+      expect(() => unflattenObject(flat)).toThrow(/empty segments/);
+      expect(() => unflattenObject(flat)).toThrow(/key 'a\.'/);
+    });
+
+    test('throws error for empty key', () => {
+      const flat = { '': 'value' };
+      expect(() => unflattenObject(flat)).toThrow();
+      expect(() => unflattenObject(flat)).toThrow(/empty segments/);
+    });
+  });
 });
