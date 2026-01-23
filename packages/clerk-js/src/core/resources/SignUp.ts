@@ -30,6 +30,7 @@ import type {
   SignUpFuturePhoneCodeVerifyParams,
   SignUpFutureResource,
   SignUpFutureSSOParams,
+  SignUpFutureVerificationsResource,
   SignUpFutureTicketParams,
   SignUpFutureUpdateParams,
   SignUpFutureWeb3Params,
@@ -588,19 +589,58 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 }
 
+type SignUpFutureVerificationsMethods = Pick<
+  SignUpFutureVerificationsResource,
+  'sendEmailCode' | 'verifyEmailCode' | 'sendPhoneCode' | 'verifyPhoneCode'
+>;
+
+class SignUpFutureVerifications implements SignUpFutureVerificationsResource {
+  #resource: SignUp;
+
+  sendEmailCode: SignUpFutureVerificationsResource['sendEmailCode'];
+  verifyEmailCode: SignUpFutureVerificationsResource['verifyEmailCode'];
+  sendPhoneCode: SignUpFutureVerificationsResource['sendPhoneCode'];
+  verifyPhoneCode: SignUpFutureVerificationsResource['verifyPhoneCode'];
+
+  constructor(resource: SignUp, methods: SignUpFutureVerificationsMethods) {
+    this.#resource = resource;
+    this.sendEmailCode = methods.sendEmailCode;
+    this.verifyEmailCode = methods.verifyEmailCode;
+    this.sendPhoneCode = methods.sendPhoneCode;
+    this.verifyPhoneCode = methods.verifyPhoneCode;
+  }
+
+  get emailAddress() {
+    return this.#resource.verifications.emailAddress;
+  }
+
+  get phoneNumber() {
+    return this.#resource.verifications.phoneNumber;
+  }
+
+  get web3Wallet() {
+    return this.#resource.verifications.web3Wallet;
+  }
+
+  get externalAccount() {
+    return this.#resource.verifications.externalAccount;
+  }
+}
+
 class SignUpFuture implements SignUpFutureResource {
-  verifications = {
-    sendEmailCode: this.sendEmailCode.bind(this),
-    verifyEmailCode: this.verifyEmailCode.bind(this),
-    sendPhoneCode: this.sendPhoneCode.bind(this),
-    verifyPhoneCode: this.verifyPhoneCode.bind(this),
-  };
+  verifications: SignUpFutureVerifications;
 
   #hasBeenFinalized = false;
   readonly #resource: SignUp;
 
   constructor(resource: SignUp) {
     this.#resource = resource;
+    this.verifications = new SignUpFutureVerifications(this.#resource, {
+      sendEmailCode: this.sendEmailCode.bind(this),
+      verifyEmailCode: this.verifyEmailCode.bind(this),
+      sendPhoneCode: this.sendPhoneCode.bind(this),
+      verifyPhoneCode: this.verifyPhoneCode.bind(this),
+    });
   }
 
   get id() {
