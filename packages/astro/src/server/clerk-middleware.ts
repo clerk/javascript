@@ -209,22 +209,27 @@ export const handleMultiDomainAndProxy = (
   opts: AuthenticateRequestOptions,
   context: AstroMiddlewareContextParam,
 ) => {
-  const relativeOrAbsoluteProxyUrl = handleValueOrFn(
-    opts?.proxyUrl,
+  const isSatellite = handleValueOrFn(
+    opts.multiDomain?.isSatellite,
+    new URL(clerkRequest.url),
+    getSafeEnv(context).isSatellite,
+  );
+  const domain = handleValueOrFn(opts.multiDomain?.domain, new URL(clerkRequest.url), getSafeEnv(context).domain);
+  const signInUrl = opts?.signInUrl || getSafeEnv(context).signInUrl;
+
+  // Resolve proxyUrl: multiDomain.proxyUrl takes precedence, then top-level, then env
+  const rawProxyUrl = handleValueOrFn(
+    opts.multiDomain?.proxyUrl ?? opts?.proxyUrl,
     clerkRequest.clerkUrl,
     getSafeEnv(context).proxyUrl,
   );
 
   let proxyUrl;
-  if (!!relativeOrAbsoluteProxyUrl && !isHttpOrHttps(relativeOrAbsoluteProxyUrl)) {
-    proxyUrl = new URL(relativeOrAbsoluteProxyUrl, clerkRequest.clerkUrl).toString();
+  if (!!rawProxyUrl && !isHttpOrHttps(rawProxyUrl)) {
+    proxyUrl = new URL(rawProxyUrl, clerkRequest.clerkUrl).toString();
   } else {
-    proxyUrl = relativeOrAbsoluteProxyUrl;
+    proxyUrl = rawProxyUrl;
   }
-
-  const isSatellite = handleValueOrFn(opts.isSatellite, new URL(clerkRequest.url), getSafeEnv(context).isSatellite);
-  const domain = handleValueOrFn(opts.domain, new URL(clerkRequest.url), getSafeEnv(context).domain);
-  const signInUrl = opts?.signInUrl || getSafeEnv(context).signInUrl;
 
   if (isSatellite && !proxyUrl && !domain) {
     throw new Error(missingDomainAndProxy);
@@ -241,8 +246,13 @@ export const handleMultiDomainAndProxy = (
 
   return {
     proxyUrl,
-    isSatellite,
-    domain,
+    multiDomain: isSatellite
+      ? {
+          isSatellite,
+          ...(domain ? { domain } : { proxyUrl: proxyUrl! }),
+          ...(opts.multiDomain?.autoSync !== undefined ? { autoSync: opts.multiDomain.autoSync } : {}),
+        }
+      : undefined,
   };
 };
 

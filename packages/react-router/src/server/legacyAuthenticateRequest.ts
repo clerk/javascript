@@ -13,7 +13,7 @@ export async function legacyAuthenticateRequest(
   const { request } = args;
   const { audience, authorizedParties } = opts;
 
-  const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey, machineSecretKey } = opts;
+  const { apiUrl, secretKey, jwtKey, proxyUrl, multiDomain, publishableKey, machineSecretKey } = opts;
   const { signInUrl, signUpUrl } = opts;
 
   const requestState = await clerkClient(args).authenticateRequest(patchRequest(request), {
@@ -21,8 +21,7 @@ export async function legacyAuthenticateRequest(
     secretKey,
     jwtKey,
     proxyUrl,
-    isSatellite,
-    domain,
+    multiDomain,
     publishableKey,
     machineSecretKey,
     audience,

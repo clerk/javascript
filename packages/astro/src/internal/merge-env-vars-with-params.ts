@@ -9,9 +9,8 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
   const {
     signInUrl: paramSignIn,
     signUpUrl: paramSignUp,
-    isSatellite: paramSatellite,
+    multiDomain: paramMultiDomain,
     proxyUrl: paramProxy,
-    domain: paramDomain,
     publishableKey: paramPublishableKey,
     telemetry: paramTelemetry,
     clerkJSUrl: paramClerkJSUrl,
@@ -21,12 +20,19 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
     ...rest
   } = params || {};
 
+  const isSatellite = paramMultiDomain?.isSatellite || import.meta.env.PUBLIC_CLERK_IS_SATELLITE;
+  const domain = paramMultiDomain?.domain || import.meta.env.PUBLIC_CLERK_DOMAIN;
+
   return {
     signInUrl: paramSignIn || import.meta.env.PUBLIC_CLERK_SIGN_IN_URL,
     signUpUrl: paramSignUp || import.meta.env.PUBLIC_CLERK_SIGN_UP_URL,
-    isSatellite: paramSatellite || import.meta.env.PUBLIC_CLERK_IS_SATELLITE,
+    multiDomain: isSatellite
+      ? {
+          isSatellite: true as const,
+          ...(domain ? { domain: domain as string } : {}),
+        }
+      : paramMultiDomain,
     proxyUrl: paramProxy || import.meta.env.PUBLIC_CLERK_PROXY_URL,
-    domain: paramDomain || import.meta.env.PUBLIC_CLERK_DOMAIN,
     publishableKey: paramPublishableKey || import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '',
     clerkUiUrl: paramClerkUiUrl || import.meta.env.PUBLIC_CLERK_UI_URL,
     clerkJSUrl: paramClerkJSUrl || import.meta.env.PUBLIC_CLERK_JS_URL,

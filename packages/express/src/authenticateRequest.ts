@@ -32,11 +32,11 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const machineSecretKey = options?.machineSecretKey || env.machineSecretKey;
   const publishableKey = options?.publishableKey || env.publishableKey;
 
-  const isSatellite = handleValueOrFn(options?.isSatellite, clerkRequest.clerkUrl, env.isSatellite);
-  const domain = handleValueOrFn(options?.domain, clerkRequest.clerkUrl) || env.domain;
+  const isSatellite = handleValueOrFn(options?.multiDomain?.isSatellite, clerkRequest.clerkUrl, env.isSatellite);
+  const domain = handleValueOrFn(options?.multiDomain?.domain, clerkRequest.clerkUrl) || env.domain;
   const signInUrl = options?.signInUrl || env.signInUrl;
   const proxyUrl = absoluteProxyUrl(
-    handleValueOrFn(options?.proxyUrl, clerkRequest.clerkUrl, env.proxyUrl),
+    handleValueOrFn(options?.multiDomain?.proxyUrl ?? options?.proxyUrl, clerkRequest.clerkUrl, env.proxyUrl),
     clerkRequest.clerkUrl.toString(),
   );
 
@@ -56,8 +56,12 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     jwtKey,
     authorizedParties,
     proxyUrl,
-    isSatellite,
-    domain,
+    multiDomain: isSatellite
+      ? {
+          isSatellite,
+          ...(domain ? { domain } : { proxyUrl: proxyUrl! }),
+        }
+      : undefined,
     signInUrl,
     acceptsToken,
   });

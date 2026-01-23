@@ -11,17 +11,16 @@ type BuildTimeOptions = Partial<
     | 'apiUrl'
     | 'apiVersion'
     | 'audience'
-    | 'domain'
-    | 'isSatellite'
     | 'jwtKey'
     | 'proxyUrl'
     | 'publishableKey'
     | 'secretKey'
     | 'machineSecretKey'
+    | 'multiDomain'
   >
 >;
 
-const defaultOptions = {
+const defaultOptions: BuildTimeOptions = {
   secretKey: '',
   machineSecretKey: '',
   jwtKey: '',
@@ -29,10 +28,8 @@ const defaultOptions = {
   apiVersion: undefined,
   proxyUrl: '',
   publishableKey: '',
-  isSatellite: false,
-  domain: '',
   audience: '',
-} satisfies BuildTimeOptions;
+};
 
 /**
  * @internal

@@ -63,14 +63,13 @@ export default defineNuxtModule<ModuleOptions>({
           signInForceRedirectUrl: options.signInForceRedirectUrl,
           signUpForceRedirectUrl: options.signUpForceRedirectUrl,
           signUpUrl: options.signUpUrl,
-          domain: options.domain,
+          multiDomain: options.multiDomain,
           // Using jsUrl/uiUrl instead of clerkJSUrl/clerkUiUrl to support
           // NUXT_PUBLIC_CLERK_JS_URL and NUXT_PUBLIC_CLERK_UI_URL env vars.
           jsUrl: options.clerkJSUrl,
           uiUrl: options.clerkUiUrl,
           clerkJSVariant: options.clerkJSVariant,
           clerkJSVersion: options.clerkJSVersion,
-          isSatellite: options.isSatellite,
           // Backend specific variables that are safe to share.
           // We want them to be overridable like the other public keys (e.g NUXT_PUBLIC_CLERK_PROXY_URL)
           proxyUrl: options.proxyUrl,

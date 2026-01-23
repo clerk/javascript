@@ -29,11 +29,13 @@ export const loadOptions = (args: DataFunctionArgs, overrides: ClerkMiddlewareOp
   const publishableKey = overrides.publishableKey || getPublicEnvVariables(context).publishableKey;
   const jwtKey = overrides.jwtKey || getEnvVariable('CLERK_JWT_KEY', context);
   const apiUrl = getEnvVariable('CLERK_API_URL', context) || apiUrlFromPublishableKey(publishableKey);
-  const domain = handleValueOrFn(overrides.domain, new URL(request.url)) || getPublicEnvVariables(context).domain;
   const isSatellite =
-    handleValueOrFn(overrides.isSatellite, new URL(request.url)) || getPublicEnvVariables(context).isSatellite;
+    handleValueOrFn(overrides.multiDomain?.isSatellite, new URL(request.url)) ||
+    getPublicEnvVariables(context).isSatellite;
+  const domain =
+    handleValueOrFn(overrides.multiDomain?.domain, new URL(request.url)) || getPublicEnvVariables(context).domain;
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(
-    overrides?.proxyUrl,
+    overrides.multiDomain?.proxyUrl ?? overrides?.proxyUrl,
     clerkRequest.clerkUrl,
     getPublicEnvVariables(context).proxyUrl,
   );
@@ -73,8 +75,6 @@ export const loadOptions = (args: DataFunctionArgs, overrides: ClerkMiddlewareOp
     publishableKey,
     jwtKey,
     apiUrl,
-    domain,
-    isSatellite,
     proxyUrl,
     signInUrl,
     signUpUrl,
@@ -82,5 +82,12 @@ export const loadOptions = (args: DataFunctionArgs, overrides: ClerkMiddlewareOp
     signUpForceRedirectUrl,
     signInFallbackRedirectUrl,
     signUpFallbackRedirectUrl,
+    multiDomain: isSatellite
+      ? {
+          isSatellite,
+          ...(domain ? { domain } : { proxyUrl: proxyUrl! }),
+          ...(overrides.multiDomain?.autoSync !== undefined ? { autoSync: overrides.multiDomain.autoSync } : {}),
+        }
+      : undefined,
   };
 };

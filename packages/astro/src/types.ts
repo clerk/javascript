@@ -16,7 +16,6 @@ type AstroClerkUpdateOptions<TUi extends Ui = Ui> = Pick<ClerkOptions, 'localiza
 
 type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
   ClerkOptions,
-  | 'isSatellite'
   | 'sdkMetadata'
   | 'standardBrowser'
   | 'selectInitialSession'

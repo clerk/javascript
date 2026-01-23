@@ -199,7 +199,6 @@ const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
   touchSession: true,
-  isSatellite: false,
   signInUrl: undefined,
   signUpUrl: undefined,
   afterSignOutUrl: undefined,
@@ -325,7 +324,7 @@ export class Clerk implements ClerkInterface {
 
   get isSatellite(): boolean {
     if (inBrowser()) {
-      return handleValueOrFn(this.#options.isSatellite, new URL(window.location.href), false);
+      return handleValueOrFn(this.#options.multiDomain?.isSatellite, new URL(window.location.href), false);
     }
     return false;
   }
@@ -2705,10 +2704,10 @@ export class Clerk implements ClerkInterface {
       return true;
     }
 
-    // Check if satelliteAutoSync is disabled - if so, skip automatic sync
+    // Check if autoSync is disabled - if so, skip automatic sync
     // unless explicitly triggered via __clerk_synced=false
-    if (this.#options.satelliteAutoSync === false) {
-      // Skip automatic sync when satelliteAutoSync is false
+    if (this.#options.multiDomain?.autoSync === false) {
+      // Skip automatic sync when autoSync is false
       return false;
     }
 

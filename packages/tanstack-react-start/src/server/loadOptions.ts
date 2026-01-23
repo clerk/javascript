@@ -16,12 +16,11 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
   const publishableKey = overrides.publishableKey || commonEnv.PUBLISHABLE_KEY;
   const jwtKey = overrides.jwtKey || commonEnv.CLERK_JWT_KEY;
   const apiUrl = getEnvVariable('CLERK_API_URL') || apiUrlFromPublishableKey(publishableKey);
-  const domain = overrides.domain || commonEnv.DOMAIN;
-  const isSatellite = overrides.isSatellite || commonEnv.IS_SATELLITE;
-  const relativeOrAbsoluteProxyUrl = overrides.proxyUrl || commonEnv.PROXY_URL;
+  const isSatellite = overrides.multiDomain?.isSatellite || commonEnv.IS_SATELLITE;
+  const domain = overrides.multiDomain?.domain || commonEnv.DOMAIN;
+  const relativeOrAbsoluteProxyUrl = overrides.multiDomain?.proxyUrl || overrides.proxyUrl || commonEnv.PROXY_URL;
   const signInUrl = overrides.signInUrl || commonEnv.SIGN_IN_URL;
   const signUpUrl = overrides.signUpUrl || commonEnv.SIGN_UP_URL;
-  const satelliteAutoSync = overrides.satelliteAutoSync;
 
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {
@@ -54,11 +53,15 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
     publishableKey,
     jwtKey,
     apiUrl,
-    domain,
-    isSatellite,
     proxyUrl,
     signInUrl,
     signUpUrl,
-    satelliteAutoSync,
+    multiDomain: isSatellite
+      ? {
+          isSatellite,
+          ...(domain ? { domain } : { proxyUrl: proxyUrl! }),
+          ...(overrides.multiDomain?.autoSync !== undefined ? { autoSync: overrides.multiDomain.autoSync } : {}),
+        }
+      : undefined,
   };
 };

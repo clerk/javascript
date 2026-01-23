@@ -1,5 +1,5 @@
 import type { MatchFunction } from '@clerk/shared/pathToRegexp';
-import type { PendingSessionOptions } from '@clerk/shared/types';
+import type { MultiDomainConfigPrimitives, PendingSessionOptions } from '@clerk/shared/types';
 
 import type { ApiClient, APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
 import type {
@@ -21,15 +21,6 @@ export type AuthenticateRequestOptions = {
    * The Clerk Publishable Key from the [**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
    */
   publishableKey?: string;
-  /**
-   * The domain of a [satellite application](https://clerk.com/docs/guides/dashboard/dns-domains/satellite-domains) in a multi-domain setup.
-   */
-  domain?: string;
-  /**
-   * Whether the instance is a satellite domain in a multi-domain setup.
-   * @default false
-   */
-  isSatellite?: boolean;
   /**
    * The proxy URL from a multi-domain setup.
    */
@@ -73,19 +64,9 @@ export type AuthenticateRequestOptions = {
    */
   machineSecretKey?: string;
   /**
-   * Controls whether satellite apps automatically sync with the primary domain on initial page load.
-   *
-   * When `false` (default), satellite apps will skip the automatic handshake if no session cookies exist,
-   * and only trigger the handshake after an explicit sign-in action. This provides the best performance
-   * by showing the satellite app immediately without attempting to sync state first.
-   *
-   * When `true`, satellite apps will automatically trigger a handshake redirect to sync authentication
-   * state with the primary domain on first load, even if no session cookies exist. Use this if you want
-   * users who are already signed in on the primary domain to be automatically recognized on the satellite.
-   *
-   * @default false
+   * Multi-domain configuration for satellite applications.
    */
-  satelliteAutoSync?: boolean;
+  multiDomain?: MultiDomainConfigPrimitives;
 } & VerifyTokenOptions;
 
 /**

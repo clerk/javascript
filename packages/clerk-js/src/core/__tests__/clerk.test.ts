@@ -2194,7 +2194,7 @@ describe('Clerk singleton', () => {
       });
 
       await sut.load({
-        isSatellite: true,
+        multiDomain: { isSatellite: true },
       });
 
       expect(sut.domain).toBe('clerk.example.com');
@@ -2207,7 +2207,7 @@ describe('Clerk singleton', () => {
       });
 
       await sut.load({
-        isSatellite: url => url.host === 'test.host',
+        multiDomain: { isSatellite: url => url.host === 'test.host' },
       });
 
       expect(sut.domain).toBe('clerk.example.com');
@@ -2220,7 +2220,7 @@ describe('Clerk singleton', () => {
       });
 
       await sut.load({
-        isSatellite: true,
+        multiDomain: { isSatellite: true },
       });
 
       expect(sut.domain).toBe('clerk.example.com');
@@ -2233,7 +2233,7 @@ describe('Clerk singleton', () => {
       });
 
       await sut.load({
-        isSatellite: true,
+        multiDomain: { isSatellite: true },
       });
 
       expect(sut.domain).toBe('clerk.test.host');
@@ -2248,7 +2248,7 @@ describe('Clerk singleton', () => {
           domain: 'satellite.dev',
         });
         await sut.load({
-          isSatellite: true,
+          multiDomain: { isSatellite: true },
           signInUrl: 'https://primary.dev/sign-in',
         });
 
@@ -2262,7 +2262,7 @@ describe('Clerk singleton', () => {
           domain: 'satellite.com',
         });
         await sut.load({
-          isSatellite: true,
+          multiDomain: { isSatellite: true },
         });
 
         expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://clerk.satellite.com/v1/me');

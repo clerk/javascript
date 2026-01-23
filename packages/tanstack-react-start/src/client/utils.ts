@@ -35,8 +35,12 @@ export const pickFromClerkInitState = (
     clerkSsrState: __clerk_ssr_state,
     publishableKey: __publishableKey,
     proxyUrl: __proxyUrl,
-    domain: __domain,
-    isSatellite: !!__isSatellite,
+    multiDomain: __isSatellite
+      ? {
+          isSatellite: true,
+          ...(__domain ? { domain: __domain } : {}),
+        }
+      : undefined,
     signInUrl: __signInUrl,
     signUpUrl: __signUpUrl,
     clerkJSUrl: __clerkJSUrl,
@@ -59,8 +63,14 @@ export const mergeWithPublicEnvs = (restInitState: any) => {
   return {
     ...restInitState,
     publishableKey: restInitState.publishableKey || getPublicEnvVariables().publishableKey,
-    domain: restInitState.domain || getPublicEnvVariables().domain,
-    isSatellite: restInitState.isSatellite || getPublicEnvVariables().isSatellite,
+    multiDomain:
+      restInitState.multiDomain ||
+      (getPublicEnvVariables().isSatellite
+        ? {
+            isSatellite: true,
+            ...(getPublicEnvVariables().domain ? { domain: getPublicEnvVariables().domain } : {}),
+          }
+        : undefined),
     signInUrl: restInitState.signInUrl || getPublicEnvVariables().signInUrl,
     signUpUrl: restInitState.signUpUrl || getPublicEnvVariables().signUpUrl,
     clerkJSUrl: restInitState.clerkJSUrl || getPublicEnvVariables().clerkJsUrl,

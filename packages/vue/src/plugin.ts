@@ -23,7 +23,7 @@ declare global {
   }
 }
 
-export type PluginOptions<TUi extends Ui = Ui> = Without<IsomorphicClerkOptions, 'domain' | 'proxyUrl' | 'appearance'> &
+export type PluginOptions<TUi extends Ui = Ui> = Without<IsomorphicClerkOptions, 'proxyUrl' | 'appearance'> &
   MultiDomainAndOrProxy & {
     initialState?: InitialState;
     appearance?: Appearance<TUi>;

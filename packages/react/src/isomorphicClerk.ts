@@ -257,8 +257,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   constructor(options: IsomorphicClerkOptions) {
     this.#publishableKey = options?.publishableKey;
-    this.#proxyUrl = options?.proxyUrl;
-    this.#domain = options?.domain;
+    this.#proxyUrl = options?.multiDomain?.proxyUrl ?? options?.proxyUrl;
+    this.#domain = options?.multiDomain?.domain;
     this.options = options;
     this.Clerk = options?.Clerk || null;
     this.mode = inBrowser() ? 'browser' : 'server';
@@ -300,9 +300,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // This getter can run in environments where window is not available.
     // In those cases we should expect and use domain as a string
     if (typeof window !== 'undefined' && window.location) {
-      return handleValueOrFn(this.options.isSatellite, new URL(window.location.href), false);
+      return handleValueOrFn(this.options.multiDomain?.isSatellite, new URL(window.location.href), false);
     }
-    if (typeof this.options.isSatellite === 'function') {
+    if (typeof this.options.multiDomain?.isSatellite === 'function') {
       return errorThrower.throw(unsupportedNonBrowserDomainOrProxyUrlFunction);
     }
     return false;

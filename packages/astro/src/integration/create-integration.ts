@@ -16,7 +16,9 @@ type HotloadAstroClerkIntegrationParams = AstroClerkIntegrationParams & {
 
 function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() {
   return (params?: Params): AstroIntegration => {
-    const { proxyUrl, isSatellite, domain, signInUrl, signUpUrl, enableEnvSchema = true } = params || {};
+    const { proxyUrl, multiDomain, signInUrl, signUpUrl, enableEnvSchema = true } = params || {};
+    const isSatellite = multiDomain?.isSatellite;
+    const domain = multiDomain?.domain;
 
     // These are not provided when the "bundled" integration is used
     const clerkJSUrl = (params as any)?.clerkJSUrl as string | undefined;

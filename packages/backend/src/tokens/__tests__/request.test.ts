@@ -305,12 +305,10 @@ const mockOptions = (options?) => {
     publishableKey: PK_TEST,
     proxyUrl: '',
     skipJwksCache: true,
-    isSatellite: false,
     signInUrl: '',
     signUpUrl: '',
     afterSignInUrl: '',
     afterSignUpUrl: '',
-    domain: '',
     ...options,
   } satisfies AuthenticateRequestOptions;
 };
@@ -663,9 +661,8 @@ describe('tokens.authenticateRequest(options)', () => {
       mockOptions({
         secretKey: 'deadbeef',
         clientUat: '0',
-        isSatellite: true,
+        multiDomain: { isSatellite: true, domain: 'satellite.dev' },
         signInUrl: 'https://primary.dev/sign-in',
-        domain: 'satellite.dev',
       }),
     );
 
@@ -697,9 +694,8 @@ describe('tokens.authenticateRequest(options)', () => {
       mockOptions({
         secretKey: 'sk_test_deadbeef',
         publishableKey: PK_TEST,
-        isSatellite: true,
+        multiDomain: { isSatellite: true, domain: 'satellite.dev' },
         signInUrl: 'https://primary.dev/sign-in',
-        domain: 'satellite.dev',
       }),
     );
 
@@ -728,9 +724,8 @@ describe('tokens.authenticateRequest(options)', () => {
       mockOptions({
         publishableKey: PK_LIVE,
         secretKey: 'deadbeef',
-        isSatellite: true,
+        multiDomain: { isSatellite: true, domain: 'satellite.dev' },
         signInUrl: 'https://primary.dev/sign-in',
-        domain: 'satellite.dev',
       }),
     );
 
@@ -749,8 +744,7 @@ describe('tokens.authenticateRequest(options)', () => {
       mockOptions({
         secretKey: 'sk_test_deadbeef',
         signInUrl: 'http://primary.example/sign-in',
-        isSatellite: true,
-        domain: 'satellite.example',
+        multiDomain: { isSatellite: true, domain: 'satellite.example' },
       }),
     );
 
@@ -776,8 +770,7 @@ describe('tokens.authenticateRequest(options)', () => {
       mockOptions({
         secretKey: 'sk_test_deadbeef',
         signInUrl: 'http://primary.example/sign-in',
-        isSatellite: true,
-        domain: 'satellite.example',
+        multiDomain: { isSatellite: true, domain: 'satellite.example' },
       }),
     );
 
@@ -801,9 +794,7 @@ describe('tokens.authenticateRequest(options)', () => {
         secretKey: 'deadbeef',
         publishableKey: PK_LIVE,
         signInUrl: 'https://primary.example/sign-in',
-        isSatellite: true,
-        domain: 'satellite.example',
-        satelliteAutoSync: false,
+        multiDomain: { isSatellite: true, domain: 'satellite.example', autoSync: false },
       }),
     );
 
@@ -829,9 +820,7 @@ describe('tokens.authenticateRequest(options)', () => {
         secretKey: 'deadbeef',
         publishableKey: PK_LIVE,
         signInUrl: 'https://primary.example/sign-in',
-        isSatellite: true,
-        domain: 'satellite.example',
-        satelliteAutoSync: false,
+        multiDomain: { isSatellite: true, domain: 'satellite.example', autoSync: false },
       }),
     );
 
@@ -854,8 +843,7 @@ describe('tokens.authenticateRequest(options)', () => {
         secretKey: 'deadbeef',
         publishableKey: PK_LIVE,
         signInUrl: 'https://primary.example/sign-in',
-        isSatellite: true,
-        domain: 'satellite.example',
+        multiDomain: { isSatellite: true, domain: 'satellite.example' },
       }),
     );
 
@@ -878,7 +866,7 @@ describe('tokens.authenticateRequest(options)', () => {
         { __client_uat: '12345', __session: mockJwt },
         requestUrl,
       ),
-      mockOptions({ secretKey: 'sk_test_deadbeef', isSatellite: false }),
+      mockOptions({ secretKey: 'sk_test_deadbeef' }),
     );
 
     expect(requestState).toMatchHandshake({
@@ -899,7 +887,7 @@ describe('tokens.authenticateRequest(options)', () => {
         { __client_uat: '12345', __session: mockJwt, __clerk_db_jwt: mockJwt },
         requestUrl,
       ),
-      mockOptions({ secretKey: 'sk_test_deadbeef', isSatellite: false }),
+      mockOptions({ secretKey: 'sk_test_deadbeef' }),
     );
 
     expect(requestState).toMatchHandshake({
@@ -927,7 +915,7 @@ describe('tokens.authenticateRequest(options)', () => {
         { __client_uat: '12345', __session: mockJwt, __clerk_db_jwt: mockJwt },
         requestUrl,
       ),
-      mockOptions({ secretKey: 'sk_test_deadbeef', isSatellite: false }),
+      mockOptions({ secretKey: 'sk_test_deadbeef' }),
     );
 
     expect(requestState).toMatchHandshake({
@@ -1016,9 +1004,8 @@ describe('tokens.authenticateRequest(options)', () => {
       ),
       mockOptions({
         secretKey: 'pk_test_deadbeef',
-        isSatellite: true,
+        multiDomain: { isSatellite: true, domain: 'localhost:3001' },
         signInUrl: 'https://localhost:3000/sign-in/',
-        domain: 'localhost:3001',
       }),
     );
 
@@ -1676,8 +1663,7 @@ describe('tokens.authenticateRequest(options)', () => {
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
         publishableKey: PK_LIVE,
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 
@@ -1705,8 +1691,7 @@ describe('tokens.authenticateRequest(options)', () => {
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
         publishableKey: PK_LIVE,
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 
@@ -1734,8 +1719,7 @@ describe('tokens.authenticateRequest(options)', () => {
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
         publishableKey: PK_LIVE,
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 
@@ -1787,8 +1771,7 @@ describe('tokens.authenticateRequest(options)', () => {
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
         publishableKey: PK_LIVE,
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 
@@ -1816,8 +1799,7 @@ describe('tokens.authenticateRequest(options)', () => {
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
         publishableKey: PK_LIVE,
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 
@@ -1845,8 +1827,7 @@ describe('tokens.authenticateRequest(options)', () => {
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
         publishableKey: PK_LIVE,
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 
@@ -1874,8 +1855,7 @@ describe('tokens.authenticateRequest(options)', () => {
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
         publishableKey: PK_LIVE,
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 
@@ -1903,8 +1883,7 @@ describe('tokens.authenticateRequest(options)', () => {
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
         publishableKey: PK_LIVE,
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 
@@ -1932,8 +1911,7 @@ describe('tokens.authenticateRequest(options)', () => {
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
         publishableKey: PK_LIVE,
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 
@@ -1960,8 +1938,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 
@@ -1985,8 +1962,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 
@@ -2010,8 +1986,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 
@@ -2036,8 +2011,7 @@ describe('tokens.authenticateRequest(options)', () => {
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
         publishableKey: PK_LIVE,
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 
@@ -2066,8 +2040,7 @@ describe('tokens.authenticateRequest(options)', () => {
       const requestState = await authenticateRequest(request, {
         ...mockOptions(),
         publishableKey: PK_LIVE,
-        domain: 'primary.com',
-        isSatellite: false,
+        multiDomain: { isSatellite: false, domain: 'primary.com' },
         signInUrl: 'https://primary.com/sign-in',
       });
 

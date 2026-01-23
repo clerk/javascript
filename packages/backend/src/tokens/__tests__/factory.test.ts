@@ -14,8 +14,6 @@ describe('createAuthenticateRequest({ options, apiClient })', () => {
       apiVersion: 'apiVersion',
       proxyUrl: 'proxyUrl',
       publishableKey: TEST_PK,
-      isSatellite: false,
-      domain: 'domain',
       audience: 'domain',
     };
 
@@ -36,8 +34,6 @@ describe('createAuthenticateRequest({ options, apiClient })', () => {
       apiVersion: 'apiVersion',
       proxyUrl: 'proxyUrl',
       publishableKey: TEST_PK,
-      isSatellite: false,
-      domain: 'domain',
       audience: 'domain',
     };
 
@@ -67,8 +63,6 @@ describe('createAuthenticateRequest({ options, apiClient })', () => {
       apiVersion: 'apiVersion',
       proxyUrl: 'proxyUrl',
       publishableKey: TEST_PK,
-      isSatellite: false,
-      domain: 'domain',
       audience: 'domain',
     };
 

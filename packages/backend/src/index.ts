@@ -15,7 +15,7 @@ export type ClerkOptions = Omit<CreateBackendApiOptions, 'skipApiVersionInUrl' |
   Partial<
     Pick<
       CreateAuthenticateRequestOptions['options'],
-      'audience' | 'jwtKey' | 'proxyUrl' | 'secretKey' | 'publishableKey' | 'domain' | 'isSatellite'
+      'audience' | 'jwtKey' | 'proxyUrl' | 'secretKey' | 'publishableKey' | 'multiDomain'
     >
   > & { sdkMetadata?: SDKMetadata; telemetry?: Pick<TelemetryCollectorOptions, 'disabled' | 'debug' | 'samplingRate'> };
 

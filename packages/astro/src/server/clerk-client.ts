@@ -13,8 +13,12 @@ const createClerkClientWithOptions: CreateClerkClientWithOptions = (context, opt
     apiUrl: getSafeEnv(context).apiUrl,
     apiVersion: getSafeEnv(context).apiVersion,
     proxyUrl: getSafeEnv(context).proxyUrl,
-    domain: getSafeEnv(context).domain,
-    isSatellite: getSafeEnv(context).isSatellite,
+    multiDomain: getSafeEnv(context).isSatellite
+      ? {
+          isSatellite: true,
+          ...(getSafeEnv(context).domain ? { domain: getSafeEnv(context).domain } : {}),
+        }
+      : undefined,
     userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
     sdkMetadata: {
       name: PACKAGE_NAME,

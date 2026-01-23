@@ -6,7 +6,7 @@ import type {
   SignedOutAuthObject,
 } from '@clerk/backend/internal';
 import type {
-  MultiDomainAndOrProxy,
+  MultiDomainAndOrProxyPrimitives,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,
   SignUpFallbackRedirectUrl,
@@ -42,7 +42,7 @@ export type ClerkMiddlewareOptions = {
    */
   organizationSyncOptions?: OrganizationSyncOptions;
 } & Pick<VerifyTokenOptions, 'audience' | 'authorizedParties'> &
-  MultiDomainAndOrProxy &
+  MultiDomainAndOrProxyPrimitives &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &

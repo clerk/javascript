@@ -109,18 +109,19 @@ export function decorateRequest(
 }
 
 export const handleMultiDomainAndProxy = (clerkRequest: ClerkRequest, opts: AuthenticateRequestOptions) => {
-  const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, clerkRequest.clerkUrl, PROXY_URL);
+  const isSatellite = handleValueOrFn(opts.multiDomain?.isSatellite, new URL(clerkRequest.url), IS_SATELLITE);
+  const domain = handleValueOrFn(opts.multiDomain?.domain, new URL(clerkRequest.url), DOMAIN);
+  const signInUrl = opts?.signInUrl || SIGN_IN_URL;
+
+  // Resolve proxyUrl: multiDomain.proxyUrl takes precedence, then top-level, then env
+  const rawProxyUrl = handleValueOrFn(opts.multiDomain?.proxyUrl ?? opts?.proxyUrl, clerkRequest.clerkUrl, PROXY_URL);
 
   let proxyUrl;
-  if (!!relativeOrAbsoluteProxyUrl && !isHttpOrHttps(relativeOrAbsoluteProxyUrl)) {
-    proxyUrl = new URL(relativeOrAbsoluteProxyUrl, clerkRequest.clerkUrl).toString();
+  if (!!rawProxyUrl && !isHttpOrHttps(rawProxyUrl)) {
+    proxyUrl = new URL(rawProxyUrl, clerkRequest.clerkUrl).toString();
   } else {
-    proxyUrl = relativeOrAbsoluteProxyUrl;
+    proxyUrl = rawProxyUrl;
   }
-
-  const isSatellite = handleValueOrFn(opts.isSatellite, new URL(clerkRequest.url), IS_SATELLITE);
-  const domain = handleValueOrFn(opts.domain, new URL(clerkRequest.url), DOMAIN);
-  const signInUrl = opts?.signInUrl || SIGN_IN_URL;
 
   if (isSatellite && !proxyUrl && !domain) {
     throw new Error(missingDomainAndProxy);
@@ -132,8 +133,13 @@ export const handleMultiDomainAndProxy = (clerkRequest: ClerkRequest, opts: Auth
 
   return {
     proxyUrl,
-    isSatellite,
-    domain,
+    multiDomain: isSatellite
+      ? {
+          isSatellite,
+          ...(domain ? { domain } : { proxyUrl: proxyUrl! }),
+          ...(opts.multiDomain?.autoSync !== undefined ? { autoSync: opts.multiDomain.autoSync } : {}),
+        }
+      : undefined,
     signInUrl,
   };
 };

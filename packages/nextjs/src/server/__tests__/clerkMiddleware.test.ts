@@ -138,12 +138,12 @@ describe('ClerkMiddleware type tests', () => {
       clerkMiddlewareMock({ ...defaultProps, proxyUrl: 'test' });
     });
 
-    it('proxyUrl + isSatellite (satellite app)', () => {
-      clerkMiddlewareMock({ ...defaultProps, proxyUrl: 'test', isSatellite: true });
+    it('proxyUrl + multiDomain (satellite app)', () => {
+      clerkMiddlewareMock({ ...defaultProps, multiDomain: { isSatellite: true, proxyUrl: 'test' } });
     });
 
-    it('domain + isSatellite (satellite app)', () => {
-      clerkMiddlewareMock({ ...defaultProps, domain: 'test', isSatellite: true });
+    it('domain + multiDomain (satellite app)', () => {
+      clerkMiddlewareMock({ ...defaultProps, multiDomain: { isSatellite: true, domain: 'test' } });
     });
   });
 });

@@ -6,15 +6,14 @@ import type { ClerkMiddlewareOptions } from './types';
 export const clerkClient = (args: DataFunctionArgs, overrides: ClerkMiddlewareOptions = {}) => {
   const options = loadOptions(args, overrides);
 
-  const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey, machineSecretKey } = options;
+  const { apiUrl, secretKey, jwtKey, proxyUrl, multiDomain, publishableKey, machineSecretKey } = options;
 
   return createClerkClient({
     apiUrl,
     secretKey,
     jwtKey,
     proxyUrl,
-    isSatellite,
-    domain,
+    multiDomain,
     publishableKey,
     machineSecretKey,
     userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,

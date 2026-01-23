@@ -13,8 +13,12 @@ const clerkClient = (options?: ClerkOptions): ClerkClient => {
     apiVersion: commonEnv.API_VERSION,
     userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
     proxyUrl: commonEnv.PROXY_URL,
-    domain: commonEnv.DOMAIN,
-    isSatellite: commonEnv.IS_SATELLITE,
+    multiDomain: commonEnv.IS_SATELLITE
+      ? {
+          isSatellite: true,
+          ...(commonEnv.DOMAIN ? { domain: commonEnv.DOMAIN } : {}),
+        }
+      : undefined,
     sdkMetadata: commonEnv.SDK_METADATA,
     telemetry: {
       disabled: commonEnv.TELEMETRY_DISABLED,

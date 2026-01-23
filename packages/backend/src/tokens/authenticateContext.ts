@@ -1,4 +1,5 @@
 import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
+import { resolveProxyUrl } from '@clerk/shared/multiDomain';
 import type { Jwt } from '@clerk/shared/types';
 import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
 
@@ -33,6 +34,11 @@ interface AuthenticateContext extends AuthenticateRequestOptions {
   handshakeNonce: string | undefined;
   handshakeRedirectLoopCounter: number;
   handshakeToken: string | undefined;
+
+  // resolved multi-domain values (set in initPublishableKeyValues)
+  isSatellite: boolean;
+  domain: string | undefined;
+  satelliteAutoSync: boolean | undefined;
 
   // url derived from headers
   clerkUrl: URL;
@@ -83,7 +89,9 @@ class AuthenticateContext implements AuthenticateContext {
       this.initHandshakeValues();
     }
 
-    Object.assign(this, options);
+    // Copy options excluding fields that are resolved from multiDomain
+    const { multiDomain: _, proxyUrl: __, ...rest } = options;
+    Object.assign(this, rest);
     this.clerkUrl = this.clerkRequest.clerkUrl;
   }
 
@@ -250,21 +258,32 @@ class AuthenticateContext implements AuthenticateContext {
     assertValidPublishableKey(options.publishableKey);
     this.publishableKey = options.publishableKey;
 
+    const isSatellite = options.multiDomain?.isSatellite ?? false;
+    const domain = options.multiDomain?.domain;
+    const proxyUrl = resolveProxyUrl(options.proxyUrl, options.multiDomain?.proxyUrl);
+    const satelliteAutoSync = options.multiDomain?.autoSync;
+
     const originalPk = parsePublishableKey(this.publishableKey, {
       fatal: true,
-      domain: options.domain,
-      isSatellite: options.isSatellite,
+      domain,
+      isSatellite,
     });
     this.originalFrontendApi = originalPk.frontendApi;
 
     const pk = parsePublishableKey(this.publishableKey, {
       fatal: true,
-      proxyUrl: options.proxyUrl,
-      domain: options.domain,
-      isSatellite: options.isSatellite,
+      proxyUrl,
+      domain,
+      isSatellite,
     });
     this.instanceType = pk.instanceType;
     this.frontendApi = pk.frontendApi;
+
+    // Set resolved values so downstream code doesn't need to re-resolve
+    (this as any).isSatellite = isSatellite;
+    (this as any).domain = domain;
+    (this as any).proxyUrl = proxyUrl;
+    (this as any).satelliteAutoSync = satelliteAutoSync;
   }
 
   private initHeaderValues() {
