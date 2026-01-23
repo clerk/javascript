@@ -1,5 +1,5 @@
 import type { FieldId } from './elementIds';
-import type { CamelToSnake, DeepPartial } from './utils';
+import type { CamelToSnake, DeepPartial, RecordToPath } from './utils';
 
 /**
  * @internal
@@ -77,8 +77,13 @@ export interface LocalizationResource
  *   "unstable__errors.passwordComplexity.maximumLength": "Password is too long"
  * };
  * ```
+ *
+ * This type provides type safety and autocomplete by restricting keys to valid localization paths.
+ * Note: This generates a large union type which may impact TypeScript performance in some cases.
  */
-export type FlattenedLocalizationResource = Record<string, string>;
+export type FlattenedLocalizationResource = {
+  [K in RecordToPath<__internal_LocalizationResource>]?: string;
+};
 
 export type __internal_LocalizationResource = {
   locale: string;
