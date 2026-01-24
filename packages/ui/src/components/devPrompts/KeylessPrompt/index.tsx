@@ -251,7 +251,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
     line-height: 1rem;
   `;
 
-  // Title text styles
+  // Title text styles - stable color that doesn't change
   const titleTextStyles = css`
     ${basePromptElementStyles};
     color: #d9d9d9;
@@ -327,8 +327,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            ${isAnimating ? 'pointer-events: none; cursor: wait; opacity: 0.6;' : ''}
-            transition: opacity 100ms ease-out;
+            ${isAnimating ? 'pointer-events: none; cursor: wait;' : ''}
           `}
         >
           <Flex
