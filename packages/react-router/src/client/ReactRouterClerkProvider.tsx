@@ -62,7 +62,7 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
     __signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl,
     __clerkJSUrl,
-    __clerkUiUrl,
+    __clerkUIUrl,
     __clerkJSVersion,
     __telemetryDisabled,
     __telemetryDebug,
@@ -90,7 +90,7 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
     signInFallbackRedirectUrl: __signInFallbackRedirectUrl,
     signUpFallbackRedirectUrl: __signUpFallbackRedirectUrl,
     clerkJSUrl: __clerkJSUrl,
-    clerkUiUrl: __clerkUiUrl,
+    clerkUIUrl: __clerkUIUrl,
     clerkJSVersion: __clerkJSVersion,
     telemetry: {
       disabled: __telemetryDisabled,

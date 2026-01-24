@@ -29,9 +29,9 @@ export type LoadClerkJsScriptOptions = {
 
 export type LoadClerkUiScriptOptions = {
   publishableKey: string;
-  clerkUiUrl?: string;
+  clerkUIUrl?: string;
   clerkUIVariant?: 'shared' | '';
-  clerkUiVersion?: string;
+  clerkUIVersion?: string;
   proxyUrl?: string;
   domain?: string;
   nonce?: string;
@@ -230,15 +230,15 @@ export const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
 };
 
 export const clerkUiScriptUrl = (opts: LoadClerkUiScriptOptions) => {
-  const { clerkUiUrl, clerkUIVariant, clerkUiVersion, proxyUrl, domain, publishableKey } = opts;
+  const { clerkUIUrl, clerkUIVariant, clerkUIVersion, proxyUrl, domain, publishableKey } = opts;
 
-  if (clerkUiUrl) {
-    return clerkUiUrl;
+  if (clerkUIUrl) {
+    return clerkUIUrl;
   }
 
   const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
   const variant = clerkUIVariant ? `${clerkUIVariant}.` : '';
-  const version = versionSelector(clerkUiVersion, UI_PACKAGE_VERSION);
+  const version = versionSelector(clerkUIVersion, UI_PACKAGE_VERSION);
   return `https://${scriptHost}/npm/@clerk/ui@${version}/dist/ui.${variant}browser.js`;
 };
 

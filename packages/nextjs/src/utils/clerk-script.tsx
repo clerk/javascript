@@ -46,7 +46,7 @@ function ClerkScript(props: ClerkScriptProps) {
 }
 
 export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] }) {
-  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant, nonce, clerkUiUrl, clerkUIVariant, ui } =
+  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant, nonce, clerkUIUrl, clerkUIVariant, ui } =
     useClerkNextOptions();
   const { domain, proxyUrl } = useClerk();
 
@@ -62,8 +62,8 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
     nonce,
     domain,
     proxyUrl,
-    clerkUiVersion: ui?.version,
-    clerkUiUrl: ui?.url || clerkUiUrl,
+    clerkUIVersion: ui?.version,
+    clerkUIUrl: ui?.url || clerkUIUrl,
     clerkUIVariant: clerkUIVariant ?? DEFAULT_CLERK_UI_VARIANT,
   };
 

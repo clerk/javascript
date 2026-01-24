@@ -2431,7 +2431,7 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   /**
    * The URL that `@clerk/ui` should be hot-loaded from.
    */
-  clerkUiUrl?: string;
+  clerkUIUrl?: string;
   /**
    * If set to `'shared'`, loads a variant of `@clerk/ui` that expects React to be provided by the host application via `globalThis.__clerkSharedModules`.
    * This reduces bundle size when using framework packages like `@clerk/react`.

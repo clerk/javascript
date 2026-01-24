@@ -19,7 +19,7 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
     publishableKey,
   });
   const clerkUiScriptSrc = clerkUiScriptUrl({
-    clerkUiUrl: getSafeEnv(locals).clerkUiUrl,
+    clerkUIUrl: getSafeEnv(locals).clerkUIUrl,
     domain,
     proxyUrl,
     publishableKey,

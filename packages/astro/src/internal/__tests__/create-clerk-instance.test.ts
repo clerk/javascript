@@ -42,7 +42,7 @@ describe('getClerkUiEntryChunk', () => {
     (window as any).Clerk = undefined;
   });
 
-  it('preserves clerkUiUrl from options when options.ui.url is not provided', async () => {
+  it('preserves clerkUIUrl from options when options.ui.url is not provided', async () => {
     mockLoadClerkUiScript.mockImplementation(async () => {
       (window as any).__internal_ClerkUICtor = mockClerkUICtor;
       return null;
@@ -59,18 +59,18 @@ describe('getClerkUiEntryChunk', () => {
     // Dynamically import to get fresh module with mocks
     const { createClerkInstance } = await import('../create-clerk-instance');
 
-    // Call createClerkInstance with clerkUiUrl but without ui.url
+    // Call createClerkInstance with clerkUIUrl but without ui.url
     await createClerkInstance({
       publishableKey: 'pk_test_xxx',
-      clerkUiUrl: 'https://custom.selfhosted.example.com/ui.js',
+      clerkUIUrl: 'https://custom.selfhosted.example.com/ui.js',
     });
 
     expect(mockLoadClerkUiScript).toHaveBeenCalled();
     const loadClerkUiScriptCall = mockLoadClerkUiScript.mock.calls[0]?.[0] as Record<string, unknown>;
-    expect(loadClerkUiScriptCall?.clerkUiUrl).toBe('https://custom.selfhosted.example.com/ui.js');
+    expect(loadClerkUiScriptCall?.clerkUIUrl).toBe('https://custom.selfhosted.example.com/ui.js');
   });
 
-  it('prefers options.ui.url over options.clerkUiUrl when both are provided', async () => {
+  it('prefers options.ui.url over options.clerkUIUrl when both are provided', async () => {
     mockLoadClerkUiScript.mockImplementation(async () => {
       (window as any).__internal_ClerkUICtor = mockClerkUICtor;
       return null;
@@ -88,7 +88,7 @@ describe('getClerkUiEntryChunk', () => {
 
     await createClerkInstance({
       publishableKey: 'pk_test_xxx',
-      clerkUiUrl: 'https://fallback.example.com/ui.js',
+      clerkUIUrl: 'https://fallback.example.com/ui.js',
       ui: {
         version: '1.0.0',
         url: 'https://preferred.example.com/ui.js',
@@ -97,10 +97,10 @@ describe('getClerkUiEntryChunk', () => {
 
     expect(mockLoadClerkUiScript).toHaveBeenCalled();
     const loadClerkUiScriptCall = mockLoadClerkUiScript.mock.calls[0]?.[0] as Record<string, unknown>;
-    expect(loadClerkUiScriptCall?.clerkUiUrl).toBe('https://preferred.example.com/ui.js');
+    expect(loadClerkUiScriptCall?.clerkUIUrl).toBe('https://preferred.example.com/ui.js');
   });
 
-  it('does not set clerkUiUrl when neither options.ui.url nor options.clerkUiUrl is provided', async () => {
+  it('does not set clerkUIUrl when neither options.ui.url nor options.clerkUIUrl is provided', async () => {
     mockLoadClerkUiScript.mockImplementation(async () => {
       (window as any).__internal_ClerkUICtor = mockClerkUICtor;
       return null;
@@ -122,6 +122,6 @@ describe('getClerkUiEntryChunk', () => {
 
     expect(mockLoadClerkUiScript).toHaveBeenCalled();
     const loadClerkUiScriptCall = mockLoadClerkUiScript.mock.calls[0]?.[0] as Record<string, unknown>;
-    expect(loadClerkUiScriptCall?.clerkUiUrl).toBeUndefined();
+    expect(loadClerkUiScriptCall?.clerkUIUrl).toBeUndefined();
   });
 });

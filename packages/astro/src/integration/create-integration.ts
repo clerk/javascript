@@ -20,7 +20,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
 
     // These are not provided when the "bundled" integration is used
     const clerkJSUrl = (params as any)?.clerkJSUrl as string | undefined;
-    const clerkUiUrl = (params as any)?.clerkUiUrl as string | undefined;
+    const clerkUIUrl = (params as any)?.clerkUIUrl as string | undefined;
     const clerkJSVariant = (params as any)?.clerkJSVariant as string | undefined;
     const clerkJSVersion = (params as any)?.clerkJSVersion as string | undefined;
 
@@ -61,7 +61,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 ...buildEnvVarFromOption(proxyUrl, 'PUBLIC_CLERK_PROXY_URL'),
                 ...buildEnvVarFromOption(domain, 'PUBLIC_CLERK_DOMAIN'),
                 ...buildEnvVarFromOption(clerkJSUrl, 'PUBLIC_CLERK_JS_URL'),
-                ...buildEnvVarFromOption(clerkUiUrl, 'PUBLIC_CLERK_UI_URL'),
+                ...buildEnvVarFromOption(clerkUIUrl, 'PUBLIC_CLERK_UI_URL'),
                 ...buildEnvVarFromOption(clerkJSVariant, 'PUBLIC_CLERK_JS_VARIANT'),
                 ...buildEnvVarFromOption(clerkJSVersion, 'PUBLIC_CLERK_JS_VERSION'),
               },

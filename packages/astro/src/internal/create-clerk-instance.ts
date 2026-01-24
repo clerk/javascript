@@ -129,8 +129,8 @@ async function getClerkUiEntryChunk<TUi extends Ui = Ui>(
     options
       ? {
           ...options,
-          clerkUiVersion: options.ui?.version,
-          clerkUiUrl: options.ui?.url ?? options.clerkUiUrl,
+          clerkUIVersion: options.ui?.version,
+          clerkUIUrl: options.ui?.url ?? options.clerkUIUrl,
         }
       : undefined,
   );

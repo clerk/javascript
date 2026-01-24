@@ -525,8 +525,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // Default: load from CDN, using ui.version if available for version pinning
     await loadClerkUiScript({
       ...this.options,
-      clerkUiVersion: this.options.ui?.version,
-      clerkUiUrl: this.options.ui?.url || this.options.clerkUiUrl,
+      clerkUIVersion: this.options.ui?.version,
+      clerkUIUrl: this.options.ui?.url || this.options.clerkUIUrl,
       publishableKey: this.#publishableKey,
       proxyUrl: this.proxyUrl,
       domain: this.domain,

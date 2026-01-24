@@ -9,7 +9,7 @@ export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, '
     ...props,
     publishableKey: props.publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',
     clerkJSUrl: props.clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS_URL,
-    clerkUiUrl: (props as any).clerkUiUrl || process.env.NEXT_PUBLIC_CLERK_UI_URL,
+    clerkUIUrl: (props as any).clerkUIUrl || process.env.NEXT_PUBLIC_CLERK_UI_URL,
     clerkJSVersion: props.clerkJSVersion || process.env.NEXT_PUBLIC_CLERK_JS_VERSION,
     proxyUrl: props.proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL || '',
     domain: props.domain || process.env.NEXT_PUBLIC_CLERK_DOMAIN || '',

@@ -15,7 +15,7 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
     publishableKey: paramPublishableKey,
     telemetry: paramTelemetry,
     clerkJSUrl: paramClerkJSUrl,
-    clerkUiUrl: paramClerkUiUrl,
+    clerkUIUrl: paramClerkUIUrl,
     clerkJSVariant: paramClerkJSVariant,
     clerkJSVersion: paramClerkJSVersion,
     // Extract `ui` separately to avoid spreading the branded Ui type which contains
@@ -31,7 +31,7 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
     proxyUrl: paramProxy || import.meta.env.PUBLIC_CLERK_PROXY_URL,
     domain: paramDomain || import.meta.env.PUBLIC_CLERK_DOMAIN,
     publishableKey: paramPublishableKey || import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '',
-    clerkUiUrl: paramClerkUiUrl || import.meta.env.PUBLIC_CLERK_UI_URL,
+    clerkUIUrl: paramClerkUIUrl || import.meta.env.PUBLIC_CLERK_UI_URL,
     clerkJSUrl: paramClerkJSUrl || import.meta.env.PUBLIC_CLERK_JS_URL,
     clerkJSVariant: paramClerkJSVariant || import.meta.env.PUBLIC_CLERK_JS_VARIANT,
     clerkJSVersion: paramClerkJSVersion || import.meta.env.PUBLIC_CLERK_JS_VERSION,

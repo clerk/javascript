@@ -15,7 +15,7 @@ export const getPublicEnvVariables = (context: AppLoadContext | undefined) => {
     signInUrl: getValue('CLERK_SIGN_IN_URL'),
     signUpUrl: getValue('CLERK_SIGN_UP_URL'),
     clerkJsUrl: getValue('CLERK_JS_URL'),
-    clerkUiUrl: getValue('CLERK_UI_URL'),
+    clerkUIUrl: getValue('CLERK_UI_URL'),
     clerkJsVariant: getValue('CLERK_JS_VARIANT') as '' | 'headless' | undefined,
     clerkJsVersion: getValue('CLERK_JS_VERSION'),
     telemetryDisabled: isTruthy(getValue('CLERK_TELEMETRY_DISABLED')),

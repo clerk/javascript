@@ -44,7 +44,7 @@ describe('clerkPlugin CDN UI loading', () => {
     template: '<div>Test</div>',
   });
 
-  it('passes clerkUiVersion from pluginOptions.ui.version to loadClerkUiScript', async () => {
+  it('passes clerkUIVersion from pluginOptions.ui.version to loadClerkUiScript', async () => {
     mockLoadClerkUiScript.mockImplementation(async () => {
       window.__internal_ClerkUICtor = mockClerkUICtor as any;
       return null;
@@ -71,11 +71,11 @@ describe('clerkPlugin CDN UI loading', () => {
     });
 
     const loadClerkUiScriptCall = mockLoadClerkUiScript.mock.calls[0][0];
-    expect(loadClerkUiScriptCall.clerkUiVersion).toBe('1.2.3');
-    expect(loadClerkUiScriptCall.clerkUiUrl).toBeUndefined();
+    expect(loadClerkUiScriptCall.clerkUIVersion).toBe('1.2.3');
+    expect(loadClerkUiScriptCall.clerkUIUrl).toBeUndefined();
   });
 
-  it('passes clerkUiUrl from pluginOptions.ui.url to loadClerkUiScript', async () => {
+  it('passes clerkUIUrl from pluginOptions.ui.url to loadClerkUiScript', async () => {
     mockLoadClerkUiScript.mockImplementation(async () => {
       window.__internal_ClerkUICtor = mockClerkUICtor as any;
       return null;
@@ -102,11 +102,11 @@ describe('clerkPlugin CDN UI loading', () => {
     });
 
     const loadClerkUiScriptCall = mockLoadClerkUiScript.mock.calls[0][0];
-    expect(loadClerkUiScriptCall.clerkUiUrl).toBe('https://custom.cdn.example.com/ui.js');
-    expect(loadClerkUiScriptCall.clerkUiVersion).toBeUndefined();
+    expect(loadClerkUiScriptCall.clerkUIUrl).toBe('https://custom.cdn.example.com/ui.js');
+    expect(loadClerkUiScriptCall.clerkUIVersion).toBeUndefined();
   });
 
-  it('passes both clerkUiVersion and clerkUiUrl when both are provided', async () => {
+  it('passes both clerkUIVersion and clerkUIUrl when both are provided', async () => {
     mockLoadClerkUiScript.mockImplementation(async () => {
       window.__internal_ClerkUICtor = mockClerkUICtor as any;
       return null;
@@ -134,8 +134,8 @@ describe('clerkPlugin CDN UI loading', () => {
     });
 
     const loadClerkUiScriptCall = mockLoadClerkUiScript.mock.calls[0][0];
-    expect(loadClerkUiScriptCall.clerkUiVersion).toBe('2.0.0');
-    expect(loadClerkUiScriptCall.clerkUiUrl).toBe('https://custom.cdn.example.com/ui-v2.js');
+    expect(loadClerkUiScriptCall.clerkUIVersion).toBe('2.0.0');
+    expect(loadClerkUiScriptCall.clerkUIUrl).toBe('https://custom.cdn.example.com/ui-v2.js');
   });
 
   it('ClerkUIPromise resolves to window.__internal_ClerkUICtor after loadClerkUiScript completes', async () => {
