@@ -1031,6 +1031,10 @@ export type HandleOAuthCallbackParams = TransferableOption &
      * The underlying resource to optionally reload before processing an OAuth callback.
      */
     reloadResource?: 'signIn' | 'signUp';
+    /**
+     * Additional arbitrary metadata to be stored alongside the User object when a sign-up transfer occurs.
+     */
+    unsafeMetadata?: SignUpUnsafeMetadata;
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
@@ -2423,6 +2427,11 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    * The URL that `@clerk/ui` should be hot-loaded from.
    */
   clerkUiUrl?: string;
+  /**
+   * If set to `'shared'`, loads a variant of `@clerk/ui` that expects React to be provided by the host application via `globalThis.__clerkSharedModules`.
+   * This reduces bundle size when using framework packages like `@clerk/react`.
+   */
+  clerkUIVariant?: 'shared' | '';
   /**
    * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
    */
