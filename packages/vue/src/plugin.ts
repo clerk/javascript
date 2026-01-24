@@ -82,8 +82,8 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           const ClerkUIPromise = (async () => {
             await loadClerkUiScript({
               ...options,
-              clerkUIVersion: pluginOptions.ui?.version ?? options.clerkUIVersion,
-              clerkUIUrl: pluginOptions.ui?.url ?? options.clerkUIUrl,
+              clerkUIVersion: pluginOptions.ui?.version ?? (pluginOptions as any).clerkUIVersion,
+              clerkUIUrl: pluginOptions.ui?.url ?? (pluginOptions as any).clerkUIUrl,
             });
             if (!window.__internal_ClerkUICtor) {
               throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
