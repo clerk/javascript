@@ -20,5 +20,5 @@ declare const PACKAGE_VERSION: string;
  */
 export const ui = {
   version: PACKAGE_VERSION,
-  ctor: ClerkUi,
+  ClerkUI: ClerkUi,
 } as Ui<Appearance>;
