@@ -6,10 +6,10 @@ const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 document.addEventListener('DOMContentLoaded', async function () {
   const clerk = new Clerk(publishableKey);
 
-  // Use bundled UI via ui.ctor
+  // Use bundled UI via ui.ClerkUI
   await clerk.load({
     ui,
-    ClerkUI: ui.ctor,
+    ClerkUI: ui.ClerkUI,
   });
 
   if (clerk.isSignedIn) {

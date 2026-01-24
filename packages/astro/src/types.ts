@@ -38,7 +38,7 @@ type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
     clerkUiUrl?: string;
     /**
      * The Clerk UI bundle to use. When provided with a bundled UI via
-     * `ui.ctor`, it will be used instead of loading from CDN.
+     * `ui.ClerkUI`, it will be used instead of loading from CDN.
      */
     ui?: TUi;
   };
