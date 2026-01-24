@@ -3,6 +3,7 @@ package expo.modules.clerk
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.clerk.api.Clerk
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
@@ -14,6 +15,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+
+private const val TAG = "ClerkExpoModule"
 
 // Parameter records
 class PresentAuthOptions : Record {
@@ -155,13 +158,23 @@ class ClerkExpoModule : Module() {
 
         // Get current session and user data
         AsyncFunction("getSession") { promise: Promise ->
+            Log.d(TAG, "getSession called - isInitialized: ${Clerk.isInitialized.value}")
+
             if (!Clerk.isInitialized.value) {
+                Log.e(TAG, "getSession - Clerk not initialized")
                 promise.reject(ClerkNotInitializedException())
                 return@AsyncFunction
             }
 
             val session = Clerk.session
             val user = Clerk.user
+
+            Log.d(TAG, "getSession - session: ${session?.id}")
+            Log.d(TAG, "getSession - user: ${user?.id}")
+            Log.d(TAG, "getSession - user.firstName: ${user?.firstName}")
+            Log.d(TAG, "getSession - user.lastName: ${user?.lastName}")
+            Log.d(TAG, "getSession - user.imageUrl: ${user?.imageUrl?.take(50)}")
+            Log.d(TAG, "getSession - user.emailAddresses: ${user?.emailAddresses?.map { it.emailAddress }}")
 
             val result = mutableMapOf<String, Any?>()
 
@@ -195,6 +208,7 @@ class ClerkExpoModule : Module() {
                 )
             }
 
+            Log.d(TAG, "getSession - returning result: $result")
             promise.resolve(result)
         }
 
@@ -233,12 +247,20 @@ class ClerkExpoModule : Module() {
     }
 
     private fun handleAuthResult(resultCode: Int, data: Intent?) {
+        Log.d(TAG, "handleAuthResult - resultCode: $resultCode")
+
         val promise = pendingAuthPromise ?: return
         pendingAuthPromise = null
 
         if (resultCode == Activity.RESULT_OK) {
             val session = Clerk.session
             val user = Clerk.user
+
+            Log.d(TAG, "handleAuthResult - session: ${session?.id}")
+            Log.d(TAG, "handleAuthResult - user: ${user?.id}")
+            Log.d(TAG, "handleAuthResult - user.firstName: ${user?.firstName}")
+            Log.d(TAG, "handleAuthResult - user.lastName: ${user?.lastName}")
+            Log.d(TAG, "handleAuthResult - user.imageUrl: ${user?.imageUrl?.take(50)}")
 
             val result = mutableMapOf<String, Any?>()
 
@@ -262,8 +284,10 @@ class ClerkExpoModule : Module() {
                 )
             }
 
+            Log.d(TAG, "handleAuthResult - returning: $result")
             promise.resolve(result)
         } else {
+            Log.d(TAG, "handleAuthResult - user cancelled")
             // User cancelled or dismissed
             promise.resolve(mapOf("cancelled" to true))
         }

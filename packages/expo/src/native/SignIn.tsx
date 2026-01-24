@@ -1,6 +1,6 @@
 import { useAuth, useClerk } from '@clerk/react';
 import { requireNativeModule, Platform } from 'expo-modules-core';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { SignInProps } from './SignIn.types';
 
@@ -37,16 +37,33 @@ const ClerkExpo = isNativeSupported ? requireNativeModule('ClerkExpo') : null;
 export function SignIn({ mode = 'signInOrUp', isDismissable = true, onSuccess, onError }: SignInProps) {
   const clerk = useClerk();
   const { isSignedIn } = useAuth();
+  // Track if we've already completed auth to prevent duplicate onSuccess calls
+  const authCompletedRef = useRef(false);
+  // Track the initial signed-in state to differentiate between "already signed in" vs "just signed in"
+  const initialSignedInRef = useRef(isSignedIn);
 
   useEffect(() => {
     if (!isNativeSupported || !ClerkExpo?.presentAuth) {
       return;
     }
 
-    // If user is already signed in (JS state), call onSuccess immediately
-    if (isSignedIn) {
-      console.log('[SignIn] User is already signed in (JS state), skipping auth modal');
+    // If auth already completed in this component instance, don't do anything
+    if (authCompletedRef.current) {
+      console.log('[SignIn] Auth already completed, ignoring effect re-run');
+      return;
+    }
+
+    // If user was already signed in when component mounted, call onSuccess once
+    if (initialSignedInRef.current && isSignedIn) {
+      console.log('[SignIn] User was already signed in on mount, skipping auth modal');
+      authCompletedRef.current = true;
       onSuccess?.();
+      return;
+    }
+
+    // If isSignedIn became true after we started (sign-in completed), don't re-present modal
+    if (isSignedIn && !initialSignedInRef.current) {
+      console.log('[SignIn] Sign-in completed (isSignedIn changed to true), not re-presenting modal');
       return;
     }
 
@@ -56,8 +73,10 @@ export function SignIn({ mode = 'signInOrUp', isDismissable = true, onSuccess, o
       if (ClerkExpo?.getSession) {
         try {
           const nativeSession = await ClerkExpo.getSession();
-          if (nativeSession) {
+          // Check for actual session data, not just truthy object (empty {} is truthy)
+          if (nativeSession?.session) {
             console.log('[SignIn] Native SDK has existing session, syncing to JS...');
+            authCompletedRef.current = true;
             // @ts-expect-error - This is an internal API
             if (clerk?.__internal_reloadInitialResources) {
               // @ts-expect-error - This is an internal API
@@ -80,6 +99,9 @@ export function SignIn({ mode = 'signInOrUp', isDismissable = true, onSuccess, o
         });
 
         console.log(`[SignIn] Auth completed:`, result);
+
+        // Mark auth as completed to prevent duplicate onSuccess calls
+        authCompletedRef.current = true;
 
         // After native sign-in completes, reload the JS SDK state from the backend
         // This syncs the native session with the JS ClerkProvider
@@ -108,6 +130,7 @@ export function SignIn({ mode = 'signInOrUp', isDismissable = true, onSuccess, o
         // This can happen when JS SDK failed to initialize (e.g., dev auth error) but native SDK has valid session
         if (error.message?.includes('already signed in')) {
           console.log('[SignIn] Native SDK reports user already signed in, syncing JS SDK state...');
+          authCompletedRef.current = true;
           // @ts-expect-error - This is an internal API
           if (clerk.__internal_reloadInitialResources) {
             try {

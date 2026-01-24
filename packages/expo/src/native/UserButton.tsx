@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/react';
+import { useClerk, useUser } from '@clerk/react';
 import { Platform } from 'expo-modules-core';
 import { useEffect, useState } from 'react';
 import { TouchableOpacity, View, Text, StyleSheet, ViewProps, Image } from 'react-native';
@@ -9,9 +9,11 @@ const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 // Get the native module for modal presentation (use optional require to avoid crash if not available)
 let ClerkExpo: {
   getSession: () => Promise<{
+    session?: { id: string };
     user?: { id: string; firstName?: string; lastName?: string; imageUrl?: string; primaryEmailAddress?: string };
   } | null>;
-  presentUserProfile: (options: { dismissable: boolean }) => Promise<{ sessionId?: string } | null>;
+  presentUserProfile: (options: { dismissable: boolean }) => Promise<{ session?: { id: string } } | null>;
+  signOut: () => Promise<void>;
 } | null = null;
 if (isNativeSupported) {
   try {
@@ -66,9 +68,12 @@ export interface UserButtonProps extends ViewProps {
  * ```
  */
 export function UserButton({ onPress, onSignOut, style, ...props }: UserButtonProps) {
-  const [user, setUser] = useState<NativeUser | null>(null);
+  const [nativeUser, setNativeUser] = useState<NativeUser | null>(null);
   const clerk = useClerk();
+  // Use the reactive user hook from clerk-react to observe sign-out state changes
+  const { user: clerkUser, isSignedIn } = useUser();
 
+  // Fetch native user data on mount and when clerk user changes
   useEffect(() => {
     const fetchUser = async () => {
       if (!isNativeSupported || !ClerkExpo?.getSession) {
@@ -78,7 +83,10 @@ export function UserButton({ onPress, onSignOut, style, ...props }: UserButtonPr
       try {
         const session = await ClerkExpo.getSession();
         if (session?.user) {
-          setUser(session.user);
+          setNativeUser(session.user);
+        } else {
+          // Clear local state if no native session
+          setNativeUser(null);
         }
       } catch (err) {
         console.error('[UserButton] Error fetching user:', err);
@@ -86,7 +94,20 @@ export function UserButton({ onPress, onSignOut, style, ...props }: UserButtonPr
     };
 
     fetchUser();
-  }, []);
+  }, [clerkUser?.id]); // Re-fetch when clerk user changes (including sign-out)
+
+  // Derive the user to display - prefer native data, fall back to clerk-react data
+  const user: NativeUser | null =
+    nativeUser ??
+    (clerkUser
+      ? {
+          id: clerkUser.id,
+          firstName: clerkUser.firstName ?? undefined,
+          lastName: clerkUser.lastName ?? undefined,
+          imageUrl: clerkUser.imageUrl ?? undefined,
+          primaryEmailAddress: clerkUser.primaryEmailAddress?.emailAddress,
+        }
+      : null);
 
   const handlePress = async () => {
     onPress?.();
@@ -101,24 +122,61 @@ export function UserButton({ onPress, onSignOut, style, ...props }: UserButtonPr
         dismissable: true,
       });
 
-      // If the modal returned a result, it means the user signed out
-      // The native SDK returns the sessionId when sign-out completes
-      if (result?.sessionId) {
-        console.log('[UserButton] Sign out event received, sessionId:', result.sessionId);
+      console.log('[UserButton] Profile modal closed, result:', result);
 
-        // Also sign out from JS SDK to ensure both native and JS states are cleared
+      // Check if native session still exists after modal closes
+      // If session is null, user signed out from the native UI
+      const sessionCheck = await ClerkExpo.getSession?.();
+      const hasNativeSession = !!sessionCheck?.session;
+
+      console.log('[UserButton] Native session after close:', hasNativeSession);
+
+      if (!hasNativeSession) {
+        console.log('[UserButton] User signed out from native profile');
+        console.log('[UserButton] JS SDK isSignedIn:', isSignedIn);
+
+        // Clear local state immediately for instant UI feedback
+        setNativeUser(null);
+
+        // Clear native session explicitly (may already be cleared, but ensure it)
+        try {
+          console.log('[UserButton] Clearing native session...');
+          await ClerkExpo.signOut?.();
+          console.log('[UserButton] Native session cleared');
+        } catch (nativeSignOutErr) {
+          console.warn('[UserButton] Native sign out error (may already be signed out):', nativeSignOutErr);
+        }
+
+        // Sign out from JS SDK - this is critical to update isSignedIn state
+        // This will trigger useUser() to update, causing parent components to re-render
         if (clerk?.signOut) {
           try {
             console.log('[UserButton] Signing out from JS SDK...');
             await clerk.signOut();
-            console.log('[UserButton] JS SDK signed out');
+            console.log('[UserButton] JS SDK signed out successfully');
           } catch (signOutErr) {
-            console.warn('[UserButton] JS SDK sign out error (may already be signed out):', signOutErr);
+            console.warn('[UserButton] JS SDK sign out error:', signOutErr);
+            // Even if signOut throws, try to force reload to clear stale state
+            // @ts-expect-error - internal API
+            if (clerk?.__internal_reloadInitialResources) {
+              try {
+                console.log('[UserButton] Force reloading JS SDK state...');
+                // @ts-expect-error - internal API
+                await clerk.__internal_reloadInitialResources();
+                console.log('[UserButton] JS SDK state reloaded');
+              } catch (reloadErr) {
+                console.warn('[UserButton] Failed to reload JS SDK state:', reloadErr);
+              }
+            }
           }
         }
 
-        // Call the onSignOut callback if provided
+        // Call the onSignOut callback AFTER JS SDK sign-out completes
+        console.log('[UserButton] Calling onSignOut callback');
         onSignOut?.();
+      } else {
+        console.log('[UserButton] User dismissed profile without signing out');
+        // User just closed the profile, don't trigger sign-out
       }
     } catch (err) {
       console.error('[UserButton] Error presenting profile:', err);

@@ -1,8 +1,8 @@
 /**
  * Expo config plugin for @clerk/clerk-expo
- * Automatically configures iOS to work with Clerk native components
+ * Automatically configures iOS and Android to work with Clerk native components
  */
-const { withXcodeProject, withDangerousMod, withInfoPlist } = require('@expo/config-plugins');
+const { withXcodeProject, withDangerousMod, withInfoPlist, withAppBuildGradle } = require('@expo/config-plugins');
 const path = require('path');
 const fs = require('fs');
 
@@ -452,6 +452,43 @@ const withClerkIOS = config => {
 };
 
 /**
+ * Add packaging exclusions to Android app build.gradle to resolve
+ * duplicate META-INF file conflicts from clerk-android dependencies.
+ */
+const withClerkAndroid = config => {
+  console.log('✅ Clerk Android plugin loaded');
+
+  return withAppBuildGradle(config, modConfig => {
+    let buildGradle = modConfig.modResults.contents;
+
+    // Check if exclusion already exists
+    if (buildGradle.includes('META-INF/versions/9/OSGI-INF/MANIFEST.MF')) {
+      console.log('✅ Clerk Android packaging exclusions already configured');
+      return modConfig;
+    }
+
+    // Find the existing packagingOptions block and add resources.excludes
+    const packagingOptionsMatch = buildGradle.match(/packagingOptions\s*\{/);
+    if (packagingOptionsMatch) {
+      // Add resources block inside packagingOptions
+      const resourcesExclude = `packagingOptions {
+        // Clerk Android SDK: exclude duplicate META-INF files
+        resources {
+            excludes += ['META-INF/versions/9/OSGI-INF/MANIFEST.MF']
+        }`;
+
+      buildGradle = buildGradle.replace(/packagingOptions\s*\{/, resourcesExclude);
+      modConfig.modResults.contents = buildGradle;
+      console.log('✅ Clerk Android packaging exclusions added');
+    } else {
+      console.warn('⚠️ Could not find packagingOptions block in build.gradle');
+    }
+
+    return modConfig;
+  });
+};
+
+/**
  * Add Google Sign-In URL scheme to Info.plist (from main branch)
  */
 const withClerkGoogleSignIn = config => {
@@ -489,6 +526,7 @@ const withClerkGoogleSignIn = config => {
 const withClerkExpo = config => {
   config = withClerkIOS(config);
   config = withClerkGoogleSignIn(config);
+  config = withClerkAndroid(config);
   return config;
 };
 

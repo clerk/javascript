@@ -81,7 +81,8 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
             // Check if native SDK has an existing session and sync to JS
             if (ClerkExpo?.getSession) {
               const nativeSession = await ClerkExpo.getSession();
-              if (nativeSession) {
+              // Check for actual session data, not just truthy object (empty {} is truthy)
+              if (nativeSession?.session) {
                 console.log(`[ClerkProvider] Native session found, syncing to JS SDK...`);
                 // Reload JS SDK state from backend to pick up the session
                 // @ts-expect-error - internal API
