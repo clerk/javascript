@@ -438,74 +438,58 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             </div>
           </div>
 
-          {isForcedExpanded &&
-            (success ? (
-              <button
-                type='button'
-                onClick={async () => {
-                  await _props.onDismiss?.();
-                  window.location.reload();
-                }}
+          {success ? (
+            <button
+              type='button'
+              onClick={async () => {
+                await _props.onDismiss?.();
+                window.location.reload();
+              }}
+              css={css`
+                ${mainCTAStyles};
+
+                &:hover {
+                  background: #4b4b4b;
+                  transition: all 120ms ease-in-out;
+                }
+              `}
+            >
+              Dismiss
+            </button>
+          ) : (
+            <Flex
+              sx={t => ({
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: t.space.$2x5,
+              })}
+            >
+              <a
+                href={claimUrlToDashboard}
+                target='_blank'
+                rel='noopener noreferrer'
                 css={css`
                   ${mainCTAStyles};
 
                   &:hover {
-                    background: #4b4b4b;
-                    transition: all 120ms ease-in-out;
-                  }
-                `}
-              >
-                Dismiss
-              </button>
-            ) : (
-              <Flex
-                data-expanded={isForcedExpanded}
-                sx={t => ({
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: t.space.$2x5,
-                })}
-              >
-                <a
-                  href={claimUrlToDashboard}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  css={css`
-                    ${mainCTAStyles};
-                    animation: ${isForcedExpanded && isSignedIn
-                      ? 'show-main-CTA 800ms ease forwards'
-                      : 'show-main-CTA 650ms ease-in forwards'};
-
-                    @keyframes show-main-CTA {
-                      0%,
-                      5% {
-                        opacity: 0;
-                      }
-                      14%,
-                      100% {
-                        opacity: 1;
-                      }
-                    }
-
-                    &:hover {
-                      ${claimed
-                        ? `
+                    ${claimed
+                      ? `
                   background: #4B4B4B;
                   transition: all 120ms ease-in-out;`
-                        : `
+                      : `
                   box-shadow:
                     0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset,
                     0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
                     0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
                     0px 0px 0px 1px rgba(0, 0, 0, 0.12),
                     0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);`}
-                    }
-                  `}
-                >
-                  {claimed ? 'Get API keys' : 'Claim application'}
-                </a>
-              </Flex>
-            ))}
+                  }
+                `}
+              >
+                {claimed ? 'Get API keys' : 'Claim application'}
+              </a>
+            </Flex>
+          )}
         </Flex>
       </PromptContainer>
       <BodyPortal>
