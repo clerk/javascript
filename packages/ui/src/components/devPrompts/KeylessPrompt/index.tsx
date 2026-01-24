@@ -32,6 +32,7 @@ const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 const ANIMATION_DURATION = '200ms';
 const CONTENT_FADE_DURATION = '200ms';
 const CONTENT_FADE_DELAY = '40ms';
+const EASING_CURVE = 'cubic-bezier(0.2, 0, 0, 1)';
 
 /**
  * If we cannot reconstruct the url properly, then simply fallback to Clerk Dashboard
@@ -57,13 +58,12 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
 
   // Track animation state to prevent interactions during transition
   useEffect(() => {
-    if (isAnimating) {
-      const timer = setTimeout(() => {
-        setIsAnimating(false);
-      }, 200); // Match ANIMATION_DURATION
-      return () => clearTimeout(timer);
+    if (!isAnimating) {
+      return;
     }
-  }, [isAnimating, isExpanded]);
+    const timer = setTimeout(() => setIsAnimating(false), 200);
+    return () => clearTimeout(timer);
+  }, [isAnimating]);
 
   const environment = useRevalidateEnvironment();
   const claimed = Boolean(environment.authConfig.claimedAt);
@@ -93,7 +93,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
     });
   }, [_props.copyKeysUrl]);
 
-  // Determine CTA button color based on state
   const ctaButtonColor = claimed || success ? 'white' : '#fde047';
 
   const mainCTAStyles = css`
@@ -123,7 +122,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
       0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
   `;
 
-  // Determine CTA button hover styles
   const ctaButtonHoverStyles = claimed
     ? 'background: #4B4B4B; transition: all 120ms ease-in-out;'
     : `box-shadow:
@@ -133,7 +131,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
       0px 0px 0px 1px rgba(0, 0, 0, 0.12),
       0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);`;
 
-  // Render the appropriate icon based on state
   function renderStatusIcon() {
     if (success) {
       return (
@@ -231,7 +228,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
     );
   }
 
-  // Get the status text based on state
   function getStatusText() {
     if (success) {
       return 'Claim completed';
@@ -242,7 +238,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
     return 'Clerk is in keyless mode';
   }
 
-  // Common paragraph styles for content text
   const contentParagraphStyles = css`
     ${basePromptElementStyles};
     color: #b4b4b4;
@@ -251,7 +246,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
     line-height: 1rem;
   `;
 
-  // Title text styles - stable color that doesn't change
   const titleTextStyles = css`
     ${basePromptElementStyles};
     color: #d9d9d9;
@@ -266,41 +260,30 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
       <PromptContainer
         data-expanded={isForcedExpanded}
         sx={t => ({
-          // Enable interpolation of keyword values (fit-content, auto)
-          // This is the key AIM technique for dynamic content
           interpolateSize: 'allow-keywords',
-
           position: 'fixed',
           bottom: '1.25rem',
           right: '1.25rem',
-          // Always column direction for consistent layout during transition
           flexDirection: 'column',
           alignItems: 'flex-start',
           justifyContent: 'flex-start',
           overflow: 'clip',
-
-          // Collapsed: static width, fixed height for title bar
           width: '13.5rem',
           height: '2.375rem',
           padding: `${t.space.$2} ${t.space.$3}`,
           borderRadius: '1.25rem',
-
-          // AIM transition - interpolate-size handles fit-content smoothly
-          // Smoother easing curve for more polished feel
-          transition: `width ${ANIMATION_DURATION} cubic-bezier(0.2, 0, 0, 1),
-                       height ${ANIMATION_DURATION} cubic-bezier(0.2, 0, 0, 1),
-                       padding ${ANIMATION_DURATION} cubic-bezier(0.2, 0, 0, 1),
-                       border-radius ${ANIMATION_DURATION} cubic-bezier(0.2, 0, 0, 1),
-                       gap ${ANIMATION_DURATION} cubic-bezier(0.2, 0, 0, 1),
-                       background ${ANIMATION_DURATION} cubic-bezier(0.2, 0, 0, 1)`,
+          transition: `width ${ANIMATION_DURATION} ${EASING_CURVE},
+                       height ${ANIMATION_DURATION} ${EASING_CURVE},
+                       padding ${ANIMATION_DURATION} ${EASING_CURVE},
+                       border-radius ${ANIMATION_DURATION} ${EASING_CURVE},
+                       gap ${ANIMATION_DURATION} ${EASING_CURVE},
+                       background ${ANIMATION_DURATION} ${EASING_CURVE}`,
 
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           },
 
           '&[data-expanded="true"]': {
-            // Expanded: static width, dynamic height via fit-content (AIM technique)
-            // interpolate-size: allow-keywords enables smooth transition to fit-content
             width: '16.125rem',
             height: 'fit-content',
             gap: `${t.space.$1x5}`,
@@ -392,7 +375,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             flexDirection: 'column',
             gap: t.space.$3,
             opacity: isForcedExpanded ? 1 : 0,
-            transition: `opacity ${CONTENT_FADE_DURATION} cubic-bezier(0.2, 0, 0, 1)`,
+            transition: `opacity ${CONTENT_FADE_DURATION} ${EASING_CURVE}`,
             transitionDelay: isForcedExpanded ? CONTENT_FADE_DELAY : '0ms',
             pointerEvents: isForcedExpanded ? 'auto' : 'none',
           })}
@@ -520,7 +503,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                   ${mainCTAStyles};
                   opacity: ${isForcedExpanded ? 1 : 0};
                   ${isAnimating ? 'pointer-events: none; opacity: 0.6;' : ''}
-                  transition: opacity ${isForcedExpanded ? CONTENT_FADE_DURATION : '80ms'} cubic-bezier(0.2, 0, 0, 1);
+                  transition: opacity ${isForcedExpanded ? CONTENT_FADE_DURATION : '80ms'} ${EASING_CURVE};
                   transitiondelay: ${isForcedExpanded ? CONTENT_FADE_DELAY : '0ms'};
 
                   &:hover {
@@ -583,6 +566,5 @@ const BodyPortal = ({ children }: PropsWithChildren) => {
     };
   }, []);
 
-  // Render the children inside the dynamically created div
   return portalContainer ? createPortal(children, portalContainer) : null;
 };
