@@ -2,7 +2,7 @@ import { useUser } from '@clerk/shared/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
 import type { PropsWithChildren } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { Flex, Link } from '../../../customizables';
@@ -45,7 +45,7 @@ function withLastActiveFallback(cb: () => string): string {
   }
 }
 
-const KeylessPromptInternal = (_props: KeylessPromptProps) => {
+const _KeylessPromptInternal = (_props: KeylessPromptProps) => {
   const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -270,13 +270,11 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           overflow: 'clip',
           width: '13.5rem',
           height: '2.375rem',
-          padding: `${t.space.$2} ${t.space.$3}`,
           borderRadius: '1.25rem',
           transition: `width ${ANIMATION_DURATION} ${EASING_CURVE},
                        height ${ANIMATION_DURATION} ${EASING_CURVE},
                        padding ${ANIMATION_DURATION} ${EASING_CURVE},
                        border-radius ${ANIMATION_DURATION} ${EASING_CURVE},
-                       gap ${ANIMATION_DURATION} ${EASING_CURVE},
                        background ${ANIMATION_DURATION} ${EASING_CURVE}`,
 
           '&[data-expanded="false"]:hover': {
@@ -286,235 +284,244 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           '&[data-expanded="true"]': {
             width: '16.125rem',
             height: 'fit-content',
-            gap: `${t.space.$1x5}`,
-            padding: `${t.space.$2x5} ${t.space.$3} ${t.space.$3} ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
           },
         })}
       >
-        <button
-          type='button'
-          aria-expanded={isForcedExpanded}
-          aria-controls={contentIdentifier}
-          id={buttonIdentifier}
-          onClick={() => {
-            if (!claimed && !isAnimating) {
-              setIsAnimating(true);
-              setIsExpanded(prev => !prev);
-            }
-          }}
-          disabled={isAnimating}
-          css={css`
-            ${basePromptElementStyles};
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            ${isAnimating ? 'pointer-events: none; cursor: wait;' : ''}
-          `}
-        >
-          <Flex
-            sx={t => ({
-              alignItems: 'center',
-              gap: t.space.$2,
-            })}
-          >
-            {renderStatusIcon()}
-
-            <p
-              data-text='Clerk is in keyless mode'
-              aria-label={getStatusText()}
-              css={titleTextStyles}
-            >
-              {getStatusText()}
-            </p>
-          </Flex>
-
-          <svg
-            width='1rem'
-            height='1rem'
-            viewBox='0 0 16 16'
-            fill='none'
-            aria-hidden
-            xmlns='http://www.w3.org/2000/svg'
-            css={css`
-              color: #8c8c8c;
-              transition: color 120ms ease-out;
-              display: ${isExpanded && !claimed && !success ? 'block' : 'none'};
-              cursor: pointer;
-
-              :hover {
-                color: #eeeeee;
-              }
-
-              animation: show-button 300ms ease;
-              @keyframes show-button {
-                from {
-                  transform: scaleX(0.9);
-                  opacity: 0;
-                }
-                to {
-                  transform: scaleX(1);
-                  opacity: 1;
-                }
-              }
-            `}
-          >
-            <path
-              d='M3.75 8H12.25'
-              stroke='currentColor'
-              strokeWidth='1.5'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            />
-          </svg>
-        </button>
-
         <Flex
           sx={t => ({
+            padding: `${t.space.$2} ${t.space.$3}`,
+            maskImage: `linear-gradient(to bottom, black calc(100% - ${t.space.$3}), transparent)`,
             flexDirection: 'column',
-            gap: t.space.$3,
-            opacity: isForcedExpanded ? 1 : 0,
-            transition: `opacity ${CONTENT_FADE_DURATION} ${EASING_CURVE}`,
-            transitionDelay: isForcedExpanded ? CONTENT_FADE_DELAY : '0ms',
-            pointerEvents: isForcedExpanded ? 'auto' : 'none',
           })}
         >
-          <div
-            role='region'
-            id={contentIdentifier}
-            aria-labelledby={buttonIdentifier}
-            aria-hidden={!isForcedExpanded}
+          <button
+            type='button'
+            aria-expanded={isForcedExpanded}
+            aria-controls={contentIdentifier}
+            id={buttonIdentifier}
+            onClick={() => {
+              if (!claimed && !isAnimating) {
+                setIsAnimating(true);
+                setIsExpanded(prev => !prev);
+              }
+            }}
+            disabled={isAnimating}
+            css={css`
+              ${basePromptElementStyles};
+              width: 100%;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              ${isAnimating ? 'pointer-events: none; cursor: wait;' : ''}
+            `}
           >
-            <div
-              css={css`
-                display: flex;
-                flex-direction: column;
-                gap: 0.5rem;
-                color: #b4b4b4;
-                max-width: 14.625rem;
-              `}
+            <Flex
+              sx={t => ({
+                alignItems: 'center',
+                gap: t.space.$2,
+              })}
             >
-              {success ? (
-                <p css={contentParagraphStyles}>
-                  Your application{' '}
-                  <span
-                    css={css`
-                      ${basePromptElementStyles};
-                      display: inline-block;
-                      white-space: nowrap;
-                      overflow: hidden;
-                      text-overflow: ellipsis;
-                      max-width: 8.125rem;
-                      vertical-align: bottom;
-                      font-size: 0.8125rem;
-                      font-weight: 500;
-                      color: #d5d5d5;
-                    `}
-                  >
-                    {appName}
-                  </span>{' '}
-                  has been claimed. Configure settings from the{' '}
-                  <Link
-                    isExternal
-                    aria-label='Go to Dashboard to configure settings'
-                    href={instanceUrlToDashboard}
-                    sx={t => ({
-                      color: t.colors.$whiteAlpha600,
-                      textDecoration: 'underline solid',
-                      transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
-                      ':hover': {
-                        color: t.colors.$whiteAlpha800,
-                      },
-                    })}
-                  >
-                    Clerk Dashboard
-                  </Link>
-                </p>
-              ) : claimed ? (
-                <p css={contentParagraphStyles}>
-                  You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk
-                  Dashboard.
-                </p>
-              ) : isSignedIn ? (
-                <p css={contentParagraphStyles}>
-                  <span>
-                    You&apos;ve created your first user! Link this application to your Clerk account to explore the
-                    Dashboard.
-                  </span>
-                </p>
-              ) : (
-                <>
-                  <p
-                    css={css`
-                      ${contentParagraphStyles};
-                      text-wrap: pretty;
-                    `}
-                  >
-                    Temporary API keys are enabled so you can get started immediately.
-                  </p>
-                  <p
-                    css={css`
-                      ${contentParagraphStyles};
-                      text-wrap: pretty;
-                    `}
-                  >
-                    Claim this application to access the Clerk Dashboard where you can manage auth settings and explore
-                    more Clerk features.
-                  </p>
-                </>
-              )}
-            </div>
-          </div>
+              {renderStatusIcon()}
 
-          {success ? (
-            <button
-              type='button'
-              onClick={() => {
-                void (async () => {
-                  await _props.onDismiss?.();
-                  window.location.reload();
-                })();
-              }}
+              <p
+                data-text='Clerk is in keyless mode'
+                aria-label={getStatusText()}
+                css={titleTextStyles}
+              >
+                {getStatusText()}
+              </p>
+            </Flex>
+
+            <svg
+              width='1rem'
+              height='1rem'
+              viewBox='0 0 16 16'
+              fill='none'
+              aria-hidden
+              xmlns='http://www.w3.org/2000/svg'
               css={css`
-                ${mainCTAStyles};
+                color: #8c8c8c;
+                transition: color 120ms ease-out;
+                display: ${isExpanded && !claimed && !success ? 'block' : 'none'};
+                cursor: pointer;
 
-                &:hover {
-                  background: #4b4b4b;
-                  transition: all 120ms ease-in-out;
+                :hover {
+                  color: #eeeeee;
+                }
+
+                animation: show-button 300ms ease;
+                @keyframes show-button {
+                  from {
+                    transform: scaleX(0.9);
+                    opacity: 0;
+                  }
+                  to {
+                    transform: scaleX(1);
+                    opacity: 1;
+                  }
                 }
               `}
             >
-              Dismiss
-            </button>
-          ) : (
-            <Flex
-              sx={t => ({
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: t.space.$2x5,
-              })}
+              <path
+                d='M3.75 8H12.25'
+                stroke='currentColor'
+                strokeWidth='1.5'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+            </svg>
+          </button>
+
+          <Flex
+            sx={t => ({
+              flexDirection: 'column',
+              gap: t.space.$3,
+              opacity: isForcedExpanded ? 1 : 0,
+              transition: `opacity ${CONTENT_FADE_DURATION} ${EASING_CURVE}`,
+              transitionDelay: isForcedExpanded ? CONTENT_FADE_DELAY : '0ms',
+              pointerEvents: isForcedExpanded ? 'auto' : 'none',
+              // marginBlockEnd: `calc(-1 * ${t.space.$3})`,
+              // paddingBlockEnd: t.space.$3,
+              // maskImage: `linear-gradient(to bottom, black calc(100% - ${t.space.$3}), transparent)`,
+            })}
+          >
+            <div
+              role='region'
+              id={contentIdentifier}
+              aria-labelledby={buttonIdentifier}
+              aria-hidden={!isForcedExpanded}
             >
-              <a
-                href={claimUrlToDashboard}
-                target='_blank'
-                rel='noopener noreferrer'
+              <div
+                css={css`
+                  display: flex;
+                  flex-direction: column;
+                  gap: 0.5rem;
+                  color: #b4b4b4;
+                  max-width: 14.625rem;
+                `}
+              >
+                {success ? (
+                  <p css={contentParagraphStyles}>
+                    Your application{' '}
+                    <span
+                      css={css`
+                        ${basePromptElementStyles};
+                        display: inline-block;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        max-width: 8.125rem;
+                        vertical-align: bottom;
+                        font-size: 0.8125rem;
+                        font-weight: 500;
+                        color: #d5d5d5;
+                      `}
+                    >
+                      {appName}
+                    </span>{' '}
+                    has been claimed. Configure settings from the{' '}
+                    <Link
+                      isExternal
+                      aria-label='Go to Dashboard to configure settings'
+                      href={instanceUrlToDashboard}
+                      sx={t => ({
+                        color: t.colors.$whiteAlpha600,
+                        textDecoration: 'underline solid',
+                        transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
+                        ':hover': {
+                          color: t.colors.$whiteAlpha800,
+                        },
+                      })}
+                    >
+                      Clerk Dashboard
+                    </Link>
+                  </p>
+                ) : claimed ? (
+                  <p css={contentParagraphStyles}>
+                    You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk
+                    Dashboard.
+                  </p>
+                ) : isSignedIn ? (
+                  <p css={contentParagraphStyles}>
+                    <span>
+                      You&apos;ve created your first user! Link this application to your Clerk account to explore the
+                      Dashboard.
+                    </span>
+                  </p>
+                ) : (
+                  <>
+                    <p
+                      css={css`
+                        ${contentParagraphStyles};
+                        text-wrap: pretty;
+                      `}
+                    >
+                      Temporary API keys are enabled so you can get started immediately.
+                    </p>
+                    <p
+                      css={css`
+                        ${contentParagraphStyles};
+                        text-wrap: pretty;
+                      `}
+                    >
+                      Claim this application to access the Clerk Dashboard where you can manage auth settings and
+                      explore more Clerk features.
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {success ? (
+              <button
+                type='button'
+                onClick={() => {
+                  void (async () => {
+                    await _props.onDismiss?.();
+                    window.location.reload();
+                  })();
+                }}
                 css={css`
                   ${mainCTAStyles};
-                  opacity: ${isForcedExpanded ? 1 : 0};
-                  ${isAnimating ? 'pointer-events: none; opacity: 0.6;' : ''}
-                  transition: opacity ${isForcedExpanded ? CONTENT_FADE_DURATION : '80ms'} ${EASING_CURVE};
-                  transitiondelay: ${isForcedExpanded ? CONTENT_FADE_DELAY : '0ms'};
 
                   &:hover {
-                    ${isAnimating ? '' : ctaButtonHoverStyles}
+                    background: #4b4b4b;
+                    transition: all 120ms ease-in-out;
                   }
                 `}
               >
-                {claimed ? 'Get API keys' : 'Claim application'}
-              </a>
-            </Flex>
-          )}
+                Dismiss
+              </button>
+            ) : (
+              <Flex
+                sx={t => ({
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: t.space.$2x5,
+                })}
+              >
+                <a
+                  href={claimUrlToDashboard}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  css={css`
+                    ${mainCTAStyles};
+                    opacity: ${isForcedExpanded ? 1 : 0};
+                    ${isAnimating ? 'pointer-events: none; opacity: 0.6;' : ''}
+                    transition: opacity ${isForcedExpanded ? CONTENT_FADE_DURATION : '80ms'} ${EASING_CURVE};
+                    transitiondelay: ${isForcedExpanded ? CONTENT_FADE_DELAY : '0ms'};
+
+                    &:hover {
+                      ${isAnimating ? '' : ctaButtonHoverStyles}
+                    }
+                  `}
+                >
+                  {claimed ? 'Get API keys' : 'Claim application'}
+                </a>
+              </Flex>
+            )}
+          </Flex>
         </Flex>
       </PromptContainer>
       <BodyPortal>
@@ -545,6 +552,315 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
     </Portal>
   );
 };
+
+function KeylessPromptInternal(_props: KeylessPromptProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const id = React.useId();
+  return (
+    <InternalThemeProvider>
+      <Portal>
+        {/* @property enables animating custom properties in gradients */}
+        <style>{`
+          @property --mask-fade-start {
+            syntax: '<percentage>';
+            initial-value: 100%;
+            inherits: false;
+          }
+        `}</style>
+        <div
+          css={css`
+            --ease-bezier: cubic-bezier(0.2, 0, 0, 1);
+            --width-expanded: 18rem;
+            --width-collapsed: 13rem;
+            position: fixed;
+            bottom: 1.25rem;
+            right: 1.25rem;
+            z-index: 999999;
+            height: auto;
+            width: ${isOpen ? 'var(--width-expanded)' : 'var(--width-collapsed)'};
+            interpolate-size: allow-keywords;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0) 100%), #1a1a1a;
+            box-shadow:
+              0px 0px 0px 0.5px #2f3037 inset,
+              0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset,
+              0px 0px 0.8px 0.8px rgba(255, 255, 255, 0.2) inset,
+              0px 0px 0px 0px rgba(255, 255, 255, 0.72),
+              0px 16px 36px -6px rgba(0, 0, 0, 0.36),
+              0px 6px 16px -2px rgba(0, 0, 0, 0.2);
+            border-radius: ${isOpen ? '0.75rem' : '2.5rem'};
+            contain: layout style paint;
+            isolation: isolate;
+            will-change: width, height, border-radius;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            transition:
+              height ${isOpen ? '220ms' : '180ms'} var(--ease-bezier),
+              width ${isOpen ? '220ms' : '180ms'} var(--ease-bezier),
+              border-radius ${isOpen ? '220ms' : '180ms'} var(--ease-bezier),
+              background ${isOpen ? '220ms' : '180ms'} var(--ease-bezier);
+            @media (prefers-reduced-motion: reduce) {
+              transition: none;
+            }
+            &::before {
+              content: '';
+              position: absolute;
+              inset: 0;
+              background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 46%, rgba(255, 255, 255, 0) 54%);
+              mix-blend-mode: overlay;
+              border-radius: inherit;
+              pointer-events: none;
+              opacity: ${isOpen ? 0 : 1};
+              transition: opacity ${isOpen ? '220ms' : '180ms'} var(--ease-bezier);
+              @media (prefers-reduced-motion: reduce) {
+                transition: none;
+              }
+            }
+          `}
+        >
+          <button
+            type='button'
+            onClick={() => setIsOpen(prev => !prev)}
+            aria-expanded={isOpen}
+            aria-controls={id}
+            css={css`
+              appearance: none;
+              border: none;
+              background-color: transparent;
+              display: flex;
+              align-items: center;
+              width: 100%;
+              border-radius: inherit;
+              padding-block: 0.75rem;
+              position: relative;
+              z-index: 1;
+            `}
+          >
+            <span
+              css={css`
+                margin-inline-start: 0.75rem;
+                margin-inline-end: 0.25rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              `}
+            >
+              <svg
+                css={css`
+                  --size: 1rem;
+                  width: var(--size);
+                  height: var(--size);
+                `}
+                viewBox='0 0 128 128'
+                fill='none'
+                aria-hidden
+              >
+                <circle
+                  cx='64'
+                  cy='64'
+                  r='20'
+                  fill='#fff'
+                />
+                <path
+                  d='M99.5716 10.788C101.571 12.1272 101.742 14.9444 100.04 16.646L85.4244 31.2618C84.1035 32.5828 82.0542 32.7914 80.3915 31.9397C75.4752 29.421 69.9035 28 64 28C44.1177 28 28 44.1177 28 64C28 69.9035 29.421 75.4752 31.9397 80.3915C32.7914 82.0542 32.5828 84.1035 31.2618 85.4244L16.646 100.04C14.9444 101.742 12.1272 101.571 10.788 99.5716C3.97411 89.3989 0 77.1635 0 64C0 28.6538 28.6538 0 64 0C77.1635 0 89.3989 3.97411 99.5716 10.788Z'
+                  fill='#fff'
+                  fillOpacity='0.4'
+                />
+                <path
+                  d='M100.04 111.354C101.742 113.056 101.571 115.873 99.5717 117.212C89.3989 124.026 77.1636 128 64 128C50.8364 128 38.6011 124.026 28.4283 117.212C26.4289 115.873 26.2581 113.056 27.9597 111.354L42.5755 96.7382C43.8965 95.4172 45.9457 95.2085 47.6084 96.0603C52.5248 98.579 58.0964 100 64 100C69.9036 100 75.4753 98.579 80.3916 96.0603C82.0543 95.2085 84.1036 95.4172 85.4245 96.7382L100.04 111.354Z'
+                  fill='#fff'
+                />
+              </svg>
+            </span>
+            <span
+              css={css`
+                font-family:
+                  -apple-system, BlinkMacSystemFont, 'avenir next', avenir, 'segoe ui', 'helvetica neue', helvetica,
+                  Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+                font-size: 0.875rem;
+                font-weight: 500;
+                line-height: 1;
+                white-space: nowrap;
+                color: rgba(255, 255, 255, 0.75);
+                background: linear-gradient(
+                  90deg,
+                  rgba(255, 255, 255, 0.75) 0%,
+                  rgba(255, 255, 255, 0.75) 35%,
+                  #ffffff 50%,
+                  rgba(255, 255, 255, 0.75) 65%,
+                  rgba(255, 255, 255, 0.75) 100%
+                );
+                background-size: 400% 100%;
+                background-position: 100% center;
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: text-shimmer 3s ease-in-out infinite;
+
+                @keyframes text-shimmer {
+                  from {
+                    background-position: 100% center;
+                  }
+                  to {
+                    background-position: 0% center;
+                  }
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                  animation: none;
+                  background: none;
+                  -webkit-text-fill-color: #fafafa;
+                }
+              `}
+            >
+              Clerk is in keyless mode
+            </span>
+            <svg
+              viewBox='0 0 16 16'
+              fill='none'
+              aria-hidden='true'
+              css={css`
+                --size: 1rem;
+                width: var(--size);
+                height: var(--size);
+                color: white;
+              `}
+            >
+              <path
+                d='M3.75 8H12.25'
+                stroke='currentColor'
+                stroke-width='1.5'
+                stroke-linecap='round'
+                stroke-linejoin='round'
+              ></path>
+            </svg>
+          </button>
+
+          <div
+            id={id}
+            css={css`
+              display: grid;
+              grid-template-rows: ${isOpen ? '1fr' : '0fr'};
+              contain: layout style;
+              will-change: grid-template-rows;
+              transition: grid-template-rows ${isOpen ? '220ms' : '180ms'} var(--ease-bezier);
+              @media (prefers-reduced-motion: reduce) {
+                transition: none;
+              }
+            `}
+            {...(!isOpen && { inert: '' })}
+            aria-hidden={!isOpen}
+          >
+            <div
+              css={css`
+                overflow: hidden;
+                min-height: 0;
+                mask-image: linear-gradient(to bottom, black calc(100% - 0.75rem), transparent);
+              `}
+            >
+              <div
+                css={css`
+                  margin: -1rem -0.75rem -0.75rem -0.75rem;
+                  padding: 0.75rem;
+                `}
+              >
+                <div
+                  css={css`
+                    width: var(--width-expanded);
+                    padding-inline: 0.75rem;
+                    padding-block-end: 0.75rem;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.75rem;
+                    opacity: ${isOpen ? 1 : 0};
+                    transition-delay: ${isOpen ? '100ms' : '0ms'};
+                    transition: opacity ${isOpen ? '200ms' : '100ms'} var(--ease-bezier);
+                  `}
+                >
+                  <div
+                    css={css`
+                      display: flex;
+                      flex-direction: column;
+                      gap: 0.5rem;
+                      color: #b4b4b4;
+                      font-size: 0.8125rem;
+                      line-height: 1.25;
+                    `}
+                  >
+                    <p>Temporary API keys are enabled so you can get started immediately.</p>
+                    <p>
+                      Claim this application to access the Clerk Dashboard where you can manage auth settings and
+                      explore more Clerk features.
+                    </p>
+                  </div>
+                  <a
+                    href='/'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    css={css`
+                      position: relative;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      gap: 0.25rem;
+                      width: 100%;
+                      height: 1.75rem;
+                      border-radius: 0.375rem;
+                      font-size: 0.75rem;
+                      font-weight: 500;
+                      color: #fff;
+                      background: #6c47ff;
+                      box-shadow:
+                        rgb(255, 255, 255) 0px 0px 0px 0px,
+                        rgb(108, 71, 255) 0px 0px 0px 1px,
+                        rgba(255, 255, 255, 0.07) 0px 1px 0px 0px inset,
+                        rgba(33, 33, 38, 0.2) 0px 1px 3px 0px;
+                      &::before {
+                        content: '';
+                        position: absolute;
+                        inset: 0;
+                        background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 46%, rgba(255, 255, 255, 0) 54%);
+                        mix-blend-mode: overlay;
+                        border-radius: inherit;
+                      }
+                    `}
+                  >
+                    <span
+                      css={css`
+                        position: relative;
+                        z-index: 1;
+                      `}
+                    >
+                      Claim application
+                    </span>
+                    <svg
+                      css={css`
+                        width: 0.625rem;
+                        height: 0.625rem;
+                        opacity: 0.6;
+                      `}
+                      viewBox='0 0 10 10'
+                      aria-hidden='true'
+                      className=''
+                    >
+                      <path
+                        fill='currentColor'
+                        stroke='currentColor'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth='1.5'
+                        d='m7.25 5-3.5-2.25v4.5L7.25 5Z'
+                      />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Portal>
+    </InternalThemeProvider>
+  );
+}
 
 export const KeylessPrompt = (props: KeylessPromptProps) => (
   <InternalThemeProvider>
