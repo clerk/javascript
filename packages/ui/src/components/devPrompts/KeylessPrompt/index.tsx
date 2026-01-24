@@ -76,14 +76,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
     });
   }, [_props.copyKeysUrl]);
 
-  const getKeysUrlFromLastActive = useMemo(() => {
-    return withLastActiveFallback(() => {
-      const redirectUrlParts = handleDashboardUrlParsing(_props.copyKeysUrl);
-      const url = new URL(`${redirectUrlParts.baseDomain}/last-active?path=api-keys`);
-      return url.href;
-    });
-  }, [_props.copyKeysUrl]);
-
   const mainCTAStyles = css`
     ${basePromptElementStyles};
     display: flex;
@@ -131,16 +123,22 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
 
           '&[data-expanded="true"]': {
             flexDirection: 'column',
-            alignItems: 'flex-center',
-            justifyContent: 'flex-center',
-            height: claimed || success ? 'fit-content' : isSignedIn ? '8.5rem' : '12rem',
-            overflow: 'hidden',
+            alignItems: 'flex-start',
+            justifyContent: 'flex-start',
+            // Use fit-content for height - this will be animated with interpolate-size in modern browsers
+            height: 'fit-content',
+            overflow: 'clip',
             width: 'fit-content',
             minWidth: '16.125rem',
             gap: `${t.space.$1x5}`,
             padding: `${t.space.$2x5} ${t.space.$3} ${t.space.$3} ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
             transition: 'all 230ms cubic-bezier(0.28, 1, 0.32, 1)',
+          },
+
+          // Progressive enhancement for height: auto/fit-content transitions
+          '@supports (interpolate-size: allow-keywords)': {
+            interpolateSize: 'allow-keywords',
           },
         })}
       >
