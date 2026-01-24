@@ -315,7 +315,8 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             flexDirection: 'column',
             gap: t.space.$3,
             opacity: isForcedExpanded ? 1 : 0,
-            transition: 'opacity 150ms ease-out',
+            // Fade in during expansion, finishing slightly after container completes
+            transition: 'opacity 250ms ease-out',
             transitionDelay: isForcedExpanded ? '50ms' : '0ms',
           })}
         >
