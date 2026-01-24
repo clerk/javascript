@@ -93,15 +93,15 @@ export const esES: LocalizationResource = {
     cancelSubscriptionTitle: '¿Cancelar la suscripción {{plan}}?',
     cannotSubscribeMonthly:
       'No puedes suscribirte a este plan con pago mensual. Para suscribirte, debes elegir el pago anual.',
-    cannotSubscribeUnrecoverable:
-      'No puedes suscribirte a este plan. Tu suscripción actual es más cara que este plan.',
+    cannotSubscribeUnrecoverable: 'No puedes suscribirte a este plan. Tu suscripción actual es más cara que este plan.',
     checkout: {
       description__paymentSuccessful: 'Tu pago se ha realizado correctamente.',
       description__subscriptionSuccessful: 'Tu nueva suscripción está lista.',
       downgradeNotice:
         'Mantendrás tu suscripción actual y sus funciones hasta el final del ciclo de facturación; después se te cambiará a esta suscripción.',
       emailForm: {
-        subtitle: 'Antes de completar la compra, debes añadir una dirección de correo electrónico donde se enviarán los recibos.',
+        subtitle:
+          'Antes de completar la compra, debes añadir una dirección de correo electrónico donde se enviarán los recibos.',
         title: 'Añadir dirección de correo electrónico',
       },
       lineItems: {
