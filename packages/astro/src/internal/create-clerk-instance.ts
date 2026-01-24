@@ -113,12 +113,18 @@ async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCre
 }
 
 /**
- * Gets the ClerkUI constructor by loading from CDN with version pinning.
+ * Gets the ClerkUI constructor, either from bundled UI or by loading from CDN.
  */
 async function getClerkUiEntryChunk<TUi extends Ui = Ui>(
   options?: AstroClerkCreateInstanceParams<TUi>,
 ): Promise<ClerkUIConstructor> {
-  // Load UI from CDN with version pinning from ui.version
+  // Use bundled UI constructor if provided via options.ui.ClerkUI
+  const bundledClerkUI = (options?.ui as { ClerkUI?: ClerkUIConstructor })?.ClerkUI;
+  if (bundledClerkUI) {
+    return bundledClerkUI;
+  }
+
+  // Fall back to loading UI from CDN with version pinning from ui.version
   await loadClerkUiScript(
     options
       ? {
