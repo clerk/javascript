@@ -29,9 +29,9 @@ const buttonIdentifier = `${buttonIdentifierPrefix}-button`;
 const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 
 // Animation timing constants
-const ANIMATION_DURATION = '150ms';
-const CONTENT_FADE_DURATION = '180ms';
-const CONTENT_FADE_DELAY = '30ms';
+const ANIMATION_DURATION = '200ms';
+const CONTENT_FADE_DURATION = '200ms';
+const CONTENT_FADE_DELAY = '40ms';
 
 /**
  * If we cannot reconstruct the url properly, then simply fallback to Clerk Dashboard
@@ -47,12 +47,23 @@ function withLastActiveFallback(cb: () => string): string {
 const KeylessPromptInternal = (_props: KeylessPromptProps) => {
   const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     if (isSignedIn) {
       setIsExpanded(true);
     }
   }, [isSignedIn]);
+
+  // Track animation state to prevent interactions during transition
+  useEffect(() => {
+    if (isAnimating) {
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+      }, 200); // Match ANIMATION_DURATION
+      return () => clearTimeout(timer);
+    }
+  }, [isAnimating, isExpanded]);
 
   const environment = useRevalidateEnvironment();
   const claimed = Boolean(environment.authConfig.claimedAt);
@@ -275,12 +286,13 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           borderRadius: '1.25rem',
 
           // AIM transition - interpolate-size handles fit-content smoothly
-          transition: `width ${ANIMATION_DURATION} cubic-bezier(0.4, 0, 0.2, 1),
-                       height ${ANIMATION_DURATION} cubic-bezier(0.4, 0, 0.2, 1),
-                       padding ${ANIMATION_DURATION} cubic-bezier(0.4, 0, 0.2, 1),
-                       border-radius ${ANIMATION_DURATION} cubic-bezier(0.4, 0, 0.2, 1),
-                       gap ${ANIMATION_DURATION} cubic-bezier(0.4, 0, 0.2, 1),
-                       background ${ANIMATION_DURATION} cubic-bezier(0.4, 0, 0.2, 1)`,
+          // Smoother easing curve for more polished feel
+          transition: `width ${ANIMATION_DURATION} cubic-bezier(0.2, 0, 0, 1),
+                       height ${ANIMATION_DURATION} cubic-bezier(0.2, 0, 0, 1),
+                       padding ${ANIMATION_DURATION} cubic-bezier(0.2, 0, 0, 1),
+                       border-radius ${ANIMATION_DURATION} cubic-bezier(0.2, 0, 0, 1),
+                       gap ${ANIMATION_DURATION} cubic-bezier(0.2, 0, 0, 1),
+                       background ${ANIMATION_DURATION} cubic-bezier(0.2, 0, 0, 1)`,
 
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
@@ -302,13 +314,21 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           aria-expanded={isForcedExpanded}
           aria-controls={contentIdentifier}
           id={buttonIdentifier}
-          onClick={() => !claimed && setIsExpanded(prev => !prev)}
+          onClick={() => {
+            if (!claimed && !isAnimating) {
+              setIsAnimating(true);
+              setIsExpanded(prev => !prev);
+            }
+          }}
+          disabled={isAnimating}
           css={css`
             ${basePromptElementStyles};
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            ${isAnimating ? 'pointer-events: none; cursor: wait; opacity: 0.6;' : ''}
+            transition: opacity 100ms ease-out;
           `}
         >
           <Flex
@@ -373,7 +393,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             flexDirection: 'column',
             gap: t.space.$3,
             opacity: isForcedExpanded ? 1 : 0,
-            transition: `opacity ${CONTENT_FADE_DURATION} cubic-bezier(0.4, 0, 0.2, 1)`,
+            transition: `opacity ${CONTENT_FADE_DURATION} cubic-bezier(0.2, 0, 0, 1)`,
             transitionDelay: isForcedExpanded ? CONTENT_FADE_DELAY : '0ms',
             pointerEvents: isForcedExpanded ? 'auto' : 'none',
           })}
@@ -499,9 +519,13 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                 rel='noopener noreferrer'
                 css={css`
                   ${mainCTAStyles};
+                  opacity: ${isForcedExpanded ? 1 : 0};
+                  ${isAnimating ? 'pointer-events: none; opacity: 0.6;' : ''}
+                  transition: opacity ${isForcedExpanded ? CONTENT_FADE_DURATION : '80ms'} cubic-bezier(0.2, 0, 0, 1);
+                  transitiondelay: ${isForcedExpanded ? CONTENT_FADE_DELAY : '0ms'};
 
                   &:hover {
-                    ${ctaButtonHoverStyles}
+                    ${isAnimating ? '' : ctaButtonHoverStyles}
                   }
                 `}
               >
