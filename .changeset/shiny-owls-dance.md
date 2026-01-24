@@ -7,15 +7,7 @@
 '@clerk/shared': minor
 ---
 
-Add `ui` prop to ClerkProvider for UI version pinning
-
-The `ui` object from `@clerk/ui` is passed to ClerkProvider to pin the UI version loaded from CDN. Each SDK decides internally whether to use the bundled constructor (`ui.ctor`) or load from CDN.
-
-**Breaking Change (internal):** `clerkUiCtor` renamed to `ClerkUI` and is no longer exposed in `IsomorphicClerkOptions`. SDKs should use `ui` prop instead.
-
-**SDK Behavior:**
-- Chrome Extension: Uses bundled UI (`__internal_forceBundledUI: true`)
-- React/Next.js, Vue, Astro: Load from CDN with version pinning via `ui.version`
+Add `ui` prop to ClerkProvider for passing `@clerk/ui`
 
 Usage:
 ```tsx
