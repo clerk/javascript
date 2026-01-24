@@ -108,37 +108,40 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
       <PromptContainer
         data-expanded={isForcedExpanded}
         sx={t => ({
+          // Enable interpolation of keyword values (fit-content, auto)
+          // This is the key AIM technique for dynamic content
+          interpolateSize: 'allow-keywords',
+
           position: 'fixed',
           bottom: '1.25rem',
           right: '1.25rem',
+          // Always column direction for consistent layout during transition
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'flex-start',
+          overflow: 'clip',
+
+          // Collapsed: static width, fixed height for title bar
+          width: '13.5rem',
           height: `${t.sizes.$10}`,
-          minWidth: '13.4rem',
-          paddingLeft: `${t.space.$3}`,
+          padding: `${t.space.$2} ${t.space.$3}`,
           borderRadius: '1.25rem',
-          transition: 'all 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
+
+          // Transition all morphing properties at same rate
+          transition:
+            'width 200ms ease-out, height 200ms ease-out, padding 200ms ease-out, border-radius 200ms ease-out, gap 200ms ease-out, background 200ms ease-out',
 
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           },
 
           '&[data-expanded="true"]': {
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            justifyContent: 'flex-start',
-            // Use fit-content for height - this will be animated with interpolate-size in modern browsers
+            // Expanded: static width, dynamic height via fit-content
+            width: '16.125rem',
             height: 'fit-content',
-            overflow: 'clip',
-            width: 'fit-content',
-            minWidth: '16.125rem',
             gap: `${t.space.$1x5}`,
             padding: `${t.space.$2x5} ${t.space.$3} ${t.space.$3} ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
-            transition: 'all 230ms cubic-bezier(0.28, 1, 0.32, 1)',
-          },
-
-          // Progressive enhancement for height: auto/fit-content transitions
-          '@supports (interpolate-size: allow-keywords)': {
-            interpolateSize: 'allow-keywords',
           },
         })}
       >
@@ -311,13 +314,16 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           sx={t => ({
             flexDirection: 'column',
             gap: t.space.$3,
+            opacity: isForcedExpanded ? 1 : 0,
+            transition: 'opacity 150ms ease-out',
+            transitionDelay: isForcedExpanded ? '50ms' : '0ms',
           })}
         >
           <div
             role='region'
             id={contentIdentifier}
             aria-labelledby={buttonIdentifier}
-            hidden={!isForcedExpanded}
+            aria-hidden={!isForcedExpanded}
           >
             <div
               css={css`
@@ -326,17 +332,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                 gap: 0.5rem;
                 color: #b4b4b4;
                 max-width: 14.625rem;
-                animation: ${isForcedExpanded && 'show-description 500ms ease-in forwards'};
-                @keyframes show-description {
-                  0%,
-                  5% {
-                    opacity: 0;
-                  }
-                  12%,
-                  100% {
-                    opacity: 1;
-                  }
-                }
               `}
             >
               {success ? (
