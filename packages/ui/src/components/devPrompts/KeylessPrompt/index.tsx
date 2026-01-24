@@ -381,7 +381,6 @@ const _KeylessPromptInternal = (_props: KeylessPromptProps) => {
               transition: `opacity ${CONTENT_FADE_DURATION} ${EASING_CURVE}`,
               transitionDelay: isForcedExpanded ? CONTENT_FADE_DELAY : '0ms',
               pointerEvents: isForcedExpanded ? 'auto' : 'none',
-              // marginBlockEnd: `calc(-1 * ${t.space.$3})`,
               // paddingBlockEnd: t.space.$3,
               // maskImage: `linear-gradient(to bottom, black calc(100% - ${t.space.$3}), transparent)`,
             })}
@@ -735,6 +734,19 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
               `}
             >
               Clerk is in keyless mode
+            </span>
+            <span
+              css={css`
+                clip: rect(0 0 0 0);
+                clippath: inset(50%);
+                height: 1px;
+                overflow: hidden;
+                position: absolute;
+                whitespace: nowrap;
+                width: 1px;
+              `}
+            >
+              {isOpen ? 'Collapse' : 'Expand'} prompt content
             </span>
             <svg
               viewBox='0 0 16 16'
