@@ -1087,10 +1087,14 @@ export type ClerkOptions = ClerkOptionsNavigation &
   AfterMultiSessionSingleSignOutUrl &
   ClerkUnsafeOptions & {
     /**
-     * @internal
-     * Clerk UI entrypoint. Used internally by SDKs to pass the UI constructor to clerk-js.
+     * The Clerk UI object from `@clerk/ui`. Contains the UI constructor and version info.
      */
-    ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
+    ui?: {
+      version?: string;
+      url?: string;
+      ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
+      __internal_forceBundledUI?: boolean;
+    };
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
@@ -2410,7 +2414,7 @@ export type ClerkProp =
   | undefined
   | null;
 
-export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite' | 'ClerkUI'> & {
+export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
   /**
    * The URL that `@clerk/clerk-js` should be hot-loaded from.

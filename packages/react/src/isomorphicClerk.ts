@@ -466,7 +466,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
       if (!clerk.loaded) {
         this.beforeLoad(clerk);
-        await clerk.load({ ...this.options, ClerkUI });
+        await clerk.load({
+          ...this.options,
+          ui: {
+            version: this.options.ui?.version,
+            url: this.options.ui?.url,
+            __internal_forceBundledUI: this.options.ui?.__internal_forceBundledUI,
+            ClerkUI,
+          },
+        });
       }
       if (clerk.loaded) {
         this.replayInterceptedInvocations(clerk);

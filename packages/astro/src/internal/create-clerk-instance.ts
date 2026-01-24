@@ -58,8 +58,12 @@ async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroC
     routerPush: createNavigationHandler(window.history.pushState.bind(window.history)),
     routerReplace: createNavigationHandler(window.history.replaceState.bind(window.history)),
     ...options,
-    // Pass the clerk-ui constructor promise to clerk.load()
-    ClerkUI,
+    // Pass the clerk-ui constructor promise inside ui object
+    ui: {
+      version: options?.ui?.version,
+      url: options?.ui?.url,
+      ClerkUI,
+    },
   } as unknown as ClerkOptions;
 
   initOptions = clerkOptions;

@@ -98,7 +98,14 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           }
 
           clerk.value = window.Clerk;
-          const loadOptions = { ...options, ClerkUI: ClerkUIPromise } as ClerkOptions;
+          const loadOptions = {
+            ...options,
+            ui: {
+              version: pluginOptions.ui?.version,
+              url: pluginOptions.ui?.url,
+              ClerkUI: ClerkUIPromise,
+            },
+          } as ClerkOptions;
           await window.Clerk.load(loadOptions);
           loaded.value = true;
 

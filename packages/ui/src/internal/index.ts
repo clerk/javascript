@@ -1,5 +1,3 @@
-import type { ClerkUIConstructor } from '@clerk/shared/ui';
-
 import type { Appearance } from './appearance';
 
 export type { ComponentControls, MountComponentRenderer } from '../Components';
@@ -28,17 +26,6 @@ export type Ui<A = any> = Tagged<
   {
     version: string;
     url?: string;
-    /**
-     * The Clerk UI constructor. When provided, this will be used instead of
-     * loading the UI from CDN. This is useful for bundling the UI with your app.
-     */
-    ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
-    /**
-     * @internal
-     * Force using the bundled UI constructor instead of loading from CDN.
-     * Used internally by SDKs that must bundle the UI (e.g., Chrome Extension).
-     */
-    __internal_forceBundledUI?: boolean;
     /**
      * Phantom property for type-level appearance inference
      * This property never exists at runtime

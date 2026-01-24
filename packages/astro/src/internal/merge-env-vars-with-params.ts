@@ -18,6 +18,10 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
     clerkUiUrl: paramClerkUiUrl,
     clerkJSVariant: paramClerkJSVariant,
     clerkJSVersion: paramClerkJSVersion,
+    // Extract `ui` separately to avoid spreading the branded Ui type which contains
+    // an unexported Tags symbol that breaks TypeScript declaration file generation.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ui: _paramUi,
     ...rest
   } = params || {};
 

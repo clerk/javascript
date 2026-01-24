@@ -6,11 +6,7 @@ const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 document.addEventListener('DOMContentLoaded', async function () {
   const clerk = new Clerk(publishableKey);
 
-  // Use bundled UI via ui.ClerkUI
-  await clerk.load({
-    ui,
-    ClerkUI: ui.ClerkUI,
-  });
+  await clerk.load({ ui });
 
   if (clerk.isSignedIn) {
     document.getElementById('app')!.innerHTML = `
