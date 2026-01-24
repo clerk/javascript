@@ -24,7 +24,10 @@ function createInjectionScriptRunner(creator: CreateClerkInstanceInternalFn) {
 
     // Pass `ui` separately to avoid TypeScript declaration file issues with the
     // branded Ui type that contains an unexported Tags symbol
-    await creator({ ...mergeEnvVarsWithParams({ ...astroClerkOptions, ...clientSafeVars }), ui: astroClerkOptions?.ui });
+    await creator({
+      ...mergeEnvVarsWithParams({ ...astroClerkOptions, ...clientSafeVars }),
+      ui: astroClerkOptions?.ui,
+    });
   }
 
   return runner;
