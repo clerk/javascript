@@ -75,7 +75,7 @@
     "@changesets/get-github-info": "^0.6.0",
     "@clerk/backend": "workspace:*",
     "@clerk/shared": "workspace:*",
-    "@clerk/snapi": "github:clerk/snapi",
+    "@clerk/snapi": "https://pkg.pr.new/clerk/snapi/@clerk/snapi@3ca6b23",
     "@clerk/testing": "workspace:*",
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
