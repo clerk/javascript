@@ -123,7 +123,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
 
           // Collapsed: static width, fixed height for title bar
           width: '13.5rem',
-          height: `${t.sizes.$10}`,
+          height: '2.375rem',
           padding: `${t.space.$2} ${t.space.$3}`,
           borderRadius: '1.25rem',
 
