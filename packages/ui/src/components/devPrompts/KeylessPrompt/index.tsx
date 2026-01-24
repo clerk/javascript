@@ -28,6 +28,11 @@ const buttonIdentifierPrefix = `--clerk-keyless-prompt`;
 const buttonIdentifier = `${buttonIdentifierPrefix}-button`;
 const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 
+// Animation timing constants
+const ANIMATION_DURATION = '150ms';
+const CONTENT_FADE_DURATION = '180ms';
+const CONTENT_FADE_DELAY = '30ms';
+
 /**
  * If we cannot reconstruct the url properly, then simply fallback to Clerk Dashboard
  */
@@ -55,6 +60,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
   const appName = environment.displayConfig.applicationName;
 
   const isForcedExpanded = claimed || success || isExpanded;
+
   const claimUrlToDashboard = useMemo(() => {
     if (claimed) {
       return _props.copyKeysUrl;
@@ -76,6 +82,9 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
     });
   }, [_props.copyKeysUrl]);
 
+  // Determine CTA button color based on state
+  const ctaButtonColor = claimed || success ? 'white' : '#fde047';
+
   const mainCTAStyles = css`
     ${basePromptElementStyles};
     display: flex;
@@ -89,7 +98,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
     font-size: 0.75rem;
     font-weight: 500;
     letter-spacing: 0.12px;
-    color: ${claimed ? 'white' : success ? 'white' : '#fde047'};
+    color: ${ctaButtonColor};
     text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
     white-space: nowrap;
     user-select: none;
@@ -101,6 +110,144 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
       0px 0px 0px 1px rgba(0, 0, 0, 0.12),
       0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
       0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
+  `;
+
+  // Determine CTA button hover styles
+  const ctaButtonHoverStyles = claimed
+    ? 'background: #4B4B4B; transition: all 120ms ease-in-out;'
+    : `box-shadow:
+      0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset,
+      0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+      0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+      0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+      0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);`;
+
+  // Render the appropriate icon based on state
+  function renderStatusIcon() {
+    if (success) {
+      return (
+        <PromptSuccessIcon
+          css={css`
+            width: 1rem;
+            height: 1rem;
+          `}
+        />
+      );
+    }
+
+    if (claimed) {
+      return (
+        <svg
+          width='1rem'
+          height='1rem'
+          viewBox='0 0 16 16'
+          aria-hidden
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+        >
+          <path
+            d='M8 5.75V7.25M8 10.2502V10.2602M13.25 8C13.25 10.8995 10.8995 13.25 8 13.25C5.10051 13.25 2.75 10.8995 2.75 8C2.75 5.10051 5.10051 2.75 8 2.75C10.8995 2.75 13.25 5.10051 13.25 8Z'
+            stroke='#F36B16'
+            strokeWidth='1.5'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+          />
+        </svg>
+      );
+    }
+
+    return (
+      <div
+        css={css`
+          perspective: 1000px;
+          position: relative;
+          width: 1rem;
+          height: 1rem;
+          transform-style: preserve-3d;
+          animation: ${isForcedExpanded ? 'coinFlipAnimation 12s infinite linear' : 'none'};
+
+          @keyframes coinFlipAnimation {
+            0%,
+            55% {
+              transform: rotateY(0);
+            }
+            60%,
+            95% {
+              transform: rotateY(180deg);
+            }
+            100% {
+              transform: rotateY(0);
+            }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            animation: none;
+          }
+        `}
+      >
+        <span
+          className='coin-flip-front'
+          aria-hidden
+          css={css`
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          `}
+        >
+          <ClerkLogoIcon />
+        </span>
+
+        <span
+          className='coin-flip-back'
+          aria-hidden
+          css={css`
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            transform: rotateY(180deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          `}
+        >
+          <KeySlashIcon />
+        </span>
+      </div>
+    );
+  }
+
+  // Get the status text based on state
+  function getStatusText() {
+    if (success) {
+      return 'Claim completed';
+    }
+    if (claimed) {
+      return 'Missing environment keys';
+    }
+    return 'Clerk is in keyless mode';
+  }
+
+  // Common paragraph styles for content text
+  const contentParagraphStyles = css`
+    ${basePromptElementStyles};
+    color: #b4b4b4;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1rem;
+  `;
+
+  // Title text styles
+  const titleTextStyles = css`
+    ${basePromptElementStyles};
+    color: #d9d9d9;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
   `;
 
   return (
@@ -127,16 +274,21 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           padding: `${t.space.$2} ${t.space.$3}`,
           borderRadius: '1.25rem',
 
-          // Transition all morphing properties at same rate - snappier timing
-          transition:
-            'width 150ms ease-out, height 150ms ease-out, padding 150ms ease-out, border-radius 150ms ease-out, gap 150ms ease-out, background 150ms ease-out',
+          // AIM transition - interpolate-size handles fit-content smoothly
+          transition: `width ${ANIMATION_DURATION} cubic-bezier(0.4, 0, 0.2, 1),
+                       height ${ANIMATION_DURATION} cubic-bezier(0.4, 0, 0.2, 1),
+                       padding ${ANIMATION_DURATION} cubic-bezier(0.4, 0, 0.2, 1),
+                       border-radius ${ANIMATION_DURATION} cubic-bezier(0.4, 0, 0.2, 1),
+                       gap ${ANIMATION_DURATION} cubic-bezier(0.4, 0, 0.2, 1),
+                       background ${ANIMATION_DURATION} cubic-bezier(0.4, 0, 0.2, 1)`,
 
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           },
 
           '&[data-expanded="true"]': {
-            // Expanded: static width, dynamic height via fit-content
+            // Expanded: static width, dynamic height via fit-content (AIM technique)
+            // interpolate-size: allow-keywords enables smooth transition to fit-content
             width: '16.125rem',
             height: 'fit-content',
             gap: `${t.space.$1x5}`,
@@ -165,108 +317,14 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
               gap: t.space.$2,
             })}
           >
-            {success ? (
-              <PromptSuccessIcon
-                css={css`
-                  width: 1rem;
-                  height: 1rem;
-                `}
-              />
-            ) : claimed ? (
-              <svg
-                width='1rem'
-                height='1rem'
-                viewBox='0 0 16 16'
-                aria-hidden
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M8 5.75V7.25M8 10.2502V10.2602M13.25 8C13.25 10.8995 10.8995 13.25 8 13.25C5.10051 13.25 2.75 10.8995 2.75 8C2.75 5.10051 5.10051 2.75 8 2.75C10.8995 2.75 13.25 5.10051 13.25 8Z'
-                  stroke='#F36B16'
-                  strokeWidth='1.5'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            ) : (
-              <div
-                css={css`
-                  perspective: 1000px;
-                  position: relative;
-                  width: 1rem;
-                  height: 1rem;
-                  transform-style: preserve-3d;
-                  animation: ${isForcedExpanded ? 'coinFlipAnimation 12s infinite linear' : ' none'};
-
-                  @keyframes coinFlipAnimation {
-                    0%,
-                    55% {
-                      transform: rotateY(0);
-                    }
-                    60%,
-                    95% {
-                      transform: rotateY(180deg);
-                    }
-                    100% {
-                      transform: rotateY(0);
-                    }
-                  }
-                  @media (prefers-reduced-motion: reduce) {
-                    animation: none;
-                  }
-                `}
-              >
-                <span
-                  className='coin-flip-front'
-                  aria-hidden
-                  css={css`
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    backface-visibility: hidden;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                  `}
-                >
-                  <ClerkLogoIcon />
-                </span>
-
-                <span
-                  className='coin-flip-back'
-                  aria-hidden
-                  css={css`
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    backface-visibility: hidden;
-                    transform: rotateY(180deg);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                  `}
-                >
-                  <KeySlashIcon />
-                </span>
-              </div>
-            )}
+            {renderStatusIcon()}
 
             <p
               data-text='Clerk is in keyless mode'
-              aria-label={
-                success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'
-              }
-              css={css`
-                ${basePromptElementStyles};
-                color: #d9d9d9;
-                font-size: 0.875rem;
-                font-weight: 500;
-                white-space: nowrap;
-                cursor: pointer;
-              `}
+              aria-label={getStatusText()}
+              css={titleTextStyles}
             >
-              {success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
+              {getStatusText()}
             </p>
           </Flex>
 
@@ -315,9 +373,9 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             flexDirection: 'column',
             gap: t.space.$3,
             opacity: isForcedExpanded ? 1 : 0,
-            // Fade in during expansion, finishing slightly after container completes
-            transition: 'opacity 180ms ease-out',
-            transitionDelay: isForcedExpanded ? '30ms' : '0ms',
+            transition: `opacity ${CONTENT_FADE_DURATION} cubic-bezier(0.4, 0, 0.2, 1)`,
+            transitionDelay: isForcedExpanded ? CONTENT_FADE_DELAY : '0ms',
+            pointerEvents: isForcedExpanded ? 'auto' : 'none',
           })}
         >
           <div
@@ -336,15 +394,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
               `}
             >
               {success ? (
-                <p
-                  css={css`
-                    ${basePromptElementStyles};
-                    color: #b4b4b4;
-                    font-size: 0.8125rem;
-                    font-weight: 400;
-                    line-height: 1rem;
-                  `}
-                >
+                <p css={contentParagraphStyles}>
                   Your application{' '}
                   <span
                     css={css`
@@ -380,28 +430,12 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                   </Link>
                 </p>
               ) : claimed ? (
-                <p
-                  css={css`
-                    ${basePromptElementStyles};
-                    color: #b4b4b4;
-                    font-size: 0.8125rem;
-                    font-weight: 400;
-                    line-height: 1rem;
-                  `}
-                >
+                <p css={contentParagraphStyles}>
                   You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk
                   Dashboard.
                 </p>
               ) : isSignedIn ? (
-                <p
-                  css={css`
-                    ${basePromptElementStyles};
-                    color: #b4b4b4;
-                    font-size: 0.8125rem;
-                    font-weight: 400;
-                    line-height: 1rem;
-                  `}
-                >
+                <p css={contentParagraphStyles}>
                   <span>
                     You&apos;ve created your first user! Link this application to your Clerk account to explore the
                     Dashboard.
@@ -411,11 +445,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                 <>
                   <p
                     css={css`
-                      ${basePromptElementStyles};
-                      color: #b4b4b4;
-                      font-size: 0.8125rem;
-                      font-weight: 400;
-                      line-height: 1rem;
+                      ${contentParagraphStyles};
                       text-wrap: pretty;
                     `}
                   >
@@ -423,11 +453,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                   </p>
                   <p
                     css={css`
-                      ${basePromptElementStyles};
-                      color: #b4b4b4;
-                      font-size: 0.8125rem;
-                      font-weight: 400;
-                      line-height: 1rem;
+                      ${contentParagraphStyles};
                       text-wrap: pretty;
                     `}
                   >
@@ -442,9 +468,11 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           {success ? (
             <button
               type='button'
-              onClick={async () => {
-                await _props.onDismiss?.();
-                window.location.reload();
+              onClick={() => {
+                void (async () => {
+                  await _props.onDismiss?.();
+                  window.location.reload();
+                })();
               }}
               css={css`
                 ${mainCTAStyles};
@@ -473,17 +501,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                   ${mainCTAStyles};
 
                   &:hover {
-                    ${claimed
-                      ? `
-                  background: #4B4B4B;
-                  transition: all 120ms ease-in-out;`
-                      : `
-                  box-shadow:
-                    0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset,
-                    0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                    0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                    0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                    0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);`}
+                    ${ctaButtonHoverStyles}
                   }
                 `}
               >
