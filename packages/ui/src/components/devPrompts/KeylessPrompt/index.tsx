@@ -556,18 +556,35 @@ const _KeylessPromptInternal = (_props: KeylessPromptProps) => {
 function KeylessPromptInternal(_props: KeylessPromptProps) {
   const [isOpen, setIsOpen] = useState(false);
   const id = React.useId();
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (isOpen && containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
     <InternalThemeProvider>
       <Portal>
-        {/* @property enables animating custom properties in gradients */}
-        <style>{`
-          @property --mask-fade-start {
-            syntax: '<percentage>';
-            initial-value: 100%;
-            inherits: false;
-          }
-        `}</style>
         <div
+          ref={containerRef}
           css={css`
             --ease-bezier: cubic-bezier(0.2, 0, 0, 1);
             --width-expanded: 18rem;
@@ -605,7 +622,7 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
               content: '';
               position: absolute;
               inset: 0;
-              background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 46%, rgba(255, 255, 255, 0) 54%);
+              background: linear-gradient(180deg, rgba(255, 255, 255, 1) 46%, rgba(255, 255, 255, 0) 54%);
               mix-blend-mode: overlay;
               border-radius: inherit;
               pointer-events: none;
@@ -614,6 +631,10 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
               @media (prefers-reduced-motion: reduce) {
                 transition: none;
               }
+            }
+            &:has(button:focus-visible) {
+              outline: 2px solid #6c47ff;
+              outline-offset: 2px;
             }
           `}
         >
@@ -633,6 +654,7 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
               padding-block: 0.75rem;
               position: relative;
               z-index: 1;
+              outline: none;
             `}
           >
             <span
@@ -658,16 +680,16 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
                   cx='64'
                   cy='64'
                   r='20'
-                  fill='#fff'
+                  fill='#fafafa'
                 />
                 <path
                   d='M99.5716 10.788C101.571 12.1272 101.742 14.9444 100.04 16.646L85.4244 31.2618C84.1035 32.5828 82.0542 32.7914 80.3915 31.9397C75.4752 29.421 69.9035 28 64 28C44.1177 28 28 44.1177 28 64C28 69.9035 29.421 75.4752 31.9397 80.3915C32.7914 82.0542 32.5828 84.1035 31.2618 85.4244L16.646 100.04C14.9444 101.742 12.1272 101.571 10.788 99.5716C3.97411 89.3989 0 77.1635 0 64C0 28.6538 28.6538 0 64 0C77.1635 0 89.3989 3.97411 99.5716 10.788Z'
-                  fill='#fff'
+                  fill='#fafafa'
                   fillOpacity='0.4'
                 />
                 <path
                   d='M100.04 111.354C101.742 113.056 101.571 115.873 99.5717 117.212C89.3989 124.026 77.1636 128 64 128C50.8364 128 38.6011 124.026 28.4283 117.212C26.4289 115.873 26.2581 113.056 27.9597 111.354L42.5755 96.7382C43.8965 95.4172 45.9457 95.2085 47.6084 96.0603C52.5248 98.579 58.0964 100 64 100C69.9036 100 75.4753 98.579 80.3916 96.0603C82.0543 95.2085 84.1036 95.4172 85.4245 96.7382L100.04 111.354Z'
-                  fill='#fff'
+                  fill='#fafafa'
                 />
               </svg>
             </span>
@@ -678,23 +700,23 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
                   Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
                 font-size: 0.875rem;
                 font-weight: 500;
-                line-height: 1;
+                line-height: 1.2;
                 white-space: nowrap;
-                color: rgba(255, 255, 255, 0.75);
+                color: #fff;
                 background: linear-gradient(
                   90deg,
-                  rgba(255, 255, 255, 0.75) 0%,
-                  rgba(255, 255, 255, 0.75) 35%,
-                  #ffffff 50%,
-                  rgba(255, 255, 255, 0.75) 65%,
-                  rgba(255, 255, 255, 0.75) 100%
+                  rgba(255, 255, 255, 0.7) 0%,
+                  rgba(255, 255, 255, 0.7) 35%,
+                  #fff 50%,
+                  rgba(255, 255, 255, 0.7) 65%,
+                  rgba(255, 255, 255, 0.7) 100%
                 );
                 background-size: 400% 100%;
                 background-position: 100% center;
                 background-clip: text;
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
-                animation: text-shimmer 3s ease-in-out infinite;
+                animation: text-shimmer 2.75s ease-in-out infinite;
 
                 @keyframes text-shimmer {
                   from {
@@ -723,15 +745,22 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
                 width: var(--size);
                 height: var(--size);
                 color: white;
+                margin-inline-start: auto;
+                margin-inline-end: 0.75rem;
+                opacity: ${isOpen ? 0.6 : 0};
+                transition: opacity 120ms ease-out;
+                button:hover & {
+                  opacity: ${isOpen ? 1 : 0};
+                }
               `}
             >
               <path
                 d='M3.75 8H12.25'
                 stroke='currentColor'
-                stroke-width='1.5'
-                stroke-linecap='round'
-                stroke-linejoin='round'
-              ></path>
+                strokeWidth='1.5'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
             </svg>
           </button>
 
@@ -814,6 +843,7 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
                         rgb(108, 71, 255) 0px 0px 0px 1px,
                         rgba(255, 255, 255, 0.07) 0px 1px 0px 0px inset,
                         rgba(33, 33, 38, 0.2) 0px 1px 3px 0px;
+                      outline: none;
                       &::before {
                         content: '';
                         position: absolute;
@@ -821,6 +851,10 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
                         background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 46%, rgba(255, 255, 255, 0) 54%);
                         mix-blend-mode: overlay;
                         border-radius: inherit;
+                      }
+                      &:focus-visible {
+                        outline: 2px solid #6c47ff;
+                        outline-offset: 2px;
                       }
                     `}
                   >
