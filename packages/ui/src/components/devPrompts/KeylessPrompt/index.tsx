@@ -127,9 +127,9 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           padding: `${t.space.$2} ${t.space.$3}`,
           borderRadius: '1.25rem',
 
-          // Transition all morphing properties at same rate
+          // Transition all morphing properties at same rate - snappier timing
           transition:
-            'width 200ms ease-out, height 200ms ease-out, padding 200ms ease-out, border-radius 200ms ease-out, gap 200ms ease-out, background 200ms ease-out',
+            'width 150ms ease-out, height 150ms ease-out, padding 150ms ease-out, border-radius 150ms ease-out, gap 150ms ease-out, background 150ms ease-out',
 
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
@@ -316,8 +316,8 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             gap: t.space.$3,
             opacity: isForcedExpanded ? 1 : 0,
             // Fade in during expansion, finishing slightly after container completes
-            transition: 'opacity 250ms ease-out',
-            transitionDelay: isForcedExpanded ? '50ms' : '0ms',
+            transition: 'opacity 180ms ease-out',
+            transitionDelay: isForcedExpanded ? '30ms' : '0ms',
           })}
         >
           <div
