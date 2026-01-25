@@ -596,14 +596,14 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
             --foreground-secondary: #b4b4b4;
             --accent: #6c47ff;
             --offset: 1.25rem;
-            --width-expanded: 18rem;
-            --width-collapsed: 13rem;
+            --width-opened: 18rem;
+            --width-closed: 13rem;
             position: fixed;
             bottom: var(--offset);
             right: var(--offset);
             z-index: 999999;
             height: auto;
-            width: ${isOpen ? 'var(--width-expanded)' : 'var(--width-collapsed)'};
+            width: ${isOpen ? 'var(--width-opened)' : 'var(--width-closed)'};
             interpolate-size: allow-keywords;
             background:
               linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0) 100%), var(--background);
@@ -615,16 +615,13 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
               0px 16px 36px -6px rgba(0, 0, 0, 0.36),
               0px 6px 16px -2px rgba(0, 0, 0, 0.2);
             border-radius: ${isOpen ? '0.75rem' : '2.5rem'};
-            contain: layout style paint;
             isolation: isolate;
-            will-change: width, height, border-radius;
+            will-change: width, border-radius;
             transform: translateZ(0);
             backface-visibility: hidden;
             transition:
-              height ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'} var(--ease-bezier),
               width ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'} var(--ease-bezier),
-              border-radius var(--duration-open) var(--ease-bezier),
-              background ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'} var(--ease-bezier);
+              border-radius var(--duration-open) var(--ease-bezier);
             @media (prefers-reduced-motion: reduce) {
               transition: none;
             }
@@ -790,8 +787,6 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
             css={css`
               display: grid;
               grid-template-rows: ${isOpen ? '1fr' : '0fr'};
-              contain: layout style;
-              will-change: grid-template-rows;
               transition: grid-template-rows ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'}
                 var(--ease-bezier);
               @media (prefers-reduced-motion: reduce) {
@@ -805,11 +800,12 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
               css={css`
                 overflow: hidden;
                 min-height: 0;
+                mask-image: linear-gradient(to bottom, black calc(100% - 0.75rem), transparent);
               `}
             >
               <div
                 css={css`
-                  width: var(--width-expanded);
+                  width: var(--width-opened);
                   display: flex;
                   flex-direction: column;
                   padding: 0 0.75rem 0.75rem 0.75rem;
