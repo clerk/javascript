@@ -675,6 +675,7 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
               <svg
                 css={css`
                   --size: 1rem;
+                  flex-shrink: 0;
                   width: var(--size);
                   height: var(--size);
                   color: var(--foreground);
@@ -760,13 +761,17 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
               aria-hidden='true'
               css={css`
                 --size: 1rem;
+                flex-shrink: 0;
                 width: var(--size);
                 height: var(--size);
                 color: var(--foreground);
                 margin-inline-start: auto;
                 margin-inline-end: 0.75rem;
                 opacity: ${isOpen ? 0.6 : 0};
-                transition: opacity 120ms ease-out;
+                transform: translateX(${isOpen ? '0' : '0.75rem'});
+                transition:
+                  opacity 120ms ease-out,
+                  transform 200ms ease-out;
                 button:hover & {
                   opacity: ${isOpen ? 1 : 0};
                 }
@@ -811,8 +816,14 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
                   padding: 0 0.75rem 0.75rem 0.75rem;
                   gap: 0.75rem;
                   opacity: ${isOpen ? 1 : 0};
+                  filter: blur(${isOpen ? '0px' : '6px'});
                   transition-delay: ${isOpen ? '100ms' : '0ms'};
-                  transition: opacity ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'} var(--ease-bezier);
+                  transition:
+                    opacity ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'} var(--ease-bezier),
+                    filter ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'} var(--ease-bezier);
+                  @media (prefers-reduced-motion: reduce) {
+                    transition: none;
+                  }
                 `}
               >
                 <div
@@ -878,6 +889,7 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
                   </span>
                   <svg
                     css={css`
+                      flex-shrink: 0;
                       width: 0.625rem;
                       height: 0.625rem;
                       opacity: 0.6;
