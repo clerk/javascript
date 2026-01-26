@@ -235,6 +235,9 @@ const spacing = {
   96: '24rem',
 } as const;
 
+// Alpha helper (similar to Tailwind's /50 syntax)
+const alpha = (color: string, opacity: number) => `color-mix(in srgb, ${color} ${opacity}%, transparent)`;
+
 // Theme object
 export const mosaicTheme = {
   colors: {
@@ -256,6 +259,7 @@ export const mosaicTheme = {
   fontWeights,
   fontFamilies,
   spacing,
+  alpha,
 } as const;
 
 export type MosaicTheme = typeof mosaicTheme;

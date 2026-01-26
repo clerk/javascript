@@ -613,14 +613,19 @@ function KeylessPromptContent() {
           width: ${isOpen ? 'var(--width-opened)' : 'var(--width-closed)'};
           interpolate-size: allow-keywords;
           background:
-            linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0) 100%), var(--background);
+            linear-gradient(
+              180deg,
+              ${theme.alpha(theme.colors.white, 1)} 0%,
+              ${theme.alpha(theme.colors.white, 0)} 100%
+            ),
+            var(--background);
           box-shadow:
-            0px 0px 0px 0.5px #2f3037 inset,
-            0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset,
-            0px 0px 0.8px 0.8px rgba(255, 255, 255, 0.2) inset,
-            0px 0px 0px 0px rgba(255, 255, 255, 0.72),
-            0px 16px 36px -6px rgba(0, 0, 0, 0.36),
-            0px 6px 16px -2px rgba(0, 0, 0, 0.2);
+            0px 0px 0px 0.5px ${theme.colors.gray[1200]} inset,
+            0px 1px 0px 0px ${theme.alpha(theme.colors.white, 8)} inset,
+            0px 0px 0.8px 0.8px ${theme.alpha(theme.colors.white, 20)} inset,
+            0px 0px 0px 0px ${theme.alpha(theme.colors.white, 72)},
+            0px 16px 36px -6px ${theme.alpha(theme.colors.black, 36)},
+            0px 6px 16px -2px ${theme.alpha(theme.colors.black, 20)};
           border-radius: ${isOpen ? theme.spacing[3] : theme.spacing[10]};
           isolation: isolate;
           will-change: width, border-radius;
@@ -636,7 +641,7 @@ function KeylessPromptContent() {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 1) 46%, rgba(255, 255, 255, 0) 54%);
+            background: linear-gradient(180deg, ${theme.colors.white} 46%, ${theme.alpha(theme.colors.white, 0)} 54%);
             mix-blend-mode: overlay;
             border-radius: inherit;
             pointer-events: none;
@@ -867,16 +872,20 @@ function KeylessPromptContent() {
                   color: var(--foreground);
                   background: var(--accent);
                   box-shadow:
-                    rgb(255, 255, 255) 0px 0px 0px 0px,
+                    ${theme.colors.white} 0px 0px 0px 0px,
                     var(--accent) 0px 0px 0px 1px,
-                    rgba(255, 255, 255, 0.07) 0px 1px 0px 0px inset,
-                    rgba(33, 33, 38, 0.2) 0px 1px 3px 0px;
+                    ${theme.alpha(theme.colors.white, 7)} 0px 1px 0px 0px inset,
+                    ${theme.alpha(theme.colors.gray[1300], 20)} 0px 1px 3px 0px;
                   outline: none;
                   &::before {
                     content: '';
                     position: absolute;
                     inset: 0;
-                    background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 46%, rgba(255, 255, 255, 0) 54%);
+                    background: linear-gradient(
+                      180deg,
+                      ${theme.alpha(theme.colors.white, 16)} 46%,
+                      ${theme.alpha(theme.colors.white, 0)} 54%
+                    );
                     mix-blend-mode: overlay;
                     border-radius: inherit;
                   }
