@@ -844,6 +844,9 @@ function KeylessPromptContent() {
                   color: 'var(--foreground-secondary)',
                   fontSize: theme.typography.body[3].fontSize,
                   lineHeight: theme.typography.body[3].lineHeight,
+                  '& > p': {
+                    textBoxTrim: 'trim-both',
+                  },
                 }}
               >
                 <p>Temporary API keys are enabled so you can get started immediately.</p>
