@@ -685,13 +685,11 @@ function KeylessPromptContent() {
             `}
           >
             <svg
-              css={css`
-                --size: ${theme.spacing[4]};
-                flex-shrink: 0;
-                width: var(--size);
-                height: var(--size);
-                color: var(--foreground);
-              `}
+              css={{
+                ...theme.size(theme.spacing[4]),
+                flexShrink: 0,
+                color: 'var(--foreground)',
+              }}
               viewBox='0 0 128 128'
               fill='none'
               aria-hidden
@@ -772,10 +770,9 @@ function KeylessPromptContent() {
             fill='none'
             aria-hidden='true'
             css={css`
-              --size: ${theme.spacing[4]};
               flex-shrink: 0;
-              width: var(--size);
-              height: var(--size);
+              width: ${theme.spacing[4]};
+              height: ${theme.spacing[4]};
               color: var(--foreground);
               margin-inline-start: auto;
               margin-inline-end: ${theme.spacing[3]};
@@ -839,14 +836,12 @@ function KeylessPromptContent() {
               `}
             >
               <div
-                css={css`
-                  display: flex;
-                  flex-direction: column;
-                  gap: ${theme.spacing[2]};
-                  color: var(--foreground-secondary);
-                  font-size: ${theme.typography.body[3].fontSize};
-                  line-height: ${theme.typography.body[3].lineHeight};
-                `}
+                css={{
+                  ...theme.stack(theme.spacing[2]),
+                  color: 'var(--foreground-secondary)',
+                  fontSize: theme.typography.body[3].fontSize,
+                  lineHeight: theme.typography.body[3].lineHeight,
+                }}
               >
                 <p>Temporary API keys are enabled so you can get started immediately.</p>
                 <p>
@@ -904,15 +899,13 @@ function KeylessPromptContent() {
                   Claim application
                 </span>
                 <svg
-                  css={css`
-                    flex-shrink: 0;
-                    width: ${theme.spacing[2.5]};
-                    height: ${theme.spacing[2.5]};
-                    opacity: 0.6;
-                  `}
+                  css={{
+                    ...theme.size(theme.spacing[2.5]),
+                    flexShrink: 0,
+                    opacity: 0.6,
+                  }}
                   viewBox='0 0 10 10'
                   aria-hidden='true'
-                  className=''
                 >
                   <path
                     fill='currentColor'

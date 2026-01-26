@@ -235,10 +235,43 @@ const spacing = {
   96: '24rem',
 } as const;
 
-// Alpha helper (similar to Tailwind's /50 syntax)
 const alpha = (color: string, opacity: number) => `color-mix(in srgb, ${color} ${opacity}%, transparent)`;
 
-// Theme object
+const negative = (value: string) => `-${value}`;
+
+const size = (value: string) => ({
+  width: value,
+  height: value,
+});
+
+const stack = (gap: string) =>
+  ({
+    display: 'flex',
+    flexDirection: 'column',
+    gap,
+  }) as const;
+
+const inline = (gap: string) =>
+  ({
+    display: 'flex',
+    alignItems: 'center',
+    gap,
+  }) as const;
+
+const truncate = (lines?: number) =>
+  lines === undefined || lines === 1
+    ? ({
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      } as const)
+    : ({
+        display: '-webkit-box',
+        WebkitLineClamp: lines,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+      } as const);
+
 export const mosaicTheme = {
   colors: {
     gray,
@@ -260,6 +293,11 @@ export const mosaicTheme = {
   fontFamilies,
   spacing,
   alpha,
+  negative,
+  size,
+  stack,
+  inline,
+  truncate,
 } as const;
 
 export type MosaicTheme = typeof mosaicTheme;
