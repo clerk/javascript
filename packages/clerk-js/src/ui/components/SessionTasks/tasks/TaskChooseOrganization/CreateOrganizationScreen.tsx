@@ -1,5 +1,9 @@
 import { useOrganizationList } from '@clerk/shared/react';
-import type { CreateOrganizationParams, OrganizationCreationDefaultsResource } from '@clerk/shared/types';
+import type {
+  CreateOrganizationParams,
+  OrganizationCreationDefaultsResource,
+  OrganizationResource,
+} from '@clerk/shared/types';
 import { useState } from 'react';
 
 import { OrganizationProfileAvatarUploader } from '@/ui/components/OrganizationProfile/OrganizationProfileAvatarUploader';
@@ -64,14 +68,9 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
 
       const organization = await createOrganization(createOrgParams);
 
-      if (file) {
-        await organization.setLogo({ file });
-      } else if (defaultLogoUrl) {
-        const response = await fetch(defaultLogoUrl);
-        const blob = await response.blob();
-        const logoFile = new File([blob], 'logo', { type: blob.type });
-        await organization.setLogo({ file: logoFile });
-      }
+      // If setting the logo fails, we still want to set the active organization
+      const uploadOrganizationLogoPromise = uploadOrganizationLogo(organization);
+      await Promise.allSettled([uploadOrganizationLogoPromise]);
 
       await setActive({
         organization,
@@ -81,6 +80,17 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
       });
     } catch (err) {
       handleError(err, [nameField, slugField], card.setError);
+    }
+  };
+
+  const uploadOrganizationLogo = async (organization: OrganizationResource) => {
+    if (file) {
+      await organization.setLogo({ file });
+    } else if (defaultLogoUrl) {
+      const response = await fetch(defaultLogoUrl);
+      const blob = await response.blob();
+      const logoFile = new File([blob], 'logo', { type: blob.type });
+      await organization.setLogo({ file: logoFile });
     }
   };
 

@@ -1022,6 +1022,10 @@ export type HandleOAuthCallbackParams = TransferableOption &
      * The underlying resource to optionally reload before processing an OAuth callback.
      */
     reloadResource?: 'signIn' | 'signUp';
+    /**
+     * Additional arbitrary metadata to be stored alongside the User object when a sign-up transfer occurs.
+     */
+    unsafeMetadata?: SignUpUnsafeMetadata;
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;

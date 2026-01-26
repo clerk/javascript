@@ -1,5 +1,23 @@
 # Change Log
 
+## 3.43.2
+
+### Patch Changes
+
+- Fix `unsafeMetadata` being lost when users are transferred between sign-in and sign-up flows during OAuth/SSO authentication ([#7647](https://github.com/clerk/javascript/pull/7647)) by [@tmilewski](https://github.com/tmilewski)
+
+## 3.43.1
+
+### Patch Changes
+
+- Fix prototype pollution vulnerability in `fastDeepMergeAndReplace` and `fastDeepMergeAndKeep` utilities by blocking dangerous keys (`__proto__`, `constructor`, `prototype`) during object merging. ([#7625](https://github.com/clerk/javascript/pull/7625)) by [@jacekradko](https://github.com/jacekradko)
+
+## 3.43.0
+
+### Minor Changes
+
+- Surface organization creation defaults with prefilled form fields and advisory warnings ([#7603](https://github.com/clerk/javascript/pull/7603)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 3.42.0
 
 ### Minor Changes

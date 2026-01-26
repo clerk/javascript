@@ -25,6 +25,7 @@ type HandleCombinedFlowTransferProps = {
   passwordEnabled: boolean;
   alternativePhoneCodeChannel?: PhoneCodeChannel | null;
   navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
+  unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
 /**
@@ -45,6 +46,7 @@ export function handleCombinedFlowTransfer({
   passwordEnabled,
   navigateOnSetActive,
   alternativePhoneCodeChannel,
+  unsafeMetadata,
 }: HandleCombinedFlowTransferProps): Promise<unknown> | void {
   if (signUpMode === SIGN_UP_MODES.WAITLIST) {
     const waitlistUrl = clerk.buildWaitlistUrl(
@@ -85,6 +87,7 @@ export function handleCombinedFlowTransfer({
       .create({
         [identifierAttribute]: identifierValue,
         ...alternativePhoneCodeChannelParams,
+        unsafeMetadata,
       })
       .then(async res => {
         const completeSignUpFlow = await lazyCompleteSignUpFlow();
