@@ -15,6 +15,8 @@ export interface ClientResource extends ClerkResource {
   destroy: () => Promise<void>;
   removeSessions: () => Promise<ClientResource>;
   clearCache: () => void;
+  resetSignIn: () => void;
+  resetSignUp: () => void;
   isEligibleForTouch: () => boolean;
   buildTouchUrl: (params: { redirectUrl: URL }) => string;
   lastActiveSessionId: string | null;

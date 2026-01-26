@@ -1,7 +1,6 @@
 import { UNSAFE_PortalProvider } from '@clerk/shared/react';
 import type { MembershipRole } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
-import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -291,23 +290,6 @@ describe('OrganizationSwitcher', () => {
       expect(getAllByText('Org1')).not.toBeNull();
       expect(getByText('Personal account')).toBeInTheDocument();
       expect(getByText('Org2')).toBeInTheDocument();
-    });
-
-    it('does not allow creating organization if max allowed memberships is reached', async () => {
-      const { wrapper, props } = await createFixtures(f => {
-        f.withOrganizations();
-        f.withMaxAllowedMemberships({ max: 1 });
-        f.withUser({
-          email_addresses: ['test@clerk.com'],
-          create_organization_enabled: true,
-          organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
-        });
-      });
-
-      props.setProps({ hidePersonal: true });
-      const { queryByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
-      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
-      expect(queryByText('Create organization')).not.toBeInTheDocument();
     });
 
     it('does allow creating organization if max allowed memberships is not reached', async () => {

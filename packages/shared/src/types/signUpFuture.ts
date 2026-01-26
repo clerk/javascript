@@ -384,11 +384,11 @@ export interface SignUpFutureResource {
   readonly locale: string | null;
 
   /**
-   * Indicates that the sign-up has been finalized.
+   * Indicates that the sign-up can be discarded (has been finalized or explicitly reset).
    *
    * @internal
    */
-  readonly hasBeenFinalized: boolean;
+  readonly canBeDiscarded: boolean;
 
   /**
    * Creates a new `SignUp` instance initialized with the provided parameters. The instance maintains the sign-up
@@ -463,4 +463,14 @@ export interface SignUpFutureResource {
    * session state (such as the `useUser()` hook) to update automatically.
    */
   finalize: (params?: SignUpFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Resets the current sign-up attempt by clearing all local state back to null.
+   * This is useful when you want to allow users to go back to the beginning of
+   * the sign-up flow (e.g., to change their email address during verification).
+   *
+   * Unlike other methods, `reset()` does not trigger the `fetchStatus` to change
+   * to `'fetching'` and does not make any API calls - it only clears local state.
+   */
+  reset: () => Promise<{ error: ClerkError | null }>;
 }
