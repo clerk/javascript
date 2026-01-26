@@ -11,7 +11,7 @@ import { unauthorized } from '../../server/nextErrors';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData } from '../../server/utils';
-import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
+import { isNext16OrHigher, isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { buildRequestLike } from './utils';
 
 /**
@@ -81,7 +81,8 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
 
     try {
       const isSrcAppDir = await import('../../server/fs/middleware-location.js').then(m => m.hasSrcAppDir());
-      return [`Your Middleware exists at ./${isSrcAppDir ? 'src/' : ''}middleware.(ts|js)`];
+      const fileName = isNext16OrHigher ? 'middleware.(ts|js) or proxy.(ts|js)' : 'middleware.(ts|js)';
+      return [`Your Middleware exists at ./${isSrcAppDir ? 'src/' : ''}${fileName}`];
     } catch {
       return [];
     }
