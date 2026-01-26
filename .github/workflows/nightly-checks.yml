@@ -74,6 +74,27 @@ jobs:
           E2E_REACT_VERSION: "19.2.3"
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
 
+      # Print error logs for immediate visibility in CI
+      - name: Print App Error Logs
+        if: steps.integration_tests.outputs.exit_code != '0'
+        run: |
+          echo "=== Integration Test Failed ==="
+          echo ""
+          echo "=== App Error Logs (.err.log files) ==="
+          # Integration tests use os.tmpdir() which is /tmp on Linux
+          find /tmp/.temp_integration -name "*.err.log" -type f 2>/dev/null | while read f; do
+            echo ""
+            echo "--- $f ---"
+            tail -100 "$f" 2>/dev/null || echo "(empty or not readable)"
+          done
+          echo ""
+          echo "=== App Stdout Logs (last 50 lines each) ==="
+          find /tmp/.temp_integration -name "e2e.*.log" -type f 2>/dev/null | while read f; do
+            echo ""
+            echo "--- $f ---"
+            tail -50 "$f" 2>/dev/null || echo "(empty or not readable)"
+          done
+
       # Upload test artifacts if tests failed
       - name: Upload Test Artifacts
         if: steps.integration_tests.outputs.exit_code != '0'
@@ -82,10 +103,8 @@ jobs:
           name: test-artifacts-${{ matrix.test-name }}
           path: |
             ${{runner.temp}}/test-output.log
+            /tmp/.temp_integration/
             integration/test-results/
-            integration/.next/
-            ${{runner.temp}}/clerk-js/node_modules/
-            ${{runner.temp}}/clerk-ui/node_modules/
           retention-days: 7
 
       - name: Report Status
