@@ -146,7 +146,7 @@ function SignUpStartInternal(): JSX.Element {
     status.setLoading();
     card.setLoading();
     signUp
-      .create({ strategy: 'ticket', ticket: formState.ticket.value })
+      .create({ strategy: 'ticket', ticket: formState.ticket.value, unsafeMetadata })
       .then(signUp => {
         formState.emailAddress.setValue(signUp.emailAddress || '');
         // In case we are in a Ticket flow and the sign up is not complete yet, update the state

@@ -897,6 +897,10 @@ export const jaJP: LocalizationResource = {
       actionLink: 'サインアウト',
       actionText: '{{identifier}} としてサインイン中',
     },
+    alerts: {
+      organizationAlreadyExists:
+        '検出された会社名 ({{organizationName}}) と {{organizationDomain}} の組織がすでに存在します。招待を通じて参加してください。',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

@@ -886,6 +886,10 @@ export const trTR: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Tespit edilen şirket adı ({{organizationName}}) ve {{organizationDomain}} için bir organizasyon zaten mevcut. Davetiye ile katılın.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,
