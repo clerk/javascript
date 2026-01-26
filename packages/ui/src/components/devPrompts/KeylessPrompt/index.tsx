@@ -686,7 +686,8 @@ function KeylessPromptContent() {
           >
             <svg
               css={{
-                ...theme.size(theme.spacing[4]),
+                width: theme.spacing[4],
+                height: theme.spacing[4],
                 flexShrink: 0,
                 color: 'var(--foreground)',
               }}
@@ -837,7 +838,9 @@ function KeylessPromptContent() {
             >
               <div
                 css={{
-                  ...theme.stack(theme.spacing[2]),
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: theme.spacing[2],
                   color: 'var(--foreground-secondary)',
                   fontSize: theme.typography.body[3].fontSize,
                   lineHeight: theme.typography.body[3].lineHeight,
@@ -900,7 +903,8 @@ function KeylessPromptContent() {
                 </span>
                 <svg
                   css={{
-                    ...theme.size(theme.spacing[2.5]),
+                    width: theme.spacing[2.5],
+                    height: theme.spacing[2.5],
                     flexShrink: 0,
                     opacity: 0.6,
                   }}

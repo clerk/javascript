@@ -236,41 +236,7 @@ const spacing = {
 } as const;
 
 const alpha = (color: string, opacity: number) => `color-mix(in srgb, ${color} ${opacity}%, transparent)`;
-
 const negative = (value: string) => `-${value}`;
-
-const size = (value: string) => ({
-  width: value,
-  height: value,
-});
-
-const stack = (gap: string) =>
-  ({
-    display: 'flex',
-    flexDirection: 'column',
-    gap,
-  }) as const;
-
-const inline = (gap: string) =>
-  ({
-    display: 'flex',
-    alignItems: 'center',
-    gap,
-  }) as const;
-
-const truncate = (lines?: number) =>
-  lines === undefined || lines === 1
-    ? ({
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      } as const)
-    : ({
-        display: '-webkit-box',
-        WebkitLineClamp: lines,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden',
-      } as const);
 
 export const mosaicTheme = {
   colors: {
@@ -294,10 +260,6 @@ export const mosaicTheme = {
   spacing,
   alpha,
   negative,
-  size,
-  stack,
-  inline,
-  truncate,
 } as const;
 
 export type MosaicTheme = typeof mosaicTheme;
