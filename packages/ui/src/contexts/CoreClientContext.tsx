@@ -1,16 +1,22 @@
-import { assertContextExists, useClientContext } from '@clerk/shared/react';
+import { useClientContext } from '@clerk/shared/react';
 import type { SignInResource, SignUpResource } from '@clerk/shared/types';
 
 export function useCoreSignIn(): SignInResource {
-  const ctx = useClientContext();
-  // TODO: useClientContext doesn't actually rely on a context anymore, so we should update this message
-  assertContextExists(ctx, 'ClientContext');
-  return ctx.signIn;
+  const client = useClientContext();
+  if (!client) {
+    throw new Error(
+      'Client must be defined before calling useCoreSignIn. This is a bug in Clerk, please report it to support@clerk.com',
+    );
+  }
+  return client.signIn;
 }
 
 export function useCoreSignUp(): SignUpResource {
-  const ctx = useClientContext();
-  // TODO: useClientContext doesn't actually rely on a context anymore, so we should update this message
-  assertContextExists(ctx, 'ClientContext');
-  return ctx.signUp;
+  const client = useClientContext();
+  if (!client) {
+    throw new Error(
+      'Client must be defined before calling useCoreSignUp. This is a bug in Clerk, please report it to support@clerk.com',
+    );
+  }
+  return client.signUp;
 }
