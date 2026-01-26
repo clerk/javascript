@@ -23,6 +23,15 @@ const [InitialStateContext, _useInitialStateContext] = createContextAndHook<Init
   'InitialStateContext',
 );
 
+/**
+ * Provides initial Clerk state (session, user, organization data) from server-side rendering
+ * to child components via React context.
+ *
+ * The initialState is snapshotted on mount and cannot change during the component lifecycle.
+ *
+ * Note that different parts of the React tree can use separate InitialStateProvider instances
+ * with different initialState values if needed.
+ */
 export function InitialStateProvider({
   children,
   initialState,
