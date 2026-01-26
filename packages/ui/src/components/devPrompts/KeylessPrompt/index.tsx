@@ -778,10 +778,10 @@ function KeylessPromptContent() {
               margin-inline-start: auto;
               margin-inline-end: ${theme.spacing[3]};
               opacity: ${isOpen ? 0.6 : 0};
-              transform: translateX(${isOpen ? '0' : theme.spacing[3]});
+              transform: translateX(${isOpen ? '0' : theme.spacing[6]});
               transition:
                 opacity 120ms ease-out,
-                transform 200ms ease-out;
+                transform ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'} ease-out;
               button:hover & {
                 opacity: ${isOpen ? 1 : 0};
               }
