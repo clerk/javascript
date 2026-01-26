@@ -146,7 +146,7 @@ function SignUpStartInternal(): JSX.Element {
     status.setLoading();
     card.setLoading();
     signUp
-      .create({ strategy: 'ticket', ticket: formState.ticket.value })
+      .create({ strategy: 'ticket', ticket: formState.ticket.value, unsafeMetadata })
       .then(signUp => {
         formState.emailAddress.setValue(signUp.emailAddress || '');
         // In case we are in a Ticket flow and the sign up is not complete yet, update the state
@@ -378,7 +378,13 @@ function SignUpStartInternal(): JSX.Element {
   }
 
   const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
-  const visibleFields = Object.entries(fields).filter(([_, opts]) => showOptionalFields || opts?.required);
+  const visibleFields = Object.entries(fields).filter(([key, opts]) => {
+    // In case both email & phone are optional (emailOrPhone case), always show the active identifier
+    if ((key === 'emailAddress' || key === 'phoneNumber') && canToggleEmailPhone) {
+      return !!opts;
+    }
+    return showOptionalFields || opts?.required;
+  });
   const shouldShowForm = showFormFields(userSettings) && visibleFields.length > 0;
 
   const showOauthProviders =

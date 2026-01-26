@@ -76,7 +76,7 @@ const useCache = <K = any, V = any>(
 };
 
 /**
- * An in-house simpler alternative to useSWR
+ * A simple data fetching hook with caching support.
  * @param fetcher If fetcher is undefined no action will be performed
  * @param params
  * @param options

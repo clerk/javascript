@@ -872,6 +872,10 @@ export const zhCN: LocalizationResource = {
       actionLink: '退出',
       actionText: '已登录为 {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        '检测到的公司名称 ({{organizationName}}) 和 {{organizationDomain}} 已存在一个组织。请通过邀请加入。',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

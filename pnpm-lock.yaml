@@ -481,8 +481,8 @@ importers:
         specifier: catalog:repo
         version: 0.5.17
       '@tanstack/query-core':
-        specifier: 5.87.4
-        version: 5.87.4
+        specifier: 5.90.16
+        version: 5.90.16
       '@wallet-standard/core':
         specifier: catalog:module-manager
         version: 1.1.1
@@ -514,6 +514,9 @@ importers:
       '@clerk/testing':
         specifier: workspace:^
         version: link:../testing
+      '@emotion/react':
+        specifier: 11.11.1
+        version: 11.11.1(@types/react@18.3.26)(react@18.3.1)
       '@rsdoctor/rspack-plugin':
         specifier: ^0.4.13
         version: 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
@@ -797,6 +800,12 @@ importers:
       '@types/semver':
         specifier: ^7.7.1
         version: 7.7.1
+      semver:
+        specifier: ^7.7.1
+        version: 7.7.3
+      yaml:
+        specifier: ^2.8.0
+        version: 2.8.1
 
   packages/react-router:
     dependencies:
@@ -834,6 +843,9 @@ importers:
 
   packages/shared:
     dependencies:
+      '@tanstack/query-core':
+        specifier: 5.90.16
+        version: 5.90.16
       dequal:
         specifier: 2.0.3
         version: 2.0.3
@@ -852,9 +864,6 @@ importers:
       std-env:
         specifier: ^3.9.0
         version: 3.10.0
-      swr:
-        specifier: 2.3.4
-        version: 2.3.4(react@18.3.1)
     devDependencies:
       '@base-org/account':
         specifier: catalog:module-manager
@@ -877,9 +886,6 @@ importers:
       '@stripe/stripe-js':
         specifier: 5.6.0
         version: 5.6.0
-      '@tanstack/query-core':
-        specifier: 5.87.4
-        version: 5.87.4
       '@types/glob-to-regexp':
         specifier: 0.4.4
         version: 0.4.4
@@ -1008,13 +1014,13 @@ importers:
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
-      swr:
-        specifier: 2.3.4
-        version: 2.3.4(react@18.3.1)
     devDependencies:
       '@floating-ui/react-dom':
         specifier: ^2.1.6
         version: 2.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@rsdoctor/rspack-plugin':
+        specifier: ^0.4.13
+        version: 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
       '@rspack/cli':
         specifier: ^1.6.0
         version: 1.6.1(@rspack/core@1.6.1(@swc/helpers@0.5.17))(@types/express@4.17.25)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
@@ -4915,8 +4921,8 @@ packages:
     resolution: {integrity: sha512-GG2R9I6QSlbNR9fEuX2sQCigY6K28w51h2634TWmkaHXlzQw+rWuIWr4nAGM9doA+kWRi1LFSFMvAiG3cOqjXQ==}
     engines: {node: '>=12'}
 
-  '@tanstack/query-core@5.87.4':
-    resolution: {integrity: sha512-uNsg6zMxraEPDVO2Bn+F3/ctHi+Zsk+MMpcN8h6P7ozqD088F6mFY5TfGM7zuyIrL7HKpDyu6QHfLWiDxh3cuw==}
+  '@tanstack/query-core@5.90.16':
+    resolution: {integrity: sha512-MvtWckSVufs/ja463/K4PyJeqT+HMlJWtw6PrCpywznd2NSgO3m4KwO9RqbFqGg6iDE8vVMFWMeQI4Io3eEYww==}
 
   '@tanstack/react-router@1.132.0':
     resolution: {integrity: sha512-tGNmQrFc4zWQZvjqYnC8ib84H/9QokRl73hr0P2XlxCY2KAgPTk2QjdzW03LqXgQZRXg7++vKznJt4LS9/M3iA==}
@@ -20418,7 +20424,7 @@ snapshots:
 
   '@tanstack/history@1.132.0': {}
 
-  '@tanstack/query-core@5.87.4': {}
+  '@tanstack/query-core@5.90.16': {}
 
   '@tanstack/react-router@1.132.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
