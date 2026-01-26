@@ -596,6 +596,71 @@ describe('SignUp', () => {
       });
     });
 
+    describe('password', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.unstubAllGlobals();
+      });
+
+      it('creates signup with password when no existing signup', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.password({ password: 'test-password-123' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'password',
+              password: 'test-password-123',
+            }),
+          }),
+        );
+      });
+
+      it('updates existing signup when already created', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.password({ password: 'test-password-123' });
+
+        // Should use PATCH to update existing signup, not POST to create a new one
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'PATCH',
+            path: '/client/sign_ups/signup_123',
+            body: expect.objectContaining({
+              strategy: 'password',
+              password: 'test-password-123',
+            }),
+          }),
+        );
+      });
+
+      it('returns error property on success', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        const result = await signUp.__internal_future.password({ password: 'test-password-123' });
+
+        expect(result).toHaveProperty('error', null);
+      });
+    });
+
     describe('ticket', () => {
       afterEach(() => {
         vi.clearAllMocks();

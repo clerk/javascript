@@ -766,7 +766,11 @@ class SignUpFuture implements SignUpFutureResource {
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
-      await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
+      if (this.#resource.id) {
+        await this.#resource.__internal_basePatch({ body });
+      } else {
+        await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
+      }
     });
   }
 
