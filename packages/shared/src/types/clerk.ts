@@ -1093,7 +1093,12 @@ export type ClerkOptions = ClerkOptionsNavigation &
       version?: string;
       url?: string;
       ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
-      __internal_forceBundledUI?: boolean;
+      /**
+       * @internal
+       * Prefer loading UI from CDN even when ClerkUI is provided.
+       * Used internally by SDKs that have bundling issues with the UI (e.g., Next.js).
+       */
+      __internal_preferCDN?: boolean;
     };
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
@@ -2460,10 +2465,10 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
     ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
     /**
      * @internal
-     * Force using the bundled UI constructor instead of loading from CDN.
-     * Used internally by SDKs that must bundle the UI (e.g., Chrome Extension).
+     * Prefer loading UI from CDN even when ClerkUI is provided.
+     * Used internally by SDKs that have bundling issues with the UI (e.g., Next.js).
      */
-    __internal_forceBundledUI?: boolean;
+    __internal_preferCDN?: boolean;
   };
 } & MultiDomainAndOrProxy;
 

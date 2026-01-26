@@ -7,6 +7,8 @@ import type { NextClerkProviderProps } from '../types';
 export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, 'children'>): any => {
   return {
     ...props,
+    // Next.js has bundling issues with ClerkUI, so prefer CDN loading
+    ui: props.ui ? { ...props.ui, __internal_preferCDN: true } : undefined,
     publishableKey: props.publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',
     clerkJSUrl: props.clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS_URL,
     clerkUIUrl: (props as any).clerkUIUrl || process.env.NEXT_PUBLIC_CLERK_UI_URL,

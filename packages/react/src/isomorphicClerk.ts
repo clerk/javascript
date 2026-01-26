@@ -471,7 +471,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
           ui: {
             version: this.options.ui?.version,
             url: this.options.ui?.url,
-            __internal_forceBundledUI: this.options.ui?.__internal_forceBundledUI,
+            __internal_preferCDN: this.options.ui?.__internal_preferCDN,
             ClerkUI,
           },
         });
@@ -517,12 +517,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   private async getClerkUiEntryChunk(): Promise<ClerkUIConstructor> {
-    // Use bundled UI constructor if forced (e.g., Chrome Extension) and ui.ClerkUI is available
-    if (this.options.ui?.__internal_forceBundledUI && this.options.ui.ClerkUI) {
+    // Use bundled UI constructor if available, unless CDN is preferred (e.g., Next.js has bundling issues)
+    if (this.options.ui?.ClerkUI && !this.options.ui.__internal_preferCDN) {
       return this.options.ui.ClerkUI;
     }
 
-    // Default: load from CDN, using ui.version if available for version pinning
+    // Load from CDN, using ui.version if available for version pinning
     await loadClerkUiScript({
       ...this.options,
       clerkUIVersion: this.options.ui?.version,

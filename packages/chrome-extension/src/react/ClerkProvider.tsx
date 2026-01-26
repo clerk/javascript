@@ -32,14 +32,11 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ChromeExtensionClerkPr
     return null;
   }
 
-  // Chrome extension must use bundled UI (no CDN access in extensions)
-  const bundledUi = { ...ui, __internal_forceBundledUI: true } as typeof ui;
-
   return (
     <ClerkReactProvider
       {...(rest as any)}
       Clerk={clerkInstance}
-      ui={bundledUi}
+      ui={ui}
       standardBrowser={!syncHost}
     >
       {children}
