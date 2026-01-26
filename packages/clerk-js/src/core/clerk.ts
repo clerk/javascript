@@ -97,6 +97,8 @@ import type {
   RedirectOptions,
   Resources,
   SDKMetadata,
+  SelectOrganizationOptions,
+  SelectSessionOptions,
   SessionResource,
   SetActiveParams,
   SignedInSessionResource,
@@ -297,7 +299,7 @@ export class Clerk implements ClerkInterface {
   public __internal_isWebAuthnAutofillSupported: (() => Promise<boolean>) | undefined;
   public __internal_isWebAuthnPlatformAuthenticatorSupported: (() => Promise<boolean>) | undefined;
 
-  public __internal_setActiveInProgress = false;
+  public __internal_selectSessionInProgress = false;
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -583,13 +585,13 @@ export class Clerk implements ClerkInterface {
     }
 
     const onBeforeSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__internal_onBeforeSetActive === 'function'
-        ? window.__internal_onBeforeSetActive
+      typeof window !== 'undefined' && typeof window.__internal_onBeforeSelectSession === 'function'
+        ? window.__internal_onBeforeSelectSession
         : noop;
 
     const onAfterSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__internal_onAfterSetActive === 'function'
-        ? window.__internal_onAfterSetActive
+      typeof window !== 'undefined' && typeof window.__internal_onAfterSelectSession === 'function'
+        ? window.__internal_onAfterSelectSession
         : noop;
 
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
@@ -1446,7 +1448,7 @@ export class Clerk implements ClerkInterface {
   public setActive = async (params: SetActiveParams): Promise<void> => {
     const { organization, redirectUrl, navigate: setActiveNavigate } = params;
     let { session } = params;
-    this.__internal_setActiveInProgress = true;
+    this.__internal_selectSessionInProgress = true;
     debugLogger.debug(
       'setActive() start',
       {
@@ -1476,13 +1478,13 @@ export class Clerk implements ClerkInterface {
       }
 
       const onBeforeSetActive: SetActiveHook =
-        typeof window !== 'undefined' && typeof window.__internal_onBeforeSetActive === 'function'
-          ? window.__internal_onBeforeSetActive
+        typeof window !== 'undefined' && typeof window.__internal_onBeforeSelectSession === 'function'
+          ? window.__internal_onBeforeSelectSession
           : noop;
 
       const onAfterSetActive: SetActiveHook =
-        typeof window !== 'undefined' && typeof window.__internal_onAfterSetActive === 'function'
-          ? window.__internal_onAfterSetActive
+        typeof window !== 'undefined' && typeof window.__internal_onAfterSelectSession === 'function'
+          ? window.__internal_onAfterSelectSession
           : noop;
 
       let newSession = session === undefined ? this.session : session;
@@ -1605,8 +1607,77 @@ export class Clerk implements ClerkInterface {
         await onAfterSetActive();
       }
     } finally {
-      this.__internal_setActiveInProgress = false;
+      this.__internal_selectSessionInProgress = false;
     }
+  };
+
+  /**
+   * Select a session to make active.
+   *
+   * Use this method after sign-in or sign-up to activate the created session,
+   * or to switch between sessions in a multi-session application.
+   *
+   * Pass `null` to sign out and clear the active session.
+   */
+  public selectSession = async (
+    session: SignedInSessionResource | string | null,
+    options?: SelectSessionOptions,
+  ): Promise<void> => {
+    const { navigate, redirectUrl } = options ?? {};
+
+    // Convert navigate callback to setActive format if provided
+    const setActiveNavigate = navigate
+      ? async ({ session: s }: { session: SessionResource }) => {
+          const result = await navigate({ session: s });
+          if (typeof result === 'string') {
+            await this.navigate(result);
+          }
+        }
+      : undefined;
+
+    return this.setActive({
+      session,
+      navigate: setActiveNavigate,
+      redirectUrl,
+    });
+  };
+
+  /**
+   * Select an organization to make active within the current session.
+   *
+   * Use this method to switch between organizations or to select a personal workspace.
+   *
+   * Pass `null` to switch to the personal workspace (no active organization).
+   */
+  public selectOrganization = async (
+    organization: OrganizationResource | string | null,
+    options?: SelectOrganizationOptions,
+  ): Promise<void> => {
+    const { navigate, redirectUrl } = options ?? {};
+
+    // Convert navigate callback to setActive format if provided
+    const setActiveNavigate = navigate
+      ? async ({ session }: { session: SessionResource }) => {
+          // Resolve the organization for the callback
+          const org =
+            organization === null
+              ? null
+              : typeof organization === 'string'
+                ? (this.organization ?? null)
+                : organization;
+
+          const result = await navigate({ session, organization: org });
+          if (typeof result === 'string') {
+            await this.navigate(result);
+          }
+        }
+      : undefined;
+
+    return this.setActive({
+      organization,
+      navigate: setActiveNavigate,
+      redirectUrl,
+    });
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
@@ -2617,8 +2688,8 @@ export class Clerk implements ClerkInterface {
       const hasTransitionedToPendingStatus = this.session.status === 'active' && session?.status === 'pending';
       if (hasTransitionedToPendingStatus) {
         const onAfterSetActive: SetActiveHook =
-          typeof window !== 'undefined' && typeof window.__internal_onAfterSetActive === 'function'
-            ? window.__internal_onAfterSetActive
+          typeof window !== 'undefined' && typeof window.__internal_onAfterSelectSession === 'function'
+            ? window.__internal_onAfterSelectSession
             : noop;
 
         // Execute hooks to update server authentication context and trigger

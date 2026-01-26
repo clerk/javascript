@@ -17,7 +17,7 @@ export const MembershipPreview = (props: { organization: OrganizationResource })
   const card = useCardState();
   const { navigateAfterSelectOrganization } = useOrganizationListContext();
   const { t } = useLocalizations();
-  const { isLoaded, setActive } = useOrganizationList();
+  const { isLoaded, selectOrganization } = useOrganizationList();
 
   if (!isLoaded) {
     return null;
@@ -26,9 +26,7 @@ export const MembershipPreview = (props: { organization: OrganizationResource })
   const handleOrganizationClicked = (organization: OrganizationResource) => {
     return card.runAsync(async () => {
       try {
-        await setActive({
-          organization,
-        });
+        await selectOrganization(organization);
 
         await navigateAfterSelectOrganization(organization);
       } catch (err: any) {
@@ -75,7 +73,7 @@ export const MembershipPreview = (props: { organization: OrganizationResource })
 export const PersonalAccountPreview = withCardStateProvider(() => {
   const card = useCardState();
   const { hidePersonal, navigateAfterSelectPersonal } = useOrganizationListContext();
-  const { isLoaded, setActive } = useOrganizationList();
+  const { isLoaded, selectOrganization } = useOrganizationList();
   const { user } = useUser();
 
   if (!user) {
@@ -89,9 +87,7 @@ export const PersonalAccountPreview = withCardStateProvider(() => {
       return;
     }
     return card.runAsync(async () => {
-      await setActive({
-        organization: null,
-      });
+      await selectOrganization(null);
 
       await navigateAfterSelectPersonal(user);
     });

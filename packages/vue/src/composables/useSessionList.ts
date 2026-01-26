@@ -36,14 +36,14 @@ export const useSessionList: UseSessionList = () => {
 
   const result = computed<UseSessionListReturn>(() => {
     if (!clientCtx.value) {
-      return { isLoaded: false, sessions: undefined, setActive: undefined };
+      return { isLoaded: false, sessions: undefined, selectSession: undefined };
     }
 
     return {
       isLoaded: true,
       sessions: clientCtx.value.sessions,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      setActive: clerk.value!.setActive,
+      selectSession: clerk.value!.selectSession,
     };
   });
 

@@ -7,7 +7,7 @@ import type {
   OrganizationMembershipResource,
   OrganizationResource,
   OrganizationSuggestionResource,
-  SetActive,
+  SelectOrganizationOptions,
   UserOrganizationInvitationResource,
 } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
@@ -84,9 +84,9 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
        */
       createOrganization: undefined;
       /**
-       * A function that sets the active session and/or Organization.
+       * A function that selects an organization to make active within the current session.
        */
-      setActive: undefined;
+      selectOrganization: undefined;
       /**
        * Returns `PaginatedResources` which includes a list of the user's Organization memberships.
        */
@@ -103,7 +103,10 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
   | {
       isLoaded: boolean;
       createOrganization: (CreateOrganizationParams: CreateOrganizationParams) => Promise<OrganizationResource>;
-      setActive: SetActive;
+      selectOrganization: (
+        organization: OrganizationResource | string | null,
+        options?: SelectOrganizationOptions,
+      ) => Promise<void>;
       userMemberships: PaginatedResources<
         OrganizationMembershipResource,
         T['userMemberships'] extends { infinite: true } ? true : false
@@ -382,7 +385,7 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
     return {
       isLoaded: false,
       createOrganization: undefined,
-      setActive: undefined,
+      selectOrganization: undefined,
       userMemberships: undefinedPaginatedResource,
       userInvitations: undefinedPaginatedResource,
       userSuggestions: undefinedPaginatedResource,
@@ -391,8 +394,8 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
 
   return {
     isLoaded: isClerkLoaded,
-    setActive: clerk.setActive,
     createOrganization: clerk.createOrganization,
+    selectOrganization: clerk.selectOrganization,
     userMemberships: memberships,
     userInvitations: invitations,
     userSuggestions: suggestions,

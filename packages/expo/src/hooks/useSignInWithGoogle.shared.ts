@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/react';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import type { ClientResource, SetActive } from '@clerk/shared/types';
+import type { ClientResource, SelectSessionHook } from '@clerk/shared/types';
 
 import { ClerkGoogleOneTapSignIn, isErrorWithCode, isSuccessResponse } from '../google-one-tap';
 import { errorThrower } from '../utils/errors';
@@ -16,7 +16,7 @@ export type GoogleClientIds = {
 
 export type GoogleAuthenticationFlowContext = {
   client: ClientResource;
-  setActive: SetActive;
+  selectSession: SelectSessionHook;
 };
 
 type PlatformConfig = {
@@ -64,12 +64,12 @@ export function createUseSignInWithGoogle(platformConfig: PlatformConfig) {
     async function startGoogleAuthenticationFlow(
       startGoogleAuthenticationFlowParams?: StartGoogleAuthenticationFlowParams,
     ): Promise<StartGoogleAuthenticationFlowReturnType> {
-      const { client, loaded, setActive } = clerk;
+      const { client, loaded, selectSession } = clerk;
 
       if (!loaded || !client) {
         return {
           createdSessionId: null,
-          setActive,
+          selectSession,
         };
       }
 
@@ -89,7 +89,7 @@ export function createUseSignInWithGoogle(platformConfig: PlatformConfig) {
       }
 
       return executeGoogleAuthenticationFlow(
-        { client, setActive },
+        { client, selectSession },
         { webClientId, iosClientId },
         startGoogleAuthenticationFlowParams,
       );
@@ -111,7 +111,7 @@ export async function executeGoogleAuthenticationFlow(
   clientIds: GoogleClientIds,
   params?: StartGoogleAuthenticationFlowParams,
 ): Promise<StartGoogleAuthenticationFlowReturnType> {
-  const { client, setActive } = context;
+  const { client, selectSession } = context;
   const { signIn, signUp } = client;
 
   // Configure Google Sign-In with client IDs
@@ -131,7 +131,7 @@ export async function executeGoogleAuthenticationFlow(
     if (!isSuccessResponse(response)) {
       return {
         createdSessionId: null,
-        setActive,
+        selectSession,
         signIn,
         signUp,
       };
@@ -158,7 +158,7 @@ export async function executeGoogleAuthenticationFlow(
 
         return {
           createdSessionId: signUp.createdSessionId,
-          setActive,
+          selectSession,
           signIn,
           signUp,
         };
@@ -167,7 +167,7 @@ export async function executeGoogleAuthenticationFlow(
       // User exists - return the SignIn session
       return {
         createdSessionId: signIn.createdSessionId,
-        setActive,
+        selectSession,
         signIn,
         signUp,
       };
@@ -186,7 +186,7 @@ export async function executeGoogleAuthenticationFlow(
 
         return {
           createdSessionId: signUp.createdSessionId,
-          setActive,
+          selectSession,
           signIn,
           signUp,
         };
@@ -200,7 +200,7 @@ export async function executeGoogleAuthenticationFlow(
     if (isErrorWithCode(error) && error.code === 'SIGN_IN_CANCELLED') {
       return {
         createdSessionId: null,
-        setActive,
+        selectSession,
         signIn,
         signUp,
       };

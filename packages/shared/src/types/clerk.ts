@@ -136,6 +136,57 @@ export type SDKMetadata = {
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
+
+/**
+ * Navigate callback for selectSession.
+ * Called after session selection with the new session.
+ */
+export type SelectSessionNavigate = (params: {
+  session: SessionResource | null;
+}) => string | Promise<string> | void;
+
+/**
+ * Navigate callback for selectOrganization.
+ * Called after organization selection with both session and organization.
+ */
+export type SelectOrganizationNavigate = (params: {
+  session: SessionResource | null;
+  organization: OrganizationResource | null;
+}) => string | Promise<string> | void;
+
+/**
+ * Options for selectSession method.
+ */
+export interface SelectSessionOptions {
+  /**
+   * A custom navigation function called after session selection.
+   * When provided, takes precedence over redirectUrl.
+   */
+  navigate?: SelectSessionNavigate;
+  /**
+   * URL to redirect to after session selection.
+   */
+  redirectUrl?: string;
+}
+
+/**
+ * Options for selectOrganization method.
+ */
+export interface SelectOrganizationOptions {
+  /**
+   * A custom navigation function called after organization selection.
+   * When provided, takes precedence over redirectUrl.
+   */
+  navigate?: SelectOrganizationNavigate;
+  /**
+   * URL to redirect to after organization selection.
+   */
+  redirectUrl?: string;
+}
+
+/**
+ * @deprecated Use SelectSessionNavigate instead
+ */
 export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
@@ -719,12 +770,63 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
-   * Set the active session and Organization explicitly.
+   * Select a session to make active.
    *
-   * If the session param is `null`, the active session is deleted.
-   * In a similar fashion, if the organization param is `null`, the current organization is removed as active.
+   * Use this method after sign-in or sign-up to activate the created session,
+   * or to switch between sessions in a multi-session application.
+   *
+   * Pass `null` to sign out and clear the active session.
+   *
+   * @param session - The session to select, or null to sign out
+   * @param options - Optional configuration for navigation after selection
+   *
+   * @example
+   * ```typescript
+   * // After sign-in, activate the new session
+   * await clerk.selectSession(signIn.createdSessionId);
+   *
+   * // With custom navigation
+   * await clerk.selectSession(sessionId, {
+   *   navigate: ({ session }) => `/dashboard/${session?.user.id}`
+   * });
+   *
+   * // Sign out
+   * await clerk.selectSession(null, { redirectUrl: '/goodbye' });
+   * ```
    */
-  setActive: SetActive;
+  selectSession: (
+    session: SignedInSessionResource | string | null,
+    options?: SelectSessionOptions,
+  ) => Promise<void>;
+
+  /**
+   * Select an organization to make active within the current session.
+   *
+   * Use this method to switch between organizations or to select a personal workspace.
+   *
+   * Pass `null` to switch to the personal workspace (no active organization).
+   *
+   * @param organization - The organization to select, or null for personal workspace
+   * @param options - Optional configuration for navigation after selection
+   *
+   * @example
+   * ```typescript
+   * // Switch to an organization
+   * await clerk.selectOrganization(org.id);
+   *
+   * // With custom navigation
+   * await clerk.selectOrganization(org, {
+   *   navigate: ({ organization }) => `/org/${organization?.slug}`
+   * });
+   *
+   * // Switch to personal workspace
+   * await clerk.selectOrganization(null, { redirectUrl: '/personal' });
+   * ```
+   */
+  selectOrganization: (
+    organization: OrganizationResource | string | null,
+    options?: SelectOrganizationOptions,
+  ) => Promise<void>;
 
   /**
    * Function used to commit a navigation after certain steps in the Clerk processes.
@@ -965,10 +1067,10 @@ export interface Clerk {
   __internal_reloadInitialResources: () => Promise<void>;
 
   /**
-   * Internal flag indicating whether a `setActive` call is in progress. Used to prevent navigations from being
+   * Internal flag indicating whether a `selectSession` call is in progress. Used to prevent navigations from being
    * initiated outside of the Clerk class.
    */
-  __internal_setActiveInProgress: boolean;
+  __internal_selectSessionInProgress: boolean;
 
   /**
    * API Keys Object
@@ -1331,6 +1433,7 @@ export type SignUpRedirectOptions = RedirectOptions &
 /**
  * The parameters for the `setActive()` method.
  *
+ * @deprecated Use `selectSession()` or `selectOrganization()` instead.
  * @interface
  */
 export type SetActiveParams = {

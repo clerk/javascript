@@ -115,7 +115,7 @@ const MembershipPreview = (props: { organization: OrganizationResource }) => {
   const card = useCardState();
   const { navigateOnSetActive } = useSessionTasksContext();
   const { redirectUrlComplete } = useTaskChooseOrganizationContext();
-  const { isLoaded, setActive } = useOrganizationList();
+  const { isLoaded, selectOrganization } = useOrganizationList();
   const { t } = useLocalizations();
 
   if (!isLoaded) {
@@ -125,8 +125,7 @@ const MembershipPreview = (props: { organization: OrganizationResource }) => {
   const handleOrganizationClicked = (organization: OrganizationResource) => {
     return card.runAsync(async () => {
       try {
-        await setActive({
-          organization,
+        await selectOrganization(organization, {
           navigate: async ({ session }) => {
             await navigateOnSetActive?.({ session, redirectUrlComplete });
           },

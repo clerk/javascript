@@ -1,4 +1,4 @@
-import type { SetActive, SignOut } from './clerk';
+import type { SelectSessionOptions, SignOut } from './clerk';
 import type { ActClaim, JwtPayload } from './jwtv2';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
@@ -118,6 +118,14 @@ export type UseAuthReturn =
     };
 
 /**
+ * Type for the selectSession function returned by hooks.
+ */
+export type SelectSessionHook = (
+  session: SignedInSessionResource | string | null,
+  options?: SelectSessionOptions,
+) => Promise<void>;
+
+/**
  * @inline
  */
 export type UseSignInReturn =
@@ -131,14 +139,14 @@ export type UseSignInReturn =
        */
       signIn: undefined;
       /**
-       * A function that sets the active session. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
+       * A function that selects a session to make active. Use after sign-in completes to activate the created session.
        */
-      setActive: undefined;
+      selectSession: undefined;
     }
   | {
       isLoaded: true;
       signIn: SignInResource;
-      setActive: SetActive;
+      selectSession: SelectSessionHook;
     };
 
 /**
@@ -155,14 +163,14 @@ export type UseSignUpReturn =
        */
       signUp: undefined;
       /**
-       * A function that sets the active session. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
+       * A function that selects a session to make active. Use after sign-up completes to activate the created session.
        */
-      setActive: undefined;
+      selectSession: undefined;
     }
   | {
       isLoaded: true;
       signUp: SignUpResource;
-      setActive: SetActive;
+      selectSession: SelectSessionHook;
     };
 
 /**
@@ -208,14 +216,14 @@ export type UseSessionListReturn =
        */
       sessions: undefined;
       /**
-       * A function that sets the active session and/or Organization. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
+       * A function that selects a session to make active from the available sessions.
        */
-      setActive: undefined;
+      selectSession: undefined;
     }
   | {
       isLoaded: true;
       sessions: SessionResource[];
-      setActive: SetActive;
+      selectSession: SelectSessionHook;
     };
 
 /**
