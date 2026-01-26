@@ -30,12 +30,17 @@ type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
   MultiDomainAndOrProxyPrimitives & {
     appearance?: Appearance<TUi>;
     clerkJSUrl?: string;
-    clerkJSVariant?: 'headless' | '';
     clerkJSVersion?: string;
     /**
      * The URL that `@clerk/ui` should be hot-loaded from.
      */
-    clerkUiUrl?: string;
+    clerkUIUrl?: string;
+    /**
+     * Controls prefetching of the `@clerk/ui` script.
+     * - `false` - Skip prefetching the UI (for custom UIs using Control Components)
+     * - `undefined` (default) - Prefetch UI normally
+     */
+    prefetchUI?: boolean;
   };
 
 type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegrationParams<TUi> & {

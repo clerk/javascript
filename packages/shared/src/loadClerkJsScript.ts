@@ -10,10 +10,9 @@ const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
 
 const errorThrower = buildErrorThrower({ packageName: '@clerk/shared' });
 
-export type LoadClerkJsScriptOptions = {
+export type LoadClerkJSScriptOptions = {
   publishableKey: string;
   clerkJSUrl?: string;
-  clerkJSVariant?: 'headless' | '';
   clerkJSVersion?: string;
   sdkMetadata?: SDKMetadata;
   proxyUrl?: string;
@@ -27,11 +26,24 @@ export type LoadClerkJsScriptOptions = {
   scriptLoadTimeout?: number;
 };
 
-export type LoadClerkUiScriptOptions = {
+/**
+ * @deprecated Use `LoadClerkJSScriptOptions` instead. This alias will be removed in a future major version.
+ */
+export type LoadClerkJsScriptOptions = LoadClerkJSScriptOptions;
+
+/**
+ * Determines whether the Clerk UI should be prefetched based on the `prefetchUI` option.
+ * @param prefetchUI - The prefetchUI option from ClerkProvider/options
+ * @returns `true` if UI should be prefetched, `false` if it should be skipped
+ */
+export const shouldPrefetchClerkUI = (prefetchUI: boolean | undefined): boolean => {
+  return prefetchUI !== false;
+};
+
+export type LoadClerkUIScriptOptions = {
   publishableKey: string;
-  clerkUiUrl?: string;
-  clerkUIVariant?: 'shared' | '';
-  clerkUiVersion?: string;
+  clerkUIUrl?: string;
+  clerkUIVersion?: string;
   proxyUrl?: string;
   domain?: string;
   nonce?: string;
@@ -54,7 +66,7 @@ function isClerkGlobalProperlyLoaded(prop: 'Clerk' | '__internal_ClerkUiCtor'): 
   return !!val;
 }
 const isClerkProperlyLoaded = () => isClerkGlobalProperlyLoaded('Clerk');
-const isClerkUiProperlyLoaded = () => isClerkGlobalProperlyLoaded('__internal_ClerkUiCtor');
+const isClerkUIProperlyLoaded = () => isClerkGlobalProperlyLoaded('__internal_ClerkUiCtor');
 
 /**
  * Checks if an existing script has a request error using Performance API.
@@ -122,7 +134,7 @@ function hasScriptRequestError(scriptUrl: string): boolean {
  * }
  * ```
  */
-export const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promise<HTMLScriptElement | null> => {
+export const loadClerkJSScript = async (opts?: LoadClerkJSScriptOptions): Promise<HTMLScriptElement | null> => {
   const timeout = opts?.scriptLoadTimeout ?? 15000;
   const rejectWith = (error?: Error) =>
     new ClerkRuntimeError('Failed to load Clerk JS' + (error?.message ? `, ${error.message}` : ''), {
@@ -139,7 +151,7 @@ export const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promis
     return null;
   }
 
-  const scriptUrl = clerkJsScriptUrl(opts);
+  const scriptUrl = clerkJSScriptUrl(opts);
   const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
 
   if (existingScript) {
@@ -161,7 +173,7 @@ export const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promis
     async: true,
     crossOrigin: 'anonymous',
     nonce: opts.nonce,
-    beforeLoad: applyAttributesToScript(buildClerkJsScriptAttributes(opts)),
+    beforeLoad: applyAttributesToScript(buildClerkJSScriptAttributes(opts)),
   }).catch(error => {
     throw rejectWith(error);
   });
@@ -169,7 +181,7 @@ export const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promis
   return loadPromise;
 };
 
-export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promise<HTMLScriptElement | null> => {
+export const loadClerkUIScript = async (opts?: LoadClerkUIScriptOptions): Promise<HTMLScriptElement | null> => {
   const timeout = opts?.scriptLoadTimeout ?? 15000;
   const rejectWith = (error?: Error) =>
     new ClerkRuntimeError('Failed to load Clerk UI' + (error?.message ? `, ${error.message}` : ''), {
@@ -177,7 +189,7 @@ export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promis
       cause: error,
     });
 
-  if (isClerkUiProperlyLoaded()) {
+  if (isClerkUIProperlyLoaded()) {
     return null;
   }
 
@@ -186,7 +198,7 @@ export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promis
     return null;
   }
 
-  const scriptUrl = clerkUiScriptUrl(opts);
+  const scriptUrl = clerkUIScriptUrl(opts);
   const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-ui-script]');
 
   if (existingScript) {
@@ -194,7 +206,7 @@ export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promis
       existingScript.remove();
     } else {
       try {
-        await waitForPredicateWithTimeout(timeout, isClerkUiProperlyLoaded, rejectWith(), existingScript);
+        await waitForPredicateWithTimeout(timeout, isClerkUIProperlyLoaded, rejectWith(), existingScript);
         return null;
       } catch {
         existingScript.remove();
@@ -202,13 +214,13 @@ export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promis
     }
   }
 
-  const loadPromise = waitForPredicateWithTimeout(timeout, isClerkUiProperlyLoaded, rejectWith());
+  const loadPromise = waitForPredicateWithTimeout(timeout, isClerkUIProperlyLoaded, rejectWith());
 
   loadScript(scriptUrl, {
     async: true,
     crossOrigin: 'anonymous',
     nonce: opts.nonce,
-    beforeLoad: applyAttributesToScript(buildClerkUiScriptAttributes(opts)),
+    beforeLoad: applyAttributesToScript(buildClerkUIScriptAttributes(opts)),
   }).catch(error => {
     throw rejectWith(error);
   });
@@ -216,33 +228,31 @@ export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promis
   return loadPromise;
 };
 
-export const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
-  const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
+export const clerkJSScriptUrl = (opts: LoadClerkJSScriptOptions) => {
+  const { clerkJSUrl, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
 
   if (clerkJSUrl) {
     return clerkJSUrl;
   }
 
   const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
-  const variant = clerkJSVariant ? `${clerkJSVariant.replace(/\.+$/, '')}.` : '';
   const version = versionSelector(clerkJSVersion);
-  return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.${variant}browser.js`;
+  return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.browser.js`;
 };
 
-export const clerkUiScriptUrl = (opts: LoadClerkUiScriptOptions) => {
-  const { clerkUiUrl, clerkUIVariant, clerkUiVersion, proxyUrl, domain, publishableKey } = opts;
+export const clerkUIScriptUrl = (opts: LoadClerkUIScriptOptions) => {
+  const { clerkUIUrl, clerkUIVersion, proxyUrl, domain, publishableKey } = opts;
 
-  if (clerkUiUrl) {
-    return clerkUiUrl;
+  if (clerkUIUrl) {
+    return clerkUIUrl;
   }
 
   const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
-  const variant = clerkUIVariant ? `${clerkUIVariant}.` : '';
-  const version = versionSelector(clerkUiVersion, UI_PACKAGE_VERSION);
-  return `https://${scriptHost}/npm/@clerk/ui@${version}/dist/ui.${variant}browser.js`;
+  const version = versionSelector(clerkUIVersion, UI_PACKAGE_VERSION);
+  return `https://${scriptHost}/npm/@clerk/ui@${version}/dist/ui.browser.js`;
 };
 
-export const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => {
+export const buildClerkJSScriptAttributes = (options: LoadClerkJSScriptOptions) => {
   const obj: Record<string, string> = {};
 
   if (options.publishableKey) {
@@ -264,9 +274,9 @@ export const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) 
   return obj;
 };
 
-export const buildClerkUiScriptAttributes = (options: LoadClerkUiScriptOptions) => {
+export const buildClerkUIScriptAttributes = (options: LoadClerkUIScriptOptions) => {
   // TODO @nikos do we need this?
-  return buildClerkJsScriptAttributes(options);
+  return buildClerkJSScriptAttributes(options);
 };
 
 const applyAttributesToScript = (attributes: Record<string, string>) => (script: HTMLScriptElement) => {
@@ -348,6 +358,26 @@ function waitForPredicateWithTimeout(
   });
 }
 
-export function setClerkJsLoadingErrorPackageName(packageName: string) {
+export function setClerkJSLoadingErrorPackageName(packageName: string) {
   errorThrower.setPackageName({ packageName });
 }
+
+/**
+ * @deprecated Use `loadClerkJSScript` instead. This alias will be removed in a future major version.
+ */
+export const loadClerkJsScript = loadClerkJSScript;
+
+/**
+ * @deprecated Use `clerkJSScriptUrl` instead. This alias will be removed in a future major version.
+ */
+export const clerkJsScriptUrl = clerkJSScriptUrl;
+
+/**
+ * @deprecated Use `buildClerkJSScriptAttributes` instead. This alias will be removed in a future major version.
+ */
+export const buildClerkJsScriptAttributes = buildClerkJSScriptAttributes;
+
+/**
+ * @deprecated Use `setClerkJSLoadingErrorPackageName` instead. This alias will be removed in a future major version.
+ */
+export const setClerkJsLoadingErrorPackageName = setClerkJSLoadingErrorPackageName;

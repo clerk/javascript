@@ -5,8 +5,9 @@ import { IsomorphicClerk } from '../isomorphicClerk';
 
 // Mock the script loading functions to prevent unhandled promise rejections in tests
 vi.mock('@clerk/shared/loadClerkJsScript', () => ({
-  loadClerkJsScript: vi.fn().mockResolvedValue(null),
-  loadClerkUiScript: vi.fn().mockResolvedValue(null),
+  loadClerkJSScript: vi.fn().mockResolvedValue(null),
+  loadClerkUIScript: vi.fn().mockResolvedValue(null),
+  shouldPrefetchClerkUI: vi.fn().mockReturnValue(true),
 }));
 
 describe('isomorphicClerk', () => {

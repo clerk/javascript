@@ -4,13 +4,14 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { ClerkRuntimeError } from '../error';
 import {
   buildClerkJsScriptAttributes,
-  buildClerkUiScriptAttributes,
+  buildClerkUIScriptAttributes,
   buildScriptHost,
   clerkJsScriptUrl,
-  clerkUiScriptUrl,
+  clerkUIScriptUrl,
   loadClerkJsScript,
-  loadClerkUiScript,
+  loadClerkUIScript,
   setClerkJsLoadingErrorPackageName,
+  shouldPrefetchClerkUI,
 } from '../loadClerkJsScript';
 import { loadScript } from '../loadScript';
 import { getMajorVersion } from '../versionSelector';
@@ -165,13 +166,6 @@ describe('clerkJsScriptUrl()', () => {
     expect(result).toBe(`https://example.clerk.com/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`);
   });
 
-  test('includes clerkJSVariant in URL when provided', () => {
-    const result = clerkJsScriptUrl({ publishableKey: mockProdPublishableKey, clerkJSVariant: 'headless' });
-    expect(result).toBe(
-      `https://example.clerk.com/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.headless.browser.js`,
-    );
-  });
-
   test('uses provided clerkJSVersion', () => {
     const result = clerkJsScriptUrl({ publishableKey: mockDevPublishableKey, clerkJSVersion: '6' });
     expect(result).toContain('/npm/@clerk/clerk-js@6/');
@@ -269,7 +263,7 @@ describe('buildClerkJsScriptAttributes()', () => {
   });
 });
 
-describe('loadClerkUiScript(options)', () => {
+describe('loadClerkUIScript(options)', () => {
   const mockPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
 
   const mockClerkUi = {
@@ -291,7 +285,7 @@ describe('loadClerkUiScript(options)', () => {
   });
 
   test('throws error when publishableKey is missing', async () => {
-    await expect(loadClerkUiScript({} as any)).rejects.toThrow(
+    await expect(loadClerkUIScript({} as any)).rejects.toThrow(
       '@clerk/react: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
     );
   });
@@ -299,13 +293,13 @@ describe('loadClerkUiScript(options)', () => {
   test('returns null immediately when ClerkUI is already loaded', async () => {
     (window as any).__internal_ClerkUiCtor = mockClerkUi;
 
-    const result = await loadClerkUiScript({ publishableKey: mockPublishableKey });
+    const result = await loadClerkUIScript({ publishableKey: mockPublishableKey });
     expect(result).toBeNull();
     expect(loadScript).not.toHaveBeenCalled();
   });
 
   test('loads script and waits for ClerkUI to be available', async () => {
-    const loadPromise = loadClerkUiScript({ publishableKey: mockPublishableKey });
+    const loadPromise = loadClerkUIScript({ publishableKey: mockPublishableKey });
 
     // Simulate ClerkUI becoming available after 250ms
     setTimeout(() => {
@@ -332,7 +326,7 @@ describe('loadClerkUiScript(options)', () => {
   test('times out and rejects when ClerkUI does not load', async () => {
     let rejectedWith: any;
 
-    const loadPromise = loadClerkUiScript({ publishableKey: mockPublishableKey, scriptLoadTimeout: 1000 });
+    const loadPromise = loadClerkUIScript({ publishableKey: mockPublishableKey, scriptLoadTimeout: 1000 });
 
     try {
       vi.advanceTimersByTime(1000);
@@ -350,7 +344,7 @@ describe('loadClerkUiScript(options)', () => {
     const mockExistingScript = document.createElement('script');
     document.querySelector = vi.fn().mockReturnValue(mockExistingScript);
 
-    const loadPromise = loadClerkUiScript({ publishableKey: mockPublishableKey });
+    const loadPromise = loadClerkUIScript({ publishableKey: mockPublishableKey });
 
     // Simulate ClerkUI becoming available after 250ms
     setTimeout(() => {
@@ -366,7 +360,7 @@ describe('loadClerkUiScript(options)', () => {
   });
 
   test('handles race condition when ClerkUI loads just as timeout fires', async () => {
-    const loadPromise = loadClerkUiScript({ publishableKey: mockPublishableKey, scriptLoadTimeout: 1000 });
+    const loadPromise = loadClerkUIScript({ publishableKey: mockPublishableKey, scriptLoadTimeout: 1000 });
 
     setTimeout(() => {
       (window as any).__internal_ClerkUiCtor = mockClerkUi;
@@ -382,49 +376,49 @@ describe('loadClerkUiScript(options)', () => {
   test('validates ClerkUI is properly loaded', async () => {
     (window as any).__internal_ClerkUiCtor = mockClerkUi;
 
-    const result = await loadClerkUiScript({ publishableKey: mockPublishableKey });
+    const result = await loadClerkUIScript({ publishableKey: mockPublishableKey });
 
     expect(result).toBeNull();
     expect((window as any).__internal_ClerkUiCtor).toBe(mockClerkUi);
   });
 });
 
-describe('clerkUiScriptUrl()', () => {
+describe('clerkUIScriptUrl()', () => {
   const mockDevPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
   const mockProdPublishableKey = 'pk_live_ZXhhbXBsZS5jbGVyay5jb20k'; // example.clerk.com
 
-  test('returns clerkUiUrl when provided', () => {
+  test('returns clerkUIUrl when provided', () => {
     const customUrl = 'https://custom.clerk.com/ui.js';
-    const result = clerkUiScriptUrl({ clerkUiUrl: customUrl, publishableKey: mockDevPublishableKey });
+    const result = clerkUIScriptUrl({ clerkUIUrl: customUrl, publishableKey: mockDevPublishableKey });
     expect(result).toBe(customUrl);
   });
 
   test('constructs URL correctly for development key', () => {
-    const result = clerkUiScriptUrl({ publishableKey: mockDevPublishableKey });
+    const result = clerkUIScriptUrl({ publishableKey: mockDevPublishableKey });
     expect(result).toBe(
       `https://foo-bar-13.clerk.accounts.dev/npm/@clerk/ui@${uiPackageMajorVersion}/dist/ui.browser.js`,
     );
   });
 
   test('constructs URL correctly for production key', () => {
-    const result = clerkUiScriptUrl({ publishableKey: mockProdPublishableKey });
+    const result = clerkUIScriptUrl({ publishableKey: mockProdPublishableKey });
     expect(result).toBe(`https://example.clerk.com/npm/@clerk/ui@${uiPackageMajorVersion}/dist/ui.browser.js`);
   });
 
-  test('uses provided clerkUiVersion', () => {
-    const result = clerkUiScriptUrl({ publishableKey: mockDevPublishableKey, clerkUiVersion: '1' });
+  test('uses provided clerkUIVersion', () => {
+    const result = clerkUIScriptUrl({ publishableKey: mockDevPublishableKey, clerkUIVersion: '1' });
     expect(result).toContain('/npm/@clerk/ui@1/');
   });
 
   test('uses latest as default version when not specified', () => {
-    const result = clerkUiScriptUrl({ publishableKey: mockDevPublishableKey });
+    const result = clerkUIScriptUrl({ publishableKey: mockDevPublishableKey });
     // When no version is specified, versionSelector should return the major version
     expect(result).toContain(`/npm/@clerk/ui@${uiPackageMajorVersion}/`);
   });
 
   test('uses UI_PACKAGE_VERSION independently from JS_PACKAGE_VERSION', () => {
-    // Verify that clerkUiScriptUrl uses UI_PACKAGE_VERSION, not JS_PACKAGE_VERSION
-    const uiResult = clerkUiScriptUrl({ publishableKey: mockDevPublishableKey });
+    // Verify that clerkUIScriptUrl uses UI_PACKAGE_VERSION, not JS_PACKAGE_VERSION
+    const uiResult = clerkUIScriptUrl({ publishableKey: mockDevPublishableKey });
     const jsResult = clerkJsScriptUrl({ publishableKey: mockDevPublishableKey });
 
     // UI script should use UI package version
@@ -439,7 +433,7 @@ describe('clerkUiScriptUrl()', () => {
   });
 });
 
-describe('buildClerkUiScriptAttributes()', () => {
+describe('buildClerkUIScriptAttributes()', () => {
   const mockPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
   const mockProxyUrl = 'https://proxy.clerk.com';
   const mockDomain = 'custom.com';
@@ -467,6 +461,20 @@ describe('buildClerkUiScriptAttributes()', () => {
     ['no options', {}, {}],
   ])('returns correct attributes with %s', (_, input, expected) => {
     // @ts-ignore input loses correct type because of empty object
-    expect(buildClerkUiScriptAttributes(input)).toEqual(expected);
+    expect(buildClerkUIScriptAttributes(input)).toEqual(expected);
+  });
+});
+
+describe('shouldPrefetchClerkUI()', () => {
+  test('returns true when prefetchUI is undefined', () => {
+    expect(shouldPrefetchClerkUI(undefined)).toBe(true);
+  });
+
+  test('returns false when prefetchUI is false', () => {
+    expect(shouldPrefetchClerkUI(false)).toBe(false);
+  });
+
+  test('returns true when prefetchUI is true', () => {
+    expect(shouldPrefetchClerkUI(true)).toBe(true);
   });
 });

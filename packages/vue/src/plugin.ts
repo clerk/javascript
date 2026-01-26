@@ -1,6 +1,11 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { deriveState } from '@clerk/shared/deriveState';
-import { loadClerkJsScript, type LoadClerkJsScriptOptions, loadClerkUiScript } from '@clerk/shared/loadClerkJsScript';
+import {
+  loadClerkJSScript,
+  type LoadClerkJSScriptOptions,
+  loadClerkUIScript,
+  shouldPrefetchClerkUI,
+} from '@clerk/shared/loadClerkJsScript';
 import type {
   Clerk,
   ClerkOptions,
@@ -70,23 +75,26 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
     const options = {
       ...pluginOptions,
       sdkMetadata: pluginOptions.sdkMetadata || SDK_METADATA,
-    } as LoadClerkJsScriptOptions;
+    } as LoadClerkJSScriptOptions;
 
     // We need this check for SSR apps like Nuxt as it will try to run this code on the server
-    // and loadClerkJsScript contains browser-specific code
+    // and loadClerkJSScript contains browser-specific code
     if (inBrowser()) {
       void (async () => {
         try {
-          const clerkPromise = loadClerkJsScript(options);
-          const clerkUiCtorPromise = pluginOptions.clerkUiCtor
-            ? Promise.resolve(pluginOptions.clerkUiCtor)
-            : (async () => {
-                await loadClerkUiScript(options);
-                if (!window.__internal_ClerkUiCtor) {
-                  throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
-                }
-                return window.__internal_ClerkUiCtor;
-              })();
+          const clerkPromise = loadClerkJSScript(options);
+          // Skip UI loading when prefetchUI={false}
+          const clerkUICtorPromise = !shouldPrefetchClerkUI(pluginOptions.prefetchUI)
+            ? Promise.resolve(undefined)
+            : pluginOptions.clerkUICtor
+              ? Promise.resolve(pluginOptions.clerkUICtor)
+              : (async () => {
+                  await loadClerkUIScript(options);
+                  if (!window.__internal_ClerkUiCtor) {
+                    throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+                  }
+                  return window.__internal_ClerkUiCtor;
+                })();
 
           await clerkPromise;
 
@@ -95,7 +103,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           }
 
           clerk.value = window.Clerk;
-          const loadOptions = { ...options, clerkUiCtor: clerkUiCtorPromise } as unknown as ClerkOptions;
+          const loadOptions = { ...options, clerkUICtor: clerkUICtorPromise } as unknown as ClerkOptions;
           await window.Clerk.load(loadOptions);
           loaded.value = true;
 

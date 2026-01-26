@@ -1,17 +1,15 @@
 import { useClerk } from '@clerk/react';
 import {
-  buildClerkJsScriptAttributes,
-  buildClerkUiScriptAttributes,
-  clerkJsScriptUrl,
-  clerkUiScriptUrl,
-  IS_REACT_SHARED_VARIANT_COMPATIBLE,
+  buildClerkJSScriptAttributes,
+  buildClerkUIScriptAttributes,
+  clerkJSScriptUrl,
+  clerkUIScriptUrl,
+  shouldPrefetchClerkUI,
 } from '@clerk/react/internal';
 import NextScript from 'next/script';
 import React from 'react';
 
 import { useClerkNextOptions } from '../client-boundary/NextOptionsContext';
-
-const DEFAULT_CLERK_UI_VARIANT = IS_REACT_SHARED_VARIANT_COMPATIBLE ? ('shared' as const) : ('' as const);
 
 type ClerkScriptProps = {
   scriptUrl: string;
@@ -46,8 +44,7 @@ function ClerkScript(props: ClerkScriptProps) {
 }
 
 export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] }) {
-  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant, nonce, clerkUiUrl, clerkUIVariant, ui } =
-    useClerkNextOptions();
+  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkUIUrl, nonce, prefetchUI } = useClerkNextOptions();
   const { domain, proxyUrl } = useClerk();
 
   if (!publishableKey) {
@@ -58,29 +55,28 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
     publishableKey,
     clerkJSUrl,
     clerkJSVersion,
-    clerkJSVariant,
+    clerkUIUrl,
     nonce,
     domain,
     proxyUrl,
-    clerkUiVersion: ui?.version,
-    clerkUiUrl: ui?.url || clerkUiUrl,
-    clerkUIVariant: clerkUIVariant ?? DEFAULT_CLERK_UI_VARIANT,
   };
 
   return (
     <>
       <ClerkScript
-        scriptUrl={clerkJsScriptUrl(opts)}
-        attributes={buildClerkJsScriptAttributes(opts)}
+        scriptUrl={clerkJSScriptUrl(opts)}
+        attributes={buildClerkJSScriptAttributes(opts)}
         dataAttribute='data-clerk-js-script'
         router={router}
       />
-      <ClerkScript
-        scriptUrl={clerkUiScriptUrl(opts)}
-        attributes={buildClerkUiScriptAttributes(opts)}
-        dataAttribute='data-clerk-ui-script'
-        router={router}
-      />
+      {shouldPrefetchClerkUI(prefetchUI) && (
+        <ClerkScript
+          scriptUrl={clerkUIScriptUrl(opts)}
+          attributes={buildClerkUIScriptAttributes(opts)}
+          dataAttribute='data-clerk-ui-script'
+          router={router}
+        />
+      )}
     </>
   );
 }

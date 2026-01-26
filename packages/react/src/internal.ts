@@ -5,10 +5,15 @@ export { useDerivedAuth } from './hooks/useAuth';
 export { IS_REACT_SHARED_VARIANT_COMPATIBLE } from './utils/versionCheck';
 
 export {
+  clerkJSScriptUrl,
+  buildClerkJSScriptAttributes,
+  clerkUIScriptUrl,
+  buildClerkUIScriptAttributes,
+  setClerkJSLoadingErrorPackageName,
+  shouldPrefetchClerkUI,
+  // Deprecated aliases - will be removed in a future major version
   clerkJsScriptUrl,
   buildClerkJsScriptAttributes,
-  clerkUiScriptUrl,
-  buildClerkUiScriptAttributes,
   setClerkJsLoadingErrorPackageName,
 } from '@clerk/shared/loadClerkJsScript';
 

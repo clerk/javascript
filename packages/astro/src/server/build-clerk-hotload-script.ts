@@ -1,30 +1,26 @@
-import { clerkJsScriptUrl, clerkUiScriptUrl } from '@clerk/shared/loadClerkJsScript';
+import { clerkJSScriptUrl, clerkUIScriptUrl, shouldPrefetchClerkUI } from '@clerk/shared/loadClerkJsScript';
 import type { APIContext } from 'astro';
 
 import { getSafeEnv } from './get-safe-env';
 
 function buildClerkHotloadScript(locals: APIContext['locals']) {
+  const env = getSafeEnv(locals);
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const publishableKey = getSafeEnv(locals).pk!;
+  const publishableKey = env.pk!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const proxyUrl = getSafeEnv(locals).proxyUrl!;
+  const proxyUrl = env.proxyUrl!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const domain = getSafeEnv(locals).domain!;
-  const clerkJsScriptSrc = clerkJsScriptUrl({
-    clerkJSUrl: getSafeEnv(locals).clerkJsUrl,
-    clerkJSVariant: getSafeEnv(locals).clerkJsVariant,
-    clerkJSVersion: getSafeEnv(locals).clerkJsVersion,
+  const domain = env.domain!;
+
+  const clerkJsScriptSrc = clerkJSScriptUrl({
+    clerkJSUrl: env.clerkJsUrl,
+    clerkJSVersion: env.clerkJsVersion,
     domain,
     proxyUrl,
     publishableKey,
   });
-  const clerkUiScriptSrc = clerkUiScriptUrl({
-    clerkUiUrl: getSafeEnv(locals).clerkUiUrl,
-    domain,
-    proxyUrl,
-    publishableKey,
-  });
-  return `
+
+  const clerkJsScript = `
   <script src="${clerkJsScriptSrc}"
   data-clerk-js-script
   async
@@ -32,7 +28,21 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
   ${publishableKey ? `data-clerk-publishable-key="${publishableKey}"` : ``}
   ${proxyUrl ? `data-clerk-proxy-url="${proxyUrl}"` : ``}
   ${domain ? `data-clerk-domain="${domain}"` : ``}
-  ></script>
+  ></script>`;
+
+  if (!shouldPrefetchClerkUI(env.prefetchUI)) {
+    return clerkJsScript + '\n';
+  }
+
+  const clerkUiScriptSrc = clerkUIScriptUrl({
+    clerkUIUrl: env.clerkUIUrl,
+    clerkUIVersion: env.clerkUIVersion,
+    domain,
+    proxyUrl,
+    publishableKey,
+  });
+
+  const clerkUiScript = `
   <script src="${clerkUiScriptSrc}"
   data-clerk-ui-script
   async
@@ -40,7 +50,9 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
   ${publishableKey ? `data-clerk-publishable-key="${publishableKey}"` : ``}
   ${proxyUrl ? `data-clerk-proxy-url="${proxyUrl}"` : ``}
   ${domain ? `data-clerk-domain="${domain}"` : ``}
-  ></script>\n`;
+  ></script>`;
+
+  return clerkJsScript + clerkUiScript + '\n';
 }
 
 export { buildClerkHotloadScript };
