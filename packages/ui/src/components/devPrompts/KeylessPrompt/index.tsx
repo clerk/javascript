@@ -562,21 +562,20 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
 }
 
 function KeylessPromptContent() {
-  const [isOpen, setIsOpen] = useState(false);
-  const id = React.useId();
-  const containerRef = React.useRef<HTMLDivElement>(null);
+  const detailsRef = React.useRef<HTMLDetailsElement>(null);
   const theme = useMosaicTheme();
 
+  // Handle Escape key and click-outside to close
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false);
+      if (e.key === 'Escape' && detailsRef.current?.open) {
+        detailsRef.current.open = false;
       }
     };
 
     const handleClickOutside = (e: MouseEvent) => {
-      if (isOpen && containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
+      if (detailsRef.current?.open && !detailsRef.current.contains(e.target as Node)) {
+        detailsRef.current.open = false;
       }
     };
 
@@ -587,12 +586,12 @@ function KeylessPromptContent() {
       window.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen]);
+  }, []);
 
   return (
     <Portal>
-      <div
-        ref={containerRef}
+      <details
+        ref={detailsRef}
         css={css`
           --duration-open: 220ms;
           --duration-close: 180ms;
@@ -610,7 +609,7 @@ function KeylessPromptContent() {
           right: var(--offset);
           z-index: 999999;
           height: auto;
-          width: ${isOpen ? 'var(--width-opened)' : 'var(--width-closed)'};
+          width: var(--width-closed);
           interpolate-size: allow-keywords;
           background:
             linear-gradient(
@@ -626,16 +625,26 @@ function KeylessPromptContent() {
             0px 0px 0px 0px ${theme.alpha(theme.colors.white, 72)},
             0px 16px 36px -6px ${theme.alpha(theme.colors.black, 36)},
             0px 6px 16px -2px ${theme.alpha(theme.colors.black, 20)};
-          border-radius: ${isOpen ? theme.spacing[3] : theme.spacing[10]};
+          border-radius: ${theme.spacing[10]};
           isolation: isolate;
           will-change: width, border-radius;
           transform: translateZ(0);
           backface-visibility: hidden;
           transition:
-            width ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'} var(--ease-bezier),
-            border-radius var(--duration-open) var(--ease-bezier);
+            width var(--duration-close) var(--ease-bezier),
+            border-radius var(--duration-close) var(--ease-bezier);
           @media (prefers-reduced-motion: reduce) {
             transition: none;
+          }
+          &[open] {
+            width: var(--width-opened);
+            border-radius: ${theme.spacing[3]};
+            transition:
+              width var(--duration-open) var(--ease-bezier),
+              border-radius var(--duration-open) var(--ease-bezier);
+            @media (prefers-reduced-motion: reduce) {
+              transition: none;
+            }
           }
           &::before {
             content: '';
@@ -645,23 +654,46 @@ function KeylessPromptContent() {
             mix-blend-mode: overlay;
             border-radius: inherit;
             pointer-events: none;
-            opacity: ${isOpen ? 0 : 1};
-            transition: opacity ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'} var(--ease-bezier);
+            opacity: 1;
+            transition: opacity var(--duration-close) var(--ease-bezier);
             @media (prefers-reduced-motion: reduce) {
               transition: none;
             }
           }
-          &:has(button:focus-visible) {
+          &[open]::before {
+            opacity: 0;
+            transition: opacity var(--duration-open) var(--ease-bezier);
+            @media (prefers-reduced-motion: reduce) {
+              transition: none;
+            }
+          }
+          &:has(summary:focus-visible) {
             outline: 2px solid var(--accent);
             outline-offset: 2px;
           }
+          /* Animate the details content using ::details-content pseudo-element */
+          &::details-content {
+            display: block;
+            block-size: 0;
+            overflow: hidden;
+            transition-property: block-size, content-visibility;
+            transition-duration: var(--duration-close);
+            transition-timing-function: var(--ease-bezier);
+            transition-behavior: allow-discrete;
+            @media (prefers-reduced-motion: reduce) {
+              transition: none;
+            }
+          }
+          &[open]::details-content {
+            block-size: calc-size(auto, size);
+            transition-duration: var(--duration-open);
+            @media (prefers-reduced-motion: reduce) {
+              transition: none;
+            }
+          }
         `}
       >
-        <button
-          type='button'
-          onClick={() => setIsOpen(prev => !prev)}
-          aria-expanded={isOpen}
-          aria-controls={id}
+        <summary
           css={css`
             appearance: none;
             border: none;
@@ -673,6 +705,14 @@ function KeylessPromptContent() {
             padding-block: ${theme.spacing[3]};
             position: relative;
             outline: none;
+            cursor: pointer;
+            list-style: none;
+            &::-webkit-details-marker {
+              display: none;
+            }
+            &::marker {
+              display: none;
+            }
           `}
         >
           <span
@@ -753,19 +793,6 @@ function KeylessPromptContent() {
           >
             Clerk is in keyless mode
           </span>
-          <span
-            css={css`
-              clip: rect(0 0 0 0);
-              clippath: inset(50%);
-              height: 1px;
-              overflow: hidden;
-              position: absolute;
-              whitespace: nowrap;
-              width: 1px;
-            `}
-          >
-            {isOpen ? 'Collapse' : 'Expand'} prompt content
-          </span>
           <svg
             viewBox='0 0 16 16'
             fill='none'
@@ -777,13 +804,20 @@ function KeylessPromptContent() {
               color: var(--foreground);
               margin-inline-start: auto;
               margin-inline-end: ${theme.spacing[3]};
-              opacity: ${isOpen ? 0.6 : 0};
-              transform: translateX(${isOpen ? '0' : theme.spacing[3]});
+              opacity: 0;
+              transform: translateX(${theme.spacing[3]});
               transition:
                 opacity 120ms ease-out,
                 transform 200ms ease-out;
-              button:hover & {
-                opacity: ${isOpen ? 1 : 0};
+              details[open] & {
+                opacity: 0.6;
+                transform: translateX(0);
+              }
+              summary:hover & {
+                opacity: 0;
+              }
+              details[open] summary:hover & {
+                opacity: 1;
               }
             `}
           >
@@ -795,136 +829,123 @@ function KeylessPromptContent() {
               strokeLinejoin='round'
             />
           </svg>
-        </button>
+        </summary>
 
         <div
-          id={id}
           css={css`
-            display: grid;
-            grid-template-rows: ${isOpen ? '1fr' : '0fr'};
-            transition: grid-template-rows ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'}
-              var(--ease-bezier);
+            width: var(--width-opened);
+            display: flex;
+            flex-direction: column;
+            padding: 0 ${theme.spacing[3]} ${theme.spacing[3]} ${theme.spacing[3]};
+            gap: ${theme.spacing[3]};
+            opacity: 0;
+            filter: blur(6px);
+            transition:
+              opacity var(--duration-close) var(--ease-bezier),
+              filter var(--duration-close) var(--ease-bezier);
             @media (prefers-reduced-motion: reduce) {
               transition: none;
             }
+            details[open] & {
+              opacity: 1;
+              filter: blur(0px);
+              transition-delay: 100ms;
+              transition:
+                opacity var(--duration-open) var(--ease-bezier),
+                filter var(--duration-open) var(--ease-bezier);
+              @media (prefers-reduced-motion: reduce) {
+                transition: none;
+              }
+            }
           `}
-          {...(!isOpen && { inert: '' })}
-          aria-hidden={!isOpen}
         >
           <div
+            css={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: theme.spacing[2],
+              color: 'var(--foreground-secondary)',
+              fontSize: theme.typography.body[3].fontSize,
+              lineHeight: theme.typography.body[3].lineHeight,
+            }}
+          >
+            <p>Temporary API keys are enabled so you can get started immediately.</p>
+            <p>
+              Claim this application to access the Clerk Dashboard where you can manage auth settings and explore more
+              Clerk features.
+            </p>
+          </div>
+          <a
+            href='/'
+            target='_blank'
+            rel='noopener noreferrer'
             css={css`
-              overflow: hidden;
-              min-height: 0;
-              mask-image: linear-gradient(to bottom, black calc(100% - ${theme.spacing[3]}), transparent);
+              position: relative;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: ${theme.spacing[1]};
+              width: 100%;
+              height: ${theme.spacing[7]};
+              border-radius: ${theme.spacing[1.5]};
+              font-size: ${theme.typography.label[3].fontSize};
+              font-weight: ${theme.fontWeights.medium};
+              color: var(--foreground);
+              background: var(--accent);
+              box-shadow:
+                ${theme.colors.white} 0px 0px 0px 0px,
+                var(--accent) 0px 0px 0px 1px,
+                ${theme.alpha(theme.colors.white, 7)} 0px 1px 0px 0px inset,
+                ${theme.alpha(theme.colors.gray[1300], 20)} 0px 1px 3px 0px;
+              outline: none;
+              &::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(
+                  180deg,
+                  ${theme.alpha(theme.colors.white, 16)} 46%,
+                  ${theme.alpha(theme.colors.white, 0)} 54%
+                );
+                mix-blend-mode: overlay;
+                border-radius: inherit;
+              }
+              &:focus-visible {
+                outline: 2px solid var(--accent);
+                outline-offset: 2px;
+              }
             `}
           >
-            <div
+            <span
               css={css`
-                width: var(--width-opened);
-                display: flex;
-                flex-direction: column;
-                padding: 0 ${theme.spacing[3]} ${theme.spacing[3]} ${theme.spacing[3]};
-                gap: ${theme.spacing[3]};
-                opacity: ${isOpen ? 1 : 0};
-                filter: blur(${isOpen ? '0px' : '6px'});
-                transition-delay: ${isOpen ? '100ms' : '0ms'};
-                transition:
-                  opacity ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'} var(--ease-bezier),
-                  filter ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'} var(--ease-bezier);
-                @media (prefers-reduced-motion: reduce) {
-                  transition: none;
-                }
+                position: relative;
+                z-index: 1;
               `}
             >
-              <div
-                css={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: theme.spacing[2],
-                  color: 'var(--foreground-secondary)',
-                  fontSize: theme.typography.body[3].fontSize,
-                  lineHeight: theme.typography.body[3].lineHeight,
-                }}
-              >
-                <p>Temporary API keys are enabled so you can get started immediately.</p>
-                <p>
-                  Claim this application to access the Clerk Dashboard where you can manage auth settings and explore
-                  more Clerk features.
-                </p>
-              </div>
-              <a
-                href='/'
-                target='_blank'
-                rel='noopener noreferrer'
-                css={css`
-                  position: relative;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  gap: ${theme.spacing[1]};
-                  width: 100%;
-                  height: ${theme.spacing[7]};
-                  border-radius: ${theme.spacing[1.5]};
-                  font-size: ${theme.typography.label[3].fontSize};
-                  font-weight: ${theme.fontWeights.medium};
-                  color: var(--foreground);
-                  background: var(--accent);
-                  box-shadow:
-                    ${theme.colors.white} 0px 0px 0px 0px,
-                    var(--accent) 0px 0px 0px 1px,
-                    ${theme.alpha(theme.colors.white, 7)} 0px 1px 0px 0px inset,
-                    ${theme.alpha(theme.colors.gray[1300], 20)} 0px 1px 3px 0px;
-                  outline: none;
-                  &::before {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    background: linear-gradient(
-                      180deg,
-                      ${theme.alpha(theme.colors.white, 16)} 46%,
-                      ${theme.alpha(theme.colors.white, 0)} 54%
-                    );
-                    mix-blend-mode: overlay;
-                    border-radius: inherit;
-                  }
-                  &:focus-visible {
-                    outline: 2px solid var(--accent);
-                    outline-offset: 2px;
-                  }
-                `}
-              >
-                <span
-                  css={css`
-                    position: relative;
-                    z-index: 1;
-                  `}
-                >
-                  Claim application
-                </span>
-                <svg
-                  css={{
-                    width: theme.spacing[2.5],
-                    height: theme.spacing[2.5],
-                    flexShrink: 0,
-                    opacity: 0.6,
-                  }}
-                  viewBox='0 0 10 10'
-                  aria-hidden='true'
-                >
-                  <path
-                    fill='currentColor'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='1.5'
-                    d='m7.25 5-3.5-2.25v4.5L7.25 5Z'
-                  />
-                </svg>
-              </a>
-            </div>
-          </div>
+              Claim application
+            </span>
+            <svg
+              css={{
+                width: theme.spacing[2.5],
+                height: theme.spacing[2.5],
+                flexShrink: 0,
+                opacity: 0.6,
+              }}
+              viewBox='0 0 10 10'
+              aria-hidden='true'
+            >
+              <path
+                fill='currentColor'
+                stroke='currentColor'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth='1.5'
+                d='m7.25 5-3.5-2.25v4.5L7.25 5Z'
+              />
+            </svg>
+          </a>
         </div>
-      </div>
+      </details>
     </Portal>
   );
 }
