@@ -14,7 +14,9 @@ To restore the previous behavior, explicitly set the option:
   appearance={{
     options: {
       showOptionalFields: true,
-    }
+    },
   }}
 >
+  {/* ... */}
+</ClerkProvider>
 ```
