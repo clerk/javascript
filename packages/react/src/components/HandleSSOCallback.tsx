@@ -1,5 +1,5 @@
 import type { SetActiveNavigate } from '@clerk/shared/types';
-import { useEffect, useRef, type ReactNode } from 'react';
+import React, { useEffect, useRef, type ReactNode } from 'react';
 import { useClerk, useSignIn, useSignUp } from '../hooks';
 
 export interface HandleSSOCallbackProps {
