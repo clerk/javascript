@@ -8,6 +8,7 @@ export {
   ClerkFailed,
   ClerkLoaded,
   ClerkLoading,
+  UNSAFE_PortalProvider,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
   RedirectToSignIn,

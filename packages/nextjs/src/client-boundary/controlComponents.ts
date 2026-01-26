@@ -12,6 +12,7 @@ export {
   RedirectToSignUp,
   RedirectToTasks,
   RedirectToUserProfile,
+  UNSAFE_PortalProvider,
   Show,
 } from '@clerk/react';
 

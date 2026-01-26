@@ -20,3 +20,5 @@ export {
 export { ClerkContextProvider } from './ClerkContextProvider';
 
 export * from './billing/payment-element';
+
+export { UNSAFE_PortalProvider, usePortalRoot } from './PortalProvider';

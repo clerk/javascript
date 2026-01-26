@@ -53,6 +53,7 @@ import type { AvailableComponentProps } from './types';
 import { buildVirtualRouterUrl } from './utils/buildVirtualRouterUrl';
 import { disambiguateRedirectOptions } from './utils/disambiguateRedirectOptions';
 import { extractCssLayerNameFromAppearance } from './utils/extractCssLayerNameFromAppearance';
+import { warnAboutCustomizationWithoutPinning } from './utils/warnAboutCustomizationWithoutPinning';
 
 // Re-export for ClerkUi
 export { extractCssLayerNameFromAppearance };
@@ -235,7 +236,18 @@ export const mountComponentRenderer = (
               getClerk={getClerk}
               getEnvironment={getEnvironment}
               options={options}
-              onComponentsMounted={deferredPromise.resolve}
+              onComponentsMounted={() => {
+                // Defer warning check to avoid blocking component mount
+                // Only check in development mode (based on publishable key, not NODE_ENV)
+                if (getClerk().instanceType === 'development') {
+                  const scheduleWarningCheck =
+                    typeof requestIdleCallback === 'function'
+                      ? requestIdleCallback
+                      : (cb: () => void) => setTimeout(cb, 0);
+                  scheduleWarningCheck(() => warnAboutCustomizationWithoutPinning(options));
+                }
+                deferredPromise.resolve();
+              }}
               moduleManager={moduleManager}
             />,
           );
@@ -480,6 +492,7 @@ const Components = (props: ComponentsProps) => {
       onClose={() => componentsControls.closeModal('signIn')}
       onExternalNavigate={() => componentsControls.closeModal('signIn')}
       startPath={buildVirtualRouterUrl({ base: '/sign-in', path: urlStateParam?.path })}
+      getContainer={signInModal?.getContainer}
       componentName={'SignInModal'}
     >
       <SignInModal {...signInModal} />
@@ -497,6 +510,7 @@ const Components = (props: ComponentsProps) => {
       onClose={() => componentsControls.closeModal('signUp')}
       onExternalNavigate={() => componentsControls.closeModal('signUp')}
       startPath={buildVirtualRouterUrl({ base: '/sign-up', path: urlStateParam?.path })}
+      getContainer={signUpModal?.getContainer}
       componentName={'SignUpModal'}
     >
       <SignInModal {...disambiguateRedirectOptions(signUpModal, 'signup')} />
@@ -517,6 +531,7 @@ const Components = (props: ComponentsProps) => {
         base: '/user',
         path: userProfileModal?.__experimental_startPath || urlStateParam?.path,
       })}
+      getContainer={userProfileModal?.getContainer}
       componentName={'UserProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
@@ -534,6 +549,7 @@ const Components = (props: ComponentsProps) => {
       onClose={() => componentsControls.closeModal('userVerification')}
       onExternalNavigate={() => componentsControls.closeModal('userVerification')}
       startPath={buildVirtualRouterUrl({ base: '/user-verification', path: urlStateParam?.path })}
+      getContainer={userVerificationModal?.getContainer}
       componentName={'UserVerificationModal'}
       modalContainerSx={{ alignItems: 'center' }}
     >
@@ -553,6 +569,7 @@ const Components = (props: ComponentsProps) => {
         base: '/organizationProfile',
         path: organizationProfileModal?.__experimental_startPath || urlStateParam?.path,
       })}
+      getContainer={organizationProfileModal?.getContainer}
       componentName={'OrganizationProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
@@ -570,6 +587,7 @@ const Components = (props: ComponentsProps) => {
       onClose={() => componentsControls.closeModal('createOrganization')}
       onExternalNavigate={() => componentsControls.closeModal('createOrganization')}
       startPath={buildVirtualRouterUrl({ base: '/createOrganization', path: urlStateParam?.path })}
+      getContainer={createOrganizationModal?.getContainer}
       componentName={'CreateOrganizationModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$120}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
@@ -587,6 +605,7 @@ const Components = (props: ComponentsProps) => {
       onClose={() => componentsControls.closeModal('waitlist')}
       onExternalNavigate={() => componentsControls.closeModal('waitlist')}
       startPath={buildVirtualRouterUrl({ base: '/waitlist', path: urlStateParam?.path })}
+      getContainer={waitlistModal?.getContainer}
       componentName={'WaitlistModal'}
     >
       <WaitlistModal {...waitlistModal} />

@@ -89,6 +89,33 @@ const noNavigateUseClerk = {
   },
 };
 
+const noGlobalObject = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow direct usage of `global.` - use `globalThis` instead for cross-platform compatibility',
+      recommended: false,
+    },
+    messages: {
+      noGlobal:
+        'Use `globalThis` instead of `global` for cross-platform compatibility. The `global` object is Node.js-specific and may not exist in browser or other environments.',
+    },
+    schema: [],
+  },
+  create(context) {
+    return {
+      MemberExpression(node) {
+        if (node.object.type === 'Identifier' && node.object.name === 'global') {
+          context.report({
+            node,
+            messageId: 'noGlobal',
+          });
+        }
+      },
+    };
+  },
+};
+
 const noUnstableMethods = {
   meta: {
     type: 'problem',
@@ -219,6 +246,7 @@ export default tseslint.config([
     plugins: {
       'custom-rules': {
         rules: {
+          'no-global-object': noGlobalObject,
           'no-unstable-methods': noUnstableMethods,
         },
       },
@@ -442,6 +470,7 @@ export default tseslint.config([
     name: 'packages/shared',
     files: ['packages/shared/src/**/*'],
     rules: {
+      'custom-rules/no-global-object': 'error',
       'no-restricted-imports': [
         'error',
         {
@@ -459,6 +488,14 @@ export default tseslint.config([
           ],
         },
       ],
+    },
+  },
+  {
+    name: 'packages/shared - tests',
+    files: ['packages/shared/src/**/__tests__/**/*', 'packages/shared/src/**/*.test.{ts,tsx}'],
+    rules: {
+      // Allow `global.` in test files for mocking (e.g., global.window, global.console)
+      'custom-rules/no-global-object': 'off',
     },
   },
   {
