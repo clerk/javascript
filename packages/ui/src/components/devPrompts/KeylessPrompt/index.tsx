@@ -46,19 +46,6 @@ function withLastActiveFallback(cb: () => string): string {
   }
 }
 
-const MosaicThemedContent = () => {
-  const theme = useMosaicTheme();
-  return (
-    <div css={{ color: theme.colors.purple[500] }}>
-      <p css={{ color: theme.colors.purple[800], ...theme.typography.heading[1] }}>
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Excepturi libero architecto explicabo ex laudantium
-        consequatur consectetur porro, animi quis mollitia eaque soluta hic dolores, odit exercitationem adipisci
-        impedit, modi nihil.
-      </p>
-    </div>
-  );
-};
-
 const _KeylessPromptInternal = (_props: KeylessPromptProps) => {
   const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -567,9 +554,18 @@ const _KeylessPromptInternal = (_props: KeylessPromptProps) => {
 };
 
 function KeylessPromptInternal(_props: KeylessPromptProps) {
+  return (
+    <MosaicThemeProvider>
+      <KeylessPromptContent />
+    </MosaicThemeProvider>
+  );
+}
+
+function KeylessPromptContent() {
   const [isOpen, setIsOpen] = useState(false);
   const id = React.useId();
   const containerRef = React.useRef<HTMLDivElement>(null);
+  const theme = useMosaicTheme();
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -595,23 +591,18 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
 
   return (
     <Portal>
-      <MosaicThemeProvider>
-        <MosaicThemedContent />
-      </MosaicThemeProvider>
       <div
         ref={containerRef}
         css={css`
           --duration-open: 220ms;
           --duration-close: 180ms;
           --ease-bezier: cubic-bezier(0.2, 0, 0, 1);
-          --font-family:
-            -apple-system, BlinkMacSystemFont, 'avenir next', avenir, 'segoe ui', 'helvetica neue', helvetica,
-            Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
-          --background: #1a1a1a;
-          --foreground: #ffffff;
-          --foreground-secondary: #b4b4b4;
-          --accent: #6c47ff;
-          --offset: 1.25rem;
+          --font-family: ${theme.fontFamilies.sans};
+          --background: ${theme.colors.gray[1400]};
+          --foreground: ${theme.colors.white};
+          --foreground-secondary: ${theme.colors.gray[500]};
+          --accent: ${theme.colors.purple[700]};
+          --offset: ${theme.spacing[5]};
           --width-opened: 18rem;
           --width-closed: 13rem;
           position: fixed;
@@ -630,7 +621,7 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
             0px 0px 0px 0px rgba(255, 255, 255, 0.72),
             0px 16px 36px -6px rgba(0, 0, 0, 0.36),
             0px 6px 16px -2px rgba(0, 0, 0, 0.2);
-          border-radius: ${isOpen ? '0.75rem' : '2.5rem'};
+          border-radius: ${isOpen ? theme.spacing[3] : theme.spacing[10]};
           isolation: isolate;
           will-change: width, border-radius;
           transform: translateZ(0);
@@ -674,15 +665,15 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
             align-items: center;
             width: 100%;
             border-radius: inherit;
-            padding-block: 0.75rem;
+            padding-block: ${theme.spacing[3]};
             position: relative;
             outline: none;
           `}
         >
           <span
             css={css`
-              margin-inline-start: 0.75rem;
-              margin-inline-end: 0.25rem;
+              margin-inline-start: ${theme.spacing[3]};
+              margin-inline-end: ${theme.spacing[1]};
               display: flex;
               align-items: center;
               justify-content: center;
@@ -690,7 +681,7 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
           >
             <svg
               css={css`
-                --size: 1rem;
+                --size: ${theme.spacing[4]};
                 flex-shrink: 0;
                 width: var(--size);
                 height: var(--size);
@@ -720,9 +711,9 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
           <span
             css={css`
               font-family: var(--font-family);
-              font-size: 0.875rem;
-              font-weight: 500;
-              line-height: calc(1rem / 0.875rem);
+              font-size: ${theme.typography.label[2].fontSize};
+              font-weight: ${theme.fontWeights.medium};
+              line-height: ${theme.typography.label[2].lineHeight};
               white-space: nowrap;
               color: var(--foreground);
               background: linear-gradient(
@@ -776,15 +767,15 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
             fill='none'
             aria-hidden='true'
             css={css`
-              --size: 1rem;
+              --size: ${theme.spacing[4]};
               flex-shrink: 0;
               width: var(--size);
               height: var(--size);
               color: var(--foreground);
               margin-inline-start: auto;
-              margin-inline-end: 0.75rem;
+              margin-inline-end: ${theme.spacing[3]};
               opacity: ${isOpen ? 0.6 : 0};
-              transform: translateX(${isOpen ? '0' : '0.75rem'});
+              transform: translateX(${isOpen ? '0' : theme.spacing[3]});
               transition:
                 opacity 120ms ease-out,
                 transform 200ms ease-out;
@@ -821,7 +812,7 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
             css={css`
               overflow: hidden;
               min-height: 0;
-              mask-image: linear-gradient(to bottom, black calc(100% - 0.75rem), transparent);
+              mask-image: linear-gradient(to bottom, black calc(100% - ${theme.spacing[3]}), transparent);
             `}
           >
             <div
@@ -829,8 +820,8 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
                 width: var(--width-opened);
                 display: flex;
                 flex-direction: column;
-                padding: 0 0.75rem 0.75rem 0.75rem;
-                gap: 0.75rem;
+                padding: 0 ${theme.spacing[3]} ${theme.spacing[3]} ${theme.spacing[3]};
+                gap: ${theme.spacing[3]};
                 opacity: ${isOpen ? 1 : 0};
                 filter: blur(${isOpen ? '0px' : '6px'});
                 transition-delay: ${isOpen ? '100ms' : '0ms'};
@@ -846,10 +837,10 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
                 css={css`
                   display: flex;
                   flex-direction: column;
-                  gap: 0.5rem;
+                  gap: ${theme.spacing[2]};
                   color: var(--foreground-secondary);
-                  font-size: 0.8125rem;
-                  line-height: 1.25;
+                  font-size: ${theme.typography.body[3].fontSize};
+                  line-height: ${theme.typography.body[3].lineHeight};
                 `}
               >
                 <p>Temporary API keys are enabled so you can get started immediately.</p>
@@ -867,12 +858,12 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
                   display: flex;
                   align-items: center;
                   justify-content: center;
-                  gap: 0.25rem;
+                  gap: ${theme.spacing[1]};
                   width: 100%;
-                  height: 1.75rem;
-                  border-radius: 0.375rem;
-                  font-size: 0.75rem;
-                  font-weight: 500;
+                  height: ${theme.spacing[7]};
+                  border-radius: ${theme.spacing[1.5]};
+                  font-size: ${theme.typography.label[3].fontSize};
+                  font-weight: ${theme.fontWeights.medium};
                   color: var(--foreground);
                   background: var(--accent);
                   box-shadow:
@@ -906,8 +897,8 @@ function KeylessPromptInternal(_props: KeylessPromptProps) {
                 <svg
                   css={css`
                     flex-shrink: 0;
-                    width: 0.625rem;
-                    height: 0.625rem;
+                    width: ${theme.spacing[2.5]};
+                    height: ${theme.spacing[2.5]};
                     opacity: 0.6;
                   `}
                   viewBox='0 0 10 10'
