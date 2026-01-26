@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { checkVersionAgainstBounds, isVersionCompatible, parseVersion, type VersionBounds } from '../versionCheck';
+import {
+  checkVersionAgainstBounds,
+  isVersionAtLeast,
+  isVersionCompatible,
+  parseVersion,
+  type VersionBounds,
+} from '../versionCheck';
 
 describe('parseVersion', () => {
   it('parses standard semver versions', () => {
@@ -140,5 +146,72 @@ describe('isVersionCompatible', () => {
   it('returns false for invalid version strings', () => {
     expect(isVersionCompatible('', bounds)).toBe(false);
     expect(isVersionCompatible('invalid', bounds)).toBe(false);
+  });
+});
+
+describe('isVersionAtLeast', () => {
+  describe('returns true when version meets or exceeds minimum', () => {
+    it('exact match', () => {
+      expect(isVersionAtLeast('5.100.0', '5.100.0')).toBe(true);
+    });
+
+    it('higher patch', () => {
+      expect(isVersionAtLeast('5.100.1', '5.100.0')).toBe(true);
+    });
+
+    it('higher minor', () => {
+      expect(isVersionAtLeast('5.101.0', '5.100.0')).toBe(true);
+      expect(isVersionAtLeast('5.114.0', '5.100.0')).toBe(true);
+    });
+
+    it('higher major', () => {
+      expect(isVersionAtLeast('6.0.0', '5.100.0')).toBe(true);
+    });
+  });
+
+  describe('returns false when version is below minimum', () => {
+    it('lower patch', () => {
+      expect(isVersionAtLeast('5.100.0', '5.100.1')).toBe(false);
+    });
+
+    it('lower minor', () => {
+      expect(isVersionAtLeast('5.99.0', '5.100.0')).toBe(false);
+      expect(isVersionAtLeast('5.99.999', '5.100.0')).toBe(false);
+    });
+
+    it('lower major', () => {
+      expect(isVersionAtLeast('4.999.999', '5.100.0')).toBe(false);
+    });
+  });
+
+  describe('handles pre-release versions', () => {
+    it('treats pre-release as base version', () => {
+      expect(isVersionAtLeast('5.100.0-canary.123', '5.100.0')).toBe(true);
+      expect(isVersionAtLeast('5.114.0-snapshot.456', '5.100.0')).toBe(true);
+    });
+
+    it('compares base versions ignoring pre-release suffix', () => {
+      expect(isVersionAtLeast('5.99.0-canary.999', '5.100.0')).toBe(false);
+    });
+  });
+
+  describe('handles edge cases', () => {
+    it('returns false for null/undefined version', () => {
+      expect(isVersionAtLeast(null, '5.100.0')).toBe(false);
+      expect(isVersionAtLeast(undefined, '5.100.0')).toBe(false);
+    });
+
+    it('returns false for empty string', () => {
+      expect(isVersionAtLeast('', '5.100.0')).toBe(false);
+    });
+
+    it('returns false for invalid version string', () => {
+      expect(isVersionAtLeast('invalid', '5.100.0')).toBe(false);
+      expect(isVersionAtLeast('5.100', '5.100.0')).toBe(false);
+    });
+
+    it('returns false if minVersion cannot be parsed', () => {
+      expect(isVersionAtLeast('5.100.0', 'invalid')).toBe(false);
+    });
   });
 });
