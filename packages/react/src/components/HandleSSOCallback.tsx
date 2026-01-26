@@ -1,5 +1,6 @@
 import type { SetActiveNavigate } from '@clerk/shared/types';
-import React, { useEffect, useRef, type ReactNode } from 'react';
+import React, { type ReactNode, useEffect, useRef } from 'react';
+
 import { useClerk, useSignIn, useSignUp } from '../hooks';
 
 export interface HandleSSOCallbackProps {
@@ -171,7 +172,7 @@ export function HandleSSOCallback(props: HandleSSOCallbackProps): ReactNode {
     <div>
       {/* Because a sign-in transferred to a sign-up might require captcha verification, make sure to render the
   captcha element. */}
-      <div id='clerk-captcha'></div>
+      <div id='clerk-captcha' />
     </div>
   );
 }
