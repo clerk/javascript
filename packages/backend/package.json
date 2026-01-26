@@ -75,6 +75,16 @@
         "default": "./dist/webhooks.js"
       }
     },
+    "./proxy": {
+      "import": {
+        "types": "./dist/proxy.d.ts",
+        "default": "./dist/proxy.mjs"
+      },
+      "require": {
+        "types": "./dist/proxy.d.ts",
+        "default": "./dist/proxy.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -83,7 +93,8 @@
     "errors",
     "internal",
     "jwt",
-    "webhooks"
+    "webhooks",
+    "proxy"
   ],
   "scripts": {
     "build": "tsup",
