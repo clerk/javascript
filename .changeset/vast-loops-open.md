@@ -1,4 +1,5 @@
 ---
+'@clerk/chrome-extension': minor
 '@clerk/nextjs': minor
 '@clerk/react': minor
 ---
