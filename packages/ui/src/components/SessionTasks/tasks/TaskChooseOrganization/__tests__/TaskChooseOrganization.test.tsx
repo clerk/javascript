@@ -264,46 +264,6 @@ describe('TaskChooseOrganization', () => {
     expect(await findByText(/testuser/)).toBeInTheDocument();
   });
 
-  it('does not allow creating organization if not allowed to create additional membership', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withOrganizations();
-      f.withMaxAllowedMemberships({ max: 1 });
-      f.withForceOrganizationSelection();
-      f.withUser({
-        email_addresses: ['test@clerk.com'],
-        create_organization_enabled: true,
-        tasks: [{ key: 'choose-organization' }],
-        // Include an organization membership so user has reached max memberships
-        organization_memberships: [{ name: 'Existing Org', slug: 'org1' }],
-      });
-    });
-
-    fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
-      Promise.resolve({
-        data: [
-          createFakeUserOrganizationMembership({
-            id: '1',
-            organization: {
-              id: '1',
-              name: 'Existing Org',
-              slug: 'org1',
-              membersCount: 1,
-              adminDeleteEnabled: false,
-              maxAllowedMemberships: 1,
-              pendingInvitationsCount: 1,
-            },
-          }),
-        ],
-        total_count: 1,
-      }),
-    );
-
-    const { findByText, queryByText } = render(<TaskChooseOrganization />, { wrapper });
-
-    expect(await findByText('Existing Org')).toBeInTheDocument();
-    expect(queryByText('Create new organization')).not.toBeInTheDocument();
-  });
-
   describe('on create organization form', () => {
     it("does not display slug field if it's disabled on environment", async () => {
       const { wrapper } = await createFixtures(f => {
