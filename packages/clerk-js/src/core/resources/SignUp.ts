@@ -596,7 +596,7 @@ class SignUpFuture implements SignUpFutureResource {
     verifyPhoneCode: this.verifyPhoneCode.bind(this),
   };
 
-  #hasBeenFinalized = false;
+  #canBeDiscarded = false;
   readonly #resource: SignUp;
 
   constructor(resource: SignUp) {
@@ -701,8 +701,8 @@ class SignUpFuture implements SignUpFutureResource {
     return undefined;
   }
 
-  get hasBeenFinalized() {
-    return this.#hasBeenFinalized;
+  get canBeDiscarded() {
+    return this.#canBeDiscarded;
   }
 
   private async getCaptchaToken(): Promise<{
@@ -971,9 +971,23 @@ class SignUpFuture implements SignUpFutureResource {
         throw new Error('Cannot finalize sign-up without a created session.');
       }
 
-      this.#hasBeenFinalized = true;
+      this.#canBeDiscarded = true;
       await SignUp.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
+  }
+
+  /**
+   * Resets the current sign-up attempt by clearing all local state back to null.
+   * Unlike other methods, this does NOT emit resource:fetch with 'fetching' status,
+   * allowing for smooth UI transitions without loading states.
+   */
+  reset(): Promise<{ error: ClerkError | null }> {
+    if (!SignUp.clerk.client) {
+      throw new Error('Cannot reset sign-up without a client.');
+    }
+    this.#canBeDiscarded = true;
+    SignUp.clerk.client.resetSignUp();
+    return Promise.resolve({ error: null });
   }
 }
 
