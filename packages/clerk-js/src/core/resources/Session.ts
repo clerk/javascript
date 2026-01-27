@@ -479,7 +479,13 @@ export class Session extends BaseResource implements SessionResource {
           tokenId,
           tokenResolver: Promise.resolve(token),
           onRefresh: () =>
-            this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate, leewayInSeconds),
+            this.#refreshTokenInBackground(
+              template,
+              organizationId,
+              tokenId,
+              shouldDispatchTokenUpdate,
+              leewayInSeconds,
+            ),
         });
         this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
       })
