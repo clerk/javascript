@@ -84,7 +84,8 @@ export function HandleSSOCallback(props: HandleSSOCallbackProps): ReactNode {
       hasRun.current = true;
 
       // If this was a sign-in, and it's complete, there's nothing else to do.
-      // Note: We perform a cast
+      // Note: We perform a cast here to prevent TypeScript from narrowing the type of signIn.status. TypeScript
+      // doesn't understand that the status can be mutated during the execution of this function.
       if ((signIn.status as string) === 'complete') {
         await signIn.finalize({
           navigate: async (...params) => {
