@@ -144,6 +144,10 @@ function KeylessPromptContent(props: KeylessPromptProps) {
           z-index: 999999;
           height: auto;
           width: ${isOpen ? 'var(--width-opened)' : 'var(--width-closed)'};
+          font-family: var(--font-family);
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
           interpolate-size: allow-keywords;
           background:
             linear-gradient(
@@ -202,6 +206,7 @@ function KeylessPromptContent(props: KeylessPromptProps) {
           aria-expanded={isOpen}
           aria-controls={id}
           css={css`
+            box-sizing: border-box;
             appearance: none;
             border: none;
             background-color: transparent;
@@ -210,6 +215,7 @@ function KeylessPromptContent(props: KeylessPromptProps) {
             width: 100%;
             border-radius: inherit;
             padding-block: ${theme.spacing[3]};
+            margin: 0;
             position: relative;
             outline: none;
           `}
@@ -351,7 +357,7 @@ function KeylessPromptContent(props: KeylessPromptProps) {
               transition: none;
             }
           `}
-          {...(!isOpen && { inert: '' })}
+          {...(!isOpen && { inert: true })}
           aria-hidden={!isOpen}
         >
           <div
@@ -385,9 +391,14 @@ function KeylessPromptContent(props: KeylessPromptProps) {
                   flexDirection: 'column',
                   gap: theme.spacing[2],
                   color: 'var(--foreground-secondary)',
+                  fontFamily: 'var(--font-family)',
                   fontSize: theme.typography.body[3].fontSize,
                   lineHeight: theme.typography.body[3].lineHeight,
+                  fontWeight: theme.typography.body[3].fontWeight,
                   '& > p': {
+                    boxSizing: 'border-box',
+                    margin: 0,
+                    padding: 0,
                     textBoxTrim: 'trim-both',
                   },
                 }}
@@ -455,6 +466,7 @@ function KeylessPromptContent(props: KeylessPromptProps) {
                     });
                   }}
                   css={css`
+                    box-sizing: border-box;
                     position: relative;
                     display: flex;
                     align-items: center;
@@ -474,6 +486,8 @@ function KeylessPromptContent(props: KeylessPromptProps) {
                       ${theme.alpha(theme.colors.gray[1300], 20)} 0px 1px 3px 0px;
                     outline: none;
                     border: none;
+                    margin: 0;
+                    padding: 0;
                     cursor: pointer;
                     &::before {
                       content: '';
@@ -512,6 +526,7 @@ function KeylessPromptContent(props: KeylessPromptProps) {
                   target='_blank'
                   rel='noopener noreferrer'
                   css={css`
+                    box-sizing: border-box;
                     position: relative;
                     display: flex;
                     align-items: center;
@@ -530,6 +545,8 @@ function KeylessPromptContent(props: KeylessPromptProps) {
                       ${theme.alpha(theme.colors.white, 7)} 0px 1px 0px 0px inset,
                       ${theme.alpha(theme.colors.gray[1300], 20)} 0px 1px 3px 0px;
                     outline: none;
+                    margin: 0;
+                    padding: 0;
                     &::before {
                       content: '';
                       position: absolute;
