@@ -128,6 +128,8 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
           --offset: ${theme.spacing[5]};
           --width-opened: 18rem;
           --width-closed: 13rem;
+          -webkit-font-smoothing: auto;
+          -moz-osx-font-smoothing: auto;
           position: fixed;
           bottom: var(--offset);
           right: var(--offset);
