@@ -4,8 +4,6 @@ export type * from '@clerk/shared/types';
 // Vue-specific types
 export type {
   VueClerkInjectionKeyType,
-  HeadlessBrowserClerk,
-  BrowserClerk,
   CustomPortalsRendererProps,
   CustomItemOrPageWithoutHandler,
   AddCustomMenuItemParams,
@@ -20,6 +18,3 @@ export type {
 
 // Plugin types
 export type { PluginOptions } from '../plugin';
-
-// Control component types
-export type { ShowProps } from '../components/controlComponents';

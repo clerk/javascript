@@ -25,5 +25,3 @@ export type {
   UserProfilePageProps,
   WithClerkProp,
 } from '../types';
-
-export type { ShowProps } from '../components/controlComponents';
