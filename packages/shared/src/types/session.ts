@@ -339,27 +339,7 @@ export interface SessionTask {
 }
 
 export type GetTokenOptions = {
-  /**
-   * Seconds before token expiration to trigger background refresh.
-   * When a token's remaining TTL falls below this threshold, `getToken()` returns the
-   * cached token immediately while triggering a background refresh.
-   *
-   * - Minimum value: 5 seconds (the poller interval)
-   * - Default value: 15 seconds
-   *
-   * Lower values delay background refresh until closer to expiration.
-   * Higher values trigger earlier background refresh, which can reduce latency for
-   * time-sensitive operations but may cause more frequent token refresh requests.
-   */
-  backgroundRefreshThreshold?: number;
   organizationId?: string;
-  /**
-   * @internal
-   * When true, triggers a background token refresh if the cached token is within the
-   * refresh threshold period, while still returning the current valid token immediately.
-   * Used by the session poller to proactively refresh tokens before they expire.
-   */
-  refreshIfStale?: boolean;
   skipCache?: boolean;
   template?: string;
 };

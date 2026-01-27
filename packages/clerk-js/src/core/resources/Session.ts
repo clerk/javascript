@@ -138,9 +138,14 @@ export class Session extends BaseResource implements SessionResource {
 
   #hydrateCache = (token: TokenResource | null) => {
     if (token) {
+      const tokenId = this.#getCacheId();
+      // Dispatch tokenUpdate for __session tokens with the session's active organization ID
+      const shouldDispatchTokenUpdate = true;
       SessionTokenCache.set({
-        tokenId: this.#getCacheId(),
+        tokenId,
         tokenResolver: Promise.resolve(token),
+        onRefresh: () =>
+          this.#refreshTokenInBackground(undefined, this.lastActiveOrganizationId, tokenId, shouldDispatchTokenUpdate),
       });
     }
   };
@@ -356,36 +361,22 @@ export class Session extends BaseResource implements SessionResource {
       return null;
     }
 
-    const { backgroundRefreshThreshold, refreshIfStale = false, skipCache = false, template } = options || {};
+    const { skipCache = false, template } = options || {};
 
     // If no organization ID is provided, default to the selected organization in memory
     // Note: this explicitly allows passing `null` or `""`, which should select the personal workspace.
     const organizationId =
       typeof options?.organizationId === 'undefined' ? this.lastActiveOrganizationId : options?.organizationId;
 
-    if (!template && Number(backgroundRefreshThreshold) >= 60) {
-      throw new Error('backgroundRefreshThreshold cannot exceed the token lifespan (60 seconds)');
-    }
-
     const tokenId = this.#getCacheId(template, organizationId);
 
-    const cacheResult = skipCache ? undefined : SessionTokenCache.get({ tokenId }, backgroundRefreshThreshold);
+    const cacheResult = skipCache ? undefined : SessionTokenCache.get({ tokenId });
 
     // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
     if (cacheResult) {
-      // If caller requests refresh when stale (e.g., poller), fetch fresh token instead of returning cached
-      if (cacheResult.needsRefresh && refreshIfStale) {
-        return this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
-      }
-
-      // Trigger background refresh if token is expiring soon
-      // This guarantees cache revalidation without relying solely on the poller
-      if (cacheResult.needsRefresh) {
-        this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate);
-      }
-
+      // Proactive refresh is handled by timers scheduled in the cache
       // Prefer synchronous read to avoid microtask overhead when token is already resolved
       const cachedToken = cacheResult.entry.resolvedToken ?? (await cacheResult.entry.tokenResolver);
       if (shouldDispatchTokenUpdate) {
@@ -439,7 +430,11 @@ export class Session extends BaseResource implements SessionResource {
     debugLogger.info('Fetching new token from API', { organizationId, template, tokenId }, 'session');
 
     const tokenResolver = this.#createTokenResolver(template, organizationId, skipCache);
-    SessionTokenCache.set({ tokenId, tokenResolver });
+    SessionTokenCache.set({
+      tokenId,
+      tokenResolver,
+      onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+    });
 
     return tokenResolver.then(token => {
       this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
@@ -475,7 +470,11 @@ export class Session extends BaseResource implements SessionResource {
     tokenResolver
       .then(token => {
         // Cache the resolved token for future calls
-        SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(token) });
+        SessionTokenCache.set({
+          tokenId,
+          tokenResolver: Promise.resolve(token),
+          onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+        });
         this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
       })
       .catch(error => {

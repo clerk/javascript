@@ -334,7 +334,6 @@ describe('SessionTokenCache', () => {
       const result = SessionTokenCache.get({ tokenId: 'future_token' });
       expect(result).toBeDefined();
       expect(result?.entry.tokenId).toBe('future_token');
-      expect(result?.needsRefresh).toBe(false);
     });
 
     it('removes token when it has already expired based on duration', async () => {
@@ -356,7 +355,7 @@ describe('SessionTokenCache', () => {
       expect(result).toBeUndefined();
     });
 
-    it('returns token with needsRefresh when remaining TTL is less than leeway (SWR)', async () => {
+    it('returns token when remaining TTL is above poller interval', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const iat = nowSeconds;
       const exp = iat + 20;
@@ -367,16 +366,15 @@ describe('SessionTokenCache', () => {
         jwt: { claims: { exp, iat } },
       } as any);
 
-      // Token has 20s TTL, created 11s ago = 9s remaining (< 10s default leeway)
+      // Token has 20s TTL, created 11s ago = 9s remaining (> 5s poller interval)
       SessionTokenCache.set({ createdAt: nowSeconds - 11, tokenId: 'soon_expired_token', tokenResolver });
 
       await tokenResolver;
 
-      // SWR: Token is still valid (9s > 0), so it should be returned with needsRefresh=true
+      // Token is still valid (9s > 5s poller interval), so it should be returned
       const result = SessionTokenCache.get({ tokenId: 'soon_expired_token' });
       expect(result).toBeDefined();
       expect(result?.entry.tokenId).toBe('soon_expired_token');
-      expect(result?.needsRefresh).toBe(true);
     });
 
     it('returns token when expiresAt is undefined (promise not yet resolved)', () => {
@@ -537,270 +535,170 @@ describe('SessionTokenCache', () => {
     });
   });
 
-  describe('SWR leeway behavior', () => {
-    it('returns needsRefresh=false when token has plenty of time remaining', async () => {
+  describe('proactive refresh timer', () => {
+    it('calls onRefresh callback when refresh timer fires', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const jwt = createJwtWithTtl(nowSeconds, 60);
 
       const token = new Token({
-        id: 'fresh-token',
+        id: 'refresh-timer-token',
+        jwt,
+        object: 'token',
+      });
+
+      const onRefresh = vi.fn();
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { audience: 'refresh-test', tokenId: 'refresh-timer-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver, onRefresh });
+      await tokenResolver;
+
+      // Timer should fire at: 60s - 15s (leeway) - 2s (lead time) = 43s
+      expect(onRefresh).not.toHaveBeenCalled();
+
+      // Advance to just before timer should fire
+      vi.advanceTimersByTime(42 * 1000);
+      expect(onRefresh).not.toHaveBeenCalled();
+
+      // Advance past timer fire time
+      vi.advanceTimersByTime(2 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not schedule refresh timer when onRefresh is not provided', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'no-callback-token',
         jwt,
         object: 'token',
       });
 
       const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { audience: 'fresh-test', tokenId: 'fresh-token' };
+      const key = { tokenId: 'no-callback-token' };
 
+      // Set without onRefresh (like broadcast-received tokens)
       SessionTokenCache.set({ ...key, tokenResolver });
       await tokenResolver;
 
-      // Token just created, 60s remaining - should return needsRefresh=false
+      // Token should still be cached and retrievable
       const result = SessionTokenCache.get(key);
-      expect(result?.entry.tokenId).toBe('fresh-token');
-      expect(result?.needsRefresh).toBe(false);
+      expect(result?.entry.tokenId).toBe('no-callback-token');
+
+      // Advance past when timer would fire - nothing should happen
+      vi.advanceTimersByTime(50 * 1000);
+
+      // Token should still be valid (10s remaining)
+      const stillCached = SessionTokenCache.get(key);
+      expect(stillCached?.entry.tokenId).toBe('no-callback-token');
     });
 
-    it('returns needsRefresh=true when token is within default leeway (SWR)', async () => {
+    it('clears refresh timer when entry is deleted', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const jwt = createJwtWithTtl(nowSeconds, 60);
 
       const token = new Token({
-        id: 'expiring-token',
+        id: 'clear-timer-token',
         jwt,
         object: 'token',
       });
 
+      const onRefresh = vi.fn();
       const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { audience: 'expiring-test', tokenId: 'expiring-token' };
+      const key = { tokenId: 'clear-timer-token' };
 
-      SessionTokenCache.set({ ...key, tokenResolver });
+      SessionTokenCache.set({ ...key, tokenResolver, onRefresh });
       await tokenResolver;
 
-      // At 44s elapsed, 16s remaining - fresh, no refresh needed (> 15s MIN_REMAINING_TTL)
-      vi.advanceTimersByTime(44 * 1000);
-      let result = SessionTokenCache.get(key);
-      expect(result?.entry.tokenId).toBe('expiring-token');
-      expect(result?.needsRefresh).toBe(false);
+      // Clear the cache before timer fires
+      vi.advanceTimersByTime(30 * 1000);
+      SessionTokenCache.clear();
 
-      // At 46s elapsed, 14s remaining (< 15s MIN_REMAINING_TTL) - SWR: return token with needsRefresh=true
-      vi.advanceTimersByTime(2 * 1000);
-      result = SessionTokenCache.get(key);
-      expect(result?.entry.tokenId).toBe('expiring-token');
-      expect(result?.needsRefresh).toBe(true);
+      // Advance past when timer would have fired
+      vi.advanceTimersByTime(20 * 1000);
 
-      // At 60s elapsed, 0s remaining - token actually expired, return undefined
-      vi.advanceTimersByTime(14 * 1000);
-      result = SessionTokenCache.get(key);
-      expect(result).toBeUndefined();
+      // onRefresh should not have been called since entry was cleared
+      expect(onRefresh).not.toHaveBeenCalled();
     });
 
-    it('returns needsRefresh=true consistently while token is within leeway', async () => {
+    it('does not schedule refresh timer for tokens with very short TTL', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      // Token with 10s TTL - refreshFireTime would be 10 - 15 - 2 = -7 (negative)
+      const jwt = createJwtWithTtl(nowSeconds, 10);
+
+      const token = new Token({
+        id: 'short-ttl-token',
+        jwt,
+        object: 'token',
+      });
+
+      const onRefresh = vi.fn();
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'short-ttl-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver, onRefresh });
+      await tokenResolver;
+
+      // Advance past token expiration
+      vi.advanceTimersByTime(15 * 1000);
+
+      // onRefresh should not have been called - no timer was scheduled
+      expect(onRefresh).not.toHaveBeenCalled();
+    });
+
+    it('returns token until expiration even after refresh timer fires', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const jwt = createJwtWithTtl(nowSeconds, 60);
 
       const token = new Token({
-        id: 'dedupe-token',
+        id: 'still-valid-token',
         jwt,
         object: 'token',
       });
 
+      const onRefresh = vi.fn();
       const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { audience: 'dedupe-test', tokenId: 'dedupe-token' };
+      const key = { tokenId: 'still-valid-token' };
 
-      SessionTokenCache.set({ ...key, tokenResolver });
+      SessionTokenCache.set({ ...key, tokenResolver, onRefresh });
       await tokenResolver;
 
-      // Advance to within leeway
-      vi.advanceTimersByTime(51 * 1000); // 9s remaining
+      // Advance past refresh timer (43s)
+      vi.advanceTimersByTime(50 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
 
-      // First call: needsRefresh=true
-      let result = SessionTokenCache.get(key);
-      expect(result?.needsRefresh).toBe(true);
-
-      // Second call: needsRefresh=true (consistently signals refresh needed)
-      result = SessionTokenCache.get(key);
-      expect(result?.entry.tokenId).toBe('dedupe-token');
-      expect(result?.needsRefresh).toBe(true);
-    });
-
-    it('honors larger custom leeway values', async () => {
-      const nowSeconds = Math.floor(Date.now() / 1000);
-      const jwt = createJwtWithTtl(nowSeconds, 60);
-
-      const token = new Token({
-        id: 'custom-leeway-token',
-        jwt,
-        object: 'token',
-      });
-
-      const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { audience: 'custom-leeway-test', tokenId: 'custom-leeway-token' };
-
-      SessionTokenCache.set({ ...key, tokenResolver });
-      await tokenResolver;
-
-      // At 29s elapsed, 31s remaining - fresh with 30s leeway
-      vi.advanceTimersByTime(29 * 1000);
-      let result = SessionTokenCache.get(key, 30);
-      expect(result?.entry.tokenId).toBe('custom-leeway-token');
-      expect(result?.needsRefresh).toBe(false);
-
-      // At 31s elapsed, 29s remaining (< 30s leeway) - needs refresh
-      vi.advanceTimersByTime(2 * 1000);
-      result = SessionTokenCache.get(key, 30);
-      expect(result?.entry.tokenId).toBe('custom-leeway-token');
-      expect(result?.needsRefresh).toBe(true);
-    });
-
-    it('enforces minimum 15 second threshold even when leeway is set to 0', async () => {
-      const nowSeconds = Math.floor(Date.now() / 1000);
-      const jwt = createJwtWithTtl(nowSeconds, 60);
-
-      const token = new Token({
-        id: 'zero-leeway-token',
-        jwt,
-        object: 'token',
-      });
-
-      const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { audience: 'zero-leeway-test', tokenId: 'zero-leeway-token' };
-
-      SessionTokenCache.set({ ...key, tokenResolver });
-      await tokenResolver;
-
-      // 16s remaining (above 15s threshold)
-      vi.advanceTimersByTime(44 * 1000);
-      let result = SessionTokenCache.get(key, 0);
-      expect(result?.entry.tokenId).toBe('zero-leeway-token');
-      expect(result?.needsRefresh).toBe(false);
-
-      // 14s remaining (below 15s threshold)
-      vi.advanceTimersByTime(2 * 1000);
-      result = SessionTokenCache.get(key, 0);
-      expect(result?.entry.tokenId).toBe('zero-leeway-token');
-      expect(result?.needsRefresh).toBe(true);
-
-      // 0s remaining (expired)
-      vi.advanceTimersByTime(14 * 1000);
-      result = SessionTokenCache.get(key, 0);
-      expect(result).toBeUndefined();
+      // Token should still be retrievable (10s remaining, > 5s poller interval)
+      const result = SessionTokenCache.get(key);
+      expect(result?.entry.tokenId).toBe('still-valid-token');
     });
   });
 
-  describe('conservative threshold behavior', () => {
-    it('returns needsRefresh=false when TTL is comfortably above 15s threshold', async () => {
+  describe('hard cutoff behavior', () => {
+    it('returns token when TTL is above poller interval', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const jwt = createJwtWithTtl(nowSeconds, 60);
 
       const token = new Token({
-        id: 'above-threshold-token',
+        id: 'above-cutoff-token',
         jwt,
         object: 'token',
       });
 
       const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { tokenId: 'above-threshold-token' };
+      const key = { tokenId: 'above-cutoff-token' };
 
       SessionTokenCache.set({ ...key, tokenResolver });
       await tokenResolver;
 
       // 60s remaining
       let result = SessionTokenCache.get(key);
-      expect(result?.entry.tokenId).toBe('above-threshold-token');
-      expect(result?.needsRefresh).toBe(false);
+      expect(result?.entry.tokenId).toBe('above-cutoff-token');
 
-      // 20s remaining
-      vi.advanceTimersByTime(40 * 1000);
+      // 10s remaining (above 5s cutoff)
+      vi.advanceTimersByTime(50 * 1000);
       result = SessionTokenCache.get(key);
-      expect(result?.entry.tokenId).toBe('above-threshold-token');
-      expect(result?.needsRefresh).toBe(false);
-    });
-
-    it('returns needsRefresh=true when TTL drops just below 15s threshold', async () => {
-      const nowSeconds = Math.floor(Date.now() / 1000);
-      const jwt = createJwtWithTtl(nowSeconds, 60);
-
-      const token = new Token({
-        id: 'below-threshold-token',
-        jwt,
-        object: 'token',
-      });
-
-      const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { tokenId: 'below-threshold-token' };
-
-      SessionTokenCache.set({ ...key, tokenResolver });
-      await tokenResolver;
-
-      // 16s remaining
-      vi.advanceTimersByTime(44 * 1000);
-      let result = SessionTokenCache.get(key);
-      expect(result?.entry.tokenId).toBe('below-threshold-token');
-      expect(result?.needsRefresh).toBe(false);
-
-      // 14s remaining
-      vi.advanceTimersByTime(2 * 1000);
-      result = SessionTokenCache.get(key);
-      expect(result?.entry.tokenId).toBe('below-threshold-token');
-      expect(result?.needsRefresh).toBe(true);
-    });
-
-    it('uses caller leeway when larger than 15s threshold', async () => {
-      const nowSeconds = Math.floor(Date.now() / 1000);
-      const jwt = createJwtWithTtl(nowSeconds, 60);
-
-      const token = new Token({
-        id: 'large-leeway-token',
-        jwt,
-        object: 'token',
-      });
-
-      const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { tokenId: 'large-leeway-token' };
-
-      SessionTokenCache.set({ ...key, tokenResolver });
-      await tokenResolver;
-
-      // 21s remaining (leeway=20s)
-      vi.advanceTimersByTime(39 * 1000);
-      let result = SessionTokenCache.get(key, 20);
-      expect(result?.entry.tokenId).toBe('large-leeway-token');
-      expect(result?.needsRefresh).toBe(false);
-
-      // 19s remaining (leeway=20s)
-      vi.advanceTimersByTime(2 * 1000);
-      result = SessionTokenCache.get(key, 20);
-      expect(result?.entry.tokenId).toBe('large-leeway-token');
-      expect(result?.needsRefresh).toBe(true);
-    });
-
-    it('ignores caller leeway when smaller than 15s threshold', async () => {
-      const nowSeconds = Math.floor(Date.now() / 1000);
-      const jwt = createJwtWithTtl(nowSeconds, 60);
-
-      const token = new Token({
-        id: 'small-leeway-token',
-        jwt,
-        object: 'token',
-      });
-
-      const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { tokenId: 'small-leeway-token' };
-
-      SessionTokenCache.set({ ...key, tokenResolver });
-      await tokenResolver;
-
-      // 16s remaining (leeway=5s, but min threshold is 15s)
-      vi.advanceTimersByTime(44 * 1000);
-      let result = SessionTokenCache.get(key, 5);
-      expect(result?.entry.tokenId).toBe('small-leeway-token');
-      expect(result?.needsRefresh).toBe(false);
-
-      // 14s remaining
-      vi.advanceTimersByTime(2 * 1000);
-      result = SessionTokenCache.get(key, 5);
-      expect(result?.entry.tokenId).toBe('small-leeway-token');
-      expect(result?.needsRefresh).toBe(true);
+      expect(result?.entry.tokenId).toBe('above-cutoff-token');
     });
 
     it('forces synchronous refresh when token has less than poller interval remaining', async () => {
@@ -823,7 +721,6 @@ describe('SessionTokenCache', () => {
       vi.advanceTimersByTime(54 * 1000);
       let result = SessionTokenCache.get(key);
       expect(result?.entry.tokenId).toBe('hard-cutoff-token');
-      expect(result?.needsRefresh).toBe(true);
 
       // 4s remaining (below 5s cutoff) - forces sync refresh
       vi.advanceTimersByTime(2 * 1000);

@@ -419,8 +419,8 @@ describe('Session', () => {
       expect(requestSpy).toHaveBeenCalledTimes(2);
     });
 
-    describe('stale-while-revalidate (SWR) behavior', () => {
-      it('returns stale token immediately while refreshing in background', async () => {
+    describe('timer-based proactive refresh', () => {
+      it('triggers background refresh via timer before leeway period', async () => {
         BaseResource.clerk = clerkMock();
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
 
@@ -437,20 +437,54 @@ describe('Session', () => {
         } as SessionJSON);
 
         await Promise.resolve();
+        requestSpy.mockClear();
 
-        // Advance time so token needs refresh (< 15s remaining of 60s TTL)
-        vi.advanceTimersByTime(46 * 1000);
+        // Timer fires at 60s - 15s (leeway) - 2s (lead time) = 43s
+        // Advance to just before timer fires
+        vi.advanceTimersByTime(42 * 1000);
+        expect(requestSpy).not.toHaveBeenCalled();
+
+        // Set up the mock for the refresh
+        requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
+
+        // Advance past timer fire time
+        await vi.advanceTimersByTimeAsync(2 * 1000);
+
+        // Background refresh should have been triggered by the timer
+        expect(requestSpy).toHaveBeenCalledTimes(1);
+      });
+
+      it('continues returning cached token while timer-triggered refresh is pending', async () => {
+        BaseResource.clerk = clerkMock();
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        await Promise.resolve();
+        requestSpy.mockClear();
 
         // Hold the network request pending
         let resolveNetworkRequest!: (value: any) => void;
-        requestSpy.mockClear();
         requestSpy.mockReturnValueOnce(
           new Promise(resolve => {
             resolveNetworkRequest = resolve;
           }),
         );
 
-        // Concurrent calls should all return immediately with stale token
+        // Advance to trigger the timer (43s)
+        await vi.advanceTimersByTimeAsync(44 * 1000);
+
+        // Concurrent calls should all return cached token
         const [token1, token2, token3] = await Promise.all([
           session.getToken(),
           session.getToken(),
@@ -460,14 +494,13 @@ describe('Session', () => {
         expect(token1).toEqual(mockJwt);
         expect(token2).toEqual(mockJwt);
         expect(token3).toEqual(mockJwt);
-        expect(requestSpy).toHaveBeenCalledTimes(1);
 
         // Cleanup: resolve the pending request
         resolveNetworkRequest({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
         await vi.advanceTimersByTimeAsync(0);
       });
 
-      it('continues returning tokens after background refresh failure', async () => {
+      it('continues returning tokens after timer-triggered refresh failure', async () => {
         BaseResource.clerk = clerkMock();
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
 
@@ -484,60 +517,20 @@ describe('Session', () => {
         } as SessionJSON);
 
         await Promise.resolve();
-        vi.advanceTimersByTime(46 * 1000);
-
-        // Background refresh fails
         requestSpy.mockClear();
+
+        // Timer-triggered refresh fails
         requestSpy.mockRejectedValueOnce(new Error('Network error'));
 
+        // Advance to trigger timer (43s) and wait for it to complete
+        await vi.advanceTimersByTimeAsync(44 * 1000);
+
+        // getToken should still return the cached token
         const token = await session.getToken();
         expect(token).toEqual(mockJwt);
-
-        // Wait for background failure to complete
-        await vi.advanceTimersByTimeAsync(100);
-
-        // Subsequent call should still return token (stale is preserved)
-        const token2 = await session.getToken();
-        expect(token2).toEqual(mockJwt);
       });
 
-      it('retries background refresh after previous failure', async () => {
-        BaseResource.clerk = clerkMock();
-        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
-
-        const session = new Session({
-          status: 'active',
-          id: 'session_1',
-          object: 'session',
-          user: createUser({}),
-          last_active_organization_id: null,
-          last_active_token: { object: 'token', jwt: mockJwt },
-          actor: null,
-          created_at: new Date().getTime(),
-          updated_at: new Date().getTime(),
-        } as SessionJSON);
-
-        await Promise.resolve();
-        vi.advanceTimersByTime(46 * 1000);
-
-        // First call triggers background refresh that fails
-        requestSpy.mockClear();
-        requestSpy.mockRejectedValueOnce(new Error('Network error'));
-
-        await session.getToken();
-        expect(requestSpy).toHaveBeenCalledTimes(1);
-
-        await vi.advanceTimersByTimeAsync(100);
-
-        // Second call should trigger another refresh attempt
-        requestSpy.mockClear();
-        requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
-
-        await session.getToken();
-        expect(requestSpy).toHaveBeenCalledTimes(1);
-      });
-
-      it('uses refreshed token for subsequent calls after background refresh succeeds', async () => {
+      it('uses refreshed token after timer-triggered refresh succeeds', async () => {
         BaseResource.clerk = clerkMock();
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
 
@@ -557,18 +550,13 @@ describe('Session', () => {
         } as SessionJSON);
 
         await Promise.resolve();
-        vi.advanceTimersByTime(46 * 1000);
-
-        // Background refresh returns new token
         requestSpy.mockClear();
+
+        // Timer-triggered refresh returns new token
         requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: newMockJwt }, status: 200 });
 
-        // First call returns stale token
-        const staleToken = await session.getToken();
-        expect(staleToken).toEqual(mockJwt);
-
-        // Wait for background refresh to complete
-        await vi.advanceTimersByTimeAsync(100);
+        // Advance to trigger timer and wait for refresh to complete
+        await vi.advanceTimersByTimeAsync(44 * 1000);
 
         // Subsequent call returns refreshed token (no new API call needed)
         requestSpy.mockClear();
@@ -577,137 +565,7 @@ describe('Session', () => {
         expect(requestSpy).not.toHaveBeenCalled();
       });
 
-      it('forces synchronous refresh when refreshIfStale is true and token is stale', async () => {
-        BaseResource.clerk = clerkMock();
-        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
-
-        const newMockJwt =
-          'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjY2NDg0MDAsImlhdCI6MTY2NjY0ODM0MCwiaXNzIjoiaHR0cHM6Ly9jbGVyay5leGFtcGxlLmNvbSIsImp0aSI6Im5ld3Rva2VuIiwibmJmIjoxNjY2NjQ4MzQwLCJzaWQiOiJzZXNzXzFxcTlveTVHaU5IeGRSMlhXVTZnRzZtSWNCWCIsInN1YiI6InVzZXJfMXFxOW95NUdpTkh4ZFIyWFdVNmdHNm1JY0JYIn0.mock';
-
-        const session = new Session({
-          status: 'active',
-          id: 'session_1',
-          object: 'session',
-          user: createUser({}),
-          last_active_organization_id: null,
-          last_active_token: { object: 'token', jwt: mockJwt },
-          actor: null,
-          created_at: new Date().getTime(),
-          updated_at: new Date().getTime(),
-        } as SessionJSON);
-
-        await Promise.resolve();
-
-        // Advance time so token needs refresh (< 15s remaining of 60s TTL)
-        vi.advanceTimersByTime(46 * 1000);
-
-        // With refreshIfStale: true, should fetch fresh token synchronously
-        requestSpy.mockClear();
-        requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: newMockJwt }, status: 200 });
-
-        const token = await session.getToken({ refreshIfStale: true });
-
-        // Should return the NEW token (synchronous refresh), not the stale one
-        expect(token).toEqual(newMockJwt);
-        expect(requestSpy).toHaveBeenCalledTimes(1);
-      });
-
-      it('returns cached token without refresh when refreshIfStale is true but token is fresh', async () => {
-        BaseResource.clerk = clerkMock();
-        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
-
-        const session = new Session({
-          status: 'active',
-          id: 'session_1',
-          object: 'session',
-          user: createUser({}),
-          last_active_organization_id: null,
-          last_active_token: { object: 'token', jwt: mockJwt },
-          actor: null,
-          created_at: new Date().getTime(),
-          updated_at: new Date().getTime(),
-        } as SessionJSON);
-
-        await Promise.resolve();
-
-        // Advance only 10s - token still has 50s remaining, not stale yet
-        vi.advanceTimersByTime(10 * 1000);
-
-        requestSpy.mockClear();
-        const token = await session.getToken({ refreshIfStale: true });
-
-        // Should return cached token, no API call
-        expect(token).toEqual(mockJwt);
-        expect(requestSpy).not.toHaveBeenCalled();
-      });
-
-      it('respects backgroundRefreshThreshold for earlier background refresh', async () => {
-        BaseResource.clerk = clerkMock();
-        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
-
-        const session = new Session({
-          status: 'active',
-          id: 'session_1',
-          object: 'session',
-          user: createUser({}),
-          last_active_organization_id: null,
-          last_active_token: { object: 'token', jwt: mockJwt },
-          actor: null,
-          created_at: new Date().getTime(),
-          updated_at: new Date().getTime(),
-        } as SessionJSON);
-
-        await Promise.resolve();
-
-        // With 30s threshold and 25s remaining (< 30), token should trigger background refresh
-        vi.advanceTimersByTime(35 * 1000); // 25s remaining
-
-        requestSpy.mockClear();
-        requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
-
-        const token = await session.getToken({ backgroundRefreshThreshold: 30 });
-
-        // Should return stale token immediately (SWR behavior)
-        expect(token).toEqual(mockJwt);
-        // Should trigger background refresh because 25s < 30s threshold
-        expect(requestSpy).toHaveBeenCalledTimes(1);
-      });
-
-      it('allows backgroundRefreshThreshold below 15s (minimum is 5s poller interval)', async () => {
-        BaseResource.clerk = clerkMock();
-        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
-
-        const session = new Session({
-          status: 'active',
-          id: 'session_1',
-          object: 'session',
-          user: createUser({}),
-          last_active_organization_id: null,
-          last_active_token: { object: 'token', jwt: mockJwt },
-          actor: null,
-          created_at: new Date().getTime(),
-          updated_at: new Date().getTime(),
-        } as SessionJSON);
-
-        await Promise.resolve();
-
-        // With 8s remaining and backgroundRefreshThreshold: 10, should trigger refresh
-        vi.advanceTimersByTime(52 * 1000); // 8s remaining
-
-        requestSpy.mockClear();
-        requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
-
-        const token = await session.getToken({ backgroundRefreshThreshold: 10 });
-
-        // Should return cached token immediately (SWR behavior)
-        expect(token).toEqual(mockJwt);
-
-        // Background refresh should be triggered because 8s < 10s threshold
-        // (threshold of 10s is respected, not floored to 15s)
-        expect(requestSpy).toHaveBeenCalledTimes(1);
-      });
-
-      it('does not trigger background refresh when token has more than threshold remaining', async () => {
+      it('does not make API call when token has plenty of time remaining', async () => {
         BaseResource.clerk = clerkMock();
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
 

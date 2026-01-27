@@ -25,6 +25,12 @@ interface TokenCacheEntry extends TokenCacheKeyJSON {
    */
   createdAt?: Seconds;
   /**
+   * Callback to refresh this token before it expires.
+   * Called by the proactive refresh timer to trigger background refresh.
+   * If not provided, no refresh timer will be scheduled (e.g., for broadcast-received tokens).
+   */
+  onRefresh?: () => void;
+  /**
    * The resolved token value for synchronous reads.
    * Populated after tokenResolver resolves. Check this first to avoid microtask overhead.
    */
@@ -39,22 +45,23 @@ interface TokenCacheEntry extends TokenCacheKeyJSON {
 type Seconds = number;
 
 /**
- * Internal cache value containing the entry, expiration metadata, and cleanup timer.
+ * Internal cache value containing the entry, expiration metadata, and timers.
  */
 interface TokenCacheValue {
   createdAt: Seconds;
   entry: TokenCacheEntry;
   expiresIn?: Seconds;
+  /** Timer for automatic cache cleanup when token expires */
   timeoutId?: ReturnType<typeof setTimeout>;
+  /** Timer for proactive refresh before token enters leeway period */
+  refreshTimeoutId?: ReturnType<typeof setTimeout>;
 }
 
 /**
- * Result from cache lookup containing the entry and refresh status.
+ * Result from cache lookup containing the entry.
  */
 export interface TokenCacheGetResult {
   entry: TokenCacheEntry;
-  /** Indicates the token is valid but expiring soon and should be refreshed in the background */
-  needsRefresh: boolean;
 }
 
 export interface TokenCache {
@@ -72,15 +79,13 @@ export interface TokenCache {
 
   /**
    * Retrieves a cached token entry if it exists and is safe to use.
-   * Implements stale-while-revalidate: returns valid tokens immediately and signals when background refresh is needed.
    * Forces synchronous refresh if token has less than one poller interval remaining.
+   * Proactive refresh is handled by timers scheduled when tokens are cached.
    *
    * @param cacheKeyJSON - Object containing tokenId and optional audience to identify the cached entry
-   * @param refreshThreshold - Seconds before expiration to trigger background refresh (default: 15s, minimum: 15s).
-   *   Higher values trigger earlier background refresh but may cause excessive requests and trip rate limiting.
-   * @returns Result with entry and refresh flag, or undefined if token is missing/expired/too close to expiration
+   * @returns Result with entry, or undefined if token is missing/expired/too close to expiration
    */
-  get(cacheKeyJSON: TokenCacheKeyJSON, refreshThreshold?: number): TokenCacheGetResult | undefined;
+  get(cacheKeyJSON: TokenCacheKeyJSON): TokenCacheGetResult | undefined;
 
   /**
    * Stores a token entry in the cache and broadcasts to other tabs when the token resolves.
@@ -196,14 +201,14 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       if (value.timeoutId !== undefined) {
         clearTimeout(value.timeoutId);
       }
+      if (value.refreshTimeoutId !== undefined) {
+        clearTimeout(value.refreshTimeoutId);
+      }
     });
     cache.clear();
   };
 
-  const get = (
-    cacheKeyJSON: TokenCacheKeyJSON,
-    refreshThreshold = BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS,
-  ): TokenCacheGetResult | undefined => {
+  const get = (cacheKeyJSON: TokenCacheKeyJSON): TokenCacheGetResult | undefined => {
     ensureBroadcastChannel();
 
     const cacheKey = new TokenCacheKey(prefix, cacheKeyJSON);
@@ -223,19 +228,15 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       if (value.timeoutId !== undefined) {
         clearTimeout(value.timeoutId);
       }
+      if (value.refreshTimeoutId !== undefined) {
+        clearTimeout(value.refreshTimeoutId);
+      }
       cache.delete(cacheKey.toKey());
       return;
     }
 
-    // Ensure threshold is at least the poller interval (values below this have no effect
-    // since tokens with less than POLLER_INTERVAL remaining force a synchronous refresh)
-    const effectiveThreshold = Math.max(refreshThreshold, POLLER_INTERVAL_IN_MS / 1000);
-
-    // Token is valid but expiring soon - signal that background refresh is needed
-    const needsRefresh = remainingTtl < effectiveThreshold;
-
-    // Return the valid token immediately, caller decides whether to refresh
-    return { entry: value.entry, needsRefresh };
+    // Proactive refresh is handled by timers scheduled in setInternal()
+    return { entry: value.entry };
   };
 
   /**
@@ -359,6 +360,9 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
         if (cachedValue.timeoutId !== undefined) {
           clearTimeout(cachedValue.timeoutId);
         }
+        if (cachedValue.refreshTimeoutId !== undefined) {
+          clearTimeout(cachedValue.refreshTimeoutId);
+        }
         cache.delete(key);
       }
     };
@@ -387,6 +391,23 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
         // More info at https://nodejs.org/api/timers.html#timeoutunref
         if (typeof (timeoutId as any).unref === 'function') {
           (timeoutId as any).unref();
+        }
+
+        // Schedule proactive refresh timer to fire before token enters leeway period
+        // This ensures new tokens are ready before the old one expires
+        const refreshLeadTime = 2; // Fire 2s before leeway starts
+        const refreshFireTime = expiresIn - BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS - refreshLeadTime;
+
+        if (refreshFireTime > 0 && entry.onRefresh) {
+          const refreshTimeoutId = setTimeout(() => {
+            entry.onRefresh?.();
+          }, refreshFireTime * 1000);
+
+          value.refreshTimeoutId = refreshTimeoutId;
+
+          if (typeof (refreshTimeoutId as any).unref === 'function') {
+            (refreshTimeoutId as any).unref();
+          }
         }
 
         const channel = broadcastChannel;
