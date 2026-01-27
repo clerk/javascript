@@ -6,10 +6,10 @@
   "scripts": {
     "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%}",
     "build:declarations": "FORCE_COLOR=1 turbo build:declarations --concurrency=${TURBO_CONCURRENCY:-80%} --filter=@clerk/nextjs --filter=@clerk/react --filter=@clerk/shared",
-    "bundlewatch": "turbo bundlewatch",
+    "bundlewatch": "turbo run bundlewatch",
     "changeset": "changeset",
     "changeset:empty": "pnpm changeset --empty",
-    "clean": "turbo clean",
+    "clean": "turbo run clean",
     "dev": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/* --filter=!@clerk/expo --filter=!@clerk/tanstack-react-start --filter=!@clerk/chrome-extension",
     "dev:fe-libs": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/clerk-js --filter=@clerk/ui",
     "dev:js": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:current --filter=@clerk/clerk-js",
