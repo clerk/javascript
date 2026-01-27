@@ -361,7 +361,7 @@ export class Session extends BaseResource implements SessionResource {
       return null;
     }
 
-    const { skipCache = false, template } = options || {};
+    const { leewayInSeconds, skipCache = false, template } = options || {};
 
     // If no organization ID is provided, default to the selected organization in memory
     // Note: this explicitly allows passing `null` or `""`, which should select the personal workspace.
@@ -386,7 +386,7 @@ export class Session extends BaseResource implements SessionResource {
       return cachedToken.getRawString() || null;
     }
 
-    return this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
+    return this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache, leewayInSeconds);
   }
 
   #createTokenResolver(
@@ -426,14 +426,17 @@ export class Session extends BaseResource implements SessionResource {
     tokenId: string,
     shouldDispatchTokenUpdate: boolean,
     skipCache: boolean,
+    leewayInSeconds?: number,
   ): Promise<string | null> {
     debugLogger.info('Fetching new token from API', { organizationId, template, tokenId }, 'session');
 
     const tokenResolver = this.#createTokenResolver(template, organizationId, skipCache);
     SessionTokenCache.set({
+      leewayInSeconds,
       tokenId,
       tokenResolver,
-      onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+      onRefresh: () =>
+        this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate, leewayInSeconds),
     });
 
     return tokenResolver.then(token => {
@@ -455,6 +458,7 @@ export class Session extends BaseResource implements SessionResource {
     organizationId: string | undefined | null,
     tokenId: string,
     shouldDispatchTokenUpdate: boolean,
+    leewayInSeconds?: number,
   ): void {
     // Prevent multiple concurrent background refreshes for the same token
     if (Session.#backgroundRefreshInProgress.has(tokenId)) {
@@ -471,9 +475,11 @@ export class Session extends BaseResource implements SessionResource {
       .then(token => {
         // Cache the resolved token for future calls
         SessionTokenCache.set({
+          leewayInSeconds,
           tokenId,
           tokenResolver: Promise.resolve(token),
-          onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+          onRefresh: () =>
+            this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate, leewayInSeconds),
         });
         this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
       })
