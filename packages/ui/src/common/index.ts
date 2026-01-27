@@ -8,6 +8,7 @@ export * from './InfiniteListSpinner';
 export * from './NotificationCountBadge';
 export * from './PrintableComponent';
 export * from './ProviderInitialIcon';
+export * from './ProviderIcon';
 export * from './QRCode';
 export * from './redirects';
 export * from './RemoveResourceForm';

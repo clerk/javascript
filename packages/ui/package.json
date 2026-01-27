@@ -10,7 +10,8 @@
   "license": "MIT",
   "author": "Clerk",
   "sideEffects": [
-    "./src/utils/setWebpackChunkPublicPath.ts"
+    "./src/utils/setWebpackChunkPublicPath.ts",
+    "./register/*"
   ],
   "type": "module",
   "exports": {
@@ -40,16 +41,28 @@
       "default": "./dist/themes/experimental.js"
     },
     "./themes/shadcn.css": "./dist/themes/shadcn.css",
+    "./register": {
+      "import": {
+        "types": "./register/index.d.ts",
+        "default": "./register/index.mjs"
+      },
+      "require": {
+        "types": "./register/index.d.cts",
+        "default": "./register/index.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "register"
   ],
   "scripts": {
     "build": "pnpm build:umd && pnpm build:esm",
-    "build:analyze": "rspack build --config rspack.config.js --env production --analyze",
+    "build:analyze": "rspack build --config rspack.config.js --env production --env analyze --analyze",
     "build:esm": "tsdown",
+    "build:rsdoctor": "RSDOCTOR=true rspack build --config rspack.config.js --env production",
     "build:umd": "rspack build --config rspack.config.js --env production",
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
@@ -63,9 +76,9 @@
     "lint:disabled": "eslint src",
     "lint:publint": "publint",
     "showerrors": "tsc",
+    "test": "vitest",
     "test:ci": "vitest --maxWorkers=70%",
     "test:coverage": "vitest --collectCoverage && open coverage/lcov-report/index.html",
-    "test:disabled": "vitest",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -86,11 +99,11 @@
     "input-otp": "1.4.2",
     "qrcode.react": "4.2.0",
     "react": "catalog:peer-react",
-    "react-dom": "catalog:peer-react",
-    "swr": "2.3.4"
+    "react-dom": "catalog:peer-react"
   },
   "devDependencies": {
     "@floating-ui/react-dom": "^2.1.6",
+    "@rsdoctor/rspack-plugin": "^0.4.13",
     "@rspack/cli": "^1.6.0",
     "@rspack/core": "^1.6.0",
     "@rspack/plugin-react-refresh": "^1.5.2",

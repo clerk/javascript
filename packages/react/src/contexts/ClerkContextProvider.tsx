@@ -11,6 +11,8 @@ import React from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
+import { mergeWithEnv } from '../utils';
+import { IS_REACT_SHARED_VARIANT_COMPATIBLE } from '../utils/versionCheck';
 import { AuthContext } from './AuthContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
 
@@ -24,7 +26,9 @@ export type ClerkContextProviderState = Resources;
 
 export function ClerkContextProvider(props: ClerkContextProvider) {
   const { isomorphicClerkOptions, initialState, children } = props;
-  const { isomorphicClerk: clerk, clerkStatus } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
+  // Merge options with environment variable fallbacks (supports Vite's VITE_CLERK_* env vars)
+  const mergedOptions = mergeWithEnv(isomorphicClerkOptions);
+  const { isomorphicClerk: clerk, clerkStatus } = useLoadedIsomorphicClerk(mergedOptions);
 
   const [state, setState] = React.useState<ClerkContextProviderState>({
     client: clerk.client as ClientResource,
@@ -111,17 +115,32 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
   );
 }
 
-const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
-  const isomorphicClerkRef = React.useRef(IsomorphicClerk.getOrCreateInstance(options));
+// Default clerkUIVariant based on React version compatibility.
+// Computed once at module level for optimal performance.
+const DEFAULT_CLERK_UI_VARIANT = IS_REACT_SHARED_VARIANT_COMPATIBLE ? ('shared' as const) : ('' as const);
+
+const useLoadedIsomorphicClerk = (mergedOptions: IsomorphicClerkOptions) => {
+  // Merge default clerkUIVariant with user options.
+  // User-provided options spread last to allow explicit overrides.
+  // The shared variant expects React to be provided via globalThis.__clerkSharedModules
+  // (set up by @clerk/ui/register import), which reduces bundle size.
+  const optionsWithDefaults = React.useMemo(
+    () => ({
+      clerkUIVariant: DEFAULT_CLERK_UI_VARIANT,
+      ...mergedOptions,
+    }),
+    [mergedOptions],
+  );
+  const isomorphicClerkRef = React.useRef(IsomorphicClerk.getOrCreateInstance(optionsWithDefaults));
   const [clerkStatus, setClerkStatus] = React.useState(isomorphicClerkRef.current.status);
 
   React.useEffect(() => {
-    void isomorphicClerkRef.current.__internal_updateProps({ appearance: options.appearance });
-  }, [options.appearance]);
+    void isomorphicClerkRef.current.__internal_updateProps({ appearance: mergedOptions.appearance });
+  }, [mergedOptions.appearance]);
 
   React.useEffect(() => {
-    void isomorphicClerkRef.current.__internal_updateProps({ options });
-  }, [options.localization]);
+    void isomorphicClerkRef.current.__internal_updateProps({ options: mergedOptions });
+  }, [mergedOptions.localization]);
 
   React.useEffect(() => {
     isomorphicClerkRef.current.on('status', setClerkStatus);
