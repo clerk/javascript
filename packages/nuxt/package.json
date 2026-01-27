@@ -49,7 +49,8 @@
     "./webhooks": {
       "types": "./dist/runtime/webhooks.d.ts",
       "default": "./dist/runtime/webhooks.js"
-    }
+    },
+    "./types": "./dist/runtime/types/index.d.ts"
   },
   "main": "./dist/module.js",
   "types": "./dist/module.d.ts",

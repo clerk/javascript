@@ -51,6 +51,7 @@
       "types": "./dist/experimental.d.ts",
       "default": "./dist/experimental.js"
     },
+    "./types": "./dist/types/index.d.ts",
     "./package.json": "./package.json"
   },
   "main": "dist/index.js",
