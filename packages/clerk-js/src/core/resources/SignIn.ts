@@ -650,7 +650,7 @@ class SignInFuture implements SignInFutureResource {
     verifyBackupCode: this.verifyBackupCode.bind(this),
   };
 
-  #hasBeenFinalized = false;
+  #canBeDiscarded = false;
   readonly #resource: SignIn;
 
   constructor(resource: SignIn) {
@@ -710,8 +710,8 @@ class SignInFuture implements SignInFutureResource {
     return this.#resource.secondFactorVerification;
   }
 
-  get hasBeenFinalized() {
-    return this.#hasBeenFinalized;
+  get canBeDiscarded() {
+    return this.#canBeDiscarded;
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: ClerkError | null }> {
@@ -1242,9 +1242,23 @@ class SignInFuture implements SignInFutureResource {
         await SignIn.clerk.client.reload();
       }
 
-      this.#hasBeenFinalized = true;
+      this.#canBeDiscarded = true;
       await SignIn.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
+  }
+
+  /**
+   * Resets the current sign-in attempt by clearing all local state back to null.
+   * Unlike other methods, this does NOT emit resource:fetch with 'fetching' status,
+   * allowing for smooth UI transitions without loading states.
+   */
+  reset(): Promise<{ error: ClerkError | null }> {
+    if (!SignIn.clerk.client) {
+      throw new Error('Cannot reset sign-in without a client.');
+    }
+    this.#canBeDiscarded = true;
+    SignIn.clerk.client.resetSignIn();
+    return Promise.resolve({ error: null });
   }
 
   private selectFirstFactor(

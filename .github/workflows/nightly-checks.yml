@@ -70,9 +70,34 @@ jobs:
           E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: "canary"
           E2E_NPM_FORCE: "true"
-          E2E_REACT_DOM_VERSION: "19.2.1"
-          E2E_REACT_VERSION: "19.2.1"
+          E2E_REACT_DOM_VERSION: "19.2.3"
+          E2E_REACT_VERSION: "19.2.3"
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+
+      # Print error logs for immediate visibility in CI
+      - name: Print App Error Logs
+        if: steps.integration_tests.outputs.exit_code != '0'
+        run: |
+          echo "=== Integration Test Failed ==="
+          echo ""
+          # Integration tests use os.tmpdir() which is /tmp on Linux
+          if [ -d /tmp/.temp_integration ]; then
+            echo "=== App Error Logs (.err.log files) ==="
+            find /tmp/.temp_integration -name "*.err.log" -type f 2>/dev/null | while read f; do
+              echo ""
+              echo "--- $f ---"
+              tail -100 "$f" 2>/dev/null || echo "(empty or not readable)"
+            done
+            echo ""
+            echo "=== App Stdout Logs (last 50 lines each) ==="
+            find /tmp/.temp_integration -name "e2e.*.log" -type f 2>/dev/null | while read f; do
+              echo ""
+              echo "--- $f ---"
+              tail -50 "$f" 2>/dev/null || echo "(empty or not readable)"
+            done
+          else
+            echo "=== No app logs found (directory /tmp/.temp_integration does not exist) ==="
+          fi
 
       # Upload test artifacts if tests failed
       - name: Upload Test Artifacts
@@ -82,10 +107,8 @@ jobs:
           name: test-artifacts-${{ matrix.test-name }}
           path: |
             ${{runner.temp}}/test-output.log
+            /tmp/.temp_integration/
             integration/test-results/
-            integration/.next/
-            ${{runner.temp}}/clerk-js/node_modules/
-            ${{runner.temp}}/clerk-ui/node_modules/
           retention-days: 7
 
       - name: Report Status
