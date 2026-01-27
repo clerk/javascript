@@ -32,40 +32,99 @@ interface NativeUser {
   primaryEmailAddress?: string;
 }
 
+/**
+ * Props for the UserButton component.
+ */
 export interface UserButtonProps extends ViewProps {
   /**
-   * Callback fired when the user button is pressed
+   * Callback fired when the user button is pressed.
+   *
+   * This is called immediately when the button is tapped, before the
+   * profile modal is presented. Use this for analytics or custom behavior.
    */
   onPress?: () => void;
 
   /**
-   * Callback fired when the user signs out from the profile modal
+   * Callback fired when the user signs out from the profile modal.
+   *
+   * This is called after:
+   * 1. The native session is cleared
+   * 2. The JS SDK session is cleared
+   *
+   * After this callback, `useAuth()` will return `isSignedIn: false`.
    */
   onSignOut?: () => void;
 }
 
 /**
- * Native UserButton component powered by clerk-ios (SwiftUI) and clerk-android (Jetpack Compose)
+ * A pre-built native button component that displays the user's avatar and opens their profile.
  *
- * Displays a button that opens the UserProfileView when tapped.
- * Shows the user's profile image, or their initials if no image is available.
+ * `UserButton` renders a circular button showing the user's profile image (or initials if
+ * no image is available). When tapped, it presents the {@link UserProfileView} modal for
+ * account management.
  *
- * Uses the official Clerk native packages:
- * - iOS: https://github.com/clerk/clerk-ios
- * - Android: https://github.com/clerk/clerk-android
+ * This component is powered by:
+ * - **iOS**: clerk-ios (SwiftUI) - https://github.com/clerk/clerk-ios
+ * - **Android**: clerk-android (Jetpack Compose) - https://github.com/clerk/clerk-android
  *
- * @example
+ * ## Features
+ *
+ * - **Profile Image**: Displays the user's profile photo from their Clerk account
+ * - **Initials Fallback**: Shows user's initials when no profile image is set
+ * - **Profile Modal**: Opens {@link UserProfileView} with full account management
+ * - **Sign Out Handling**: Properly syncs sign-out between native and JS SDKs
+ *
+ * ## Avatar Display
+ *
+ * The button displays the user's avatar in this order of preference:
+ * 1. User's profile image from Clerk (if available)
+ * 2. First letter of first name + first letter of last name
+ * 3. "U" as a fallback
+ *
+ * ## Styling
+ *
+ * The button is 36x36 pixels by default with circular border radius.
+ * You can customize the size using the `style` prop:
+ *
  * ```tsx
- * import { UserButton } from '@clerk/clerk-expo/native';
+ * <UserButton style={{ width: 44, height: 44 }} />
+ * ```
+ *
+ * @example Basic usage in a header
+ * ```tsx
+ * import { UserButton } from '@clerk/expo/native';
  *
  * export default function Header() {
  *   return (
- *     <View style={{ flexDirection: 'row', padding: 16 }}>
- *       <UserButton style={{ width: 36, height: 36 }} />
+ *     <View style={styles.header}>
+ *       <Text style={styles.title}>My App</Text>
+ *       <UserButton />
  *     </View>
  *   );
  * }
  * ```
+ *
+ * @example With sign-out handling
+ * ```tsx
+ * <UserButton
+ *   onSignOut={() => router.replace('/sign-in')}
+ *   style={{ width: 40, height: 40 }}
+ * />
+ * ```
+ *
+ * @example With press tracking
+ * ```tsx
+ * <UserButton
+ *   onPress={() => analytics.track('profile_opened')}
+ *   onSignOut={() => {
+ *     analytics.track('signed_out');
+ *     router.replace('/sign-in');
+ *   }}
+ * />
+ * ```
+ *
+ * @see {@link UserProfileView} The profile view that opens when tapped
+ * @see {@link https://clerk.com/docs/components/user/user-button} Clerk UserButton Documentation
  */
 export function UserButton({ onPress, onSignOut, style, ...props }: UserButtonProps) {
   const [nativeUser, setNativeUser] = useState<NativeUser | null>(null);
@@ -157,12 +216,10 @@ export function UserButton({ onPress, onSignOut, style, ...props }: UserButtonPr
           } catch (signOutErr) {
             console.warn('[UserButton] JS SDK sign out error:', signOutErr);
             // Even if signOut throws, try to force reload to clear stale state
-            // @ts-expect-error - internal API
-            if (clerk?.__internal_reloadInitialResources) {
+            if ((clerk as any)?.__internal_reloadInitialResources) {
               try {
                 console.log('[UserButton] Force reloading JS SDK state...');
-                // @ts-expect-error - internal API
-                await clerk.__internal_reloadInitialResources();
+                await (clerk as any).__internal_reloadInitialResources();
                 console.log('[UserButton] JS SDK state reloaded');
               } catch (reloadErr) {
                 console.warn('[UserButton] Failed to reload JS SDK state:', reloadErr);

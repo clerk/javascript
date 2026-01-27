@@ -214,7 +214,7 @@ const withClerkIOS = config => {
     },
   ]);
 
-  // Then inject ClerkSignInView.swift into the app target
+  // Then inject ClerkViewFactory.swift into the app target
   // This is required because the file uses `import Clerk` which is only available
   // via SPM in the app target (CocoaPods targets can't see SPM packages)
   config = withXcodeProject(config, config => {
@@ -223,7 +223,7 @@ const withClerkIOS = config => {
       const projectName = config.modRequest.projectName;
       const iosProjectPath = path.join(platformProjectRoot, projectName);
 
-      // Find the ClerkSignInView.swift source file
+      // Find the ClerkViewFactory.swift source file
       // Check multiple possible locations in order of preference
       let sourceFile;
       const possiblePaths = [
@@ -234,7 +234,7 @@ const withClerkIOS = config => {
           '@clerk',
           'clerk-expo',
           'ios',
-          'ClerkSignInView.swift',
+          'ClerkViewFactory.swift',
         ),
         // pnpm hoisted node_modules
         path.join(
@@ -244,7 +244,7 @@ const withClerkIOS = config => {
           '@clerk',
           'clerk-expo',
           'ios',
-          'ClerkSignInView.swift',
+          'ClerkViewFactory.swift',
         ),
         // Monorepo workspace (pnpm workspace)
         path.join(
@@ -254,10 +254,10 @@ const withClerkIOS = config => {
           'packages',
           'expo',
           'ios',
-          'ClerkSignInView.swift',
+          'ClerkViewFactory.swift',
         ),
         // Alternative monorepo structure
-        path.join(config.modRequest.projectRoot, '..', 'packages', 'expo', 'ios', 'ClerkSignInView.swift'),
+        path.join(config.modRequest.projectRoot, '..', 'packages', 'expo', 'ios', 'ClerkViewFactory.swift'),
       ];
 
       for (const possiblePath of possiblePaths) {
@@ -269,14 +269,14 @@ const withClerkIOS = config => {
 
       if (sourceFile && fs.existsSync(sourceFile)) {
         // ALWAYS copy the file to ensure we have the latest version
-        const targetFile = path.join(iosProjectPath, 'ClerkSignInView.swift');
+        const targetFile = path.join(iosProjectPath, 'ClerkViewFactory.swift');
         fs.copyFileSync(sourceFile, targetFile);
-        console.log('✅ Copied ClerkSignInView.swift to app target');
+        console.log('✅ Copied ClerkViewFactory.swift to app target');
 
         // Add the file to the Xcode project manually
         const xcodeProject = config.modResults;
-        const relativePath = `${projectName}/ClerkSignInView.swift`;
-        const fileName = 'ClerkSignInView.swift';
+        const relativePath = `${projectName}/ClerkViewFactory.swift`;
+        const fileName = 'ClerkViewFactory.swift';
 
         try {
           // Get the main target
@@ -294,7 +294,7 @@ const withClerkIOS = config => {
 
           if (alreadyExists) {
             // File is already in project, but we still copied the latest version
-            console.log('✅ ClerkSignInView.swift updated in app target');
+            console.log('✅ ClerkViewFactory.swift updated in app target');
             return config;
           }
 
@@ -308,7 +308,7 @@ const withClerkIOS = config => {
             isa: 'PBXFileReference',
             lastKnownFileType: 'sourcecode.swift',
             name: fileName,
-            path: relativePath, // Use full relative path (projectName/ClerkSignInView.swift)
+            path: relativePath, // Use full relative path (projectName/ClerkViewFactory.swift)
             sourceTree: '"<group>"',
           };
 
@@ -378,16 +378,16 @@ const withClerkIOS = config => {
             console.warn('⚠️  Could not find main PBXGroup for project');
           }
 
-          console.log('✅ Added ClerkSignInView.swift to Xcode project');
+          console.log('✅ Added ClerkViewFactory.swift to Xcode project');
         } catch (addError) {
           console.error('❌ Error adding file to Xcode project:', addError.message);
           console.error(addError.stack);
         }
       } else {
-        console.warn('⚠️  ClerkSignInView.swift not found, skipping injection');
+        console.warn('⚠️  ClerkViewFactory.swift not found, skipping injection');
       }
     } catch (error) {
-      console.error('❌ Error injecting ClerkSignInView.swift:', error.message);
+      console.error('❌ Error injecting ClerkViewFactory.swift:', error.message);
     }
 
     return config;

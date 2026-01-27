@@ -18,6 +18,6 @@ Pod::Spec.new do |s|
   s.dependency 'ExpoModulesCore'
   s.dependency 'GoogleSignIn', '~> 9.0'
 
-  # Only include the Google Sign-In module file, not ClerkSignInView.swift which uses `import Clerk` (SPM)
+  # Only include the Google Sign-In module file, not ClerkViewFactory.swift which uses `import Clerk` (SPM)
   s.source_files = 'ClerkGoogleSignInModule.swift'
 end

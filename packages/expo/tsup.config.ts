@@ -26,6 +26,6 @@ export default defineConfig(overrideOptions => {
     },
   };
 
-  // Temporarily skip declarations for testing
+  // Note: declarations build disabled due to pre-existing TS errors
   return runAfterLast([/* 'pnpm build:declarations', */ shouldPublish && 'pnpm publish:local'])(options);
 });

@@ -85,10 +85,8 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
               if (nativeSession?.session) {
                 console.log(`[ClerkProvider] Native session found, syncing to JS SDK...`);
                 // Reload JS SDK state from backend to pick up the session
-                // @ts-expect-error - internal API
-                if (clerkInstance?.__internal_reloadInitialResources) {
-                  // @ts-expect-error - internal API
-                  await clerkInstance.__internal_reloadInitialResources();
+                if ((clerkInstance as any)?.__internal_reloadInitialResources) {
+                  await (clerkInstance as any).__internal_reloadInitialResources();
                   console.log(`[ClerkProvider] JS SDK state synced`);
                 }
               }
