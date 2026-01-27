@@ -3,10 +3,8 @@ import { useUser } from '@clerk/shared/react';
 import { css } from '@emotion/react';
 import React, { useMemo, useState } from 'react';
 
-import { Link } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { MosaicThemeProvider, useMosaicTheme } from '../../../mosaic/theme-provider';
-import { InternalThemeProvider } from '../../../styledSystem';
 import { handleDashboardUrlParsing } from '../shared';
 import { useRevalidateEnvironment } from './use-revalidate-environment';
 
@@ -28,14 +26,6 @@ function withLastActiveFallback(cb: () => string): string {
 }
 
 function KeylessPromptInternal(props: KeylessPromptProps) {
-  return (
-    <MosaicThemeProvider>
-      <KeylessPromptContent {...props} />
-    </MosaicThemeProvider>
-  );
-}
-
-function KeylessPromptContent(props: KeylessPromptProps) {
   const { isSignedIn } = useUser();
   const environment = useRevalidateEnvironment();
   const claimed = Boolean(environment.authConfig.claimedAt);
@@ -421,21 +411,16 @@ function KeylessPromptContent(props: KeylessPromptProps) {
                       {appName}
                     </span>{' '}
                     has been claimed. Configure settings from the{' '}
-                    <Link
-                      isExternal
-                      aria-label='Go to Dashboard to configure settings'
+                    <a
                       href={instanceUrlToDashboard}
-                      sx={t => ({
-                        color: t.colors.$whiteAlpha600,
-                        textDecoration: 'underline solid',
-                        transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
-                        ':hover': {
-                          color: t.colors.$whiteAlpha800,
-                        },
-                      })}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      css={css`
+                        text-decoration: underline;
+                      `}
                     >
                       Clerk Dashboard
-                    </Link>
+                    </a>
                   </p>
                 ) : claimed ? (
                   <p>
@@ -603,7 +588,7 @@ function KeylessPromptContent(props: KeylessPromptProps) {
 }
 
 export const KeylessPrompt = (props: KeylessPromptProps) => (
-  <InternalThemeProvider>
+  <MosaicThemeProvider>
     <KeylessPromptInternal {...props} />
-  </InternalThemeProvider>
+  </MosaicThemeProvider>
 );
