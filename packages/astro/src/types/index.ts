@@ -10,11 +10,7 @@ export type {
   AstroClerkUpdateOptions,
   AstroClerkIntegrationParams,
   AstroClerkCreateInstanceParams,
-  HeadlessBrowserClerk,
-  BrowserClerk,
-  ProtectParams,
   ProtectProps,
-  ShowProps,
   ButtonProps,
   InternalUIComponentId,
 } from '../types';
@@ -30,8 +26,3 @@ export type {
   SessionAuthObjectWithRedirect,
   AuthFn,
 } from '../server/types';
-
-/**
- * Astro React types
- */
-export type { SignInButtonProps, SignUpButtonProps } from '../react/types';
