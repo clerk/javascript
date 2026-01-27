@@ -3,4 +3,6 @@
 '@clerk/shared': minor
 ---
 
-Add stale-while-revalidate support for session tokens
+Add proactive session token refresh. Tokens are now automatically refreshed in the background before they expire, eliminating the need for manual refresh configuration.
+
+Remove `leewayInSeconds` from `GetTokenOptions`. Token refresh timing is now handled automatically.
