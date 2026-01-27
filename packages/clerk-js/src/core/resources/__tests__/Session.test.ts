@@ -424,7 +424,8 @@ describe('Session', () => {
         BaseResource.clerk = clerkMock();
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
 
-        const session = new Session({
+        // Create session with last_active_token to trigger cache hydration and timer scheduling
+        new Session({
           status: 'active',
           id: 'session_1',
           object: 'session',
