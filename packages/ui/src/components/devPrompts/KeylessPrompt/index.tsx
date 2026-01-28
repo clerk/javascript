@@ -117,7 +117,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
     <Portal>
       <div
         ref={containerRef}
-        onPointerDown={onPointerDown}
+        onPointerDown={isOpen ? undefined : onPointerDown}
         style={{
           ...cornerStyle,
           opacity: isInitialized ? undefined : 0,
@@ -164,7 +164,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
           will-change: width, border-radius;
           transform: translateZ(0);
           backface-visibility: hidden;
-          cursor: ${isDragging ? 'grabbing' : 'grab'};
+          cursor: ${isDragging ? 'grabbing' : isOpen ? 'default' : 'grab'};
           touch-action: none;
           transition: ${isDragging
             ? 'none'

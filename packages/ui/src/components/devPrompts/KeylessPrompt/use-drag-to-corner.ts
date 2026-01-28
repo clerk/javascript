@@ -10,6 +10,11 @@ const DRAG_THRESHOLD = 5;
 const VELOCITY_SAMPLE_INTERVAL_MS = 10;
 const VELOCITY_HISTORY_SIZE = 5;
 const INERTIA_DECELERATION_RATE = 0.999;
+const SPRING_DURATION = '350ms';
+const SPRING_EASING = 'cubic-bezier(0.34, 1.2, 0.64, 1)';
+const SPRING_TRANSITION = `transform ${SPRING_DURATION} ${SPRING_EASING}`;
+const ZERO_TRANSFORM = 'translate3d(0px, 0px, 0)';
+const ZERO_POINT: Point = { x: 0, y: 0 };
 
 interface Point {
   x: number;
@@ -36,26 +41,13 @@ interface UseDragToCornerResult {
   isInitialized: boolean;
 }
 
-const getCornerFromPosition = (x: number, y: number): Corner => {
-  const centerX = window.innerWidth / 2;
-  const centerY = window.innerHeight / 2;
+function getCornerFromPosition(x: number, y: number): Corner {
+  const vertical = y < window.innerHeight / 2 ? 'top' : 'bottom';
+  const horizontal = x < window.innerWidth / 2 ? 'left' : 'right';
+  return `${vertical}-${horizontal}` as Corner;
+}
 
-  const isLeft = x < centerX;
-  const isTop = y < centerY;
-
-  if (isTop && isLeft) {
-    return 'top-left';
-  }
-  if (isTop && !isLeft) {
-    return 'top-right';
-  }
-  if (!isTop && isLeft) {
-    return 'bottom-left';
-  }
-  return 'bottom-right';
-};
-
-const getCornerStyles = (corner: Corner): React.CSSProperties => {
+function getCornerStyles(corner: Corner): React.CSSProperties {
   switch (corner) {
     case 'top-left':
       return { top: CORNER_OFFSET, left: CORNER_OFFSET };
@@ -66,24 +58,11 @@ const getCornerStyles = (corner: Corner): React.CSSProperties => {
     case 'bottom-right':
       return { bottom: CORNER_OFFSET, right: CORNER_OFFSET };
   }
-};
+}
 
-const loadCornerPreference = (): Corner => {
-  if (typeof window === 'undefined') {
-    return 'bottom-right';
-  }
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(stored)) {
-      return stored as Corner;
-    }
-  } catch {
-    // Ignore localStorage errors
-  }
-  return 'bottom-right';
-};
+const VALID_CORNERS: Corner[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
 
-const saveCornerPreference = (corner: Corner): void => {
+function saveCornerPreference(corner: Corner): void {
   if (typeof window === 'undefined') {
     return;
   }
@@ -92,34 +71,32 @@ const saveCornerPreference = (corner: Corner): void => {
   } catch {
     // Ignore localStorage errors
   }
-};
+}
 
-const project = (initialVelocity: number): number => {
+function project(initialVelocity: number): number {
   return ((initialVelocity / 1000) * INERTIA_DECELERATION_RATE) / (1 - INERTIA_DECELERATION_RATE);
-};
+}
 
-const calculateVelocity = (history: Velocity[]): Point => {
+function calculateVelocity(history: Velocity[]): Point {
   if (history.length < 2) {
-    return { x: 0, y: 0 };
+    return ZERO_POINT;
   }
 
-  const oldestPoint = history[0];
-  const latestPoint = history[history.length - 1];
-  const timeDelta = latestPoint.timestamp - oldestPoint.timestamp;
+  const oldest = history[0];
+  const latest = history[history.length - 1];
+  const timeDelta = latest.timestamp - oldest.timestamp;
 
   if (timeDelta === 0) {
-    return { x: 0, y: 0 };
+    return ZERO_POINT;
   }
 
-  // Calculate pixels per millisecond
-  const velocityX = (latestPoint.position.x - oldestPoint.position.x) / timeDelta;
-  const velocityY = (latestPoint.position.y - oldestPoint.position.y) / timeDelta;
+  return {
+    x: ((latest.position.x - oldest.position.x) / timeDelta) * 1000,
+    y: ((latest.position.y - oldest.position.y) / timeDelta) * 1000,
+  };
+}
 
-  // Convert to pixels per second for more intuitive values
-  return { x: velocityX * 1000, y: velocityY * 1000 };
-};
-
-export const useDragToCorner = (): UseDragToCornerResult => {
+export function useDragToCorner(): UseDragToCornerResult {
   // Initialize with deterministic server-safe value to avoid SSR/hydration mismatch
   const [corner, setCorner] = useState<Corner>('bottom-right');
   const [isDragging, setIsDragging] = useState(false);
@@ -135,15 +112,12 @@ export const useDragToCorner = (): UseDragToCornerResult => {
     }
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored && ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(stored)) {
-        const storedCorner = stored as Corner;
-        // Set corner before making visible to prevent flash
-        setCorner(storedCorner);
+      if (stored && VALID_CORNERS.includes(stored as Corner)) {
+        setCorner(stored as Corner);
       }
     } catch {
       // Ignore localStorage errors
     } finally {
-      // Mark as initialized after reading localStorage (or if it fails)
       setIsInitialized(true);
     }
   }, []);
@@ -159,50 +133,50 @@ export const useDragToCorner = (): UseDragToCornerResult => {
   const lastTimestamp = useRef<number>(0);
   const velocities = useRef<Velocity[]>([]);
 
-  const set = useCallback((position: Point) => {
-    if (containerRef.current) {
-      translation.current = position;
-      containerRef.current.style.translate = `${position.x}px ${position.y}px`;
+  const setTranslation = useCallback((position: Point) => {
+    if (!containerRef.current) {
+      return;
     }
+    translation.current = position;
+    containerRef.current.style.transform = `translate3d(${position.x}px, ${position.y}px, 0)`;
   }, []);
 
   const getCorners = useCallback((): Record<Corner, Point> => {
     const container = containerRef.current;
     if (!container) {
       return {
-        'top-left': { x: 0, y: 0 },
-        'top-right': { x: 0, y: 0 },
-        'bottom-left': { x: 0, y: 0 },
-        'bottom-right': { x: 0, y: 0 },
+        'top-left': ZERO_POINT,
+        'top-right': ZERO_POINT,
+        'bottom-left': ZERO_POINT,
+        'bottom-right': ZERO_POINT,
       };
     }
 
-    const offset = CORNER_OFFSET_PX;
     const triggerWidth = container.offsetWidth || 0;
     const triggerHeight = container.offsetHeight || 0;
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
 
-    const getAbsolutePosition = (corner: Corner): Point => {
-      const isRight = corner.includes('right');
-      const isBottom = corner.includes('bottom');
+    function getAbsolutePosition(c: Corner): Point {
+      const isRight = c.includes('right');
+      const isBottom = c.includes('bottom');
+      return {
+        x: isRight ? window.innerWidth - scrollbarWidth - CORNER_OFFSET_PX - triggerWidth : CORNER_OFFSET_PX,
+        y: isBottom ? window.innerHeight - CORNER_OFFSET_PX - triggerHeight : CORNER_OFFSET_PX,
+      };
+    }
 
-      const x = isRight ? window.innerWidth - scrollbarWidth - offset - triggerWidth : offset;
-      const y = isBottom ? window.innerHeight - offset - triggerHeight : offset;
+    const base = getAbsolutePosition(corner);
 
-      return { x, y };
-    };
-
-    const basePosition = getAbsolutePosition(corner);
-
-    const rel = (pos: Point): Point => {
-      return { x: pos.x - basePosition.x, y: pos.y - basePosition.y };
-    };
+    function toRelative(c: Corner): Point {
+      const pos = getAbsolutePosition(c);
+      return { x: pos.x - base.x, y: pos.y - base.y };
+    }
 
     return {
-      'top-left': rel(getAbsolutePosition('top-left')),
-      'top-right': rel(getAbsolutePosition('top-right')),
-      'bottom-left': rel(getAbsolutePosition('bottom-left')),
-      'bottom-right': rel(getAbsolutePosition('bottom-right')),
+      'top-left': toRelative('top-left'),
+      'top-right': toRelative('top-right'),
+      'bottom-left': toRelative('bottom-left'),
+      'bottom-right': toRelative('bottom-right'),
     };
   }, [corner]);
 
@@ -214,7 +188,7 @@ export const useDragToCorner = (): UseDragToCornerResult => {
       }
 
       const handleAnimationEnd = (e: TransitionEvent) => {
-        if (e.propertyName === 'translate') {
+        if (e.propertyName === 'transform') {
           machine.current = { state: 'animating' };
 
           // Mark that we're waiting for corner update, then update corner state
@@ -222,26 +196,57 @@ export const useDragToCorner = (): UseDragToCornerResult => {
           pendingCornerUpdate.current = cornerTranslation.corner;
           setCorner(cornerTranslation.corner);
           saveCornerPreference(cornerTranslation.corner);
-
-          el.removeEventListener('transitionend', handleAnimationEnd);
         }
       };
 
-      el.style.transition = 'translate 300ms cubic-bezier(0.2, 0, 0.2, 1)';
-      el.addEventListener('transitionend', handleAnimationEnd);
-      set(cornerTranslation.translation);
+      el.style.transition = SPRING_TRANSITION;
+      el.addEventListener('transitionend', handleAnimationEnd, { once: true });
+      setTranslation(cornerTranslation.translation);
     },
-    [set],
+    [setTranslation],
   );
 
-  const cancel = useCallback(() => {
-    if (machine.current.state === 'drag') {
-      containerRef.current?.releasePointerCapture(machine.current.pointerId);
+  const resetTranslation = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) {
+      return;
     }
-    const wasDragging = machine.current.state === 'drag';
-    machine.current = machine.current.state === 'drag' ? { state: 'animating' } : { state: 'idle' };
 
-    if (cleanup.current !== null) {
+    const hasTranslation = translation.current.x !== 0 || translation.current.y !== 0;
+
+    if (hasTranslation) {
+      el.style.transition = SPRING_TRANSITION;
+      el.addEventListener(
+        'transitionend',
+        () => {
+          translation.current = ZERO_POINT;
+          el.style.transition = '';
+          el.style.transform = ZERO_TRANSFORM;
+          setPreventClick(false);
+        },
+        { once: true },
+      );
+      el.style.transform = ZERO_TRANSFORM;
+    } else {
+      translation.current = ZERO_POINT;
+      el.style.transform = ZERO_TRANSFORM;
+      el.style.transition = '';
+      setPreventClick(false);
+    }
+  }, []);
+
+  const cancel = useCallback(() => {
+    const currentState = machine.current.state;
+    const wasDragging = currentState === 'drag';
+
+    if (currentState === 'drag') {
+      containerRef.current?.releasePointerCapture(machine.current.pointerId);
+      machine.current = { state: 'animating' };
+    } else {
+      machine.current = { state: 'idle' };
+    }
+
+    if (cleanup.current) {
       cleanup.current();
       cleanup.current = null;
     }
@@ -252,23 +257,19 @@ export const useDragToCorner = (): UseDragToCornerResult => {
     document.body.style.removeProperty('user-select');
     document.body.style.removeProperty('-webkit-user-select');
 
-    // If we weren't dragging, reset any translation that might have been applied
-    if (!wasDragging && containerRef.current) {
-      translation.current = { x: 0, y: 0 };
-      containerRef.current.style.translate = '0px 0px';
-      containerRef.current.style.transition = '';
-      setPreventClick(false);
+    if (!wasDragging) {
+      resetTranslation();
     }
-  }, []);
+  }, [resetTranslation]);
 
   // Reset translate after corner state has updated and cornerStyle has been applied
   useLayoutEffect(() => {
-    if (pendingCornerUpdate.current !== null && pendingCornerUpdate.current === corner) {
+    if (pendingCornerUpdate.current === corner) {
       const el = containerRef.current;
       if (el && machine.current.state === 'animating') {
-        translation.current = { x: 0, y: 0 };
+        translation.current = ZERO_POINT;
         el.style.transition = '';
-        el.style.translate = '0px 0px';
+        el.style.transform = ZERO_TRANSFORM;
         machine.current = { state: 'idle' };
         setPreventClick(false);
         pendingCornerUpdate.current = null;
@@ -301,7 +302,7 @@ export const useDragToCorner = (): UseDragToCornerResult => {
       origin.current = { x: e.clientX, y: e.clientY };
       machine.current = { state: 'press' };
       velocities.current = [];
-      translation.current = { x: 0, y: 0 };
+      translation.current = ZERO_POINT;
       lastTimestamp.current = Date.now();
 
       const handlePointerMove = (moveEvent: PointerEvent) => {
@@ -310,16 +311,20 @@ export const useDragToCorner = (): UseDragToCornerResult => {
           const dy = moveEvent.clientY - origin.current.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          if (distance >= DRAG_THRESHOLD) {
-            machine.current = { state: 'drag', pointerId: moveEvent.pointerId };
-            container.setPointerCapture(moveEvent.pointerId);
-            container.classList.add('dev-tools-grabbing');
-            document.body.style.userSelect = 'none';
-            document.body.style.webkitUserSelect = 'none';
-            setIsDragging(true);
-          } else {
+          if (distance < DRAG_THRESHOLD) {
             return;
           }
+
+          machine.current = { state: 'drag', pointerId: moveEvent.pointerId };
+          try {
+            container.setPointerCapture(moveEvent.pointerId);
+          } catch {
+            // Pointer capture may fail on some browsers/devices - drag still works without it
+          }
+          container.classList.add('dev-tools-grabbing');
+          document.body.style.userSelect = 'none';
+          document.body.style.webkitUserSelect = 'none';
+          setIsDragging(true);
         }
 
         if (machine.current.state !== 'drag') {
@@ -332,18 +337,13 @@ export const useDragToCorner = (): UseDragToCornerResult => {
 
         origin.current = currentPosition;
 
-        const newTranslation = {
+        setTranslation({
           x: translation.current.x + dx,
           y: translation.current.y + dy,
-        };
+        });
 
-        set(newTranslation);
-
-        // Keep a history of recent positions for velocity calculation
         const now = Date.now();
-        const shouldAddToHistory = now - lastTimestamp.current >= VELOCITY_SAMPLE_INTERVAL_MS;
-
-        if (shouldAddToHistory) {
+        if (now - lastTimestamp.current >= VELOCITY_SAMPLE_INTERVAL_MS) {
           velocities.current = [
             ...velocities.current.slice(-VELOCITY_HISTORY_SIZE + 1),
             { position: currentPosition, timestamp: now },
@@ -385,17 +385,11 @@ export const useDragToCorner = (): UseDragToCornerResult => {
           setPreventClick(true);
           animate({ corner: newCorner, translation: targetTranslation });
         } else {
-          // If we weren't dragging, just cancel to clean up state
-          // Make sure preventClick is false so button clicks work
           cancel();
-          // Double-check preventClick is reset (in case cancel() didn't handle it)
-          setPreventClick(false);
         }
       };
 
       const handleClick = (clickEvent: MouseEvent) => {
-        // Only prevent clicks if we're animating to a new corner
-        // Never prevent clicks on buttons or links - let them handle their own clicks
         const target = clickEvent.target as HTMLElement;
         const isButton = target.tagName === 'BUTTON' || target.closest('button');
         const isLink = target.tagName === 'A' || target.closest('a');
@@ -408,19 +402,21 @@ export const useDragToCorner = (): UseDragToCornerResult => {
 
       window.addEventListener('pointermove', handlePointerMove);
       window.addEventListener('pointerup', handlePointerUp, { once: true });
+      window.addEventListener('pointercancel', cancel, { once: true });
       container.addEventListener('click', handleClick);
 
-      if (cleanup.current !== null) {
+      if (cleanup.current) {
         cleanup.current();
       }
 
       cleanup.current = () => {
         window.removeEventListener('pointermove', handlePointerMove);
         window.removeEventListener('pointerup', handlePointerUp);
+        window.removeEventListener('pointercancel', cancel);
         container.removeEventListener('click', handleClick);
       };
     },
-    [cancel, set, animate, getCorners],
+    [cancel, setTranslation, animate, getCorners],
   );
 
   return {
@@ -432,4 +428,4 @@ export const useDragToCorner = (): UseDragToCornerResult => {
     preventClick,
     isInitialized,
   };
-};
+}
