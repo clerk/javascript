@@ -3114,6 +3114,8 @@ export class Clerk implements ClerkInterface {
   /**
    * Updates the accessors for the Clerk singleton and emits.
    * If dangerouslySkipEmit is true, the emit will be skipped and you are responsible for calling #emit() yourself. This is dangerous because if there is a gap between setting these and emitting, library consumers that both read state directly and set up listeners could end up in a inconsistent state.
+   *
+   * New code should avoid using dangerouslySkipEmit. If you need to use the new values for something before emitting, instead use a "work in progress" state with the new values that you pass around and act on until it's time to "commit" it by calling #updateAccessors with the new values.
    */
   #updateAccessors = (session?: SignedInSessionResource | null, options?: { dangerouslySkipEmit?: boolean }) => {
     const { session: newSession, organization, user } = this.#getAccessorsFromSession(session);
