@@ -17,10 +17,10 @@ export function useUserBase(): UserResource | null | undefined {
       [clerk],
     ),
     useCallback(() => {
-      if (!clerk.loaded) {
+      if (!clerk.loaded || !clerk.__internal_lastEmittedResources) {
         return getInitialState();
       }
-      return clerk.user;
+      return clerk.__internal_lastEmittedResources.user;
     }, [clerk, getInitialState]),
     getInitialState,
   );

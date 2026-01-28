@@ -13,10 +13,10 @@ export function useOrganizationBase(): OrganizationResource | null | undefined {
   const organization = useSyncExternalStore(
     useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
     useCallback(() => {
-      if (!clerk.loaded) {
+      if (!clerk.loaded || !clerk.__internal_lastEmittedResources) {
         return getInitialState();
       }
-      return clerk.organization;
+      return clerk.__internal_lastEmittedResources.organization;
     }, [clerk, getInitialState]),
     getInitialState,
   );

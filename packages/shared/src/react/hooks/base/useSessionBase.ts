@@ -14,10 +14,10 @@ export function useSessionBase(): SignedInSessionResource | null | undefined {
   const session = useSyncExternalStore(
     useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
     useCallback(() => {
-      if (!clerk.loaded) {
+      if (!clerk.loaded || !clerk.__internal_lastEmittedResources) {
         return getInitialState();
       }
-      return clerk.session;
+      return clerk.__internal_lastEmittedResources.session;
     }, [clerk, getInitialState]),
     getInitialState,
   );

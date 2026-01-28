@@ -12,10 +12,10 @@ export function useClientBase(): ClientResource | null | undefined {
   const client = useSyncExternalStore(
     useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
     useCallback(() => {
-      if (!clerk.loaded) {
+      if (!clerk.loaded || !clerk.__internal_lastEmittedResources) {
         return initialSnapshot;
       }
-      return clerk.client;
+      return clerk.__internal_lastEmittedResources.client;
     }, [clerk]),
     getInitialSnapshot,
   );
