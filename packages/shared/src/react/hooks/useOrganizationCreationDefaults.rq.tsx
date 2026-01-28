@@ -47,12 +47,7 @@ export function useOrganizationCreationDefaults(
 
   const query = useClerkQuery({
     queryKey,
-    queryFn: () => {
-      if (!user) {
-        throw new Error('User is required to fetch organization creation defaults');
-      }
-      return user.getOrganizationCreationDefaults();
-    },
+    queryFn: user?.getOrganizationCreationDefaults,
     enabled: queryEnabled,
     placeholderData: defineKeepPreviousDataFn(keepPreviousData),
   });
