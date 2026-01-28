@@ -30,7 +30,7 @@ import type {
   SignUpFuturePhoneCodeVerifyParams,
   SignUpFutureResource,
   SignUpFutureSSOParams,
-  SignUpFutureVerificationsResource,
+  SignUpFutureVerifications as SignUpFutureVerificationsType,
   SignUpFutureTicketParams,
   SignUpFutureUpdateParams,
   SignUpFutureWeb3Params,
@@ -590,17 +590,17 @@ export class SignUp extends BaseResource implements SignUpResource {
 }
 
 type SignUpFutureVerificationsMethods = Pick<
-  SignUpFutureVerificationsResource,
+  SignUpFutureVerifications,
   'sendEmailCode' | 'verifyEmailCode' | 'sendPhoneCode' | 'verifyPhoneCode'
 >;
 
-class SignUpFutureVerifications implements SignUpFutureVerificationsResource {
+class SignUpFutureVerifications implements SignUpFutureVerificationsType {
   #resource: SignUp;
 
-  sendEmailCode: SignUpFutureVerificationsResource['sendEmailCode'];
-  verifyEmailCode: SignUpFutureVerificationsResource['verifyEmailCode'];
-  sendPhoneCode: SignUpFutureVerificationsResource['sendPhoneCode'];
-  verifyPhoneCode: SignUpFutureVerificationsResource['verifyPhoneCode'];
+  sendEmailCode: SignUpFutureVerificationsType['sendEmailCode'];
+  verifyEmailCode: SignUpFutureVerificationsType['verifyEmailCode'];
+  sendPhoneCode: SignUpFutureVerificationsType['sendPhoneCode'];
+  verifyPhoneCode: SignUpFutureVerificationsType['verifyPhoneCode'];
 
   constructor(resource: SignUp, methods: SignUpFutureVerificationsMethods) {
     this.#resource = resource;
