@@ -12,6 +12,9 @@ const INVITATIONS_KEY = 'invitations';
 // Keys for `useAPIKeys`
 const API_KEYS_KEY = 'apiKeys';
 
+// Keys for `useOrganizationCreationDefaults`
+const ORGANIZATION_CREATION_DEFAULTS_KEY = 'organizationCreationDefaults';
+
 // Keys for `usePlans`
 const PLANS_KEY = 'billing-plans';
 
@@ -48,6 +51,9 @@ export const STABLE_KEYS = {
 
   // Keys for `useAPIKeys`
   API_KEYS_KEY,
+
+  // Keys for `useOrganizationCreationDefaults`
+  ORGANIZATION_CREATION_DEFAULTS_KEY,
 } as const;
 
 export type ResourceCacheStableKey = (typeof STABLE_KEYS)[keyof typeof STABLE_KEYS];
