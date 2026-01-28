@@ -1,16 +1,19 @@
+import type { Ui } from '@clerk/react/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import { SDK_METADATA } from '../server/constants';
 import type { NextClerkProviderProps } from '../types';
 
-// @ts-ignore - https://github.com/microsoft/TypeScript/issues/47663
-export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, 'children'>): any => {
+export const mergeNextClerkPropsWithEnv = <TUi extends Ui = Ui>(
+  props: Omit<NextClerkProviderProps<TUi>, 'children'>,
+) => {
   return {
     ...props,
     publishableKey: props.publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',
     clerkJSUrl: props.clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS_URL,
     clerkUiUrl: (props as any).clerkUiUrl || process.env.NEXT_PUBLIC_CLERK_UI_URL,
     clerkJSVersion: props.clerkJSVersion || process.env.NEXT_PUBLIC_CLERK_JS_VERSION,
+    clerkUIVariant: (props as any).clerkUIVariant || process.env.NEXT_PUBLIC_CLERK_UI_VARIANT,
     proxyUrl: props.proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL || '',
     domain: props.domain || process.env.NEXT_PUBLIC_CLERK_DOMAIN || '',
     isSatellite: props.isSatellite || isTruthy(process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE),
@@ -34,5 +37,5 @@ export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, '
     unsafe_disableDevelopmentModeConsoleWarning: isTruthy(
       process.env.NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING,
     ),
-  };
+  } satisfies Omit<NextClerkProviderProps<TUi>, 'children'>;
 };
