@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "2.29.5",
+  "version": "2.29.6",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "homepage": "https://clerk.com/",
   "bugs": {

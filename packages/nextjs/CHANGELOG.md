@@ -1,5 +1,21 @@
 # Change Log
 
+## 6.37.0
+
+### Minor Changes
+
+- Export `useOrganizationCreationDefaults` hook to fetch suggested organization name and logo from default naming rules ([#7690](https://github.com/clerk/javascript/pull/7690)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updates middleware location check to account for proxy.ts in next 16+ applications. ([#7269](https://github.com/clerk/javascript/pull/7269)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`64a35f7`](https://github.com/clerk/javascript/commit/64a35f79e9a49dfc140b4c8a8df517b74d46d6c6)]:
+  - @clerk/shared@3.44.0
+  - @clerk/clerk-react@5.60.0
+  - @clerk/backend@2.29.6
+  - @clerk/types@4.101.14
+
 ## 6.36.10
 
 ### Patch Changes
