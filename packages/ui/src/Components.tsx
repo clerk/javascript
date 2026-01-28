@@ -330,6 +330,14 @@ const Components = (props: ComponentsProps) => {
     useCallback(() => {
       return clerk.__internal_lastEmittedResources;
     }, [clerk]),
+    // This is not a correct implementation of getServerSnapshot, but should be fine since we don't use the
+    // return state anyway.
+    // We currently do not server render the Clerk components, so leaving it out entirely would also be fine,
+    // but this is a workaround to avoid a hard error when we want to experiment with server rendering.
+    // A fully correct implementation would require passing in the initialState to the <Components> component.
+    useCallback(() => {
+      return clerk.__internal_lastEmittedResources;
+    }, [clerk]),
   );
 
   // See above comment on useSyncExternalStore for why we use a ref to store the nodes instead of state
