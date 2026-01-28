@@ -43,6 +43,7 @@ const defaultOptions: ParsedOptions = {
   socialButtonsPlacement: 'top',
   socialButtonsVariant: 'auto',
   logoImageUrl: '',
+  renderLogoImage: undefined,
   logoLinkUrl: '',
   showOptionalFields: false,
   helpPageUrl: '',

@@ -1,7 +1,9 @@
+import { mergeProps } from '@base-ui/react/merge-props';
+import { useRender } from '@base-ui/react/use-render';
 import React from 'react';
 
 import { useEnvironment } from '../contexts';
-import { descriptors, Flex, Image, useAppearance } from '../customizables';
+import { Box, descriptors, Flex, Image, useAppearance } from '../customizables';
 import { Link } from '../primitives';
 import type { PropsOfComponent } from '../styledSystem';
 import { RouterLink } from './RouterLink';
@@ -49,30 +51,72 @@ export const ApplicationLogo: React.FC<ApplicationLogoProps> = (props: Applicati
   const [loaded, setLoaded] = React.useState(false);
   const { logoImageUrl, applicationName, homeUrl } = useEnvironment().displayConfig;
   const { parsedOptions } = useAppearance();
+  const { renderLogoImage } = parsedOptions;
   const imageSrc = src || parsedOptions.logoImageUrl || logoImageUrl;
   const imageAlt = alt || applicationName;
   const logoUrl = href || parsedOptions.logoLinkUrl || homeUrl;
 
-  if (!imageSrc) {
+  // Call useRender unconditionally to satisfy React hooks rules
+  // When renderLogoImage is undefined, pass undefined and useRender will use the default img element
+  const logoElement = useRender({
+    defaultTagName: 'img',
+    render: renderLogoImage,
+    ref: imageRef,
+    props: mergeProps<'img'>(
+      {
+        src: imageSrc || '',
+        alt: imageAlt,
+        crossOrigin: 'anonymous',
+        onLoad: () => setLoaded(true),
+        style: {
+          height: '100%',
+          width: '100%',
+          objectFit: 'contain',
+        },
+      },
+      {},
+    ),
+  });
+
+  // Early return after hooks
+  if (!imageSrc && !renderLogoImage) {
     return null;
   }
 
-  const image = (
-    <Image
-      ref={imageRef}
-      elementDescriptor={descriptors.logoImage}
-      alt={imageAlt}
-      src={imageSrc}
-      size={200}
-      onLoad={() => setLoaded(true)}
-      sx={{
-        display: loaded ? 'inline-block' : 'none',
-        height: '100%',
-        width: '100%',
-        objectFit: 'contain',
-      }}
-    />
-  );
+  let image: React.ReactElement;
+
+  if (renderLogoImage && logoElement) {
+    // Use render prop when provided
+    image = (
+      <Box
+        sx={{
+          display: loaded ? 'inline-block' : 'none',
+          height: '100%',
+          width: '100%',
+        }}
+      >
+        {logoElement}
+      </Box>
+    );
+  } else {
+    // Fallback to existing Image component behavior
+    image = (
+      <Image
+        ref={imageRef}
+        elementDescriptor={descriptors.logoImage}
+        alt={imageAlt}
+        src={imageSrc}
+        size={200}
+        onLoad={() => setLoaded(true)}
+        sx={{
+          display: loaded ? 'inline-block' : 'none',
+          height: '100%',
+          width: '100%',
+          objectFit: 'contain',
+        }}
+      />
+    );
+  }
 
   return (
     <Flex

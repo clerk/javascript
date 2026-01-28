@@ -16,6 +16,7 @@ import type {
   UserPreviewId,
   Web3Provider,
 } from '@clerk/shared/types';
+import type { useRender } from '@base-ui/react/use-render';
 import type * as CSS from 'csstype';
 
 type CSSProperties = CSS.PropertiesFallback<number | string>;
@@ -886,6 +887,26 @@ export type Options = {
    * @default undefined
    */
   logoImageUrl?: string;
+  /**
+   * A render prop to customize the logo image element.
+   * Useful for handling light/dark mode with different logo images.
+   * When provided, this takes precedence over `logoImageUrl`.
+   *
+   * @example
+   * // Using a custom component
+   * renderLogoImage={<MyCustomLogo />}
+   *
+   * // Using a callback for more control
+   * renderLogoImage={(props) => (
+   *   <picture>
+   *     <source srcSet="/logo-dark.png" media="(prefers-color-scheme: dark)" />
+   *     <img {...props} />
+   *   </picture>
+   * )}
+   *
+   * @default undefined
+   */
+  renderLogoImage?: useRender.RenderProp<{ src: string; alt: string }>;
   /**
    * Controls where the browser will redirect to after the user clicks the application logo,
    * usually found in the SignIn and SignUp components.

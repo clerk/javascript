@@ -82,6 +82,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@base-ui/react": "^1.1.0",
     "@clerk/localizations": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@emotion/cache": "11.11.0",
