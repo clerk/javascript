@@ -238,6 +238,7 @@ export const useDragToCorner = (): UseDragToCornerResult => {
     if (machine.current.state === 'drag') {
       containerRef.current?.releasePointerCapture(machine.current.pointerId);
     }
+    const wasDragging = machine.current.state === 'drag';
     machine.current = machine.current.state === 'drag' ? { state: 'animating' } : { state: 'idle' };
 
     if (cleanup.current !== null) {
@@ -250,6 +251,14 @@ export const useDragToCorner = (): UseDragToCornerResult => {
     containerRef.current?.classList.remove('dev-tools-grabbing');
     document.body.style.removeProperty('user-select');
     document.body.style.removeProperty('-webkit-user-select');
+
+    // If we weren't dragging, reset any translation that might have been applied
+    if (!wasDragging && containerRef.current) {
+      translation.current = { x: 0, y: 0 };
+      containerRef.current.style.translate = '0px 0px';
+      containerRef.current.style.transition = '';
+      setPreventClick(false);
+    }
   }, []);
 
   // Reset translate after corner state has updated and cornerStyle has been applied
@@ -345,10 +354,11 @@ export const useDragToCorner = (): UseDragToCornerResult => {
 
       const handlePointerUp = () => {
         const wasDragging = machine.current.state === 'drag';
-        const velocity = calculateVelocity(velocities.current);
-        cancel();
 
         if (wasDragging) {
+          const velocity = calculateVelocity(velocities.current);
+          cancel();
+
           const container = containerRef.current;
           if (!container) {
             return;
@@ -374,15 +384,25 @@ export const useDragToCorner = (): UseDragToCornerResult => {
 
           setPreventClick(true);
           animate({ corner: newCorner, translation: targetTranslation });
+        } else {
+          // If we weren't dragging, just cancel to clean up state
+          // Make sure preventClick is false so button clicks work
+          cancel();
+          // Double-check preventClick is reset (in case cancel() didn't handle it)
+          setPreventClick(false);
         }
       };
 
       const handleClick = (clickEvent: MouseEvent) => {
-        if (machine.current.state === 'animating') {
+        // Only prevent clicks if we're animating to a new corner
+        // Never prevent clicks on buttons or links - let them handle their own clicks
+        const target = clickEvent.target as HTMLElement;
+        const isButton = target.tagName === 'BUTTON' || target.closest('button');
+        const isLink = target.tagName === 'A' || target.closest('a');
+
+        if (machine.current.state === 'animating' && !isButton && !isLink) {
           clickEvent.preventDefault();
           clickEvent.stopPropagation();
-          machine.current = { state: 'idle' };
-          container.removeEventListener('click', handleClick);
         }
       };
 
