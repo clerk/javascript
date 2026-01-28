@@ -40,7 +40,7 @@ export function useClearQueriesOnSignOut(options: ClearQueriesOnSignOutOptions) 
 
     const isNowSignedOut = isSignedOut === true;
 
-    if (previousIsSignedIn && isNowSignedOut && authenticated === true) {
+    if (previousIsSignedIn && isNowSignedOut) {
       queryClient.removeQueries({
         predicate: query => {
           const [cachedStableKey, queryAuthenticated] = query.queryKey;
