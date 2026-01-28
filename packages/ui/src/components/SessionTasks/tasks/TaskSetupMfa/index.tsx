@@ -1,5 +1,6 @@
-import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import { useEffect, useMemo } from 'react';
+
+import { useClerk, useSession, useUser } from '@clerk/shared/react';
 
 import { useWizard, Wizard } from '@/common';
 import { useSessionTasksContext, useTaskSetupMFAContext } from '@/contexts/components/SessionTasks';
@@ -11,6 +12,7 @@ import { getSecondFactorsAvailableToAdd } from '@/ui/utils/mfa';
 import { SetupMfaStartScreen } from './SetupMfaStartScreen';
 import { SmsCodeFlow } from './SmsCodeFlowScreen';
 import { TOTPCodeFlow } from './TOTPCodeFlowScreen';
+import { withTaskGuard } from '../shared';
 
 const TaskSetupMFAInternal = () => {
   const clerk = useClerk();
@@ -59,11 +61,15 @@ const TaskSetupMFAInternal = () => {
   // This is to prevent the user from being redirected to the home page after setting up MFA
   // as if backup codes are enabled, the user will be redirected without seeing the backup codes
   useEffect(() => {
-    const currentTask = session?.currentTask;
-    if (currentTask && currentTask.key === 'setup-mfa' && ctx.shouldAutoNavigateAway) {
+    if (ctx.shouldAutoNavigateAway) {
       ctx.shouldAutoNavigateAway.current = false;
     }
-  }, [session?.currentTask, ctx.shouldAutoNavigateAway]);
+    return () => {
+      if (ctx.shouldAutoNavigateAway) {
+        ctx.shouldAutoNavigateAway.current = true;
+      }
+    };
+  }, [ctx.shouldAutoNavigateAway]);
 
   return (
     <Flow.Root flow='taskSetupMfa'>
@@ -94,4 +100,6 @@ const TaskSetupMFAInternal = () => {
   );
 };
 
-export const TaskSetupMFA = withCoreSessionSwitchGuard(withCardStateProvider(TaskSetupMFAInternal));
+export const TaskSetupMFA = withCoreSessionSwitchGuard(
+  withTaskGuard(withCardStateProvider(TaskSetupMFAInternal), 'setup-mfa', { allowAfterTaskComplete: true }),
+);
