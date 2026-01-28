@@ -1,14 +1,12 @@
 import { Clerk } from '@clerk/clerk-js';
-import { ClerkUi } from '@clerk/ui/entry';
+import { ui } from '@clerk/ui';
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 document.addEventListener('DOMContentLoaded', async function () {
   const clerk = new Clerk(publishableKey);
 
-  await clerk.load({
-    clerkUiCtor: ClerkUi,
-  });
+  await clerk.load({ ui });
 
   if (clerk.isSignedIn) {
     document.getElementById('app')!.innerHTML = `

@@ -1,6 +1,6 @@
 import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 
-import type { ClerkUiConstructor } from '../ui/types';
+import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   BillingCheckoutResource,
@@ -1087,9 +1087,19 @@ export type ClerkOptions = ClerkOptionsNavigation &
   AfterMultiSessionSingleSignOutUrl &
   ClerkUnsafeOptions & {
     /**
-     * Clerk UI entrypoint.
+     * The Clerk UI object from `@clerk/ui`. Contains the UI constructor and version info.
      */
-    clerkUiCtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
+    ui?: {
+      version?: string;
+      url?: string;
+      ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
+      /**
+       * @internal
+       * Prefer loading UI from CDN even when ClerkUI is provided.
+       * Used internally by SDKs that have bundling issues with the UI (e.g., Next.js).
+       */
+      __internal_preferCDN?: boolean;
+    };
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
@@ -2426,7 +2436,7 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   /**
    * The URL that `@clerk/ui` should be hot-loaded from.
    */
-  clerkUiUrl?: string;
+  clerkUIUrl?: string;
   /**
    * If set to `'shared'`, loads a variant of `@clerk/ui` that expects React to be provided by the host application via `globalThis.__clerkSharedModules`.
    * This reduces bundle size when using framework packages like `@clerk/react`.
@@ -2445,7 +2455,21 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    * This is a structural-only type for the `ui` object that can be passed
    * to Clerk.load() and ClerkProvider
    */
-  ui?: { version: string; url?: string };
+  ui?: {
+    version: string;
+    url?: string;
+    /**
+     * The Clerk UI constructor. When provided, this will be used instead of
+     * loading the UI from CDN. This is useful for bundling the UI with your app.
+     */
+    ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
+    /**
+     * @internal
+     * Prefer loading UI from CDN even when ClerkUI is provided.
+     * Used internally by SDKs that have bundling issues with the UI (e.g., Next.js).
+     */
+    __internal_preferCDN?: boolean;
+  };
 } & MultiDomainAndOrProxy;
 
 export interface LoadedClerk extends Clerk {

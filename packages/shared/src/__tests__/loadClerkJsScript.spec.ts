@@ -281,7 +281,7 @@ describe('loadClerkUiScript(options)', () => {
     (loadScript as Mock).mockResolvedValue(undefined);
     document.querySelector = vi.fn().mockReturnValue(null);
 
-    (window as any).__internal_ClerkUiCtor = undefined;
+    (window as any).__internal_ClerkUICtor = undefined;
 
     vi.useFakeTimers();
   });
@@ -297,7 +297,7 @@ describe('loadClerkUiScript(options)', () => {
   });
 
   test('returns null immediately when ClerkUI is already loaded', async () => {
-    (window as any).__internal_ClerkUiCtor = mockClerkUi;
+    (window as any).__internal_ClerkUICtor = mockClerkUi;
 
     const result = await loadClerkUiScript({ publishableKey: mockPublishableKey });
     expect(result).toBeNull();
@@ -309,7 +309,7 @@ describe('loadClerkUiScript(options)', () => {
 
     // Simulate ClerkUI becoming available after 250ms
     setTimeout(() => {
-      (window as any).__internal_ClerkUiCtor = mockClerkUi;
+      (window as any).__internal_ClerkUICtor = mockClerkUi;
     }, 250);
 
     // Advance timers to allow polling to detect ClerkUI
@@ -343,7 +343,7 @@ describe('loadClerkUiScript(options)', () => {
 
     expect(rejectedWith).toBeInstanceOf(ClerkRuntimeError);
     expect(rejectedWith.message).toContain('Failed to load Clerk UI');
-    expect((window as any).__internal_ClerkUiCtor).toBeUndefined();
+    expect((window as any).__internal_ClerkUICtor).toBeUndefined();
   });
 
   test('waits for existing script with timeout', async () => {
@@ -354,7 +354,7 @@ describe('loadClerkUiScript(options)', () => {
 
     // Simulate ClerkUI becoming available after 250ms
     setTimeout(() => {
-      (window as any).__internal_ClerkUiCtor = mockClerkUi;
+      (window as any).__internal_ClerkUICtor = mockClerkUi;
     }, 250);
 
     // Advance timers to allow polling to detect ClerkUI
@@ -369,23 +369,23 @@ describe('loadClerkUiScript(options)', () => {
     const loadPromise = loadClerkUiScript({ publishableKey: mockPublishableKey, scriptLoadTimeout: 1000 });
 
     setTimeout(() => {
-      (window as any).__internal_ClerkUiCtor = mockClerkUi;
+      (window as any).__internal_ClerkUICtor = mockClerkUi;
     }, 999);
 
     vi.advanceTimersByTime(1000);
 
     const result = await loadPromise;
     expect(result).toBeNull();
-    expect((window as any).__internal_ClerkUiCtor).toBe(mockClerkUi);
+    expect((window as any).__internal_ClerkUICtor).toBe(mockClerkUi);
   });
 
   test('validates ClerkUI is properly loaded', async () => {
-    (window as any).__internal_ClerkUiCtor = mockClerkUi;
+    (window as any).__internal_ClerkUICtor = mockClerkUi;
 
     const result = await loadClerkUiScript({ publishableKey: mockPublishableKey });
 
     expect(result).toBeNull();
-    expect((window as any).__internal_ClerkUiCtor).toBe(mockClerkUi);
+    expect((window as any).__internal_ClerkUICtor).toBe(mockClerkUi);
   });
 });
 
@@ -393,9 +393,9 @@ describe('clerkUiScriptUrl()', () => {
   const mockDevPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
   const mockProdPublishableKey = 'pk_live_ZXhhbXBsZS5jbGVyay5jb20k'; // example.clerk.com
 
-  test('returns clerkUiUrl when provided', () => {
+  test('returns clerkUIUrl when provided', () => {
     const customUrl = 'https://custom.clerk.com/ui.js';
-    const result = clerkUiScriptUrl({ clerkUiUrl: customUrl, publishableKey: mockDevPublishableKey });
+    const result = clerkUiScriptUrl({ clerkUIUrl: customUrl, publishableKey: mockDevPublishableKey });
     expect(result).toBe(customUrl);
   });
 
@@ -411,8 +411,8 @@ describe('clerkUiScriptUrl()', () => {
     expect(result).toBe(`https://example.clerk.com/npm/@clerk/ui@${uiPackageMajorVersion}/dist/ui.browser.js`);
   });
 
-  test('uses provided clerkUiVersion', () => {
-    const result = clerkUiScriptUrl({ publishableKey: mockDevPublishableKey, clerkUiVersion: '1' });
+  test('uses provided clerkUIVersion', () => {
+    const result = clerkUiScriptUrl({ publishableKey: mockDevPublishableKey, clerkUIVersion: '1' });
     expect(result).toContain('/npm/@clerk/ui@1/');
   });
 

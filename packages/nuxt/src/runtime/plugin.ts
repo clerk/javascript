@@ -21,9 +21,9 @@ export default defineNuxtPlugin(nuxtApp => {
 
   nuxtApp.vueApp.use(clerkPlugin as any, {
     ...clerkConfig,
-    // Map jsUrl/uiUrl to clerkJSUrl/clerkUiUrl as expected by the Vue plugin
+    // Map jsUrl/uiUrl to clerkJSUrl/clerkUIUrl as expected by the Vue plugin
     clerkJSUrl: clerkConfig.jsUrl,
-    clerkUiUrl: clerkConfig.uiUrl,
+    clerkUIUrl: clerkConfig.uiUrl,
     sdkMetadata: {
       name: PACKAGE_NAME,
       version: PACKAGE_VERSION,

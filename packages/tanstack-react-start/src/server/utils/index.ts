@@ -35,7 +35,7 @@ export function getResponseClerkState(requestState: RequestState, additionalStat
     __afterSignUpUrl: requestState.afterSignUpUrl,
     __clerk_debug: debugRequestState(requestState),
     __clerkJSUrl: getEnvVariable('CLERK_JS') || getEnvVariable('CLERK_JS_URL'),
-    __clerkUiUrl: getEnvVariable('CLERK_UI_URL'),
+    __clerkUIUrl: getEnvVariable('CLERK_UI_URL'),
     __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION'),
     __telemetryDisabled: isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED')),
     __telemetryDebug: isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG')),

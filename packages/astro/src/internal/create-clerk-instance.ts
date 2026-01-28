@@ -4,7 +4,7 @@ import {
   setClerkJsLoadingErrorPackageName,
 } from '@clerk/shared/loadClerkJsScript';
 import type { ClerkOptions } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { Ui } from '@clerk/ui/internal';
 
 import { $clerkStore } from '../stores/external';
@@ -40,7 +40,7 @@ async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroC
   // Both functions return early if the scripts are already loaded
   // (e.g., via middleware-injected script tags in the HTML head).
   const clerkJsChunk = getClerkJsEntryChunk(options);
-  const clerkUiCtor = getClerkUiEntryChunk(options);
+  const ClerkUI = getClerkUiEntryChunk(options);
 
   await clerkJsChunk;
 
@@ -58,8 +58,12 @@ async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroC
     routerPush: createNavigationHandler(window.history.pushState.bind(window.history)),
     routerReplace: createNavigationHandler(window.history.replaceState.bind(window.history)),
     ...options,
-    // Pass the clerk-ui constructor promise to clerk.load()
-    clerkUiCtor,
+    // Pass the clerk-ui constructor promise inside ui object
+    ui: {
+      version: options?.ui?.version,
+      url: options?.ui?.url,
+      ClerkUI,
+    },
   } as unknown as ClerkOptions;
 
   initOptions = clerkOptions;
@@ -109,23 +113,33 @@ async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCre
 }
 
 /**
- * Gets the ClerkUI constructor, either from options or by loading the script.
- * Returns early if window.__internal_ClerkUiCtor already exists.
+ * Gets the ClerkUI constructor, either from bundled UI or by loading from CDN.
  */
 async function getClerkUiEntryChunk<TUi extends Ui = Ui>(
   options?: AstroClerkCreateInstanceParams<TUi>,
-): Promise<ClerkUiConstructor> {
-  if (options?.clerkUiCtor) {
-    return options.clerkUiCtor;
+): Promise<ClerkUIConstructor> {
+  // Use bundled UI constructor if provided via options.ui.ClerkUI
+  const bundledClerkUI = (options?.ui as { ClerkUI?: ClerkUIConstructor })?.ClerkUI;
+  if (bundledClerkUI) {
+    return bundledClerkUI;
   }
 
-  await loadClerkUiScript(options);
+  // Fall back to loading UI from CDN with version pinning from ui.version
+  await loadClerkUiScript(
+    options
+      ? {
+          ...options,
+          clerkUIVersion: options.ui?.version,
+          clerkUIUrl: options.ui?.url ?? options.clerkUIUrl,
+        }
+      : undefined,
+  );
 
-  if (!window.__internal_ClerkUiCtor) {
+  if (!window.__internal_ClerkUICtor) {
     throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
   }
 
-  return window.__internal_ClerkUiCtor;
+  return window.__internal_ClerkUICtor;
 }
 
 export { createClerkInstance, updateClerkOptions };

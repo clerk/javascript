@@ -11,7 +11,7 @@ import type {
   Resources,
   Without,
 } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { Appearance, Ui } from '@clerk/ui/internal';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
@@ -19,7 +19,7 @@ import { computed, ref, shallowRef, triggerRef } from 'vue';
 import { ClerkInjectionKey } from './keys';
 declare global {
   interface Window {
-    __internal_ClerkUiCtor?: ClerkUiConstructor;
+    __internal_ClerkUICtor?: ClerkUIConstructor;
   }
 }
 
@@ -78,15 +78,18 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
       void (async () => {
         try {
           const clerkPromise = loadClerkJsScript(options);
-          const clerkUiCtorPromise = pluginOptions.clerkUiCtor
-            ? Promise.resolve(pluginOptions.clerkUiCtor)
-            : (async () => {
-                await loadClerkUiScript(options);
-                if (!window.__internal_ClerkUiCtor) {
-                  throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
-                }
-                return window.__internal_ClerkUiCtor;
-              })();
+          // Load UI from CDN with version pinning from ui.version
+          const ClerkUIPromise = (async () => {
+            await loadClerkUiScript({
+              ...options,
+              clerkUIVersion: pluginOptions.ui?.version ?? (pluginOptions as any).clerkUIVersion,
+              clerkUIUrl: pluginOptions.ui?.url ?? (pluginOptions as any).clerkUIUrl,
+            });
+            if (!window.__internal_ClerkUICtor) {
+              throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+            }
+            return window.__internal_ClerkUICtor;
+          })();
 
           await clerkPromise;
 
@@ -95,7 +98,14 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           }
 
           clerk.value = window.Clerk;
-          const loadOptions = { ...options, clerkUiCtor: clerkUiCtorPromise } as unknown as ClerkOptions;
+          const loadOptions = {
+            ...options,
+            ui: {
+              version: pluginOptions.ui?.version,
+              url: pluginOptions.ui?.url,
+              ClerkUI: ClerkUIPromise,
+            },
+          } as ClerkOptions;
           await window.Clerk.load(loadOptions);
           loaded.value = true;
 

@@ -31,7 +31,7 @@ function getSafeEnv(context: ContextOrLocals) {
     signInUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_IN_URL', context),
     signUpUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_UP_URL', context),
     clerkJsUrl: getContextEnvVar('PUBLIC_CLERK_JS_URL', context),
-    clerkUiUrl: getContextEnvVar('PUBLIC_CLERK_UI_URL', context),
+    clerkUIUrl: getContextEnvVar('PUBLIC_CLERK_UI_URL', context),
     clerkJsVariant: getContextEnvVar('PUBLIC_CLERK_JS_VARIANT', context) as 'headless' | '' | undefined,
     clerkJsVersion: getContextEnvVar('PUBLIC_CLERK_JS_VERSION', context),
     apiVersion: getContextEnvVar('CLERK_API_VERSION', context),

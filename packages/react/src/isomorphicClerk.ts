@@ -59,7 +59,7 @@ import type {
   WaitlistResource,
   Without,
 } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import { handleValueOrFn } from '@clerk/shared/utils';
 
 import { errorThrower } from './errors/errorThrower';
@@ -87,7 +87,7 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
-  __internal_ClerkUiCtor?: ClerkUiConstructor;
+  __internal_ClerkUICtor?: ClerkUIConstructor;
 }
 
 declare const global: Global;
@@ -461,12 +461,20 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
-      const clerkUiCtor = this.getClerkUiEntryChunk();
+      const ClerkUI = await this.getClerkUiEntryChunk();
       const clerk = await this.getClerkJsEntryChunk();
 
       if (!clerk.loaded) {
         this.beforeLoad(clerk);
-        await clerk.load({ ...this.options, clerkUiCtor });
+        await clerk.load({
+          ...this.options,
+          ui: {
+            version: this.options.ui?.version,
+            url: this.options.ui?.url,
+            __internal_preferCDN: this.options.ui?.__internal_preferCDN,
+            ClerkUI,
+          },
+        });
       }
       if (clerk.loaded) {
         this.replayInterceptedInvocations(clerk);
@@ -508,26 +516,28 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return global.Clerk;
   }
 
-  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor> {
-    if (this.options.clerkUiCtor) {
-      return this.options.clerkUiCtor;
+  private async getClerkUiEntryChunk(): Promise<ClerkUIConstructor> {
+    // Use bundled UI constructor if available, unless CDN is preferred (e.g., Next.js has bundling issues)
+    if (this.options.ui?.ClerkUI && !this.options.ui.__internal_preferCDN) {
+      return this.options.ui.ClerkUI;
     }
 
+    // Load from CDN, using ui.version if available for version pinning
     await loadClerkUiScript({
       ...this.options,
-      clerkUiVersion: this.options.ui?.version,
-      clerkUiUrl: this.options.ui?.url || this.options.clerkUiUrl,
+      clerkUIVersion: this.options.ui?.version,
+      clerkUIUrl: this.options.ui?.url || this.options.clerkUIUrl,
       publishableKey: this.#publishableKey,
       proxyUrl: this.proxyUrl,
       domain: this.domain,
       nonce: this.options.nonce,
     });
 
-    if (!global.__internal_ClerkUiCtor) {
+    if (!global.__internal_ClerkUICtor) {
       throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
     }
 
-    return global.__internal_ClerkUiCtor;
+    return global.__internal_ClerkUICtor;
   }
 
   public on: Clerk['on'] = (...args) => {

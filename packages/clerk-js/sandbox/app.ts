@@ -446,7 +446,9 @@ void (async () => {
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
-      clerkUiCtor: window.__internal_ClerkUiCtor,
+      ui: {
+        ClerkUI: window.__internal_ClerkUICtor,
+      },
     });
     renderCurrentRoute();
     updateVariables();

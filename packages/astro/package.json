@@ -86,7 +86,8 @@
     "lint": "eslint src env.d.ts",
     "lint:attw": "attw --pack . --profile esm-only --ignore-rules internal-resolution-error",
     "lint:publint": "pnpm copy:components && publint",
-    "publish:local": "pnpm yalc push --replace --sig"
+    "publish:local": "pnpm yalc push --replace --sig",
+    "test": "vitest run"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
