@@ -41,10 +41,21 @@ interface UseDragToCornerResult {
   isInitialized: boolean;
 }
 
-function getCornerFromPosition(x: number, y: number): Corner {
-  const vertical = y < window.innerHeight / 2 ? 'top' : 'bottom';
-  const horizontal = x < window.innerWidth / 2 ? 'left' : 'right';
-  return `${vertical}-${horizontal}` as Corner;
+function getNearestCorner(projectedTranslation: Point, corners: Record<Corner, Point>): Corner {
+  let nearestCorner: Corner = 'bottom-right';
+  let minDistance = Infinity;
+
+  for (const [corner, translation] of Object.entries(corners)) {
+    const dx = projectedTranslation.x - translation.x;
+    const dy = projectedTranslation.y - translation.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance < minDistance) {
+      minDistance = distance;
+      nearestCorner = corner as Corner;
+    }
+  }
+
+  return nearestCorner;
 }
 
 function getCornerStyles(corner: Corner): React.CSSProperties {
@@ -190,9 +201,6 @@ export function useDragToCorner(): UseDragToCornerResult {
       const handleAnimationEnd = (e: TransitionEvent) => {
         if (e.propertyName === 'transform') {
           machine.current = { state: 'animating' };
-
-          // Mark that we're waiting for corner update, then update corner state
-          // The useLayoutEffect will reset translate once cornerStyle has been applied
           pendingCornerUpdate.current = cornerTranslation.corner;
           setCorner(cornerTranslation.corner);
           saveCornerPreference(cornerTranslation.corner);
@@ -213,23 +221,20 @@ export function useDragToCorner(): UseDragToCornerResult {
     }
 
     const hasTranslation = translation.current.x !== 0 || translation.current.y !== 0;
+    translation.current = ZERO_POINT;
+    el.style.transform = ZERO_TRANSFORM;
 
     if (hasTranslation) {
       el.style.transition = SPRING_TRANSITION;
       el.addEventListener(
         'transitionend',
         () => {
-          translation.current = ZERO_POINT;
           el.style.transition = '';
-          el.style.transform = ZERO_TRANSFORM;
           setPreventClick(false);
         },
         { once: true },
       );
-      el.style.transform = ZERO_TRANSFORM;
     } else {
-      translation.current = ZERO_POINT;
-      el.style.transform = ZERO_TRANSFORM;
       el.style.transition = '';
       setPreventClick(false);
     }
@@ -239,7 +244,7 @@ export function useDragToCorner(): UseDragToCornerResult {
     const currentState = machine.current.state;
     const wasDragging = currentState === 'drag';
 
-    if (currentState === 'drag') {
+    if (machine.current.state === 'drag') {
       containerRef.current?.releasePointerCapture(machine.current.pointerId);
       machine.current = { state: 'animating' };
     } else {
@@ -262,7 +267,6 @@ export function useDragToCorner(): UseDragToCornerResult {
     }
   }, [resetTranslation]);
 
-  // Reset translate after corner state has updated and cornerStyle has been applied
   useLayoutEffect(() => {
     if (pendingCornerUpdate.current === corner) {
       const el = containerRef.current;
@@ -291,7 +295,7 @@ export function useDragToCorner(): UseDragToCornerResult {
       }
 
       if (e.button !== 0) {
-        return; // ignore right click
+        return;
       }
 
       const container = containerRef.current;
@@ -319,7 +323,7 @@ export function useDragToCorner(): UseDragToCornerResult {
           try {
             container.setPointerCapture(moveEvent.pointerId);
           } catch {
-            // Pointer capture may fail on some browsers/devices - drag still works without it
+            // Pointer capture may fail - drag still works without it
           }
           container.classList.add('dev-tools-grabbing');
           document.body.style.userSelect = 'none';
@@ -364,22 +368,13 @@ export function useDragToCorner(): UseDragToCornerResult {
             return;
           }
 
-          const rect = container.getBoundingClientRect();
-          const currentAbsoluteX = rect.left;
-          const currentAbsoluteY = rect.top;
+          const projectedTranslation = {
+            x: translation.current.x + project(velocity.x),
+            y: translation.current.y + project(velocity.y),
+          };
 
-          // Project final position with inertia
-          const projectedX = currentAbsoluteX + project(velocity.x);
-          const projectedY = currentAbsoluteY + project(velocity.y);
-
-          // Determine target corner based on projected position
-          const newCorner = getCornerFromPosition(projectedX, projectedY);
-
-          // Get all corner translations relative to current corner
           const allCorners = getCorners();
-
-          // The translation to animate to is the difference between the new corner's position
-          // and the current translation
+          const newCorner = getNearestCorner(projectedTranslation, allCorners);
           const targetTranslation = allCorners[newCorner];
 
           setPreventClick(true);
