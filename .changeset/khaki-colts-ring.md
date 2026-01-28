@@ -3,4 +3,4 @@
 '@clerk/shared': minor
 ---
 
-Add additional verifications fields to SignUpFuture.
+Add additional verification fields to SignUpFuture.
