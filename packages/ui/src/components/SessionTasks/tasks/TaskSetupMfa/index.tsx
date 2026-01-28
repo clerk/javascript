@@ -8,7 +8,6 @@ import { useEnvironment, withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { getSecondFactorsAvailableToAdd } from '@/ui/utils/mfa';
 
-import { withTaskGuard } from '../shared';
 import { SetupMfaStartScreen } from './SetupMfaStartScreen';
 import { SmsCodeFlow } from './SmsCodeFlowScreen';
 import { TOTPCodeFlow } from './TOTPCodeFlowScreen';
@@ -22,10 +21,22 @@ const TaskSetupMFAInternal = () => {
   } = useEnvironment();
   const ctx = useSessionTasksContext();
 
-  const secondFactorsAvailableToAdd = useMemo(
-    () => (user ? getSecondFactorsAvailableToAdd(attributes, user) : []),
-    [attributes, user],
-  );
+  const secondFactorsAvailableToAdd = useMemo(() => {
+    const availableMethods = user ? getSecondFactorsAvailableToAdd(attributes, user) : [];
+
+    if (user?.enterpriseAccounts && user.enterpriseAccounts.length === 0) {
+      return availableMethods;
+    }
+
+    const firstEnterpriseConnection = user?.enterpriseAccounts[0];
+
+    return availableMethods.filter(method => {
+      if (method === 'phone_code') {
+        return firstEnterpriseConnection?.enterpriseConnection?.disableAdditionalIdentifications === false;
+      }
+      return true;
+    });
+  }, [attributes, user]);
 
   const wizard = useWizard({ defaultStep: 0 });
   const { redirectUrlComplete } = useTaskSetupMFAContext();
@@ -83,6 +94,4 @@ const TaskSetupMFAInternal = () => {
   );
 };
 
-export const TaskSetupMFA = withCoreSessionSwitchGuard(
-  withTaskGuard(withCardStateProvider(TaskSetupMFAInternal), 'setup-mfa'),
-);
+export const TaskSetupMFA = withCoreSessionSwitchGuard(withCardStateProvider(TaskSetupMFAInternal));

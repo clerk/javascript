@@ -66,7 +66,7 @@ function SessionTasksRoutes(): JSX.Element {
     // here to be defensive and ensure proper redirection
     const task = clerk.session?.currentTask;
     if (!task || clerk.session?.status === 'active') {
-      if (ctx.shouldAutoNavigateAway.current) {
+      if (ctx.shouldAutoNavigateAway?.current) {
         void navigate(ctx.redirectUrlComplete);
       }
       return;
@@ -75,7 +75,7 @@ function SessionTasksRoutes(): JSX.Element {
     clerk.telemetry?.record(eventComponentMounted('SessionTask', { task: task.key }));
   }, [clerk, currentPath, navigate, ctx.redirectUrlComplete, ctx.shouldAutoNavigateAway]);
 
-  if (!clerk.session?.currentTask && ctx.shouldAutoNavigateAway.current) {
+  if (!clerk.session?.currentTask && ctx.shouldAutoNavigateAway?.current) {
     return (
       <Card.Root
         sx={() => ({

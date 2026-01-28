@@ -45,9 +45,11 @@ export const SetupMfaStartScreen = withCardStateProvider((props: SetupMfaStartSc
           <Header.Title localizationKey={localizationKeys('taskSetupMfa.start.title')} />
           <Header.Subtitle localizationKey={localizationKeys('taskSetupMfa.start.subtitle')} />
         </Header.Root>
-        <Flex sx={t => ({ paddingInline: t.space.$8 })}>
-          <Card.Alert>{card.error}</Card.Alert>
-        </Flex>
+        {card.error && (
+          <Flex sx={t => ({ paddingInline: t.space.$8 })}>
+            <Card.Alert>{card.error}</Card.Alert>
+          </Flex>
+        )}
         <Actions
           role='menu'
           elementDescriptor={descriptors.taskSetupMfaMethodSelectionItems}

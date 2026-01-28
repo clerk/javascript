@@ -31,14 +31,14 @@ export const getAvailablePhonesFromUser = (user: UserResource | undefined | null
   return (
     user?.phoneNumbers.filter(phoneNumber => {
       const hasOtherIdentifications =
-        user?.emailAddresses.length > 0 ||
-        user?.web3Wallets.length > 0 ||
+        user?.primaryEmailAddress !== null ||
+        user?.primaryWeb3Wallet !== null ||
         user?.passkeys.length > 0 ||
         user?.externalAccounts.length > 0 ||
         user?.enterpriseAccounts.length > 0 ||
         user.username !== null;
 
-      if (phoneNumber.id === user?.primaryPhoneNumber?.id && hasOtherIdentifications) {
+      if (phoneNumber.id === user?.primaryPhoneNumber?.id && !hasOtherIdentifications) {
         return false;
       }
       return !phoneNumber.reservedForSecondFactor;
@@ -293,9 +293,11 @@ const SmsCodeScreen = withCardStateProvider((props: SmsCodeScreenProps) => {
           <Header.Title localizationKey={localizationKeys('taskSetupMfa.smsCode.title')} />
           <Header.Subtitle localizationKey={localizationKeys('taskSetupMfa.smsCode.subtitle')} />
         </Header.Root>
-        <Flex sx={t => ({ paddingInline: t.space.$8 })}>
-          <Card.Alert>{card.error}</Card.Alert>
-        </Flex>
+        {card.error && (
+          <Flex sx={t => ({ paddingInline: t.space.$8 })}>
+            <Card.Alert>{card.error}</Card.Alert>
+          </Flex>
+        )}
         <Col>
           <Actions
             role='menu'
@@ -371,7 +373,7 @@ const STEPS = {
   SUCCESS: 3,
 } as const;
 
-export const SmsCodeFlow = withCardStateProvider((props: SmsCodeFlowProps) => {
+export const SmsCodeFlow = (props: SmsCodeFlowProps) => {
   const { onSuccess, goToStartStep } = props;
   const { user } = useUser();
 
@@ -403,7 +405,7 @@ export const SmsCodeFlow = withCardStateProvider((props: SmsCodeFlowProps) => {
         <MFAVerifyPhoneForSessionTasks
           resourceRef={ref}
           onSuccess={() => wizard.goToStep(STEPS.SUCCESS)}
-          onReset={() => wizard.goToStep(STEPS.VERIFY_PHONE)}
+          onReset={() => wizard.goToStep(STEPS.ADD_PHONE)}
         />
         {/* Step 2: Phone selection (default if available phones) */}
         <SmsCodeScreen
@@ -413,7 +415,7 @@ export const SmsCodeFlow = withCardStateProvider((props: SmsCodeFlowProps) => {
           onAddPhoneClick={() => wizard.goToStep(STEPS.ADD_PHONE)}
           onUnverifiedPhoneClick={(phone: PhoneNumberResource) => {
             ref.current = phone;
-            wizard.goToStep(STEPS.SELECT_PHONE);
+            wizard.goToStep(STEPS.VERIFY_PHONE);
           }}
           resourceRef={ref}
         />
@@ -428,4 +430,4 @@ export const SmsCodeFlow = withCardStateProvider((props: SmsCodeFlowProps) => {
       </Card.Footer>
     </Card.Root>
   );
-});
+};
