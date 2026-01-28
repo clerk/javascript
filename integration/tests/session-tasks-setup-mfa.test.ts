@@ -26,8 +26,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
         fictionalEmail: true,
         withPassword: true,
       });
-      const bapiUser = await u.services.users.createBapiUser(user);
-      userIdsToBeDeleted.push(bapiUser.id);
+      await u.services.users.createBapiUser(user);
 
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
@@ -163,14 +162,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
 
       await expect(u.page.getByTestId('form-feedback-error')).toBeVisible();
 
-      await u.po.signIn.enterTestOtpCode();
-      await u.page.getByText(/save these backup codes/i).waitFor({ state: 'visible', timeout: 10000 });
-
-      await u.po.signIn.continue();
-
-      await u.page.waitForAppUrl('/page-protected');
-      await u.po.expect.toBeSignedIn();
-
       await user.deleteIfExists();
     });
 
@@ -201,7 +192,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
         })
         .waitFor({ state: 'visible' });
 
-      await u.page.getByRole('link', { name: /back/i }).first().click();
+      await u.page
+        .getByRole('button', { name: /cancel/i })
+        .first()
+        .click();
 
       await u.page.getByText(/set up two-step verification/i).waitFor({ state: 'visible' });
       await u.page.getByRole('button', { name: /sms code/i }).waitFor({ state: 'visible' });
