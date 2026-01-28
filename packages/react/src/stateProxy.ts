@@ -7,6 +7,8 @@ import type {
   SignInErrors,
   SignUpErrors,
   State,
+  VerificationResource,
+  SignUpVerificationResource,
   WaitlistErrors,
   WaitlistResource,
 } from '@clerk/shared/types';
@@ -46,6 +48,57 @@ const defaultWaitlistErrors = (): WaitlistErrors => ({
   },
   raw: null,
   global: null,
+});
+
+const defaultVerificationResource = (): VerificationResource => ({
+  pathRoot: '',
+
+  attempts: null,
+  error: null,
+  expireAt: null,
+  externalVerificationRedirectURL: null,
+  nonce: null,
+  message: null,
+  status: null,
+  strategy: null,
+  verifiedAtClient: null,
+  verifiedFromTheSameClient() {
+    return false;
+  },
+  reload() {
+    throw new Error('reload() called before Clerk is loaded');
+  },
+  __internal_toSnapshot() {
+    return {
+      object: 'verification',
+      id: '',
+      attempts: null,
+      error: { code: '', message: '' },
+      expire_at: null,
+      externalVerificationRedirectURL: null,
+      nonce: null,
+      message: null,
+      status: null,
+      strategy: null,
+      verified_at_client: null,
+    };
+  },
+});
+
+const defaultSignUpVerificationResource = (): SignUpVerificationResource => ({
+  ...defaultVerificationResource(),
+  supportedStrategies: [],
+  nextAction: '',
+  reload() {
+    throw new Error('reload() called before Clerk is loaded');
+  },
+  __internal_toSnapshot() {
+    return {
+      ...defaultVerificationResource().__internal_toSnapshot(),
+      next_action: this.nextAction,
+      supported_strategies: this.supportedStrategies,
+    };
+  },
 });
 
 type CheckoutSignalProps = {
@@ -271,12 +324,17 @@ export class StateProxy implements State {
         finalize: gateMethod(target, 'finalize'),
         reset: gateMethod(target, 'reset'),
 
-        verifications: wrapMethods(() => target().verifications, [
-          'sendEmailCode',
-          'verifyEmailCode',
-          'sendPhoneCode',
-          'verifyPhoneCode',
-        ] as const),
+        verifications: this.wrapStruct(
+          () => target().verifications,
+          ['sendEmailCode', 'verifyEmailCode', 'sendPhoneCode', 'verifyPhoneCode'] as const,
+          ['emailAddress', 'phoneNumber', 'web3Wallet', 'externalAccount'] as const,
+          {
+            emailAddress: defaultSignUpVerificationResource(),
+            phoneNumber: defaultSignUpVerificationResource(),
+            web3Wallet: defaultSignUpVerificationResource(),
+            externalAccount: defaultSignUpVerificationResource(),
+          },
+        ),
       },
     };
   }
