@@ -1,4 +1,5 @@
 import { eventMethodCalled } from '../../telemetry/events/method-called';
+import type { EnvironmentResource } from '../../types/environment';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useClerkInstanceContext, useUserContext } from '../contexts';
@@ -39,11 +40,15 @@ export function useOrganizationCreationDefaults(
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
 
+  // @ts-expect-error `__unstable__environment` is not typed
+  const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
+  const featureEnabled = environment?.organizationSettings?.organizationCreationDefaults?.enabled ?? false;
+
   clerk.telemetry?.record(eventMethodCalled('useOrganizationCreationDefaults'));
 
   const { queryKey } = useOrganizationCreationDefaultsCacheKeys({ userId: user?.id ?? null });
 
-  const queryEnabled = Boolean(user) && enabled && clerk.loaded;
+  const queryEnabled = Boolean(user) && enabled && featureEnabled && clerk.loaded;
 
   const query = useClerkQuery({
     queryKey,
