@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import { appConfigs } from '../presets';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 import { stringPhoneNumber } from '../testUtils/phoneUtils';
+import { fakerPhoneNumber } from '../testUtils/usersService';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
   'session tasks setup-mfa flow @nextjs',
@@ -42,7 +43,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
 
       await u.page.getByRole('button', { name: /use a different phone number/i }).click();
 
-      const testPhoneNumber = '+15555550100';
+      const testPhoneNumber = fakerPhoneNumber();
       await u.page.getByLabel(/phone number/i).fill(testPhoneNumber);
       await u.page.getByRole('button', { name: /continue/i }).click();
 
@@ -128,7 +129,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
 
       await expect(u.page.getByText(/is invalid/i)).toBeVisible();
 
-      const validPhoneNumber = '+15555550100';
+      const validPhoneNumber = fakerPhoneNumber();
       await u.page.getByLabel(/phone number/i).fill(validPhoneNumber);
       await u.page.getByRole('button', { name: /continue/i }).click();
 
@@ -165,7 +166,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
 
       await u.page.getByRole('button', { name: /use a different phone number/i }).click();
 
-      const testPhoneNumber = '+15555550100';
+      const testPhoneNumber = fakerPhoneNumber();
       await u.page.getByLabel(/phone number/i).fill(testPhoneNumber);
       await u.page.getByRole('button', { name: /continue/i }).click();
 
