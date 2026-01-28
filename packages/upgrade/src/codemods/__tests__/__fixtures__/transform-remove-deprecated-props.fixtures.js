@@ -208,4 +208,53 @@ export const Provider = ({ children }) => (
 );
     `,
   },
+  {
+    name: 'getToken leewayInSeconds removal - direct call',
+    source: `
+const token = await getToken({ leewayInSeconds: 30 });
+    `,
+    output: `
+const token = await getToken();
+    `,
+  },
+  {
+    name: 'getToken leewayInSeconds removal - member expression',
+    source: `
+const token = await session.getToken({ leewayInSeconds: 30, template: 'custom' });
+    `,
+    output: `
+const token = await session.getToken({
+  template: 'custom'
+});
+    `,
+  },
+  {
+    name: 'getToken leewayInSeconds removal - optional chaining',
+    source: `
+const token = await session?.getToken({ leewayInSeconds: 15, organizationId: 'org_123' });
+    `,
+    output: `
+const token = await session?.getToken({
+  organizationId: 'org_123'
+});
+    `,
+  },
+  {
+    name: 'getToken leewayInSeconds removal - multiple options',
+    source: `
+const token = await getToken({
+  template: 'my-template',
+  leewayInSeconds: 20,
+  organizationId: 'org_abc',
+  skipCache: true
+});
+    `,
+    output: `
+const token = await getToken({
+  template: 'my-template',
+  organizationId: 'org_abc',
+  skipCache: true
+});
+    `,
+  },
 ];
