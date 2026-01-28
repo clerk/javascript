@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.122.0
+
+### Minor Changes
+
+- Export `useOrganizationCreationDefaults` hook to fetch suggested organization name and logo from default naming rules ([#7690](https://github.com/clerk/javascript/pull/7690)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`64a35f7`](https://github.com/clerk/javascript/commit/64a35f79e9a49dfc140b4c8a8df517b74d46d6c6), [`71b20f1`](https://github.com/clerk/javascript/commit/71b20f126042a55148a9da146dcedd672a230811), [`aebb8df`](https://github.com/clerk/javascript/commit/aebb8df24f19a932ef4663ee2c7c93a535d314f9), [`71b20f1`](https://github.com/clerk/javascript/commit/71b20f126042a55148a9da146dcedd672a230811)]:
+  - @clerk/shared@3.44.0
+  - @clerk/localizations@3.35.3
+
 ## 5.121.1
 
 ### Patch Changes
