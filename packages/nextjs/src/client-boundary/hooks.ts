@@ -4,6 +4,7 @@ export {
   useClerk,
   useEmailLink,
   useOrganization,
+  useOrganizationCreationDefaults,
   useOrganizationList,
   useSession,
   useSessionList,
@@ -12,6 +13,7 @@ export {
   useUser,
   useReverification,
 } from '@clerk/clerk-react';
+export type { UseOrganizationCreationDefaultsParams, UseOrganizationCreationDefaultsReturn } from '@clerk/clerk-react';
 
 export {
   isClerkAPIResponseError,

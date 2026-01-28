@@ -30,6 +30,9 @@
       "virtual:data-hooks/useStatementQuery": ["./src/react/hooks/useStatementQuery.swr.tsx"],
       "virtual:data-hooks/usePaymentAttemptQuery": ["./src/react/hooks/usePaymentAttemptQuery.swr.tsx"],
       "virtual:data-hooks/usePlanDetailsQuery": ["./src/react/hooks/usePlanDetailsQuery.swr.tsx"],
+      "virtual:data-hooks/useOrganizationCreationDefaults": [
+        "./src/react/hooks/useOrganizationCreationDefaults.swr.tsx"
+      ],
       "virtual:data-hooks/useInitializePaymentMethod": ["./src/react/billing/useInitializePaymentMethod.swr.tsx"],
       "virtual:data-hooks/useStripeClerkLibs": ["./src/react/billing/useStripeClerkLibs.swr.tsx"],
       "virtual:data-hooks/useStripeLoader": ["./src/react/billing/useStripeLoader.swr.tsx"]
