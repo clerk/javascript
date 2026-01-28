@@ -1,4 +1,3 @@
-import type { AuthObject } from '@clerk/backend';
 import type { Without } from '@clerk/shared/types';
 import { headers } from 'next/headers';
 import type { PropsWithChildren } from 'react';
@@ -12,7 +11,7 @@ import { ClientClerkProvider } from '../client/ClerkProvider';
 import { deleteKeylessAction } from '../keyless-actions';
 
 export async function getKeylessStatus(
-  params: Without<NextClerkProviderProps, '__internal_invokeMiddlewareOnAuthStateChange'>,
+  params: Without<NextClerkProviderProps, '__internal_invokeMiddlewareOnAuthStateChange' | 'children'>,
 ) {
   let [shouldRunAsKeyless, runningWithClaimedKeys, locallyStoredPublishableKey] = [false, false, ''];
   if (canUseKeyless) {
@@ -31,14 +30,12 @@ export async function getKeylessStatus(
 }
 
 type KeylessProviderProps = PropsWithChildren<{
-  rest: Without<NextClerkProviderProps, '__internal_invokeMiddlewareOnAuthStateChange'>;
+  rest: Without<NextClerkProviderProps, '__internal_invokeMiddlewareOnAuthStateChange' | 'children'>;
   runningWithClaimedKeys: boolean;
-  generateStatePromise: () => Promise<AuthObject | null>;
-  generateNonce: () => Promise<string>;
 }>;
 
 export const KeylessProvider = async (props: KeylessProviderProps) => {
-  const { rest, runningWithClaimedKeys, generateNonce, generateStatePromise, children } = props;
+  const { rest, runningWithClaimedKeys, children } = props;
 
   // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
   const newOrReadKeys = await import('../../server/keyless-node.js')
@@ -54,8 +51,6 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
     return (
       <ClientClerkProvider
         {...mergeNextClerkPropsWithEnv(rest)}
-        nonce={await generateNonce()}
-        initialState={await generateStatePromise()}
         disableKeyless
       >
         {children}
@@ -73,8 +68,6 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
         // Explicitly use `null` instead of `undefined` here to avoid persisting `deleteKeylessAction` during merging of options.
         __internal_keyless_dismissPrompt: runningWithClaimedKeys ? deleteKeylessAction : null,
       })}
-      nonce={await generateNonce()}
-      initialState={await generateStatePromise()}
     >
       {children}
     </ClientClerkProvider>

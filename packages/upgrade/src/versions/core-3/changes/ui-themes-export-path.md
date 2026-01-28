@@ -1,5 +1,5 @@
 ---
-title: 'UI themes moved to `@clerk/ui/themes/experimental`'
+title: '`createTheme` moved to `@clerk/ui/themes/experimental`'
 matcher:
   - '__experimental_createTheme'
   - 'experimental_createTheme'
