@@ -4,6 +4,7 @@ export { useSignIn, useSignUp, useWaitlist } from './useClerkSignal';
 export {
   useClerk,
   useOrganization,
+  useOrganizationCreationDefaults,
   useOrganizationList,
   useSessionList,
   useUser,
