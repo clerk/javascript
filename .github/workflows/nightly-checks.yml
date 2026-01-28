@@ -66,8 +66,10 @@ jobs:
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
-          E2E_CLERK_JS_VERSION: "latest"
-          E2E_CLERK_UI_VERSION: "latest"
+          # Don't set E2E_CLERK_JS_VERSION - let it use '*' (via linkPackage)
+          # which matches any version including snapshots from verdaccio.
+          # Using "latest" would fail since snapshot packages don't have
+          # the "latest" dist-tag, causing fallback to npm's stable version.
           E2E_NEXTJS_VERSION: "canary"
           E2E_NPM_FORCE: "true"
           E2E_REACT_DOM_VERSION: "19.2.3"
