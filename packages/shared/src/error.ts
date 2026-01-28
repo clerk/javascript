@@ -4,6 +4,7 @@ export { ClerkAPIError, isClerkAPIError } from './errors/clerkApiError';
 export { ClerkAPIResponseError, isClerkAPIResponseError } from './errors/clerkApiResponseError';
 export { ClerkError, isClerkError } from './errors/clerkError';
 export { MissingExpiredTokenError } from './errors/missingExpiredTokenError';
+export { ClerkOfflineError } from './errors/clerkOfflineError';
 
 export { buildErrorThrower, type ErrorThrower, type ErrorThrowerOptions } from './errors/errorThrower';
 

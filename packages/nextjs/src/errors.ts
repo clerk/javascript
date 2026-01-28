@@ -8,4 +8,4 @@ export {
   EmailLinkErrorCodeStatus,
 } from './client-boundary/hooks';
 
-export { isClerkAPIResponseError } from '@clerk/react/errors';
+export { ClerkOfflineError, isClerkAPIResponseError } from '@clerk/react/errors';

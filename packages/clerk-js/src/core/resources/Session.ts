@@ -1,5 +1,6 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { ClerkWebAuthnError, is4xxError, MissingExpiredTokenError } from '@clerk/shared/error';
+import { isValidBrowserOnline } from '@clerk/shared/browser';
+import { ClerkOfflineError, ClerkWebAuthnError, is4xxError, MissingExpiredTokenError } from '@clerk/shared/error';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -109,17 +110,41 @@ export class Session extends BaseResource implements SessionResource {
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
     // This will retry the getToken call if it fails with a non-4xx error
-    // We're going to trigger 8 retries in the span of ~3 minutes,
-    // Example delays: 3s, 5s, 13s, 19s, 26s, 34s, 43s, 50s, total: ~193s
-    return retry(() => this._getToken(options), {
-      factor: 1.55,
-      initialDelay: 3 * 1000,
-      maxDelayBetweenRetries: 50 * 1_000,
-      jitter: false,
-      shouldRetry: (error, iterationsCount) => {
-        return !is4xxError(error) && iterationsCount <= 8;
-      },
-    });
+    // For offline state, we use shorter retries (~15s total) before throwing ClerkOfflineError
+    // For other errors, we retry up to 8 times over ~3 minutes
+    try {
+      const result = await retry(() => this._getToken(options), {
+        factor: 1.55,
+        initialDelay: 3 * 1000,
+        maxDelayBetweenRetries: 50 * 1_000,
+        jitter: false,
+        shouldRetry: (error, iterationsCount) => {
+          if (is4xxError(error)) {
+            return false;
+          }
+
+          if (!isValidBrowserOnline()) {
+            return iterationsCount <= 3;
+          }
+          return iterationsCount <= 8;
+        },
+      });
+
+      // If we're offline and got a null/empty result, this is likely due to
+      // BaseResource._baseFetch returning null when offline (silent failure mode).
+      // Throw ClerkOfflineError to make the offline state explicit.
+      if (!result && !isValidBrowserOnline()) {
+        throw new ClerkOfflineError('Network request failed while offline. The browser appears to be disconnected.');
+      }
+
+      return result;
+    } catch (error) {
+      // If the browser is offline after retries, throw ClerkOfflineError
+      if (!isValidBrowserOnline()) {
+        throw new ClerkOfflineError('Network request failed while offline. The browser appears to be disconnected.');
+      }
+      throw error;
+    }
   };
 
   checkAuthorization: CheckAuthorization = params => {
@@ -399,12 +424,14 @@ export class Session extends BaseResource implements SessionResource {
     const params: Record<string, string | null> = template ? {} : { organizationId: organizationId ?? null };
     const lastActiveToken = this.lastActiveToken?.getRawString();
 
-    return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+    const tokenResolver = Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
       if (MissingExpiredTokenError.is(e) && lastActiveToken) {
         return Token.create(path, { ...params }, { expired_token: lastActiveToken });
       }
       throw e;
     });
+
+    return tokenResolver;
   }
 
   #dispatchTokenEvents(token: TokenResource, shouldDispatch: boolean): void {
