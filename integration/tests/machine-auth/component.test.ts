@@ -394,8 +394,8 @@ test.describe('api keys component @machine', () => {
       // Wait for the table to be fully loaded first
       await u.page.locator('.cl-apiKeysTable').waitFor({ timeout: 10000 });
 
-      // Wait for any ongoing navigation/pagination to complete by waiting for network idle
-      await u.page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {
+      // Wait for any ongoing navigation/pagination to complete
+      await u.page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(() => {
         // Ignore timeout - continue with other checks
       });
 

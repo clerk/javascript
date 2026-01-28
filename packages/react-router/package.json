@@ -53,7 +53,8 @@
     "./legacy": {
       "types": "./dist/legacy.d.ts",
       "default": "./dist/legacy.js"
-    }
+    },
+    "./types": "./dist/types/index.d.ts"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -74,6 +75,9 @@
       ],
       "webhooks": [
         "dist/webhooks.d.ts"
+      ],
+      "types": [
+        "dist/types/index.d.ts"
       ]
     }
   },

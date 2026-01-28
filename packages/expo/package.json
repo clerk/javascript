@@ -60,6 +60,7 @@
       "types": "./dist/legacy.d.ts",
       "default": "./dist/legacy.js"
     },
+    "./types": "./dist/types/index.d.ts",
     "./app.plugin.js": "./app.plugin.js"
   },
   "main": "./dist/index.js",
