@@ -1,4 +1,4 @@
-import { useClerk, useSession, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganizationCreationDefaults, useSession, useUser } from '@clerk/shared/react';
 import type { OrganizationCreationDefaultsResource } from '@clerk/shared/types';
 import { useState } from 'react';
 
