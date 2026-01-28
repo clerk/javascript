@@ -44,8 +44,8 @@ export function useOrganizationCreationDefaults(
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
 
-  // @ts-expect-error `__unstable__environment` is not typed
-  const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
+  // @ts-expect-error `__internal_environment` is not typed
+  const environment = clerk.__internal_environment as unknown as EnvironmentResource | null | undefined;
   const featureEnabled = environment?.organizationSettings?.organizationCreationDefaults?.enabled ?? false;
 
   clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
