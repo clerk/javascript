@@ -6,6 +6,7 @@ import React, { useMemo, useState } from 'react';
 import { Portal } from '../../../elements/Portal';
 import { MosaicThemeProvider, useMosaicTheme } from '../../../mosaic/theme-provider';
 import { handleDashboardUrlParsing } from '../shared';
+import { useDragToCorner } from './use-drag-to-corner';
 import { useRevalidateEnvironment } from './use-revalidate-environment';
 
 type KeylessPromptProps = {
@@ -36,8 +37,8 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
   const [isOpen, setIsOpen] = useState(isSignedIn || isLocked);
   const [hasMounted, setHasMounted] = useState(false);
   const id = React.useId();
-  const containerRef = React.useRef<HTMLDivElement>(null);
   const theme = useMosaicTheme();
+  const { isDragging, cornerStyle, containerRef, onPointerDown, preventClick, isInitialized } = useDragToCorner();
 
   React.useEffect(() => {
     setHasMounted(true);
@@ -116,6 +117,11 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
     <Portal>
       <div
         ref={containerRef}
+        onPointerDown={onPointerDown}
+        style={{
+          ...cornerStyle,
+          opacity: isInitialized ? undefined : 0,
+        }}
         css={css`
           --duration-open: 220ms;
           --duration-close: 180ms;
@@ -131,8 +137,6 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
           -webkit-font-smoothing: auto;
           -moz-osx-font-smoothing: auto;
           position: fixed;
-          bottom: var(--offset);
-          right: var(--offset);
           z-index: 999999;
           height: auto;
           width: ${isOpen ? 'var(--width-opened)' : 'var(--width-closed)'};
@@ -160,9 +164,13 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
           will-change: width, border-radius;
           transform: translateZ(0);
           backface-visibility: hidden;
-          transition: ${hasMounted
-            ? `width ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'} var(--ease-bezier), border-radius var(--duration-open) var(--ease-bezier)`
-            : 'none'};
+          cursor: ${isDragging ? 'grabbing' : 'grab'};
+          touch-action: none;
+          transition: ${isDragging
+            ? 'none'
+            : hasMounted
+              ? `width ${isOpen ? 'var(--duration-open)' : 'var(--duration-close)'} var(--ease-bezier), border-radius var(--duration-open) var(--ease-bezier)`
+              : 'none'};
           @media (prefers-reduced-motion: reduce) {
             transition: none;
           }
@@ -191,6 +199,9 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
         <button
           type='button'
           onClick={() => {
+            if (preventClick) {
+              return;
+            }
             if (!isLocked) {
               setIsOpen(prev => !prev);
             }
