@@ -2424,6 +2424,17 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   clerkJSVersion?: string;
   /**
+   * Branded object for pinning @clerk/clerk-js version.
+   * Import from `@clerk/clerk-js-pinned` for dependency-managed version pinning.
+   *
+   * @example
+   * ```tsx
+   * import { clerkJs } from '@clerk/clerk-js-pinned';
+   * <ClerkProvider clerkJs={clerkJs} />
+   * ```
+   */
+  clerkJs?: { version: string };
+  /**
    * The URL that `@clerk/ui` should be hot-loaded from.
    */
   clerkUiUrl?: string;
@@ -2441,9 +2452,14 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   nonce?: string;
   /**
-   * @internal
-   * This is a structural-only type for the `ui` object that can be passed
-   * to Clerk.load() and ClerkProvider
+   * Branded object for pinning @clerk/ui version with full appearance type support.
+   * Import from `@clerk/ui-pinned` for dependency-managed version pinning.
+   *
+   * @example
+   * ```tsx
+   * import { ui } from '@clerk/ui-pinned';
+   * <ClerkProvider ui={ui} appearance={{ ... }} />
+   * ```
    */
   ui?: { version: string; url?: string };
 } & MultiDomainAndOrProxy;

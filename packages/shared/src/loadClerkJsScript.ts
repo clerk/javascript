@@ -15,6 +15,11 @@ export type LoadClerkJsScriptOptions = {
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
   clerkJSVersion?: string;
+  /**
+   * Branded object for pinning @clerk/clerk-js version.
+   * Takes precedence over clerkJSVersion if both are provided.
+   */
+  clerkJs?: { version: string };
   sdkMetadata?: SDKMetadata;
   proxyUrl?: string;
   domain?: string;
@@ -217,7 +222,7 @@ export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promis
 };
 
 export const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
-  const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
+  const { clerkJSUrl, clerkJSVariant, clerkJSVersion, clerkJs, proxyUrl, domain, publishableKey } = opts;
 
   if (clerkJSUrl) {
     return clerkJSUrl;
@@ -225,7 +230,8 @@ export const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
 
   const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
   const variant = clerkJSVariant ? `${clerkJSVariant.replace(/\.+$/, '')}.` : '';
-  const version = versionSelector(clerkJSVersion);
+  // clerkJs object takes precedence over clerkJSVersion string
+  const version = versionSelector(clerkJs?.version ?? clerkJSVersion);
   return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.${variant}browser.js`;
 };
 
