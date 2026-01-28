@@ -8,15 +8,9 @@ import { fakerPhoneNumber } from '../testUtils/usersService';
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
   'session tasks setup-mfa flow @nextjs',
   ({ app }) => {
-    test.describe.configure({ mode: 'parallel' });
-
-    const userIds: string[] = [];
+    test.describe.configure({ mode: 'serial' });
 
     test.afterAll(async () => {
-      const u = createTestUtils({ app });
-      for (const userId of userIds) {
-        void u.services.users.deleteIfExists({ id: userId });
-      }
       await app.teardown();
     });
 
@@ -33,7 +27,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
         withPassword: true,
       });
       const bapiUser = await u.services.users.createBapiUser(user);
-      userIds.push(bapiUser.id);
+      userIdsToBeDeleted.push(bapiUser.id);
 
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
@@ -46,19 +40,15 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
 
       await u.page.getByRole('button', { name: /sms code/i }).click();
 
-      await u.page.getByRole('button', { name: /use a different phone number/i }).click();
-
       const testPhoneNumber = fakerPhoneNumber();
-      await u.page.getByLabel(/phone number/i).fill(testPhoneNumber);
+      await u.po.signIn.getPhoneNumberInput().fill(testPhoneNumber);
       await u.page.getByRole('button', { name: /continue/i }).click();
 
-      await u.page.getByLabel(/enter code/i).waitFor({ state: 'visible' });
-      await u.page.getByLabel(/enter code/i).fill('424242');
+      await u.po.signIn.enterTestOtpCode();
 
-      await u.page.getByText(/backup codes/i).waitFor({ state: 'visible', timeout: 10000 });
-      await u.page.getByText(/save these codes/i).waitFor({ state: 'visible' });
+      await u.page.getByText(/save these backup codes/i).waitFor({ state: 'visible', timeout: 10000 });
 
-      await u.page.getByRole('button', { name: /finish/i }).click();
+      await u.po.signIn.continue();
 
       await u.page.waitForAppUrl('/page-protected');
       await u.po.expect.toBeSignedIn();
@@ -73,8 +63,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
         withPhoneNumber: true,
         withPassword: true,
       });
-      const bapiUser = await u.services.users.createBapiUser(user);
-      userIds.push(bapiUser.id);
+      await u.services.users.createBapiUser(user);
 
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
@@ -94,13 +83,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
         })
         .click();
 
-      await u.page.getByLabel(/enter code/i).waitFor({ state: 'visible' });
-      await u.page.getByLabel(/enter code/i).fill('424242');
+      await u.page.getByText(/save these backup codes/i).waitFor({ state: 'visible', timeout: 10000 });
 
-      await u.page.getByText(/backup codes/i).waitFor({ state: 'visible', timeout: 10000 });
-      await u.page.getByText(/save these codes/i).waitFor({ state: 'visible' });
-
-      await u.page.getByRole('button', { name: /finish/i }).click();
+      await u.po.signIn.continue();
 
       await u.page.waitForAppUrl('/page-protected');
       await u.po.expect.toBeSignedIn();
@@ -114,8 +99,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
         fictionalEmail: true,
         withPassword: true,
       });
-      const bapiUser = await u.services.users.createBapiUser(user);
-      userIds.push(bapiUser.id);
+      await u.services.users.createBapiUser(user);
 
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
@@ -128,26 +112,24 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
 
       await u.page.getByRole('button', { name: /sms code/i }).click();
 
-      await u.page.getByRole('button', { name: /use a different phone number/i }).click();
-
-      const invalidPhoneNumber = '123';
-      await u.page.getByLabel(/phone number/i).fill(invalidPhoneNumber);
-      await u.page.getByRole('button', { name: /continue/i }).click();
-
-      await expect(u.page.getByText(/is invalid/i)).toBeVisible();
+      const invalidPhoneNumber = '123091293193091311';
+      await u.po.signIn.getPhoneNumberInput().fill(invalidPhoneNumber);
+      await u.po.signIn.continue();
+      // we need to improve this error message
+      await expect(u.page.getByTestId('form-feedback-error')).toBeVisible();
 
       const validPhoneNumber = fakerPhoneNumber();
-      await u.page.getByLabel(/phone number/i).fill(validPhoneNumber);
-      await u.page.getByRole('button', { name: /continue/i }).click();
+      await u.po.signIn.getPhoneNumberInput().fill(validPhoneNumber);
+      await u.po.signIn.continue();
 
-      await u.page.getByLabel(/enter code/i).waitFor({ state: 'visible' });
-      await u.page.getByLabel(/enter code/i).fill('424242');
+      await u.po.signIn.enterTestOtpCode();
 
-      await u.page.getByText(/backup codes/i).waitFor({ state: 'visible', timeout: 10000 });
+      await u.page.getByText(/save these backup codes/i).waitFor({ state: 'visible', timeout: 10000 });
 
-      await u.page.getByRole('button', { name: /finish/i }).click();
+      await u.po.signIn.continue();
 
       await u.page.waitForAppUrl('/page-protected');
+      await u.po.expect.toBeSignedIn();
 
       await user.deleteIfExists();
     });
@@ -158,8 +140,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
         fictionalEmail: true,
         withPassword: true,
       });
-      const bapiUser = await u.services.users.createBapiUser(user);
-      userIds.push(bapiUser.id);
+      await u.services.users.createBapiUser(user);
 
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
@@ -172,23 +153,20 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
 
       await u.page.getByRole('button', { name: /sms code/i }).click();
 
-      await u.page.getByRole('button', { name: /use a different phone number/i }).click();
-
       const testPhoneNumber = fakerPhoneNumber();
-      await u.page.getByLabel(/phone number/i).fill(testPhoneNumber);
-      await u.page.getByRole('button', { name: /continue/i }).click();
+      await u.po.signIn.getPhoneNumberInput().fill(testPhoneNumber);
+      await u.po.signIn.continue();
 
-      await u.page.getByLabel(/enter code/i).waitFor({ state: 'visible' });
-      await u.page.getByLabel(/enter code/i).fill('111111');
+      await u.po.signIn.enterOtpCode('111111', {
+        awaitRequests: false,
+      });
 
-      await expect(u.page.getByText(/incorrect/i)).toBeVisible();
+      await expect(u.page.getByTestId('form-feedback-error')).toBeVisible();
 
-      await u.page.getByLabel(/enter code/i).fill('424242');
+      await u.po.signIn.enterTestOtpCode();
+      await u.page.getByText(/save these backup codes/i).waitFor({ state: 'visible', timeout: 10000 });
 
-      await u.page.getByText(/backup codes/i).waitFor({ state: 'visible', timeout: 10000 });
-      await u.page.getByText(/save these codes/i).waitFor({ state: 'visible' });
-
-      await u.page.getByRole('button', { name: /finish/i }).click();
+      await u.po.signIn.continue();
 
       await u.page.waitForAppUrl('/page-protected');
       await u.po.expect.toBeSignedIn();
@@ -203,8 +181,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
         withPhoneNumber: true,
         withPassword: true,
       });
-      const bapiUser = await u.services.users.createBapiUser(user);
-      userIds.push(bapiUser.id);
+      await u.services.users.createBapiUser(user);
 
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
