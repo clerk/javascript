@@ -6,9 +6,9 @@ import type {
   ForPayerType,
   SignInErrors,
   SignUpErrors,
+  SignUpVerificationResource,
   State,
   VerificationResource,
-  SignUpVerificationResource,
   WaitlistErrors,
   WaitlistResource,
 } from '@clerk/shared/types';
@@ -244,7 +244,6 @@ export class StateProxy implements State {
   private buildSignUpProxy() {
     const gateProperty = this.gateProperty.bind(this);
     const gateMethod = this.gateMethod.bind(this);
-    const wrapMethods = this.wrapMethods.bind(this);
     const target = () => this.client.signUp.__internal_future;
 
     return {
