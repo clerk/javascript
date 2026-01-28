@@ -26,7 +26,7 @@ import type {
   UserProfileProps,
   WaitlistProps,
 } from '@clerk/shared/types';
-import type { MutableRefObject, Ref } from 'react';
+import type { MutableRefObject } from 'react';
 
 import type { WithInternalRouting } from './internal';
 

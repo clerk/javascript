@@ -24,7 +24,7 @@ const TaskSetupMFAInternal = () => {
   const secondFactorsAvailableToAdd = useMemo(() => {
     const availableMethods = user ? getSecondFactorsAvailableToAdd(attributes, user) : [];
 
-    if (user?.enterpriseAccounts && user.enterpriseAccounts.length === 0) {
+    if (!user?.enterpriseAccounts || user.enterpriseAccounts.length === 0) {
       return availableMethods;
     }
 
