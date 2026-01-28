@@ -1,5 +1,5 @@
 ---
-'@clerk/clerk-js': minor
+'@clerk/clerk-js': major
 ---
 
-Add proactive session token refresh. Tokens are now automatically refreshed in the background before they expire. The `leewayInSeconds` option controls how far in advance refresh is triggered (default: 15 seconds, minimum: 5 seconds).
+Add proactive session token refresh. Tokens are now automatically refreshed in the background before they expire, reducing latency for API calls near token expiration.

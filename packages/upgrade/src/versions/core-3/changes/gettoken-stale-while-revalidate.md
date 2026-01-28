@@ -1,5 +1,5 @@
 ---
-title: '`getToken` now uses stale-while-revalidate pattern'
+title: '`getToken` now uses proactive background refresh'
 matcher:
   - 'getToken'
   - 'session\.getToken'
@@ -11,7 +11,7 @@ warning: true
 
 ### How it works
 
-1. When a token is within 15 seconds of expiration (configurable via `backgroundRefreshThreshold`), `getToken()` returns the valid cached token immediately
+1. When a token is within 15 seconds of expiration, `getToken()` returns the valid cached token immediately
 2. A background refresh is triggered automatically to fetch a fresh token
 3. Subsequent calls receive the new token once the background refresh completes
 
@@ -37,12 +37,3 @@ const token = await session.getToken();
 ### Compatibility
 
 This is a transparent improvement - no code changes are required. Your existing `getToken()` calls benefit automatically.
-
-### Customizing refresh timing
-
-Use `backgroundRefreshThreshold` to customize when background refresh is triggered (minimum 5 seconds, default 15 seconds):
-
-```js
-// Start background refresh 30 seconds before expiration
-const token = await session.getToken({ backgroundRefreshThreshold: 30 });
-```

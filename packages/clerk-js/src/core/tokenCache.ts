@@ -25,11 +25,6 @@ interface TokenCacheEntry extends TokenCacheKeyJSON {
    */
   createdAt?: Seconds;
   /**
-   * Seconds before token expiration when background refresh should be triggered.
-   * Defaults to BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS if not provided.
-   */
-  leewayInSeconds?: Seconds;
-  /**
    * Callback to refresh this token before it expires.
    * Called by the proactive refresh timer to trigger background refresh.
    * If not provided, no refresh timer will be scheduled (e.g., for broadcast-received tokens).
@@ -400,9 +395,11 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
         // Schedule proactive refresh timer to fire before token enters leeway period
         // This ensures new tokens are ready before the old one expires
-        const refreshLeadTime = 2; // Fire 2s before leeway starts
+        // refreshLeadTime: 2s buffer before leeway starts. Token fetches typically complete in ~100ms,
+        // so 2s provides ample margin for the refresh to complete before the token enters the leeway period.
+        const refreshLeadTime = 2;
         const minLeeway = POLLER_INTERVAL_IN_MS / 1000; // Minimum is poller interval (5s)
-        const leeway = Math.max(entry.leewayInSeconds ?? BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS, minLeeway);
+        const leeway = Math.max(BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS, minLeeway);
         const refreshFireTime = expiresIn - leeway - refreshLeadTime;
 
         if (refreshFireTime > 0 && entry.onRefresh) {

@@ -339,12 +339,6 @@ export interface SessionTask {
 }
 
 export type GetTokenOptions = {
-  /**
-   * The number of seconds before token expiration when background refresh should be triggered.
-   * Must be at least 5 seconds (the poller interval).
-   * @default 15
-   */
-  leewayInSeconds?: number;
   organizationId?: string;
   skipCache?: boolean;
   template?: string;
