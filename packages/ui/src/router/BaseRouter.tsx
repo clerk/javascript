@@ -3,6 +3,7 @@ import { trimTrailingSlash } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { NavigateOptions } from '@clerk/shared/types';
 import React from 'react';
+import { flushSync } from 'react-dom';
 
 import { useWindowEventListener } from '../hooks';
 import { newPaths } from './newPaths';
@@ -118,7 +119,13 @@ export const BaseRouter = ({
       toURL.search = stringifyQueryParams(toQueryParams);
     }
     const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
-    setRouteParts({ path: toURL.pathname, queryString: toURL.search });
+    // We need to flushSync to guarantee the re-render happens before handing things back to the caller,
+    // otherwise setActive might emit, and children re-render with the old navigation state.
+    // An alternative solution here could be to return a deferred promise, set that to state together
+    // with the routeParts and resolve it in an effect. That way we could avoid the flushSync performance penalty.
+    flushSync(() => {
+      setRouteParts({ path: toURL.pathname, queryString: toURL.search });
+    });
     return internalNavRes;
   };
 

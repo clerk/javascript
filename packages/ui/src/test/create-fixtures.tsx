@@ -10,7 +10,7 @@ import { Clerk as ClerkCtor } from '@/core/clerk';
 import { Client, Environment } from '@/core/resources';
 import {
   ComponentContextProvider,
-  CoreClerkContextWrapper,
+  ClerkContextProvider,
   EnvironmentProvider,
   ModuleManagerProvider,
   OptionsProvider,
@@ -99,7 +99,6 @@ const unboundCreateFixtures = (
 
     const MockClerkProvider = (props: any) => {
       const { children } = props;
-      const [swrConfig] = useState(() => ({ provider: () => new Map() }));
 
       const componentsWithoutContext = [
         'UsernameSection',
@@ -120,11 +119,7 @@ const unboundCreateFixtures = (
       );
 
       return (
-        <CoreClerkContextWrapper
-          clerk={clerkMock}
-          // Clear swr cache
-          swrConfig={swrConfig}
-        >
+        <ClerkContextProvider clerk={clerkMock}>
           <ModuleManagerProvider moduleManager={mockModuleManager}>
             <EnvironmentProvider value={environmentMock}>
               <OptionsProvider value={optionsMock}>
@@ -138,7 +133,7 @@ const unboundCreateFixtures = (
               </OptionsProvider>
             </EnvironmentProvider>
           </ModuleManagerProvider>
-        </CoreClerkContextWrapper>
+        </ClerkContextProvider>
       );
     };
 
