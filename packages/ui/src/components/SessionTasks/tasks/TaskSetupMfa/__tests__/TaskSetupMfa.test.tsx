@@ -114,7 +114,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /authenticator application/i }));
       });
 
-      await findByText('Add authenticator application');
+      await findByText(/add authenticator application/i);
       await findByText(/scan the following QR code/i);
       expect(getByRole('button', { name: /can't scan qr code/i })).toBeInTheDocument();
     });
@@ -140,7 +140,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /authenticator application/i }));
       });
 
-      await findByText('Add authenticator application');
+      await findByText(/add authenticator application/i);
 
       await act(async () => {
         await userEvent.click(getByRole('button', { name: /can't scan qr code/i }));
@@ -172,7 +172,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /authenticator application/i }));
       });
 
-      await findByText('Add authenticator application');
+      await findByText(/add authenticator application/i);
 
       await act(async () => {
         await userEvent.click(getByRole('button', { name: /continue/i }));
@@ -208,7 +208,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /authenticator application/i }));
       });
 
-      await findByText('Add authenticator application');
+      await findByText(/add authenticator application/i);
 
       await act(async () => {
         await userEvent.click(getByRole('button', { name: /continue/i }));
@@ -249,7 +249,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /authenticator application/i }));
       });
 
-      await findByText('Add authenticator application');
+      await findByText(/add authenticator application/i);
 
       await act(async () => {
         await userEvent.click(getByRole('button', { name: /continue/i }));
@@ -288,7 +288,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /authenticator application/i }));
       });
 
-      await findByText('Add authenticator application');
+      await findByText(/add authenticator application/i);
 
       // Switch to URI view
       await act(async () => {
@@ -332,7 +332,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /authenticator application/i }));
       });
 
-      await findByText('Add authenticator application');
+      await findByText(/add authenticator application/i);
 
       await act(async () => {
         await userEvent.click(getByRole('button', { name: /cancel/i }));
@@ -411,7 +411,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /authenticator application/i }));
       });
 
-      await findByText('Add authenticator application');
+      await findByText(/add authenticator application/i);
 
       await act(async () => {
         await userEvent.click(getByRole('button', { name: /continue/i }));
@@ -447,7 +447,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /sms code/i }));
       });
 
-      await findByText('Add sms code verification');
+      await findByText(/add sms code verification/i);
       await findByText(/choose phone number you want to use/i);
       await findByText(/\+30 691 1111111/i);
       expect(getByRole('menuitem', { name: /add phone number/i })).toBeInTheDocument();
@@ -469,7 +469,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /sms code/i }));
       });
 
-      await findByText('Add phone number');
+      await findByText(/add phone number/i);
       await findByText(/a text message containing a verification code/i);
     });
 
@@ -490,13 +490,13 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /sms code/i }));
       });
 
-      await findByText('Add sms code verification');
+      await findByText(/add sms code verification/i);
 
       await act(async () => {
         await userEvent.click(getByRole('menuitem', { name: /add phone number/i }));
       });
 
-      await findByText('Add phone number');
+      await findByText(/add phone number/i);
       await findByText(/a text message containing a verification code/i);
     });
 
@@ -528,7 +528,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /sms code/i }));
       });
 
-      await findByText('Add sms code verification');
+      await findByText(/add sms code verification/i);
 
       await act(async () => {
         await userEvent.click(getByRole('button', { name: /\+30 691 1111111/i }));
@@ -567,7 +567,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /sms code/i }));
       });
 
-      await findByText('Add sms code verification');
+      await findByText(/add sms code verification/i);
 
       await act(async () => {
         await userEvent.click(getByRole('button', { name: /\+30 691 1111111/i }));
@@ -611,7 +611,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /sms code/i }));
       });
 
-      await findByText('Add sms code verification');
+      await findByText(/add sms code verification/i);
 
       // Phone already reserved for 2FA should not be shown
       expect(queryByText(/\+30 691 1111111/i)).not.toBeInTheDocument();
@@ -637,7 +637,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /sms code/i }));
       });
 
-      await findByText('Add sms code verification');
+      await findByText(/add sms code verification/i);
 
       await act(async () => {
         await userEvent.click(getByRole('button', { name: /cancel/i }));
@@ -685,7 +685,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /sms code/i }));
       });
 
-      await findByText('Add sms code verification');
+      await findByText(/add sms code verification/i);
 
       await act(async () => {
         await userEvent.click(getByRole('button', { name: /\+30 691 1111111/i }));
@@ -723,7 +723,7 @@ describe('TaskSetupMFA', () => {
       });
 
       // Should go directly to add phone screen since user has no phones
-      await findByText('Add phone number');
+      await findByText(/add phone number/i);
 
       await userEvent.type(getByLabelText(/phone number/i), '6505551234');
 
@@ -769,7 +769,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /sms code/i }));
       });
 
-      await findByText('Add phone number');
+      await findByText(/add phone number/i);
 
       await userEvent.type(getByLabelText(/phone number/i), '6505551234');
 
@@ -807,7 +807,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /sms code/i }));
       });
 
-      await findByText('Add sms code verification');
+      await findByText(/add sms code verification/i);
 
       // Click unverified phone to go to verification
       await act(async () => {
@@ -870,7 +870,7 @@ describe('TaskSetupMFA', () => {
         await userEvent.click(getByRole('button', { name: /sms code/i }));
       });
 
-      await findByText('Add sms code verification');
+      await findByText(/add sms code verification/i);
 
       // Click unverified phone to go to verification
       await act(async () => {
