@@ -10,9 +10,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
   ({ app }) => {
     test.describe.configure({ mode: 'parallel' });
 
+    const userIds: string[] = [];
+
     test.afterAll(async () => {
       const u = createTestUtils({ app });
-      await u.services.organizations.deleteAll();
+      for (const userId of userIds) {
+        void u.services.users.deleteIfExists({ id: userId });
+      }
       await app.teardown();
     });
 
@@ -28,7 +32,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
         fictionalEmail: true,
         withPassword: true,
       });
-      await u.services.users.createBapiUser(user);
+      const bapiUser = await u.services.users.createBapiUser(user);
+      userIds.push(bapiUser.id);
 
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
@@ -68,7 +73,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
         withPhoneNumber: true,
         withPassword: true,
       });
-      await u.services.users.createBapiUser(user);
+      const bapiUser = await u.services.users.createBapiUser(user);
+      userIds.push(bapiUser.id);
 
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
@@ -108,7 +114,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
         fictionalEmail: true,
         withPassword: true,
       });
-      await u.services.users.createBapiUser(user);
+      const bapiUser = await u.services.users.createBapiUser(user);
+      userIds.push(bapiUser.id);
 
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
@@ -151,7 +158,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
         fictionalEmail: true,
         withPassword: true,
       });
-      await u.services.users.createBapiUser(user);
+      const bapiUser = await u.services.users.createBapiUser(user);
+      userIds.push(bapiUser.id);
 
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
@@ -195,7 +203,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
         withPhoneNumber: true,
         withPassword: true,
       });
-      await u.services.users.createBapiUser(user);
+      const bapiUser = await u.services.users.createBapiUser(user);
+      userIds.push(bapiUser.id);
 
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
