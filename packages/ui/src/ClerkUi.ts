@@ -41,9 +41,9 @@ export class ClerkUi implements ClerkUiInstance {
 
     if (incompatibilityMessage) {
       if (isDevelopmentInstance) {
-        logger.warnOnce(incompatibilityMessage);
-      } else {
         throw new ClerkRuntimeError(incompatibilityMessage, { code: 'clerk_ui_version_mismatch' });
+      } else {
+        logger.warnOnce(incompatibilityMessage);
       }
     }
 
