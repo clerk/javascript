@@ -389,7 +389,7 @@ describe('Clerk singleton', () => {
             cookieExpiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
             isEligibleForTouch: () => true,
             buildTouchUrl: ({ redirectUrl }: { redirectUrl: URL }) =>
-              `https://clerk.example.com/v1/client/touch?redirect_url=${redirectUrl.href}`,
+              `https://clerk.example.com/v1/client/touch?redirect_url=${encodeURIComponent(redirectUrl.href)}`,
           }),
         );
 
@@ -419,7 +419,7 @@ describe('Clerk singleton', () => {
             cookieExpiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
             isEligibleForTouch: () => false,
             buildTouchUrl: ({ redirectUrl }: { redirectUrl: URL }) =>
-              `https://clerk.example.com/v1/client/touch?redirect_url=${redirectUrl.href}`,
+              `https://clerk.example.com/v1/client/touch?redirect_url=${encodeURIComponent(redirectUrl.href)}`,
           }),
         );
 
