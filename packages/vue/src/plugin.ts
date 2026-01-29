@@ -1,10 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { deriveState } from '@clerk/shared/deriveState';
-import {
-  loadClerkJSScript,
-  type LoadClerkJSScriptOptions,
-  loadClerkUIScript,
-} from '@clerk/shared/loadClerkJsScript';
+import { loadClerkJSScript, type LoadClerkJSScriptOptions, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   Clerk,
   ClerkOptions,

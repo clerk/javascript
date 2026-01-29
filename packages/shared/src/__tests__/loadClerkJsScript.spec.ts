@@ -463,4 +463,3 @@ describe('buildClerkUIScriptAttributes()', () => {
     expect(buildClerkUIScriptAttributes(input)).toEqual(expected);
   });
 });
-
