@@ -96,7 +96,6 @@ runs:
           "@clerk/shared"
           "@clerk/tanstack-react-start"
           "@clerk/testing"
-          "@clerk/types"
           "@clerk/ui"
           "@clerk/upgrade"
           "@clerk/vue"
