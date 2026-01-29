@@ -35,7 +35,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Safari IT
 
     // Intercept client responses and modify cookie_expires_at to be within 8 days
     // This makes isEligibleForTouch() return true
-    await page.route('**/v1/client?**', async route => {
+    await page.route('**/v1/client**', async route => {
+      // Skip touch endpoint - we want to track that separately
+      if (route.request().url().includes('/v1/client/touch')) {
+        await route.continue();
+        return;
+      }
       const response = await route.fetch();
       const json = await response.json();
 
@@ -82,7 +87,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Safari IT
 
     // Intercept client responses and set cookie_expires_at to be far in the future
     // This makes isEligibleForTouch() return false
-    await page.route('**/v1/client?**', async route => {
+    await page.route('**/v1/client**', async route => {
+      // Skip touch endpoint - we want to track that separately
+      if (route.request().url().includes('/v1/client/touch')) {
+        await route.continue();
+        return;
+      }
+
       const response = await route.fetch();
       const json = await response.json();
 
