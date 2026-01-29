@@ -41,9 +41,8 @@ module.exports = function transformSatelliteAutoSync({ source }, { jscodeshift: 
       return;
     }
 
-    const isSatelliteIndex = properties.findIndex(prop => isObjectPropertyNamed(prop, 'isSatellite'));
     const autoSyncProp = j.objectProperty(j.identifier('satelliteAutoSync'), j.booleanLiteral(true));
-    properties.splice(isSatelliteIndex + 1, 0, autoSyncProp);
+    properties.push(autoSyncProp);
     dirty = true;
   });
 

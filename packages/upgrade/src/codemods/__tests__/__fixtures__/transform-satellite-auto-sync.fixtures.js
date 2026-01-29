@@ -103,8 +103,8 @@ import { clerkMiddleware } from '@clerk/nextjs/server';
 
 export default clerkMiddleware({
   isSatellite: true,
-  satelliteAutoSync: true,
-  domain: 'example.com'
+  domain: 'example.com',
+  satelliteAutoSync: true
 });
     `,
   },
@@ -119,8 +119,8 @@ const options = {
     output: `
 const options = {
   isSatellite: true,
-  satelliteAutoSync: true,
-  domain: 'satellite.example.com'
+  domain: 'satellite.example.com',
+  satelliteAutoSync: true
 };
     `,
   },
@@ -139,8 +139,8 @@ import { clerkMiddleware } from '@clerk/nextjs/server';
 
 export default clerkMiddleware({
   isSatellite: (url) => url.host === 'satellite.example.com',
-  satelliteAutoSync: true,
-  domain: 'example.com'
+  domain: 'example.com',
+  satelliteAutoSync: true
 });
     `,
   },
