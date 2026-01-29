@@ -1,5 +1,5 @@
 import type { FieldId } from './elementIds';
-import type { CamelToSnake, DeepPartial } from './utils';
+import type { CamelToSnake, DeepPartial, RecordToPath } from './utils';
 
 /**
  * @internal
@@ -64,6 +64,26 @@ type DeepLocalizationWithoutObjects<T> = {
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Needs to be an interface for typedoc to link correctly
 export interface LocalizationResource
   extends DeepPartial<DeepLocalizationWithoutObjects<__internal_LocalizationResource>> {}
+
+/**
+ * A flattened representation of LocalizationResource where nested keys are represented
+ * using dot notation (e.g., "formFieldLabel__emailAddress" or "unstable__errors.passwordComplexity.maximumLength").
+ *
+ * @example
+ * ```typescript
+ * const flattened: FlattenedLocalizationResource = {
+ *   "locale": "en-US",
+ *   "formFieldLabel__emailAddress": "Email address",
+ *   "unstable__errors.passwordComplexity.maximumLength": "Password is too long"
+ * };
+ * ```
+ *
+ * This type provides type safety and autocomplete by restricting keys to valid localization paths.
+ * Note: This generates a large union type which may impact TypeScript performance in some cases.
+ */
+export type FlattenedLocalizationResource = {
+  [K in RecordToPath<__internal_LocalizationResource>]?: string;
+};
 
 export type __internal_LocalizationResource = {
   locale: string;
