@@ -2433,6 +2433,10 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   clerkUIUrl?: string;
   /**
+   * The npm version for `@clerk/ui`.
+   */
+  clerkUIVersion?: string;
+  /**
    * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
    */
   publishableKey: string;

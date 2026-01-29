@@ -24,7 +24,7 @@ import { computed, ref, shallowRef, triggerRef } from 'vue';
 import { ClerkInjectionKey } from './keys';
 declare global {
   interface Window {
-    __internal_ClerkUiCtor?: ClerkUiConstructor;
+    __internal_ClerkUICtor?: ClerkUiConstructor;
   }
 }
 
@@ -90,10 +90,10 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
               ? Promise.resolve(pluginOptions.clerkUICtor)
               : (async () => {
                   await loadClerkUIScript(options);
-                  if (!window.__internal_ClerkUiCtor) {
+                  if (!window.__internal_ClerkUICtor) {
                     throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
                   }
-                  return window.__internal_ClerkUiCtor;
+                  return window.__internal_ClerkUICtor;
                 })();
 
           await clerkPromise;

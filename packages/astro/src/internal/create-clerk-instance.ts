@@ -111,7 +111,7 @@ async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCre
 
 /**
  * Gets the ClerkUI constructor, either from options or by loading the script.
- * Returns early if window.__internal_ClerkUiCtor already exists.
+ * Returns early if window.__internal_ClerkUICtor already exists.
  * Returns undefined when prefetchUI={false} (no UI needed).
  */
 async function getClerkUIEntryChunk<TUi extends Ui = Ui>(
@@ -127,11 +127,11 @@ async function getClerkUIEntryChunk<TUi extends Ui = Ui>(
 
   await loadClerkUIScript(options as any);
 
-  if (!window.__internal_ClerkUiCtor) {
+  if (!window.__internal_ClerkUICtor) {
     throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
   }
 
-  return window.__internal_ClerkUiCtor;
+  return window.__internal_ClerkUICtor;
 }
 
 export { createClerkInstance, updateClerkOptions };

@@ -89,7 +89,7 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
-  __internal_ClerkUiCtor?: ClerkUiConstructor;
+  __internal_ClerkUICtor?: ClerkUiConstructor;
 }
 
 declare const global: Global;
@@ -530,11 +530,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       nonce: this.options.nonce,
     });
 
-    if (!global.__internal_ClerkUiCtor) {
+    if (!global.__internal_ClerkUICtor) {
       throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
     }
 
-    return global.__internal_ClerkUiCtor;
+    return global.__internal_ClerkUICtor;
   }
 
   public on: Clerk['on'] = (...args) => {

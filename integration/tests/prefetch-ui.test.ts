@@ -11,7 +11,7 @@ test.describe('prefetchUI disabled @nextjs', () => {
     app = await appConfigs.next.appRouter.clone().commit();
     await app.setup();
     // Use withEmailCodes but disable the UI prefetching
-    const env = appConfigs.envs.withEmailCodes.clone().setEnvVariable('public', 'CLERK_PREFETCH_UI_DISABLED', 'true');
+    const env = appConfigs.envs.withEmailCodes.clone().setEnvVariable('public', 'CLERK_PREFETCH_UI', 'false');
     await app.withEnv(env);
     await app.dev();
   });
