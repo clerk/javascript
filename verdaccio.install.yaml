@@ -9,8 +9,7 @@ packages:
   '@clerk/*':
     access: $all
     publish: $all
-    # No proxy for @clerk/* - ensures we use locally published packages
-    # and never fall back to npm (which would return stable instead of snapshot)
+    proxy: npmjs
   '**':
     access: $all
     publish: $all
