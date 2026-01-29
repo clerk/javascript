@@ -74,8 +74,8 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
 
       await setActive({
         organization,
-        navigate: async ({ session }) => {
-          await navigateOnSetActive?.({ session, redirectUrlComplete });
+        navigate: async ({ session, decorateUrl }) => {
+          await navigateOnSetActive?.({ session, redirectUrlComplete, decorateUrl });
         },
       });
     } catch (err: any) {
