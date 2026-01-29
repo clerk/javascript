@@ -17,14 +17,27 @@ describe('ClerkProvider', () => {
     });
   });
 
-  describe('clerkJSVariant', () => {
+  describe('prefetchUI', () => {
     const defaultProps = { children: '' };
 
-    it('is either headless or empty', () => {
-      expectTypeOf({ ...defaultProps, clerkJSVariant: 'headless' as const }).toMatchTypeOf<ClerkProviderProps>();
-      expectTypeOf({ ...defaultProps, clerkJSVariant: '' as const }).toMatchTypeOf<ClerkProviderProps>();
-      expectTypeOf({ ...defaultProps, clerkJSVariant: undefined }).toMatchTypeOf<ClerkProviderProps>();
-      expectTypeOf({ ...defaultProps, clerkJSVariant: 'test' }).not.toMatchTypeOf<ClerkProviderProps>();
+    it('accepts false to disable UI prefetching', () => {
+      expectTypeOf({ ...defaultProps, prefetchUI: false as const }).toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('accepts undefined for default UI prefetching', () => {
+      expectTypeOf({ ...defaultProps, prefetchUI: undefined }).toMatchTypeOf<ClerkProviderProps>();
+    });
+  });
+
+  describe('clerkUIUrl', () => {
+    const defaultProps = { children: '' };
+
+    it('accepts string URL for custom UI location', () => {
+      expectTypeOf({ ...defaultProps, clerkUIUrl: 'https://custom.com/ui.js' }).toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('accepts undefined', () => {
+      expectTypeOf({ ...defaultProps, clerkUIUrl: undefined }).toMatchTypeOf<ClerkProviderProps>();
     });
   });
 

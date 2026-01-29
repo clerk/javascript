@@ -52,11 +52,11 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       expect(message).toContain('elements.card "& > div"');
     });
 
-    test('still warns when clerkUiCtor is provided without ui (CDN scenario)', () => {
-      // clerkUiCtor is always set when loading from CDN, but ui is only set
+    test('still warns when clerkUICtor is provided without ui (CDN scenario)', () => {
+      // clerkUICtor is always set when loading from CDN, but ui is only set
       // when the user explicitly imports @clerk/ui
       warnAboutCustomizationWithoutPinning({
-        clerkUiCtor: class MockClerkUi {} as any,
+        clerkUICtor: class MockClerkUi {} as any,
         appearance: {
           elements: { card: { '& > div': { color: 'red' } } },
         },

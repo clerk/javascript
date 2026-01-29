@@ -79,6 +79,7 @@ export const injectRequestStateIntoResponse = async (
  */
 export function getResponseClerkState(requestState: RequestStateWithRedirectUrls, context: AppLoadContext) {
   const { reason, message, isSignedIn, ...rest } = requestState;
+  const envVars = getPublicEnvVariables(context);
   const clerkState = wrapWithClerkState({
     __clerk_ssr_state: rest.toAuth(),
     __publishableKey: requestState.publishableKey,
@@ -92,11 +93,12 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __signInFallbackRedirectUrl: requestState.signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl: requestState.signUpFallbackRedirectUrl,
     __clerk_debug: debugRequestState(requestState),
-    __clerkJSUrl: getPublicEnvVariables(context).clerkJsUrl,
-    __clerkUiUrl: getPublicEnvVariables(context).clerkUiUrl,
-    __clerkJSVersion: getPublicEnvVariables(context).clerkJsVersion,
-    __telemetryDisabled: getPublicEnvVariables(context).telemetryDisabled,
-    __telemetryDebug: getPublicEnvVariables(context).telemetryDebug,
+    __clerkJSUrl: envVars.clerkJsUrl,
+    __clerkJSVersion: envVars.clerkJsVersion,
+    __clerkUIUrl: envVars.clerkUIUrl,
+    __prefetchUI: envVars.prefetchUI,
+    __telemetryDisabled: envVars.telemetryDisabled,
+    __telemetryDebug: envVars.telemetryDebug,
   });
 
   return {

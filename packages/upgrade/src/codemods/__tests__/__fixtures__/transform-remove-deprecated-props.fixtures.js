@@ -208,4 +208,52 @@ export const Provider = ({ children }) => (
 );
     `,
   },
+  {
+    name: 'clerkJSVariant headless to prefetchUI false',
+    source: `
+import { ClerkProvider } from '@clerk/nextjs';
+
+export function App({ children }) {
+  return (
+    <ClerkProvider
+      clerkJSVariant="headless"
+      publishableKey="pk_test_123"
+    >
+      {children}
+    </ClerkProvider>
+  );
+}
+    `,
+    output: `
+import { ClerkProvider } from '@clerk/nextjs';
+
+export function App({ children }) {
+  return (
+    <ClerkProvider
+      prefetchUI={false}
+      publishableKey="pk_test_123"
+    >
+      {children}
+    </ClerkProvider>
+  );
+}
+    `,
+  },
+  {
+    name: 'clerkJSVariant empty string removal',
+    source: `
+import { ClerkProvider } from '@clerk/react';
+
+export const Provider = ({ children }) => (
+  <ClerkProvider clerkJSVariant="">{children}</ClerkProvider>
+);
+    `,
+    output: `
+import { ClerkProvider } from '@clerk/react';
+
+export const Provider = ({ children }) => (
+  <ClerkProvider>{children}</ClerkProvider>
+);
+    `,
+  },
 ];

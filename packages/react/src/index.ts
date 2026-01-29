@@ -5,7 +5,7 @@ import './types/appearance';
 // instead of bundling its own copy, reducing overall bundle size.
 import '@clerk/ui/register';
 
-import { setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
+import { setClerkJSLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
 
 import { setErrorThrowerOptions } from './errors/errorThrower';
 
@@ -25,4 +25,4 @@ export type {
 export type { ClerkProviderProps } from './types';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
-setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
+setClerkJSLoadingErrorPackageName(PACKAGE_NAME);

@@ -36,7 +36,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ChromeExtensionClerkPr
     <ClerkReactProvider
       {...rest}
       Clerk={clerkInstance}
-      clerkUiCtor={ClerkUi}
+      clerkUICtor={ClerkUi}
       standardBrowser={!syncHost}
     >
       {children}

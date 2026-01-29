@@ -35,12 +35,6 @@ export function createClerkClient({
   storageCache = BrowserStorageCache,
   syncHost,
 }: CreateClerkClientOptions) {
-  if (scope === SCOPE.BACKGROUND) {
-    // TODO @nikos
-    // @ts-expect-error will be replaced by clerk ui
-    Clerk.mountComponentRenderer = undefined;
-  }
-
   // Don't cache background scripts as it can result in out-of-sync client information.
   if (clerk && scope !== SCOPE.BACKGROUND) {
     return clerk;

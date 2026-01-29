@@ -35,14 +35,23 @@ describe('ClerkProvider', () => {
     });
   });
 
-  describe('clerkJSVariant', () => {
+  describe('prefetchUI', () => {
     const defaultProps = { publishableKey: 'test', children: '' };
 
-    it('is either headless or empty', () => {
-      expectTypeOf({ ...defaultProps, clerkJSVariant: 'headless' as const }).toMatchTypeOf<ClerkProviderProps>();
-      expectTypeOf({ ...defaultProps, clerkJSVariant: '' as const }).toMatchTypeOf<ClerkProviderProps>();
-      expectTypeOf({ ...defaultProps, clerkJSVariant: undefined }).toMatchTypeOf<ClerkProviderProps>();
-      expectTypeOf({ ...defaultProps, clerkJSVariant: 'test' }).not.toMatchTypeOf<ClerkProviderProps>();
+    it('accepts false to disable UI prefetching', () => {
+      expectTypeOf({ ...defaultProps, prefetchUI: false as const }).toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('accepts undefined for default behavior', () => {
+      expectTypeOf({ ...defaultProps, prefetchUI: undefined }).toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('accepts true to explicitly enable UI prefetching', () => {
+      expectTypeOf({ ...defaultProps, prefetchUI: true as const }).toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('rejects non-boolean values', () => {
+      expectTypeOf({ ...defaultProps, prefetchUI: 'test' }).not.toMatchTypeOf<ClerkProviderProps>();
     });
   });
 

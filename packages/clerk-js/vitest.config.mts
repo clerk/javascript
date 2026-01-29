@@ -41,8 +41,6 @@ export default defineConfig({
         'src/**/index.ts',
         'src/**/index.browser.ts',
         'src/**/index.chips.browser.ts',
-        'src/**/index.headless.ts',
-        'src/**/index.headless.browser.ts',
         'src/**/index.legacy.browser.ts',
         'src/**/coverage/**',
         'src/**/dist/**',

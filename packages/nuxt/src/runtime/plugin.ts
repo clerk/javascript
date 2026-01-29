@@ -1,11 +1,11 @@
-import { setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
+import { setClerkJSLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
 import type { InitialState } from '@clerk/shared/types';
 import { clerkPlugin } from '@clerk/vue';
 import { setErrorThrowerOptions } from '@clerk/vue/internal';
 import { defineNuxtPlugin, navigateTo, useRuntimeConfig, useState } from 'nuxt/app';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
-setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
+setClerkJSLoadingErrorPackageName(PACKAGE_NAME);
 
 export default defineNuxtPlugin(nuxtApp => {
   // SSR-friendly shared state
@@ -21,9 +21,9 @@ export default defineNuxtPlugin(nuxtApp => {
 
   nuxtApp.vueApp.use(clerkPlugin as any, {
     ...clerkConfig,
-    // Map jsUrl/uiUrl to clerkJSUrl/clerkUiUrl as expected by the Vue plugin
+    // Map jsUrl/uiUrl to clerkJSUrl/clerkUIUrl as expected by the Vue plugin
     clerkJSUrl: clerkConfig.jsUrl,
-    clerkUiUrl: clerkConfig.uiUrl,
+    clerkUIUrl: clerkConfig.uiUrl,
     sdkMetadata: {
       name: PACKAGE_NAME,
       version: PACKAGE_VERSION,
