@@ -49,7 +49,7 @@ export const SubscriptionDetailsButton = withClerk(
     children,
     ...props
   }: WithClerkProp<React.PropsWithChildren<__experimental_SubscriptionDetailsButtonProps>>) => {
-    const { for: _for, subscriptionDetailsProps, onSubscriptionCancel, ...rest } = props;
+    const { for: _for, subscriptionDetailsProps, onSubscriptionCancel, getContainer, component, ...rest } = props;
     children = normalizeWithDefaultValue(children, 'Subscription details');
     const child = assertSingleChild(children)('SubscriptionDetailsButton');
 

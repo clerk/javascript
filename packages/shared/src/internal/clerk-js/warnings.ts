@@ -21,6 +21,7 @@ const createMessageForDisabledBilling = (componentName: 'PricingTable' | 'Checko
     `The <${componentName}/> component cannot be rendered when billing is disabled. Visit 'https://dashboard.clerk.com/last-active?path=billing/settings' to follow the necessary steps to enable billing. Since billing is disabled, this is no-op.`,
   );
 };
+
 const warnings = {
   cannotRenderComponentWhenSessionExists:
     'The <SignUp/> and <SignIn/> components cannot render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the Home URL instead.',

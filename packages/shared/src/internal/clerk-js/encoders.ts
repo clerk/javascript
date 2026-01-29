@@ -1,5 +1,5 @@
 export function encodeB64(input: string) {
-  return global.btoa(input);
+  return globalThis.btoa(input);
 }
 
 // https://stackoverflow.com/questions/30106476/

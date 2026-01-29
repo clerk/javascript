@@ -505,6 +505,7 @@ function SignInStartInternal(): JSX.Element {
             attribute,
             identifierField.value,
           ),
+        unsafeMetadata: ctx.unsafeMetadata,
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);

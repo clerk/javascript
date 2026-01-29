@@ -38,7 +38,7 @@ const valueResolution = (params: UsePricingFooterStateParams): [boolean, boolean
   // Active subscription
   if (subscription.status === 'active') {
     const isCanceled = !!subscription.canceledAt;
-    const isSwitchingPaidPeriod = planPeriod !== subscription.planPeriod && Boolean(plan.annualMonthlyFee);
+    const isSwitchingPaidPeriod = planPeriod !== subscription.planPeriod && Boolean(plan.annualMonthlyFee?.amount);
     const isActiveFreeTrial = plan.freeTrialEnabled && subscription.isFreeTrial;
 
     if (isCanceled || isSwitchingPaidPeriod) {

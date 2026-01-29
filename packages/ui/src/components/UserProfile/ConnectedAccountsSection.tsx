@@ -9,9 +9,9 @@ import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { ProviderInitialIcon } from '../../common';
+import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
-import { Box, Button, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
+import { Box, Button, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
@@ -117,11 +117,11 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
     }),
   );
 
+  const { providerToDisplayData } = useEnabledThirdPartyProviders();
+
   if (!user) {
     return null;
   }
-
-  const { providerToDisplayData } = useEnabledThirdPartyProviders();
   const label = account.username || account.emailAddress;
   const fallbackErrorMessage = account.verification?.error?.longMessage;
   const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
@@ -153,34 +153,28 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
     }
   };
 
-  const ImageOrInitial = () =>
-    providerToDisplayData[account.provider].iconUrl ? (
-      <Image
-        elementDescriptor={[descriptors.providerIcon]}
-        elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
-        alt={providerToDisplayData[account.provider].name}
-        src={providerToDisplayData[account.provider].iconUrl}
-        sx={theme => ({ width: theme.sizes.$4, flexShrink: 0 })}
-      />
-    ) : (
-      <ProviderInitialIcon
-        id={account.provider}
-        value={providerToDisplayData[account.provider].name}
-      />
-    );
+  const providerData = providerToDisplayData[account.provider];
 
   return (
     <Fragment key={account.id}>
       <ProfileSection.Item id='connectedAccounts'>
         <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
-          <ImageOrInitial />
+          <ProviderIcon
+            id={account.provider}
+            iconUrl={providerData?.iconUrl}
+            name={providerData?.name || account.provider}
+            alt={providerData?.name || account.provider}
+            elementDescriptor={descriptors.providerIcon}
+            elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
+            sx={{ flexShrink: 0 }}
+          />
           <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
             <Flex
               gap={1}
               center
             >
               <Text sx={t => ({ color: t.colors.$colorForeground })}>{`${
-                providerToDisplayData[account.provider].name
+                providerData?.name || account.provider
               }`}</Text>
               <Text
                 truncate

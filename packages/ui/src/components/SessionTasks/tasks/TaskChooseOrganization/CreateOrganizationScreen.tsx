@@ -1,5 +1,9 @@
 import { useOrganizationList } from '@clerk/shared/react';
-import type { CreateOrganizationParams, OrganizationCreationDefaultsResource } from '@clerk/shared/types';
+import type {
+  CreateOrganizationParams,
+  OrganizationCreationDefaultsResource,
+  OrganizationResource,
+} from '@clerk/shared/types';
 import { useState } from 'react';
 
 import { useEnvironment } from '@/ui/contexts';
@@ -35,12 +39,12 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
   const { organizationSettings } = useEnvironment();
   const [file, setFile] = useState<File | null>();
 
-  const nameField = useFormControl('name', props.organizationCreationDefaults?.form.name ?? '', {
+  const nameField = useFormControl('name', props.organizationCreationDefaults?.form?.name ?? '', {
     type: 'text',
     label: localizationKeys('taskChooseOrganization.createOrganization.formFieldLabel__name'),
     placeholder: localizationKeys('taskChooseOrganization.createOrganization.formFieldInputPlaceholder__name'),
   });
-  const slugField = useFormControl('slug', props.organizationCreationDefaults?.form.slug ?? '', {
+  const slugField = useFormControl('slug', props.organizationCreationDefaults?.form?.slug ?? '', {
     type: 'text',
     label: localizationKeys('taskChooseOrganization.createOrganization.formFieldLabel__slug'),
     placeholder: localizationKeys('taskChooseOrganization.createOrganization.formFieldInputPlaceholder__slug'),
@@ -64,14 +68,9 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
 
       const organization = await createOrganization(createOrgParams);
 
-      if (file) {
-        await organization.setLogo({ file });
-      } else if (defaultLogoUrl) {
-        const response = await fetch(defaultLogoUrl);
-        const blob = await response.blob();
-        const logoFile = new File([blob], 'logo', { type: blob.type });
-        await organization.setLogo({ file: logoFile });
-      }
+      // If setting the logo fails, we still want to set the active organization
+      const uploadOrganizationLogoPromise = uploadOrganizationLogo(organization);
+      await Promise.allSettled([uploadOrganizationLogoPromise]);
 
       await setActive({
         organization,
@@ -81,6 +80,17 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
       });
     } catch (err: any) {
       handleError(err, [nameField, slugField], card.setError);
+    }
+  };
+
+  const uploadOrganizationLogo = async (organization: OrganizationResource) => {
+    if (file) {
+      await organization.setLogo({ file });
+    } else if (defaultLogoUrl) {
+      const response = await fetch(defaultLogoUrl);
+      const blob = await response.blob();
+      const logoFile = new File([blob], 'logo', { type: blob.type });
+      await organization.setLogo({ file: logoFile });
     }
   };
 
@@ -99,7 +109,7 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
   };
 
   const isSubmitButtonDisabled = !nameField.value || !isLoaded;
-  const defaultLogoUrl = file === undefined ? props.organizationCreationDefaults?.form.logo : undefined;
+  const defaultLogoUrl = file === undefined ? props.organizationCreationDefaults?.form?.logo : undefined;
 
   return (
     <>

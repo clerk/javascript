@@ -3,8 +3,9 @@ import { useReverification, useUser } from '@clerk/shared/react';
 import type { Web3Provider, Web3Strategy } from '@clerk/shared/types';
 
 import { useModuleManager } from '@/contexts';
-import { descriptors, Image, localizationKeys } from '@/customizables';
+import { descriptors, localizationKeys } from '@/customizables';
 import { useEnabledThirdPartyProviders } from '@/hooks';
+import { ProviderIcon } from '@/ui/common';
 import { Web3SelectSolanaWalletScreen } from '@/ui/components/UserProfile/Web3SelectSolanaWalletScreen';
 import { Action } from '@/ui/elements/Action';
 import { useActionContext } from '@/ui/elements/Action/ActionRoot';
@@ -91,14 +92,15 @@ export const AddWeb3WalletActionMenu = () => {
                 gap: t.space.$2,
               })}
               leftIcon={
-                <Image
-                  elementDescriptor={descriptors.providerIcon}
-                  elementId={descriptors.providerIcon.setId(strategyToDisplayData[strategy].id)}
+                <ProviderIcon
+                  id={strategyToDisplayData[strategy].id}
+                  iconUrl={strategyToDisplayData[strategy].iconUrl}
+                  name={strategyToDisplayData[strategy].name}
                   isLoading={card.loadingMetadata === strategy}
                   isDisabled={card.isLoading}
-                  src={strategyToDisplayData[strategy].iconUrl}
                   alt={`Connect ${strategyToDisplayData[strategy].name}`}
-                  sx={theme => ({ width: theme.sizes.$5 })}
+                  elementDescriptor={descriptors.providerIcon}
+                  elementId={descriptors.providerIcon.setId(strategyToDisplayData[strategy].id)}
                 />
               }
             />

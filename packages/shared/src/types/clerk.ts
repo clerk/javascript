@@ -135,6 +135,7 @@ export type SDKMetadata = {
 };
 
 export type ListenerCallback = (emission: Resources) => void;
+export type ListenerOptions = { skipInitialEmit?: boolean };
 export type UnsubscribeCallback = () => void;
 
 /**
@@ -278,6 +279,13 @@ export interface Clerk {
 
   /** Current User. */
   user: UserResource | null | undefined;
+
+  /**
+   * Last emitted resources, maintains a stable reference to the resources between emits.
+   *
+   * @internal
+   */
+  __internal_lastEmittedResources: Resources | undefined;
 
   /**
    * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
@@ -722,9 +730,10 @@ export interface Clerk {
    *    When a session is loading, user and session will be undefined.
    *
    * @param callback - Callback function receiving the most updated Clerk resources after a change.
+   * @param options.skipInitialEmit - If true, the callback will not be called immediately after registration.
    * @returns - Unsubscribe callback
    */
-  addListener: (callback: ListenerCallback) => UnsubscribeCallback;
+  addListener: (callback: ListenerCallback, options?: ListenerOptions) => UnsubscribeCallback;
 
   /**
    * Registers an event handler for a specific Clerk event.
@@ -1065,6 +1074,10 @@ export type HandleOAuthCallbackParams = TransferableOption &
      * The underlying resource to optionally reload before processing an OAuth callback.
      */
     reloadResource?: 'signIn' | 'signUp';
+    /**
+     * Additional arbitrary metadata to be stored alongside the User object when a sign-up transfer occurs.
+     */
+    unsafeMetadata?: SignUpUnsafeMetadata;
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
@@ -1166,6 +1179,20 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * This option defines that the application is a satellite application.
      */
     isSatellite?: boolean | ((url: URL) => boolean);
+    /**
+     * Controls whether satellite apps automatically sync with the primary domain on initial page load.
+     *
+     * When `false` (default), satellite apps will skip the automatic handshake if no session cookies exist,
+     * and only trigger the handshake after an explicit sign-in action. This provides the best performance
+     * by showing the satellite app immediately without attempting to sync state first.
+     *
+     * When `true`, satellite apps will automatically trigger a handshake redirect to sync authentication
+     * state with the primary domain on first load, even if no session cookies exist. Use this if you want
+     * users who are already signed in on the primary domain to be automatically recognized on the satellite.
+     *
+     * @default false
+     */
+    satelliteAutoSync?: boolean;
     /**
      * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/guides/how-clerk-works/security/clerk-telemetry). If set to `debug`, telemetry events are only logged to the console and not sent to Clerk.
      */
@@ -1483,9 +1510,22 @@ export interface TransferableOption {
   transferable?: boolean;
 }
 
-export type SignInModalProps = WithoutRouting<SignInProps>;
+export type SignInModalProps = WithoutRouting<SignInProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 export type __internal_UserVerificationProps = RoutingOptions & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
   /**
    * Non-awaitable callback for when verification is completed successfully
    */
@@ -1627,7 +1667,14 @@ export type SignUpProps = RoutingOptions & {
   SignInForceRedirectUrl &
   AfterSignOutUrl;
 
-export type SignUpModalProps = WithoutRouting<SignUpProps>;
+export type SignUpModalProps = WithoutRouting<SignUpProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 export type UserProfileProps = RoutingOptions & {
   /**
@@ -1669,7 +1716,14 @@ export type UserProfileProps = RoutingOptions & {
   };
 };
 
-export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
+export type UserProfileModalProps = WithoutRouting<UserProfileProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 export type OrganizationProfileProps = RoutingOptions & {
   /**
@@ -1712,7 +1766,14 @@ export type OrganizationProfileProps = RoutingOptions & {
   };
 };
 
-export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
+export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 export type CreateOrganizationProps = RoutingOptions & {
   /**
@@ -1738,7 +1799,14 @@ export type CreateOrganizationProps = RoutingOptions & {
   appearance?: ClerkAppearanceTheme;
 };
 
-export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
+export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 type UserProfileMode = 'modal' | 'navigation';
 type UserButtonProfileMode =
@@ -1961,7 +2029,14 @@ export type WaitlistProps = {
   signInUrl?: string;
 };
 
-export type WaitlistModalProps = WaitlistProps;
+export type WaitlistModalProps = WaitlistProps & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 type PricingTableDefaultProps = {
   /**
@@ -2404,6 +2479,11 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    * The URL that `@clerk/ui` should be hot-loaded from.
    */
   clerkUiUrl?: string;
+  /**
+   * If set to `'shared'`, loads a variant of `@clerk/ui` that expects React to be provided by the host application via `globalThis.__clerkSharedModules`.
+   * This reduces bundle size when using framework packages like `@clerk/react`.
+   */
+  clerkUIVariant?: 'shared' | '';
   /**
    * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
    */

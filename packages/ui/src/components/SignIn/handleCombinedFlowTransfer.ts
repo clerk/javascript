@@ -7,6 +7,7 @@ import type {
   SessionResource,
   SignUpModes,
   SignUpResource,
+  SignUpUnsafeMetadata,
 } from '@clerk/shared/types';
 
 import type { RouteContextValue } from '../../router/RouteContext';
@@ -30,6 +31,7 @@ type HandleCombinedFlowTransferProps = {
     redirectUrl: string;
     decorateUrl: DecorateUrl;
   }) => Promise<unknown>;
+  unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
 /**
@@ -50,6 +52,7 @@ export function handleCombinedFlowTransfer({
   passwordEnabled,
   navigateOnSetActive,
   alternativePhoneCodeChannel,
+  unsafeMetadata,
 }: HandleCombinedFlowTransferProps): Promise<unknown> | void {
   if (signUpMode === SIGN_UP_MODES.WAITLIST) {
     const waitlistUrl = clerk.buildWaitlistUrl(
@@ -90,6 +93,7 @@ export function handleCombinedFlowTransfer({
       .create({
         [identifierAttribute]: identifierValue,
         ...alternativePhoneCodeChannelParams,
+        unsafeMetadata,
       })
       .then(async res => {
         const completeSignUpFlow = await lazyCompleteSignUpFlow();
