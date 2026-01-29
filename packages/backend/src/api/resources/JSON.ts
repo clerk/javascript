@@ -904,7 +904,7 @@ export interface BillingSubscriptionItemWebhookEventJSON extends ClerkResourceJS
   proration_date: string;
   plan_period: 'month' | 'annual';
   period_start: number;
-  period_end?: number;
+  period_end: number | null;
   canceled_at?: number;
   past_due_at?: number;
   lifetime_paid: number;
