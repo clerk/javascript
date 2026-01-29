@@ -4,7 +4,6 @@ import {
   loadClerkJSScript,
   type LoadClerkJSScriptOptions,
   loadClerkUIScript,
-  shouldPrefetchClerkUI,
 } from '@clerk/shared/loadClerkJsScript';
 import type {
   Clerk,
@@ -86,7 +85,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           // Honor explicit clerkUICtor even when prefetchUI={false}
           const clerkUICtorPromise = pluginOptions.clerkUICtor
             ? Promise.resolve(pluginOptions.clerkUICtor)
-            : !shouldPrefetchClerkUI(pluginOptions.prefetchUI)
+            : pluginOptions.prefetchUI === false
               ? Promise.resolve(undefined)
               : (async () => {
                   await loadClerkUIScript(options);

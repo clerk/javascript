@@ -1,10 +1,5 @@
 import { useClerk } from '@clerk/react';
-import {
-  buildClerkJSScriptAttributes,
-  clerkJSScriptUrl,
-  clerkUIScriptUrl,
-  shouldPrefetchClerkUI,
-} from '@clerk/react/internal';
+import { buildClerkJSScriptAttributes, clerkJSScriptUrl, clerkUIScriptUrl } from '@clerk/react/internal';
 import NextScript from 'next/script';
 import React from 'react';
 
@@ -74,7 +69,7 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
           registration (which happens when React code runs @clerk/ui/register).
           When loadClerkUIScript() later adds a <script> tag, the browser uses the
           cached resource and executes it without re-downloading. */}
-      {shouldPrefetchClerkUI(prefetchUI) && (
+      {prefetchUI !== false && (
         <link
           rel='preload'
           href={clerkUIScriptUrl(opts)}

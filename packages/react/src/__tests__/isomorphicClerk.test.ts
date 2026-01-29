@@ -7,7 +7,6 @@ import { IsomorphicClerk } from '../isomorphicClerk';
 vi.mock('@clerk/shared/loadClerkJsScript', () => ({
   loadClerkJSScript: vi.fn().mockResolvedValue(null),
   loadClerkUIScript: vi.fn().mockResolvedValue(null),
-  shouldPrefetchClerkUI: vi.fn().mockReturnValue(true),
 }));
 
 describe('isomorphicClerk', () => {

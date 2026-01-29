@@ -10,7 +10,6 @@ export {
   clerkUIScriptUrl,
   buildClerkUIScriptAttributes,
   setClerkJSLoadingErrorPackageName,
-  shouldPrefetchClerkUI,
   // Deprecated aliases - will be removed in a future major version
   clerkJsScriptUrl,
   buildClerkJsScriptAttributes,

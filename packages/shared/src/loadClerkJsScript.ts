@@ -31,15 +31,6 @@ export type LoadClerkJSScriptOptions = {
  */
 export type LoadClerkJsScriptOptions = LoadClerkJSScriptOptions;
 
-/**
- * Determines whether the Clerk UI should be prefetched based on the `prefetchUI` option.
- * @param prefetchUI - The prefetchUI option from ClerkProvider/options
- * @returns `true` if UI should be prefetched, `false` if it should be skipped
- */
-export const shouldPrefetchClerkUI = (prefetchUI: boolean | undefined): boolean => {
-  return prefetchUI !== false;
-};
-
 export type LoadClerkUIScriptOptions = {
   publishableKey: string;
   clerkUIUrl?: string;

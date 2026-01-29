@@ -1,4 +1,4 @@
-import { clerkJSScriptUrl, clerkUIScriptUrl, shouldPrefetchClerkUI } from '@clerk/shared/loadClerkJsScript';
+import { clerkJSScriptUrl, clerkUIScriptUrl } from '@clerk/shared/loadClerkJsScript';
 import type { APIContext } from 'astro';
 
 import { getSafeEnv } from './get-safe-env';
@@ -30,7 +30,7 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
   ${domain ? `data-clerk-domain="${domain}"` : ``}
   ></script>`;
 
-  if (!shouldPrefetchClerkUI(env.prefetchUI)) {
+  if (env.prefetchUI === false) {
     return clerkJsScript + '\n';
   }
 

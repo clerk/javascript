@@ -2,7 +2,6 @@ import {
   loadClerkJSScript,
   loadClerkUIScript,
   setClerkJSLoadingErrorPackageName,
-  shouldPrefetchClerkUI,
 } from '@clerk/shared/loadClerkJsScript';
 import type { ClerkOptions } from '@clerk/shared/types';
 import type { ClerkUiConstructor } from '@clerk/shared/ui';
@@ -122,7 +121,7 @@ async function getClerkUIEntryChunk<TUi extends Ui = Ui>(
     return options.clerkUICtor;
   }
 
-  if (!shouldPrefetchClerkUI(options?.prefetchUI)) {
+  if (options?.prefetchUI === false) {
     return undefined;
   }
 

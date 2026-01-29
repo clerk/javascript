@@ -11,7 +11,6 @@ import {
   loadClerkJsScript,
   loadClerkUIScript,
   setClerkJsLoadingErrorPackageName,
-  shouldPrefetchClerkUI,
 } from '../loadClerkJsScript';
 import { loadScript } from '../loadScript';
 import { getMajorVersion } from '../versionSelector';
@@ -465,16 +464,3 @@ describe('buildClerkUIScriptAttributes()', () => {
   });
 });
 
-describe('shouldPrefetchClerkUI()', () => {
-  test('returns true when prefetchUI is undefined', () => {
-    expect(shouldPrefetchClerkUI(undefined)).toBe(true);
-  });
-
-  test('returns false when prefetchUI is false', () => {
-    expect(shouldPrefetchClerkUI(false)).toBe(false);
-  });
-
-  test('returns true when prefetchUI is true', () => {
-    expect(shouldPrefetchClerkUI(true)).toBe(true);
-  });
-});

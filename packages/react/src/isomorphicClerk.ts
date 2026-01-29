@@ -1,6 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
-import { loadClerkJSScript, loadClerkUIScript, shouldPrefetchClerkUI } from '@clerk/shared/loadClerkJsScript';
+import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
@@ -519,7 +519,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return this.options.clerkUICtor;
     }
 
-    if (!shouldPrefetchClerkUI(this.options.prefetchUI)) {
+    if (this.options.prefetchUI === false) {
       return undefined;
     }
 
