@@ -37,7 +37,7 @@ export const UVFactorOnePasskeysCard = (props: UVFactorOnePasskeysCard) => {
   return (
     <Card.Root>
       <Card.Content>
-        <Header.Root showLogo>
+        <Header.Root>
           <Header.Title localizationKey={localizationKeys('reverification.passkey.title')} />
           <Header.Subtitle localizationKey={localizationKeys('reverification.passkey.subtitle')} />
         </Header.Root>

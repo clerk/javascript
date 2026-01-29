@@ -8,8 +8,7 @@ import { Header } from '@/ui/elements/Header';
 import { IdentityPreview } from '@/ui/elements/IdentityPreview';
 
 import { useCoreSignIn } from '../../contexts';
-import { descriptors, Flex, Flow, Icon, localizationKeys } from '../../customizables';
-import { Fingerprint } from '../../icons';
+import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { useRouter } from '../../router/RouteContext';
 import { HavingTrouble } from './HavingTrouble';
 import { useHandleAuthenticateWithPasskey } from './shared';
@@ -47,17 +46,6 @@ export const SignInFactorOnePasskey = (props: SignInFactorOnePasswordProps) => {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Icon
-              elementDescriptor={descriptors.passkeyIcon}
-              icon={Fingerprint}
-              sx={t => ({
-                color: t.colors.$neutralAlpha500,
-                marginInline: 'auto',
-                paddingBottom: t.sizes.$1,
-                width: t.sizes.$12,
-                height: t.sizes.$12,
-              })}
-            />
             <Header.Title localizationKey={localizationKeys('signIn.passkey.title')} />
             <Header.Subtitle localizationKey={localizationKeys('signIn.passkey.subtitle')} />
             <IdentityPreview
