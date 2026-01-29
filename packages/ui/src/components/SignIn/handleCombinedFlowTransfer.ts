@@ -7,7 +7,6 @@ import type {
   SessionResource,
   SignUpModes,
   SignUpResource,
-  SignUpUnsafeMetadata,
 } from '@clerk/shared/types';
 
 import type { RouteContextValue } from '../../router/RouteContext';

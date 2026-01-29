@@ -132,8 +132,9 @@ export const useSignUpContext = (): SignUpContextType => {
       // Use decorateUrl to enable Safari ITP cookie refresh when needed
       const decoratedUrl = decorateUrl(redirectUrl);
 
-      // If decorateUrl returns an external URL (Safari ITP fix), do a full page navigation
-      if (decoratedUrl.startsWith('https://')) {
+      // If decorateUrl modified the URL (Safari ITP fix), do a full page navigation
+      // The touch endpoint URL will be an absolute URL starting with http:// or https://
+      if (decoratedUrl !== redirectUrl && /^https?:\/\//.test(decoratedUrl)) {
         window.location.href = decoratedUrl;
         return;
       }
