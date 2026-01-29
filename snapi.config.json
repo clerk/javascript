@@ -1,0 +1,16 @@
+{
+  "packages": [
+    "packages/backend",
+    "packages/clerk-js",
+    "packages/express",
+    "packages/fastify",
+    "packages/nextjs",
+    "packages/react",
+    "packages/shared",
+    "packages/vue"
+  ],
+  "snapshotDir": ".api-snapshots",
+  "mainBranch": "main",
+  "checkVersionBump": true,
+  "outputFormat": "markdown"
+}
