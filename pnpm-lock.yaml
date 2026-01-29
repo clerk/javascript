@@ -548,6 +548,18 @@ importers:
         specifier: ^5.10.0
         version: 5.10.0
 
+  packages/clerk-js-pinned:
+    devDependencies:
+      '@clerk/shared':
+        specifier: workspace:^
+        version: link:../shared
+      dts-bundle-generator:
+        specifier: ^9.5.1
+        version: 9.5.1
+      tsdown:
+        specifier: catalog:repo
+        version: 0.15.7(publint@0.3.15)(typescript@5.8.3)(vue-tsc@3.1.4(typescript@5.8.3))
+
   packages/dev-cli:
     dependencies:
       commander:
@@ -1054,6 +1066,21 @@ importers:
       webpack-merge:
         specifier: ^5.10.0
         version: 5.10.0
+
+  packages/ui-pinned:
+    devDependencies:
+      '@clerk/shared':
+        specifier: workspace:^
+        version: link:../shared
+      '@clerk/ui':
+        specifier: workspace:^
+        version: link:../ui
+      dts-bundle-generator:
+        specifier: ^9.5.1
+        version: 9.5.1
+      tsdown:
+        specifier: catalog:repo
+        version: 0.15.7(publint@0.3.15)(typescript@5.8.3)(vue-tsc@3.1.4(typescript@5.8.3))
 
   packages/upgrade:
     dependencies:
@@ -7832,6 +7859,11 @@ packages:
   dset@3.1.4:
     resolution: {integrity: sha512-2QF/g9/zTaPDc3BjNcVTGoBbXBgYfMTTceLaYcFJ/W9kggFUkhxD/hMEeuLKbugyef9SqAx8cpgwlIP/jinUTA==}
     engines: {node: '>=4'}
+
+  dts-bundle-generator@9.5.1:
+    resolution: {integrity: sha512-DxpJOb2FNnEyOzMkG11sxO2dmxPjthoVWxfKqWYJ/bI/rT1rvTMktF5EKjAYrRZu6Z6t3NhOUZ0sZ5ZXevOfbA==}
+    engines: {node: '>=14.0.0'}
+    hasBin: true
 
   dts-resolver@2.1.2:
     resolution: {integrity: sha512-xeXHBQkn2ISSXxbJWD828PFjtyg+/UrMDo7W4Ffcs7+YWCquxU8YjV1KoxuiL+eJ5pg3ll+bC6flVv61L3LKZg==}
@@ -23980,6 +24012,11 @@ snapshots:
   dotenv@17.2.3: {}
 
   dset@3.1.4: {}
+
+  dts-bundle-generator@9.5.1:
+    dependencies:
+      typescript: 5.8.3
+      yargs: 17.7.2
 
   dts-resolver@2.1.2: {}
 
