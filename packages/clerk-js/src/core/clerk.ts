@@ -1604,7 +1604,7 @@ export class Clerk implements ClerkInterface {
                 'Clerk: The navigate callback in setActive() did not call decorateUrl(). ' +
                   'In Safari, sessions may be limited to 7 days due to Intelligent Tracking Prevention (ITP). ' +
                   'Use decorateUrl() to wrap your destination URL to enable the ITP workaround. ' +
-                  'Learn more: https://clerk.com/docs/references/javascript/clerk/session-methods#safari-cookie-limitations',
+                  'Learn more: https://clerk.com/docs/reference/javascript/clerk#safari-cookie-limitations',
               );
             }
           } else if (redirectUrl) {
