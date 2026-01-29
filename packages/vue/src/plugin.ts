@@ -83,11 +83,11 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
       void (async () => {
         try {
           const clerkPromise = loadClerkJSScript(options);
-          // Skip UI loading when prefetchUI={false}
-          const clerkUICtorPromise = !shouldPrefetchClerkUI(pluginOptions.prefetchUI)
-            ? Promise.resolve(undefined)
-            : pluginOptions.clerkUICtor
-              ? Promise.resolve(pluginOptions.clerkUICtor)
+          // Honor explicit clerkUICtor even when prefetchUI={false}
+          const clerkUICtorPromise = pluginOptions.clerkUICtor
+            ? Promise.resolve(pluginOptions.clerkUICtor)
+            : !shouldPrefetchClerkUI(pluginOptions.prefetchUI)
+              ? Promise.resolve(undefined)
               : (async () => {
                   await loadClerkUIScript(options);
                   if (!window.__internal_ClerkUICtor) {

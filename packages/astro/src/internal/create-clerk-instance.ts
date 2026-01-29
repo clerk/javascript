@@ -117,12 +117,13 @@ async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCre
 async function getClerkUIEntryChunk<TUi extends Ui = Ui>(
   options?: AstroClerkCreateInstanceParams<TUi>,
 ): Promise<ClerkUiConstructor | undefined> {
-  if (!shouldPrefetchClerkUI(options?.prefetchUI)) {
-    return undefined;
-  }
-
+  // Honor explicit clerkUICtor even when prefetchUI=false
   if (options?.clerkUICtor) {
     return options.clerkUICtor;
+  }
+
+  if (!shouldPrefetchClerkUI(options?.prefetchUI)) {
+    return undefined;
   }
 
   await loadClerkUIScript(options as any);

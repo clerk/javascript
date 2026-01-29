@@ -514,12 +514,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor | undefined> {
-    if (!shouldPrefetchClerkUI(this.options.prefetchUI)) {
-      return undefined;
-    }
-
+    // Honor explicit clerkUICtor even when prefetchUI=false
     if (this.options.clerkUICtor) {
       return this.options.clerkUICtor;
+    }
+
+    if (!shouldPrefetchClerkUI(this.options.prefetchUI)) {
+      return undefined;
     }
 
     await loadClerkUIScript({
