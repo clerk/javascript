@@ -594,7 +594,7 @@ test.describe('api keys component @machine', () => {
 
       const getAPIKeyCount = createAPIKeyCountHelper(u);
 
-      // Use a unique search term with timestamp to avoid matching leftover keys from previous test runs
+      // Create a specific search term that will match our new key
       const timestamp = Date.now();
       const searchTerm = `searchfilter-${timestamp}`;
       const newApiKeyName = `${searchTerm}-key`;
@@ -605,14 +605,13 @@ test.describe('api keys component @machine', () => {
 
       // Wait for search to actually filter results - either empty state appears
       // or the loading/fetching state completes with no matching results.
-      // The unique timestamp-based search term should never match existing keys.
       await expect(async () => {
         const emptyMessage = u.page.locator('[data-localization-key*="emptyRow"]');
         const isEmptyVisible = await emptyMessage.isVisible().catch(() => false);
         expect(isEmptyVisible).toBe(true);
       }).toPass({ timeout: 10000 });
 
-      // Verify no results initially match (unique timestamp-based search term)
+      // Verify no results initially match
       expect(await getAPIKeyCount()).toBe(0);
 
       // Create API key that matches the search
@@ -642,16 +641,6 @@ test.describe('api keys component @machine', () => {
         { timeout: 5000 },
       );
       await expect(table.locator('.cl-tableRow', { hasText: newApiKeyName })).toBeVisible();
-
-      // Clean up - revoke the API key created in this test
-      const menuButton = table.locator('.cl-tableRow', { hasText: newApiKeyName }).locator('.cl-menuButton');
-      await menuButton.click();
-      const revokeButton = u.page.getByRole('menuitem', { name: 'Revoke key' });
-      await revokeButton.click();
-      await u.po.apiKeys.waitForRevokeModalOpened();
-      await u.po.apiKeys.typeRevokeConfirmation('Revoke');
-      await u.po.apiKeys.clickConfirmRevokeButton();
-      await u.po.apiKeys.waitForRevokeModalClosed();
     });
 
     test('api key list invalidation: works when on second page of results', async ({ page, context }) => {
