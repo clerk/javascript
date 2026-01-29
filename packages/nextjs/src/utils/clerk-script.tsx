@@ -67,6 +67,9 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
     clerkUIVariant: clerkUIVariant ?? DEFAULT_CLERK_UI_VARIANT,
   };
 
+  const uiScriptUrl = clerkUiScriptUrl(opts);
+  const isSharedVariant = opts.clerkUIVariant === 'shared';
+
   return (
     <>
       <ClerkScript
@@ -75,14 +78,23 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
         dataAttribute='data-clerk-js-script'
         router={router}
       />
-      {clerkJSVariant !== 'headless' && (
-        <ClerkScript
-          scriptUrl={clerkUiScriptUrl(opts)}
-          attributes={buildClerkUiScriptAttributes(opts)}
-          dataAttribute='data-clerk-ui-script'
-          router={router}
-        />
-      )}
+      {clerkJSVariant !== 'headless' &&
+        (isSharedVariant ? (
+          <link
+            rel='preload'
+            href={uiScriptUrl}
+            as='script'
+            crossOrigin='anonymous'
+            nonce={nonce}
+          />
+        ) : (
+          <ClerkScript
+            scriptUrl={uiScriptUrl}
+            attributes={buildClerkUiScriptAttributes(opts)}
+            dataAttribute='data-clerk-ui-script'
+            router={router}
+          />
+        ))}
     </>
   );
 }

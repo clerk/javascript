@@ -35,7 +35,7 @@ export const createLogger = (opts: CreateLoggerOptions) => {
       }
     },
     warn: (msg: string, error?: unknown) => {
-      const errorMsg = error instanceof Error ? error.message : String(error ?? '');
+      const errorMsg = error instanceof Error ? error.message : typeof error === 'string' ? error : '';
       const fullMsg = errorMsg ? `${msg} ${errorMsg}` : msg;
       console.warn(`${chalk.yellow(`[${prefix}]`)} ${fullMsg}`);
     },
