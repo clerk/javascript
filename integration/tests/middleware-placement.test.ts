@@ -78,8 +78,8 @@ test.describe('next start - missing middleware @quickstart', () => {
 
     const expectedMessage =
       major >= 16
-        ? 'Your Middleware exists at ./src/middleware.(ts|js) or proxy.(ts|js)'
-        : 'Your Middleware exists at ./src/middleware.(ts|js)';
+        ? 'Your middleware or proxy file exists at ./src/middleware.(ts|js) or proxy.(ts|js)'
+        : 'Your middleware file exists at ./src/middleware.(ts|js)';
     expect(app.serveOutput).toContain(expectedMessage);
   });
 });
@@ -113,8 +113,8 @@ test.describe('next start - invalid middleware at root on src/ @quickstart', () 
 
     const expectedMessage =
       major >= 16
-        ? 'Your Middleware exists at ./src/middleware.(ts|js) or proxy.(ts|js)'
-        : 'Your Middleware exists at ./src/middleware.(ts|js)';
+        ? 'Your middleware or proxy file exists at ./src/middleware.(ts|js) or proxy.(ts|js)'
+        : 'Your middleware file exists at ./src/middleware.(ts|js)';
     expect(app.serveOutput).not.toContain(expectedMessage);
     const expectedError =
       major >= 16
@@ -160,8 +160,8 @@ test.describe('next start - invalid middleware inside app on src/ @quickstart', 
     await u.page.goToAppHome();
     const expectedMessage =
       major >= 16
-        ? 'Your Middleware exists at ./src/middleware.(ts|js) or proxy.(ts|js)'
-        : 'Your Middleware exists at ./src/middleware.(ts|js)';
+        ? 'Your middleware or proxy file exists at ./src/middleware.(ts|js) or proxy.(ts|js)'
+        : 'Your middleware file exists at ./src/middleware.(ts|js)';
     expect(app.serveOutput).not.toContain(expectedMessage);
     const expectedError =
       major >= 16

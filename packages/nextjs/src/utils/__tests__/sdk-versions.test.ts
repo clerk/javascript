@@ -162,4 +162,33 @@ describe('sdk-versions', () => {
       expect(isNext16OrHigher).toBe(false);
     });
   });
+
+  describe('middlewareFileReference', () => {
+    it('should return "middleware or proxy" for Next.js 16+', async () => {
+      vi.doMock('next/package.json', () => ({
+        default: { version: '16.0.0' },
+      }));
+
+      const { middlewareFileReference } = await import('../sdk-versions.js');
+      expect(middlewareFileReference).toBe('middleware or proxy');
+    });
+
+    it('should return "middleware" for Next.js < 16', async () => {
+      vi.doMock('next/package.json', () => ({
+        default: { version: '15.9.9' },
+      }));
+
+      const { middlewareFileReference } = await import('../sdk-versions.js');
+      expect(middlewareFileReference).toBe('middleware');
+    });
+
+    it('should return "middleware or proxy" for Next.js 17+', async () => {
+      vi.doMock('next/package.json', () => ({
+        default: { version: '17.0.0' },
+      }));
+
+      const { middlewareFileReference } = await import('../sdk-versions.js');
+      expect(middlewareFileReference).toBe('middleware or proxy');
+    });
+  });
 });

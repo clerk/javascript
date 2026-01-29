@@ -11,7 +11,7 @@ import { unauthorized } from '../../server/nextErrors';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData } from '../../server/utils';
-import { isNext16OrHigher } from '../../utils/sdk-versions';
+import { middlewareFileReference } from '../../utils/sdk-versions';
 import { buildRequestLike } from './utils';
 
 /**
@@ -77,15 +77,18 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
   const stepsBasedOnSrcDirectory = async () => {
     try {
       const isSrcAppDir = await import('../../server/fs/middleware-location.js').then(m => m.hasSrcAppDir());
-      const fileName = isNext16OrHigher ? 'middleware.(ts|js) or proxy.(ts|js)' : 'middleware.(ts|js)';
-      return [`Your Middleware exists at ./${isSrcAppDir ? 'src/' : ''}${fileName}`];
+      const fileName =
+        middlewareFileReference === 'middleware or proxy'
+          ? 'middleware.(ts|js) or proxy.(ts|js)'
+          : 'middleware.(ts|js)';
+      return [`Your ${middlewareFileReference} file exists at ./${isSrcAppDir ? 'src/' : ''}${fileName}`];
     } catch {
       return [];
     }
   };
   const authObject = await createAsyncGetAuth({
     debugLoggerName: 'auth()',
-    noAuthStatusMessage: authAuthHeaderMissing('auth', await stepsBasedOnSrcDirectory()),
+    noAuthStatusMessage: authAuthHeaderMissing('auth', await stepsBasedOnSrcDirectory(), middlewareFileReference),
   })(request, {
     treatPendingAsSignedOut: options?.treatPendingAsSignedOut,
     acceptsToken: options?.acceptsToken ?? TokenType.SessionToken,
