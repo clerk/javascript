@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: '复制并关闭',
+      formHint: '出于安全原因，我们不会允许您稍后再次查看。',
+      formTitle: '立即复制您的"{{name}}" API密钥',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const zhCN: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API密钥',
+  formFieldLabel__apiKeyDescription: '描述',
+  formFieldLabel__apiKeyExpiration: '过期时间',
+  formFieldLabel__apiKeyName: '密钥名称',
   formFieldLabel__automaticInvitations: '为此域名启用自动邀请',
   formFieldLabel__backupCode: '备用代码',
   formFieldLabel__confirmDeletion: '确认',
@@ -384,6 +390,12 @@ export const zhCN: LocalizationResource = {
         headerTitle__invitations: '邀请',
         headerTitle__members: '成员',
         headerTitle__requests: '请求',
+      },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: '角色暂时被锁定',
+          subtitle: '我们正在更新可用角色。完成后，您将能够再次更新角色。',
+        },
       },
     },
     navbar: {
@@ -596,6 +608,12 @@ export const zhCN: LocalizationResource = {
       subtitle: '继续使用 {{applicationName}}',
       title: '查看您的电子邮件',
     },
+    emailCodeMfa: {
+      formTitle: '查看您的电子邮件',
+      resendButton: '未收到验证码？重新发送',
+      subtitle: '继续使用 {{applicationName}}',
+      title: '查看您的电子邮件',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -631,6 +649,12 @@ export const zhCN: LocalizationResource = {
         titleNewTab: '在其他标签页上登录',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: '使用发送到您电子邮件的验证链接',
+      resendButton: '没有收到链接？重新发送',
+      subtitle: '继续使用 {{applicationName}}',
+      title: '查看您的电子邮件',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -648,6 +672,7 @@ export const zhCN: LocalizationResource = {
       label__alternativeMethods: '或者，使用其他方式登录。',
       title: '忘记密码？',
     },
+    newDeviceVerificationNotice: '您正在从新设备登录。我们需要验证以保护您的账户安全。',
     noAvailableMethods: {
       message: '无法继续登录。没有可用的身份验证因素。',
       subtitle: '出现错误',
@@ -662,7 +687,13 @@ export const zhCN: LocalizationResource = {
       subtitle: '继续使用 {{applicationName}}',
       title: '输入您的密码',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -711,6 +742,10 @@ export const zhCN: LocalizationResource = {
       formTitle: '验证码',
       subtitle: '请继续输入由您的身份验证应用生成的验证码。',
       title: '两步验证',
+    },
+    web3Solana: {
+      subtitle: '请选择下方的钱包进行登录',
+      title: '使用 Solana 登录',
     },
   },
   signInEnterPasswordTitle: '输入您的密码',
@@ -802,42 +837,68 @@ export const zhCN: LocalizationResource = {
       title: '创建您的账户',
       titleCombined: '创建您的账户',
     },
+    web3Solana: {
+      subtitle: '请选择下方的钱包进行注册',
+      title: '使用 Solana 注册',
+    },
   },
   socialButtonsBlockButton: '使用 {{provider|titleize}} 登录',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: '创建新组织',
+      action__invitationAccept: '加入',
+      action__suggestionsAccept: '请求加入',
+      subtitle: '加入现有组织或创建新组织',
+      subtitle__createOrganizationDisabled: '加入现有组织',
+      suggestionsAcceptedLabel: '等待批准',
+      title: '选择组织',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: '取消',
+      formButtonSubmit: '继续',
+      formFieldInputPlaceholder__name: '我的组织',
+      formFieldInputPlaceholder__slug: 'wo-de-zu-zhi',
+      formFieldLabel__name: '名称',
+      formFieldLabel__slug: 'Slug',
+      subtitle: '输入您的组织详细信息以继续',
+      title: '设置您的组织',
     },
+    organizationCreationDisabled: {
+      title: '您必须属于一个组织',
+      subtitle: '请联系您的组织管理员获取邀请。',
+    },
+    signOut: {
+      actionLink: '退出',
+      actionText: '已登录为 {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        '检测到的公司名称 ({{organizationName}}) 和 {{organizationDomain}} 已存在一个组织。请通过邀请加入。',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
+    title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: '文件大小超过10MB的最大限制。请选择一个较小的文件。',
+    avatar_file_type_invalid: '不支持的文件类型。请上传 JPG、PNG、GIF 或 WEBP 格式的图片。',
     captcha_invalid: '由于安全验证失败，注册未成功。请刷新页面重试或联系支持获取更多帮助。',
     captcha_unavailable: '注册失败，原因是未通过机器人验证。请刷新页面重试或联系支持团队以获取更多帮助。',
     form_code_incorrect: undefined,
+    form_email_address_blocked: '不支持临时电子邮件服务。请使用您的常规电子邮件地址创建账户。',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: '我们无法找到具有这些信息的账户。',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: '邮箱地址必须是有效的邮箱格式。',
     form_param_format_invalid__phone_number: '电话号码必须符合有效的国际格式。',
@@ -850,14 +911,17 @@ export const zhCN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: '密码或电子邮件地址不正确。请重试或使用其他方法。',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: '您的密码强度不够。',
     form_password_pwned: '这个密码在数据泄露中被发现，不能使用，请换一个密码试试。',
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded: '您的密码超过了允许的最大字节数，请缩短它或去掉一些特殊字符。',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: '密码错误',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: '您的用户名必须包含至少一个非数字字符。',
     identification_deletion_failed: '您无法删除最后一个身份标识。',
     not_allowed_access:
       "您使用的电子邮件地址或电话号码不允许注册。这可能是因为您在电子邮件地址中使用了 '+', '=', '#' 或 '.'，使用了与临时电子邮件服务关联的域名，或者有明确的排除。如果您认为这是错误，请联系支持。",
@@ -885,6 +949,8 @@ export const zhCN: LocalizationResource = {
     phone_number_exists: '该电话号码已被使用，请尝试其他号码。',
     session_exists: '您已登录。',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: '您已拒绝签名请求。请重试以继续。',
+    web3_solana_signature_generation_failed: '生成签名时发生错误。请重试以继续。',
     zxcvbn: {
       couldBeStronger: '您的密码可以用，但可以更强。试着添加更多字符。',
       goodPassword: '做得好。这是一个优秀的密码。',
@@ -1239,6 +1305,10 @@ export const zhCN: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 钱包',
         title: 'Web3 钱包',
+        web3SelectSolanaWalletScreen: {
+          subtitle: '选择一个 Solana 钱包以连接到您的账户。',
+          title: '添加 Solana 钱包',
+        },
       },
     },
     usernamePage: {
@@ -1262,16 +1332,22 @@ export const zhCN: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: '登录',
+      actionText: '已有访问权限？',
+      formButton: '加入候补名单',
+      subtitle: '输入您的电子邮件地址，我们会在您的位置准备好时通知您',
+      title: '加入候补名单',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: '您将很快被重定向...',
+      subtitle: '当您的位置准备好时，我们会与您联系',
+      title: '感谢您加入候补名单！',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '使用 {{walletName}} 连接',
+    continue: '使用 {{walletName}} 继续',
+    noneAvailable:
+      '未检测到 Solana Web3 钱包。请安装支持 Web3 的 {{ solanaWalletsLink || link("wallet extension") }}。',
   },
 } as const;

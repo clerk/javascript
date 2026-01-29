@@ -1,0 +1,44 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "dev:sandbox": {
+      "cache": false,
+      "dependsOn": ["build"],
+      "persistent": true
+    },
+    "build": {
+      "inputs": [
+        "*.d.ts",
+        "src/**",
+        "tsconfig.json",
+        "tsconfig.declarations.json",
+        "rspack.config.js",
+
+        "!**/*.test.*",
+        "!**/test/**",
+        "!**/tests/**",
+        "!**/__tests__/**",
+        "!**/__mocks__/**",
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
+      ]
+    },
+    "test": {
+      "inputs": [
+        "*.d.ts",
+        "src/**",
+        "tests/**",
+        "tsconfig.json",
+        "tsconfig.*.json",
+        "rspack.config.js",
+
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
+      ]
+    }
+  }
+}

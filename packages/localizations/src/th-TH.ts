@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
   apiKeys: {
     action__add: 'เพิ่มคีย์ใหม่',
     action__search: 'ค้นหาคีย์',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'คัดลอกและปิด',
+      formHint: 'ด้วยเหตุผลด้านความปลอดภัย เราจะไม่อนุญาตให้คุณดูอีกครั้งในภายหลัง',
+      formTitle: 'คัดลอกคีย์ API "{{name}}" ของคุณตอนนี้',
+    },
     createdAndExpirationStatus__expiresOn:
       "สร้างเมื่อ {{ createdDate | shortDate('th-TH') }} • หมดอายุ {{ expiresDate | longDate('th-TH') }}",
     createdAndExpirationStatus__never: "สร้างเมื่อ {{ createdDate | shortDate('th-TH') }} • ไม่มีวันหมดอายุ",
@@ -224,6 +229,7 @@ export const thTH: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'ใส่หมายเลขโทรศัพท์ของคุณ',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'คีย์ API',
   formFieldLabel__apiKeyDescription: 'คำอธิบาย',
   formFieldLabel__apiKeyExpiration: 'วันหมดอายุ',
   formFieldLabel__apiKeyName: 'ชื่อคีย์ลับ',
@@ -392,6 +398,12 @@ export const thTH: LocalizationResource = {
         headerTitle__invitations: 'คำเชิญ',
         headerTitle__members: 'สมาชิก',
         headerTitle__requests: 'คำขอ',
+      },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'บทบาทถูกล็อคชั่วคราว',
+          subtitle: 'เรากำลังอัปเดตบทบาทที่มีอยู่ เมื่อเสร็จแล้ว คุณจะสามารถอัปเดตบทบาทได้อีกครั้ง',
+        },
       },
     },
     navbar: {
@@ -608,6 +620,12 @@ export const thTH: LocalizationResource = {
       subtitle: 'เพื่อดำเนินการต่อไปยัง {{applicationName}}',
       title: 'ตรวจสอบอีเมลของคุณ',
     },
+    emailCodeMfa: {
+      formTitle: 'ตรวจสอบอีเมลของคุณ',
+      resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
+      subtitle: 'เพื่อดำเนินการต่อไปยัง {{applicationName}}',
+      title: 'ตรวจสอบอีเมลของคุณ',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'เพื่อดำเนินการต่อ เปิดลิงก์ยืนยันในอุปกรณ์และเบราว์เซอร์ที่คุณเริ่มต้นการเข้าสู่ระบบ',
@@ -643,6 +661,12 @@ export const thTH: LocalizationResource = {
         titleNewTab: 'เข้าสู่ระบบในแท็บอื่น',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'ใช้ลิงก์ยืนยันที่ส่งไปยังอีเมลของคุณ',
+      resendButton: 'ไม่ได้รับลิงก์? ส่งอีกครั้ง',
+      subtitle: 'เพื่อดำเนินการต่อที่ {{applicationName}}',
+      title: 'ตรวจสอบอีเมลของคุณ',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -660,6 +684,8 @@ export const thTH: LocalizationResource = {
       label__alternativeMethods: 'หรือ เข้าสู่ระบบด้วยวิธีอื่น',
       title: 'ลืมรหัสผ่าน?',
     },
+    newDeviceVerificationNotice:
+      'คุณกำลังเข้าสู่ระบบจากอุปกรณ์ใหม่ เรากำลังขอการยืนยันเพื่อรักษาความปลอดภัยของบัญชีของคุณ',
     noAvailableMethods: {
       message: 'ไม่สามารถดำเนินการเข้าสู่ระบบได้ ไม่มีปัจจัยการยืนยันตัวตนที่สามารถใช้ได้',
       subtitle: 'เกิดข้อผิดพลาด',
@@ -674,8 +700,14 @@ export const thTH: LocalizationResource = {
       subtitle: 'ใส่รหัสผ่านที่เชื่อมโยงกับบัญชีของคุณ',
       title: 'ใส่รหัสผ่านของคุณ',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'รหัสผ่านถูกโจรกรรม',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'รหัสยืนยัน',
@@ -723,6 +755,10 @@ export const thTH: LocalizationResource = {
       formTitle: 'รหัสยืนยัน',
       subtitle: 'เพื่อดำเนินการต่อ โปรดใส่รหัสยืนยันที่สร้างโดยแอป Authenticator ของคุณ',
       title: 'การยืนยันตัวตนสองขั้นตอน',
+    },
+    web3Solana: {
+      subtitle: 'เลือกกระเป๋าเงินด้านล่างเพื่อเข้าสู่ระบบ',
+      title: 'เข้าสู่ระบบด้วย Solana',
     },
   },
   signInEnterPasswordTitle: 'ใส่รหัสผ่านของคุณ',
@@ -815,6 +851,10 @@ export const thTH: LocalizationResource = {
       title: 'สร้างบัญชีของคุณ',
       titleCombined: 'สร้างบัญชีของคุณ',
     },
+    web3Solana: {
+      subtitle: 'เลือกกระเป๋าเงินด้านล่างเพื่อสมัครใช้งาน',
+      title: 'สมัครใช้งานด้วย Solana',
+    },
   },
   socialButtonsBlockButton: 'ดำเนินการต่อด้วย {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -824,6 +864,7 @@ export const thTH: LocalizationResource = {
       action__invitationAccept: 'เข้าร่วม',
       action__suggestionsAccept: 'ขอเข้าร่วม',
       subtitle: 'เข้าร่วมองค์กรที่มีอยู่หรือสร้างใหม่',
+      subtitle__createOrganizationDisabled: 'เข้าร่วมองค์กรที่มีอยู่',
       suggestionsAcceptedLabel: 'รออนุมัติ',
       title: 'เลือกองค์กร',
     },
@@ -837,21 +878,42 @@ export const thTH: LocalizationResource = {
       subtitle: 'ใส่รายละเอียดองค์กรของคุณเพื่อดำเนินการต่อ',
       title: 'ตั้งค่าองค์กรของคุณ',
     },
+    organizationCreationDisabled: {
+      title: 'คุณต้องเป็นสมาชิกขององค์กร',
+      subtitle: 'ติดต่อผู้ดูแลระบบขององค์กรของคุณเพื่อขอคำเชิญ',
+    },
     signOut: {
       actionLink: 'ออกจากระบบ',
       actionText: 'เข้าสู่ระบบในนาม {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'องค์กรสำหรับชื่อบริษัทที่ตรวจพบ ({{organizationName}}) และ {{organizationDomain}} มีอยู่แล้ว เข้าร่วมโดยการเชิญ',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} เป็นสมาชิกขององค์กรอยู่แล้ว',
+    avatar_file_size_exceeded: 'ขนาดไฟล์เกินขีดจำกัดสูงสุด 10MB กรุณาเลือกไฟล์ที่เล็กกว่า',
+    avatar_file_type_invalid: 'ประเภทไฟล์ไม่รองรับ กรุณาอัปโหลดรูปภาพ JPG, PNG, GIF หรือ WEBP',
     captcha_invalid: undefined,
     captcha_unavailable:
       'การสมัครสมาชิกไม่สำเร็จเนื่องจากการตรวจสอบความปลอดถัยล้มเหลว โปรดรีเฟรชหน้าเพื่อลองใหม่หรือติดต่อฝ่ายสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
     form_code_incorrect: undefined,
+    form_email_address_blocked: 'บริการอีเมลชั่วคราวไม่ได้รับการสนับสนุน กรุณาใช้อีเมลปกติของคุณเพื่อสร้างบัญชี',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: undefined,
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: undefined,
     form_param_format_invalid__phone_number: undefined,
@@ -864,6 +926,7 @@ export const thTH: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: 'รหัสผ่านหรือที่อยู่อีเมลไม่ถูกต้อง ลองอีกครั้งหรือใช้วิธีอื่น',
     form_password_length_too_short: 'รหัสผ่านของคุณสั้นเกินไป ต้องมีความยาวอย่างน้อย 8 ตัวอักษร',
     form_password_not_strong_enough: 'รหัสผ่านของคุณไม่แข็งแกร่งพอ',
     form_password_pwned:
@@ -871,9 +934,11 @@ export const thTH: LocalizationResource = {
     form_password_pwned__sign_in:
       'รหัสผ่านนี้ถูกพบว่าเป็นส่วนหนึ่งของรหัสผ่านที่เคยถูกโจรกรรมข้อมูลและไม่สามารถใช้ได้ โปรดรีเซ็ตรหัสผ่านของคุณ',
     form_password_size_in_bytes_exceeded: undefined,
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'ชื่อผู้ใช้ของคุณต้องมีความยาวระหว่าง {{min_length}} ถึง {{max_length}} ตัวอักษร',
+    form_username_needs_non_number_char: 'ชื่อผู้ใช้ของคุณต้องมีอักขระที่ไม่ใช่ตัวเลขอย่างน้อยหนึ่งตัว',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
@@ -901,6 +966,8 @@ export const thTH: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'ไม่พบส่วนขยาย Web3 Wallet โปรดติดตั้งเพื่อดำเนินการต่อ',
+    web3_signature_request_rejected: 'คุณได้ปฏิเสธคำขอการลงลายเซ็น โปรดลองอีกครั้งเพื่อดำเนินการต่อ',
+    web3_solana_signature_generation_failed: 'เกิดข้อผิดพลาดขณะสร้างลายเซ็น โปรดลองอีกครั้งเพื่อดำเนินการต่อ',
     zxcvbn: {
       couldBeStronger: 'รหัสผ่านของคุณใช้ได้ แต่อาจแข็งแกร่งกว่านี้ ลองเพิ่มตัวอักษรเพิ่มเติม',
       goodPassword: 'รหัสผ่านของคุณตรงตามข้อกำหนดที่จำเป็นทั้งหมด',
@@ -1264,6 +1331,10 @@ export const thTH: LocalizationResource = {
         detailsAction__nonPrimary: 'ตั้งเป็นหลัก',
         primaryButton: 'เชื่อมต่อวอลเล็ต',
         title: 'วอลเล็ต Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'เลือกกระเป๋าเงิน Solana เพื่อเชื่อมต่อกับบัญชีของคุณ',
+          title: 'เพิ่มกระเป๋าเงิน Solana',
+        },
       },
     },
     usernamePage: {
@@ -1298,5 +1369,11 @@ export const thTH: LocalizationResource = {
       subtitle: 'เราจะติดต่อเมื่อคิวของคุณพร้อม',
       title: 'ขอบคุณที่เข้าร่วม Waitlist!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'เชื่อมต่อด้วย {{walletName}}',
+    continue: 'ดำเนินการต่อด้วย {{walletName}}',
+    noneAvailable:
+      'ไม่พบกระเป๋าเงิน Solana Web3 โปรดติดตั้ง {{ solanaWalletsLink || link("wallet extension") }} ที่รองรับ Web3',
   },
 } as const;

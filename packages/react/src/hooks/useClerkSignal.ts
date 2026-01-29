@@ -1,4 +1,5 @@
-import type { SignInSignalValue, SignUpSignalValue } from '@clerk/shared/types';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
+import type { SignInSignalValue, SignUpSignalValue, WaitlistSignalValue } from '@clerk/shared/types';
 import { useCallback, useSyncExternalStore } from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -6,10 +7,27 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
 
 function useClerkSignal(signal: 'signIn'): SignInSignalValue;
 function useClerkSignal(signal: 'signUp'): SignUpSignalValue;
-function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUpSignalValue {
+function useClerkSignal(signal: 'waitlist'): WaitlistSignalValue;
+function useClerkSignal(
+  signal: 'signIn' | 'signUp' | 'waitlist',
+): SignInSignalValue | SignUpSignalValue | WaitlistSignalValue {
   useAssertWrappedByClerkProvider('useClerkSignal');
 
   const clerk = useIsomorphicClerkContext();
+
+  switch (signal) {
+    case 'signIn':
+      clerk.telemetry?.record(eventMethodCalled('useSignIn', { apiVersion: '2025-11' }));
+      break;
+    case 'signUp':
+      clerk.telemetry?.record(eventMethodCalled('useSignUp', { apiVersion: '2025-11' }));
+      break;
+    case 'waitlist':
+      clerk.telemetry?.record(eventMethodCalled('useWaitlist', { apiVersion: '2025-11' }));
+      break;
+    default:
+      break;
+  }
 
   const subscribe = useCallback(
     (callback: () => void) => {
@@ -25,6 +43,9 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUp
           case 'signUp':
             clerk.__internal_state.signUpSignal();
             break;
+          case 'waitlist':
+            clerk.__internal_state.waitlistSignal();
+            break;
           default:
             throw new Error(`Unknown signal: ${signal}`);
         }
@@ -39,6 +60,8 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUp
         return clerk.__internal_state.signInSignal() as SignInSignalValue;
       case 'signUp':
         return clerk.__internal_state.signUpSignal() as SignUpSignalValue;
+      case 'waitlist':
+        return clerk.__internal_state.waitlistSignal() as WaitlistSignalValue;
       default:
         throw new Error(`Unknown signal: ${signal}`);
     }
@@ -53,7 +76,7 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUp
  * This hook allows you to access the Signal-based `SignIn` resource.
  *
  * @example
- * import { useSignInSignal } from "@clerk/clerk-react/experimental";
+ * import { useSignIn } from "@clerk/react";
  *
  * function SignInForm() {
  *   const { signIn, errors, fetchStatus } = useSignInSignal();
@@ -62,7 +85,7 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUp
  *
  * @experimental This experimental API is subject to change.
  */
-export function useSignInSignal() {
+export function useSignIn() {
   return useClerkSignal('signIn');
 }
 
@@ -70,7 +93,7 @@ export function useSignInSignal() {
  * This hook allows you to access the Signal-based `SignUp` resource.
  *
  * @example
- * import { useSignUpSignal } from "@clerk/clerk-react/experimental";
+ * import { useSignUp } from "@clerk/react";
  *
  * function SignUpForm() {
  *   const { signUp, errors, fetchStatus } = useSignUpSignal();
@@ -79,6 +102,23 @@ export function useSignInSignal() {
  *
  * @experimental This experimental API is subject to change.
  */
-export function useSignUpSignal() {
+export function useSignUp() {
   return useClerkSignal('signUp');
+}
+
+/**
+ * This hook allows you to access the Signal-based `Waitlist` resource.
+ *
+ * @example
+ * import { useWaitlist } from "@clerk/react";
+ *
+ * function WaitlistForm() {
+ *   const { waitlist, errors, fetchStatus } = useWaitlist();
+ *   //
+ * }
+ *
+ * @experimental This experimental API is subject to change.
+ */
+export function useWaitlist() {
+  return useClerkSignal('waitlist');
 }

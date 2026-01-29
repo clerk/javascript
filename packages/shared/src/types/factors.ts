@@ -11,7 +11,6 @@ import type {
   PhoneCodeStrategy,
   ResetPasswordEmailCodeStrategy,
   ResetPasswordPhoneCodeStrategy,
-  SamlStrategy,
   TOTPStrategy,
   Web3Strategy,
 } from './strategies';
@@ -43,6 +42,7 @@ export type Web3SignatureFactor = {
   strategy: Web3Strategy;
   web3WalletId: string;
   primary?: boolean;
+  walletName?: string;
 };
 
 export type PasswordFactor = {
@@ -55,10 +55,6 @@ export type PasskeyFactor = {
 
 export type OauthFactor = {
   strategy: OAuthStrategy;
-};
-
-export type SamlFactor = {
-  strategy: SamlStrategy;
 };
 
 export type EnterpriseSSOFactor = {
@@ -115,11 +111,6 @@ export type OAuthConfig = OauthFactor & {
   oidcLoginHint?: string;
 };
 
-export type SamlConfig = SamlFactor & {
-  redirectUrl: string;
-  actionCompleteRedirectUrl: string;
-};
-
 export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
@@ -137,6 +128,11 @@ export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
 export type PhoneCodeSecondFactorConfig = {
   strategy: PhoneCodeStrategy;
   phoneNumberId?: string;
+};
+
+export type EmailCodeSecondFactorConfig = {
+  strategy: EmailCodeStrategy;
+  emailAddressId?: string;
 };
 
 export type EmailCodeAttempt = {

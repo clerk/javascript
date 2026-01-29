@@ -1,8 +1,10 @@
 import type { APIKeysSettingsResource } from './apiKeysSettings';
 import type { AuthConfigResource } from './authConfig';
 import type { CommerceSettingsResource } from './commerceSettings';
+import type { EnableEnvironmentSettingParams } from './devtools';
 import type { DisplayConfigResource } from './displayConfig';
 import type { OrganizationSettingsResource } from './organizationSettings';
+import type { ProtectConfigResource } from './protectConfig';
 import type { ClerkResource } from './resource';
 import type { EnvironmentJSONSnapshot } from './snapshots';
 import type { UserSettingsResource } from './userSettings';
@@ -14,6 +16,7 @@ export interface EnvironmentResource extends ClerkResource {
   displayConfig: DisplayConfigResource;
   commerceSettings: CommerceSettingsResource;
   apiKeysSettings: APIKeysSettingsResource;
+  protectConfig: ProtectConfigResource;
   isSingleSession: () => boolean;
   isProduction: () => boolean;
   isDevelopmentOrStaging: () => boolean;
@@ -21,4 +24,5 @@ export interface EnvironmentResource extends ClerkResource {
   maintenanceMode: boolean;
   clientDebugMode: boolean;
   __internal_toSnapshot: () => EnvironmentJSONSnapshot;
+  __internal_enableEnvironmentSetting: (params: EnableEnvironmentSettingParams) => Promise<void>;
 }

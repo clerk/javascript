@@ -2,7 +2,7 @@ name: Nightly upstream tests
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 7 * * *'
+    - cron: "0 7 * * *"
 
 jobs:
   integration-tests:
@@ -12,13 +12,15 @@ jobs:
 
     strategy:
       matrix:
-        test-name: ['nextjs']
+        test-name: ["nextjs"]
 
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Setup
@@ -30,19 +32,37 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true
 
+      - name: Version packages for snapshot
+        run: npm run version-packages:snapshot ci
+
       - name: Verdaccio
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
+            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag --tag latest; fi
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
-        run: pnpm init && pnpm add @clerk/backend
+        run: |
+          pnpm init
+          pnpm config set minimum-release-age-exclude @clerk/*
+          pnpm add @clerk/backend
 
       - name: Install @clerk/clerk-js in os temp
         working-directory: ${{runner.temp}}
-        run: mkdir clerk-js && cd clerk-js && pnpm init && pnpm add @clerk/clerk-js
+        run: |
+          mkdir clerk-js && cd clerk-js
+          pnpm init
+          pnpm config set minimum-release-age-exclude @clerk/*
+          pnpm add @clerk/clerk-js
+
+      - name: Install @clerk/ui in os temp
+        working-directory: ${{runner.temp}}
+        run: |
+          mkdir clerk-ui && cd clerk-ui
+          pnpm init
+          pnpm config set minimum-release-age-exclude @clerk/*
+          pnpm add @clerk/ui
 
       - name: Run Integration Tests
         id: integration_tests
@@ -59,13 +79,41 @@ jobs:
           echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: 'latest'
-          E2E_NEXTJS_VERSION: 'canary'
-          E2E_NPM_FORCE: 'true'
-          E2E_REACT_DOM_VERSION: '19.1.0'
-          E2E_REACT_VERSION: '19.1.0'
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          # Don't set E2E_CLERK_JS_VERSION - let it use '*' (via linkPackage)
+          # which matches any version including snapshots from verdaccio.
+          # Using "latest" would fail since snapshot packages don't have
+          # the "latest" dist-tag, causing fallback to npm's stable version.
+          E2E_NEXTJS_VERSION: "canary"
+          E2E_NPM_FORCE: "true"
+          E2E_REACT_DOM_VERSION: "19.2.3"
+          E2E_REACT_VERSION: "19.2.3"
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
-          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
+
+      # Print error logs for immediate visibility in CI
+      - name: Print App Error Logs
+        if: steps.integration_tests.outputs.exit_code != '0'
+        run: |
+          echo "=== Integration Test Failed ==="
+          echo ""
+          # Integration tests use os.tmpdir() which is /tmp on Linux
+          if [ -d /tmp/.temp_integration ]; then
+            echo "=== App Error Logs (.err.log files) ==="
+            find /tmp/.temp_integration -name "*.err.log" -type f 2>/dev/null | while read f; do
+              echo ""
+              echo "--- $f ---"
+              tail -100 "$f" 2>/dev/null || echo "(empty or not readable)"
+            done
+            echo ""
+            echo "=== App Stdout Logs (last 50 lines each) ==="
+            find /tmp/.temp_integration -name "e2e.*.log" -type f 2>/dev/null | while read f; do
+              echo ""
+              echo "--- $f ---"
+              tail -50 "$f" 2>/dev/null || echo "(empty or not readable)"
+            done
+          else
+            echo "=== No app logs found (directory /tmp/.temp_integration does not exist) ==="
+          fi
 
       # Upload test artifacts if tests failed
       - name: Upload Test Artifacts
@@ -75,9 +123,8 @@ jobs:
           name: test-artifacts-${{ matrix.test-name }}
           path: |
             ${{runner.temp}}/test-output.log
+            /tmp/.temp_integration/
             integration/test-results/
-            integration/.next/
-            ${{runner.temp}}/clerk-js/node_modules/
           retention-days: 7
 
       - name: Report Status
@@ -85,8 +132,8 @@ jobs:
         uses: ravsamhq/notify-slack-action@v1
         with:
           status: ${{ steps.integration_tests.outputs.exit_code == '0' && 'success' || 'failure' }}
-          notify_when: 'failure'
-          notification_title: 'Integration Test Failure - ${{ matrix.test-name }}'
+          notify_when: "failure"
+          notification_title: "Integration Test Failure - ${{ matrix.test-name }}"
           message_format: |
             *Job:* ${{ github.workflow }} (${{ matrix.test-name }})
             *Status:* ${{ steps.integration_tests.outputs.exit_code == '0' && 'Success' || 'Failed' }}

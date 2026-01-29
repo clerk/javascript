@@ -1,6 +1,5 @@
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
-  ClerkPaginatedResponse,
   CreateOrganizationParams,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationMembershipParams,
@@ -12,7 +11,10 @@ import type {
   UserOrganizationInvitationResource,
 } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
+import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
+import { createCacheKeys } from './createCacheKeys';
+import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -82,19 +84,19 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
        */
       createOrganization: undefined;
       /**
-       * A function that sets the active session and/or organization.
+       * A function that sets the active session and/or Organization.
        */
       setActive: undefined;
       /**
-       * Returns `PaginatedResources` which includes a list of the user's organization memberships.
+       * Returns `PaginatedResources` which includes a list of the user's Organization memberships.
        */
       userMemberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
       /**
-       * Returns `PaginatedResources` which includes a list of the user's organization invitations.
+       * Returns `PaginatedResources` which includes a list of the user's Organization invitations.
        */
       userInvitations: PaginatedResourcesWithDefault<UserOrganizationInvitationResource>;
       /**
-       * Returns `PaginatedResources` which includes a list of suggestions for organizations that the user can join.
+       * Returns `PaginatedResources` which includes a list of suggestions for Organizations that the user can join.
        */
       userSuggestions: PaginatedResourcesWithDefault<OrganizationSuggestionResource>;
     }
@@ -152,10 +154,10 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
  * @example
  * ### Infinite pagination
  *
- * The following example demonstrates how to use the `infinite` property to fetch and append new data to the existing list. The `userMemberships` attribute will be populated with the first page of the user's organization memberships. When the "Load more" button is clicked, the `fetchNext` helper function will be called to append the next page of memberships to the list.
+ * The following example demonstrates how to use the `infinite` property to fetch and append new data to the existing list. The `userMemberships` attribute will be populated with the first page of the user's Organization memberships. When the "Load more" button is clicked, the `fetchNext` helper function will be called to append the next page of memberships to the list.
  *
  * ```tsx {{ filename: 'src/components/JoinedOrganizations.tsx' }}
- * import { useOrganizationList } from '@clerk/clerk-react'
+ * import { useOrganizationList } from '@clerk/react'
  * import React from 'react'
  *
  * const JoinedOrganizations = () => {
@@ -198,7 +200,7 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
  * Notice the difference between this example's pagination and the infinite pagination example above.
  *
  * ```tsx {{ filename: 'src/components/UserInvitationsTable.tsx' }}
- * import { useOrganizationList } from '@clerk/clerk-react'
+ * import { useOrganizationList } from '@clerk/react'
  * import React from 'react'
  *
  * const UserInvitationsTable = () => {
@@ -250,6 +252,7 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
   const { userMemberships, userInvitations, userSuggestions } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganizationList');
+  useAttemptToEnableOrganizations('useOrganizationList');
 
   const userMembershipsSafeValues = useWithSafeValues(userMemberships, {
     initialPage: 1,
@@ -307,60 +310,72 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
 
   const isClerkLoaded = !!(clerk.loaded && user);
 
-  const memberships = usePagesOrInfinite<
-    GetUserOrganizationMembershipParams,
-    ClerkPaginatedResponse<OrganizationMembershipResource>
-  >(
-    userMembershipsParams || {},
-    user?.getOrganizationMemberships,
-    {
+  const memberships = usePagesOrInfinite({
+    fetcher: user?.getOrganizationMemberships,
+    config: {
       keepPreviousData: userMembershipsSafeValues.keepPreviousData,
       infinite: userMembershipsSafeValues.infinite,
       enabled: !!userMembershipsParams,
+      isSignedIn: user !== null,
+      initialPage: userMembershipsSafeValues.initialPage,
+      pageSize: userMembershipsSafeValues.pageSize,
     },
-    {
-      type: 'userMemberships',
-      userId: user?.id,
-    },
-  );
+    keys: createCacheKeys({
+      stablePrefix: STABLE_KEYS.USER_MEMBERSHIPS_KEY,
+      authenticated: true,
+      tracked: {
+        userId: user?.id,
+      },
+      untracked: {
+        args: userMembershipsParams,
+      },
+    }),
+  });
 
-  const invitations = usePagesOrInfinite<
-    GetUserOrganizationInvitationsParams,
-    ClerkPaginatedResponse<UserOrganizationInvitationResource>
-  >(
-    {
-      ...userInvitationsParams,
-    },
-    user?.getOrganizationInvitations,
-    {
+  const invitations = usePagesOrInfinite({
+    fetcher: user?.getOrganizationInvitations,
+    config: {
       keepPreviousData: userInvitationsSafeValues.keepPreviousData,
       infinite: userInvitationsSafeValues.infinite,
+      // In useOrganizationList, you need to opt in by passing an object or `true`.
       enabled: !!userInvitationsParams,
+      isSignedIn: user !== null,
+      initialPage: userInvitationsSafeValues.initialPage,
+      pageSize: userInvitationsSafeValues.pageSize,
     },
-    {
-      type: 'userInvitations',
-      userId: user?.id,
-    },
-  );
+    keys: createCacheKeys({
+      stablePrefix: STABLE_KEYS.USER_INVITATIONS_KEY,
+      authenticated: true,
+      tracked: {
+        userId: user?.id,
+      },
+      untracked: {
+        args: userInvitationsParams,
+      },
+    }),
+  });
 
-  const suggestions = usePagesOrInfinite<
-    GetUserOrganizationSuggestionsParams,
-    ClerkPaginatedResponse<OrganizationSuggestionResource>
-  >(
-    {
-      ...userSuggestionsParams,
-    },
-    user?.getOrganizationSuggestions,
-    {
+  const suggestions = usePagesOrInfinite({
+    fetcher: user?.getOrganizationSuggestions,
+    config: {
       keepPreviousData: userSuggestionsSafeValues.keepPreviousData,
       infinite: userSuggestionsSafeValues.infinite,
       enabled: !!userSuggestionsParams,
+      isSignedIn: user !== null,
+      initialPage: userSuggestionsSafeValues.initialPage,
+      pageSize: userSuggestionsSafeValues.pageSize,
     },
-    {
-      type: 'userSuggestions',
-      userId: user?.id,
-    },
-  );
+    keys: createCacheKeys({
+      stablePrefix: STABLE_KEYS.USER_SUGGESTIONS_KEY,
+      authenticated: true,
+      tracked: {
+        userId: user?.id,
+      },
+      untracked: {
+        args: userSuggestionsParams,
+      },
+    }),
+  });
 
   // TODO: Properly check for SSR user values
   if (!isClerkLoaded) {

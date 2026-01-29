@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "2.5.0",
+  "version": "2.6.8",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -42,6 +42,14 @@
         "types": "./dist/webhooks.d.ts",
         "default": "./dist/webhooks.js"
       }
+    },
+    "./types": {
+      "import": {
+        "types": "./dist/types.d.mts"
+      },
+      "require": {
+        "types": "./dist/types.d.ts"
+      }
     }
   },
   "main": "./dist/index.js",
@@ -67,7 +75,6 @@
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "cookies": "0.9.1",
     "fastify-plugin": "^5.0.1"
   },

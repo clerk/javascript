@@ -2,6 +2,7 @@ import type { OAuthProvider } from './oauth';
 import type { Web3Provider } from './web3';
 
 export type GoogleOneTapStrategy = 'google_one_tap';
+export type AppleIdTokenStrategy = 'oauth_token_apple';
 export type PasskeyStrategy = 'passkey';
 export type PasswordStrategy = 'password';
 export type PhoneCodeStrategy = 'phone_code';
@@ -17,8 +18,3 @@ export type EnterpriseSSOStrategy = 'enterprise_sso';
 
 export type OAuthStrategy = `oauth_${OAuthProvider}` | CustomOAuthStrategy;
 export type Web3Strategy = `web3_${Web3Provider}_signature`;
-
-/**
- * @deprecated Use `EnterpriseSSOStrategy` instead.
- */
-export type SamlStrategy = 'saml';

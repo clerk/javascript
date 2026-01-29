@@ -1,80 +1,82 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
-import type { EnvironmentResource, ForPayerType } from '../../types';
-import { useSWR } from '../clerk-swr';
+import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
+import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
+import { useClerkQuery } from '../clerk-rq/useQuery';
 import {
   useAssertWrappedByClerkProvider,
   useClerkInstanceContext,
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
+import { useBillingHookEnabled } from './useBillingHookEnabled';
+import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
+import { useSubscriptionCacheKeys } from './useSubscription.shared';
+import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
 
-const hookName = 'useSubscription';
-
-type UseSubscriptionParams = {
-  for?: ForPayerType;
-  /**
-   * If `true`, the previous data will be kept in the cache until new data is fetched.
-   *
-   * @default false
-   */
-  keepPreviousData?: boolean;
-};
+const HOOK_NAME = 'useSubscription';
 
 /**
  * @internal
- *
- * Fetches subscription data for the current user or organization.
- *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export const useSubscription = (params?: UseSubscriptionParams) => {
-  useAssertWrappedByClerkProvider(hookName);
+export function useSubscription(params?: UseSubscriptionParams): SubscriptionResult {
+  useAssertWrappedByClerkProvider(HOOK_NAME);
 
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
   const { organization } = useOrganizationContext();
 
-  // @ts-expect-error `__unstable__environment` is not typed
-  const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
+  const billingEnabled = useBillingHookEnabled(params);
 
-  clerk.telemetry?.record(eventMethodCalled(hookName));
+  const recordedRef = useRef(false);
+  useEffect(() => {
+    if (!recordedRef.current && clerk?.telemetry) {
+      clerk.telemetry.record(eventMethodCalled(HOOK_NAME));
+      recordedRef.current = true;
+    }
+  }, [clerk]);
 
-  const isOrganization = params?.for === 'organization';
-  const billingEnabled = isOrganization
-    ? environment?.commerceSettings.billing.organization.enabled
-    : environment?.commerceSettings.billing.user.enabled;
+  const keepPreviousData = params?.keepPreviousData ?? false;
 
-  const swr = useSWR(
-    billingEnabled
-      ? {
-          type: 'commerce-subscription',
-          userId: user?.id,
-          args: { orgId: isOrganization ? organization?.id : undefined },
-        }
-      : null,
-    ({ args, userId }) => {
-      // This allows for supporting keeping previous data between revalidations
-      // but also hides the stale data on sign-out.
-      if (userId) {
-        return clerk.billing.getSubscription(args);
-      }
-      return null;
+  const [queryClient] = useClerkQueryClient();
+
+  const { queryKey, invalidationKey, stableKey, authenticated } = useSubscriptionCacheKeys({
+    userId: user?.id,
+    orgId: organization?.id,
+    for: params?.for,
+  });
+
+  const queriesEnabled = Boolean(user?.id && billingEnabled);
+  useClearQueriesOnSignOut({
+    isSignedOut: user === null,
+    authenticated,
+    stableKeys: stableKey,
+  });
+
+  const query = useClerkQuery({
+    queryKey,
+    queryFn: ({ queryKey }) => {
+      const obj = queryKey[3];
+      return clerk.billing.getSubscription(obj.args);
     },
-    {
-      dedupingInterval: 1_000 * 60,
-      keepPreviousData: params?.keepPreviousData,
-    },
+    staleTime: 1_000 * 60,
+    enabled: queriesEnabled,
+    placeholderData: defineKeepPreviousDataFn(keepPreviousData && queriesEnabled),
+  });
+
+  const revalidate = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: invalidationKey }),
+    [queryClient, invalidationKey],
   );
 
-  const revalidate = useCallback(() => swr.mutate(), [swr.mutate]);
-
   return {
-    data: swr.data,
-    error: swr.error,
-    isLoading: swr.isLoading,
-    isFetching: swr.isValidating,
+    data: query.data,
+    // React Query returns null for no error, but our types expect undefined.
+    // Convert to undefined for type compatibility.
+    error: query.error ?? undefined,
+    isLoading: query.isLoading,
+    isFetching: query.isFetching,
     revalidate,
   };
-};
+}

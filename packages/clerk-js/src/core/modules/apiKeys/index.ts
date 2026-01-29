@@ -3,12 +3,14 @@ import type {
   ApiKeyJSON,
   APIKeyResource,
   APIKeysNamespace,
+  ClerkPaginatedResponse,
   CreateAPIKeyParams,
   GetAPIKeysParams,
   RevokeAPIKeyParams,
 } from '@clerk/shared/types';
 
 import type { FapiRequestInit } from '@/core/fapiClient';
+import { convertPageToOffsetSearchParams } from '@/utils/convertPageToOffsetSearchParams';
 
 import { APIKey, BaseResource } from '../../resources/internal';
 
@@ -35,69 +37,52 @@ export class APIKeys implements APIKeysNamespace {
     };
   }
 
-  async getAll(params?: GetAPIKeysParams): Promise<APIKeyResource[]> {
-    return BaseResource.clerk
-      .getFapiClient()
-      .request<{ api_keys: ApiKeyJSON[] }>({
-        ...(await this.getBaseFapiProxyOptions()),
-        method: 'GET',
-        path: '/api_keys',
-        search: {
-          subject: params?.subject ?? BaseResource.clerk.organization?.id ?? BaseResource.clerk.user?.id ?? '',
-          // TODO: (rob) Remove when server-side pagination is implemented.
-          limit: '100',
-        },
-      })
-      .then(res => {
-        const apiKeysJSON = res.payload as unknown as { api_keys: ApiKeyJSON[] };
-        return apiKeysJSON.api_keys.map(json => new APIKey(json));
-      });
-  }
+  async getAll(params?: GetAPIKeysParams): Promise<ClerkPaginatedResponse<APIKeyResource>> {
+    return BaseResource._fetch({
+      ...(await this.getBaseFapiProxyOptions()),
+      method: 'GET',
+      path: '/api_keys',
+      search: convertPageToOffsetSearchParams({
+        ...params,
+        subject: params?.subject ?? BaseResource.clerk.organization?.id ?? BaseResource.clerk.user?.id ?? '',
+        query: params?.query ?? '',
+      }),
+    }).then(res => {
+      const { data: apiKeys, total_count } = res as unknown as ClerkPaginatedResponse<ApiKeyJSON>;
 
-  async getSecret(id: string): Promise<string> {
-    return BaseResource.clerk
-      .getFapiClient()
-      .request<{ secret: string }>({
-        ...(await this.getBaseFapiProxyOptions()),
-        method: 'GET',
-        path: `/api_keys/${id}/secret`,
-      })
-      .then(res => {
-        const { secret } = res.payload as unknown as { secret: string };
-        return secret;
-      });
+      return {
+        total_count,
+        data: apiKeys.map(apiKey => new APIKey(apiKey)),
+      };
+    });
   }
 
   async create(params: CreateAPIKeyParams): Promise<APIKeyResource> {
-    const json = (
-      await BaseResource._fetch<ApiKeyJSON>({
-        ...(await this.getBaseFapiProxyOptions()),
-        path: '/api_keys',
-        method: 'POST',
-        body: JSON.stringify({
-          type: params.type ?? 'api_key',
-          name: params.name,
-          subject: params.subject ?? BaseResource.clerk.organization?.id ?? BaseResource.clerk.user?.id ?? '',
-          description: params.description,
-          seconds_until_expiration: params.secondsUntilExpiration,
-        }),
-      })
-    )?.response as ApiKeyJSON;
+    const json = (await BaseResource._fetch<ApiKeyJSON>({
+      ...(await this.getBaseFapiProxyOptions()),
+      path: '/api_keys',
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'api_key',
+        name: params.name,
+        subject: params.subject ?? BaseResource.clerk.organization?.id ?? BaseResource.clerk.user?.id ?? '',
+        description: params.description,
+        seconds_until_expiration: params.secondsUntilExpiration,
+      }),
+    })) as unknown as ApiKeyJSON;
 
     return new APIKey(json);
   }
 
   async revoke(params: RevokeAPIKeyParams): Promise<APIKeyResource> {
-    const json = (
-      await BaseResource._fetch<ApiKeyJSON>({
-        ...(await this.getBaseFapiProxyOptions()),
-        method: 'POST',
-        path: `/api_keys/${params.apiKeyID}/revoke`,
-        body: JSON.stringify({
-          revocation_reason: params.revocationReason,
-        }),
-      })
-    )?.response as ApiKeyJSON;
+    const json = (await BaseResource._fetch<ApiKeyJSON>({
+      ...(await this.getBaseFapiProxyOptions()),
+      method: 'POST',
+      path: `/api_keys/${params.apiKeyID}/revoke`,
+      body: JSON.stringify({
+        revocation_reason: params.revocationReason,
+      }),
+    })) as unknown as ApiKeyJSON;
 
     return new APIKey(json);
   }

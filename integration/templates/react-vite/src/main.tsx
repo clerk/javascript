@@ -1,4 +1,4 @@
-import { ClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider } from '@clerk/react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, Outlet, RouterProvider, useNavigate } from 'react-router-dom';
@@ -28,11 +28,15 @@ const Root = () => {
   const navigate = useNavigate();
   return (
     <ClerkProvider
-      // @ts-ignore
-      publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string}
       clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL as string}
+      clerkUiUrl={import.meta.env.VITE_CLERK_UI_URL as string}
       routerPush={(to: string) => navigate(to)}
       routerReplace={(to: string) => navigate(to, { replace: true })}
+      appearance={{
+        options: {
+          showOptionalFields: true,
+        },
+      }}
       experimental={{
         persistClient: import.meta.env.VITE_EXPERIMENTAL_PERSIST_CLIENT
           ? import.meta.env.VITE_EXPERIMENTAL_PERSIST_CLIENT === 'true'

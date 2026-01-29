@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const bnIN: LocalizationResource = {
   locale: 'bn-IN',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'কপি করুন এবং বন্ধ করুন',
+      formHint: 'নিরাপত্তার কারণে, আমরা আপনাকে পরে এটি আবার দেখতে অনুমতি দেব না।',
+      formTitle: 'এখনই আপনার "{{name}}" API কী কপি করুন',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const bnIN: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'আপনার ফোন নম্বর লিখুন',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API কী',
+  formFieldLabel__apiKeyDescription: 'বিবরণ',
+  formFieldLabel__apiKeyExpiration: 'মেয়াদ শেষ',
+  formFieldLabel__apiKeyName: 'গোপন কী-এর নাম',
   formFieldLabel__automaticInvitations: 'এই ডোমেনের জন্য স্বয়ংক্রিয় আমন্ত্রণ সক্ষম করুন',
   formFieldLabel__backupCode: 'ব্যাকআপ কোড',
   formFieldLabel__confirmDeletion: 'নিশ্চিতকরণ',
@@ -390,6 +396,12 @@ export const bnIN: LocalizationResource = {
         headerTitle__invitations: 'আমন্ত্রণ',
         headerTitle__members: 'সদস্য',
         headerTitle__requests: 'অনুরোধ',
+      },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'ভূমিকাগুলি সাময়িকভাবে লক করা আছে',
+          subtitle: 'আমরা উপলব্ধ ভূমিকাগুলি আপডেট করছি। এটি সম্পন্ন হলে, আপনি আবার ভূমিকা আপডেট করতে পারবেন।',
+        },
       },
     },
     navbar: {
@@ -609,6 +621,12 @@ export const bnIN: LocalizationResource = {
       subtitle: '{{applicationName}}-এ চালিয়ে যাওয়ার জন্য',
       title: 'আপনার ইমেইল চেক করুন',
     },
+    emailCodeMfa: {
+      formTitle: 'আপনার ইমেইল চেক করুন',
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
+      subtitle: '{{applicationName}}-এ চালিয়ে যাওয়ার জন্য',
+      title: 'আপনার ইমেইল চেক করুন',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'চালিয়ে যেতে, যে ডিভাইস এবং ব্রাউজার থেকে আপনি সাইন-ইন শুরু করেছেন সেখানে যাচাইকরণ লিংক খুলুন',
@@ -644,6 +662,12 @@ export const bnIN: LocalizationResource = {
         titleNewTab: 'অন্য ট্যাবে সাইন ইন হয়েছে',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'আপনার ইমেইলে পাঠানো যাচাইকরণ লিঙ্কটি ব্যবহার করুন',
+      resendButton: 'লিঙ্ক পাননি? আবার পাঠান',
+      subtitle: '{{applicationName}} এ চালিয়ে যেতে',
+      title: 'আপনার ইমেইল পরীক্ষা করুন',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -661,6 +685,8 @@ export const bnIN: LocalizationResource = {
       label__alternativeMethods: 'অথবা, অন্য পদ্ধতি দিয়ে সাইন ইন করুন',
       title: 'পাসওয়ার্ড ভুলে গেছেন?',
     },
+    newDeviceVerificationNotice:
+      'আপনি একটি নতুন ডিভাইস থেকে সাইন ইন করছেন। আমরা আপনার অ্যাকাউন্ট নিরাপদ রাখতে যাচাইকরণ চাইছি।',
     noAvailableMethods: {
       message: 'সাইন ইন চালিয়ে যাওয়া যাচ্ছে না। কোনো উপলব্ধ অথেনটিকেশন ফ্যাক্টর নেই।',
       subtitle: 'একটি ত্রুটি ঘটেছে',
@@ -676,8 +702,14 @@ export const bnIN: LocalizationResource = {
       subtitle: 'আপনার অ্যাকাউন্টের সাথে যুক্ত পাসওয়ার্ড লিখুন',
       title: 'আপনার পাসওয়ার্ড লিখুন',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'পাসওয়ার্ড সমঝোতা হয়েছে',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'যাচাইকরণ কোড',
@@ -726,6 +758,10 @@ export const bnIN: LocalizationResource = {
       formTitle: 'যাচাইকরণ কোড',
       subtitle: 'চালিয়ে যেতে, আপনার অথেনটিকেটর অ্যাপ দ্বারা উৎপন্ন যাচাইকরণ কোড লিখুন',
       title: 'দুই-ধাপ যাচাইকরণ',
+    },
+    web3Solana: {
+      subtitle: 'সাইন ইন করতে নিচে একটি ওয়ালেট নির্বাচন করুন',
+      title: 'Solana দিয়ে সাইন ইন করুন',
     },
   },
   signInEnterPasswordTitle: 'আপনার পাসওয়ার্ড লিখুন',
@@ -819,45 +855,72 @@ export const bnIN: LocalizationResource = {
       title: 'আপনার অ্যাকাউন্ট তৈরি করুন',
       titleCombined: 'আপনার অ্যাকাউন্ট তৈরি করুন',
     },
+    web3Solana: {
+      subtitle: 'সাইন আপ করতে নিচে একটি ওয়ালেট নির্বাচন করুন',
+      title: 'Solana দিয়ে সাইন আপ করুন',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}} দিয়ে চালিয়ে যান',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'নতুন সংগঠন তৈরি করুন',
+      action__invitationAccept: 'যোগ দিন',
+      action__suggestionsAccept: 'যোগদানের অনুরোধ করুন',
+      subtitle: 'বিদ্যমান সংগঠনে যোগ দিন বা একটি নতুন তৈরি করুন',
+      subtitle__createOrganizationDisabled: 'বিদ্যমান সংগঠনে যোগ দিন',
+      suggestionsAcceptedLabel: 'অনুমোদনের অপেক্ষায়',
+      title: 'একটি সংগঠন নির্বাচন করুন',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'বাতিল',
+      formButtonSubmit: 'চালিয়ে যান',
+      formFieldInputPlaceholder__name: 'আমার সংগঠন',
+      formFieldInputPlaceholder__slug: 'amar-sangstha',
+      formFieldLabel__name: 'নাম',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'চালিয়ে যাওয়ার জন্য আপনার সংগঠনের বিবরণ লিখুন',
+      title: 'আপনার সংগঠন সেটআপ করুন',
     },
+    organizationCreationDisabled: {
+      title: 'আপনাকে অবশ্যই একটি সংগঠনের অন্তর্ভুক্ত হতে হবে',
+      subtitle: 'আমন্ত্রণের জন্য আপনার সংগঠনের প্রশাসকের সাথে যোগাযোগ করুন।',
+    },
+    signOut: {
+      actionLink: 'সাইন আউট',
+      actionText: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'শনাক্ত করা কোম্পানির নাম ({{organizationName}}) এবং {{organizationDomain}}-এর জন্য একটি সংস্থা ইতিমধ্যেই বিদ্যমান। আমন্ত্রণের মাধ্যমে যোগ দিন।',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
+    title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ইতিমধ্যে সংগঠনের একজন সদস্য।',
+    avatar_file_size_exceeded: 'ফাইলের আকার সর্বোচ্চ ১০ এমবি সীমা অতিক্রম করেছে। দয়া করে একটি ছোট ফাইল নির্বাচন করুন।',
+    avatar_file_type_invalid: 'ফাইলের ধরন সমর্থিত নয়। দয়া করে JPG, PNG, GIF বা WEBP ছবি আপলোড করুন।',
     captcha_invalid:
       'নিরাপত্তা যাচাইকরণ ব্যর্থ হওয়ার কারণে সাইন আপ ব্যর্থ হয়েছে। আবার চেষ্টা করতে দয়া করে পৃষ্ঠাটি রিফ্রেশ করুন বা আরও সাহায্যের জন্য সাপোর্টের সাথে যোগাযোগ করুন।',
     captcha_unavailable:
       'বট যাচাইকরণ ব্যর্থ হওয়ার কারণে সাইন আপ ব্যর্থ হয়েছে। আবার চেষ্টা করতে দয়া করে পৃষ্ঠাটি রিফ্রেশ করুন বা আরও সাহায্যের জন্য সাপোর্টের সাথে যোগাযোগ করুন।',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'অস্থায়ী ইমেইল পরিষেবাগুলি সমর্থিত নয়। অনুগ্রহ করে অ্যাকাউন্ট তৈরি করতে আপনার নিয়মিত ইমেইল ঠিকানা ব্যবহার করুন।',
     form_identifier_exists__email_address: 'এই ইমেইল ঠিকানা ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     form_identifier_exists__phone_number: 'এই ফোন নম্বর ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     form_identifier_exists__username: 'এই ব্যবহারকারীর নাম ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     form_identifier_not_found:
       'এই শনাক্তকারী দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি। দয়া করে চেক করুন এবং আবার চেষ্টা করুন।',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'লেখা মানটি একটি অবৈধ ফরম্যাটে আছে। দয়া করে চেক করুন এবং সংশোধন করুন।',
     form_param_format_invalid__email_address: 'ইমেইল ঠিকানা একটি বৈধ ইমেইল ঠিকানা হতে হবে।',
     form_param_format_invalid__phone_number: 'ফোন নম্বর একটি বৈধ আন্তর্জাতিক ফরম্যাটে হতে হবে।',
@@ -870,6 +933,8 @@ export const bnIN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'লেখা মানটি অবৈধ। দয়া করে এটি সংশোধন করুন।',
     form_password_incorrect: 'আপনি যে পাসওয়ার্ড লিখেছেন তা ভুল। দয়া করে আবার চেষ্টা করুন।',
+    form_password_or_identifier_incorrect:
+      'পাসওয়ার্ড বা ইমেইল ঠিকানা ভুল। আবার চেষ্টা করুন বা অন্য পদ্ধতি ব্যবহার করুন।',
     form_password_length_too_short: 'আপনার পাসওয়ার্ড খুব ছোট। এটি কমপক্ষে ৮ অক্ষর দীর্ঘ হতে হবে।',
     form_password_not_strong_enough: 'আপনার পাসওয়ার্ড যথেষ্ট শক্তিশালী নয়।',
     form_password_pwned:
@@ -878,10 +943,12 @@ export const bnIN: LocalizationResource = {
       'এই পাসওয়ার্ডটি একটি ডেটা লঙ্ঘনের অংশ হিসাবে পাওয়া গেছে এবং ব্যবহার করা যাবে না, দয়া করে আপনার পাসওয়ার্ড রিসেট করুন।',
     form_password_size_in_bytes_exceeded:
       'আপনার পাসওয়ার্ড অনুমোদিত সর্বাধিক বাইট সংখ্যা অতিক্রম করেছে, দয়া করে এটি ছোট করুন বা কিছু বিশেষ অক্ষর সরান।',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'ভুল পাসওয়ার্ড',
     form_username_invalid_character:
       'আপনার ব্যবহারকারীর নামে অবৈধ অক্ষর রয়েছে। দয়া করে শুধুমাত্র অক্ষর, সংখ্যা এবং আন্ডারস্কোর ব্যবহার করুন।',
     form_username_invalid_length: 'আপনার ব্যবহারকারীর নাম {{min_length}} থেকে {{max_length}} অক্ষর দীর্ঘ হতে হবে।',
+    form_username_needs_non_number_char: 'আপনার ব্যবহারকারীর নামে কমপক্ষে একটি অ-সংখ্যাসূচক অক্ষর থাকতে হবে।',
     identification_deletion_failed: 'আপনি আপনার শেষ শনাক্তকরণ মুছতে পারবেন না।',
     not_allowed_access:
       'আপনার এই পৃষ্ঠা অ্যাক্সেস করার অনুমতি নেই। আপনি যদি মনে করেন এটি একটি ত্রুটি, দয়া করে সাপোর্টের সাথে যোগাযোগ করুন।',
@@ -910,6 +977,10 @@ export const bnIN: LocalizationResource = {
     phone_number_exists: 'এই ফোন নম্বর ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     session_exists: undefined,
     web3_missing_identifier: 'একটি Web3 ওয়ালেট এক্সটেনশন পাওয়া যায়নি। চালিয়ে যেতে দয়া করে একটি ইনস্টল করুন।',
+    web3_signature_request_rejected:
+      'আপনি সিগনেচার অনুরোধটি প্রত্যাখ্যান করেছেন। চালিয়ে যেতে অনুগ্রহ করে আবার চেষ্টা করুন।',
+    web3_solana_signature_generation_failed:
+      'সিগনেচার তৈরি করার সময় একটি ত্রুটি ঘটেছে। চালিয়ে যেতে অনুগ্রহ করে আবার চেষ্টা করুন।',
     zxcvbn: {
       couldBeStronger: 'আপনার পাসওয়ার্ড কাজ করে, কিন্তু আরও শক্তিশালী হতে পারে। আরও অক্ষর যোগ করার চেষ্টা করুন।',
       goodPassword: 'আপনার পাসওয়ার্ড সমস্ত প্রয়োজনীয় শর্ত পূরণ করে।',
@@ -1280,6 +1351,10 @@ export const bnIN: LocalizationResource = {
         detailsAction__nonPrimary: 'প্রাথমিক হিসাবে সেট করুন',
         primaryButton: 'ওয়ালেট সংযুক্ত করুন',
         title: 'Web3 ওয়ালেট',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'আপনার অ্যাকাউন্টের সাথে সংযুক্ত করতে একটি Solana ওয়ালেট নির্বাচন করুন।',
+          title: 'একটি Solana ওয়ালেট যোগ করুন',
+        },
       },
     },
     usernamePage: {
@@ -1314,5 +1389,11 @@ export const bnIN: LocalizationResource = {
       subtitle: 'আপনার স্থান প্রস্তুত হলে আমরা আপনার সাথে যোগাযোগ করব',
       title: 'ওয়েটলিস্টে যোগ দেওয়ার জন্য ধন্যবাদ!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} দিয়ে সংযুক্ত করুন',
+    continue: '{{walletName}} দিয়ে চালিয়ে যান',
+    noneAvailable:
+      'কোনো Solana Web3 ওয়ালেট শনাক্ত হয়নি। অনুগ্রহ করে Web3 সমর্থিত {{ solanaWalletsLink || link("wallet extension") }} ইনস্টল করুন।',
   },
 } as const;

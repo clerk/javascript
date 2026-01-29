@@ -25,6 +25,10 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
 
       - name: Setup
         id: config
@@ -34,7 +38,7 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
 
       - name: Version packages for canary
         id: version-packages
@@ -45,6 +49,7 @@ jobs:
         run: pnpm turbo build $TURBO_ARGS
 
       - name: Canary release
+        id: publish
         if: steps.version-packages.outputs.success == '1'
         run: pnpm release:canary
         env:
@@ -52,6 +57,7 @@ jobs:
           NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
+        if: steps.publish.outcome == 'success'
         uses: actions/github-script@v7
         with:
           result-encoding: string
@@ -60,15 +66,16 @@ jobs:
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
             const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+            const clerkUiVersion = require('./packages/ui/package.json').version;
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerk',
-                repo: 'sdk-infra-workers',
-                workflow_id: 'update-clerkjs.yml',
-                ref: 'main',
-                inputs: { version: clerkjsVersion }
-              })
+            github.rest.actions.createWorkflowDispatch({
+              owner: 'clerk',
+              repo: 'sdk-infra-workers',
+              workflow_id: 'update-pkg-versions.yml',
+              ref: 'main',
+              inputs: { clerkjsVersion, clerkUiVersion }
+            })
 
             if (nextjsVersion.includes('canary')) {
               console.log('clerk/nextjs changed, will notify clerk/accounts');

@@ -1,6 +1,6 @@
 {
-  "name": "@clerk/clerk-react",
-  "version": "5.53.4",
+  "name": "@clerk/react",
+  "version": "5.58.1",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -63,18 +63,32 @@
         "default": "./dist/experimental.js"
       }
     },
+    "./legacy": {
+      "import": {
+        "types": "./dist/legacy.d.mts",
+        "default": "./dist/legacy.mjs"
+      },
+      "require": {
+        "types": "./dist/legacy.d.ts",
+        "default": "./dist/legacy.js"
+      }
+    },
+    "./types": {
+      "import": {
+        "types": "./dist/types.d.mts"
+      },
+      "require": {
+        "types": "./dist/types.d.ts"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "files": [
-    "dist",
-    "internal",
-    "errors",
-    "experimental"
+    "dist"
   ],
   "scripts": {
     "build": "tsup",
-    "postbuild": "node ../../scripts/subpath-workaround.mjs react",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
@@ -94,15 +108,17 @@
   },
   "devDependencies": {
     "@clerk/localizations": "workspace:*",
-    "@clerk/themes": "workspace:*",
-    "@types/semver": "^7.7.1"
+    "@clerk/ui": "workspace:*",
+    "@types/semver": "^7.7.1",
+    "semver": "^7.7.1",
+    "yaml": "^2.8.0"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

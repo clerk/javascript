@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "1.13.9",
+  "version": "1.13.22",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -76,7 +76,6 @@
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "dotenv": "17.2.2"
   },
   "devDependencies": {
@@ -96,7 +95,7 @@
     }
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

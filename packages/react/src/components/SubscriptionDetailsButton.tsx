@@ -7,35 +7,39 @@ import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../ut
 import { withClerk } from './withClerk';
 
 /**
- * A button component that opens the Clerk Subscription Details drawer when clicked. This component must be rendered inside a `<SignedIn />` component to ensure the user is authenticated.
+ * A button component that opens the Clerk Subscription Details drawer when clicked. Render only when the user is signed in (e.g., wrap with `<Show when="signed-in">`).
  *
  * @example
  * ```tsx
- * import { SignedIn } from '@clerk/clerk-react';
- * import { SubscriptionDetailsButton } from '@clerk/clerk-react/experimental';
+ * import { Show } from '@clerk/react';
+ * import { SubscriptionDetailsButton } from '@clerk/react/experimental';
  *
  * // Basic usage with default "Subscription details" text
  * function BasicSubscriptionDetails() {
  *   return (
- *     <SubscriptionDetailsButton />
+ *     <Show when="signed-in">
+ *       <SubscriptionDetailsButton />
+ *     </Show>
  *   );
  * }
  *
- * // Custom button with organization subscription
+ * // Custom button with Organization Subscription
  * function OrganizationSubscriptionDetails() {
  *   return (
- *     <SubscriptionDetailsButton
- *       for="organization"
- *       onSubscriptionCancel={() => console.log('Subscription canceled')}
- *     >
- *       <button>View Organization Subscription</button>
- *     </SubscriptionDetailsButton>
+ *     <Show when="signed-in">
+ *       <SubscriptionDetailsButton
+ *         for="organization"
+ *         onSubscriptionCancel={() => console.log('Subscription canceled')}
+ *       >
+ *         <button>View Organization Subscription</button>
+ *       </SubscriptionDetailsButton>
+ *     </Show>
  *   );
  * }
  * ```
  *
- * @throws {Error} When rendered outside of a `<SignedIn />` component
- * @throws {Error} When `for="organization"` is used without an active organization context
+ * @throws {Error} When rendered while the user is signed out
+ * @throws {Error} When `for="organization"` is used without an Active Organization context
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -45,7 +49,7 @@ export const SubscriptionDetailsButton = withClerk(
     children,
     ...props
   }: WithClerkProp<React.PropsWithChildren<__experimental_SubscriptionDetailsButtonProps>>) => {
-    const { for: _for, subscriptionDetailsProps, onSubscriptionCancel, ...rest } = props;
+    const { for: _for, subscriptionDetailsProps, onSubscriptionCancel, getContainer, component, ...rest } = props;
     children = normalizeWithDefaultValue(children, 'Subscription details');
     const child = assertSingleChild(children)('SubscriptionDetailsButton');
 
@@ -53,7 +57,7 @@ export const SubscriptionDetailsButton = withClerk(
 
     if (userId === null) {
       throw new Error(
-        'Clerk: Ensure that `<SubscriptionDetailsButton />` is rendered inside a `<SignedIn />` component.',
+        'Clerk: Ensure that `<SubscriptionDetailsButton />` is rendered only when the user is signed in (wrap with `<Show when="signed-in">` or guard with `useAuth()`).',
       );
     }
 

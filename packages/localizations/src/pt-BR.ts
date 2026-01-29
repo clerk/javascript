@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
   apiKeys: {
     action__add: 'Adicionar nova chave',
     action__search: 'Pesquisar chaves',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copiar e fechar',
+      formHint: 'Por razões de segurança, não permitiremos que você visualize novamente mais tarde.',
+      formTitle: 'Copie sua chave API "{{name}}" agora',
+    },
     createdAndExpirationStatus__expiresOn:
       "Criada {{ createdDate | shortDate('pt-BR') }} • Expira {{ expiresDate | longDate('pt-BR') }}",
     createdAndExpirationStatus__never: "Criada {{ createdDate | shortDate('pt-BR') }} • Nunca expira",
@@ -226,7 +231,8 @@ export const ptBR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Digite sua senha',
   formFieldInputPlaceholder__phoneNumber: 'Digite seu número de telefone',
   formFieldInputPlaceholder__username: 'Digite seu nome de usuário',
-  formFieldInput__emailAddress_format: undefined,
+  formFieldInput__emailAddress_format: 'Formato de exemplo: nome@exemplo.com',
+  formFieldLabel__apiKey: 'Chave API',
   formFieldLabel__apiKeyDescription: 'Descrição',
   formFieldLabel__apiKeyExpiration: 'Expiração',
   formFieldLabel__apiKeyName: 'Nome da chave de API',
@@ -397,6 +403,13 @@ export const ptBR: LocalizationResource = {
         headerTitle__members: 'Membros',
         headerTitle__requests: 'Solicitações',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'As funções estão temporariamente bloqueadas',
+          subtitle:
+            'Estamos atualizando as funções disponíveis. Assim que isso for concluído, você poderá atualizar as funções novamente.',
+        },
+      },
     },
     navbar: {
       apiKeys: 'Chaves de API',
@@ -497,11 +510,11 @@ export const ptBR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
-    action__closeOrganizationSwitcher: undefined,
+    action__closeOrganizationSwitcher: 'Fechar seletor de organização',
     action__createOrganization: 'Criar organização',
     action__invitationAccept: 'Participar',
     action__manageOrganization: 'Gerenciar organização',
-    action__openOrganizationSwitcher: undefined,
+    action__openOrganizationSwitcher: 'Abrir seletor de organização',
     action__suggestionsAccept: 'Solicitar participação',
     notSelected: 'Nenhuma organização selecionada',
     personalWorkspace: 'Conta pessoal',
@@ -615,6 +628,12 @@ export const ptBR: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Verifique seu e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Verifique seu e-mail',
+      resendButton: 'Não recebeu um código? Reenviar',
+      subtitle: 'para continuar em {{applicationName}}',
+      title: 'Verifique seu e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Para continuar, abra o link de verificação no mesmo dispositivo e navegador em que iniciou o login',
@@ -650,9 +669,15 @@ export const ptBR: LocalizationResource = {
         titleNewTab: 'Conectado em outra aba',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Use o link de verificação enviado para o seu e-mail',
+      resendButton: 'Não recebeu o link? Reenviar',
+      subtitle: 'para continuar para {{applicationName}}',
+      title: 'Verifique seu e-mail',
+    },
     enterpriseConnections: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecione a conta corporativa com a qual deseja continuar.',
+      title: 'Escolha sua conta corporativa',
     },
     forgotPassword: {
       formTitle: 'Código de redefinição de senha',
@@ -667,6 +692,8 @@ export const ptBR: LocalizationResource = {
       label__alternativeMethods: 'Ou, faça login com outro método.',
       title: 'Esqueceu a senha?',
     },
+    newDeviceVerificationNotice:
+      'Você está entrando de um novo dispositivo. Estamos solicitando verificação para manter sua conta segura.',
     noAvailableMethods: {
       message: 'Não foi possível fazer login. Não há nenhum método de autenticação disponível.',
       subtitle: 'Aconteceu um erro',
@@ -682,8 +709,14 @@ export const ptBR: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Insira sua senha',
     },
+    passwordCompromised: {
+      title: 'Senha comprometida',
+    },
     passwordPwned: {
       title: 'Senha comprometida',
+    },
+    passwordUntrusted: {
+      title: 'Senha não confiável',
     },
     phoneCode: {
       formTitle: 'Código de verificação',
@@ -732,6 +765,10 @@ export const ptBR: LocalizationResource = {
       subtitle: 'Para continuar, insira o código gerado pelo seu aplicativo autenticador.',
       title: 'Verificação em duas etapas',
     },
+    web3Solana: {
+      subtitle: 'Selecione uma carteira abaixo para entrar',
+      title: 'Entrar com Solana',
+    },
   },
   signInEnterPasswordTitle: 'Insira sua senha',
   signUp: {
@@ -777,8 +814,8 @@ export const ptBR: LocalizationResource = {
       },
     },
     enterpriseConnections: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecione a conta corporativa com a qual deseja continuar.',
+      title: 'Escolha sua conta corporativa',
     },
     legalConsent: {
       checkbox: {
@@ -826,6 +863,10 @@ export const ptBR: LocalizationResource = {
       title: 'Criar sua conta',
       titleCombined: 'Criar sua conta',
     },
+    web3Solana: {
+      subtitle: 'Selecione uma carteira abaixo para se cadastrar',
+      title: 'Cadastrar-se com Solana',
+    },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -835,6 +876,7 @@ export const ptBR: LocalizationResource = {
       action__invitationAccept: 'Participar',
       action__suggestionsAccept: 'Solicitar participação',
       subtitle: 'Junte-se a uma organização existente ou crie uma nova',
+      subtitle__createOrganizationDisabled: 'Junte-se a uma organização existente',
       suggestionsAcceptedLabel: 'Aprovação pendente',
       title: 'Escolha uma organização',
     },
@@ -848,22 +890,45 @@ export const ptBR: LocalizationResource = {
       subtitle: 'Conte-nos um pouco sobre sua organização',
       title: 'Configure sua conta',
     },
+    organizationCreationDisabled: {
+      title: 'Você deve pertencer a uma organização',
+      subtitle: 'Entre em contato com o administrador da sua organização para obter um convite.',
+    },
     signOut: {
       actionLink: 'Sair',
       actionText: 'Conectado como {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Uma organização já existe para o nome da empresa detectado ({{organizationName}}) e {{organizationDomain}}. Entre por convite.',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'Resetar Senha',
+    signOut: {
+      actionLink: 'Sair',
+      actionText: 'Conectado como {{identifier}}',
+    },
+    subtitle: 'Sua conta requer uma nova senha antes de continuar',
+    title: 'Resetar senha',
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} já é membro da organização.',
+    avatar_file_size_exceeded:
+      'O tamanho do arquivo excede o limite máximo de 10 MB. Por favor, escolha um arquivo menor.',
+    avatar_file_type_invalid: 'Tipo de arquivo não suportado. Por favor, envie uma imagem JPG, PNG, GIF ou WEBP.',
     captcha_invalid:
       'Não foi possível se inscrever devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     captcha_unavailable:
       'Não foi possível se inscrever devido à indisponibilidade do captcha. Por favor atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     form_code_incorrect: 'Código incorreto.',
+    form_email_address_blocked:
+      'Serviços de e-mail temporários não são suportados. Por favor, use seu endereço de e-mail regular para criar uma conta.',
     form_identifier_exists__email_address: 'E-mail já está em uso. Por favor, tente outro.',
     form_identifier_exists__phone_number: 'Telefone já está em uso. Por favor, tente outro.',
     form_identifier_exists__username: 'Nome de usuário já está em uso. Por favor, tente outro.',
     form_identifier_not_found: 'Não foi possível encontrar o usuário.',
+    form_new_password_matches_current: 'A nova senha não pode ser igual à senha atual.',
     form_param_format_invalid: 'Formato inválido.',
     form_param_format_invalid__email_address: 'O endereço de e-mail deve ser um endereço de e-mail válido.',
     form_param_format_invalid__phone_number: 'Número de telefone precisa estar num formato internacional válido.',
@@ -876,15 +941,20 @@ export const ptBR: LocalizationResource = {
     form_param_type_invalid__phone_number: 'Número de telefone inválido.',
     form_param_value_invalid: 'Valor inválido.',
     form_password_incorrect: 'Senha incorreta.',
+    form_password_or_identifier_incorrect:
+      'A senha ou o endereço de e-mail está incorreto. Tente novamente ou use outro método.',
     form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',
     form_password_not_strong_enough: 'Sua senha não é forte o suficiente.',
     form_password_pwned: 'Esta senha foi comprometida e não pode ser usada, por favor, tente outra senha.',
     form_password_pwned__sign_in: 'Esta senha foi comprometida, por favor redefina sua senha.',
     form_password_size_in_bytes_exceeded:
       'Sua senha excedeu o número máximo de bytes permitidos, por favor, encurte-a ou remova alguns caracteres especiais.',
+    form_password_untrusted__sign_in:
+      'Sua senha pode estar comprometida. Para proteger sua conta, continue com um método de login alternativo. Você precisará redefinir sua senha após o login.',
     form_password_validation_failed: 'Senha incorreta',
     form_username_invalid_character: 'Nome de usuário contém caracteres inválidos. Por favor, tente outro.',
     form_username_invalid_length: 'Nome de usuário deve ter entre 3 e 256 caracteres.',
+    form_username_needs_non_number_char: 'Nome de usuário deve conter pelo menos um caractere não número.',
     identification_deletion_failed: 'Você não pode excluir sua última identificação.',
     not_allowed_access:
       "O endereço de e-mail ou número de telefone não é permitido para registro. Isso pode ser devido ao uso de '+', '=', '#' ou '.' no endereço de e-mail, o uso de um domínio associado a um serviço de e-mail temporário ou uma exclusão explícita.",
@@ -916,6 +986,8 @@ export const ptBR: LocalizationResource = {
     session_exists: 'Você já está conectado.',
     web3_missing_identifier:
       'Uma extensão de carteira Web3 não pode ser encontrada. Por favor, instale uma para continuar.',
+    web3_signature_request_rejected: 'Você rejeitou a solicitação de assinatura. Tente novamente para continuar.',
+    web3_solana_signature_generation_failed: 'Ocorreu um erro ao gerar a assinatura. Tente novamente para continuar.',
     zxcvbn: {
       couldBeStronger: 'Sua senha funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
       goodPassword: 'Sua senha atende a todos os requisitos necessários.',
@@ -1288,6 +1360,10 @@ export const ptBR: LocalizationResource = {
         detailsAction__nonPrimary: 'Definir como principal',
         primaryButton: 'Carteiras Web3',
         title: 'Carteiras Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selecione uma carteira Solana para conectar à sua conta.',
+          title: 'Adicionar uma carteira Solana',
+        },
       },
     },
     usernamePage: {
@@ -1322,5 +1398,11 @@ export const ptBR: LocalizationResource = {
       subtitle: 'Entraremos em contato quando seu lugar estiver disponível',
       title: 'Obrigado por entrar na lista de espera!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Conectar com {{walletName}}',
+    continue: 'Continuar com {{walletName}}',
+    noneAvailable:
+      'Nenhuma carteira Solana Web3 foi detectada. Instale uma {{ solanaWalletsLink || link("wallet extension") }} compatível com Web3.',
   },
 } as const;

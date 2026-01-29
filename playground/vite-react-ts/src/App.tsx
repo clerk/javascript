@@ -1,14 +1,13 @@
 import {
   ClerkProvider,
   RedirectToSignIn,
-  SignedIn,
-  SignedOut,
+  Show,
   SignIn,
   SignUp,
   UserButton,
   UserProfile,
   useUser,
-} from '@clerk/clerk-react';
+} from '@clerk/react';
 import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import './App.css';
 import reactLogo from './assets/react.svg';
@@ -37,7 +36,7 @@ function NavBar() {
           <a href='/user'>User Profile</a>
         </li>
       </ul>
-      <UserButton afterSignOutUrl='/' />
+      <UserButton />
     </nav>
   );
 }
@@ -126,12 +125,12 @@ function ClerkProviderWithRoutes() {
           path='/protected'
           element={
             <>
-              <SignedIn>
+              <Show when='signed-in'>
                 <ProtectedPage />
-              </SignedIn>
-              <SignedOut>
+              </Show>
+              <Show when='signed-out'>
                 <RedirectToSignIn />
-              </SignedOut>
+              </Show>
             </>
           }
         />

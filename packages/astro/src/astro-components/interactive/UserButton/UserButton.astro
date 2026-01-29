@@ -1,8 +1,8 @@
 ---
-import type { UserButtonProps, UserProfileProps, Without } from '@clerk/types';
+import type { UserButtonProps, UserProfileProps, Without } from '@clerk/shared/types';
 
 type Props = Without<UserButtonProps, 'userProfileProps'> & {
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'apiKeysProps'>;
   /**
    * If you have more than one UserButton on a page, providing a custom ID is required
    * to properly scope menu items to the correct button.

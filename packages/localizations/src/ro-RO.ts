@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
   apiKeys: {
     action__add: 'Adaugă cheie nouă',
     action__search: 'Caută chei',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copiază și închide',
+      formHint: 'Din motive de securitate, nu vă vom permite să îl vizualizați din nou mai târziu.',
+      formTitle: 'Copiați acum cheia API "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn:
       "Creată {{ createdDate | shortDate('ro-RO') }} • Expiră {{ expiresDate | longDate('ro-RO') }}",
     createdAndExpirationStatus__never: "Creată {{ createdDate | shortDate('ro-RO') }} • Nu expiră niciodată",
@@ -227,6 +232,7 @@ export const roRO: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Introdu numărul de telefon',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Cheie API',
   formFieldLabel__apiKeyDescription: 'Descriere',
   formFieldLabel__apiKeyExpiration: 'Expirare',
   formFieldLabel__apiKeyName: 'Numele cheii secrete',
@@ -396,6 +402,13 @@ export const roRO: LocalizationResource = {
         headerTitle__invitations: 'Invitații',
         headerTitle__members: 'Membri',
         headerTitle__requests: 'Ceri de acces',
+      },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Rolurile sunt temporar blocate',
+          subtitle:
+            'Actualizăm rolurile disponibile. Odată ce acest lucru este finalizat, veți putea actualiza din nou rolurile.',
+        },
       },
     },
     navbar: {
@@ -616,6 +629,12 @@ export const roRO: LocalizationResource = {
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Verifică-ți emailul',
     },
+    emailCodeMfa: {
+      formTitle: 'Verifică-ți emailul',
+      resendButton: 'Nu ai primit un cod? Retrimite',
+      subtitle: 'pentru a continua la {{applicationName}}',
+      title: 'Verifică-ți emailul',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -652,6 +671,12 @@ export const roRO: LocalizationResource = {
         titleNewTab: 'Autentificat în altă filă',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Folosiți linkul de verificare trimis la adresa dvs. de e-mail',
+      resendButton: 'Nu ați primit linkul? Retrimiteți',
+      subtitle: 'pentru a continua către {{applicationName}}',
+      title: 'Verificați-vă e-mailul',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -669,6 +694,8 @@ export const roRO: LocalizationResource = {
       label__alternativeMethods: 'Sau autentifică-te cu altă metodă',
       title: 'Ai uitat parola?',
     },
+    newDeviceVerificationNotice:
+      'Te conectezi de pe un dispozitiv nou. Solicităm verificarea pentru a menține contul tău sigur.',
     noAvailableMethods: {
       message: 'Nu se poate continua autentificarea. Nu există niciun factor de autentificare disponibil.',
       subtitle: 'A apărut o eroare',
@@ -684,8 +711,14 @@ export const roRO: LocalizationResource = {
       subtitle: 'Introdu parola asociată contului tău',
       title: 'Introdu parola',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Parola este compromisă',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Cod de verificare',
@@ -733,6 +766,10 @@ export const roRO: LocalizationResource = {
       formTitle: 'Cod de verificare',
       subtitle: 'Pentru a continua, introdu codul generat de aplicația ta de autentificare',
       title: 'Verificare în doi pași',
+    },
+    web3Solana: {
+      subtitle: 'Selectați un portofel mai jos pentru a vă conecta',
+      title: 'Conectare cu Solana',
     },
   },
   signInEnterPasswordTitle: 'Introdu parola',
@@ -827,6 +864,10 @@ export const roRO: LocalizationResource = {
       title: 'Creează-ți contul',
       titleCombined: 'Creează-ți contul',
     },
+    web3Solana: {
+      subtitle: 'Selectați un portofel mai jos pentru a vă înregistra',
+      title: 'Înregistrare cu Solana',
+    },
   },
   socialButtonsBlockButton: 'Continuă cu {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -836,6 +877,7 @@ export const roRO: LocalizationResource = {
       action__invitationAccept: 'Alătură-te',
       action__suggestionsAccept: 'Solicită alăturarea',
       subtitle: 'Alătură-te unei organizații existente sau creează una nouă',
+      subtitle__createOrganizationDisabled: 'Alătură-te unei organizații existente',
       suggestionsAcceptedLabel: 'În așteptare',
       title: 'Alege o organizație',
     },
@@ -849,21 +891,45 @@ export const roRO: LocalizationResource = {
       subtitle: 'Introdu detaliile organizației pentru a continua',
       title: 'Configurează-ți organizația',
     },
+    organizationCreationDisabled: {
+      title: 'Trebuie să aparții unei organizații',
+      subtitle: 'Contactează administratorul organizației tale pentru o invitație.',
+    },
     signOut: {
       actionLink: 'Deconectează-te',
       actionText: 'Autentificat ca {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Există deja o organizație pentru numele companiei detectate ({{organizationName}}) și {{organizationDomain}}. Alătură-te prin invitație.',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} este deja membru al organizației.',
+    avatar_file_size_exceeded:
+      'Dimensiunea fișierului depășește limita maximă de 10 MB. Te rugăm să alegi un fișier mai mic.',
+    avatar_file_type_invalid:
+      'Tipul fișierului nu este acceptat. Te rugăm să încarci o imagine JPG, PNG, GIF sau WEBP.',
     captcha_invalid: undefined,
     captcha_unavailable:
       'Înregistrarea a eșuat din cauza validării anti-bot. Reîmprospătează pagina sau contactează suportul.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Serviciile de e-mail temporare nu sunt acceptate. Vă rugăm să folosiți adresa dvs. de e-mail obișnuită pentru a crea un cont.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: undefined,
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: undefined,
     form_param_format_invalid__phone_number: undefined,
@@ -876,6 +942,8 @@ export const roRO: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Parola sau adresa de e-mail este incorectă. Încearcă din nou sau folosește o altă metodă.',
     form_password_length_too_short: 'Parola este prea scurtă. Trebuie să aibă cel puțin 8 caractere.',
     form_password_not_strong_enough: 'Parola ta nu este suficient de puternică.',
     form_password_pwned:
@@ -883,10 +951,13 @@ export const roRO: LocalizationResource = {
     form_password_pwned__sign_in:
       'Această parolă a fost găsită într-o breșă de securitate și nu poate fi folosită. Te rugăm resetează parola.',
     form_password_size_in_bytes_exceeded: undefined,
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length:
       'Numele de utilizator trebuie să aibă între {{min_length}} și {{max_length}} caractere.',
+    form_username_needs_non_number_char:
+      'Numele dvs. de utilizator trebuie să conțină cel puțin un caracter nenumeric.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
@@ -915,6 +986,9 @@ export const roRO: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Nu am găsit o extensie pentru portofel Web3. Te rugăm instalează una pentru a continua.',
+    web3_signature_request_rejected: 'Ați respins solicitarea de semnătură. Încercați din nou pentru a continua.',
+    web3_solana_signature_generation_failed:
+      'A apărut o eroare la generarea semnăturii. Încercați din nou pentru a continua.',
     zxcvbn: {
       couldBeStronger: 'Parola ta funcționează, dar ar putea fi mai puternică. Încearcă să adaugi mai multe caractere.',
       goodPassword: 'Parola ta îndeplinește toate cerințele necesare.',
@@ -1283,6 +1357,10 @@ export const roRO: LocalizationResource = {
         detailsAction__nonPrimary: 'Setează ca principal',
         primaryButton: 'Conectează portofel',
         title: 'Portofele Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selectați un portofel Solana pentru a-l conecta la contul dvs.',
+          title: 'Adăugați un portofel Solana',
+        },
       },
     },
     usernamePage: {
@@ -1317,5 +1395,11 @@ export const roRO: LocalizationResource = {
       subtitle: 'Te vom contacta când îți vine rândul',
       title: 'Mulțumim pentru înscriere!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Conectează cu {{walletName}}',
+    continue: 'Continuă cu {{walletName}}',
+    noneAvailable:
+      'Nu s-au detectat portofele Solana Web3. Instalați un {{ solanaWalletsLink || link("wallet extension") }} compatibil cu Web3.',
   },
 } as const;

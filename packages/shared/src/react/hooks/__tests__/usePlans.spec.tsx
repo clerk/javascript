@@ -1,9 +1,15 @@
-import { render, renderHook, screen, waitFor } from '@testing-library/react';
+import { act, render, renderHook, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mockUser: any = { id: 'user_1' };
-const mockOrganization: any = { id: 'org_1' };
+import type { BillingPlanResource } from '@/types/billing';
+
+import { usePlans } from '../usePlans';
+import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';
+import { wrapper } from './wrapper';
+
+const mockUser: any = createMockUser();
+const mockOrganization: any = createMockOrganization();
 
 const getPlansSpy = vi.fn((args: any) =>
   Promise.resolve({
@@ -16,21 +22,14 @@ const getPlansSpy = vi.fn((args: any) =>
   }),
 );
 
-const mockClerk = {
-  loaded: true,
+const defaultQueryClient = createMockQueryClient();
+
+const mockClerk = createMockClerk({
   billing: {
     getPlans: getPlansSpy,
   },
-  telemetry: { record: vi.fn() },
-  __unstable__environment: {
-    commerceSettings: {
-      billing: {
-        user: { enabled: true },
-        organization: { enabled: true },
-      },
-    },
-  },
-};
+  queryClient: defaultQueryClient,
+});
 
 vi.mock('../../contexts', () => {
   return {
@@ -41,16 +40,13 @@ vi.mock('../../contexts', () => {
   };
 });
 
-import type { BillingPlanResource } from '../../../types/billing';
-import { usePlans } from '../usePlans';
-import { wrapper } from './wrapper';
-
 describe('usePlans', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockClerk.loaded = true;
-    mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = true;
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = true;
+    mockClerk.__internal_environment.commerceSettings.billing.user.enabled = true;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = true;
+    defaultQueryClient.client.clear();
   });
 
   it('does not call fetcher when clerk.loaded is false', () => {
@@ -115,6 +111,8 @@ describe('usePlans', () => {
     expect(getPlansSpy).toHaveBeenCalledTimes(1);
     // orgId must not leak to fetcher
     expect(getPlansSpy.mock.calls[0][0]).toStrictEqual({ for: 'organization', pageSize: 3, initialPage: 1 });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.data.length).toBe(3);
   });
 
@@ -181,5 +179,91 @@ describe('usePlans', () => {
         { for: 'organization', initialPage: 1, pageSize: 2 },
       ]),
     );
+  });
+
+  it('does not clear data after user sign out', async () => {
+    const { result, rerender } = renderHook(() => usePlans({ initialPage: 1, pageSize: 5 }), { wrapper });
+
+    // Wait for initial data to load
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(getPlansSpy).toHaveBeenCalledTimes(1);
+    expect(getPlansSpy.mock.calls[0][0]).toStrictEqual({ for: 'user', initialPage: 1, pageSize: 5 });
+    expect(result.current.data.length).toBe(5);
+    expect(result.current.count).toBe(25);
+
+    const initialData = result.current.data;
+
+    // Simulate user sign out
+    mockUser.id = null;
+    rerender();
+
+    // Data should persist after sign out
+    expect(result.current.data).toEqual(initialData);
+    expect(result.current.data.length).toBe(5);
+    expect(result.current.count).toBe(25);
+  });
+
+  it('revalidate refetches plans and updates cache', async () => {
+    const firstResponse = {
+      data: [{ id: 'plan_initial', forPayerType: 'user' } as Partial<BillingPlanResource>],
+      total_count: 1,
+    };
+
+    const secondResponse = {
+      data: [{ id: 'plan_updated', forPayerType: 'user' } as Partial<BillingPlanResource>],
+      total_count: 1,
+    };
+
+    getPlansSpy.mockImplementationOnce(() => Promise.resolve(firstResponse));
+    getPlansSpy.mockImplementationOnce(() => Promise.resolve(secondResponse));
+
+    const { result } = renderHook(() => usePlans({ initialPage: 1, pageSize: 1 }), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual(firstResponse.data);
+
+    await act(async () => {
+      await result.current.revalidate();
+    });
+
+    await waitFor(() => expect(result.current.data).toEqual(secondResponse.data));
+    expect(getPlansSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('revalidate for user plans does not refetch organization plans', async () => {
+    getPlansSpy.mockImplementation(({ for: forParam, initialPage, pageSize }) =>
+      Promise.resolve({
+        data: [
+          {
+            id: `${forParam}-plan-${initialPage}-${pageSize}`,
+            forPayerType: forParam,
+          } as Partial<BillingPlanResource>,
+        ],
+        total_count: 1,
+      }),
+    );
+
+    const useBoth = () => {
+      const userPlans = usePlans({ initialPage: 1, pageSize: 1 });
+      const orgPlans = usePlans({ initialPage: 1, pageSize: 1, for: 'organization' } as any);
+      return { userPlans, orgPlans };
+    };
+
+    const { result } = renderHook(useBoth, { wrapper });
+
+    await waitFor(() => expect(result.current.userPlans.isLoading).toBe(false));
+    await waitFor(() => expect(result.current.orgPlans.isLoading).toBe(false));
+
+    getPlansSpy.mockClear();
+
+    await act(async () => {
+      await result.current.userPlans.revalidate();
+    });
+
+    await waitFor(() => expect(getPlansSpy.mock.calls.length).toBeGreaterThanOrEqual(1));
+
+    const calls = getPlansSpy.mock.calls.map(call => call[0]?.for);
+    expect(calls.every(value => value === 'user')).toBe(true);
   });
 });

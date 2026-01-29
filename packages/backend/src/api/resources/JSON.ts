@@ -1,4 +1,4 @@
-import type { LastAuthenticationStrategy, SignUpStatus, VerificationStatus } from '@clerk/types';
+import type { LastAuthenticationStrategy, SignUpStatus, VerificationStatus } from '@clerk/shared/types';
 
 import type {
   ActorTokenStatus,
@@ -50,7 +50,6 @@ export const ObjectType = {
   PhoneNumber: 'phone_number',
   ProxyCheck: 'proxy_check',
   RedirectUrl: 'redirect_url',
-  SamlAccount: 'saml_account',
   SamlConnection: 'saml_connection',
   Session: 'session',
   SignInAttempt: 'sign_in_attempt',
@@ -235,21 +234,6 @@ export interface JwtTemplateJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
-
-export interface SamlAccountJSON extends ClerkResourceJSON {
-  object: typeof ObjectType.SamlAccount;
-  provider: string;
-  provider_user_id: string | null;
-  active: boolean;
-  email_address: string;
-  first_name: string;
-  last_name: string;
-  verification: VerificationJSON | null;
-  saml_connection: SamlAccountConnectionJSON | null;
-  last_authenticated_at: number | null;
-  enterprise_connection_id: string | null;
-}
-
 export interface IdentificationLinkJSON extends ClerkResourceJSON {
   type: string;
 }
@@ -316,6 +300,8 @@ export interface OauthAccessTokenJSON {
   // Only set in OAuth 1.0 tokens
   token_secret?: string;
   expires_at?: number;
+  // Only present for OIDC-compliant OAuth 2.0 providers when available
+  id_token?: string;
 }
 
 export interface OAuthApplicationJSON extends ClerkResourceJSON {
@@ -405,19 +391,19 @@ export interface OrganizationInvitationAcceptedJSON extends OrganizationInvitati
  */
 export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
   /**
-   * The name of the organization.
+   * The name of the Organization.
    */
   name: string;
   /**
-   * The slug of the organization.
+   * The slug of the Organization.
    */
   slug: string;
   /**
-   * Holds the default organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization).
+   * Holds the default Organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization).
    */
   image_url?: string;
   /**
-   * Whether the organization has a profile image.
+   * Whether the Organization has a profile image.
    */
   has_image: boolean;
 }
@@ -496,6 +482,17 @@ export interface SessionJSON extends ClerkResourceJSON {
   abandon_at: number;
   created_at: number;
   updated_at: number;
+}
+
+/**
+ * Session webhook event payload extending `SessionJSON` interface with associated `User` information.
+ * Used for `session.created`, `session.ended`, `session.removed`, and `session.revoked` webhook events.
+ */
+export interface SessionWebhookEventJSON extends SessionJSON {
+  /**
+   * The user associated with the session, or null if not available.
+   */
+  user: UserJSON | null;
 }
 
 export interface SignInJSON extends ClerkResourceJSON {
@@ -590,7 +587,6 @@ export interface UserJSON extends ClerkResourceJSON {
   web3_wallets: Web3WalletJSON[];
   organization_memberships: OrganizationMembershipJSON[] | null;
   external_accounts: ExternalAccountJSON[];
-  saml_accounts: SamlAccountJSON[];
   password_last_updated_at: number | null;
   public_metadata: UserPublicMetadata;
   private_metadata: UserPrivateMetadata;
@@ -647,6 +643,18 @@ export interface DeletedObjectJSON {
   id?: string;
   slug?: string;
   deleted: boolean;
+}
+
+/**
+ * User deletion webhook event payload that extends `DeletedObjectJSON`.
+ * Includes the `external_id` field to identify the deleted user in external systems.
+ * Used for `user.deleted` webhook events.
+ */
+export interface UserDeletedJSON extends DeletedObjectJSON {
+  /**
+   * The external identifier associated with the deleted user, if one was set.
+   */
+  external_id?: string;
 }
 
 export interface PaginatedResponseJSON {
@@ -707,20 +715,6 @@ export interface PermissionJSON extends ClerkResourceJSON {
   key: string;
   name: string;
   description: string;
-  created_at: number;
-  updated_at: number;
-}
-
-export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
-  id: string;
-  name: string;
-  domain: string;
-  active: boolean;
-  provider: string;
-  sync_user_attributes: boolean;
-  allow_subdomains: boolean;
-  allow_idp_initiated: boolean;
-  disable_additional_identifications: boolean;
   created_at: number;
   updated_at: number;
 }
@@ -834,9 +828,9 @@ interface BillingTotalsJSON {
 export interface FeatureJSON extends ClerkResourceJSON {
   object: typeof ObjectType.Feature;
   name: string;
-  description: string;
+  description?: string | null;
   slug: string;
-  avatar_url: string;
+  avatar_url?: string | null;
 }
 
 /**
@@ -845,19 +839,18 @@ export interface FeatureJSON extends ClerkResourceJSON {
 export interface BillingPlanJSON extends ClerkResourceJSON {
   object: typeof ObjectType.BillingPlan;
   id: string;
-  product_id: string;
   name: string;
   slug: string;
-  description?: string;
+  description: string | null;
   is_default: boolean;
   is_recurring: boolean;
   has_base_fee: boolean;
   publicly_visible: boolean;
   fee: BillingMoneyAmountJSON;
-  annual_fee: BillingMoneyAmountJSON;
-  annual_monthly_fee: BillingMoneyAmountJSON;
+  annual_fee: BillingMoneyAmountJSON | null;
+  annual_monthly_fee: BillingMoneyAmountJSON | null;
   for_payer_type: 'org' | 'user';
-  features: FeatureJSON[];
+  features?: FeatureJSON[];
 }
 
 type BillingSubscriptionItemStatus =
@@ -877,7 +870,7 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   object: typeof ObjectType.BillingSubscriptionItem;
   status: BillingSubscriptionItemStatus;
   plan_period: 'month' | 'annual';
-  payer_id: string;
+  payer_id?: string;
   period_start: number;
   period_end: number | null;
   is_free_trial?: boolean;
@@ -886,12 +879,12 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   updated_at: number;
   canceled_at: number | null;
   past_due_at: number | null;
-  lifetime_paid: BillingMoneyAmountJSON;
-  next_payment: {
+  lifetime_paid: BillingMoneyAmountJSON | null;
+  next_payment?: {
     amount: number;
     date: number;
   } | null;
-  amount: BillingMoneyAmountJSON | null;
+  amount: BillingMoneyAmountJSON;
   plan?: BillingPlanJSON | null;
   plan_id?: string | null;
 }

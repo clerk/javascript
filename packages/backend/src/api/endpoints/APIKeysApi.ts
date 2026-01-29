@@ -1,14 +1,17 @@
-import type { ClerkPaginationRequest } from '@clerk/types';
+import type { ClerkPaginationRequest } from '@clerk/shared/types';
 
+import type { PaginatedResourceResponse } from '../../api/resources/Deserializer';
 import { joinPaths } from '../../util/path';
+import { deprecated } from '../../util/shared';
 import type { APIKey } from '../resources/APIKey';
+import type { DeletedObject } from '../resources/DeletedObject';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/api_keys';
 
 type GetAPIKeyListParams = ClerkPaginationRequest<{
   /**
-   * The user or organization ID to query API keys by
+   * The user or Organization ID to query API keys by
    */
   subject: string;
   /**
@@ -20,13 +23,12 @@ type GetAPIKeyListParams = ClerkPaginationRequest<{
 }>;
 
 type CreateAPIKeyParams = {
-  type?: 'api_key';
   /**
    * API key name
    */
   name: string;
   /**
-   * The user or organization ID to associate the API key with
+   * The user or Organization ID to associate the API key with
    */
   subject: string;
   /**
@@ -50,9 +52,27 @@ type RevokeAPIKeyParams = {
   revocationReason?: string | null;
 };
 
+type UpdateAPIKeyParams = {
+  /**
+   * API key ID
+   */
+  apiKeyId: string;
+  /**
+   * The user or Organization ID to associate the API key with
+   */
+  subject: string;
+  /**
+   * API key description
+   */
+  description?: string | null;
+  claims?: Record<string, any> | null;
+  scopes?: string[];
+  secondsUntilExpiration?: number | null;
+};
+
 export class APIKeysAPI extends AbstractAPI {
   async list(queryParams: GetAPIKeyListParams) {
-    return this.request<APIKey[]>({
+    return this.request<PaginatedResourceResponse<APIKey[]>>({
       method: 'GET',
       path: basePath,
       queryParams,
@@ -67,15 +87,45 @@ export class APIKeysAPI extends AbstractAPI {
     });
   }
 
-  async revoke(params: RevokeAPIKeyParams) {
+  async get(apiKeyId: string) {
+    this.requireId(apiKeyId);
+
+    return this.request<APIKey>({
+      method: 'GET',
+      path: joinPaths(basePath, apiKeyId),
+    });
+  }
+
+  async update(params: UpdateAPIKeyParams) {
     const { apiKeyId, ...bodyParams } = params;
+
+    this.requireId(apiKeyId);
+
+    return this.request<APIKey>({
+      method: 'PATCH',
+      path: joinPaths(basePath, apiKeyId),
+      bodyParams,
+    });
+  }
+
+  async delete(apiKeyId: string) {
+    this.requireId(apiKeyId);
+
+    return this.request<DeletedObject>({
+      method: 'DELETE',
+      path: joinPaths(basePath, apiKeyId),
+    });
+  }
+
+  async revoke(params: RevokeAPIKeyParams) {
+    const { apiKeyId, revocationReason = null } = params;
 
     this.requireId(apiKeyId);
 
     return this.request<APIKey>({
       method: 'POST',
       path: joinPaths(basePath, apiKeyId, 'revoke'),
-      bodyParams,
+      bodyParams: { revocationReason },
     });
   }
 
@@ -88,11 +138,19 @@ export class APIKeysAPI extends AbstractAPI {
     });
   }
 
-  async verifySecret(secret: string) {
+  async verify(secret: string) {
     return this.request<APIKey>({
       method: 'POST',
       path: joinPaths(basePath, 'verify'),
       bodyParams: { secret },
     });
+  }
+
+  /**
+   * @deprecated Use `verify()` instead. This method will be removed in the next major release.
+   */
+  async verifySecret(secret: string) {
+    deprecated('apiKeys.verifySecret()', 'Use `apiKeys.verify()` instead.');
+    return this.verify(secret);
   }
 }

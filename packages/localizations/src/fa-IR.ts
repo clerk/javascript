@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const faIR: LocalizationResource = {
   locale: 'fa-IR',
   apiKeys: {
     action__add: 'افزودن کلید جدید',
     action__search: 'جستجوی کلیدها',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'کپی و بستن',
+      formHint: 'به دلایل امنیتی، ما بعداً به شما اجازه مشاهده دوباره آن را نخواهیم داد.',
+      formTitle: 'اکنون کلید API "{{name}}" خود را کپی کنید',
+    },
     createdAndExpirationStatus__expiresOn:
       "ایجاد شده {{ createdDate | shortDate('en-US') }} • منقضی می‌شود {{ expiresDate | longDate('en-US') }}",
     createdAndExpirationStatus__never: "ایجاد شده {{ createdDate | shortDate('en-US') }} • هرگز منقضی نمی‌شود",
@@ -226,6 +231,7 @@ export const faIR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'شماره تلفن خود را وارد کنید',
   formFieldInputPlaceholder__username: 'نام کاربری خود را وارد کنید',
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'کلید API',
   formFieldLabel__apiKeyDescription: 'توضیحات کلید API',
   formFieldLabel__apiKeyExpiration: 'انقضای کلید API',
   formFieldLabel__apiKeyName: 'نام کلید API',
@@ -395,6 +401,13 @@ export const faIR: LocalizationResource = {
         headerTitle__invitations: 'دعوت نامه ها',
         headerTitle__members: 'اعضا',
         headerTitle__requests: 'درخواست‌ها',
+      },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'نقش‌ها موقتاً قفل شده‌اند',
+          subtitle:
+            'ما در حال به‌روزرسانی نقش‌های موجود هستیم. پس از اتمام، می‌توانید دوباره نقش‌ها را به‌روزرسانی کنید.',
+        },
       },
     },
     navbar: {
@@ -614,6 +627,12 @@ export const faIR: LocalizationResource = {
       subtitle: 'برای ادامه به {{applicationName}}',
       title: 'ایمیل خود را بررسی کنید',
     },
+    emailCodeMfa: {
+      formTitle: 'ایمیل خود را بررسی کنید',
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
+      subtitle: 'برای ادامه به {{applicationName}}',
+      title: 'ایمیل خود را بررسی کنید',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -650,6 +669,12 @@ export const faIR: LocalizationResource = {
         titleNewTab: 'در برگه دیگر وارد سیستم شده‌اید',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'از لینک تأیید ارسال شده به ایمیل خود استفاده کنید',
+      resendButton: 'لینک را دریافت نکردید؟ ارسال مجدد',
+      subtitle: 'برای ادامه به {{applicationName}}',
+      title: 'ایمیل خود را بررسی کنید',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -667,6 +692,8 @@ export const faIR: LocalizationResource = {
       label__alternativeMethods: 'یا با روش دیگری وارد شوید',
       title: 'رمز عبور را فراموش کرده‌اید؟',
     },
+    newDeviceVerificationNotice:
+      'شما از یک دستگاه جدید وارد می‌شوید. برای حفظ امنیت حساب کاربری شما، درخواست تأیید می‌کنیم.',
     noAvailableMethods: {
       message: 'نمی‌توان وارد سیستم شد. هیچ عامل احراز هویتی در دسترس نیست.',
       subtitle: 'خطایی رخ داد',
@@ -682,8 +709,14 @@ export const faIR: LocalizationResource = {
       subtitle: 'رمز عبور مرتبط با حساب کاربری خود را وارد کنید',
       title: 'رمز عبور خود را وارد کنید',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'رمز عبور به خطر افتاده است',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'کد تأیید',
@@ -731,6 +764,10 @@ export const faIR: LocalizationResource = {
       formTitle: 'کد تأیید',
       subtitle: 'برای ادامه، لطفاً کد تأیید تولید شده توسط برنامه تأیید هویت خود را وارد کنید',
       title: 'تأیید  دو مرحله‌ای',
+    },
+    web3Solana: {
+      subtitle: 'برای ورود، یک کیف پول را در زیر انتخاب کنید',
+      title: 'ورود با Solana',
     },
   },
   signInEnterPasswordTitle: 'رمز عبور خود را وارد کنید',
@@ -825,6 +862,10 @@ export const faIR: LocalizationResource = {
       title: 'حساب کاربری خود را ایجاد کنید',
       titleCombined: 'حساب کاربری خود را ایجاد کنید',
     },
+    web3Solana: {
+      subtitle: 'برای ثبت‌نام، یک کیف پول را در زیر انتخاب کنید',
+      title: 'ثبت‌نام با Solana',
+    },
   },
   socialButtonsBlockButton: 'ادامه با {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -834,6 +875,7 @@ export const faIR: LocalizationResource = {
       action__invitationAccept: 'بپیوندید',
       action__suggestionsAccept: 'درخواست عضویت',
       subtitle: 'برای ادامه، سازمانی را انتخاب کنید',
+      subtitle__createOrganizationDisabled: 'به یک سازمان موجود بپیوندید',
       suggestionsAcceptedLabel: 'در انتظار تایید',
       title: 'یک سازمان انتخاب کنید',
     },
@@ -847,21 +889,43 @@ export const faIR: LocalizationResource = {
       subtitle: 'سازمان جدیدی برای شروع کار ایجاد کنید',
       title: 'ایجاد سازمان جدید',
     },
+    organizationCreationDisabled: {
+      title: 'شما باید عضو یک سازمان باشید',
+      subtitle: 'برای دریافت دعوتنامه با مدیر سازمان خود تماس بگیرید.',
+    },
     signOut: {
       actionLink: 'خروج از همه حساب‌ها',
       actionText: 'می‌خواهید خارج شوید؟',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'سازمانی برای نام شرکت شناسایی شده ({{organizationName}}) و {{organizationDomain}} از قبل وجود دارد. از طریق دعوتنامه بپیوندید.',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} از قبل عضو سازمان است.',
+    avatar_file_size_exceeded: 'حجم فایل از حداکثر مجاز ۱۰ مگابایت بیشتر است. لطفاً فایل کوچکتری انتخاب کنید.',
+    avatar_file_type_invalid: 'نوع فایل پشتیبانی نمی‌شود. لطفاً تصویری با فرمت JPG، PNG، GIF یا WEBP آپلود کنید.',
     captcha_invalid: 'کپچا نامعتبر است. لطفاً دوباره امتحان کنید.',
     captcha_unavailable:
       'به دلیل عدم موفقیت در اعتبارسنجی ربات، ثبت نام ناموفق بود. لطفاً برای امتحان مجدد، صفحه را رفرش کنید یا برای راهنمایی بیشتر با پشتیبانی تماس بگیرید.',
     form_code_incorrect: 'کد وارد شده نادرست است.',
+    form_email_address_blocked:
+      'سرویس‌های ایمیل موقت پشتیبانی نمی‌شوند. لطفاً از آدرس ایمیل معمولی خود برای ایجاد حساب استفاده کنید.',
     form_identifier_exists__email_address: 'این آدرس ایمیل قبلاً استفاده شده است.',
     form_identifier_exists__phone_number: 'این شماره تلفن قبلاً استفاده شده است.',
     form_identifier_exists__username: 'این نام کاربری قبلاً گرفته شده است.',
     form_identifier_not_found: 'شناسه یافت نشد.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'فرمت پارامتر نامعتبر است.',
     form_param_format_invalid__email_address: 'آدرس ایمیل نامعتبر است.',
     form_param_format_invalid__phone_number: 'شماره تلفن نامعتبر است.',
@@ -874,6 +938,8 @@ export const faIR: LocalizationResource = {
     form_param_type_invalid__phone_number: 'شماره تلفن باید یک رشته معتبر باشد.',
     form_param_value_invalid: 'مقدار پارامتر نامعتبر است.',
     form_password_incorrect: 'رمز عبور نادرست است.',
+    form_password_or_identifier_incorrect:
+      'رمز عبور یا آدرس ایمیل نادرست است. دوباره تلاش کنید یا از روش دیگری استفاده کنید.',
     form_password_length_too_short: 'رمز عبور شما خیلی کوتاه است. باید حداقل ۸ کاراکتر داشته باشد.',
     form_password_not_strong_enough: 'رمز عبور شما به اندازه کافی قوی نیست.',
     form_password_pwned:
@@ -881,9 +947,11 @@ export const faIR: LocalizationResource = {
     form_password_pwned__sign_in:
       'این رمز عبور به عنوان بخشی از یک نقض امنیتی یافت شده و قابل استفاده نیست، لطفاً رمز عبور خود را مجدداً تنظیم کنید.',
     form_password_size_in_bytes_exceeded: 'رمز عبور خیلی طولانی است.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'اعتبارسنجی رمز عبور ناموفق بود.',
     form_username_invalid_character: 'نام کاربری شامل کاراکترهای نامعتبر است.',
     form_username_invalid_length: 'نام کاربری شما باید بین {{min_length}} و {{max_length}} کاراکتر باشد.',
+    form_username_needs_non_number_char: 'نام کاربری شما باید حداقل شامل یک کاراکتر غیر عددی باشد.',
     identification_deletion_failed: 'حذف شناسه ناموفق بود.',
     not_allowed_access: 'دسترسی مجاز نیست.',
     organization_domain_blocked: 'دامنه سازمان مسدود شده است.',
@@ -910,6 +978,8 @@ export const faIR: LocalizationResource = {
     phone_number_exists: 'این شماره تلفن قبلاً استفاده شده است.',
     session_exists: 'جلسه از قبل وجود دارد.',
     web3_missing_identifier: 'افزونه‌ی کیف پول وب۳ پیدا نشد. برای ادامه، لطفاً یکی نصب کنید.',
+    web3_signature_request_rejected: 'درخواست امضا را رد کرده‌اید. برای ادامه دوباره تلاش کنید.',
+    web3_solana_signature_generation_failed: 'هنگام ایجاد امضا خطایی رخ داد. برای ادامه دوباره تلاش کنید.',
     zxcvbn: {
       couldBeStronger: 'رمز عبور شما کار می‌کند، اما می‌توانست قوی‌تر باشد. سعی کنید کاراکترهای بیشتری اضافه کنید.',
       goodPassword: 'رمز عبور شما تمام شرایط لازم را برآورده می‌کند.',
@@ -1279,6 +1349,10 @@ export const faIR: LocalizationResource = {
         detailsAction__nonPrimary: 'به عنوان اصلی تنظیم کنید',
         primaryButton: 'اتصال کیف پول',
         title: 'کیف پول های Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'یک کیف پول Solana را برای اتصال به حساب خود انتخاب کنید.',
+          title: 'افزودن کیف پول Solana',
+        },
       },
     },
     usernamePage: {
@@ -1313,5 +1387,11 @@ export const faIR: LocalizationResource = {
       subtitle: 'وقتی رزرو شما آماده شد، با شما تماس خواهیم گرفت',
       title: 'ممنون که به لیست انتظار پیوستید!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'اتصال با {{walletName}}',
+    continue: 'ادامه با {{walletName}}',
+    noneAvailable:
+      'هیچ کیف پول Solana Web3 شناسایی نشد. لطفاً یک {{ solanaWalletsLink || link("wallet extension") }} پشتیبانی‌شده از Web3 نصب کنید.',
   },
 } as const;

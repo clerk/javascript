@@ -20,7 +20,7 @@ const hookName = 'useSessionList';
  * <Tab>
  *
  * ```tsx {{ filename: 'src/Home.tsx' }}
- * import { useSessionList } from '@clerk/clerk-react'
+ * import { useSessionList } from '@clerk/react'
  *
  * export default function Home() {
  *   const { isLoaded, sessions } = useSessionList()

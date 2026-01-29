@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ukUA: LocalizationResource = {
   locale: 'uk-UA',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копіювати та закрити',
+      formHint: 'З міркувань безпеки ми не дозволимо вам переглянути його пізніше.',
+      formTitle: 'Скопіюйте ваш API-ключ "{{name}}" зараз',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const ukUA: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API-ключ',
+  formFieldLabel__apiKeyDescription: 'Опис',
+  formFieldLabel__apiKeyExpiration: 'Термін дії',
+  formFieldLabel__apiKeyName: 'Назва секретного ключа',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Код відновлення',
   formFieldLabel__confirmDeletion: 'Підтвердження',
@@ -388,6 +394,12 @@ export const ukUA: LocalizationResource = {
         headerTitle__invitations: 'Invitations',
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
+      },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Ролі тимчасово заблоковані',
+          subtitle: 'Ми оновлюємо доступні ролі. Коли це буде зроблено, ви зможете знову оновлювати ролі.',
+        },
       },
     },
     navbar: {
@@ -605,6 +617,12 @@ export const ukUA: LocalizationResource = {
       subtitle: 'продовжити до {{applicationName}}',
       title: 'Перевірте свою електронну пошту',
     },
+    emailCodeMfa: {
+      formTitle: 'Перевірте свою електронну пошту',
+      resendButton: 'Не отримали код? Повторно відправити',
+      subtitle: 'продовжити до {{applicationName}}',
+      title: 'Перевірте свою електронну пошту',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -640,6 +658,12 @@ export const ukUA: LocalizationResource = {
         titleNewTab: 'Ви ввійшли на іншій вкладці',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Використовуйте посилання для підтвердження, надіслане на вашу електронну пошту',
+      resendButton: 'Не отримали посилання? Надіслати знову',
+      subtitle: 'щоб продовжити до {{applicationName}}',
+      title: 'Перевірте свою електронну пошту',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -657,6 +681,8 @@ export const ukUA: LocalizationResource = {
       label__alternativeMethods: 'Або, увійти іншим способом',
       title: 'Забули пароль?',
     },
+    newDeviceVerificationNotice:
+      'Ви входите з нового пристрою. Ми просимо підтвердження для забезпечення безпеки вашого облікового запису.',
     noAvailableMethods: {
       message: 'Не вдається виконати вхід. Немає доступного фактору автентифікації.',
       subtitle: 'Виникла помилка',
@@ -671,7 +697,13 @@ export const ukUA: LocalizationResource = {
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Введіть пароль',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -720,6 +752,10 @@ export const ukUA: LocalizationResource = {
       formTitle: 'Верифікаційний код',
       subtitle: undefined,
       title: 'Двоетапна перевірка',
+    },
+    web3Solana: {
+      subtitle: 'Виберіть гаманець нижче, щоб увійти',
+      title: 'Увійти через Solana',
     },
   },
   signInEnterPasswordTitle: 'Введіть Ваш пароль',
@@ -811,44 +847,72 @@ export const ukUA: LocalizationResource = {
       title: 'Створіть Ваш акаунт',
       titleCombined: 'Створіть Ваш акаунт',
     },
+    web3Solana: {
+      subtitle: 'Виберіть гаманець нижче, щоб зареєструватися',
+      title: 'Зареєструватися через Solana',
+    },
   },
   socialButtonsBlockButton: 'Продовжити за допомогою {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Створити нову організацію',
+      action__invitationAccept: 'Приєднатися',
+      action__suggestionsAccept: 'Запросити приєднання',
+      subtitle: 'Приєднайтеся до існуючої організації або створіть нову',
+      subtitle__createOrganizationDisabled: 'Приєднайтеся до існуючої організації',
+      suggestionsAcceptedLabel: 'Очікує схвалення',
+      title: 'Виберіть організацію',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Скасувати',
+      formButtonSubmit: 'Продовжити',
+      formFieldInputPlaceholder__name: 'Моя організація',
+      formFieldInputPlaceholder__slug: 'moya-organizatsiya',
+      formFieldLabel__name: 'Назва',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Введіть дані вашої організації для продовження',
+      title: 'Налаштуйте вашу організацію',
     },
+    organizationCreationDisabled: {
+      title: 'Ви повинні належати до організації',
+      subtitle: 'Зверніться до адміністратора вашої організації для отримання запрошення.',
+    },
+    signOut: {
+      actionLink: 'Вийти',
+      actionText: 'Увійшли як {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Організація вже існує для виявленої назви компанії ({{organizationName}}) та {{organizationDomain}}. Приєднуйтесь за запрошенням.',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
+    title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Розмір файлу перевищує максимальний ліміт 10 МБ. Будь ласка, виберіть менший файл.',
+    avatar_file_type_invalid:
+      'Тип файлу не підтримується. Будь ласка, завантажте зображення у форматі JPG, PNG, GIF або WEBP.',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Тимчасові поштові служби не підтримуються. Будь ласка, використовуйте свою звичайну адресу електронної пошти для створення облікового запису.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Не вдалося знайти акаунт з цими даними.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
@@ -861,15 +925,19 @@ export const ukUA: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Пароль або адреса електронної пошти невірні. Спробуйте ще раз або використайте інший метод.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Ваш пароль недостатньо надійний.',
     form_password_pwned: 'Цей пароль було зламано і його не можна використовувати, спробуйте інший пароль.',
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Ваш пароль перевищує максимально допустиму кількість байтів, скоротіть його або видаліть деякі спеціальні символи.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Невірний пароль',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: "Ім'я користувача повинно містити принаймні один нецифровий символ.",
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access:
       "Адреса електронної пошти або номер телефону не дозволено для реєстрації. Це може бути пов'язано з використанням '+', '=', '#' або '.' в адресі електронної пошти, використанням домену, пов'язаного з тимчасовою електронною поштою, або явного виключення.",
@@ -897,6 +965,9 @@ export const ukUA: LocalizationResource = {
     phone_number_exists: 'Цей номер телефону вже використовується. Спробуйте інший.',
     session_exists: 'Ви вже увійшли в систему.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Ви відхилили запит на підпис. Будь ласка, спробуйте ще раз, щоб продовжити.',
+    web3_solana_signature_generation_failed:
+      'Під час створення підпису сталася помилка. Будь ласка, спробуйте ще раз, щоб продовжити.',
     zxcvbn: {
       couldBeStronger: 'Ваш пароль підходить, але міг би бути надійнішим. Спробуйте додати більше символів.',
       goodPassword: 'Хороша робота. Це відмінний пароль.',
@@ -1266,6 +1337,10 @@ export const ukUA: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 гаманці',
         title: 'Web3 гаманці',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Виберіть гаманець Solana, щоб підключити його до свого облікового запису.',
+          title: 'Додати гаманець Solana',
+        },
       },
     },
     usernamePage: {
@@ -1289,16 +1364,22 @@ export const ukUA: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Увійти',
+      actionText: 'Вже маєте доступ?',
+      formButton: 'Приєднатися до списку очікування',
+      subtitle: 'Введіть свою електронну адресу, і ми повідомимо вас, коли ваше місце буде готове',
+      title: 'Приєднатися до списку очікування',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Ви будете перенаправлені незабаром...',
+      subtitle: "Ми зв'яжемося з вами, коли ваше місце буде готове",
+      title: 'Дякуємо за приєднання до списку очікування!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Підключитися через {{walletName}}',
+    continue: 'Продовжити через {{walletName}}',
+    noneAvailable:
+      'Гаманці Solana Web3 не виявлено. Установіть {{ solanaWalletsLink || link("wallet extension") }} з підтримкою Web3.',
   },
 } as const;

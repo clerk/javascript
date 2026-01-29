@@ -1,30 +1,10 @@
-import type { HandleOAuthCallbackParams, PendingSessionOptions } from '@clerk/types';
+import type { HandleOAuthCallbackParams, PendingSessionOptions, ShowWhenCondition } from '@clerk/shared/types';
 import { computed } from 'nanostores';
-import type { PropsWithChildren } from 'react';
 import React, { useEffect, useState } from 'react';
 
 import { $csrState } from '../stores/internal';
-import type { ProtectProps as _ProtectProps } from '../types';
 import { useAuth } from './hooks';
-import type { WithClerkProp } from './utils';
-import { withClerk } from './utils';
-
-export function SignedOut({ children, treatPendingAsSignedOut }: PropsWithChildren<PendingSessionOptions>) {
-  const { userId } = useAuth({ treatPendingAsSignedOut });
-
-  if (userId) {
-    return null;
-  }
-  return children;
-}
-
-export function SignedIn({ children, treatPendingAsSignedOut }: PropsWithChildren<PendingSessionOptions>) {
-  const { userId } = useAuth({ treatPendingAsSignedOut });
-  if (!userId) {
-    return null;
-  }
-  return children;
-}
+import { withClerk, type WithClerkProp } from './utils';
 
 const $isLoadingClerkStore = computed($csrState, state => state.isLoaded);
 
@@ -69,70 +49,44 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren): JSX.Element
   return <>{children}</>;
 };
 
-export type ProtectProps = React.PropsWithChildren<
-  _ProtectProps & { fallback?: React.ReactNode } & PendingSessionOptions
+export type ShowProps = React.PropsWithChildren<
+  {
+    fallback?: React.ReactNode;
+    when: ShowWhenCondition;
+  } & PendingSessionOptions
 >;
 
-/**
- * Use `<Protect/>` in order to prevent unauthenticated or unauthorized users from accessing the children passed to the component.
- *
- * Examples:
- * ```
- * <Protect permission="a_permission_key" />
- * <Protect role="a_role_key" />
- * <Protect condition={(has) => has({permission:"a_permission_key"})} />
- * <Protect condition={(has) => has({role:"a_role_key"})} />
- * <Protect fallback={<p>Unauthorized</p>} />
- * ```
- */
-export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAuthorizedParams }: ProtectProps) => {
-  const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut });
+export const Show = ({ children, fallback, treatPendingAsSignedOut, when }: ShowProps) => {
+  if (typeof when === 'undefined') {
+    throw new Error('@clerk/astro: <Show /> requires a `when` prop.');
+  }
 
-  /**
-   * Avoid flickering children or fallback while clerk is loading sessionId or userId
-   */
+  const { has, isLoaded, userId } = useAuth({ treatPendingAsSignedOut });
+
   if (!isLoaded) {
     return null;
   }
 
-  /**
-   * Fallback to UI provided by user or `null` if authorization checks failed
-   */
+  const authorized = <>{children}</>;
   const unauthorized = <>{fallback ?? null}</>;
 
-  const authorized = <>{children}</>;
+  if (when === 'signed-out') {
+    return userId ? unauthorized : authorized;
+  }
 
   if (!userId) {
     return unauthorized;
   }
 
-  /**
-   * Check against the results of `has` called inside the callback
-   */
-  if (typeof restAuthorizedParams.condition === 'function') {
-    if (restAuthorizedParams.condition(has)) {
-      return authorized;
-    }
-    return unauthorized;
+  if (when === 'signed-in') {
+    return authorized;
   }
 
-  if (
-    restAuthorizedParams.role ||
-    restAuthorizedParams.permission ||
-    restAuthorizedParams.feature ||
-    restAuthorizedParams.plan
-  ) {
-    if (has?.(restAuthorizedParams)) {
-      return authorized;
-    }
-    return unauthorized;
+  if (typeof when === 'function') {
+    return when(has) ? authorized : unauthorized;
   }
 
-  /**
-   * If neither of the authorization params are passed behave as the `<SignedIn/>`.
-   * If fallback is present render that instead of rendering nothing.
-   */
-  return authorized;
+  return has(when) ? authorized : unauthorized;
 };
 
 /**
@@ -140,7 +94,7 @@ export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAu
  */
 export const AuthenticateWithRedirectCallback = withClerk(
   ({ clerk, ...handleRedirectCallbackParams }: WithClerkProp<HandleOAuthCallbackParams>) => {
-    React.useEffect(() => {
+    useEffect(() => {
       void clerk?.handleRedirectCallback(handleRedirectCallbackParams);
     }, []);
 

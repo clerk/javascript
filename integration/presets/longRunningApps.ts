@@ -1,7 +1,6 @@
 import type { LongRunningApplication } from '../models/longRunningApplication';
 import { longRunningApplication } from '../models/longRunningApplication';
 import { astro } from './astro';
-import { elements } from './elements';
 import { envs } from './envs';
 import { expo } from './expo';
 import { express } from './express';
@@ -31,26 +30,21 @@ export const createLongRunningApps = () => {
     { id: 'next.appRouter.withSignInOrUpFlow', config: next.appRouter, env: envs.withSignInOrUpFlow },
     { id: 'next.appRouter.withSignInOrUpEmailLinksFlow', config: next.appRouter, env: envs.withSignInOrUpEmailLinksFlow },
     { id: 'next.appRouter.withSessionTasks', config: next.appRouter, env: envs.withSessionTasks },
+    { id: 'next.appRouter.withSessionTasksResetPassword', config: next.appRouter, env: envs.withSessionTasksResetPassword },
     { id: 'next.appRouter.withLegalConsent', config: next.appRouter, env: envs.withLegalConsent },
+    { id: 'next.appRouter.withNeedsClientTrust', config: next.appRouter, env: envs.withNeedsClientTrust },
+    { id: 'next.appRouter.withSharedUIVariant', config: next.appRouter, env: envs.withSharedUIVariant },
 
     /**
      * Quickstart apps
      */
     { id: 'quickstart.next.appRouter', config: next.appRouterQuickstart, env: envs.withEmailCodesQuickstart },
 
-    /** 
+    /**
      * Billing apps
      */
     { id: 'withBillingJwtV2.next.appRouter', config: next.appRouter, env: envs.withBillingJwtV2 },
-    { id: 'withBilling.next.appRouter', config: next.appRouter, env: envs.withBilling },
     { id: 'withBillingJwtV2.vue.vite', config: vue.vite, env: envs.withBillingJwtV2 },
-    { id: 'withBilling.vue.vite', config: vue.vite, env: envs.withBilling },
-
-    /**
-     * Machine auth apps
-     */
-    { id: 'withMachine.express.vite', config: express.vite, env: envs.withAPIKeys },
-    { id: 'withMachine.next.appRouter', config: next.appRouter, env: envs.withAPIKeys },
 
     /**
      * Vite apps - basic flows
@@ -60,27 +54,25 @@ export const createLongRunningApps = () => {
     { id: 'react.vite.withEmailLinks', config: react.vite, env: envs.withEmailLinks },
     { id: 'vue.vite', config: vue.vite, env: envs.withCustomRoles },
 
-    /** 
+    /**
      * Tanstack apps - basic flows
      */
     { id: 'tanstack.react-start', config: tanstack.reactStart, env: envs.withEmailCodes },
- 
+
     /**
      * Various apps - basic flows
-     */ 
-    { id: 'withBilling.astro.node', config: astro.node, env: envs.withBilling },
+     */
     { id: 'astro.node.withCustomRoles', config: astro.node, env: envs.withCustomRoles },
     { id: 'astro.static.withCustomRoles', config: astro.static, env: envs.withCustomRoles },
     { id: 'expo.expo-web', config: expo.expoWeb, env: envs.withEmailCodes },
     { id: 'nuxt.node', config: nuxt.node, env: envs.withCustomRoles },
     { id: 'react-router.node', config: reactRouter.reactRouterNode, env: envs.withEmailCodes },
     { id: 'express.vite.withEmailCodes', config: express.vite, env: envs.withEmailCodes },
-    { id: 'elements.next.appRouter', config: elements.nextAppRouter, env: envs.withEmailCodes },
   ] as const;
 
   const apps = configs.map(longRunningApplication);
 
-  return { 
+  return {
     getByPattern: (patterns: Array<string | (typeof configs)[number]['id']>) => {
       const res = new Set(patterns.map(pattern => apps.filter(app => idMatchesPattern(app.id, pattern))).flat());
       if (!res.size) {

@@ -7,6 +7,8 @@ export const pickFromClerkInitState = (
   clerkInitState: any,
 ): TanStackProviderAndInitialProps & {
   clerkSsrState: any;
+  __keylessClaimUrl?: string;
+  __keylessApiKeysUrl?: string;
 } => {
   const {
     __clerk_ssr_state,
@@ -16,9 +18,8 @@ export const pickFromClerkInitState = (
     __isSatellite,
     __signInUrl,
     __signUpUrl,
-    __afterSignInUrl,
-    __afterSignUpUrl,
     __clerkJSUrl,
+    __clerkUiUrl,
     __clerkJSVersion,
     __telemetryDisabled,
     __telemetryDebug,
@@ -26,6 +27,8 @@ export const pickFromClerkInitState = (
     __signUpForceRedirectUrl,
     __signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl,
+    __keylessClaimUrl,
+    __keylessApiKeysUrl,
   } = clerkInitState || {};
 
   return {
@@ -36,9 +39,8 @@ export const pickFromClerkInitState = (
     isSatellite: !!__isSatellite,
     signInUrl: __signInUrl,
     signUpUrl: __signUpUrl,
-    afterSignInUrl: __afterSignInUrl,
-    afterSignUpUrl: __afterSignUpUrl,
     clerkJSUrl: __clerkJSUrl,
+    clerkUiUrl: __clerkUiUrl,
     clerkJSVersion: __clerkJSVersion,
     telemetry: {
       disabled: __telemetryDisabled,
@@ -48,6 +50,8 @@ export const pickFromClerkInitState = (
     signUpForceRedirectUrl: __signUpForceRedirectUrl,
     signInFallbackRedirectUrl: __signInFallbackRedirectUrl,
     signUpFallbackRedirectUrl: __signUpFallbackRedirectUrl,
+    __keylessClaimUrl,
+    __keylessApiKeysUrl,
   };
 };
 
@@ -59,9 +63,8 @@ export const mergeWithPublicEnvs = (restInitState: any) => {
     isSatellite: restInitState.isSatellite || getPublicEnvVariables().isSatellite,
     signInUrl: restInitState.signInUrl || getPublicEnvVariables().signInUrl,
     signUpUrl: restInitState.signUpUrl || getPublicEnvVariables().signUpUrl,
-    afterSignInUrl: restInitState.afterSignInUrl || getPublicEnvVariables().afterSignInUrl,
-    afterSignUpUrl: restInitState.afterSignUpUrl || getPublicEnvVariables().afterSignUpUrl,
     clerkJSUrl: restInitState.clerkJSUrl || getPublicEnvVariables().clerkJsUrl,
+    clerkUiUrl: restInitState.clerkUiUrl || getPublicEnvVariables().clerkUiUrl,
     clerkJSVersion: restInitState.clerkJSVersion || getPublicEnvVariables().clerkJsVersion,
     signInForceRedirectUrl: restInitState.signInForceRedirectUrl,
     clerkJSVariant: restInitState.clerkJSVariant || getPublicEnvVariables().clerkJsVariant,

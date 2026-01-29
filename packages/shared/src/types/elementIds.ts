@@ -24,7 +24,9 @@ export type FieldId =
   | 'legalAccepted'
   | 'apiKeyDescription'
   | 'apiKeyExpirationDate'
-  | 'apiKeyRevokeConfirmation';
+  | 'apiKeyRevokeConfirmation'
+  | 'apiKeySecret'
+  | 'web3WalletName';
 export type ProfileSectionId =
   | 'profile'
   | 'username'

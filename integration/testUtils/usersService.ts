@@ -3,6 +3,19 @@ import { faker } from '@faker-js/faker';
 
 import { hash } from '../models/helpers';
 
+async function withErrorLogging<T>(operation: string, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (e: any) {
+    console.error(`[usersService] ${operation} failed:`);
+    console.error('  Status:', e.status);
+    console.error('  Message:', e.message);
+    console.error('  Errors:', JSON.stringify(e.errors, null, 2));
+    console.error('  Clerk Trace ID:', e.clerkTraceId);
+    throw e;
+  }
+}
+
 type FakeUserOptions = {
   /**
    * A fictional email is an email that contains +clerk_test and can always be verified using 424242 as the OTP. No email will be sent.
@@ -62,7 +75,7 @@ export type FakeOrganization = {
 export type FakeAPIKey = {
   apiKey: APIKey;
   secret: string;
-  revoke: () => Promise<APIKey>;
+  revoke: (reason?: string | null) => Promise<APIKey>;
 };
 
 export type UserService = {
@@ -76,6 +89,7 @@ export type UserService = {
   createFakeOrganization: (userId: string) => Promise<FakeOrganization>;
   getUser: (opts: { id?: string; email?: string }) => Promise<User | undefined>;
   createFakeAPIKey: (userId: string) => Promise<FakeAPIKey>;
+  setPasswordCompromised: (userId: string) => Promise<void>;
 };
 
 /**
@@ -125,15 +139,17 @@ export const createUserService = (clerkClient: ClerkClient) => {
       };
     },
     createBapiUser: async fakeUser => {
-      return await clerkClient.users.createUser({
-        emailAddress: fakeUser.email !== undefined ? [fakeUser.email] : undefined,
-        password: fakeUser.password,
-        firstName: fakeUser.firstName,
-        lastName: fakeUser.lastName,
-        phoneNumber: fakeUser.phoneNumber !== undefined ? [fakeUser.phoneNumber] : undefined,
-        username: fakeUser.username,
-        skipPasswordRequirement: fakeUser.password === undefined,
-      });
+      return withErrorLogging('createBapiUser', () =>
+        clerkClient.users.createUser({
+          emailAddress: fakeUser.email !== undefined ? [fakeUser.email] : undefined,
+          password: fakeUser.password,
+          firstName: fakeUser.firstName,
+          lastName: fakeUser.lastName,
+          phoneNumber: fakeUser.phoneNumber !== undefined ? [fakeUser.phoneNumber] : undefined,
+          username: fakeUser.username,
+          skipPasswordRequirement: fakeUser.password === undefined,
+        }),
+      );
     },
     getOrCreateUser: async fakeUser => {
       const existingUser = await self.getUser({ email: fakeUser.email });
@@ -146,10 +162,12 @@ export const createUserService = (clerkClient: ClerkClient) => {
       let id = opts.id;
 
       if (!id) {
-        const { data: users } = await clerkClient.users.getUserList({
-          emailAddress: [opts.email],
-          phoneNumber: [opts.phoneNumber],
-        });
+        const { data: users } = await withErrorLogging('getUserList', () =>
+          clerkClient.users.getUserList({
+            emailAddress: [opts.email],
+            phoneNumber: [opts.phoneNumber],
+          }),
+        );
         id = users[0]?.id;
       }
 
@@ -158,12 +176,12 @@ export const createUserService = (clerkClient: ClerkClient) => {
         return;
       }
 
-      await clerkClient.users.deleteUser(id);
+      await withErrorLogging('deleteUser', () => clerkClient.users.deleteUser(id));
     },
     getUser: async (opts: { id?: string; email?: string }) => {
       if (opts.id) {
         try {
-          const user = await clerkClient.users.getUser(opts.id);
+          const user = await withErrorLogging('getUser', () => clerkClient.users.getUser(opts.id));
           return user;
         } catch (err) {
           console.log(`Error fetching user "${opts.id}": ${err.message}`);
@@ -172,7 +190,9 @@ export const createUserService = (clerkClient: ClerkClient) => {
       }
 
       if (opts.email) {
-        const { data: users } = await clerkClient.users.getUserList({ emailAddress: [opts.email] });
+        const { data: users } = await withErrorLogging('getUserList', () =>
+          clerkClient.users.getUserList({ emailAddress: [opts.email] }),
+        );
         if (users.length > 0) {
           return users[0];
         } else {
@@ -185,32 +205,39 @@ export const createUserService = (clerkClient: ClerkClient) => {
     },
     createFakeOrganization: async userId => {
       const name = faker.animal.dog();
-      const organization = await clerkClient.organizations.createOrganization({
-        name: faker.animal.dog(),
-        createdBy: userId,
-      });
+      const organization = await withErrorLogging('createOrganization', () =>
+        clerkClient.organizations.createOrganization({
+          name: name,
+          createdBy: userId,
+        }),
+      );
       return {
         name,
         organization,
-        delete: () => clerkClient.organizations.deleteOrganization(organization.id),
+        delete: () =>
+          withErrorLogging('deleteOrganization', () => clerkClient.organizations.deleteOrganization(organization.id)),
       } satisfies FakeOrganization;
     },
     createFakeAPIKey: async (userId: string) => {
       const TWENTY_MINUTES = 20 * 60;
 
-      const apiKey = await clerkClient.apiKeys.create({
-        subject: userId,
-        name: `Integration Test - ${userId}`,
-        secondsUntilExpiration: TWENTY_MINUTES,
-      });
-
-      const { secret } = await clerkClient.apiKeys.getSecret(apiKey.id);
+      const apiKey = await withErrorLogging('createAPIKey', () =>
+        clerkClient.apiKeys.create({
+          subject: userId,
+          name: `Integration Test - ${faker.string.uuid()}`,
+          secondsUntilExpiration: TWENTY_MINUTES,
+        }),
+      );
 
       return {
         apiKey,
-        secret,
-        revoke: () => clerkClient.apiKeys.revoke({ apiKeyId: apiKey.id, revocationReason: 'For testing purposes' }),
+        secret: apiKey.secret ?? '',
+        revoke: (reason?: string | null) =>
+          clerkClient.apiKeys.revoke({ apiKeyId: apiKey.id, revocationReason: reason }),
       } satisfies FakeAPIKey;
+    },
+    setPasswordCompromised: async (userId: string) => {
+      await clerkClient.users.setPasswordCompromised(userId);
     },
   };
 

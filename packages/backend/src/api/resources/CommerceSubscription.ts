@@ -1,4 +1,4 @@
-import type { BillingMoneyAmount } from '@clerk/types';
+import type { BillingMoneyAmount } from '@clerk/shared/types';
 
 import { BillingSubscriptionItem } from './CommerceSubscriptionItem';
 import type { BillingSubscriptionJSON } from './JSON';
@@ -73,7 +73,7 @@ export class BillingSubscription {
       data.updated_at,
       data.active_at ?? null,
       data.past_due_at ?? null,
-      data.subscription_items.map(item => BillingSubscriptionItem.fromJSON(item)),
+      (data.subscription_items ?? []).map(item => BillingSubscriptionItem.fromJSON(item)),
       nextPayment,
       data.eligible_for_free_trial ?? false,
     );

@@ -1,3 +1,4 @@
+import type { ClerkError } from '@clerk/shared/error';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { retry } from '@clerk/shared/retry';
 import type {
@@ -7,13 +8,20 @@ import type {
   BillingPayerResource,
   BillingPaymentMethodResource,
   BillingSubscriptionPlanPeriod,
+  CheckoutFlowFinalizeParams,
+  CheckoutFlowResource,
+  CheckoutFlowResourceNonStrict,
+  CheckoutSignalValue,
   ConfirmCheckoutParams,
+  CreateCheckoutParams,
 } from '@clerk/shared/types';
+import { computed, endBatch, signal, startBatch } from 'alien-signals';
 
 import { unixEpochToDate } from '@/utils/date';
 
 import { billingTotalsFromJSON } from '../../utils';
 import { Billing } from '../modules/billing/namespace';
+import { errorsToParsedErrors } from '../signals';
 import { BillingPayer } from './BillingPayer';
 import { BaseResource, BillingPaymentMethod, BillingPlan } from './internal';
 
@@ -28,11 +36,11 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
   status!: 'needs_confirmation' | 'completed';
   totals!: BillingCheckoutTotals;
   isImmediatePlanChange!: boolean;
-  freeTrialEndsAt!: Date | null;
+  freeTrialEndsAt?: Date;
   payer!: BillingPayerResource;
   needsPaymentMethod!: boolean;
 
-  constructor(data: BillingCheckoutJSON) {
+  constructor(data: BillingCheckoutJSON | null = null) {
     super();
     this.fromJSON(data);
   }
@@ -52,7 +60,9 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
     this.status = data.status;
     this.totals = billingTotalsFromJSON(data.totals);
     this.isImmediatePlanChange = data.is_immediate_plan_change;
-    this.freeTrialEndsAt = data.free_trial_ends_at ? unixEpochToDate(data.free_trial_ends_at) : null;
+    if (data.free_trial_ends_at) {
+      this.freeTrialEndsAt = unixEpochToDate(data.free_trial_ends_at);
+    }
     this.payer = new BillingPayer(data.payer);
     this.needsPaymentMethod = data.needs_payment_method;
     return this;
@@ -87,5 +97,165 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
         },
       },
     );
+  };
+}
+
+export const createSignals = () => {
+  const resourceSignal = signal<{ resource: CheckoutFlow | null }>({ resource: null });
+  const errorSignal = signal<{ error: ClerkError | null }>({ error: null });
+  const fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+  const computedSignal = computed<Omit<CheckoutSignalValue, 'checkout'> & { checkout: CheckoutFlowResource | null }>(
+    () => {
+      const resource = resourceSignal().resource;
+      const error = errorSignal().error;
+      const fetchStatus = fetchSignal().status;
+      const errors = errorsToParsedErrors(error, {});
+      return { errors: errors, fetchStatus, checkout: resource };
+    },
+  );
+
+  return { resourceSignal, errorSignal, fetchSignal, computedSignal };
+};
+
+type CheckoutTask = 'start' | 'confirm' | 'finalize';
+
+export class CheckoutFlow implements CheckoutFlowResourceNonStrict {
+  private resource = new BillingCheckout(null);
+  private readonly config: CreateCheckoutParams;
+  private readonly signals: ReturnType<typeof createSignals>;
+  private readonly pendingOperations = new Map<CheckoutTask, Promise<{ error: unknown }> | null>();
+
+  constructor(signals: ReturnType<typeof createSignals>, config: CreateCheckoutParams) {
+    this.config = config;
+    this.signals = signals;
+    this.signals.resourceSignal({ resource: this });
+  }
+
+  get status() {
+    return this.resource.status ?? 'needs_initialization';
+  }
+
+  get externalClientSecret() {
+    return this.resource.externalClientSecret;
+  }
+
+  get externalGatewayId() {
+    return this.resource.externalGatewayId;
+  }
+
+  get plan() {
+    return this.resource.plan;
+  }
+  get planPeriod() {
+    return this.resource.planPeriod;
+  }
+  get totals() {
+    return this.resource.totals;
+  }
+  get isImmediatePlanChange() {
+    return this.resource.isImmediatePlanChange;
+  }
+  get freeTrialEndsAt() {
+    return this.resource.freeTrialEndsAt;
+  }
+  get payer() {
+    return this.resource.payer;
+  }
+
+  get paymentMethod() {
+    return this.resource.paymentMethod ?? null;
+  }
+
+  get planPeriodStart() {
+    return this.resource.planPeriodStart;
+  }
+
+  get needsPaymentMethod() {
+    return this.resource.needsPaymentMethod;
+  }
+
+  async start(): Promise<{ error: ClerkError | null }> {
+    return this.runAsyncCheckoutTask(
+      'start',
+      async () => {
+        const checkout = (await BillingCheckout.clerk.billing?.startCheckout(this.config)) as BillingCheckout;
+        this.resource = checkout;
+      },
+      () => {
+        this.resource = new BillingCheckout(null);
+        this.signals.resourceSignal({ resource: this });
+      },
+    );
+  }
+
+  async confirm(params: ConfirmCheckoutParams): Promise<{ error: ClerkError | null }> {
+    if (!this.resource.id) {
+      throw new Error('Clerk: `start()` must be called before `confirm()`');
+    }
+    return this.runAsyncCheckoutTask('confirm', async () => {
+      await this.resource.confirm(params);
+    });
+  }
+
+  async finalize(params?: CheckoutFlowFinalizeParams): Promise<{ error: ClerkError | null }> {
+    const { navigate } = params || {};
+    return this.runAsyncCheckoutTask('finalize', async () => {
+      if (this.resource.status !== 'completed') {
+        throw new Error('Clerk: `confirm()` must be called before `finalize()`');
+      }
+
+      await BillingCheckout.clerk.setActive({ session: BillingCheckout.clerk.session?.id, navigate });
+    });
+  }
+
+  private runAsyncCheckoutTask<T>(operationType: CheckoutTask, task: () => Promise<T>, beforeTask?: () => void) {
+    // Noops during transitive state
+    if (typeof BillingCheckout.clerk.user === 'undefined') {
+      console.warn('Clerk: Checkout operations cannot be performed during transitive state');
+      return { error: null };
+    }
+    return createRunAsyncCheckoutTask(this, this.signals, this.pendingOperations)(operationType, task, beforeTask);
+  }
+}
+
+function createRunAsyncCheckoutTask(
+  resource: CheckoutFlow,
+  signals: ReturnType<typeof createSignals>,
+  pendingOperations: Map<CheckoutTask, Promise<{ error: unknown }> | null>,
+): <T>(
+  operationType: CheckoutTask,
+  task: () => Promise<T>,
+  beforeTask?: () => void,
+) => Promise<{ error: ClerkError | null }> {
+  return async (operationType, task, beforeTask?: () => void) => {
+    if (pendingOperations.get(operationType)) {
+      // Wait for the existing operation to complete and return its result
+      // If it fails, all callers should receive the same error
+      return pendingOperations.get(operationType) as Promise<{ error: unknown }>;
+    }
+
+    const operationPromise = (async () => {
+      startBatch();
+      signals.errorSignal({ error: null });
+      signals.fetchSignal({ status: 'fetching' });
+      beforeTask?.();
+      endBatch();
+      startBatch();
+      try {
+        await task();
+        signals.resourceSignal({ resource: resource });
+        return { error: null };
+      } catch (err) {
+        signals.errorSignal({ error: err });
+        return { error: err };
+      } finally {
+        pendingOperations.delete(operationType);
+        signals.fetchSignal({ status: 'idle' });
+        endBatch();
+      }
+    })();
+
+    pendingOperations.set(operationType, operationPromise);
+    return operationPromise;
   };
 }

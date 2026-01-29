@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.103.1",
+  "version": "5.114.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -32,17 +32,15 @@
   ],
   "scripts": {
     "build": "pnpm build:bundle && pnpm build:declarations",
-    "postbuild": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs",
     "build:analyze": "rspack build --config rspack.config.js --env production --env variant=\"clerk.browser\" --env analysis --analyze",
     "build:bundle": "pnpm clean && rspack build --config rspack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
-    "build:sandbox": "rspack build --config rspack.config.js --env production --env sandbox",
+    "build:sandbox": "pnpm --filter @clerk/ui build:umd && rspack build --config rspack.config.js --env production --env sandbox",
     "build:stats": "rspack build --config rspack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
-    "dev:channel": "rspack serve --config rspack.config.js --env variant=\"clerk.channel.browser\"",
     "dev:chips": "rspack serve --config rspack.config.js --env variant=\"clerk.chips.browser\"",
     "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4000}",
@@ -52,6 +50,7 @@
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports",
     "lint:publint": "publint || true",
+    "postbuild:disabled": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs",
     "test": "vitest --watch=false",
     "test:sandbox:integration": "playwright test",
     "test:sandbox:integration:ui": "playwright test --ui",
@@ -60,37 +59,31 @@
   },
   "browserslist": "last 2 years",
   "dependencies": {
-    "@base-org/account": "2.0.1",
-    "@clerk/localizations": "workspace:^",
+    "@base-org/account": "catalog:module-manager",
     "@clerk/shared": "workspace:^",
-    "@coinbase/wallet-sdk": "4.3.0",
-    "@emotion/cache": "11.11.0",
-    "@emotion/react": "11.11.1",
-    "@floating-ui/react": "0.27.12",
-    "@floating-ui/react-dom": "^2.1.3",
-    "@formkit/auto-animate": "^0.8.2",
+    "@coinbase/wallet-sdk": "catalog:module-manager",
+    "@solana/wallet-adapter-base": "catalog:module-manager",
+    "@solana/wallet-adapter-react": "catalog:module-manager",
+    "@solana/wallet-standard": "catalog:module-manager",
     "@stripe/stripe-js": "5.6.0",
-    "@swc/helpers": "^0.5.17",
-    "@zxcvbn-ts/core": "3.0.4",
-    "@zxcvbn-ts/language-common": "3.0.4",
+    "@swc/helpers": "catalog:repo",
+    "@tanstack/query-core": "5.90.16",
+    "@wallet-standard/core": "catalog:module-manager",
+    "@zxcvbn-ts/core": "catalog:module-manager",
+    "@zxcvbn-ts/language-common": "catalog:module-manager",
     "alien-signals": "2.0.6",
     "browser-tabs-lock": "1.3.0",
-    "copy-to-clipboard": "3.3.3",
-    "core-js": "3.41.0",
+    "core-js": "catalog:repo",
     "crypto-js": "^4.2.0",
-    "dequal": "2.0.3",
-    "input-otp": "1.4.2",
-    "qrcode.react": "4.2.0",
-    "regenerator-runtime": "0.14.1",
-    "swr": "2.3.4"
+    "dequal": "2.0.3"
   },
   "devDependencies": {
+    "@clerk/msw": "workspace:^",
     "@clerk/testing": "workspace:^",
+    "@emotion/react": "11.11.1",
     "@rsdoctor/rspack-plugin": "^0.4.13",
-    "@rspack/cli": "^1.4.11",
-    "@rspack/core": "^1.4.11",
-    "@rspack/plugin-react-refresh": "^1.5.0",
-    "@svgr/webpack": "^6.5.1",
+    "@rspack/cli": "^1.6.0",
+    "@rspack/core": "^1.6.0",
     "@types/cloudflare-turnstile": "^0.2.2",
     "@types/node": "^22.18.12",
     "@types/webpack-env": "^1.18.8",
@@ -99,12 +92,8 @@
     "minimatch": "^10.0.3",
     "webpack-merge": "^5.10.0"
   },
-  "peerDependencies": {
-    "react": "catalog:peer-react",
-    "react-dom": "catalog:peer-react"
-  },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"
