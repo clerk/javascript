@@ -1,0 +1,66 @@
+{
+  "name": "@clerk/ui-pinned",
+  "version": "0.0.1",
+  "description": "Lightweight package for pinning @clerk/ui version via dependency management with full type support",
+  "keywords": [
+    "clerk",
+    "ui",
+    "version",
+    "pinning",
+    "theming"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/ui-pinned"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown && pnpm build:dts",
+    "build:dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts --no-check && cp dist/index.d.ts dist/index.d.cts",
+    "clean": "rimraf ./dist",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile node16",
+    "lint:publint": "publint"
+  },
+  "devDependencies": {
+    "@clerk/shared": "workspace:^",
+    "@clerk/ui": "workspace:^",
+    "dts-bundle-generator": "^9.5.1",
+    "tsdown": "catalog:repo"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
