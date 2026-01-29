@@ -3,6 +3,7 @@ import type { TokenResource } from '@clerk/shared/types';
 import { debugLogger } from '@/utils/debug';
 import { TokenId } from '@/utils/tokenId';
 
+import { POLLER_INTERVAL_IN_MS } from './auth/SessionCookiePoller';
 import { Token } from './resources/internal';
 
 /**
@@ -24,6 +25,17 @@ interface TokenCacheEntry extends TokenCacheKeyJSON {
    */
   createdAt?: Seconds;
   /**
+   * Callback to refresh this token before it expires.
+   * Called by the proactive refresh timer to trigger background refresh.
+   * If not provided, no refresh timer will be scheduled (e.g., for broadcast-received tokens).
+   */
+  onRefresh?: () => void;
+  /**
+   * The resolved token value for synchronous reads.
+   * Populated after tokenResolver resolves. Check this first to avoid microtask overhead.
+   */
+  resolvedToken?: TokenResource;
+  /**
    * Promise that resolves to the TokenResource.
    * May be pending and should be awaited before accessing token data.
    */
@@ -33,13 +45,23 @@ interface TokenCacheEntry extends TokenCacheKeyJSON {
 type Seconds = number;
 
 /**
- * Internal cache value containing the entry, expiration metadata, and cleanup timer.
+ * Internal cache value containing the entry, expiration metadata, and timers.
  */
 interface TokenCacheValue {
   createdAt: Seconds;
   entry: TokenCacheEntry;
   expiresIn?: Seconds;
+  /** Timer for automatic cache cleanup when token expires */
   timeoutId?: ReturnType<typeof setTimeout>;
+  /** Timer for proactive refresh before token enters leeway period */
+  refreshTimeoutId?: ReturnType<typeof setTimeout>;
+}
+
+/**
+ * Result from cache lookup containing the entry.
+ */
+export interface TokenCacheGetResult {
+  entry: TokenCacheEntry;
 }
 
 export interface TokenCache {
@@ -56,13 +78,14 @@ export interface TokenCache {
   close(): void;
 
   /**
-   * Retrieves a cached token entry if it exists and has not expired.
+   * Retrieves a cached token entry if it exists and is safe to use.
+   * Forces synchronous refresh if token has less than one poller interval remaining.
+   * Proactive refresh is handled by timers scheduled when tokens are cached.
    *
    * @param cacheKeyJSON - Object containing tokenId and optional audience to identify the cached entry
-   * @param leeway - Optional seconds before expiration to treat token as expired (default: 10s). Combined with 5s sync leeway.
-   * @returns The cached TokenCacheEntry if found and valid, undefined otherwise
+   * @returns Result with entry, or undefined if token is missing/expired/too close to expiration
    */
-  get(cacheKeyJSON: TokenCacheKeyJSON, leeway?: number): TokenCacheEntry | undefined;
+  get(cacheKeyJSON: TokenCacheKeyJSON): TokenCacheGetResult | undefined;
 
   /**
    * Stores a token entry in the cache and broadcasts to other tabs when the token resolves.
@@ -82,9 +105,17 @@ export interface TokenCache {
 
 const KEY_PREFIX = 'clerk';
 const DELIMITER = '::';
-const LEEWAY = 10;
-// This value should have the same value as the INTERVAL_IN_MS in SessionCookiePoller
-const SYNC_LEEWAY = 5;
+
+/**
+ * Default seconds before token expiration to trigger background refresh.
+ * This threshold accounts for timer jitter, SafeLock contention (~5s), network latency,
+ * and tolerance for missed poller ticks.
+ *
+ * Users can customize this value:
+ * - Lower values (min: 5s) delay background refresh until closer to expiration
+ * - Higher values trigger earlier background refresh but may cause more frequent requests
+ */
+const BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS = 15;
 
 const BROADCAST = { broadcast: true };
 const NO_BROADCAST = { broadcast: false };
@@ -170,11 +201,14 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       if (value.timeoutId !== undefined) {
         clearTimeout(value.timeoutId);
       }
+      if (value.refreshTimeoutId !== undefined) {
+        clearTimeout(value.refreshTimeoutId);
+      }
     });
     cache.clear();
   };
 
-  const get = (cacheKeyJSON: TokenCacheKeyJSON, leeway = LEEWAY): TokenCacheEntry | undefined => {
+  const get = (cacheKeyJSON: TokenCacheKeyJSON): TokenCacheGetResult | undefined => {
     ensureBroadcastChannel();
 
     const cacheKey = new TokenCacheKey(prefix, cacheKeyJSON);
@@ -186,21 +220,23 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     const nowSeconds = Math.floor(Date.now() / 1000);
     const elapsed = nowSeconds - value.createdAt;
+    const remainingTtl = (value.expiresIn ?? Infinity) - elapsed;
 
-    // Include poller interval as part of the leeway to ensure the cache value
-    // will be valid for more than the SYNC_LEEWAY or the leeway in the next poll.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const expiresSoon = value.expiresIn! - elapsed < (leeway || 1) + SYNC_LEEWAY;
-
-    if (expiresSoon) {
+    // Token expired or dangerously close to expiration - force synchronous refresh
+    // Uses poller interval as threshold since the poller might not get to it in time
+    if (remainingTtl <= POLLER_INTERVAL_IN_MS / 1000) {
       if (value.timeoutId !== undefined) {
         clearTimeout(value.timeoutId);
+      }
+      if (value.refreshTimeoutId !== undefined) {
+        clearTimeout(value.refreshTimeoutId);
       }
       cache.delete(cacheKey.toKey());
       return;
     }
 
-    return value.entry;
+    // Proactive refresh is handled by timers scheduled in setInternal()
+    return { entry: value.entry };
   };
 
   /**
@@ -249,9 +285,9 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     }
 
     try {
-      const existingEntry = get({ tokenId: data.tokenId });
-      if (existingEntry) {
-        const existingToken = await existingEntry.tokenResolver;
+      const result = get({ tokenId: data.tokenId });
+      if (result) {
+        const existingToken = await result.entry.tokenResolver;
         const existingIat = existingToken.jwt?.claims?.iat;
         if (existingIat && existingIat >= iat) {
           debugLogger.debug(
@@ -324,12 +360,18 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
         if (cachedValue.timeoutId !== undefined) {
           clearTimeout(cachedValue.timeoutId);
         }
+        if (cachedValue.refreshTimeoutId !== undefined) {
+          clearTimeout(cachedValue.refreshTimeoutId);
+        }
         cache.delete(key);
       }
     };
 
     entry.tokenResolver
       .then(newToken => {
+        // Store resolved token for synchronous reads
+        entry.resolvedToken = newToken;
+
         const claims = newToken.jwt?.claims;
         if (!claims || typeof claims.exp !== 'number' || typeof claims.iat !== 'number') {
           return deleteKey();
@@ -339,6 +381,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
         const issuedAt = claims.iat;
         const expiresIn: Seconds = expiresAt - issuedAt;
 
+        value.createdAt = issuedAt;
         value.expiresIn = expiresIn;
 
         const timeoutId = setTimeout(deleteKey, expiresIn * 1000);
@@ -348,6 +391,27 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
         // More info at https://nodejs.org/api/timers.html#timeoutunref
         if (typeof (timeoutId as any).unref === 'function') {
           (timeoutId as any).unref();
+        }
+
+        // Schedule proactive refresh timer to fire before token enters leeway period
+        // This ensures new tokens are ready before the old one expires
+        // refreshLeadTime: 2s buffer before leeway starts. Token fetches typically complete in ~100ms,
+        // so 2s provides ample margin for the refresh to complete before the token enters the leeway period.
+        const refreshLeadTime = 2;
+        const minLeeway = POLLER_INTERVAL_IN_MS / 1000; // Minimum is poller interval (5s)
+        const leeway = Math.max(BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS, minLeeway);
+        const refreshFireTime = expiresIn - leeway - refreshLeadTime;
+
+        if (refreshFireTime > 0 && entry.onRefresh) {
+          const refreshTimeoutId = setTimeout(() => {
+            entry.onRefresh?.();
+          }, refreshFireTime * 1000);
+
+          value.refreshTimeoutId = refreshTimeoutId;
+
+          if (typeof (refreshTimeoutId as any).unref === 'function') {
+            (refreshTimeoutId as any).unref();
+          }
         }
 
         const channel = broadcastChannel;

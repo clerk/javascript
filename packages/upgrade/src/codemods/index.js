@@ -91,8 +91,9 @@ function renderDeprecatedPropsSummary(stats) {
   const userButtonCount = stats.userbuttonAfterSignOutPropsRemoved || 0;
   const hideSlugCount = stats.hideSlugRemoved || 0;
   const beforeEmitCount = stats.beforeEmitTransformed || 0;
+  const leewayCount = stats.leewayInSecondsRemoved || 0;
 
-  if (!userButtonCount && !hideSlugCount && !beforeEmitCount) {
+  if (!userButtonCount && !hideSlugCount && !beforeEmitCount && !leewayCount) {
     return;
   }
 
@@ -114,6 +115,11 @@ function renderDeprecatedPropsSummary(stats) {
   if (beforeEmitCount > 0) {
     console.log(chalk.yellow(`• Transformed ${beforeEmitCount} setActive({ beforeEmit }) → setActive({ navigate })`));
     console.log(chalk.gray('  The callback now receives an object with session property.'));
+  }
+
+  if (leewayCount > 0) {
+    console.log(chalk.yellow(`• Removed ${leewayCount} leewayInSeconds option(s) from getToken() calls`));
+    console.log(chalk.gray('  Tokens are now automatically refreshed in the background with a fixed threshold.'));
   }
 
   console.log('');

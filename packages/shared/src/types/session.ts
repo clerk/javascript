@@ -339,10 +339,9 @@ export interface SessionTask {
 }
 
 export type GetTokenOptions = {
-  template?: string;
   organizationId?: string;
-  leewayInSeconds?: number;
   skipCache?: boolean;
+  template?: string;
 };
 /**
  * @inline
