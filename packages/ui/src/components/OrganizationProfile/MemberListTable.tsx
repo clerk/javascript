@@ -22,8 +22,13 @@ import {
 import { useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import { type PropsOfComponent, type ThemableCssProp } from '../../styledSystem';
 
+type ColumnHeader = {
+  key: LocalizationKey;
+  align?: 'left' | 'right' | 'center';
+};
+
 type MembersListTableProps = {
-  headers: LocalizationKey[];
+  headers: ColumnHeader[];
   rows: React.ReactNode[];
   isLoading?: boolean;
   page: number;
@@ -59,17 +64,14 @@ export const DataTable = (props: MembersListTableProps) => {
         <Table>
           <Thead>
             <Tr>
-              {headers.map((h, index) => {
-                const isActionsHeader = h?.key?.includes('tableHeader__actions');
-                return (
-                  <Th
-                    elementDescriptor={descriptors.tableHead}
-                    key={index}
-                    localizationKey={h}
-                    sx={isActionsHeader ? { textAlign: 'right' } : undefined}
-                  />
-                );
-              })}
+              {headers.map((h, index) => (
+                <Th
+                  elementDescriptor={descriptors.tableHead}
+                  key={index}
+                  localizationKey={h.key}
+                  sx={h.align ? { textAlign: h.align } : undefined}
+                />
+              ))}
             </Tr>
           </Thead>
           <Tbody>
