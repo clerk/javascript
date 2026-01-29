@@ -137,7 +137,41 @@ export type SDKMetadata = {
 export type ListenerCallback = (emission: Resources) => void;
 export type ListenerOptions = { skipInitialEmit?: boolean };
 export type UnsubscribeCallback = () => void;
-export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
+
+/**
+ * A function to decorate URLs for Safari ITP workaround.
+ *
+ * Safari's Intelligent Tracking Prevention (ITP) caps cookies set via fetch/XHR requests to 7 days.
+ * This function returns a URL that goes through the `/v1/client/touch` endpoint when the ITP fix is needed,
+ * allowing the cookie to be refreshed via a full page navigation.
+ *
+ * @param url - The destination URL to potentially decorate
+ * @returns The decorated URL if ITP fix is needed, otherwise the original URL unchanged
+ *
+ * @example
+ * ```typescript
+ * const url = decorateUrl('/dashboard');
+ * // When ITP fix is needed: 'https://clerk.example.com/v1/client/touch?redirect_url=https://app.example.com/dashboard'
+ * // When not needed: '/dashboard'
+ *
+ * // decorateUrl may return an external URL when Safari ITP fix is needed
+ * if (url.startsWith('https')) {
+ *   window.location.href = url;  // External redirect
+ * } else {
+ *   router.push(url);  // Client-side navigation
+ * }
+ * ```
+ */
+export type DecorateUrl = (url: string) => string;
+
+export type SetActiveNavigate = (params: {
+  session: SessionResource;
+  /**
+   * Decorate the destination URL to enable Safari ITP cookie refresh when needed.
+   * @see {@link DecorateUrl}
+   */
+  decorateUrl: DecorateUrl;
+}) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -1363,18 +1397,27 @@ export type SetActiveParams = {
    *
    * When provided, it takes precedence over the `redirectUrl` parameter for navigation.
    *
+   * The callback receives a `decorateUrl` function that should be used to wrap destination URLs.
+   * This enables Safari ITP cookie refresh when needed. The decorated URL may be an external URL
+   * (starting with `https://`) that requires `window.location.href` instead of client-side navigation.
+   *
    * @example
    * ```typescript
    * await clerk.setActive({
    *   session,
-   *   navigate: async ({ session }) => {
-   *     const currentTask = session.currentTask;
-   *     if (currentTask) {
-   *       await router.push(`/onboarding/${currentTask.key}`)
-   *       return
-   *     }
+   *   navigate: async ({ session, decorateUrl }) => {
+   *     const destination = session.currentTask
+   *       ? `/onboarding/${session.currentTask.key}`
+   *       : '/dashboard';
    *
-   *     router.push('/dashboard');
+   *     const url = decorateUrl(destination);
+   *
+   *     // decorateUrl may return an external URL when Safari ITP fix is needed
+   *     if (url.startsWith('https')) {
+   *       window.location.href = url;
+   *     } else {
+   *       router.push(url);
+   *     }
    *   }
    * });
    * ```

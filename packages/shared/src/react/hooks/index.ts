@@ -1,6 +1,11 @@
 export { assertContextExists, createContextAndHook } from './createContextAndHook';
 export { useAPIKeys as __experimental_useAPIKeys } from './useAPIKeys';
 export { useOrganization } from './useOrganization';
+export { useOrganizationCreationDefaults } from './useOrganizationCreationDefaults';
+export type {
+  UseOrganizationCreationDefaultsParams,
+  UseOrganizationCreationDefaultsReturn,
+} from './useOrganizationCreationDefaults.types';
 export { useOrganizationList } from './useOrganizationList';
 export { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 export { useSafeLayoutEffect } from './useSafeLayoutEffect';

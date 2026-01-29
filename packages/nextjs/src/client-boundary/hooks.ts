@@ -6,6 +6,7 @@ export {
   useEmailLink,
   useOrganization,
   useOrganizationList,
+  useOrganizationCreationDefaults,
   useSession,
   useSessionList,
   useSignIn,

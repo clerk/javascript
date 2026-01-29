@@ -1576,7 +1576,37 @@ export class Clerk implements ClerkInterface {
               : taskUrl;
             await this.navigate(taskUrlWithRedirect);
           } else if (setActiveNavigate && newSession) {
-            await setActiveNavigate({ session: newSession });
+            // Track whether decorateUrl was called for dev-mode warning
+            let decorateUrlCalled = false;
+
+            /**
+             * Creates a URL that goes through the /v1/client/touch endpoint when Safari ITP fix is needed.
+             * This allows the session cookie to be refreshed via a full page navigation, bypassing
+             * Safari's 7-day cap on cookies set via fetch/XHR.
+             */
+            const decorateUrl = (url: string): string => {
+              decorateUrlCalled = true;
+
+              if (!this.client?.isEligibleForTouch()) {
+                return url;
+              }
+
+              const absoluteUrl = new URL(url, window.location.href);
+              const touchUrl = this.client.buildTouchUrl({ redirectUrl: absoluteUrl });
+              return this.buildUrlWithAuth(touchUrl);
+            };
+
+            await setActiveNavigate({ session: newSession, decorateUrl });
+
+            // Warn in development if decorateUrl wasn't called but the client is eligible for touch
+            if (this.#instanceType === 'development' && !decorateUrlCalled && this.client.isEligibleForTouch()) {
+              logger.warnOnce(
+                'Clerk: The navigate callback in setActive() did not call decorateUrl(). ' +
+                  'In Safari, sessions may be limited to 7 days due to Intelligent Tracking Prevention (ITP). ' +
+                  'Use decorateUrl() to wrap your destination URL to enable the ITP workaround. ' +
+                  'Learn more: https://clerk.com/docs/troubleshooting/safari-itp',
+              );
+            }
           } else if (redirectUrl) {
             if (this.client.isEligibleForTouch()) {
               const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
