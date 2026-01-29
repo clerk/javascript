@@ -1,8 +1,9 @@
 import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
-import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUpCommon';
+import type { SignUpField, SignUpIdentificationField, SignUpStatus, SignUpVerificationResource } from './signUpCommon';
 import type { Web3Strategy } from './strategies';
+import type { VerificationResource } from './verification';
 
 export interface SignUpFutureAdditionalParams {
   /**
@@ -253,6 +254,51 @@ export interface SignUpFutureFinalizeParams {
 }
 
 /**
+ * An object that contains information about all available verification strategies.
+ */
+export interface SignUpFutureVerifications {
+  /**
+   * An object holding information about the email address verification.
+   */
+  readonly emailAddress: SignUpVerificationResource;
+
+  /**
+   * An object holding information about the phone number verification.
+   */
+  readonly phoneNumber: SignUpVerificationResource;
+
+  /**
+   * An object holding information about the Web3 wallet verification.
+   */
+  readonly web3Wallet: VerificationResource;
+
+  /**
+   * An object holding information about the external account verification.
+   */
+  readonly externalAccount: VerificationResource;
+
+  /**
+   * Used to send an email code to verify an email address.
+   */
+  sendEmailCode: () => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Used to verify a code sent via email.
+   */
+  verifyEmailCode: (params: SignUpFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Used to send a phone code to verify a phone number.
+   */
+  sendPhoneCode: (params: SignUpFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Used to verify a code sent via phone.
+   */
+  verifyPhoneCode: (params: SignUpFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
+}
+
+/**
  * The `SignUpFuture` class holds the state of the current sign-up attempt and provides methods to drive custom sign-up
  * flows, including email/phone verification, password, SSO, ticket-based, and Web3-based account creation.
  */
@@ -414,29 +460,9 @@ export interface SignUpFutureResource {
   update: (params: SignUpFutureUpdateParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   *
+   * An object that contains information about all available verification strategies.
    */
-  verifications: {
-    /**
-     * Used to send an email code to verify an email address.
-     */
-    sendEmailCode: () => Promise<{ error: ClerkError | null }>;
-
-    /**
-     * Used to verify a code sent via email.
-     */
-    verifyEmailCode: (params: SignUpFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
-
-    /**
-     * Used to send a phone code to verify a phone number.
-     */
-    sendPhoneCode: (params: SignUpFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
-
-    /**
-     * Used to verify a code sent via phone.
-     */
-    verifyPhoneCode: (params: SignUpFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
-  };
+  verifications: SignUpFutureVerifications;
 
   /**
    * Used to sign up using an email address and password.
