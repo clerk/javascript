@@ -59,7 +59,8 @@
       "types": "./dist/types/legacy.d.ts",
       "import": "./dist/esm/legacy.js",
       "require": "./dist/cjs/legacy.js"
-    }
+    },
+    "./types": "./dist/types/types/index.d.ts"
   },
   "types": "./dist/types/index.d.ts",
   "files": [

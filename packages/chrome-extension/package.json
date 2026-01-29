@@ -29,7 +29,8 @@
     "background",
     "dist",
     "internal",
-    "react"
+    "react",
+    "types"
   ],
   "scripts": {
     "build": "tsup",

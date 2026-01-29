@@ -83,6 +83,7 @@ import type {
   InstanceType,
   JoinWaitlistParams,
   ListenerCallback,
+  ListenerOptions,
   LoadedClerk,
   NavigateOptions,
   OrganizationListProps,
@@ -517,8 +518,7 @@ export class Clerk implements ClerkInterface {
      * with the new token to the state listeners.
      */
     eventBus.on(events.SessionTokenResolved, () => {
-      this.#setAccessors(this.session);
-      this.#emit();
+      this.#updateAccessors(this.session);
     });
 
     if (this.#options.sdkMetadata) {
@@ -627,8 +627,7 @@ export class Clerk implements ClerkInterface {
         return;
       }
 
-      this.#setAccessors();
-      this.#emit();
+      this.#updateAccessors();
 
       await onAfterSetActive();
     };
@@ -1596,8 +1595,7 @@ export class Clerk implements ClerkInterface {
         return;
       }
 
-      this.#setAccessors(newSession);
-      this.#emit();
+      this.#updateAccessors(newSession);
 
       // Do not revalidate server cache for pending sessions to avoid unmount of `SignIn/SignUp` AIOs when navigating to task
       // newSession can be mutated by the time we get here (org change session touch)
@@ -1609,11 +1607,11 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
+  public addListener = (listener: ListenerCallback, options?: ListenerOptions): UnsubscribeCallback => {
     listener = memoizeListenerCallback(listener);
     this.#listeners.push(listener);
     // emit right away
-    if (this.client) {
+    if (this.client && !options?.skipInitialEmit) {
       listener({
         client: this.client,
         session: this.session,
@@ -1645,6 +1643,27 @@ export class Clerk implements ClerkInterface {
 
   public navigate = async (to: string | undefined, options?: NavigateOptions): Promise<unknown> => {
     if (!to || !inBrowser()) {
+      return;
+    }
+
+    // In React Native, window exists but window.location does not.
+    // If we have a custom router, use it directly. Otherwise, return early.
+    if (typeof window.location === 'undefined') {
+      const customNavigate =
+        options?.replace && this.#options.routerReplace ? this.#options.routerReplace : this.#options.routerPush;
+
+      if (customNavigate) {
+        debugLogger.info(`Clerk is navigating to: ${to}`);
+        return await customNavigate(to, { windowNavigate });
+      }
+
+      // No window.location and no custom router - can't navigate
+      if (__DEV__) {
+        console.warn(
+          'Clerk: Navigation was attempted but window.location is not available and no custom router (routerPush/routerReplace) was provided. ' +
+            'If you are using React Native, please provide routerPush and routerReplace options to ClerkProvider.',
+        );
+      }
       return;
     }
 
@@ -2244,7 +2263,7 @@ export class Clerk implements ClerkInterface {
         return navigateToSignIn();
       }
 
-      const res = await signUp.create({ transfer: true });
+      const res = await signUp.create({ transfer: true, unsafeMetadata: params.unsafeMetadata });
       switch (res.status) {
         case 'complete':
           return this.setActive({
@@ -2586,14 +2605,16 @@ export class Clerk implements ClerkInterface {
       const session = this.#options.selectInitialSession
         ? this.#options.selectInitialSession(newClient)
         : this.#defaultSession(newClient);
-      this.#setAccessors(session);
+
+      this.#updateAccessors(session, { dangerouslySkipEmit: true });
     }
+
     this.client = newClient;
 
     if (this.session) {
-      const session = this.#getSessionFromClient(this.session.id);
+      const newSession = this.#getSessionFromClient(this.session.id, newClient);
 
-      const hasTransitionedToPendingStatus = this.session.status === 'active' && session?.status === 'pending';
+      const hasTransitionedToPendingStatus = this.session.status === 'active' && newSession?.status === 'pending';
       if (hasTransitionedToPendingStatus) {
         const onAfterSetActive: SetActiveHook =
           typeof window !== 'undefined' && typeof window.__internal_onAfterSetActive === 'function'
@@ -2606,7 +2627,10 @@ export class Clerk implements ClerkInterface {
       }
 
       // Note: this might set this.session to null
-      this.#setAccessors(session);
+      // We need to set these values before emitting the token update, as handling that relies on these values being set.
+      // We don't want to emit here though, as we want to emit the token update first. That happens synchronously, so it
+      // should be safe as long as we call #emit() right after.
+      this.#updateAccessors(newSession, { dangerouslySkipEmit: true });
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
       if (!this.session?.lastActiveToken && !isValidBrowserOnline()) {
@@ -3040,15 +3064,18 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  public __internal_lastEmittedResources: Resources | undefined;
   #emit = (): void => {
     if (this.client) {
+      const resources = {
+        client: this.client,
+        session: this.session,
+        user: this.user,
+        organization: this.organization,
+      };
+      this.__internal_lastEmittedResources = resources;
       for (const listener of this.#listeners) {
-        listener({
-          client: this.client,
-          session: this.session,
-          user: this.user,
-          organization: this.organization,
-        });
+        listener(resources);
       }
     }
   };
@@ -3071,21 +3098,39 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  #getLastActiveOrganizationFromSession = () => {
-    const orgMemberships = this.session?.user.organizationMemberships || [];
-    return (
-      orgMemberships.map(om => om.organization).find(org => org.id === this.session?.lastActiveOrganizationId) || null
-    );
+  #getLastActiveOrganizationFromSession = (session = this.session) => {
+    const orgMemberships = session?.user.organizationMemberships || [];
+    return orgMemberships.map(om => om.organization).find(org => org.id === session?.lastActiveOrganizationId) || null;
   };
 
-  #setAccessors = (session?: SignedInSessionResource | null) => {
-    this.session = session || null;
-    this.organization = this.#getLastActiveOrganizationFromSession();
-    this.user = this.session ? this.session.user : null;
+  #getAccessorsFromSession = (session = this.session) => {
+    return {
+      session: session || null,
+      organization: this.#getLastActiveOrganizationFromSession(session),
+      user: session ? session.user : null,
+    };
   };
 
-  #getSessionFromClient = (sessionId: string | undefined): SignedInSessionResource | null => {
-    return this.client?.signedInSessions.find(x => x.id === sessionId) || null;
+  /**
+   * Updates the accessors for the Clerk singleton and emits.
+   * If dangerouslySkipEmit is true, the emit will be skipped and you are responsible for calling #emit() yourself. This is dangerous because if there is a gap between setting these and emitting, library consumers that both read state directly and set up listeners could end up in a inconsistent state.
+   *
+   * New code should avoid using dangerouslySkipEmit. If you need to use the new values for something before emitting, instead use a "work in progress" state with the new values that you pass around and act on until it's time to "commit" it by calling #updateAccessors with the new values.
+   */
+  #updateAccessors = (session?: SignedInSessionResource | null, options?: { dangerouslySkipEmit?: boolean }) => {
+    const { session: newSession, organization, user } = this.#getAccessorsFromSession(session);
+
+    this.session = newSession;
+    this.organization = organization;
+    this.user = user;
+
+    if (!options?.dangerouslySkipEmit) {
+      this.#emit();
+    }
+  };
+
+  #getSessionFromClient = (sessionId: string | undefined, client = this.client): SignedInSessionResource | null => {
+    return client?.signedInSessions.find(x => x.id === sessionId) || null;
   };
 
   #handleImpersonationFab = () => {

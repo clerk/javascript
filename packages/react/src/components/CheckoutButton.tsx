@@ -54,6 +54,8 @@ export const CheckoutButton = withClerk(
       onSubscriptionComplete,
       newSubscriptionRedirectUrl,
       checkoutProps,
+      getContainer,
+      component,
       ...rest
     } = props;
 

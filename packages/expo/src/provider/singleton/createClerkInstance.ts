@@ -30,7 +30,7 @@ let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
 export function createClerkInstance(ClerkClass: typeof Clerk) {
   return (options?: BuildClerkOptions): HeadlessBrowserClerk | BrowserClerk => {
     const {
-      publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '',
+      publishableKey = '',
       tokenCache = MemoryTokenCache,
       __experimental_resourceCache: createResourceCache,
     } = options || {};
