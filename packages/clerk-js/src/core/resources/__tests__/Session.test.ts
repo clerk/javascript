@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkOfflineError } from '@clerk/shared/error';
 import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
@@ -260,13 +260,13 @@ describe('Session', () => {
     });
 
     describe('with offline browser and network failure', () => {
-      let warnSpy;
       beforeEach(() => {
+        // Use real timers for offline tests to avoid unhandled rejection issues with retry logic
+        vi.useRealTimers();
         Object.defineProperty(window.navigator, 'onLine', {
           writable: true,
           value: false,
         });
-        warnSpy = vi.spyOn(console, 'warn').mockReturnValue();
       });
 
       afterEach(() => {
@@ -274,10 +274,10 @@ describe('Session', () => {
           writable: true,
           value: true,
         });
-        warnSpy.mockRestore();
+        vi.useFakeTimers();
       });
 
-      it('returns null', async () => {
+      it('throws ClerkOfflineError when offline', { timeout: 20000 }, async () => {
         const session = new Session({
           status: 'active',
           id: 'session_1',
@@ -292,11 +292,33 @@ describe('Session', () => {
         mockNetworkFailedFetch();
         BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
 
-        const token = await session.getToken();
+        try {
+          await session.getToken({ skipCache: true });
+          expect.fail('Expected ClerkOfflineError to be thrown');
+        } catch (error) {
+          expect(ClerkOfflineError.is(error)).toBe(true);
+        }
+      });
 
+      it('throws ClerkOfflineError after fetch fails while offline', { timeout: 20000 }, async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: 'activeOrganization',
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        mockNetworkFailedFetch();
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        await expect(session.getToken({ skipCache: true })).rejects.toThrow(ClerkOfflineError);
+
+        // Fetch should have been called at least once
         expect(global.fetch).toHaveBeenCalled();
-        expect(dispatchSpy).toHaveBeenCalledTimes(1);
-        expect(token).toEqual(null);
       });
     });
 
