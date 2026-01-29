@@ -59,13 +59,17 @@ export const DataTable = (props: MembersListTableProps) => {
         <Table>
           <Thead>
             <Tr>
-              {headers.map((h, index) => (
-                <Th
-                  elementDescriptor={descriptors.tableHead}
-                  key={index}
-                  localizationKey={h}
-                />
-              ))}
+              {headers.map((h, index) => {
+                const isActionsHeader = h?.key?.includes('tableHeader__actions');
+                return (
+                  <Th
+                    elementDescriptor={descriptors.tableHead}
+                    key={index}
+                    localizationKey={h}
+                    sx={isActionsHeader ? { textAlign: 'right' } : undefined}
+                  />
+                );
+              })}
             </Tr>
           </Thead>
           <Tbody>

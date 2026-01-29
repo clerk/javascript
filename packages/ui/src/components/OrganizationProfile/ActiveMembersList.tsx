@@ -122,7 +122,7 @@ const MemberRow = (props: {
           />
         </Protect>
       </Td>
-      <Td>
+      <Td sx={{ textAlign: 'right' }}>
         <Protect permission={'org:sys_memberships:manage'}>
           <ThreeDotsMenu
             actions={[
