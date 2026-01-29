@@ -36,17 +36,17 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
 
   const clerkUiScriptSrc = clerkUIScriptUrl({
     clerkUIUrl: env.clerkUIUrl,
-    clerkUIVersion: env.clerkUIVersion,
     domain,
     proxyUrl,
     publishableKey,
   });
 
   // Use <link rel='preload'> instead of <script> for the UI bundle.
-  // This pre-fetches for performance but doesn't execute immediately,
-  // avoiding race conditions with __clerkSharedModules registration
-  // (which happens when React code runs @clerk/ui/register).
-  // The actual execution happens via loadClerkUIScript() in the client code.
+  // This tells the browser to download the resource immediately (high priority)
+  // but doesn't execute it, avoiding race conditions with __clerkSharedModules
+  // registration (which happens when React code runs @clerk/ui/register).
+  // When loadClerkUIScript() later adds a <script> tag, the browser uses the
+  // cached resource and executes it without re-downloading.
   const clerkUiPreload = `
   <link rel="preload"
   href="${clerkUiScriptSrc}"

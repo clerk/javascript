@@ -69,10 +69,11 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
         router={router}
       />
       {/* Use <link rel='preload'> instead of <script> for the UI bundle.
-          This pre-fetches for performance but doesn't execute immediately,
-          avoiding race conditions with __clerkSharedModules registration
-          (which happens when React code runs @clerk/ui/register).
-          The actual execution happens via loadClerkUIScript() in isomorphicClerk. */}
+          This tells the browser to download the resource immediately (high priority)
+          but doesn't execute it, avoiding race conditions with __clerkSharedModules
+          registration (which happens when React code runs @clerk/ui/register).
+          When loadClerkUIScript() later adds a <script> tag, the browser uses the
+          cached resource and executes it without re-downloading. */}
       {shouldPrefetchClerkUI(prefetchUI) && (
         <link
           rel='preload'
