@@ -1,9 +1,8 @@
-import { useClerk, useSession, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganizationCreationDefaults, useSession, useUser } from '@clerk/shared/react';
 import type { OrganizationCreationDefaultsResource } from '@clerk/shared/types';
 import { useState } from 'react';
 
-import { useFetch } from '@/hooks';
-import { useEnvironment, useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
+import { useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { descriptors, Flex, Flow, localizationKeys, Spinner } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
@@ -18,11 +17,7 @@ import { CreateOrganizationScreen } from './CreateOrganizationScreen';
 const TaskChooseOrganizationInternal = () => {
   const { user } = useUser();
   const { userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
-  const { organizationSettings } = useEnvironment();
-  const organizationCreationDefaults = useFetch(
-    organizationSettings.organizationCreationDefaults?.enabled ? user?.getOrganizationCreationDefaults : undefined,
-    'organization-creation-defaults',
-  );
+  const organizationCreationDefaults = useOrganizationCreationDefaults();
 
   const isLoading =
     userMemberships?.isLoading ||
