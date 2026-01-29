@@ -1,7 +1,6 @@
 import { useClerk } from '@clerk/react';
 import {
   buildClerkJSScriptAttributes,
-  buildClerkUIScriptAttributes,
   clerkJSScriptUrl,
   clerkUIScriptUrl,
   shouldPrefetchClerkUI,
@@ -69,12 +68,18 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
         dataAttribute='data-clerk-js-script'
         router={router}
       />
+      {/* Use <link rel='preload'> instead of <script> for the UI bundle.
+          This pre-fetches for performance but doesn't execute immediately,
+          avoiding race conditions with __clerkSharedModules registration
+          (which happens when React code runs @clerk/ui/register).
+          The actual execution happens via loadClerkUIScript() in isomorphicClerk. */}
       {shouldPrefetchClerkUI(prefetchUI) && (
-        <ClerkScript
-          scriptUrl={clerkUIScriptUrl(opts)}
-          attributes={buildClerkUIScriptAttributes(opts)}
-          dataAttribute='data-clerk-ui-script'
-          router={router}
+        <link
+          rel='preload'
+          href={clerkUIScriptUrl(opts)}
+          as='script'
+          crossOrigin='anonymous'
+          nonce={nonce}
         />
       )}
     </>

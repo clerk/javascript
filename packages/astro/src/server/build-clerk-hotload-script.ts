@@ -42,17 +42,19 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
     publishableKey,
   });
 
-  const clerkUiScript = `
-  <script src="${clerkUiScriptSrc}"
-  data-clerk-ui-script
-  async
-  crossOrigin='anonymous'
-  ${publishableKey ? `data-clerk-publishable-key="${publishableKey}"` : ``}
-  ${proxyUrl ? `data-clerk-proxy-url="${proxyUrl}"` : ``}
-  ${domain ? `data-clerk-domain="${domain}"` : ``}
-  ></script>`;
+  // Use <link rel='preload'> instead of <script> for the UI bundle.
+  // This pre-fetches for performance but doesn't execute immediately,
+  // avoiding race conditions with __clerkSharedModules registration
+  // (which happens when React code runs @clerk/ui/register).
+  // The actual execution happens via loadClerkUIScript() in the client code.
+  const clerkUiPreload = `
+  <link rel="preload"
+  href="${clerkUiScriptSrc}"
+  as="script"
+  crossOrigin="anonymous"
+  />`;
 
-  return clerkJsScript + clerkUiScript + '\n';
+  return clerkJsScript + clerkUiPreload + '\n';
 }
 
 export { buildClerkHotloadScript };
