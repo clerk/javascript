@@ -1,7 +1,7 @@
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useClerkInstanceContext } from '../contexts';
-import { useBillingHookEnabled } from './useBillingHookEnabled';
+import { useBillingIsEnabled } from './useBillingIsEnabled';
 import { usePlanDetailsQueryCacheKeys } from './usePlanDetailsQuery.shared';
 import type { PlanDetailsQueryResult, UsePlanDetailsQueryParams } from './usePlanDetailsQuery.types';
 
@@ -16,7 +16,7 @@ export function __internal_usePlanDetailsQuery(params: UsePlanDetailsQueryParams
 
   const { queryKey } = usePlanDetailsQueryCacheKeys({ planId: targetPlanId });
 
-  const billingEnabled = useBillingHookEnabled({
+  const billingEnabled = useBillingIsEnabled({
     authenticated: false,
   });
 

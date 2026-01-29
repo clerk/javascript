@@ -1,7 +1,7 @@
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useClerkInstanceContext, useOrganizationContext, useUserContext } from '../contexts';
-import { useBillingHookEnabled } from './useBillingHookEnabled';
+import { useBillingIsEnabled } from './useBillingIsEnabled';
 import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
 import { usePaymentAttemptQueryCacheKeys } from './usePaymentAttemptQuery.shared';
 import type { PaymentAttemptQueryResult, UsePaymentAttemptQueryParams } from './usePaymentAttemptQuery.types';
@@ -25,7 +25,7 @@ function usePaymentAttemptQuery(params: UsePaymentAttemptQueryParams): PaymentAt
     for: forType,
   });
 
-  const billingEnabled = useBillingHookEnabled(params);
+  const billingEnabled = useBillingIsEnabled(params);
 
   const queryEnabled = Boolean(paymentAttemptId) && billingEnabled;
 

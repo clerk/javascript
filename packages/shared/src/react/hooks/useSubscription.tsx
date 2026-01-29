@@ -10,7 +10,7 @@ import {
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
-import { useBillingHookEnabled } from './useBillingHookEnabled';
+import { useBillingIsEnabled } from './useBillingIsEnabled';
 import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
 import { useSubscriptionCacheKeys } from './useSubscription.shared';
 import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
@@ -27,7 +27,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   const user = useUserContext();
   const { organization } = useOrganizationContext();
 
-  const billingEnabled = useBillingHookEnabled(params);
+  const billingEnabled = useBillingIsEnabled(params);
 
   const recordedRef = useRef(false);
   useEffect(() => {
