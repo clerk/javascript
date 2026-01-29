@@ -359,6 +359,12 @@ export type ElementsConfig = {
   taskChooseOrganizationCreateOrganizationActionButton: WithOptions;
   taskChooseOrganizationPreviewButton: WithOptions;
 
+  taskSetupMfaMethodSelectionItem: WithOptions;
+  taskSetupMfaMethodSelectionItems: WithOptions;
+  taskSetupMfaPhoneSelectionItems: WithOptions;
+  taskSetupMfaPhoneSelectionItem: WithOptions;
+  taskSetupMfaPhoneSelectionAddPhoneAction: WithOptions;
+
   userAvatarBox: WithOptions;
   userAvatarImage: WithOptions;
 
@@ -996,6 +1002,7 @@ export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
 export type TaskChooseOrganizationTheme = Theme;
 export type TaskResetPasswordTheme = Theme;
+export type TaskSetupMFATheme = Theme;
 
 type GlobalAppearanceOptions = {
   /**

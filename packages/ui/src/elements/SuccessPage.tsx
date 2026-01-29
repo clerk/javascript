@@ -11,14 +11,17 @@ import { Header } from './Header';
 
 type SuccessPageProps = Omit<PropsOfComponent<typeof Flex>, 'headerTitle' | 'title'> & {
   title?: LocalizationKey;
+  subtitle?: LocalizationKey;
   text?: LocalizationKey | LocalizationKey[];
   finishLabel?: LocalizationKey;
   contents?: React.ReactNode;
+  headerBadgeText?: LocalizationKey;
   onFinish?: () => void;
+  finishButtonProps?: PropsOfComponent<typeof Button>;
 };
 
 export const SuccessPage = (props: SuccessPageProps) => {
-  const { text, title, finishLabel, onFinish, contents, ...rest } = props;
+  const { text, title, subtitle, finishLabel, onFinish, contents, finishButtonProps, headerBadgeText, ...rest } = props;
   const { navigateToFlowStart } = useNavigateToFlowStart();
 
   return (
@@ -26,11 +29,14 @@ export const SuccessPage = (props: SuccessPageProps) => {
       {...rest}
       gap={4}
     >
-      <Header.Root>
-        <Header.Title
-          localizationKey={title}
-          textVariant='subtitle'
-        />
+      <Header.Root badgeText={headerBadgeText}>
+        {title && (
+          <Header.Title
+            localizationKey={title}
+            textVariant={subtitle ? undefined : 'subtitle'}
+          />
+        )}
+        {subtitle && <Header.Subtitle localizationKey={subtitle} />}
       </Header.Root>
       <Col gap={4}>
         {Array.isArray(text) ? (
@@ -62,6 +68,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
           localizationKey={finishLabel || localizationKeys('userProfile.formButtonPrimary__finish')}
           elementDescriptor={descriptors.formButtonPrimary}
           onClick={onFinish || navigateToFlowStart}
+          {...finishButtonProps}
         />
       </FormButtonContainer>
     </Col>
