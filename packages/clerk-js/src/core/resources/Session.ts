@@ -433,8 +433,7 @@ export class Session extends BaseResource implements SessionResource {
     SessionTokenCache.set({
       tokenId,
       tokenResolver,
-      onRefresh: () =>
-        this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+      onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
     });
 
     return tokenResolver.then(token => {
@@ -475,8 +474,7 @@ export class Session extends BaseResource implements SessionResource {
         SessionTokenCache.set({
           tokenId,
           tokenResolver: Promise.resolve(token),
-          onRefresh: () =>
-            this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+          onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
         });
         this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
       })
