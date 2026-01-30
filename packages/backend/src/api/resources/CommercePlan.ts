@@ -62,6 +62,18 @@ export class BillingPlan {
      * The features the Plan offers.
      */
     readonly features: Feature[],
+    /**
+     * The URL of the Plan's avatar image.
+     */
+    readonly avatarUrl: string | null,
+    /**
+     * Number of free trial days for this plan.
+     */
+    readonly freeTrialDays: number | null,
+    /**
+     * Whether free trial is enabled for this plan.
+     */
+    readonly freeTrialEnabled: boolean,
   ) {}
 
   static fromJSON(data: BillingPlanJSON): BillingPlan {
@@ -79,6 +91,7 @@ export class BillingPlan {
           : null
       ) as T extends null ? null : BillingMoneyAmount;
     };
+
     return new BillingPlan(
       data.id,
       data.name,
@@ -93,6 +106,9 @@ export class BillingPlan {
       formatAmountJSON(data.annual_monthly_fee),
       data.for_payer_type,
       (data.features ?? []).map(feature => Feature.fromJSON(feature)),
+      data.avatar_url,
+      data.free_trial_days,
+      data.free_trial_enabled,
     );
   }
 }

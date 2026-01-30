@@ -5,8 +5,8 @@ import { IsomorphicClerk } from '../isomorphicClerk';
 
 // Mock the script loading functions to prevent unhandled promise rejections in tests
 vi.mock('@clerk/shared/loadClerkJsScript', () => ({
-  loadClerkJsScript: vi.fn().mockResolvedValue(null),
-  loadClerkUiScript: vi.fn().mockResolvedValue(null),
+  loadClerkJSScript: vi.fn().mockResolvedValue(null),
+  loadClerkUIScript: vi.fn().mockResolvedValue(null),
 }));
 
 describe('isomorphicClerk', () => {
@@ -18,14 +18,14 @@ describe('isomorphicClerk', () => {
       load: vi.fn().mockResolvedValue(undefined),
       loaded: false,
     };
-    (global as any).__internal_ClerkUiCtor = vi.fn();
+    (global as any).__internal_ClerkUICtor = vi.fn();
   });
 
   afterAll(() => {
     vi.useRealTimers();
     // Clean up globals
     delete (global as any).Clerk;
-    delete (global as any).__internal_ClerkUiCtor;
+    delete (global as any).__internal_ClerkUICtor;
   });
 
   it('instantiates a IsomorphicClerk instance', () => {

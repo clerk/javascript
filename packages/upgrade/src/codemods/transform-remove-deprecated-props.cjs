@@ -1,10 +1,17 @@
 const CLERK_PACKAGE_PREFIX = '@clerk/';
 const COMPONENTS_WITH_HIDE_SLUG = new Set(['CreateOrganization', 'OrganizationSwitcher', 'OrganizationList']);
 const COMPONENT_RENAMES = new Map([
-  ['ClerkProvider', { afterSignInUrl: 'signInFallbackRedirectUrl', afterSignUpUrl: 'signUpFallbackRedirectUrl' }],
+  [
+    'ClerkProvider',
+    {
+      afterSignInUrl: 'signInFallbackRedirectUrl',
+      afterSignUpUrl: 'signUpFallbackRedirectUrl',
+    },
+  ],
   ['SignIn', { afterSignInUrl: 'fallbackRedirectUrl', afterSignUpUrl: 'signUpFallbackRedirectUrl' }],
   ['SignUp', { afterSignInUrl: 'signInFallbackRedirectUrl', afterSignUpUrl: 'fallbackRedirectUrl' }],
 ]);
+const COMPONENTS_WITH_CLERK_JS_VARIANT = new Set(['ClerkProvider']);
 const COMPONENT_REDIRECT_ATTR = new Map([
   ['ClerkProvider', { targetAttrs: ['signInFallbackRedirectUrl', 'signUpFallbackRedirectUrl'] }],
   ['SignIn', { targetAttrs: ['fallbackRedirectUrl'] }],
@@ -33,6 +40,12 @@ module.exports = function transformDeprecatedProps({ source }, { jscodeshift: j,
       if (removeJsxAttribute(j, jsxNode, 'hideSlug')) {
         dirty = true;
         stats('hideSlugRemoved');
+      }
+    }
+
+    if (COMPONENTS_WITH_CLERK_JS_VARIANT.has(canonicalName)) {
+      if (transformClerkJsVariantToPrefetchUI(j, jsxNode, stats)) {
+        dirty = true;
       }
     }
 
@@ -106,6 +119,10 @@ module.exports = function transformDeprecatedProps({ source }, { jscodeshift: j,
   }
 
   if (renameTypeReferences(root, j, 'ClerkMiddlewareAuthObject', 'ClerkMiddlewareSessionAuthObject')) {
+    dirty = true;
+  }
+
+  if (removeGetTokenLeewayInSeconds(root, j, stats)) {
     dirty = true;
   }
 
@@ -499,5 +516,97 @@ function renameEntityName(entity, oldName, newName) {
     return renameEntityName(entity.left, oldName, newName);
   }
 
+  return false;
+}
+
+function transformClerkJsVariantToPrefetchUI(j, jsxNode, stats) {
+  if (!jsxNode.attributes) {
+    return false;
+  }
+
+  const attrIndex = jsxNode.attributes.findIndex(attr => isJsxAttrNamed(attr, 'clerkJSVariant'));
+  if (attrIndex === -1) {
+    return false;
+  }
+
+  const attr = jsxNode.attributes[attrIndex];
+  const value = attr.value;
+
+  // Check if the value is "headless" (either as string literal or JSX expression)
+  let isHeadless = false;
+  if (value && value.type === 'StringLiteral') {
+    isHeadless = value.value === 'headless';
+  } else if (value && value.type === 'Literal') {
+    isHeadless = value.value === 'headless';
+  } else if (value && value.type === 'JSXExpressionContainer') {
+    const expr = value.expression;
+    if (expr.type === 'StringLiteral' || expr.type === 'Literal') {
+      isHeadless = expr.value === 'headless';
+    }
+  }
+
+  // Check if prefetchUI already exists
+  const prefetchUIExists = jsxNode.attributes.some(attr => isJsxAttrNamed(attr, 'prefetchUI'));
+
+  if (isHeadless && !prefetchUIExists) {
+    // Replace clerkJSVariant="headless" with prefetchUI={false}
+    const newAttr = j.jsxAttribute(j.jsxIdentifier('prefetchUI'), j.jsxExpressionContainer(j.booleanLiteral(false)));
+    jsxNode.attributes.splice(attrIndex, 1, newAttr);
+    stats('clerkJSVariantTransformed');
+  } else {
+    // Just remove the attribute
+    jsxNode.attributes.splice(attrIndex, 1);
+    stats('clerkJSVariantRemoved');
+  }
+
+  return true;
+}
+
+/**
+ * Removes leewayInSeconds from getToken() calls.
+ * The leewayInSeconds option has been removed from the public API in favor of
+ * automatic background token refresh with a fixed threshold.
+ */
+function removeGetTokenLeewayInSeconds(root, j, stats) {
+  let changed = false;
+
+  root
+    .find(j.CallExpression)
+    .filter(path => isGetTokenCall(path.node.callee))
+    .forEach(path => {
+      const [args0] = path.node.arguments;
+      if (!args0 || args0.type !== 'ObjectExpression') {
+        return;
+      }
+
+      const leewayIndex = args0.properties.findIndex(prop => isPropertyNamed(prop, 'leewayInSeconds'));
+      if (leewayIndex === -1) {
+        return;
+      }
+
+      args0.properties.splice(leewayIndex, 1);
+      changed = true;
+      stats('leewayInSecondsRemoved');
+
+      // If the object is now empty, remove the entire argument
+      if (args0.properties.length === 0) {
+        path.node.arguments = [];
+      }
+    });
+
+  return changed;
+}
+
+function isGetTokenCall(callee) {
+  if (!callee) {
+    return false;
+  }
+  if (callee.type === 'Identifier') {
+    return callee.name === 'getToken';
+  }
+  if (callee.type === 'MemberExpression' || callee.type === 'OptionalMemberExpression') {
+    const property = callee.property;
+    return property && property.type === 'Identifier' && property.name === 'getToken';
+  }
   return false;
 }

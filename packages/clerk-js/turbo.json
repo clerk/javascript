@@ -4,7 +4,6 @@
     "build": {
       "inputs": [
         "*.d.ts",
-        "headless/**",
         "src/**",
         "tsconfig.json",
         "tsconfig.declarations.json",
