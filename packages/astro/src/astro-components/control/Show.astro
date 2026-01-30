@@ -24,7 +24,7 @@ const props = { ...rest, when };
 
 // If user explicitly sets isStatic prop, honor it
 // Otherwise, detect based on runtime (whether auth function exists)
-const shouldUseCSR = isStatic !== undefined ? isStaticOutput(isStatic) : !Astro.locals.auth;
+const shouldUseCSR = isStatic !== undefined ? isStaticOutput(isStatic) : !Astro.locals?.auth;
 const ShowComponent = shouldUseCSR ? ShowCSR : ShowSSR;
 
 // Note: Astro server islands also use a "fallback" slot for loading states
