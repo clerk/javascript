@@ -8,7 +8,7 @@
     "start": "vite start --port=$PORT"
   },
   "dependencies": {
-    "@tanstack/react-router": "1.156.16",
+    "@tanstack/react-router": "1.157.16",
     "@tanstack/react-router-devtools": "1.157.16",
     "@tanstack/react-start": "1.157.16",
     "react": "^19.0.0",
