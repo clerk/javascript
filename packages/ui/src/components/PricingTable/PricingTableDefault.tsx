@@ -157,7 +157,7 @@ function Card(props: CardProps) {
         borderColor: t.colors.$borderAlpha150,
         borderRadius: t.radii.$xl,
         overflow: 'hidden',
-        textAlign: 'left',
+        textAlign: 'start',
       })}
       data-variant={isCompact ? 'compact' : 'default'}
     >

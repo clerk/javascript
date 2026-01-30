@@ -42,7 +42,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
               sx={t => ({
                 display: 'inline',
                 ':not(:last-of-type)': {
-                  marginRight: t.sizes.$1,
+                  marginInlineEnd: t.sizes.$1,
                 },
               })}
             />

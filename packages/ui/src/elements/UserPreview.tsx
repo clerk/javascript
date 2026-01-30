@@ -132,7 +132,7 @@ export const UserPreview = (props: UserPreviewProps) => {
             {icon && (
               <Flex
                 elementDescriptor={descriptors.userPreviewAvatarIcon}
-                sx={[{ position: 'absolute', left: 0, bottom: 0 }, iconSx]}
+                sx={[{ position: 'absolute', insetInlineStart: 0, bottom: 0 }, iconSx]}
                 as='span'
               >
                 {icon}
@@ -148,7 +148,7 @@ export const UserPreview = (props: UserPreviewProps) => {
         direction='col'
         justify='center'
         as='span'
-        sx={{ minWidth: '0px', textAlign: 'left' }}
+        sx={{ minWidth: '0px', textAlign: 'start' }}
       >
         <Text
           elementDescriptor={descriptors.userPreviewMainIdentifier}

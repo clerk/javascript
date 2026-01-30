@@ -82,7 +82,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
         <Icon
           elementDescriptor={descriptors.organizationSwitcherTriggerIcon}
           icon={ChevronDown}
-          sx={t => ({ marginLeft: `${t.space.$2}` })}
+          sx={t => ({ marginInlineStart: `${t.space.$2}` })}
         />
       </Button>
     );

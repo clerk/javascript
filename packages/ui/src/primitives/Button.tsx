@@ -180,7 +180,7 @@ const ButtonChildrenWithArrow = ({ children }: PropsWithChildren) => {
         elementDescriptor={descriptors.buttonArrowIcon}
         icon={ArrowRightButtonIcon}
         sx={t => ({
-          marginLeft: t.space.$2,
+          marginInlineStart: t.space.$2,
           width: t.sizes.$2x5,
           height: t.sizes.$2x5,
           opacity: t.opacity.$inactive,

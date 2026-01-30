@@ -112,7 +112,7 @@ export function OAuthConsentInternal() {
           </Header.Root>
           <Box
             sx={t => ({
-              textAlign: 'left',
+              textAlign: 'start',
               borderWidth: t.borderWidths.$normal,
               borderStyle: t.borderStyles.$solid,
               borderColor: t.colors.$borderAlpha100,
@@ -157,7 +157,7 @@ export function OAuthConsentInternal() {
                       background: t.colors.$colorMutedForeground,
                       borderRadius: t.radii.$circle,
                       transform: 'translateY(-0.1875rem)',
-                      marginRight: t.space.$2,
+                      marginInlineEnd: t.space.$2,
                       flexShrink: 0,
                     },
                   })}

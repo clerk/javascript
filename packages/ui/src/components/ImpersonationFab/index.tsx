@@ -77,8 +77,8 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
     <Col
       sx={t => ({
         width: '100%',
-        paddingLeft: t.sizes.$4,
-        paddingRight: t.sizes.$6,
+        paddingInlineStart: t.sizes.$4,
+        paddingInlineEnd: t.sizes.$6,
         whiteSpace: 'nowrap',
       })}
     >

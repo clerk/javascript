@@ -407,8 +407,8 @@ export const SelectButton = (
       sx={[
         theme => ({
           gap: theme.space.$2,
-          paddingLeft: theme.space.$3x5,
-          paddingRight: theme.space.$3x5,
+          paddingInlineStart: theme.space.$3x5,
+          paddingInlineEnd: theme.space.$3x5,
           alignItems: 'center',
           '> *': { pointerEvents: 'none' },
         }),
