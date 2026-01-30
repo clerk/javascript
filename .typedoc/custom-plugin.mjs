@@ -33,6 +33,8 @@ const FILES_WITHOUT_HEADINGS = [
   'use-reverification-params.mdx',
   'payment-element-provider-props.mdx',
   'payment-element-props.mdx',
+  'use-organization-creation-defaults-return.mdx',
+  'use-organization-creation-defaults-params.mdx',
 ];
 
 /**
@@ -90,6 +92,7 @@ const LINK_REPLACEMENTS = [
   ['billing-payment-resource', '/docs/reference/javascript/types/billing-payment-resource'],
   ['deleted-object-resource', '/docs/reference/javascript/types/deleted-object-resource'],
   ['use-checkout-return', '/docs/reference/hooks/use-checkout#returns'],
+  ['organization-creation-defaults-resource', '#organization-creation-defaults-resource'],
 ];
 
 /**
