@@ -30,11 +30,8 @@ export function Collapsible({ open, children, sx }: CollapsibleProps): JSX.Eleme
 
   const [shouldRender, setShouldRender] = useState(open);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    setIsAnimating(true);
-
     if (open) {
       setShouldRender(true);
       const frame = requestAnimationFrame(() => setIsExpanded(true));
@@ -44,7 +41,6 @@ export function Collapsible({ open, children, sx }: CollapsibleProps): JSX.Eleme
     setIsExpanded(false);
     if (!isMotionSafe) {
       setShouldRender(false);
-      setIsAnimating(false);
     }
   }, [open, isMotionSafe]);
 
@@ -52,11 +48,13 @@ export function Collapsible({ open, children, sx }: CollapsibleProps): JSX.Eleme
     if (e.target !== e.currentTarget) {
       return;
     }
-    setIsAnimating(false);
     if (!open) {
       setShouldRender(false);
     }
   }
+
+  const isFullyOpen = open && isExpanded;
+  const isAnimating = shouldRender && !isFullyOpen;
 
   if (!shouldRender) {
     return null;
