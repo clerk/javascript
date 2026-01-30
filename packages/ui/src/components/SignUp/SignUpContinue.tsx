@@ -182,8 +182,8 @@ function SignUpContinueInternal() {
           handleComplete: () =>
             clerk.setActive({
               session: res.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
               },
             }),
           navigate,

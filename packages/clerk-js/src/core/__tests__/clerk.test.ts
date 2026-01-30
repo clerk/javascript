@@ -364,6 +364,81 @@ describe('Clerk singleton', () => {
         expect(navigate).toHaveBeenCalled();
       });
 
+      it('passes decorateUrl to the navigate callback', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        const navigate = vi.fn();
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource, navigate });
+
+        expect(navigate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            session: expect.any(Object),
+            decorateUrl: expect.any(Function),
+          }),
+        );
+      });
+
+      it('decorateUrl returns touch URL when isEligibleForTouch is true', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            cookieExpiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+            isEligibleForTouch: () => true,
+            buildTouchUrl: ({ redirectUrl }: { redirectUrl: URL }) =>
+              `https://clerk.example.com/v1/client/touch?redirect_url=${encodeURIComponent(redirectUrl.href)}`,
+          }),
+        );
+
+        let capturedDecorateUrl: ((url: string) => string) | undefined;
+        const navigate = vi.fn(({ decorateUrl }) => {
+          capturedDecorateUrl = decorateUrl;
+        });
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource, navigate });
+
+        expect(capturedDecorateUrl).toBeDefined();
+        const decoratedUrl = capturedDecorateUrl!('/dashboard');
+
+        // Should return touch URL when ITP fix is needed
+        expect(decoratedUrl).toContain('/v1/client/touch');
+        expect(decoratedUrl).toContain('redirect_url=');
+        expect(decoratedUrl).toContain('%2Fdashboard');
+      });
+
+      it('decorateUrl returns original URL when isEligibleForTouch is false', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            cookieExpiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
+            isEligibleForTouch: () => false,
+            buildTouchUrl: ({ redirectUrl }: { redirectUrl: URL }) =>
+              `https://clerk.example.com/v1/client/touch?redirect_url=${encodeURIComponent(redirectUrl.href)}`,
+          }),
+        );
+
+        let capturedDecorateUrl: ((url: string) => string) | undefined;
+        const navigate = vi.fn(({ decorateUrl }) => {
+          capturedDecorateUrl = decorateUrl;
+        });
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource, navigate });
+
+        expect(capturedDecorateUrl).toBeDefined();
+        const decoratedUrl = capturedDecorateUrl!('/dashboard');
+
+        // Should return original URL when ITP fix is not needed
+        expect(decoratedUrl).toBe('/dashboard');
+      });
+
       mockNativeRuntime(() => {
         it('calls session.touch in a non-standard browser', async () => {
           mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
