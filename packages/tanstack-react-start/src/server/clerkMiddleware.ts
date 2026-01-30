@@ -3,7 +3,7 @@ import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/intern
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { AnyRequestMiddleware } from '@tanstack/react-start';
-import { createMiddleware, json } from '@tanstack/react-start';
+import { createMiddleware } from '@tanstack/react-start';
 
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
@@ -56,8 +56,7 @@ export const clerkMiddleware = (
         publishableKey: requestState.publishableKey,
       });
       // Trigger a handshake redirect
-      // eslint-disable-next-line @typescript-eslint/only-throw-error
-      throw json(null, { status: 307, headers: requestState.headers });
+      return new Response(null, { status: 307, headers: requestState.headers });
     }
 
     if (requestState.status === AuthStatus.Handshake) {
