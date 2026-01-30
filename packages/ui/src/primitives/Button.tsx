@@ -184,6 +184,9 @@ const ButtonChildrenWithArrow = ({ children }: PropsWithChildren) => {
           width: t.sizes.$2x5,
           height: t.sizes.$2x5,
           opacity: t.opacity.$inactive,
+          '[dir="rtl"] &': {
+            transform: 'scaleX(-1)',
+          },
         })}
       />
     </Flex>

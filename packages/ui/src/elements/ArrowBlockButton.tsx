@@ -66,10 +66,16 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
           alignItems: 'center',
           padding: `${theme.space.$1x5} ${theme.space.$3} ${theme.space.$1x5} ${theme.space.$2x5}`,
           '--arrow-opacity': '0',
-          '--arrow-transform': `translateX(-${theme.space.$2});`,
+          '--arrow-transform': `translateX(-${theme.space.$2})`,
           '&:hover,&:focus ': {
             '--arrow-opacity': '0.5',
-            '--arrow-transform': 'translateX(0px);',
+            '--arrow-transform': 'translateX(0px)',
+          },
+          '[dir="rtl"] &': {
+            '--arrow-transform': `translateX(${theme.space.$2})`,
+          },
+          '[dir="rtl"] &:hover, [dir="rtl"] &:focus': {
+            '--arrow-transform': 'translateX(0px)',
           },
         },
         props.sx,
@@ -141,6 +147,9 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
               height: '1em',
               opacity: `var(--arrow-opacity)`,
               transform: `var(--arrow-transform)`,
+              '[dir="rtl"] &': {
+                transform: `var(--arrow-transform) scaleX(-1)`,
+              },
             }),
             rightIconSx,
           ]}
