@@ -520,6 +520,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           href={`#${buttonIdentifier}`}
           css={css`
             position: fixed;
+            /* eslint-disable-next-line custom-rules/no-physical-css-properties -- Skip link - visually hidden pattern */
             left: -999px;
             top: 1rem;
             z-index: 999999;
@@ -531,6 +532,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             text-decoration: underline;
 
             &:focus {
+              /* eslint-disable-next-line custom-rules/no-physical-css-properties -- Skip link - visually hidden pattern */
               left: 1rem;
               outline: 2px solid;
               outline-offset: 2px;

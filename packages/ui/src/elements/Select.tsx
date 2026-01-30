@@ -332,6 +332,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
           }),
           sx,
         ]}
+        // eslint-disable-next-line custom-rules/no-physical-css-properties -- Floating UI library positioning
         style={{ ...styles, left: styles.left - 1 }}
       >
         {comparator && (
