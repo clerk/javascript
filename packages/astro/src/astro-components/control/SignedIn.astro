@@ -15,7 +15,10 @@ type Props = {
 
 const { isStatic, class: className } = Astro.props;
 
-const SignedInComponent = isStaticOutput(isStatic) ? SignedInCSR : SignedInSSR;
+// If user explicitly sets isStatic prop, honor it
+// Otherwise, detect based on runtime (whether auth function exists)
+const shouldUseCSR = isStatic !== undefined ? isStaticOutput(isStatic) : !Astro.locals.auth;
+const SignedInComponent = shouldUseCSR ? SignedInCSR : SignedInSSR;
 ---
 
 <SignedInComponent class={className}>
