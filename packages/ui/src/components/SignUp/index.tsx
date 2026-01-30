@@ -2,13 +2,15 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/shared/types';
 import React from 'react';
 
-import { usePreloadTasks } from '@/ui/hooks/usePreloadTasks';
+import { SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
+import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '@/contexts';
+import { Flow } from '@/customizables';
+import { usePreloadTasks } from '@/hooks/usePreloadTasks';
+import type { WithInternalRouting } from '@/internal';
+import { SessionTasks as LazySessionTasks } from '@/lazyModules/components';
+import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
+import { SignUpStartSolanaWalletsCard } from '@/ui/components/SignUp/SignUpStartSolanaWalletsCard';
 
-import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
-import { Flow } from '../../customizables';
-import { SessionTasks as LazySessionTasks } from '../../lazyModules/components';
-import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpEnterpriseConnections } from './SignUpEnterpriseConnections';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
@@ -20,7 +22,7 @@ function RedirectToSignUp() {
   const clerk = useClerk();
   React.useEffect(() => {
     void clerk.redirectToSignUp();
-  }, []);
+  }, [clerk]);
   return null;
 }
 
@@ -54,6 +56,7 @@ function SignUpRoutes(): JSX.Element {
             continueSignUpUrl='../continue'
             verifyEmailAddressUrl='../verify-email-address'
             verifyPhoneNumberUrl='../verify-phone-number'
+            unsafeMetadata={signUpContext.unsafeMetadata}
           />
         </Route>
         <Route path='verify'>
@@ -86,6 +89,9 @@ function SignUpRoutes(): JSX.Element {
         <Route path='enterprise-connections'>
           <SignUpEnterpriseConnections />
         </Route>
+        <Route path='choose-wallet'>
+          <SignUpStartSolanaWalletsCard />
+        </Route>
         <Route index>
           <SignUpStart />
         </Route>
@@ -100,6 +106,8 @@ function SignUpRoutes(): JSX.Element {
 SignUpRoutes.displayName = 'SignUp';
 
 export const SignUp: React.ComponentType<SignUpProps> = withCoreSessionSwitchGuard(SignUpRoutes);
+
+const InternalSignUp: React.ComponentType<WithInternalRouting<SignUpProps>> = withCoreSessionSwitchGuard(SignUpRoutes);
 
 export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
   const signUpProps = {
@@ -120,7 +128,7 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
       >
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
-          <SignUp
+          <InternalSignUp
             {...signUpProps}
             routing='virtual'
           />

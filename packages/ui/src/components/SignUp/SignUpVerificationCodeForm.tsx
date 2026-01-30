@@ -50,8 +50,8 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
           handleComplete: () =>
             setActive({
               session: res.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
               },
             }),
           navigate,

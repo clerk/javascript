@@ -48,6 +48,8 @@ export const Text = React.forwardRef<HTMLElement, TextProps>((props, ref) => {
   return (
     <As
       {...applyDataStateProps(filterProps(rest))}
+      data-variant={props.variant || 'body'}
+      data-color={props.colorScheme || 'inherit'}
       css={applyVariants(props) as any}
       ref={ref as unknown as any}
     />

@@ -14,11 +14,11 @@ import type { UserResource } from './user';
 /**
  * @inline
  */
-type CheckAuthorizationSignedOut = undefined;
+type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 /**
  * @inline
  */
-type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
+type CheckAuthorizationSignedOut = CheckAuthorizationWithoutOrgOrUser;
 
 /**
  * @inline

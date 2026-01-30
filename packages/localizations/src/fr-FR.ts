@@ -19,7 +19,7 @@ export const frFR: LocalizationResource = {
     action__search: 'Rechercher des clés',
     copySecret: {
       formButtonPrimary__copyAndClose: 'Copier et fermer',
-      formHint: 'Pour des raisons de sécurité, nous ne vous permettrons pas de le consulter à nouveau plus tard.',
+      formHint: 'Pour des raisons de sécurité, nous ne vous permettrons pas de la consulter à nouveau plus tard.',
       formTitle: 'Copiez votre clé API "{{name}}" maintenant',
     },
     createdAndExpirationStatus__expiresOn:
@@ -225,7 +225,7 @@ export const frFR: LocalizationResource = {
   formFieldInputPlaceholder__emailAddress_username: "Nom d'utilisateur ou adresse e-mail",
   formFieldInputPlaceholder__emailAddresses: 'exemple@email.com, exemple2@email.com',
   formFieldInputPlaceholder__firstName: 'Prénom',
-  formFieldInputPlaceholder__lastName: 'Nom de famille',
+  formFieldInputPlaceholder__lastName: 'Nom',
   formFieldInputPlaceholder__organizationDomain: "Domaine de l'organisation",
   formFieldInputPlaceholder__organizationDomainEmailAddress: "Adresse e-mail de l'organisation",
   formFieldInputPlaceholder__organizationName: "Nom de l'organisation",
@@ -238,7 +238,7 @@ export const frFR: LocalizationResource = {
   formFieldLabel__apiKeyDescription: 'Description',
   formFieldLabel__apiKeyExpiration: 'Expiration',
   formFieldLabel__apiKeyName: 'Nom de la clé secrète',
-  formFieldLabel__automaticInvitations: 'Autoriser les invitations automatiques pour ce domaine',
+  formFieldLabel__automaticInvitations: 'Activer les invitations automatiques pour ce domaine',
   formFieldLabel__backupCode: 'Code de récupération',
   formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__confirmPassword: 'Confirmer le mot de passe',
@@ -247,7 +247,7 @@ export const frFR: LocalizationResource = {
   formFieldLabel__emailAddress_username: "Adresse e-mail ou nom d'utilisateur",
   formFieldLabel__emailAddresses: 'Adresses e-mail',
   formFieldLabel__firstName: 'Prénom',
-  formFieldLabel__lastName: 'Nom de famille',
+  formFieldLabel__lastName: 'Nom',
   formFieldLabel__newPassword: 'Nouveau mot de passe',
   formFieldLabel__organizationDomain: 'Domaine',
   formFieldLabel__organizationDomainDeletePending: 'Supprimer les invitations et suggestions en attente',
@@ -266,7 +266,7 @@ export const frFR: LocalizationResource = {
     action__signOut: 'Déconnexion',
     title: 'Connecté en tant que {{identifier}}',
   },
-  lastAuthenticationStrategy: 'Dernière utilisation',
+  lastAuthenticationStrategy: 'Utilisé la dernière fois',
   maintenanceMode:
     'Nous effectuons des travaux de maintenance, mais ne vous en inquiétez pas, cela ne devrait pas prendre plus de quelques minutes.',
   membershipRole__admin: 'Administrateur',
@@ -353,7 +353,7 @@ export const frFR: LocalizationResource = {
     },
     createDomainPage: {
       subtitle:
-        "Ajoutez le domaine pour le vérifier. Les utilisateurs possédant une adresses e-mail sur ce domaine peuvent rejoindre l'organisation automatiquement ou faire une demande pour y adhérer.",
+        "Ajoutez le domaine pour le vérifier. Les utilisateurs possédant une adresse e-mail sur ce domaine peuvent rejoindre l'organisation automatiquement ou demander à y adhérer.",
       title: 'Ajouter un domaine',
     },
     invitePage: {
@@ -371,7 +371,7 @@ export const frFR: LocalizationResource = {
       activeMembersTab: {
         menuAction__remove: 'Supprimer',
         tableHeader__actions: 'Actions',
-        tableHeader__joined: 'Rejoint',
+        tableHeader__joined: 'Rejoint le',
         tableHeader__role: 'Rôle',
         tableHeader__user: 'Utilisateur',
       },
@@ -379,7 +379,7 @@ export const frFR: LocalizationResource = {
       invitationsTab: {
         autoInvitations: {
           headerSubtitle:
-            "Invitez des utilisateurs en connectant un domaine de messagerie à votre organisation. Toute personne s'inscrivant avec une adresses e-mail sur ce domaine pourra rejoindre l'organisation.",
+            "Invitez des utilisateurs en connectant un domaine de messagerie à votre organisation. Toute personne s'inscrivant avec une adresse e-mail de ce domaine pourra rejoindre l'organisation.",
           headerTitle: 'Invitations automatiques',
           primaryButton: 'Gérer les domaines validés',
         },
@@ -405,6 +405,13 @@ export const frFR: LocalizationResource = {
         headerTitle__invitations: 'Invitations',
         headerTitle__members: 'Membres',
         headerTitle__requests: 'Demandes',
+      },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Les rôles sont temporairement verrouillés',
+          subtitle:
+            'Nous mettons à jour les rôles disponibles. Une fois terminé, vous pourrez de nouveau modifier les rôles.',
+        },
       },
     },
     navbar: {
@@ -518,7 +525,7 @@ export const frFR: LocalizationResource = {
     personalWorkspace: 'Espace de travail personnel',
     suggestionsAcceptedLabel: "En attente d'acceptation",
   },
-  paginationButton__next: 'Prochain',
+  paginationButton__next: 'Suivant',
   paginationButton__previous: 'Précédent',
   paginationRowText__displaying: 'Affichage',
   paginationRowText__of: 'de',
@@ -594,7 +601,7 @@ export const frFR: LocalizationResource = {
     },
     alternativeMethods: {
       actionLink: "Obtenir de l'aide",
-      actionText: "Aucune de ces méthode d'authentification ?",
+      actionText: 'Aucune de ces méthodes ne fonctionne ?',
       blockButton__backupCode: 'Utiliser un code de récupération',
       blockButton__emailCode: 'Envoyer le code à {{identifier}}',
       blockButton__emailLink: 'Envoyer le lien à {{identifier}}',
@@ -650,7 +657,7 @@ export const frFR: LocalizationResource = {
       formTitle: 'lien de vérification',
       loading: {
         subtitle: 'Vous allez bientôt être redirigé',
-        title: 'Signing in...',
+        title: 'Connexion en cours...',
       },
       resendButton: 'Renvoyer le lien',
       subtitle: 'pour continuer vers {{applicationName}}',
@@ -705,7 +712,7 @@ export const frFR: LocalizationResource = {
     password: {
       actionLink: 'Utiliser une autre méthode',
       subtitle: 'pour continuer vers {{applicationName}}',
-      title: 'Tapez votre mot de passe',
+      title: 'Entrez votre mot de passe',
     },
     passwordCompromised: {
       title: undefined,
@@ -756,7 +763,7 @@ export const frFR: LocalizationResource = {
       },
       subtitle: 'pour continuer vers {{applicationName}}',
       subtitleCombined: undefined,
-      title: "S'identifier",
+      title: 'Se connecter',
       titleCombined: 'Continuer vers {{applicationName}}',
     },
     totpMfa: {
@@ -764,8 +771,12 @@ export const frFR: LocalizationResource = {
       subtitle: "Entrez le code de l'application d'authentification.",
       title: 'Vérification en deux étapes',
     },
+    web3Solana: {
+      subtitle: 'Sélectionnez un portefeuille ci-dessous pour vous connecter',
+      title: 'Se connecter avec Solana',
+    },
   },
-  signInEnterPasswordTitle: 'Tapez votre mot de passe',
+  signInEnterPasswordTitle: 'Entrez votre mot de passe',
   signUp: {
     alternativePhoneCodeProvider: {
       resendButton: 'Vous n’avez pas reçu de code ? Renvoyer',
@@ -773,7 +784,7 @@ export const frFR: LocalizationResource = {
       title: 'Vérifiez votre {{provider}}',
     },
     continue: {
-      actionLink: "S'identifier",
+      actionLink: 'Se connecter',
       actionText: 'Vous avez déjà un compte ?',
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Remplir les champs manquants',
@@ -805,7 +816,7 @@ export const frFR: LocalizationResource = {
       verifiedSwitchTab: {
         subtitle: "Revenez à l'onglet nouvellement ouvert pour continuer",
         subtitleNewTab: "Revenir à l'onglet précédent pour continuer",
-        title: 'Courriel vérifié avec succès',
+        title: 'E-mail vérifié avec succès',
       },
     },
     enterpriseConnections: {
@@ -841,7 +852,7 @@ export const frFR: LocalizationResource = {
       title: 'Accès restreint',
     },
     start: {
-      actionLink: "S'identifier",
+      actionLink: 'Se connecter',
       actionLink__use_email: 'Utiliser votre adresse e-mail',
       actionLink__use_phone: 'Utiliser votre téléphone',
       actionText: 'Vous avez déjà un compte ?',
@@ -856,6 +867,10 @@ export const frFR: LocalizationResource = {
       title: 'Créez votre compte',
       titleCombined: 'Créez votre compte',
     },
+    web3Solana: {
+      subtitle: 'Sélectionnez un portefeuille ci-dessous pour vous inscrire',
+      title: "S'inscrire avec Solana",
+    },
   },
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -865,6 +880,7 @@ export const frFR: LocalizationResource = {
       action__invitationAccept: 'Rejoindre',
       action__suggestionsAccept: 'Demander à rejoindre',
       subtitle: 'Rejoignez une organisation existante ou créez-en une nouvelle',
+      subtitle__createOrganizationDisabled: 'Rejoignez une organisation existante',
       suggestionsAcceptedLabel: 'En attente d’approbation',
       title: 'Choisir une organisation',
     },
@@ -877,6 +893,10 @@ export const frFR: LocalizationResource = {
       formFieldLabel__slug: 'Identifiant (slug)',
       subtitle: 'Entrez les détails de votre organisation pour continuer',
       title: 'Configurer votre organisation',
+    },
+    organizationCreationDisabled: {
+      title: 'Vous devez appartenir à une organisation',
+      subtitle: "Contactez l'administrateur de votre organisation pour obtenir une invitation.",
     },
     signOut: {
       actionLink: 'Se déconnecter',
@@ -903,6 +923,8 @@ export const frFR: LocalizationResource = {
     captcha_unavailable:
       "Inscription échouée en raison d'une validation de captcha non réussie. Veuillez actualiser la page pour réessayer ou contacter le support pour obtenir de l'aide.",
     form_code_incorrect: 'Code incorrect',
+    form_email_address_blocked:
+      'Les services de messagerie temporaire ne sont pas pris en charge. Veuillez utiliser votre adresse e-mail habituelle pour créer un compte.',
     form_identifier_exists__email_address: 'Cette adresse e-mail existe déjà.',
     form_identifier_exists__phone_number: 'Ce numéro de téléphone existe déjà.',
     form_identifier_exists__username: "Ce nom d'utilisateur existe déjà.",
@@ -920,6 +942,8 @@ export const frFR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'La valeur fournie est invalide.',
     form_password_incorrect: 'Mot de passe incorrect',
+    form_password_or_identifier_incorrect:
+      "Le mot de passe ou l'adresse e-mail est incorrect. Réessayez ou utilisez une autre méthode.",
     form_password_length_too_short: 'Votre mot de passe est trop court.',
     form_password_not_strong_enough: "Votre mot de passe n'est pas assez fort.",
     form_password_pwned:
@@ -951,7 +975,7 @@ export const frFR: LocalizationResource = {
     passkey_retrieval_cancelled: 'Récupération de la clé de sécurité annulée.',
     passwordComplexity: {
       maximumLength: 'moins de {{length}} caractères',
-      minimumLength: '{{length}} caractères ou plus',
+      minimumLength: 'au moins {{length}} caractères',
       requireLowercase: 'une lettre minuscule',
       requireNumbers: 'un chiffre',
       requireSpecialCharacter: 'un caractère spécial',
@@ -961,6 +985,9 @@ export const frFR: LocalizationResource = {
     phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
     session_exists: 'Vous êtes déjà connecté.',
     web3_missing_identifier: 'Aucune extension de portefeuille Web3 trouvée. Veuillez en installer une pour continuer.',
+    web3_signature_request_rejected: 'Vous avez refusé la demande de signature. Veuillez réessayer pour continuer.',
+    web3_solana_signature_generation_failed:
+      "Une erreur s'est produite lors de la génération de la signature. Veuillez réessayer pour continuer.",
     zxcvbn: {
       couldBeStronger: "Votre mot de passe fonctionne mais pourrait être plus sûr. Essayez d'ajouter des caractères.",
       goodPassword: "Bien joué. C'est un excellent mot de passe.",
@@ -1005,7 +1032,7 @@ export const frFR: LocalizationResource = {
   userButton: {
     action__addAccount: 'Ajouter un compte',
     action__closeUserMenu: 'Fermer le menu utilisateur',
-    action__manageAccount: 'Gérer son compte',
+    action__manageAccount: 'Gérer mon compte',
     action__openUserMenu: 'Ouvrir le menu utilisateur',
     action__signOut: 'Déconnexion',
     action__signOutAll: 'Se déconnecter de tous les comptes',
@@ -1100,7 +1127,7 @@ export const frFR: LocalizationResource = {
         successMessage: '{{connectedAccount}} a été supprimé de votre compte.',
         title: 'Supprimer le compte connecté',
       },
-      socialButtonsBlockButton: 'Connecter {{provider|titleize}} compte',
+      socialButtonsBlockButton: 'Connecter un compte {{provider|titleize}}',
       successMessage: 'Le fournisseur a été ajouté à votre compte',
       title: 'Ajouter un compte connecté',
     },
@@ -1139,11 +1166,11 @@ export const frFR: LocalizationResource = {
         title: "Supprimer l'adresse e-mail",
       },
       title: 'Ajouter une adresse e-mail',
-      verifyTitle: 'Verifier un e-mail',
+      verifyTitle: 'Vérifier un e-mail',
     },
     formButtonPrimary__add: 'Ajouter',
     formButtonPrimary__continue: 'Continuer',
-    formButtonPrimary__finish: 'Retour',
+    formButtonPrimary__finish: 'Terminer',
     formButtonPrimary__remove: 'Supprimer',
     formButtonPrimary__save: 'Sauvegarder',
     formButtonReset: 'Annuler',
@@ -1247,7 +1274,7 @@ export const frFR: LocalizationResource = {
       imageFormTitle: 'Photo de profil',
       readonly:
         "Les informations de votre profil ont été fournies par la connexion d'entreprise et ne peuvent pas être modifiées.",
-      successMessage: 'Votre profil a été mis a jour.',
+      successMessage: 'Votre profil a été mis à jour.',
       title: 'Mettre à jour le profil',
     },
     start: {
@@ -1259,7 +1286,7 @@ export const frFR: LocalizationResource = {
         actionLabel__connectionFailed: 'Réessayer',
         actionLabel__reauthorize: 'Autoriser maintenant',
         destructiveActionTitle: 'Retirer',
-        primaryButton: 'Connecter le compte',
+        primaryButton: 'Connecter un compte',
         subtitle__disconnected: 'Compte déconnecté. Connectez-vous à nouveau pour accéder aux fonctionnalités.',
         subtitle__reauthorize:
           'Les autorisations requises ont été mises à jour, ce qui peut entraîner des fonctionnalités limitées. Veuillez ré-autoriser cette application pour éviter tout problème.',
@@ -1334,6 +1361,10 @@ export const frFR: LocalizationResource = {
         detailsAction__nonPrimary: 'Définir comme principal',
         primaryButton: 'Portefeuilles Web3',
         title: 'Portefeuilles Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Sélectionnez un portefeuille Solana à connecter à votre compte.',
+          title: 'Ajouter un portefeuille Solana',
+        },
       },
     },
     usernamePage: {
@@ -1368,5 +1399,11 @@ export const frFR: LocalizationResource = {
       subtitle: 'Nous vous contacterons bientôt avec plus de détails.',
       title: 'Inscription réussie',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Se connecter avec {{walletName}}',
+    continue: 'Continuer avec {{walletName}}',
+    noneAvailable:
+      'Aucun portefeuille Solana Web3 détecté. Veuillez installer une {{ solanaWalletsLink || link("wallet extension") }} compatible Web3.',
   },
 } as const;

@@ -395,6 +395,12 @@ export const trTR: LocalizationResource = {
         headerTitle__members: 'Üyeler',
         headerTitle__requests: 'İstekler',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Roller geçici olarak kilitlendi',
+          subtitle: 'Mevcut rolleri güncelliyoruz. Bu tamamlandığında rolleri tekrar güncelleyebileceksiniz.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -750,6 +756,10 @@ export const trTR: LocalizationResource = {
       subtitle: 'Devam etmek için lütfen kimlik doğrulayıcı uygulamanız tarafından oluşturulan doğrulama kodunu girin',
       title: 'İki aşamalı doğrulama',
     },
+    web3Solana: {
+      subtitle: 'Giriş yapmak için aşağıdan bir cüzdan seçin',
+      title: 'Solana ile giriş yap',
+    },
   },
   signInEnterPasswordTitle: 'Şifrenizi girin',
   signUp: {
@@ -841,31 +851,44 @@ export const trTR: LocalizationResource = {
       title: 'Hesap oluştur',
       titleCombined: 'Hesap oluştur',
     },
+    web3Solana: {
+      subtitle: 'Kaydolmak için aşağıdan bir cüzdan seçin',
+      title: 'Solana ile kaydol',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Yeni organizasyon oluştur',
+      action__invitationAccept: 'Katıl',
+      action__suggestionsAccept: 'Katılım iste',
+      subtitle: 'Mevcut bir organizasyona katılın veya yeni bir tane oluşturun',
+      subtitle__createOrganizationDisabled: 'Mevcut bir organizasyona katılın',
+      suggestionsAcceptedLabel: 'Onay bekleniyor',
+      title: 'Bir organizasyon seçin',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'İptal',
+      formButtonSubmit: 'Devam et',
+      formFieldInputPlaceholder__name: 'Organizasyonum',
+      formFieldInputPlaceholder__slug: 'organizasyonum',
+      formFieldLabel__name: 'Ad',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Devam etmek için organizasyon bilgilerinizi girin',
+      title: 'Organizasyonunuzu ayarlayın',
+    },
+    organizationCreationDisabled: {
+      title: 'Bir organizasyona ait olmalısınız',
+      subtitle: 'Davet için organizasyon yöneticinizle iletişime geçin.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Çıkış yap',
+      actionText: '{{identifier}} olarak giriş yapıldı',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Tespit edilen şirket adı ({{organizationName}}) ve {{organizationDomain}} için bir organizasyon zaten mevcut. Davetiye ile katılın.',
     },
   },
   taskResetPassword: {
@@ -887,6 +910,8 @@ export const trTR: LocalizationResource = {
     captcha_unavailable:
       'Bot doğrulaması başarısız olduğu için kayıt yapılamadı. Lütfen tekrar denemek için sayfayı yenileyin veya daha fazla yardım için destek ekibi ile iletişime geçin.',
     form_code_incorrect: 'Hatalı kod.',
+    form_email_address_blocked:
+      'Geçici e-posta hizmetleri desteklenmemektedir. Lütfen hesap oluşturmak için normal e-posta adresinizi kullanın.',
     form_identifier_exists__email_address: 'Bu e-posta adresi zaten kullanılıyor.',
     form_identifier_exists__phone_number: 'Bu telefon numarası zaten kullanılıyor.',
     form_identifier_exists__username: 'Bu kullanıcı adı zaten kullanılıyor.',
@@ -904,6 +929,8 @@ export const trTR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Parametre değeri geçersiz.',
     form_password_incorrect: 'Şifre yanlış.',
+    form_password_or_identifier_incorrect:
+      'Şifre veya e-posta adresi yanlış. Tekrar deneyin veya başka bir yöntem kullanın.',
     form_password_length_too_short: 'Şifre çok kısa.',
     form_password_not_strong_enough: 'Şifreniz yeterince güçlü değil.',
     form_password_pwned: 'Bu şifre bir veri ihlalinde tespit edildi ve kullanılamaz. Lütfen başka bir şifre deneyin.',
@@ -944,6 +971,9 @@ export const trTR: LocalizationResource = {
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
     session_exists: 'Zaten giriş yapmışsınız.',
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
+    web3_signature_request_rejected: 'İmza isteğini reddettiniz. Devam etmek için lütfen tekrar deneyin.',
+    web3_solana_signature_generation_failed:
+      'İmza oluşturulurken bir hata oluştu. Devam etmek için lütfen tekrar deneyin.',
     zxcvbn: {
       couldBeStronger:
         'Şifreniz kriterleri karşılıyor; fakat birkaç karakter daha ekleyerek daha güçlü bir şifre oluşturabilirsiniz.',
@@ -1313,6 +1343,10 @@ export const trTR: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 cüzdanları',
         title: 'Web3 cüzdanları',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Hesabınıza bağlamak için bir Solana cüzdanı seçin.',
+          title: 'Bir Solana cüzdanı ekle',
+        },
       },
     },
     usernamePage: {
@@ -1347,5 +1381,11 @@ export const trTR: LocalizationResource = {
       subtitle: 'Bekleme listesinde olduğunuz için teşekkür ederiz.',
       title: 'Bekleme Listesine Katıldınız',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} ile bağlan',
+    continue: '{{walletName}} ile devam et',
+    noneAvailable:
+      'Solana Web3 cüzdanı tespit edilmedi. Lütfen Web3 destekli {{ solanaWalletsLink || link("wallet extension") }} kurun.',
   },
 } as const;

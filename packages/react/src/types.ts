@@ -29,7 +29,7 @@ declare global {
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: Clerk['proxyUrl'];
     __clerk_domain?: Clerk['domain'];
-    __internal_ClerkUiCtor?: ClerkUiConstructor;
+    __internal_ClerkUICtor?: ClerkUiConstructor;
   }
 }
 
@@ -49,7 +49,7 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<IsomorphicClerkOption
    */
   __internal_bypassMissingPublishableKey?: boolean;
   /**
-   * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
+   * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
    */
   appearance?: ExtractAppearanceType<TUi, Appearance>;
   /**
@@ -60,7 +60,11 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<IsomorphicClerkOption
   ui?: TUi;
 };
 
-export type WithClerkProp<T = unknown> = T & { clerk: LoadedClerk; component?: string };
+export type WithClerkProp<T = unknown> = T & {
+  clerk: LoadedClerk;
+  component?: string;
+  getContainer?: () => HTMLElement | null;
+};
 
 export interface CustomPortalsRendererProps {
   customPagesPortals?: any[];

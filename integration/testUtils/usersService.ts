@@ -89,7 +89,7 @@ export type UserService = {
   createFakeOrganization: (userId: string) => Promise<FakeOrganization>;
   getUser: (opts: { id?: string; email?: string }) => Promise<User | undefined>;
   createFakeAPIKey: (userId: string) => Promise<FakeAPIKey>;
-  passwordCompromised: (userId: string) => Promise<void>;
+  setPasswordCompromised: (userId: string) => Promise<void>;
 };
 
 /**
@@ -207,7 +207,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
       const name = faker.animal.dog();
       const organization = await withErrorLogging('createOrganization', () =>
         clerkClient.organizations.createOrganization({
-          name: faker.animal.dog(),
+          name: name,
           createdBy: userId,
         }),
       );
@@ -236,8 +236,8 @@ export const createUserService = (clerkClient: ClerkClient) => {
           clerkClient.apiKeys.revoke({ apiKeyId: apiKey.id, revocationReason: reason }),
       } satisfies FakeAPIKey;
     },
-    passwordCompromised: async (userId: string) => {
-      await withErrorLogging('passwordCompromised', () => clerkClient.users.__experimental_passwordCompromised(userId));
+    setPasswordCompromised: async (userId: string) => {
+      await clerkClient.users.setPasswordCompromised(userId);
     },
   };
 

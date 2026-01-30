@@ -1,6 +1,7 @@
 import type { Appearance } from './appearance';
 
 export type { ComponentControls, MountComponentRenderer } from '../Components';
+export type { WithInternalRouting } from './routing';
 
 /**
  * Extracts the appearance type from a Ui object. We got 3 cases:
@@ -92,5 +93,5 @@ export type {
  */
 export const localUiForTesting = {
   version: PACKAGE_VERSION,
-  url: 'http://localhost:4001/npm/ui.browser.js',
+  url: 'http://localhost:4011/npm/ui.browser.js',
 } as Ui<Appearance & { newprop?: string }>;

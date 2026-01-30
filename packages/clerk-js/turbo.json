@@ -4,7 +4,6 @@
     "build": {
       "inputs": [
         "*.d.ts",
-        "headless/**",
         "src/**",
         "tsconfig.json",
         "tsconfig.declarations.json",
@@ -25,6 +24,11 @@
       "dependsOn": ["^build", "@clerk/localizations#build"],
       "inputs": ["sandbox/**"],
       "outputs": ["dist/**"]
+    },
+    "dev:sandbox": {
+      "cache": false,
+      "dependsOn": ["build"],
+      "persistent": true
     },
     "test": {
       "inputs": [

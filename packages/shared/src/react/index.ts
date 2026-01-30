@@ -4,19 +4,21 @@ export type { UseSubscriptionParams } from './hooks/useSubscription.types';
 
 export {
   ClerkInstanceContext,
-  ClientContext,
   OptionsContext,
-  OrganizationProvider,
-  SessionContext,
   useAssertWrappedByClerkProvider,
   useClerkInstanceContext,
   useClientContext,
   useOptionsContext,
   useOrganizationContext,
-  UserContext,
   useSessionContext,
   useUserContext,
   __experimental_CheckoutProvider,
+  InitialStateProvider,
+  useInitialStateContext,
 } from './contexts';
 
+export { ClerkContextProvider } from './ClerkContextProvider';
+
 export * from './billing/payment-element';
+
+export { UNSAFE_PortalProvider, usePortalRoot } from './PortalProvider';

@@ -397,6 +397,12 @@ export const bnIN: LocalizationResource = {
         headerTitle__members: 'সদস্য',
         headerTitle__requests: 'অনুরোধ',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'ভূমিকাগুলি সাময়িকভাবে লক করা আছে',
+          subtitle: 'আমরা উপলব্ধ ভূমিকাগুলি আপডেট করছি। এটি সম্পন্ন হলে, আপনি আবার ভূমিকা আপডেট করতে পারবেন।',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -753,6 +759,10 @@ export const bnIN: LocalizationResource = {
       subtitle: 'চালিয়ে যেতে, আপনার অথেনটিকেটর অ্যাপ দ্বারা উৎপন্ন যাচাইকরণ কোড লিখুন',
       title: 'দুই-ধাপ যাচাইকরণ',
     },
+    web3Solana: {
+      subtitle: 'সাইন ইন করতে নিচে একটি ওয়ালেট নির্বাচন করুন',
+      title: 'Solana দিয়ে সাইন ইন করুন',
+    },
   },
   signInEnterPasswordTitle: 'আপনার পাসওয়ার্ড লিখুন',
   signUp: {
@@ -845,31 +855,44 @@ export const bnIN: LocalizationResource = {
       title: 'আপনার অ্যাকাউন্ট তৈরি করুন',
       titleCombined: 'আপনার অ্যাকাউন্ট তৈরি করুন',
     },
+    web3Solana: {
+      subtitle: 'সাইন আপ করতে নিচে একটি ওয়ালেট নির্বাচন করুন',
+      title: 'Solana দিয়ে সাইন আপ করুন',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}} দিয়ে চালিয়ে যান',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'নতুন সংগঠন তৈরি করুন',
+      action__invitationAccept: 'যোগ দিন',
+      action__suggestionsAccept: 'যোগদানের অনুরোধ করুন',
+      subtitle: 'বিদ্যমান সংগঠনে যোগ দিন বা একটি নতুন তৈরি করুন',
+      subtitle__createOrganizationDisabled: 'বিদ্যমান সংগঠনে যোগ দিন',
+      suggestionsAcceptedLabel: 'অনুমোদনের অপেক্ষায়',
+      title: 'একটি সংগঠন নির্বাচন করুন',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'বাতিল',
+      formButtonSubmit: 'চালিয়ে যান',
+      formFieldInputPlaceholder__name: 'আমার সংগঠন',
+      formFieldInputPlaceholder__slug: 'amar-sangstha',
+      formFieldLabel__name: 'নাম',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'চালিয়ে যাওয়ার জন্য আপনার সংগঠনের বিবরণ লিখুন',
+      title: 'আপনার সংগঠন সেটআপ করুন',
+    },
+    organizationCreationDisabled: {
+      title: 'আপনাকে অবশ্যই একটি সংগঠনের অন্তর্ভুক্ত হতে হবে',
+      subtitle: 'আমন্ত্রণের জন্য আপনার সংগঠনের প্রশাসকের সাথে যোগাযোগ করুন।',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'সাইন আউট',
+      actionText: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'শনাক্ত করা কোম্পানির নাম ({{organizationName}}) এবং {{organizationDomain}}-এর জন্য একটি সংস্থা ইতিমধ্যেই বিদ্যমান। আমন্ত্রণের মাধ্যমে যোগ দিন।',
     },
   },
   taskResetPassword: {
@@ -890,6 +913,8 @@ export const bnIN: LocalizationResource = {
     captcha_unavailable:
       'বট যাচাইকরণ ব্যর্থ হওয়ার কারণে সাইন আপ ব্যর্থ হয়েছে। আবার চেষ্টা করতে দয়া করে পৃষ্ঠাটি রিফ্রেশ করুন বা আরও সাহায্যের জন্য সাপোর্টের সাথে যোগাযোগ করুন।',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'অস্থায়ী ইমেইল পরিষেবাগুলি সমর্থিত নয়। অনুগ্রহ করে অ্যাকাউন্ট তৈরি করতে আপনার নিয়মিত ইমেইল ঠিকানা ব্যবহার করুন।',
     form_identifier_exists__email_address: 'এই ইমেইল ঠিকানা ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     form_identifier_exists__phone_number: 'এই ফোন নম্বর ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     form_identifier_exists__username: 'এই ব্যবহারকারীর নাম ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
@@ -908,6 +933,8 @@ export const bnIN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'লেখা মানটি অবৈধ। দয়া করে এটি সংশোধন করুন।',
     form_password_incorrect: 'আপনি যে পাসওয়ার্ড লিখেছেন তা ভুল। দয়া করে আবার চেষ্টা করুন।',
+    form_password_or_identifier_incorrect:
+      'পাসওয়ার্ড বা ইমেইল ঠিকানা ভুল। আবার চেষ্টা করুন বা অন্য পদ্ধতি ব্যবহার করুন।',
     form_password_length_too_short: 'আপনার পাসওয়ার্ড খুব ছোট। এটি কমপক্ষে ৮ অক্ষর দীর্ঘ হতে হবে।',
     form_password_not_strong_enough: 'আপনার পাসওয়ার্ড যথেষ্ট শক্তিশালী নয়।',
     form_password_pwned:
@@ -950,6 +977,10 @@ export const bnIN: LocalizationResource = {
     phone_number_exists: 'এই ফোন নম্বর ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     session_exists: undefined,
     web3_missing_identifier: 'একটি Web3 ওয়ালেট এক্সটেনশন পাওয়া যায়নি। চালিয়ে যেতে দয়া করে একটি ইনস্টল করুন।',
+    web3_signature_request_rejected:
+      'আপনি সিগনেচার অনুরোধটি প্রত্যাখ্যান করেছেন। চালিয়ে যেতে অনুগ্রহ করে আবার চেষ্টা করুন।',
+    web3_solana_signature_generation_failed:
+      'সিগনেচার তৈরি করার সময় একটি ত্রুটি ঘটেছে। চালিয়ে যেতে অনুগ্রহ করে আবার চেষ্টা করুন।',
     zxcvbn: {
       couldBeStronger: 'আপনার পাসওয়ার্ড কাজ করে, কিন্তু আরও শক্তিশালী হতে পারে। আরও অক্ষর যোগ করার চেষ্টা করুন।',
       goodPassword: 'আপনার পাসওয়ার্ড সমস্ত প্রয়োজনীয় শর্ত পূরণ করে।',
@@ -1320,6 +1351,10 @@ export const bnIN: LocalizationResource = {
         detailsAction__nonPrimary: 'প্রাথমিক হিসাবে সেট করুন',
         primaryButton: 'ওয়ালেট সংযুক্ত করুন',
         title: 'Web3 ওয়ালেট',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'আপনার অ্যাকাউন্টের সাথে সংযুক্ত করতে একটি Solana ওয়ালেট নির্বাচন করুন।',
+          title: 'একটি Solana ওয়ালেট যোগ করুন',
+        },
       },
     },
     usernamePage: {
@@ -1354,5 +1389,11 @@ export const bnIN: LocalizationResource = {
       subtitle: 'আপনার স্থান প্রস্তুত হলে আমরা আপনার সাথে যোগাযোগ করব',
       title: 'ওয়েটলিস্টে যোগ দেওয়ার জন্য ধন্যবাদ!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} দিয়ে সংযুক্ত করুন',
+    continue: '{{walletName}} দিয়ে চালিয়ে যান',
+    noneAvailable:
+      'কোনো Solana Web3 ওয়ালেট শনাক্ত হয়নি। অনুগ্রহ করে Web3 সমর্থিত {{ solanaWalletsLink || link("wallet extension") }} ইনস্টল করুন।',
   },
 } as const;

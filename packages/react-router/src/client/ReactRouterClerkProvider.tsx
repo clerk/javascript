@@ -62,8 +62,9 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
     __signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl,
     __clerkJSUrl,
-    __clerkUiUrl,
     __clerkJSVersion,
+    __clerkUIUrl,
+    __prefetchUI,
     __telemetryDisabled,
     __telemetryDebug,
   } = clerkState?.__internal_clerk_state || {};
@@ -90,8 +91,9 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
     signInFallbackRedirectUrl: __signInFallbackRedirectUrl,
     signUpFallbackRedirectUrl: __signUpFallbackRedirectUrl,
     clerkJSUrl: __clerkJSUrl,
-    clerkUiUrl: __clerkUiUrl,
     clerkJSVersion: __clerkJSVersion,
+    clerkUIUrl: __clerkUIUrl,
+    prefetchUI: __prefetchUI,
     telemetry: {
       disabled: __telemetryDisabled,
       debug: __telemetryDebug,

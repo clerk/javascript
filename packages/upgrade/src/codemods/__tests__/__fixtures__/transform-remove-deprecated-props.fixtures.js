@@ -208,4 +208,101 @@ export const Provider = ({ children }) => (
 );
     `,
   },
+  {
+    name: 'clerkJSVariant headless to prefetchUI false',
+    source: `
+import { ClerkProvider } from '@clerk/nextjs';
+
+export function App({ children }) {
+  return (
+    <ClerkProvider
+      clerkJSVariant="headless"
+      publishableKey="pk_test_123"
+    >
+      {children}
+    </ClerkProvider>
+  );
+}
+    `,
+    output: `
+import { ClerkProvider } from '@clerk/nextjs';
+
+export function App({ children }) {
+  return (
+    <ClerkProvider
+      prefetchUI={false}
+      publishableKey="pk_test_123"
+    >
+      {children}
+    </ClerkProvider>
+  );
+}
+    `,
+  },
+  {
+    name: 'clerkJSVariant empty string removal',
+    source: `
+import { ClerkProvider } from '@clerk/react';
+
+export const Provider = ({ children }) => (
+  <ClerkProvider clerkJSVariant="">{children}</ClerkProvider>
+);
+    `,
+    output: `
+import { ClerkProvider } from '@clerk/react';
+
+export const Provider = ({ children }) => (
+  <ClerkProvider>{children}</ClerkProvider>
+);
+    `,
+  },
+  {
+    name: 'getToken leewayInSeconds removal - direct call',
+    source: `
+const token = await getToken({ leewayInSeconds: 30 });
+    `,
+    output: `
+const token = await getToken();
+    `,
+  },
+  {
+    name: 'getToken leewayInSeconds removal - member expression',
+    source: `
+const token = await session.getToken({ leewayInSeconds: 30, template: 'custom' });
+    `,
+    output: `
+const token = await session.getToken({
+  template: 'custom'
+});
+    `,
+  },
+  {
+    name: 'getToken leewayInSeconds removal - optional chaining',
+    source: `
+const token = await session?.getToken({ leewayInSeconds: 15, organizationId: 'org_123' });
+    `,
+    output: `
+const token = await session?.getToken({
+  organizationId: 'org_123'
+});
+    `,
+  },
+  {
+    name: 'getToken leewayInSeconds removal - multiple options',
+    source: `
+const token = await getToken({
+  template: 'my-template',
+  leewayInSeconds: 20,
+  organizationId: 'org_abc',
+  skipCache: true
+});
+    `,
+    output: `
+const token = await getToken({
+  template: 'my-template',
+  organizationId: 'org_abc',
+  skipCache: true
+});
+    `,
+  },
 ];

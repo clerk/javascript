@@ -1,0 +1,9 @@
+{
+  "name": "test-nextjs-catalog",
+  "version": "1.0.0",
+  "dependencies": {
+    "@clerk/nextjs": "catalog:",
+    "next": "^14.0.0",
+    "react": "^18.0.0"
+  }
+}

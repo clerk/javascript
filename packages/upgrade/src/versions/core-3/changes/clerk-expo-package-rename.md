@@ -15,7 +15,7 @@ Update your imports:
 + import { ClerkProvider, useUser } from '@clerk/expo';
 ```
 
-And update your package.json:
+And update your `package.json`:
 
 ```diff
 - "@clerk/clerk-expo": "^2.0.0",

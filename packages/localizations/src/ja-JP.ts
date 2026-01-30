@@ -403,6 +403,12 @@ export const jaJP: LocalizationResource = {
         headerTitle__members: 'メンバー',
         headerTitle__requests: 'リクエスト',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'ロールは一時的にロックされています',
+          subtitle: '利用可能なロールを更新しています。完了次第、ロールを再度更新できるようになります。',
+        },
+      },
     },
     navbar: {
       apiKeys: 'APIキー',
@@ -759,6 +765,10 @@ export const jaJP: LocalizationResource = {
       subtitle: '続行するには、認証アプリで生成された検証コードを入力してください',
       title: '二段階認証',
     },
+    web3Solana: {
+      subtitle: 'サインインするには下のウォレットを選択してください',
+      title: 'Solana でサインイン',
+    },
   },
   signInEnterPasswordTitle: 'パスワードを入力してください',
   signUp: {
@@ -852,6 +862,10 @@ export const jaJP: LocalizationResource = {
       title: 'アカウントを作成',
       titleCombined: 'アカウントを作成',
     },
+    web3Solana: {
+      subtitle: 'サインアップするには下のウォレットを選択してください',
+      title: 'Solana でサインアップ',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}}で続ける',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -861,6 +875,7 @@ export const jaJP: LocalizationResource = {
       action__invitationAccept: '参加する',
       action__suggestionsAccept: '参加をリクエストする',
       subtitle: '既存の組織に参加するか、新しい組織を作成します',
+      subtitle__createOrganizationDisabled: '既存の組織に参加する',
       suggestionsAcceptedLabel: '承認待ち',
       title: '組織を選択',
     },
@@ -874,9 +889,17 @@ export const jaJP: LocalizationResource = {
       subtitle: '続行するには組織の詳細を入力してください',
       title: '組織をセットアップ',
     },
+    organizationCreationDisabled: {
+      title: '組織に所属する必要があります',
+      subtitle: '招待を受けるには組織の管理者にお問い合わせください。',
+    },
     signOut: {
       actionLink: 'サインアウト',
       actionText: '{{identifier}} としてサインイン中',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        '検出された会社名 ({{organizationName}}) と {{organizationDomain}} の組織がすでに存在します。招待を通じて参加してください。',
     },
   },
   taskResetPassword: {
@@ -897,6 +920,8 @@ export const jaJP: LocalizationResource = {
     captcha_unavailable:
       'ボット検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートに連絡してさらに支援を受けてください。',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      '一時的なメールサービスはサポートされていません。アカウントを作成するには、通常のメールアドレスを使用してください。',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -914,6 +939,8 @@ export const jaJP: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'パスワードまたはメールアドレスが正しくありません。もう一度お試しいただくか、別の方法をご利用ください。',
     form_password_length_too_short: 'パスワードが短すぎます。8文字以上である必要があります。',
     form_password_not_strong_enough: 'パスワードの強度が不十分です。',
     form_password_pwned:
@@ -956,6 +983,8 @@ export const jaJP: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Web3ウォレット拡張機能が見つかりません。続行するにはインストールしてください。',
+    web3_signature_request_rejected: '署名リクエストを拒否しました。続行するにはもう一度お試しください。',
+    web3_solana_signature_generation_failed: '署名の生成中にエラーが発生しました。続行するにはもう一度お試しください。',
     zxcvbn: {
       couldBeStronger: 'パスワードは有効ですが、もう少し強化できます。文字を追加してみてください。',
       goodPassword: 'パスワードはすべての要件を満たしています。',
@@ -1322,6 +1351,10 @@ export const jaJP: LocalizationResource = {
         detailsAction__nonPrimary: 'プライマリに設定する',
         primaryButton: 'ウォレットを接続',
         title: 'Web3ウォレット',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'アカウントに接続する Solana ウォレットを選択してください。',
+          title: 'Solana ウォレットを追加',
+        },
       },
     },
     usernamePage: {
@@ -1356,5 +1389,11 @@ export const jaJP: LocalizationResource = {
       subtitle: '準備が整い次第ご連絡いたします',
       title: '待機リストへの参加ありがとうございます！',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} で接続',
+    continue: '{{walletName}} で続行',
+    noneAvailable:
+      'Solana Web3 ウォレットが検出されませんでした。Web3 に対応した {{ solanaWalletsLink || link("wallet extension") }} をインストールしてください。',
   },
 } as const;

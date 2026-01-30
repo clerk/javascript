@@ -395,6 +395,12 @@ export const plPL: LocalizationResource = {
         headerTitle__members: 'Członkowie',
         headerTitle__requests: 'Prośby',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: 'Role są tymczasowo zablokowane',
+          subtitle: 'Aktualizujemy dostępne role. Po zakończeniu będziesz mógł ponownie aktualizować role.',
+        },
+      },
     },
     navbar: {
       apiKeys: undefined,
@@ -751,6 +757,10 @@ export const plPL: LocalizationResource = {
       subtitle: 'Aby kontynuować, wprowadź kod weryfikacyjny wygenerowany przez aplikację uwierzytelniającą',
       title: 'Weryfikacja dwustopniowa',
     },
+    web3Solana: {
+      subtitle: 'Wybierz poniżej portfel, aby się zalogować',
+      title: 'Zaloguj się przez Solana',
+    },
   },
   signInEnterPasswordTitle: 'Wprowadź swoje hasło',
   signUp: {
@@ -845,6 +855,10 @@ export const plPL: LocalizationResource = {
       title: 'Utwórz swoje konto',
       titleCombined: 'Utwórz swoje konto',
     },
+    web3Solana: {
+      subtitle: 'Wybierz poniżej portfel, aby się zarejestrować',
+      title: 'Zarejestruj się przez Solana',
+    },
   },
   socialButtonsBlockButton: 'Kontynuuj z {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -854,6 +868,7 @@ export const plPL: LocalizationResource = {
       action__invitationAccept: 'Dołącz',
       action__suggestionsAccept: 'Poproś o dołączenie',
       subtitle: 'Dołącz do istniejącej organizacji lub utwórz nową',
+      subtitle__createOrganizationDisabled: 'Dołącz do istniejącej organizacji',
       suggestionsAcceptedLabel: 'Oczekiwanie na dołączenie',
       title: 'Wybierz organizację',
     },
@@ -867,9 +882,17 @@ export const plPL: LocalizationResource = {
       subtitle: 'Wprowadź szczegóły swojej organizacji',
       title: 'Utwórz swoją organizację',
     },
+    organizationCreationDisabled: {
+      title: 'Musisz należeć do organizacji',
+      subtitle: 'Skontaktuj się z administratorem swojej organizacji, aby uzyskać zaproszenie.',
+    },
     signOut: {
       actionLink: 'Wyloguj',
       actionText: 'Zalogowano jako {{identifier}}',
+    },
+    alerts: {
+      organizationAlreadyExists:
+        'Organizacja już istnieje dla wykrytej nazwy firmy ({{organizationName}}) i {{organizationDomain}}. Dołącz przez zaproszenie.',
     },
   },
   taskResetPassword: {
@@ -878,8 +901,8 @@ export const plPL: LocalizationResource = {
       actionLink: 'Wyloguj',
       actionText: 'Zalogowano jako {{identifier}}',
     },
-    title: 'Zresetuj hasło',
     subtitle: undefined,
+    title: 'Zresetuj hasło',
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} jest już członkiem organizacji.',
@@ -890,6 +913,8 @@ export const plPL: LocalizationResource = {
     captcha_unavailable:
       'Rejestracja nie powiodła się z powodu niedostępności weryfikacji botów. Odśwież stronę, aby spróbować ponownie lub skontaktuj się z pomocą, aby uzyskać wsparcie.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Tymczasowe usługi e-mail nie są obsługiwane. Proszę użyć zwykłego adresu e-mail, aby utworzyć konto.',
     form_identifier_exists__email_address: 'Adres e-mail jest już zajęty. Proszę spróbować innego.',
     form_identifier_exists__phone_number: 'Ten numer telefonu jest zajęty. Spróbuj użyć innego.',
     form_identifier_exists__username: 'Ta nazwa użytkownika jest zajęta. Spróbuj użyć innej.',
@@ -907,6 +932,8 @@ export const plPL: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Wprowadzona wartość jest nieprawidłowa. Popraw ją.',
     form_password_incorrect: 'Wprowadzone hasło jest nieprawidłowe. Spróbuj ponownie.',
+    form_password_or_identifier_incorrect:
+      'Hasło lub adres e-mail jest nieprawidłowy. Spróbuj ponownie lub użyj innej metody.',
     form_password_length_too_short: 'Twoje hasło jest zbyt krótkie. Musi mieć co najmniej 8 znaków.',
     form_password_not_strong_enough: 'Twoje hasło nie jest wystarczająco silne',
     form_password_pwned:
@@ -949,6 +976,9 @@ export const plPL: LocalizationResource = {
     phone_number_exists: 'Numer telefonu jest już zajęty. Proszę spróbować innego.',
     session_exists: 'Jesteś już zalogowany.',
     web3_missing_identifier: 'Nie można znaleźć rozszerzenia Web3 Wallet. Zainstaluj je, aby kontynuować.',
+    web3_signature_request_rejected: 'Odrzuciłeś prośbę o podpis. Spróbuj ponownie, aby kontynuować.',
+    web3_solana_signature_generation_failed:
+      'Wystąpił błąd podczas generowania podpisu. Spróbuj ponownie, aby kontynuować.',
     zxcvbn: {
       couldBeStronger: 'Twoje hasło jest odpowiednie, ale mogłoby być silniejsze. Spróbuj dodać więcej znaków.',
       goodPassword: 'Twoje hasło jest wystarczająco silne.',
@@ -1319,6 +1349,10 @@ export const plPL: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Portfele Web3',
         title: 'Portfele Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Wybierz portfel Solana, aby połączyć go z kontem.',
+          title: 'Dodaj portfel Solana',
+        },
       },
     },
     usernamePage: {
@@ -1353,5 +1387,11 @@ export const plPL: LocalizationResource = {
       subtitle: 'Skontaktujemy się z Tobą, gdy miejsce dla Ciebie będzie gotowe',
       title: 'Dziękujemy za dołączenie do listy oczekujących!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Połącz z {{walletName}}',
+    continue: 'Kontynuuj z {{walletName}}',
+    noneAvailable:
+      'Nie wykryto portfeli Solana Web3. Zainstaluj {{ solanaWalletsLink || link("wallet extension") }} obsługujący Web3.',
   },
 } as const;

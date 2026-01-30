@@ -9,9 +9,7 @@ export {
   // Control components
   ClerkLoaded,
   ClerkLoading,
-  SignedOut,
-  SignedIn,
-  Protect,
+  Show,
   RedirectToSignIn,
   RedirectToSignUp,
   RedirectToUserProfile,
@@ -25,4 +23,5 @@ export {
   SignOutButton,
   SignInWithMetamaskButton,
   PricingTable,
+  UNSAFE_PortalProvider,
 } from '@clerk/vue';

@@ -6,7 +6,11 @@ import type {
   ForPayerType,
   SignInErrors,
   SignUpErrors,
+  SignUpVerificationResource,
   State,
+  VerificationResource,
+  WaitlistErrors,
+  WaitlistResource,
 } from '@clerk/shared/types';
 
 import { errorThrower } from './errors/errorThrower';
@@ -38,6 +42,65 @@ const defaultSignUpErrors = (): SignUpErrors => ({
   global: null,
 });
 
+const defaultWaitlistErrors = (): WaitlistErrors => ({
+  fields: {
+    emailAddress: null,
+  },
+  raw: null,
+  global: null,
+});
+
+const defaultVerificationResource = (): VerificationResource => ({
+  pathRoot: '',
+
+  attempts: null,
+  error: null,
+  expireAt: null,
+  externalVerificationRedirectURL: null,
+  nonce: null,
+  message: null,
+  status: null,
+  strategy: null,
+  verifiedAtClient: null,
+  verifiedFromTheSameClient() {
+    return false;
+  },
+  reload() {
+    throw new Error('reload() called before Clerk is loaded');
+  },
+  __internal_toSnapshot() {
+    return {
+      object: 'verification',
+      id: '',
+      attempts: null,
+      error: { code: '', message: '' },
+      expire_at: null,
+      externalVerificationRedirectURL: null,
+      nonce: null,
+      message: null,
+      status: null,
+      strategy: null,
+      verified_at_client: null,
+    };
+  },
+});
+
+const defaultSignUpVerificationResource = (): SignUpVerificationResource => ({
+  ...defaultVerificationResource(),
+  supportedStrategies: [],
+  nextAction: '',
+  reload() {
+    throw new Error('reload() called before Clerk is loaded');
+  },
+  __internal_toSnapshot() {
+    return {
+      ...defaultVerificationResource().__internal_toSnapshot(),
+      next_action: this.nextAction,
+      supported_strategies: this.supportedStrategies,
+    };
+  },
+});
+
 type CheckoutSignalProps = {
   for?: ForPayerType;
   planPeriod: BillingSubscriptionPlanPeriod;
@@ -49,12 +112,20 @@ export class StateProxy implements State {
 
   private readonly signInSignalProxy = this.buildSignInProxy();
   private readonly signUpSignalProxy = this.buildSignUpProxy();
+  private readonly waitlistSignalProxy = this.buildWaitlistProxy();
 
   signInSignal() {
     return this.signInSignalProxy;
   }
   signUpSignal() {
     return this.signUpSignalProxy;
+  }
+  waitlistSignal() {
+    return this.waitlistSignalProxy;
+  }
+
+  get __internal_waitlist() {
+    return this.state.__internal_waitlist;
   }
 
   checkoutSignal(params: CheckoutSignalProps) {
@@ -132,14 +203,15 @@ export class StateProxy implements State {
             },
           });
         },
-        get hasBeenFinalized() {
-          return gateProperty(target, 'hasBeenFinalized', false);
+        get canBeDiscarded() {
+          return gateProperty(target, 'canBeDiscarded', false);
         },
 
         create: this.gateMethod(target, 'create'),
         password: this.gateMethod(target, 'password'),
         sso: this.gateMethod(target, 'sso'),
         finalize: this.gateMethod(target, 'finalize'),
+        reset: this.gateMethod(target, 'reset'),
 
         emailCode: this.wrapMethods(() => target().emailCode, ['sendCode', 'verifyCode'] as const),
         emailLink: this.wrapStruct(
@@ -157,6 +229,8 @@ export class StateProxy implements State {
         mfa: this.wrapMethods(() => target().mfa, [
           'sendPhoneCode',
           'verifyPhoneCode',
+          'sendEmailCode',
+          'verifyEmailCode',
           'verifyTOTP',
           'verifyBackupCode',
         ] as const),
@@ -170,7 +244,6 @@ export class StateProxy implements State {
   private buildSignUpProxy() {
     const gateProperty = this.gateProperty.bind(this);
     const gateMethod = this.gateMethod.bind(this);
-    const wrapMethods = this.wrapMethods.bind(this);
     const target = () => this.client.signUp.__internal_future;
 
     return {
@@ -237,8 +310,8 @@ export class StateProxy implements State {
         get isTransferable() {
           return gateProperty(target, 'isTransferable', false);
         },
-        get hasBeenFinalized() {
-          return gateProperty(target, 'hasBeenFinalized', false);
+        get canBeDiscarded() {
+          return gateProperty(target, 'canBeDiscarded', false);
         },
 
         create: gateMethod(target, 'create'),
@@ -248,13 +321,47 @@ export class StateProxy implements State {
         ticket: gateMethod(target, 'ticket'),
         web3: gateMethod(target, 'web3'),
         finalize: gateMethod(target, 'finalize'),
+        reset: gateMethod(target, 'reset'),
 
-        verifications: wrapMethods(() => target().verifications, [
-          'sendEmailCode',
-          'verifyEmailCode',
-          'sendPhoneCode',
-          'verifyPhoneCode',
-        ] as const),
+        verifications: this.wrapStruct(
+          () => target().verifications,
+          ['sendEmailCode', 'verifyEmailCode', 'sendPhoneCode', 'verifyPhoneCode'] as const,
+          ['emailAddress', 'phoneNumber', 'web3Wallet', 'externalAccount'] as const,
+          {
+            emailAddress: defaultSignUpVerificationResource(),
+            phoneNumber: defaultSignUpVerificationResource(),
+            web3Wallet: defaultSignUpVerificationResource(),
+            externalAccount: defaultSignUpVerificationResource(),
+          },
+        ),
+      },
+    };
+  }
+
+  private buildWaitlistProxy() {
+    const gateProperty = this.gateProperty.bind(this);
+    const gateMethod = this.gateMethod.bind(this);
+    const target = (): WaitlistResource => {
+      return this.state.__internal_waitlist;
+    };
+
+    return {
+      errors: defaultWaitlistErrors(),
+      fetchStatus: 'idle' as const,
+      waitlist: {
+        pathRoot: '/waitlist',
+        get id() {
+          return gateProperty(target, 'id', '');
+        },
+        get createdAt() {
+          return gateProperty(target, 'createdAt', null);
+        },
+        get updatedAt() {
+          return gateProperty(target, 'updatedAt', null);
+        },
+
+        join: gateMethod(target, 'join'),
+        reload: gateMethod(target, 'reload'),
       },
     };
   }
@@ -320,6 +427,14 @@ export class StateProxy implements State {
   }
   __internal_computed<T>(_: (prev?: T) => T): () => T {
     throw new Error('__internal_computed called before Clerk is loaded');
+  }
+
+  private get state() {
+    const s = this.isomorphicClerk.__internal_state;
+    if (!s) {
+      throw new Error('Clerk state not ready');
+    }
+    return s;
   }
 
   private get client() {

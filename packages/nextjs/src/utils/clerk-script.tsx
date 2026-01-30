@@ -1,10 +1,5 @@
 import { useClerk } from '@clerk/react';
-import {
-  buildClerkJsScriptAttributes,
-  buildClerkUiScriptAttributes,
-  clerkJsScriptUrl,
-  clerkUiScriptUrl,
-} from '@clerk/react/internal';
+import { buildClerkJSScriptAttributes, clerkJSScriptUrl, clerkUIScriptUrl } from '@clerk/react/internal';
 import NextScript from 'next/script';
 import React from 'react';
 
@@ -43,7 +38,7 @@ function ClerkScript(props: ClerkScriptProps) {
 }
 
 export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] }) {
-  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant, nonce, clerkUiUrl, ui } = useClerkNextOptions();
+  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkUIUrl, nonce, prefetchUI } = useClerkNextOptions();
   const { domain, proxyUrl } = useClerk();
 
   if (!publishableKey) {
@@ -54,28 +49,35 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
     publishableKey,
     clerkJSUrl,
     clerkJSVersion,
-    clerkJSVariant,
+    clerkUIUrl,
     nonce,
     domain,
     proxyUrl,
-    clerkUiVersion: ui?.version,
-    clerkUiUrl: ui?.url || clerkUiUrl,
   };
 
   return (
     <>
       <ClerkScript
-        scriptUrl={clerkJsScriptUrl(opts)}
-        attributes={buildClerkJsScriptAttributes(opts)}
+        scriptUrl={clerkJSScriptUrl(opts)}
+        attributes={buildClerkJSScriptAttributes(opts)}
         dataAttribute='data-clerk-js-script'
         router={router}
       />
-      <ClerkScript
-        scriptUrl={clerkUiScriptUrl(opts)}
-        attributes={buildClerkUiScriptAttributes(opts)}
-        dataAttribute='data-clerk-ui-script'
-        router={router}
-      />
+      {/* Use <link rel='preload'> instead of <script> for the UI bundle.
+          This tells the browser to download the resource immediately (high priority)
+          but doesn't execute it, avoiding race conditions with __clerkSharedModules
+          registration (which happens when React code runs @clerk/ui/register).
+          When loadClerkUIScript() later adds a <script> tag, the browser uses the
+          cached resource and executes it without re-downloading. */}
+      {prefetchUI !== false && (
+        <link
+          rel='preload'
+          href={clerkUIScriptUrl(opts)}
+          as='script'
+          crossOrigin='anonymous'
+          nonce={nonce}
+        />
+      )}
     </>
   );
 }

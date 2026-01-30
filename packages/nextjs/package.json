@@ -59,7 +59,8 @@
       "types": "./dist/types/legacy.d.ts",
       "import": "./dist/esm/legacy.js",
       "require": "./dist/cjs/legacy.js"
-    }
+    },
+    "./types": "./dist/types/types/index.d.ts"
   },
   "types": "./dist/types/index.d.ts",
   "files": [
@@ -92,10 +93,10 @@
   },
   "devDependencies": {
     "crypto-es": "^2.1.0",
-    "next": "15.2.3"
+    "next": "15.2.8"
   },
   "peerDependencies": {
-    "next": "^15.2.3 || ^16",
+    "next": "^15.2.8 || ^15.3.8 || ^15.4.10 || ^15.5.9 || ^15.6.0-0 || ^16.0.10 || ^16.1.0-0",
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react"
   },

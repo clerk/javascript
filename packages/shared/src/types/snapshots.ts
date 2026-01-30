@@ -28,6 +28,7 @@ import type {
   VerificationJSON,
   Web3WalletJSON,
 } from './json';
+import type { OrganizationCreationDefaultsJSON } from './organizationCreationDefaults';
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { ProtectConfigJSON } from './protectConfig';
 import type { SignInJSON } from './signIn';
@@ -142,6 +143,8 @@ export type OrganizationJSONSnapshot = OrganizationJSON;
 export type OrganizationMembershipJSONSnapshot = OrganizationMembershipJSON;
 
 export type OrganizationSettingsJSONSnapshot = OrganizationSettingsJSON;
+
+export type OrganizationCreationDefaultsJSONSnapshot = OrganizationCreationDefaultsJSON;
 
 export type PasskeyJSONSnapshot = Override<PasskeyJSON, { verification: VerificationJSONSnapshot | null }>;
 

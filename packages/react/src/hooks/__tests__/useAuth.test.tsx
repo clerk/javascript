@@ -1,11 +1,10 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { ClerkInstanceContext } from '@clerk/shared/react';
+import { ClerkInstanceContext, InitialStateProvider } from '@clerk/shared/react';
 import type { LoadedClerk, UseAuthReturn } from '@clerk/shared/types';
 import { render, renderHook } from '@testing-library/react';
 import React from 'react';
 import { afterAll, beforeAll, beforeEach, describe, expect, expectTypeOf, it, test, vi } from 'vitest';
 
-import { AuthContext } from '../../contexts/AuthContext';
 import { errorThrower } from '../../errors/errorThrower';
 import { invalidStateError } from '../../errors/messages';
 import { useAuth, useDerivedAuth } from '../useAuth';
@@ -69,10 +68,10 @@ describe('useAuth', () => {
   test('renders the correct values when wrapped in <ClerkProvider>', () => {
     expect(() => {
       render(
-        <ClerkInstanceContext.Provider value={{ value: {} as LoadedClerk }}>
-          <AuthContext.Provider value={{ value: {} as any }}>
+        <ClerkInstanceContext.Provider value={{ value: { addListener: vi.fn() } as unknown as LoadedClerk }}>
+          <InitialStateProvider initialState={{} as any}>
             <TestComponent />
-          </AuthContext.Provider>
+          </InitialStateProvider>
         </ClerkInstanceContext.Provider>,
       );
     }).not.toThrow();
@@ -98,7 +97,8 @@ describe('useDerivedAuth', () => {
     expect(current.orgId).toBeUndefined();
     expect(current.orgRole).toBeUndefined();
     expect(current.orgSlug).toBeUndefined();
-    expect(current.has).toBeUndefined();
+    expect(current.has).toBeInstanceOf(Function);
+    expect(current.has?.({ permission: 'test' })).toBe(false);
   });
 
   it('returns loaded but not signed in when sessionId and userId are null', () => {

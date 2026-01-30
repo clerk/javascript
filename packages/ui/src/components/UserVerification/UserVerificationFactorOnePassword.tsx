@@ -51,7 +51,7 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
     <Flow.Part part='password'>
       <Card.Root>
         <Card.Content>
-          <Header.Root showLogo>
+          <Header.Root>
             <Header.Title localizationKey={localizationKeys('reverification.password.title')} />
             <Header.Subtitle localizationKey={localizationKeys('reverification.password.subtitle')} />
           </Header.Root>
