@@ -1,6 +1,6 @@
 import { type PropsWithChildren, useEffect, useState } from 'react';
 
-import { Box, useAppearance } from '../customizables';
+import { Box, descriptors, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
 
@@ -62,6 +62,7 @@ export function Collapsible({ open, children, sx }: CollapsibleProps): JSX.Eleme
 
   return (
     <Box
+      elementDescriptor={descriptors.collapsible}
       onTransitionEnd={handleTransitionEnd}
       sx={[
         t => ({
@@ -78,6 +79,7 @@ export function Collapsible({ open, children, sx }: CollapsibleProps): JSX.Eleme
       inert={!open ? '' : undefined}
     >
       <Box
+        elementDescriptor={descriptors.collapsibleInner}
         sx={t => ({
           overflow: 'hidden',
           minHeight: 0,
