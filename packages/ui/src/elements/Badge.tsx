@@ -29,6 +29,9 @@ export const LastAuthenticationStrategyBadge = ({
             top: -1,
             transform: `translate(${t.space.$2x5}, calc(-50% - ${t.space.$0x5}))`,
             pointerEvents: 'none',
+            '[dir="rtl"] &': {
+              transform: `translate(-${t.space.$2x5}, calc(-50% - ${t.space.$0x5}))`,
+            },
           }),
         }),
         sx,
