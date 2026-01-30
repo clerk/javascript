@@ -511,4 +511,34 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     // await expect(u.page.getByText('Loading')).toBeHidden();
     await expect(u.page.getByText("I'm an admin")).toBeVisible();
   });
+
+  test('prerendered page with control components works correctly', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // Test while signed out
+    await u.page.goToRelative('/prerendered');
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+
+    // Verify SignedOut content is visible and SignedIn is hidden
+    await expect(u.page.locator('#signed-out-content')).toBeVisible();
+    await expect(u.page.locator('#signed-in-content')).toBeHidden();
+
+    // Sign in
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({
+      email: fakeAdmin.email,
+      password: fakeAdmin.password,
+    });
+    await u.po.expect.toBeSignedIn();
+
+    // Visit prerendered page again while signed in
+    await u.page.goToRelative('/prerendered');
+    await u.page.waitForClerkJsLoaded();
+
+    // Verify SignedIn content is visible and SignedOut is hidden
+    await expect(u.page.locator('#signed-in-content')).toBeVisible();
+    await expect(u.page.locator('#signed-out-content')).toBeHidden();
+  });
 });

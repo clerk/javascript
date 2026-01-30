@@ -15,7 +15,9 @@ type Props = {
 
 const { isStatic, class: className } = Astro.props;
 
-const SignedInComponent = isStaticOutput(isStatic) ? SignedInCSR : SignedInSSR;
+// Use CSR if explicitly static OR if auth is unavailable (prerendered page)
+const shouldUseCSR = isStaticOutput(isStatic) || !Astro.locals.auth;
+const SignedInComponent = shouldUseCSR ? SignedInCSR : SignedInSSR;
 ---
 
 <SignedInComponent class={className}>

@@ -26,7 +26,9 @@ type Props = ProtectProps & {
 
 const { isStatic, ...props } = Astro.props;
 
-const ProtectComponent = isStaticOutput(isStatic) ? ProtectCSR : ProtectSSR;
+// Use CSR if explicitly static OR if auth is unavailable (prerendered page)
+const shouldUseCSR = isStaticOutput(isStatic) || !Astro.locals.auth;
+const ProtectComponent = shouldUseCSR ? ProtectCSR : ProtectSSR;
 
 // Note: Astro server islands also use a "fallback" slot for loading states
 // See: https://docs.astro.build/en/guides/server-islands/#server-island-fallback-content
