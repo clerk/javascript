@@ -207,7 +207,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
       const name = faker.animal.dog();
       const organization = await withErrorLogging('createOrganization', () =>
         clerkClient.organizations.createOrganization({
-          name: faker.animal.dog(),
+          name: name,
           createdBy: userId,
         }),
       );

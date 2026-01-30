@@ -1,6 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { deriveState } from '@clerk/shared/deriveState';
-import { loadClerkJsScript, type LoadClerkJsScriptOptions, loadClerkUiScript } from '@clerk/shared/loadClerkJsScript';
+import { loadClerkJSScript, type LoadClerkJSScriptOptions, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   Clerk,
   ClerkOptions,
@@ -11,7 +11,7 @@ import type {
   Resources,
   Without,
 } from '@clerk/shared/types';
-import type { ClerkUIConstructor } from '@clerk/shared/ui';
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
 import type { Appearance, Ui } from '@clerk/ui/internal';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
@@ -19,7 +19,7 @@ import { computed, ref, shallowRef, triggerRef } from 'vue';
 import { ClerkInjectionKey } from './keys';
 declare global {
   interface Window {
-    __internal_ClerkUICtor?: ClerkUIConstructor;
+    __internal_ClerkUICtor?: ClerkUiConstructor;
   }
 }
 
@@ -70,26 +70,26 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
     const options = {
       ...pluginOptions,
       sdkMetadata: pluginOptions.sdkMetadata || SDK_METADATA,
-    } as LoadClerkJsScriptOptions;
+    } as LoadClerkJSScriptOptions;
 
     // We need this check for SSR apps like Nuxt as it will try to run this code on the server
-    // and loadClerkJsScript contains browser-specific code
+    // and loadClerkJSScript contains browser-specific code
     if (inBrowser()) {
       void (async () => {
         try {
-          const clerkPromise = loadClerkJsScript(options);
-          // Load UI from CDN with version pinning from ui.version
-          const ClerkUIPromise = (async () => {
-            await loadClerkUiScript({
-              ...options,
-              clerkUIVersion: pluginOptions.ui?.version ?? (pluginOptions as any).clerkUIVersion,
-              clerkUIUrl: pluginOptions.ui?.url ?? (pluginOptions as any).clerkUIUrl,
-            });
-            if (!window.__internal_ClerkUICtor) {
-              throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
-            }
-            return window.__internal_ClerkUICtor;
-          })();
+          const clerkPromise = loadClerkJSScript(options);
+          // Honor explicit clerkUICtor even when prefetchUI={false}
+          const clerkUICtorPromise = pluginOptions.clerkUICtor
+            ? Promise.resolve(pluginOptions.clerkUICtor)
+            : pluginOptions.prefetchUI === false
+              ? Promise.resolve(undefined)
+              : (async () => {
+                  await loadClerkUIScript(options);
+                  if (!window.__internal_ClerkUICtor) {
+                    throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+                  }
+                  return window.__internal_ClerkUICtor;
+                })();
 
           await clerkPromise;
 
@@ -98,14 +98,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           }
 
           clerk.value = window.Clerk;
-          const loadOptions = {
-            ...options,
-            ui: {
-              version: pluginOptions.ui?.version,
-              url: pluginOptions.ui?.url,
-              ClerkUI: ClerkUIPromise,
-            },
-          } as ClerkOptions;
+          const loadOptions = { ...options, clerkUICtor: clerkUICtorPromise } as unknown as ClerkOptions;
           await window.Clerk.load(loadOptions);
           loaded.value = true;
 

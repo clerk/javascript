@@ -1,15 +1,12 @@
 import type { Resources, UnsubscribeCallback } from '@clerk/shared/types';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 
-const mockLoadClerkJsScript = vi.fn().mockResolvedValue(null);
-const mockLoadClerkUiScript = vi.fn().mockResolvedValue(null);
-
 // Mock the script loading functions to prevent unhandled promise rejections in tests
 vi.mock('@clerk/shared/loadClerkJsScript', () => ({
-  loadClerkJsScript: (...args: unknown[]) => mockLoadClerkJsScript(...args),
-  loadClerkUiScript: (...args: unknown[]) => mockLoadClerkUiScript(...args),
+  loadClerkJSScript: vi.fn().mockResolvedValue(null),
+  loadClerkUIScript: vi.fn().mockResolvedValue(null),
 }));
 
 describe('isomorphicClerk', () => {
@@ -22,10 +19,6 @@ describe('isomorphicClerk', () => {
       loaded: false,
     };
     (global as any).__internal_ClerkUICtor = vi.fn();
-  });
-
-  beforeEach(() => {
-    vi.clearAllMocks();
   });
 
   afterAll(() => {
@@ -123,79 +116,5 @@ describe('isomorphicClerk', () => {
 
     expect(listenerCallHistory).toEqual([]);
     expect(listenerCallHistory.length).toBe(0);
-  });
-
-  describe('bundled vs CDN UI loading', () => {
-    const mockClerkUI = vi.fn();
-
-    it('uses bundled UI when ui.ClerkUI is provided without __internal_preferCDN', async () => {
-      const isomorphicClerk = new IsomorphicClerk({
-        publishableKey: 'pk_test_XXX',
-        ui: {
-          version: '1.0.0',
-          ClerkUI: mockClerkUI as any,
-        },
-      });
-
-      // Access the private method through any type cast
-      const result = await (isomorphicClerk as any).getClerkUiEntryChunk();
-
-      // Should return the bundled ClerkUI, not load from CDN
-      expect(result).toBe(mockClerkUI);
-      expect(mockLoadClerkUiScript).not.toHaveBeenCalled();
-    });
-
-    it('loads from CDN when ui.ClerkUI is provided WITH __internal_preferCDN: true', async () => {
-      const isomorphicClerk = new IsomorphicClerk({
-        publishableKey: 'pk_test_XXX',
-        ui: {
-          version: '1.0.0',
-          ClerkUI: mockClerkUI as any,
-          __internal_preferCDN: true,
-        },
-      });
-
-      // Access the private method through any type cast
-      await (isomorphicClerk as any).getClerkUiEntryChunk();
-
-      // Should load from CDN because __internal_preferCDN is true
-      expect(mockLoadClerkUiScript).toHaveBeenCalled();
-    });
-
-    it('loads from CDN when ui.ClerkUI is NOT provided', async () => {
-      const isomorphicClerk = new IsomorphicClerk({
-        publishableKey: 'pk_test_XXX',
-        ui: {
-          version: '1.0.0',
-        },
-      });
-
-      // Access the private method through any type cast
-      await (isomorphicClerk as any).getClerkUiEntryChunk();
-
-      // Should load from CDN because no bundled UI was provided
-      expect(mockLoadClerkUiScript).toHaveBeenCalled();
-    });
-
-    it('loads from CDN with version pinning when ui.version is provided', async () => {
-      const isomorphicClerk = new IsomorphicClerk({
-        publishableKey: 'pk_test_XXX',
-        ui: {
-          version: '2.0.0',
-          __internal_preferCDN: true,
-          ClerkUI: mockClerkUI as any,
-        },
-      });
-
-      // Access the private method through any type cast
-      await (isomorphicClerk as any).getClerkUiEntryChunk();
-
-      // Should load from CDN with version pinning
-      expect(mockLoadClerkUiScript).toHaveBeenCalledWith(
-        expect.objectContaining({
-          clerkUIVersion: '2.0.0',
-        }),
-      );
-    });
   });
 });

@@ -6,7 +6,7 @@ import { vi } from 'vitest';
 
 import { Clerk as ClerkCtor } from '@/core/clerk';
 import { Client, Environment } from '@/core/resources';
-import { ComponentContextProvider, CoreClerkContextWrapper, EnvironmentProvider, OptionsProvider } from '@/ui/contexts';
+import { ComponentContextProvider, ClerkContextProvider, EnvironmentProvider, OptionsProvider } from '@/ui/contexts';
 import { AppearanceProvider } from '@/ui/customizables';
 import { FlowMetadataProvider } from '@/ui/elements/contexts';
 import { RouteContext } from '@/ui/router';
@@ -106,7 +106,7 @@ const unboundCreateFixtures = (
       );
 
       return (
-        <CoreClerkContextWrapper clerk={clerkMock}>
+        <ClerkContextProvider clerk={clerkMock}>
           <EnvironmentProvider value={environmentMock}>
             <OptionsProvider value={optionsMock}>
               <RouteContext.Provider value={routerMock}>
@@ -118,7 +118,7 @@ const unboundCreateFixtures = (
               </RouteContext.Provider>
             </OptionsProvider>
           </EnvironmentProvider>
-        </CoreClerkContextWrapper>
+        </ClerkContextProvider>
       );
     };
 

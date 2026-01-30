@@ -52,13 +52,11 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       expect(message).toContain('elements.card "& > div"');
     });
 
-    test('still warns when ui.ClerkUI is provided without ui.version (CDN scenario)', () => {
-      // When SDK loads from CDN, it sets ui.ClerkUI but not ui.version
-      // This is NOT version pinning, so we should still warn
+    test('still warns when clerkUICtor is provided without ui (CDN scenario)', () => {
+      // clerkUICtor is always set when loading from CDN, but ui is only set
+      // when the user explicitly imports @clerk/ui
       warnAboutCustomizationWithoutPinning({
-        ui: {
-          ClerkUI: class MockClerkUi {} as any,
-        } as any,
+        clerkUICtor: class MockClerkUi {} as any,
         appearance: {
           elements: { card: { '& > div': { color: 'red' } } },
         },

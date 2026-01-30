@@ -1,6 +1,6 @@
 import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 
-import type { ClerkUIConstructor } from '../ui/types';
+import type { ClerkUiConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   BillingCheckoutResource,
@@ -135,8 +135,43 @@ export type SDKMetadata = {
 };
 
 export type ListenerCallback = (emission: Resources) => void;
+export type ListenerOptions = { skipInitialEmit?: boolean };
 export type UnsubscribeCallback = () => void;
-export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
+
+/**
+ * A function to decorate URLs for Safari ITP workaround.
+ *
+ * Safari's Intelligent Tracking Prevention (ITP) caps cookies set via fetch/XHR requests to 7 days.
+ * This function returns a URL that goes through the `/v1/client/touch` endpoint when the ITP fix is needed,
+ * allowing the cookie to be refreshed via a full page navigation.
+ *
+ * @param url - The destination URL to potentially decorate
+ * @returns The decorated URL if ITP fix is needed, otherwise the original URL unchanged
+ *
+ * @example
+ * ```typescript
+ * const url = decorateUrl('/dashboard');
+ * // When ITP fix is needed: 'https://clerk.example.com/v1/client/touch?redirect_url=https://app.example.com/dashboard'
+ * // When not needed: '/dashboard'
+ *
+ * // decorateUrl may return an external URL when Safari ITP fix is needed
+ * if (url.startsWith('https')) {
+ *   window.location.href = url;  // External redirect
+ * } else {
+ *   router.push(url);  // Client-side navigation
+ * }
+ * ```
+ */
+export type DecorateUrl = (url: string) => string;
+
+export type SetActiveNavigate = (params: {
+  session: SessionResource;
+  /**
+   * Decorate the destination URL to enable Safari ITP cookie refresh when needed.
+   * @see {@link DecorateUrl}
+   */
+  decorateUrl: DecorateUrl;
+}) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -244,6 +279,13 @@ export interface Clerk {
 
   /** Current User. */
   user: UserResource | null | undefined;
+
+  /**
+   * Last emitted resources, maintains a stable reference to the resources between emits.
+   *
+   * @internal
+   */
+  __internal_lastEmittedResources: Resources | undefined;
 
   /**
    * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
@@ -688,9 +730,10 @@ export interface Clerk {
    *    When a session is loading, user and session will be undefined.
    *
    * @param callback - Callback function receiving the most updated Clerk resources after a change.
+   * @param options.skipInitialEmit - If true, the callback will not be called immediately after registration.
    * @returns - Unsubscribe callback
    */
-  addListener: (callback: ListenerCallback) => UnsubscribeCallback;
+  addListener: (callback: ListenerCallback, options?: ListenerOptions) => UnsubscribeCallback;
 
   /**
    * Registers an event handler for a specific Clerk event.
@@ -1087,19 +1130,9 @@ export type ClerkOptions = ClerkOptionsNavigation &
   AfterMultiSessionSingleSignOutUrl &
   ClerkUnsafeOptions & {
     /**
-     * The Clerk UI object from `@clerk/ui`. Contains the UI constructor and version info.
+     * Clerk UI entrypoint.
      */
-    ui?: {
-      version?: string;
-      url?: string;
-      ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
-      /**
-       * @internal
-       * Prefer loading UI from CDN even when ClerkUI is provided.
-       * Used internally by SDKs that have bundling issues with the UI (e.g., Next.js).
-       */
-      __internal_preferCDN?: boolean;
-    };
+    clerkUICtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
@@ -1364,18 +1397,27 @@ export type SetActiveParams = {
    *
    * When provided, it takes precedence over the `redirectUrl` parameter for navigation.
    *
+   * The callback receives a `decorateUrl` function that should be used to wrap destination URLs.
+   * This enables Safari ITP cookie refresh when needed. The decorated URL may be an external URL
+   * (starting with `https://`) that requires `window.location.href` instead of client-side navigation.
+   *
    * @example
    * ```typescript
    * await clerk.setActive({
    *   session,
-   *   navigate: async ({ session }) => {
-   *     const currentTask = session.currentTask;
-   *     if (currentTask) {
-   *       await router.push(`/onboarding/${currentTask.key}`)
-   *       return
-   *     }
+   *   navigate: async ({ session, decorateUrl }) => {
+   *     const destination = session.currentTask
+   *       ? `/onboarding/${session.currentTask.key}`
+   *       : '/dashboard';
    *
-   *     router.push('/dashboard');
+   *     const url = decorateUrl(destination);
+   *
+   *     // decorateUrl may return an external URL when Safari ITP fix is needed
+   *     if (url.startsWith('https')) {
+   *       window.location.href = url;
+   *     } else {
+   *       router.push(url);
+   *     }
    *   }
    * });
    * ```
@@ -2426,10 +2468,6 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   clerkJSUrl?: string;
   /**
-   * If your web application only uses [Control Components](https://clerk.com/docs/reference/components/overview#control-components), you can set this value to `'headless'` and load a minimal ClerkJS bundle for optimal page performance.
-   */
-  clerkJSVariant?: 'headless' | '';
-  /**
    * The npm version for `@clerk/clerk-js`.
    */
   clerkJSVersion?: string;
@@ -2438,10 +2476,9 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   clerkUIUrl?: string;
   /**
-   * If set to `'shared'`, loads a variant of `@clerk/ui` that expects React to be provided by the host application via `globalThis.__clerkSharedModules`.
-   * This reduces bundle size when using framework packages like `@clerk/react`.
+   * The npm version for `@clerk/ui`.
    */
-  clerkUIVariant?: 'shared' | '';
+  clerkUIVersion?: string;
   /**
    * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
    */
@@ -2451,25 +2488,11 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   nonce?: string;
   /**
-   * @internal
-   * This is a structural-only type for the `ui` object that can be passed
-   * to Clerk.load() and ClerkProvider
+   * Controls prefetching of the `@clerk/ui` script.
+   * - `false` - Skip prefetching the UI (for custom UIs using Control Components)
+   * - `undefined` (default) - Prefetch UI normally
    */
-  ui?: {
-    version: string;
-    url?: string;
-    /**
-     * The Clerk UI constructor. When provided, this will be used instead of
-     * loading the UI from CDN. This is useful for bundling the UI with your app.
-     */
-    ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
-    /**
-     * @internal
-     * Prefer loading UI from CDN even when ClerkUI is provided.
-     * Used internally by SDKs that have bundling issues with the UI (e.g., Next.js).
-     */
-    __internal_preferCDN?: boolean;
-  };
+  prefetchUI?: boolean;
 } & MultiDomainAndOrProxy;
 
 export interface LoadedClerk extends Clerk {

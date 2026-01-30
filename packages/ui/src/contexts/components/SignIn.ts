@@ -3,7 +3,7 @@ import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
-import type { SessionResource } from '@clerk/shared/types';
+import type { DecorateUrl, SessionResource } from '@clerk/shared/types';
 import { isAbsoluteUrl } from '@clerk/shared/url';
 import { createContext, useContext, useMemo } from 'react';
 
@@ -28,7 +28,11 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
   isCombinedFlow: boolean;
-  navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
+  navigateOnSetActive: (opts: {
+    session: SessionResource;
+    redirectUrl: string;
+    decorateUrl: DecorateUrl;
+  }) => Promise<unknown>;
   taskUrl: string | null;
 };
 
@@ -119,9 +123,27 @@ export const useSignInContext = (): SignInContextType => {
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
-  const navigateOnSetActive = async ({ session, redirectUrl }: { session: SessionResource; redirectUrl: string }) => {
+  const navigateOnSetActive = async ({
+    session,
+    redirectUrl,
+    decorateUrl,
+  }: {
+    session: SessionResource;
+    redirectUrl: string;
+    decorateUrl: DecorateUrl;
+  }) => {
     const currentTask = session.currentTask;
     if (!currentTask) {
+      // Use decorateUrl to enable Safari ITP cookie refresh when needed
+      const decoratedUrl = decorateUrl(redirectUrl);
+
+      // If decorateUrl modified the URL (Safari ITP fix), do a full page navigation
+      // The touch endpoint URL will be an absolute URL starting with http:// or https://
+      if (decoratedUrl !== redirectUrl && /^https?:\/\//.test(decoratedUrl)) {
+        window.location.href = decoratedUrl;
+        return;
+      }
+
       return navigate(redirectUrl);
     }
 

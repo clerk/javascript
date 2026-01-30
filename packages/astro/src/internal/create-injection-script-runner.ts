@@ -22,11 +22,8 @@ function createInjectionScriptRunner(creator: CreateClerkInstanceInternalFn) {
       clientSafeVars = JSON.parse(clientSafeVarsContainer.textContent || '{}');
     }
 
-    // Pass `ui` separately to avoid TypeScript declaration file issues with the
-    // branded Ui type that contains an unexported Tags symbol
     await creator({
       ...mergeEnvVarsWithParams({ ...astroClerkOptions, ...clientSafeVars }),
-      ui: astroClerkOptions?.ui,
     });
   }
 

@@ -41,3 +41,6 @@ export interface ClerkUIConstructor {
 }
 
 export type ClerkUi = ClerkUiInstance;
+
+// Alias for compatibility with main branch naming convention
+export type ClerkUiConstructor = ClerkUIConstructor;

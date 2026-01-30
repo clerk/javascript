@@ -851,6 +851,9 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   annual_monthly_fee: BillingMoneyAmountJSON | null;
   for_payer_type: 'org' | 'user';
   features?: FeatureJSON[];
+  free_trial_days: number | null;
+  free_trial_enabled: boolean;
+  avatar_url: string | null;
 }
 
 type BillingSubscriptionItemStatus =
