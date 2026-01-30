@@ -9,7 +9,19 @@ type CollapsibleProps = PropsWithChildren<{
   sx?: ThemableCssProp;
 }>;
 
-const BOTTOM_MASK = 'linear-gradient(to bottom, black, black calc(100% - 0.5rem), transparent)';
+// Register custom property for animatable mask size
+if (typeof CSS !== 'undefined' && 'registerProperty' in CSS) {
+  try {
+    CSS.registerProperty({
+      name: '--cl-collapsible-mask-size',
+      syntax: '<length>',
+      initialValue: '0px',
+      inherits: false,
+    });
+  } catch {
+    // Property already registered or not supported
+  }
+}
 
 export function Collapsible({ open, children, sx }: CollapsibleProps): JSX.Element | null {
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -59,7 +71,7 @@ export function Collapsible({ open, children, sx }: CollapsibleProps): JSX.Eleme
           gridTemplateRows: isExpanded ? '1fr' : '0fr',
           opacity: isExpanded ? 1 : 0,
           transition: isMotionSafe
-            ? `grid-template-rows ${t.transitionDuration.$slow}, opacity ${t.transitionDuration.$slow}`
+            ? `grid-template-rows ${t.transitionDuration.$fast} ease-out, opacity ${t.transitionDuration.$fast} ease-out`
             : 'none',
         }),
         sx,
@@ -68,11 +80,14 @@ export function Collapsible({ open, children, sx }: CollapsibleProps): JSX.Eleme
       inert={!open ? '' : undefined}
     >
       <Box
-        sx={{
+        sx={t => ({
           overflow: 'hidden',
           minHeight: 0,
-          maskImage: isAnimating ? BOTTOM_MASK : 'none',
-        }}
+          '--cl-collapsible-mask-size': isAnimating ? '0.5rem' : '0px',
+          maskImage:
+            'linear-gradient(to bottom, black, black calc(100% - var(--cl-collapsible-mask-size)), transparent)',
+          transition: isMotionSafe ? `--cl-collapsible-mask-size ${t.transitionDuration.$slow}` : 'none',
+        })}
       >
         {children}
       </Box>
