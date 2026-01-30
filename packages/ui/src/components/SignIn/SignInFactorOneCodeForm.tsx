@@ -98,8 +98,8 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
           case 'complete':
             return setActive({
               session: res.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
               },
             });
           case 'needs_second_factor':
