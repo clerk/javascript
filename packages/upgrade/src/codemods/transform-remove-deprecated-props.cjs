@@ -122,6 +122,10 @@ module.exports = function transformDeprecatedProps({ source }, { jscodeshift: j,
     dirty = true;
   }
 
+  if (removeGetTokenLeewayInSeconds(root, j, stats)) {
+    dirty = true;
+  }
+
   return dirty ? root.toSource() : undefined;
 };
 
@@ -556,4 +560,53 @@ function transformClerkJsVariantToPrefetchUI(j, jsxNode, stats) {
   }
 
   return true;
+}
+
+/**
+ * Removes leewayInSeconds from getToken() calls.
+ * The leewayInSeconds option has been removed from the public API in favor of
+ * automatic background token refresh with a fixed threshold.
+ */
+function removeGetTokenLeewayInSeconds(root, j, stats) {
+  let changed = false;
+
+  root
+    .find(j.CallExpression)
+    .filter(path => isGetTokenCall(path.node.callee))
+    .forEach(path => {
+      const [args0] = path.node.arguments;
+      if (!args0 || args0.type !== 'ObjectExpression') {
+        return;
+      }
+
+      const leewayIndex = args0.properties.findIndex(prop => isPropertyNamed(prop, 'leewayInSeconds'));
+      if (leewayIndex === -1) {
+        return;
+      }
+
+      args0.properties.splice(leewayIndex, 1);
+      changed = true;
+      stats('leewayInSecondsRemoved');
+
+      // If the object is now empty, remove the entire argument
+      if (args0.properties.length === 0) {
+        path.node.arguments = [];
+      }
+    });
+
+  return changed;
+}
+
+function isGetTokenCall(callee) {
+  if (!callee) {
+    return false;
+  }
+  if (callee.type === 'Identifier') {
+    return callee.name === 'getToken';
+  }
+  if (callee.type === 'MemberExpression' || callee.type === 'OptionalMemberExpression') {
+    const property = callee.property;
+    return property && property.type === 'Identifier' && property.name === 'getToken';
+  }
+  return false;
 }
