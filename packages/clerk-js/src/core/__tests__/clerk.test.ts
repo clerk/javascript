@@ -312,6 +312,29 @@ describe('Clerk singleton', () => {
       expect(mockEnvironmentFetch).toHaveBeenCalledTimes(2);
       expect(mockClientFetch).toHaveBeenCalledTimes(2);
     });
+
+    it('uses cached environment when fetch fails but cache exists', async () => {
+      const cachedEnv = {
+        userSettings: { signUp: { captcha_enabled: false } },
+        displayConfig: {},
+      };
+      const localStorageSpy = vi.spyOn(localStorageModule.SafeLocalStorage, 'getItem').mockReturnValue(cachedEnv);
+
+      mockEnvironmentFetch.mockReset().mockRejectedValue(new Error('Network error'));
+      mockClientFetch.mockClear().mockResolvedValue({ signedInSessions: [] });
+
+      const sut = new Clerk(productionPublishableKey);
+
+      try {
+        await sut.load();
+      } finally {
+        localStorageSpy.mockRestore();
+      }
+
+      // Should only fetch once since cache is used as fallback (no retry needed)
+      expect(mockEnvironmentFetch).toHaveBeenCalledTimes(1);
+      expect(mockClientFetch).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('.setActive', () => {
