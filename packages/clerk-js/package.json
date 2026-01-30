@@ -21,13 +21,38 @@
   },
   "license": "MIT",
   "author": "Clerk",
+  "exports": {
+    ".": {
+      "react-native": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/clerk.native.js"
+      },
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/clerk.mjs"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/clerk.js"
+      }
+    },
+    "./no-rhc": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/clerk.no-rhc.mjs"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/clerk.no-rhc.js"
+      }
+    }
+  },
   "main": "dist/clerk.js",
   "jsdelivr": "dist/clerk.browser.js",
   "module": "dist/clerk.mjs",
   "types": "dist/types/index.d.ts",
   "files": [
     "dist",
-    "headless",
     "no-rhc"
   ],
   "scripts": {
@@ -42,13 +67,12 @@
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
     "dev:chips": "rspack serve --config rspack.config.js --env variant=\"clerk.chips.browser\"",
-    "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4000}",
     "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4000} --env sandbox=1",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports",
+    "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports --ignore-rules false-cjs",
     "lint:publint": "publint || true",
     "postbuild:disabled": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs",
     "test": "vitest --watch=false",
