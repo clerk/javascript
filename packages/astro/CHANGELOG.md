@@ -1,5 +1,14 @@
 # @clerk/astro
 
+## 2.16.17
+
+### Patch Changes
+
+- Fixed an error when using Control components (`<SignedIn />`, `<SignedOut />`) in prerendered pages ([#7708](https://github.com/clerk/javascript/pull/7708)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`559cd84`](https://github.com/clerk/javascript/commit/559cd84a320a1d808fb38c404f31437046198123)]:
+  - @clerk/backend@2.29.7
+
 ## 2.16.16
 
 ### Patch Changes
