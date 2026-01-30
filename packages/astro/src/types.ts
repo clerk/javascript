@@ -36,6 +36,10 @@ type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
      */
     clerkUIUrl?: string;
     /**
+     * The version of `@clerk/ui` to hot-load.
+     */
+    clerkUIVersion?: string;
+    /**
      * Controls prefetching of the `@clerk/ui` script.
      * - `false` - Skip prefetching the UI (for custom UIs using Control Components)
      * - `undefined` (default) - Prefetch UI normally
