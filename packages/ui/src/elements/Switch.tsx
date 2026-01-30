@@ -79,7 +79,7 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
             elementDescriptor={descriptors.switchThumb}
             sx={t => ({
               position: 'absolute',
-              insetInlineStart: t.sizes.$0x5,
+              left: t.sizes.$0x5,
               width: t.sizes.$3,
               height: t.sizes.$3,
               borderRadius: '50%',
