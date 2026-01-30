@@ -7,7 +7,7 @@ import { name, version } from './package.json';
 export default defineConfig(() => {
   return {
     clean: true,
-    entry: ['./src/index.ts', './src/experimental.ts', './src/internal.ts', './src/errors.ts'],
+    entry: ['./src/index.ts', './src/experimental.ts', './src/internal.ts', './src/errors.ts', './src/types/index.ts'],
     format: ['esm'],
     bundle: true,
     sourcemap: true,

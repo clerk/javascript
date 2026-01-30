@@ -44,7 +44,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
     <Flow.Part part='alternativeMethods'>
       <Card.Root>
         <Card.Content>
-          <Header.Root showLogo>
+          <Header.Root>
             <Header.Title localizationKey={localizationKeys('reverification.alternativeMethods.title')} />
             <Header.Subtitle localizationKey={localizationKeys('reverification.alternativeMethods.subtitle')} />
           </Header.Root>

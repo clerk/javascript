@@ -18,7 +18,7 @@ interface Window {
   __internal_onBeforeSetActive: (intent?: 'sign-out') => Promise<void> | void;
   __internal_onAfterSetActive: () => Promise<void> | void;
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  __internal_ClerkUiCtor?: import('@clerk/shared/types').ClerkUiConstructor;
+  __internal_ClerkUICtor?: import('@clerk/shared/types').ClerkUiConstructor;
   /**
    * Promise used for coordination between standalone getToken() from @clerk/shared and clerk-js.
    * When getToken() is called before Clerk loads, it creates this promise with __resolve/__reject callbacks.

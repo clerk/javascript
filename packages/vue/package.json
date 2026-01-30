@@ -41,7 +41,8 @@
     "./errors": {
       "types": "./dist/errors.d.ts",
       "default": "./dist/errors.js"
-    }
+    },
+    "./types": "./dist/types/index.d.ts"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

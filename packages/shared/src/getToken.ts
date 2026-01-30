@@ -96,7 +96,6 @@ async function waitForClerk(): Promise<LoadedClerk> {
  * @param options - Optional configuration for token retrieval
  * @param options.template - The name of a JWT template to use
  * @param options.organizationId - Organization ID to include in the token
- * @param options.leewayInSeconds - Number of seconds of leeway for token expiration
  * @param options.skipCache - Whether to skip the token cache
  * @returns A Promise that resolves to the session token, or `null` if the user is not signed in
  *
