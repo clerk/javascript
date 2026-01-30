@@ -81,7 +81,7 @@ export function OAuthConsentInternal() {
                     sx={t => ({
                       position: 'absolute',
                       bottom: `calc(${t.space.$3} * -1)`,
-                      right: `calc(${t.space.$3} * -1)`,
+                      insetInlineEnd: `calc(${t.space.$3} * -1)`,
                     })}
                   />
                 </Box>

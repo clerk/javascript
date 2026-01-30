@@ -25,7 +25,7 @@ export const LastAuthenticationStrategyBadge = ({
           boxShadow: `0 0 0 1px ${t.colors.$colorBackground}`,
           ...(overlay && {
             position: 'absolute',
-            right: -1,
+            insetInlineEnd: -1,
             top: -1,
             transform: `translate(${t.space.$2x5}, calc(-50% - ${t.space.$0x5}))`,
             pointerEvents: 'none',

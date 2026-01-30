@@ -118,10 +118,10 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
         sx={t => ({
           position: 'fixed',
           bottom: '1.25rem',
-          right: '1.25rem',
+          insetInlineEnd: '1.25rem',
           height: `${t.sizes.$10}`,
           minWidth: '13.4rem',
-          paddingLeft: `${t.space.$3}`,
+          paddingInlineStart: `${t.space.$3}`,
           borderRadius: '1.25rem',
           transition: 'all 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
 
