@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.6.19
+
+### Patch Changes
+
+- Updated dependencies [[`559cd84`](https://github.com/clerk/javascript/commit/559cd84a320a1d808fb38c404f31437046198123)]:
+  - @clerk/backend@2.29.7
+
 ## 2.6.18
 
 ### Patch Changes

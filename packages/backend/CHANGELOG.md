@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.29.7
+
+### Patch Changes
+
+- fix: correct `createInvitationBulk` return type to `Promise<Invitation[]>` ([#7702](https://github.com/clerk/javascript/pull/7702)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 2.29.6
 
 ### Patch Changes

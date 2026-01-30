@@ -1,5 +1,12 @@
 # @clerk/nuxt
 
+## 1.13.17
+
+### Patch Changes
+
+- Updated dependencies [[`559cd84`](https://github.com/clerk/javascript/commit/559cd84a320a1d808fb38c404f31437046198123)]:
+  - @clerk/backend@2.29.7
+
 ## 1.13.16
 
 ### Patch Changes
