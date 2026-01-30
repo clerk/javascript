@@ -27,7 +27,8 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): AnyRequestMid
         publishableKey: requestState.publishableKey,
       });
       // Trigger a handshake redirect
-      return new Response(null, { status: 307, headers: requestState.headers });
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      throw new Response(null, { status: 307, headers: requestState.headers });
     }
 
     if (requestState.status === AuthStatus.Handshake) {
