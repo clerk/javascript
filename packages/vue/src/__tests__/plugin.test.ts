@@ -8,8 +8,8 @@ const mockLoadClerkUiScript = vi.fn();
 const mockLoadClerkJsScript = vi.fn();
 
 vi.mock('@clerk/shared/loadClerkJsScript', () => ({
-  loadClerkJsScript: (...args: unknown[]) => mockLoadClerkJsScript(...args),
-  loadClerkUiScript: (...args: unknown[]) => mockLoadClerkUiScript(...args),
+  loadClerkJSScript: (...args: unknown[]) => mockLoadClerkJsScript(...args),
+  loadClerkUIScript: (...args: unknown[]) => mockLoadClerkUiScript(...args),
 }));
 
 vi.mock('@clerk/shared/browser', () => ({
