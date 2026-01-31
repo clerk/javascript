@@ -154,6 +154,7 @@ import {
 } from '../utils';
 import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
+import { withRetry } from '../utils/retry';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
 import {
@@ -178,7 +179,6 @@ import { BaseResource, Client, Environment, Organization, Waitlist } from './res
 import { State } from './state';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
-
 declare global {
   interface Window {
     Clerk?: Clerk;
@@ -2876,97 +2876,115 @@ export class Clerk implements ClerkInterface {
 
     let initializationDegradedCounter = 0;
 
-    let retries = 0;
-    while (retries < 2) {
-      retries++;
-
-      try {
-        const initEnvironmentPromise = Environment.getInstance()
-          .fetch({ touch: shouldTouchEnv })
-          .then(res => this.updateEnvironment(res))
-          .catch(() => {
-            ++initializationDegradedCounter;
-            const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
-              CLERK_ENVIRONMENT_STORAGE_ENTRY,
-              null,
-            );
-
-            if (environmentSnapshot) {
-              this.updateEnvironment(new Environment(environmentSnapshot));
-            }
-          });
-
-        const initClient = async () => {
-          return Client.getOrCreateInstance()
-            .fetch()
-            .then(res => this.updateClient(res))
-            .catch(async e => {
-              /**
-               * Only handle non 4xx errors, like 5xx errors and network errors.
-               */
-              if (is4xxError(e)) {
-                // bubble it up
-                throw e;
-              }
-
-              ++initializationDegradedCounter;
-
-              const jwtInCookie = this.#authService?.getSessionCookie();
-              const localClient = createClientFromJwt(jwtInCookie);
-
-              this.updateClient(localClient);
-
-              /**
-               * In most scenarios we want the poller to stop while we are fetching a fresh token during an outage.
-               * We want to avoid having the below `getToken()` retrying at the same time as the poller.
-               */
-              this.#authService?.stopPollingForToken();
-
-              // Attempt to grab a fresh token
-              await this.session
-                ?.getToken({ skipCache: true })
-                // If the token fetch fails, let Clerk be marked as loaded and leave it up to the poller.
-                .catch(() => null)
-                .finally(() => {
-                  this.#authService?.startPollingForToken();
-                });
-
-              // Allows for Clerk to be marked as loaded with the client and session created from the JWT.
-              return null;
-            });
-        };
-
-        const [, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
-        if (clientResult.status === 'rejected') {
-          const e = clientResult.reason;
-
-          if (isError(e, 'requires_captcha')) {
-            await initClient();
-          } else {
-            throw e;
+    const initializeClerk = async (): Promise<void> => {
+      const initEnvironmentPromise = Environment.getInstance()
+        .fetch({ touch: shouldTouchEnv })
+        .then(res => this.updateEnvironment(res))
+        .catch(err => {
+          if (is4xxError(err)) {
+            throw err;
           }
-        }
 
-        this.#authService?.setClientUatCookieForDevelopmentInstances();
+          ++initializationDegradedCounter;
+          const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
+            CLERK_ENVIRONMENT_STORAGE_ENTRY,
+            null,
+          );
 
-        if (await this.#redirectFAPIInitiatedFlow()) {
-          return;
-        }
-        break;
-      } catch (err) {
-        if (isError(err, 'dev_browser_unauthenticated')) {
-          await this.#authService.handleUnauthenticatedDevBrowser();
-        } else if (!isValidBrowserOnline()) {
-          console.warn(err);
-          return;
+          if (environmentSnapshot) {
+            this.updateEnvironment(new Environment(environmentSnapshot));
+          } else {
+            throw new ClerkRuntimeError('Failed to fetch environment', { code: 'network_error' });
+          }
+        });
+
+      const initClient = async () => {
+        return Client.getOrCreateInstance()
+          .fetch()
+          .then(res => this.updateClient(res))
+          .catch(async e => {
+            if (is4xxError(e)) {
+              throw e;
+            }
+
+            ++initializationDegradedCounter;
+
+            const jwtInCookie = this.#authService?.getSessionCookie();
+            const localClient = createClientFromJwt(jwtInCookie);
+
+            this.updateClient(localClient);
+
+            this.#authService?.stopPollingForToken();
+
+            await this.session
+              ?.getToken({ skipCache: true })
+              .catch(() => null)
+              .finally(() => {
+                this.#authService?.startPollingForToken();
+              });
+
+            return null;
+          });
+      };
+
+      const initComponents = () => {
+        void this.#clerkUi?.then(ui => ui.ensureMounted());
+      };
+
+      const [envResult, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+
+      if (envResult.status === 'rejected') {
+        throw envResult.reason;
+      }
+
+      if (clientResult.status === 'rejected') {
+        const e = clientResult.reason;
+
+        if (isError(e, 'requires_captcha')) {
+          initComponents();
+          await initClient();
         } else {
-          throw err;
+          throw e;
         }
       }
 
-      if (retries >= 2) {
-        clerkErrorInitFailed();
+      this.#authService?.setClientUatCookieForDevelopmentInstances();
+
+      if (await this.#redirectFAPIInitiatedFlow()) {
+        return;
       }
+
+      initComponents();
+    };
+
+    try {
+      await withRetry(initializeClerk, {
+        jitter: true,
+        maxAttempts: 2,
+        shouldRetry: async error => {
+          if (!isValidBrowserOnline()) {
+            console.warn(error);
+            return false;
+          }
+
+          const isDevBrowserUnauthenticated = isError(error as any, 'dev_browser_unauthenticated');
+          const isNetworkError = isClerkRuntimeError(error) && error.code === 'network_error';
+
+          if (isDevBrowserUnauthenticated && this.#authService) {
+            await this.#authService.handleUnauthenticatedDevBrowser();
+            return true;
+          }
+
+          return isNetworkError;
+        },
+      });
+    } catch (err) {
+      if (!isValidBrowserOnline()) {
+        console.warn(err);
+        return;
+      }
+
+      clerkErrorInitFailed(err);
     }
 
     this.#captchaHeartbeat = new CaptchaHeartbeat(this);

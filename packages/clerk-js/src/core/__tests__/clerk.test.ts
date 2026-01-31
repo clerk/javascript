@@ -1,4 +1,4 @@
-import { EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import { ClerkRuntimeError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -13,8 +13,11 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test,
 import { mockJwt } from '@/test/core-fixtures';
 
 import { mockNativeRuntime } from '../../test/utils';
+import * as localStorageModule from '../../utils/localStorage';
+import { AuthCookieService } from '../auth/AuthCookieService';
 import type { DevBrowser } from '../auth/devBrowser';
 import { Clerk } from '../clerk';
+import * as errorsModule from '../errors';
 import { eventBus, events } from '../events';
 import type { DisplayConfig, Organization } from '../resources/internal';
 import { BaseResource, Client, Environment, SignIn, SignUp } from '../resources/internal';
@@ -154,6 +157,183 @@ describe('Clerk singleton', () => {
       expect(() => {
         new Clerk('invalidPK');
       }).toThrowError(/The publishableKey passed to Clerk is invalid/);
+    });
+  });
+
+  describe('load retry behavior', () => {
+    let originalMountComponentRenderer: typeof Clerk.mountComponentRenderer;
+
+    const createMockAuthService = () => ({
+      decorateUrlWithDevBrowserToken: vi.fn((url: URL) => url),
+      getSessionCookie: vi.fn(() => null),
+      handleUnauthenticatedDevBrowser: vi.fn(() => Promise.resolve()),
+      isSignedOut: vi.fn(() => false),
+      setClientUatCookieForDevelopmentInstances: vi.fn(),
+      startPollingForToken: vi.fn(),
+      stopPollingForToken: vi.fn(),
+    });
+
+    const createMockComponentControls = () => {
+      const componentInstance = {
+        mountImpersonationFab: vi.fn(),
+        updateProps: vi.fn(),
+      };
+
+      return {
+        ensureMounted: vi.fn().mockResolvedValue(componentInstance),
+        prioritizedOn: vi.fn(),
+      };
+    };
+
+    beforeEach(() => {
+      originalMountComponentRenderer = Clerk.mountComponentRenderer;
+    });
+
+    afterEach(() => {
+      Clerk.mountComponentRenderer = originalMountComponentRenderer;
+      vi.useRealTimers();
+    });
+
+    it('retries once when dev browser authentication is lost', async () => {
+      vi.useFakeTimers();
+
+      const mockAuthService = createMockAuthService();
+      const authCreateSpy = vi
+        .spyOn(AuthCookieService, 'create')
+        .mockResolvedValue(mockAuthService as unknown as AuthCookieService);
+
+      const componentControls = createMockComponentControls();
+      const devBrowserError = Object.assign(new Error('dev browser unauthenticated'), {
+        errors: [{ code: 'dev_browser_unauthenticated' }],
+        status: 401,
+      });
+
+      const mountSpy = vi
+        .fn<NonNullable<typeof Clerk.mountComponentRenderer>>()
+        .mockImplementationOnce(() => {
+          throw devBrowserError;
+        })
+        .mockReturnValue(componentControls);
+
+      Clerk.mountComponentRenderer = mountSpy;
+      mockClientFetch.mockClear();
+
+      const sut = new Clerk(productionPublishableKey);
+
+      try {
+        const loadPromise = sut.load();
+
+        await vi.runAllTimersAsync();
+        await loadPromise;
+      } finally {
+        authCreateSpy.mockRestore();
+      }
+
+      expect(mountSpy).toHaveBeenCalledTimes(2);
+      expect(mockAuthService.handleUnauthenticatedDevBrowser).toHaveBeenCalledTimes(1);
+      expect(mockClientFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('surfaces network errors after exhausting retries', async () => {
+      vi.useFakeTimers();
+
+      const mockAuthService = createMockAuthService();
+      const authCreateSpy = vi
+        .spyOn(AuthCookieService, 'create')
+        .mockResolvedValue(mockAuthService as unknown as AuthCookieService);
+
+      const networkError = new ClerkRuntimeError('Network failure', { code: 'network_error' });
+      const mountSpy = vi.fn<NonNullable<typeof Clerk.mountComponentRenderer>>().mockImplementation(() => {
+        throw networkError;
+      });
+
+      Clerk.mountComponentRenderer = mountSpy;
+      mockClientFetch.mockClear();
+
+      const errorSpy = vi.spyOn(errorsModule, 'clerkErrorInitFailed');
+      const sut = new Clerk(productionPublishableKey);
+
+      try {
+        const loadPromise = sut.load();
+
+        // Attach rejection handler before advancing timers to avoid unhandled rejection
+        const expectation = expect(loadPromise).rejects.toThrow(/Something went wrong initializing Clerk/);
+        await vi.runAllTimersAsync();
+
+        const err = await loadPromise.catch(e => e);
+        expect(err).toBeInstanceOf(Error);
+        expect((err as Error).message).toMatch(/Something went wrong initializing Clerk/);
+        const cause = (err as Error).cause as any;
+        expect(cause).toBeDefined();
+        expect(cause.code).toBe('network_error');
+        expect(cause.clerkRuntimeError).toBe(true);
+
+        await expectation;
+
+        expect(mountSpy).toHaveBeenCalledTimes(2);
+        expect(mockClientFetch).toHaveBeenCalledTimes(2);
+        expect(errorSpy).toHaveBeenCalledTimes(1);
+        expect(errorSpy).toHaveBeenLastCalledWith(networkError);
+        expect(mockAuthService.handleUnauthenticatedDevBrowser).not.toHaveBeenCalled();
+      } finally {
+        authCreateSpy.mockRestore();
+        errorSpy.mockRestore();
+      }
+    });
+
+    it('retries when environment fetch fails and no cached snapshot exists', async () => {
+      vi.useFakeTimers();
+
+      const mockAuthService = createMockAuthService();
+      const authCreateSpy = vi
+        .spyOn(AuthCookieService, 'create')
+        .mockResolvedValue(mockAuthService as unknown as AuthCookieService);
+
+      const localStorageSpy = vi.spyOn(localStorageModule.SafeLocalStorage, 'getItem').mockReturnValue(null);
+
+      mockEnvironmentFetch.mockReset().mockRejectedValueOnce(new Error('Network error')).mockResolvedValue({});
+
+      const componentControls = createMockComponentControls();
+      const mountSpy = vi.fn<NonNullable<typeof Clerk.mountComponentRenderer>>().mockReturnValue(componentControls);
+      Clerk.mountComponentRenderer = mountSpy;
+      mockClientFetch.mockClear();
+
+      const sut = new Clerk(productionPublishableKey);
+
+      try {
+        const loadPromise = sut.load();
+        await vi.runAllTimersAsync();
+        await loadPromise;
+      } finally {
+        authCreateSpy.mockRestore();
+        localStorageSpy.mockRestore();
+      }
+
+      expect(mockEnvironmentFetch).toHaveBeenCalledTimes(2);
+      expect(mockClientFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('uses cached environment when fetch fails but cache exists', async () => {
+      const cachedEnv = {
+        userSettings: { signUp: { captcha_enabled: false } },
+        displayConfig: {},
+      };
+      const localStorageSpy = vi.spyOn(localStorageModule.SafeLocalStorage, 'getItem').mockReturnValue(cachedEnv);
+
+      mockEnvironmentFetch.mockReset().mockRejectedValue(new Error('Network error'));
+      mockClientFetch.mockClear().mockResolvedValue({ signedInSessions: [] });
+
+      const sut = new Clerk(productionPublishableKey);
+
+      try {
+        await sut.load();
+      } finally {
+        localStorageSpy.mockRestore();
+      }
+
+      // Should only fetch once since cache is used as fallback (no retry needed)
+      expect(mockEnvironmentFetch).toHaveBeenCalledTimes(1);
+      expect(mockClientFetch).toHaveBeenCalledTimes(1);
     });
   });
 
