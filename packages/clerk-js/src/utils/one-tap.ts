@@ -71,4 +71,4 @@ async function loadGIS() {
 }
 
 export { loadGIS };
-export type { GISCredentialResponse };
+export type { GISCredentialResponse, PromptMomentNotification };
