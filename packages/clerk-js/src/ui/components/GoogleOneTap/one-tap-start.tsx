@@ -20,26 +20,16 @@ import { useRouter } from '../../router';
  * @see https://developers.google.com/identity/gsi/web/guides/fedcm-migration
  */
 export function isPromptSkipped(notification: PromptMomentNotification): boolean {
-  // Debug: log available methods
-  console.log('[Clerk Debug] Notification methods:', {
-    hasIsSkippedMoment: 'isSkippedMoment' in notification,
-    hasGetMomentType: 'getMomentType' in notification,
-    allKeys: Object.keys(notification),
-  });
-
-  if ('isSkippedMoment' in notification && typeof notification.isSkippedMoment === 'function') {
-    // FedCM-compatible method (preferred)
-    console.log('[Clerk Debug] Using isSkippedMoment()');
-    return notification.isSkippedMoment();
+  // Prioritize FedCM-compatible method
+  if ('isSkippedMoment' in notification) {
+    return notification.isSkippedMoment?.() ?? false;
   }
 
-  if ('getMomentType' in notification && typeof notification.getMomentType === 'function') {
-    // Legacy method for backward compatibility
-    console.log('[Clerk Debug] Using getMomentType()');
-    return notification.getMomentType() === 'skipped';
+  // Fallback to legacy method only if FedCM method doesn't exist
+  if ('getMomentType' in notification) {
+    return notification.getMomentType?.() === 'skipped';
   }
 
-  console.log('[Clerk Debug] No skipped detection method available');
   return false;
 }
 
