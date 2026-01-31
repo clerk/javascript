@@ -39,7 +39,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
         elementDescriptor={descriptors.alertTextContainer}
         elementId={descriptors.alertTextContainer.setId(variant)}
         gap={1}
-        sx={{ textAlign: 'left' }}
+        sx={{ textAlign: 'start' }}
       >
         <Text
           elementDescriptor={descriptors.alertText}

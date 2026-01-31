@@ -9,12 +9,16 @@ const { applyVariants, filterProps } = createVariants(theme => {
       display: 'inline-block',
       borderRadius: '99999px',
       borderTop: `${thickness} solid currentColor`,
+      // eslint-disable-next-line custom-rules/no-physical-css-properties -- Decorative spinner visual effect
       borderRight: `${thickness} solid currentColor`,
       borderBottomWidth: thickness,
+      // eslint-disable-next-line custom-rules/no-physical-css-properties -- Decorative spinner visual effect
       borderLeftWidth: thickness,
       borderBottomStyle: 'solid',
+      // eslint-disable-next-line custom-rules/no-physical-css-properties -- Decorative spinner visual effect
       borderLeftStyle: 'solid',
       borderBottomColor: theme.colors.$transparent,
+      // eslint-disable-next-line custom-rules/no-physical-css-properties -- Decorative spinner visual effect
       borderLeftColor: theme.colors.$transparent,
       opacity: 1,
       animation: `${animations.spinning} ${speed} linear 0s infinite normal none running`,
@@ -25,9 +29,11 @@ const { applyVariants, filterProps } = createVariants(theme => {
     },
     variants: {
       colorScheme: {
+        // eslint-disable-next-line custom-rules/no-physical-css-properties -- Decorative spinner visual effect
         primary: { borderTopColor: theme.colors.$primary500, borderRightColor: theme.colors.$primary500, opacity: 1 },
         neutral: {
           borderTopColor: theme.colors.$borderAlpha700,
+          // eslint-disable-next-line custom-rules/no-physical-css-properties -- Decorative spinner visual effect
           borderRightColor: theme.colors.$borderAlpha700,
           opacity: 1,
         },

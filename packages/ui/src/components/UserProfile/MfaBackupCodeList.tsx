@@ -85,16 +85,16 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
             borderTopColor: t.colors.$borderAlpha100,
             gridTemplateColumns: `repeat(3, minmax(0, 1fr))`,
             '>:not([hidden])~:not([hidden])': {
-              borderRightWidth: '0px',
-              borderLeftWidth: '1px',
+              borderInlineEndWidth: '0px',
+              borderInlineStartWidth: '1px',
               borderStyle: 'solid',
               borderColor: t.colors.$borderAlpha100,
             },
             '>:first-child': {
-              borderBottomLeftRadius: t.radii.$lg,
+              borderEndStartRadius: t.radii.$lg,
             },
             '>:last-child': {
-              borderBottomRightRadius: t.radii.$lg,
+              borderEndEndRadius: t.radii.$lg,
             },
           })}
         >

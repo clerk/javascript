@@ -198,7 +198,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
           <Text
             colorScheme='secondary'
             sx={t => ({
-              paddingRight: t.sizes.$1x5,
+              paddingInlineEnd: t.sizes.$1x5,
               display: 'inline-block',
             })}
             localizationKey={connectedAccountErrorMessage}

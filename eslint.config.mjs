@@ -171,6 +171,83 @@ const noUnstableMethods = {
   },
 };
 
+const noPhysicalCssProperties = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Enforce use of CSS logical properties instead of physical properties for RTL support',
+      recommended: false,
+    },
+    messages: {
+      useLogicalProperty:
+        'Use logical CSS property "{{logical}}" instead of physical property "{{physical}}" for RTL support.',
+      useLogicalTextAlign:
+        'Use logical textAlign value "{{logical}}" instead of physical value "{{physical}}" for RTL support.',
+    },
+    schema: [],
+  },
+  create(context) {
+    // Mapping of physical properties to logical equivalents
+    const propertyMap = {
+      left: 'insetInlineStart',
+      right: 'insetInlineEnd',
+      marginLeft: 'marginInlineStart',
+      marginRight: 'marginInlineEnd',
+      paddingLeft: 'paddingInlineStart',
+      paddingRight: 'paddingInlineEnd',
+      borderLeft: 'borderInlineStart',
+      borderRight: 'borderInlineEnd',
+      borderLeftWidth: 'borderInlineStartWidth',
+      borderRightWidth: 'borderInlineEndWidth',
+      borderLeftStyle: 'borderInlineStartStyle',
+      borderRightStyle: 'borderInlineEndStyle',
+      borderLeftColor: 'borderInlineStartColor',
+      borderRightColor: 'borderInlineEndColor',
+      borderTopLeftRadius: 'borderStartStartRadius',
+      borderTopRightRadius: 'borderStartEndRadius',
+      borderBottomLeftRadius: 'borderEndStartRadius',
+      borderBottomRightRadius: 'borderEndEndRadius',
+    };
+
+    const checkProperty = (key, value) => {
+      const keyName = key.type === 'Identifier' ? key.name : key.value;
+
+      // Check for physical property names
+      if (propertyMap[keyName]) {
+        context.report({
+          node: key,
+          messageId: 'useLogicalProperty',
+          data: {
+            physical: keyName,
+            logical: propertyMap[keyName],
+          },
+        });
+      }
+
+      // Check for textAlign with physical values
+      if (keyName === 'textAlign' && value) {
+        if (value.type === 'Literal' && (value.value === 'left' || value.value === 'right')) {
+          const logicalValue = value.value === 'left' ? 'start' : 'end';
+          context.report({
+            node: value,
+            messageId: 'useLogicalTextAlign',
+            data: {
+              physical: value.value,
+              logical: logicalValue,
+            },
+          });
+        }
+      }
+    };
+
+    return {
+      Property(node) {
+        checkProperty(node.key, node.value);
+      },
+    };
+  },
+};
+
 export default tseslint.config([
   {
     name: 'repo/ignores',
@@ -248,6 +325,7 @@ export default tseslint.config([
         rules: {
           'no-global-object': noGlobalObject,
           'no-unstable-methods': noUnstableMethods,
+          'no-physical-css-properties': noPhysicalCssProperties,
         },
       },
       'simple-import-sort': pluginSimpleImportSort,
@@ -456,6 +534,13 @@ export default tseslint.config([
     rules: {
       'custom-rules/no-navigate-useClerk': 'error',
       'custom-rules/no-unstable-methods': 'error',
+    },
+  },
+  {
+    name: 'packages/ui',
+    files: ['packages/ui/src/**/*'],
+    rules: {
+      'custom-rules/no-physical-css-properties': 'error',
     },
   },
   {
