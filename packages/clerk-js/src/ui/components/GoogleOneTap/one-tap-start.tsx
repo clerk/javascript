@@ -19,7 +19,7 @@ import { useRouter } from '../../router';
  *
  * @see https://developers.google.com/identity/gsi/web/guides/fedcm-migration
  */
-function isPromptSkipped(notification: PromptMomentNotification): boolean {
+export function isPromptSkipped(notification: PromptMomentNotification): boolean {
   if ('isSkippedMoment' in notification && typeof notification.isSkippedMoment === 'function') {
     // FedCM-compatible method (preferred)
     return notification.isSkippedMoment();
