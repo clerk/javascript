@@ -5,7 +5,7 @@ import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useOrganizationContext, useUserContext } from '../contexts';
-import { useBillingHookEnabled } from '../hooks/useBillingHookEnabled';
+import { useBillingIsEnabled } from '../hooks/useBillingIsEnabled';
 import { useClearQueriesOnSignOut } from '../hooks/useClearQueriesOnSignOut';
 
 type InitializePaymentMethodOptions = {
@@ -27,7 +27,7 @@ function useInitializePaymentMethod(options?: InitializePaymentMethodOptions): U
 
   const resource = forType === 'organization' ? organization : user;
 
-  const billingEnabled = useBillingHookEnabled(options);
+  const billingEnabled = useBillingIsEnabled(options);
 
   const stableKey = 'billing-payment-method-initialize';
   const authenticated = true;
