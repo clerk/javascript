@@ -66,8 +66,21 @@ function OneTapStartInternal(): JSX.Element | null {
   useEffect(() => {
     if (initializedGoogle && !user?.id && !isPromptedRef.current) {
       initializedGoogle.accounts.id.prompt(notification => {
-        // Close the modal, when the user clicks outside the prompt or cancels
-        if (notification.getMomentType() === 'skipped') {
+        // Close the modal when the user clicks outside the prompt or cancels
+        // Per FedCM migration guide, we should use isSkippedMoment() which continues to work
+        // Fall back to getMomentType() for legacy browsers that haven't migrated yet
+        // Reference: https://developers.google.com/identity/gsi/web/guides/fedcm-migration
+        let isSkipped = false;
+
+        if ('isSkippedMoment' in notification && typeof notification.isSkippedMoment === 'function') {
+          // FedCM-compatible method (preferred)
+          isSkipped = notification.isSkippedMoment();
+        } else if ('getMomentType' in notification && typeof notification.getMomentType === 'function') {
+          // Legacy method for backward compatibility
+          isSkipped = notification.getMomentType() === 'skipped';
+        }
+
+        if (isSkipped) {
           // Unmounts the component will cause the useEffect cleanup function from below to be called
           clerk.closeGoogleOneTap();
         }

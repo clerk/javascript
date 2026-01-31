@@ -15,9 +15,28 @@ interface InitializeProps {
   use_fedcm_for_prompt?: boolean;
 }
 
-interface PromptMomentNotification {
+// Legacy methods that are removed in FedCM mode
+interface LegacyPromptMomentNotification {
   getMomentType: () => 'display' | 'skipped' | 'dismissed';
+  // These methods are deprecated and will not work with FedCM enabled
+  isDisplayMoment?: () => boolean;
+  isDisplayed?: () => boolean;
+  isNotDisplayed?: () => boolean;
+  getNotDisplayedReason?: () => string;
+  getSkippedReason?: () => string;
 }
+
+// FedCM-compatible methods (safe to use regardless of FedCM mode)
+interface FedCMPromptMomentNotification {
+  getMomentType: () => 'display' | 'skipped' | 'dismissed';
+  // These methods continue to work with FedCM
+  isSkippedMoment?: () => boolean;
+  isDismissedMoment?: () => boolean;
+  getDismissedReason?: () => string;
+}
+
+// Union type for backward compatibility
+type PromptMomentNotification = LegacyPromptMomentNotification & FedCMPromptMomentNotification;
 
 interface OneTapMethods {
   initialize: (params: InitializeProps) => void;
