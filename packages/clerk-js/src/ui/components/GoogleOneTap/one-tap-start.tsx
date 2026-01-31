@@ -26,9 +26,10 @@ export function isPromptSkipped(notification: PromptMomentNotification): boolean
   }
 
   // Fallback to legacy method only if FedCM method doesn't exist
-  if ('getMomentType' in notification) {
-    return notification.getMomentType?.() === 'skipped';
-  }
+  // TODO: Temporarily commented out to test if this triggers the GSI_LOGGER warning
+  // if ('getMomentType' in notification) {
+  //   return notification.getMomentType?.() === 'skipped';
+  // }
 
   return false;
 }
