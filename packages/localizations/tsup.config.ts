@@ -2,7 +2,7 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig(_overrideOptions => {
   return {
-    entry: ['src/*.ts'],
+    entry: ['src/*.ts', 'src/utils/*.ts'],
     format: ['cjs', 'esm'],
     bundle: true,
     clean: true,
