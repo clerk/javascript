@@ -114,17 +114,8 @@ function OneTapStartInternal(): JSX.Element | null {
   useEffect(() => {
     if (initializedGoogle && !user?.id && !isPromptedRef.current) {
       console.log('[Clerk Debug] Showing Google One Tap prompt...');
-      initializedGoogle.accounts.id.prompt(notification => {
-        console.log('[Clerk Debug] Prompt notification received');
-        if (isPromptSkipped(notification)) {
-          console.log('[Clerk Debug] Prompt was skipped, closing Google One Tap');
-          // Close the modal when the user clicks outside the prompt or cancels
-          // Unmounts the component will cause the useEffect cleanup function from below to be called
-          clerk.closeGoogleOneTap();
-        } else {
-          console.log('[Clerk Debug] Prompt was not skipped');
-        }
-      });
+      // @ts-expect-error: testing
+      initializedGoogle.accounts.id.prompt();
       isPromptedRef.current = true;
     }
   }, [clerk, initializedGoogle, user?.id]);
