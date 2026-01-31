@@ -66,6 +66,8 @@ function OneTapStartInternal(): JSX.Element | null {
 
     const google = await loadGIS();
 
+    console.log('[Clerk Debug] Initializing Google One Tap with fedCmSupport:', ctx.fedCmSupport);
+
     google.accounts.id.initialize({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       client_id: environmentClientID!,
