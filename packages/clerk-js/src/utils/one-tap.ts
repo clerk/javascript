@@ -35,7 +35,6 @@ interface FedCMPromptMomentNotification {
   getDismissedReason?: () => string;
 }
 
-// Union type for backward compatibility
 type PromptMomentNotification = LegacyPromptMomentNotification & FedCMPromptMomentNotification;
 
 interface OneTapMethods {
