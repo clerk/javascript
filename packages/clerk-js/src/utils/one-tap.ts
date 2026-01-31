@@ -16,15 +16,19 @@ interface InitializeProps {
 }
 
 interface PromptMomentNotification {
-  // FedCM-compatible methods (continue to work)
+  /**
+   * FedCM-compatible method to check if the prompt was skipped.
+   * This method continues to work with FedCM enabled.
+   * @see https://developers.google.com/identity/gsi/web/guides/fedcm-migration
+   */
   isSkippedMoment?: () => boolean;
-  isDismissedMoment?: () => boolean;
-  getDismissedReason?: () => string;
-  // Legacy methods (may be removed when FedCM becomes mandatory)
+  /**
+   * Legacy method to get the moment type.
+   * @deprecated This method may be removed when FedCM becomes mandatory in Chrome.
+   * Use isSkippedMoment() instead for forward compatibility.
+   * @see https://developers.google.com/identity/gsi/web/guides/fedcm-migration
+   */
   getMomentType?: () => 'display' | 'skipped' | 'dismissed';
-  isDisplayMoment?: () => boolean;
-  getNotDisplayedReason?: () => string;
-  getSkippedReason?: () => string;
 }
 
 interface OneTapMethods {
