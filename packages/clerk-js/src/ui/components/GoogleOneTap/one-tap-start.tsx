@@ -79,7 +79,8 @@ function OneTapStartInternal(): JSX.Element | null {
     const google = await loadGIS();
     console.log('[Clerk Debug] Google Identity Services loaded');
 
-    const useFedCm = ctx.fedCmSupport ?? true;
+    // TODO: Temporarily disable FedCM to test if it's causing the CORS error
+    const useFedCm = ctx.fedCmSupport ?? false;
     console.log('[Clerk Debug] Initializing Google One Tap with:', {
       fedCmSupport: ctx.fedCmSupport,
       use_fedcm_for_prompt: useFedCm,
