@@ -459,7 +459,7 @@ export const nlNL: LocalizationResource = {
       headerTitle__general: 'Algemeen',
       headerTitle__members: 'Leden',
       profileSection: {
-        primaryButton: '',
+        primaryButton: 'Profiel aanpassen',
         title: 'Organisatieprofiel',
         uploadAction__title: 'Logo',
       },
