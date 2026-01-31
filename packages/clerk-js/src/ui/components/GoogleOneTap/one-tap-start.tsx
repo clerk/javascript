@@ -20,17 +20,26 @@ import { useRouter } from '../../router';
  * @see https://developers.google.com/identity/gsi/web/guides/fedcm-migration
  */
 export function isPromptSkipped(notification: PromptMomentNotification): boolean {
+  console.log('[Clerk Debug] isPromptSkipped called with notification:', {
+    hasIsSkippedMoment: 'isSkippedMoment' in notification,
+    hasGetMomentType: 'getMomentType' in notification,
+  });
+
   // Prioritize FedCM-compatible method
   if ('isSkippedMoment' in notification) {
-    return notification.isSkippedMoment?.() ?? false;
+    const result = notification.isSkippedMoment?.() ?? false;
+    console.log('[Clerk Debug] Using isSkippedMoment(), result:', result);
+    return result;
   }
 
   // Fallback to legacy method only if FedCM method doesn't exist
-  // TODO: Temporarily commented out to test if this triggers the GSI_LOGGER warning
-  // if ('getMomentType' in notification) {
-  //   return notification.getMomentType?.() === 'skipped';
-  // }
+  if ('getMomentType' in notification) {
+    const result = notification.getMomentType?.() === 'skipped';
+    console.log('[Clerk Debug] Using getMomentType() fallback, result:', result);
+    return result;
+  }
 
+  console.log('[Clerk Debug] No skip detection method available, returning false');
   return false;
 }
 
@@ -44,14 +53,16 @@ function OneTapStartInternal(): JSX.Element | null {
   const ctx = useGoogleOneTapContext();
 
   async function oneTapCallback(response: GISCredentialResponse) {
+    console.log('[Clerk Debug] oneTapCallback called');
     isPromptedRef.current = false;
     try {
       const res = await clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
+      console.log('[Clerk Debug] Authentication successful');
       await clerk.handleGoogleOneTapCallback(res, ctx.generateCallbackUrls(window.location.href), navigate);
     } catch (e) {
-      console.error(e);
+      console.error('[Clerk Debug] Authentication error:', e);
     }
   }
 
@@ -64,9 +75,17 @@ function OneTapStartInternal(): JSX.Element | null {
       return undefined;
     }
 
+    console.log('[Clerk Debug] Loading Google Identity Services...');
     const google = await loadGIS();
+    console.log('[Clerk Debug] Google Identity Services loaded');
 
-    console.log('[Clerk Debug] Initializing Google One Tap with fedCmSupport:', ctx.fedCmSupport);
+    const useFedCm = ctx.fedCmSupport ?? true;
+    console.log('[Clerk Debug] Initializing Google One Tap with:', {
+      fedCmSupport: ctx.fedCmSupport,
+      use_fedcm_for_prompt: useFedCm,
+      itp_support: ctx.itpSupport,
+      cancel_on_tap_outside: ctx.cancelOnTapOutside,
+    });
 
     google.accounts.id.initialize({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -75,9 +94,11 @@ function OneTapStartInternal(): JSX.Element | null {
       itp_support: ctx.itpSupport,
       cancel_on_tap_outside: ctx.cancelOnTapOutside,
       auto_select: false,
-      use_fedcm_for_prompt: ctx.fedCmSupport,
+      // Default to true if not explicitly set (per the type definition)
+      use_fedcm_for_prompt: useFedCm,
     });
 
+    console.log('[Clerk Debug] Google One Tap initialized successfully');
     return google;
   }
 
@@ -91,11 +112,16 @@ function OneTapStartInternal(): JSX.Element | null {
 
   useEffect(() => {
     if (initializedGoogle && !user?.id && !isPromptedRef.current) {
+      console.log('[Clerk Debug] Showing Google One Tap prompt...');
       initializedGoogle.accounts.id.prompt(notification => {
+        console.log('[Clerk Debug] Prompt notification received');
         if (isPromptSkipped(notification)) {
+          console.log('[Clerk Debug] Prompt was skipped, closing Google One Tap');
           // Close the modal when the user clicks outside the prompt or cancels
           // Unmounts the component will cause the useEffect cleanup function from below to be called
           clerk.closeGoogleOneTap();
+        } else {
+          console.log('[Clerk Debug] Prompt was not skipped');
         }
       });
       isPromptedRef.current = true;
@@ -106,6 +132,7 @@ function OneTapStartInternal(): JSX.Element | null {
   useEffect(() => {
     return () => {
       if (initializedGoogle && isPromptedRef.current) {
+        console.log('[Clerk Debug] Cleanup: Cancelling Google One Tap prompt');
         isPromptedRef.current = false;
         initializedGoogle.accounts.id.cancel();
       }
