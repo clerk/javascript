@@ -42,7 +42,7 @@ async function detectNext(app: Application): Promise<{ version: string | undefin
   return { version: installedVersion };
 }
 
-const middlewareFileContents = `
+const proxyFileContents = `
 import { clerkMiddleware } from '@clerk/nextjs/server';
 export default clerkMiddleware();
 
@@ -51,9 +51,9 @@ export const config = {
 };
 `;
 
-const commonSetup = appConfigs.next.appRouterQuickstart.clone().removeFile('src/middleware.ts');
+const commonSetup = appConfigs.next.appRouterQuickstart.clone().removeFile('src/proxy.ts');
 
-test.describe('next start - missing middleware @quickstart', () => {
+test.describe('next start - missing proxy @quickstart', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
 
@@ -70,21 +70,21 @@ test.describe('next start - missing middleware @quickstart', () => {
     await app.teardown();
   });
 
-  test('Display error for missing middleware', async ({ page, context }) => {
+  test('Display error for missing proxy', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
 
-    expect(app.serveOutput).toContain('Your Middleware exists at ./src/middleware.(ts|js)');
+    expect(app.serveOutput).toContain('Your Proxy exists at ./src/proxy.(ts|js)');
   });
 });
 
-test.describe('next start - invalid middleware at root on src/ @quickstart', () => {
+test.describe('next start - invalid proxy at root on src/ @quickstart', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
 
   test.beforeAll(async () => {
     test.setTimeout(90_000);
-    app = await commonSetup.addFile('middleware.ts', () => middlewareFileContents).commit();
+    app = await commonSetup.addFile('proxy.ts', () => proxyFileContents).commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodesQuickstart);
     await app.build();
@@ -95,23 +95,20 @@ test.describe('next start - invalid middleware at root on src/ @quickstart', () 
     await app.teardown();
   });
 
-  test('Display suggestion for moving middleware to from `./middleware.ts` to `./src/middleware.ts`', async ({
-    page,
-    context,
-  }) => {
+  test('Display suggestion for moving proxy from `./proxy.ts` to `./src/proxy.ts`', async ({ page, context }) => {
     const { version } = await detectNext(app);
     const major = parseSemverMajor(version) ?? 0;
-    test.skip(major >= 16, 'Middleware detection is smarter in Next 16+.');
+    test.skip(major >= 16, 'Proxy detection is smarter in Next 16+.');
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
 
-    expect(app.serveOutput).not.toContain('Your Middleware exists at ./src/middleware.(ts|js)');
+    expect(app.serveOutput).not.toContain('Your Proxy exists at ./src/proxy.(ts|js)');
     expect(app.serveOutput).toContain(
-      'Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./src/middleware.ts. Currently located at ./middleware.ts',
+      'Clerk: clerkMiddleware() was not run, your proxy file might be misplaced. Move your proxy file to ./src/proxy.ts. Currently located at ./proxy.ts',
     );
   });
 
-  test('Does not display misplaced middleware error on Next 16+', async ({ page, context }) => {
+  test('Does not display misplaced proxy error on Next 16+', async ({ page, context }) => {
     const { version } = await detectNext(app);
     const major = parseSemverMajor(version) ?? 0;
     test.skip(major < 16, 'Only applicable on Next 16+');
@@ -121,13 +118,13 @@ test.describe('next start - invalid middleware at root on src/ @quickstart', () 
   });
 });
 
-test.describe('next start - invalid middleware inside app on src/ @quickstart', () => {
+test.describe('next start - invalid proxy inside app on src/ @quickstart', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
 
   test.beforeAll(async () => {
     test.setTimeout(90_000);
-    app = await commonSetup.addFile('src/app/middleware.ts', () => middlewareFileContents).commit();
+    app = await commonSetup.addFile('src/app/proxy.ts', () => proxyFileContents).commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodesQuickstart);
     await app.build();
@@ -138,15 +135,15 @@ test.describe('next start - invalid middleware inside app on src/ @quickstart', 
     await app.teardown();
   });
 
-  test('Display suggestion for moving middleware to from `./src/app/middleware.ts` to `./src/middleware.ts`', async ({
+  test('Display suggestion for moving proxy from `./src/app/proxy.ts` to `./src/proxy.ts`', async ({
     page,
     context,
   }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
-    expect(app.serveOutput).not.toContain('Your Middleware exists at ./src/middleware.(ts|js)');
+    expect(app.serveOutput).not.toContain('Your Proxy exists at ./src/proxy.(ts|js)');
     expect(app.serveOutput).toContain(
-      'Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./src/middleware.ts. Currently located at ./src/app/middleware.ts',
+      'Clerk: clerkMiddleware() was not run, your proxy file might be misplaced. Move your proxy file to ./src/proxy.ts. Currently located at ./src/app/proxy.ts',
     );
   });
 });

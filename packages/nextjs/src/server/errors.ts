@@ -22,9 +22,9 @@ export const getAuthAuthHeaderMissing = () => authAuthHeaderMissing('getAuth');
 
 export const authAuthHeaderMissing = (helperName = 'auth', prefixSteps?: string[]) =>
   `Clerk: ${helperName}() was called but Clerk can't detect usage of clerkMiddleware(). Please ensure the following:
-- ${prefixSteps ? [...prefixSteps, ''].join('\n- ') : ' '}clerkMiddleware() is used in your Next.js Middleware.
-- Your Middleware matcher is configured to match this route or page.
-- If you are using the src directory, make sure the Middleware file is inside of it.
+- ${prefixSteps ? [...prefixSteps, ''].join('\n- ') : ' '}clerkMiddleware() is used in your Next.js Proxy.
+- Your Proxy matcher is configured to match this route or page.
+- If you are using the src directory, make sure the Proxy file is inside of it.
 
 For more details, see https://clerk.com/err/auth-middleware
 `;

@@ -75,8 +75,8 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
 
   const stepsBasedOnSrcDirectory = async () => {
     try {
-      const isSrcAppDir = await import('../../server/fs/middleware-location.js').then(m => m.hasSrcAppDir());
-      return [`Your Middleware exists at ./${isSrcAppDir ? 'src/' : ''}middleware.(ts|js)`];
+      const isSrcAppDir = await import('../../server/fs/proxy-location.js').then(m => m.hasSrcAppDir());
+      return [`Your Proxy exists at ./${isSrcAppDir ? 'src/' : ''}proxy.(ts|js)`];
     } catch {
       return [];
     }

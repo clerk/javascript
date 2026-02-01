@@ -10,14 +10,14 @@ function hasSrcAppDir() {
   return !!existsSync(projectWithAppSrc);
 }
 
-function suggestMiddlewareLocation() {
+function suggestProxyLocation() {
   const fileExtensions = ['ts', 'js'] as const;
   const suggestionMessage = (
     extension: (typeof fileExtensions)[number],
     to: 'src/' | '',
     from: 'src/app/' | 'app/' | '',
   ) =>
-    `Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./${to}middleware.${extension}. Currently located at ./${from}middleware.${extension}`;
+    `Clerk: clerkMiddleware() was not run, your proxy file might be misplaced. Move your proxy file to ./${to}proxy.${extension}. Currently located at ./${from}proxy.${extension}`;
 
   const { existsSync } = nodeFsOrThrow();
   const path = nodePathOrThrow();
@@ -26,13 +26,13 @@ function suggestMiddlewareLocation() {
   const projectWithAppSrcPath = path.join(cwd(), 'src', 'app');
   const projectWithAppPath = path.join(cwd(), 'app');
 
-  const checkMiddlewareLocation = (
+  const checkProxyLocation = (
     basePath: string,
     to: 'src/' | '',
     from: 'src/app/' | 'app/' | '',
   ): string | undefined => {
     for (const fileExtension of fileExtensions) {
-      if (existsSync(path.join(basePath, `middleware.${fileExtension}`))) {
+      if (existsSync(path.join(basePath, `proxy.${fileExtension}`))) {
         return suggestionMessage(fileExtension, to, from);
       }
     }
@@ -40,16 +40,14 @@ function suggestMiddlewareLocation() {
   };
 
   if (existsSync(projectWithAppSrcPath)) {
-    return (
-      checkMiddlewareLocation(projectWithAppSrcPath, 'src/', 'src/app/') || checkMiddlewareLocation(cwd(), 'src/', '')
-    );
+    return checkProxyLocation(projectWithAppSrcPath, 'src/', 'src/app/') || checkProxyLocation(cwd(), 'src/', '');
   }
 
   if (existsSync(projectWithAppPath)) {
-    return checkMiddlewareLocation(projectWithAppPath, '', 'app/');
+    return checkProxyLocation(projectWithAppPath, '', 'app/');
   }
 
   return undefined;
 }
 
-export { suggestMiddlewareLocation, hasSrcAppDir };
+export { suggestProxyLocation, hasSrcAppDir };

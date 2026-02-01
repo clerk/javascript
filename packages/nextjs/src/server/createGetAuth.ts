@@ -36,12 +36,12 @@ export const createAsyncGetAuth = ({
       }
 
       if (!detectClerkMiddleware(req)) {
-        const missConfiguredMiddlewareLocation = await import('./fs/middleware-location.js')
-          .then(m => m.suggestMiddlewareLocation())
+        const misconfiguredProxyLocation = await import('./fs/proxy-location.js')
+          .then(m => m.suggestProxyLocation())
           .catch(() => undefined);
 
-        if (missConfiguredMiddlewareLocation) {
-          throw new Error(missConfiguredMiddlewareLocation);
+        if (misconfiguredProxyLocation) {
+          throw new Error(misconfiguredProxyLocation);
         }
 
         // still throw there is no suggested move location
