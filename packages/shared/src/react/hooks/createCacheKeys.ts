@@ -9,6 +9,12 @@ export function createCacheKeys<
   U extends Record<string, unknown> | undefined = undefined,
 >(params: {
   stablePrefix: ResourceCacheStableKey | __internal_ResourceCacheStableKey;
+  /**
+   * Describes queries that will contain data that require a user to be authenticated.
+   *
+   * `authenticated` should be not be resolved at runtime.
+   * When`authenticated: true` use it with `useClearQueriesOnSignOut` to automatically clear the cache entries associated with the cache key when a user signs out.
+   */
   authenticated: boolean;
   tracked: T;
   untracked: U extends { args: Params } ? U : never;
