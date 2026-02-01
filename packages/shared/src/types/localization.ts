@@ -412,6 +412,9 @@ export type __internal_LocalizationResource = {
     passwordCompromised: {
       title: LocalizationValue;
     };
+    passwordTooLong: {
+      title: LocalizationValue;
+    };
     passkey: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -1360,6 +1363,7 @@ type UnstableErrors = WithParamName<{
   /** @deprecated Use `form_password_compromised__sign_in` instead */
   form_password_untrusted__sign_in: LocalizationValue;
   form_password_compromised__sign_in: LocalizationValue;
+  password_too_long_needs_reset__sign_in: LocalizationValue;
   form_username_invalid_length: LocalizationValue<'min_length' | 'max_length'>;
   form_username_needs_non_number_char: LocalizationValue;
   form_username_invalid_character: LocalizationValue;

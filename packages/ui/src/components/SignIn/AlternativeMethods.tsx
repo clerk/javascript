@@ -18,7 +18,7 @@ import { SignInSocialButtons } from './SignInSocialButtons';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { withHavingTrouble } from './withHavingTrouble';
 
-export type AlternativeMethodsMode = 'forgot' | 'pwned' | 'passwordCompromised' | 'default';
+export type AlternativeMethodsMode = 'forgot' | 'pwned' | 'passwordCompromised' | 'passwordTooLong' | 'default';
 
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
@@ -55,7 +55,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
         <Card.Content>
           <Header.Root showLogo>
             <Header.Title localizationKey={cardTitleKey} />
-            {!isReset && mode !== 'passwordCompromised' && (
+            {!isReset && mode !== 'passwordCompromised' && mode !== 'passwordTooLong' && (
               <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
             )}
           </Header.Root>
@@ -187,6 +187,8 @@ function determineFlowPart(mode: AlternativeMethodsMode) {
       return 'passwordPwnedMethods';
     case 'passwordCompromised':
       return 'passwordCompromisedMethods';
+    case 'passwordTooLong':
+      return 'passwordTooLongMethods';
     default:
       return 'alternativeMethods';
   }
@@ -200,6 +202,8 @@ function determineTitle(mode: AlternativeMethodsMode): LocalizationKey {
       return localizationKeys('signIn.passwordPwned.title');
     case 'passwordCompromised':
       return localizationKeys('signIn.passwordCompromised.title');
+    case 'passwordTooLong':
+      return localizationKeys('signIn.passwordTooLong.title');
     default:
       return localizationKeys('signIn.alternativeMethods.title');
   }
@@ -209,6 +213,7 @@ function determineIsReset(mode: AlternativeMethodsMode): boolean {
   switch (mode) {
     case 'forgot':
     case 'pwned':
+    case 'passwordTooLong':
       return true;
     case 'passwordCompromised':
       return false;
