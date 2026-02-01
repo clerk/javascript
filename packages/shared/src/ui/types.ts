@@ -30,7 +30,7 @@ export interface ClerkUiInstance {
 }
 
 // Constructor type
-export interface ClerkUiConstructor {
+export interface ClerkUIConstructor {
   new (
     getClerk: () => Clerk,
     getEnvironment: () => EnvironmentResource | null | undefined,
@@ -41,3 +41,6 @@ export interface ClerkUiConstructor {
 }
 
 export type ClerkUi = ClerkUiInstance;
+
+// Alias for compatibility with main branch naming convention
+export type ClerkUiConstructor = ClerkUIConstructor;
