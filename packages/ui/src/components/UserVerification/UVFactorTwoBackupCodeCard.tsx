@@ -39,7 +39,7 @@ export const UVFactorTwoBackupCodeCard = (props: UVFactorTwoBackupCodeCardProps)
   return (
     <Card.Root>
       <Card.Content>
-        <Header.Root showLogo>
+        <Header.Root>
           <Header.Title localizationKey={localizationKeys('reverification.backupCodeMfa.title')} />
           <Header.Subtitle localizationKey={localizationKeys('reverification.backupCodeMfa.subtitle')} />
         </Header.Root>
