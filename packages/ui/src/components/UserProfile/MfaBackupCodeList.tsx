@@ -44,17 +44,6 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
 
   return (
     <>
-      <Col gap={1}>
-        <Text
-          localizationKey={localizationKeys('userProfile.backupCodePage.title__codelist')}
-          variant='subtitle'
-        />
-        <Text
-          localizationKey={subtitle}
-          variant='caption'
-          colorScheme='secondary'
-        />
-      </Col>
       <Box
         sx={t => ({
           borderWidth: t.borderWidths.$normal,
@@ -63,11 +52,38 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
           borderRadius: t.radii.$lg,
         })}
       >
+        <Col
+          gap={1}
+          sx={t => ({
+            padding: t.space.$4,
+          })}
+        >
+          <Text
+            localizationKey={localizationKeys('userProfile.backupCodePage.title__codelist')}
+            variant='subtitle'
+            sx={t => ({
+              textAlign: 'start',
+            })}
+          />
+          <Text
+            localizationKey={subtitle}
+            variant='body'
+            sx={t => ({
+              textAlign: 'start',
+            })}
+            colorScheme='secondary'
+          />
+        </Col>
         <Grid
           gap={2}
           sx={t => ({
             gridTemplateColumns: `repeat(2, minmax(${t.sizes.$12}, 1fr))`,
-            padding: `${t.space.$4} ${t.space.$6}`,
+            paddingBlock: t.space.$2,
+            backgroundColor: t.colors.$neutralAlpha50,
+            color: t.colors.$colorMutedForeground,
+            borderTopWidth: t.borderWidths.$normal,
+            borderTopStyle: t.borderStyles.$solid,
+            borderTopColor: t.colors.$borderAlpha100,
           })}
         >
           {backupCodes.map((code, i) => (
@@ -100,7 +116,7 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
         >
           <Button
             variant='ghost'
-            sx={t => ({ width: '100%', padding: `${t.space.$2} 0`, borderRadius: 0 })}
+            sx={t => ({ width: '100%', padding: `${t.space.$0x25} 0`, borderRadius: 0 })}
             onClick={onDownloadTxtFile}
           >
             <Icon icon={Download} />

@@ -219,6 +219,12 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'taskChooseOrganizationCreateOrganizationActionButton',
   'taskChooseOrganizationPreviewButton',
 
+  'taskSetupMfaMethodSelectionItem',
+  'taskSetupMfaMethodSelectionItems',
+  'taskSetupMfaPhoneSelectionItems',
+  'taskSetupMfaPhoneSelectionItem',
+  'taskSetupMfaPhoneSelectionAddPhoneAction',
+
   'userAvatarBox',
   'userAvatarImage',
 

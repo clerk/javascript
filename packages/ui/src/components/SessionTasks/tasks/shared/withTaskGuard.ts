@@ -1,5 +1,5 @@
-import type { SessionTask } from '@clerk/shared/types';
 import { warnings } from '@clerk/shared/internal/clerk-js/warnings';
+import type { SessionTask } from '@clerk/shared/types';
 import type { ComponentType } from 'react';
 
 import { withRedirect } from '@/ui/common';

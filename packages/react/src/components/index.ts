@@ -10,6 +10,7 @@ export {
   SignUp,
   TaskChooseOrganization,
   TaskResetPassword,
+  TaskSetupMFA,
   UserAvatar,
   UserButton,
   UserProfile,
