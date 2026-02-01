@@ -170,6 +170,8 @@ import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
+import type { SessionReplayNamespace } from './modules/session-replay';
+import { SessionReplay } from './modules/session-replay';
 import { Protect } from './protect';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
@@ -218,6 +220,7 @@ export class Clerk implements ClerkInterface {
   private static _billing: BillingNamespace;
   private static _apiKeys: APIKeysNamespace;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
+  private static _sessionReplay: SessionReplayNamespace;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -375,6 +378,31 @@ export class Clerk implements ClerkInterface {
       Clerk._billing = new Billing();
     }
     return Clerk._billing;
+  }
+
+  get sessionReplay(): SessionReplayNamespace {
+    if (!Clerk._sessionReplay) {
+      const displayConfig = this.environment?.displayConfig;
+      // if (
+      //   !displayConfig?.sessionReplayEnabled ||
+      //   !displayConfig?.sessionReplayPublicKey ||
+      //   !this.client?.id
+      // ) {
+      //   return errorThrower.throw('Session replay is not enabled');
+      // }
+
+      const environment = displayConfig?.instanceEnvironmentType === 'production' ? 'production' : 'development';
+
+      Clerk._sessionReplay = new SessionReplay({
+        publicAPIKey: displayConfig?.sessionReplayPublicKey ?? '',
+        clientId: this.client?.id ?? '',
+        instanceId: this.frontendApi,
+        environment,
+        userId: this.user?.id,
+        sessionId: this.session?.id,
+      });
+    }
+    return Clerk._sessionReplay;
   }
 
   get apiKeys(): APIKeysNamespace {
@@ -604,6 +632,10 @@ export class Clerk implements ClerkInterface {
 
       this.#setAccessors();
       this.#emit();
+
+      if (this.sessionReplay.isRecording()) {
+        this.sessionReplay.abandonRecording();
+      }
 
       await onAfterSetActive();
     };
@@ -1573,6 +1605,13 @@ export class Clerk implements ClerkInterface {
 
       this.#setAccessors(newSession);
       this.#emit();
+
+      if (newSession?.id && newSession?.user.id) {
+        this.sessionReplay.completeRecording({
+          sessionId: newSession?.id,
+          userId: newSession?.user.id,
+        });
+      }
 
       // Do not revalidate server cache for pending sessions to avoid unmount of `SignIn/SignUp` AIOs when navigating to task
       // newSession can be mutated by the time we get here (org change session touch)
@@ -2826,6 +2865,8 @@ export class Clerk implements ClerkInterface {
     this.#handleImpersonationFab();
     this.#handleKeylessPrompt();
 
+    this.sessionReplay.startRecording({ sessionType: 'sign_in' });
+
     this.#publicEventBus.emit(clerkEvents.Status, initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
@@ -2987,6 +3028,12 @@ export class Clerk implements ClerkInterface {
     this.session = session || null;
     this.organization = this.#getLastActiveOrganizationFromSession();
     this.user = this.session ? this.session.user : null;
+    if (session) {
+      this.sessionReplay.addMeta({
+        user_id: session.user.id,
+        clerk_session_id: session.id,
+      });
+    }
   };
 
   #getSessionFromClient = (sessionId: string | undefined): SignedInSessionResource | null => {

@@ -6,6 +6,7 @@ export type ImportableModuleToTypeMap = {
   '@base-org/account': typeof import('@base-org/account');
   '@coinbase/wallet-sdk': typeof import('@coinbase/wallet-sdk');
   '@stripe/stripe-js': typeof import('@stripe/stripe-js');
+  '@rrwebcloud/js-client': typeof import('@rrwebcloud/js-client');
 };
 
 export type ImportableModule = keyof ImportableModuleToTypeMap;

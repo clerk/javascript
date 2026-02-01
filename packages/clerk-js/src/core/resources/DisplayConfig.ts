@@ -37,6 +37,8 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   googleOneTapClientId?: string;
   homeUrl: string = '';
   id: string = '';
+  sessionReplayEnabled: boolean = false;
+  sessionReplayPublicKey: string | null = null;
   instanceEnvironmentType: string = '';
   logoImageUrl: string = '';
   organizationProfileUrl: string = '';
@@ -97,6 +99,8 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.googleOneTapClientId = this.withDefault(data.google_one_tap_client_id, this.googleOneTapClientId);
     this.homeUrl = this.withDefault(data.home_url, this.homeUrl);
     this.id = this.withDefault(data.id, this.id);
+    this.sessionReplayEnabled = this.withDefault(data.session_replay_enabled, this.sessionReplayEnabled);
+    this.sessionReplayPublicKey = this.withDefault(data.session_replay_public_key, this.sessionReplayPublicKey);
     this.instanceEnvironmentType = this.withDefault(data.instance_environment_type, this.instanceEnvironmentType);
     this.logoImageUrl = this.withDefault(data.logo_image_url, this.logoImageUrl);
     this.organizationProfileUrl = this.withDefault(data.organization_profile_url, this.organizationProfileUrl);
@@ -140,6 +144,8 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
       google_one_tap_client_id: this.googleOneTapClientId,
       home_url: this.homeUrl,
       id: this.id,
+      session_replay_enabled: this.sessionReplayEnabled,
+      session_replay_public_key: this.sessionReplayPublicKey,
       instance_environment_type: this.instanceEnvironmentType,
       logo_image_url: this.logoImageUrl,
       organization_profile_url: this.organizationProfileUrl,

@@ -133,6 +133,7 @@
   "devDependencies": {
     "@base-org/account": "catalog:module-manager",
     "@coinbase/wallet-sdk": "catalog:module-manager",
+    "@rrwebcloud/js-client": "^2.0.0-alpha.24",
     "@solana/wallet-adapter-base": "catalog:module-manager",
     "@solana/wallet-adapter-react": "catalog:module-manager",
     "@solana/wallet-standard": "catalog:module-manager",

@@ -45,6 +45,8 @@ export interface DisplayConfigJSON {
   privacy_policy_url: string;
   waitlist_url: string;
   after_join_waitlist_url: string;
+  session_replay_enabled?: boolean;
+  session_replay_public_key?: string | null;
 }
 
 export interface DisplayConfigResource extends ClerkResource {
@@ -90,5 +92,7 @@ export interface DisplayConfigResource extends ClerkResource {
   privacyPolicyUrl: string;
   waitlistUrl: string;
   afterJoinWaitlistUrl: string;
+  sessionReplayEnabled?: boolean;
+  sessionReplayPublicKey?: string | null;
   __internal_toSnapshot: () => DisplayConfigJSONSnapshot;
 }

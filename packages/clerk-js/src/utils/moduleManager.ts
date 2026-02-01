@@ -8,6 +8,7 @@ export class ModuleManager implements ModuleManagerI {
     '@base-org/account': () => safeImport(() => import('@base-org/account')),
     '@coinbase/wallet-sdk': () => safeImport(() => import('@coinbase/wallet-sdk')),
     '@stripe/stripe-js': () => safeImport(() => import('@stripe/stripe-js')),
+    '@rrwebcloud/js-client': () => safeImport(() => import('@rrwebcloud/js-client')),
   } satisfies Record<ImportableModule, () => Promise<any>>;
 
   import(module: ImportableModule) {
