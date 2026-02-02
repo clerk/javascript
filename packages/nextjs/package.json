@@ -60,11 +60,6 @@
       "import": "./dist/esm/legacy.js",
       "require": "./dist/cjs/legacy.js"
     },
-    "./proxy": {
-      "types": "./dist/types/proxy.d.ts",
-      "import": "./dist/esm/proxy.js",
-      "require": "./dist/cjs/proxy.js"
-    },
     "./types": "./dist/types/types/index.d.ts"
   },
   "types": "./dist/types/index.d.ts",

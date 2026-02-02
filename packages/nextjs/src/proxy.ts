@@ -33,7 +33,7 @@ export interface NextFrontendApiProxyOptions extends Omit<FrontendApiProxyOption
  * @example
  * ```typescript
  * // app/api/__clerk/[[...path]]/route.ts
- * import { clerkFrontendApiProxy } from '@clerk/nextjs/proxy';
+ * import { clerkFrontendApiProxy } from '@clerk/nextjs/server';
  *
  * export async function GET(request: Request) {
  *   return clerkFrontendApiProxy(request);
@@ -83,7 +83,7 @@ export interface FrontendApiProxyHandlers {
  * @example
  * ```typescript
  * // app/api/__clerk/[[...path]]/route.ts
- * import { createFrontendApiProxyHandlers } from '@clerk/nextjs/proxy';
+ * import { createFrontendApiProxyHandlers } from '@clerk/nextjs/server';
  *
  * export const { GET, POST, PUT, DELETE, PATCH } = createFrontendApiProxyHandlers();
  * ```
