@@ -478,7 +478,9 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                       window.location.reload();
                     });
                   }}
-                  css={buttonStyles()}
+                  css={buttonStyles({
+                    fullWidth: true,
+                  })}
                 >
                   Dismiss
                 </button>
@@ -487,7 +489,9 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                   href={claimUrlToDashboard}
                   target='_blank'
                   rel='noopener noreferrer'
-                  css={buttonStyles()}
+                  css={buttonStyles({
+                    fullWidth: true,
+                  })}
                 >
                   {claimed ? 'Get API keys' : 'Configure your application'}
                   <svg
