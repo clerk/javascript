@@ -166,8 +166,14 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
     // Auto-derive proxyUrl from frontendApiProxy config if not explicitly set
     let resolvedOptions = options;
     if (proxyEnabled && !options.proxyUrl) {
-      const protocol = request.secure || request.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-      const host = request.headers['x-forwarded-host'] || request.headers.host || 'localhost';
+      const forwardedProto = request.headers['x-forwarded-proto'];
+      const proto = Array.isArray(forwardedProto) ? forwardedProto[0] : forwardedProto;
+      const protocol = request.secure || proto === 'https' ? 'https' : 'http';
+
+      const forwardedHost = request.headers['x-forwarded-host'];
+      const host =
+        (Array.isArray(forwardedHost) ? forwardedHost[0] : forwardedHost) || request.headers.host || 'localhost';
+
       const derivedProxyUrl = `${protocol}://${host}${proxyPath}`;
       resolvedOptions = { ...options, proxyUrl: derivedProxyUrl };
     }
