@@ -9,7 +9,7 @@ import {
 import type { ResourceCacheStableKey } from '../stable-keys';
 import type { PagesOrInfiniteOptions, PaginatedHookConfig, PaginatedResources } from '../types';
 import { createCacheKeys } from './createCacheKeys';
-import { useBillingHookEnabled } from './useBillingHookEnabled';
+import { useBillingIsEnabled } from './useBillingIsEnabled';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -106,7 +106,7 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
 
     const isForOrganization = safeFor === 'organization';
 
-    const billingEnabled = useBillingHookEnabled({
+    const billingEnabled = useBillingIsEnabled({
       for: safeFor,
       enabled: externalEnabled,
       authenticated: !options?.unauthenticated,
