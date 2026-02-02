@@ -4,6 +4,7 @@ import { css } from '@emotion/react';
 import React, { useMemo, useState } from 'react';
 
 import { Portal } from '../../../elements/Portal';
+import { buttonStyles } from '../../../mosaic/button';
 import { MosaicThemeProvider, useMosaicTheme } from '../../../mosaic/theme-provider';
 import { useRevalidateEnvironment } from './use-revalidate-environment';
 
@@ -477,114 +478,18 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                       window.location.reload();
                     });
                   }}
-                  css={css`
-                    box-sizing: border-box;
-                    position: relative;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: ${theme.spacing[1]};
-                    width: 100%;
-                    height: ${theme.spacing[7]};
-                    border-radius: ${theme.spacing[1.5]};
-                    font-size: ${theme.typography.label[3].fontSize};
-                    font-weight: ${theme.fontWeights.medium};
-                    color: var(--foreground);
-                    background: var(--accent);
-                    box-shadow:
-                      ${theme.colors.white} 0px 0px 0px 0px,
-                      var(--accent) 0px 0px 0px 1px,
-                      ${theme.alpha(theme.colors.white, 7)} 0px 1px 0px 0px inset,
-                      ${theme.alpha(theme.colors.gray[1300], 20)} 0px 1px 3px 0px;
-                    outline: none;
-                    border: none;
-                    margin: 0;
-                    padding: 0;
-                    cursor: pointer;
-                    &::before {
-                      content: '';
-                      position: absolute;
-                      inset: 0;
-                      background: linear-gradient(
-                        180deg,
-                        ${theme.alpha(theme.colors.white, 16)} 46%,
-                        ${theme.alpha(theme.colors.white, 0)} 54%
-                      );
-                      mix-blend-mode: overlay;
-                      border-radius: inherit;
-                    }
-                    &:focus-visible {
-                      outline: 2px solid var(--accent);
-                      outline-offset: 2px;
-                    }
-                    &:hover {
-                      background: ${theme.colors.gray[1200]};
-                      transition: all 120ms ease-in-out;
-                    }
-                  `}
+                  css={buttonStyles()}
                 >
-                  <span
-                    css={css`
-                      position: relative;
-                      z-index: 1;
-                    `}
-                  >
-                    Dismiss
-                  </span>
+                  Dismiss
                 </button>
               ) : (
                 <a
                   href={claimUrlToDashboard}
                   target='_blank'
                   rel='noopener noreferrer'
-                  css={css`
-                    box-sizing: border-box;
-                    position: relative;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: ${theme.spacing[1]};
-                    width: 100%;
-                    height: ${theme.spacing[7]};
-                    border-radius: ${theme.spacing[1.5]};
-                    font-size: ${theme.typography.label[3].fontSize};
-                    font-weight: ${theme.fontWeights.medium};
-                    color: var(--foreground);
-                    background: var(--accent);
-                    box-shadow:
-                      ${theme.colors.white} 0px 0px 0px 0px,
-                      var(--accent) 0px 0px 0px 1px,
-                      ${theme.alpha(theme.colors.white, 7)} 0px 1px 0px 0px inset,
-                      ${theme.alpha(theme.colors.gray[1300], 20)} 0px 1px 3px 0px;
-                    outline: none;
-                    margin: 0;
-                    padding: 0;
-                    &::before {
-                      content: '';
-                      position: absolute;
-                      inset: 0;
-                      background: linear-gradient(
-                        180deg,
-                        ${theme.alpha(theme.colors.white, 16)} 46%,
-                        ${theme.alpha(theme.colors.white, 0)} 54%
-                      );
-                      mix-blend-mode: overlay;
-                      border-radius: inherit;
-                    }
-                    &:focus-visible {
-                      outline: 2px solid var(--accent);
-                      outline-offset: 2px;
-                    }
-                  `}
+                  css={buttonStyles()}
                 >
-                  <span
-                    css={css`
-                      position: relative;
-                      z-index: 1;
-                    `}
-                  >
-                    {claimed ? 'Get API keys' : 'Configure your application'}
-                  </span>
+                  {claimed ? 'Get API keys' : 'Configure your application'}
                   <svg
                     css={{
                       width: theme.spacing[2.5],
