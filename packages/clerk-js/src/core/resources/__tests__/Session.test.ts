@@ -277,7 +277,7 @@ describe('Session', () => {
         vi.useFakeTimers();
       });
 
-      it('throws ClerkOfflineError when offline', { timeout: 20000 }, async () => {
+      it('throws ClerkOfflineError when offline', async () => {
         const session = new Session({
           status: 'active',
           id: 'session_1',
@@ -300,7 +300,7 @@ describe('Session', () => {
         }
       });
 
-      it('throws ClerkOfflineError after fetch fails while offline', { timeout: 20000 }, async () => {
+      it('throws ClerkOfflineError after fetch fails while offline', async () => {
         const session = new Session({
           status: 'active',
           id: 'session_1',
