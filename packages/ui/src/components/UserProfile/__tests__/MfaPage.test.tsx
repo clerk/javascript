@@ -386,4 +386,193 @@ describe('MfaPage', () => {
       });
     });
   });
+
+  describe('Hide delete actions when MFA is required', () => {
+    it('hides TOTP delete action when MFA is required and TOTP is the only second factor', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withAuthenticatorApp();
+        f.withMfaRequired(true);
+        f.withUser({
+          two_factor_enabled: true,
+          totp_enabled: true,
+        });
+      });
+
+      const { findByText } = render(
+        <CardStateProvider>
+          <MfaSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await findByText('Two-step verification');
+      await findByText(/Authenticator application/i);
+
+      const itemButton = (await findByText(/Authenticator application/i))?.parentElement?.parentElement?.children[1];
+      expect(itemButton).toBeUndefined();
+    });
+
+    it('shows TOTP delete action when MFA is required but phone_code is also available', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withAuthenticatorApp();
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
+        f.withMfaRequired(true);
+        f.withUser({
+          phone_numbers: [
+            {
+              phone_number: '+306911111111',
+              id: 'id',
+              reserved_for_second_factor: true,
+              verification: { status: 'verified', strategy: 'phone_code' } as VerificationJSON,
+            },
+          ],
+          two_factor_enabled: true,
+          totp_enabled: true,
+        });
+      });
+
+      const { findByText } = render(
+        <CardStateProvider>
+          <MfaSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await findByText('Two-step verification');
+      await findByText(/Authenticator application/i);
+
+      const itemButton = (await findByText(/Authenticator application/i))?.parentElement?.parentElement?.children[1];
+      expect(itemButton).toBeDefined();
+    });
+
+    it('shows TOTP delete action when MFA is not required', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withAuthenticatorApp();
+        f.withMfaRequired(false);
+        f.withUser({
+          two_factor_enabled: true,
+          totp_enabled: true,
+        });
+      });
+
+      const { findByText } = render(
+        <CardStateProvider>
+          <MfaSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await findByText('Two-step verification');
+      await findByText(/Authenticator application/i);
+
+      const itemButton = (await findByText(/Authenticator application/i))?.parentElement?.parentElement?.children[1];
+      expect(itemButton).toBeDefined();
+    });
+
+    it('hides phone code delete action when it is the last one reserved for second factor and TOTP is not available', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
+        f.withMfaRequired(true);
+        f.withUser({
+          phone_numbers: [
+            {
+              phone_number: '+306911111111',
+              id: 'id',
+              reserved_for_second_factor: true,
+              default_second_factor: true,
+              verification: { status: 'verified', strategy: 'phone_code' } as VerificationJSON,
+            },
+          ],
+          two_factor_enabled: true,
+        });
+      });
+
+      const { findByText } = render(
+        <CardStateProvider>
+          <MfaSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await findByText('Two-step verification');
+      await findByText(/\+30 691 1111111/i);
+
+      const itemButton = (await findByText(/\+30 691 1111111/i))?.parentElement?.parentElement?.parentElement
+        ?.children[1];
+
+      expect(itemButton).toBeUndefined();
+    });
+
+    it('shows phone code delete action when TOTP is also available', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
+        f.withAuthenticatorApp();
+        f.withUser({
+          phone_numbers: [
+            {
+              phone_number: '+306911111111',
+              id: 'id',
+              reserved_for_second_factor: true,
+              verification: { status: 'verified', strategy: 'phone_code' } as VerificationJSON,
+            },
+          ],
+          two_factor_enabled: true,
+          totp_enabled: true,
+        });
+      });
+
+      const { findByText } = render(
+        <CardStateProvider>
+          <MfaSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await findByText('Two-step verification');
+      await findByText(/\+30 691 1111111/i);
+
+      const itemButton = (await findByText(/\+30 691 1111111/i))?.parentElement?.parentElement?.parentElement
+        ?.children[1];
+
+      expect(itemButton).toBeDefined();
+    });
+
+    it('shows phone code delete action when multiple phone numbers are registered', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
+        f.withUser({
+          phone_numbers: [
+            {
+              phone_number: '+306911111111',
+              id: 'id1',
+              reserved_for_second_factor: true,
+              verification: { status: 'verified', strategy: 'phone_code' } as VerificationJSON,
+            },
+            {
+              phone_number: '+306922222222',
+              id: 'id2',
+              reserved_for_second_factor: true,
+              verification: { status: 'verified', strategy: 'phone_code' } as VerificationJSON,
+            },
+          ],
+          two_factor_enabled: true,
+        });
+      });
+
+      const { findByText } = render(
+        <CardStateProvider>
+          <MfaSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await findByText('Two-step verification');
+      await findByText(/\+30 691 1111111/i);
+
+      const itemButton = (await findByText(/\+30 691 1111111/i))?.parentElement?.parentElement?.parentElement
+        ?.children[1];
+
+      expect(itemButton).toBeDefined();
+    });
+  });
 });
