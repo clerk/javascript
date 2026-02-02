@@ -300,6 +300,8 @@ export interface OauthAccessTokenJSON {
   // Only set in OAuth 1.0 tokens
   token_secret?: string;
   expires_at?: number;
+  // Only present for OIDC-compliant OAuth 2.0 providers when available
+  id_token?: string;
 }
 
 export interface OAuthApplicationJSON extends ClerkResourceJSON {
@@ -849,6 +851,9 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   annual_monthly_fee: BillingMoneyAmountJSON | null;
   for_payer_type: 'org' | 'user';
   features?: FeatureJSON[];
+  free_trial_days: number | null;
+  free_trial_enabled: boolean;
+  avatar_url: string | null;
 }
 
 type BillingSubscriptionItemStatus =

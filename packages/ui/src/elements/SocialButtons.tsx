@@ -4,7 +4,7 @@ import type { OAuthProvider, OAuthStrategy, PhoneCodeChannel, Web3Provider, Web3
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement } from 'react';
 
-import { ProviderInitialIcon } from '../common';
+import { ProviderIcon } from '../common';
 import type { LocalizationKey } from '../customizables';
 import {
   Button,
@@ -12,7 +12,6 @@ import {
   Flex,
   Grid,
   Icon,
-  Image,
   localizationKeys,
   SimpleButton,
   Spinner,
@@ -188,22 +187,16 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                   provider: strategyToDisplayData[strategy].name,
                 });
 
-            const imageOrInitial = strategyToDisplayData[strategy].iconUrl ? (
-              <Image
+            const imageOrInitial = (
+              <ProviderIcon
+                id={strategyToDisplayData[strategy].id}
+                iconUrl={strategyToDisplayData[strategy].iconUrl}
+                name={strategyToDisplayData[strategy].name}
+                isLoading={card.loadingMetadata === strategy}
+                isDisabled={card.isLoading}
+                alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
                 elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
                 elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
-                isLoading={card.loadingMetadata === strategy}
-                isDisabled={card.isLoading}
-                src={strategyToDisplayData[strategy].iconUrl}
-                alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
-                sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
-              />
-            ) : (
-              <ProviderInitialIcon
-                id={strategyToDisplayData[strategy].id}
-                value={strategyToDisplayData[strategy].name}
-                isLoading={card.loadingMetadata === strategy}
-                isDisabled={card.isLoading}
               />
             );
 

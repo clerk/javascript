@@ -584,9 +584,14 @@ describe('SignInStart', () => {
       fixtures.signIn.create.mockRejectedValueOnce(sessionExistsError);
 
       const mockSession = { id: 'sess_123' } as any;
+      const mockDecorateUrl = (url: string) => url;
       (fixtures.clerk.setActive as any).mockImplementation(
-        async ({ navigate }: { navigate: ({ session }: { session: any }) => Promise<void> }) => {
-          await navigate({ session: mockSession });
+        async ({
+          navigate,
+        }: {
+          navigate: ({ session, decorateUrl }: { session: any; decorateUrl: (url: string) => string }) => Promise<void>;
+        }) => {
+          await navigate({ session: mockSession, decorateUrl: mockDecorateUrl });
         },
       );
 

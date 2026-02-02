@@ -15,6 +15,7 @@ export default defineConfig(() => {
       './src/async-local-storage.client.ts',
       './src/async-local-storage.server.ts',
       './src/webhooks.ts',
+      './src/types/index.ts',
     ],
     dts: true,
     minify: false,

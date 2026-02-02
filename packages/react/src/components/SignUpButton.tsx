@@ -12,6 +12,8 @@ export const SignUpButton = withClerk(
       appearance,
       // @ts-expect-error - unsafeMetadata is a valid prop for SignUpProps & SignUpButtonPropsModal
       unsafeMetadata,
+      getContainer,
+      component,
       fallbackRedirectUrl,
       forceRedirectUrl,
       signInFallbackRedirectUrl,
@@ -40,6 +42,7 @@ export const SignUpButton = withClerk(
           ...opts,
           appearance,
           unsafeMetadata,
+          getContainer,
         });
       }
 

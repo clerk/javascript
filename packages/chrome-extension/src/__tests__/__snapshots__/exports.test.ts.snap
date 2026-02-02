@@ -35,6 +35,7 @@ exports[`public exports > should not include a breaking change 1`] = `
   "useClerk",
   "useEmailLink",
   "useOrganization",
+  "useOrganizationCreationDefaults",
   "useOrganizationList",
   "useReverification",
   "useSession",
@@ -42,5 +43,6 @@ exports[`public exports > should not include a breaking change 1`] = `
   "useSignIn",
   "useSignUp",
   "useUser",
+  "useWaitlist",
 ]
 `;

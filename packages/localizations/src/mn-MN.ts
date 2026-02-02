@@ -886,6 +886,10 @@ export const mnMN: LocalizationResource = {
       actionLink: 'Гарах',
       actionText: '{{identifier}} гэж нэвтэрсэн',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Илрүүлсэн компанийн нэр ({{organizationName}}) болон {{organizationDomain}}-д байгууллага аль хэдийн байна. Урилгаар нэгдэнэ үү.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

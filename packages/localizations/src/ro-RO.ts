@@ -899,6 +899,10 @@ export const roRO: LocalizationResource = {
       actionLink: 'Deconectează-te',
       actionText: 'Autentificat ca {{identifier}}',
     },
+    alerts: {
+      organizationAlreadyExists:
+        'Există deja o organizație pentru numele companiei detectate ({{organizationName}}) și {{organizationDomain}}. Alătură-te prin invitație.',
+    },
   },
   taskResetPassword: {
     formButtonPrimary: undefined,

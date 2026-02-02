@@ -29,7 +29,7 @@ declare global {
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: Clerk['proxyUrl'];
     __clerk_domain?: Clerk['domain'];
-    __internal_ClerkUiCtor?: ClerkUiConstructor;
+    __internal_ClerkUICtor?: ClerkUiConstructor;
   }
 }
 
@@ -60,7 +60,11 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<IsomorphicClerkOption
   ui?: TUi;
 };
 
-export type WithClerkProp<T = unknown> = T & { clerk: LoadedClerk; component?: string };
+export type WithClerkProp<T = unknown> = T & {
+  clerk: LoadedClerk;
+  component?: string;
+  getContainer?: () => HTMLElement | null;
+};
 
 export interface CustomPortalsRendererProps {
   customPagesPortals?: any[];

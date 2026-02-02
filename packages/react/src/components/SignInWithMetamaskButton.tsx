@@ -6,7 +6,7 @@ import { withClerk } from './withClerk';
 
 export const SignInWithMetamaskButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<SignInWithMetamaskButtonProps>) => {
-    const { redirectUrl, ...rest } = props;
+    const { redirectUrl, getContainer, component, ...rest } = props;
 
     children = normalizeWithDefaultValue(children, 'Sign in with Metamask');
     const child = assertSingleChild(children)('SignInWithMetamaskButton');

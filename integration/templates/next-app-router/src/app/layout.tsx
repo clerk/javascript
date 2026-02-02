@@ -12,6 +12,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider
+      prefetchUI={process.env.NEXT_PUBLIC_CLERK_PREFETCH_UI === 'false' ? false : undefined}
       appearance={{
         options: {
           showOptionalFields: true,

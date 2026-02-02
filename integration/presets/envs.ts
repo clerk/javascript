@@ -55,6 +55,11 @@ const withEmailCodes_destroy_client = withEmailCodes
   .clone()
   .setEnvVariable('public', 'EXPERIMENTAL_PERSIST_CLIENT', 'false');
 
+const withSharedUIVariant = withEmailCodes
+  .clone()
+  .setId('withSharedUIVariant')
+  .setEnvVariable('public', 'CLERK_UI_VARIANT', 'shared');
+
 const withEmailLinks = base
   .clone()
   .setId('withEmailLinks')
@@ -210,6 +215,7 @@ export const envs = {
   withReverification,
   withSessionTasks,
   withSessionTasksResetPassword,
+  withSharedUIVariant,
   withSignInOrUpEmailLinksFlow,
   withSignInOrUpFlow,
   withSignInOrUpwithRestrictedModeFlow,

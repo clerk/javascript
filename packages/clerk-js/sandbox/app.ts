@@ -389,7 +389,8 @@ void (async () => {
       const searchParams = new URLSearchParams(window.location.search);
       const scopes = (searchParams.get('scopes')?.split(',') ?? []).map(scope => ({
         scope,
-        description: `Grants access to your ${scope}`,
+        description: scope === 'offline_access' ? null : `Grants access to your ${scope}`,
+        requires_consent: true,
       }));
       Clerk.__internal_mountOAuthConsent(
         app,
@@ -445,7 +446,7 @@ void (async () => {
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
-      clerkUiCtor: window.__internal_ClerkUiCtor,
+      clerkUICtor: window.__internal_ClerkUICtor,
     });
     renderCurrentRoute();
     updateVariables();
