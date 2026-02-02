@@ -76,13 +76,25 @@ export function fapiUrlFromPublishableKey(publishableKey: string): string {
 }
 
 /**
+ * Removes trailing slashes from a string without using regex
+ * to avoid potential ReDoS concerns flagged by security scanners.
+ */
+function stripTrailingSlashes(str: string): string {
+  let end = str.length;
+  while (end > 0 && str[end - 1] === '/') {
+    end--;
+  }
+  return str.slice(0, end);
+}
+
+/**
  * Checks if a request path matches the proxy path.
  * @param request - The incoming request
  * @param options - Proxy options including the proxy path
  * @returns True if the request matches the proxy path
  */
 export function matchProxyPath(request: Request, options?: Pick<FrontendApiProxyOptions, 'proxyPath'>): boolean {
-  const proxyPath = (options?.proxyPath || DEFAULT_PROXY_PATH).replace(/\/+$/, '');
+  const proxyPath = stripTrailingSlashes(options?.proxyPath || DEFAULT_PROXY_PATH);
   const url = new URL(request.url);
   return url.pathname === proxyPath || url.pathname.startsWith(proxyPath + '/');
 }
@@ -147,7 +159,7 @@ function getClientIp(request: Request): string | undefined {
  * ```
  */
 export async function clerkFrontendApiProxy(request: Request, options?: FrontendApiProxyOptions): Promise<Response> {
-  const proxyPath = (options?.proxyPath || DEFAULT_PROXY_PATH).replace(/\/+$/, '');
+  const proxyPath = stripTrailingSlashes(options?.proxyPath || DEFAULT_PROXY_PATH);
   const publishableKey =
     options?.publishableKey || (typeof process !== 'undefined' ? process.env?.CLERK_PUBLISHABLE_KEY : undefined);
   const secretKey = options?.secretKey || (typeof process !== 'undefined' ? process.env?.CLERK_SECRET_KEY : undefined);

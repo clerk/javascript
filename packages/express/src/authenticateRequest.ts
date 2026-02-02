@@ -100,6 +100,18 @@ const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): strin
   return new URL(relativeOrAbsoluteUrl, baseUrl).toString();
 };
 
+/**
+ * Removes trailing slashes from a string without using regex
+ * to avoid potential ReDoS concerns flagged by security scanners.
+ */
+function stripTrailingSlashes(str: string): string {
+  let end = str.length;
+  while (end > 0 && str[end - 1] === '/') {
+    end--;
+  }
+  return str.slice(0, end);
+}
+
 export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
   const clerkClient = options.clerkClient || defaultClerkClient;
   const enableHandshake = options.enableHandshake ?? true;
@@ -107,7 +119,7 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
   // Extract proxy configuration
   const frontendApiProxy = options.frontendApiProxy;
   const proxyEnabled = frontendApiProxy?.enabled === true;
-  const proxyPath = (frontendApiProxy?.path ?? DEFAULT_PROXY_PATH).replace(/\/+$/, '');
+  const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH);
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const middleware: RequestHandler = async (request, response, next) => {
