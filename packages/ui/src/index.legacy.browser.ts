@@ -5,8 +5,8 @@ import './utils/setWebpackChunkPublicPath';
 
 import { ClerkUi } from './ClerkUi';
 
-if (!window.__internal_ClerkUiCtor) {
-  window.__internal_ClerkUiCtor = ClerkUi;
+if (!window.__internal_ClerkUICtor) {
+  window.__internal_ClerkUICtor = ClerkUi;
 }
 
 // Hot module replacement for development

@@ -74,7 +74,7 @@ jobs:
               repo: 'sdk-infra-workers',
               workflow_id: 'update-pkg-versions.yml',
               ref: 'main',
-              inputs: { clerkjsVersion, clerkUiVersion }
+              inputs: { clerkjsVersion, clerkUiVersion, sourceCommit: context.sha }
             })
 
             if (nextjsVersion.includes('canary')) {

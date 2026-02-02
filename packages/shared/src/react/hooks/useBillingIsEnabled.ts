@@ -4,7 +4,7 @@ import { useClerkInstanceContext, useOrganizationContext, useUserContext } from 
 /**
  * @internal
  */
-export function useBillingHookEnabled(params?: { for?: ForPayerType; enabled?: boolean; authenticated?: boolean }) {
+export function useBillingIsEnabled(params?: { for?: ForPayerType; enabled?: boolean; authenticated?: boolean }) {
   const clerk = useClerkInstanceContext();
 
   const enabledFromParam = params?.enabled ?? true;
@@ -15,11 +15,17 @@ export function useBillingHookEnabled(params?: { for?: ForPayerType; enabled?: b
   const user = useUserContext();
   const { organization } = useOrganizationContext();
 
-  const isOrganization = params?.for === 'organization';
-  const billingEnabled = isOrganization
-    ? environment?.commerceSettings.billing.organization.enabled
-    : environment?.commerceSettings.billing.user.enabled;
+  const userBillingEnabled = environment?.commerceSettings.billing.user.enabled;
+  const orgBillingEnabled = environment?.commerceSettings.billing.organization.enabled;
 
+  const billingEnabled =
+    params?.for === 'organization'
+      ? orgBillingEnabled
+      : params?.for === 'user'
+        ? userBillingEnabled
+        : userBillingEnabled || orgBillingEnabled;
+
+  const isOrganization = params?.for === 'organization';
   const requireUserAndOrganizationWhenAuthenticated =
     (params?.authenticated ?? true) ? (isOrganization ? Boolean(organization?.id) : true) && Boolean(user?.id) : true;
 

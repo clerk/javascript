@@ -1,6 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
-import { loadClerkJsScript, loadClerkUiScript } from '@clerk/shared/loadClerkJsScript';
+import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
@@ -89,7 +89,7 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
-  __internal_ClerkUiCtor?: ClerkUiConstructor;
+  __internal_ClerkUICtor?: ClerkUiConstructor;
 }
 
 declare const global: Global;
@@ -466,12 +466,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
-      const clerkUiCtor = this.getClerkUiEntryChunk();
+      const clerkUICtor = await this.getClerkUiEntryChunk();
       const clerk = await this.getClerkJsEntryChunk();
 
       if (!clerk.loaded) {
         this.beforeLoad(clerk);
-        await clerk.load({ ...this.options, clerkUiCtor });
+        await clerk.load({ ...this.options, clerkUICtor });
       }
       if (clerk.loaded) {
         this.replayInterceptedInvocations(clerk);
@@ -489,7 +489,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (!this.options.Clerk && !__BUILD_DISABLE_RHC__) {
       // the UMD script sets the global.Clerk instance
       // we do not want to await here as we
-      await loadClerkJsScript({
+      await loadClerkJSScript({
         ...this.options,
         publishableKey: this.#publishableKey,
         proxyUrl: this.proxyUrl,
@@ -513,26 +513,29 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return global.Clerk;
   }
 
-  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor> {
-    if (this.options.clerkUiCtor) {
-      return this.options.clerkUiCtor;
+  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor | undefined> {
+    // Honor explicit clerkUICtor even when prefetchUI=false
+    if (this.options.clerkUICtor) {
+      return this.options.clerkUICtor;
     }
 
-    await loadClerkUiScript({
+    if (this.options.prefetchUI === false) {
+      return undefined;
+    }
+
+    await loadClerkUIScript({
       ...this.options,
-      clerkUiVersion: this.options.ui?.version,
-      clerkUiUrl: this.options.ui?.url || this.options.clerkUiUrl,
       publishableKey: this.#publishableKey,
       proxyUrl: this.proxyUrl,
       domain: this.domain,
       nonce: this.options.nonce,
     });
 
-    if (!global.__internal_ClerkUiCtor) {
+    if (!global.__internal_ClerkUICtor) {
       throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
     }
 
-    return global.__internal_ClerkUiCtor;
+    return global.__internal_ClerkUICtor;
   }
 
   public on: Clerk['on'] = (...args) => {

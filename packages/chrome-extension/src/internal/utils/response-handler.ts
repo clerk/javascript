@@ -7,7 +7,7 @@ type Handler = Parameters<Clerk['__internal_onAfterResponse']>[0];
 type Res = Parameters<Handler>[1];
 
 /** Retrieve the JWT to the FAPI response */
-export function responseHandler(jwtHandler: JWTHandler, { isProd }: { isProd: boolean }) {
+export function responseHandler(jwtHandler: JWTHandler, { isProd }: { isProd: boolean }): Handler {
   const handler: Handler = async (_, response) => {
     if (isProd) {
       await prodHandler(response, jwtHandler);
