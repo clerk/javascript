@@ -5,7 +5,6 @@ import React, { useMemo, useState } from 'react';
 
 import { Portal } from '../../../elements/Portal';
 import { MosaicThemeProvider, useMosaicTheme } from '../../../mosaic/theme-provider';
-import { handleDashboardUrlParsing } from '../shared';
 import { useRevalidateEnvironment } from './use-revalidate-environment';
 
 type KeylessPromptProps = {
@@ -14,16 +13,7 @@ type KeylessPromptProps = {
   onDismiss: (() => Promise<unknown>) | undefined | null;
 };
 
-/**
- * If we cannot reconstruct the url properly, then simply fallback to Clerk Dashboard
- */
-function withLastActiveFallback(cb: () => string): string {
-  try {
-    return cb();
-  } catch {
-    return 'https://dashboard.clerk.com/last-active';
-  }
-}
+const LIST_ITEMS = ['Add SSO connections (eg. GitHub)', 'Setup B2B Auth.', 'Enable MFA'] as const;
 
 function KeylessPromptInternal(props: KeylessPromptProps) {
   const { isSignedIn } = useUser();
@@ -33,7 +23,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
   const appName = environment.displayConfig.applicationName;
   const isLocked = claimed || success;
 
-  const [isOpen, setIsOpen] = useState(isSignedIn || isLocked);
+  const [isOpen, setIsOpen] = useState(true);
   const [hasMounted, setHasMounted] = useState(false);
   const id = React.useId();
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -66,24 +56,14 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
     return url.href;
   }, [claimed, props.copyKeysUrl, props.claimUrl]);
 
-  const instanceUrlToDashboard = useMemo(() => {
-    return withLastActiveFallback(() => {
-      const redirectUrlParts = handleDashboardUrlParsing(props.copyKeysUrl);
-      const url = new URL(
-        `${redirectUrlParts.baseDomain}/apps/${redirectUrlParts.appId}/instances/${redirectUrlParts.instanceId}/user-authentication/email-phone-username`,
-      );
-      return url.href;
-    });
-  }, [props.copyKeysUrl]);
-
   function getStatusText() {
     if (success) {
-      return 'Claim completed';
+      return 'Your app is ready';
     }
     if (claimed) {
       return 'Missing environment keys';
     }
-    return 'Clerk is in keyless mode';
+    return 'Configure your application';
   }
 
   React.useEffect(() => {
@@ -127,7 +107,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
           --accent: ${theme.colors.purple[700]};
           --offset: ${theme.spacing[5]};
           --width-opened: 18rem;
-          --width-closed: 13rem;
+          --width-closed: 14rem;
           -webkit-font-smoothing: auto;
           -moz-osx-font-smoothing: auto;
           position: fixed;
@@ -412,17 +392,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                     >
                       {appName}
                     </span>{' '}
-                    has been claimed. Configure settings from the{' '}
-                    <a
-                      href={instanceUrlToDashboard}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      css={css`
-                        text-decoration: underline;
-                      `}
-                    >
-                      Clerk Dashboard
-                    </a>
+                    has been configured. Customize your settings in the Clerk dashboard.
                   </p>
                 ) : claimed ? (
                   <p>
@@ -430,17 +400,72 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                     Dashboard.
                   </p>
                 ) : isSignedIn ? (
-                  <p>
-                    You&apos;ve created your first user! Link this application to your Clerk account to explore the
-                    Dashboard.
-                  </p>
+                  <>
+                    <p>
+                      Head to the dashboard to customize authentication settings, view user info, and explore more
+                      features.
+                    </p>
+                    <ul
+                      css={css`
+                        box-sizing: border-box;
+                        list-style: disc;
+                        margin: 0;
+                        padding: 0;
+                        padding-inline-start: ${theme.spacing[4]};
+                        display: flex;
+                        flex-direction: column;
+                        gap: ${theme.spacing[1]};
+                        color: var(--foreground-secondary);
+                        font-family: var(--font-family);
+                      `}
+                    >
+                      {LIST_ITEMS.map(item => (
+                        <li
+                          key={item}
+                          css={css`
+                          margin: 0;
+                          padding: 0;
+                          box-sizing: border-box;
+                          ...theme.typography.body[3],
+                        `}
+                        >
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
                 ) : (
                   <>
                     <p>Temporary API keys are enabled so you can get started immediately.</p>
-                    <p>
-                      Claim this application to access the Clerk Dashboard where you can manage auth settings and
-                      explore more Clerk features.
-                    </p>
+                    <ul
+                      css={css`
+                        box-sizing: border-box;
+                        list-style: disc;
+                        margin: 0;
+                        padding: 0;
+                        padding-inline-start: ${theme.spacing[4]};
+                        display: flex;
+                        flex-direction: column;
+                        gap: ${theme.spacing[1]};
+                        color: var(--foreground-secondary);
+                        font-family: var(--font-family);
+                      `}
+                    >
+                      {LIST_ITEMS.map(item => (
+                        <li
+                          key={item}
+                          css={css`
+                          margin: 0;
+                          padding: 0;
+                          box-sizing: border-box;
+                          ...theme.typography.body[3],
+                        `}
+                        >
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                    <p>Access the dashboard to customize auth settings and explore Clerk features.</p>
                   </>
                 )}
               </div>
@@ -558,7 +583,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                       z-index: 1;
                     `}
                   >
-                    {claimed ? 'Get API keys' : 'Claim application'}
+                    {claimed ? 'Get API keys' : 'Configure your application'}
                   </span>
                   <svg
                     css={{
