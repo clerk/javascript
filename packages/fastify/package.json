@@ -42,6 +42,14 @@
         "types": "./dist/webhooks.d.ts",
         "default": "./dist/webhooks.js"
       }
+    },
+    "./types": {
+      "import": {
+        "types": "./dist/types.d.mts"
+      },
+      "require": {
+        "types": "./dist/types.d.ts"
+      }
     }
   },
   "main": "./dist/index.js",

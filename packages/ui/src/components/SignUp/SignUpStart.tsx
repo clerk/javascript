@@ -146,7 +146,7 @@ function SignUpStartInternal(): JSX.Element {
     status.setLoading();
     card.setLoading();
     signUp
-      .create({ strategy: 'ticket', ticket: formState.ticket.value })
+      .create({ strategy: 'ticket', ticket: formState.ticket.value, unsafeMetadata })
       .then(signUp => {
         formState.emailAddress.setValue(signUp.emailAddress || '');
         // In case we are in a Ticket flow and the sign up is not complete yet, update the state
@@ -170,8 +170,8 @@ function SignUpStartInternal(): JSX.Element {
             removeClerkQueryParam('__clerk_invitation_token');
             return setActive({
               session: signUp.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
               },
             });
           },
@@ -347,8 +347,8 @@ function SignUpStartInternal(): JSX.Element {
           handleComplete: () =>
             setActive({
               session: res.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
               },
             }),
           navigate,

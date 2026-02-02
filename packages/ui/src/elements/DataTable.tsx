@@ -9,8 +9,16 @@ import { Pagination } from './Pagination';
  * DataTable
  * -----------------------------------------------------------------------------------------------*/
 
+type ColumnHeader = {
+  key: LocalizationKey | string;
+  /**
+   * @default 'left'
+   */
+  align?: 'left' | 'right';
+};
+
 export type DataTableProps = {
-  headers: (LocalizationKey | string)[];
+  headers: ColumnHeader[];
   rows: React.ReactNode[];
   isLoading?: boolean;
   page: number;
@@ -50,8 +58,8 @@ export const DataTable = (props: DataTableProps) => {
                 <Th
                   elementDescriptor={descriptors.tableHead}
                   key={index}
-                  localizationKey={h}
-                  sx={{ width: index === 0 ? 'auto' : '25%' }}
+                  localizationKey={h.key}
+                  sx={[{ width: index === 0 ? 'auto' : '25%' }, h.align ? { textAlign: h.align } : undefined]}
                 />
               ))}
             </Tr>

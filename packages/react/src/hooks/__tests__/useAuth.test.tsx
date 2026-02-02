@@ -1,11 +1,10 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { ClerkInstanceContext } from '@clerk/shared/react';
+import { ClerkInstanceContext, InitialStateProvider } from '@clerk/shared/react';
 import type { LoadedClerk, UseAuthReturn } from '@clerk/shared/types';
 import { render, renderHook } from '@testing-library/react';
 import React from 'react';
 import { afterAll, beforeAll, beforeEach, describe, expect, expectTypeOf, it, test, vi } from 'vitest';
 
-import { AuthContext } from '../../contexts/AuthContext';
 import { errorThrower } from '../../errors/errorThrower';
 import { invalidStateError } from '../../errors/messages';
 import { useAuth, useDerivedAuth } from '../useAuth';
@@ -69,13 +68,38 @@ describe('useAuth', () => {
   test('renders the correct values when wrapped in <ClerkProvider>', () => {
     expect(() => {
       render(
-        <ClerkInstanceContext.Provider value={{ value: {} as LoadedClerk }}>
-          <AuthContext.Provider value={{ value: {} as any }}>
+        <ClerkInstanceContext.Provider value={{ value: { addListener: vi.fn() } as unknown as LoadedClerk }}>
+          <InitialStateProvider initialState={{} as any}>
             <TestComponent />
-          </AuthContext.Provider>
+          </InitialStateProvider>
         </ClerkInstanceContext.Provider>,
       );
     }).not.toThrow();
+  });
+});
+
+describe('useAuth.getToken', () => {
+  test('throws an error if getToken is called in a non-browser environment', async () => {
+    const originalWindow = global.window;
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => (
+        <ClerkInstanceContext.Provider value={{ value: { addListener: vi.fn() } as unknown as LoadedClerk }}>
+          <InitialStateProvider initialState={{} as any}>{children}</InitialStateProvider>
+        </ClerkInstanceContext.Provider>
+      ),
+    });
+
+    // Set window to undefined to simulate non-browser environment
+    global.window = undefined as any;
+
+    try {
+      await expect(result.current.getToken()).rejects.toThrow(
+        'useAuth().getToken() can only be used in browser environments',
+      );
+    } finally {
+      global.window = originalWindow;
+    }
   });
 });
 

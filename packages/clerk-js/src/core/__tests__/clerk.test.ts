@@ -364,6 +364,81 @@ describe('Clerk singleton', () => {
         expect(navigate).toHaveBeenCalled();
       });
 
+      it('passes decorateUrl to the navigate callback', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        const navigate = vi.fn();
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource, navigate });
+
+        expect(navigate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            session: expect.any(Object),
+            decorateUrl: expect.any(Function),
+          }),
+        );
+      });
+
+      it('decorateUrl returns touch URL when isEligibleForTouch is true', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            cookieExpiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+            isEligibleForTouch: () => true,
+            buildTouchUrl: ({ redirectUrl }: { redirectUrl: URL }) =>
+              `https://clerk.example.com/v1/client/touch?redirect_url=${encodeURIComponent(redirectUrl.href)}`,
+          }),
+        );
+
+        let capturedDecorateUrl: ((url: string) => string) | undefined;
+        const navigate = vi.fn(({ decorateUrl }) => {
+          capturedDecorateUrl = decorateUrl;
+        });
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource, navigate });
+
+        expect(capturedDecorateUrl).toBeDefined();
+        const decoratedUrl = capturedDecorateUrl!('/dashboard');
+
+        // Should return touch URL when ITP fix is needed
+        expect(decoratedUrl).toContain('/v1/client/touch');
+        expect(decoratedUrl).toContain('redirect_url=');
+        expect(decoratedUrl).toContain('%2Fdashboard');
+      });
+
+      it('decorateUrl returns original URL when isEligibleForTouch is false', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            cookieExpiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
+            isEligibleForTouch: () => false,
+            buildTouchUrl: ({ redirectUrl }: { redirectUrl: URL }) =>
+              `https://clerk.example.com/v1/client/touch?redirect_url=${encodeURIComponent(redirectUrl.href)}`,
+          }),
+        );
+
+        let capturedDecorateUrl: ((url: string) => string) | undefined;
+        const navigate = vi.fn(({ decorateUrl }) => {
+          capturedDecorateUrl = decorateUrl;
+        });
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource, navigate });
+
+        expect(capturedDecorateUrl).toBeDefined();
+        const decoratedUrl = capturedDecorateUrl!('/dashboard');
+
+        // Should return original URL when ITP fix is not needed
+        expect(decoratedUrl).toBe('/dashboard');
+      });
+
       mockNativeRuntime(() => {
         it('calls session.touch in a non-standard browser', async () => {
           mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
@@ -992,7 +1067,67 @@ describe('Clerk singleton', () => {
       await sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
+        expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined });
+        expect(mockSetActive).toHaveBeenCalled();
+      });
+    });
+
+    it('passes unsafeMetadata to signUp.create during OAuth transfer flow', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_identifier',
+            first_factor_verification: {
+              status: 'transferable',
+              strategy: 'oauth_google',
+              external_verification_redirect_url: '',
+              error: {
+                code: 'external_account_not_found',
+                long_message: 'The External Account was not found.',
+                message: 'Invalid external account',
+              },
+            },
+            second_factor_verification: null,
+            identifier: '',
+            user_data: null,
+            created_session_id: null,
+            created_user_id: null,
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const mockSetActive = vi.fn();
+      const mockSignUpCreate = vi
+        .fn()
+        .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      if (!sut.client) {
+        fail('we should always have a client');
+      }
+      sut.client.signUp.create = mockSignUpCreate;
+      sut.setActive = mockSetActive;
+
+      const unsafeMetadata = { foo: 'bar', nested: { value: 123 } };
+      await sut.handleRedirectCallback({ unsafeMetadata });
+
+      await waitFor(() => {
+        expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata });
         expect(mockSetActive).toHaveBeenCalled();
       });
     });
@@ -2595,6 +2730,71 @@ describe('Clerk singleton', () => {
         expect(result?.isEnabled).toBe(true);
         expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('clerkUICtor backwards compatibility', () => {
+    beforeEach(() => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => true,
+          isDevelopmentOrStaging: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+        }),
+      );
+    });
+
+    it('uses clerkUICtor when provided with correct casing', async () => {
+      const mockClerkUIInstance = { mount: vi.fn() };
+      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({
+        ...mockedLoadOptions,
+        clerkUICtor: mockClerkUICtor,
+      });
+
+      expect(mockClerkUICtor).toHaveBeenCalled();
+    });
+
+    it('uses clerkUiCtor (legacy casing) for backwards compatibility', async () => {
+      const mockClerkUIInstance = { mount: vi.fn() };
+      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+
+      const sut = new Clerk(productionPublishableKey);
+      // Use legacy casing - cast to bypass TypeScript since clerkUiCtor is not in the type
+      await sut.load({
+        ...mockedLoadOptions,
+        clerkUiCtor: mockClerkUICtor,
+      } as Parameters<typeof sut.load>[0]);
+
+      expect(mockClerkUICtor).toHaveBeenCalled();
+    });
+
+    it('prefers clerkUICtor over clerkUiCtor when both are provided', async () => {
+      const mockClerkUIInstanceCorrect = { mount: vi.fn() };
+      const mockClerkUICtorCorrect = vi.fn(() => mockClerkUIInstanceCorrect);
+
+      const mockClerkUIInstanceLegacy = { mount: vi.fn() };
+      const mockClerkUICtorLegacy = vi.fn(() => mockClerkUIInstanceLegacy);
+
+      const sut = new Clerk(productionPublishableKey);
+      // Provide both - the correct casing should take precedence
+      await sut.load({
+        ...mockedLoadOptions,
+        clerkUICtor: mockClerkUICtorCorrect,
+        clerkUiCtor: mockClerkUICtorLegacy,
+      } as Parameters<typeof sut.load>[0]);
+
+      expect(mockClerkUICtorCorrect).toHaveBeenCalled();
+      expect(mockClerkUICtorLegacy).not.toHaveBeenCalled();
     });
   });
 });

@@ -32,6 +32,7 @@ import type {
   SignUpFutureSSOParams,
   SignUpFutureTicketParams,
   SignUpFutureUpdateParams,
+  SignUpFutureVerifications as SignUpFutureVerificationsType,
   SignUpFutureWeb3Params,
   SignUpIdentificationField,
   SignUpJSON,
@@ -588,19 +589,58 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 }
 
-class SignUpFuture implements SignUpFutureResource {
-  verifications = {
-    sendEmailCode: this.sendEmailCode.bind(this),
-    verifyEmailCode: this.verifyEmailCode.bind(this),
-    sendPhoneCode: this.sendPhoneCode.bind(this),
-    verifyPhoneCode: this.verifyPhoneCode.bind(this),
-  };
+type SignUpFutureVerificationsMethods = Pick<
+  SignUpFutureVerifications,
+  'sendEmailCode' | 'verifyEmailCode' | 'sendPhoneCode' | 'verifyPhoneCode'
+>;
 
-  #hasBeenFinalized = false;
+class SignUpFutureVerifications implements SignUpFutureVerificationsType {
+  #resource: SignUp;
+
+  sendEmailCode: SignUpFutureVerificationsType['sendEmailCode'];
+  verifyEmailCode: SignUpFutureVerificationsType['verifyEmailCode'];
+  sendPhoneCode: SignUpFutureVerificationsType['sendPhoneCode'];
+  verifyPhoneCode: SignUpFutureVerificationsType['verifyPhoneCode'];
+
+  constructor(resource: SignUp, methods: SignUpFutureVerificationsMethods) {
+    this.#resource = resource;
+    this.sendEmailCode = methods.sendEmailCode;
+    this.verifyEmailCode = methods.verifyEmailCode;
+    this.sendPhoneCode = methods.sendPhoneCode;
+    this.verifyPhoneCode = methods.verifyPhoneCode;
+  }
+
+  get emailAddress() {
+    return this.#resource.verifications.emailAddress;
+  }
+
+  get phoneNumber() {
+    return this.#resource.verifications.phoneNumber;
+  }
+
+  get web3Wallet() {
+    return this.#resource.verifications.web3Wallet;
+  }
+
+  get externalAccount() {
+    return this.#resource.verifications.externalAccount;
+  }
+}
+
+class SignUpFuture implements SignUpFutureResource {
+  verifications: SignUpFutureVerifications;
+
+  #canBeDiscarded = false;
   readonly #resource: SignUp;
 
   constructor(resource: SignUp) {
     this.#resource = resource;
+    this.verifications = new SignUpFutureVerifications(this.#resource, {
+      sendEmailCode: this.sendEmailCode.bind(this),
+      verifyEmailCode: this.verifyEmailCode.bind(this),
+      sendPhoneCode: this.sendPhoneCode.bind(this),
+      verifyPhoneCode: this.verifyPhoneCode.bind(this),
+    });
   }
 
   get id() {
@@ -701,8 +741,8 @@ class SignUpFuture implements SignUpFutureResource {
     return undefined;
   }
 
-  get hasBeenFinalized() {
-    return this.#hasBeenFinalized;
+  get canBeDiscarded() {
+    return this.#canBeDiscarded;
   }
 
   private async getCaptchaToken(): Promise<{
@@ -766,7 +806,11 @@ class SignUpFuture implements SignUpFutureResource {
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
-      await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
+      if (this.#resource.id) {
+        await this.#resource.__internal_basePatch({ body });
+      } else {
+        await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
+      }
     });
   }
 
@@ -971,9 +1015,23 @@ class SignUpFuture implements SignUpFutureResource {
         throw new Error('Cannot finalize sign-up without a created session.');
       }
 
-      this.#hasBeenFinalized = true;
+      this.#canBeDiscarded = true;
       await SignUp.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
+  }
+
+  /**
+   * Resets the current sign-up attempt by clearing all local state back to null.
+   * Unlike other methods, this does NOT emit resource:fetch with 'fetching' status,
+   * allowing for smooth UI transitions without loading states.
+   */
+  reset(): Promise<{ error: ClerkError | null }> {
+    if (!SignUp.clerk.client) {
+      throw new Error('Cannot reset sign-up without a client.');
+    }
+    this.#canBeDiscarded = true;
+    SignUp.clerk.client.resetSignUp();
+    return Promise.resolve({ error: null });
   }
 }
 

@@ -1,10 +1,12 @@
 'use client';
 
 export {
+  useAuth,
   useClerk,
   useEmailLink,
   useOrganization,
   useOrganizationList,
+  useOrganizationCreationDefaults,
   useSession,
   useSessionList,
   useSignIn,
@@ -24,5 +26,3 @@ export {
   EmailLinkErrorCode,
   EmailLinkErrorCodeStatus,
 } from '@clerk/react/errors';
-
-export { usePromisifiedAuth as useAuth } from './PromisifiedAuthProvider';
