@@ -505,6 +505,7 @@ describe('MfaPage', () => {
 
     it('shows phone code delete action when TOTP is also available', async () => {
       const { wrapper } = await createFixtures(f => {
+        f.withMfaRequired(true);
         f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
         f.withAuthenticatorApp();
         f.withUser({

@@ -185,10 +185,6 @@ const MfaPhoneCodeMenu = ({ phone, isDefault, hidePhoneCodeDeleteAction }: MfaPh
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
 
-  console.log('actions', actions);
-  console.log('hidePhoneCodeDeleteAction', hidePhoneCodeDeleteAction);
-  console.log('isDefault', isDefault);
-
   if (actions.length === 0) {
     return null;
   }
