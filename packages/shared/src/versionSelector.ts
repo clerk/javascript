@@ -32,4 +32,8 @@ const getPrereleaseTag = (packageVersion: string) =>
     .replace(/^v/, '')
     .match(/-(.+?)(\.|$)/)?.[1];
 
-export const getMajorVersion = (packageVersion: string) => packageVersion.trim().replace(/^v/, '').split('.')[0];
+export const getMajorVersion = (packageVersion: string) => {
+  const major = packageVersion.trim().replace(/^v/, '').split('.')[0];
+  // For 0.x.x versions, use canary since @pkg@0 doesn't resolve properly on the CDN
+  return major === '0' ? 'canary' : major;
+};

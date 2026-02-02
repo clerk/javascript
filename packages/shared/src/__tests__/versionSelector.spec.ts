@@ -52,4 +52,25 @@ describe('versionSelector', () => {
   ])('versionSelector(%s) should return %i', (version, expected) => {
     expect(versionSelector(undefined, version)).toEqual(expected.toString());
   });
+
+  // 0.x.x versions should return 'canary' since @pkg@0 doesn't resolve properly on the CDN
+  test.each([
+    ['0.0.1', 'canary'],
+    ['0.1.0', 'canary'],
+    ['0.2.3', 'canary'],
+    ['v0.0.1', 'canary'],
+    [' 0.0.1 ', 'canary'],
+  ])('versionSelector(%s) should return canary for 0.x versions', (version, expected) => {
+    expect(versionSelector(undefined, version)).toEqual(expected);
+  });
+
+  // 0.x.x versions with prerelease tags should still use the prerelease tag
+  test.each([
+    ['0.0.1-next.0', 'next'],
+    ['0.1.0-alpha.1', 'alpha'],
+    ['0.2.3-beta.5', 'beta'],
+    ['0.0.1-snapshot.0', '0.0.1-snapshot.0'],
+  ])('versionSelector(%s) should return prerelease tag for 0.x prerelease versions', (version, expected) => {
+    expect(versionSelector(undefined, version)).toEqual(expected);
+  });
 });
