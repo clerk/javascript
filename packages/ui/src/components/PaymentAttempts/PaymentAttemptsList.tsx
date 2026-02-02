@@ -26,9 +26,9 @@ export const PaymentAttemptsList = () => {
       isLoading={isLoading}
       emptyStateLocalizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.empty`)}
       headers={[
-        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__date`),
-        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__amount`),
-        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__status`),
+        { key: localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__date`) },
+        { key: localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__amount`) },
+        { key: localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__status`) },
       ]}
       rows={paymentAttempts.map(i => (
         <PaymentAttemptsListRow

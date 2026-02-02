@@ -3248,9 +3248,14 @@ export class Clerk implements ClerkInterface {
   };
 
   #initOptions = (options?: ClerkOptions): ClerkOptions => {
+    // Support both clerkUICtor (correct) and clerkUiCtor (legacy) for backwards compatibility
+    const clerkUICtor =
+      options?.clerkUICtor ?? (options as Record<string, unknown> | undefined)?.clerkUiCtor ?? undefined;
+
     return {
       ...defaultOptions,
       ...options,
+      clerkUICtor: clerkUICtor as ClerkOptions['clerkUICtor'],
       allowedRedirectOrigins: createAllowedRedirectOrigins(
         options?.allowedRedirectOrigins,
         this.frontendApi,
