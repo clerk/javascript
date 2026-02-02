@@ -48,8 +48,7 @@ type VariantsConfig<T> = {
  */
 export const style = (fn: StyleFunction): StyleFunction => fn;
 
-// Resolves a StyleRule (either a CSS object or a theme function) to a CSS object
-const resolveStyleRule = (rule: StyleRule | undefined, theme: MosaicTheme): CSSObject => {
+function resolveStyleRule(rule: StyleRule | undefined, theme: MosaicTheme): CSSObject {
   if (!rule) {
     return {};
   }
@@ -57,38 +56,31 @@ const resolveStyleRule = (rule: StyleRule | undefined, theme: MosaicTheme): CSSO
     return rule(theme);
   }
   return rule;
-};
+}
 
-// Converts a variant value to its string key (handles boolean -> 'true'/'false')
-const normalizeVariantValue = (value: any): string => {
-  if (typeof value === 'boolean') {
-    return String(value);
-  }
+function normalizeVariantValue(value: unknown): string {
   return String(value);
-};
+}
 
-// Calculates which variants should be applied based on props and defaults
-const calculateVariantsToBeApplied = (
+function calculateVariantsToBeApplied(
   variants: Record<string, Record<string, StyleRule>>,
-  props: Record<string, any>,
-  defaultVariants: Record<string, any>,
-) => {
-  const variantsToApply: Record<string, any> = {};
+  props: Record<string, unknown>,
+  defaultVariants: Record<string, unknown>,
+): Record<string, unknown> {
+  const variantsToApply: Record<string, unknown> = {};
   for (const key in variants) {
-    if (key in props && props[key] !== null && props[key] !== undefined) {
-      variantsToApply[key] = props[key];
-    } else if (key in defaultVariants && defaultVariants[key] !== null && defaultVariants[key] !== undefined) {
-      variantsToApply[key] = defaultVariants[key];
+    const value = props[key] ?? defaultVariants[key];
+    if (value != null) {
+      variantsToApply[key] = value;
     }
   }
   return variantsToApply;
-};
+}
 
-// Checks if a compound variant condition matches the applied variants
-const conditionMatches = (
-  compoundVariant: { condition: Record<string, any>; styles?: StyleRule },
-  variantsToApply: Record<string, any>,
-) => {
+function conditionMatches(
+  compoundVariant: { condition: Record<string, unknown>; styles?: StyleRule },
+  variantsToApply: Record<string, unknown>,
+): boolean {
   const { condition } = compoundVariant;
   for (const key in condition) {
     if (condition[key] !== variantsToApply[key]) {
@@ -96,7 +88,7 @@ const conditionMatches = (
     }
   }
   return true;
-};
+}
 
 /**
  * Creates a variant-based style function for Emotion CSS objects.
@@ -131,31 +123,24 @@ export function variants<T>(config: VariantsConfig<T>) {
 
   return (props: ConfigVariants<T> = {}): Interpolation<Theme> => {
     return ((theme: Theme) => {
-      // At runtime, theme is MosaicTheme when used within MosaicThemeProvider
       const mosaicTheme = theme as unknown as MosaicTheme;
-
-      // Start with an empty object that will accumulate all styles
       const computedStyles: CSSObject = {};
+      const variantDefs = variantDefinitions as Record<string, Record<string, StyleRule>>;
 
-      // Apply base styles
       const baseStyles = resolveStyleRule(base, mosaicTheme);
       if (baseStyles && typeof baseStyles === 'object') {
         fastDeepMergeAndReplace(baseStyles, computedStyles);
       }
 
-      // Calculate which variants to apply (cast to runtime type)
       const variantsToApply = calculateVariantsToBeApplied(
-        variantDefinitions as Record<string, Record<string, StyleRule>>,
-        props as Record<string, any>,
-        defaultVariants as Record<string, any>,
+        variantDefs,
+        props as Record<string, unknown>,
+        defaultVariants as Record<string, unknown>,
       );
 
-      // Apply variant styles
-      const variantDefs = variantDefinitions as Record<string, Record<string, StyleRule>>;
       for (const variantKey in variantsToApply) {
         const variantValue = variantsToApply[variantKey];
         const variantDef = variantDefs[variantKey];
-        // Convert boolean values to string keys for lookup
         const normalizedValue = normalizeVariantValue(variantValue);
         if (variantDef && normalizedValue in variantDef) {
           const variantStyle = resolveStyleRule(variantDef[normalizedValue], mosaicTheme);
@@ -163,7 +148,6 @@ export function variants<T>(config: VariantsConfig<T>) {
         }
       }
 
-      // Apply compound variant styles
       for (const compoundVariant of compoundVariants) {
         if (conditionMatches(compoundVariant, variantsToApply)) {
           const compoundStyles = resolveStyleRule(compoundVariant.styles, mosaicTheme);
