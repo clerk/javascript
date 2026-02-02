@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { Clerk, ClerkStatus, InitialState, LoadedClerk } from '../types';
+import type { ClerkProviderValue, ClerkStatus, InitialState, LoadedClerk } from '../types';
 import {
   __experimental_CheckoutProvider as CheckoutProvider,
   ClerkInstanceContext,
@@ -9,13 +9,21 @@ import {
 import { assertClerkSingletonExists } from './utils';
 
 type ClerkContextProps = {
-  clerk: Clerk;
+  /**
+   * The Clerk instance to provide to the application.
+   * Accepts ClerkProviderValue which is compatible with IsomorphicClerk.
+   */
+  clerk: ClerkProviderValue;
   clerkStatus?: ClerkStatus;
   children: React.ReactNode;
   initialState?: InitialState;
 };
 
 export function ClerkContextProvider(props: ClerkContextProps): JSX.Element | null {
+  // SAFETY: This cast is safe because ClerkProviderValue is structurally compatible
+  // with LoadedClerk at runtime. The type difference exists because IsomorphicClerk
+  // wraps methods to allow void returns during pre-mount queuing. By the time
+  // consumers access the clerk instance, it is fully functional.
   const clerk = props.clerk as LoadedClerk;
 
   assertClerkSingletonExists(clerk);
