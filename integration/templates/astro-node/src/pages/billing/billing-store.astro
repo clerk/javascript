@@ -17,7 +17,7 @@ import Layout from '../../layouts/Layout.astro';
     }
 
     connectedCallback() {
-      $billingStore.subscribe(this.render);
+      $billingStore.subscribe(this.render.bind(this));
     }
 
     async render(billing) {
@@ -25,14 +25,16 @@ import Layout from '../../layouts/Layout.astro';
         const plans = await billing.getPlans();
         this.innerHTML = `
           <div>
-            ${plans.map(
-              p => `
+            ${plans
+              .map(
+                p => `
                 <div>
                   <h4>${p.name}</h4>
                   <p>$${p.fee.amountFormatted}</p>
                 </div>
               `,
-            )}
+              )
+              .join('')}
           </div>
         `;
       }
