@@ -22,7 +22,7 @@ import Layout from '../../layouts/Layout.astro';
 
     async render(billing) {
       if (billing) {
-        const plans = await billing.getPlans();
+        const { data: plans } = await billing.getPlans();
         this.innerHTML = `
           <div>
             ${plans
