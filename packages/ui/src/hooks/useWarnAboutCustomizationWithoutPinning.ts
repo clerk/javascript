@@ -1,4 +1,4 @@
-import { ClerkInstanceContext, OptionsContext as SharedOptionsContext } from '@clerk/shared/react';
+import { ClerkInstanceContext, OptionsContext as SharedOptionsContext, useDeepEqualMemo } from '@clerk/shared/react';
 import { useContext, useEffect } from 'react';
 
 import { OptionsContext } from '../contexts/OptionsContext';
@@ -29,6 +29,10 @@ export function useWarnAboutCustomizationWithoutPinning(appearance: Appearance |
   // This matches the pattern used in warnAboutCustomizationWithoutPinning
   const uiPinned = !!(options as any)?.ui;
 
+  // Stabilize the appearance reference to prevent effect re-runs when consumers
+  // pass inline objects (e.g., <SignIn appearance={{ elements: { card: {} } }} />)
+  const stableAppearance = useDeepEqualMemo(() => appearance, [appearance]);
+
   useEffect(() => {
     // Skip if clerk context is not available (e.g., in tests)
     if (!clerkCtx?.value) {
@@ -41,17 +45,17 @@ export function useWarnAboutCustomizationWithoutPinning(appearance: Appearance |
     }
 
     // Defer warning check to avoid blocking component mount
-    const scheduleWarningCheck =
-      typeof requestIdleCallback === 'function' ? requestIdleCallback : (cb: () => void) => setTimeout(cb, 0);
-
-    const handle = scheduleWarningCheck(() => {
-      warnAboutComponentAppearance(appearance, uiPinned);
-    });
+    const useIdleCallback = typeof requestIdleCallback === 'function';
+    const handle = useIdleCallback
+      ? requestIdleCallback(() => warnAboutComponentAppearance(stableAppearance, uiPinned))
+      : setTimeout(() => warnAboutComponentAppearance(stableAppearance, uiPinned), 0);
 
     return () => {
-      if (typeof cancelIdleCallback === 'function' && typeof handle === 'number') {
-        cancelIdleCallback(handle);
+      if (useIdleCallback) {
+        cancelIdleCallback(handle as number);
+      } else {
+        clearTimeout(handle as ReturnType<typeof setTimeout>);
       }
     };
-  }, [clerkCtx?.value, appearance, uiPinned]);
+  }, [clerkCtx?.value, stableAppearance, uiPinned]);
 }

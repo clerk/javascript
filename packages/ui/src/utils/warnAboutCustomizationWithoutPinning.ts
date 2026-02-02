@@ -5,6 +5,11 @@ import type { Appearance } from '../internal/appearance';
 import { CLERK_CLASS_RE, HAS_RE, POSITIONAL_PSEUDO_RE } from './cssPatterns';
 import { detectStructuralClerkCss } from './detectClerkStylesheetUsage';
 
+// Regex patterns for hasAdjacencyWithOtherSelector
+const OTHER_SELECTOR_RE = /[.#\w\[:]/;
+const CLERK_CLASS_GLOBAL_RE = /\.cl-[A-Za-z0-9_-]+/g;
+const COMBINATOR_RE = /[>+~\s]/;
+
 function formatStructuralCssWarning(patterns: string[]): string {
   const displayPatterns = patterns.slice(0, 5);
   const patternsList = displayPatterns.map(p => `  - ${p}`).join('\n');
@@ -40,11 +45,11 @@ function hasAdjacencyWithOtherSelector(selector: string): boolean {
   const hasClerkClass = CLERK_CLASS_RE.test(rest);
 
   // Check if there's another selector (class, tag, id, attribute)
-  const hasOtherSelector = /[.#\w\[:]/.test(rest.replace(/\.cl-[A-Za-z0-9_-]+/g, ''));
+  const hasOtherSelector = OTHER_SELECTOR_RE.test(rest.replace(CLERK_CLASS_GLOBAL_RE, ''));
 
   // Only structural if both a .cl- class and another selector exist
   // OR if it references a .cl- class (assumes internal structure)
-  return hasClerkClass || (hasOtherSelector && /[>+~\s]/.test(selector));
+  return hasClerkClass || (hasOtherSelector && COMBINATOR_RE.test(selector));
 }
 
 /**
