@@ -29,8 +29,8 @@ describe('ClerkUi version check', () => {
   });
 
   describe('compatible versions', () => {
-    test('accepts exact minimum version (6.0.0)', () => {
-      const getClerk = () => ({ version: '6.0.0', instanceType: 'production' }) as Clerk;
+    test(`accepts exact minimum version (${MIN_CLERK_JS_VERSION})`, () => {
+      const getClerk = () => ({ version: MIN_CLERK_JS_VERSION, instanceType: 'production' }) as Clerk;
 
       expect(() => {
         new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
