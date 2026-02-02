@@ -41,6 +41,8 @@ type UserListParams = ClerkPaginationRequest<
       | 'last_sign_in_at'
     >;
     last_active_at_since?: number;
+    lastSignInAtAfter?: number;
+    lastSignInAtBefore?: number;
     organizationId?: string[];
   }
 >;
