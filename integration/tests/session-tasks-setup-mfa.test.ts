@@ -157,7 +157,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
       await u.po.signIn.continue();
 
       await u.po.signIn.enterOtpCode('111111', {
-        awaitRequests: false,
+        awaitPrepare: true,
+        awaitAttempt: true,
       });
 
       await expect(u.page.getByTestId('form-feedback-error')).toBeVisible();
