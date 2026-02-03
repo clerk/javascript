@@ -8,7 +8,7 @@ import { fakerPhoneNumber } from '../testUtils/usersService';
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
   'session tasks setup-mfa flow @nextjs',
   ({ app }) => {
-    test.describe.configure({ mode: 'serial' });
+    test.describe.configure({ mode: 'parallel' });
 
     test.afterAll(async () => {
       await app.teardown();
