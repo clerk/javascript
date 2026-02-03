@@ -10,6 +10,7 @@ import type {
   SignUpProps,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
+  TaskSetupMFAProps,
   UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
@@ -724,4 +725,32 @@ export const TaskResetPassword = withClerk(
     );
   },
   { component: 'TaskResetPassword', renderWhileLoading: true },
+);
+
+export const TaskSetupMFA = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<TaskSetupMFAProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountTaskSetupMfa}
+            unmount={clerk.unmountTaskSetupMfa}
+            updateProps={(clerk as any).__internal_updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'TaskSetupMFA', renderWhileLoading: true },
 );

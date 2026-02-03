@@ -364,6 +364,13 @@ export const nlNL: LocalizationResource = {
         tableHeader__role: 'Rol',
         tableHeader__user: 'Gebruiker',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'We zijn de beschikbare rollen aan het bijwerken. Zodra dit klaar is, kunt u de rollen opnieuw bijwerken.',
+          title: 'Rollen zijn tijdelijk vergrendeld',
+        },
+      },
       detailsTitle__emptyRow: 'Geen leden gevonden',
       invitationsTab: {
         autoInvitations: {
@@ -394,13 +401,6 @@ export const nlNL: LocalizationResource = {
         headerTitle__invitations: 'Uitnodigingen',
         headerTitle__members: 'Leden',
         headerTitle__requests: 'Verzoeken',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Rollen zijn tijdelijk vergrendeld',
-          subtitle:
-            'We zijn de beschikbare rollen aan het bijwerken. Zodra dit klaar is, kunt u de rollen opnieuw bijwerken.',
-        },
       },
     },
     navbar: {
@@ -859,6 +859,10 @@ export const nlNL: LocalizationResource = {
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: 'Ga verder met {{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Er bestaat al een organisatie voor de gedetecteerde bedrijfsnaam ({{organizationName}}) en {{organizationDomain}}. Word lid via uitnodiging.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Nieuwe organisatie aanmaken',
       action__invitationAccept: 'Deelnemen',
@@ -879,16 +883,12 @@ export const nlNL: LocalizationResource = {
       title: 'Stel je organisatie in',
     },
     organizationCreationDisabled: {
-      title: 'Je moet tot een organisatie behoren',
       subtitle: 'Neem contact op met de beheerder van je organisatie voor een uitnodiging.',
+      title: 'Je moet tot een organisatie behoren',
     },
     signOut: {
       actionLink: 'Uitloggen',
       actionText: 'Ingelogd als {{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'Er bestaat al een organisatie voor de gedetecteerde bedrijfsnaam ({{organizationName}}) en {{organizationDomain}}. Word lid via uitnodiging.',
     },
   },
   taskResetPassword: {
@@ -899,6 +899,69 @@ export const nlNL: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: 'Je bent al lid van de organisatie.',
@@ -927,11 +990,12 @@ export const nlNL: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'De waarde die je hebt ingevoerd is ongeldig.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Het wachtwoord is incorrect.',
-    form_password_or_identifier_incorrect:
-      'Het wachtwoord of het e-mailadres is onjuist. Probeer het opnieuw of gebruik een andere methode.',
     form_password_length_too_short: 'Het wachtwoord is te kort.',
     form_password_not_strong_enough: 'Je wachtwoord is niet sterk genoeg.',
+    form_password_or_identifier_incorrect:
+      'Het wachtwoord of het e-mailadres is onjuist. Probeer het opnieuw of gebruik een andere methode.',
     form_password_pwned: 'Dit wachtwoord is in een datalek gevonden.',
     form_password_pwned__sign_in: 'Als je dit wachtwoord elders gebruikt, moet je het wijzigen.',
     form_password_size_in_bytes_exceeded:
