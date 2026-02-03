@@ -105,11 +105,10 @@ const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): strin
  * to avoid potential ReDoS concerns flagged by security scanners.
  */
 function stripTrailingSlashes(str: string): string {
-  let end = str.length;
-  while (end > 0 && str[end - 1] === '/') {
-    end--;
+  while (str.endsWith('/')) {
+    str = str.slice(0, -1);
   }
-  return str.slice(0, end);
+  return str;
 }
 
 export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
