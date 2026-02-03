@@ -1,3 +1,5 @@
+export const MIN_CLERK_JS_VERSION = '6.0.0';
+
 export const USER_PROFILE_NAVBAR_ROUTE_ID = {
   ACCOUNT: 'account',
   SECURITY: 'security',
