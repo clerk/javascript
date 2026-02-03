@@ -37,6 +37,29 @@ export interface SignInFutureCreateParams {
    * generated from the Backend API. **Required** if `strategy` is set to `'ticket'`.
    */
   ticket?: string;
+  /**
+   * When set to `true`, if a user does not exist, the sign-in will create a new account automatically.
+   * Captcha will be required when this is enabled.
+   */
+  sign_up_if_missing?: boolean;
+  /**
+   * The captcha token returned from the captcha challenge.
+   *
+   * @internal
+   */
+  captcha_token?: string;
+  /**
+   * The captcha error if the captcha challenge failed.
+   *
+   * @internal
+   */
+  captcha_error?: unknown;
+  /**
+   * The type of captcha widget used ('smart', 'invisible', or null).
+   *
+   * @internal
+   */
+  captcha_widget_type?: string | null;
 }
 
 export type SignInFuturePasswordParams = {

@@ -162,8 +162,18 @@ export type SignInCreateParams = (
   | {
       identifier: string;
     }
-  | { transfer?: boolean }
-) & { transfer?: boolean };
+  | {
+      transfer: true;
+      strategy?: OAuthStrategy | EnterpriseSSOStrategy;
+    }
+) & {
+  transfer?: boolean;
+  locale?: string;
+  sign_up_if_missing?: boolean;
+  captcha_token?: string;
+  captcha_error?: unknown;
+  captcha_widget_type?: string | null;
+};
 
 export type ResetPasswordParams = {
   password: string;

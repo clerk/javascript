@@ -16,6 +16,7 @@ import type {
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
+  CaptchaWidgetType,
   ClientTrustState,
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
@@ -80,6 +81,7 @@ import {
   _futureAuthenticateWithPopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
+import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
@@ -162,12 +164,43 @@ export class SignIn extends BaseResource implements SignInResource {
     this.fromJSON(data);
   }
 
-  create = (params: SignInCreateParams): Promise<SignInResource> => {
+  create = async (params: SignInCreateParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.create', { id: this.id, strategy: 'strategy' in params ? params.strategy : undefined });
-    const locale = getBrowserLocale();
+
+    let finalParams = { ...params };
+
+    // Inject browser locale if not already provided
+    if (!finalParams.locale) {
+      const browserLocale = getBrowserLocale();
+      if (browserLocale) {
+        finalParams.locale = browserLocale;
+      }
+    }
+
+    // Determine captcha requirement based on params
+    const requiresCaptcha = this.shouldRequireCaptcha(params);
+
+    if (requiresCaptcha) {
+      const captchaChallenge = new CaptchaChallenge(SignIn.clerk);
+      const captchaParams = await captchaChallenge.managedOrInvisible({ action: 'signin' });
+      if (!captchaParams) {
+        throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
+      }
+      finalParams = { ...finalParams, ...captchaParams };
+    }
+
+    if (params.transfer && this.shouldBypassCaptchaForAttempt(params)) {
+      const strategy = SignIn.clerk.client?.signUp.verifications.externalAccount.strategy;
+      if (strategy) {
+        // When transfer is true, we're in the OAuth/Enterprise SSO transfer case
+        type TransferParams = Extract<SignInCreateParams, { transfer: true }>;
+        (finalParams as TransferParams).strategy = strategy as TransferParams['strategy'];
+      }
+    }
+
     return this._basePost({
       path: this.pathRoot,
-      body: locale ? { locale, ...params } : params,
+      body: finalParams,
     });
   };
 
@@ -574,6 +607,59 @@ export class SignIn extends BaseResource implements SignInResource {
     return this;
   }
 
+  /**
+   * We delegate bot detection to the following providers, instead of relying on turnstile exclusively
+   *
+   * This is almost identical to SignUp.shouldBypassCaptchaForAttempt, but they differ because on transfer
+   * sign up needs to check the sign in, and sign in needs to check the sign up.
+   */
+  protected shouldBypassCaptchaForAttempt(params: SignInCreateParams) {
+    if (!('strategy' in params) || !params.strategy) {
+      return false;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const captchaOauthBypass = SignIn.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
+
+    if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
+      return true;
+    }
+
+    if (
+      params.transfer &&
+      captchaOauthBypass.some(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        strategy => strategy === SignIn.clerk.client!.signUp.verifications.externalAccount.strategy,
+      )
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Determines whether captcha is required based on the provided params.
+   */
+  private shouldRequireCaptcha(params: SignInCreateParams): boolean {
+    // Always bypass for these conditions
+    if (__BUILD_DISABLE_RHC__) {
+      return false;
+    }
+
+    if (SignIn.clerk.client?.captchaBypass) {
+      return false;
+    }
+
+    // Strategy-based bypass (OAuth, etc.)
+    if (this.shouldBypassCaptchaForAttempt(params)) {
+      return false;
+    }
+
+    // Require captcha if sign_up_if_missing is present
+    return !!params.sign_up_if_missing;
+  }
+
   public __internal_toSnapshot(): SignInJSONSnapshot {
     return {
       object: 'sign_in',
@@ -757,11 +843,42 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
+  private async getCaptchaToken(): Promise<{
+    captcha_token?: string;
+    captcha_widget_type?: CaptchaWidgetType;
+    captcha_error?: unknown;
+  }> {
+    const captchaChallenge = new CaptchaChallenge(SignIn.clerk);
+    const response = await captchaChallenge.managedOrInvisible({ action: 'signin' });
+    if (!response) {
+      throw new Error('Captcha challenge failed');
+    }
+
+    const { captchaError, captchaToken, captchaWidgetType } = response;
+    return { captcha_token: captchaToken, captcha_widget_type: captchaWidgetType, captcha_error: captchaError };
+  }
+
   private async _create(params: SignInFutureCreateParams): Promise<void> {
     const locale = getBrowserLocale();
+    let body: Record<string, unknown> = { ...params };
+    if (locale) {
+      body.locale = locale;
+    }
+
+    // Determine captcha requirement based on params
+    const requiresCaptcha = this.#resource['shouldRequireCaptcha'](
+      body,
+      'strategy' in params ? params.strategy : undefined,
+    );
+
+    if (requiresCaptcha) {
+      const captchaParams = await this.getCaptchaToken();
+      body = { ...body, ...captchaParams };
+    }
+
     await this.#resource.__internal_basePost({
       path: this.#resource.pathRoot,
-      body: locale ? { locale, ...params } : params,
+      body,
     });
   }
 

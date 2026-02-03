@@ -17,6 +17,16 @@ vi.mock('../../../utils/authenticateWithPopup', async () => {
 // Import the mocked function after mocking
 import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPopup';
 
+// Mock the CaptchaChallenge module
+vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
+  CaptchaChallenge: vi.fn().mockImplementation(() => ({
+    managedOrInvisible: vi.fn().mockResolvedValue({
+      captchaToken: 'mock_captcha_token',
+      captchaWidgetType: 'invisible',
+    }),
+  })),
+}));
+
 describe('SignIn', () => {
   it('can be serialized with JSON.stringify', () => {
     const signIn = new SignIn();
@@ -40,6 +50,12 @@ describe('SignIn', () => {
       BaseResource._fetch = mockFetch;
 
       const signIn = new SignIn();
+      SignIn.clerk = {
+        client: {
+          captchaBypass: false,
+        },
+      } as any;
+
       await signIn.create({ identifier: 'user@example.com' });
 
       expect(mockFetch).toHaveBeenCalledWith(
@@ -64,6 +80,12 @@ describe('SignIn', () => {
       BaseResource._fetch = mockFetch;
 
       const signIn = new SignIn();
+      SignIn.clerk = {
+        client: {
+          captchaBypass: false,
+        },
+      } as any;
+
       await signIn.create({ identifier: 'user@example.com' });
 
       expect(mockFetch).toHaveBeenCalledWith(
@@ -73,6 +95,98 @@ describe('SignIn', () => {
           body: {
             identifier: 'user@example.com',
           },
+        }),
+      );
+    });
+
+    it('includes captcha params when sign_up_if_missing is true', async () => {
+      vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
+
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'needs_first_factor' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      SignIn.clerk = {
+        client: {
+          captchaBypass: false,
+        },
+        isStandardBrowser: true,
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+            captchaPublicKey: 'test-site-key',
+            captchaPublicKeyInvisible: 'test-invisible-key',
+            captchaProvider: 'turnstile',
+            captchaWidgetType: 'invisible',
+          },
+          userSettings: {
+            signUp: {
+              captcha_enabled: true,
+            },
+          },
+        },
+      } as any;
+
+      await signIn.create({ identifier: 'user@example.com', sign_up_if_missing: true });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: expect.objectContaining({
+            identifier: 'user@example.com',
+            sign_up_if_missing: true,
+            captchaToken: 'mock_captcha_token',
+            captchaWidgetType: 'invisible',
+          }),
+        }),
+      );
+    });
+
+    it('excludes captcha params when sign_up_if_missing is false', async () => {
+      vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
+
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'needs_first_factor' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      SignIn.clerk = {
+        client: {
+          captchaBypass: false,
+        },
+        isStandardBrowser: true,
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+            captchaPublicKey: 'test-site-key',
+            captchaPublicKeyInvisible: 'test-invisible-key',
+            captchaProvider: 'turnstile',
+            captchaWidgetType: 'invisible',
+          },
+          userSettings: {
+            signUp: {
+              captcha_enabled: true,
+            },
+          },
+        },
+      } as any;
+
+      await signIn.create({ identifier: 'user@example.com', sign_up_if_missing: false });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: expect.not.objectContaining({
+            captchaToken: expect.anything(),
+            captchaWidgetType: expect.anything(),
+          }),
         }),
       );
     });
@@ -1109,6 +1223,11 @@ describe('SignIn', () => {
           __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
           __internal_isWebAuthnAutofillSupported: mockIsWebAuthnAutofillSupported,
           __internal_getPublicCredentials: mockWebAuthnGetCredential,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi
@@ -1163,6 +1282,11 @@ describe('SignIn', () => {
         SignIn.clerk = {
           __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
           __internal_getPublicCredentials: mockWebAuthnGetCredential,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi
@@ -1236,6 +1360,11 @@ describe('SignIn', () => {
         SignIn.clerk = {
           __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
           __internal_getPublicCredentials: mockWebAuthnGetCredential,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi.fn().mockResolvedValue({
@@ -1323,6 +1452,14 @@ describe('SignIn', () => {
       });
 
       it('authenticates with metamask strategy', async () => {
+        SignIn.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
         const mockFetch = vi
           .fn()
           .mockResolvedValueOnce({
@@ -1659,6 +1796,11 @@ describe('SignIn', () => {
         const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
         SignIn.clerk = {
           buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi
@@ -1707,6 +1849,11 @@ describe('SignIn', () => {
         const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
         SignIn.clerk = {
           buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi.fn().mockResolvedValue({
@@ -1755,6 +1902,11 @@ describe('SignIn', () => {
           buildUrlWithAuth: mockBuildUrlWithAuth,
           buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
           frontendApi: 'clerk.example.com',
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi.fn();
@@ -1829,6 +1981,14 @@ describe('SignIn', () => {
           },
         });
         vi.stubGlobal('URLSearchParams', vi.fn().mockReturnValue(mockSearchParams));
+
+        SignIn.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
 
         const mockFetch = vi.fn().mockResolvedValue({
           client: null,
