@@ -360,6 +360,136 @@ describe('SignIn', () => {
 
         expect(result).toHaveProperty('error', mockError);
       });
+
+      it('includes captcha params when sign_up_if_missing is true', async () => {
+        vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        SignIn.clerk = {
+          client: {
+            captchaBypass: false,
+          },
+          isStandardBrowser: true,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+              captchaPublicKey: 'test-site-key',
+              captchaPublicKeyInvisible: 'test-invisible-key',
+              captchaProvider: 'turnstile',
+              captchaWidgetType: 'invisible',
+            },
+            userSettings: {
+              signUp: {
+                captcha_enabled: true,
+              },
+            },
+          },
+        } as any;
+
+        await signIn.__internal_future.create({ identifier: 'user@example.com', sign_up_if_missing: true });
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: {
+            identifier: 'user@example.com',
+            sign_up_if_missing: true,
+            captchaToken: 'mock_captcha_token',
+            captchaWidgetType: 'invisible',
+          },
+        });
+      });
+
+      it('excludes captcha params when sign_up_if_missing is false', async () => {
+        vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        SignIn.clerk = {
+          client: {
+            captchaBypass: false,
+          },
+          isStandardBrowser: true,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+              captchaPublicKey: 'test-site-key',
+              captchaPublicKeyInvisible: 'test-invisible-key',
+              captchaProvider: 'turnstile',
+              captchaWidgetType: 'invisible',
+            },
+            userSettings: {
+              signUp: {
+                captcha_enabled: true,
+              },
+            },
+          },
+        } as any;
+
+        await signIn.__internal_future.create({ identifier: 'user@example.com', sign_up_if_missing: false });
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: {
+            identifier: 'user@example.com',
+            sign_up_if_missing: false,
+          },
+        });
+      });
+
+      it('excludes captcha params when sign_up_if_missing is not provided', async () => {
+        vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        SignIn.clerk = {
+          client: {
+            captchaBypass: false,
+          },
+          isStandardBrowser: true,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+              captchaPublicKey: 'test-site-key',
+              captchaPublicKeyInvisible: 'test-invisible-key',
+              captchaProvider: 'turnstile',
+              captchaWidgetType: 'invisible',
+            },
+            userSettings: {
+              signUp: {
+                captcha_enabled: true,
+              },
+            },
+          },
+        } as any;
+
+        await signIn.__internal_future.create({ identifier: 'user@example.com' });
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: {
+            identifier: 'user@example.com',
+          },
+        });
+      });
     });
 
     describe('password', () => {

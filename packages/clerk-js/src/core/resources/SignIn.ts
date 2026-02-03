@@ -169,23 +169,17 @@ export class SignIn extends BaseResource implements SignInResource {
 
     let finalParams = { ...params };
 
-    // Inject browser locale if not already provided
-    if (!finalParams.locale) {
-      const browserLocale = getBrowserLocale();
-      if (browserLocale) {
-        finalParams.locale = browserLocale;
-      }
+    // Inject browser locale
+    const browserLocale = getBrowserLocale();
+    if (browserLocale) {
+      finalParams.locale = browserLocale;
     }
 
     // Determine captcha requirement based on params
     const requiresCaptcha = this.shouldRequireCaptcha(params);
 
     if (requiresCaptcha) {
-      const captchaChallenge = new CaptchaChallenge(SignIn.clerk);
-      const captchaParams = await captchaChallenge.managedOrInvisible({ action: 'signin' });
-      if (!captchaParams) {
-        throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
-      }
+      const captchaParams = await this.getCaptchaToken();
       finalParams = { ...finalParams, ...captchaParams };
     }
 
@@ -613,7 +607,7 @@ export class SignIn extends BaseResource implements SignInResource {
    * This is almost identical to SignUp.shouldBypassCaptchaForAttempt, but they differ because on transfer
    * sign up needs to check the sign in, and sign in needs to check the sign up.
    */
-  protected shouldBypassCaptchaForAttempt(params: SignInCreateParams) {
+  protected shouldBypassCaptchaForAttempt(params: { strategy?: string; transfer?: boolean }) {
     if (!('strategy' in params) || !params.strategy) {
       return false;
     }
@@ -641,7 +635,11 @@ export class SignIn extends BaseResource implements SignInResource {
   /**
    * Determines whether captcha is required based on the provided params.
    */
-  private shouldRequireCaptcha(params: SignInCreateParams): boolean {
+  private shouldRequireCaptcha(params: {
+    strategy?: string;
+    transfer?: boolean;
+    sign_up_if_missing?: boolean;
+  }): boolean {
     // Always bypass for these conditions
     if (__BUILD_DISABLE_RHC__) {
       return false;
@@ -658,6 +656,19 @@ export class SignIn extends BaseResource implements SignInResource {
 
     // Require captcha if sign_up_if_missing is present
     return !!params.sign_up_if_missing;
+  }
+
+  /**
+   * Gets captcha token and widget type from the captcha challenge.
+   * Throws if captcha is unavailable.
+   */
+  private async getCaptchaToken() {
+    const captchaChallenge = new CaptchaChallenge(SignIn.clerk);
+    const captchaParams = await captchaChallenge.managedOrInvisible({ action: 'signin' });
+    if (!captchaParams) {
+      throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
+    }
+    return captchaParams;
   }
 
   public __internal_toSnapshot(): SignInJSONSnapshot {
@@ -843,36 +854,19 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  private async getCaptchaToken(): Promise<{
-    captcha_token?: string;
-    captcha_widget_type?: CaptchaWidgetType;
-    captcha_error?: unknown;
-  }> {
-    const captchaChallenge = new CaptchaChallenge(SignIn.clerk);
-    const response = await captchaChallenge.managedOrInvisible({ action: 'signin' });
-    if (!response) {
-      throw new Error('Captcha challenge failed');
-    }
-
-    const { captchaError, captchaToken, captchaWidgetType } = response;
-    return { captcha_token: captchaToken, captcha_widget_type: captchaWidgetType, captcha_error: captchaError };
-  }
-
   private async _create(params: SignInFutureCreateParams): Promise<void> {
+    let body = { ...params };
+
     const locale = getBrowserLocale();
-    let body: Record<string, unknown> = { ...params };
     if (locale) {
       body.locale = locale;
     }
 
     // Determine captcha requirement based on params
-    const requiresCaptcha = this.#resource['shouldRequireCaptcha'](
-      body,
-      'strategy' in params ? params.strategy : undefined,
-    );
+    const requiresCaptcha = this.#resource['shouldRequireCaptcha'](body);
 
     if (requiresCaptcha) {
-      const captchaParams = await this.getCaptchaToken();
+      const captchaParams = await this.#resource['getCaptchaToken']();
       body = { ...body, ...captchaParams };
     }
 

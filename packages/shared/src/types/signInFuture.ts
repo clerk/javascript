@@ -38,6 +38,11 @@ export interface SignInFutureCreateParams {
    */
   ticket?: string;
   /**
+   * The locale to assign to the user in [BCP 47](https://developer.mozilla.org/en-US/docs/Glossary/BCP_47_language_tag)
+   * format (e.g., "en-US", "fr-FR"). Set from the browser's locale.
+   */
+  locale?: string;
+  /**
    * When set to `true`, if a user does not exist, the sign-in will create a new account automatically.
    * Captcha will be required when this is enabled.
    */
