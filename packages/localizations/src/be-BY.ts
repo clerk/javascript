@@ -365,6 +365,12 @@ export const beBY: LocalizationResource = {
         tableHeader__role: 'Роля',
         tableHeader__user: 'Карыстальнік',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Мы абнаўляем даступныя ролі. Калі гэта будзе зроблена, вы зможаце абнавіць ролі зноў.',
+          title: 'Ролі часова заблакіраваны',
+        },
+      },
       detailsTitle__emptyRow: 'Нет участников для отображения',
       invitationsTab: {
         autoInvitations: {
@@ -395,12 +401,6 @@ export const beBY: LocalizationResource = {
         headerTitle__invitations: 'Приглашения',
         headerTitle__members: 'Удзельнікі',
         headerTitle__requests: 'Заявкі',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Ролі часова заблакіраваны',
-          subtitle: 'Мы абнаўляем даступныя ролі. Калі гэта будзе зроблена, вы зможаце абнавіць ролі зноў.',
-        },
       },
     },
     navbar: {
@@ -863,6 +863,10 @@ export const beBY: LocalizationResource = {
   socialButtonsBlockButton: 'Працягнуць з дапамогай {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Арганізацыя ўжо існуе для выяўленай назвы кампаніі ({{organizationName}}) і {{organizationDomain}}. Далучайцеся па запрашэнні.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Стварыць новую арганізацыю',
       action__invitationAccept: 'Далучыцца',
@@ -883,16 +887,12 @@ export const beBY: LocalizationResource = {
       title: 'Наладзьце вашу арганізацыю',
     },
     organizationCreationDisabled: {
-      title: 'Вы павінны належаць да арганізацыі',
       subtitle: 'Звярніцеся да адміністратара вашай арганізацыі для атрымання запрашэння.',
+      title: 'Вы павінны належаць да арганізацыі',
     },
     signOut: {
       actionLink: 'Выйсці',
       actionText: 'Увайшлі як {{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'Арганізацыя ўжо існуе для выяўленай назвы кампаніі ({{organizationName}}) і {{organizationDomain}}. Далучайцеся па запрашэнні.',
     },
   },
   taskResetPassword: {
@@ -903,6 +903,69 @@ export const beBY: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: 'Вы ўжо з’яўляецеся членам гэтай арганізацыі.',
@@ -933,11 +996,12 @@ export const beBY: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Невядомы або недапушчальны значэнне.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Невірны пароль.',
-    form_password_or_identifier_incorrect:
-      'Пароль або адрас электроннай пошты няправільны. Паспрабуйце яшчэ раз або выкарыстоўвайце іншы метад.',
     form_password_length_too_short: 'Пароль занадта кароткі.',
     form_password_not_strong_enough: 'Ваш пароль недастаткова надзейны.',
+    form_password_or_identifier_incorrect:
+      'Пароль або адрас электроннай пошты няправільны. Паспрабуйце яшчэ раз або выкарыстоўвайце іншы метад.',
     form_password_pwned: 'Гэты пароль быў узламаны і не можа быць выкарыстаны, паспрабуйце іншы пароль.',
     form_password_pwned__sign_in: 'Гэты пароль быў узламаны, калі ласка, абярыце іншы.',
     form_password_size_in_bytes_exceeded:

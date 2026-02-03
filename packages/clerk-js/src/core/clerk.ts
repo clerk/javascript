@@ -114,6 +114,7 @@ import type {
   SignUpResource,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
+  TaskSetupMFAProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
   UserAvatarProps,
@@ -1437,6 +1438,28 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountTaskResetPassword = (node: HTMLDivElement) => {
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
+  public mountTaskSetupMfa = (node: HTMLDivElement, props?: TaskSetupMFAProps) => {
+    this.assertComponentsReady(this.#clerkUi);
+
+    const component = 'TaskSetupMFA';
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'taskSetupMfa',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('TaskSetupMfa', props));
+  };
+
+  public unmountTaskSetupMfa = (node: HTMLDivElement) => {
     void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
