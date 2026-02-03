@@ -56,7 +56,7 @@ export const isNextjsUseCacheError = (e: unknown): boolean => {
 export const USE_CACHE_ERROR_MESSAGE =
   `Clerk: auth() and currentUser() cannot be called inside a "use cache" function. ` +
   `These functions access \`headers()\` internally, which is a dynamic API not allowed in cached contexts.\n\n` +
-  `To fix this, call auth() outside the cached function and pass the userId as an argument:\n\n` +
+  `To fix this, call auth() outside the cached function and pass the values you need as arguments:\n\n` +
   `  import { auth, clerkClient } from '@clerk/nextjs/server';\n\n` +
   `  async function getCachedUser(userId: string) {\n` +
   `    "use cache";\n` +
