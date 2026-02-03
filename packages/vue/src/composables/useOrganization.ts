@@ -56,7 +56,7 @@ export const useOrganization: UseOrganization = () => {
   const { clerk, organizationCtx } = useClerkContext('useOrganization');
   const { session } = useSession();
 
-  const unwatch = watch(
+  watch(
     clerk,
     value => {
       if (value) {
@@ -65,10 +65,9 @@ export const useOrganization: UseOrganization = () => {
           for: 'organizations',
           caller: 'useOrganization',
         });
-        unwatch();
       }
     },
-    { immediate: true },
+    { once: true },
   );
 
   const result = computed<UseOrganizationReturn>(() => {

@@ -1,4 +1,4 @@
-import { EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import { ClerkOfflineError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -643,6 +643,73 @@ describe('Clerk singleton', () => {
 
         await sut.setActive({ organization: null });
         expect(sut.session).toMatchObject(mockSessionWithOrganization);
+      });
+    });
+
+    describe('when offline', () => {
+      const mockSession = {
+        id: '1',
+        remove: vi.fn(),
+        status: 'active',
+        user: {},
+        touch: vi.fn(() => Promise.resolve()),
+        getToken: vi.fn(),
+        lastActiveToken: { getRawString: () => 'mocked-token' },
+      };
+      let eventBusSpy: ReturnType<typeof vi.spyOn>;
+
+      beforeEach(() => {
+        eventBusSpy = vi.spyOn(eventBus, 'emit');
+      });
+
+      afterEach(() => {
+        mockSession.remove.mockReset();
+        mockSession.touch.mockReset();
+        mockSession.getToken.mockReset();
+        eventBusSpy?.mockRestore();
+      });
+
+      it('does not emit TokenUpdate with null when getToken throws ClerkOfflineError', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.getToken.mockRejectedValue(new ClerkOfflineError('Network request failed while offline.'));
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+
+        expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
+
+        const tokenUpdateCalls = eventBusSpy.mock.calls.filter(call => call[0] === 'token:update');
+        const nullTokenCalls = tokenUpdateCalls.filter(call => call[1]?.token === null);
+        expect(nullTokenCalls.length).toBe(0);
+      });
+
+      it('preserves existing auth state when offline during setActive', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.getToken.mockRejectedValue(new ClerkOfflineError('Network request failed while offline.'));
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+
+        expect(sut.session).toBeDefined();
+      });
+
+      it('re-throws non-offline errors from getToken', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.getToken.mockRejectedValue(new Error('Some other error'));
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await expect(sut.setActive({ session: mockSession as any as ActiveSessionResource })).rejects.toThrow(
+          'Some other error',
+        );
       });
     });
   });
