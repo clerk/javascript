@@ -374,6 +374,13 @@ export const deDE: LocalizationResource = {
         tableHeader__role: 'Rolle',
         tableHeader__user: 'Benutzer',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Wir aktualisieren die verfügbaren Rollen. Sobald dies abgeschlossen ist, können Sie die Rollen wieder aktualisieren.',
+          title: 'Rollen sind vorübergehend gesperrt',
+        },
+      },
       detailsTitle__emptyRow: 'Keine Mitglieder zum Anzeigen',
       invitationsTab: {
         autoInvitations: {
@@ -404,13 +411,6 @@ export const deDE: LocalizationResource = {
         headerTitle__invitations: 'Einladungen',
         headerTitle__members: 'Mitglieder',
         headerTitle__requests: 'Anfragen',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Rollen sind vorübergehend gesperrt',
-          subtitle:
-            'Wir aktualisieren die verfügbaren Rollen. Sobald dies abgeschlossen ist, können Sie die Rollen wieder aktualisieren.',
-        },
       },
     },
     navbar: {
@@ -874,6 +874,10 @@ export const deDE: LocalizationResource = {
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Für den erkannten Firmennamen ({{organizationName}}) und {{organizationDomain}} existiert bereits eine Organisation. Treten Sie per Einladung bei.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Neue Organisation erstellen',
       action__invitationAccept: 'Beitreten',
@@ -894,8 +898,8 @@ export const deDE: LocalizationResource = {
       title: 'Organisation einrichten',
     },
     organizationCreationDisabled: {
-      title: 'Sie müssen einer Organisation angehören',
       subtitle: 'Kontaktieren Sie Ihren Organisationsadministrator für eine Einladung.',
+      title: 'Sie müssen einer Organisation angehören',
     },
     signOut: {
       actionLink: 'Abmelden',
@@ -910,6 +914,69 @@ export const deDE: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
@@ -940,11 +1007,12 @@ export const deDE: LocalizationResource = {
     form_param_type_invalid__email_address: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
     form_param_type_invalid__phone_number: 'Bitte geben Sie eine gültige Telefonnummer ein.',
     form_param_value_invalid: 'Der eingegebene Wert ist ungültig.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Das eingegebene Passwort ist falsch.',
-    form_password_or_identifier_incorrect:
-      'Passwort oder E-Mail-Adresse ist falsch. Versuchen Sie es erneut oder verwenden Sie eine andere Methode.',
     form_password_length_too_short: 'Das Passwort ist zu kurz. Es muss mindestens 8 Zeichen lang sein.',
     form_password_not_strong_enough: 'Passwort nicht stark genug.',
+    form_password_or_identifier_incorrect:
+      'Passwort oder E-Mail-Adresse ist falsch. Versuchen Sie es erneut oder verwenden Sie eine andere Methode.',
     form_password_pwned:
       'Das gewählte Passwort wurde bei einem Datenleck im Internet gefunden. Wählen Sie aus Sicherheitsgründen bitte ein anderes Passwort.',
     form_password_pwned__sign_in:

@@ -39,7 +39,7 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
 
-  // Filter out falsy values that can occur when SWR infinite loading resolves pages out of order
+  // Filter out falsy values that can occur when infinite loading resolves pages out of order
   // This happens when concurrent requests resolve in unexpected order, leaving undefined/null items in the data array
   const userInvitationsData = userInvitations.data?.filter(a => !!a);
   const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
@@ -127,8 +127,8 @@ const MembershipPreview = (props: { organization: OrganizationResource }) => {
       try {
         await setActive({
           organization,
-          navigate: async ({ session }) => {
-            await navigateOnSetActive?.({ session, redirectUrlComplete });
+          navigate: async ({ session, decorateUrl }) => {
+            await navigateOnSetActive?.({ session, redirectUrlComplete, decorateUrl });
           },
         });
       } catch (err: any) {

@@ -364,6 +364,12 @@ export const skSK: LocalizationResource = {
         tableHeader__role: 'Rola',
         tableHeader__user: 'Užívateľ',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Aktualizujeme dostupné úlohy. Po dokončení budete môcť úlohy opäť aktualizovať.',
+          title: 'Úlohy sú dočasne uzamknuté',
+        },
+      },
       detailsTitle__emptyRow: 'Žiadni členovia na zobrazenie',
       invitationsTab: {
         autoInvitations: {
@@ -394,12 +400,6 @@ export const skSK: LocalizationResource = {
         headerTitle__invitations: 'Pozvánky',
         headerTitle__members: 'Členovia',
         headerTitle__requests: 'Požiadavky',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Úlohy sú dočasne uzamknuté',
-          subtitle: 'Aktualizujeme dostupné úlohy. Po dokončení budete môcť úlohy opäť aktualizovať.',
-        },
       },
     },
     navbar: {
@@ -863,6 +863,10 @@ export const skSK: LocalizationResource = {
   socialButtonsBlockButton: 'Pokračovať s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Organizácia už existuje pre zistený názov spoločnosti ({{organizationName}}) a {{organizationDomain}}. Pripojte sa prostredníctvom pozvánky.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Vytvoriť novú organizáciu',
       action__invitationAccept: 'Pridať sa',
@@ -883,8 +887,8 @@ export const skSK: LocalizationResource = {
       title: 'Nastavte svoju organizáciu',
     },
     organizationCreationDisabled: {
-      title: 'Musíte patriť do organizácie',
       subtitle: 'Kontaktujte administrátora vašej organizácie pre pozvánku.',
+      title: 'Musíte patriť do organizácie',
     },
     signOut: {
       actionLink: 'Odhlásiť sa',
@@ -899,6 +903,69 @@ export const skSK: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
@@ -928,11 +995,12 @@ export const skSK: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Hodnota je neplatná. Skontrolujte a opravte.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Heslo je nesprávne. Skontrolujte a skúste to znova.',
-    form_password_or_identifier_incorrect:
-      'Heslo alebo e-mailová adresa je nesprávna. Skúste to znova alebo použite inú metódu.',
     form_password_length_too_short: 'Heslo musí mať aspoň 8 znakov.',
     form_password_not_strong_enough: 'Vaše heslo nie je dostatočne silné.',
+    form_password_or_identifier_incorrect:
+      'Heslo alebo e-mailová adresa je nesprávna. Skúste to znova alebo použite inú metódu.',
     form_password_pwned: 'Toto heslo bolo nájdené v rámci úniku dát a nemôže byť použité, prosím zvoľte iné heslo.',
     form_password_pwned__sign_in:
       'Toto heslo bolo nájdené v rámci úniku dát a nemôže byť použité, prosím zvoľte iné heslo.',

@@ -8,6 +8,12 @@ import { withClerk } from './withClerk';
 export const SignUpButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<SignUpButtonProps>>) => {
     const {
+      // @ts-expect-error - appearance is a valid prop for SignUpProps & SignUpButtonPropsModal
+      appearance,
+      // @ts-expect-error - unsafeMetadata is a valid prop for SignUpProps & SignUpButtonPropsModal
+      unsafeMetadata,
+      getContainer,
+      component,
       fallbackRedirectUrl,
       forceRedirectUrl,
       signInFallbackRedirectUrl,
@@ -34,8 +40,9 @@ export const SignUpButton = withClerk(
       if (mode === 'modal') {
         return clerk.openSignUp({
           ...opts,
-          appearance: props.appearance,
-          unsafeMetadata: props.unsafeMetadata,
+          appearance,
+          unsafeMetadata,
+          getContainer,
         });
       }
 

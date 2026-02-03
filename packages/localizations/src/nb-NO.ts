@@ -364,6 +364,12 @@ export const nbNO: LocalizationResource = {
         tableHeader__role: 'Rolle',
         tableHeader__user: 'Bruker',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Vi oppdaterer tilgjengelige roller. Når det er gjort, vil du kunne oppdatere roller igjen.',
+          title: 'Roller er midlertidig låst',
+        },
+      },
       detailsTitle__emptyRow: 'Ingen medlemmer å vise',
       invitationsTab: {
         autoInvitations: {
@@ -394,12 +400,6 @@ export const nbNO: LocalizationResource = {
         headerTitle__invitations: 'Invitasjoner',
         headerTitle__members: 'Medlemmer',
         headerTitle__requests: 'Forespørsler',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Roller er midlertidig låst',
-          subtitle: 'Vi oppdaterer tilgjengelige roller. Når det er gjort, vil du kunne oppdatere roller igjen.',
-        },
       },
     },
     navbar: {
@@ -857,6 +857,10 @@ export const nbNO: LocalizationResource = {
   socialButtonsBlockButton: 'Fortsett med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'En organisasjon eksisterer allerede for det oppdagede firmanavnet ({{organizationName}}) og {{organizationDomain}}. Bli med via invitasjon.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Opprett ny organisasjon',
       action__invitationAccept: 'Bli med',
@@ -877,8 +881,8 @@ export const nbNO: LocalizationResource = {
       title: 'Sett opp din organisasjon',
     },
     organizationCreationDisabled: {
-      title: 'Du må tilhøre en organisasjon',
       subtitle: 'Kontakt organisasjonsadministratoren din for en invitasjon.',
+      title: 'Du må tilhøre en organisasjon',
     },
     signOut: {
       actionLink: 'Logg ut',
@@ -893,6 +897,69 @@ export const nbNO: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
@@ -921,11 +988,12 @@ export const nbNO: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect:
-      'Passordet eller e-postadressen er feil. Prøv igjen eller bruk en annen metode.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Passordet ditt er ikke sterkt nok.',
+    form_password_or_identifier_incorrect:
+      'Passordet eller e-postadressen er feil. Prøv igjen eller bruk en annen metode.',
     form_password_pwned:
       'Dette passordet er funnet som en del av et datainnbrudd og kan ikke brukes. Vennligst prøv et annet passord.',
     form_password_pwned__sign_in: undefined,

@@ -34,6 +34,7 @@ const AVAILABLE_COMPONENTS = [
   'oauthConsent',
   'taskChooseOrganization',
   'taskResetPassword',
+  'taskSetupMFA',
 ] as const;
 type AvailableComponent = (typeof AVAILABLE_COMPONENTS)[number];
 
@@ -137,6 +138,7 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   oauthConsent: buildComponentControls('oauthConsent'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
   taskResetPassword: buildComponentControls('taskResetPassword'),
+  taskSetupMFA: buildComponentControls('taskSetupMFA'),
 };
 
 declare global {
@@ -389,7 +391,8 @@ void (async () => {
       const searchParams = new URLSearchParams(window.location.search);
       const scopes = (searchParams.get('scopes')?.split(',') ?? []).map(scope => ({
         scope,
-        description: `Grants access to your ${scope}`,
+        description: scope === 'offline_access' ? null : `Grants access to your ${scope}`,
+        requires_consent: true,
       }));
       Clerk.__internal_mountOAuthConsent(
         app,
@@ -414,6 +417,14 @@ void (async () => {
       Clerk.mountTaskResetPassword(
         app,
         componentControls.taskResetPassword.getProps() ?? {
+          redirectUrlComplete: '/user-profile',
+        },
+      );
+    },
+    '/task-setup-mfa': () => {
+      Clerk.mountTaskSetupMfa(
+        app,
+        componentControls.taskSetupMFA.getProps() ?? {
           redirectUrlComplete: '/user-profile',
         },
       );
@@ -445,7 +456,7 @@ void (async () => {
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
-      clerkUiCtor: window.__internal_ClerkUiCtor,
+      clerkUICtor: window.__internal_ClerkUICtor,
     });
     renderCurrentRoute();
     updateVariables();

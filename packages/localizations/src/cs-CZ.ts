@@ -370,6 +370,12 @@ export const csCZ: LocalizationResource = {
         tableHeader__role: 'Role',
         tableHeader__user: 'Uživatel',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Aktualizujeme dostupné role. Jakmile to bude hotové, budete moci role opět aktualizovat.',
+          title: 'Role jsou dočasně uzamčeny',
+        },
+      },
       detailsTitle__emptyRow: 'Žádní členové k zobrazení',
       invitationsTab: {
         autoInvitations: {
@@ -400,12 +406,6 @@ export const csCZ: LocalizationResource = {
         headerTitle__invitations: 'Pozvánky',
         headerTitle__members: 'Členové',
         headerTitle__requests: 'Žádosti',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Role jsou dočasně uzamčeny',
-          subtitle: 'Aktualizujeme dostupné role. Jakmile to bude hotové, budete moci role opět aktualizovat.',
-        },
       },
     },
     navbar: {
@@ -869,6 +869,10 @@ export const csCZ: LocalizationResource = {
   socialButtonsBlockButton: 'Pokračovat s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Organizace již existuje pro detekovaný název společnosti ({{organizationName}}) a {{organizationDomain}}. Připojte se prostřednictvím pozvánky.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Vytvořit novou organizaci',
       action__invitationAccept: 'Připojit se',
@@ -889,8 +893,8 @@ export const csCZ: LocalizationResource = {
       title: 'Nastavte svou organizaci',
     },
     organizationCreationDisabled: {
-      title: 'Musíte patřit do organizace',
       subtitle: 'Kontaktujte administrátora vaší organizace pro pozvánku.',
+      title: 'Musíte patřit do organizace',
     },
     signOut: {
       actionLink: 'Odhlásit se',
@@ -905,6 +909,69 @@ export const csCZ: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je již členem organizace.',
@@ -934,11 +1001,12 @@ export const csCZ: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Tento parametr má neplatnou hodnotu.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Heslo je nesprávné.',
-    form_password_or_identifier_incorrect:
-      'Heslo nebo e-mailová adresa je nesprávná. Zkuste to znovu nebo použijte jinou metodu.',
     form_password_length_too_short: 'Heslo je příliš krátké.',
     form_password_not_strong_enough: 'Vaše heslo není dostatečně silné.',
+    form_password_or_identifier_incorrect:
+      'Heslo nebo e-mailová adresa je nesprávná. Zkuste to znovu nebo použijte jinou metodu.',
     form_password_pwned: 'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, zkuste prosím jiné heslo.',
     form_password_pwned__sign_in:
       'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, prosím resetujte si heslo.',

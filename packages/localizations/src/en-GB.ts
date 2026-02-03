@@ -365,6 +365,12 @@ export const enGB: LocalizationResource = {
         tableHeader__role: 'Role',
         tableHeader__user: 'User',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: "We are updating the available roles. Once that's done, you'll be able to update roles again.",
+          title: 'Roles are temporarily locked',
+        },
+      },
       detailsTitle__emptyRow: 'No members to display',
       invitationsTab: {
         autoInvitations: {
@@ -395,12 +401,6 @@ export const enGB: LocalizationResource = {
         headerTitle__invitations: 'Invitations',
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Roles are temporarily locked',
-          subtitle: "We are updating the available roles. Once that's done, you'll be able to update roles again.",
-        },
       },
     },
     navbar: {
@@ -860,6 +860,10 @@ export const enGB: LocalizationResource = {
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'An organisation already exists for the detected company name ({{organizationName}}) and {{organizationDomain}}. Join by invitation.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Create new organisation',
       action__invitationAccept: 'Join',
@@ -880,8 +884,8 @@ export const enGB: LocalizationResource = {
       title: 'Setup your organisation',
     },
     organizationCreationDisabled: {
-      title: 'You must belong to an organisation',
       subtitle: 'Contact your organisation admin for an invitation.',
+      title: 'You must belong to an organisation',
     },
     signOut: {
       actionLink: 'Sign out',
@@ -896,6 +900,69 @@ export const enGB: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organisation.',
@@ -924,10 +991,11 @@ export const enGB: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'The value entered is invalid. Please correct it.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'The password you entered is incorrect. Please try again.',
-    form_password_or_identifier_incorrect: 'Password or email address is incorrect. Try again, or use another method.',
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
     form_password_not_strong_enough: 'Your password is not strong enough.',
+    form_password_or_identifier_incorrect: 'Password or email address is incorrect. Try again, or use another method.',
     form_password_pwned:
       'This password has been found as part of a breach and can not be used, please try another password instead.',
     form_password_pwned__sign_in:

@@ -372,6 +372,13 @@ export const itIT: LocalizationResource = {
         tableHeader__role: 'Ruolo',
         tableHeader__user: 'Utente',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Stiamo aggiornando i ruoli disponibili. Una volta completato, potrai aggiornare nuovamente i ruoli.',
+          title: 'I ruoli sono temporaneamente bloccati',
+        },
+      },
       detailsTitle__emptyRow: 'Nessun membro da visualizzare',
       invitationsTab: {
         autoInvitations: {
@@ -402,13 +409,6 @@ export const itIT: LocalizationResource = {
         headerTitle__invitations: 'Inviti',
         headerTitle__members: 'Membri',
         headerTitle__requests: 'Richieste',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'I ruoli sono temporaneamente bloccati',
-          subtitle:
-            'Stiamo aggiornando i ruoli disponibili. Una volta completato, potrai aggiornare nuovamente i ruoli.',
-        },
       },
     },
     navbar: {
@@ -867,6 +867,10 @@ export const itIT: LocalizationResource = {
   socialButtonsBlockButton: 'Continua con {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        "Un'organizzazione esiste già per il nome dell'azienda rilevato ({{organizationName}}) e {{organizationDomain}}. Unisciti tramite invito.",
+    },
     chooseOrganization: {
       action__createOrganization: 'Crea nuova organizzazione',
       action__invitationAccept: 'Unisciti',
@@ -887,8 +891,8 @@ export const itIT: LocalizationResource = {
       title: 'Configura la tua organizzazione',
     },
     organizationCreationDisabled: {
-      title: "Devi appartenere a un'organizzazione",
       subtitle: "Contatta l'amministratore della tua organizzazione per un invito.",
+      title: "Devi appartenere a un'organizzazione",
     },
     signOut: {
       actionLink: 'Esci',
@@ -903,6 +907,69 @@ export const itIT: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: 'Sei già un membro di questa organizzazione.',
@@ -931,10 +998,11 @@ export const itIT: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valore non valido.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Password errata.',
-    form_password_or_identifier_incorrect: "La password o l'indirizzo email è errato. Riprova o usa un altro metodo.",
     form_password_length_too_short: 'La password deve avere almeno 8 caratteri.',
     form_password_not_strong_enough: 'La tua password non è abbastanza forte.',
+    form_password_or_identifier_incorrect: "La password o l'indirizzo email è errato. Riprova o usa un altro metodo.",
     form_password_pwned: 'Questa password è stata trovata in una violazione dei dati. Scegli una password diversa.',
     form_password_pwned__sign_in:
       'Questa password è stata trovata in una violazione dei dati. Non può essere utilizzata. Reimposta la tua password.',

@@ -365,6 +365,12 @@ export const caES: LocalizationResource = {
         tableHeader__role: 'Rol',
         tableHeader__user: 'Usuari',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Estem actualitzant els rols disponibles. Un cop fet, podreu tornar a actualitzar els rols.',
+          title: 'Els rols estan temporalment bloquejats',
+        },
+      },
       detailsTitle__emptyRow: 'No hi ha membres per mostrar',
       invitationsTab: {
         autoInvitations: {
@@ -395,12 +401,6 @@ export const caES: LocalizationResource = {
         headerTitle__invitations: 'Invitacions',
         headerTitle__members: 'Membres',
         headerTitle__requests: 'Sol·licituds',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Els rols estan temporalment bloquejats',
-          subtitle: 'Estem actualitzant els rols disponibles. Un cop fet, podreu tornar a actualitzar els rols.',
-        },
       },
     },
     navbar: {
@@ -858,6 +858,10 @@ export const caES: LocalizationResource = {
   socialButtonsBlockButton: 'Continua amb {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        "Ja existeix una organització per al nom d'empresa detectat ({{organizationName}}) i {{organizationDomain}}. Uneix-te per invitació.",
+    },
     chooseOrganization: {
       action__createOrganization: 'Crear nova organització',
       action__invitationAccept: 'Unir-se',
@@ -878,8 +882,8 @@ export const caES: LocalizationResource = {
       title: 'Configureu la vostra organització',
     },
     organizationCreationDisabled: {
-      title: 'Heu de pertànyer a una organització',
       subtitle: "Contacteu amb l'administrador de la vostra organització per obtenir una invitació.",
+      title: 'Heu de pertànyer a una organització',
     },
     signOut: {
       actionLink: 'Tancar sessió',
@@ -894,6 +898,69 @@ export const caES: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
@@ -923,11 +990,12 @@ export const caES: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'La contrasenya introduïda és incorrecta.',
-    form_password_or_identifier_incorrect:
-      "La contrasenya o l'identificador és incorrecte. Torna-ho a intentar o utilitza un altre mètode.",
     form_password_length_too_short: 'La teva contrasenya ha de tenir almenys 8 caràcters.',
     form_password_not_strong_enough: 'La teva contrasenya no és prou forta.',
+    form_password_or_identifier_incorrect:
+      "La contrasenya o l'identificador és incorrecte. Torna-ho a intentar o utilitza un altre mètode.",
     form_password_pwned:
       'Aquesta contrasenya ha aparegut en una filtració i no es pot utilitzar, si us plau, prova una altra contrasenya.',
     form_password_pwned__sign_in: undefined,

@@ -42,6 +42,7 @@ import type {
   SignInFutureEmailCodeVerifyParams,
   SignInFutureEmailLinkSendParams,
   SignInFutureFinalizeParams,
+  SignInFutureMFAEmailCodeVerifyParams,
   SignInFutureMFAPhoneCodeVerifyParams,
   SignInFuturePasskeyParams,
   SignInFuturePasswordParams,
@@ -643,11 +644,13 @@ class SignInFuture implements SignInFutureResource {
   mfa = {
     sendPhoneCode: this.sendMFAPhoneCode.bind(this),
     verifyPhoneCode: this.verifyMFAPhoneCode.bind(this),
+    sendEmailCode: this.sendMFAEmailCode.bind(this),
+    verifyEmailCode: this.verifyMFAEmailCode.bind(this),
     verifyTOTP: this.verifyTOTP.bind(this),
     verifyBackupCode: this.verifyBackupCode.bind(this),
   };
 
-  #hasBeenFinalized = false;
+  #canBeDiscarded = false;
   readonly #resource: SignIn;
 
   constructor(resource: SignIn) {
@@ -707,8 +710,8 @@ class SignInFuture implements SignInFutureResource {
     return this.#resource.secondFactorVerification;
   }
 
-  get hasBeenFinalized() {
-    return this.#hasBeenFinalized;
+  get canBeDiscarded() {
+    return this.#canBeDiscarded;
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: ClerkError | null }> {
@@ -1174,6 +1177,32 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
+  async sendMFAEmailCode(): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
+      const emailCodeFactor = this.#resource.supportedSecondFactors?.find(f => f.strategy === 'email_code');
+
+      if (!emailCodeFactor) {
+        throw new ClerkRuntimeError('Email code factor not found', { code: 'factor_not_found' });
+      }
+
+      const { emailAddressId } = emailCodeFactor;
+      await this.#resource.__internal_basePost({
+        body: { emailAddressId, strategy: 'email_code' },
+        action: 'prepare_second_factor',
+      });
+    });
+  }
+
+  async verifyMFAEmailCode(params: SignInFutureMFAEmailCodeVerifyParams): Promise<{ error: ClerkError | null }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePost({
+        body: { code, strategy: 'email_code' },
+        action: 'attempt_second_factor',
+      });
+    });
+  }
+
   async verifyTOTP(params: SignInFutureTOTPVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.#resource, async () => {
@@ -1213,9 +1242,23 @@ class SignInFuture implements SignInFutureResource {
         await SignIn.clerk.client.reload();
       }
 
-      this.#hasBeenFinalized = true;
+      this.#canBeDiscarded = true;
       await SignIn.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
+  }
+
+  /**
+   * Resets the current sign-in attempt by clearing all local state back to null.
+   * Unlike other methods, this does NOT emit resource:fetch with 'fetching' status,
+   * allowing for smooth UI transitions without loading states.
+   */
+  reset(): Promise<{ error: ClerkError | null }> {
+    if (!SignIn.clerk.client) {
+      throw new Error('Cannot reset sign-in without a client.');
+    }
+    this.#canBeDiscarded = true;
+    SignIn.clerk.client.resetSignIn();
+    return Promise.resolve({ error: null });
   }
 
   private selectFirstFactor(

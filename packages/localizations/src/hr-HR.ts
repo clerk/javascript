@@ -364,6 +364,12 @@ export const hrHR: LocalizationResource = {
         tableHeader__role: 'Uloga',
         tableHeader__user: 'Korisnik',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Ažuriramo dostupne uloge. Kada to završimo, moći ćete ponovno ažurirati uloge.',
+          title: 'Uloge su privremeno zaključane',
+        },
+      },
       detailsTitle__emptyRow: 'Nema članova za prikaz',
       invitationsTab: {
         autoInvitations: {
@@ -394,12 +400,6 @@ export const hrHR: LocalizationResource = {
         headerTitle__invitations: 'Pozivnice',
         headerTitle__members: 'Članovi',
         headerTitle__requests: 'Zahtjevi',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Uloge su privremeno zaključane',
-          subtitle: 'Ažuriramo dostupne uloge. Kada to završimo, moći ćete ponovno ažurirati uloge.',
-        },
       },
     },
     navbar: {
@@ -860,6 +860,10 @@ export const hrHR: LocalizationResource = {
   socialButtonsBlockButton: 'Nastavite s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Organizacija već postoji za otkriveni naziv tvrtke ({{organizationName}}) i {{organizationDomain}}. Pridružite se putem pozivnice.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Stvori novu organizaciju',
       action__invitationAccept: 'Pridruži se',
@@ -880,8 +884,8 @@ export const hrHR: LocalizationResource = {
       title: 'Postavite svoju organizaciju',
     },
     organizationCreationDisabled: {
-      title: 'Morate pripadati organizaciji',
       subtitle: 'Kontaktirajte administratora svoje organizacije za pozivnicu.',
+      title: 'Morate pripadati organizaciji',
     },
     signOut: {
       actionLink: 'Odjavi se',
@@ -896,6 +900,69 @@ export const hrHR: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je već član organizacije.',
@@ -925,11 +992,12 @@ export const hrHR: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect:
-      'Lozinka ili e-mail adresa nisu točne. Pokušajte ponovno ili koristite drugu metodu.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Vaša lozinka nije dovoljno jaka.',
+    form_password_or_identifier_incorrect:
+      'Lozinka ili e-mail adresa nisu točne. Pokušajte ponovno ili koristite drugu metodu.',
     form_password_pwned:
       'Ova lozinka je pronađena kao dio curenja podataka i ne može se koristiti, molimo pokušajte s drugom lozinkom.',
     form_password_pwned__sign_in:

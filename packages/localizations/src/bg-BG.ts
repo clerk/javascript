@@ -365,6 +365,12 @@ export const bgBG: LocalizationResource = {
         tableHeader__role: 'Роля',
         tableHeader__user: 'Потребител',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Актуализираме наличните роли. Когато това приключи, ще можете отново да актуализирате ролите.',
+          title: 'Ролите са временно заключени',
+        },
+      },
       detailsTitle__emptyRow: 'Няма членове за показване',
       invitationsTab: {
         autoInvitations: {
@@ -395,12 +401,6 @@ export const bgBG: LocalizationResource = {
         headerTitle__invitations: 'Покани',
         headerTitle__members: 'Членове',
         headerTitle__requests: 'Заявки',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Ролите са временно заключени',
-          subtitle: 'Актуализираме наличните роли. Когато това приключи, ще можете отново да актуализирате ролите.',
-        },
       },
     },
     navbar: {
@@ -859,6 +859,10 @@ export const bgBG: LocalizationResource = {
   socialButtonsBlockButton: 'Продължи с {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Организация вече съществува за откритото име на компанията ({{organizationName}}) и {{organizationDomain}}. Присъединете се чрез покана.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Създай нова организация',
       action__invitationAccept: 'Присъедини се',
@@ -879,8 +883,8 @@ export const bgBG: LocalizationResource = {
       title: 'Настройте вашата организация',
     },
     organizationCreationDisabled: {
-      title: 'Трябва да принадлежите към организация',
       subtitle: 'Свържете се с администратора на вашата организация за покана.',
+      title: 'Трябва да принадлежите към организация',
     },
     signOut: {
       actionLink: 'Изход',
@@ -895,6 +899,69 @@ export const bgBG: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: 'Вие вече сте член на тази организация.',
@@ -922,12 +989,13 @@ export const bgBG: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Невалидна парола. Моля, опитайте отново.',
-    form_password_or_identifier_incorrect:
-      'Паролата или имейл адресът са невалидни. Моля, опитайте отново или използвайте друг метод.',
     form_password_length_too_short: 'Паролата е твърде кратка. Моля, въведете поне 8 символа.',
     form_password_not_strong_enough:
       'Паролата трябва да съдържа поне една главна буква, една цифра и един специален символ.',
+    form_password_or_identifier_incorrect:
+      'Паролата или имейл адресът са невалидни. Моля, опитайте отново или използвайте друг метод.',
     form_password_pwned: 'Тази парола е компрометирана в изтекли данни. Моля, изберете друга.',
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded: 'Паролата ви е твърде дълга. Моля, съкратете я.',

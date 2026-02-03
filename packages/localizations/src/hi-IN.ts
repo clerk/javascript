@@ -366,6 +366,13 @@ export const hiIN: LocalizationResource = {
         tableHeader__role: 'भूमिका',
         tableHeader__user: 'उपयोगकर्ता',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'हम उपलब्ध भूमिकाओं को अपडेट कर रहे हैं। एक बार यह हो जाने के बाद, आप फिर से भूमिकाएं अपडेट कर सकेंगे।',
+          title: 'भूमिकाएं अस्थायी रूप से लॉक हैं',
+        },
+      },
       detailsTitle__emptyRow: 'प्रदर्शित करने के लिए कोई सदस्य नहीं',
       invitationsTab: {
         autoInvitations: {
@@ -396,13 +403,6 @@ export const hiIN: LocalizationResource = {
         headerTitle__invitations: 'आमंत्रण',
         headerTitle__members: 'सदस्य',
         headerTitle__requests: 'अनुरोध',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'भूमिकाएं अस्थायी रूप से लॉक हैं',
-          subtitle:
-            'हम उपलब्ध भूमिकाओं को अपडेट कर रहे हैं। एक बार यह हो जाने के बाद, आप फिर से भूमिकाएं अपडेट कर सकेंगे।',
-        },
       },
     },
     navbar: {
@@ -864,6 +864,10 @@ export const hiIN: LocalizationResource = {
   socialButtonsBlockButton: '{{provider|titleize}} के साथ जारी रखें',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'पता लगाई गई कंपनी के नाम ({{organizationName}}) और {{organizationDomain}} के लिए एक संगठन पहले से मौजूद है। आमंत्रण द्वारा शामिल हों।',
+    },
     chooseOrganization: {
       action__createOrganization: 'नया संगठन बनाएं',
       action__invitationAccept: 'शामिल हों',
@@ -884,8 +888,8 @@ export const hiIN: LocalizationResource = {
       title: 'अपने संगठन को सेटअप करें',
     },
     organizationCreationDisabled: {
-      title: 'आपको किसी संगठन से संबंधित होना चाहिए',
       subtitle: 'आमंत्रण के लिए अपने संगठन के व्यवस्थापक से संपर्क करें।',
+      title: 'आपको किसी संगठन से संबंधित होना चाहिए',
     },
     signOut: {
       actionLink: 'साइन आउट',
@@ -900,6 +904,69 @@ export const hiIN: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} पहले से ही संगठन का सदस्य है।',
@@ -928,11 +995,12 @@ export const hiIN: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'दर्ज किया गया मान अमान्य है। कृपया इसे सही करें।',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'आपके द्वारा दर्ज किया गया पासवर्ड गलत है। कृपया पुनः प्रयास करें।',
-    form_password_or_identifier_incorrect:
-      'पासवर्ड या ईमेल पता गलत है। कृपया पुनः प्रयास करें या किसी अन्य विधि का उपयोग करें।',
     form_password_length_too_short: 'आपका पासवर्ड बहुत छोटा है। इसमें कम से कम 8 अक्षर होने चाहिए।',
     form_password_not_strong_enough: 'आपका पासवर्ड पर्याप्त मजबूत नहीं है।',
+    form_password_or_identifier_incorrect:
+      'पासवर्ड या ईमेल पता गलत है। कृपया पुनः प्रयास करें या किसी अन्य विधि का उपयोग करें।',
     form_password_pwned:
       'यह पासवर्ड डेटा उल्लंघन के हिस्से के रूप में पाया गया है और इसका उपयोग नहीं किया जा सकता, कृपया इसके बजाय दूसरा पासवर्ड आज़माएं।',
     form_password_pwned__sign_in:

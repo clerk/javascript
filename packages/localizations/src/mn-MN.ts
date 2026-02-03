@@ -365,6 +365,13 @@ export const mnMN: LocalizationResource = {
         tableHeader__role: 'Үүрэг',
         tableHeader__user: 'Хэрэглэгч',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Бид боломжтой дүрүүдийг шинэчилж байна. Дууссаны дараа та дүрүүдийг дахин шинэчлэх боломжтой болно.',
+          title: 'Дүрүүд түр хугацаанд түгжигдсэн байна',
+        },
+      },
       detailsTitle__emptyRow: 'Харуулах гишүүн алга',
       invitationsTab: {
         autoInvitations: {
@@ -395,13 +402,6 @@ export const mnMN: LocalizationResource = {
         headerTitle__invitations: 'Урилга',
         headerTitle__members: 'Гишүүд',
         headerTitle__requests: 'Хүсэлтүүд',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Дүрүүд түр хугацаанд түгжигдсэн байна',
-          subtitle:
-            'Бид боломжтой дүрүүдийг шинэчилж байна. Дууссаны дараа та дүрүүдийг дахин шинэчлэх боломжтой болно.',
-        },
       },
     },
     navbar: {
@@ -859,6 +859,10 @@ export const mnMN: LocalizationResource = {
   socialButtonsBlockButton: '{{provider|titleize}}-р үргэлжлүүлэх',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Илрүүлсэн компанийн нэр ({{organizationName}}) болон {{organizationDomain}}-д байгууллага аль хэдийн байна. Урилгаар нэгдэнэ үү.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Шинэ байгууллага үүсгэх',
       action__invitationAccept: 'Нэгдэх',
@@ -879,8 +883,8 @@ export const mnMN: LocalizationResource = {
       title: 'Байгууллагаа тохируулах',
     },
     organizationCreationDisabled: {
-      title: 'Та байгууллагад харьяалагдах ёстой',
       subtitle: 'Урилга авахын тулд байгууллагын админтай холбогдоно уу.',
+      title: 'Та байгууллагад харьяалагдах ёстой',
     },
     signOut: {
       actionLink: 'Гарах',
@@ -895,6 +899,69 @@ export const mnMN: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
@@ -923,11 +990,12 @@ export const mnMN: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Нууц үг буруу байна.',
-    form_password_or_identifier_incorrect:
-      'Нууц үг эсвэл имэйл хаяг буруу байна. Дахин оролдох эсвэл өөр арга ашиглана уу.',
     form_password_length_too_short: 'Нууц үгийн урт хэт богино байна.',
     form_password_not_strong_enough: 'Таны нууц үг хангалттай хүчтэй биш байна.',
+    form_password_or_identifier_incorrect:
+      'Нууц үг эсвэл имэйл хаяг буруу байна. Дахин оролдох эсвэл өөр арга ашиглана уу.',
     form_password_pwned:
       'Энэ нууц үгийг зөрчлийн нэг хэсэг гэж олсон тул ашиглах боломжгүй, оронд нь өөр нууц үг оролдоно уу.',
     form_password_pwned__sign_in: undefined,

@@ -513,4 +513,27 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     // await expect(u.page.getByText('Loading')).toBeHidden();
     await expect(u.page.getByText("I'm an admin")).toBeVisible({ timeout: 15_000 });
   });
+
+  test('Show component works correctly on prerendered pages', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // Visit prerendered page when signed out
+    await u.page.goToRelative('/prerendered');
+    await expect(u.page.getByText('🔒 You are signed out.')).toBeVisible();
+    await expect(u.page.getByText('✅ You are signed in!')).not.toBeVisible();
+
+    // Sign in
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({
+      email: fakeAdmin.email,
+      password: fakeAdmin.password,
+    });
+    await u.po.expect.toBeSignedIn();
+
+    // Visit prerendered page when signed in
+    await u.page.goToRelative('/prerendered');
+    await expect(u.page.getByText('✅ You are signed in!')).toBeVisible();
+    await expect(u.page.getByText('🔒 You are signed out.')).not.toBeVisible();
+  });
 });

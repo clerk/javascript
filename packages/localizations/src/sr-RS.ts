@@ -364,6 +364,12 @@ export const srRS: LocalizationResource = {
         tableHeader__role: 'Uloga',
         tableHeader__user: 'Korisnik',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Ažuriramo dostupne uloge. Kada to bude završeno, moći ćete ponovo da ažurirate uloge.',
+          title: 'Uloge su privremeno zaključane',
+        },
+      },
       detailsTitle__emptyRow: 'Nema članova za prikaz',
       invitationsTab: {
         autoInvitations: {
@@ -394,12 +400,6 @@ export const srRS: LocalizationResource = {
         headerTitle__invitations: 'Pozivnice',
         headerTitle__members: 'Članovi',
         headerTitle__requests: 'Zahtevi',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Uloge su privremeno zaključane',
-          subtitle: 'Ažuriramo dostupne uloge. Kada to bude završeno, moći ćete ponovo da ažurirate uloge.',
-        },
       },
     },
     navbar: {
@@ -856,6 +856,10 @@ export const srRS: LocalizationResource = {
   socialButtonsBlockButton: 'Nastavi sa {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Organizacija već postoji za otkriveno ime kompanije ({{organizationName}}) i {{organizationDomain}}. Pridružite se putem pozivnice.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Napravi novu organizaciju',
       action__invitationAccept: 'Pridruži se',
@@ -876,8 +880,8 @@ export const srRS: LocalizationResource = {
       title: 'Podesite svoju organizaciju',
     },
     organizationCreationDisabled: {
-      title: 'Morate pripadati organizaciji',
       subtitle: 'Kontaktirajte administratora svoje organizacije za pozivnicu.',
+      title: 'Morate pripadati organizaciji',
     },
     signOut: {
       actionLink: 'Odjavi se',
@@ -892,6 +896,69 @@ export const srRS: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
@@ -920,11 +987,12 @@ export const srRS: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Lozinka je netačna.',
-    form_password_or_identifier_incorrect:
-      'Лозинка или адреса е-поште је нетачна. Покушај поново или користи други метод.',
     form_password_length_too_short: 'Lozinka je prekratka.',
     form_password_not_strong_enough: 'Tvoja lozinka nije dovoljno jaka.',
+    form_password_or_identifier_incorrect:
+      'Лозинка или адреса е-поште је нетачна. Покушај поново или користи други метод.',
     form_password_pwned:
       'Ova lozinka je pronađena kao deo kompromitovanih podataka i ne može se koristiti, molimo pokušaj sa drugom lozinkom.',
     form_password_pwned__sign_in:

@@ -365,6 +365,12 @@ export const isIS: LocalizationResource = {
         tableHeader__role: 'Hlutverk',
         tableHeader__user: 'Notandi',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Við erum að uppfæra tiltæk hlutverk. Þegar því er lokið geturðu uppfært hlutverk aftur.',
+          title: 'Hlutverk eru tímabundið læst',
+        },
+      },
       detailsTitle__emptyRow: 'Engir meðlimir til að sýna',
       invitationsTab: {
         autoInvitations: {
@@ -395,12 +401,6 @@ export const isIS: LocalizationResource = {
         headerTitle__invitations: 'Boð',
         headerTitle__members: 'Meðlimir',
         headerTitle__requests: 'Beiðnir',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Hlutverk eru tímabundið læst',
-          subtitle: 'Við erum að uppfæra tiltæk hlutverk. Þegar því er lokið geturðu uppfært hlutverk aftur.',
-        },
       },
     },
     navbar: {
@@ -860,6 +860,10 @@ export const isIS: LocalizationResource = {
   socialButtonsBlockButton: 'Halda áfram með {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Fyrirtæki er þegar til fyrir uppgötvaða fyrirtækjanafnið ({{organizationName}}) og {{organizationDomain}}. Skráðu þig með boði.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Stofna samtök',
       action__invitationAccept: 'Ganga í',
@@ -880,8 +884,8 @@ export const isIS: LocalizationResource = {
       title: 'Stilltu samtökin þín',
     },
     organizationCreationDisabled: {
-      title: 'Þú verður að tilheyra samtökum',
       subtitle: 'Hafðu samband við stjórnanda samtakanna til að fá boð.',
+      title: 'Þú verður að tilheyra samtökum',
     },
     signOut: {
       actionLink: 'Skrá út',
@@ -896,6 +900,69 @@ export const isIS: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
@@ -924,10 +991,11 @@ export const isIS: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect: 'Lykilorðið eða netfangið er rangt. Reyndu aftur eða notaðu aðra aðferð.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Lykilorðið þitt er ekki nógu sterkt.',
+    form_password_or_identifier_incorrect: 'Lykilorðið eða netfangið er rangt. Reyndu aftur eða notaðu aðra aðferð.',
     form_password_pwned:
       'Þetta lykilorð hefur fundist sem hluti af öryggisbresti og má ekki nota, vinsamlegast reyndu annað lykilorð.',
     form_password_pwned__sign_in:

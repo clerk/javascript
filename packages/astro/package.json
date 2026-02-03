@@ -59,6 +59,7 @@
       "types": "./dist/webhooks.d.ts",
       "default": "./dist/webhooks.js"
     },
+    "./types": "./dist/types/index.d.ts",
     "./env": "./env.d.ts",
     "./components": "./components/index.ts",
     "./package.json": "./package.json"

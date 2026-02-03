@@ -57,8 +57,9 @@ describe('useSubscription', () => {
     defaultQueryClient.client.clear();
   });
 
-  it('does not fetch when billing disabled for user', () => {
+  it('does not fetch when billing disabled', () => {
     mockClerk.__internal_environment.commerceSettings.billing.user.enabled = false;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = false;
 
     const { result } = renderHook(() => useSubscription(), { wrapper });
 
@@ -105,14 +106,7 @@ describe('useSubscription', () => {
     mockUser = null;
     rerender();
 
-    if (__CLERK_USE_RQ__) {
-      await waitFor(() => expect(result.current.data).toBeUndefined());
-    } else {
-      // Assert that SWR will flip to fetching because the fetcherFN runs, but it forces `null` when userId is falsy.
-      await waitFor(() => expect(result.current.isFetching).toBe(true));
-      // The fetcher returns null when userId is falsy, so data should become null
-      await waitFor(() => expect(result.current.data).toBeNull());
-    }
+    await waitFor(() => expect(result.current.data).toBeUndefined());
 
     expect(getSubscriptionSpy).toHaveBeenCalledTimes(1);
     expect(result.current.isFetching).toBe(false);
@@ -133,15 +127,7 @@ describe('useSubscription', () => {
     mockUser = null;
     rerender({ kp: true });
 
-    if (__CLERK_USE_RQ__) {
-      await waitFor(() => expect(result.current.data).toBeUndefined());
-    } else {
-      // Assert that SWR will flip to fetching because the fetcherFN runs, but it forces `null` when userId is falsy.
-      await waitFor(() => expect(result.current.isFetching).toBe(true));
-
-      // The fetcher returns null when userId is falsy, so data should become null
-      await waitFor(() => expect(result.current.data).toBeNull());
-    }
+    await waitFor(() => expect(result.current.data).toBeUndefined());
 
     expect(getSubscriptionSpy).toHaveBeenCalledTimes(1);
     expect(result.current.isFetching).toBe(false);
@@ -169,12 +155,7 @@ describe('useSubscription', () => {
 
     await waitFor(() => expect(result.current.isFetching).toBe(true));
 
-    // Slight difference in behavior between SWR and React Query, but acceptable for the migration.
-    if (__CLERK_USE_RQ__) {
-      await waitFor(() => expect(result.current.isLoading).toBe(false));
-    } else {
-      await waitFor(() => expect(result.current.isLoading).toBe(true));
-    }
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.data).toEqual({ id: 'sub_org_org_1' });
 
     deferred.resolve({ id: 'sub_org_org_2' });

@@ -364,6 +364,12 @@ export const arSA: LocalizationResource = {
         tableHeader__role: 'دور',
         tableHeader__user: 'مستخدم',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'نحن نقوم بتحديث الأدوار المتاحة. بمجرد الانتهاء، ستتمكن من تحديث الأدوار مرة أخرى.',
+          title: 'الأدوار مقفلة مؤقتًا',
+        },
+      },
       detailsTitle__emptyRow: 'لا يوجد أعضاء للعرض',
       invitationsTab: {
         autoInvitations: {
@@ -394,12 +400,6 @@ export const arSA: LocalizationResource = {
         headerTitle__invitations: 'الدعوات',
         headerTitle__members: 'الأعضاء',
         headerTitle__requests: 'الطلبات',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'الأدوار مقفلة مؤقتًا',
-          subtitle: 'نحن نقوم بتحديث الأدوار المتاحة. بمجرد الانتهاء، ستتمكن من تحديث الأدوار مرة أخرى.',
-        },
       },
     },
     navbar: {
@@ -855,6 +855,10 @@ export const arSA: LocalizationResource = {
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'توجد منظمة بالفعل لاسم الشركة المكتشف ({{organizationName}}) و {{organizationDomain}}. انضم عن طريق الدعوة.',
+    },
     chooseOrganization: {
       action__createOrganization: 'إنشاء منظمة جديدة',
       action__invitationAccept: 'انضم',
@@ -875,8 +879,8 @@ export const arSA: LocalizationResource = {
       title: 'إعداد منظمتك',
     },
     organizationCreationDisabled: {
-      title: 'يجب أن تنتمي إلى منظمة',
       subtitle: 'تواصل مع مسؤول منظمتك للحصول على دعوة.',
+      title: 'يجب أن تنتمي إلى منظمة',
     },
     signOut: {
       actionLink: 'تسجيل الخروج',
@@ -891,6 +895,69 @@ export const arSA: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
@@ -919,11 +986,12 @@ export const arSA: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect:
-      'كلمة المرور أو عنوان البريد الإلكتروني غير صحيح. حاول مرة أخرى أو استخدم طريقة أخرى.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'كلمة المرور ليست قوية',
+    form_password_or_identifier_incorrect:
+      'كلمة المرور أو عنوان البريد الإلكتروني غير صحيح. حاول مرة أخرى أو استخدم طريقة أخرى.',
     form_password_pwned: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',
     form_password_pwned__sign_in: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',
     form_password_size_in_bytes_exceeded:

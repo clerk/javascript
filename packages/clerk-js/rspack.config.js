@@ -14,8 +14,7 @@ const variants = {
   clerk: 'clerk',
   clerkNoRHC: 'clerk.no-rhc', // Omit Remotely Hosted Code
   clerkBrowser: 'clerk.browser',
-  clerkHeadless: 'clerk.headless',
-  clerkHeadlessBrowser: 'clerk.headless.browser',
+  clerkNative: 'clerk.native', // For React Native (no chunk splitting)
   clerkLegacyBrowser: 'clerk.legacy.browser',
   clerkCHIPS: 'clerk.chips.browser',
 };
@@ -24,8 +23,7 @@ const variantToSourceFile = {
   [variants.clerk]: './src/index.ts',
   [variants.clerkNoRHC]: './src/index.ts',
   [variants.clerkBrowser]: './src/index.browser.ts',
-  [variants.clerkHeadless]: './src/index.headless.ts',
-  [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
+  [variants.clerkNative]: './src/index.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
   [variants.clerkCHIPS]: './src/index.browser.ts',
 };
@@ -229,16 +227,6 @@ const commonForProd = () => {
   };
 };
 
-// /** @type { () => (import('webpack').Configuration) } */
-// const externalsForHeadless = () => {
-//   return {
-//     externals: {
-//       react: 'react',
-//       'react-dom': 'react-dom',
-//     },
-//   };
-// };
-
 /**
  *
  * @param {string} variant
@@ -292,14 +280,13 @@ const prodConfig = ({ mode, env, analysis }) => {
     commonForProdChunked({ targets: packageJSON.browserslistLegacy, useCoreJs: true }),
   );
 
-  const clerkHeadless = merge(
-    entryForVariant(variants.clerkHeadless),
-    common({ mode, variant: variants.clerkHeadless }),
+  const clerkNative = merge(
+    entryForVariant(variants.clerkNative),
+    common({ mode, variant: variants.clerkNative }),
     commonForProd(),
     commonForProdChunked(),
-    // Disable chunking for the headless variant, since it's meant to be used in a non-browser environment and
-    // attempting to load chunks causes issues due to usage of a dynamic publicPath. We generally are only concerned with
-    // chunking in our browser bundles.
+    // Disable chunking for the native variant, since it's meant to be used in React Native
+    // where dynamic chunk loading is not supported.
     {
       output: {
         publicPath: '',
@@ -308,15 +295,6 @@ const prodConfig = ({ mode, env, analysis }) => {
         splitChunks: false,
       },
     },
-    // externalsForHeadless(),
-  );
-
-  const clerkHeadlessBrowser = merge(
-    entryForVariant(variants.clerkHeadlessBrowser),
-    common({ mode, variant: variants.clerkHeadlessBrowser }),
-    commonForProd(),
-    commonForProdChunked(),
-    // externalsForHeadless(),
   );
 
   const clerkCHIPS = merge(
@@ -434,17 +412,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     return [clerkBrowser];
   }
 
-  return [
-    clerkBrowser,
-    clerkLegacyBrowser,
-    clerkHeadless,
-    clerkHeadlessBrowser,
-    clerkCHIPS,
-    clerkEsm,
-    clerkEsmNoRHC,
-    clerkCjs,
-    clerkCjsNoRHC,
-  ];
+  return [clerkBrowser, clerkLegacyBrowser, clerkNative, clerkCHIPS, clerkEsm, clerkEsmNoRHC, clerkCjs, clerkCjsNoRHC];
 };
 
 /**
@@ -534,17 +502,10 @@ const devConfig = ({ mode, env }) => {
       common({ mode, disableRHC: true, variant: variants.clerkBrowserNoRHC }),
       commonForDev(),
     ),
-    [variants.clerkHeadless]: merge(
-      entryForVariant(variants.clerkHeadless),
-      common({ mode, variant: variants.clerkHeadless }),
+    [variants.clerkNative]: merge(
+      entryForVariant(variants.clerkNative),
+      common({ mode, variant: variants.clerkNative }),
       commonForDev(),
-      // externalsForHeadless(),
-    ),
-    [variants.clerkHeadlessBrowser]: merge(
-      entryForVariant(variants.clerkHeadlessBrowser),
-      common({ mode, variant: variants.clerkHeadlessBrowser }),
-      commonForDev(),
-      // externalsForHeadless(),
     ),
     [variants.clerkCHIPS]: merge(
       entryForVariant(variants.clerkCHIPS),

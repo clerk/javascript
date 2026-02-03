@@ -366,6 +366,13 @@ export const teIN: LocalizationResource = {
         tableHeader__role: 'పాత్ర',
         tableHeader__user: 'వినియోగదారు',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'మేము అందుబాటులో ఉన్న పాత్రలను అప్‌డేట్ చేస్తున్నాము. అది పూర్తయిన తర్వాత, మీరు మళ్ళీ పాత్రలను అప్‌డేట్ చేయగలరు.',
+          title: 'పాత్రలు తాత్కాలికంగా లాక్ చేయబడ్డాయి',
+        },
+      },
       detailsTitle__emptyRow: 'ప్రదర్శించడానికి సభ్యులు లేరు',
       invitationsTab: {
         autoInvitations: {
@@ -396,13 +403,6 @@ export const teIN: LocalizationResource = {
         headerTitle__invitations: 'ఆహ్వానాలు',
         headerTitle__members: 'సభ్యులు',
         headerTitle__requests: 'అభ్యర్థనలు',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'పాత్రలు తాత్కాలికంగా లాక్ చేయబడ్డాయి',
-          subtitle:
-            'మేము అందుబాటులో ఉన్న పాత్రలను అప్‌డేట్ చేస్తున్నాము. అది పూర్తయిన తర్వాత, మీరు మళ్ళీ పాత్రలను అప్‌డేట్ చేయగలరు.',
-        },
       },
     },
     navbar: {
@@ -866,6 +866,10 @@ export const teIN: LocalizationResource = {
   socialButtonsBlockButton: '{{provider|titleize}}తో కొనసాగించండి',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'గుర్తించిన కంపెనీ పేరు ({{organizationName}}) మరియు {{organizationDomain}} కోసం ఒక సంస్థ ఇప్పటికే ఉంది. ఆహ్వానం ద్వారా చేరండి.',
+    },
     chooseOrganization: {
       action__createOrganization: 'కొత్త సంస్థను సృష్టించండి',
       action__invitationAccept: 'చేరండి',
@@ -886,8 +890,8 @@ export const teIN: LocalizationResource = {
       title: 'మీ సంస్థను సెటప్ చేయండి',
     },
     organizationCreationDisabled: {
-      title: 'మీరు ఒక సంస్థకు చెంది ఉండాలి',
       subtitle: 'ఆహ్వానం కోసం మీ సంస్థ నిర్వాహకుడిని సంప్రదించండి.',
+      title: 'మీరు ఒక సంస్థకు చెంది ఉండాలి',
     },
     signOut: {
       actionLink: 'సైన్ అవుట్',
@@ -902,6 +906,69 @@ export const teIN: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ఇప్పటికే సంస్థ సభ్యుడు.',
@@ -930,11 +997,12 @@ export const teIN: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'నమోదు చేసిన విలువ చెల్లనిది. దయచేసి దిద్దుబాటు చేయండి.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'మీరు నమోదు చేసిన పాస్‌వర్డ్ తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి.',
-    form_password_or_identifier_incorrect:
-      'పాస్‌వర్డ్ లేదా ఇమెయిల్ చిరునామా తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి లేదా మరొక పద్ధతిని ఉపయోగించండి.',
     form_password_length_too_short: 'మీ పాస్‌వర్డ్ చాలా చిన్నది. ఇది కనీసం 8 అక్షరాల పొడవు ఉండాలి.',
     form_password_not_strong_enough: 'మీ పాస్‌వర్డ్ సరిపడా బలంగా లేదు.',
+    form_password_or_identifier_incorrect:
+      'పాస్‌వర్డ్ లేదా ఇమెయిల్ చిరునామా తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి లేదా మరొక పద్ధతిని ఉపయోగించండి.',
     form_password_pwned:
       'ఈ పాస్‌వర్డ్ డేటా ఉల్లంఘన భాగంగా కనుగొనబడింది మరియు ఉపయోగించడానికి వీలుపడదు, దయచేసి మరొక పాస్‌వర్డ్‌ను ప్రయత్నించండి.',
     form_password_pwned__sign_in:

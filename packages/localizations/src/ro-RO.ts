@@ -372,6 +372,13 @@ export const roRO: LocalizationResource = {
         tableHeader__role: 'Rol',
         tableHeader__user: 'Utilizator',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Actualizăm rolurile disponibile. Odată ce acest lucru este finalizat, veți putea actualiza din nou rolurile.',
+          title: 'Rolurile sunt temporar blocate',
+        },
+      },
       detailsTitle__emptyRow: 'Nu sunt membri de afișat',
       invitationsTab: {
         autoInvitations: {
@@ -402,13 +409,6 @@ export const roRO: LocalizationResource = {
         headerTitle__invitations: 'Invitații',
         headerTitle__members: 'Membri',
         headerTitle__requests: 'Ceri de acces',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Rolurile sunt temporar blocate',
-          subtitle:
-            'Actualizăm rolurile disponibile. Odată ce acest lucru este finalizat, veți putea actualiza din nou rolurile.',
-        },
       },
     },
     navbar: {
@@ -872,6 +872,10 @@ export const roRO: LocalizationResource = {
   socialButtonsBlockButton: 'Continuă cu {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Există deja o organizație pentru numele companiei detectate ({{organizationName}}) și {{organizationDomain}}. Alătură-te prin invitație.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Creează organizație nouă',
       action__invitationAccept: 'Alătură-te',
@@ -892,8 +896,8 @@ export const roRO: LocalizationResource = {
       title: 'Configurează-ți organizația',
     },
     organizationCreationDisabled: {
-      title: 'Trebuie să aparții unei organizații',
       subtitle: 'Contactează administratorul organizației tale pentru o invitație.',
+      title: 'Trebuie să aparții unei organizații',
     },
     signOut: {
       actionLink: 'Deconectează-te',
@@ -908,6 +912,69 @@ export const roRO: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} este deja membru al organizației.',
@@ -937,11 +1004,12 @@ export const roRO: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect:
-      'Parola sau adresa de e-mail este incorectă. Încearcă din nou sau folosește o altă metodă.',
     form_password_length_too_short: 'Parola este prea scurtă. Trebuie să aibă cel puțin 8 caractere.',
     form_password_not_strong_enough: 'Parola ta nu este suficient de puternică.',
+    form_password_or_identifier_incorrect:
+      'Parola sau adresa de e-mail este incorectă. Încearcă din nou sau folosește o altă metodă.',
     form_password_pwned:
       'Această parolă a fost găsită într-o breșă de securitate și nu poate fi folosită. Te rugăm alege alta.',
     form_password_pwned__sign_in:

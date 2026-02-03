@@ -365,6 +365,13 @@ export const idID: LocalizationResource = {
         tableHeader__role: 'Peran',
         tableHeader__user: 'Pengguna',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Kami sedang memperbarui peran yang tersedia. Setelah selesai, Anda akan dapat memperbarui peran lagi.',
+          title: 'Peran untuk sementara terkunci',
+        },
+      },
       detailsTitle__emptyRow: 'Tidak ada anggota untuk ditampilkan',
       invitationsTab: {
         autoInvitations: {
@@ -395,13 +402,6 @@ export const idID: LocalizationResource = {
         headerTitle__invitations: 'Undangan',
         headerTitle__members: 'Anggota',
         headerTitle__requests: 'Permintaan',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Peran untuk sementara terkunci',
-          subtitle:
-            'Kami sedang memperbarui peran yang tersedia. Setelah selesai, Anda akan dapat memperbarui peran lagi.',
-        },
       },
     },
     navbar: {
@@ -865,6 +865,10 @@ export const idID: LocalizationResource = {
   socialButtonsBlockButton: 'Lanjutkan dengan {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Organisasi sudah ada untuk nama perusahaan yang terdeteksi ({{organizationName}}) dan {{organizationDomain}}. Bergabung melalui undangan.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Buat organisasi baru',
       action__invitationAccept: 'Bergabung',
@@ -885,8 +889,8 @@ export const idID: LocalizationResource = {
       title: 'Atur organisasi Anda',
     },
     organizationCreationDisabled: {
-      title: 'Anda harus menjadi anggota organisasi',
       subtitle: 'Hubungi admin organisasi Anda untuk mendapatkan undangan.',
+      title: 'Anda harus menjadi anggota organisasi',
     },
     signOut: {
       actionLink: 'Keluar',
@@ -901,6 +905,69 @@ export const idID: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi anggota organisasi.',
@@ -929,10 +996,11 @@ export const idID: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect: 'Kata sandi atau alamat email salah. Coba lagi atau gunakan metode lain.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Kata sandi Anda tidak cukup kuat.',
+    form_password_or_identifier_incorrect: 'Kata sandi atau alamat email salah. Coba lagi atau gunakan metode lain.',
     form_password_pwned:
       'Kata sandi ini telah ditemukan sebagai bagian dari kebocoran data dan tidak dapat digunakan, silakan coba kata sandi lain.',
     form_password_pwned__sign_in:

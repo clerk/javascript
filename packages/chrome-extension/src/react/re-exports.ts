@@ -30,11 +30,13 @@ export {
   useClerk,
   useEmailLink,
   useOrganization,
+  useOrganizationCreationDefaults,
   useOrganizationList,
   useReverification,
   useSession,
   useSessionList,
   useSignIn,
   useSignUp,
+  useWaitlist,
   useUser,
 } from '@clerk/react';

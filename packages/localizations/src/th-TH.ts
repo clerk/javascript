@@ -369,6 +369,12 @@ export const thTH: LocalizationResource = {
         tableHeader__role: 'บทบาท',
         tableHeader__user: 'ผู้ใช้',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'เรากำลังอัปเดตบทบาทที่มีอยู่ เมื่อเสร็จแล้ว คุณจะสามารถอัปเดตบทบาทได้อีกครั้ง',
+          title: 'บทบาทถูกล็อคชั่วคราว',
+        },
+      },
       detailsTitle__emptyRow: 'ไม่มีสมาชิกที่จะแสดง',
       invitationsTab: {
         autoInvitations: {
@@ -398,12 +404,6 @@ export const thTH: LocalizationResource = {
         headerTitle__invitations: 'คำเชิญ',
         headerTitle__members: 'สมาชิก',
         headerTitle__requests: 'คำขอ',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'บทบาทถูกล็อคชั่วคราว',
-          subtitle: 'เรากำลังอัปเดตบทบาทที่มีอยู่ เมื่อเสร็จแล้ว คุณจะสามารถอัปเดตบทบาทได้อีกครั้ง',
-        },
       },
     },
     navbar: {
@@ -859,6 +859,10 @@ export const thTH: LocalizationResource = {
   socialButtonsBlockButton: 'ดำเนินการต่อด้วย {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'องค์กรสำหรับชื่อบริษัทที่ตรวจพบ ({{organizationName}}) และ {{organizationDomain}} มีอยู่แล้ว เข้าร่วมโดยการเชิญ',
+    },
     chooseOrganization: {
       action__createOrganization: 'สร้างองค์กรใหม่',
       action__invitationAccept: 'เข้าร่วม',
@@ -879,8 +883,8 @@ export const thTH: LocalizationResource = {
       title: 'ตั้งค่าองค์กรของคุณ',
     },
     organizationCreationDisabled: {
-      title: 'คุณต้องเป็นสมาชิกขององค์กร',
       subtitle: 'ติดต่อผู้ดูแลระบบขององค์กรของคุณเพื่อขอคำเชิญ',
+      title: 'คุณต้องเป็นสมาชิกขององค์กร',
     },
     signOut: {
       actionLink: 'ออกจากระบบ',
@@ -895,6 +899,69 @@ export const thTH: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} เป็นสมาชิกขององค์กรอยู่แล้ว',
@@ -921,10 +988,11 @@ export const thTH: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect: 'รหัสผ่านหรือที่อยู่อีเมลไม่ถูกต้อง ลองอีกครั้งหรือใช้วิธีอื่น',
     form_password_length_too_short: 'รหัสผ่านของคุณสั้นเกินไป ต้องมีความยาวอย่างน้อย 8 ตัวอักษร',
     form_password_not_strong_enough: 'รหัสผ่านของคุณไม่แข็งแกร่งพอ',
+    form_password_or_identifier_incorrect: 'รหัสผ่านหรือที่อยู่อีเมลไม่ถูกต้อง ลองอีกครั้งหรือใช้วิธีอื่น',
     form_password_pwned:
       'รหัสผ่านนี้ถูกพบว่าเป็นส่วนหนึ่งของรหัสผ่านที่เคยถูกโจรกรรมข้อมูลและไม่สามารถใช้ได้ โปรดลองใช้รหัสผ่านอื่นแทน',
     form_password_pwned__sign_in:

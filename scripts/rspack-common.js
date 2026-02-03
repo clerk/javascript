@@ -47,6 +47,7 @@ const typescriptLoaderProd = ({ targets, useCoreJs = false } = {}) => {
             ...(useCoreJs
               ? {
                   mode: 'usage',
+                  // eslint-disable-next-line @typescript-eslint/no-require-imports
                   coreJs: require('core-js/package.json').version,
                 }
               : {}),

@@ -370,6 +370,12 @@ export const viVN: LocalizationResource = {
         tableHeader__role: 'Vai trò',
         tableHeader__user: 'Người dùng',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Chúng tôi đang cập nhật các vai trò có sẵn. Sau khi hoàn tất, bạn sẽ có thể cập nhật vai trò lại.',
+          title: 'Các vai trò tạm thời bị khóa',
+        },
+      },
       detailsTitle__emptyRow: 'Không có thành viên để hiển thị',
       invitationsTab: {
         autoInvitations: {
@@ -400,12 +406,6 @@ export const viVN: LocalizationResource = {
         headerTitle__invitations: 'Mời',
         headerTitle__members: 'Thành viên',
         headerTitle__requests: 'Yêu cầu',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Các vai trò tạm thời bị khóa',
-          subtitle: 'Chúng tôi đang cập nhật các vai trò có sẵn. Sau khi hoàn tất, bạn sẽ có thể cập nhật vai trò lại.',
-        },
       },
     },
     navbar: {
@@ -866,6 +866,10 @@ export const viVN: LocalizationResource = {
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Một tổ chức đã tồn tại cho tên công ty được phát hiện ({{organizationName}}) và {{organizationDomain}}. Tham gia bằng lời mời.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Tạo tổ chức mới',
       action__invitationAccept: 'Tham gia',
@@ -886,8 +890,8 @@ export const viVN: LocalizationResource = {
       title: 'Thiết lập tổ chức của bạn',
     },
     organizationCreationDisabled: {
-      title: 'Bạn phải thuộc về một tổ chức',
       subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để nhận lời mời.',
+      title: 'Bạn phải thuộc về một tổ chức',
     },
     signOut: {
       actionLink: 'Đăng xuất',
@@ -902,6 +906,69 @@ export const viVN: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} đã là thành viên của tổ chức.',
@@ -929,11 +996,12 @@ export const viVN: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect:
-      'Mật khẩu hoặc địa chỉ email không đúng. Vui lòng thử lại hoặc sử dụng phương thức khác.',
     form_password_length_too_short: 'Mật khẩu của bạn quá ngắn. Nó phải có ít nhất 8 ký tự.',
     form_password_not_strong_enough: 'Mật khẩu của bạn không đủ mạnh.',
+    form_password_or_identifier_incorrect:
+      'Mật khẩu hoặc địa chỉ email không đúng. Vui lòng thử lại hoặc sử dụng phương thức khác.',
     form_password_pwned:
       'Mật khẩu này đã được tìm thấy trong một rò rỉ và không thể được sử dụng, vui lòng thử một mật khẩu khác.',
     form_password_pwned__sign_in:

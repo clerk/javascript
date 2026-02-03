@@ -55,6 +55,11 @@ const withEmailCodes_destroy_client = withEmailCodes
   .clone()
   .setEnvVariable('public', 'EXPERIMENTAL_PERSIST_CLIENT', 'false');
 
+const withSharedUIVariant = withEmailCodes
+  .clone()
+  .setId('withSharedUIVariant')
+  .setEnvVariable('public', 'CLERK_UI_VARIANT', 'shared');
+
 const withEmailLinks = base
   .clone()
   .setId('withEmailLinks')
@@ -153,6 +158,13 @@ const withSessionTasksResetPassword = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-session-tasks-reset-password').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks-reset-password').pk);
 
+const withSessionTasksSetupMfa = base
+  .clone()
+  .setId('withSessionTasksSetupMfa')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-session-tasks-setup-mfa').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks-setup-mfa').pk)
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
+
 const withBillingJwtV2 = base
   .clone()
   .setId('withBillingJwtV2')
@@ -210,6 +222,8 @@ export const envs = {
   withReverification,
   withSessionTasks,
   withSessionTasksResetPassword,
+  withSharedUIVariant,
+  withSessionTasksSetupMfa,
   withSignInOrUpEmailLinksFlow,
   withSignInOrUpFlow,
   withSignInOrUpwithRestrictedModeFlow,

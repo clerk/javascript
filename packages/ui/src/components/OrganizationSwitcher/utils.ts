@@ -26,8 +26,8 @@ export const populateCacheUpdateItem = <T extends { id: string }>(
   const prevTotalCount = itemsInfinitePages?.[itemsInfinitePages.length - 1]?.total_count || 1;
 
   /**
-   * We should "preserve" an undefined page if one is found. For example if swr triggers 2 requests, page 1 & page2, and the request for page2 resolves first, at that point in memory itemsInfinitePages would look like this [undefined, {....}]
-   * if SWR says that has fetched 2 pages but the first result of is undefined, we should not return back an array with 1 item as this will end up having cacheKeys that point nowhere.
+   * We should "preserve" an undefined page if one is found. For example if infinite loading triggers 2 requests, page 1 & page 2, and the request for page 2 resolves first, at that point in memory itemsInfinitePages would look like this [undefined, {....}]
+   * If the hook says it has fetched 2 pages but the first result is undefined, we should not return back an array with 1 item as this will end up having cacheKeys that point nowhere.
    */
   return itemsInfinitePages.map(item => {
     if (typeof item === 'undefined') {
@@ -61,8 +61,8 @@ export const populateCacheRemoveItem = <T extends { id: string }>(
   }
 
   /**
-   * We should "preserve" an undefined page if one is found. For example if swr triggers 2 requests, page 1 & page2, and the request for page2 resolves first, at that point in memory itemsInfinitePages would look like this [undefined, {....}]
-   * if SWR says that has fetched 2 pages but the first result of is undefined, we should not return back an array with 1 item as this will end up having cacheKeys that point nowhere.
+   * We should "preserve" an undefined page if one is found. For example if infinite loading triggers 2 requests, page 1 & page 2, and the request for page 2 resolves first, at that point in memory itemsInfinitePages would look like this [undefined, {....}]
+   * If the hook says it has fetched 2 pages but the first result is undefined, we should not return back an array with 1 item as this will end up having cacheKeys that point nowhere.
    */
   return itemsInfinitePages?.map(item => {
     if (typeof item === 'undefined') {

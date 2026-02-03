@@ -366,6 +366,12 @@ export const bnIN: LocalizationResource = {
         tableHeader__role: 'ভূমিকা',
         tableHeader__user: 'ব্যবহারকারী',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'আমরা উপলব্ধ ভূমিকাগুলি আপডেট করছি। এটি সম্পন্ন হলে, আপনি আবার ভূমিকা আপডেট করতে পারবেন।',
+          title: 'ভূমিকাগুলি সাময়িকভাবে লক করা আছে',
+        },
+      },
       detailsTitle__emptyRow: 'প্রদর্শন করার জন্য কোনো সদস্য নেই',
       invitationsTab: {
         autoInvitations: {
@@ -396,12 +402,6 @@ export const bnIN: LocalizationResource = {
         headerTitle__invitations: 'আমন্ত্রণ',
         headerTitle__members: 'সদস্য',
         headerTitle__requests: 'অনুরোধ',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'ভূমিকাগুলি সাময়িকভাবে লক করা আছে',
-          subtitle: 'আমরা উপলব্ধ ভূমিকাগুলি আপডেট করছি। এটি সম্পন্ন হলে, আপনি আবার ভূমিকা আপডেট করতে পারবেন।',
-        },
       },
     },
     navbar: {
@@ -863,6 +863,10 @@ export const bnIN: LocalizationResource = {
   socialButtonsBlockButton: '{{provider|titleize}} দিয়ে চালিয়ে যান',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'শনাক্ত করা কোম্পানির নাম ({{organizationName}}) এবং {{organizationDomain}}-এর জন্য একটি সংস্থা ইতিমধ্যেই বিদ্যমান। আমন্ত্রণের মাধ্যমে যোগ দিন।',
+    },
     chooseOrganization: {
       action__createOrganization: 'নতুন সংগঠন তৈরি করুন',
       action__invitationAccept: 'যোগ দিন',
@@ -883,8 +887,8 @@ export const bnIN: LocalizationResource = {
       title: 'আপনার সংগঠন সেটআপ করুন',
     },
     organizationCreationDisabled: {
-      title: 'আপনাকে অবশ্যই একটি সংগঠনের অন্তর্ভুক্ত হতে হবে',
       subtitle: 'আমন্ত্রণের জন্য আপনার সংগঠনের প্রশাসকের সাথে যোগাযোগ করুন।',
+      title: 'আপনাকে অবশ্যই একটি সংগঠনের অন্তর্ভুক্ত হতে হবে',
     },
     signOut: {
       actionLink: 'সাইন আউট',
@@ -899,6 +903,69 @@ export const bnIN: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ইতিমধ্যে সংগঠনের একজন সদস্য।',
@@ -928,11 +995,12 @@ export const bnIN: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'লেখা মানটি অবৈধ। দয়া করে এটি সংশোধন করুন।',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'আপনি যে পাসওয়ার্ড লিখেছেন তা ভুল। দয়া করে আবার চেষ্টা করুন।',
-    form_password_or_identifier_incorrect:
-      'পাসওয়ার্ড বা ইমেইল ঠিকানা ভুল। আবার চেষ্টা করুন বা অন্য পদ্ধতি ব্যবহার করুন।',
     form_password_length_too_short: 'আপনার পাসওয়ার্ড খুব ছোট। এটি কমপক্ষে ৮ অক্ষর দীর্ঘ হতে হবে।',
     form_password_not_strong_enough: 'আপনার পাসওয়ার্ড যথেষ্ট শক্তিশালী নয়।',
+    form_password_or_identifier_incorrect:
+      'পাসওয়ার্ড বা ইমেইল ঠিকানা ভুল। আবার চেষ্টা করুন বা অন্য পদ্ধতি ব্যবহার করুন।',
     form_password_pwned:
       'এই পাসওয়ার্ডটি একটি ডেটা লঙ্ঘনের অংশ হিসাবে পাওয়া গেছে এবং ব্যবহার করা যাবে না, দয়া করে অন্য একটি পাসওয়ার্ড ব্যবহার করুন।',
     form_password_pwned__sign_in:
