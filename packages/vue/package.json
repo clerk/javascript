@@ -71,7 +71,7 @@
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue.ts/tsx-auto-props": "^0.6.0",
     "unplugin-vue": "^6.2.0",
-    "vue": "3.5.21",
+    "vue": "3.5.24",
     "vue-tsc": "^2.2.12"
   },
   "peerDependencies": {
