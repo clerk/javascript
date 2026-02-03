@@ -100,3 +100,10 @@ scripts/.env
 # typedoc
 .typedoc/docs
 .typedoc/docs.json
+
+# Personal Claude prompt
+CLAUDE.local.md
+
+# Claude Code local settings (user-specific permissions)
+.claude/settings.local.json
+pnpm-lock.yaml
