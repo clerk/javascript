@@ -8,7 +8,7 @@ import { fakerPhoneNumber } from '../testUtils/usersService';
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
   'session tasks setup-mfa flow @nextjs',
   ({ app }) => {
-    test.describe.configure({ mode: 'serial' });
+    test.describe.configure({ mode: 'parallel' });
 
     test.afterAll(async () => {
       await app.teardown();
@@ -157,7 +157,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
       await u.po.signIn.continue();
 
       await u.po.signIn.enterOtpCode('111111', {
-        awaitRequests: false,
+        awaitPrepare: true,
+        awaitAttempt: true,
       });
 
       await expect(u.page.getByTestId('form-feedback-error')).toBeVisible();
