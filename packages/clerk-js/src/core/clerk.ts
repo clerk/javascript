@@ -1,6 +1,7 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import {
+  ClerkOfflineError,
   ClerkRuntimeError,
   EmailLinkError,
   EmailLinkErrorCodeStatus,
@@ -113,6 +114,7 @@ import type {
   SignUpResource,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
+  TaskSetupMFAProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
   UserAvatarProps,
@@ -1439,6 +1441,28 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
+  public mountTaskSetupMfa = (node: HTMLDivElement, props?: TaskSetupMFAProps) => {
+    this.assertComponentsReady(this.#clerkUi);
+
+    const component = 'TaskSetupMFA';
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'taskSetupMfa',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('TaskSetupMfa', props));
+  };
+
+  public unmountTaskSetupMfa = (node: HTMLDivElement) => {
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
@@ -1536,16 +1560,21 @@ export class Clerk implements ClerkInterface {
       }
 
       // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
-      const token = await newSession?.getToken();
-      if (!token) {
-        if (!isValidBrowserOnline()) {
+      try {
+        const token = await newSession?.getToken();
+        if (!token) {
+          eventBus.emit(events.TokenUpdate, { token: null });
+        }
+      } catch (error) {
+        if (ClerkOfflineError.is(error)) {
           debugLogger.warn(
-            'Token is null when setting active session (offline)',
+            'Token fetch failed when setting active session (offline). Preserving existing auth state.',
             { sessionId: newSession?.id },
             'clerk',
           );
+        } else {
+          throw error;
         }
-        eventBus.emit(events.TokenUpdate, { token: null });
       }
 
       //2. When navigation is required we emit the session as undefined,
