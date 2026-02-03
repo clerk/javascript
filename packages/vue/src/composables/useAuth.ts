@@ -20,7 +20,7 @@ function clerkLoaded(clerk: ShallowRef<Clerk | null>) {
           resolve(value);
         }
       },
-      { immediate: true },
+      { immediate: true, once: true },
     );
   });
 }
