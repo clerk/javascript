@@ -254,6 +254,15 @@ const baseTheme = {
     blue,
     white: '#fff',
     black: '#000',
+    // Semantic tokens (using dark palette values)
+    primary: gray[100],
+    secondary: gray[500],
+    dimmed: gray[800],
+    positive: green[400],
+    negative: red[600],
+    warning: orange[500],
+    brand: purple[600],
+    info: blue[600],
   },
   typography: {
     label,

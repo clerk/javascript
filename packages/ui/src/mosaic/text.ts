@@ -30,10 +30,10 @@ export const textStyles = variants({
       'body-4': style(theme => ({ ...theme.typography.body[4] })),
     },
     color: {
-      default: style(theme => ({ color: theme.colors.white })),
-      muted: style(theme => ({ color: theme.colors.gray[500] })),
-      subtle: style(theme => ({ color: theme.colors.gray[400] })),
-      accent: style(theme => ({ color: theme.colors.purple[400] })),
+      default: style(theme => ({ color: theme.colors.primary })),
+      muted: style(theme => ({ color: theme.colors.secondary })),
+      subtle: style(theme => ({ color: theme.colors.dimmed })),
+      accent: style(theme => ({ color: theme.colors.brand })),
     },
     font: {
       sans: style(theme => ({ fontFamily: theme.fontFamilies.sans })),
