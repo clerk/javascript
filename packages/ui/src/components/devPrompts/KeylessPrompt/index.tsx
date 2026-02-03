@@ -5,6 +5,7 @@ import React, { useMemo, useState } from 'react';
 
 import { Portal } from '../../../elements/Portal';
 import { buttonStyles } from '../../../mosaic/button';
+import { textStyles } from '../../../mosaic/text';
 import { MosaicThemeProvider, useMosaicTheme } from '../../../mosaic/theme-provider';
 import { useRevalidateEnvironment } from './use-revalidate-environment';
 
@@ -109,8 +110,6 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
           --offset: ${theme.spacing[5]};
           --width-opened: 18rem;
           --width-closed: 14rem;
-          -webkit-font-smoothing: auto;
-          -moz-osx-font-smoothing: auto;
           position: fixed;
           bottom: var(--offset);
           right: var(--offset);
@@ -129,13 +128,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
               ${theme.alpha(theme.colors.white, 0)} 100%
             ),
             var(--background);
-          box-shadow:
-            0px 0px 0px 0.5px ${theme.colors.gray[1200]} inset,
-            0px 1px 0px 0px ${theme.alpha(theme.colors.white, 8)} inset,
-            0px 0px 0.8px 0.8px ${theme.alpha(theme.colors.white, 20)} inset,
-            0px 0px 0px 0px ${theme.alpha(theme.colors.white, 72)},
-            0px 16px 36px -6px ${theme.alpha(theme.colors.black, 36)},
-            0px 6px 16px -2px ${theme.alpha(theme.colors.black, 20)};
+          box-shadow: ${theme.shadows.card()};
           border-radius: ${isOpen ? theme.spacing[3] : theme.spacing[10]};
           isolation: isolate;
           will-change: width, border-radius;
@@ -231,54 +224,53 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
             </svg>
           </span>
           <span
-            css={css`
-              font-family: var(--font-family);
-              font-size: ${theme.typography.label[2].fontSize};
-              font-weight: ${theme.fontWeights.medium};
-              line-height: ${theme.typography.label[2].lineHeight};
-              white-space: nowrap;
-              color: var(--foreground);
-              background: linear-gradient(
-                90deg,
-                var(--foreground-secondary) 0%,
-                var(--foreground-secondary) 35%,
-                #fff 50%,
-                var(--foreground-secondary) 65%,
-                var(--foreground-secondary) 100%
-              );
-              background-size: 400% 100%;
-              background-position: 100% center;
-              background-clip: text;
-              -webkit-background-clip: text;
-              -webkit-text-fill-color: transparent;
-              animation: text-shimmer 2.75s ease-in-out infinite;
+            css={[
+              textStyles({ variant: 'label-2' }),
+              css`
+                white-space: nowrap;
+                color: var(--foreground);
+                background: linear-gradient(
+                  90deg,
+                  var(--foreground-secondary) 0%,
+                  var(--foreground-secondary) 35%,
+                  #fff 50%,
+                  var(--foreground-secondary) 65%,
+                  var(--foreground-secondary) 100%
+                );
+                background-size: 400% 100%;
+                background-position: 100% center;
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: text-shimmer 2.75s ease-in-out infinite;
 
-              @keyframes text-shimmer {
-                from {
-                  background-position: 100% center;
+                @keyframes text-shimmer {
+                  from {
+                    background-position: 100% center;
+                  }
+                  to {
+                    background-position: 0% center;
+                  }
                 }
-                to {
-                  background-position: 0% center;
-                }
-              }
 
-              @media (prefers-reduced-motion: reduce) {
-                animation: none;
-                background: none;
-                -webkit-text-fill-color: var(--foreground-secondary);
-              }
-            `}
+                @media (prefers-reduced-motion: reduce) {
+                  animation: none;
+                  background: none;
+                  -webkit-text-fill-color: var(--foreground-secondary);
+                }
+              `,
+            ]}
           >
             {getStatusText()}
           </span>
           <span
             css={css`
               clip: rect(0 0 0 0);
-              clippath: inset(50%);
+              clip-path: inset(50%);
               height: 1px;
               overflow: hidden;
               position: absolute;
-              whitespace: nowrap;
+              white-space: nowrap;
               width: 1px;
             `}
           >
@@ -330,13 +322,14 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
               transition: none;
             }
           `}
-          {...(!isOpen && { inert: true })}
+          {...(!isOpen && { inert: 'true' })}
           aria-hidden={!isOpen}
         >
           <div
             css={css`
               overflow: hidden;
               min-height: 0;
+              -webkit-mask-image: linear-gradient(to bottom, black calc(100% - ${theme.spacing[3]}), transparent);
               mask-image: linear-gradient(to bottom, black calc(100% - ${theme.spacing[3]}), transparent);
             `}
           >
@@ -359,25 +352,16 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
               `}
             >
               <div
-                css={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: theme.spacing[2],
-                  color: 'var(--foreground-secondary)',
-                  fontFamily: 'var(--font-family)',
-                  fontSize: theme.typography.body[3].fontSize,
-                  lineHeight: theme.typography.body[3].lineHeight,
-                  fontWeight: theme.typography.body[3].fontWeight,
-                  '& > p': {
-                    boxSizing: 'border-box',
-                    margin: 0,
-                    padding: 0,
-                    textBoxTrim: 'trim-both',
-                  },
-                }}
+                css={[
+                  css`
+                    display: flex;
+                    flex-direction: column;
+                    gap: ${theme.spacing[2]};
+                  `,
+                ]}
               >
                 {success ? (
-                  <p>
+                  <p css={textStyles({ color: 'muted' })}>
                     Your application{' '}
                     <span
                       css={css`
@@ -396,13 +380,13 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                     has been configured. Customize your settings in the Clerk dashboard.
                   </p>
                 ) : claimed ? (
-                  <p>
+                  <p css={textStyles({ color: 'muted', variant: 'body-3' })}>
                     You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk
                     Dashboard.
                   </p>
                 ) : isSignedIn ? (
                   <>
-                    <p>
+                    <p css={textStyles({ color: 'muted', variant: 'body-3' })}>
                       Head to the dashboard to customize authentication settings, view user info, and explore more
                       features.
                     </p>
@@ -423,12 +407,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                       {LIST_ITEMS.map(item => (
                         <li
                           key={item}
-                          css={css`
-                          margin: 0;
-                          padding: 0;
-                          box-sizing: border-box;
-                          ...theme.typography.body[3],
-                        `}
+                          css={textStyles({ color: 'muted', variant: 'body-3' })}
                         >
                           {item}
                         </li>
@@ -455,12 +434,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                       {LIST_ITEMS.map(item => (
                         <li
                           key={item}
-                          css={css`
-                          margin: 0;
-                          padding: 0;
-                          box-sizing: border-box;
-                          ...theme.typography.body[3],
-                        `}
+                          css={textStyles({ variant: 'body-3', color: 'muted' })}
                         >
                           {item}
                         </li>

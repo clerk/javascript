@@ -235,10 +235,15 @@ const spacing = {
   96: '24rem',
 } as const;
 
+/**
+ * Creates a transparent color using color-mix().
+ * Browser support: Chrome 111+, Firefox 113+, Safari 16.4+
+ * For older browsers, consider using rgba() fallback or CSS @supports queries.
+ */
 const alpha = (color: string, opacity: number) => `color-mix(in srgb, ${color} ${opacity}%, transparent)`;
 const negative = (value: string) => `-${value}`;
 
-export const mosaicTheme = {
+const baseTheme = {
   colors: {
     gray,
     purple,
@@ -260,6 +265,27 @@ export const mosaicTheme = {
   spacing,
   alpha,
   negative,
+} as const;
+
+const fontRendering = {
+  WebkitFontSmoothing: 'auto',
+  MozOsxFontSmoothing: 'auto',
+  textRendering: 'auto',
+  WebkitTextSizeAdjust: '100%',
+  textSizeAdjust: '100%',
+} as const;
+
+export const mosaicTheme = {
+  ...baseTheme,
+  shadows: {
+    card: () =>
+      `0px 0px 0px 0.5px ${baseTheme.colors.gray[1200]} inset, 0px 1px 0px 0px ${baseTheme.alpha(baseTheme.colors.white, 8)} inset, 0px 0px 0.8px 0.8px ${baseTheme.alpha(baseTheme.colors.white, 20)} inset, 0px 0px 0px 0px ${baseTheme.alpha(baseTheme.colors.white, 72)}, 0px 16px 36px -6px ${baseTheme.alpha(baseTheme.colors.black, 36)}, 0px 6px 16px -2px ${baseTheme.alpha(baseTheme.colors.black, 20)}`,
+  },
+  focusRing: () => ({
+    outline: `2px solid ${baseTheme.colors.purple[700]}`,
+    outlineOffset: '2px',
+  }),
+  fontRendering,
 } as const;
 
 export type MosaicTheme = typeof mosaicTheme;

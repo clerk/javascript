@@ -12,6 +12,28 @@ type StyleRule = CSSObject | StyleFunction;
 // Convert string literal "true" | "false" to boolean (CVA's StringToBoolean)
 type StringToBoolean<T> = T extends 'true' | 'false' ? boolean : T;
 
+/**
+ * Extracts variant props type from a variant style function.
+ *
+ * @example
+ * ```ts
+ * const buttonStyles = variants({
+ *   variants: {
+ *     size: { sm: {...}, md: {...} },
+ *     variant: { primary: {...}, secondary: {...} },
+ *   },
+ * });
+ *
+ * type ButtonProps = VariantProps<typeof buttonStyles>;
+ * // { size?: 'sm' | 'md' | null | undefined; variant?: 'primary' | 'secondary' | null | undefined }
+ *
+ * function Button(props: ButtonProps) {
+ *   return <button css={buttonStyles(props)} />;
+ * }
+ * ```
+ */
+export type VariantProps<T extends (...args: any) => any> = Parameters<T>[0];
+
 // Maps variant names to their allowed values (with boolean conversion)
 // This is the key type that allows boolean values for variants with true/false keys
 type ConfigVariants<T> = {
