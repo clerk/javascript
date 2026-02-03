@@ -16,7 +16,6 @@ import type {
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
-  CaptchaWidgetType,
   ClientTrustState,
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
