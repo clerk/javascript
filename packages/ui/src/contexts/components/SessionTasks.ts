@@ -1,10 +1,11 @@
-import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
+import { buildTaskUrl, getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
+import { useClerk } from '@clerk/shared/react';
 import type { DecorateUrl, SessionResource } from '@clerk/shared/types';
 import { createContext, useContext } from 'react';
 
-import { useRouter } from '@/ui/router';
+import { useRouter, VIRTUAL_ROUTER_BASE_PATH } from '@/ui/router';
 
-import type { SessionTasksCtx, TaskChooseOrganizationCtx, TaskResetPasswordCtx } from '../../types';
+import type { SessionTasksCtx, TaskChooseOrganizationCtx, TaskResetPasswordCtx, TaskSetupMFACtx } from '../../types';
 
 export const SessionTasksContext = createContext<SessionTasksCtx | null>(null);
 
@@ -19,6 +20,7 @@ type SessionTasksContextType = SessionTasksCtx & {
 export const useSessionTasksContext = (): SessionTasksContextType => {
   const context = useContext(SessionTasksContext);
   const { navigate, basePath, startPath } = useRouter();
+  const clerk = useClerk();
 
   if (context === null) {
     throw new Error('Clerk: useSessionTasksContext called outside of the mounted SessionTasks component.');
@@ -48,11 +50,21 @@ export const useSessionTasksContext = (): SessionTasksContextType => {
       return navigate(redirectUrlComplete);
     }
 
-    const taskEndpoint = getTaskEndpoint(currentTask);
+    // Check if there's a custom taskUrl configured for this task
+    const customTaskUrl = clerk.__internal_getOption('taskUrls')?.[currentTask.key];
+    if (customTaskUrl) {
+      return navigate(customTaskUrl);
+    }
 
-    // Base path is required for virtual routing with start path
-    // eg: to navigate from /sign-in/factor-one to /sign-in/tasks/choose-organization
-    return navigate(`/${basePath + startPath + taskEndpoint}`);
+    const taskEndpoint = getTaskEndpoint(currentTask);
+    if (basePath === VIRTUAL_ROUTER_BASE_PATH) {
+      return navigate(`/${basePath + startPath + taskEndpoint}`);
+    }
+
+    // If there's no custom taskUrl, and we are not using virtual routing
+    // we can just navigate to the task endpoint directly.
+    const signInUrl = clerk.buildSignInUrl();
+    return navigate(buildTaskUrl(currentTask, { base: signInUrl }));
   };
 
   return { ...context, navigateOnSetActive };
@@ -79,6 +91,18 @@ export const useTaskResetPasswordContext = (): TaskResetPasswordCtx => {
 
   if (context === null) {
     throw new Error('Clerk: useTaskResetPasswordContext called outside of the mounted TaskResetPassword component.');
+  }
+
+  return context;
+};
+
+export const TaskSetupMFAContext = createContext<TaskSetupMFACtx | null>(null);
+
+export const useTaskSetupMFAContext = (): TaskSetupMFACtx => {
+  const context = useContext(TaskSetupMFAContext);
+
+  if (context === null) {
+    throw new Error('Clerk: useTaskSetupMFAContext called outside of the mounted TaskSetupMFA component.');
   }
 
   return context;
