@@ -1,9 +1,3 @@
 {
-  "platforms": ["android", "ios"],
-  "android": {
-    "modules": ["expo.modules.clerk.ClerkExpoModule", "expo.modules.clerk.googlesignin.ClerkGoogleSignInModule"]
-  },
-  "ios": {
-    "modules": ["ClerkExpoModule", "ClerkGoogleSignInModule"]
-  }
+  "platforms": []
 }

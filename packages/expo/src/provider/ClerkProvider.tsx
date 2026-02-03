@@ -93,7 +93,20 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
             }
           }
         } catch (error) {
-          console.error(`[ClerkProvider] Failed to configure Clerk ${Platform.OS}:`, error);
+          // Native module not found is expected when the @clerk/expo plugin isn't configured
+          // This is fine - the JS SDK will work without native features
+          const isNativeModuleNotFound = error instanceof Error && error.message.includes('Cannot find native module');
+          if (isNativeModuleNotFound) {
+            // Silent in production, debug log only
+            if (__DEV__) {
+              console.debug(
+                `[ClerkProvider] Native Clerk module not available. ` +
+                  `To enable native features, add "@clerk/expo" to your app.json plugins array.`,
+              );
+            }
+          } else {
+            console.error(`[ClerkProvider] Failed to configure Clerk ${Platform.OS}:`, error);
+          }
         }
       };
       configureAndSyncClerk();

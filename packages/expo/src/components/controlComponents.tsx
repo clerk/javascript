@@ -1,20 +1,22 @@
-import React from 'react';
-import { ClerkLoaded, ClerkLoading, Show } from '@clerk/react';
+// Re-export control components from @clerk/react
+// These provide conditional rendering based on auth state
+export { ClerkLoaded, ClerkLoading, Show } from '@clerk/react';
 
-export { ClerkLoaded, ClerkLoading, Show };
+import type { PropsWithChildren, ReactNode } from 'react';
+import { Show } from '@clerk/react';
 
 /**
- * Renders children only when a user is signed in.
- * Backward-compatible wrapper around `<Show when="signed-in">`.
+ * Render children only when the user is signed in.
+ * A convenience wrapper around `<Show when="signed-in">`.
  */
-export function SignedIn({ children }: React.PropsWithChildren<unknown>) {
+export function SignedIn({ children }: PropsWithChildren): ReactNode {
   return <Show when='signed-in'>{children}</Show>;
 }
 
 /**
- * Renders children only when no user is signed in.
- * Backward-compatible wrapper around `<Show when="signed-out">`.
+ * Render children only when the user is signed out.
+ * A convenience wrapper around `<Show when="signed-out">`.
  */
-export function SignedOut({ children }: React.PropsWithChildren<unknown>) {
+export function SignedOut({ children }: PropsWithChildren): ReactNode {
   return <Show when='signed-out'>{children}</Show>;
 }

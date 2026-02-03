@@ -9,7 +9,17 @@ import type { AuthViewProps } from './AuthView.types';
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
 // Get the native module for modal presentation
-const ClerkExpo = isNativeSupported ? requireNativeModule('ClerkExpo') : null;
+// Wrapped in try/catch because the module may not be available if the plugin isn't configured
+let ClerkExpo: ReturnType<typeof requireNativeModule> | null = null;
+if (isNativeSupported) {
+  try {
+    ClerkExpo = requireNativeModule('ClerkExpo');
+  } catch {
+    // Native module not available - plugin not configured
+    // This is expected when users use @clerk/expo without the native plugin
+    ClerkExpo = null;
+  }
+}
 
 /**
  * A pre-built native authentication component that handles sign-in and sign-up flows.
@@ -215,11 +225,15 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
     presentModal();
   }, [mode, isDismissable, clerk, onSuccess, onError, isSignedIn]);
 
-  // Show a placeholder while modal is presented
-  if (!isNativeSupported) {
+  // Show a placeholder when native modules aren't available
+  if (!isNativeSupported || !ClerkExpo) {
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>Native AuthView is only available on iOS and Android</Text>
+        <Text style={styles.text}>
+          {!isNativeSupported
+            ? 'Native AuthView is only available on iOS and Android'
+            : 'Native AuthView requires the @clerk/expo plugin. Add "@clerk/expo" to your app.json plugins array.'}
+        </Text>
       </View>
     );
   }

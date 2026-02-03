@@ -1,6 +1,11 @@
 /**
  * Expo config plugin for @clerk/clerk-expo
  * Automatically configures iOS and Android to work with Clerk native components
+ *
+ * When this plugin is used:
+ * 1. Native modules are enabled by writing the full expo-module.config.json
+ * 2. iOS is configured with Swift Package Manager dependency for clerk-ios
+ * 3. Android is configured with packaging exclusions for dependencies
  */
 const { withXcodeProject, withDangerousMod, withInfoPlist, withAppBuildGradle } = require('@expo/config-plugins');
 const path = require('path');
@@ -10,6 +15,49 @@ const CLERK_IOS_REPO = 'https://github.com/clerk/clerk-ios.git';
 const CLERK_IOS_VERSION = '0.68.1';
 
 const CLERK_MIN_IOS_VERSION = '17.0';
+
+/**
+ * The native module configuration that gets enabled when this plugin is used.
+ * By default, @clerk/expo ships with an empty config ({ "platforms": [] }) so that
+ * users who don't need native features can use the package without native build issues.
+ */
+const NATIVE_MODULE_CONFIG = {
+  platforms: ['android', 'ios'],
+  android: {
+    modules: ['expo.modules.clerk.ClerkExpoModule', 'expo.modules.clerk.googlesignin.ClerkGoogleSignInModule'],
+  },
+  ios: {
+    modules: ['ClerkExpoModule', 'ClerkGoogleSignInModule'],
+  },
+};
+
+/**
+ * Enable native modules by writing the full expo-module.config.json.
+ * This must run BEFORE autolinking scans node_modules for native modules.
+ */
+const withClerkNativeModules = config => {
+  // Use withDangerousMod to write the config file during prebuild
+  return withDangerousMod(config, [
+    'ios',
+    async modConfig => {
+      try {
+        // Find the @clerk/expo package directory in node_modules
+        const packageJsonPath = require.resolve('@clerk/expo/package.json');
+        const packageDir = path.dirname(packageJsonPath);
+        const configPath = path.join(packageDir, 'expo-module.config.json');
+
+        // Write the config that enables native modules
+        fs.writeFileSync(configPath, JSON.stringify(NATIVE_MODULE_CONFIG, null, 2) + '\n');
+
+        console.log('✅ Clerk native modules enabled');
+      } catch (error) {
+        console.warn('⚠️ Could not enable Clerk native modules:', error.message);
+      }
+
+      return modConfig;
+    },
+  ]);
+};
 
 const withClerkIOS = config => {
   console.log('✅ Clerk iOS plugin loaded');
@@ -522,8 +570,19 @@ const withClerkGoogleSignIn = config => {
 
 /**
  * Combined Clerk Expo plugin
+ *
+ * When this plugin is configured in app.json/app.config.js:
+ * 1. Native modules are enabled (expo-module.config.json is updated)
+ * 2. iOS gets Swift Package Manager dependency for clerk-ios SDK
+ * 3. Android gets packaging exclusions for dependency conflicts
+ * 4. Google Sign-In URL scheme is configured (if env var is set)
  */
 const withClerkExpo = config => {
+  // FIRST: Enable native modules by writing the full expo-module.config.json
+  // This must happen before autolinking scans for native modules
+  config = withClerkNativeModules(config);
+
+  // Then configure platform-specific settings
   config = withClerkIOS(config);
   config = withClerkGoogleSignIn(config);
   config = withClerkAndroid(config);

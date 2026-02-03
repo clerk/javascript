@@ -243,14 +243,18 @@ export function UserProfileView({ isDismissable = true, onSignOut, style, ...pro
     void presentModal();
   }, [isDismissable, onSignOut, clerk, isSignedIn]);
 
-  // Show a placeholder while modal is presented
-  if (!isNativeSupported) {
+  // Show a placeholder when native modules aren't available
+  if (!isNativeSupported || !ClerkExpo) {
     return (
       <View
         style={[styles.container, style]}
         {...props}
       >
-        <Text style={styles.text}>Native UserProfileView is only available on iOS and Android</Text>
+        <Text style={styles.text}>
+          {!isNativeSupported
+            ? 'Native UserProfileView is only available on iOS and Android'
+            : 'Native UserProfileView requires the @clerk/expo plugin. Add "@clerk/expo" to your app.json plugins array.'}
+        </Text>
       </View>
     );
   }

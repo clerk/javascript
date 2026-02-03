@@ -1,6 +1,60 @@
-import { type ConfigPlugin, createRunOncePlugin, withInfoPlist, withAppBuildGradle } from '@expo/config-plugins';
+import {
+  type ConfigPlugin,
+  createRunOncePlugin,
+  withInfoPlist,
+  withAppBuildGradle,
+  withDangerousMod,
+} from '@expo/config-plugins';
+import * as fs from 'fs';
+import * as path from 'path';
 
 import pkg from '../../package.json';
+
+/**
+ * The native module configuration that gets enabled when the plugin is used.
+ * This is written to expo-module.config.json to enable autolinking of native modules.
+ */
+const NATIVE_MODULE_CONFIG = {
+  platforms: ['android', 'ios'],
+  android: {
+    modules: ['expo.modules.clerk.ClerkExpoModule', 'expo.modules.clerk.googlesignin.ClerkGoogleSignInModule'],
+  },
+  ios: {
+    modules: ['ClerkExpoModule', 'ClerkGoogleSignInModule'],
+  },
+};
+
+/**
+ * Enable native modules by writing the full expo-module.config.json.
+ *
+ * By default, @clerk/expo ships with an empty config ({ "platforms": [] }) so that
+ * users who don't need native features can use the package without native dependencies.
+ *
+ * When the plugin is configured, this function writes the real config to enable
+ * autolinking of the native modules (ClerkExpoModule, ClerkGoogleSignInModule).
+ */
+const withClerkNativeModules: ConfigPlugin = config => {
+  return withDangerousMod(config, [
+    'ios',
+    async modConfig => {
+      try {
+        // Find the @clerk/expo package directory
+        const packageJsonPath = require.resolve('@clerk/expo/package.json');
+        const packageDir = path.dirname(packageJsonPath);
+        const configPath = path.join(packageDir, 'expo-module.config.json');
+
+        // Write the config that enables native modules
+        fs.writeFileSync(configPath, JSON.stringify(NATIVE_MODULE_CONFIG, null, 2) + '\n');
+
+        console.log('✅ Clerk native modules enabled');
+      } catch (error) {
+        console.warn('⚠️ Could not enable Clerk native modules:', error);
+      }
+
+      return modConfig;
+    },
+  ]);
+};
 
 /**
  * Add packaging exclusions to Android app build.gradle to resolve
@@ -81,9 +135,16 @@ const withClerkGoogleSignIn: ConfigPlugin = config => {
 };
 
 /**
- * Combined plugin that applies all Clerk configurations
+ * Combined plugin that applies all Clerk configurations.
+ *
+ * When this plugin is used, it:
+ * 1. Enables native modules by writing the full expo-module.config.json
+ * 2. Configures iOS URL scheme for Google Sign-In (if env var is set)
+ * 3. Adds Android packaging exclusions to resolve dependency conflicts
  */
 const withClerkExpo: ConfigPlugin = config => {
+  // Enable native modules first (writes expo-module.config.json)
+  config = withClerkNativeModules(config);
   config = withClerkGoogleSignIn(config);
   config = withClerkAndroidPackaging(config);
   return config;

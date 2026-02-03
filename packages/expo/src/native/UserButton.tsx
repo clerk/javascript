@@ -250,7 +250,8 @@ export function UserButton({ onPress, onSignOut, style, ...props }: UserButtonPr
     return 'U';
   };
 
-  if (!isNativeSupported) {
+  // Show fallback when native modules aren't available
+  if (!isNativeSupported || !ClerkExpo) {
     return (
       <View
         style={[styles.button, style]}
