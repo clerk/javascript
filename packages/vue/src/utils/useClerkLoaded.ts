@@ -26,6 +26,6 @@ export const useClerkLoaded = (callback: (clerk: LoadedClerk) => void) => {
 
       callback(unwrappedClerk as LoadedClerk);
     },
-    { immediate: true },
+    { immediate: true, once: true },
   );
 };
