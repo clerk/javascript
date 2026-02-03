@@ -36,7 +36,7 @@ export const getAvailablePhonesFromUser = (user: UserResource | undefined | null
         user?.passkeys.length > 0 ||
         user?.externalAccounts.length > 0 ||
         user?.enterpriseAccounts.length > 0 ||
-        user.username !== null;
+        user?.username !== null;
 
       if (phoneNumber.id === user?.primaryPhoneNumber?.id && !hasOtherIdentifications) {
         return false;
