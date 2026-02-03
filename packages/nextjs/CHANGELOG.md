@@ -1,5 +1,14 @@
 # Change Log
 
+## 6.37.2
+
+### Patch Changes
+
+- Fixed an issue where JWT OAuth access tokens where not treated as a machine token ([#7756](https://github.com/clerk/javascript/pull/7756)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`7917ff4`](https://github.com/clerk/javascript/commit/7917ff4214fc9e1001e2698c7241bbfa4b68e5af), [`b0d28c1`](https://github.com/clerk/javascript/commit/b0d28c14815a6136c67a719efb1dc5496ffb5c82)]:
+  - @clerk/backend@2.30.0
+
 ## 6.37.1
 
 ### Patch Changes

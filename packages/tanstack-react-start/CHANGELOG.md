@@ -1,5 +1,16 @@
 # @clerk/tanstack-react-start
 
+## 0.29.0
+
+### Minor Changes
+
+- Bumped minimum required TanStack Start dependencies to 1.157.0+ and removed usage of deprecated `json()` in favor of standard Web APIs. ([#7720](https://github.com/clerk/javascript/pull/7720)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`7917ff4`](https://github.com/clerk/javascript/commit/7917ff4214fc9e1001e2698c7241bbfa4b68e5af), [`b0d28c1`](https://github.com/clerk/javascript/commit/b0d28c14815a6136c67a719efb1dc5496ffb5c82)]:
+  - @clerk/backend@2.30.0
+
 ## 0.28.1
 
 ### Patch Changes
