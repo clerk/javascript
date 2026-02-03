@@ -13,14 +13,17 @@ import { useClerkContext } from './useClerkContext';
  */
 function clerkLoaded(clerk: ShallowRef<Clerk | null>) {
   return new Promise<Clerk>(resolve => {
-    watch(
+    let unwatch: (() => void) | undefined;
+    // eslint-disable-next-line prefer-const
+    unwatch = watch(
       clerk,
       value => {
         if (value?.loaded) {
           resolve(value);
+          unwatch?.();
         }
       },
-      { immediate: true, once: true },
+      { immediate: true },
     );
   });
 }
