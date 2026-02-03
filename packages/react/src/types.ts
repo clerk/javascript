@@ -55,9 +55,12 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<IsomorphicClerkOption
   /**
    * Optional object to pin the UI version your app will be using. Useful when you've extensively customize the look and feel of the
    * components using the appearance prop.
+   * Can include version/url for CDN loading, or ClerkUI constructor for bundled usage.
    * Note: When `ui` is used, appearance is automatically typed based on the specific UI version.
    */
-  ui?: TUi;
+  ui?: TUi & {
+    ClerkUI?: ClerkUiConstructor;
+  };
 };
 
 export type WithClerkProp<T = unknown> = T & {
