@@ -1,8 +1,12 @@
+import { useClerk } from '@clerk/shared/react';
+import React from 'react';
+
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn } from '../../contexts';
+import { useRouter } from '../../router';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoBackupCodeCard } from './SignInFactorTwoBackupCodeCard';
 import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
@@ -12,7 +16,9 @@ import { SignInFactorTwoTOTPCard } from './SignInFactorTwoTOTPCard';
 import { useSecondFactorSelection } from './useSecondFactorSelection';
 
 function SignInFactorTwoInternal(): JSX.Element {
+  const { __internal_setActiveInProgress } = useClerk();
   const signIn = useCoreSignIn();
+  const router = useRouter();
   const {
     currentFactor,
     factorAlreadyPrepared,
@@ -21,6 +27,18 @@ function SignInFactorTwoInternal(): JSX.Element {
     showAllStrategies,
     toggleAllStrategies,
   } = useSecondFactorSelection(signIn.supportedSecondFactors);
+
+  React.useEffect(() => {
+    if (__internal_setActiveInProgress) {
+      return;
+    }
+
+    // If the sign-in doesn't require second factor verification,
+    // redirect back to the start of the sign-in flow
+    if (signIn.status !== 'needs_second_factor') {
+      void router.navigate('../');
+    }
+  }, [__internal_setActiveInProgress, signIn.status, router]);
 
   if (!currentFactor) {
     return <LoadingCard />;

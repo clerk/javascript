@@ -18,8 +18,17 @@ describe('SignInFactorTwo', () => {
   });
 
   describe('Navigation', () => {
-    //This isn't yet implemented in the component
-    it.todo('navigates to SignInStart component if user lands on SignInFactorTwo page but they should not');
+    it('navigates to SignInStart component if sign-in status is not needs_second_factor', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        // Note: We do NOT call f.startSignInFactorTwo() here, so the sign-in status
+        // will be null/needs_identifier, not 'needs_second_factor'
+      });
+      render(<SignInFactorTwo />, { wrapper });
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
+      });
+    });
   });
 
   describe('Submitting', () => {
