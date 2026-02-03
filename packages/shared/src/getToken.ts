@@ -106,6 +106,9 @@ async function waitForClerk(): Promise<LoadedClerk> {
  *
  * @throws {ClerkRuntimeError} When Clerk fails to load within timeout (code: `clerk_runtime_load_timeout`)
  *
+ * @throws {ClerkOfflineError} When the browser is offline and unable to fetch a token (code: `clerk_offline`).
+ * Use `ClerkOfflineError.is(error)` to check for this error type.
+ *
  * @example
  * ```typescript
  * // In an Axios interceptor
