@@ -361,6 +361,12 @@ export const enUS: LocalizationResource = {
         tableHeader__role: 'Role',
         tableHeader__user: 'User',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'We are updating the available roles. Once that’s done, you’ll be able to update roles again.',
+          title: 'Roles are temporarily locked',
+        },
+      },
       detailsTitle__emptyRow: 'No members to display',
       invitationsTab: {
         autoInvitations: {
@@ -391,12 +397,6 @@ export const enUS: LocalizationResource = {
         headerTitle__invitations: 'Invitations',
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Roles are temporarily locked',
-          subtitle: 'We are updating the available roles. Once that’s done, you’ll be able to update roles again.',
-        },
       },
     },
     navbar: {
@@ -857,6 +857,10 @@ export const enUS: LocalizationResource = {
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'An organization already exists for the detected company name ({{organizationName}}) and {{organizationDomain}}. Join by invitation.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Create new organization',
       action__invitationAccept: 'Join',
@@ -877,16 +881,12 @@ export const enUS: LocalizationResource = {
       title: 'Setup your organization',
     },
     organizationCreationDisabled: {
-      title: 'You must belong to an organization',
       subtitle: 'Contact your organization admin for an invitation.',
+      title: 'You must belong to an organization',
     },
     signOut: {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'An organization already exists for the detected company name ({{organizationName}}) and {{organizationDomain}}. Join by invitation.',
     },
   },
   taskResetPassword: {
@@ -900,72 +900,72 @@ export const enUS: LocalizationResource = {
   },
   taskSetupMfa: {
     badge: 'Two-step verification setup',
-    start: {
-      title: 'Set up two-step verification',
-      subtitle: 'Choose which method you prefer to protect your account with an extra layer of security',
-      methodSelection: {
-        totp: 'Authenticator application',
-        phoneCode: 'SMS code',
-      },
+    signOut: {
+      actionLink: 'Sign out',
+      actionText: 'Signed in as {{identifier}}',
     },
     smsCode: {
-      title: 'Add SMS code verification',
-      subtitle: 'Choose phone number you want to use for SMS code two-step verification',
-      addPhoneNumber: 'Add phone number',
-      cancel: 'Cancel',
-      verifyPhone: {
-        title: 'Verify your phone number',
-        subtitle: 'Enter the verification code sent to',
-        formTitle: 'Verification code',
-        resendButton: "Didn't receive a code? Resend",
-        formButtonPrimary: 'Continue',
-      },
       addPhone: {
+        formButtonPrimary: 'Continue',
         infoText:
           'A text message containing a verification code will be sent to this phone number. Message and data rates may apply.',
-        formButtonPrimary: 'Continue',
       },
+      addPhoneNumber: 'Add phone number',
+      cancel: 'Cancel',
+      subtitle: 'Choose phone number you want to use for SMS code two-step verification',
       success: {
-        title: 'SMS code verification enabled',
+        finishButton: 'Continue',
         message1:
           'Two-step verification is now enabled. When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
         message2:
           'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
-        finishButton: 'Continue',
+        title: 'SMS code verification enabled',
+      },
+      title: 'Add SMS code verification',
+      verifyPhone: {
+        formButtonPrimary: 'Continue',
+        formTitle: 'Verification code',
+        resendButton: "Didn't receive a code? Resend",
+        subtitle: 'Enter the verification code sent to',
+        title: 'Verify your phone number',
       },
     },
+    start: {
+      methodSelection: {
+        phoneCode: 'SMS code',
+        totp: 'Authenticator application',
+      },
+      subtitle: 'Choose which method you prefer to protect your account with an extra layer of security',
+      title: 'Set up two-step verification',
+    },
     totpCode: {
-      title: 'Add authenticator application',
       addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: 'Scan QR code instead',
+        buttonUnableToScan__nonPrimary: "Can't scan QR code?",
+        formButtonPrimary: 'Continue',
+        formButtonReset: 'Cancel',
         infoText__ableToScan:
           'Set up a new sign-in method in your authenticator app and scan the following QR code to link it to your account.',
         infoText__unableToScan: 'Set up a new sign-in method in your authenticator and enter the Key provided below.',
         inputLabel__unableToScan1:
           'Make sure Time-based or One-time passwords is enabled, then finish linking your account.',
-        buttonUnableToScan__nonPrimary: "Can't scan QR code?",
-        buttonAbleToScan__nonPrimary: 'Scan QR code instead',
-        formButtonPrimary: 'Continue',
-        formButtonReset: 'Cancel',
-      },
-      verifyTotp: {
-        title: 'Add authenticator application',
-        subtitle: 'Enter verification code generated by your authenticator',
-        formTitle: 'Verification code',
-        formButtonPrimary: 'Continue',
-        formButtonReset: 'Cancel',
       },
       success: {
-        title: 'Authenticator application verification enabled',
+        finishButton: 'Continue',
         message1:
           'Two-step verification is now enabled. When signing in, you will need to enter a verification code from this authenticator as an additional step.',
         message2:
           'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
-        finishButton: 'Continue',
+        title: 'Authenticator application verification enabled',
       },
-    },
-    signOut: {
-      actionText: 'Signed in as {{identifier}}',
-      actionLink: 'Sign out',
+      title: 'Add authenticator application',
+      verifyTotp: {
+        formButtonPrimary: 'Continue',
+        formButtonReset: 'Cancel',
+        formTitle: 'Verification code',
+        subtitle: 'Enter verification code generated by your authenticator',
+        title: 'Add authenticator application',
+      },
     },
   },
   unstable__errors: {
@@ -993,16 +993,16 @@ export const enUS: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect: undefined,
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
     form_password_not_strong_enough: 'Your password is not strong enough.',
+    form_password_or_identifier_incorrect: undefined,
     form_password_pwned:
       'This password has been found as part of a breach and can not be used, please try another password instead.',
     form_password_pwned__sign_in:
       'This password has been found as part of a breach and can not be used, please reset your password.',
     form_password_size_in_bytes_exceeded: undefined,
-    form_password_compromised__sign_in: undefined,
     form_password_untrusted__sign_in:
       'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
     form_password_validation_failed: undefined,
