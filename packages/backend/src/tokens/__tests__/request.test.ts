@@ -1332,6 +1332,20 @@ describe('tokens.authenticateRequest(options)', () => {
         expect(requestState).toBeSignedIn();
         expect(requestState.toAuth()).toBeSignedInToAuth();
       });
+
+      test('accepts OAuth JWT when acceptsToken is "any"', async () => {
+        server.use(
+          http.post(mockMachineAuthResponses.oauth_token.endpoint, () => {
+            return HttpResponse.json(mockVerificationResults.oauth_token);
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` });
+        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'any' }));
+
+        expect(result).toBeMachineAuthenticated();
+        expect(result.tokenType).toBe('oauth_token');
+      });
     });
 
     describe('Token Type Mismatch', () => {
@@ -1405,34 +1419,6 @@ describe('tokens.authenticateRequest(options)', () => {
           message: '',
         });
         expect(result.toAuth()).toBeSignedOutToAuth();
-      });
-
-      test('accepts valid session token when acceptsToken is session_token', async () => {
-        server.use(
-          http.get('https://api.clerk.test/v1/jwks', () => {
-            return HttpResponse.json(mockJwks);
-          }),
-        );
-
-        const request = mockRequest({ authorization: `Bearer ${mockJwt}` });
-        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'session_token' }));
-
-        expect(result).toBeSignedIn();
-        expect(result.tokenType).toBe('session_token');
-      });
-
-      test('accepts OAuth JWT when acceptsToken is "any"', async () => {
-        server.use(
-          http.post(mockMachineAuthResponses.oauth_token.endpoint, () => {
-            return HttpResponse.json(mockVerificationResults.oauth_token);
-          }),
-        );
-
-        const request = mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` });
-        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'any' }));
-
-        expect(result).toBeMachineAuthenticated();
-        expect(result.tokenType).toBe('oauth_token');
       });
     });
 
