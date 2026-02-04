@@ -2,6 +2,8 @@ import { waitForElement } from '@clerk/shared/dom';
 import { loadScript } from '@clerk/shared/loadScript';
 import type { CaptchaAppearanceOptions, CaptchaWidgetType } from '@clerk/shared/types';
 
+import { debugLogger } from '@/utils/debug';
+
 import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
 import type { CaptchaOptions } from './types';
 
@@ -75,6 +77,8 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   const { modalContainerQuerySelector, modalWrapperQuerySelector, closeModal, openModal } = opts;
   const captcha: Turnstile.Turnstile = await loadCaptcha(nonce);
   const errorCodes: (string | number)[] = [];
+  // Unique ID to correlate log entries for this captcha attempt
+  const captchaAttemptId = Math.random().toString(36).substring(2, 9);
 
   let captchaToken = '';
   let id = '';
@@ -219,6 +223,16 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       // After a failed challenge remove it
       captcha.remove(id);
     }
+
+    // Log failure with full error history for debugging
+    debugLogger.error('Turnstile captcha challenge failed', {
+      captchaAttemptId,
+      errorCodesHistory: [...errorCodes],
+      finalError: String(e),
+      retriesAttempted: retries,
+      widgetType: captchaTypeUsed,
+    }, 'captcha');
+
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw {
       captchaError: e,
