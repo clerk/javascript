@@ -468,12 +468,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
-      const clerkUICtor = await this.getClerkUiEntryChunk();
       const clerk = await this.getClerkJsEntryChunk();
 
       if (!clerk.loaded) {
         this.beforeLoad(clerk);
-        await clerk.load({ ...this.options, clerkUICtor });
+        // Only load UI scripts in standard browser environments (not native/headless)
+        const shouldLoadUi = !this.options.Clerk && this.options.standardBrowser !== false;
+        const clerkUiCtor = shouldLoadUi ? await this.getClerkUiEntryChunk() : undefined;
+        await clerk.load({ ...this.options, clerkUiCtor });
       }
       if (clerk.loaded) {
         this.replayInterceptedInvocations(clerk);
