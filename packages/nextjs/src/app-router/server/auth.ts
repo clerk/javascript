@@ -11,7 +11,13 @@ import { unauthorized } from '../../server/nextErrors';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData } from '../../server/utils';
-import { buildRequestLike, isNextjsUseCacheError, USE_CACHE_ERROR_MESSAGE } from './utils';
+import {
+  buildRequestLike,
+  ClerkUseCacheError,
+  isClerkUseCacheError,
+  isNextjsUseCacheError,
+  USE_CACHE_ERROR_MESSAGE,
+} from './utils';
 
 /**
  * `Auth` object of the currently active user and the `redirectToSignIn()` method.
@@ -136,9 +142,11 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
 
     return authObject;
   } catch (e: any) {
-    // Catch "use cache" errors that bubble up from Next.js cache boundary
+    if (isClerkUseCacheError(e)) {
+      throw e;
+    }
     if (isNextjsUseCacheError(e)) {
-      throw new Error(`${USE_CACHE_ERROR_MESSAGE}\n\nOriginal error: ${e.message}`);
+      throw new ClerkUseCacheError(`${USE_CACHE_ERROR_MESSAGE}\n\nOriginal error: ${e.message}`, e);
     }
     throw e;
   }

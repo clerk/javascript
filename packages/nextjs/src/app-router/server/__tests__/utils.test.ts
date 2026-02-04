@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isNextjsUseCacheError, isPrerenderingBailout } from '../utils';
+import { ClerkUseCacheError, isClerkUseCacheError, isNextjsUseCacheError, isPrerenderingBailout } from '../utils';
 
 describe('isPrerenderingBailout', () => {
   it('returns false for non-Error values', () => {
@@ -43,6 +43,40 @@ describe('isPrerenderingBailout', () => {
   });
 });
 
+describe('ClerkUseCacheError', () => {
+  it('is recognized by isClerkUseCacheError', () => {
+    const error = new ClerkUseCacheError('Test message');
+    expect(isClerkUseCacheError(error)).toBe(true);
+  });
+
+  it('preserves original error', () => {
+    const original = new Error('Original');
+    const error = new ClerkUseCacheError('Wrapped', original);
+    expect(error.originalError).toBe(original);
+  });
+
+  it('has correct name', () => {
+    const error = new ClerkUseCacheError('Test');
+    expect(error.name).toBe('ClerkUseCacheError');
+  });
+});
+
+describe('isClerkUseCacheError', () => {
+  it('returns false for regular errors', () => {
+    expect(isClerkUseCacheError(new Error('test'))).toBe(false);
+  });
+
+  it('returns false for non-Error values', () => {
+    expect(isClerkUseCacheError(null)).toBe(false);
+    expect(isClerkUseCacheError('string')).toBe(false);
+    expect(isClerkUseCacheError({})).toBe(false);
+  });
+
+  it('returns true for ClerkUseCacheError', () => {
+    expect(isClerkUseCacheError(new ClerkUseCacheError('test'))).toBe(true);
+  });
+});
+
 describe('isNextjsUseCacheError', () => {
   it('returns false for non-Error values', () => {
     expect(isNextjsUseCacheError(null)).toBe(false);
@@ -65,9 +99,10 @@ describe('isNextjsUseCacheError', () => {
     expect(isNextjsUseCacheError(error)).toBe(true);
   });
 
-  it('returns true for dynamic data source cache errors', () => {
+  it('returns false for generic "cache" mentions without specific patterns', () => {
+    // This should NOT match to reduce false positives - requires "cache scope" not just "cache"
     const error = new Error('Dynamic data source accessed in cache context');
-    expect(isNextjsUseCacheError(error)).toBe(true);
+    expect(isNextjsUseCacheError(error)).toBe(false);
   });
 
   it('returns false for regular prerendering bailout errors', () => {

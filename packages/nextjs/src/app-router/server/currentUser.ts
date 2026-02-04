@@ -3,7 +3,12 @@ import type { PendingSessionOptions } from '@clerk/shared/types';
 
 import { clerkClient } from '../../server/clerkClient';
 import { auth } from './auth';
-import { isNextjsUseCacheError, USE_CACHE_ERROR_MESSAGE } from './utils';
+import {
+  ClerkUseCacheError,
+  isClerkUseCacheError,
+  isNextjsUseCacheError,
+  USE_CACHE_ERROR_MESSAGE,
+} from './utils';
 
 type CurrentUserOptions = PendingSessionOptions;
 
@@ -40,9 +45,11 @@ export async function currentUser(opts?: CurrentUserOptions): Promise<User | nul
 
     return (await clerkClient()).users.getUser(userId);
   } catch (e: any) {
-    // Catch "use cache" errors that bubble up from Next.js cache boundary
+    if (isClerkUseCacheError(e)) {
+      throw e;
+    }
     if (isNextjsUseCacheError(e)) {
-      throw new Error(`${USE_CACHE_ERROR_MESSAGE}\n\nOriginal error: ${e.message}`);
+      throw new ClerkUseCacheError(`${USE_CACHE_ERROR_MESSAGE}\n\nOriginal error: ${e.message}`, e);
     }
     throw e;
   }

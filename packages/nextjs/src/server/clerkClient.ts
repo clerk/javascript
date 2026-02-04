@@ -1,6 +1,6 @@
 import { constants } from '@clerk/backend/internal';
 
-import { buildRequestLike, isNextjsUseCacheError, isPrerenderingBailout } from '../app-router/server/utils';
+import { buildRequestLike, isClerkUseCacheError, isPrerenderingBailout } from '../app-router/server/utils';
 import { createClerkClientWithOptions } from './createClerkClient';
 import { getHeader } from './headers-utils';
 import { clerkMiddlewareRequestDataStorage } from './middleware-storage';
@@ -21,8 +21,7 @@ const clerkClient = async () => {
     if (err && isPrerenderingBailout(err)) {
       throw err;
     }
-    // Re-throw "use cache" errors with the helpful message from buildRequestLike
-    if (err && isNextjsUseCacheError(err)) {
+    if (err && isClerkUseCacheError(err)) {
       throw err;
     }
   }
