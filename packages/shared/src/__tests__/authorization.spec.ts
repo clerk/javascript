@@ -36,4 +36,8 @@ describe('splitByScope', () => {
     expect(org).toEqual(['reservations', 'support-chat', 'billing']);
     expect(user).toEqual(['dashboard', 'support-chat', 'billing']);
   });
+
+  it('throws an error if the claim element is missing a colon', () => {
+    expect(() => splitByScope('reservations,dashboard')).toThrow('Invalid claim element (missing colon): reservations');
+  });
 });

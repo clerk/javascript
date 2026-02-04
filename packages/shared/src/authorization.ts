@@ -148,6 +148,9 @@ const splitByScope = (fea: string | null | undefined) => {
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i].trim();
     const colonIndex = part.indexOf(':');
+    if (colonIndex === -1) {
+      throw new Error(`Invalid claim element (missing colon): ${part}`);
+    }
     const scope = part.slice(0, colonIndex);
     const value = part.slice(colonIndex + 1);
 
