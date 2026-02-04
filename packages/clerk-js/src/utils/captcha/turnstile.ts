@@ -77,14 +77,19 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   const { modalContainerQuerySelector, modalWrapperQuerySelector, closeModal, openModal } = opts;
   const captcha: Turnstile.Turnstile = await loadCaptcha(nonce);
 
-  // Timing and error tracking for diagnostics
-  const startTime = Date.now();
-  const errorTimeline: Array<{ code: string | number; t: number }> = [];
-  // Unique ID to correlate log entries for this captcha attempt
-  const captchaAttemptId =
-    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-      ? crypto.randomUUID()
-      : Math.random().toString(36).substring(2, 9);
+  // Diagnostic tracking - wrapped in try-catch to never affect production behavior
+  let startTime = 0;
+  let errorTimeline: Array<{ code: string | number; t: number }> = [];
+  let captchaAttemptId = '';
+  try {
+    startTime = Date.now();
+    captchaAttemptId =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : Math.random().toString(36).substring(2, 9);
+  } catch {
+    // Silently ignore - diagnostics should never break captcha flow
+  }
 
   let captchaToken = '';
   let id = '';
@@ -190,7 +195,11 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
             }
           },
           'error-callback': function (errorCode) {
-            errorTimeline.push({ code: errorCode, t: Date.now() - startTime });
+            try {
+              errorTimeline.push({ code: errorCode, t: Date.now() - startTime });
+            } catch {
+              // Silently ignore - diagnostics should never break captcha flow
+            }
             /**
              * By setting retry to 'never' the responsibility for implementing retrying is ours
              * https://developers.cloudflare.com/turnstile/reference/client-side-errors/#retrying
@@ -230,22 +239,25 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       captcha.remove(id);
     }
 
-    // Check if widget container exists at failure time (helps diagnose 200100 race conditions)
-    const containerExistsAtFailure = widgetContainerQuerySelector
-      ? !!document.querySelector(widgetContainerQuerySelector)
-      : false;
+    // Log failure with full error history for debugging - wrapped to never affect production
+    try {
+      const containerExistsAtFailure = widgetContainerQuerySelector
+        ? !!document.querySelector(widgetContainerQuerySelector)
+        : false;
 
-    // Log failure with full error history for debugging
-    debugLogger.error('Turnstile captcha challenge failed', {
-      captchaAttemptId,
-      errorTimeline,
-      lastErrorCode: errorTimeline.length > 0 ? errorTimeline[errorTimeline.length - 1].code : null,
-      finalError: String(e),
-      retriesAttempted: retries,
-      widgetType: captchaTypeUsed,
-      containerExistsAtFailure,
-      totalDurationMs: Date.now() - startTime,
-    }, 'captcha');
+      debugLogger.error('Turnstile captcha challenge failed', {
+        captchaAttemptId,
+        errorTimeline,
+        lastErrorCode: errorTimeline.length > 0 ? errorTimeline[errorTimeline.length - 1].code : null,
+        finalError: String(e),
+        retriesAttempted: retries,
+        widgetType: captchaTypeUsed,
+        containerExistsAtFailure,
+        totalDurationMs: Date.now() - startTime,
+      }, 'captcha');
+    } catch {
+      // Silently ignore - diagnostics should never break captcha flow
+    }
 
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw {
