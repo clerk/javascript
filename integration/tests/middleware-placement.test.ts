@@ -15,13 +15,6 @@ function parseSemverMajor(range?: string): number | undefined {
   return match ? Number.parseInt(match[0], 10) : undefined;
 }
 
-/**
- * Checks if a version string indicates a canary release.
- * Canary versions contain "canary" in their version string (e.g., "16.2.0-canary.23").
- */
-function isCanaryVersion(version?: string | null): boolean {
-  return Boolean(version && version.includes('canary'));
-}
 
 /**
  * Detects the installed Next.js version for a given application.
@@ -109,8 +102,7 @@ test.describe('next start - invalid middleware at root on src/ @quickstart', () 
   }) => {
     const { version } = await detectNext(app);
     const major = parseSemverMajor(version) ?? 0;
-    const isCanary = isCanaryVersion(version);
-    test.skip(major >= 16 && isCanary, 'Middleware detection is smarter in Next 16 canary.');
+    test.skip(major >= 16, 'Middleware detection is smarter in Next 16+.');
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
 
@@ -120,11 +112,10 @@ test.describe('next start - invalid middleware at root on src/ @quickstart', () 
     );
   });
 
-  test('Does not display misplaced middleware error on Next 16 canary', async ({ page, context }) => {
+  test('Does not display misplaced middleware error on Next 16+', async ({ page, context }) => {
     const { version } = await detectNext(app);
     const major = parseSemverMajor(version) ?? 0;
-    const isCanary = isCanaryVersion(version);
-    test.skip(major < 16 || !isCanary, 'Only applicable on Next 16 canary.');
+    test.skip(major < 16, 'Only applicable on Next 16+.');
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
     expect(app.serveOutput).not.toContain('Clerk: clerkMiddleware() was not run');
@@ -154,8 +145,7 @@ test.describe('next start - invalid middleware inside app on src/ @quickstart', 
   }) => {
     const { version } = await detectNext(app);
     const major = parseSemverMajor(version) ?? 0;
-    const isCanary = isCanaryVersion(version);
-    test.skip(major >= 16 && isCanary, 'Middleware detection is smarter in Next 16 canary.');
+    test.skip(major >= 16, 'Middleware detection is smarter in Next 16+.');
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
     expect(app.serveOutput).not.toContain('Your Middleware exists at ./src/middleware.(ts|js)');
@@ -164,11 +154,10 @@ test.describe('next start - invalid middleware inside app on src/ @quickstart', 
     );
   });
 
-  test('Does not display misplaced middleware error on Next 16 canary', async ({ page, context }) => {
+  test('Does not display misplaced middleware error on Next 16+', async ({ page, context }) => {
     const { version } = await detectNext(app);
     const major = parseSemverMajor(version) ?? 0;
-    const isCanary = isCanaryVersion(version);
-    test.skip(major < 16 || !isCanary, 'Only applicable on Next 16 canary.');
+    test.skip(major < 16, 'Only applicable on Next 16+.');
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
     expect(app.serveOutput).not.toContain('Clerk: clerkMiddleware() was not run');
