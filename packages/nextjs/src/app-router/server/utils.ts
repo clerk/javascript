@@ -8,7 +8,10 @@ const CLERK_USE_CACHE_MARKER = Symbol.for('clerk_use_cache_error');
 export class ClerkUseCacheError extends Error {
   readonly [CLERK_USE_CACHE_MARKER] = true;
 
-  constructor(message: string, public readonly originalError?: Error) {
+  constructor(
+    message: string,
+    public readonly originalError?: Error,
+  ) {
     super(message);
     this.name = 'ClerkUseCacheError';
   }

@@ -3,12 +3,7 @@ import type { PendingSessionOptions } from '@clerk/shared/types';
 
 import { clerkClient } from '../../server/clerkClient';
 import { auth } from './auth';
-import {
-  ClerkUseCacheError,
-  isClerkUseCacheError,
-  isNextjsUseCacheError,
-  USE_CACHE_ERROR_MESSAGE,
-} from './utils';
+import { ClerkUseCacheError, isClerkUseCacheError, isNextjsUseCacheError, USE_CACHE_ERROR_MESSAGE } from './utils';
 
 type CurrentUserOptions = PendingSessionOptions;
 
