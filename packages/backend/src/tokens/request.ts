@@ -411,10 +411,10 @@ export const authenticateRequest: AuthenticateRequest = (async (
   async function authenticateRequestWithTokenInHeader() {
     const { tokenInHeader } = authenticateContext;
 
-    // SECURITY: Reject machine tokens (M2M, OAuth, API keys) when expecting session tokens.
+    // Reject machine tokens (M2M, OAuth, API keys) when expecting session tokens.
     // OAuth JWTs (RFC 9068) are valid JWTs signed by Clerk and will pass verifyToken() verification,
-    // but they should not be accepted as session tokens. We must explicitly check the token type
-    // before verification to prevent machine tokens from being incorrectly authenticated as sessions.
+    // but should not be accepted as session tokens. Explicitly check the token type before verification
+    // to ensure only session tokens are authenticated in this flow.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (isMachineToken(tokenInHeader!)) {
       return signedOut({
@@ -568,9 +568,9 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleSessionTokenError(decodedErrors[0], 'cookie');
     }
 
-    // SECURITY: Defense-in-depth check to reject machine tokens in cookies.
-    // While machine tokens should only be in headers, this prevents potential security issues
-    // if a machine token somehow ends up in the session cookie.
+    // Reject OAuth JWTs (RFC 9068) that may appear in cookies when expecting session tokens.
+    // OAuth JWTs are valid Clerk-signed JWTs and will pass verifyToken() verification,
+    // but should not be accepted as session tokens.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (isMachineToken(authenticateContext.sessionTokenInCookie!)) {
       return signedOut({
