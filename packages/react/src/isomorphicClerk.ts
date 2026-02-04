@@ -52,6 +52,7 @@ import type {
   State,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
+  TaskSetupMFAProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
   UserAvatarProps,
@@ -157,6 +158,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   private premountTaskResetPasswordNodes = new Map<HTMLDivElement, TaskResetPasswordProps | undefined>();
+  private premountTaskSetupMfaNodes = new Map<HTMLDivElement, TaskSetupMFAProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -707,6 +709,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     this.premountTaskResetPasswordNodes.forEach((props, node) => {
       clerkjs.mountTaskResetPassword(node, props);
+    });
+
+    this.premountTaskSetupMfaNodes.forEach((props, node) => {
+      clerkjs.mountTaskSetupMfa(node, props);
     });
 
     /**
@@ -1270,6 +1276,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountTaskResetPassword(node);
     } else {
       this.premountTaskResetPasswordNodes.delete(node);
+    }
+  };
+
+  mountTaskSetupMfa = (node: HTMLDivElement, props?: TaskSetupMFAProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountTaskSetupMfa(node, props);
+    } else {
+      this.premountTaskSetupMfaNodes.set(node, props);
+    }
+  };
+
+  unmountTaskSetupMfa = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountTaskSetupMfa(node);
+    } else {
+      this.premountTaskSetupMfaNodes.delete(node);
     }
   };
 

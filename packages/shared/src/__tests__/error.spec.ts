@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { ErrorThrowerOptions } from '../error';
-import { buildErrorThrower, ClerkRuntimeError, isClerkRuntimeError } from '../error';
+import { buildErrorThrower, ClerkOfflineError, ClerkRuntimeError, isClerkRuntimeError } from '../error';
 
 describe('ErrorThrower', () => {
   const errorThrower = buildErrorThrower({ packageName: '@clerk/test-package' });
@@ -60,5 +60,47 @@ describe('ClerkRuntimeError', () => {
 
   it('helper recognises error', () => {
     expect(isClerkRuntimeError(clerkRuntimeError)).toEqual(true);
+  });
+});
+
+describe('ClerkOfflineError', () => {
+  it('is an instance of ClerkRuntimeError', () => {
+    const error = new ClerkOfflineError('Network request failed');
+    expect(error).toBeInstanceOf(ClerkRuntimeError);
+    expect(error.code).toBe('clerk_offline');
+  });
+
+  describe('ClerkOfflineError.is() type guard', () => {
+    it('returns true for ClerkOfflineError instances', () => {
+      const error = new ClerkOfflineError('test');
+      expect(ClerkOfflineError.is(error)).toBe(true);
+    });
+
+    it('returns true for ClerkRuntimeError with clerk_offline code', () => {
+      const error = new ClerkRuntimeError('test', { code: 'clerk_offline' });
+      expect(ClerkOfflineError.is(error)).toBe(true);
+    });
+
+    it('returns false for other ClerkRuntimeError instances', () => {
+      const error = new ClerkRuntimeError('test', { code: 'other_code' });
+      expect(ClerkOfflineError.is(error)).toBe(false);
+    });
+
+    it('returns false for regular Error instances', () => {
+      const error = new Error('test');
+      expect(ClerkOfflineError.is(error)).toBe(false);
+    });
+
+    it('returns false for null', () => {
+      expect(ClerkOfflineError.is(null)).toBe(false);
+    });
+
+    it('returns false for undefined', () => {
+      expect(ClerkOfflineError.is(undefined)).toBe(false);
+    });
+
+    it('returns false for non-error objects', () => {
+      expect(ClerkOfflineError.is({ message: 'test' })).toBe(false);
+    });
   });
 });

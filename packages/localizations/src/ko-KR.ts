@@ -368,6 +368,12 @@ export const koKR: LocalizationResource = {
         tableHeader__role: '역할',
         tableHeader__user: '사용자',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: '사용 가능한 역할을 업데이트하고 있어요. 끝나면 다시 역할을 바꿀 수 있어요.',
+          title: '역할이 잠시 잠겼어요',
+        },
+      },
       detailsTitle__emptyRow: '표시할 멤버 없음',
       invitationsTab: {
         autoInvitations: {
@@ -397,12 +403,6 @@ export const koKR: LocalizationResource = {
         headerTitle__invitations: '초대',
         headerTitle__members: '멤버',
         headerTitle__requests: '요청',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: '역할이 잠시 잠겼어요',
-          subtitle: '사용 가능한 역할을 업데이트하고 있어요. 끝나면 다시 역할을 바꿀 수 있어요.',
-        },
       },
     },
     navbar: {
@@ -854,6 +854,10 @@ export const koKR: LocalizationResource = {
   socialButtonsBlockButton: '{{provider|titleize}}로 계속하기',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        '감지된 회사 이름({{organizationName}})과 {{organizationDomain}}에 해당하는 조직이 이미 있어요. 초대로 참여해 주세요.',
+    },
     chooseOrganization: {
       action__createOrganization: '새 조직 만들기',
       action__invitationAccept: '참여',
@@ -874,16 +878,12 @@ export const koKR: LocalizationResource = {
       title: '조직 설정',
     },
     organizationCreationDisabled: {
-      title: '조직에 소속돼야 해요',
       subtitle: '초대가 필요하면 조직 관리자에게 문의해 주세요.',
+      title: '조직에 소속돼야 해요',
     },
     signOut: {
       actionLink: '로그아웃',
       actionText: '{{identifier}}로 로그인됨',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        '감지된 회사 이름({{organizationName}})과 {{organizationDomain}}에 해당하는 조직이 이미 있어요. 초대로 참여해 주세요.',
     },
   },
   taskResetPassword: {
@@ -894,6 +894,69 @@ export const koKR: LocalizationResource = {
     },
     subtitle: '계속하려면 비밀번호를 새로 설정해야 해요',
     title: '비밀번호 재설정',
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}}은(는) 이미 이 조직의 멤버예요.',
@@ -922,11 +985,12 @@ export const koKR: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect:
-      '비밀번호 또는 이메일 주소가 올바르지 않아요. 다시 시도하거나 다른 방법을 사용해 보세요.',
     form_password_length_too_short: '비밀번호가 너무 짧아요. 최소 8자 이상이어야 해요.',
     form_password_not_strong_enough: '비밀번호가 충분히 안전하지 않아요.',
+    form_password_or_identifier_incorrect:
+      '비밀번호 또는 이메일 주소가 올바르지 않아요. 다시 시도하거나 다른 방법을 사용해 보세요.',
     form_password_pwned: '이 비밀번호는 유출된 기록이 있어 사용할 수 없어요. 다른 비밀번호를 사용해 주세요.',
     form_password_pwned__sign_in: '이 비밀번호는 유출된 비밀번호예요. 비밀번호를 재설정해 주세요.',
     form_password_size_in_bytes_exceeded:

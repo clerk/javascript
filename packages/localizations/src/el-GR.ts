@@ -367,6 +367,13 @@ export const elGR: LocalizationResource = {
         tableHeader__role: 'Ρόλος',
         tableHeader__user: 'Χρήστης',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Ενημερώνουμε τους διαθέσιμους ρόλους. Μόλις ολοκληρωθεί, θα μπορείτε να ενημερώσετε ξανά τους ρόλους.',
+          title: 'Οι ρόλοι είναι προσωρινά κλειδωμένοι',
+        },
+      },
       detailsTitle__emptyRow: 'Δεν υπάρχουν μέλη για εμφάνιση',
       invitationsTab: {
         autoInvitations: {
@@ -397,13 +404,6 @@ export const elGR: LocalizationResource = {
         headerTitle__invitations: 'Προσκλήσεις',
         headerTitle__members: 'Μέλη',
         headerTitle__requests: 'Αιτήματα',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Οι ρόλοι είναι προσωρινά κλειδωμένοι',
-          subtitle:
-            'Ενημερώνουμε τους διαθέσιμους ρόλους. Μόλις ολοκληρωθεί, θα μπορείτε να ενημερώσετε ξανά τους ρόλους.',
-        },
       },
     },
     navbar: {
@@ -869,6 +869,10 @@ export const elGR: LocalizationResource = {
   socialButtonsBlockButton: 'Συνέχεια με {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Υπάρχει ήδη οργανισμός για το ανιχνευμένο όνομα εταιρείας ({{organizationName}}) και {{organizationDomain}}. Εγγραφείτε μέσω πρόσκλησης.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Δημιουργία νέου οργανισμού',
       action__invitationAccept: 'Συμμετοχή',
@@ -889,16 +893,12 @@ export const elGR: LocalizationResource = {
       title: 'Ρυθμίστε τον οργανισμό σας',
     },
     organizationCreationDisabled: {
-      title: 'Πρέπει να ανήκετε σε έναν οργανισμό',
       subtitle: 'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για πρόσκληση.',
+      title: 'Πρέπει να ανήκετε σε έναν οργανισμό',
     },
     signOut: {
       actionLink: 'Αποσύνδεση',
       actionText: 'Συνδεδεμένος ως {{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'Υπάρχει ήδη οργανισμός για το ανιχνευμένο όνομα εταιρείας ({{organizationName}}) και {{organizationDomain}}. Εγγραφείτε μέσω πρόσκλησης.',
     },
   },
   taskResetPassword: {
@@ -909,6 +909,69 @@ export const elGR: LocalizationResource = {
     },
     subtitle: 'Για λόγους ασφαλείας, παρακαλώ επαναφέρετε τον κωδικό πρόσβασής σας',
     title: 'Επαναφορά κωδικού πρόσβασης',
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: 'Είστε ήδη μέλος σε αυτόν τον οργανισμό',
@@ -939,20 +1002,20 @@ export const elGR: LocalizationResource = {
     form_param_type_invalid__email_address: 'Η διεύθυνση email δεν είναι έγκυρη.',
     form_param_type_invalid__phone_number: 'Ο αριθμός τηλεφώνου δεν είναι έγκυρος.',
     form_param_value_invalid: '{{paramName}} δεν είναι έγκυρο.',
+    form_password_compromised__sign_in:
+      'Ο κωδικός πρόσβασής σας ενδέχεται να έχει παραβιαστεί. Για την προστασία του λογαριασμού σας, παρακαλώ συνεχίστε με εναλλακτική μέθοδο σύνδεσης. Θα σας ζητηθεί να επαναφέρετε τον κωδικό πρόσβασής σας μετά τη σύνδεση.',
     form_password_incorrect: 'Ο κωδικός πρόσβασης δεν είναι σωστός.',
-    form_password_or_identifier_incorrect:
-      'Ο κωδικός πρόσβασης ή η διεύθυνση email είναι λανθασμένη. Δοκιμάστε ξανά ή χρησιμοποιήστε άλλη μέθοδο.',
     form_password_length_too_short:
       'Ο κωδικός πρόσβασής σας πρέπει να αποτελείται από τουλάχιστον {{length}} χαρακτήρες.',
     form_password_not_strong_enough: 'Ο κωδικός πρόσβασής σας δεν είναι αρκετά ισχυρός.',
+    form_password_or_identifier_incorrect:
+      'Ο κωδικός πρόσβασης ή η διεύθυνση email είναι λανθασμένη. Δοκιμάστε ξανά ή χρησιμοποιήστε άλλη μέθοδο.',
     form_password_pwned:
       'Αυτός ο κωδικός πρόσβασης έχει διαρρεύσει online στο παρελθόν και δεν μπορεί να χρησιμοποιηθεί. Δοκιμάστε έναν άλλο κωδικό πρόσβασης αντί για αυτόν.',
     form_password_pwned__sign_in:
       'Αυτός ο κωδικός πρόσβασης εντοπίστηκε σε παραβίαση δεδομένων και πρέπει να επαναφερθεί. Παρακαλώ δοκιμάστε έναν άλλο κωδικό πρόσβασης ή χρησιμοποιήστε τον σύνδεσμο "Ξεχάσατε τον κωδικό πρόσβασης;" για να τον επαναφέρετε.',
     form_password_size_in_bytes_exceeded:
       'Ο κωδικός πρόσβασής σας έχει υπερβεί το μέγιστο αριθμό bytes που επιτρέπεται. Παρακαλούμε, συντομεύστε τον ή αφαιρέστε μερικούς ειδικούς χαρακτήρες.',
-    form_password_compromised__sign_in:
-      'Ο κωδικός πρόσβασής σας ενδέχεται να έχει παραβιαστεί. Για την προστασία του λογαριασμού σας, παρακαλώ συνεχίστε με εναλλακτική μέθοδο σύνδεσης. Θα σας ζητηθεί να επαναφέρετε τον κωδικό πρόσβασής σας μετά τη σύνδεση.',
     form_password_untrusted__sign_in:
       'Για λόγους ασφαλείας, απαιτείται επαναφορά κωδικού πρόσβασης. Παρακαλώ χρησιμοποιήστε τον σύνδεσμο "Ξεχάσατε τον κωδικό πρόσβασης;" για να τον επαναφέρετε.',
     form_password_validation_failed: 'Λανθασμένος κωδικός',

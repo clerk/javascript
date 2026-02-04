@@ -5,13 +5,13 @@ import React from 'react';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
+import { getSecondFactorsAvailableToAdd } from '@/ui/utils/mfa';
 
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { MfaBackupCodeScreen } from './MfaBackupCodeScreen';
 import { MfaPhoneCodeScreen } from './MfaPhoneCodeScreen';
 import { MfaTOTPScreen } from './MfaTOTPScreen';
-import { getSecondFactorsAvailableToAdd } from './utils';
 
 type MfaFormProps = FormProps & {
   selectedStrategy?: VerificationStrategy;
