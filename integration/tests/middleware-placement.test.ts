@@ -15,6 +15,10 @@ function parseSemverMajor(range?: string): number | undefined {
   return match ? Number.parseInt(match[0], 10) : undefined;
 }
 
+function isCanaryVersion(version?: string | null): boolean {
+  return Boolean(version && version.includes('canary'));
+}
+
 /**
  * Detects the installed Next.js version for a given application.
  * Reads the version from node_modules/next/package.json to ensure
@@ -114,7 +118,7 @@ test.describe('next start - invalid middleware at root on src/ @quickstart', () 
   test('Does not display misplaced middleware error on Next 16+', async ({ page, context }) => {
     const { version } = await detectNext(app);
     const major = parseSemverMajor(version) ?? 0;
-    test.skip(major < 16, 'Only applicable on Next 16+');
+    test.skip(major < 16, 'Only applicable on Next 16+.');
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
     expect(app.serveOutput).not.toContain('Clerk: clerkMiddleware() was not run');
@@ -142,11 +146,26 @@ test.describe('next start - invalid middleware inside app on src/ @quickstart', 
     page,
     context,
   }) => {
+    const { version } = await detectNext(app);
+    const major = parseSemverMajor(version) ?? 0;
+    const isCanary = isCanaryVersion(version);
+    // Next 16 stable still shows this warning, only canary changed behavior
+    test.skip(major >= 16 && isCanary, 'Middleware detection is smarter in Next 16 canary.');
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
     expect(app.serveOutput).not.toContain('Your Middleware exists at ./src/middleware.(ts|js)');
     expect(app.serveOutput).toContain(
       'Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./src/middleware.ts. Currently located at ./src/app/middleware.ts',
     );
+  });
+
+  test('Does not display misplaced middleware error on Next 16 canary', async ({ page, context }) => {
+    const { version } = await detectNext(app);
+    const major = parseSemverMajor(version) ?? 0;
+    const isCanary = isCanaryVersion(version);
+    test.skip(major < 16 || !isCanary, 'Only applicable on Next 16 canary.');
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToAppHome();
+    expect(app.serveOutput).not.toContain('Clerk: clerkMiddleware() was not run');
   });
 });
