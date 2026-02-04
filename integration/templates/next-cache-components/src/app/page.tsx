@@ -13,16 +13,25 @@ export default function Home() {
             <Link href='/auth-server-component'>auth() in Server Component</Link>
           </li>
           <li>
+            <Link href='/current-user-server-component'>currentUser() in Server Component</Link>
+          </li>
+          <li>
             <Link href='/auth-server-action'>auth() in Server Action</Link>
           </li>
           <li>
             <Link href='/api/auth-check'>auth() in API Route</Link>
           </li>
           <li>
-            <Link href='/use-cache-error'>use cache with auth() (should error)</Link>
+            <Link href='/use-cache-error'>use cache with auth() (documentation)</Link>
           </li>
           <li>
-            <Link href='/use-cache-correct'>&quot;use cache&quot; correct pattern</Link>
+            <Link href='/use-cache-error-trigger'>use cache error trigger (actual error)</Link>
+          </li>
+          <li>
+            <Link href='/use-cache-correct'>&quot;use cache&quot; correct pattern (auth)</Link>
+          </li>
+          <li>
+            <Link href='/current-user-cache-correct'>&quot;use cache&quot; correct pattern (currentUser)</Link>
           </li>
           <li>
             <Link href='/ppr-auth'>PPR with auth()</Link>
