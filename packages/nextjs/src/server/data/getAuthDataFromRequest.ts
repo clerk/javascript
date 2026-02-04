@@ -11,7 +11,7 @@ import {
   getAuthObjectForAcceptedToken,
   getAuthObjectFromJwt,
   invalidTokenAuthObject,
-  isMachineTokenByPrefix,
+  isMachineToken,
   isTokenTypeAccepted,
   signedOutAuthObject,
   TokenType,
@@ -147,7 +147,7 @@ const handleMachineToken = (
   acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
   options: Record<string, any>,
 ): MachineAuthObject<MachineTokenType> | null => {
-  const hasMachineToken = bearerToken && isMachineTokenByPrefix(bearerToken);
+  const hasMachineToken = bearerToken && isMachineToken(bearerToken);
 
   const acceptsOnlySessionToken =
     acceptsToken === TokenType.SessionToken ||

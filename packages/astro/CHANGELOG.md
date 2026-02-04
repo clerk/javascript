@@ -1,5 +1,16 @@
 # @clerk/astro
 
+## 2.17.0
+
+### Minor Changes
+
+- Add `$billingStore` for access to the `Clerk.billing` object containing various Clerk Billing methods. ([#7733](https://github.com/clerk/javascript/pull/7733)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`7917ff4`](https://github.com/clerk/javascript/commit/7917ff4214fc9e1001e2698c7241bbfa4b68e5af), [`b0d28c1`](https://github.com/clerk/javascript/commit/b0d28c14815a6136c67a719efb1dc5496ffb5c82)]:
+  - @clerk/backend@2.30.0
+
 ## 2.16.17
 
 ### Patch Changes
