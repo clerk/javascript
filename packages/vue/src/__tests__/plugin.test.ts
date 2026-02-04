@@ -105,7 +105,7 @@ describe('clerkPlugin UI loading', () => {
     expect(mockLoadClerkUiScript).not.toHaveBeenCalled();
 
     // Should pass the bundled ClerkUI constructor
-    const resolvedClerkUI = await capturedLoadOptions.ui.ClerkUI;
+    const resolvedClerkUI = await capturedLoadOptions.clerkUICtor;
     expect(resolvedClerkUI).toBe(mockClerkUICtor);
   });
 
@@ -144,7 +144,7 @@ describe('clerkPlugin UI loading', () => {
     expect(mockLoadClerkUiScript).not.toHaveBeenCalled();
 
     // ClerkUI should be undefined (headless mode)
-    const resolvedClerkUI = await capturedLoadOptions.ui.ClerkUI;
+    const resolvedClerkUI = await capturedLoadOptions.clerkUICtor;
     expect(resolvedClerkUI).toBeUndefined();
   });
 });
