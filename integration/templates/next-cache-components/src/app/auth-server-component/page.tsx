@@ -16,13 +16,13 @@ async function AuthContent() {
               isSignedIn: !!userId,
             },
             null,
-            2
+            2,
           )}
         </pre>
       </div>
 
-      <div data-testid="user-id">{userId ?? 'Not signed in'}</div>
-      <div data-testid="session-id">{sessionId ?? 'No session'}</div>
+      <div data-testid='user-id'>{userId ?? 'Not signed in'}</div>
+      <div data-testid='session-id'>{sessionId ?? 'No session'}</div>
     </>
   );
 }

@@ -15,14 +15,14 @@ export default function UseCacheErrorPage() {
     <main>
       <h1>&quot;use cache&quot; with auth() - Error Case</h1>
       <p>
-        This page documents the expected error when calling <code>auth()</code> inside
-        a <code>&quot;use cache&quot;</code> function.
+        This page documents the expected error when calling <code>auth()</code> inside a{' '}
+        <code>&quot;use cache&quot;</code> function.
       </p>
 
-      <div className="test-result error">
+      <div className='test-result error'>
         <h3>Expected Build Error:</h3>
-        <pre data-testid="expected-error">
-{`Route used \`headers()\` inside "use cache".
+        <pre data-testid='expected-error'>
+          {`Route used \`headers()\` inside "use cache".
 Accessing Dynamic data sources inside a cache scope is not supported.
 If you need this data inside a cached function use \`headers()\`
 outside of the cached function and pass the required dynamic data
@@ -30,19 +30,18 @@ in as an argument.`}
         </pre>
       </div>
 
-      <div className="test-result">
+      <div className='test-result'>
         <h3>Why This Happens:</h3>
         <p>
           <code>auth()</code> internally uses <code>headers()</code> and <code>cookies()</code>
-          to read authentication data. These are &quot;Dynamic APIs&quot; that cannot be used
-          inside cache functions.
+          to read authentication data. These are &quot;Dynamic APIs&quot; that cannot be used inside cache functions.
         </p>
       </div>
 
-      <div className="test-result success">
+      <div className='test-result success'>
         <h3>Correct Pattern:</h3>
         <pre>
-{`// Call auth() OUTSIDE the cache function
+          {`// Call auth() OUTSIDE the cache function
 const { userId } = await auth();
 
 // Pass userId INTO the cache function
@@ -55,14 +54,14 @@ async function getCachedData(userId: string) {
 }`}
         </pre>
         <p>
-          See <a href="/use-cache-correct">/use-cache-correct</a> for a working example.
+          See <a href='/use-cache-correct'>/use-cache-correct</a> for a working example.
         </p>
       </div>
 
       <details>
         <summary>Code that would produce this error:</summary>
         <pre>
-{`import { auth } from '@clerk/nextjs/server';
+          {`import { auth } from '@clerk/nextjs/server';
 
 // This will ERROR at build time
 async function getCachedAuthData() {

@@ -10,28 +10,28 @@ export default function Home() {
         <h2>Test Scenarios</h2>
         <ul>
           <li>
-            <Link href="/auth-server-component">auth() in Server Component</Link>
+            <Link href='/auth-server-component'>auth() in Server Component</Link>
           </li>
           <li>
-            <Link href="/auth-server-action">auth() in Server Action</Link>
+            <Link href='/auth-server-action'>auth() in Server Action</Link>
           </li>
           <li>
-            <Link href="/api/auth-check">auth() in API Route</Link>
+            <Link href='/api/auth-check'>auth() in API Route</Link>
           </li>
           <li>
-            <Link href="/use-cache-error">use cache with auth() (should error)</Link>
+            <Link href='/use-cache-error'>use cache with auth() (should error)</Link>
           </li>
           <li>
-            <Link href="/use-cache-correct">&quot;use cache&quot; correct pattern</Link>
+            <Link href='/use-cache-correct'>&quot;use cache&quot; correct pattern</Link>
           </li>
           <li>
-            <Link href="/ppr-auth">PPR with auth()</Link>
+            <Link href='/ppr-auth'>PPR with auth()</Link>
           </li>
           <li>
-            <Link href="/protected">Protected Route (middleware)</Link>
+            <Link href='/protected'>Protected Route (middleware)</Link>
           </li>
           <li>
-            <Link href="/sign-in">Sign In</Link>
+            <Link href='/sign-in'>Sign In</Link>
           </li>
         </ul>
       </nav>

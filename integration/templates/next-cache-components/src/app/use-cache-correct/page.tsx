@@ -27,7 +27,7 @@ async function UseCacheCorrectContent() {
     return (
       <>
         <p>Please sign in to test the caching pattern.</p>
-        <div data-testid="signed-out">Not signed in</div>
+        <div data-testid='signed-out'>Not signed in</div>
       </>
     );
   }
@@ -50,9 +50,9 @@ async function UseCacheCorrectContent() {
         <li>The cache function only contains cacheable operations</li>
       </ol>
 
-      <div className="test-result success">
+      <div className='test-result success'>
         <h3>Cached User Data:</h3>
-        <pre data-testid="cached-data">{JSON.stringify(userData, null, 2)}</pre>
+        <pre data-testid='cached-data'>{JSON.stringify(userData, null, 2)}</pre>
       </div>
 
       <pre>

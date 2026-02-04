@@ -23,22 +23,25 @@ export default function AuthServerActionPage() {
       <h1>auth() in Server Action</h1>
       <p>This page tests using auth() inside a server action.</p>
 
-      <button onClick={handleCheck} data-testid="check-auth-btn">
+      <button
+        onClick={handleCheck}
+        data-testid='check-auth-btn'
+      >
         Check Auth via Server Action
       </button>
 
       {result && (
-        <div className="test-result success">
+        <div className='test-result success'>
           <h3>Auth Result:</h3>
           <pre>{JSON.stringify(result, null, 2)}</pre>
-          <div data-testid="action-user-id">{result.userId ?? 'Not signed in'}</div>
+          <div data-testid='action-user-id'>{result.userId ?? 'Not signed in'}</div>
         </div>
       )}
 
       {error && (
-        <div className="test-result error">
+        <div className='test-result error'>
           <h3>Error:</h3>
-          <pre data-testid="action-error">{error}</pre>
+          <pre data-testid='action-error'>{error}</pre>
         </div>
       )}
     </main>
