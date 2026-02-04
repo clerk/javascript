@@ -48,6 +48,14 @@
       "types": "./dist/token-cache/index.d.ts",
       "default": "./dist/token-cache/index.js"
     },
+    "./google": {
+      "types": "./dist/google/index.d.ts",
+      "default": "./dist/google/index.js"
+    },
+    "./apple": {
+      "types": "./dist/apple/index.d.ts",
+      "default": "./dist/apple/index.js"
+    },
     "./resource-cache": {
       "types": "./dist/resource-cache/index.d.ts",
       "default": "./dist/resource-cache/index.js"
@@ -70,6 +78,8 @@
     "dist",
     "android",
     "ios",
+    "google",
+    "apple",
     "expo-module.config.json",
     "app.plugin.js"
   ],

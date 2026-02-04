@@ -851,6 +851,9 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   annual_monthly_fee: BillingMoneyAmountJSON | null;
   for_payer_type: 'org' | 'user';
   features?: FeatureJSON[];
+  free_trial_days: number | null;
+  free_trial_enabled: boolean;
+  avatar_url: string | null;
 }
 
 type BillingSubscriptionItemStatus =
@@ -904,7 +907,7 @@ export interface BillingSubscriptionItemWebhookEventJSON extends ClerkResourceJS
   proration_date: string;
   plan_period: 'month' | 'annual';
   period_start: number;
-  period_end?: number;
+  period_end: number | null;
   canceled_at?: number;
   past_due_at?: number;
   lifetime_paid: number;

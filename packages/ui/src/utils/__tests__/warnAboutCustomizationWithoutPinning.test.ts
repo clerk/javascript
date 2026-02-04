@@ -14,7 +14,10 @@ vi.mock('../detectClerkStylesheetUsage', () => ({
 import { logger } from '@clerk/shared/logger';
 
 import { detectStructuralClerkCss } from '../detectClerkStylesheetUsage';
-import { warnAboutCustomizationWithoutPinning } from '../warnAboutCustomizationWithoutPinning';
+import {
+  warnAboutComponentAppearance,
+  warnAboutCustomizationWithoutPinning,
+} from '../warnAboutCustomizationWithoutPinning';
 
 const getWarningMessage = () => {
   const calls = vi.mocked(logger.warnOnce).mock.calls;
@@ -48,15 +51,15 @@ describe('warnAboutCustomizationWithoutPinning', () => {
 
       expect(logger.warnOnce).toHaveBeenCalledTimes(1);
       const message = getWarningMessage();
-      expect(message).toContain('[CLERK_W001]');
+      expect(message).toContain('(code=structural_css_pin_clerk_ui)');
       expect(message).toContain('elements.card "& > div"');
     });
 
-    test('still warns when clerkUiCtor is provided without ui (CDN scenario)', () => {
-      // clerkUiCtor is always set when loading from CDN, but ui is only set
+    test('still warns when clerkUICtor is provided without ui (CDN scenario)', () => {
+      // clerkUICtor is always set when loading from CDN, but ui is only set
       // when the user explicitly imports @clerk/ui
       warnAboutCustomizationWithoutPinning({
-        clerkUiCtor: class MockClerkUi {} as any,
+        clerkUICtor: class MockClerkUi {} as any,
         appearance: {
           elements: { card: { '& > div': { color: 'red' } } },
         },
@@ -269,7 +272,7 @@ describe('warnAboutCustomizationWithoutPinning', () => {
 
       expect(logger.warnOnce).toHaveBeenCalledTimes(1);
       const message = getWarningMessage();
-      expect(message).toContain('[CLERK_W001]');
+      expect(message).toContain('(code=structural_css_pin_clerk_ui)');
       expect(message).toContain('CSS ".cl-card > div"');
     });
 
@@ -315,13 +318,15 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       expect(logger.warnOnce).not.toHaveBeenCalled();
     });
 
-    test('truncates pattern list when more than 3 patterns are found', () => {
+    test('truncates pattern list when more than 5 patterns are found', () => {
       vi.mocked(detectStructuralClerkCss).mockReturnValue([
         { stylesheetHref: null, selector: '.cl-a > div', cssText: '', reason: [] },
         { stylesheetHref: null, selector: '.cl-b > div', cssText: '', reason: [] },
         { stylesheetHref: null, selector: '.cl-c > div', cssText: '', reason: [] },
         { stylesheetHref: null, selector: '.cl-d > div', cssText: '', reason: [] },
         { stylesheetHref: null, selector: '.cl-e > div', cssText: '', reason: [] },
+        { stylesheetHref: null, selector: '.cl-f > div', cssText: '', reason: [] },
+        { stylesheetHref: null, selector: '.cl-g > div', cssText: '', reason: [] },
       ]);
 
       warnAboutCustomizationWithoutPinning({});
@@ -329,11 +334,10 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       expect(logger.warnOnce).toHaveBeenCalledTimes(1);
       const message = getWarningMessage();
       expect(message).toContain('(+2 more)');
-      // Should only show first 3 patterns
-      expect(message).toContain('CSS ".cl-a > div"');
-      expect(message).toContain('CSS ".cl-b > div"');
-      expect(message).toContain('CSS ".cl-c > div"');
-      expect(message).not.toContain('.cl-d > div');
+      // Should show first 5 patterns as bullet points
+      expect(message).toContain('- CSS ".cl-a > div"');
+      expect(message).toContain('- CSS ".cl-e > div"');
+      expect(message).not.toContain('.cl-f > div');
     });
 
     test('warning message includes documentation link', () => {
@@ -344,7 +348,49 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       });
 
       const message = getWarningMessage();
-      expect(message).toContain('https://clerk.com/docs/customization/versioning');
+      expect(message).toContain('https://clerk.com/docs/reference/components/versioning');
     });
+  });
+});
+
+describe('warnAboutComponentAppearance', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  test('does not warn when uiPinned is true', () => {
+    warnAboutComponentAppearance(
+      {
+        elements: { card: { '& > div': { color: 'red' } } },
+      },
+      true,
+    );
+
+    expect(logger.warnOnce).not.toHaveBeenCalled();
+  });
+
+  test('warns when uiPinned is false and structural customization is used', () => {
+    warnAboutComponentAppearance(
+      {
+        elements: { card: { '& > div': { color: 'red' } } },
+      },
+      false,
+    );
+
+    expect(logger.warnOnce).toHaveBeenCalledTimes(1);
+    const message = getWarningMessage();
+    expect(message).toContain('(code=structural_css_pin_clerk_ui)');
+    expect(message).toContain('elements.card "& > div"');
+  });
+
+  test('does not call detectStructuralClerkCss (only checks elements, not stylesheets)', () => {
+    warnAboutComponentAppearance(
+      {
+        elements: { card: { '& > div': { color: 'red' } } },
+      },
+      false,
+    );
+
+    expect(detectStructuralClerkCss).not.toHaveBeenCalled();
   });
 });

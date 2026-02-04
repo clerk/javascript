@@ -49,10 +49,13 @@ export const ActiveMembersList = ({ memberships, pageSize }: ActiveMembersListPr
       isLoading={(memberships?.isLoading && !memberships?.data.length) || loadingRoles}
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
       headers={[
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__joined'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__role'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
+        { key: localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user') },
+        { key: localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__joined') },
+        { key: localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__role') },
+        {
+          key: localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
+          align: 'right',
+        },
       ]}
       rows={(memberships?.data || []).map(m => (
         <MemberRow
@@ -122,7 +125,7 @@ const MemberRow = (props: {
           />
         </Protect>
       </Td>
-      <Td>
+      <Td sx={{ textAlign: 'right' }}>
         <Protect permission={'org:sys_memberships:manage'}>
           <ThreeDotsMenu
             actions={[

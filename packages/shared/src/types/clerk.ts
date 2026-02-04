@@ -715,6 +715,23 @@ export interface Clerk {
   unmountTaskResetPassword: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts a TaskSetupMFA component at the target element.
+   * This component allows users to set up multi-factor authentication.
+   *
+   * @param targetNode - Target node to mount the TaskSetupMFA component.
+   * @param props - configuration parameters.
+   */
+  mountTaskSetupMfa: (targetNode: HTMLDivElement, props?: TaskSetupMFAProps) => void;
+
+  /**
+   * Unmount a TaskSetupMFA component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode - Target node to unmount the TaskSetupMFA component from.
+   */
+  unmountTaskSetupMfa: (targetNode: HTMLDivElement) => void;
+
+  /**
    * @internal
    * Loads Stripe libraries for commerce functionality
    */
@@ -1132,7 +1149,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /**
      * Clerk UI entrypoint.
      */
-    clerkUiCtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
+    clerkUICtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
@@ -2354,6 +2371,14 @@ export type TaskResetPasswordProps = {
   appearance?: ClerkAppearanceTheme;
 };
 
+export type TaskSetupMFAProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   */
+  redirectUrlComplete: string;
+  appearance?: ClerkAppearanceTheme;
+};
+
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;
   role: OrganizationCustomRoleKey;
@@ -2468,22 +2493,17 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   clerkJSUrl?: string;
   /**
-   * If your web application only uses [Control Components](https://clerk.com/docs/reference/components/overview#control-components), you can set this value to `'headless'` and load a minimal ClerkJS bundle for optimal page performance.
-   */
-  clerkJSVariant?: 'headless' | '';
-  /**
    * The npm version for `@clerk/clerk-js`.
    */
   clerkJSVersion?: string;
   /**
    * The URL that `@clerk/ui` should be hot-loaded from.
    */
-  clerkUiUrl?: string;
+  clerkUIUrl?: string;
   /**
-   * If set to `'shared'`, loads a variant of `@clerk/ui` that expects React to be provided by the host application via `globalThis.__clerkSharedModules`.
-   * This reduces bundle size when using framework packages like `@clerk/react`.
+   * The npm version for `@clerk/ui`.
    */
-  clerkUIVariant?: 'shared' | '';
+  clerkUIVersion?: string;
   /**
    * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
    */
@@ -2493,11 +2513,11 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   nonce?: string;
   /**
-   * @internal
-   * This is a structural-only type for the `ui` object that can be passed
-   * to Clerk.load() and ClerkProvider
+   * Controls prefetching of the `@clerk/ui` script.
+   * - `false` - Skip prefetching the UI (for custom UIs using Control Components)
+   * - `undefined` (default) - Prefetch UI normally
    */
-  ui?: { version: string; url?: string };
+  prefetchUI?: boolean;
 } & MultiDomainAndOrProxy;
 
 export interface LoadedClerk extends Clerk {

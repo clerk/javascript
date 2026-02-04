@@ -1,7 +1,7 @@
 import {
-  loadClerkJsScript,
-  loadClerkUiScript,
-  setClerkJsLoadingErrorPackageName,
+  loadClerkJSScript,
+  loadClerkUIScript,
+  setClerkJSLoadingErrorPackageName,
 } from '@clerk/shared/loadClerkJsScript';
 import type { ClerkOptions } from '@clerk/shared/types';
 import type { ClerkUiConstructor } from '@clerk/shared/ui';
@@ -16,7 +16,7 @@ import { runOnce } from './run-once';
 
 let initOptions: ClerkOptions | undefined;
 
-setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
+setClerkJSLoadingErrorPackageName(PACKAGE_NAME);
 
 function createNavigationHandler(
   windowNav: typeof window.history.pushState | typeof window.history.replaceState,
@@ -40,7 +40,7 @@ async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroC
   // Both functions return early if the scripts are already loaded
   // (e.g., via middleware-injected script tags in the HTML head).
   const clerkJsChunk = getClerkJsEntryChunk(options);
-  const clerkUiCtor = getClerkUiEntryChunk(options);
+  const clerkUICtor = getClerkUIEntryChunk(options);
 
   await clerkJsChunk;
 
@@ -59,7 +59,7 @@ async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroC
     routerReplace: createNavigationHandler(window.history.replaceState.bind(window.history)),
     ...options,
     // Pass the clerk-ui constructor promise to clerk.load()
-    clerkUiCtor,
+    clerkUICtor,
   } as unknown as ClerkOptions;
 
   initOptions = clerkOptions;
@@ -105,27 +105,33 @@ function updateClerkOptions<TUi extends Ui = Ui>(options: AstroClerkUpdateOption
  * Returns early if window.Clerk already exists.
  */
 async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCreateInstanceParams<TUi>): Promise<void> {
-  await loadClerkJsScript(options);
+  await loadClerkJSScript(options);
 }
 
 /**
  * Gets the ClerkUI constructor, either from options or by loading the script.
- * Returns early if window.__internal_ClerkUiCtor already exists.
+ * Returns early if window.__internal_ClerkUICtor already exists.
+ * Returns undefined when prefetchUI={false} (no UI needed).
  */
-async function getClerkUiEntryChunk<TUi extends Ui = Ui>(
+async function getClerkUIEntryChunk<TUi extends Ui = Ui>(
   options?: AstroClerkCreateInstanceParams<TUi>,
-): Promise<ClerkUiConstructor> {
-  if (options?.clerkUiCtor) {
-    return options.clerkUiCtor;
+): Promise<ClerkUiConstructor | undefined> {
+  // Honor explicit clerkUICtor even when prefetchUI=false
+  if (options?.clerkUICtor) {
+    return options.clerkUICtor;
   }
 
-  await loadClerkUiScript(options);
+  if (options?.prefetchUI === false) {
+    return undefined;
+  }
 
-  if (!window.__internal_ClerkUiCtor) {
+  await loadClerkUIScript(options as any);
+
+  if (!window.__internal_ClerkUICtor) {
     throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
   }
 
-  return window.__internal_ClerkUiCtor;
+  return window.__internal_ClerkUICtor;
 }
 
 export { createClerkInstance, updateClerkOptions };
