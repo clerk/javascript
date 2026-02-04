@@ -116,17 +116,33 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   }
 
   // smart widget with container provided by user
+  // We create a stable container outside React to prevent 200100 errors from React re-renders
+  // removing the element during Turnstile verification
+  let stableSmartContainer: HTMLDivElement | null = null;
   if (!widgetContainerQuerySelector && widgetType === 'smart') {
     const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
     if (visibleDiv) {
       captchaTypeUsed = 'smart';
       captchaWidgetType = 'smart';
-      widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
-      visibleDiv.style.maxHeight = '0'; // This is to prevent the layout shift when the render method is called
+
       const { theme, language, size } = getCaptchaAttibutesFromElemenet(visibleDiv);
       captchaTheme = theme;
       captchaLanguage = language;
       captchaSize = size;
+
+      // Create a stable container that won't be affected by React re-renders
+      stableSmartContainer = document.createElement('div');
+      stableSmartContainer.id = `${CAPTCHA_ELEMENT_ID}-stable`;
+      stableSmartContainer.style.maxHeight = '0';
+      stableSmartContainer.style.overflow = 'hidden';
+      stableSmartContainer.style.transition = 'max-height 0.2s ease';
+
+      // Insert the stable container right after the React element
+      visibleDiv.parentNode?.insertBefore(stableSmartContainer, visibleDiv.nextSibling);
+      // Hide the original React element
+      visibleDiv.style.display = 'none';
+
+      widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}-stable`;
     } else {
       console.error(
         'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/guides/development/custom-flows/authentication/bot-sign-up-protection for instructions',
@@ -167,14 +183,17 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
               const el = document.querySelector(modalWrapperQuerySelector) as HTMLElement;
               el?.style.setProperty('visibility', 'visible');
               el?.style.setProperty('pointer-events', 'all');
+            } else if (stableSmartContainer) {
+              // Style the stable container (which is outside React's control)
+              stableSmartContainer.style.maxHeight = 'unset';
+              stableSmartContainer.style.minHeight = captchaSize === 'compact' ? '140px' : '68px';
+              stableSmartContainer.style.marginBottom = '1.5rem';
+              stableSmartContainer.style.overflow = 'visible';
             } else {
+              // Fallback for non-stable container (shouldn't happen, but just in case)
               const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
               if (visibleWidget) {
-                // We unset the max-height to allow the widget to expand
                 visibleWidget.style.maxHeight = 'unset';
-                // We set the min-height to the height of the Turnstile widget
-                // because the widget initially does a small layout shift
-                // and then expands to the correct height
                 visibleWidget.style.minHeight = captchaSize === 'compact' ? '140px' : '68px';
                 visibleWidget.style.marginBottom = '1.5rem';
               }
@@ -236,8 +255,14 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       }
     }
     if (captchaTypeUsed === 'smart') {
+      // Remove the stable container we created
+      if (stableSmartContainer?.parentNode) {
+        stableSmartContainer.parentNode.removeChild(stableSmartContainer);
+      }
+      // Restore the original React element
       const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
       if (visibleWidget) {
+        visibleWidget.style.display = 'block';
         visibleWidget.style.maxHeight = '0';
         visibleWidget.style.minHeight = 'unset';
         visibleWidget.style.marginBottom = 'unset';
