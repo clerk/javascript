@@ -76,9 +76,15 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   const { siteKey, widgetType, invisibleSiteKey, nonce } = opts;
   const { modalContainerQuerySelector, modalWrapperQuerySelector, closeModal, openModal } = opts;
   const captcha: Turnstile.Turnstile = await loadCaptcha(nonce);
-  const errorCodes: (string | number)[] = [];
+
+  // Timing and error tracking for diagnostics
+  const startTime = Date.now();
+  const errorTimeline: Array<{ code: string | number; t: number }> = [];
   // Unique ID to correlate log entries for this captcha attempt
-  const captchaAttemptId = Math.random().toString(36).substring(2, 9);
+  const captchaAttemptId =
+    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : Math.random().toString(36).substring(2, 9);
 
   let captchaToken = '';
   let id = '';
@@ -184,7 +190,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
             }
           },
           'error-callback': function (errorCode) {
-            errorCodes.push(errorCode);
+            errorTimeline.push({ code: errorCode, t: Date.now() - startTime });
             /**
              * By setting retry to 'never' the responsibility for implementing retrying is ours
              * https://developers.cloudflare.com/turnstile/reference/client-side-errors/#retrying
@@ -196,7 +202,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
               }, 250);
               return;
             }
-            reject([errorCodes.join(','), id]);
+            reject([errorTimeline.map(e => e.code).join(','), id]);
           },
           'unsupported-callback': function () {
             reject(['This browser is not supported by the CAPTCHA.', id]);
@@ -224,13 +230,21 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       captcha.remove(id);
     }
 
+    // Check if widget container exists at failure time (helps diagnose 200100 race conditions)
+    const containerExistsAtFailure = widgetContainerQuerySelector
+      ? !!document.querySelector(widgetContainerQuerySelector)
+      : false;
+
     // Log failure with full error history for debugging
     debugLogger.error('Turnstile captcha challenge failed', {
       captchaAttemptId,
-      errorCodesHistory: [...errorCodes],
+      errorTimeline,
+      lastErrorCode: errorTimeline.length > 0 ? errorTimeline[errorTimeline.length - 1].code : null,
       finalError: String(e),
       retriesAttempted: retries,
       widgetType: captchaTypeUsed,
+      containerExistsAtFailure,
+      totalDurationMs: Date.now() - startTime,
     }, 'captcha');
 
     // eslint-disable-next-line @typescript-eslint/only-throw-error
