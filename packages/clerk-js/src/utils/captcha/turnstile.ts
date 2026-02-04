@@ -82,7 +82,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
 
   // Diagnostic tracking - wrapped in try-catch to never affect production behavior
   let startTime = 0;
-  let errorTimeline: Array<{ code: string | number; t: number }> = [];
+  const errorTimeline: Array<{ code: string | number; t: number }> = [];
   let captchaAttemptId = '';
   try {
     startTime = Date.now();
@@ -251,16 +251,20 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
         ? !!document.querySelector(widgetContainerQuerySelector)
         : false;
 
-      debugLogger.error('Turnstile captcha challenge failed', {
-        captchaAttemptId,
-        errorTimeline,
-        lastErrorCode: errorTimeline.length > 0 ? errorTimeline[errorTimeline.length - 1].code : null,
-        finalError: String(e),
-        retriesAttempted: retries,
-        widgetType: captchaTypeUsed,
-        containerExistsAtFailure,
-        totalDurationMs: Date.now() - startTime,
-      }, 'captcha');
+      debugLogger.error(
+        'Turnstile captcha challenge failed',
+        {
+          captchaAttemptId,
+          errorTimeline,
+          lastErrorCode: errorTimeline.length > 0 ? errorTimeline[errorTimeline.length - 1].code : null,
+          finalError: String(e),
+          retriesAttempted: retries,
+          widgetType: captchaTypeUsed,
+          containerExistsAtFailure,
+          totalDurationMs: Date.now() - startTime,
+        },
+        'captcha',
+      );
     } catch {
       // Silently ignore - diagnostics should never break captcha flow
     }
