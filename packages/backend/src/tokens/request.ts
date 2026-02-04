@@ -411,6 +411,20 @@ export const authenticateRequest: AuthenticateRequest = (async (
   async function authenticateRequestWithTokenInHeader() {
     const { tokenInHeader } = authenticateContext;
 
+    // SECURITY: Reject machine tokens (M2M, OAuth, API keys) when expecting session tokens.
+    // OAuth JWTs (RFC 9068) are valid JWTs signed by Clerk and will pass verifyToken() verification,
+    // but they should not be accepted as session tokens. We must explicitly check the token type
+    // before verification to prevent machine tokens from being incorrectly authenticated as sessions.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    if (isMachineToken(tokenInHeader!)) {
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+    }
+
     try {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const { data, errors } = await verifyToken(tokenInHeader!, authenticateContext);
@@ -606,6 +620,19 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
     if (decodedErrors) {
       return handleSessionTokenError(decodedErrors[0], 'cookie');
+    }
+
+    // SECURITY: Defense-in-depth check to reject machine tokens in cookies.
+    // While machine tokens should only be in headers, this prevents potential security issues
+    // if a machine token somehow ends up in the session cookie.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    if (isMachineToken(authenticateContext.sessionTokenInCookie!)) {
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
     }
 
     if (decodeResult.payload.iat < authenticateContext.clientUat) {
