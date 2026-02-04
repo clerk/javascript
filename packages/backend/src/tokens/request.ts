@@ -14,7 +14,7 @@ import { AuthErrorReason, handshake, signedIn, signedOut, signedOutInvalidToken 
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
-import { getMachineTokenType, isMachineToken, isTokenTypeAccepted } from './machine';
+import { getMachineTokenType, isMachineToken, isOAuthJwt, isTokenTypeAccepted } from './machine';
 import { OrganizationMatcher } from './organizationMatcher';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
@@ -415,7 +415,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     // OAuth JWTs are valid Clerk-signed JWTs and will pass verifyToken() verification,
     // but should not be accepted as session tokens.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (isMachineToken(tokenInHeader!)) {
+    if (isOAuthJwt(tokenInHeader!)) {
       return signedOut({
         tokenType: TokenType.SessionToken,
         authenticateContext,
@@ -565,19 +565,6 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
     if (decodedErrors) {
       return handleSessionTokenError(decodedErrors[0], 'cookie');
-    }
-
-    // Defense-in-depth: Reject machine tokens in cookies.
-    // Machine tokens should only be in headers, but this check prevents potential issues
-    // if a machine token somehow ends up in the session cookie.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (isMachineToken(authenticateContext.sessionTokenInCookie!)) {
-      return signedOut({
-        tokenType: TokenType.SessionToken,
-        authenticateContext,
-        reason: AuthErrorReason.TokenTypeMismatch,
-        message: '',
-      });
     }
 
     if (decodeResult.payload.iat < authenticateContext.clientUat) {
