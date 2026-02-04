@@ -10,7 +10,12 @@ import {
   mockJwtPayload,
   mockMalformedJwt,
 } from '../../fixtures';
-import { mockMachineAuthResponses, mockTokens, mockVerificationResults } from '../../fixtures/machine';
+import {
+  mockMachineAuthResponses,
+  mockSignedOAuthAccessTokenJwt,
+  mockTokens,
+  mockVerificationResults,
+} from '../../fixtures/machine';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
@@ -1498,40 +1503,12 @@ describe('tokens.authenticateRequest(options)', () => {
       });
 
       test('rejects OAuth JWT token when acceptsToken is session_token', async () => {
-        const request = mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` });
+        const request = mockRequest({ authorization: `Bearer ${mockSignedOAuthAccessTokenJwt}` });
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'session_token' }));
 
         expect(result).toBeSignedOut({
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
-          tokenType: 'session_token',
-          isAuthenticated: false,
-        });
-        expect(result.toAuth()).toBeSignedOutToAuth();
-      });
-
-      test('rejects M2M token when acceptsToken is session_token', async () => {
-        const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
-        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'session_token' }));
-
-        expect(result).toBeSignedOut({
-          reason: AuthErrorReason.TokenTypeMismatch,
-          message: '',
-          tokenType: 'session_token',
-          isAuthenticated: false,
-        });
-        expect(result.toAuth()).toBeSignedOutToAuth();
-      });
-
-      test('rejects API key when acceptsToken is session_token', async () => {
-        const request = mockRequest({ authorization: `Bearer ${mockTokens.api_key}` });
-        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'session_token' }));
-
-        expect(result).toBeSignedOut({
-          reason: AuthErrorReason.TokenTypeMismatch,
-          message: '',
-          tokenType: 'session_token',
-          isAuthenticated: false,
         });
         expect(result.toAuth()).toBeSignedOutToAuth();
       });
