@@ -18,7 +18,7 @@ vi.mock('@clerk/shared/browser', () => ({
 
 const mockClerkUICtor = vi.fn();
 
-describe('clerkPlugin CDN UI loading', () => {
+describe('clerkPlugin UI loading', () => {
   const originalWindowClerk = window.Clerk;
 
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe('clerkPlugin CDN UI loading', () => {
     template: '<div>Test</div>',
   });
 
-  it('passes clerkUIVersion from pluginOptions.ui.version to loadClerkUiScript', async () => {
+  it('loads UI from CDN when no ui prop is provided', async () => {
     mockLoadClerkUiScript.mockImplementation(async () => {
       window.__internal_ClerkUICtor = mockClerkUICtor as any;
       return null;
@@ -57,9 +57,6 @@ describe('clerkPlugin CDN UI loading', () => {
             clerkPlugin,
             {
               publishableKey: 'pk_test_xxx',
-              ui: {
-                version: '1.2.3',
-              },
             },
           ],
         ],
@@ -69,82 +66,10 @@ describe('clerkPlugin CDN UI loading', () => {
     await vi.waitFor(() => {
       expect(mockLoadClerkUiScript).toHaveBeenCalled();
     });
-
-    const loadClerkUiScriptCall = mockLoadClerkUiScript.mock.calls[0][0];
-    expect(loadClerkUiScriptCall.clerkUIVersion).toBe('1.2.3');
-    expect(loadClerkUiScriptCall.clerkUIUrl).toBeUndefined();
   });
 
-  it('passes clerkUIUrl from pluginOptions.ui.url to loadClerkUiScript', async () => {
-    mockLoadClerkUiScript.mockImplementation(async () => {
-      window.__internal_ClerkUICtor = mockClerkUICtor as any;
-      return null;
-    });
-
-    render(TestComponent, {
-      global: {
-        plugins: [
-          [
-            clerkPlugin,
-            {
-              publishableKey: 'pk_test_xxx',
-              ui: {
-                url: 'https://custom.cdn.example.com/ui.js',
-              },
-            },
-          ],
-        ],
-      },
-    });
-
-    await vi.waitFor(() => {
-      expect(mockLoadClerkUiScript).toHaveBeenCalled();
-    });
-
-    const loadClerkUiScriptCall = mockLoadClerkUiScript.mock.calls[0][0];
-    expect(loadClerkUiScriptCall.clerkUIUrl).toBe('https://custom.cdn.example.com/ui.js');
-    expect(loadClerkUiScriptCall.clerkUIVersion).toBeUndefined();
-  });
-
-  it('passes both clerkUIVersion and clerkUIUrl when both are provided', async () => {
-    mockLoadClerkUiScript.mockImplementation(async () => {
-      window.__internal_ClerkUICtor = mockClerkUICtor as any;
-      return null;
-    });
-
-    render(TestComponent, {
-      global: {
-        plugins: [
-          [
-            clerkPlugin,
-            {
-              publishableKey: 'pk_test_xxx',
-              ui: {
-                version: '2.0.0',
-                url: 'https://custom.cdn.example.com/ui-v2.js',
-              },
-            },
-          ],
-        ],
-      },
-    });
-
-    await vi.waitFor(() => {
-      expect(mockLoadClerkUiScript).toHaveBeenCalled();
-    });
-
-    const loadClerkUiScriptCall = mockLoadClerkUiScript.mock.calls[0][0];
-    expect(loadClerkUiScriptCall.clerkUIVersion).toBe('2.0.0');
-    expect(loadClerkUiScriptCall.clerkUIUrl).toBe('https://custom.cdn.example.com/ui-v2.js');
-  });
-
-  it('ClerkUIPromise resolves to window.__internal_ClerkUICtor after loadClerkUiScript completes', async () => {
+  it('uses bundled UI when ui.ClerkUI is provided', async () => {
     let capturedLoadOptions: any;
-
-    mockLoadClerkUiScript.mockImplementation(async () => {
-      window.__internal_ClerkUICtor = mockClerkUICtor as any;
-      return null;
-    });
 
     mockLoadClerkJsScript.mockImplementation(async () => {
       (window as any).Clerk = {
@@ -164,7 +89,7 @@ describe('clerkPlugin CDN UI loading', () => {
             {
               publishableKey: 'pk_test_xxx',
               ui: {
-                version: '1.0.0',
+                ClerkUI: mockClerkUICtor,
               },
             },
           ],
@@ -176,7 +101,50 @@ describe('clerkPlugin CDN UI loading', () => {
       expect(capturedLoadOptions).toBeDefined();
     });
 
+    // Should not load from CDN
+    expect(mockLoadClerkUiScript).not.toHaveBeenCalled();
+
+    // Should pass the bundled ClerkUI constructor
     const resolvedClerkUI = await capturedLoadOptions.ui.ClerkUI;
     expect(resolvedClerkUI).toBe(mockClerkUICtor);
+  });
+
+  it('does not load UI when prefetchUI is false', async () => {
+    let capturedLoadOptions: any;
+
+    mockLoadClerkJsScript.mockImplementation(async () => {
+      (window as any).Clerk = {
+        load: vi.fn().mockImplementation(async (opts: any) => {
+          capturedLoadOptions = opts;
+        }),
+        addListener: vi.fn(),
+      };
+      return null;
+    });
+
+    render(TestComponent, {
+      global: {
+        plugins: [
+          [
+            clerkPlugin,
+            {
+              publishableKey: 'pk_test_xxx',
+              prefetchUI: false,
+            },
+          ],
+        ],
+      },
+    });
+
+    await vi.waitFor(() => {
+      expect(capturedLoadOptions).toBeDefined();
+    });
+
+    // Should not load from CDN
+    expect(mockLoadClerkUiScript).not.toHaveBeenCalled();
+
+    // ClerkUI should be undefined (headless mode)
+    const resolvedClerkUI = await capturedLoadOptions.ui.ClerkUI;
+    expect(resolvedClerkUI).toBeUndefined();
   });
 });

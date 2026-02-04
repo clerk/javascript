@@ -520,7 +520,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     // Support bundled UI via ui.ClerkUI prop
-    const uiProp = (this.options as { ui?: { ClerkUI?: ClerkUiConstructor; version?: string; url?: string } }).ui;
+    const uiProp = (this.options as { ui?: { ClerkUI?: ClerkUiConstructor } }).ui;
     if (uiProp?.ClerkUI) {
       return uiProp.ClerkUI;
     }
@@ -535,8 +535,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       proxyUrl: this.proxyUrl,
       domain: this.domain,
       nonce: this.options.nonce,
-      clerkUIVersion: uiProp?.version,
-      clerkUIUrl: uiProp?.url,
     });
 
     if (!global.__internal_ClerkUICtor) {

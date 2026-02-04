@@ -28,12 +28,11 @@ export type PluginOptions<TUi extends Ui = Ui> = Without<IsomorphicClerkOptions,
     initialState?: InitialState;
     appearance?: Appearance<TUi>;
     /**
-     * UI object for Clerk UI components.
-     * Can include version/url for CDN loading, or ClerkUI constructor for bundled usage.
+     * Optional object to use the bundled Clerk UI instead of loading from CDN.
+     * Import `ui` from `@clerk/ui` and pass it here to bundle the UI with your application.
+     * When omitted, UI is loaded from Clerk's CDN.
      */
-    ui?: TUi & {
-      ClerkUI?: ClerkUiConstructor;
-    };
+    ui?: TUi;
   };
 
 const SDK_METADATA = {
@@ -86,7 +85,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
         try {
           const clerkPromise = loadClerkJSScript(options);
           // Honor explicit clerkUICtor even when prefetchUI={false}
-          // Also support the new ui prop with version/url/ClerkUI
+          // Also support bundled UI via ui.ClerkUI prop
           const uiProp = pluginOptions.ui;
           const clerkUICtorPromise = pluginOptions.clerkUICtor
             ? Promise.resolve(pluginOptions.clerkUICtor)
@@ -95,12 +94,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
               : pluginOptions.prefetchUI === false
                 ? Promise.resolve(undefined)
                 : (async () => {
-                    const uiScriptOptions = {
-                      ...options,
-                      clerkUIVersion: uiProp?.version,
-                      clerkUIUrl: uiProp?.url,
-                    };
-                    await loadClerkUIScript(uiScriptOptions);
+                    await loadClerkUIScript(options);
                     if (!window.__internal_ClerkUICtor) {
                       throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
                     }

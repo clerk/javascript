@@ -1,3 +1,5 @@
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
+
 import type { Appearance } from './appearance';
 
 export type { ComponentControls, MountComponentRenderer } from '../Components';
@@ -24,8 +26,11 @@ type Tagged<BaseType, Tag extends PropertyKey> = BaseType & { [Tags]: { [K in Ta
  */
 export type Ui<A = any> = Tagged<
   {
-    version: string;
-    url?: string;
+    ClerkUI: ClerkUiConstructor;
+    /**
+     * Version of the UI package (for potential future use)
+     */
+    version?: string;
     /**
      * Phantom property for type-level appearance inference
      * This property never exists at runtime
@@ -86,12 +91,3 @@ export type {
 //   UserPreviewId,
 // } from './internal/elementIds';
 
-/**
- * @internal
- * Local ui object for testing purposes
- * Do not use
- */
-export const localUiForTesting = {
-  version: PACKAGE_VERSION,
-  url: 'http://localhost:4011/npm/ui.browser.js',
-} as Ui<Appearance & { newprop?: string }>;
