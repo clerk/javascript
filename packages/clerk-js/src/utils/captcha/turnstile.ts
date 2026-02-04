@@ -77,6 +77,9 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   const { modalContainerQuerySelector, modalWrapperQuerySelector, closeModal, openModal } = opts;
   const captcha: Turnstile.Turnstile = await loadCaptcha(nonce);
 
+  // Error codes array - used for actual error handling (unchanged from original behavior)
+  const errorCodes: (string | number)[] = [];
+
   // Diagnostic tracking - wrapped in try-catch to never affect production behavior
   let startTime = 0;
   let errorTimeline: Array<{ code: string | number; t: number }> = [];
@@ -195,6 +198,9 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
             }
           },
           'error-callback': function (errorCode) {
+            // Track error for actual error handling (original behavior)
+            errorCodes.push(errorCode);
+            // Track timing for diagnostics only
             try {
               errorTimeline.push({ code: errorCode, t: Date.now() - startTime });
             } catch {
@@ -211,7 +217,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
               }, 250);
               return;
             }
-            reject([errorTimeline.map(e => e.code).join(','), id]);
+            reject([errorCodes.join(','), id]);
           },
           'unsupported-callback': function () {
             reject(['This browser is not supported by the CAPTCHA.', id]);
