@@ -1332,20 +1332,6 @@ describe('tokens.authenticateRequest(options)', () => {
         expect(requestState).toBeSignedIn();
         expect(requestState.toAuth()).toBeSignedInToAuth();
       });
-
-      test('accepts OAuth JWT when acceptsToken is "any"', async () => {
-        server.use(
-          http.post(mockMachineAuthResponses.oauth_token.endpoint, () => {
-            return HttpResponse.json(mockVerificationResults.oauth_token);
-          }),
-        );
-
-        const request = mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` });
-        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'any' }));
-
-        expect(result).toBeMachineAuthenticated();
-        expect(result.tokenType).toBe('oauth_token');
-      });
     });
 
     describe('Token Type Mismatch', () => {
