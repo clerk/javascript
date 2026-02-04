@@ -2,12 +2,12 @@
 import Layout from '../layouts/Layout.astro';
 import Card from '../components/Card.astro';
 
-import { SignedIn, SignedOut, SignOutButton, OrganizationSwitcher } from '@clerk/astro/components';
+import { Show, SignOutButton, OrganizationSwitcher } from '@clerk/astro/components';
 ---
 
 <Layout title='Welcome to Astro.'>
   <h1>Welcome to <span class='text-gradient'>Astro</span></h1>
-  <SignedIn>
+  <Show when='signed-in'>
     <OrganizationSwitcher
       appearance={{
         elements: {
@@ -18,7 +18,7 @@ import { SignedIn, SignedOut, SignOutButton, OrganizationSwitcher } from '@clerk
       afterSelectOrganizationUrl='/organization'
     />
     <SignOutButton>Sign out!</SignOutButton>
-  </SignedIn>
+  </Show>
 
   <div class='h-12'></div>
 
@@ -26,7 +26,7 @@ import { SignedIn, SignedOut, SignOutButton, OrganizationSwitcher } from '@clerk
     role='list'
     class='link-card-grid'
   >
-    <SignedOut>
+    <Show when='signed-out'>
       <Card
         href='/sign-in'
         title='Log in'
@@ -37,8 +37,8 @@ import { SignedIn, SignedOut, SignOutButton, OrganizationSwitcher } from '@clerk
         title='Create account'
         body='Supercharge your project with new frameworks and libraries.'
       />
-    </SignedOut>
-    <SignedIn>
+    </Show>
+    <Show when='signed-in'>
       <Card
         href='/user'
         title='User Profile'
@@ -64,7 +64,12 @@ import { SignedIn, SignedOut, SignOutButton, OrganizationSwitcher } from '@clerk
         title='For members'
         body='Learn how Astro works and explore the official API docs.'
       />
-    </SignedIn>
+      <Card
+        href='/prerendered'
+        title='Prerendered Page'
+        body='Test prerendered pages with Clerk control components'
+      />
+    </Show>
   </ul>
 </Layout>
 

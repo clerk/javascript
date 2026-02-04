@@ -4,8 +4,9 @@ interface InternalEnv {
   readonly PUBLIC_CLERK_FRONTEND_API?: string;
   readonly PUBLIC_CLERK_PUBLISHABLE_KEY?: string;
   readonly PUBLIC_CLERK_JS_URL?: string;
-  readonly PUBLIC_CLERK_JS_VARIANT?: 'headless' | '';
   readonly PUBLIC_CLERK_JS_VERSION?: string;
+  readonly PUBLIC_CLERK_UI_URL?: string;
+  readonly PUBLIC_CLERK_PREFETCH_UI?: string;
   readonly CLERK_API_KEY?: string;
   readonly CLERK_API_URL?: string;
   readonly CLERK_API_VERSION?: string;

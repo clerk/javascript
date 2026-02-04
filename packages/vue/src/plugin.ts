@@ -1,22 +1,32 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { deriveState } from '@clerk/shared/deriveState';
-import { loadClerkJsScript, type LoadClerkJsScriptOptions } from '@clerk/shared/loadClerkJsScript';
+import { loadClerkJSScript, type LoadClerkJSScriptOptions, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   Clerk,
+  ClerkOptions,
   ClientResource,
   InitialState,
+  IsomorphicClerkOptions,
   MultiDomainAndOrProxy,
   Resources,
   Without,
 } from '@clerk/shared/types';
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { Appearance, Ui } from '@clerk/ui/internal';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
 
 import { ClerkInjectionKey } from './keys';
+declare global {
+  interface Window {
+    __internal_ClerkUICtor?: ClerkUiConstructor;
+  }
+}
 
-export type PluginOptions = Without<LoadClerkJsScriptOptions, 'domain' | 'proxyUrl'> &
+export type PluginOptions<TUi extends Ui = Ui> = Without<IsomorphicClerkOptions, 'domain' | 'proxyUrl' | 'appearance'> &
   MultiDomainAndOrProxy & {
     initialState?: InitialState;
+    appearance?: Appearance<TUi>;
   };
 
 const SDK_METADATA = {
@@ -44,7 +54,7 @@ const SDK_METADATA = {
  * ```
  */
 export const clerkPlugin: Plugin<[PluginOptions]> = {
-  install(app, pluginOptions) {
+  install<TUi extends Ui = Ui>(app: any, pluginOptions: PluginOptions<TUi>) {
     const { initialState } = pluginOptions || {};
 
     const loaded = shallowRef(false);
@@ -60,29 +70,53 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
     const options = {
       ...pluginOptions,
       sdkMetadata: pluginOptions.sdkMetadata || SDK_METADATA,
-    } as LoadClerkJsScriptOptions;
+    } as LoadClerkJSScriptOptions;
 
     // We need this check for SSR apps like Nuxt as it will try to run this code on the server
-    // and loadClerkJsScript contains browser-specific code
+    // and loadClerkJSScript contains browser-specific code
     if (inBrowser()) {
-      void loadClerkJsScript(options).then(async () => {
-        if (!window.Clerk) {
-          throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
+      void (async () => {
+        try {
+          const clerkPromise = loadClerkJSScript(options);
+          // Honor explicit clerkUICtor even when prefetchUI={false}
+          const clerkUICtorPromise = pluginOptions.clerkUICtor
+            ? Promise.resolve(pluginOptions.clerkUICtor)
+            : pluginOptions.prefetchUI === false
+              ? Promise.resolve(undefined)
+              : (async () => {
+                  await loadClerkUIScript(options);
+                  if (!window.__internal_ClerkUICtor) {
+                    throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+                  }
+                  return window.__internal_ClerkUICtor;
+                })();
+
+          await clerkPromise;
+
+          if (!window.Clerk) {
+            throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
+          }
+
+          clerk.value = window.Clerk;
+          const loadOptions = { ...options, clerkUICtor: clerkUICtorPromise } as unknown as ClerkOptions;
+          await window.Clerk.load(loadOptions);
+          loaded.value = true;
+
+          if (clerk.value) {
+            clerk.value.addListener(payload => {
+              resources.value = payload;
+            });
+
+            // When Clerk updates its state internally, Vue's reactivity system doesn't detect
+            // the change since it's an external object being mutated. triggerRef() forces Vue
+            // to re-evaluate all dependencies regardless of how the value was changed.
+            triggerRef(clerk);
+          }
+        } catch (err) {
+          const error = err as Error;
+          console.error(error.stack || error.message || error);
         }
-
-        clerk.value = window.Clerk;
-        await window.Clerk.load(options);
-        loaded.value = true;
-
-        clerk.value.addListener(payload => {
-          resources.value = payload;
-        });
-
-        // When Clerk updates its state internally, Vue's reactivity system doesn't detect
-        // the change since it's an external object being mutated. triggerRef() forces Vue
-        // to re-evaluate all dependencies regardless of how the value was changed.
-        triggerRef(clerk);
-      });
+      })();
     }
 
     const derivedState = computed(() => deriveState(loaded.value, resources.value, initialState));

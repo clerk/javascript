@@ -11,7 +11,7 @@ const reactRouterNode = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/react-router', constants.E2E_CLERK_VERSION || linkPackage('react-router'));
+  .addDependency('@clerk/react-router', constants.E2E_CLERK_JS_VERSION || linkPackage('react-router'));
 
 const reactRouterLibrary = applicationConfig()
   .setName('react-router-library')
@@ -21,7 +21,7 @@ const reactRouterLibrary = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/react-router', constants.E2E_CLERK_VERSION || linkPackage('react-router'));
+  .addDependency('@clerk/react-router', constants.E2E_CLERK_JS_VERSION || linkPackage('react-router'));
 
 export const reactRouter = {
   reactRouterNode,

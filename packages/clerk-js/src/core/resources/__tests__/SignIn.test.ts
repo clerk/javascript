@@ -1,5 +1,7 @@
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { eventBus } from '../../events';
+import { signInErrorSignal, signInResourceSignal } from '../../signals';
 import { BaseResource } from '../internal';
 import { SignIn } from '../SignIn';
 
@@ -979,6 +981,48 @@ describe('SignIn', () => {
       });
     });
 
+    describe('sendMFAEmailCode', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+      });
+
+      it('prepares second factor with email code', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({
+          id: 'signin_123',
+          supported_second_factors: [
+            { strategy: 'email_code', email_address_id: 'email_123', safe_identifier: 'user@example.com' },
+          ],
+        } as any);
+        await signIn.__internal_future.mfa.sendEmailCode();
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins/signin_123/prepare_second_factor',
+          body: {
+            emailAddressId: 'email_123',
+            strategy: 'email_code',
+          },
+        });
+      });
+
+      it('returns error when email code factor not found', async () => {
+        const signIn = new SignIn({
+          id: 'signin_123',
+          supported_second_factors: [{ strategy: 'totp' }],
+        } as any);
+        const result = await signIn.__internal_future.mfa.sendEmailCode();
+
+        expect(result.error).toBeTruthy();
+        expect(result.error?.code).toBe('factor_not_found');
+      });
+    });
+
     describe('passkey', () => {
       afterEach(() => {
         vi.clearAllMocks();
@@ -1302,11 +1346,11 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getMetamaskIdentifierModule = await import('../../../utils');
-        vi.spyOn(getMetamaskIdentifierModule, 'getMetamaskIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-        vi.spyOn(getMetamaskIdentifierModule, 'generateSignatureWithMetamask').mockResolvedValue('signature_123');
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getMetamaskIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithMetamask: vi.fn().mockResolvedValue('signature_123'),
+        } as any);
 
         const signIn = new SignIn();
         await signIn.__internal_future.web3({ strategy: 'web3_metamask_signature' });
@@ -1360,13 +1404,11 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getCoinbaseWalletIdentifierModule = await import('../../../utils');
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'getCoinbaseWalletIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'generateSignatureWithCoinbaseWallet').mockResolvedValue(
-          'signature_123',
-        );
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getCoinbaseWalletIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithCoinbaseWallet: vi.fn().mockResolvedValue('signature_123'),
+        } as any);
 
         const signIn = new SignIn();
         await signIn.__internal_future.web3({ strategy: 'web3_coinbase_wallet_signature' });
@@ -1405,19 +1447,16 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getCoinbaseWalletIdentifierModule = await import('../../../utils');
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'getCoinbaseWalletIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-
+        const utilsModule = await import('../../../utils');
         const mockGenerateSignature = vi
           .fn()
           .mockRejectedValueOnce({ code: 4001, message: 'User rejected' })
           .mockResolvedValueOnce('signature_123');
 
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'generateSignatureWithCoinbaseWallet').mockImplementation(
-          mockGenerateSignature,
-        );
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getCoinbaseWalletIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithCoinbaseWallet: mockGenerateSignature,
+        } as any);
 
         const signIn = new SignIn();
         await signIn.__internal_future.web3({ strategy: 'web3_coinbase_wallet_signature' });
@@ -1453,13 +1492,12 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getCoinbaseWalletIdentifierModule = await import('../../../utils');
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'getCoinbaseWalletIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-
+        const utilsModule = await import('../../../utils');
         const mockError = { code: 5000, message: 'Other error' };
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'generateSignatureWithCoinbaseWallet').mockRejectedValue(mockError);
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getCoinbaseWalletIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithCoinbaseWallet: vi.fn().mockRejectedValue(mockError),
+        } as any);
 
         const signIn = new SignIn();
         const result = await signIn.__internal_future.web3({ strategy: 'web3_coinbase_wallet_signature' });
@@ -1491,11 +1529,11 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getBaseIdentifierModule = await import('../../../utils');
-        vi.spyOn(getBaseIdentifierModule, 'getBaseIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-        vi.spyOn(getBaseIdentifierModule, 'generateSignatureWithBase').mockResolvedValue('signature_123');
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getBaseIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithBase: vi.fn().mockResolvedValue('signature_123'),
+        } as any);
 
         const signIn = new SignIn();
         await signIn.__internal_future.web3({ strategy: 'web3_base_signature' });
@@ -1534,11 +1572,11 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getOKXWalletIdentifierModule = await import('../../../utils');
-        vi.spyOn(getOKXWalletIdentifierModule, 'getOKXWalletIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-        vi.spyOn(getOKXWalletIdentifierModule, 'generateSignatureWithOKXWallet').mockResolvedValue('signature_123');
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getOKXWalletIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithOKXWallet: vi.fn().mockResolvedValue('signature_123'),
+        } as any);
 
         const signIn = new SignIn();
         await signIn.__internal_future.web3({ strategy: 'web3_okx_wallet_signature' });
@@ -1564,10 +1602,10 @@ describe('SignIn', () => {
         });
         BaseResource._fetch = mockFetch;
 
-        const getMetamaskIdentifierModule = await import('../../../utils');
-        vi.spyOn(getMetamaskIdentifierModule, 'getMetamaskIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getMetamaskIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+        } as any);
 
         const signIn = new SignIn();
         const result = await signIn.__internal_future.web3({ strategy: 'web3_metamask_signature' });
@@ -1596,10 +1634,10 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getMetamaskIdentifierModule = await import('../../../utils');
-        vi.spyOn(getMetamaskIdentifierModule, 'getMetamaskIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getMetamaskIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+        } as any);
 
         const signIn = new SignIn();
         const result = await signIn.__internal_future.web3({ strategy: 'web3_metamask_signature' });
@@ -1821,7 +1859,7 @@ describe('SignIn', () => {
         const mockSetActive = vi.fn().mockResolvedValue({});
 
         SignIn.clerk = {
-          client: { reload: mockReload },
+          client: { reload: mockReload, sessions: [] },
           setActive: mockSetActive,
         } as any;
 
@@ -1838,7 +1876,7 @@ describe('SignIn', () => {
         const mockNavigate = vi.fn();
 
         SignIn.clerk = {
-          client: { reload: mockReload },
+          client: { reload: mockReload, sessions: [] },
           setActive: mockSetActive,
         } as any;
 
@@ -1852,6 +1890,118 @@ describe('SignIn', () => {
         const signIn = new SignIn({ id: 'signin_123' } as any);
 
         await expect(signIn.__internal_future.finalize()).rejects.toThrow();
+      });
+    });
+
+    describe('reset', () => {
+      let mockClient: { signIn: SignIn; resetSignIn: ReturnType<typeof vi.fn> };
+
+      beforeEach(() => {
+        // Set up mock client with resetSignIn method that simulates what the real
+        // Client.resetSignIn does: creates a new SignIn, updates signals via events,
+        // and the State class responds by updating the actual signal values
+        mockClient = {
+          signIn: new SignIn(null),
+          resetSignIn: vi.fn().mockImplementation(function (this: typeof mockClient) {
+            const newSignIn = new SignIn(null);
+            this.signIn = newSignIn;
+            // Emit events like the real implementation
+            eventBus.emit('resource:error', { resource: newSignIn, error: null });
+            // Also update signals directly since State isn't set up in tests
+            signInResourceSignal({ resource: newSignIn });
+            signInErrorSignal({ error: null });
+          }),
+        };
+        SignIn.clerk = {
+          client: mockClient,
+        } as any;
+      });
+
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.restoreAllMocks();
+        // Reset signals to initial state
+        signInResourceSignal({ resource: null });
+        signInErrorSignal({ error: null });
+      });
+
+      it('does NOT emit resource:fetch with status fetching', async () => {
+        const emitSpy = vi.spyOn(eventBus, 'emit');
+        const mockFetch = vi.fn();
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({ id: 'signin_123', status: 'needs_first_factor' } as any);
+        await signIn.__internal_future.reset();
+
+        // Verify that resource:fetch was NOT called with status: 'fetching'
+        const fetchingCalls = emitSpy.mock.calls.filter(
+          call => call[0] === 'resource:fetch' && call[1]?.status === 'fetching',
+        );
+        expect(fetchingCalls).toHaveLength(0);
+        // Verify no API calls were made
+        expect(mockFetch).not.toHaveBeenCalled();
+      });
+
+      it('clears any previous errors by updating signInErrorSignal', async () => {
+        // Set an initial error
+        signInErrorSignal({ error: new Error('Previous error') });
+        expect(signInErrorSignal().error).toBeTruthy();
+
+        const signIn = new SignIn({ id: 'signin_123', status: 'needs_first_factor' } as any);
+        await signIn.__internal_future.reset();
+
+        // Verify that error signal was cleared
+        expect(signInErrorSignal().error).toBeNull();
+      });
+
+      it('returns error: null on success', async () => {
+        const signIn = new SignIn({ id: 'signin_123', status: 'needs_first_factor' } as any);
+        const result = await signIn.__internal_future.reset();
+
+        expect(result).toHaveProperty('error', null);
+      });
+
+      it('resets an existing signin with data to a fresh null state', async () => {
+        const signIn = new SignIn({
+          id: 'signin_123',
+          status: 'needs_first_factor',
+          identifier: 'user@example.com',
+        } as any);
+
+        // Verify initial state
+        expect(signIn.id).toBe('signin_123');
+        expect(signIn.status).toBe('needs_first_factor');
+        expect(signIn.identifier).toBe('user@example.com');
+
+        await signIn.__internal_future.reset();
+
+        // Verify that signInResourceSignal was updated with a new SignIn(null) instance
+        const updatedSignIn = signInResourceSignal().resource;
+        expect(updatedSignIn).toBeInstanceOf(SignIn);
+        expect(updatedSignIn?.id).toBeUndefined();
+        expect(updatedSignIn?.status).toBeNull();
+        expect(updatedSignIn?.identifier).toBeNull();
+      });
+
+      it('updates clerk.client.signIn with the fresh null instance', async () => {
+        const originalSignIn = new SignIn({
+          id: 'signin_123',
+          status: 'needs_first_factor',
+          identifier: 'user@example.com',
+        } as any);
+        mockClient.signIn = originalSignIn;
+
+        // Verify initial state
+        expect(mockClient.signIn.id).toBe('signin_123');
+        expect(mockClient.signIn.status).toBe('needs_first_factor');
+
+        await originalSignIn.__internal_future.reset();
+
+        // Verify that clerk.client.signIn was updated with a new SignIn(null) instance
+        expect(mockClient.signIn).toBeInstanceOf(SignIn);
+        expect(mockClient.signIn.id).toBeUndefined();
+        expect(mockClient.signIn.status).toBeNull();
+        expect(mockClient.signIn.identifier).toBeNull();
       });
     });
   });

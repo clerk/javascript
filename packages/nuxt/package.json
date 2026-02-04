@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "1.13.3",
+  "version": "1.13.6",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -49,7 +49,8 @@
     "./webhooks": {
       "types": "./dist/runtime/webhooks.d.ts",
       "default": "./dist/runtime/webhooks.js"
-    }
+    },
+    "./types": "./dist/runtime/types/index.d.ts"
   },
   "main": "./dist/module.js",
   "types": "./dist/module.d.ts",
@@ -71,7 +72,6 @@
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "@clerk/vue": "workspace:^",
     "@nuxt/kit": "^4.1.3",
     "@nuxt/schema": "^4.1.3",
@@ -79,10 +79,11 @@
   },
   "devDependencies": {
     "nuxt": "^4.1.2",
-    "typescript": "catalog:repo"
+    "typescript": "catalog:repo",
+    "vue": "catalog:repo"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

@@ -28,7 +28,7 @@ provide(OrganizationProfileInjectionKey, {
     :mount="clerk?.mountOrganizationProfile"
     :unmount="clerk?.unmountOrganizationProfile"
     :props="finalProps"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal_updateProps"
   />
   <CustomPortalsRenderer :custom-pages-portals="customPagesPortals" />
   <slot />

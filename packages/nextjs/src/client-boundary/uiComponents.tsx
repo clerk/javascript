@@ -5,7 +5,7 @@ import {
   SignIn as BaseSignIn,
   SignUp as BaseSignUp,
   UserProfile as BaseUserProfile,
-} from '@clerk/clerk-react';
+} from '@clerk/react';
 import type { ComponentProps } from 'react';
 import React from 'react';
 
@@ -23,10 +23,12 @@ export {
   SignOutButton,
   SignUpButton,
   TaskChooseOrganization,
+  TaskResetPassword,
+  TaskSetupMFA,
   UserAvatar,
   UserButton,
   Waitlist,
-} from '@clerk/clerk-react';
+} from '@clerk/react';
 
 // The assignment of UserProfile with BaseUserProfile props is used
 // to support the CustomPage functionality (eg UserProfile.Page)

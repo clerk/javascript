@@ -406,11 +406,13 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
   test('react/ render content based on Clerk loaded status', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/utility');
-    await expect(u.page.getByText('Clerk is loading')).toBeVisible();
-    await expect(u.page.getByText('Clerk is loaded')).toBeHidden();
+    const clerkIsLoaded = u.page.getByText('Clerk is loaded');
+    const clerkIsLoading = u.page.getByText('Clerk is loading');
+
+    // Depending on cache/timing, Clerk may already be loaded by the time the page is ready.
+    await expect(clerkIsLoading.or(clerkIsLoaded)).toBeVisible();
     await u.page.waitForClerkJsLoaded();
-    await expect(u.page.getByText('Clerk is loaded')).toBeVisible();
-    await expect(u.page.getByText('Clerk is loading')).toBeHidden();
+    await expect(clerkIsLoaded).toBeVisible();
   });
 
   // ----- redirect
@@ -482,7 +484,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.userButton.waitForMounted();
   });
 
-  test('server islands protect component shows correct states', async ({ page, context }) => {
+  test('server islands Show component shows correct states', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/server-islands');
@@ -509,6 +511,29 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     // This is being investigated upstream with the Astro team. The test is commented out for now
     // to unblock development and will be revisited once the root cause is resolved.
     // await expect(u.page.getByText('Loading')).toBeHidden();
-    await expect(u.page.getByText("I'm an admin")).toBeVisible();
+    await expect(u.page.getByText("I'm an admin")).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('Show component works correctly on prerendered pages', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // Visit prerendered page when signed out
+    await u.page.goToRelative('/prerendered');
+    await expect(u.page.getByText('🔒 You are signed out.')).toBeVisible();
+    await expect(u.page.getByText('✅ You are signed in!')).not.toBeVisible();
+
+    // Sign in
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({
+      email: fakeAdmin.email,
+      password: fakeAdmin.password,
+    });
+    await u.po.expect.toBeSignedIn();
+
+    // Visit prerendered page when signed in
+    await u.page.goToRelative('/prerendered');
+    await expect(u.page.getByText('✅ You are signed in!')).toBeVisible();
+    await expect(u.page.getByText('🔒 You are signed out.')).not.toBeVisible();
   });
 });

@@ -1,7 +1,8 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createDeferredPromise } from '../../../utils/createDeferredPromise';
+import { createDeferredPromise } from '@/utils/createDeferredPromise';
+
 import type { ResourceCacheStableKey } from '../../stable-keys';
 import { createCacheKeys } from '../createCacheKeys';
 import { usePagesOrInfinite } from '../usePagesOrInfinite';
@@ -88,7 +89,7 @@ describe('usePagesOrInfinite - basic pagination', () => {
 
     const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
-    // wait until SWR mock finishes fetching
+    // wait until React Query finishes fetching
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     // ensure fetcher received params without cache keys and with page info
@@ -202,7 +203,7 @@ describe('usePagesOrInfinite - infinite mode', () => {
     await waitFor(() => expect(result.current.page).toBe(2));
     await waitFor(() => expect(result.current.data.length).toBe(4));
 
-    // SWR may refetch the first page after size change; ensure both pages 1 and 2 were requested
+    // React Query may refetch the first page after size change; ensure both pages 1 and 2 were requested
     expect(fetcher.mock.calls.length).toBeGreaterThanOrEqual(2);
     const requestedPages = fetcher.mock.calls.map(c => c[0].initialPage);
     expect(requestedPages).toContain(1);
@@ -237,7 +238,7 @@ describe('usePagesOrInfinite - disabled and isSignedIn gating', () => {
 
     const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
 
-    // our SWR mock sets loading=false if key is null and not calling fetcher
+    // React Query sets loading=false when query is disabled and fetcher is not called
     expect(fetcher).toHaveBeenCalledTimes(0);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.data).toEqual([]);
@@ -673,7 +674,7 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
     const revalidateCalls = fetcherCalls.slice(callCountBeforeRevalidate);
     expect(revalidateCalls.length).toBeGreaterThanOrEqual(2);
 
-    // Verify both pages were revalidated (SWR refetches all pages in infinite mode)
+    // Verify both pages were revalidated (React Query refetches all pages in infinite mode)
     const revalidatedPages = revalidateCalls.map(c => c.page);
     expect(revalidatedPages).toContain(1);
     expect(revalidatedPages).toContain(2);
@@ -721,11 +722,7 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
       await result.current.paginated.revalidate();
     });
 
-    if (__CLERK_USE_RQ__) {
-      await waitFor(() => expect(fetcher.mock.calls.length).toBeGreaterThanOrEqual(2));
-    } else {
-      await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(1));
-    }
+    await waitFor(() => expect(fetcher.mock.calls.length).toBeGreaterThanOrEqual(2));
   });
 });
 

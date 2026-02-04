@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
@@ -364,6 +364,12 @@ export const daDK: LocalizationResource = {
         tableHeader__role: 'Rolle',
         tableHeader__user: 'Bruger',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Vi opdaterer de tilgængelige roller. Når det er gjort, vil du kunne opdatere roller igen.',
+          title: 'Roller er midlertidigt låst',
+        },
+      },
       detailsTitle__emptyRow: 'Ingen medlemmer at vise',
       invitationsTab: {
         autoInvitations: {
@@ -692,8 +698,14 @@ export const daDK: LocalizationResource = {
       subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Indtast din adgangskode',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Sikkerhedsadvarsel',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Bekræftelseskode',
@@ -732,7 +744,7 @@ export const daDK: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Log ind',
       titleCombined: undefined,
@@ -741,6 +753,10 @@ export const daDK: LocalizationResource = {
       formTitle: 'Bekræftelseskode',
       subtitle: undefined,
       title: 'Totrinsbekræftelse',
+    },
+    web3Solana: {
+      subtitle: 'Vælg en wallet nedenfor for at logge ind',
+      title: 'Log ind med Solana',
     },
   },
   signInEnterPasswordTitle: 'Indtast din adgangskode',
@@ -753,7 +769,7 @@ export const daDK: LocalizationResource = {
     continue: {
       actionLink: 'Log ind',
       actionText: 'Har du en konto?',
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Udfyld manglende felter',
     },
     emailCode: {
@@ -774,7 +790,7 @@ export const daDK: LocalizationResource = {
         title: 'Tilmelding...',
       },
       resendButton: 'Send link igen',
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Bekræft din email',
       verified: {
         title: 'Vellykket tilmelding',
@@ -827,36 +843,49 @@ export const daDK: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
-      subtitle: 'Forsæt til {{applicationName}}',
-      subtitleCombined: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
+      subtitleCombined: 'Fortsæt til {{applicationName}}',
       title: 'Opret din konto',
       titleCombined: 'Opret din konto',
     },
+    web3Solana: {
+      subtitle: 'Vælg en wallet nedenfor for at tilmelde dig',
+      title: 'Tilmeld dig med Solana',
+    },
   },
-  socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',
+  socialButtonsBlockButton: 'Fortsæt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Der findes allerede en organisation for det registrerede firmanavn ({{organizationName}}) og {{organizationDomain}}. Tilmeld dig via invitation.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Opret ny organisation',
+      action__invitationAccept: 'Deltag',
+      action__suggestionsAccept: 'Anmod om at deltage',
+      subtitle: 'Deltag i en eksisterende organisation eller opret en ny',
+      subtitle__createOrganizationDisabled: 'Deltag i en eksisterende organisation',
+      suggestionsAcceptedLabel: 'Afventer godkendelse',
+      title: 'Vælg en organisation',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Annuller',
+      formButtonSubmit: 'Fortsæt',
+      formFieldInputPlaceholder__name: 'Min organisation',
+      formFieldInputPlaceholder__slug: 'min-organisation',
+      formFieldLabel__name: 'Navn',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Indtast dine organisationsoplysninger for at fortsætte',
+      title: 'Opsæt din organisation',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'Kontakt din organisationsadministrator for en invitation.',
+      title: 'Du skal tilhøre en organisation',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Log ud',
+      actionText: 'Logget ind som {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -865,19 +894,88 @@ export const daDK: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Filstørrelsen overskrider den maksimale grænse på 10 MB. Vælg venligst en mindre fil.',
+    avatar_file_type_invalid: 'Filtypen understøttes ikke. Upload venligst et JPG-, PNG-, GIF- eller WEBP-billede.',
     captcha_invalid:
       'Tilmelding mislykkedes på grund af fejlede sikkerhedsvalideringer. Opdater siden for at prøve igen, eller kontakt support for yderligere assistance.',
     captcha_unavailable:
       'Tilmelding mislykkedes på grund af fejlet botvalidering. Opdater siden for at prøve igen, eller kontakt support for yderligere assistance.',
     form_code_incorrect: 'Koden er forkert.',
+    form_email_address_blocked:
+      'Midlertidige e-mailtjenester understøttes ikke. Brug venligst din almindelige e-mailadresse til at oprette en konto.',
     form_identifier_exists__email_address: 'E-mailadressen er allerede i brug.',
     form_identifier_exists__phone_number: 'Telefonnummeret er allerede i brug.',
     form_identifier_exists__username: 'Brugernavnet er allerede i brug.',
     form_identifier_not_found: 'Vi kunne ikke finde en konto med disse detaljer.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formatet er ugyldigt.',
     form_param_format_invalid__email_address: 'E-mailadressen skal være en gyldig e-mailadresse.',
     form_param_format_invalid__phone_number: 'Telefonnummeret skal være i et gyldigt internationalt format.',
@@ -889,13 +987,17 @@ export const daDK: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Adgangskoden er forkert.',
     form_password_length_too_short: 'Adgangskoden er for kort.',
     form_password_not_strong_enough: 'Adgangskoden er ikke stærk nok.',
+    form_password_or_identifier_incorrect:
+      'Adgangskoden eller e-mailadressen er forkert. Prøv igen eller brug en anden metode.',
     form_password_pwned: 'Adgangskoden er blevet kompromitteret.',
     form_password_pwned__sign_in: 'Din adgangskode er blevet kompromitteret, vælg en ny.',
     form_password_size_in_bytes_exceeded:
       'Din adgangskode har overskredet det maksimalt tilladte antal bytes, forkort den eller fjern nogle specialtegn.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Forkert adgangskode.',
     form_username_invalid_character: 'Brugernavnet indeholder ugyldige tegn.',
     form_username_invalid_length: 'Brugernavnet har en ugyldig længde.',
@@ -927,6 +1029,9 @@ export const daDK: LocalizationResource = {
     phone_number_exists: 'Dette telefonnummer er allerede taget. Prøv et andet.',
     session_exists: 'Du er allerede logget ind.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Du har afvist signaturanmodningen. Prøv igen for at fortsætte.',
+    web3_solana_signature_generation_failed:
+      'Der opstod en fejl under generering af signaturen. Prøv igen for at fortsætte.',
     zxcvbn: {
       couldBeStronger: 'Din adgangskode virker, men kunne være stærkere. Prøv at tilføje flere tegn.',
       goodPassword: 'Din adgangskode opfylder alle nødvendige krav.',
@@ -1296,6 +1401,10 @@ export const daDK: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Tilføj Web3 tegnebøger',
         title: 'Web3 tegnebøger',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Vælg en Solana-wallet for at forbinde den til din konto.',
+          title: 'Tilføj en Solana-wallet',
+        },
       },
     },
     usernamePage: {
@@ -1319,16 +1428,22 @@ export const daDK: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Log ind',
+      actionText: 'Har du allerede adgang?',
+      formButton: 'Tilmeld dig ventelisten',
+      subtitle: 'Indtast din e-mailadresse, så giver vi dig besked, når din plads er klar',
+      title: 'Tilmeld dig ventelisten',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Du vil blive omdirigeret snart...',
+      subtitle: 'Vi kontakter dig, når din plads er klar',
+      title: 'Tak fordi du tilmeldte dig ventelisten!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Forbind med {{walletName}}',
+    continue: 'Fortsæt med {{walletName}}',
+    noneAvailable:
+      'Ingen Solana Web3-wallets fundet. Installer venligst en Web3-understøttet {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

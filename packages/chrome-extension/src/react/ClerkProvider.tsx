@@ -1,12 +1,14 @@
 import type { Clerk } from '@clerk/clerk-js/no-rhc';
-import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
-import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
+import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/react';
+import { ClerkProvider as ClerkReactProvider } from '@clerk/react';
+import type { Ui } from '@clerk/react/internal';
+import { ClerkUi } from '@clerk/ui/entry';
 import React from 'react';
 
 import { createClerkClient } from '../internal/clerk';
 import type { StorageCache } from '../internal/utils/storage';
 
-type ChromeExtensionClerkProviderProps = ClerkReactProviderProps & {
+type ChromeExtensionClerkProviderProps<TUi extends Ui = Ui> = ClerkReactProviderProps<TUi> & {
   /**
    * @experimental
    * @description Enables the listener to sync host cookies on changes.
@@ -16,18 +18,14 @@ type ChromeExtensionClerkProviderProps = ClerkReactProviderProps & {
   syncHost?: string;
 };
 
-export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Element | null {
+export function ClerkProvider<TUi extends Ui = Ui>(props: ChromeExtensionClerkProviderProps<TUi>): JSX.Element | null {
   const { children, storageCache, syncHost, __experimental_syncHostListener, ...rest } = props;
   const { publishableKey = '' } = props;
 
   const [clerkInstance, setClerkInstance] = React.useState<Clerk | null>(null);
 
   React.useEffect(() => {
-    void (async () => {
-      setClerkInstance(
-        await createClerkClient({ publishableKey, storageCache, syncHost, __experimental_syncHostListener }),
-      );
-    })();
+    setClerkInstance(createClerkClient({ publishableKey, storageCache, syncHost, __experimental_syncHostListener }));
   }, [publishableKey, storageCache, syncHost, __experimental_syncHostListener]);
 
   if (!clerkInstance) {
@@ -38,6 +36,7 @@ export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Ele
     <ClerkReactProvider
       {...rest}
       Clerk={clerkInstance}
+      clerkUICtor={ClerkUi}
       standardBrowser={!syncHost}
     >
       {children}

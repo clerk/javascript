@@ -1,3 +1,4 @@
+import { ClerkAPIResponseError, ClerkOfflineError } from '@clerk/shared/error';
 import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
@@ -20,9 +21,9 @@ describe('Session', () => {
   beforeEach(() => {
     // Mock Date.now() to make the test tokens appear valid
     // mockJwt has iat: 1666648250, exp: 1666648310
-    // Set current time to 1666648260 (10 seconds after iat, 50 seconds before exp)
+    // Set current time to iat so token appears freshly issued (60 seconds before exp)
     vi.useFakeTimers();
-    vi.setSystemTime(new Date(1666648260 * 1000));
+    vi.setSystemTime(new Date(1666648250 * 1000));
   });
 
   afterEach(() => {
@@ -100,7 +101,7 @@ describe('Session', () => {
       expect(dispatchSpy).toHaveBeenCalledTimes(2);
     });
 
-    it('does not re-cache token when Session is reconstructed with same token', async () => {
+    it('returns same token without API call when Session is reconstructed', async () => {
       BaseResource.clerk = clerkMock({
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
       });
@@ -119,10 +120,6 @@ describe('Session', () => {
         updated_at: new Date().getTime(),
       } as SessionJSON);
 
-      expect(SessionTokenCache.size()).toBe(1);
-      const cachedEntry1 = SessionTokenCache.get({ tokenId: 'session_1-activeOrganization' });
-      expect(cachedEntry1).toBeDefined();
-
       const session2 = new Session({
         status: 'active',
         id: 'session_1',
@@ -135,8 +132,6 @@ describe('Session', () => {
         updated_at: new Date().getTime(),
       } as SessionJSON);
 
-      expect(SessionTokenCache.size()).toBe(1);
-
       const token1 = await session1.getToken();
       const token2 = await session2.getToken();
 
@@ -145,12 +140,12 @@ describe('Session', () => {
       expect(BaseResource.clerk.getFapiClient().request).not.toHaveBeenCalled();
     });
 
-    it('caches token from cookie during degraded mode recovery', async () => {
+    it('returns lastActiveToken without API call (degraded mode recovery)', async () => {
       BaseResource.clerk = clerkMock();
 
       SessionTokenCache.clear();
 
-      const sessionFromCookie = new Session({
+      const session = new Session({
         status: 'active',
         id: 'session_1',
         object: 'session',
@@ -162,11 +157,8 @@ describe('Session', () => {
         updated_at: new Date().getTime(),
       } as SessionJSON);
 
-      expect(SessionTokenCache.size()).toBe(1);
-      const cachedEntry = SessionTokenCache.get({ tokenId: 'session_1' });
-      expect(cachedEntry).toBeDefined();
+      const token = await session.getToken();
 
-      const token = await sessionFromCookie.getToken();
       expect(token).toEqual(mockJwt);
       expect(BaseResource.clerk.getFapiClient().request).not.toHaveBeenCalled();
     });
@@ -268,13 +260,13 @@ describe('Session', () => {
     });
 
     describe('with offline browser and network failure', () => {
-      let warnSpy;
       beforeEach(() => {
+        // Use real timers for offline tests to avoid unhandled rejection issues with retry logic
+        vi.useRealTimers();
         Object.defineProperty(window.navigator, 'onLine', {
           writable: true,
           value: false,
         });
-        warnSpy = vi.spyOn(console, 'warn').mockReturnValue();
       });
 
       afterEach(() => {
@@ -282,10 +274,10 @@ describe('Session', () => {
           writable: true,
           value: true,
         });
-        warnSpy.mockRestore();
+        vi.useFakeTimers();
       });
 
-      it('returns null', async () => {
+      it('throws ClerkOfflineError when offline', async () => {
         const session = new Session({
           status: 'active',
           id: 'session_1',
@@ -300,11 +292,33 @@ describe('Session', () => {
         mockNetworkFailedFetch();
         BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
 
-        const token = await session.getToken();
+        try {
+          await session.getToken({ skipCache: true });
+          expect.fail('Expected ClerkOfflineError to be thrown');
+        } catch (error) {
+          expect(ClerkOfflineError.is(error)).toBe(true);
+        }
+      });
 
+      it('throws ClerkOfflineError after fetch fails while offline', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: 'activeOrganization',
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        mockNetworkFailedFetch();
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        await expect(session.getToken({ skipCache: true })).rejects.toThrow(ClerkOfflineError);
+
+        // Fetch should have been called at least once
         expect(global.fetch).toHaveBeenCalled();
-        expect(dispatchSpy).toHaveBeenCalledTimes(1);
-        expect(token).toEqual(null);
       });
     });
 
@@ -425,6 +439,182 @@ describe('Session', () => {
       await Promise.all([session.getToken({ organizationId: 'org_1' }), session.getToken({ organizationId: 'org_2' })]);
 
       expect(requestSpy).toHaveBeenCalledTimes(2);
+    });
+
+    describe('timer-based proactive refresh', () => {
+      it('triggers background refresh via timer before leeway period', async () => {
+        BaseResource.clerk = clerkMock();
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+        // Create session with last_active_token to trigger cache hydration and timer scheduling
+        new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        await Promise.resolve();
+        requestSpy.mockClear();
+
+        // Timer fires at 60s - 15s (leeway) - 2s (lead time) = 43s
+        // Advance to just before timer fires
+        vi.advanceTimersByTime(42 * 1000);
+        expect(requestSpy).not.toHaveBeenCalled();
+
+        // Set up the mock for the refresh
+        requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
+
+        // Advance past timer fire time
+        await vi.advanceTimersByTimeAsync(2 * 1000);
+
+        // Background refresh should have been triggered by the timer
+        expect(requestSpy).toHaveBeenCalledTimes(1);
+      });
+
+      it('continues returning cached token while timer-triggered refresh is pending', async () => {
+        BaseResource.clerk = clerkMock();
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        await Promise.resolve();
+        requestSpy.mockClear();
+
+        // Hold the network request pending
+        let resolveNetworkRequest!: (value: any) => void;
+        requestSpy.mockReturnValueOnce(
+          new Promise(resolve => {
+            resolveNetworkRequest = resolve;
+          }),
+        );
+
+        // Advance to trigger the timer (43s)
+        await vi.advanceTimersByTimeAsync(44 * 1000);
+
+        // Concurrent calls should all return cached token
+        const [token1, token2, token3] = await Promise.all([
+          session.getToken(),
+          session.getToken(),
+          session.getToken(),
+        ]);
+
+        expect(token1).toEqual(mockJwt);
+        expect(token2).toEqual(mockJwt);
+        expect(token3).toEqual(mockJwt);
+
+        // Cleanup: resolve the pending request
+        resolveNetworkRequest({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
+        await vi.advanceTimersByTimeAsync(0);
+      });
+
+      it('continues returning tokens after timer-triggered refresh failure', async () => {
+        BaseResource.clerk = clerkMock();
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        await Promise.resolve();
+        requestSpy.mockClear();
+
+        // Timer-triggered refresh fails
+        requestSpy.mockRejectedValueOnce(new Error('Network error'));
+
+        // Advance to trigger timer (43s) and wait for it to complete
+        await vi.advanceTimersByTimeAsync(44 * 1000);
+
+        // getToken should still return the cached token
+        const token = await session.getToken();
+        expect(token).toEqual(mockJwt);
+      });
+
+      it('uses refreshed token after timer-triggered refresh succeeds', async () => {
+        BaseResource.clerk = clerkMock();
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+        const newMockJwt =
+          'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjY2NDg0MDAsImlhdCI6MTY2NjY0ODM0MCwiaXNzIjoiaHR0cHM6Ly9jbGVyay5leGFtcGxlLmNvbSIsImp0aSI6Im5ld3Rva2VuIiwibmJmIjoxNjY2NjQ4MzQwLCJzaWQiOiJzZXNzXzFxcTlveTVHaU5IeGRSMlhXVTZnRzZtSWNCWCIsInN1YiI6InVzZXJfMXFxOW95NUdpTkh4ZFIyWFdVNmdHNm1JY0JYIn0.mock';
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        await Promise.resolve();
+        requestSpy.mockClear();
+
+        // Timer-triggered refresh returns new token
+        requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: newMockJwt }, status: 200 });
+
+        // Advance to trigger timer and wait for refresh to complete
+        await vi.advanceTimersByTimeAsync(44 * 1000);
+
+        // Subsequent call returns refreshed token (no new API call needed)
+        requestSpy.mockClear();
+        const freshToken = await session.getToken();
+        expect(freshToken).toEqual(newMockJwt);
+        expect(requestSpy).not.toHaveBeenCalled();
+      });
+
+      it('does not make API call when token has plenty of time remaining', async () => {
+        BaseResource.clerk = clerkMock();
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        await Promise.resolve();
+
+        // With 40s remaining and default 15s threshold, token is fresh
+        vi.advanceTimersByTime(20 * 1000); // 40s remaining
+
+        requestSpy.mockClear();
+        const token = await session.getToken();
+
+        expect(token).toEqual(mockJwt);
+        expect(requestSpy).not.toHaveBeenCalled();
+      });
     });
   });
 
@@ -1083,6 +1273,153 @@ describe('Session', () => {
       });
 
       expect(isAuthorized).toBe(true);
+    });
+  });
+
+  describe('origin outage mode fallback', () => {
+    let dispatchSpy: ReturnType<typeof vi.spyOn>;
+    let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      SessionTokenCache.clear();
+      dispatchSpy = vi.spyOn(eventBus, 'emit');
+      fetchSpy = vi.spyOn(BaseResource, '_fetch' as any);
+      BaseResource.clerk = clerkMock() as any;
+    });
+
+    afterEach(() => {
+      dispatchSpy?.mockRestore();
+      fetchSpy?.mockRestore();
+      BaseResource.clerk = null as any;
+    });
+
+    it('should retry with expired token when API returns 422 with missing_expired_token error', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      const errorResponse = new ClerkAPIResponseError('Missing expired token', {
+        data: [
+          { code: 'missing_expired_token', message: 'Missing expired token', long_message: 'Missing expired token' },
+        ],
+        status: 422,
+      });
+      fetchSpy.mockRejectedValueOnce(errorResponse);
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken();
+
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+      expect(fetchSpy.mock.calls[0][0]).toMatchObject({
+        path: '/client/sessions/session_1/tokens',
+        method: 'POST',
+        body: { organizationId: null },
+      });
+
+      expect(fetchSpy.mock.calls[1][0]).toMatchObject({
+        path: '/client/sessions/session_1/tokens',
+        method: 'POST',
+        body: { organizationId: null },
+        search: { expired_token: mockJwt },
+      });
+    });
+
+    it('should not retry with expired token when lastActiveToken is not available', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as unknown as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      const errorResponse = new ClerkAPIResponseError('Missing expired token', {
+        data: [
+          { code: 'missing_expired_token', message: 'Missing expired token', long_message: 'Missing expired token' },
+        ],
+        status: 422,
+      });
+      fetchSpy.mockRejectedValue(errorResponse);
+
+      await expect(session.getToken()).rejects.toMatchObject({
+        status: 422,
+        errors: [{ code: 'missing_expired_token' }],
+      });
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not retry with expired token for non-422 errors', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      const errorResponse = new ClerkAPIResponseError('Bad request', {
+        data: [{ code: 'bad_request', message: 'Bad request', long_message: 'Bad request' }],
+        status: 400,
+      });
+      fetchSpy.mockRejectedValueOnce(errorResponse);
+
+      await expect(session.getToken()).rejects.toThrow(ClerkAPIResponseError);
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not retry with expired token when error code is different', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as unknown as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      const errorResponse = new ClerkAPIResponseError('Validation failed', {
+        data: [{ code: 'validation_error', message: 'Validation failed', long_message: 'Validation failed' }],
+        status: 422,
+      });
+      fetchSpy.mockRejectedValue(errorResponse);
+
+      await expect(session.getToken()).rejects.toMatchObject({
+        status: 422,
+        errors: [{ code: 'validation_error' }],
+      });
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
   });
 });

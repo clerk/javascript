@@ -1,17 +1,20 @@
 'use client';
 
 export {
+  useAuth,
   useClerk,
   useEmailLink,
   useOrganization,
   useOrganizationList,
+  useOrganizationCreationDefaults,
   useSession,
   useSessionList,
   useSignIn,
   useSignUp,
+  useWaitlist,
   useUser,
   useReverification,
-} from '@clerk/clerk-react';
+} from '@clerk/react';
 
 export {
   isClerkAPIResponseError,
@@ -22,6 +25,4 @@ export {
   isReverificationCancelledError,
   EmailLinkErrorCode,
   EmailLinkErrorCodeStatus,
-} from '@clerk/clerk-react/errors';
-
-export { usePromisifiedAuth as useAuth } from './PromisifiedAuthProvider';
+} from '@clerk/react/errors';

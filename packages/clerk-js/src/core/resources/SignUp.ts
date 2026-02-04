@@ -1,4 +1,6 @@
 import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
+import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -14,6 +16,7 @@ import type {
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
   PrepareWeb3WalletVerificationParams,
+  SignUpAuthenticateWithSolanaParams,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpEnterpriseConnectionJSON,
@@ -29,6 +32,7 @@ import type {
   SignUpFutureSSOParams,
   SignUpFutureTicketParams,
   SignUpFutureUpdateParams,
+  SignUpFutureVerifications as SignUpFutureVerificationsType,
   SignUpFutureWeb3Params,
   SignUpIdentificationField,
   SignUpJSON,
@@ -42,28 +46,16 @@ import type {
 
 import { debugLogger } from '@/utils/debug';
 
-import {
-  generateSignatureWithBase,
-  generateSignatureWithCoinbaseWallet,
-  generateSignatureWithMetamask,
-  generateSignatureWithOKXWallet,
-  getBaseIdentifier,
-  getBrowserLocale,
-  getClerkQueryParam,
-  getCoinbaseWalletIdentifier,
-  getMetamaskIdentifier,
-  getOKXWalletIdentifier,
-  windowNavigate,
-} from '../../utils';
+import { getBrowserLocale, getClerkQueryParam, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
-import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
@@ -278,6 +270,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       unsafeMetadata,
       strategy = 'web3_metamask_signature',
       legalAccepted,
+      walletName,
     } = params || {};
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
@@ -297,7 +290,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     let signature: string;
     try {
-      signature = await generateSignature({ identifier, nonce: message, provider });
+      signature = await generateSignature({ identifier, nonce: message, provider, walletName });
     } catch (err) {
       // There is a chance that as a first time visitor when you try to setup and use the
       // Coinbase Wallet from scratch in order to authenticate, the initial generate
@@ -321,10 +314,10 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    const identifier = await getMetamaskIdentifier();
+    const identifier = await web3().getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithMetamask,
+      generateSignature: web3().generateSignatureWithMetamask,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_metamask_signature',
       legalAccepted: params?.legalAccepted,
@@ -332,47 +325,71 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   public authenticateWithCoinbaseWallet = async (
-    params?: SignUpAuthenticateWithWeb3Params & {
-      legalAccepted?: boolean;
-    },
+    params?: SignUpAuthenticateWithWeb3Params,
   ): Promise<SignUpResource> => {
-    const identifier = await getCoinbaseWalletIdentifier();
+    const identifier = await web3().getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithCoinbaseWallet,
+      generateSignature: web3().generateSignatureWithCoinbaseWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_coinbase_wallet_signature',
       legalAccepted: params?.legalAccepted,
     });
   };
 
-  public authenticateWithBase = async (
-    params?: SignUpAuthenticateWithWeb3Params & {
-      legalAccepted?: boolean;
-    },
-  ): Promise<SignUpResource> => {
-    const identifier = await getBaseIdentifier();
+  public authenticateWithBase = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
+    const identifier = await web3().getBaseIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithBase,
+      generateSignature: web3().generateSignatureWithBase,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_base_signature',
       legalAccepted: params?.legalAccepted,
     });
   };
 
-  public authenticateWithOKXWallet = async (
-    params?: SignUpAuthenticateWithWeb3Params & {
-      legalAccepted?: boolean;
-    },
-  ): Promise<SignUpResource> => {
-    const identifier = await getOKXWalletIdentifier();
+  public authenticateWithOKXWallet = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
+    const identifier = await web3().getOKXWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithOKXWallet,
+      generateSignature: web3().generateSignatureWithOKXWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_okx_wallet_signature',
       legalAccepted: params?.legalAccepted,
+    });
+  };
+
+  /**
+   * Authenticates a user using a Solana Web3 wallet during sign-up.
+   *
+   * @param params - Configuration for Solana authentication
+   * @param params.walletName - The name of the Solana wallet to use (e.g., 'phantom')
+   * @param params.unsafeMetadata - Optional unsafe metadata to attach to the user
+   * @param params.legalAccepted - Optional flag indicating legal terms acceptance
+   * @returns A promise that resolves to the updated SignUp resource
+   * @throws {ClerkRuntimeError} If wallet connection fails
+   *
+   * @example
+   * ```typescript
+   * await signUp.authenticateWithSolana({
+   *   walletName: 'phantom',
+   *   legalAccepted: true
+   * });
+   * ```
+   */
+  public authenticateWithSolana = async ({
+    walletName,
+    unsafeMetadata,
+    legalAccepted,
+  }: SignUpAuthenticateWithSolanaParams): Promise<SignUpResource> => {
+    const identifier = await web3().getSolanaIdentifier(walletName);
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: p => web3().generateSignatureWithSolana({ ...p, walletName }),
+      unsafeMetadata,
+      strategy: 'web3_solana_signature',
+      legalAccepted,
+      walletName,
     });
   };
 
@@ -416,7 +433,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       // If this fails again, we will let the caller handle the error accordingly.
       if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await SignUp.clerk.__unstable__environment!.reload();
+        await SignUp.clerk.__internal_environment!.reload();
         return authenticateFn();
       }
       throw e;
@@ -466,9 +483,9 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
-    if (SignUp.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword({
-        ...SignUp.clerk.__unstable__environment?.userSettings.passwordSettings,
+    if (SignUp.clerk.__internal_environment?.userSettings.passwordSettings) {
+      return createValidatePassword(loadZxcvbn(), {
+        ...SignUp.clerk.__internal_environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
     }
@@ -543,7 +560,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const captchaOauthBypass = SignUp.clerk.__unstable__environment!.displayConfig.captchaOauthBypass;
+    const captchaOauthBypass = SignUp.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
 
     if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
@@ -572,18 +589,58 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 }
 
-class SignUpFuture implements SignUpFutureResource {
-  verifications = {
-    sendEmailCode: this.sendEmailCode.bind(this),
-    verifyEmailCode: this.verifyEmailCode.bind(this),
-    sendPhoneCode: this.sendPhoneCode.bind(this),
-    verifyPhoneCode: this.verifyPhoneCode.bind(this),
-  };
+type SignUpFutureVerificationsMethods = Pick<
+  SignUpFutureVerifications,
+  'sendEmailCode' | 'verifyEmailCode' | 'sendPhoneCode' | 'verifyPhoneCode'
+>;
 
+class SignUpFutureVerifications implements SignUpFutureVerificationsType {
+  #resource: SignUp;
+
+  sendEmailCode: SignUpFutureVerificationsType['sendEmailCode'];
+  verifyEmailCode: SignUpFutureVerificationsType['verifyEmailCode'];
+  sendPhoneCode: SignUpFutureVerificationsType['sendPhoneCode'];
+  verifyPhoneCode: SignUpFutureVerificationsType['verifyPhoneCode'];
+
+  constructor(resource: SignUp, methods: SignUpFutureVerificationsMethods) {
+    this.#resource = resource;
+    this.sendEmailCode = methods.sendEmailCode;
+    this.verifyEmailCode = methods.verifyEmailCode;
+    this.sendPhoneCode = methods.sendPhoneCode;
+    this.verifyPhoneCode = methods.verifyPhoneCode;
+  }
+
+  get emailAddress() {
+    return this.#resource.verifications.emailAddress;
+  }
+
+  get phoneNumber() {
+    return this.#resource.verifications.phoneNumber;
+  }
+
+  get web3Wallet() {
+    return this.#resource.verifications.web3Wallet;
+  }
+
+  get externalAccount() {
+    return this.#resource.verifications.externalAccount;
+  }
+}
+
+class SignUpFuture implements SignUpFutureResource {
+  verifications: SignUpFutureVerifications;
+
+  #canBeDiscarded = false;
   readonly #resource: SignUp;
 
   constructor(resource: SignUp) {
     this.#resource = resource;
+    this.verifications = new SignUpFutureVerifications(this.#resource, {
+      sendEmailCode: this.sendEmailCode.bind(this),
+      verifyEmailCode: this.verifyEmailCode.bind(this),
+      sendPhoneCode: this.sendPhoneCode.bind(this),
+      verifyPhoneCode: this.verifyPhoneCode.bind(this),
+    });
   }
 
   get id() {
@@ -684,6 +741,10 @@ class SignUpFuture implements SignUpFutureResource {
     return undefined;
   }
 
+  get canBeDiscarded() {
+    return this.#canBeDiscarded;
+  }
+
   private async getCaptchaToken(): Promise<{
     captchaToken?: string;
     captchaWidgetType?: CaptchaWidgetType;
@@ -745,7 +806,11 @@ class SignUpFuture implements SignUpFutureResource {
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
-      await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
+      if (this.#resource.id) {
+        await this.#resource.__internal_basePatch({ body });
+      } else {
+        await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
+      }
     });
   }
 
@@ -852,7 +917,7 @@ class SignUpFuture implements SignUpFutureResource {
       await authenticateFn().catch(async e => {
         if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          await SignUp.clerk.__unstable__environment!.reload();
+          await SignUp.clerk.__internal_environment!.reload();
           return authenticateFn();
         }
         throw e;
@@ -881,20 +946,20 @@ class SignUpFuture implements SignUpFutureResource {
       let generateSignature;
       switch (provider) {
         case 'metamask':
-          identifier = await getMetamaskIdentifier();
-          generateSignature = generateSignatureWithMetamask;
+          identifier = await web3().getMetamaskIdentifier();
+          generateSignature = web3().generateSignatureWithMetamask;
           break;
         case 'coinbase_wallet':
-          identifier = await getCoinbaseWalletIdentifier();
-          generateSignature = generateSignatureWithCoinbaseWallet;
+          identifier = await web3().getCoinbaseWalletIdentifier();
+          generateSignature = web3().generateSignatureWithCoinbaseWallet;
           break;
         case 'base':
-          identifier = await getBaseIdentifier();
-          generateSignature = generateSignatureWithBase;
+          identifier = await web3().getBaseIdentifier();
+          generateSignature = web3().generateSignatureWithBase;
           break;
         case 'okx_wallet':
-          identifier = await getOKXWalletIdentifier();
-          generateSignature = generateSignatureWithOKXWallet;
+          identifier = await web3().getOKXWalletIdentifier();
+          generateSignature = web3().generateSignatureWithOKXWallet;
           break;
         default:
           throw new Error(`Unsupported Web3 provider: ${provider}`);
@@ -950,8 +1015,23 @@ class SignUpFuture implements SignUpFutureResource {
         throw new Error('Cannot finalize sign-up without a created session.');
       }
 
+      this.#canBeDiscarded = true;
       await SignUp.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
+  }
+
+  /**
+   * Resets the current sign-up attempt by clearing all local state back to null.
+   * Unlike other methods, this does NOT emit resource:fetch with 'fetching' status,
+   * allowing for smooth UI transitions without loading states.
+   */
+  reset(): Promise<{ error: ClerkError | null }> {
+    if (!SignUp.clerk.client) {
+      throw new Error('Cannot reset sign-up without a client.');
+    }
+    this.#canBeDiscarded = true;
+    SignUp.clerk.client.resetSignUp();
+    return Promise.resolve({ error: null });
   }
 }
 

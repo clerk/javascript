@@ -12,9 +12,8 @@ const nuxtNode = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/nuxt', constants.E2E_CLERK_VERSION || linkPackage('nuxt'))
+  .addDependency('@clerk/nuxt', constants.E2E_CLERK_JS_VERSION || linkPackage('nuxt'))
   .addDependency('@clerk/shared', linkPackage('shared'))
-  .addDependency('@clerk/types', linkPackage('types'))
   .addDependency('@clerk/vue', linkPackage('vue'));
 
 export const nuxt = {

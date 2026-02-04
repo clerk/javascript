@@ -1,6 +1,5 @@
 export type * from './apiKeys';
 export type * from './apiKeysSettings';
-export type * from './appearance';
 export type * from './attributes';
 export type * from './authConfig';
 export type * from './authObject';
@@ -34,6 +33,7 @@ export type * from './localization';
 export type * from './multiDomain';
 export type * from './oauth';
 export type * from './organization';
+export type * from './organizationCreationDefaults';
 export type * from './organizationDomain';
 export type * from './organizationInvitation';
 export type * from './organizationMembership';
@@ -46,7 +46,7 @@ export type * from './passwords';
 export type * from './permission';
 export type * from './phoneCodeChannel';
 export type * from './phoneNumber';
-export type * from './protect';
+export type * from './authorization';
 export type * from './protectConfig';
 export type * from './redirects';
 export type * from './resource';
@@ -55,10 +55,9 @@ export type * from './router';
 /**
  * TODO @revamp-hooks: Drop this in the next major release.
  */
+export type * from '../ui/types';
 export type * from './runtime-values';
 export type * from './saml';
-export type * from './samlAccount';
-export type * from './samlConnection';
 export type * from './session';
 export type * from './sessionVerification';
 export type * from './signIn';

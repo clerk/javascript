@@ -1,10 +1,20 @@
-import { type ClerkError, createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
-import type { Errors, SignInErrors, SignInSignal, SignUpErrors, SignUpSignal } from '@clerk/shared/types';
+import type { ClerkAPIError, ClerkError } from '@clerk/shared/error';
+import { createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
+import type {
+  Errors,
+  SignInErrors,
+  SignInSignal,
+  SignUpErrors,
+  SignUpSignal,
+  WaitlistErrors,
+  WaitlistSignal,
+} from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 import { computed, signal } from 'alien-signals';
 
 import type { SignIn } from './resources/SignIn';
 import type { SignUp } from './resources/SignUp';
+import type { Waitlist } from './resources/Waitlist';
 
 export const signInResourceSignal = signal<{ resource: SignIn | null }>({ resource: null });
 export const signInErrorSignal = signal<{ error: ClerkError | null }>({ error: null });
@@ -34,6 +44,20 @@ export const signUpComputedSignal: SignUpSignal = computed(() => {
   return { errors, fetchStatus, signUp: signUp ? signUp.__internal_future : null };
 });
 
+export const waitlistResourceSignal = signal<{ resource: Waitlist | null }>({ resource: null });
+export const waitlistErrorSignal = signal<{ error: ClerkError | null }>({ error: null });
+export const waitlistFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+
+export const waitlistComputedSignal: WaitlistSignal = computed(() => {
+  const waitlist = waitlistResourceSignal().resource;
+  const error = waitlistErrorSignal().error;
+  const fetchStatus = waitlistFetchSignal().status;
+
+  const errors = errorsToWaitlistErrors(error);
+
+  return { errors, fetchStatus, waitlist };
+});
+
 /**
  * Converts an error to a parsed errors object that reports the specific fields that the error pertains to. Will put
  * generic non-API errors into the global array.
@@ -58,7 +82,10 @@ export function errorsToParsedErrors<T extends Record<string, unknown>>(
     return parsedErrors;
   }
 
-  const hasFieldErrors = error.errors.some(error => 'meta' in error && error.meta && 'paramName' in error.meta);
+  function isFieldError(error: ClerkAPIError): boolean {
+    return 'meta' in error && error.meta && 'paramName' in error.meta && error.meta.paramName !== undefined;
+  }
+  const hasFieldErrors = error.errors.some(isFieldError);
   if (hasFieldErrors) {
     error.errors.forEach(error => {
       if (parsedErrors.raw) {
@@ -66,7 +93,7 @@ export function errorsToParsedErrors<T extends Record<string, unknown>>(
       } else {
         parsedErrors.raw = [error];
       }
-      if ('meta' in error && error.meta && 'paramName' in error.meta) {
+      if (isFieldError(error)) {
         const name = snakeToCamel(error.meta.paramName);
         if (name in parsedErrors.fields) {
           (parsedErrors.fields as any)[name] = error;
@@ -105,5 +132,11 @@ function errorsToSignUpErrors(error: ClerkError | null): SignUpErrors {
     code: null,
     captcha: null,
     legalAccepted: null,
+  });
+}
+
+function errorsToWaitlistErrors(error: ClerkError | null): WaitlistErrors {
+  return errorsToParsedErrors(error, {
+    emailAddress: null,
   });
 }

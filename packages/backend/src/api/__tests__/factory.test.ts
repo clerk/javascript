@@ -59,6 +59,40 @@ describe('api.client', () => {
     expect(totalCount).toBe(2);
   });
 
+  it('executes users.getUserList() with last_sign_in_at filters', async () => {
+    const afterTimestamp = 1640000000;
+    const beforeTimestamp = 1700000000;
+
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('last_sign_in_at_after')).toBe(afterTimestamp.toString());
+          expect(url.searchParams.get('last_sign_in_at_before')).toBe(beforeTimestamp.toString());
+          return HttpResponse.json([userJson]);
+        }),
+      ),
+      http.get(
+        `https://api.clerk.test/v1/users/count`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('last_sign_in_at_after')).toBe(afterTimestamp.toString());
+          expect(url.searchParams.get('last_sign_in_at_before')).toBe(beforeTimestamp.toString());
+          return HttpResponse.json({ object: 'total_count', total_count: 1 });
+        }),
+      ),
+    );
+
+    const { data, totalCount } = await apiClient.users.getUserList({
+      lastSignInAtAfter: afterTimestamp,
+      lastSignInAtBefore: beforeTimestamp,
+    });
+
+    expect(data.length).toBe(1);
+    expect(totalCount).toBe(1);
+  });
+
   it('executes a successful backend API request for a paginated response', async () => {
     server.use(
       http.get(
@@ -325,7 +359,7 @@ describe('api.client', () => {
         ),
       );
 
-      const response = await apiClient.m2m.verifyToken({
+      const response = await apiClient.m2m.verify({
         machineSecretKey: 'ak_test_in_header_params', // this will be added to headerParams.Authorization
         token: 'mt_secret_test',
       });
@@ -353,7 +387,7 @@ describe('api.client', () => {
         ),
       );
 
-      const response = await apiClient.m2m.verifyToken({
+      const response = await apiClient.m2m.verify({
         token: 'mt_secret_test',
       });
       expect(response.id).toBe('mt_test');
@@ -425,7 +459,7 @@ describe('api.client', () => {
         ),
       );
 
-      const response = await apiClient.m2m.verifyToken({
+      const response = await apiClient.m2m.verify({
         token: 'mt_secret_test',
       });
       expect(response.id).toBe('mt_test');

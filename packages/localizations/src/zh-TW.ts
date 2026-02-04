@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
@@ -361,6 +361,12 @@ export const zhTW: LocalizationResource = {
         tableHeader__role: '角色',
         tableHeader__user: '使用者',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: '我們正在更新可用角色。完成後，您將能夠再次更新角色。',
+          title: '角色暫時被鎖定',
+        },
+      },
       detailsTitle__emptyRow: '沒有可顯示的成員',
       invitationsTab: {
         autoInvitations: {
@@ -681,7 +687,13 @@ export const zhTW: LocalizationResource = {
       subtitle: '以繼續前往 {{applicationName}}',
       title: '輸入您的密碼',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -730,6 +742,10 @@ export const zhTW: LocalizationResource = {
       formTitle: '驗證碼',
       subtitle: undefined,
       title: '兩步驟驗證',
+    },
+    web3Solana: {
+      subtitle: '請選擇下方錢包以登入',
+      title: '使用 Solana 登入',
     },
   },
   signInEnterPasswordTitle: '輸入您的密碼',
@@ -822,31 +838,44 @@ export const zhTW: LocalizationResource = {
       title: '建立您的帳戶',
       titleCombined: '建立您的帳戶',
     },
+    web3Solana: {
+      subtitle: '請選擇下方錢包以註冊',
+      title: '使用 Solana 註冊',
+    },
   },
   socialButtonsBlockButton: '以 {{provider|titleize}} 帳戶登入',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        '偵測到的公司名稱 ({{organizationName}}) 和 {{organizationDomain}} 已存在一個組織。請透過邀請加入。',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: '建立新組織',
+      action__invitationAccept: '加入',
+      action__suggestionsAccept: '請求加入',
+      subtitle: '加入現有組織或建立新組織',
+      subtitle__createOrganizationDisabled: '加入現有組織',
+      suggestionsAcceptedLabel: '等待批准',
+      title: '選擇組織',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: '取消',
+      formButtonSubmit: '繼續',
+      formFieldInputPlaceholder__name: '我的組織',
+      formFieldInputPlaceholder__slug: 'wo-de-zu-zhi',
+      formFieldLabel__name: '名稱',
+      formFieldLabel__slug: 'Slug',
+      subtitle: '輸入您的組織詳細資訊以繼續',
+      title: '設定您的組織',
+    },
+    organizationCreationDisabled: {
+      subtitle: '請聯繫您的組織管理員以獲取邀請。',
+      title: '您必須屬於一個組織',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: '登出',
+      actionText: '已登入為 {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -855,17 +884,85 @@ export const zhTW: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: '檔案大小超過10MB的上限。請選擇較小的檔案。',
+    avatar_file_type_invalid: '不支援的檔案類型。請上傳 JPG、PNG、GIF 或 WEBP 格式的圖片。',
     captcha_invalid: '由於安全驗證失敗，註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     captcha_unavailable: '由於機器人驗證失敗導致註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     form_code_incorrect: undefined,
+    form_email_address_blocked: '不支援臨時電子郵件服務。請使用您的常規電子郵件地址建立帳戶。',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: '我們無法找到具有這些信息的帳戶。',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: '電子郵件地址必須是有效的格式。',
     form_param_format_invalid__phone_number: '電話號碼必須是有效的國際格式。',
@@ -877,12 +974,15 @@ export const zhTW: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: '您的密碼強度不足。',
+    form_password_or_identifier_incorrect: '密碼或電子郵件地址不正確。請重試或使用其他方法。',
     form_password_pwned: '此密碼已在已知的資料外洩事件中出現，請改用其他密碼。',
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded: '您的密碼超過允許的大小上限，請縮短或移除部分特殊字元。',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: '密碼驗證失敗',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
@@ -913,6 +1013,8 @@ export const zhTW: LocalizationResource = {
     phone_number_exists: '此電話號碼已被使用，請嘗試其他號碼。',
     session_exists: '您已經登錄。',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: '您已拒絕簽名請求。請再試一次以繼續。',
+    web3_solana_signature_generation_failed: '產生簽名時發生錯誤。請再試一次以繼續。',
     zxcvbn: {
       couldBeStronger: '您的密碼強度尚可，但可以更安全。請嘗試增加長度或複雜度。',
       goodPassword: '密碼強度良好。',
@@ -1265,6 +1367,10 @@ export const zhTW: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: '新增 Web3 錢包',
         title: 'Web3 錢包',
+        web3SelectSolanaWalletScreen: {
+          subtitle: '選擇一個 Solana 錢包以連線到您的帳戶。',
+          title: '新增 Solana 錢包',
+        },
       },
     },
     usernamePage: {
@@ -1288,16 +1394,22 @@ export const zhTW: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: '登入',
+      actionText: '已有存取權限？',
+      formButton: '加入候補名單',
+      subtitle: '輸入您的電子郵件地址，我們會在您的位置準備好時通知您',
+      title: '加入候補名單',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: '您將很快被重新導向...',
+      subtitle: '當您的位置準備好時，我們會與您聯繫',
+      title: '感謝您加入候補名單！',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '使用 {{walletName}} 連線',
+    continue: '使用 {{walletName}} 繼續',
+    noneAvailable:
+      '未偵測到 Solana Web3 錢包。請安裝支援 Web3 的 {{ solanaWalletsLink || link("wallet extension") }}。',
   },
 } as const;

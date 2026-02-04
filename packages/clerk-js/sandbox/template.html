@@ -172,6 +172,14 @@
           <li class="relative">
             <a
               class="relative isolate flex w-full rounded-md border border-white px-2 py-[0.4375rem] text-sm hover:bg-gray-50 aria-[current]:bg-gray-50"
+              href="/task-setup-mfa"
+            >
+              TaskSetupMFA
+            </a>
+          </li>
+          <li class="relative">
+            <a
+              class="relative isolate flex w-full rounded-md border border-white px-2 py-[0.4375rem] text-sm hover:bg-gray-50 aria-[current]:bg-gray-50"
               href="/open-sign-in"
             >
               Open sign in
@@ -355,6 +363,12 @@
     </main>
 
     <!-- This app is in the Team SDK organization. -->
+    <!-- Load the UI bundle first, so window.__internal_ClerkUICtor is available -->
+    <script
+      type="text/javascript"
+      src="<%= uiScriptUrl %>"
+      crossorigin="anonymous"
+    ></script>
     <script
       type="text/javascript"
       src="/<%= htmlRspackPlugin.files.js[0] %>"

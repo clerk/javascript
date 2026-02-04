@@ -7,6 +7,8 @@ export const pickFromClerkInitState = (
   clerkInitState: any,
 ): TanStackProviderAndInitialProps & {
   clerkSsrState: any;
+  __keylessClaimUrl?: string;
+  __keylessApiKeysUrl?: string;
 } => {
   const {
     __clerk_ssr_state,
@@ -16,8 +18,6 @@ export const pickFromClerkInitState = (
     __isSatellite,
     __signInUrl,
     __signUpUrl,
-    __afterSignInUrl,
-    __afterSignUpUrl,
     __clerkJSUrl,
     __clerkJSVersion,
     __telemetryDisabled,
@@ -26,6 +26,9 @@ export const pickFromClerkInitState = (
     __signUpForceRedirectUrl,
     __signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl,
+    __keylessClaimUrl,
+    __keylessApiKeysUrl,
+    __prefetchUI,
   } = clerkInitState || {};
 
   return {
@@ -36,10 +39,9 @@ export const pickFromClerkInitState = (
     isSatellite: !!__isSatellite,
     signInUrl: __signInUrl,
     signUpUrl: __signUpUrl,
-    afterSignInUrl: __afterSignInUrl,
-    afterSignUpUrl: __afterSignUpUrl,
     clerkJSUrl: __clerkJSUrl,
     clerkJSVersion: __clerkJSVersion,
+    prefetchUI: __prefetchUI,
     telemetry: {
       disabled: __telemetryDisabled,
       debug: __telemetryDebug,
@@ -48,22 +50,23 @@ export const pickFromClerkInitState = (
     signUpForceRedirectUrl: __signUpForceRedirectUrl,
     signInFallbackRedirectUrl: __signInFallbackRedirectUrl,
     signUpFallbackRedirectUrl: __signUpFallbackRedirectUrl,
+    __keylessClaimUrl,
+    __keylessApiKeysUrl,
   };
 };
 
 export const mergeWithPublicEnvs = (restInitState: any) => {
+  const envVars = getPublicEnvVariables();
   return {
     ...restInitState,
-    publishableKey: restInitState.publishableKey || getPublicEnvVariables().publishableKey,
-    domain: restInitState.domain || getPublicEnvVariables().domain,
-    isSatellite: restInitState.isSatellite || getPublicEnvVariables().isSatellite,
-    signInUrl: restInitState.signInUrl || getPublicEnvVariables().signInUrl,
-    signUpUrl: restInitState.signUpUrl || getPublicEnvVariables().signUpUrl,
-    afterSignInUrl: restInitState.afterSignInUrl || getPublicEnvVariables().afterSignInUrl,
-    afterSignUpUrl: restInitState.afterSignUpUrl || getPublicEnvVariables().afterSignUpUrl,
-    clerkJSUrl: restInitState.clerkJSUrl || getPublicEnvVariables().clerkJsUrl,
-    clerkJSVersion: restInitState.clerkJSVersion || getPublicEnvVariables().clerkJsVersion,
+    publishableKey: restInitState.publishableKey || envVars.publishableKey,
+    domain: restInitState.domain || envVars.domain,
+    isSatellite: restInitState.isSatellite || envVars.isSatellite,
+    signInUrl: restInitState.signInUrl || envVars.signInUrl,
+    signUpUrl: restInitState.signUpUrl || envVars.signUpUrl,
+    clerkJSUrl: restInitState.clerkJSUrl || envVars.clerkJsUrl,
+    clerkJSVersion: restInitState.clerkJSVersion || envVars.clerkJsVersion,
     signInForceRedirectUrl: restInitState.signInForceRedirectUrl,
-    clerkJSVariant: restInitState.clerkJSVariant || getPublicEnvVariables().clerkJsVariant,
+    prefetchUI: restInitState.prefetchUI ?? envVars.prefetchUI,
   };
 };

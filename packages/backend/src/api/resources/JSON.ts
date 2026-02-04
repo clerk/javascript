@@ -1,4 +1,4 @@
-import type { LastAuthenticationStrategy, SignUpStatus, VerificationStatus } from '@clerk/types';
+import type { LastAuthenticationStrategy, SignUpStatus, VerificationStatus } from '@clerk/shared/types';
 
 import type {
   ActorTokenStatus,
@@ -50,7 +50,6 @@ export const ObjectType = {
   PhoneNumber: 'phone_number',
   ProxyCheck: 'proxy_check',
   RedirectUrl: 'redirect_url',
-  SamlAccount: 'saml_account',
   SamlConnection: 'saml_connection',
   Session: 'session',
   SignInAttempt: 'sign_in_attempt',
@@ -235,21 +234,6 @@ export interface JwtTemplateJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
-
-export interface SamlAccountJSON extends ClerkResourceJSON {
-  object: typeof ObjectType.SamlAccount;
-  provider: string;
-  provider_user_id: string | null;
-  active: boolean;
-  email_address: string;
-  first_name: string;
-  last_name: string;
-  verification: VerificationJSON | null;
-  saml_connection: SamlAccountConnectionJSON | null;
-  last_authenticated_at: number | null;
-  enterprise_connection_id: string | null;
-}
-
 export interface IdentificationLinkJSON extends ClerkResourceJSON {
   type: string;
 }
@@ -316,6 +300,8 @@ export interface OauthAccessTokenJSON {
   // Only set in OAuth 1.0 tokens
   token_secret?: string;
   expires_at?: number;
+  // Only present for OIDC-compliant OAuth 2.0 providers when available
+  id_token?: string;
 }
 
 export interface OAuthApplicationJSON extends ClerkResourceJSON {
@@ -405,19 +391,19 @@ export interface OrganizationInvitationAcceptedJSON extends OrganizationInvitati
  */
 export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
   /**
-   * The name of the organization.
+   * The name of the Organization.
    */
   name: string;
   /**
-   * The slug of the organization.
+   * The slug of the Organization.
    */
   slug: string;
   /**
-   * Holds the default organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization).
+   * Holds the default Organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization).
    */
   image_url?: string;
   /**
-   * Whether the organization has a profile image.
+   * Whether the Organization has a profile image.
    */
   has_image: boolean;
 }
@@ -601,7 +587,6 @@ export interface UserJSON extends ClerkResourceJSON {
   web3_wallets: Web3WalletJSON[];
   organization_memberships: OrganizationMembershipJSON[] | null;
   external_accounts: ExternalAccountJSON[];
-  saml_accounts: SamlAccountJSON[];
   password_last_updated_at: number | null;
   public_metadata: UserPublicMetadata;
   private_metadata: UserPrivateMetadata;
@@ -730,20 +715,6 @@ export interface PermissionJSON extends ClerkResourceJSON {
   key: string;
   name: string;
   description: string;
-  created_at: number;
-  updated_at: number;
-}
-
-export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
-  id: string;
-  name: string;
-  domain: string;
-  active: boolean;
-  provider: string;
-  sync_user_attributes: boolean;
-  allow_subdomains: boolean;
-  allow_idp_initiated: boolean;
-  disable_additional_identifications: boolean;
   created_at: number;
   updated_at: number;
 }
@@ -880,6 +851,9 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   annual_monthly_fee: BillingMoneyAmountJSON | null;
   for_payer_type: 'org' | 'user';
   features?: FeatureJSON[];
+  free_trial_days: number | null;
+  free_trial_enabled: boolean;
+  avatar_url: string | null;
 }
 
 type BillingSubscriptionItemStatus =
@@ -933,7 +907,7 @@ export interface BillingSubscriptionItemWebhookEventJSON extends ClerkResourceJS
   proration_date: string;
   plan_period: 'month' | 'annual';
   period_start: number;
-  period_end?: number;
+  period_end: number | null;
   canceled_at?: number;
   past_due_at?: number;
   lifetime_paid: number;

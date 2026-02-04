@@ -13,7 +13,7 @@
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=expo_passkeys)
-[![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/Clerk?style=social)](https://twitter.com/intent/follow?screen_name=Clerk)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/expo-passkeys/CHANGELOG.md)
 ·
@@ -38,8 +38,8 @@
 ## Usage
 
 ```tsx
-import { ClerkProvider } from '@clerk/clerk-expo';
-import { passkeys } from '@clerk/clerk-expo/passkeys';
+import { ClerkProvider } from '@clerk/expo';
+import { passkeys } from '@clerk/expo/passkeys';
 
 <ClerkProvider __experimental_passkeys={passkeys}>{/* Your app here */}</ClerkProvider>;
 ```

@@ -1,4 +1,3 @@
-import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
 import { linkPackage } from './utils';
@@ -11,8 +10,9 @@ const cra = applicationConfig()
   .addScript('dev', 'pnpm start')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/clerk-react', constants.E2E_CLERK_VERSION || linkPackage('react'))
-  .addDependency('@clerk/themes', constants.E2E_CLERK_VERSION || linkPackage('themes'));
+  .addDependency('@clerk/react', linkPackage('react'))
+  .addDependency('@clerk/shared', linkPackage('shared'))
+  .addDependency('@clerk/ui', linkPackage('ui'));
 
 const vite = cra
   .clone()

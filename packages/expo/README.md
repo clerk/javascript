@@ -6,14 +6,14 @@
     </picture>
   </a>
   <br />
-  <h1 align="center">@clerk/clerk-expo</h1>
+  <h1 align="center">@clerk/expo</h1>
 </p>
 
 <div align="center">
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_expo)
-[![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/Clerk?style=social)](https://twitter.com/intent/follow?screen_name=Clerk)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/expo/CHANGELOG.md)
 ·
@@ -61,9 +61,9 @@ We're open to all community contributions! If you'd like to contribute in any wa
 
 ## Security
 
-`@clerk/clerk-expo` follows good practices of security, but 100% security cannot be assured.
+`@clerk/expo` follows good practices of security, but 100% security cannot be assured.
 
-`@clerk/clerk-expo` is provided **"as is"** without any **warranty**. Use at your own risk.
+`@clerk/expo` is provided **"as is"** without any **warranty**. Use at your own risk.
 
 _For more information and to report security issues, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
 

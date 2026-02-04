@@ -3,13 +3,18 @@ import type {
   ClerkOptions,
   ClientResource,
   MultiDomainAndOrProxyPrimitives,
-  ProtectProps,
+  ProtectParams,
+  ShowProps,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { Appearance, Ui } from '@clerk/ui/internal';
 
-type AstroClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
+type AstroClerkUpdateOptions<TUi extends Ui = Ui> = Pick<ClerkOptions, 'localization'> & {
+  appearance?: Appearance<TUi>;
+};
 
-type AstroClerkIntegrationParams = Without<
+type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
   ClerkOptions,
   | 'isSatellite'
   | 'sdkMetadata'
@@ -20,18 +25,35 @@ type AstroClerkIntegrationParams = Without<
   | 'routerPush'
   | 'polling'
   | 'touchSession'
+  | 'appearance'
 > &
-  MultiDomainAndOrProxyPrimitives;
+  MultiDomainAndOrProxyPrimitives & {
+    appearance?: Appearance<TUi>;
+    clerkJSUrl?: string;
+    clerkJSVersion?: string;
+    /**
+     * The URL that `@clerk/ui` should be hot-loaded from.
+     */
+    clerkUIUrl?: string;
+    /**
+     * Controls prefetching of the `@clerk/ui` script.
+     * - `false` - Skip prefetching the UI (for custom UIs using Control Components)
+     * - `undefined` (default) - Prefetch UI normally
+     */
+    prefetchUI?: boolean;
+  };
 
-type AstroClerkCreateInstanceParams = AstroClerkIntegrationParams & { publishableKey: string };
+type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegrationParams<TUi> & {
+  publishableKey: string;
+};
 
-// Copied from `@clerk/clerk-react`
+// Copied from `@clerk/react`
 export interface HeadlessBrowserClerk extends Clerk {
   load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
   updateClient: (client: ClientResource) => void;
 }
 
-// Copied from `@clerk/clerk-react`
+// Copied from `@clerk/react`
 export interface BrowserClerk extends HeadlessBrowserClerk {
   onComponentsReady: Promise<void>;
   components: any;
@@ -42,10 +64,20 @@ declare global {
     __astro_clerk_component_props: Map<string, Map<string, Record<string, unknown>>>;
     __astro_clerk_function_props: Map<string, Map<string, Record<string, unknown>>>;
     Clerk: BrowserClerk;
+    __internal_ClerkUICtor?: ClerkUiConstructor;
   }
 }
 
-export type { AstroClerkUpdateOptions, AstroClerkIntegrationParams, AstroClerkCreateInstanceParams, ProtectProps };
+export type {
+  AstroClerkUpdateOptions,
+  AstroClerkIntegrationParams,
+  AstroClerkCreateInstanceParams,
+  ProtectParams,
+  ShowProps,
+};
+
+// Backward compatibility alias
+export type ProtectProps = ProtectParams;
 
 export type ButtonProps<Tag> = {
   /**

@@ -1,10 +1,10 @@
 export { useAuth } from './useAuth';
 export { useEmailLink } from './useEmailLink';
-export { useSignIn } from './useSignIn';
-export { useSignUp } from './useSignUp';
+export { useSignIn, useSignUp, useWaitlist } from './useClerkSignal';
 export {
   useClerk,
   useOrganization,
+  useOrganizationCreationDefaults,
   useOrganizationList,
   useSessionList,
   useUser,

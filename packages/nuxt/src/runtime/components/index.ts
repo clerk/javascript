@@ -1,22 +1,15 @@
+export { SignIn, SignUp, UserProfile, OrganizationProfile, CreateOrganization, OrganizationList } from './uiComponents';
+
 export {
-  // UI components
-  SignUp,
-  SignIn,
-  UserProfile,
   UserAvatar,
   UserButton,
   OrganizationSwitcher,
-  OrganizationProfile,
-  CreateOrganization,
-  OrganizationList,
   GoogleOneTap,
   Waitlist,
   // Control components
   ClerkLoaded,
   ClerkLoading,
-  SignedOut,
-  SignedIn,
-  Protect,
+  Show,
   RedirectToSignIn,
   RedirectToSignUp,
   RedirectToUserProfile,
@@ -30,5 +23,5 @@ export {
   SignOutButton,
   SignInWithMetamaskButton,
   PricingTable,
-  APIKeys,
+  UNSAFE_PortalProvider,
 } from '@clerk/vue';

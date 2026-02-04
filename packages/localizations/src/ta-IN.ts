@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const taIN: LocalizationResource = {
   locale: 'ta-IN',
@@ -367,6 +367,13 @@ export const taIN: LocalizationResource = {
         tableHeader__role: 'பங்கு',
         tableHeader__user: 'பயனர்',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'கிடைக்கக்கூடிய பாத்திரங்களை நாங்கள் புதுப்பிக்கிறோம். இது முடிந்ததும், நீங்கள் மீண்டும் பாத்திரங்களை புதுப்பிக்க முடியும்.',
+          title: 'பாத்திரங்கள் தற்காலிகமாக பூட்டப்பட்டுள்ளன',
+        },
+      },
       detailsTitle__emptyRow: 'காட்ட உறுப்பினர்கள் இல்லை',
       invitationsTab: {
         autoInvitations: {
@@ -698,8 +705,14 @@ export const taIN: LocalizationResource = {
       subtitle: 'உங்கள் கணக்குடன் தொடர்புடைய கடவுச்சொல்லை உள்ளிடவும்',
       title: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'கடவுச்சொல் அபாயத்தில் உள்ளது',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'சரிபார்ப்புக் குறியீடு',
@@ -747,6 +760,10 @@ export const taIN: LocalizationResource = {
       formTitle: 'சரிபார்ப்புக் குறியீடு',
       subtitle: 'தொடர, உங்கள் அங்கீகாரி பயன்பாட்டால் உருவாக்கப்பட்ட சரிபார்ப்புக் குறியீட்டை உள்ளிடவும்',
       title: 'இரண்டு-படி சரிபார்ப்பு',
+    },
+    web3Solana: {
+      subtitle: 'உள்நுழைய கீழே ஒரு வாலெட்டைத் தேர்ந்தெடுக்கவும்',
+      title: 'Solana மூலம் உள்நுழையவும்',
     },
   },
   signInEnterPasswordTitle: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
@@ -841,31 +858,44 @@ export const taIN: LocalizationResource = {
       title: 'உங்கள் கணக்கை உருவாக்கவும்',
       titleCombined: 'உங்கள் கணக்கை உருவாக்கவும்',
     },
+    web3Solana: {
+      subtitle: 'பதிவு செய்ய கீழே ஒரு வாலெட்டைத் தேர்ந்தெடுக்கவும்',
+      title: 'Solana மூலம் பதிவு செய்யவும்',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}} மூலம் தொடரவும்',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'கண்டறியப்பட்ட நிறுவன பெயர் ({{organizationName}}) மற்றும் {{organizationDomain}} க்கு ஒரு அமைப்பு ஏற்கனவே உள்ளது. அழைப்பின் மூலம் சேரவும்.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'புதிய அமைப்பை உருவாக்கவும்',
+      action__invitationAccept: 'சேரவும்',
+      action__suggestionsAccept: 'சேர்வதற்கு கோரிக்கை',
+      subtitle: 'இருக்கும் அமைப்பில் சேரவும் அல்லது புதியதை உருவாக்கவும்',
+      subtitle__createOrganizationDisabled: 'இருக்கும் அமைப்பில் சேரவும்',
+      suggestionsAcceptedLabel: 'அனுமதிக்காக காத்திருக்கிறது',
+      title: 'ஒரு அமைப்பைத் தேர்ந்தெடுக்கவும்',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'ரத்துசெய்',
+      formButtonSubmit: 'தொடரவும்',
+      formFieldInputPlaceholder__name: 'எனது அமைப்பு',
+      formFieldInputPlaceholder__slug: 'enathu-amaippu',
+      formFieldLabel__name: 'பெயர்',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'தொடர உங்கள் அமைப்பு விவரங்களை உள்ளிடவும்',
+      title: 'உங்கள் அமைப்பை அமைக்கவும்',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'அழைப்புக்கு உங்கள் அமைப்பின் நிர்வாகியைத் தொடர்பு கொள்ளவும்.',
+      title: 'நீங்கள் ஒரு அமைப்பில் உறுப்பினராக இருக்க வேண்டும்',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'வெளியேறு',
+      actionText: '{{identifier}} என உள்நுழைந்துள்ளீர்கள்',
     },
   },
   taskResetPassword: {
@@ -874,19 +904,88 @@ export const taIN: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ஏற்கனவே நிறுவனத்தின் உறுப்பினராக உள்ளார்.',
+    avatar_file_size_exceeded: 'கோப்பு அளவு 10MB அதிகபட்ச வரம்பை மீறுகிறது. சிறிய கோப்பை தேர்வு செய்யவும்.',
+    avatar_file_type_invalid: 'கோப்பு வகை ஆதரிக்கப்படவில்லை. JPG, PNG, GIF அல்லது WEBP படத்தை பதிவேற்றவும்.',
     captcha_invalid:
       'பாதுகாப்பு சரிபார்ப்புகள் தோல்வியடைந்ததால் பதிவு செய்ய முடியவில்லை. மீண்டும் முயற்சிக்க பக்கத்தை புதுப்பிக்கவும் அல்லது மேலும் உதவிக்கு ஆதரவை தொடர்பு கொள்ளவும்.',
     captcha_unavailable:
       'போட் சரிபார்ப்பு தோல்வியடைந்ததால் பதிவு செய்ய முடியவில்லை. மீண்டும் முயற்சிக்க பக்கத்தை புதுப்பிக்கவும் அல்லது மேலும் உதவிக்கு ஆதரவை தொடர்பு கொள்ளவும்.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'தற்காலிக மின்னஞ்சல் சேவைகள் ஆதரிக்கப்படவில்லை. கணக்கை உருவாக்க உங்கள் வழக்கமான மின்னஞ்சல் முகவரியைப் பயன்படுத்தவும்.',
     form_identifier_exists__email_address: 'இந்த மின்னஞ்சல் முகவரி எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     form_identifier_exists__phone_number: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     form_identifier_exists__username: 'இந்த பயனர்பெயர் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     form_identifier_not_found: 'இந்த அடையாளத்துடன் கணக்கு எதுவும் இல்லை. சரிபார்த்து மீண்டும் முயற்சிக்கவும்.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'உள்ளிடப்பட்ட மதிப்பு தவறான வடிவத்தில் உள்ளது. சரிபார்த்து திருத்தவும்.',
     form_param_format_invalid__email_address: 'மின்னஞ்சல் முகவரி சரியான மின்னஞ்சல் முகவரியாக இருக்க வேண்டும்.',
     form_param_format_invalid__phone_number: 'தொலைபேசி எண் சரியான சர்வதேச வடிவமைப்பில் இருக்க வேண்டும்.',
@@ -898,16 +997,20 @@ export const taIN: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'உள்ளிடப்பட்ட மதிப்பு தவறானது. அதை திருத்தவும்.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'நீங்கள் உள்ளிட்ட கடவுச்சொல் தவறானது. மீண்டும் முயற்சிக்கவும்.',
     form_password_length_too_short:
       'உங்கள் கடவுச்சொல் மிகவும் குறுகியது. இது குறைந்தது 8 எழுத்துகள் நீளமாக இருக்க வேண்டும்.',
     form_password_not_strong_enough: 'உங்கள் கடவுச்சொல் போதுமான வலிமை இல்லை.',
+    form_password_or_identifier_incorrect:
+      'கடவுச்சொல் அல்லது மின்னஞ்சல் முகவரி தவறானது. மீண்டும் முயற்சிக்கவும் அல்லது வேறு முறையைப் பயன்படுத்தவும்.',
     form_password_pwned:
       'இந்த கடவுச்சொல் தரவு மீறலின் ஒரு பகுதியாக காணப்பட்டது மற்றும் பயன்படுத்த முடியாது, தயவுசெய்து வேறு கடவுச்சொல்லை முயற்சிக்கவும்.',
     form_password_pwned__sign_in:
       'இந்த கடவுச்சொல் தரவு மீறலின் ஒரு பகுதியாக காணப்பட்டது மற்றும் பயன்படுத்த முடியாது, தயவுசெய்து உங்கள் கடவுச்சொல்லை மீட்டமைக்கவும்.',
     form_password_size_in_bytes_exceeded:
       'உங்கள் கடவுச்சொல் அனுமதிக்கப்பட்ட அதிகபட்ச பைட்டுகளை மீறிவிட்டது, தயவுசெய்து அதை குறைக்கவும் அல்லது சில சிறப்பு எழுத்துக்களை நீக்கவும்.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'தவறான கடவுச்சொல்',
     form_username_invalid_character:
       'உங்கள் பயனர்பெயரில் தவறான எழுத்துக்கள் உள்ளன. எழுத்துக்கள், எண்கள் மற்றும் அடிக்கோடுகளை மட்டும் பயன்படுத்தவும்.',
@@ -944,6 +1047,9 @@ export const taIN: LocalizationResource = {
     phone_number_exists: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 வாலட் நீட்டிப்பு காணப்படவில்லை. தொடர ஒன்றை நிறுவவும்.',
+    web3_signature_request_rejected: 'நீங்கள் கையொப்ப கோரிக்கையை நிராகரித்துவிட்டீர்கள். தொடர மீண்டும் முயற்சிக்கவும்.',
+    web3_solana_signature_generation_failed:
+      'கையொப்பத்தை உருவாக்கும் போது பிழை ஏற்பட்டது. தொடர மீண்டும் முயற்சிக்கவும்.',
     zxcvbn: {
       couldBeStronger:
         'உங்கள் கடவுச்சொல் செயல்படுகிறது, ஆனால் மேலும் வலுவாக இருக்கலாம். மேலும் எழுத்துகளைச் சேர்க்க முயற்சிக்கவும்.',
@@ -1315,6 +1421,10 @@ export const taIN: LocalizationResource = {
         detailsAction__nonPrimary: 'முதன்மையாக அமைக்கவும்',
         primaryButton: 'வாலட்டை இணைக்கவும்',
         title: 'Web3 வாலட்டுகள்',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'உங்கள் கணக்குடன் இணைக்க Solana வாலெட்டைத் தேர்ந்தெடுக்கவும்.',
+          title: 'Solana வாலெட்டை சேர்க்கவும்',
+        },
       },
     },
     usernamePage: {
@@ -1349,5 +1459,11 @@ export const taIN: LocalizationResource = {
       subtitle: 'உங்கள் இடம் தயாராகும் போது உங்களுடன் தொடர்பில் இருப்போம்',
       title: 'காத்திருப்பில் சேர்ந்ததற்கு நன்றி!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} மூலம் இணைக்கவும்',
+    continue: '{{walletName}} மூலம் தொடரவும்',
+    noneAvailable:
+      'Solana Web3 வாலெட்டுகள் எதுவும் கண்டறியப்படவில்லை. Web3 ஆதரிக்கும் {{ solanaWalletsLink || link("wallet extension") }} ஐ நிறுவவும்.',
   },
 } as const;

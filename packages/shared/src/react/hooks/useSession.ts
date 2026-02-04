@@ -23,7 +23,7 @@ const hookName = `useSession`;
  * <Tab>
  *
  * ```tsx {{ filename: 'src/Home.tsx' }}
- * import { useSession } from '@clerk/clerk-react'
+ * import { useSession } from '@clerk/react'
  *
  * export default function Home() {
  *   const { isLoaded, session, isSignedIn } = useSession()

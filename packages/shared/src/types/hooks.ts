@@ -14,11 +14,11 @@ import type { UserResource } from './user';
 /**
  * @inline
  */
-type CheckAuthorizationSignedOut = undefined;
+type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 /**
  * @inline
  */
-type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
+type CheckAuthorizationSignedOut = CheckAuthorizationWithoutOrgOrUser;
 
 /**
  * @inline
@@ -50,19 +50,19 @@ export type UseAuthReturn =
        */
       actor: undefined;
       /**
-       * The ID of the user's active organization.
+       * The ID of the user's active Organization.
        */
       orgId: undefined;
       /**
-       * The current user's role in their active organization.
+       * The current user's Role in their active Organization.
        */
       orgRole: undefined;
       /**
-       * The URL-friendly identifier of the user's active organization.
+       * The URL-friendly identifier of the user's Active Organization.
        */
       orgSlug: undefined;
       /**
-       * A function that checks if the user has specific permissions or roles. See the [reference doc](https://clerk.com/docs/reference/backend/types/auth-object#has).
+       * A function that checks if the user has specific Permissions or Roles. See the [reference doc](https://clerk.com/docs/reference/backend/types/auth-object#has).
        */
       has: CheckAuthorizationSignedOut;
       /**
@@ -71,6 +71,11 @@ export type UseAuthReturn =
       signOut: SignOut;
       /**
        * A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](https://clerk.com/docs/reference/javascript/session#get-token).
+       *
+       * > [!NOTE]
+       * > To access auth data server-side, see the [`Auth` object reference doc](https://clerk.com/docs/reference/backend/types/auth-object).
+       *
+       * @throws {ClerkRuntimeError} When called in a non-browser environment (code: `clerk_runtime_not_browser`)
        */
       getToken: GetToken;
     }
@@ -208,7 +213,7 @@ export type UseSessionListReturn =
        */
       sessions: undefined;
       /**
-       * A function that sets the active session and/or organization. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
+       * A function that sets the active session and/or Organization. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
        */
       setActive: undefined;
     }

@@ -2,6 +2,7 @@
 
 exports[`errors public exports > should not change unexpectedly 1`] = `
 [
+  "ClerkOfflineError",
   "EmailLinkErrorCode",
   "EmailLinkErrorCodeStatus",
   "isClerkAPIResponseError",
@@ -9,6 +10,13 @@ exports[`errors public exports > should not change unexpectedly 1`] = `
   "isKnownError",
   "isMetamaskError",
   "isReverificationCancelledError",
+]
+`;
+
+exports[`legacy public exports > should not change unexpectedly 1`] = `
+[
+  "useSignIn",
+  "useSignUp",
 ]
 `;
 
@@ -27,22 +35,23 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "OrganizationProfile",
   "OrganizationSwitcher",
   "PricingTable",
-  "Protect",
   "RedirectToCreateOrganization",
   "RedirectToOrganizationProfile",
   "RedirectToSignIn",
   "RedirectToSignUp",
   "RedirectToTasks",
   "RedirectToUserProfile",
+  "Show",
   "SignIn",
   "SignInButton",
   "SignInWithMetamaskButton",
   "SignOutButton",
   "SignUp",
   "SignUpButton",
-  "SignedIn",
-  "SignedOut",
   "TaskChooseOrganization",
+  "TaskResetPassword",
+  "TaskSetupMFA",
+  "UNSAFE_PortalProvider",
   "UserAvatar",
   "UserButton",
   "UserProfile",
@@ -52,10 +61,12 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "__experimental_PaymentElementProvider",
   "__experimental_useCheckout",
   "__experimental_usePaymentElement",
+  "getToken",
   "useAuth",
   "useClerk",
   "useEmailLink",
   "useOrganization",
+  "useOrganizationCreationDefaults",
   "useOrganizationList",
   "useReverification",
   "useSession",
@@ -63,6 +74,7 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "useSignIn",
   "useSignUp",
   "useUser",
+  "useWaitlist",
 ]
 `;
 

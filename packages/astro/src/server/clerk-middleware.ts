@@ -18,8 +18,8 @@ import {
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 import { handleValueOrFn } from '@clerk/shared/utils';
-import type { PendingSessionOptions } from '@clerk/types';
 import type { APIContext } from 'astro';
 
 import { authAsyncStorage } from '#async-local-storage';
@@ -300,6 +300,7 @@ function decorateAstroLocal(
           signInUrl: requestState.signInUrl,
           signUpUrl: requestState.signUpUrl,
           sessionStatus: requestState.toAuth()?.sessionStatus,
+          isSatellite: requestState.isSatellite,
         }).redirectToSignIn({
           returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl.toString(),
         });
@@ -422,6 +423,7 @@ const handleControlFlowErrors = (
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         publishableKey: getSafeEnv(context).pk!,
         sessionStatus: requestState.toAuth()?.sessionStatus,
+        isSatellite: requestState.isSatellite,
       }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
     default:
       throw e;

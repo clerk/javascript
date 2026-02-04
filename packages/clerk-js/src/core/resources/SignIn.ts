@@ -1,5 +1,13 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
+import {
+  convertJSONToPublicKeyRequestOptions,
+  serializePublicKeyCredentialAssertion,
+  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
+} from '@clerk/shared/internal/clerk-js/passkeys';
+import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
+import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
+import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptFirstFactorParams,
@@ -15,6 +23,7 @@ import type {
   EmailLinkConfig,
   EmailLinkFactor,
   EnterpriseSSOConfig,
+  GenerateSignature,
   PassKeyConfig,
   PasskeyFactor,
   PhoneCodeConfig,
@@ -24,7 +33,7 @@ import type {
   ResetPasswordEmailCodeFactorConfig,
   ResetPasswordParams,
   ResetPasswordPhoneCodeFactorConfig,
-  SamlConfig,
+  SignInAuthenticateWithSolanaParams,
   SignInCreateParams,
   SignInFirstFactor,
   SignInFutureBackupCodeVerifyParams,
@@ -33,6 +42,7 @@ import type {
   SignInFutureEmailCodeVerifyParams,
   SignInFutureEmailLinkSendParams,
   SignInFutureFinalizeParams,
+  SignInFutureMFAEmailCodeVerifyParams,
   SignInFutureMFAPhoneCodeVerifyParams,
   SignInFuturePasskeyParams,
   SignInFuturePasswordParams,
@@ -64,31 +74,14 @@ import {
 
 import { debugLogger } from '@/utils/debug';
 
-import {
-  generateSignatureWithBase,
-  generateSignatureWithCoinbaseWallet,
-  generateSignatureWithMetamask,
-  generateSignatureWithOKXWallet,
-  getBaseIdentifier,
-  getBrowserLocale,
-  getClerkQueryParam,
-  getCoinbaseWalletIdentifier,
-  getMetamaskIdentifier,
-  getOKXWalletIdentifier,
-  windowNavigate,
-} from '../../utils';
+import { getBrowserLocale, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
-import {
-  convertJSONToPublicKeyRequestOptions,
-  serializePublicKeyCredentialAssertion,
-  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
-} from '../../utils/passkeys';
-import { createValidatePassword } from '../../utils/passwords/password';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
@@ -212,6 +205,7 @@ export class SignIn extends BaseResource implements SignInResource {
       case 'web3_base_signature':
       case 'web3_coinbase_wallet_signature':
       case 'web3_okx_wallet_signature':
+      case 'web3_solana_signature':
         config = { web3WalletId: params.web3WalletId } as Web3SignatureConfig;
         break;
       case 'reset_password_phone_code':
@@ -219,12 +213,6 @@ export class SignIn extends BaseResource implements SignInResource {
         break;
       case 'reset_password_email_code':
         config = { emailAddressId: params.emailAddressId } as ResetPasswordEmailCodeFactorConfig;
-        break;
-      case 'saml':
-        config = {
-          redirectUrl: params.redirectUrl,
-          actionCompleteRedirectUrl: params.actionCompleteRedirectUrl,
-        } as SamlConfig;
         break;
       case 'enterprise_sso':
         config = {
@@ -278,7 +266,7 @@ export class SignIn extends BaseResource implements SignInResource {
         emailAddressId,
         redirectUrl,
       };
-      const isSecondFactor = this.status === 'needs_second_factor';
+      const isSecondFactor = this.status === 'needs_second_factor' || this.status === 'needs_client_trust';
       const verificationKey: 'firstFactorVerification' | 'secondFactorVerification' = isSecondFactor
         ? 'secondFactorVerification'
         : 'firstFactorVerification';
@@ -345,7 +333,7 @@ export class SignIn extends BaseResource implements SignInResource {
       });
     }
 
-    if (strategy === 'saml' || strategy === 'enterprise_sso') {
+    if (strategy === 'enterprise_sso') {
       await this.prepareFirstFactor({
         strategy,
         redirectUrl,
@@ -379,11 +367,15 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
-    const { identifier, generateSignature, strategy = 'web3_metamask_signature' } = params || {};
+    const { identifier, generateSignature, strategy = 'web3_metamask_signature', walletName } = params || {};
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
     if (!(typeof generateSignature === 'function')) {
       clerkMissingOptionError('generateSignature');
+    }
+
+    if (provider === 'solana' && !walletName) {
+      clerkMissingOptionError('walletName');
     }
 
     await this.create({ identifier });
@@ -403,7 +395,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
     let signature: string;
     try {
-      signature = await generateSignature({ identifier, nonce: message, provider });
+      signature = await generateSignature({ identifier, nonce: message, walletName, provider });
     } catch (err) {
       // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
       // Passkey in order to authenticate, the initial generate signature request to be rejected. For this
@@ -412,7 +404,7 @@ export class SignIn extends BaseResource implements SignInResource {
       // error code 4001 means the user rejected the request
       // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
       if (provider === 'coinbase_wallet' && err.code === 4001) {
-        signature = await generateSignature({ identifier, nonce: message, provider });
+        signature = await generateSignature({ identifier, nonce: message, provider, walletName });
       } else {
         throw err;
       }
@@ -425,38 +417,63 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithMetamask = async (): Promise<SignInResource> => {
-    const identifier = await getMetamaskIdentifier();
+    const identifier = await web3().getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithMetamask,
+      generateSignature: web3().generateSignatureWithMetamask,
       strategy: 'web3_metamask_signature',
     });
   };
 
   public authenticateWithCoinbaseWallet = async (): Promise<SignInResource> => {
-    const identifier = await getCoinbaseWalletIdentifier();
+    const identifier = await web3().getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithCoinbaseWallet,
+      generateSignature: web3().generateSignatureWithCoinbaseWallet,
       strategy: 'web3_coinbase_wallet_signature',
     });
   };
 
   public authenticateWithBase = async (): Promise<SignInResource> => {
-    const identifier = await getBaseIdentifier();
+    const identifier = await web3().getBaseIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithBase,
+      generateSignature: web3().generateSignatureWithBase,
       strategy: 'web3_base_signature',
     });
   };
 
   public authenticateWithOKXWallet = async (): Promise<SignInResource> => {
-    const identifier = await getOKXWalletIdentifier();
+    const identifier = await web3().getOKXWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithOKXWallet,
+      generateSignature: web3().generateSignatureWithOKXWallet,
       strategy: 'web3_okx_wallet_signature',
+    });
+  };
+
+  /**
+   * Authenticates a user using a Solana Web3 wallet during sign-in.
+   *
+   * @param params - Configuration for Solana authentication
+   * @param params.walletName - The name of the Solana wallet to use for authentication
+   * @returns A promise that resolves to the updated SignIn resource
+   * @throws {ClerkRuntimeError} If walletName is not provided or wallet connection fails
+   *
+   * @example
+   * ```typescript
+   * await signIn.authenticateWithSolana({ walletName: 'phantom' });
+   * ```
+   */
+  public authenticateWithSolana = async ({
+    walletName,
+  }: SignInAuthenticateWithSolanaParams): Promise<SignInResource> => {
+    const identifier = await web3().getSolanaIdentifier(walletName);
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: p => web3().generateSignatureWithSolana({ ...p, walletName: walletName }),
+      strategy: 'web3_solana_signature',
+      walletName: walletName,
     });
   };
 
@@ -530,9 +547,9 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
-    if (SignIn.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword({
-        ...SignIn.clerk.__unstable__environment?.userSettings.passwordSettings,
+    if (SignIn.clerk.__internal_environment?.userSettings.passwordSettings) {
+      return createValidatePassword(loadZxcvbn(), {
+        ...SignIn.clerk.__internal_environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
     }
@@ -627,10 +644,13 @@ class SignInFuture implements SignInFutureResource {
   mfa = {
     sendPhoneCode: this.sendMFAPhoneCode.bind(this),
     verifyPhoneCode: this.verifyMFAPhoneCode.bind(this),
+    sendEmailCode: this.sendMFAEmailCode.bind(this),
+    verifyEmailCode: this.verifyMFAEmailCode.bind(this),
     verifyTOTP: this.verifyTOTP.bind(this),
     verifyBackupCode: this.verifyBackupCode.bind(this),
   };
 
+  #canBeDiscarded = false;
   readonly #resource: SignIn;
 
   constructor(resource: SignIn) {
@@ -688,6 +708,10 @@ class SignInFuture implements SignInFutureResource {
 
   get secondFactorVerification() {
     return this.#resource.secondFactorVerification;
+  }
+
+  get canBeDiscarded() {
+    return this.#canBeDiscarded;
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: ClerkError | null }> {
@@ -972,23 +996,33 @@ class SignInFuture implements SignInFutureResource {
 
     return runAsyncResourceTask(this.#resource, async () => {
       let identifier;
-      let generateSignature;
+      let generateSignature: GenerateSignature;
       switch (provider) {
         case 'metamask':
-          identifier = await getMetamaskIdentifier();
-          generateSignature = generateSignatureWithMetamask;
+          identifier = await web3().getMetamaskIdentifier();
+          generateSignature = web3().generateSignatureWithMetamask;
           break;
         case 'coinbase_wallet':
-          identifier = await getCoinbaseWalletIdentifier();
-          generateSignature = generateSignatureWithCoinbaseWallet;
+          identifier = await web3().getCoinbaseWalletIdentifier();
+          generateSignature = web3().generateSignatureWithCoinbaseWallet;
           break;
         case 'base':
-          identifier = await getBaseIdentifier();
-          generateSignature = generateSignatureWithBase;
+          identifier = await web3().getBaseIdentifier();
+          generateSignature = web3().generateSignatureWithBase;
           break;
         case 'okx_wallet':
-          identifier = await getOKXWalletIdentifier();
-          generateSignature = generateSignatureWithOKXWallet;
+          identifier = await web3().getOKXWalletIdentifier();
+          generateSignature = web3().generateSignatureWithOKXWallet;
+          break;
+        case 'solana':
+          if (!params.walletName) {
+            throw new ClerkRuntimeError('Wallet name is required for Solana authentication.', {
+              code: 'web3_solana_wallet_name_required',
+            });
+          }
+          identifier = await web3().getSolanaIdentifier(params.walletName);
+          generateSignature = p =>
+            web3().generateSignatureWithSolana({ ...p, walletName: params.walletName as string });
           break;
         default:
           throw new Error(`Unsupported Web3 provider: ${provider}`);
@@ -1015,7 +1049,12 @@ class SignInFuture implements SignInFutureResource {
 
       let signature: string;
       try {
-        signature = await generateSignature({ identifier, nonce: message });
+        signature = await generateSignature({
+          identifier,
+          nonce: message,
+          walletName: params?.walletName,
+          provider,
+        });
       } catch (err) {
         // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
         // Passkey in order to authenticate, the initial generate signature request to be rejected. For this
@@ -1024,7 +1063,11 @@ class SignInFuture implements SignInFutureResource {
         // error code 4001 means the user rejected the request
         // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
         if (provider === 'coinbase_wallet' && err.code === 4001) {
-          signature = await generateSignature({ identifier, nonce: message });
+          signature = await generateSignature({
+            identifier,
+            nonce: message,
+            provider,
+          });
         } else {
           throw err;
         }
@@ -1134,6 +1177,32 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
+  async sendMFAEmailCode(): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
+      const emailCodeFactor = this.#resource.supportedSecondFactors?.find(f => f.strategy === 'email_code');
+
+      if (!emailCodeFactor) {
+        throw new ClerkRuntimeError('Email code factor not found', { code: 'factor_not_found' });
+      }
+
+      const { emailAddressId } = emailCodeFactor;
+      await this.#resource.__internal_basePost({
+        body: { emailAddressId, strategy: 'email_code' },
+        action: 'prepare_second_factor',
+      });
+    });
+  }
+
+  async verifyMFAEmailCode(params: SignInFutureMFAEmailCodeVerifyParams): Promise<{ error: ClerkError | null }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePost({
+        body: { code, strategy: 'email_code' },
+        action: 'attempt_second_factor',
+      });
+    });
+  }
+
   async verifyTOTP(params: SignInFutureTOTPVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.#resource, async () => {
@@ -1167,11 +1236,29 @@ class SignInFuture implements SignInFutureResource {
     }
 
     return runAsyncResourceTask(this.#resource, async () => {
-      // Reload the client to prevent an issue where the created session is not picked up.
-      await SignIn.clerk.client?.reload();
+      // Reload the client if the created session is not in the client's sessions. This can happen during modal SSO
+      // flows where the in-memory client does not have the created session.
+      if (SignIn.clerk.client && !SignIn.clerk.client.sessions.some(s => s.id === this.#resource.createdSessionId)) {
+        await SignIn.clerk.client.reload();
+      }
 
+      this.#canBeDiscarded = true;
       await SignIn.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
+  }
+
+  /**
+   * Resets the current sign-in attempt by clearing all local state back to null.
+   * Unlike other methods, this does NOT emit resource:fetch with 'fetching' status,
+   * allowing for smooth UI transitions without loading states.
+   */
+  reset(): Promise<{ error: ClerkError | null }> {
+    if (!SignIn.clerk.client) {
+      throw new Error('Cannot reset sign-in without a client.');
+    }
+    this.#canBeDiscarded = true;
+    SignIn.clerk.client.resetSignIn();
+    return Promise.resolve({ error: null });
   }
 
   private selectFirstFactor(

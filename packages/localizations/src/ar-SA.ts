@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
@@ -364,6 +364,12 @@ export const arSA: LocalizationResource = {
         tableHeader__role: 'دور',
         tableHeader__user: 'مستخدم',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'نحن نقوم بتحديث الأدوار المتاحة. بمجرد الانتهاء، ستتمكن من تحديث الأدوار مرة أخرى.',
+          title: 'الأدوار مقفلة مؤقتًا',
+        },
+      },
       detailsTitle__emptyRow: 'لا يوجد أعضاء للعرض',
       invitationsTab: {
         autoInvitations: {
@@ -690,8 +696,14 @@ export const arSA: LocalizationResource = {
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'ادخل كلمة المرور',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'كلمة المرور غير آمنة',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'رمز التحقق',
@@ -740,6 +752,10 @@ export const arSA: LocalizationResource = {
       formTitle: 'رمز التحقق',
       subtitle: 'للمتابعة، يرجى إدخال رمز التحقق الذي تم إنشاؤه بواسطة تطبيق المصادقة الخاص بك',
       title: 'نظام التحقق بخطوتين',
+    },
+    web3Solana: {
+      subtitle: 'حدد محفظة أدناه لتسجيل الدخول',
+      title: 'تسجيل الدخول باستخدام Solana',
     },
   },
   signInEnterPasswordTitle: 'إدخل كلمة المرور',
@@ -831,31 +847,44 @@ export const arSA: LocalizationResource = {
       title: 'أنشاء حساب جديد',
       titleCombined: 'أنشاء حساب جديد',
     },
+    web3Solana: {
+      subtitle: 'حدد محفظة أدناه للتسجيل',
+      title: 'التسجيل باستخدام Solana',
+    },
   },
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'توجد منظمة بالفعل لاسم الشركة المكتشف ({{organizationName}}) و {{organizationDomain}}. انضم عن طريق الدعوة.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'إنشاء منظمة جديدة',
+      action__invitationAccept: 'انضم',
+      action__suggestionsAccept: 'طلب الانضمام',
+      subtitle: 'انضم إلى منظمة موجودة أو أنشئ واحدة جديدة',
+      subtitle__createOrganizationDisabled: 'انضم إلى منظمة موجودة',
+      suggestionsAcceptedLabel: 'في انتظار الموافقة',
+      title: 'اختر منظمة',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'إلغاء',
+      formButtonSubmit: 'متابعة',
+      formFieldInputPlaceholder__name: 'منظمتي',
+      formFieldInputPlaceholder__slug: 'munazzamati',
+      formFieldLabel__name: 'الاسم',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'أدخل تفاصيل منظمتك للمتابعة',
+      title: 'إعداد منظمتك',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'تواصل مع مسؤول منظمتك للحصول على دعوة.',
+      title: 'يجب أن تنتمي إلى منظمة',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'تسجيل الخروج',
+      actionText: 'تم تسجيل الدخول كـ {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -864,19 +893,88 @@ export const arSA: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'حجم الملف يتجاوز الحد الأقصى البالغ 10 ميغابايت. يرجى اختيار ملف أصغر.',
+    avatar_file_type_invalid: 'نوع الملف غير مدعوم. يرجى تحميل صورة بصيغة JPG أو PNG أو GIF أو WEBP.',
     captcha_invalid:
       'لا يمكن تسجيل الحساب بسبب مشاكل تحقق أمنية. الرجاء تحديث الصفحة للمحاولة مرة أخرى أو تواصل معنا للمزيد من المساعدة',
     captcha_unavailable:
       'التسجيل غير ناجح بسبب فشل التحقق من صحة الروبوت. يُرجى تحديث الصفحة للمحاولة مرة أخرى أو التواصل مع فريق الدعم للحصول على مزيد من المساعدة',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'خدمات البريد الإلكتروني المؤقتة غير مدعومة. يرجى استخدام عنوان بريدك الإلكتروني العادي لإنشاء حساب.',
     form_identifier_exists__email_address: 'تم إستخدام البريد الإلكتروني هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__phone_number: 'تم إستخدام رقم الهاتف هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__username: 'تم إستخدام اسم المستخدمد هذا. يرجى المحاولة مرة أخرى',
     form_identifier_not_found: 'لم يتم العثور على حساب بهذه التفاصيل',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'يجب أستعمال بريد إلكتروني صالح',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
@@ -888,13 +986,17 @@ export const arSA: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'كلمة المرور ليست قوية',
+    form_password_or_identifier_incorrect:
+      'كلمة المرور أو عنوان البريد الإلكتروني غير صحيح. حاول مرة أخرى أو استخدم طريقة أخرى.',
     form_password_pwned: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',
     form_password_pwned__sign_in: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',
     form_password_size_in_bytes_exceeded:
       'تجاوزت كلمة المرور الحد الأقصى للحروف المدخلة, الرجاء أدخال كلمة مرور أقصر أو حذف بعض الأحرف الخاصة',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'كلمة مرور خاطئة',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
@@ -926,6 +1028,8 @@ export const arSA: LocalizationResource = {
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
     session_exists: 'لقد قمت بتسجيل الدخول بالفعل',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'لقد رفضت طلب التوقيع. يرجى المحاولة مرة أخرى للمتابعة.',
+    web3_solana_signature_generation_failed: 'حدث خطأ أثناء إنشاء التوقيع. يرجى المحاولة مرة أخرى للمتابعة.',
     zxcvbn: {
       couldBeStronger: 'كلمة مرورك سليمة من الأفضل ان تكون اقوى. الرجاء أضافة حروف أكثر',
       goodPassword: 'كلمة مرورك طابقت جميع المتطلبات الازمة',
@@ -1290,6 +1394,10 @@ export const arSA: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'محافظ Web3',
         title: 'محافظ Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'حدد محفظة Solana للاتصال بحسابك.',
+          title: 'إضافة محفظة Solana',
+        },
       },
     },
     usernamePage: {
@@ -1313,16 +1421,22 @@ export const arSA: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'تسجيل الدخول',
+      actionText: 'هل لديك وصول بالفعل؟',
+      formButton: 'الانضمام إلى قائمة الانتظار',
+      subtitle: 'أدخل عنوان بريدك الإلكتروني وسنخبرك عندما يكون مكانك جاهزًا',
+      title: 'الانضمام إلى قائمة الانتظار',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'سيتم إعادة توجيهك قريبًا...',
+      subtitle: 'سنكون على اتصال عندما يكون مكانك جاهزًا',
+      title: 'شكرًا للانضمام إلى قائمة الانتظار!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'الاتصال باستخدام {{walletName}}',
+    continue: 'المتابعة باستخدام {{walletName}}',
+    noneAvailable:
+      'لم يتم اكتشاف محافظ Solana Web3. يرجى تثبيت {{ solanaWalletsLink || link("wallet extension") }} مدعوم بـ Web3.',
   },
 } as const;

@@ -5,6 +5,7 @@ const path = require('path');
 const { merge } = require('webpack-merge');
 const ReactRefreshPlugin = require('@rspack/plugin-react-refresh');
 const { RsdoctorRspackPlugin } = require('@rsdoctor/rspack-plugin');
+const { svgLoader, typescriptLoaderProd, typescriptLoaderDev } = require('../../scripts/rspack-common');
 
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
@@ -13,8 +14,7 @@ const variants = {
   clerk: 'clerk',
   clerkNoRHC: 'clerk.no-rhc', // Omit Remotely Hosted Code
   clerkBrowser: 'clerk.browser',
-  clerkHeadless: 'clerk.headless',
-  clerkHeadlessBrowser: 'clerk.headless.browser',
+  clerkNative: 'clerk.native', // For React Native (no chunk splitting)
   clerkLegacyBrowser: 'clerk.legacy.browser',
   clerkCHIPS: 'clerk.chips.browser',
 };
@@ -23,8 +23,7 @@ const variantToSourceFile = {
   [variants.clerk]: './src/index.ts',
   [variants.clerkNoRHC]: './src/index.ts',
   [variants.clerkBrowser]: './src/index.browser.ts',
-  [variants.clerkHeadless]: './src/index.headless.ts',
-  [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
+  [variants.clerkNative]: './src/index.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
   [variants.clerkCHIPS]: './src/index.browser.ts',
 };
@@ -120,23 +119,22 @@ const common = ({ mode, variant, disableRHC = false }) => {
             chunks: 'all',
             enforce: true,
           },
-          /**
-           * Sign up is shared between the SignUp component and the SignIn component.
-           */
-          signUp: {
-            minChunks: 1,
-            name: 'signup',
-            test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
-          },
-          common: {
-            minChunks: 1,
-            name: 'ui-common',
-            priority: -20,
-            test: module => !!(module.resource && !module.resource.includes('/ui/components')),
-          },
           defaultVendors: {
             minChunks: 1,
-            test: /[\\/]node_modules[\\/]/,
+            test: module => {
+              if (!(module instanceof rspack.NormalModule) || !module.resource) {
+                return false;
+              }
+              // Exclude Solana packages and their known transitive dependencies
+              if (
+                /[\\/]node_modules[\\/](@solana|@solana-mobile|@wallet-standard|bn\.js|borsh|buffer|superstruct|bs58|jayson|rpc-websockets|qrcode)[\\/]/.test(
+                  module.resource,
+                )
+              ) {
+                return false;
+              }
+              return /[\\/]node_modules[\\/]/.test(module.resource);
+            },
             name: 'vendors',
             priority: -10,
           },
@@ -153,116 +151,6 @@ const common = ({ mode, variant, disableRHC = false }) => {
     // Disable Rspack's warnings since we use bundlewatch
     ignoreWarnings: [/entrypoint size limit/, /asset size limit/, /Rspack performance recommendations/],
   };
-};
-
-/** @type { () => (import('@rspack/core').RuleSetRule) }  */
-const svgLoader = () => {
-  return {
-    test: /\.svg$/,
-    resolve: {
-      fullySpecified: false,
-    },
-    use: {
-      loader: '@svgr/webpack',
-      options: {
-        svgo: true,
-        svgoConfig: {
-          floatPrecision: 3,
-          transformPrecision: 1,
-          plugins: ['preset-default', 'removeDimensions', 'removeStyleElement'],
-        },
-      },
-    },
-  };
-};
-
-/** @type { (opts?: { targets?: string, useCoreJs?: boolean }) => (import('@rspack/core').RuleSetRule[]) } */
-const typescriptLoaderProd = (
-  { targets = packageJSON.browserslist, useCoreJs = false } = { targets: packageJSON.browserslist, useCoreJs: false },
-) => {
-  return [
-    {
-      test: /\.(jsx?|tsx?)$/,
-      exclude: /node_modules/,
-      use: {
-        loader: 'builtin:swc-loader',
-        options: {
-          env: {
-            targets,
-            ...(useCoreJs
-              ? {
-                  mode: 'usage',
-                  coreJs: require('core-js/package.json').version,
-                }
-              : {}),
-          },
-          jsc: {
-            parser: {
-              syntax: 'typescript',
-              tsx: true,
-            },
-            externalHelpers: true,
-            transform: {
-              react: {
-                runtime: 'automatic',
-                importSource: '@emotion/react',
-                development: false,
-                refresh: false,
-              },
-            },
-          },
-        },
-      },
-    },
-    {
-      test: /\.m?js$/,
-      exclude: /node_modules[\\/]core-js/,
-      use: {
-        loader: 'builtin:swc-loader',
-        options: {
-          env: {
-            targets,
-            ...(useCoreJs
-              ? {
-                  mode: 'usage',
-                  coreJs: '3.41.0',
-                }
-              : {}),
-          },
-          isModule: 'unknown',
-        },
-      },
-    },
-  ];
-};
-
-/** @type { () => (import('@rspack/core').RuleSetRule[]) } */
-const typescriptLoaderDev = () => {
-  return [
-    {
-      test: /\.(jsx?|tsx?)$/,
-      exclude: /node_modules/,
-      loader: 'builtin:swc-loader',
-      options: {
-        jsc: {
-          target: 'esnext',
-          parser: {
-            syntax: 'typescript',
-            tsx: true,
-          },
-          externalHelpers: true,
-          transform: {
-            react: {
-              runtime: 'automatic',
-              importSource: '@emotion/react',
-              development: true,
-              refresh: true,
-            },
-          },
-        },
-      },
-    },
-  ];
 };
 
 /**
@@ -339,16 +227,6 @@ const commonForProd = () => {
   };
 };
 
-// /** @type { () => (import('webpack').Configuration) } */
-// const externalsForHeadless = () => {
-//   return {
-//     externals: {
-//       react: 'react',
-//       'react-dom': 'react-dom',
-//     },
-//   };
-// };
-
 /**
  *
  * @param {string} variant
@@ -375,11 +253,17 @@ const prodConfig = ({ mode, env, analysis }) => {
       ? {
           entry: { sandbox: './sandbox/app.ts' },
           plugins: [
+            new rspack.CopyRspackPlugin({
+              patterns: [{ from: path.resolve(__dirname, '../ui/dist/*.js'), to: '[name][ext]' }],
+            }),
             new rspack.HtmlRspackPlugin({
               minify: false,
               template: './sandbox/template.html',
               inject: false,
               hash: true,
+              templateParameters: {
+                uiScriptUrl: './ui.browser.js',
+              },
             }),
           ],
         }
@@ -396,14 +280,13 @@ const prodConfig = ({ mode, env, analysis }) => {
     commonForProdChunked({ targets: packageJSON.browserslistLegacy, useCoreJs: true }),
   );
 
-  const clerkHeadless = merge(
-    entryForVariant(variants.clerkHeadless),
-    common({ mode, variant: variants.clerkHeadless }),
+  const clerkNative = merge(
+    entryForVariant(variants.clerkNative),
+    common({ mode, variant: variants.clerkNative }),
     commonForProd(),
     commonForProdChunked(),
-    // Disable chunking for the headless variant, since it's meant to be used in a non-browser environment and
-    // attempting to load chunks causes issues due to usage of a dynamic publicPath. We generally are only concerned with
-    // chunking in our browser bundles.
+    // Disable chunking for the native variant, since it's meant to be used in React Native
+    // where dynamic chunk loading is not supported.
     {
       output: {
         publicPath: '',
@@ -412,15 +295,6 @@ const prodConfig = ({ mode, env, analysis }) => {
         splitChunks: false,
       },
     },
-    // externalsForHeadless(),
-  );
-
-  const clerkHeadlessBrowser = merge(
-    entryForVariant(variants.clerkHeadlessBrowser),
-    common({ mode, variant: variants.clerkHeadlessBrowser }),
-    commonForProd(),
-    commonForProdChunked(),
-    // externalsForHeadless(),
   );
 
   const clerkCHIPS = merge(
@@ -538,17 +412,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     return [clerkBrowser];
   }
 
-  return [
-    clerkBrowser,
-    clerkLegacyBrowser,
-    clerkHeadless,
-    clerkHeadlessBrowser,
-    clerkCHIPS,
-    clerkEsm,
-    clerkEsmNoRHC,
-    clerkCjs,
-    clerkCjsNoRHC,
-  ];
+  return [clerkBrowser, clerkLegacyBrowser, clerkNative, clerkCHIPS, clerkEsm, clerkEsmNoRHC, clerkCjs, clerkCjsNoRHC];
 };
 
 /**
@@ -579,6 +443,9 @@ const devConfig = ({ mode, env }) => {
             minify: false,
             template: './sandbox/template.html',
             inject: false,
+            templateParameters: {
+              uiScriptUrl: 'http://localhost:4011/npm/ui.browser.js',
+            },
           }),
       ].filter(Boolean),
       devtool: 'eval-cheap-source-map',
@@ -602,13 +469,14 @@ const devConfig = ({ mode, env }) => {
         ...(isSandbox
           ? {
               historyApiFallback: true,
+              static: ['sandbox/public'],
             }
           : {}),
       },
       cache: true,
       experiments: {
         cache: {
-          type: 'persistent',
+          type: 'memory',
         },
       },
     };
@@ -634,17 +502,10 @@ const devConfig = ({ mode, env }) => {
       common({ mode, disableRHC: true, variant: variants.clerkBrowserNoRHC }),
       commonForDev(),
     ),
-    [variants.clerkHeadless]: merge(
-      entryForVariant(variants.clerkHeadless),
-      common({ mode, variant: variants.clerkHeadless }),
+    [variants.clerkNative]: merge(
+      entryForVariant(variants.clerkNative),
+      common({ mode, variant: variants.clerkNative }),
       commonForDev(),
-      // externalsForHeadless(),
-    ),
-    [variants.clerkHeadlessBrowser]: merge(
-      entryForVariant(variants.clerkHeadlessBrowser),
-      common({ mode, variant: variants.clerkHeadlessBrowser }),
-      commonForDev(),
-      // externalsForHeadless(),
     ),
     [variants.clerkCHIPS]: merge(
       entryForVariant(variants.clerkCHIPS),

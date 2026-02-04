@@ -3,7 +3,8 @@ import { createWorkerTimers } from '@clerk/shared/workerTimers';
 import { SafeLock } from './safeLock';
 
 const REFRESH_SESSION_TOKEN_LOCK_KEY = 'clerk.lock.refreshSessionToken';
-const INTERVAL_IN_MS = 5 * 1_000;
+
+export const POLLER_INTERVAL_IN_MS = 5 * 1_000;
 
 export class SessionCookiePoller {
   private lock = SafeLock(REFRESH_SESSION_TOKEN_LOCK_KEY);
@@ -20,7 +21,7 @@ export class SessionCookiePoller {
     const run = async () => {
       this.initiated = true;
       await this.lock.acquireLockAndRun(cb);
-      this.timerId = this.workerTimers.setTimeout(run, INTERVAL_IN_MS);
+      this.timerId = this.workerTimers.setTimeout(run, POLLER_INTERVAL_IN_MS);
     };
 
     void run();

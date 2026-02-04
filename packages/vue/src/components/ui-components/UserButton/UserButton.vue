@@ -39,7 +39,7 @@ provide(UserProfileInjectionKey, {
     :mount="clerk?.mountUserButton"
     :unmount="clerk?.unmountUserButton"
     :props="finalProps"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal_updateProps"
   />
   <CustomPortalsRenderer
     :custom-pages-portals="customPagesPortals"

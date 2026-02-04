@@ -9,14 +9,14 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
-    entry: ['./src/index.ts', './src/background/index.ts', './src/react/index.ts'],
+    entry: ['./src/index.ts', './src/background/index.ts', './src/react/index.ts', './src/types/index.ts'],
     bundle: true,
     clean: true,
     minify: false,
     sourcemap: true,
     legacyOutput: true,
     treeshake: true,
-    noExternal: ['@clerk/clerk-react', '@clerk/shared'],
+    noExternal: ['@clerk/react', '@clerk/shared'],
     external: ['use-sync-external-store', '@stripe/stripe-js', '@stripe/react-stripe-js'],
     define: {
       PACKAGE_NAME: `"${name}"`,

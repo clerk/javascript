@@ -11,7 +11,6 @@ import { unauthorized } from '../../server/nextErrors';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData } from '../../server/utils';
-import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { buildRequestLike } from './utils';
 
 /**
@@ -75,10 +74,6 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
   const request = await buildRequestLike();
 
   const stepsBasedOnSrcDirectory = async () => {
-    if (isNextWithUnstableServerActions) {
-      return [];
-    }
-
     try {
       const isSrcAppDir = await import('../../server/fs/middleware-location.js').then(m => m.hasSrcAppDir());
       return [`Your Middleware exists at ./${isSrcAppDir ? 'src/' : ''}middleware.(ts|js)`];
@@ -114,6 +109,7 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
         signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
         signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
         sessionStatus: authObject.tokenType === TokenType.SessionToken ? authObject.sessionStatus : null,
+        isSatellite: decryptedRequestData.isSatellite,
       }),
       returnBackUrl === null ? '' : returnBackUrl || clerkUrl?.toString(),
     ] as const;

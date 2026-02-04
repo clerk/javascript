@@ -9,6 +9,8 @@ import type {
   SignInProps,
   SignUpProps,
   TaskChooseOrganizationProps,
+  TaskResetPasswordProps,
+  TaskSetupMFAProps,
   UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
@@ -146,7 +148,7 @@ export const SignIn = withClerk(
             component={component}
             mount={clerk.mountSignIn}
             unmount={clerk.unmountSignIn}
-            updateProps={(clerk as any).__unstable__updateProps}
+            updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}
           />
@@ -174,7 +176,7 @@ export const SignUp = withClerk(
             component={component}
             mount={clerk.mountSignUp}
             unmount={clerk.unmountSignUp}
-            updateProps={(clerk as any).__unstable__updateProps}
+            updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}
           />
@@ -217,7 +219,7 @@ const _UserProfile = withClerk(
           component={component}
           mount={clerk.mountUserProfile}
           unmount={clerk.unmountUserProfile}
-          updateProps={(clerk as any).__unstable__updateProps}
+          updateProps={(clerk as any).__internal_updateProps}
           props={{ ...props, customPages }}
           rootProps={rendererRootProps}
         >
@@ -266,7 +268,7 @@ const _UserButton = withClerk(
     const passableProps = {
       mount: clerk.mountUserButton,
       unmount: clerk.unmountUserButton,
-      updateProps: (clerk as any).__unstable__updateProps,
+      updateProps: (clerk as any).__internal_updateProps,
       props: { ...props, userProfileProps, customMenuItems },
     };
     const portalProps = {
@@ -366,7 +368,7 @@ const _OrganizationProfile = withClerk(
             component={component}
             mount={clerk.mountOrganizationProfile}
             unmount={clerk.unmountOrganizationProfile}
-            updateProps={(clerk as any).__unstable__updateProps}
+            updateProps={(clerk as any).__internal_updateProps}
             props={{ ...props, customPages }}
             rootProps={rendererRootProps}
           >
@@ -401,7 +403,7 @@ export const CreateOrganization = withClerk(
             component={component}
             mount={clerk.mountCreateOrganization}
             unmount={clerk.unmountCreateOrganization}
-            updateProps={(clerk as any).__unstable__updateProps}
+            updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}
           />
@@ -441,7 +443,7 @@ const _OrganizationSwitcher = withClerk(
     const passableProps = {
       mount: clerk.mountOrganizationSwitcher,
       unmount: clerk.unmountOrganizationSwitcher,
-      updateProps: (clerk as any).__unstable__updateProps,
+      updateProps: (clerk as any).__internal_updateProps,
       props: { ...props, organizationProfileProps },
       rootProps: rendererRootProps,
       component,
@@ -512,7 +514,7 @@ export const OrganizationList = withClerk(
             component={component}
             mount={clerk.mountOrganizationList}
             unmount={clerk.unmountOrganizationList}
-            updateProps={(clerk as any).__unstable__updateProps}
+            updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}
           />
@@ -540,7 +542,7 @@ export const GoogleOneTap = withClerk(
             component={component}
             open={clerk.openGoogleOneTap}
             close={clerk.closeGoogleOneTap}
-            updateProps={(clerk as any).__unstable__updateProps}
+            updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}
           />
@@ -568,7 +570,7 @@ export const Waitlist = withClerk(
             component={component}
             mount={clerk.mountWaitlist}
             unmount={clerk.unmountWaitlist}
-            updateProps={(clerk as any).__unstable__updateProps}
+            updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}
           />
@@ -599,7 +601,7 @@ export const PricingTable = withClerk(
             component={component}
             mount={clerk.mountPricingTable}
             unmount={clerk.unmountPricingTable}
-            updateProps={(clerk as any).__unstable__updateProps}
+            updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}
           />
@@ -630,7 +632,7 @@ export const APIKeys = withClerk(
             component={component}
             mount={clerk.mountAPIKeys}
             unmount={clerk.unmountAPIKeys}
-            updateProps={(clerk as any).__unstable__updateProps}
+            updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}
           />
@@ -658,7 +660,7 @@ export const UserAvatar = withClerk(
             component={component}
             mount={clerk.mountUserAvatar}
             unmount={clerk.unmountUserAvatar}
-            updateProps={(clerk as any).__unstable__updateProps}
+            updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}
           />
@@ -686,7 +688,7 @@ export const TaskChooseOrganization = withClerk(
             component={component}
             mount={clerk.mountTaskChooseOrganization}
             unmount={clerk.unmountTaskChooseOrganization}
-            updateProps={(clerk as any).__unstable__updateProps}
+            updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}
           />
@@ -695,4 +697,60 @@ export const TaskChooseOrganization = withClerk(
     );
   },
   { component: 'TaskChooseOrganization', renderWhileLoading: true },
+);
+
+export const TaskResetPassword = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<TaskResetPasswordProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountTaskResetPassword}
+            unmount={clerk.unmountTaskResetPassword}
+            updateProps={(clerk as any).__internal_updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'TaskResetPassword', renderWhileLoading: true },
+);
+
+export const TaskSetupMFA = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<TaskSetupMFAProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountTaskSetupMfa}
+            unmount={clerk.unmountTaskSetupMfa}
+            updateProps={(clerk as any).__internal_updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'TaskSetupMFA', renderWhileLoading: true },
 );

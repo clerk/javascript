@@ -1,5 +1,6 @@
-import type { ClerkProviderProps } from '@clerk/clerk-react';
-import type { InitialState, Without } from '@clerk/types';
+import type { ClerkProviderProps } from '@clerk/react';
+import type { Ui } from '@clerk/react/internal';
+import type { InitialState, Without } from '@clerk/shared/types';
 import type React from 'react';
 
 export type ClerkState = {
@@ -17,12 +18,16 @@ export type ClerkState = {
     __clerk_debug: any;
     __clerkJSUrl: string | undefined;
     __clerkJSVersion: string | undefined;
+    __prefetchUI: boolean | undefined;
     __telemetryDisabled: boolean | undefined;
     __telemetryDebug: boolean | undefined;
   };
 };
 
-export type TanstackStartClerkProviderProps = Without<ClerkProviderProps, 'publishableKey' | 'initialState'> & {
+export type TanstackStartClerkProviderProps<TUi extends Ui = Ui> = Without<
+  ClerkProviderProps<TUi>,
+  'publishableKey' | 'initialState'
+> & {
   publishableKey?: string;
   children: React.ReactNode;
 };

@@ -1,6 +1,6 @@
-import { useAuth as useAuthBase } from '@clerk/clerk-react';
+import { useAuth as useAuthBase } from '@clerk/react';
 import { isNetworkError } from '@clerk/shared/error';
-import type { GetToken, GetTokenOptions, UseAuthReturn } from '@clerk/types';
+import type { GetToken, GetTokenOptions, UseAuthReturn } from '@clerk/shared/types';
 
 import { SessionJWTCache } from '../cache';
 
@@ -8,8 +8,8 @@ import { SessionJWTCache } from '../cache';
  * This hook extends the useAuth hook to add experimental JWT caching.
  * The caching is used only when no options are passed to getToken.
  */
-export const useAuth = (initialAuthState?: any): UseAuthReturn => {
-  const { getToken: getTokenBase, ...rest } = useAuthBase(initialAuthState);
+export const useAuth = (options?: Parameters<typeof useAuthBase>[0]): UseAuthReturn => {
+  const { getToken: getTokenBase, ...rest } = useAuthBase(options);
 
   const getToken: GetToken = (opts?: GetTokenOptions): Promise<string | null> =>
     getTokenBase(opts)

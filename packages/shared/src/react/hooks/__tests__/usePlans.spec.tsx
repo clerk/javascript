@@ -2,7 +2,11 @@ import { act, render, renderHook, screen, waitFor } from '@testing-library/react
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { BillingPlanResource } from '@/types/billing';
+
+import { usePlans } from '../usePlans';
 import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';
+import { wrapper } from './wrapper';
 
 const mockUser: any = createMockUser();
 const mockOrganization: any = createMockOrganization();
@@ -36,16 +40,12 @@ vi.mock('../../contexts', () => {
   };
 });
 
-import type { BillingPlanResource } from '../../../types/billing';
-import { usePlans } from '../usePlans';
-import { wrapper } from './wrapper';
-
 describe('usePlans', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockClerk.loaded = true;
-    mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = true;
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = true;
+    mockClerk.__internal_environment.commerceSettings.billing.user.enabled = true;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = true;
     defaultQueryClient.client.clear();
   });
 
@@ -261,19 +261,9 @@ describe('usePlans', () => {
       await result.current.userPlans.revalidate();
     });
 
-    const isRQ = Boolean((globalThis as any).__CLERK_USE_RQ__);
-    const calls = getPlansSpy.mock.calls.map(call => call[0]?.for);
+    await waitFor(() => expect(getPlansSpy.mock.calls.length).toBeGreaterThanOrEqual(1));
 
-    if (isRQ) {
-      await waitFor(() => expect(getPlansSpy.mock.calls.length).toBeGreaterThanOrEqual(1));
-      expect(calls.every(value => value === 'user')).toBe(true);
-    } else {
-      await waitFor(() => expect(getPlansSpy.mock.calls.length).toBe(1));
-      expect(getPlansSpy.mock.calls[0][0]).toEqual(
-        expect.objectContaining({
-          for: 'user',
-        }),
-      );
-    }
+    const calls = getPlansSpy.mock.calls.map(call => call[0]?.for);
+    expect(calls.every(value => value === 'user')).toBe(true);
   });
 });

@@ -6,7 +6,6 @@ import type {
   PasskeySettingsData,
   PasswordSettingsData,
   PhoneCodeChannel,
-  SamlSettings,
   SignInData,
   SignUpData,
   UsernameSettingsData,
@@ -112,9 +111,6 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     show_sign_in_button: false,
   };
   passwordSettings: PasswordSettingsData = {} as PasswordSettingsData;
-  saml: SamlSettings = {
-    enabled: false,
-  };
   signIn: SignInData = {
     second_factor: {
       required: false,
@@ -127,6 +123,9 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     legal_consent_enabled: false,
     mode: 'public',
     progressive: true,
+    mfa: {
+      required: false,
+    },
   };
   social: OAuthProviders = {} as OAuthProviders;
   usernameSettings: UsernameSettingsData = {} as UsernameSettingsData;
@@ -191,7 +190,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   }
 
   get instanceIsPasswordBased() {
-    return Boolean(this.attributes?.password?.enabled && this.attributes.password?.required);
+    return Boolean(this.attributes?.password?.enabled);
   }
 
   get hasValidAuthFactor() {
@@ -229,7 +228,6 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
               : Math.min(data.password_settings?.max_length ?? defaultMaxPasswordLength, defaultMaxPasswordLength),
         }
       : this.passwordSettings;
-    this.saml = this.withDefault(data.saml, this.saml);
     this.signIn = this.withDefault(data.sign_in, this.signIn);
     this.signUp = this.withDefault(data.sign_up, this.signUp);
     this.social = this.withDefault(data.social, this.social);
@@ -256,7 +254,6 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       attributes: this.attributes,
       passkey_settings: this.passkeySettings,
       password_settings: this.passwordSettings,
-      saml: this.saml,
       sign_in: this.signIn,
       sign_up: this.signUp,
       social: this.social,

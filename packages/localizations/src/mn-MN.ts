@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
@@ -365,6 +365,13 @@ export const mnMN: LocalizationResource = {
         tableHeader__role: 'Үүрэг',
         tableHeader__user: 'Хэрэглэгч',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Бид боломжтой дүрүүдийг шинэчилж байна. Дууссаны дараа та дүрүүдийг дахин шинэчлэх боломжтой болно.',
+          title: 'Дүрүүд түр хугацаанд түгжигдсэн байна',
+        },
+      },
       detailsTitle__emptyRow: 'Харуулах гишүүн алга',
       invitationsTab: {
         autoInvitations: {
@@ -694,7 +701,13 @@ export const mnMN: LocalizationResource = {
       subtitle: 'Бүртгэлтэй холбоотой нууц үгээ оруулна уу',
       title: 'Нууц үгээ оруулна уу',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -743,6 +756,10 @@ export const mnMN: LocalizationResource = {
       formTitle: 'Баталгаажуулах код',
       subtitle: 'Үргэлжлүүлэхийн тулд authenticator апп-аар үүсгэсэн баталгаажуулах кодыг оруулна уу',
       title: 'Two-step баталгаажуулалт',
+    },
+    web3Solana: {
+      subtitle: 'Нэвтрэхийн тулд доороос түрийвч сонгоно уу',
+      title: 'Solana-аар нэвтрэх',
     },
   },
   signInEnterPasswordTitle: 'Нууц үгээ оруулна уу',
@@ -834,31 +851,44 @@ export const mnMN: LocalizationResource = {
       title: 'Бүртгэл үүсгэх',
       titleCombined: 'Бүртгэл үүсгэх',
     },
+    web3Solana: {
+      subtitle: 'Бүртгүүлэхийн тулд доороос түрийвч сонгоно уу',
+      title: 'Solana-аар бүртгүүлэх',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}}-р үргэлжлүүлэх',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Илрүүлсэн компанийн нэр ({{organizationName}}) болон {{organizationDomain}}-д байгууллага аль хэдийн байна. Урилгаар нэгдэнэ үү.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Шинэ байгууллага үүсгэх',
+      action__invitationAccept: 'Нэгдэх',
+      action__suggestionsAccept: 'Нэгдэх хүсэлт илгээх',
+      subtitle: 'Одоо байгаа байгууллагад нэгдэх эсвэл шинэ үүсгэх',
+      subtitle__createOrganizationDisabled: 'Одоо байгаа байгууллагад нэгдэх',
+      suggestionsAcceptedLabel: 'Зөвшөөрөл хүлээж байна',
+      title: 'Байгууллага сонгох',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Цуцлах',
+      formButtonSubmit: 'Үргэлжлүүлэх',
+      formFieldInputPlaceholder__name: 'Миний байгууллага',
+      formFieldInputPlaceholder__slug: 'minii-baiguullaga',
+      formFieldLabel__name: 'Нэр',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Үргэлжлүүлэхийн тулд байгууллагын мэдээллийг оруулна уу',
+      title: 'Байгууллагаа тохируулах',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'Урилга авахын тулд байгууллагын админтай холбогдоно уу.',
+      title: 'Та байгууллагад харьяалагдах ёстой',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Гарах',
+      actionText: '{{identifier}} гэж нэвтэрсэн',
     },
   },
   taskResetPassword: {
@@ -867,19 +897,88 @@ export const mnMN: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Файлын хэмжээ 10MB-ийн дээд хязгаараас хэтэрсэн. Жижиг файл сонгоно уу.',
+    avatar_file_type_invalid: 'Файлын төрөл дэмжигдэхгүй байна. JPG, PNG, GIF эсвэл WEBP зураг байршуулна уу.',
     captcha_invalid:
       'Аюулгүй байдлын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
     captcha_unavailable:
       'Ботын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
     form_code_incorrect: 'Маягтын код буруу байна',
+    form_email_address_blocked:
+      'Түр зуурын имэйл үйлчилгээг дэмжихгүй. Данс үүсгэхийн тулд ердийн имэйл хаягаа ашиглана уу.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Тодорхойлогч олдсонгүй.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Параметрийн формат буруу.',
     form_param_format_invalid__email_address: 'Имэйл хаяг нь хүчинтэй имэйл хаяг байх ёстой.',
     form_param_format_invalid__phone_number: 'Утасны дугаар нь олон улсын хүчинтэй форматтай байх ёстой',
@@ -891,14 +990,18 @@ export const mnMN: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Нууц үг буруу байна.',
     form_password_length_too_short: 'Нууц үгийн урт хэт богино байна.',
     form_password_not_strong_enough: 'Таны нууц үг хангалттай хүчтэй биш байна.',
+    form_password_or_identifier_incorrect:
+      'Нууц үг эсвэл имэйл хаяг буруу байна. Дахин оролдох эсвэл өөр арга ашиглана уу.',
     form_password_pwned:
       'Энэ нууц үгийг зөрчлийн нэг хэсэг гэж олсон тул ашиглах боломжгүй, оронд нь өөр нууц үг оролдоно уу.',
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Энэ нууц үгийг зөрчлийн нэг хэсэг гэж олсон тул ашиглах боломжгүй. Өөр нууц үг оруулж үзнэ үү.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Нууц үг буруу',
     form_username_invalid_character: 'Хэрэглэгчийн нэр буруу тэмдэгт агуулж байна.',
     form_username_invalid_length: 'Хэрэглэгчийн нэр буруу байна.',
@@ -930,6 +1033,10 @@ export const mnMN: LocalizationResource = {
     phone_number_exists: 'Энэ утасны дугаарыг авсан. Өөр оролдоно уу.',
     session_exists: 'Та аль хэдийн нэвтэрсэн байна.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected:
+      'Та гарын үсгийн хүсэлтийг цуцалсан байна. Үргэлжлүүлэхийн тулд дахин оролдоно уу.',
+    web3_solana_signature_generation_failed:
+      'Гарын үсэг үүсгэх үед алдаа гарлаа. Үргэлжлүүлэхийн тулд дахин оролдоно уу.',
     zxcvbn: {
       couldBeStronger: 'Таны нууц үг ажилладаг, гэхдээ илүү хүчтэй байж болно. Илүү олон тэмдэгт нэмж үзээрэй.',
       goodPassword: 'Таны нууц үг шаардлагатай бүх шаардлагыг хангаж байна.',
@@ -1299,6 +1406,10 @@ export const mnMN: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 wallets',
         title: 'Web3 wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Өөрийн бүртгэлтэй холбох Solana түрийвч сонгоно уу.',
+          title: 'Solana түрийвч нэмэх',
+        },
       },
     },
     usernamePage: {
@@ -1322,16 +1433,22 @@ export const mnMN: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Нэвтрэх',
+      actionText: 'Та аль хэдийн нэвтрэх эрхтэй юу?',
+      formButton: 'Хүлээлгийн жагсаалтад нэгдэх',
+      subtitle: 'Имэйл хаягаа оруулаад таны байр бэлэн болоход мэдэгдэх болно',
+      title: 'Хүлээлгийн жагсаалтад нэгдэх',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Удахгүй дахин чиглүүлэх болно...',
+      subtitle: 'Таны байр бэлэн болоход бид холбогдох болно',
+      title: 'Хүлээлгийн жагсаалтад нэгдсэнд баярлалаа!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}}-аар холбох',
+    continue: '{{walletName}}-аар үргэлжлүүлэх',
+    noneAvailable:
+      'Solana Web3 түрийвч илрээгүй. Web3-ийг дэмждэг {{ solanaWalletsLink || link("wallet extension") }} суулгана уу.',
   },
 } as const;

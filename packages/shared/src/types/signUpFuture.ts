@@ -1,10 +1,11 @@
 import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
-import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUpCommon';
+import type { SignUpField, SignUpIdentificationField, SignUpStatus, SignUpVerificationResource } from './signUpCommon';
 import type { Web3Strategy } from './strategies';
+import type { VerificationResource } from './verification';
 
-interface SignUpFutureAdditionalParams {
+export interface SignUpFutureAdditionalParams {
   /**
    * The user's first name. Only supported if
    * [First and last name](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#user-model)
@@ -253,6 +254,51 @@ export interface SignUpFutureFinalizeParams {
 }
 
 /**
+ * An object that contains information about all available verification strategies.
+ */
+export interface SignUpFutureVerifications {
+  /**
+   * An object holding information about the email address verification.
+   */
+  readonly emailAddress: SignUpVerificationResource;
+
+  /**
+   * An object holding information about the phone number verification.
+   */
+  readonly phoneNumber: SignUpVerificationResource;
+
+  /**
+   * An object holding information about the Web3 wallet verification.
+   */
+  readonly web3Wallet: VerificationResource;
+
+  /**
+   * An object holding information about the external account verification.
+   */
+  readonly externalAccount: VerificationResource;
+
+  /**
+   * Used to send an email code to verify an email address.
+   */
+  sendEmailCode: () => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Used to verify a code sent via email.
+   */
+  verifyEmailCode: (params: SignUpFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Used to send a phone code to verify a phone number.
+   */
+  sendPhoneCode: (params: SignUpFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Used to verify a code sent via phone.
+   */
+  verifyPhoneCode: (params: SignUpFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
+}
+
+/**
  * The `SignUpFuture` class holds the state of the current sign-up attempt and provides methods to drive custom sign-up
  * flows, including email/phone verification, password, SSO, ticket-based, and Web3-based account creation.
  */
@@ -384,6 +430,13 @@ export interface SignUpFutureResource {
   readonly locale: string | null;
 
   /**
+   * Indicates that the sign-up can be discarded (has been finalized or explicitly reset).
+   *
+   * @internal
+   */
+  readonly canBeDiscarded: boolean;
+
+  /**
    * Creates a new `SignUp` instance initialized with the provided parameters. The instance maintains the sign-up
    * lifecycle state through its `status` property, which updates as the authentication flow progresses. Will also
    * deactivate any existing sign-up process the client may already have in progress.
@@ -407,29 +460,9 @@ export interface SignUpFutureResource {
   update: (params: SignUpFutureUpdateParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   *
+   * An object that contains information about all available verification strategies.
    */
-  verifications: {
-    /**
-     * Used to send an email code to verify an email address.
-     */
-    sendEmailCode: () => Promise<{ error: ClerkError | null }>;
-
-    /**
-     * Used to verify a code sent via email.
-     */
-    verifyEmailCode: (params: SignUpFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
-
-    /**
-     * Used to send a phone code to verify a phone number.
-     */
-    sendPhoneCode: (params: SignUpFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
-
-    /**
-     * Used to verify a code sent via phone.
-     */
-    verifyPhoneCode: (params: SignUpFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
-  };
+  verifications: SignUpFutureVerifications;
 
   /**
    * Used to sign up using an email address and password.
@@ -456,4 +489,14 @@ export interface SignUpFutureResource {
    * session state (such as the `useUser()` hook) to update automatically.
    */
   finalize: (params?: SignUpFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Resets the current sign-up attempt by clearing all local state back to null.
+   * This is useful when you want to allow users to go back to the beginning of
+   * the sign-up flow (e.g., to change their email address during verification).
+   *
+   * Unlike other methods, `reset()` does not trigger the `fetchStatus` to change
+   * to `'fetching'` and does not make any API calls - it only clears local state.
+   */
+  reset: () => Promise<{ error: ClerkError | null }>;
 }

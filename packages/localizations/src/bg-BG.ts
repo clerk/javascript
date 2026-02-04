@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
@@ -365,6 +365,12 @@ export const bgBG: LocalizationResource = {
         tableHeader__role: 'Роля',
         tableHeader__user: 'Потребител',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Актуализираме наличните роли. Когато това приключи, ще можете отново да актуализирате ролите.',
+          title: 'Ролите са временно заключени',
+        },
+      },
       detailsTitle__emptyRow: 'Няма членове за показване',
       invitationsTab: {
         autoInvitations: {
@@ -693,7 +699,13 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Въведете паролата, свързана с вашия акаунт',
       title: 'Въведете вашата парола',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -743,6 +755,10 @@ export const bgBG: LocalizationResource = {
       subtitle:
         'За да продължите, моля въведете кода за потвърждение, генериран от вашето приложение за удостоверяване',
       title: 'Двустепенна верификация',
+    },
+    web3Solana: {
+      subtitle: 'Изберете портфейл по-долу, за да влезете',
+      title: 'Вход със Solana',
     },
   },
   signInEnterPasswordTitle: 'Въведете вашата парола',
@@ -835,31 +851,44 @@ export const bgBG: LocalizationResource = {
       title: 'Създайте своя акаунт',
       titleCombined: 'Създайте своя акаунт',
     },
+    web3Solana: {
+      subtitle: 'Изберете портфейл по-долу, за да се регистрирате',
+      title: 'Регистрация със Solana',
+    },
   },
   socialButtonsBlockButton: 'Продължи с {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Организация вече съществува за откритото име на компанията ({{organizationName}}) и {{organizationDomain}}. Присъединете се чрез покана.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Създай нова организация',
+      action__invitationAccept: 'Присъедини се',
+      action__suggestionsAccept: 'Поискай присъединяване',
+      subtitle: 'Присъедини се към съществуваща организация или създай нова',
+      subtitle__createOrganizationDisabled: 'Присъедини се към съществуваща организация',
+      suggestionsAcceptedLabel: 'В очакване на одобрение',
+      title: 'Избери организация',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Отказ',
+      formButtonSubmit: 'Продължи',
+      formFieldInputPlaceholder__name: 'Моята организация',
+      formFieldInputPlaceholder__slug: 'moyata-organizatsiya',
+      formFieldLabel__name: 'Име',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Въведете данните за вашата организация, за да продължите',
+      title: 'Настройте вашата организация',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'Свържете се с администратора на вашата организация за покана.',
+      title: 'Трябва да принадлежите към организация',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Изход',
+      actionText: 'Влязъл като {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -868,17 +897,87 @@ export const bgBG: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: 'Вие вече сте член на тази организация.',
+    avatar_file_size_exceeded: 'Размерът на файла надвишава максималния лимит от 10 MB. Моля, изберете по-малък файл.',
+    avatar_file_type_invalid:
+      'Типът на файла не се поддържа. Моля, качете изображение във формат JPG, PNG, GIF или WEBP.',
     captcha_invalid: undefined,
     captcha_unavailable: undefined,
     form_code_incorrect: 'Невалиден код. Моля, опитайте отново.',
+    form_email_address_blocked:
+      'Временните имейл услуги не се поддържат. Моля, използвайте вашия обикновен имейл адрес, за да създадете акаунт.',
     form_identifier_exists__email_address: 'Този имейл адрес вече е регистриран.',
     form_identifier_exists__phone_number: 'Този телефонен номер вече е използван.',
     form_identifier_exists__username: 'Това потребителско име вече съществува.',
     form_identifier_not_found: 'Не можем да намерим този идентификатор.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Имейл адресът не е във валиден формат.',
     form_param_format_invalid__phone_number: 'Телефонният номер не е във валиден формат.',
@@ -890,13 +989,17 @@ export const bgBG: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Невалидна парола. Моля, опитайте отново.',
     form_password_length_too_short: 'Паролата е твърде кратка. Моля, въведете поне 8 символа.',
     form_password_not_strong_enough:
       'Паролата трябва да съдържа поне една главна буква, една цифра и един специален символ.',
+    form_password_or_identifier_incorrect:
+      'Паролата или имейл адресът са невалидни. Моля, опитайте отново или използвайте друг метод.',
     form_password_pwned: 'Тази парола е компрометирана в изтекли данни. Моля, изберете друга.',
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded: 'Паролата ви е твърде дълга. Моля, съкратете я.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Невалидна парола.',
     form_username_invalid_character: 'Потребителското име съдържа невалидни символи.',
     form_username_invalid_length: 'Потребителското име трябва да бъде между 3 и 256 символа.',
@@ -928,6 +1031,9 @@ export const bgBG: LocalizationResource = {
     phone_number_exists: 'Този телефонен номер е зает. Моля, опитайте с друг.',
     session_exists: 'Вече сте влезнали.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Отхвърлихте заявката за подпис. Моля, опитайте отново, за да продължите.',
+    web3_solana_signature_generation_failed:
+      'Възникна грешка при генерирането на подписа. Моля, опитайте отново, за да продължите.',
     zxcvbn: {
       couldBeStronger: 'Вашата парола работи, но може да бъде по-сигурна. Опитайте да добавите повече символи.',
       goodPassword: 'Вашата парола отговаря на всички необходими изисквания.',
@@ -1298,6 +1404,10 @@ export const bgBG: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 портфейли',
         title: 'Web3 портфейли',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Изберете Solana портфейл, който да свържете с акаунта си.',
+          title: 'Добавяне на Solana портфейл',
+        },
       },
     },
     usernamePage: {
@@ -1332,5 +1442,11 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Thank you for your patience.',
       title: 'Waitlist successful',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Свързване с {{walletName}}',
+    continue: 'Продължаване с {{walletName}}',
+    noneAvailable:
+      'Не са открити Solana Web3 портфейли. Моля, инсталирайте {{ solanaWalletsLink || link("wallet extension") }} с поддръжка на Web3.',
   },
 } as const;

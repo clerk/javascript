@@ -5,7 +5,9 @@ export const templates = {
   // If /integration becomes a module in the future, use these helpers:
   // 'next-app-router': fileURLToPath(new URL('./next-app-router', import.meta.url)),
   'next-app-router': resolve(__dirname, './next-app-router'),
+  'next-cache-components': resolve(__dirname, './next-cache-components'),
   'next-app-router-quickstart': resolve(__dirname, './next-app-router-quickstart'),
+  'next-app-router-quickstart-v6': resolve(__dirname, './next-app-router-quickstart-v6'),
   'react-cra': resolve(__dirname, './react-cra'),
   'react-vite': resolve(__dirname, './react-vite'),
   'express-vite': resolve(__dirname, './express-vite'),

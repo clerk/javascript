@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
@@ -365,6 +365,12 @@ export const isIS: LocalizationResource = {
         tableHeader__role: 'Hlutverk',
         tableHeader__user: 'Notandi',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Við erum að uppfæra tiltæk hlutverk. Þegar því er lokið geturðu uppfært hlutverk aftur.',
+          title: 'Hlutverk eru tímabundið læst',
+        },
+      },
       detailsTitle__emptyRow: 'Engir meðlimir til að sýna',
       invitationsTab: {
         autoInvitations: {
@@ -695,8 +701,14 @@ export const isIS: LocalizationResource = {
       subtitle: 'Sláðu inn lykilorðið sem tengist reikningnum þínum',
       title: 'Sláðu inn lykilorðið þitt',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lykilorð brotið',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Staðfestingarkóði',
@@ -744,6 +756,10 @@ export const isIS: LocalizationResource = {
       formTitle: 'Staðfestingarkóði',
       subtitle: 'Til að halda áfram, vinsamlegast sláðu inn staðfestingarkóðann sem auðkennisforritið þitt bjó til',
       title: 'Tveggja þrepa auðkenning',
+    },
+    web3Solana: {
+      subtitle: 'Veldu veski hér að neðan til að skrá þig inn',
+      title: 'Skrá inn með Solana',
     },
   },
   signInEnterPasswordTitle: 'Sláðu inn lykilorðið þitt',
@@ -836,31 +852,44 @@ export const isIS: LocalizationResource = {
       title: 'Stofna reikning',
       titleCombined: 'Stofna reikning',
     },
+    web3Solana: {
+      subtitle: 'Veldu veski hér að neðan til að skrá þig',
+      title: 'Skráðu þig með Solana',
+    },
   },
   socialButtonsBlockButton: 'Halda áfram með {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Fyrirtæki er þegar til fyrir uppgötvaða fyrirtækjanafnið ({{organizationName}}) og {{organizationDomain}}. Skráðu þig með boði.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Stofna samtök',
+      action__invitationAccept: 'Ganga í',
+      action__suggestionsAccept: 'Biðja um að ganga í',
+      subtitle: 'Gangtu í fyrirliggjandi samtök eða stofnaðu ný',
+      subtitle__createOrganizationDisabled: 'Gangtu í fyrirliggjandi samtök',
+      suggestionsAcceptedLabel: 'Bíður eftir samþykki',
+      title: 'Veldu samtök',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Hætta við',
+      formButtonSubmit: 'Halda áfram',
+      formFieldInputPlaceholder__name: 'Samtökin mín',
+      formFieldInputPlaceholder__slug: 'samtokin-min',
+      formFieldLabel__name: 'Nafn',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Sláðu inn upplýsingar um samtökin þín til að halda áfram',
+      title: 'Stilltu samtökin þín',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'Hafðu samband við stjórnanda samtakanna til að fá boð.',
+      title: 'Þú verður að tilheyra samtökum',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Skrá út',
+      actionText: 'Skráður inn sem {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -869,19 +898,88 @@ export const isIS: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Skráarstærð fer yfir hámarksmörk 10 MB. Vinsamlegast veldu minni skrá.',
+    avatar_file_type_invalid: 'Skráargerð er ekki studd. Vinsamlegast hlaðið upp JPG, PNG, GIF eða WEBP mynd.',
     captcha_invalid:
       'Skráning mistókst vegna misheppnaðra öryggisstaðfestinga. Vinsamlegast endurhlaðið síðuna til að reyna aftur eða hafið samband við stuðning til að fá frekari aðstoð.',
     captcha_unavailable:
       'Skráning mistókst vegna misheppnaðrar vélmenna staðfestingar. Vinsamlegast endurhlaðið síðuna til að reyna aftur eða hafið samband við stuðning til að fá frekari aðstoð.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Tímabundin tölvupóstþjónusta er ekki studd. Vinsamlegast notaðu venjulega netfangið þitt til að búa til reikning.',
     form_identifier_exists__email_address: 'Þetta netfang er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_exists__phone_number: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_exists__username: 'Þetta notendanafn er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_not_found: 'Við getum ekki fundið reikning með þessum upplýsingum.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Netfang verður að vera gilt netfang.',
     form_param_format_invalid__phone_number: 'Símanúmer verður að vera á giltu alþjóðlegu formi',
@@ -893,15 +991,18 @@ export const isIS: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Lykilorðið þitt er ekki nógu sterkt.',
+    form_password_or_identifier_incorrect: 'Lykilorðið eða netfangið er rangt. Reyndu aftur eða notaðu aðra aðferð.',
     form_password_pwned:
       'Þetta lykilorð hefur fundist sem hluti af öryggisbresti og má ekki nota, vinsamlegast reyndu annað lykilorð.',
     form_password_pwned__sign_in:
       'Þetta lykilorð hefur fundist sem hluti af öryggisbresti og má ekki nota, vinsamlegast endurstilltu lykilorðið þitt.',
     form_password_size_in_bytes_exceeded:
       'Lykilorðið þitt hefur farið yfir hámarksfjölda bæta sem leyfðir eru, vinsamlegast styttu það eða fjarlægðu nokkra sérstafi.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Rangt lykilorð',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
@@ -934,6 +1035,9 @@ export const isIS: LocalizationResource = {
     phone_number_exists: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     session_exists: 'Þú ert nú þegar innskráður.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Þú hafðir hafnað beiðni um undirritun. Reyndu aftur til að halda áfram.',
+    web3_solana_signature_generation_failed:
+      'Villa kom upp við að búa til undirritun. Reyndu aftur til að halda áfram.',
     zxcvbn: {
       couldBeStronger: 'Lykilorðið þitt virkar, en gæti verið sterkara. Reyndu að bæta við fleiri stöfum.',
       goodPassword: 'Lykilorðið þitt uppfyllir allar nauðsynlegar kröfur.',
@@ -1305,6 +1409,10 @@ export const isIS: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 veski',
         title: 'Web3 veski',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Veldu Solana-veski til að tengja við aðganginn þinn.',
+          title: 'Bæta við Solana-veski',
+        },
       },
     },
     usernamePage: {
@@ -1328,16 +1436,22 @@ export const isIS: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Skrá inn',
+      actionText: 'Áttu nú þegar aðgang?',
+      formButton: 'Skrá sig á biðlista',
+      subtitle: 'Sláðu inn netfangið þitt og við látum þig vita þegar staða þín er tilbúin',
+      title: 'Skrá sig á biðlista',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Þú verður áframsendur fljótlega...',
+      subtitle: 'Við höfum samband þegar staða þín er tilbúin',
+      title: 'Takk fyrir að skrá sig á biðlistann!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Tengjast með {{walletName}}',
+    continue: 'Halda áfram með {{walletName}}',
+    noneAvailable:
+      'Engin Solana Web3 veski fundust. Vinsamlegast settu upp Web3-stutt {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

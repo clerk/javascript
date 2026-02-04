@@ -1,36 +1,37 @@
-import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
+import type { Ui } from '@clerk/react/internal';
 // Override Clerk React error thrower to show that errors come from @clerk/nextjs
-import { setClerkJsLoadingErrorPackageName, setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+import { setClerkJSLoadingErrorPackageName, setErrorThrowerOptions } from '@clerk/react/internal';
 import { useRouter } from 'next/router';
 import React from 'react';
 
 import { useSafeLayoutEffect } from '../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider } from '../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../types';
-import { ClerkJSScript } from '../utils/clerk-js-script';
+import { ClerkScripts } from '../utils/clerk-script';
 import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
 import { removeBasePath } from '../utils/removeBasePath';
 import { RouterTelemetry } from '../utils/router-telemetry';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
-setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
+setClerkJSLoadingErrorPackageName(PACKAGE_NAME);
 
-export function ClerkProvider({ children, ...props }: NextClerkProviderProps): JSX.Element {
-  const { __unstable_invokeMiddlewareOnAuthStateChange = true } = props;
+export function ClerkProvider<TUi extends Ui = Ui>({ children, ...props }: NextClerkProviderProps<TUi>): JSX.Element {
+  const { __internal_invokeMiddlewareOnAuthStateChange = true } = props;
   const { push, replace } = useRouter();
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   useSafeLayoutEffect(() => {
-    window.__unstable__onBeforeSetActive = invalidateNextRouterCache;
+    window.__internal_onBeforeSetActive = invalidateNextRouterCache;
   }, []);
 
   useSafeLayoutEffect(() => {
-    window.__unstable__onAfterSetActive = () => {
+    window.__internal_onAfterSetActive = () => {
       // Re-run the middleware every time there auth state changes.
-      // This enables complete control from a centralised place (NextJS middleware),
+      // This enables complete control from a centralized place (NextJS middleware),
       // as we will invoke it every time the client-side auth state changes, eg: signing-out, switching orgs, etc.\
-      if (__unstable_invokeMiddlewareOnAuthStateChange) {
+      if (__internal_invokeMiddlewareOnAuthStateChange) {
         void push(window.location.href);
       }
     };
@@ -55,7 +56,7 @@ export function ClerkProvider({ children, ...props }: NextClerkProviderProps): J
         initialState={initialState}
       >
         <RouterTelemetry />
-        <ClerkJSScript router='pages' />
+        <ClerkScripts router='pages' />
         {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>

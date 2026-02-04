@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
@@ -364,6 +364,12 @@ export const nbNO: LocalizationResource = {
         tableHeader__role: 'Rolle',
         tableHeader__user: 'Bruker',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Vi oppdaterer tilgjengelige roller. Når det er gjort, vil du kunne oppdatere roller igjen.',
+          title: 'Roller er midlertidig låst',
+        },
+      },
       detailsTitle__emptyRow: 'Ingen medlemmer å vise',
       invitationsTab: {
         autoInvitations: {
@@ -692,7 +698,13 @@ export const nbNO: LocalizationResource = {
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Skriv inn passordet ditt',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -742,6 +754,10 @@ export const nbNO: LocalizationResource = {
       formTitle: 'Verifiseringskode',
       subtitle: undefined,
       title: 'To-trinns verifisering',
+    },
+    web3Solana: {
+      subtitle: 'Velg en lommebok nedenfor for å logge inn',
+      title: 'Logg inn med Solana',
     },
   },
   signInEnterPasswordTitle: 'Skriv inn passordet ditt',
@@ -833,31 +849,44 @@ export const nbNO: LocalizationResource = {
       title: 'Opprett kontoen din',
       titleCombined: 'Opprett kontoen din',
     },
+    web3Solana: {
+      subtitle: 'Velg en lommebok nedenfor for å registrere deg',
+      title: 'Registrer deg med Solana',
+    },
   },
   socialButtonsBlockButton: 'Fortsett med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'En organisasjon eksisterer allerede for det oppdagede firmanavnet ({{organizationName}}) og {{organizationDomain}}. Bli med via invitasjon.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Opprett ny organisasjon',
+      action__invitationAccept: 'Bli med',
+      action__suggestionsAccept: 'Be om å bli med',
+      subtitle: 'Bli med i en eksisterende organisasjon eller opprett en ny',
+      subtitle__createOrganizationDisabled: 'Bli med i en eksisterende organisasjon',
+      suggestionsAcceptedLabel: 'Venter på godkjenning',
+      title: 'Velg en organisasjon',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Avbryt',
+      formButtonSubmit: 'Fortsett',
+      formFieldInputPlaceholder__name: 'Min organisasjon',
+      formFieldInputPlaceholder__slug: 'min-organisasjon',
+      formFieldLabel__name: 'Navn',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Skriv inn organisasjonsdetaljene dine for å fortsette',
+      title: 'Sett opp din organisasjon',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'Kontakt organisasjonsadministratoren din for en invitasjon.',
+      title: 'Du må tilhøre en organisasjon',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Logg ut',
+      actionText: 'Innlogget som {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -866,19 +895,88 @@ export const nbNO: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Filstørrelsen overskrider maksgrensen på 10 MB. Vennligst velg en mindre fil.',
+    avatar_file_type_invalid: 'Filtypen støttes ikke. Vennligst last opp et JPG-, PNG-, GIF- eller WEBP-bilde.',
     captcha_invalid:
       'Registreringen mislyktes på grunn av mislykkede sikkerhetsvalideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
     captcha_unavailable:
       'Registreringen mislyktes på grunn av mislykkede bot-valideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Midlertidige e-posttjenester støttes ikke. Vennligst bruk din vanlige e-postadresse for å opprette en konto.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Vi klarte ikke finne en konto med disse detaljene.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'E-postadressen må være en gyldig e-postadresse',
     form_param_format_invalid__phone_number: 'Telefonnummeret må være i et gyldig internasjonalt format',
@@ -890,14 +988,18 @@ export const nbNO: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Passordet ditt er ikke sterkt nok.',
+    form_password_or_identifier_incorrect:
+      'Passordet eller e-postadressen er feil. Prøv igjen eller bruk en annen metode.',
     form_password_pwned:
       'Dette passordet er funnet som en del av et datainnbrudd og kan ikke brukes. Vennligst prøv et annet passord.',
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Passordet ditt har overskredet maksimalt antall byte tillatt. Vennligst forkort det eller fjern noen spesialtegn.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Feil passord',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
@@ -929,6 +1031,9 @@ export const nbNO: LocalizationResource = {
     phone_number_exists: 'Dette telefonnummeret er allerede i bruk. Vennligst bruk et annet telefonnummer.',
     session_exists: 'Du er allerede logget inn.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Du avviste signaturforespørselen. Prøv igjen for å fortsette.',
+    web3_solana_signature_generation_failed:
+      'Det oppstod en feil under generering av signaturen. Prøv igjen for å fortsette.',
     zxcvbn: {
       couldBeStronger: 'Passordet ditt fungerer, men det kan være sterkere. Prøv å legge til flere tegn.',
       goodPassword: 'Godt jobbet. Dette er et utmerket passord.',
@@ -1298,6 +1403,10 @@ export const nbNO: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3-lommebøker',
         title: 'Web3-lommebøker',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Velg en Solana-lommebok for å koble den til kontoen din.',
+          title: 'Legg til en Solana-lommebok',
+        },
       },
     },
     usernamePage: {
@@ -1321,16 +1430,22 @@ export const nbNO: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Logg inn',
+      actionText: 'Har du allerede tilgang?',
+      formButton: 'Bli med på ventelisten',
+      subtitle: 'Skriv inn e-postadressen din, så gir vi deg beskjed når plassen din er klar',
+      title: 'Bli med på ventelisten',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Du vil bli omdirigert snart...',
+      subtitle: 'Vi tar kontakt når plassen din er klar',
+      title: 'Takk for at du ble med på ventelisten!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Koble til med {{walletName}}',
+    continue: 'Fortsett med {{walletName}}',
+    noneAvailable:
+      'Ingen Solana Web3-lommebøker ble funnet. Installer en Web3-støttet {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

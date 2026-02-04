@@ -64,11 +64,6 @@ export type ClerkMiddlewareSessionAuthObject = (SignedInAuthObject | SignedOutAu
   redirectToSignUp: RedirectFun<Response>;
 };
 
-/**
- * @deprecated Use `ClerkMiddlewareSessionAuthObject` instead.
- */
-export type ClerkMiddlewareAuthObject = ClerkMiddlewareSessionAuthObject;
-
 export type ClerkMiddlewareAuth = AuthFn;
 
 type ClerkMiddlewareHandler = (
@@ -511,6 +506,7 @@ const handleControlFlowErrors = (
       signUpUrl: requestState.signUpUrl,
       publishableKey: requestState.publishableKey,
       sessionStatus: requestState.toAuth()?.sessionStatus,
+      isSatellite: requestState.isSatellite,
     });
 
     const { returnBackUrl } = e;

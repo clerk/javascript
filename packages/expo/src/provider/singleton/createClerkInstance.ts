@@ -1,13 +1,12 @@
-import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/core/fapiClient';
-import { type Clerk, isClerkRuntimeError } from '@clerk/clerk-js/headless';
-import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
+import { type Clerk, isClerkRuntimeError } from '@clerk/clerk-js';
+import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/react';
 import { is4xxError } from '@clerk/shared/error';
 import type {
   ClientJSONSnapshot,
   EnvironmentJSONSnapshot,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { Platform } from 'react-native';
 
 import packageJson from '../../../package.json';
@@ -23,18 +22,28 @@ import { errorThrower } from '../../errorThrower';
 import { isNative } from '../../utils';
 import type { BuildClerkOptions } from './types';
 
+/**
+ * Internal types for FAPI client callbacks.
+ * These are simplified versions of the internal clerk-js types,
+ * used only for the __internal_onBeforeRequest and __internal_onAfterResponse hooks.
+ */
+type FapiRequestInit = RequestInit & {
+  url?: URL;
+  headers?: Headers;
+};
+
+type FapiResponse = Response & {
+  payload: { errors?: Array<{ code: string }> } | null;
+};
+
 const KEY = '__clerk_client_jwt';
 
-/**
- * @deprecated Use `getClerkInstance()` instead. `Clerk` will be removed in the next major version.
- */
-export let clerk: HeadlessBrowserClerk | BrowserClerk;
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
 
 export function createClerkInstance(ClerkClass: typeof Clerk) {
   return (options?: BuildClerkOptions): HeadlessBrowserClerk | BrowserClerk => {
     const {
-      publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '',
+      publishableKey = '',
       tokenCache = MemoryTokenCache,
       __experimental_resourceCache: createResourceCache,
     } = options || {};
@@ -53,7 +62,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
       const getToken = tokenCache.getToken;
       const saveToken = tokenCache.saveToken;
-      __internal_clerk = clerk = new ClerkClass(publishableKey);
+      __internal_clerk = new ClerkClass(publishableKey);
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API
@@ -116,7 +125,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
           __internal_clerk.addListener(({ client }) => {
             // @ts-expect-error - This is an internal API
-            const environment = __internal_clerk?.__unstable__environment as EnvironmentResource;
+            const environment = __internal_clerk?.__internal_environment as EnvironmentResource;
             if (environment) {
               void EnvironmentResourceCache.save(environment.__internal_toSnapshot());
             }
@@ -152,7 +161,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       }
 
       // @ts-expect-error - This is an internal API
-      __internal_clerk.__unstable__onBeforeRequest(async (requestInit: FapiRequestInit) => {
+      __internal_clerk.__internal_onBeforeRequest(async (requestInit: FapiRequestInit) => {
         // https://reactnative.dev/docs/0.61/network#known-issues-with-fetch-and-cookie-based-authentication
         requestInit.credentials = 'omit';
 
@@ -172,7 +181,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
       let nativeApiErrorShown = false;
       // @ts-expect-error - This is an internal API
-      __internal_clerk.__unstable__onAfterResponse(async (_: FapiRequestInit, response: FapiResponse<unknown>) => {
+      __internal_clerk.__internal_onAfterResponse(async (_: FapiRequestInit, response: FapiResponse) => {
         const authHeader = response.headers.get('authorization');
         if (authHeader) {
           await saveToken(KEY, authHeader);

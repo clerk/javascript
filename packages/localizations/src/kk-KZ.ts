@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const kkKZ: LocalizationResource = {
   locale: 'kk-KZ',
@@ -363,6 +363,12 @@ export const kkKZ: LocalizationResource = {
         tableHeader__role: 'Рөл',
         tableHeader__user: 'Пайдаланушы',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Қолжетімді рөлдерді жаңартып жатырмыз. Бұл аяқталғаннан кейін рөлдерді қайта жаңарта аласыз.',
+          title: 'Рөлдер уақытша құлыпталған',
+        },
+      },
       detailsTitle__emptyRow: 'Көрсету үшін мүшелер жоқ',
       invitationsTab: {
         autoInvitations: {
@@ -685,8 +691,14 @@ export const kkKZ: LocalizationResource = {
       subtitle: 'Есептік жазбаңыздың құпия сөзін енгізіңіз',
       title: 'Құпия сөзді енгізіңіз',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Құпия сөз қауіпті',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Растау коды',
@@ -734,6 +746,10 @@ export const kkKZ: LocalizationResource = {
       formTitle: 'Растау коды',
       subtitle: 'Аутентификатор қолданбасындағы кодты енгізіңіз',
       title: 'Екі қадамды растау',
+    },
+    web3Solana: {
+      subtitle: 'Кіру үшін төменде әмиянды таңдаңыз',
+      title: 'Solana арқылы кіру',
     },
   },
   signInEnterPasswordTitle: 'Құпия сөзді енгізіңіз',
@@ -826,31 +842,44 @@ export const kkKZ: LocalizationResource = {
       title: 'Есептік жазбаны құру',
       titleCombined: 'Есептік жазбаны құру',
     },
+    web3Solana: {
+      subtitle: 'Тіркелу үшін төменде әмиянды таңдаңыз',
+      title: 'Solana арқылы тіркелу',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}} арқылы жалғастыру',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Анықталған компания атауы ({{organizationName}}) және {{organizationDomain}} үшін ұйым бұрыннан бар. Шақыру арқылы қосылыңыз.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Жаңа ұйым құру',
+      action__invitationAccept: 'Қосылу',
+      action__suggestionsAccept: 'Қосылуды сұрау',
+      subtitle: 'Мәні бар ұйымға қосылыңыз немесе жаңасын құрыңыз',
+      subtitle__createOrganizationDisabled: 'Бар ұйымға қосылыңыз',
+      suggestionsAcceptedLabel: 'Мақұлдау күтілуде',
+      title: 'Ұйым таңдаңыз',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Болдырмау',
+      formButtonSubmit: 'Жалғастыру',
+      formFieldInputPlaceholder__name: 'Менің ұйымым',
+      formFieldInputPlaceholder__slug: 'menin-uiyym',
+      formFieldLabel__name: 'Атауы',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Жалғастыру үшін ұйымыңыздың мәліметтерін енгізіңіз',
+      title: 'Ұйымыңызды баптаңыз',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'Шақыру алу үшін ұйымыңыздың әкімшісіне хабарласыңыз.',
+      title: 'Сіз ұйымға тиесілі болуыңыз керек',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Шығу',
+      actionText: '{{identifier}} ретінде кірді',
     },
   },
   taskResetPassword: {
@@ -859,17 +888,86 @@ export const kkKZ: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ұйымға қазірдің өзінде қосылған.',
+    avatar_file_size_exceeded: 'Файл өлшемі 10 МБ шегінен асып кетті. Кішірек файлды таңдаңыз.',
+    avatar_file_type_invalid: 'Файл түрі қолдау көрсетілмейді. JPG, PNG, GIF немесе WEBP суретін жүктеңіз.',
     captcha_invalid: 'Қауіпсіздік тексерілуі сәтсіз аяқталды. Браузерді өзгерту немесе кеңейтулерді өшіруге тырысыңыз.',
     captcha_unavailable: 'Бот тексерілуі сәтсіз аяқталды. Бетті жаңартып немесе қолдау қызметіне хабарласыңыз.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Уақытша электрондық пошта қызметтері қолдау көрсетілмейді. Есептік жазбаны жасау үшін кәдімгі электрондық пошта мекенжайыңызды пайдаланыңыз.',
     form_identifier_exists__email_address: 'Бұл электрондық пошта тіркелген. Басқасын қолданыңыз.',
     form_identifier_exists__phone_number: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
     form_identifier_exists__username: 'Бұл пайдаланушы аты тіркелген. Басқасын қолданыңыз.',
     form_identifier_not_found: 'Есептік жазба табылмады. Дұрыстығын тексеріңіз.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Енгізілген мән жарамсыз пішімде.',
     form_param_format_invalid__email_address: 'Электрондық пошта жарамсыз.',
     form_param_format_invalid__phone_number: 'Телефон нөмірі жарамсыз.',
@@ -881,13 +979,17 @@ export const kkKZ: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Енгізілген мән жарамсыз.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Құпия сөз қате.',
     form_password_length_too_short: 'Құпия сөз тым қысқа. Кемінде 8 таңба болуы керек.',
     form_password_not_strong_enough: 'Құпия сөз әлсіз.',
+    form_password_or_identifier_incorrect:
+      'Құпия сөз немесе электрондық пошта мекенжайы дұрыс емес. Қайталап көріңіз немесе басқа әдісті пайдаланыңыз.',
     form_password_pwned: 'Бұл құпия сөз қауіпсіздік бұзылуынан табылды. Басқа құпия сөзді қолданыңыз.',
     form_password_pwned__sign_in: 'Бұл құпия сөз қауіпсіз емес. Құпия сөзді өзгертуге болады.',
     form_password_size_in_bytes_exceeded:
       'Құпия сөзде тым көп байт бар. Оны қысқартыңыз немесе арнайы таңбаларды алып тастаңыз.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Құпия сөз қате',
     form_username_invalid_character:
       'Пайдаланушы атында жарамсыз таңбалар бар. Тек әріптер, сандар және астыңғы сызықшаларды қолданыңыз.',
@@ -919,6 +1021,9 @@ export const kkKZ: LocalizationResource = {
     phone_number_exists: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 Wallet кеңейтуі табылмады. Орнатыңыз.',
+    web3_signature_request_rejected: 'Сіз қолтаңба сұрауын қабылдамадыңыз. Жалғастыру үшін қайтадан көріңіз.',
+    web3_solana_signature_generation_failed:
+      'Қолтаңбаны жасау кезінде қате орын алды. Жалғастыру үшін қайтадан көріңіз.',
     zxcvbn: {
       couldBeStronger: 'Құпия сөз әлсіз. Таңбалар санын көбейтіңіз.',
       goodPassword: 'Құпия сөз талаптарға сай.',
@@ -1277,6 +1382,10 @@ export const kkKZ: LocalizationResource = {
         detailsAction__nonPrimary: 'Негізгі ретінде орнату',
         primaryButton: 'Әптәпқалманы қосу',
         title: 'Web3 әптәпқалмалары',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Есептік жазбаңызға қосу үшін Solana әмиянын таңдаңыз.',
+          title: 'Solana әмиянын қосу',
+        },
       },
     },
     usernamePage: {
@@ -1311,5 +1420,11 @@ export const kkKZ: LocalizationResource = {
       subtitle: 'Даяр болған кезде хабарласамыз',
       title: 'Күту тізіміне қосылғаныңыз үшін рақмет!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} арқылы қосылу',
+    continue: '{{walletName}} арқылы жалғастыру',
+    noneAvailable:
+      'Solana Web3 әмияндары табылмады. Web3 қолдайтын {{ solanaWalletsLink || link("wallet extension") }} орнатыңыз.',
   },
 } as const;

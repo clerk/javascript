@@ -1,14 +1,12 @@
 ---
-import { Protect } from '@clerk/astro/react';
+import { Show } from '@clerk/astro/components';
 import Layout from '../../layouts/react/Layout.astro';
 ---
 
 <Layout title='Page is only accessible by members'>
   <div class='w-full flex justify-center flex-col'>
-    <Protect
-      client:load
-      role='basic_member'
-    >
+    <Show when={{ role: 'basic_member' }}>
+      <h1 class='text-2xl text-center'>I'm a member</h1>
       <Fragment slot='fallback'>
         <h1 class='text-2xl text-center'>Not a member</h1>
         <a
@@ -17,7 +15,6 @@ import Layout from '../../layouts/react/Layout.astro';
           >Go to Admin Page</a
         >
       </Fragment>
-      <h1 class='text-2xl text-center'>I'm a member</h1>
-    </Protect>
+    </Show>
   </div>
 </Layout>

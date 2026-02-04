@@ -1,4 +1,4 @@
-import { EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import { ClerkOfflineError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -180,8 +180,8 @@ describe('Clerk singleton', () => {
 
         eventBusSpy?.mockRestore();
         // cleanup global window pollution
-        (window as any).__unstable__onBeforeSetActive = null;
-        (window as any).__unstable__onAfterSetActive = null;
+        (window as any).__internal_onBeforeSetActive = null;
+        (window as any).__internal_onAfterSetActive = null;
       });
 
       it('does not call session touch on signOut', async () => {
@@ -219,11 +219,11 @@ describe('Clerk singleton', () => {
         });
       });
 
-      it('calls __unstable__onBeforeSetActive before session.touch', async () => {
+      it('calls __internal_onBeforeSetActive before session.touch', async () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
-        (window as any).__unstable__onBeforeSetActive = () => {
+        (window as any).__internal_onBeforeSetActive = () => {
           expect(mockSession.touch).not.toHaveBeenCalled();
         };
 
@@ -233,111 +233,17 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
-      it('sets __session and __client_uat cookie before calling __unstable__onBeforeSetActive', async () => {
+      it('sets __session and __client_uat cookie before calling __internal_onBeforeSetActive', async () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
-        (window as any).__unstable__onBeforeSetActive = () => {
+        (window as any).__internal_onBeforeSetActive = () => {
           expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
         };
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-      });
-
-      it('calls __unstable__onAfterSetActive after beforeEmit and session.touch', async () => {
-        const beforeEmitMock = vi.fn();
-        mockSession.touch.mockReturnValueOnce(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-
-        (window as any).__unstable__onAfterSetActive = () => {
-          expect(mockSession.touch).toHaveBeenCalled();
-          expect(beforeEmitMock).toHaveBeenCalled();
-        };
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load();
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
-      });
-
-      // TODO: @dimkl include set transitive state
-      it('calls session.touch -> set cookie -> before emit with touched session on session switch', async () => {
-        const mockSession2 = {
-          id: '2',
-          remove: vi.fn(),
-          status: 'active',
-          user: {},
-          touch: vi.fn(),
-          getToken: vi.fn(),
-        };
-        mockClientFetch.mockReturnValue(
-          Promise.resolve({
-            signedInSessions: [mockSession, mockSession2],
-          }),
-        );
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load();
-
-        const executionOrder: string[] = [];
-        mockSession2.touch.mockImplementationOnce(() => {
-          sut.session = mockSession2 as any;
-          executionOrder.push('session.touch');
-          return Promise.resolve();
-        });
-        mockSession2.getToken.mockImplementation(() => {
-          executionOrder.push('set cookie');
-          return 'mocked-token-2';
-        });
-        const beforeEmitMock = vi.fn().mockImplementationOnce(() => {
-          executionOrder.push('before emit');
-          return Promise.resolve();
-        });
-
-        await sut.setActive({ session: mockSession2 as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
-
-        await waitFor(() => {
-          expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
-          expect(mockSession2.touch).toHaveBeenCalled();
-          expect(mockSession2.getToken).toHaveBeenCalled();
-          expect(beforeEmitMock).toHaveBeenCalledWith(mockSession2);
-          expect(sut.session).toMatchObject(mockSession2);
-        });
-      });
-
-      // TODO: @dimkl include set transitive state
-      it('calls with lastActiveOrganizationId session.touch -> set cookie -> before emit -> set accessors with touched session on organization switch', async () => {
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load();
-
-        const executionOrder: string[] = [];
-        mockSession.touch.mockImplementationOnce(() => {
-          sut.session = mockSession as any;
-          executionOrder.push('session.touch');
-          return Promise.resolve();
-        });
-        mockSession.getToken.mockImplementation(() => {
-          executionOrder.push('set cookie');
-          return 'mocked-token';
-        });
-
-        const beforeEmitMock = vi.fn().mockImplementationOnce(() => {
-          executionOrder.push('before emit');
-          return Promise.resolve();
-        });
-
-        await sut.setActive({ organization: { id: 'org_id' } as Organization, beforeEmit: beforeEmitMock });
-
-        await waitFor(() => {
-          expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
-          expect(mockSession.touch).toHaveBeenCalled();
-          expect(mockSession.getToken).toHaveBeenCalled();
-          expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
-          expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);
-          expect(sut.session).toMatchObject(mockSession);
-        });
       });
 
       it('sets active organization by slug', async () => {
@@ -458,6 +364,81 @@ describe('Clerk singleton', () => {
         expect(navigate).toHaveBeenCalled();
       });
 
+      it('passes decorateUrl to the navigate callback', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        const navigate = vi.fn();
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource, navigate });
+
+        expect(navigate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            session: expect.any(Object),
+            decorateUrl: expect.any(Function),
+          }),
+        );
+      });
+
+      it('decorateUrl returns touch URL when isEligibleForTouch is true', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            cookieExpiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+            isEligibleForTouch: () => true,
+            buildTouchUrl: ({ redirectUrl }: { redirectUrl: URL }) =>
+              `https://clerk.example.com/v1/client/touch?redirect_url=${encodeURIComponent(redirectUrl.href)}`,
+          }),
+        );
+
+        let capturedDecorateUrl: ((url: string) => string) | undefined;
+        const navigate = vi.fn(({ decorateUrl }) => {
+          capturedDecorateUrl = decorateUrl;
+        });
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource, navigate });
+
+        expect(capturedDecorateUrl).toBeDefined();
+        const decoratedUrl = capturedDecorateUrl!('/dashboard');
+
+        // Should return touch URL when ITP fix is needed
+        expect(decoratedUrl).toContain('/v1/client/touch');
+        expect(decoratedUrl).toContain('redirect_url=');
+        expect(decoratedUrl).toContain('%2Fdashboard');
+      });
+
+      it('decorateUrl returns original URL when isEligibleForTouch is false', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            cookieExpiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
+            isEligibleForTouch: () => false,
+            buildTouchUrl: ({ redirectUrl }: { redirectUrl: URL }) =>
+              `https://clerk.example.com/v1/client/touch?redirect_url=${encodeURIComponent(redirectUrl.href)}`,
+          }),
+        );
+
+        let capturedDecorateUrl: ((url: string) => string) | undefined;
+        const navigate = vi.fn(({ decorateUrl }) => {
+          capturedDecorateUrl = decorateUrl;
+        });
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource, navigate });
+
+        expect(capturedDecorateUrl).toBeDefined();
+        const decoratedUrl = capturedDecorateUrl!('/dashboard');
+
+        // Should return original URL when ITP fix is not needed
+        expect(decoratedUrl).toBe('/dashboard');
+      });
+
       mockNativeRuntime(() => {
         it('calls session.touch in a non-standard browser', async () => {
           mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
@@ -465,24 +446,16 @@ describe('Clerk singleton', () => {
           const sut = new Clerk(productionPublishableKey);
           await sut.load({ standardBrowser: false });
 
-          const executionOrder: string[] = [];
           mockSession.touch.mockImplementationOnce(() => {
             sut.session = mockSession as any;
-            executionOrder.push('session.touch');
-            return Promise.resolve();
-          });
-          const beforeEmitMock = vi.fn().mockImplementationOnce(() => {
-            executionOrder.push('before emit');
             return Promise.resolve();
           });
 
-          await sut.setActive({ organization: { id: 'org_id' } as Organization, beforeEmit: beforeEmitMock });
+          await sut.setActive({ organization: { id: 'org_id' } as Organization });
 
-          expect(executionOrder).toEqual(['session.touch', 'before emit']);
           expect(mockSession.touch).toHaveBeenCalled();
           expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
           expect(mockSession.getToken).toHaveBeenCalled();
-          expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);
           expect(sut.session).toMatchObject(mockSession);
         });
       });
@@ -523,8 +496,8 @@ describe('Clerk singleton', () => {
 
         eventBusSpy?.mockRestore();
         // cleanup global window pollution
-        (window as any).__unstable__onBeforeSetActive = null;
-        (window as any).__unstable__onAfterSetActive = null;
+        (window as any).__internal_onBeforeSetActive = null;
+        (window as any).__internal_onAfterSetActive = null;
       });
 
       it('calls session.touch by default', async () => {
@@ -537,12 +510,12 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
-      it('does not call __unstable__onBeforeSetActive before session.touch', async () => {
+      it('does not call __internal_onBeforeSetActive before session.touch', async () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
         const onBeforeSetActive = vi.fn();
-        (window as any).__unstable__onBeforeSetActive = onBeforeSetActive;
+        (window as any).__internal_onBeforeSetActive = onBeforeSetActive;
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
@@ -550,12 +523,12 @@ describe('Clerk singleton', () => {
         expect(onBeforeSetActive).not.toHaveBeenCalled();
       });
 
-      it('does not call __unstable__onAfterSetActive after session.touch', async () => {
+      it('does not call __internal_onAfterSetActive after session.touch', async () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
         const onAfterSetActive = vi.fn();
-        (window as any).__unstable__onAfterSetActive = onAfterSetActive;
+        (window as any).__internal_onAfterSetActive = onAfterSetActive;
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
@@ -624,8 +597,8 @@ describe('Clerk singleton', () => {
         mockEnvironmentFetch.mockReset();
 
         // cleanup global window pollution
-        (window as any).__unstable__onBeforeSetActive = null;
-        (window as any).__unstable__onAfterSetActive = null;
+        (window as any).__internal_onBeforeSetActive = null;
+        (window as any).__internal_onAfterSetActive = null;
       });
 
       it('does not update session to personal workspace', async () => {
@@ -672,6 +645,73 @@ describe('Clerk singleton', () => {
         expect(sut.session).toMatchObject(mockSessionWithOrganization);
       });
     });
+
+    describe('when offline', () => {
+      const mockSession = {
+        id: '1',
+        remove: vi.fn(),
+        status: 'active',
+        user: {},
+        touch: vi.fn(() => Promise.resolve()),
+        getToken: vi.fn(),
+        lastActiveToken: { getRawString: () => 'mocked-token' },
+      };
+      let eventBusSpy: ReturnType<typeof vi.spyOn>;
+
+      beforeEach(() => {
+        eventBusSpy = vi.spyOn(eventBus, 'emit');
+      });
+
+      afterEach(() => {
+        mockSession.remove.mockReset();
+        mockSession.touch.mockReset();
+        mockSession.getToken.mockReset();
+        eventBusSpy?.mockRestore();
+      });
+
+      it('does not emit TokenUpdate with null when getToken throws ClerkOfflineError', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.getToken.mockRejectedValue(new ClerkOfflineError('Network request failed while offline.'));
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+
+        expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
+
+        const tokenUpdateCalls = eventBusSpy.mock.calls.filter(call => call[0] === 'token:update');
+        const nullTokenCalls = tokenUpdateCalls.filter(call => call[1]?.token === null);
+        expect(nullTokenCalls.length).toBe(0);
+      });
+
+      it('preserves existing auth state when offline during setActive', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.getToken.mockRejectedValue(new ClerkOfflineError('Network request failed while offline.'));
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+
+        expect(sut.session).toBeDefined();
+      });
+
+      it('re-throws non-offline errors from getToken', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.getToken.mockRejectedValue(new Error('Some other error'));
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await expect(sut.setActive({ session: mockSession as any as ActiveSessionResource })).rejects.toThrow(
+          'Some other error',
+        );
+      });
+    });
   });
 
   describe('.load()', () => {
@@ -688,8 +728,8 @@ describe('Clerk singleton', () => {
 
         afterEach(() => {
           // cleanup global window pollution
-          (window as any).__unstable__onBeforeSetActive = null;
-          (window as any).__unstable__onAfterSetActive = null;
+          (window as any).__internal_onBeforeSetActive = null;
+          (window as any).__internal_onAfterSetActive = null;
         });
 
         it('gracefully handles an incorrect value returned from the user provided selectInitialSession', async () => {
@@ -1094,7 +1134,67 @@ describe('Clerk singleton', () => {
       await sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
+        expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined });
+        expect(mockSetActive).toHaveBeenCalled();
+      });
+    });
+
+    it('passes unsafeMetadata to signUp.create during OAuth transfer flow', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_identifier',
+            first_factor_verification: {
+              status: 'transferable',
+              strategy: 'oauth_google',
+              external_verification_redirect_url: '',
+              error: {
+                code: 'external_account_not_found',
+                long_message: 'The External Account was not found.',
+                message: 'Invalid external account',
+              },
+            },
+            second_factor_verification: null,
+            identifier: '',
+            user_data: null,
+            created_session_id: null,
+            created_user_id: null,
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const mockSetActive = vi.fn();
+      const mockSignUpCreate = vi
+        .fn()
+        .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      if (!sut.client) {
+        fail('we should always have a client');
+      }
+      sut.client.signUp.create = mockSignUpCreate;
+      sut.setActive = mockSetActive;
+
+      const unsafeMetadata = { foo: 'bar', nested: { value: 123 } };
+      await sut.handleRedirectCallback({ unsafeMetadata });
+
+      await waitFor(() => {
+        expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata });
         expect(mockSetActive).toHaveBeenCalled();
       });
     });
@@ -2454,15 +2554,15 @@ describe('Clerk singleton', () => {
   describe('updateClient', () => {
     afterEach(() => {
       // cleanup global window pollution
-      (window as any).__unstable__onBeforeSetActive = null;
-      (window as any).__unstable__onAfterSetActive = null;
+      (window as any).__internal_onBeforeSetActive = null;
+      (window as any).__internal_onAfterSetActive = null;
     });
 
     it('runs server revalidation hooks when session transitions from `active` to `pending`', async () => {
       const mockOnBeforeSetActive = vi.fn().mockReturnValue(Promise.resolve());
       const mockOnAfterSetActive = vi.fn().mockReturnValue(Promise.resolve());
-      (window as any).__unstable__onBeforeSetActive = mockOnBeforeSetActive;
-      (window as any).__unstable__onAfterSetActive = mockOnAfterSetActive;
+      (window as any).__internal_onBeforeSetActive = mockOnBeforeSetActive;
+      (window as any).__internal_onAfterSetActive = mockOnAfterSetActive;
 
       const mockActiveSession = {
         id: 'session_1',
@@ -2697,6 +2797,71 @@ describe('Clerk singleton', () => {
         expect(result?.isEnabled).toBe(true);
         expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('clerkUICtor backwards compatibility', () => {
+    beforeEach(() => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => true,
+          isDevelopmentOrStaging: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+        }),
+      );
+    });
+
+    it('uses clerkUICtor when provided with correct casing', async () => {
+      const mockClerkUIInstance = { mount: vi.fn() };
+      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({
+        ...mockedLoadOptions,
+        clerkUICtor: mockClerkUICtor,
+      });
+
+      expect(mockClerkUICtor).toHaveBeenCalled();
+    });
+
+    it('uses clerkUiCtor (legacy casing) for backwards compatibility', async () => {
+      const mockClerkUIInstance = { mount: vi.fn() };
+      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+
+      const sut = new Clerk(productionPublishableKey);
+      // Use legacy casing - cast to bypass TypeScript since clerkUiCtor is not in the type
+      await sut.load({
+        ...mockedLoadOptions,
+        clerkUiCtor: mockClerkUICtor,
+      } as Parameters<typeof sut.load>[0]);
+
+      expect(mockClerkUICtor).toHaveBeenCalled();
+    });
+
+    it('prefers clerkUICtor over clerkUiCtor when both are provided', async () => {
+      const mockClerkUIInstanceCorrect = { mount: vi.fn() };
+      const mockClerkUICtorCorrect = vi.fn(() => mockClerkUIInstanceCorrect);
+
+      const mockClerkUIInstanceLegacy = { mount: vi.fn() };
+      const mockClerkUICtorLegacy = vi.fn(() => mockClerkUIInstanceLegacy);
+
+      const sut = new Clerk(productionPublishableKey);
+      // Provide both - the correct casing should take precedence
+      await sut.load({
+        ...mockedLoadOptions,
+        clerkUICtor: mockClerkUICtorCorrect,
+        clerkUiCtor: mockClerkUICtorLegacy,
+      } as Parameters<typeof sut.load>[0]);
+
+      expect(mockClerkUICtorCorrect).toHaveBeenCalled();
+      expect(mockClerkUICtorLegacy).not.toHaveBeenCalled();
     });
   });
 });

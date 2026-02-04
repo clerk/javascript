@@ -1,4 +1,3 @@
-import { useAttemptToEnableOrganizations } from '../../organization';
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   CreateOrganizationParams,
@@ -15,6 +14,7 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContex
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { createCacheKeys } from './createCacheKeys';
+import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -84,19 +84,19 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
        */
       createOrganization: undefined;
       /**
-       * A function that sets the active session and/or organization.
+       * A function that sets the active session and/or Organization.
        */
       setActive: undefined;
       /**
-       * Returns `PaginatedResources` which includes a list of the user's organization memberships.
+       * Returns `PaginatedResources` which includes a list of the user's Organization memberships.
        */
       userMemberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
       /**
-       * Returns `PaginatedResources` which includes a list of the user's organization invitations.
+       * Returns `PaginatedResources` which includes a list of the user's Organization invitations.
        */
       userInvitations: PaginatedResourcesWithDefault<UserOrganizationInvitationResource>;
       /**
-       * Returns `PaginatedResources` which includes a list of suggestions for organizations that the user can join.
+       * Returns `PaginatedResources` which includes a list of suggestions for Organizations that the user can join.
        */
       userSuggestions: PaginatedResourcesWithDefault<OrganizationSuggestionResource>;
     }
@@ -154,10 +154,10 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
  * @example
  * ### Infinite pagination
  *
- * The following example demonstrates how to use the `infinite` property to fetch and append new data to the existing list. The `userMemberships` attribute will be populated with the first page of the user's organization memberships. When the "Load more" button is clicked, the `fetchNext` helper function will be called to append the next page of memberships to the list.
+ * The following example demonstrates how to use the `infinite` property to fetch and append new data to the existing list. The `userMemberships` attribute will be populated with the first page of the user's Organization memberships. When the "Load more" button is clicked, the `fetchNext` helper function will be called to append the next page of memberships to the list.
  *
  * ```tsx {{ filename: 'src/components/JoinedOrganizations.tsx' }}
- * import { useOrganizationList } from '@clerk/clerk-react'
+ * import { useOrganizationList } from '@clerk/react'
  * import React from 'react'
  *
  * const JoinedOrganizations = () => {
@@ -200,7 +200,7 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
  * Notice the difference between this example's pagination and the infinite pagination example above.
  *
  * ```tsx {{ filename: 'src/components/UserInvitationsTable.tsx' }}
- * import { useOrganizationList } from '@clerk/clerk-react'
+ * import { useOrganizationList } from '@clerk/react'
  * import React from 'react'
  *
  * const UserInvitationsTable = () => {
@@ -316,13 +316,13 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
       keepPreviousData: userMembershipsSafeValues.keepPreviousData,
       infinite: userMembershipsSafeValues.infinite,
       enabled: !!userMembershipsParams,
-      isSignedIn: Boolean(user),
+      isSignedIn: user !== null,
       initialPage: userMembershipsSafeValues.initialPage,
       pageSize: userMembershipsSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.USER_MEMBERSHIPS_KEY,
-      authenticated: Boolean(user),
+      authenticated: true,
       tracked: {
         userId: user?.id,
       },
@@ -339,13 +339,13 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
       infinite: userInvitationsSafeValues.infinite,
       // In useOrganizationList, you need to opt in by passing an object or `true`.
       enabled: !!userInvitationsParams,
-      isSignedIn: Boolean(user),
+      isSignedIn: user !== null,
       initialPage: userInvitationsSafeValues.initialPage,
       pageSize: userInvitationsSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.USER_INVITATIONS_KEY,
-      authenticated: Boolean(user),
+      authenticated: true,
       tracked: {
         userId: user?.id,
       },
@@ -361,13 +361,13 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
       keepPreviousData: userSuggestionsSafeValues.keepPreviousData,
       infinite: userSuggestionsSafeValues.infinite,
       enabled: !!userSuggestionsParams,
-      isSignedIn: Boolean(user),
+      isSignedIn: user !== null,
       initialPage: userSuggestionsSafeValues.initialPage,
       pageSize: userSuggestionsSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.USER_SUGGESTIONS_KEY,
-      authenticated: Boolean(user),
+      authenticated: true,
       tracked: {
         userId: user?.id,
       },

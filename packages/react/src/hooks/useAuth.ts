@@ -10,17 +10,17 @@ import type {
 } from '@clerk/shared/types';
 import { useCallback } from 'react';
 
-import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { errorThrower } from '../errors/errorThrower';
 import { invalidStateError } from '../errors/messages';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
+import { useAuthBase } from './useAuthBase';
 import { createGetToken, createSignOut } from './utils';
 
 /**
  * @inline
  */
-type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | null;
+type UseAuthOptions = PendingSessionOptions | undefined | null;
 
 /**
  * The `useAuth()` hook provides access to the current user's authentication state and methods to manage the active session.
@@ -35,7 +35,7 @@ type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | 
  * @unionReturnHeadings
  * ["Initialization", "Signed out", "Signed in (no active organization)", "Signed in (with active organization)"]
  *
- * @param [initialAuthStateOrOptions] - An object containing the initial authentication state or options for the `useAuth()` hook. If not provided, the hook will attempt to derive the state from the context. `treatPendingAsSignedOut` is a boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
+ * @param [options] - An object containing options for the `useAuth()` hook. `treatPendingAsSignedOut` is a boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
  *
  * @function
  *
@@ -47,7 +47,7 @@ type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | 
  * <Tab>
  *
  * ```tsx {{ filename: 'src/pages/ExternalDataPage.tsx' }}
- * import { useAuth } from '@clerk/clerk-react'
+ * import { useAuth } from '@clerk/react'
  *
  * export default function ExternalDataPage() {
  *   const { userId, sessionId, getToken, isLoaded, isSignedIn } = useAuth()
@@ -92,18 +92,11 @@ type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | 
  * </Tab>
  * </Tabs>
  */
-export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuthReturn => {
+export const useAuth = (options: UseAuthOptions = {}): UseAuthReturn => {
   useAssertWrappedByClerkProvider('useAuth');
 
-  const { treatPendingAsSignedOut, ...rest } = initialAuthStateOrOptions ?? {};
-  const initialAuthState = rest as any;
-
-  const authContextFromHook = useAuthContext();
-  let authContext = authContextFromHook;
-
-  if (authContext.sessionId === undefined && authContext.userId === undefined) {
-    authContext = initialAuthState != null ? initialAuthState : {};
-  }
+  const { treatPendingAsSignedOut } = options ?? {};
+  const authState = useAuthBase();
 
   const isomorphicClerk = useIsomorphicClerkContext();
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
@@ -113,7 +106,7 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
 
   return useDerivedAuth(
     {
-      ...authContext,
+      ...authState,
       getToken,
       signOut,
     },
@@ -133,7 +126,7 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
  * @remarks
  * This hook inspects session, user, and organization information to determine the current authentication state.
  * It returns an object that includes various properties such as whether the state is loaded, if a user is signed in,
- * session and user identifiers, organization roles, and a `has` function for authorization checks.
+ * session and user identifiers, Organization Roles, and a `has` function for authorization checks.
  * Additionally, it provides `signOut` and `getToken` functions if applicable.
  *
  * @example

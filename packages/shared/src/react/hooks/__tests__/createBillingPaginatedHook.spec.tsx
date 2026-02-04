@@ -1,7 +1,8 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { ClerkResource } from '../../../types';
+import type { ClerkResource } from '@/types';
+
 import type { ResourceCacheStableKey } from '../../stable-keys';
 import { createBillingPaginatedHook } from '../createBillingPaginatedHook';
 import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';
@@ -55,8 +56,8 @@ describe('createBillingPaginatedHook', () => {
       }),
     );
     mockClerk.loaded = true;
-    mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = true;
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = true;
+    mockClerk.__internal_environment.commerceSettings.billing.user.enabled = true;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = true;
     mockUser = createMockUser();
     mockOrganization = createMockOrganization();
     defaultQueryClient.client.clear();
@@ -87,14 +88,14 @@ describe('createBillingPaginatedHook', () => {
   });
 
   it('does not fetch when billing disabled (user)', () => {
-    mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = false;
+    mockClerk.__internal_environment.commerceSettings.billing.user.enabled = false;
 
     const { result } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 4 }), { wrapper });
 
     expect(useFetcherMock).toHaveBeenCalledWith('user');
 
     expect(fetcherMock).not.toHaveBeenCalled();
-    // Ensures that SWR does not update the loading state even if the fetcher is not called.
+    // Ensures that React Query does not update the loading state even if the fetcher is not called.
     expect(result.current.isLoading).toBe(false);
     expect(result.current.isFetching).toBe(false);
   });
@@ -144,8 +145,8 @@ describe('createBillingPaginatedHook', () => {
 
   it('unauthenticated hook: does not fetch when billing disabled for both user and organization', () => {
     mockUser = null;
-    mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = false;
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = false;
+    mockClerk.__internal_environment.commerceSettings.billing.user.enabled = false;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = false;
 
     const { result } = renderHook(() => useDummyUnauth({ initialPage: 1, pageSize: 4 }), { wrapper });
 
@@ -157,8 +158,8 @@ describe('createBillingPaginatedHook', () => {
   });
 
   it('allows fetching for user when organization billing disabled', async () => {
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = false;
-    mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = true;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = false;
+    mockClerk.__internal_environment.commerceSettings.billing.user.enabled = true;
 
     const { result } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 4 }), { wrapper });
 
@@ -207,7 +208,7 @@ describe('createBillingPaginatedHook', () => {
   });
 
   it('does not fetch in organization mode when organization billing disabled', async () => {
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = false;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = false;
 
     const { result } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 4, for: 'organization' } as any), {
       wrapper,
@@ -220,7 +221,7 @@ describe('createBillingPaginatedHook', () => {
   });
 
   it('unauthenticated hook: does not fetch in organization mode when organization billing disabled', async () => {
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = false;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = false;
 
     const { result } = renderHook(() => useDummyUnauth({ initialPage: 1, pageSize: 4, for: 'organization' } as any), {
       wrapper,
@@ -307,16 +308,7 @@ describe('createBillingPaginatedHook', () => {
         expect(params).toStrictEqual({ initialPage: 1, pageSize: 5 });
       });
 
-      if (__CLERK_USE_RQ__) {
-        expect(result.current.isLoading).toBe(false);
-      } else {
-        // Attention: We are forcing fetcher to be executed instead of setting the key to null
-        // because SWR will continue to display the cached data when the key is null and `keepPreviousData` is true.
-        // This means that SWR will update the loading state to true even if the fetcher is not called,
-        // because the key changes from `{..., userId: 'user_1'}` to `{..., userId: undefined}`.
-        await waitFor(() => expect(result.current.isLoading).toBe(true));
-        await waitFor(() => expect(result.current.isLoading).toBe(false));
-      }
+      expect(result.current.isLoading).toBe(false);
 
       // Data should be cleared even with keepPreviousData: true
       // The key difference here vs usePagesOrInfinite test: userId in cache key changes
@@ -542,11 +534,7 @@ describe('createBillingPaginatedHook', () => {
         await result.current.paginated.revalidate();
       });
 
-      if (__CLERK_USE_RQ__) {
-        await waitFor(() => expect(fetcherMock.mock.calls.length).toBeGreaterThanOrEqual(2));
-      } else {
-        await waitFor(() => expect(fetcherMock).toHaveBeenCalledTimes(1));
-      }
+      await waitFor(() => expect(fetcherMock.mock.calls.length).toBeGreaterThanOrEqual(2));
     });
   });
 });

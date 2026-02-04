@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
@@ -364,6 +364,12 @@ export const hrHR: LocalizationResource = {
         tableHeader__role: 'Uloga',
         tableHeader__user: 'Korisnik',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Ažuriramo dostupne uloge. Kada to završimo, moći ćete ponovno ažurirati uloge.',
+          title: 'Uloge su privremeno zaključane',
+        },
+      },
       detailsTitle__emptyRow: 'Nema članova za prikaz',
       invitationsTab: {
         autoInvitations: {
@@ -694,8 +700,14 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Unesite lozinku povezanu s vašim računom',
       title: 'Unesite svoju lozinku',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lozinka je kompromitirana',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verifikacijski kod',
@@ -743,6 +755,10 @@ export const hrHR: LocalizationResource = {
       formTitle: 'Verifikacijski kod',
       subtitle: 'Za nastavak, unesite verifikacijski kod generiran vašom aplikacijom za autentifikaciju',
       title: 'Dvostupanjska verifikacija',
+    },
+    web3Solana: {
+      subtitle: 'Odaberite novčanik u nastavku za prijavu',
+      title: 'Prijava putem Solane',
     },
   },
   signInEnterPasswordTitle: 'Unesite svoju lozinku',
@@ -836,31 +852,44 @@ export const hrHR: LocalizationResource = {
       title: 'Kreirajte svoj račun',
       titleCombined: 'Kreirajte svoj račun',
     },
+    web3Solana: {
+      subtitle: 'Odaberite novčanik u nastavku za registraciju',
+      title: 'Registracija putem Solane',
+    },
   },
   socialButtonsBlockButton: 'Nastavite s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Organizacija već postoji za otkriveni naziv tvrtke ({{organizationName}}) i {{organizationDomain}}. Pridružite se putem pozivnice.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Stvori novu organizaciju',
+      action__invitationAccept: 'Pridruži se',
+      action__suggestionsAccept: 'Zatraži pridruživanje',
+      subtitle: 'Pridružite se postojećoj organizaciji ili stvorite novu',
+      subtitle__createOrganizationDisabled: 'Pridružite se postojećoj organizaciji',
+      suggestionsAcceptedLabel: 'Čeka odobrenje',
+      title: 'Odaberite organizaciju',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Odustani',
+      formButtonSubmit: 'Nastavi',
+      formFieldInputPlaceholder__name: 'Moja organizacija',
+      formFieldInputPlaceholder__slug: 'moja-organizacija',
+      formFieldLabel__name: 'Naziv',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Unesite podatke o svojoj organizaciji za nastavak',
+      title: 'Postavite svoju organizaciju',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'Kontaktirajte administratora svoje organizacije za pozivnicu.',
+      title: 'Morate pripadati organizaciji',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Odjavi se',
+      actionText: 'Prijavljen kao {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -869,19 +898,89 @@ export const hrHR: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je već član organizacije.',
+    avatar_file_size_exceeded:
+      'Veličina datoteke premašuje maksimalno ograničenje od 10 MB. Molimo odaberite manju datoteku.',
+    avatar_file_type_invalid: 'Vrsta datoteke nije podržana. Molimo prenesite sliku u formatu JPG, PNG, GIF ili WEBP.',
     captcha_invalid:
       'Registracija neuspješna zbog neuspjelih sigurnosnih provjera. Molimo osvježite stranicu i pokušajte ponovno ili se obratite podršci za dodatnu pomoć.',
     captcha_unavailable:
       'Registracija neuspješna zbog neuspjele provjere bota. Molimo osvježite stranicu i pokušajte ponovno ili se obratite podršci za dodatnu pomoć.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Privremene e-mail usluge nisu podržane. Molimo koristite svoju redovitu e-mail adresu za kreiranje računa.',
     form_identifier_exists__email_address: 'Ova e-mail adresa je zauzeta. Molimo pokušajte s drugom.',
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušajte s drugim.',
     form_identifier_not_found: 'Nismo pronašli račun s tim podacima.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'E-mail adresa mora biti valjana e-mail adresa.',
     form_param_format_invalid__phone_number: 'Telefonski broj mora biti u valjanom međunarodnom formatu',
@@ -893,15 +992,19 @@ export const hrHR: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Vaša lozinka nije dovoljno jaka.',
+    form_password_or_identifier_incorrect:
+      'Lozinka ili e-mail adresa nisu točne. Pokušajte ponovno ili koristite drugu metodu.',
     form_password_pwned:
       'Ova lozinka je pronađena kao dio curenja podataka i ne može se koristiti, molimo pokušajte s drugom lozinkom.',
     form_password_pwned__sign_in:
       'Ova lozinka je pronađena kao dio curenja podataka i ne može se koristiti, molimo resetirajte svoju lozinku.',
     form_password_size_in_bytes_exceeded:
       'Vaša lozinka je premašila maksimalni dopušteni broj bajtova, molimo skratite je ili uklonite neke posebne znakove.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Netočna lozinka',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
@@ -935,6 +1038,9 @@ export const hrHR: LocalizationResource = {
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     session_exists: 'Već ste prijavljeni.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Odbili ste zahtjev za potpis. Pokušajte ponovno za nastavak.',
+    web3_solana_signature_generation_failed:
+      'Došlo je do pogreške pri generiranju potpisa. Pokušajte ponovno za nastavak.',
     zxcvbn: {
       couldBeStronger: 'Vaša lozinka funkcionira, ali mogla bi biti jača. Pokušajte dodati više znakova.',
       goodPassword: 'Vaša lozinka zadovoljava sve potrebne zahtjeve.',
@@ -1303,6 +1409,10 @@ export const hrHR: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Poveži novčanik',
         title: 'Web3 novčanici',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Odaberite Solana novčanik za povezivanje s vašim računom.',
+          title: 'Dodaj Solana novčanik',
+        },
       },
     },
     usernamePage: {
@@ -1326,16 +1436,22 @@ export const hrHR: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Prijavi se',
+      actionText: 'Već imaš pristup?',
+      formButton: 'Pridruži se listi čekanja',
+      subtitle: 'Unesi svoju e-mail adresu i obavijestit ćemo te kada tvoje mjesto bude spremno',
+      title: 'Pridruži se listi čekanja',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Uskoro ćeš biti preusmjeren...',
+      subtitle: 'Javit ćemo ti se kada tvoje mjesto bude spremno',
+      title: 'Hvala što si se pridružio/la listi čekanja!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Poveži se s {{walletName}}',
+    continue: 'Nastavi s {{walletName}}',
+    noneAvailable:
+      'Nisu otkrivene Solana Web3 novčanike. Instalirajte {{ solanaWalletsLink || link("wallet extension") }} s podrškom za Web3.',
   },
 } as const;

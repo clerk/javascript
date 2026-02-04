@@ -1,5 +1,4 @@
 import type {
-  ActiveSessionResource,
   ClientJSON,
   ClientJSONSnapshot,
   ClientResource,
@@ -10,6 +9,7 @@ import type {
 } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { eventBus } from '../events';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, Session, SignIn, SignUp } from './internal';
 
@@ -57,13 +57,6 @@ export class Client extends BaseResource implements ClientResource {
     return this.signIn;
   }
 
-  /**
-   * @deprecated Use `signedInSessions()` instead.
-   */
-  get activeSessions(): ActiveSessionResource[] {
-    return this.sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
-  }
-
   get signedInSessions(): SignedInSessionResource[] {
     return this.sessions.filter(s => s.status === 'active' || s.status === 'pending') as SignedInSessionResource[];
   }
@@ -99,6 +92,18 @@ export class Client extends BaseResource implements ClientResource {
       SessionTokenCache.clear();
       return e as unknown as ClientResource;
     });
+  }
+
+  resetSignIn(): void {
+    this.signIn = new SignIn(null);
+    // Cast needed because this.signIn is typed as SignInResource (interface), not SignIn (class extending BaseResource)
+    eventBus.emit('resource:error', { resource: this.signIn as SignIn, error: null });
+  }
+
+  resetSignUp(): void {
+    this.signUp = new SignUp(null);
+    // Cast needed because this.signUp is typed as SignUpResource (interface), not SignUp (class extending BaseResource)
+    eventBus.emit('resource:error', { resource: this.signUp as SignUp, error: null });
   }
 
   clearCache(): void {

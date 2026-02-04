@@ -69,7 +69,7 @@ export type __internal_LocalizationResource = {
   locale: string;
   maintenanceMode: LocalizationValue;
   /**
-   * Add role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
+   * Add Role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
    *
    * @experimental
    */
@@ -369,6 +369,11 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    web3Solana: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      noAvailableWallets: LocalizationValue;
+    };
   };
   signIn: {
     start: {
@@ -398,6 +403,13 @@ export type __internal_LocalizationResource = {
       actionLink: LocalizationValue;
     };
     passwordPwned: {
+      title: LocalizationValue;
+    };
+    /** @deprecated Use `passwordCompromised` instead */
+    passwordUntrusted: {
+      title: LocalizationValue;
+    };
+    passwordCompromised: {
       title: LocalizationValue;
     };
     passkey: {
@@ -537,6 +549,10 @@ export type __internal_LocalizationResource = {
       action__signOutAll: LocalizationValue;
     };
     enterpriseConnections: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
+    web3Solana: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
@@ -702,6 +718,10 @@ export type __internal_LocalizationResource = {
         primaryButton: LocalizationValue;
         destructiveAction: LocalizationValue;
         detailsAction__nonPrimary: LocalizationValue;
+        web3SelectSolanaWalletScreen: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
       };
       dangerSection: {
         title: LocalizationValue;
@@ -1108,6 +1128,12 @@ export type __internal_LocalizationResource = {
           primaryButton: LocalizationValue;
         };
       };
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
+      };
     };
     billingPage: {
       title: LocalizationValue;
@@ -1278,19 +1304,96 @@ export type __internal_LocalizationResource = {
     chooseOrganization: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      subtitle__createOrganizationDisabled: LocalizationValue;
       suggestionsAcceptedLabel: LocalizationValue;
       action__suggestionsAccept: LocalizationValue;
       action__createOrganization: LocalizationValue;
       action__invitationAccept: LocalizationValue;
     };
+    organizationCreationDisabled: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
+    alerts: {
+      organizationAlreadyExists: LocalizationValue<'organizationDomain' | 'organizationName'>;
+    };
   };
   taskResetPassword: {
     title: LocalizationValue;
+    subtitle: LocalizationValue;
     signOut: {
       actionLink: LocalizationValue;
       actionText: LocalizationValue<'identifier'>;
     };
     formButtonPrimary: LocalizationValue;
+  };
+  taskSetupMfa: {
+    badge: LocalizationValue;
+    start: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      methodSelection: {
+        totp: LocalizationValue;
+        phoneCode: LocalizationValue;
+      };
+    };
+    smsCode: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      addPhoneNumber: LocalizationValue;
+      cancel: LocalizationValue;
+      verifyPhone: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        formTitle: LocalizationValue;
+        resendButton: LocalizationValue;
+        formButtonPrimary: LocalizationValue;
+      };
+      addPhone: {
+        infoText: LocalizationValue;
+        formButtonPrimary: LocalizationValue;
+      };
+      success: {
+        title: LocalizationValue;
+        message1: LocalizationValue;
+        message2: LocalizationValue;
+        finishButton: LocalizationValue;
+      };
+    };
+    totpCode: {
+      title: LocalizationValue;
+      addAuthenticatorApp: {
+        infoText__ableToScan: LocalizationValue;
+        infoText__unableToScan: LocalizationValue;
+        inputLabel__unableToScan1: LocalizationValue;
+        buttonUnableToScan__nonPrimary: LocalizationValue;
+        buttonAbleToScan__nonPrimary: LocalizationValue;
+        formButtonPrimary: LocalizationValue;
+        formButtonReset: LocalizationValue;
+      };
+      verifyTotp: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        formTitle: LocalizationValue;
+        formButtonPrimary: LocalizationValue;
+        formButtonReset: LocalizationValue;
+      };
+      success: {
+        title: LocalizationValue;
+        message1: LocalizationValue;
+        message2: LocalizationValue;
+        finishButton: LocalizationValue;
+      };
+    };
+    signOut: {
+      actionText: LocalizationValue<'identifier'>;
+      actionLink: LocalizationValue;
+    };
+  };
+  web3SolanaWalletButtons: {
+    connect: LocalizationValue<'walletName'>;
+    continue: LocalizationValue<'walletName'>;
+    noneAvailable: LocalizationValue<'solanaWalletsLink'>;
   };
 };
 
@@ -1298,6 +1401,8 @@ type WithParamName<T> = T &
   Partial<Record<`${keyof T & string}__${CamelToSnake<Exclude<FieldId, 'role'>>}`, LocalizationValue>>;
 
 type UnstableErrors = WithParamName<{
+  avatar_file_type_invalid: LocalizationValue;
+  avatar_file_size_exceeded: LocalizationValue;
   external_account_not_found: LocalizationValue;
   identification_deletion_failed: LocalizationValue;
   phone_number_exists: LocalizationValue;
@@ -1310,8 +1415,14 @@ type UnstableErrors = WithParamName<{
   passkey_registration_cancelled: LocalizationValue;
   passkey_already_exists: LocalizationValue;
   web3_missing_identifier: LocalizationValue;
+  web3_solana_signature_generation_failed: LocalizationValue;
+  web3_signature_request_rejected: LocalizationValue;
   form_password_pwned: LocalizationValue;
   form_password_pwned__sign_in: LocalizationValue;
+  form_new_password_matches_current: LocalizationValue;
+  /** @deprecated Use `form_password_compromised__sign_in` instead */
+  form_password_untrusted__sign_in: LocalizationValue;
+  form_password_compromised__sign_in: LocalizationValue;
   form_username_invalid_length: LocalizationValue<'min_length' | 'max_length'>;
   form_username_needs_non_number_char: LocalizationValue;
   form_username_invalid_character: LocalizationValue;
@@ -1320,10 +1431,12 @@ type UnstableErrors = WithParamName<{
   form_param_type_invalid: LocalizationValue;
   form_param_type_invalid__phone_number: LocalizationValue;
   form_param_type_invalid__email_address: LocalizationValue;
+  form_email_address_blocked: LocalizationValue;
   form_password_length_too_short: LocalizationValue;
   form_param_nil: LocalizationValue;
   form_code_incorrect: LocalizationValue;
   form_password_incorrect: LocalizationValue;
+  form_password_or_identifier_incorrect: LocalizationValue;
   form_password_validation_failed: LocalizationValue;
   not_allowed_access: LocalizationValue;
   form_identifier_exists: LocalizationValue;

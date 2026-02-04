@@ -11,13 +11,13 @@ import {
   getAuthObjectForAcceptedToken,
   getAuthObjectFromJwt,
   invalidTokenAuthObject,
-  isMachineTokenByPrefix,
+  isMachineToken,
   isTokenTypeAccepted,
   signedOutAuthObject,
   TokenType,
 } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
-import type { PendingSessionOptions } from '@clerk/types';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
 import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
@@ -147,7 +147,7 @@ const handleMachineToken = (
   acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
   options: Record<string, any>,
 ): MachineAuthObject<MachineTokenType> | null => {
-  const hasMachineToken = bearerToken && isMachineTokenByPrefix(bearerToken);
+  const hasMachineToken = bearerToken && isMachineToken(bearerToken);
 
   const acceptsOnlySessionToken =
     acceptsToken === TokenType.SessionToken ||

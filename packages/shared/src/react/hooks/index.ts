@@ -1,7 +1,13 @@
 export { assertContextExists, createContextAndHook } from './createContextAndHook';
 export { useAPIKeys as __experimental_useAPIKeys } from './useAPIKeys';
 export { useOrganization } from './useOrganization';
+export { useOrganizationCreationDefaults } from './useOrganizationCreationDefaults';
+export type {
+  UseOrganizationCreationDefaultsParams,
+  UseOrganizationCreationDefaultsReturn,
+} from './useOrganizationCreationDefaults.types';
 export { useOrganizationList } from './useOrganizationList';
+export { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 export { useSafeLayoutEffect } from './useSafeLayoutEffect';
 export { useSession } from './useSession';
 export { useSessionList } from './useSessionList';
@@ -20,7 +26,7 @@ export { useCheckout as __experimental_useCheckout } from './useCheckout';
  * Internal hooks to be consumed only by `@clerk/clerk-js`.
  * These are not considered part of the public API and their query keys can change without notice.
  *
- * These exist here in order to keep RQ and SWR implementations in a centralized place.
+ * These exist here in order to keep React Query implementations in a centralized place.
  */
 export { __internal_useStatementQuery } from './useStatementQuery';
 export { __internal_usePlanDetailsQuery } from './usePlanDetailsQuery';

@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest } from '@clerk/types';
+import type { ClerkPaginationRequest } from '@clerk/shared/types';
 
 import { joinPaths } from '../../util/path';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
@@ -67,7 +67,7 @@ export class InvitationAPI extends AbstractAPI {
   }
 
   public async createInvitationBulk(params: CreateBulkParams) {
-    return this.request<Invitation>({
+    return this.request<Invitation[]>({
       method: 'POST',
       path: joinPaths(basePath, 'bulk'),
       bodyParams: params,

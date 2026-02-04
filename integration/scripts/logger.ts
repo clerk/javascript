@@ -34,6 +34,11 @@ export const createLogger = (opts: CreateLoggerOptions) => {
         console.info(`${chalk[prefixColor](`[${prefix}]`)} ${msg}`);
       }
     },
+    warn: (msg: string, error?: unknown) => {
+      const errorMsg = error instanceof Error ? error.message : typeof error === 'string' ? error : '';
+      const fullMsg = errorMsg ? `${msg} ${errorMsg}` : msg;
+      console.warn(`${chalk.yellow(`[${prefix}]`)} ${fullMsg}`);
+    },
     child: (childOpts: CreateLoggerOptions) => {
       return createLogger({ prefix: `${prefix} :: ${childOpts.prefix}`, color: prefixColor });
     },

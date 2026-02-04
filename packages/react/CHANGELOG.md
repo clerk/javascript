@@ -1,5 +1,49 @@
 # Change Log
 
+## 5.58.1
+
+### Patch Changes
+
+- Re-export experimental `useAPIKeys` hook ([#7387](https://github.com/clerk/javascript/pull/7387)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Allow reordering API Keys and Billing pages in `<UserProfile />` and `<OrganizationProfile />`. ([#7383](https://github.com/clerk/javascript/pull/7383)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  export function CustomUserProfile() {
+    return (
+      <UserProfile>
+        <UserProfile.Page label='apiKeys' />
+        <UserProfile.Page label='billing' />
+      </UserProfile>
+    );
+  }
+  ```
+
+- Updated dependencies [[`b117ebc`](https://github.com/clerk/javascript/commit/b117ebc956e1a5d48d5fdb7210de3344a74a524a)]:
+  - @clerk/shared@3.39.0
+
+## 5.58.0
+
+### Minor Changes
+
+- Introduce new `<TaskResetPassword/>` session task component ([#7314](https://github.com/clerk/javascript/pull/7314)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Updated dependencies [[`e31f3d5`](https://github.com/clerk/javascript/commit/e31f3d567302f99d8d073ba75cd934fb3c1eca7f), [`8376789`](https://github.com/clerk/javascript/commit/8376789de2383b52fabc563a9382622627055ecd), [`f917d68`](https://github.com/clerk/javascript/commit/f917d68fc2fc5d317770491e9d4d7185e1985d04), [`818c25a`](https://github.com/clerk/javascript/commit/818c25a9eec256245152725c64419c73e762c1a2), [`b41c0d5`](https://github.com/clerk/javascript/commit/b41c0d539835a5a43d15e3399bac7cbf046d9345)]:
+  - @clerk/shared@3.38.0
+
+## 5.57.1
+
+### Patch Changes
+
+- Fixed an issue where `<APIKeys />` mounted in a custom page caused an application to freeze. ([#7316](https://github.com/clerk/javascript/pull/7316)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`40a841d`](https://github.com/clerk/javascript/commit/40a841d56cd8983dce21376c832f1085c43a9518), [`f364924`](https://github.com/clerk/javascript/commit/f364924708f20f0bc7b8b291ea2ae01ce09e2e9f), [`f115e56`](https://github.com/clerk/javascript/commit/f115e56d14b5c49f52b6aca01b434dbe4f6193cf), [`d4aef71`](https://github.com/clerk/javascript/commit/d4aef71961d6d0abf8f1d1142c4e3ae943181c4b), [`3f99742`](https://github.com/clerk/javascript/commit/3f997427e400248502b0977e1b69e109574dfe7d), [`02798f5`](https://github.com/clerk/javascript/commit/02798f571065d8142cf1dade57b42b3e8ce0f818), [`07a30ce`](https://github.com/clerk/javascript/commit/07a30ce52b7d2ba85ce3533879700b9ec129152e), [`ce8b914`](https://github.com/clerk/javascript/commit/ce8b9149bff27866cdb686f1ab0b56cef8d8c697)]:
+  - @clerk/shared@3.37.0
+
 ## 5.57.0
 
 ### Minor Changes
