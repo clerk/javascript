@@ -5,7 +5,7 @@ import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern: ['next.cacheComponents'] })(
-  'Next.js Cache Components @nextjs',
+  'Next.js Cache Components @cache-components',
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });
 
