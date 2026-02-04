@@ -2,4 +2,4 @@
 "@clerk/backend": patch
 ---
 
-Reject OAuth JWTs for session token token type
+Improved token type validation in authentication requests
