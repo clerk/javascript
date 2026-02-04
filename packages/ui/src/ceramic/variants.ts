@@ -2,11 +2,11 @@ import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 // eslint-disable-next-line no-restricted-imports
 import type { Interpolation, Theme } from '@emotion/react';
 
-import { type MosaicTheme } from './theme';
+import { type CeramicTheme } from './theme';
 
 type CSSObject = Record<string, any>;
-// StyleFunction uses MosaicTheme to provide proper typing for theme parameter
-type StyleFunction = (theme: MosaicTheme) => CSSObject;
+// StyleFunction uses CeramicTheme to provide proper typing for theme parameter
+type StyleFunction = (theme: CeramicTheme) => CSSObject;
 type StyleRule = CSSObject | StyleFunction;
 
 // Convert string literal "true" | "false" to boolean (CVA's StringToBoolean)
@@ -53,7 +53,7 @@ type VariantsConfig<T> = {
 };
 
 /**
- * Identity function that provides MosaicTheme typing for style functions.
+ * Identity function that provides CeramicTheme typing for style functions.
  * Use this to get autocomplete and type checking for theme properties.
  *
  * @example
@@ -70,7 +70,7 @@ type VariantsConfig<T> = {
  */
 export const style = (fn: StyleFunction): StyleFunction => fn;
 
-function resolveStyleRule(rule: StyleRule | undefined, theme: MosaicTheme): CSSObject {
+function resolveStyleRule(rule: StyleRule | undefined, theme: CeramicTheme): CSSObject {
   if (!rule) {
     return {};
   }
@@ -145,11 +145,11 @@ export function variants<T>(config: VariantsConfig<T>) {
 
   return (props: ConfigVariants<T> = {}): Interpolation<Theme> => {
     return ((theme: Theme) => {
-      const mosaicTheme = theme as unknown as MosaicTheme;
+      const ceramicTheme = theme as unknown as CeramicTheme;
       const computedStyles: CSSObject = {};
       const variantDefs = variantDefinitions as Record<string, Record<string, StyleRule>>;
 
-      const baseStyles = resolveStyleRule(base, mosaicTheme);
+      const baseStyles = resolveStyleRule(base, ceramicTheme);
       if (baseStyles && typeof baseStyles === 'object') {
         fastDeepMergeAndReplace(baseStyles, computedStyles);
       }
@@ -165,14 +165,14 @@ export function variants<T>(config: VariantsConfig<T>) {
         const variantDef = variantDefs[variantKey];
         const normalizedValue = normalizeVariantValue(variantValue);
         if (variantDef && normalizedValue in variantDef) {
-          const variantStyle = resolveStyleRule(variantDef[normalizedValue], mosaicTheme);
+          const variantStyle = resolveStyleRule(variantDef[normalizedValue], ceramicTheme);
           fastDeepMergeAndReplace(variantStyle, computedStyles);
         }
       }
 
       for (const compoundVariant of compoundVariants) {
         if (conditionMatches(compoundVariant, variantsToApply)) {
-          const compoundStyles = resolveStyleRule(compoundVariant.styles, mosaicTheme);
+          const compoundStyles = resolveStyleRule(compoundVariant.styles, ceramicTheme);
           fastDeepMergeAndReplace(compoundStyles, computedStyles);
         }
       }

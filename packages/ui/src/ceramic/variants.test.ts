@@ -2,13 +2,13 @@
 import type { Interpolation, Theme } from '@emotion/react';
 import { describe, expect, it } from 'vitest';
 
-import { mosaicTheme } from './theme';
+import { ceramicTheme } from './theme';
 import { style, variants } from './variants';
 
 // Helper to extract the CSS object from Interpolation<Theme>
 function getStyles(interpolation: Interpolation<Theme>): Record<string, unknown> {
   if (typeof interpolation === 'function') {
-    return interpolation(mosaicTheme as unknown as Theme) as Record<string, unknown>;
+    return interpolation(ceramicTheme as unknown as Theme) as Record<string, unknown>;
   }
   if (interpolation == null) {
     return {};
@@ -38,8 +38,8 @@ describe('variants', () => {
 
     const result = getStyles(buttonStyles());
     expect(result).toEqual({
-      padding: mosaicTheme.spacing[4],
-      color: mosaicTheme.colors.white,
+      padding: ceramicTheme.spacing[4],
+      color: ceramicTheme.colors.white,
     });
   });
 
@@ -76,8 +76,8 @@ describe('variants', () => {
 
     const result = getStyles(buttonStyles({ variant: 'primary' }));
     expect(result).toEqual({
-      background: mosaicTheme.colors.purple[700],
-      color: mosaicTheme.colors.white,
+      background: ceramicTheme.colors.purple[700],
+      color: ceramicTheme.colors.white,
     });
   });
 
@@ -230,7 +230,7 @@ describe('variants', () => {
     expect(result).toEqual({
       fontSize: '0.75rem',
       background: 'blue',
-      border: `1px solid ${mosaicTheme.colors.purple[700]}`,
+      border: `1px solid ${ceramicTheme.colors.purple[700]}`,
     });
   });
 
@@ -360,21 +360,21 @@ describe('variants', () => {
 
 describe('style', () => {
   it('returns the function unchanged', () => {
-    const fn = (theme: typeof mosaicTheme) => ({ color: theme.colors.white });
+    const fn = (theme: typeof ceramicTheme) => ({ color: theme.colors.white });
     const result = style(fn);
     expect(result).toBe(fn);
   });
 
-  it('provides MosaicTheme typing', () => {
+  it('provides CeramicTheme typing', () => {
     const fn = style(theme => ({
       color: theme.colors.white,
       padding: theme.spacing[4],
     }));
 
-    const result = fn(mosaicTheme);
+    const result = fn(ceramicTheme);
     expect(result).toEqual({
-      color: mosaicTheme.colors.white,
-      padding: mosaicTheme.spacing[4],
+      color: ceramicTheme.colors.white,
+      padding: ceramicTheme.spacing[4],
     });
   });
 });

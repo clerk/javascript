@@ -284,7 +284,7 @@ const fontRendering = {
   textSizeAdjust: '100%',
 } as const;
 
-export const mosaicTheme = {
+export const ceramicTheme = {
   ...baseTheme,
   focusRing: () => ({
     outline: `2px solid ${baseTheme.colors.purple[700]}`,
@@ -293,4 +293,4 @@ export const mosaicTheme = {
   fontRendering,
 } as const;
 
-export type MosaicTheme = typeof mosaicTheme;
+export type CeramicTheme = typeof ceramicTheme;

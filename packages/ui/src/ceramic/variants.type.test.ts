@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, it } from 'vitest';
 
-import type { MosaicTheme } from './theme';
+import type { CeramicTheme } from './theme';
 import { style, variants } from './variants';
 
 describe('variants type tests', () => {
@@ -114,14 +114,14 @@ describe('variants type tests', () => {
   });
 
   describe('style helper', () => {
-    it('provides MosaicTheme typing for theme parameter', () => {
+    it('provides CeramicTheme typing for theme parameter', () => {
       const fn = style(theme => {
-        // Theme parameter should be typed as MosaicTheme
+        // Theme parameter should be typed as CeramicTheme
         return { color: theme.colors.white };
       });
 
       expectTypeOf(fn).toBeFunction();
-      expectTypeOf<Parameters<typeof fn>[0]>().toEqualTypeOf<MosaicTheme>();
+      expectTypeOf<Parameters<typeof fn>[0]>().toEqualTypeOf<CeramicTheme>();
     });
 
     it('returns StyleFunction type', () => {
