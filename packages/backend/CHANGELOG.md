@@ -1,5 +1,17 @@
 # Change Log
 
+## 2.30.0
+
+### Minor Changes
+
+- Add `lastSignInAtAfter` and `lastSignInAtBefore` filters to the Users API list and count endpoints. ([#7721](https://github.com/clerk/javascript/pull/7721)) by [@Jibaru](https://github.com/Jibaru)
+
+  These parameters are supported by `users.getUserList()` and are forwarded to `/v1/users` and `/v1/users/count` to filter users by last sign-in timestamp.
+
+### Patch Changes
+
+- Fixed an issue where JWT OAuth access tokens where not treated as a machine token ([#7756](https://github.com/clerk/javascript/pull/7756)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 2.29.7
 
 ### Patch Changes

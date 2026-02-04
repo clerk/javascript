@@ -1,5 +1,11 @@
 # @clerk/vue
 
+## 1.17.12
+
+### Patch Changes
+
+- Fixed an error occurring in the composables where watchers attempted to call unwatch() within their own initialization. ([#7744](https://github.com/clerk/javascript/pull/7744)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 1.17.11
 
 ### Patch Changes
