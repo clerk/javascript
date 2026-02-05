@@ -45,6 +45,26 @@
         "types": "./dist/types/index.d.ts",
         "default": "./dist/clerk.no-rhc.js"
       }
+    },
+    "./bundled": {
+      "react-server": {
+        "types": "./dist/esm/server.d.mts",
+        "import": "./dist/esm/server.mjs",
+        "default": "./dist/esm/server.mjs"
+      },
+      "types": "./dist/esm/bundled.d.mts",
+      "import": "./dist/esm/bundled.mjs",
+      "default": "./dist/esm/bundled.mjs"
+    },
+    "./entry": {
+      "types": "./dist/esm/entry.d.mts",
+      "import": "./dist/esm/entry.mjs",
+      "default": "./dist/esm/entry.mjs"
+    },
+    "./internal": {
+      "types": "./dist/esm/internal/index.d.mts",
+      "import": "./dist/esm/internal/index.mjs",
+      "default": "./dist/esm/internal/index.mjs"
     }
   },
   "main": "dist/clerk.js",
@@ -56,9 +76,10 @@
     "no-rhc"
   ],
   "scripts": {
-    "build": "pnpm build:bundle && pnpm build:declarations",
+    "build": "pnpm build:bundle && pnpm build:esm && pnpm build:declarations",
     "build:analyze": "rspack build --config rspack.config.js --env production --env variant=\"clerk.browser\" --env analysis --analyze",
     "build:bundle": "pnpm clean && rspack build --config rspack.config.js --env production",
+    "build:esm": "tsdown",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "build:sandbox": "pnpm --filter @clerk/ui build:umd && rspack build --config rspack.config.js --env production --env sandbox",
     "build:stats": "rspack build --config rspack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
@@ -114,6 +135,7 @@
     "bundlewatch": "^0.4.1",
     "jsdom": "26.1.0",
     "minimatch": "^10.0.3",
+    "tsdown": "catalog:repo",
     "webpack-merge": "^5.10.0"
   },
   "engines": {
