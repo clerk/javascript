@@ -22,8 +22,9 @@ export const isClerkUseCacheError = (e: unknown): e is ClerkUseCacheError => {
 };
 
 // Patterns for Next.js "use cache" errors - tightened to reduce false positives
+// Matches both "use cache" (double quotes) and 'use cache' (single quotes)
 const USE_CACHE_WITH_DYNAMIC_API_PATTERN =
-  /inside\s+"use cache"|"use cache".*(?:headers|cookies)|(?:headers|cookies).*"use cache"/i;
+  /inside\s+["']use cache["']|["']use cache["'].*(?:headers|cookies)|(?:headers|cookies).*["']use cache["']/i;
 const CACHE_SCOPE_PATTERN = /cache scope/i;
 const DYNAMIC_DATA_SOURCE_PATTERN = /dynamic data source/i;
 // https://github.com/vercel/next.js/pull/61332

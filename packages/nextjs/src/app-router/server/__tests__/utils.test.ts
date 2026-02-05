@@ -86,8 +86,13 @@ describe('isNextjsUseCacheError', () => {
     expect(isNextjsUseCacheError({})).toBe(false);
   });
 
-  it('returns true for "use cache" errors', () => {
+  it('returns true for "use cache" errors with double quotes', () => {
     const error = new Error('Route /example used `headers()` inside "use cache"');
+    expect(isNextjsUseCacheError(error)).toBe(true);
+  });
+
+  it("returns true for 'use cache' errors with single quotes", () => {
+    const error = new Error("Route /example used `cookies()` inside 'use cache'");
     expect(isNextjsUseCacheError(error)).toBe(true);
   });
 
