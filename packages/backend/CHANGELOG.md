@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.30.1
+
+### Patch Changes
+
+- Improved token type validation in authentication requests ([#7764](https://github.com/clerk/javascript/pull/7764)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 2.30.0
 
 ### Minor Changes
