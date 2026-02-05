@@ -1522,10 +1522,15 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
    * The browser controls user settings, displays user prompts, and only contacts
    * an Identity Provider such as Google after explicit user consent.
    *
-   * When enabled:
-   * - Uses browser-native FedCM API (Chrome 116+, Edge 116+)
-   * - Falls back to legacy mode in unsupported browsers
-   * - Requires HTTPS in production
+   * Requirements:
+   * - Chrome 117+ or Edge 117+ (falls back to legacy mode in older browsers)
+   * - HTTPS in production
+   * - Proper Content Security Policy (CSP) configuration
+   *
+   * Troubleshooting:
+   * - If you see "NetworkError: Failed to execute 'get'" or CORS errors, check your CSP headers
+   * - Add `connect-src https://accounts.google.com` to your CSP policy
+   * - Set to `false` to temporarily use legacy mode while debugging
    *
    * @see https://developers.google.com/identity/gsi/web/guides/fedcm-migration
    * @default true

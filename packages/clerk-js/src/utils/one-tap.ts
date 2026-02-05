@@ -20,21 +20,12 @@ interface PromptMomentNotification {
   getMomentType?: () => 'display' | 'skipped' | 'dismissed';
 }
 
-// FedCM-compatible
+// FedCM-compatible (dismissed moment still works)
 interface FedCMNotification {
-  isDisplayed?: () => boolean;
-  isNotDisplayed?: () => boolean;
-  getNotDisplayedReason?: () =>
-    | 'browser_not_supported'
-    | 'invalid_client'
-    | 'missing_client_id'
-    | 'opt_out_or_no_session'
-    | 'secure_http_required'
-    | 'suppressed_by_user'
-    | 'unregistered_origin'
-    | 'unknown_reason';
+  isDismissedMoment?: () => boolean;
+  getDismissedReason?: () => 'credential_returned' | 'cancel' | 'flow_restarted' | 'tap_outside' | 'user_cancel';
+  // Note: isSkippedMoment works but without detailed reasons
   isSkippedMoment?: () => boolean;
-  getSkippedReason?: () => 'auto_cancel' | 'user_cancel' | 'tap_outside' | 'issuing_failed';
 }
 
 // Unified type supporting both
@@ -63,7 +54,9 @@ declare global {
 async function loadGIS() {
   if (!window.google) {
     try {
-      await loadScript('https://accounts.google.com/gsi/client', { defer: true });
+      // Add timestamp to prevent caching issues with updated FedCM endpoints
+      const cacheBuster = `?cb=${Date.now()}`;
+      await loadScript(`https://accounts.google.com/gsi/client${cacheBuster}`, { defer: true });
     } catch {
       // Rethrow with specific message
       clerkFailedToLoadThirdPartyScript('Google Identity Services');
