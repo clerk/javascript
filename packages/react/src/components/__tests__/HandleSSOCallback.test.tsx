@@ -104,7 +104,6 @@ describe('<HandleSSOCallback />', () => {
         navigateToApp={mockNavigateToApp}
         navigateToSignIn={mockNavigateToSignIn}
         navigateToSignUp={mockNavigateToSignUp}
-        render={() => <div data-testid='custom-render'>Loading...</div>}
       />,
     );
 
