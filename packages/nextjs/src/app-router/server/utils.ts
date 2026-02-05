@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import React from 'react';
 
 export const isPrerenderingBailout = (e: unknown) => {
   if (!(e instanceof Error) || !('message' in e)) {
@@ -83,3 +84,19 @@ export function getScriptNonceFromHeader(cspHeaderValue: string): string | undef
 
   return nonce;
 }
+
+/**
+ * Fetches the nonce from request headers.
+ * Uses React.cache to deduplicate calls within the same request.
+ */
+export const getNonce = React.cache(async function getNonce(): Promise<string> {
+  // Dynamically import next/headers
+  // @ts-expect-error: Cannot find module 'next/headers' or its corresponding type declarations.ts(2307)
+  const { headers } = await import('next/headers');
+  const headersList = await headers();
+  const nonce = headersList.get('X-Nonce');
+  return nonce
+    ? nonce
+    : // Fallback to extracting from CSP header
+      getScriptNonceFromHeader(headersList.get('Content-Security-Policy') || '') || '';
+});

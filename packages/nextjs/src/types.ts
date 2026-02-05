@@ -23,4 +23,10 @@ export type NextClerkProviderProps<TUi extends Ui = Ui> = Without<ClerkProviderP
    * @default false
    */
   dynamic?: boolean;
+  /**
+   * @internal
+   * If set to true, the client ClerkProvider will not render ClerkScripts.
+   * Used when scripts are rendered server-side in a Suspense boundary.
+   */
+  __internal_skipScripts?: boolean;
 };
