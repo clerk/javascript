@@ -22,10 +22,17 @@ vi.mock('../../contexts', () => {
   return {
     useAssertWrappedByClerkProvider: () => {},
     useClerkInstanceContext: () => mockClerk,
-    useUserContext: () => (mockClerk.loaded ? mockUser : null),
-    useOrganizationContext: () => ({ organization: mockClerk.loaded ? mockOrganization : null }),
+    useInitialStateContext: () => undefined,
   };
 });
+
+vi.mock('../base/useUserBase', () => ({
+  useUserBase: () => (mockClerk.loaded ? mockUser : null),
+}));
+
+vi.mock('../base/useOrganizationBase', () => ({
+  useOrganizationBase: () => (mockClerk.loaded ? mockOrganization : null),
+}));
 
 type DummyResource = { id: string } & ClerkResource;
 type DummyParams = { initialPage?: number; pageSize?: number } & { orgId?: string };

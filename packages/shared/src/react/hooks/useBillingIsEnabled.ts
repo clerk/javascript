@@ -1,5 +1,7 @@
 import type { ForPayerType } from '../../types/billing';
-import { useClerkInstanceContext, useOrganizationContext, useUserContext } from '../contexts';
+import { useClerkInstanceContext } from '../contexts';
+import { useOrganizationBase } from './base/useOrganizationBase';
+import { useUserBase } from './base/useUserBase';
 
 /**
  * @internal
@@ -12,8 +14,8 @@ export function useBillingIsEnabled(params?: { for?: ForPayerType; enabled?: boo
   // @ts-expect-error `__internal_environment` is not typed
   const environment = clerk.__internal_environment as unknown as EnvironmentResource | null | undefined;
 
-  const user = useUserContext();
-  const { organization } = useOrganizationContext();
+  const user = useUserBase();
+  const organization = useOrganizationBase();
 
   const userBillingEnabled = environment?.commerceSettings.billing.user.enabled;
   const orgBillingEnabled = environment?.commerceSettings.billing.organization.enabled;
