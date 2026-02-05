@@ -1,4 +1,5 @@
 import type { Ui } from './internal';
+import { UI_BRAND } from './internal';
 import type { Appearance } from './internal/appearance';
 
 import { ClerkUi } from './ClerkUi';
@@ -19,6 +20,7 @@ declare const PACKAGE_VERSION: string;
  * ```
  */
 export const ui = {
+  __brand: UI_BRAND,
   version: PACKAGE_VERSION,
   ClerkUI: ClerkUi,
-} as Ui<Appearance>;
+} as unknown as Ui<Appearance>;

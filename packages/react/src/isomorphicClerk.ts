@@ -522,9 +522,16 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     // Support bundled UI via ui.ClerkUI prop
-    const uiProp = (this.options as { ui?: { ClerkUI?: ClerkUiConstructor } }).ui;
+    const uiProp = (this.options as { ui?: { __brand?: string; ClerkUI?: ClerkUiConstructor } }).ui;
     if (uiProp?.ClerkUI) {
       return uiProp.ClerkUI;
+    }
+
+    // Support server-safe UI marker (react-server condition)
+    // When ui prop is present but ClerkUI is absent, dynamically import
+    if (uiProp?.__brand === '__clerkUI') {
+      const { ClerkUi } = await import('@clerk/ui/entry');
+      return ClerkUi;
     }
 
     if (this.options.prefetchUI === false) {

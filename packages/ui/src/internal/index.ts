@@ -21,12 +21,28 @@ declare const Tags: unique symbol;
 type Tagged<BaseType, Tag extends PropertyKey> = BaseType & { [Tags]: { [K in Tag]: void } };
 
 /**
+ * Runtime brand value to identify valid UI objects
+ */
+export const UI_BRAND = '__clerkUI' as const;
+
+/**
  * Ui type that carries appearance type information via phantom property
  * Tagged to ensure only official ui objects from @clerk/ui can be used
+ *
+ * ClerkUI is optional to support server-safe marker exports (react-server condition).
+ * When ClerkUI is absent, the SDK will dynamically import it.
  */
 export type Ui<A = any> = Tagged<
   {
-    ClerkUI: ClerkUiConstructor;
+    /**
+     * Runtime brand to identify valid UI objects
+     */
+    __brand: typeof UI_BRAND;
+    /**
+     * ClerkUI constructor. Optional to support server-safe marker exports.
+     * When absent (e.g., in React Server Components), the SDK resolves it via dynamic import.
+     */
+    ClerkUI?: ClerkUiConstructor;
     /**
      * Version of the UI package (for potential future use)
      */
