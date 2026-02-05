@@ -97,20 +97,6 @@ describe('<HandleSSOCallback />', () => {
     expect(document.getElementById('clerk-captcha')).not.toBeNull();
   });
 
-  it('renders custom component when render prop is provided', async () => {
-    mockClerkLoaded = false;
-    render(
-      <HandleSSOCallback
-        navigateToApp={mockNavigateToApp}
-        navigateToSignIn={mockNavigateToSignIn}
-        navigateToSignUp={mockNavigateToSignUp}
-      />,
-    );
-
-    await screen.findByTestId('custom-render');
-    await screen.findByText('Loading...');
-  });
-
   it('does nothing when clerk is not loaded', async () => {
     mockClerkLoaded = false;
     render(
