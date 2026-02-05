@@ -55,6 +55,7 @@ export * from './SignInTokens';
 export * from './SignUpAttempt';
 export * from './SMSMessage';
 export * from './TestingToken';
+export * from './TestSessionToken';
 export * from './Token';
 export * from './User';
 export * from './Verification';
