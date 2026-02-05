@@ -4,6 +4,7 @@ import { AbstractAPI } from './AbstractApi';
 type CreateTestSessionTokenParams = {
   userId: string;
   sessionMaxDurationInSeconds?: number;
+  redirectUrl?: string;
 };
 
 const basePath = '/test_session_tokens';
