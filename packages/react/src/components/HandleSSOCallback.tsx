@@ -17,11 +17,6 @@ export interface HandleSSOCallbackProps {
    * Called when a sign-in is transfered to a sign-up that requires additional verification.
    */
   navigateToSignUp: () => void;
-  /**
-   * Can be provided to render a custom component while the SSO callback is being processed. This component should, at
-   * a minimum, render a `<div id='clerk-captcha'></div>` element to handle captchas.
-   */
-  render?: () => ReactNode;
 }
 
 /**
@@ -69,7 +64,7 @@ export interface HandleSSOCallbackProps {
  * ```
  */
 export function HandleSSOCallback(props: HandleSSOCallbackProps): ReactNode {
-  const { navigateToApp, navigateToSignIn, navigateToSignUp, render } = props;
+  const { navigateToApp, navigateToSignIn, navigateToSignUp } = props;
   const clerk = useClerk();
   const { signIn } = useSignIn();
   const { signUp } = useSignUp();
@@ -164,10 +159,6 @@ export function HandleSSOCallback(props: HandleSSOCallbackProps): ReactNode {
       }
     })();
   }, [clerk, signIn, signUp]);
-
-  if (render) {
-    return render();
-  }
 
   return (
     <div>
