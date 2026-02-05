@@ -1,4 +1,4 @@
-import { useClientContext } from '@clerk/shared/react';
+import { __internal_useClientBase } from '@clerk/shared/react';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { UseSignInReturn } from '@clerk/shared/types';
 
@@ -53,7 +53,7 @@ export const useSignIn = (): UseSignInReturn => {
   useAssertWrappedByClerkProvider('useSignIn');
 
   const isomorphicClerk = useIsomorphicClerkContext();
-  const client = useClientContext();
+  const client = __internal_useClientBase();
 
   isomorphicClerk.telemetry?.record(eventMethodCalled('useSignIn'));
 

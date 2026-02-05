@@ -3,21 +3,10 @@
 import type { PropsWithChildren } from 'react';
 import React, { useState } from 'react';
 
-import type {
-  BillingSubscriptionPlanPeriod,
-  ClerkOptions,
-  ForPayerType,
-  InitialState,
-  LoadedClerk,
-  OrganizationResource,
-} from '../types';
-import { useOrganizationBase } from './hooks/base/useOrganizationBase';
+import type { BillingSubscriptionPlanPeriod, ClerkOptions, ForPayerType, InitialState, LoadedClerk } from '../types';
 import { createContextAndHook } from './hooks/createContextAndHook';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
-export { useUserBase as useUserContext } from './hooks/base/useUserBase';
-export { useClientBase as useClientContext } from './hooks/base/useClientBase';
-export { useSessionBase as useSessionContext } from './hooks/base/useSessionBase';
 
 const [InitialStateContext, _useInitialStateContext] = createContextAndHook<
   InitialState | Promise<InitialState> | undefined
@@ -103,11 +92,6 @@ function useOptionsContext(): ClerkOptions {
   return context;
 }
 
-function useOrganizationContext(): { organization: OrganizationResource | null | undefined } {
-  const organization = useOrganizationBase();
-  return React.useMemo(() => ({ organization }), [organization]);
-}
-
 /**
  * @internal
  */
@@ -140,5 +124,4 @@ export {
   useCheckoutContext,
   useClerkInstanceContext,
   useOptionsContext,
-  useOrganizationContext,
 };
