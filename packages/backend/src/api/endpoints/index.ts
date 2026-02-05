@@ -24,6 +24,7 @@ export * from './SamlConnectionApi';
 export * from './SessionApi';
 export * from './SignInTokenApi';
 export * from './SignUpApi';
+export * from './TestSessionTokenApi';
 export * from './TestingTokenApi';
 export * from './UserApi';
 export * from './WaitlistEntryApi';

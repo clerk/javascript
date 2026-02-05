@@ -33,6 +33,7 @@ import {
   SignInToken,
   SignUpAttempt,
   SMSMessage,
+  TestSessionToken,
   Token,
   User,
 } from '.';
@@ -169,6 +170,8 @@ function jsonToObject(item: any): any {
       return SamlConnection.fromJSON(item);
     case ObjectType.SignInToken:
       return SignInToken.fromJSON(item);
+    case ObjectType.TestSessionToken:
+      return TestSessionToken.fromJSON(item);
     case ObjectType.SignUpAttempt:
       return SignUpAttempt.fromJSON(item);
     case ObjectType.Session:
