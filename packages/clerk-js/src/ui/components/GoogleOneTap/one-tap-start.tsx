@@ -66,20 +66,11 @@ function OneTapStartInternal(): JSX.Element | null {
   useEffect(() => {
     if (initializedGoogle && !user?.id && !isPromptedRef.current) {
       initializedGoogle.accounts.id.prompt(notification => {
-        // Use isDismissedMoment() which works in both FedCM and legacy modes
-        // This avoids deprecation warnings about getMomentType() and isSkippedMoment()
-        if ('isDismissedMoment' in notification && typeof notification.isDismissedMoment === 'function') {
-          if (notification.isDismissedMoment()) {
-            // User dismissed or cancelled the prompt
-            clerk.closeGoogleOneTap();
-          }
-        }
-        // Fallback for legacy mode (browsers that don't support FedCM yet)
-        else if ('getMomentType' in notification && typeof notification.getMomentType === 'function') {
-          const momentType = notification.getMomentType();
-          if (momentType === 'skipped' || momentType === 'dismissed') {
-            clerk.closeGoogleOneTap();
-          }
+        // Close Google One Tap when user dismisses or skips the prompt
+        // Using methods compatible with both FedCM and legacy modes
+        // https://developers.google.com/identity/gsi/web/guides/fedcm-migration
+        if (notification.isSkippedMoment?.() || notification.isDismissedMoment?.()) {
+          clerk.closeGoogleOneTap();
         }
       });
       isPromptedRef.current = true;

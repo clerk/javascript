@@ -15,25 +15,38 @@ interface InitializeProps {
   use_fedcm_for_prompt?: boolean;
 }
 
-// Legacy (deprecated in FedCM mode)
+// PromptMomentNotification methods
+// See: https://developers.google.com/identity/gsi/web/reference/js-reference#PromptMomentNotification
 interface PromptMomentNotification {
+  // Moment type detection
   getMomentType?: () => 'display' | 'skipped' | 'dismissed';
-}
 
-// FedCM-compatible (dismissed moment still works)
-interface FedCMNotification {
-  isDismissedMoment?: () => boolean;
-  getDismissedReason?: () => 'credential_returned' | 'cancel' | 'flow_restarted' | 'tap_outside' | 'user_cancel';
-  // Note: isSkippedMoment works but without detailed reasons
+  // Display moment methods - NOT supported when FedCM is enabled
+  isDisplayMoment?: () => boolean;
+  isDisplayed?: () => boolean;
+  isNotDisplayed?: () => boolean;
+  getNotDisplayedReason?: () =>
+    | 'browser_not_supported'
+    | 'invalid_client'
+    | 'missing_client_id'
+    | 'opt_out_or_no_session'
+    | 'secure_http_required'
+    | 'suppressed_by_user'
+    | 'unregistered_origin'
+    | 'unknown_reason';
+
+  // Skipped moment methods - partially supported in FedCM (no user_cancel reason)
   isSkippedMoment?: () => boolean;
-}
+  getSkippedReason?: () => 'auto_cancel' | 'user_cancel' | 'tap_outside' | 'issuing_failed';
 
-// Unified type supporting both
-type PromptNotification = PromptMomentNotification & FedCMNotification;
+  // Dismissed moment methods - fully supported in FedCM
+  isDismissedMoment?: () => boolean;
+  getDismissedReason?: () => 'credential_returned' | 'cancel_called' | 'flow_restarted';
+}
 
 interface OneTapMethods {
   initialize: (params: InitializeProps) => void;
-  prompt: (promptListener: (promptMomentNotification: PromptNotification) => void) => void;
+  prompt: (promptListener?: (notification: PromptMomentNotification) => void) => void;
   cancel: () => void;
 }
 
@@ -54,9 +67,7 @@ declare global {
 async function loadGIS() {
   if (!window.google) {
     try {
-      // Add timestamp to prevent caching issues with updated FedCM endpoints
-      const cacheBuster = `?cb=${Date.now()}`;
-      await loadScript(`https://accounts.google.com/gsi/client${cacheBuster}`, { defer: true });
+      await loadScript('https://accounts.google.com/gsi/client', { defer: true });
     } catch {
       // Rethrow with specific message
       clerkFailedToLoadThirdPartyScript('Google Identity Services');
