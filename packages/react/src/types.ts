@@ -77,7 +77,7 @@ export type ClerkProviderProps<TUi extends Ui = Ui, TJs extends Js = Js> = Omit<
   /**
    * Provide an initial state of the Clerk client during server-side rendering. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).
    */
-  initialState?: InitialState;
+  initialState?: InitialState; // For React >= 19, Promise<InitialState> is also supported for internal use, but not reflected in the types
   /**
    * Indicates to silently fail the initialization process when the publishable keys is not provided, instead of throwing an error.
    * @default false
