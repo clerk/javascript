@@ -753,6 +753,7 @@ export interface BillingCheckoutTotalsJSON {
   tax_total: BillingMoneyAmountJSON;
   total_due_now: BillingMoneyAmountJSON;
   credit: BillingMoneyAmountJSON | null;
+  account_credit: BillingMoneyAmountJSON | null;
   past_due: BillingMoneyAmountJSON | null;
   total_due_after_free_trial: BillingMoneyAmountJSON | null;
 }

@@ -31,7 +31,9 @@ export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | Bil
   if ('credit' in data) {
     totals.credit = data.credit ? billingMoneyAmountFromJSON(data.credit) : null;
   }
-
+  if ('account_credit' in data) {
+    totals.accountCredit = data.account_credit ? billingMoneyAmountFromJSON(data.account_credit) : null;
+  }
   if ('total_due_now' in data) {
     totals.totalDueNow = billingMoneyAmountFromJSON(data.total_due_now);
   }

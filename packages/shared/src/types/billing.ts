@@ -716,6 +716,7 @@ export interface BillingCheckoutTotals {
    * Any credits (like account balance or promo credits) that are being applied to the checkout.
    */
   credit: BillingMoneyAmount | null;
+  accountCredit: BillingMoneyAmount | null;
   /**
    * Any outstanding amount from previous unpaid invoices that is being collected as part of the checkout.
    */
