@@ -1518,10 +1518,16 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
    */
   itpSupport?: boolean;
   /**
-   * FedCM enables more private sign-in flows without requiring the use of third-party cookies.
-   * The browser controls user settings, displays user prompts, and only contacts an Identity Provider such as Google after explicit user consent is given.
-   * Backwards compatible with browsers that still support third-party cookies.
+   * FedCM enables more private sign-in flows without requiring third-party cookies.
+   * The browser controls user settings, displays user prompts, and only contacts
+   * an Identity Provider such as Google after explicit user consent.
    *
+   * When enabled:
+   * - Uses browser-native FedCM API (Chrome 116+, Edge 116+)
+   * - Falls back to legacy mode in unsupported browsers
+   * - Requires HTTPS in production
+   *
+   * @see https://developers.google.com/identity/gsi/web/guides/fedcm-migration
    * @default true
    */
   fedCmSupport?: boolean;

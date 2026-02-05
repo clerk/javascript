@@ -15,13 +15,34 @@ interface InitializeProps {
   use_fedcm_for_prompt?: boolean;
 }
 
+// Legacy (deprecated in FedCM mode)
 interface PromptMomentNotification {
-  getMomentType: () => 'display' | 'skipped' | 'dismissed';
+  getMomentType?: () => 'display' | 'skipped' | 'dismissed';
 }
+
+// FedCM-compatible
+interface FedCMNotification {
+  isDisplayed?: () => boolean;
+  isNotDisplayed?: () => boolean;
+  getNotDisplayedReason?: () =>
+    | 'browser_not_supported'
+    | 'invalid_client'
+    | 'missing_client_id'
+    | 'opt_out_or_no_session'
+    | 'secure_http_required'
+    | 'suppressed_by_user'
+    | 'unregistered_origin'
+    | 'unknown_reason';
+  isSkippedMoment?: () => boolean;
+  getSkippedReason?: () => 'auto_cancel' | 'user_cancel' | 'tap_outside' | 'issuing_failed';
+}
+
+// Unified type supporting both
+type PromptNotification = PromptMomentNotification & FedCMNotification;
 
 interface OneTapMethods {
   initialize: (params: InitializeProps) => void;
-  prompt: (promptListener: (promptMomentNotification: PromptMomentNotification) => void) => void;
+  prompt: (promptListener: (promptMomentNotification: PromptNotification) => void) => void;
   cancel: () => void;
 }
 
