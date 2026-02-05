@@ -4,8 +4,8 @@ import {
   __experimental_usePlans,
   __experimental_useStatements,
   __experimental_useSubscription,
+  __internal_useOrganizationBase,
   useClerk,
-  useOrganizationContext,
   useSession,
 } from '@clerk/shared/react';
 import type {
@@ -39,13 +39,13 @@ const useBillingHookParams = () => {
       }) || has({ permission: 'org:sys_billing:manage' }),
   );
   // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
-  const organizationCtx = useOrganizationContext();
+  const organization = __internal_useOrganizationBase();
 
   return {
     for: subscriberType,
     keepPreviousData: true,
     // If the user is in an organization, only fetch billing data if they have the necessary permissions
-    enabled: subscriberType === 'organization' ? Boolean(organizationCtx?.organization) && allowBillingRoutes : true,
+    enabled: subscriberType === 'organization' ? Boolean(organization) && allowBillingRoutes : true,
   };
 };
 

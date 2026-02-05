@@ -1,6 +1,7 @@
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { UseSessionReturn } from '../../types';
-import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useSessionContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
+import { useSessionBase } from './base/useSessionBase';
 
 type UseSession = () => UseSessionReturn;
 
@@ -56,7 +57,7 @@ const hookName = `useSession`;
 export const useSession: UseSession = () => {
   useAssertWrappedByClerkProvider(hookName);
 
-  const session = useSessionContext();
+  const session = useSessionBase();
   const clerk = useClerkInstanceContext();
 
   clerk.telemetry?.record(eventMethodCalled(hookName));

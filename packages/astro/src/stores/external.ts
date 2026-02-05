@@ -115,6 +115,16 @@ export const $signInStore = computed([$clientStore], client => client?.signIn);
 export const $signUpStore = computed([$clientStore], client => client?.signUp);
 
 /**
+ * A client side store that is populated after clerk-js has loaded.
+ * The store returns a `BillingNamespace` or `null`.
+ * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
+ *
+ * @example
+ * $billingStore.subscribe((billing) => billing.getPlans().then((plans) => console.log(plans.data.length)))
+ */
+export const $billingStore = computed([$clerk], clerk => clerk?.billing);
+
+/**
  * Records a telemetry event when a store is used to match React hooks telemetry.
  *
  * @param {Store} store - The nanostore instance to monitor.

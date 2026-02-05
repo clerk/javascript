@@ -63,6 +63,7 @@ export default defineConfig({
       { find: '@/utils/formatSafeIdentifier', replacement: `${uiPath}/utils/formatSafeIdentifier` },
       { find: '@/utils/intl', replacement: `${uiPath}/utils/intl` },
       { find: '@/utils/normalizeRoutingOptions', replacement: `${uiPath}/utils/normalizeRoutingOptions` },
+      { find: '@/utils/phoneUtils', replacement: `${uiPath}/utils/phoneUtils` },
       // Utils from clerk-js (needed by clerk-js core modules)
       { find: '@/utils', replacement: `${clerkJsPath}/utils` },
       // Catch-all for other @/ imports - UI package
