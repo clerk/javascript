@@ -38,10 +38,17 @@ vi.mock('../../contexts', () => {
   return {
     useAssertWrappedByClerkProvider: () => {},
     useClerkInstanceContext: () => mockClerk,
-    useUserContext: () => (mockClerk.loaded ? mockUser : null),
-    useOrganizationContext: () => ({ organization: mockClerk.loaded ? mockOrganization : null }),
+    useInitialStateContext: () => undefined,
   };
 });
+
+vi.mock('../../hooks/base/useUserBase', () => ({
+  useUserBase: () => (mockClerk.loaded ? mockUser : null),
+}));
+
+vi.mock('../../hooks/base/useOrganizationBase', () => ({
+  useOrganizationBase: () => (mockClerk.loaded ? mockOrganization : null),
+}));
 
 describe('useInitializePaymentMethod', () => {
   beforeEach(() => {
