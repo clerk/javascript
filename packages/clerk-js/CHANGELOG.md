@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.122.1
+
+### Patch Changes
+
+- Improve captcha error diagnostics ([#7768](https://github.com/clerk/javascript/pull/7768)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 5.122.0
 
 ### Minor Changes
