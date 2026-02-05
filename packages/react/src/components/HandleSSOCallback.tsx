@@ -158,7 +158,7 @@ export function HandleSSOCallback(props: HandleSSOCallbackProps): ReactNode {
         }
       }
     })();
-  }, [clerk, signIn, signUp]);
+  }, [clerk, clerk.loaded, signIn, signUp]);
 
   return (
     <div>
