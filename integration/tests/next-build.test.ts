@@ -23,6 +23,41 @@ function getIndicator(buildOutput: string, type: 'Static' | 'Dynamic') {
     .split(' ')[0];
 }
 
+test.describe('next build - bundled UI with react-server condition @nextjs', () => {
+  test.describe.configure({ mode: 'parallel' });
+  let app: Application;
+
+  test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
+    app = await appConfigs.next.appRouter.clone().commit();
+    await app.setup();
+    await app.withEnv(appConfigs.envs.withEmailCodes);
+    await app.build();
+  });
+
+  test.afterAll(async () => {
+    await app.teardown();
+  });
+
+  test('When ui prop is used in server component layout, builds successfully', () => {
+    // The layout.tsx imports { ui } from "@clerk/ui" and passes ui={ui} to ClerkProvider
+    // This tests the react-server conditional export which provides a server-safe marker
+    // The build should succeed without errors about client-only modules in server components
+    expect(app.buildOutput).not.toMatch(/error/i);
+    expect(app.buildOutput).toContain('Generating static pages');
+  });
+
+  test('Static pages remain static with bundled UI', () => {
+    // Get the static indicator from the build output
+    const staticIndicator = getIndicator(app.buildOutput, 'Static');
+
+    // /_not-found should still be static even with bundled UI
+    const notFoundPageLine = app.buildOutput.split('\n').find(msg => msg.includes('/_not-found'));
+
+    expect(notFoundPageLine).toContain(staticIndicator);
+  });
+});
+
 test.describe('next build - provider as client component @nextjs', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
