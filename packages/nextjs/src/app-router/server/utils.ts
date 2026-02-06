@@ -158,7 +158,8 @@ export function getScriptNonceFromHeader(cspHeaderValue: string): string | undef
  * Uses React.cache to deduplicate calls within the same request.
  */
 // React.cache is only available in RSC environments; provide a no-op fallback for tests/non-RSC contexts.
-const reactCache = typeof React.cache === 'function' ? React.cache : <T extends (...args: any[]) => any>(fn: T): T => fn;
+const reactCache =
+  typeof React.cache === 'function' ? React.cache : <T extends (...args: any[]) => any>(fn: T): T => fn;
 
 export const getNonce = reactCache(async function getNonce(): Promise<string> {
   try {
