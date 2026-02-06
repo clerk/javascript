@@ -9,7 +9,7 @@ import { createContext } from 'react-router';
 import { clerkClient } from './clerkClient';
 import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import { loadOptions } from './loadOptions';
-import type { ClerkMiddlewareOptions, RequestStateWithRedirectUrls } from './types';
+import type { ClerkMiddlewareOptions } from './types';
 import { patchRequest } from './utils';
 
 export const authFnContext = createContext<((options?: PendingSessionOptions) => AuthObject) | null>(null);
@@ -83,33 +83,33 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       acceptsToken: 'any',
     });
 
-    const requestStateWithKeyless = Object.assign(requestState, {
+    Object.assign(requestState, {
       __keylessClaimUrl,
       __keylessApiKeysUrl,
-    }) as RequestStateWithRedirectUrls;
+    });
 
-    const locationHeader = requestStateWithKeyless.headers.get(constants.Headers.Location);
+    const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
       handleNetlifyCacheInDevInstance({
         locationHeader,
-        requestStateHeaders: requestStateWithKeyless.headers,
-        publishableKey: requestStateWithKeyless.publishableKey,
+        requestStateHeaders: requestState.headers,
+        publishableKey: requestState.publishableKey,
       });
       // Trigger a handshake redirect
-      return new Response(null, { status: 307, headers: requestStateWithKeyless.headers });
+      return new Response(null, { status: 307, headers: requestState.headers });
     }
 
-    if (requestStateWithKeyless.status === AuthStatus.Handshake) {
+    if (requestState.status === AuthStatus.Handshake) {
       throw new Error('Clerk: handshake status without redirect');
     }
 
-    args.context.set(authFnContext, (opts?: PendingSessionOptions) => requestStateWithKeyless.toAuth(opts));
-    args.context.set(requestStateContext, requestStateWithKeyless);
+    args.context.set(authFnContext, (opts?: PendingSessionOptions) => requestState.toAuth(opts));
+    args.context.set(requestStateContext, requestState);
 
     const response = await next();
 
-    if (requestStateWithKeyless.headers) {
-      requestStateWithKeyless.headers.forEach((value, key) => {
+    if (requestState.headers) {
+      requestState.headers.forEach((value, key) => {
         response.headers.append(key, value);
       });
     }
