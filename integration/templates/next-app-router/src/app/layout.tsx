@@ -1,7 +1,6 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
-import { ui } from '@clerk/ui';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -13,7 +12,6 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider
-      ui={ui}
       prefetchUI={process.env.NEXT_PUBLIC_CLERK_PREFETCH_UI === 'false' ? false : undefined}
       appearance={{
         options: {
