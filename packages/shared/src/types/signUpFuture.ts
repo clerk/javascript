@@ -85,6 +85,13 @@ export interface SignUpFutureEmailCodeVerifyParams {
   code: string;
 }
 
+export interface SignUpFutureEmailLinkSendParams {
+  /**
+   * The full URL that the user will be redirected to when they visit the email link.
+   */
+  verificationUrl: string;
+}
+
 export type SignUpFuturePasswordParams = SignUpFutureAdditionalParams & {
   /**
    * The user's password. Only supported if
@@ -278,6 +285,26 @@ export interface SignUpFutureVerifications {
   readonly externalAccount: VerificationResource;
 
   /**
+   * The verification status for email link flows.
+   */
+  readonly emailLinkVerification: {
+    /**
+     * The verification status.
+     */
+    status: 'verified' | 'expired' | 'failed' | 'client_mismatch';
+
+    /**
+     * The created session ID.
+     */
+    createdSessionId: string;
+
+    /**
+     * Whether the verification was from the same client.
+     */
+    verifiedFromTheSameClient: boolean;
+  } | null;
+
+  /**
    * Used to send an email code to verify an email address.
    */
   sendEmailCode: () => Promise<{ error: ClerkError | null }>;
@@ -286,6 +313,16 @@ export interface SignUpFutureVerifications {
    * Used to verify a code sent via email.
    */
   verifyEmailCode: (params: SignUpFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Used to send an email link to verify an email address.
+   */
+  sendEmailLink: (params: SignUpFutureEmailLinkSendParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Will wait for email link verification to complete or expire.
+   */
+  waitForEmailLinkVerification: () => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to send a phone code to verify a phone number.

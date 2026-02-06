@@ -179,6 +179,156 @@ describe('SignUp', () => {
       });
     });
 
+    describe('sendEmailLink', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.unstubAllGlobals();
+      });
+
+      it('prepares email link verification with absolute redirectUrl', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.verifications.sendEmailLink({ verificationUrl: '/verify' });
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ups/signup_123/prepare_verification',
+          body: {
+            strategy: 'email_link',
+            redirectUrl: 'https://example.com/verify',
+          },
+        });
+      });
+
+      it('keeps absolute verificationUrl unchanged', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.verifications.sendEmailLink({
+          verificationUrl: 'https://other.com/verify',
+        });
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ups/signup_123/prepare_verification',
+          body: {
+            strategy: 'email_link',
+            redirectUrl: 'https://other.com/verify',
+          },
+        });
+      });
+    });
+
+    describe('waitForEmailLinkVerification', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+      });
+
+      it('polls until email verification status is verified', async () => {
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: { email_address: { status: 'unverified' } },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: { email_address: { status: 'verified' } },
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.verifications.waitForEmailLinkVerification();
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'GET',
+            path: '/client/sign_ups/signup_123',
+          }),
+          expect.anything(),
+        );
+      });
+
+      it('polls until email verification status is expired', async () => {
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: { email_address: { status: 'unverified' } },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: { email_address: { status: 'expired' } },
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.verifications.waitForEmailLinkVerification();
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'GET',
+            path: '/client/sign_ups/signup_123',
+          }),
+          expect.anything(),
+        );
+      });
+    });
+
+    describe('emailLinkVerification', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.unstubAllGlobals();
+        SignUp.clerk = {} as any;
+      });
+
+      it('returns verification data when query params are present', () => {
+        vi.stubGlobal('window', {
+          location: {
+            href: 'https://example.com?__clerk_status=verified&__clerk_created_session=sess_123',
+          },
+        });
+
+        SignUp.clerk = {
+          client: {
+            sessions: [{ id: 'sess_123' }],
+          },
+        } as any;
+
+        const signUp = new SignUp();
+        const verification = signUp.__internal_future.verifications.emailLinkVerification;
+
+        expect(verification).toEqual({
+          status: 'verified',
+          createdSessionId: 'sess_123',
+          verifiedFromTheSameClient: true,
+        });
+      });
+    });
+
     describe('sso', () => {
       afterEach(() => {
         vi.clearAllMocks();
