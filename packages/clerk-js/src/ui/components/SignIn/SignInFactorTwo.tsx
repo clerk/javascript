@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/shared/react';
 import type { SignInFactor } from '@clerk/shared/types';
 import React from 'react';
 
@@ -6,6 +7,7 @@ import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn } from '../../contexts';
+import { useRouter } from '../../router';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoBackupCodeCard } from './SignInFactorTwoBackupCodeCard';
 import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
@@ -26,7 +28,9 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
 };
 
 function SignInFactorTwoInternal(): JSX.Element {
+  const { __internal_setActiveInProgress } = useClerk();
   const signIn = useCoreSignIn();
+  const router = useRouter();
   const availableFactors = signIn.supportedSecondFactors;
 
   const lastPreparedFactorKeyRef = React.useRef('');
@@ -44,6 +48,19 @@ function SignInFactorTwoInternal(): JSX.Element {
     setCurrentFactor(factor);
     toggleAllStrategies();
   };
+
+  React.useEffect(() => {
+    if (__internal_setActiveInProgress) {
+      return;
+    }
+
+    // If the sign-in was reset or doesn't exist, redirect back to the start.
+    // Don't redirect for 'complete' status - setActive will handle navigation.
+    if (signIn.status === null || signIn.status === 'needs_identifier' || signIn.status === 'needs_first_factor') {
+      void router.navigate('../');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Match SignInFactorOne pattern: only run on mount and when setActiveInProgress changes
+  }, [__internal_setActiveInProgress]);
 
   if (!currentFactor) {
     return <LoadingCard />;
