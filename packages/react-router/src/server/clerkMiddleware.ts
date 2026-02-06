@@ -36,7 +36,6 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
     const clerkRequest = createClerkRequest(patchRequest(args.request));
     const loadedOptions = loadOptions(args, options);
 
-    // Resolve keys with keyless fallback
     const {
       publishableKey,
       secretKey,
@@ -44,7 +43,6 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       apiKeysUrl: __keylessApiKeysUrl,
     } = await resolveKeysWithKeylessFallback(loadedOptions.publishableKey, loadedOptions.secretKey, args, options);
 
-    // Update loaded options with resolved keys
     if (publishableKey) {
       loadedOptions.publishableKey = publishableKey;
     }
@@ -85,7 +83,6 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       acceptsToken: 'any',
     });
 
-    // Attach keyless URLs to requestState
     const requestStateWithKeyless = Object.assign(requestState, {
       __keylessClaimUrl,
       __keylessApiKeysUrl,

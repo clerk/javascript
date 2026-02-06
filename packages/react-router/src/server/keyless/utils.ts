@@ -15,14 +15,6 @@ export interface KeylessResult {
 
 /**
  * Resolves Clerk keys, falling back to keyless mode in development if configured keys are missing.
- *
- * Implements the TanStack keyless pattern:
- * 1. Check if keyless mode is enabled (dev + not disabled)
- * 2. If running with claimed keys (configured === stored), complete onboarding
- * 3. If no keys configured, create/read keyless keys from storage
- * 4. Return resolved keys + keyless URLs
- *
- * @returns The resolved keys + keyless URLs to inject into state
  */
 export async function resolveKeysWithKeylessFallback(
   configuredPublishableKey: string | undefined,
@@ -35,7 +27,6 @@ export async function resolveKeysWithKeylessFallback(
   let claimUrl: string | undefined;
   let apiKeysUrl: string | undefined;
 
-  // Early return if keyless is disabled
   if (!canUseKeyless) {
     return { publishableKey, secretKey, claimUrl, apiKeysUrl };
   }
@@ -43,26 +34,23 @@ export async function resolveKeysWithKeylessFallback(
   try {
     const keylessService = await keyless(args, options);
 
-    // Early return if keyless service unavailable (e.g., Cloudflare)
     if (!keylessService) {
       return { publishableKey, secretKey, claimUrl, apiKeysUrl };
     }
 
     const locallyStoredKeys = keylessService.readKeys();
 
-    // Scenario 1: Running with claimed keys
     const runningWithClaimedKeys =
       Boolean(configuredPublishableKey) && configuredPublishableKey === locallyStoredKeys?.publishableKey;
 
     if (runningWithClaimedKeys && locallyStoredKeys) {
-      // Complete onboarding (throttled by dev cache)
       try {
         await clerkDevelopmentCache?.run(() => keylessService.completeOnboarding(), {
           cacheKey: `${locallyStoredKeys.publishableKey}_complete`,
-          onSuccessStale: 24 * 60 * 60 * 1000, // 24 hours
+          onSuccessStale: 24 * 60 * 60 * 1000,
         });
       } catch {
-        // noop - non-critical
+        // noop
       }
 
       clerkDevelopmentCache?.log({
@@ -73,7 +61,6 @@ export async function resolveKeysWithKeylessFallback(
       return { publishableKey, secretKey, claimUrl, apiKeysUrl };
     }
 
-    // Scenario 2: Keyless mode (no keys configured)
     if (!publishableKey || !secretKey) {
       const keylessApp: AccountlessApplication | null = await keylessService.getOrCreateKeys();
 
@@ -90,7 +77,6 @@ export async function resolveKeysWithKeylessFallback(
       }
     }
   } catch (error) {
-    // Graceful fallback - never break the app
     console.warn('[Clerk] Keyless resolution failed:', error);
   }
 
