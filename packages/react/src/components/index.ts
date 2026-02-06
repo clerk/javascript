@@ -38,3 +38,4 @@ export { SignInButton } from './SignInButton';
 export { SignInWithMetamaskButton } from './SignInWithMetamaskButton';
 export { SignOutButton } from './SignOutButton';
 export { SignUpButton } from './SignUpButton';
+export { HandleSSOCallback } from './HandleSSOCallback';
