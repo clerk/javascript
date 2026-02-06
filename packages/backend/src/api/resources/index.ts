@@ -1,5 +1,6 @@
 export * from './AccountlessApplication';
 export * from './ActorToken';
+export * from './AgentToken';
 export * from './AllowlistIdentifier';
 export * from './APIKey';
 export * from './BlocklistIdentifier';
@@ -54,8 +55,6 @@ export * from './Session';
 export * from './SignInTokens';
 export * from './SignUpAttempt';
 export * from './SMSMessage';
-export * from './TestingToken';
-export * from './TestSessionToken';
 export * from './Token';
 export * from './User';
 export * from './Verification';
