@@ -41,6 +41,12 @@ type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
      * - `undefined` (default) - Prefetch UI normally
      */
     prefetchUI?: boolean;
+    /**
+     * Optional object to use the bundled Clerk UI instead of loading from CDN.
+     * Import `ui` from `@clerk/ui` and pass it here to bundle the UI with your application.
+     * When omitted, UI is loaded from Clerk's CDN.
+     */
+    ui?: TUi;
   };
 
 type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegrationParams<TUi> & {

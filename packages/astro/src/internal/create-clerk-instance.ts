@@ -121,6 +121,11 @@ async function getClerkUIEntryChunk<TUi extends Ui = Ui>(
     return options.clerkUICtor;
   }
 
+  // Support bundled UI via ui.ClerkUI prop
+  if (options?.ui?.ClerkUI) {
+    return options.ui.ClerkUI;
+  }
+
   if (options?.prefetchUI === false) {
     return undefined;
   }
