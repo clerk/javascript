@@ -17,3 +17,5 @@ import { ui } from '@clerk/ui';
   ...
 </ClerkProvider>
 ```
+
+**Migration note**: If you were previously using the internal `clerkUiCtor` prop, migrate to the new `ui` prop by importing `ui` from `@clerk/ui`.
