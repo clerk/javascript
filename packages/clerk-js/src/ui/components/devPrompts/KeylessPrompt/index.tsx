@@ -41,7 +41,7 @@ function withLastActiveFallback(cb: () => string): string {
 
 const KeylessPromptInternal = (_props: KeylessPromptProps) => {
   const { isSignedIn } = useUser();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   useEffect(() => {
     if (isSignedIn) {
@@ -83,7 +83,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
     justify-content: center;
     width: 100%;
     height: 1.75rem;
-    max-width: 14.625rem;
     padding: 0.25rem 0.625rem;
     border-radius: 0.375rem;
     font-size: 0.75rem;
@@ -112,7 +111,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           bottom: '1.25rem',
           right: '1.25rem',
           height: `${t.sizes.$10}`,
-          minWidth: '13.4rem',
+          minWidth: '15.5rem',
           paddingLeft: `${t.space.$3}`,
           borderRadius: '1.25rem',
           transition: 'all 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
@@ -125,10 +124,10 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             flexDirection: 'column',
             alignItems: 'flex-center',
             justifyContent: 'flex-center',
-            height: claimed || success ? 'fit-content' : isSignedIn ? '8.5rem' : '12rem',
+            height: claimed || success ? 'fit-content' : isSignedIn ? '12rem' : '14.5rem',
             overflow: 'hidden',
             width: 'fit-content',
-            minWidth: '16.125rem',
+            minWidth: '18.5rem',
             gap: `${t.space.$1x5}`,
             padding: `${t.space.$2x5} ${t.space.$3} ${t.space.$3} ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
@@ -244,9 +243,15 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             )}
 
             <p
-              data-text='Clerk is in keyless mode'
+              data-text='Configure your application'
               aria-label={
-                success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'
+                success
+                  ? 'Your app is ready'
+                  : claimed
+                    ? 'Missing environment keys'
+                    : isSignedIn
+                      ? "You've created your first user"
+                      : 'Configure your application'
               }
               css={css`
                 ${basePromptElementStyles};
@@ -257,7 +262,13 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                 cursor: pointer;
               `}
             >
-              {success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
+              {success
+                ? 'Your app is ready'
+                : claimed
+                  ? 'Missing environment keys'
+                  : isSignedIn
+                    ? "You've created your first user"
+                    : 'Configure your application'}
             </p>
           </Flex>
 
@@ -360,7 +371,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                   >
                     {appName}
                   </span>{' '}
-                  has been claimed. Configure settings from the{' '}
+                  has been configured. You may now customize your settings in the{' '}
                   <Link
                     isExternal
                     aria-label='Go to Dashboard to configure settings'
@@ -374,8 +385,9 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                       },
                     })}
                   >
-                    Clerk Dashboard
+                    Clerk dashboard
                   </Link>
+                  .
                 </p>
               ) : claimed ? (
                 <p
@@ -391,20 +403,36 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                   Dashboard.
                 </p>
               ) : isSignedIn ? (
-                <p
-                  css={css`
-                    ${basePromptElementStyles};
-                    color: #b4b4b4;
-                    font-size: 0.8125rem;
-                    font-weight: 400;
-                    line-height: 1rem;
-                  `}
-                >
-                  <span>
-                    You&apos;ve created your first user! Link this application to your Clerk account to explore the
-                    Dashboard.
-                  </span>
-                </p>
+                <>
+                  <p
+                    css={css`
+                      ${basePromptElementStyles};
+                      color: #b4b4b4;
+                      font-size: 0.8125rem;
+                      font-weight: 400;
+                      line-height: 1rem;
+                    `}
+                  >
+                    Head to the dashboard to customize authentication settings, view user info, and explore more
+                    features.
+                  </p>
+                  <ul
+                    css={css`
+                      ${basePromptElementStyles};
+                      color: #b4b4b4;
+                      font-size: 0.8125rem;
+                      font-weight: 400;
+                      line-height: 1rem;
+                      margin: 0;
+                      padding-left: 1.25rem;
+                      list-style: disc;
+                    `}
+                  >
+                    <li>Add SSO connections (eg. GitHub)</li>
+                    <li>Set up B2B authentication</li>
+                    <li>Enable MFA</li>
+                  </ul>
+                </>
               ) : (
                 <>
                   <p
@@ -419,6 +447,22 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                   >
                     Temporary API keys are enabled so you can get started immediately.
                   </p>
+                  <ul
+                    css={css`
+                      ${basePromptElementStyles};
+                      color: #b4b4b4;
+                      font-size: 0.8125rem;
+                      font-weight: 400;
+                      line-height: 1rem;
+                      margin: 0;
+                      padding-left: 1.25rem;
+                      list-style: disc;
+                    `}
+                  >
+                    <li>Add SSO connections (eg. GitHub)</li>
+                    <li>Set up B2B authentication</li>
+                    <li>Enable MFA</li>
+                  </ul>
                   <p
                     css={css`
                       ${basePromptElementStyles};
@@ -429,8 +473,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                       text-wrap: pretty;
                     `}
                   >
-                    Claim this application to access the Clerk Dashboard where you can manage auth settings and explore
-                    more Clerk features.
+                    Access the dashboard to customize auth settings and explore Clerk features.
                   </p>
                 </>
               )}
@@ -501,7 +544,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                     }
                   `}
                 >
-                  {claimed ? 'Get API keys' : 'Claim application'}
+                  {claimed ? 'Get API keys' : 'Configure your application'}
                 </a>
               </Flex>
             ))}
