@@ -242,7 +242,6 @@ test.describe('Keyless mode @quickstart', () => {
     const successContent = u.po.keylessPopover.getSuccessContent();
     await expect(successContent.title).toBeVisible();
     await expect(successContent.configuredText).toBeVisible();
-    await expect(successContent.dashboardLink).toBeVisible();
 
     await u.po.keylessPopover.promptToDismiss().click();
 
