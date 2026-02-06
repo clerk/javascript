@@ -82,7 +82,7 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
   const { reason, message, isSignedIn, __keylessClaimUrl, __keylessApiKeysUrl, ...rest } = requestState;
   const envVars = getPublicEnvVariables(context);
 
-  const baseState = {
+  const baseState: Record<string, unknown> = {
     __clerk_ssr_state: rest.toAuth(),
     __publishableKey: requestState.publishableKey,
     __proxyUrl: requestState.proxyUrl,
@@ -104,8 +104,8 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
   };
 
   if (canUseKeyless && __keylessClaimUrl) {
-    (baseState as any).__keylessClaimUrl = __keylessClaimUrl;
-    (baseState as any).__keylessApiKeysUrl = __keylessApiKeysUrl;
+    baseState.__keylessClaimUrl = __keylessClaimUrl;
+    baseState.__keylessApiKeysUrl = __keylessApiKeysUrl;
   }
 
   const clerkState = wrapWithClerkState(baseState);
