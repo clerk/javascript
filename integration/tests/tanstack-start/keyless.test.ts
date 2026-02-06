@@ -1,26 +1,10 @@
-import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
-import { createTestUtils } from '../../testUtils';
+import { createTestUtils, mockClaimedInstanceEnvironmentCall } from '../../testUtils';
 
 const commonSetup = appConfigs.tanstack.reactStart.clone();
-
-const mockClaimedInstanceEnvironmentCall = async (page: Page) => {
-  await page.route('*/**/v1/environment*', async route => {
-    const response = await route.fetch();
-    const json = await response.json();
-    const newJson = {
-      ...json,
-      auth_config: {
-        ...json.auth_config,
-        claimed_at: Date.now(),
-      },
-    };
-    await route.fulfill({ response, json: newJson });
-  });
-};
 
 test.describe('Keyless mode @tanstack-react-start', () => {
   test.describe.configure({ mode: 'serial' });

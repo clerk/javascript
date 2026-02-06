@@ -1,13 +1,14 @@
 import { expect, test } from '@playwright/test';
 
-import type { Application } from '../models/application';
-import { appConfigs } from '../presets';
-import { createTestUtils, mockClaimedInstanceEnvironmentCall } from '../testUtils';
+import type { Application } from '../../models/application';
+import { appConfigs } from '../../presets';
+import { createTestUtils, mockClaimedInstanceEnvironmentCall } from '../../testUtils';
 
-const commonSetup = appConfigs.next.appRouterQuickstart.clone();
+const commonSetup = appConfigs.reactRouter.reactRouterNode.clone();
 
-test.describe('Keyless mode @quickstart', () => {
+test.describe('Keyless mode @react-router', () => {
   test.describe.configure({ mode: 'serial' });
+  test.setTimeout(90_000);
 
   test.use({
     extraHTTPHeaders: {
@@ -29,29 +30,8 @@ test.describe('Keyless mode @quickstart', () => {
   });
 
   test.afterAll(async () => {
-    await app.teardown();
-  });
-
-  test('Navigates to non-existent page (/_not-found) without a infinite redirect loop.', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.page.goToAppHome();
-    await u.page.waitForClerkJsLoaded();
-    await u.po.expect.toBeSignedOut();
-
-    await u.po.keylessPopover.waitForMounted();
-
-    const redirectMap = new Map<string, number>();
-    page.on('request', request => {
-      // Only count GET requests since Next.js server actions are sent with POST requests.
-      if (request.method() === 'GET') {
-        const url = request.url();
-        redirectMap.set(url, (redirectMap.get(url) || 0) + 1);
-        expect(redirectMap.get(url)).toBeLessThanOrEqual(1);
-      }
-    });
-
-    await u.page.goToRelative('/something');
-    await u.page.waitForAppUrl('/something');
+    // Keep files for debugging
+    await app?.teardown();
   });
 
   test('Toggle collapse popover and claim.', async ({ page, context }) => {
@@ -114,30 +94,22 @@ test.describe('Keyless mode @quickstart', () => {
     });
   });
 
-  test('Claimed application with keys inside .env, on dismiss, keyless prompt is removed.', async ({
-    page,
-    context,
-  }) => {
-    await mockClaimedInstanceEnvironmentCall(page);
+  test('Keyless popover is removed after adding keys to .env and restarting.', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
 
     await u.po.keylessPopover.waitForMounted();
-    await expect(await u.po.keylessPopover.promptToUseClaimedKeys()).toBeVisible();
+    expect(await u.po.keylessPopover.isExpanded()).toBe(false);
 
-    /**
-     * Copy keys from `.clerk/.tmp/keyless.json to `.env`
-     */
+    // Copy keys from keyless.json to .env
     await app.keylessToEnv();
-    /**
-     * wait a bit for the server to load the new env file
-     */
-    await page.waitForTimeout(5_000);
 
-    await page.reload();
-    await u.po.keylessPopover.waitForMounted();
-    await u.po.keylessPopover.promptToDismiss().click();
+    // Restart the dev server to pick up new env vars (Vite doesn't hot-reload .env)
+    await app.restart();
 
+    await u.page.goToAppHome();
+
+    // Keyless popover should no longer be present since we now have explicit keys
     await u.po.keylessPopover.waitForUnmounted();
   });
 });
