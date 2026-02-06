@@ -4,7 +4,7 @@ import {
   setClerkJSLoadingErrorPackageName,
 } from '@clerk/shared/loadClerkJsScript';
 import type { ClerkOptions } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { Ui } from '@clerk/ui/internal';
 
 import { $clerkStore } from '../stores/external';
@@ -40,7 +40,7 @@ async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroC
   // Both functions return early if the scripts are already loaded
   // (e.g., via middleware-injected script tags in the HTML head).
   const clerkJsChunk = getClerkJsEntryChunk(options);
-  const clerkUICtor = getClerkUIEntryChunk(options);
+  const ClerkUI = getClerkUIEntryChunk(options);
 
   await clerkJsChunk;
 
@@ -59,7 +59,7 @@ async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroC
     routerReplace: createNavigationHandler(window.history.replaceState.bind(window.history)),
     ...options,
     // Pass the clerk-ui constructor promise to clerk.load()
-    clerkUICtor,
+    ui: { ...options?.ui, ClerkUI },
   } as unknown as ClerkOptions;
 
   initOptions = clerkOptions;
@@ -115,12 +115,7 @@ async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCre
  */
 async function getClerkUIEntryChunk<TUi extends Ui = Ui>(
   options?: AstroClerkCreateInstanceParams<TUi>,
-): Promise<ClerkUiConstructor | undefined> {
-  // Honor explicit clerkUICtor even when prefetchUI=false
-  if (options?.clerkUICtor) {
-    return options.clerkUICtor;
-  }
-
+): Promise<ClerkUIConstructor | undefined> {
   // Support bundled UI via ui.ClerkUI prop
   if (options?.ui?.ClerkUI) {
     return options.ui.ClerkUI;

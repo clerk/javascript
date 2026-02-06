@@ -4,12 +4,12 @@ import { defineComponent } from 'vue';
 
 import { clerkPlugin } from '../plugin';
 
-const mockLoadClerkUiScript = vi.fn();
+const mockLoadClerkUIScript = vi.fn();
 const mockLoadClerkJsScript = vi.fn();
 
 vi.mock('@clerk/shared/loadClerkJsScript', () => ({
   loadClerkJSScript: (...args: unknown[]) => mockLoadClerkJsScript(...args),
-  loadClerkUIScript: (...args: unknown[]) => mockLoadClerkUiScript(...args),
+  loadClerkUIScript: (...args: unknown[]) => mockLoadClerkUIScript(...args),
 }));
 
 vi.mock('@clerk/shared/browser', () => ({
@@ -45,7 +45,7 @@ describe('clerkPlugin UI loading', () => {
   });
 
   it('loads UI from CDN when no ui prop is provided', async () => {
-    mockLoadClerkUiScript.mockImplementation(async () => {
+    mockLoadClerkUIScript.mockImplementation(async () => {
       window.__internal_ClerkUICtor = mockClerkUICtor as any;
       return null;
     });
@@ -64,7 +64,7 @@ describe('clerkPlugin UI loading', () => {
     });
 
     await vi.waitFor(() => {
-      expect(mockLoadClerkUiScript).toHaveBeenCalled();
+      expect(mockLoadClerkUIScript).toHaveBeenCalled();
     });
   });
 
@@ -102,10 +102,10 @@ describe('clerkPlugin UI loading', () => {
     });
 
     // Should not load from CDN
-    expect(mockLoadClerkUiScript).not.toHaveBeenCalled();
+    expect(mockLoadClerkUIScript).not.toHaveBeenCalled();
 
     // Should pass the bundled ClerkUI constructor
-    const resolvedClerkUI = await capturedLoadOptions.clerkUICtor;
+    const resolvedClerkUI = await capturedLoadOptions.ui?.ClerkUI;
     expect(resolvedClerkUI).toBe(mockClerkUICtor);
   });
 
@@ -141,10 +141,10 @@ describe('clerkPlugin UI loading', () => {
     });
 
     // Should not load from CDN
-    expect(mockLoadClerkUiScript).not.toHaveBeenCalled();
+    expect(mockLoadClerkUIScript).not.toHaveBeenCalled();
 
     // ClerkUI should be undefined (headless mode)
-    const resolvedClerkUI = await capturedLoadOptions.clerkUICtor;
+    const resolvedClerkUI = await capturedLoadOptions.ui?.ClerkUI;
     expect(resolvedClerkUI).toBeUndefined();
   });
 });

@@ -2,7 +2,7 @@ import type { Ui } from './internal';
 import { UI_BRAND } from './internal';
 import type { Appearance } from './internal/appearance';
 
-import { ClerkUi } from './ClerkUi';
+import { ClerkUI } from './ClerkUI';
 
 declare const PACKAGE_VERSION: string;
 
@@ -22,5 +22,5 @@ declare const PACKAGE_VERSION: string;
 export const ui = {
   __brand: UI_BRAND,
   version: PACKAGE_VERSION,
-  ClerkUI: ClerkUi,
+  ClerkUI,
 } as unknown as Ui<Appearance>;

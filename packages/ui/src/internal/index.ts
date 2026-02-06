@@ -1,4 +1,4 @@
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 
 import type { Appearance } from './appearance';
 
@@ -42,7 +42,7 @@ export type Ui<A = any> = Tagged<
      * ClerkUI constructor. Optional to support server-safe marker exports.
      * When absent (e.g., in React Server Components), the SDK resolves it via dynamic import.
      */
-    ClerkUI?: ClerkUiConstructor;
+    ClerkUI?: ClerkUIConstructor;
     /**
      * Version of the UI package (for potential future use)
      */
@@ -53,7 +53,7 @@ export type Ui<A = any> = Tagged<
      */
     __appearanceType?: A;
   },
-  'ClerkUi'
+  'ClerkUI'
 >;
 
 export type {

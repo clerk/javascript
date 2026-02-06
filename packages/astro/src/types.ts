@@ -7,7 +7,7 @@ import type {
   ShowProps,
   Without,
 } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { Appearance, Ui } from '@clerk/ui/internal';
 
 type AstroClerkUpdateOptions<TUi extends Ui = Ui> = Pick<ClerkOptions, 'localization'> & {
@@ -36,17 +36,15 @@ type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
      */
     clerkUIUrl?: string;
     /**
+     * The npm version for `@clerk/ui`.
+     */
+    clerkUIVersion?: string;
+    /**
      * Controls prefetching of the `@clerk/ui` script.
      * - `false` - Skip prefetching the UI (for custom UIs using Control Components)
      * - `undefined` (default) - Prefetch UI normally
      */
     prefetchUI?: boolean;
-    /**
-     * Optional object to use the bundled Clerk UI instead of loading from CDN.
-     * Import `ui` from `@clerk/ui` and pass it here to bundle the UI with your application.
-     * When omitted, UI is loaded from Clerk's CDN.
-     */
-    ui?: TUi;
   };
 
 type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegrationParams<TUi> & {
@@ -70,7 +68,7 @@ declare global {
     __astro_clerk_component_props: Map<string, Map<string, Record<string, unknown>>>;
     __astro_clerk_function_props: Map<string, Map<string, Record<string, unknown>>>;
     Clerk: BrowserClerk;
-    __internal_ClerkUICtor?: ClerkUiConstructor;
+    __internal_ClerkUICtor?: ClerkUIConstructor;
   }
 }
 

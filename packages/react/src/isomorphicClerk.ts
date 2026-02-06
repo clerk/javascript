@@ -62,7 +62,7 @@ import type {
   WaitlistResource,
   Without,
 } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import { handleValueOrFn } from '@clerk/shared/utils';
 
 import { errorThrower } from './errors/errorThrower';
@@ -90,7 +90,7 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
-  __internal_ClerkUICtor?: ClerkUiConstructor;
+  __internal_ClerkUICtor?: ClerkUIConstructor;
 }
 
 declare const global: Global;
@@ -468,12 +468,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
-      const clerkUICtor = await this.getClerkUiEntryChunk();
+      const ClerkUI = await this.getClerkUIEntryChunk();
       const clerk = await this.getClerkJsEntryChunk();
 
       if (!clerk.loaded) {
         this.beforeLoad(clerk);
-        await clerk.load({ ...this.options, clerkUICtor });
+        await clerk.load({ ...this.options, ui: { ...this.options.ui, ClerkUI } });
       }
       if (clerk.loaded) {
         this.replayInterceptedInvocations(clerk);
@@ -515,14 +515,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return global.Clerk;
   }
 
-  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor | undefined> {
-    // Honor explicit clerkUICtor even when prefetchUI=false
-    if (this.options.clerkUICtor) {
-      return this.options.clerkUICtor;
-    }
-
+  private async getClerkUIEntryChunk(): Promise<ClerkUIConstructor | undefined> {
     // Support bundled UI via ui.ClerkUI prop
-    const uiProp = (this.options as { ui?: { __brand?: string; ClerkUI?: ClerkUiConstructor } }).ui;
+    const uiProp = (this.options as { ui?: { __brand?: string; ClerkUI?: ClerkUIConstructor } }).ui;
     if (uiProp?.ClerkUI) {
       return uiProp.ClerkUI;
     }
@@ -530,8 +525,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // Support server-safe UI marker (react-server condition)
     // When ui prop is present but ClerkUI is absent, dynamically import
     if (uiProp?.__brand === '__clerkUI') {
-      const { ClerkUi } = await import('@clerk/ui/entry');
-      return ClerkUi;
+      const { ClerkUI } = await import('@clerk/ui/entry');
+      return ClerkUI;
     }
 
     if (this.options.prefetchUI === false) {
