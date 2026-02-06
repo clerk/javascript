@@ -8,7 +8,7 @@
     { "path": "./dist/clerk.legacy.browser.js", "maxSize": "123KB" },
     { "path": "./dist/clerk.no-rhc.js", "maxSize": "305KB" },
     { "path": "./dist/clerk.native.js", "maxSize": "65KB" },
-    { "path": "./dist/clerk.headless*.js", "maxSize": "65KB" },
+
     { "path": "./dist/vendors*.js", "maxSize": "7KB" },
     { "path": "./dist/coinbase*.js", "maxSize": "36KB" },
     { "path": "./dist/base-account-sdk*.js", "maxSize": "203KB" },

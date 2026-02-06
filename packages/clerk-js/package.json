@@ -68,7 +68,7 @@
     "dev": "rspack serve --config rspack.config.js",
     "dev:chips": "rspack serve --config rspack.config.js --env variant=\"clerk.chips.browser\"",
     "dev:experimental": "rspack serve --config rspack.config.js --env variant=\"clerk.experimental.browser\"",
-    "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
+
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4000}",
     "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4000} --env sandbox=1",
     "format": "node ../../scripts/format-package.mjs",

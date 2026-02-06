@@ -16,8 +16,7 @@ const variants = {
   clerkCHIPS: 'clerk.chips.browser',
   clerkChannelBrowser: 'clerk.channel.browser',
   clerkExperimentalBrowser: 'clerk.experimental.browser',
-  clerkHeadless: 'clerk.headless',
-  clerkHeadlessBrowser: 'clerk.headless.browser',
+
   clerkNative: 'clerk.native', // For React Native (no chunk splitting)
   clerkLegacyBrowser: 'clerk.legacy.browser',
   clerkNoRHC: 'clerk.no-rhc', // Omit Remotely Hosted Code
@@ -30,8 +29,7 @@ const variantToSourceFile = {
   [variants.clerkCHIPS]: './src/index.browser.ts',
   [variants.clerkChannelBrowser]: './src/index.browser.ts',
   [variants.clerkExperimentalBrowser]: './src/index.browser.ts',
-  [variants.clerkHeadless]: './src/index.headless.ts',
-  [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
+
   [variants.clerkNative]: './src/index.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
   [variants.clerkNoRHC]: './src/index.ts',
@@ -678,11 +676,7 @@ const devConfig = ({ mode, env }) => {
       common({ mode, variant: variants.clerkExperimentalBrowser }),
       commonForDev(),
     ),
-    [variants.clerkHeadless]: merge(
-      entryForVariant(variants.clerkHeadless),
-      common({ mode, variant: variants.clerkHeadless }),
-      commonForDev(),
-    ),
+
     [variants.clerkNative]: merge(
       entryForVariant(variants.clerkNative),
       common({ mode, variant: variants.clerkNative }),
