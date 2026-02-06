@@ -1,4 +1,4 @@
-import { buildClerkJSScriptAttributes, clerkJSScriptUrl, clerkUIScriptUrl } from '@clerk/react/internal';
+import { buildClerkJSScriptAttributes, clerkJSScriptUrl, clerkUIScriptUrl } from '@clerk/shared/loadClerkJsScript';
 import React from 'react';
 
 type ClerkScriptTagsProps = {
