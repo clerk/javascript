@@ -25,8 +25,7 @@ export class ExternalAccount {
      */
     readonly identificationId: string,
     /**
-     * The unique ID of the user in the provider.
-     * @deprecated Use providerUserId instead
+     * @deprecated Use `providerUserId` instead.
      */
     readonly externalId: string,
     /**
