@@ -142,7 +142,9 @@ const splitByScope = (fea: string | null | undefined) => {
   const org: string[] = [];
   const user: string[] = [];
 
-  if (!fea) return { org, user };
+  if (!fea) {
+    return { org, user };
+  }
 
   const parts = fea.split(',');
   for (let i = 0; i < parts.length; i++) {
