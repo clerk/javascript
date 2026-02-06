@@ -24,13 +24,114 @@ type KeylessPromptProps = {
   onDismiss: (() => Promise<unknown>) | undefined | null;
 };
 
+export type KeylessPromptState = 'default' | 'signedIn' | 'claimed' | 'success';
+
+export interface SizingConfig {
+  collapsed: {
+    height: string;
+    minWidth: string;
+  };
+  expanded: {
+    height: string;
+    minWidth: string;
+  };
+}
+
+const COLLAPSED_PADDING_LEFT = '0.75rem';
+const EXPANDED_PADDING = '0.625rem 0.75rem 0.75rem 0.75rem';
+
+const contentTextStyles = css`
+  ${basePromptElementStyles};
+  color: #b4b4b4;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1rem;
+`;
+
+const bulletListStyles = css`
+  ${basePromptElementStyles};
+  color: #b4b4b4;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1rem;
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+`;
+
+export const STATE_SIZING_CONFIG: Record<KeylessPromptState, SizingConfig> = {
+  default: {
+    collapsed: {
+      height: '2.5rem',
+      minWidth: '15.5rem',
+    },
+    expanded: {
+      height: '14.5rem',
+      minWidth: '16.5rem',
+    },
+  },
+  signedIn: {
+    collapsed: {
+      height: '2.5rem',
+      minWidth: '15.75rem',
+    },
+    expanded: {
+      height: '12rem',
+      minWidth: '17rem',
+    },
+  },
+  claimed: {
+    collapsed: {
+      height: '2.5rem',
+      minWidth: '15.5rem',
+    },
+    expanded: {
+      height: 'fit-content',
+      minWidth: '16.5rem',
+    },
+  },
+  success: {
+    collapsed: {
+      height: '2.5rem',
+      minWidth: '15.5rem',
+    },
+    expanded: {
+      height: 'fit-content',
+      minWidth: '16.5rem',
+    },
+  },
+};
+
 const buttonIdentifierPrefix = `--clerk-keyless-prompt`;
 const buttonIdentifier = `${buttonIdentifierPrefix}-button`;
 const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 
-/**
- * If we cannot reconstruct the url properly, then simply fallback to Clerk Dashboard
- */
+function getButtonLabel(success: boolean, claimed: boolean, isSignedIn: boolean): string {
+  if (success) {
+    return 'Your app is ready';
+  }
+  if (claimed) {
+    return 'Missing environment keys';
+  }
+  if (isSignedIn) {
+    return "You've created your first user";
+  }
+  return 'Configure your application';
+}
+
+function determineState(claimed: boolean, success: boolean, isSignedIn: boolean): KeylessPromptState {
+  if (success) {
+    return 'success';
+  }
+  if (claimed) {
+    return 'claimed';
+  }
+  if (isSignedIn) {
+    return 'signedIn';
+  }
+  return 'default';
+}
+
 function withLastActiveFallback(cb: () => string): string {
   try {
     return cb();
@@ -39,42 +140,48 @@ function withLastActiveFallback(cb: () => string): string {
   }
 }
 
-const KeylessPromptInternal = (_props: KeylessPromptProps) => {
+const KeylessPromptInternal = (props: KeylessPromptProps) => {
   const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(true);
 
-  useEffect(() => {
-    if (isSignedIn) {
-      setIsExpanded(true);
-    }
-  }, [isSignedIn]);
-
   const environment = useRevalidateEnvironment();
   const claimed = Boolean(environment.authConfig.claimedAt);
-  const success = typeof _props.onDismiss === 'function' && claimed;
+  const success = typeof props.onDismiss === 'function' && claimed;
   const appName = environment.displayConfig.applicationName;
+  const isSignedInBoolean = Boolean(isSignedIn);
+
+  const state = useMemo(
+    () => determineState(claimed, success, isSignedInBoolean),
+    [claimed, success, isSignedInBoolean],
+  );
+  const sizingConfig = useMemo(() => STATE_SIZING_CONFIG[state], [state]);
+
+  useEffect(() => {
+    if (isSignedInBoolean) {
+      setIsExpanded(true);
+    }
+  }, [isSignedInBoolean]);
 
   const isForcedExpanded = claimed || success || isExpanded;
+
   const claimUrlToDashboard = useMemo(() => {
     if (claimed) {
-      return _props.copyKeysUrl;
+      return props.copyKeysUrl;
     }
-
-    const url = new URL(_props.claimUrl);
-    // Clerk Dashboard accepts a `return_url` query param when visiting `/apps/claim`.
+    const url = new URL(props.claimUrl);
     url.searchParams.append('return_url', window.location.href);
     return url.href;
-  }, [claimed, _props.copyKeysUrl, _props.claimUrl]);
+  }, [claimed, props.copyKeysUrl, props.claimUrl]);
 
   const instanceUrlToDashboard = useMemo(() => {
     return withLastActiveFallback(() => {
-      const redirectUrlParts = handleDashboardUrlParsing(_props.copyKeysUrl);
+      const redirectUrlParts = handleDashboardUrlParsing(props.copyKeysUrl);
       const url = new URL(
         `${redirectUrlParts.baseDomain}/apps/${redirectUrlParts.appId}/instances/${redirectUrlParts.instanceId}/user-authentication/email-phone-username`,
       );
       return url.href;
     });
-  }, [_props.copyKeysUrl]);
+  }, [props.copyKeysUrl]);
 
   const mainCTAStyles = css`
     ${basePromptElementStyles};
@@ -88,7 +195,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
     font-size: 0.75rem;
     font-weight: 500;
     letter-spacing: 0.12px;
-    color: ${claimed ? 'white' : success ? 'white' : '#fde047'};
+    color: ${success || claimed ? 'white' : '#fde047'};
     text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
     white-space: nowrap;
     user-select: none;
@@ -110,9 +217,9 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           position: 'fixed',
           bottom: '1.25rem',
           right: '1.25rem',
-          height: `${t.sizes.$10}`,
-          minWidth: '15.5rem',
-          paddingLeft: `${t.space.$3}`,
+          height: sizingConfig.collapsed.height,
+          minWidth: sizingConfig.collapsed.minWidth,
+          paddingLeft: COLLAPSED_PADDING_LEFT,
           borderRadius: '1.25rem',
           transition: 'all 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
 
@@ -124,12 +231,13 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             flexDirection: 'column',
             alignItems: 'flex-center',
             justifyContent: 'flex-center',
-            height: claimed || success ? 'fit-content' : isSignedIn ? '12rem' : '14.5rem',
+            height: sizingConfig.expanded.height,
             overflow: 'hidden',
             width: 'fit-content',
-            minWidth: '18.5rem',
+            minWidth: sizingConfig.expanded.minWidth,
+            paddingLeft: undefined,
+            padding: EXPANDED_PADDING,
             gap: `${t.space.$1x5}`,
-            padding: `${t.space.$2x5} ${t.space.$3} ${t.space.$3} ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
             transition: 'all 230ms cubic-bezier(0.28, 1, 0.32, 1)',
           },
@@ -244,15 +352,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
 
             <p
               data-text='Configure your application'
-              aria-label={
-                success
-                  ? 'Your app is ready'
-                  : claimed
-                    ? 'Missing environment keys'
-                    : isSignedIn
-                      ? "You've created your first user"
-                      : 'Configure your application'
-              }
+              aria-label={getButtonLabel(success, claimed, isSignedInBoolean)}
               css={css`
                 ${basePromptElementStyles};
                 color: #d9d9d9;
@@ -262,13 +362,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                 cursor: pointer;
               `}
             >
-              {success
-                ? 'Your app is ready'
-                : claimed
-                  ? 'Missing environment keys'
-                  : isSignedIn
-                    ? "You've created your first user"
-                    : 'Configure your application'}
+              {getButtonLabel(success, claimed, isSignedInBoolean)}
             </p>
           </Flex>
 
@@ -330,7 +424,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                 flex-direction: column;
                 gap: 0.5rem;
                 color: #b4b4b4;
-                max-width: 14.625rem;
+                max-width: 15rem;
                 animation: ${isForcedExpanded && 'show-description 500ms ease-in forwards'};
                 @keyframes show-description {
                   0%,
@@ -345,15 +439,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
               `}
             >
               {success ? (
-                <p
-                  css={css`
-                    ${basePromptElementStyles};
-                    color: #b4b4b4;
-                    font-size: 0.8125rem;
-                    font-weight: 400;
-                    line-height: 1rem;
-                  `}
-                >
+                <p css={contentTextStyles}>
                   Your application{' '}
                   <span
                     css={css`
@@ -367,6 +453,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                       font-size: 0.8125rem;
                       font-weight: 500;
                       color: #d5d5d5;
+                      line-height: inherit;
                     `}
                   >
                     {appName}
@@ -390,44 +477,17 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                   .
                 </p>
               ) : claimed ? (
-                <p
-                  css={css`
-                    ${basePromptElementStyles};
-                    color: #b4b4b4;
-                    font-size: 0.8125rem;
-                    font-weight: 400;
-                    line-height: 1rem;
-                  `}
-                >
+                <p css={contentTextStyles}>
                   You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk
                   Dashboard.
                 </p>
-              ) : isSignedIn ? (
+              ) : isSignedInBoolean ? (
                 <>
-                  <p
-                    css={css`
-                      ${basePromptElementStyles};
-                      color: #b4b4b4;
-                      font-size: 0.8125rem;
-                      font-weight: 400;
-                      line-height: 1rem;
-                    `}
-                  >
+                  <p css={contentTextStyles}>
                     Head to the dashboard to customize authentication settings, view user info, and explore more
                     features.
                   </p>
-                  <ul
-                    css={css`
-                      ${basePromptElementStyles};
-                      color: #b4b4b4;
-                      font-size: 0.8125rem;
-                      font-weight: 400;
-                      line-height: 1rem;
-                      margin: 0;
-                      padding-left: 1.25rem;
-                      list-style: disc;
-                    `}
-                  >
+                  <ul css={bulletListStyles}>
                     <li>Add SSO connections (eg. GitHub)</li>
                     <li>Set up B2B authentication</li>
                     <li>Enable MFA</li>
@@ -437,39 +497,20 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                 <>
                   <p
                     css={css`
-                      ${basePromptElementStyles};
-                      color: #b4b4b4;
-                      font-size: 0.8125rem;
-                      font-weight: 400;
-                      line-height: 1rem;
+                      ${contentTextStyles};
                       text-wrap: pretty;
                     `}
                   >
                     Temporary API keys are enabled so you can get started immediately.
                   </p>
-                  <ul
-                    css={css`
-                      ${basePromptElementStyles};
-                      color: #b4b4b4;
-                      font-size: 0.8125rem;
-                      font-weight: 400;
-                      line-height: 1rem;
-                      margin: 0;
-                      padding-left: 1.25rem;
-                      list-style: disc;
-                    `}
-                  >
+                  <ul css={bulletListStyles}>
                     <li>Add SSO connections (eg. GitHub)</li>
                     <li>Set up B2B authentication</li>
                     <li>Enable MFA</li>
                   </ul>
                   <p
                     css={css`
-                      ${basePromptElementStyles};
-                      color: #b4b4b4;
-                      font-size: 0.8125rem;
-                      font-weight: 400;
-                      line-height: 1rem;
+                      ${contentTextStyles};
                       text-wrap: pretty;
                     `}
                   >
@@ -485,7 +526,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
               <button
                 type='button'
                 onClick={async () => {
-                  await _props.onDismiss?.();
+                  await props.onDismiss?.();
                   window.location.reload();
                 }}
                 css={css`
@@ -514,7 +555,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                   rel='noopener noreferrer'
                   css={css`
                     ${mainCTAStyles};
-                    animation: ${isForcedExpanded && isSignedIn
+                    animation: ${isForcedExpanded && isSignedInBoolean
                       ? 'show-main-CTA 800ms ease forwards'
                       : 'show-main-CTA 650ms ease-in forwards'};
 
@@ -599,6 +640,5 @@ const BodyPortal = ({ children }: PropsWithChildren) => {
     };
   }, []);
 
-  // Render the children inside the dynamically created div
   return portalContainer ? createPortal(children, portalContainer) : null;
 };
