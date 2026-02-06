@@ -158,13 +158,21 @@ export function getScriptNonceFromHeader(cspHeaderValue: string): string | undef
  * Uses React.cache to deduplicate calls within the same request.
  */
 export const getNonce = React.cache(async function getNonce(): Promise<string> {
-  // Dynamically import next/headers
-  // @ts-expect-error: Cannot find module 'next/headers' or its corresponding type declarations.ts(2307)
-  const { headers } = await import('next/headers');
-  const headersList = await headers();
-  const nonce = headersList.get('X-Nonce');
-  return nonce
-    ? nonce
-    : // Fallback to extracting from CSP header
-      getScriptNonceFromHeader(headersList.get('Content-Security-Policy') || '') || '';
+  try {
+    // Dynamically import next/headers
+    // @ts-expect-error: Cannot find module 'next/headers' or its corresponding type declarations.ts(2307)
+    const { headers } = await import('next/headers');
+    const headersList = await headers();
+    const nonce = headersList.get('X-Nonce');
+    return nonce
+      ? nonce
+      : // Fallback to extracting from CSP header
+        getScriptNonceFromHeader(headersList.get('Content-Security-Policy') || '') || '';
+  } catch (e) {
+    if (isPrerenderingBailout(e)) {
+      throw e;
+    }
+    // Graceful degradation — scripts load without nonce
+    return '';
+  }
 });
