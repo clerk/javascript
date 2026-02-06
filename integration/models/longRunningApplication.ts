@@ -106,8 +106,12 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
           throw error;
         }
         try {
-          const { port, serverUrl, pid } = await app.serve({ detached: true });
-          stateFile.addLongRunningApp({ port, serverUrl, pid, id, appDir: app.appDir, env: params.env.toJson() });
+          const serveResult = await app.serve({ detached: true });
+          port = serveResult.port;
+          serverUrl = serveResult.serverUrl;
+          pid = serveResult.pid;
+          appDir = app.appDir;
+          stateFile.addLongRunningApp({ port, serverUrl, pid, id, appDir, env: params.env.toJson() });
         } catch (error) {
           console.error('Error during app serve:', error);
           throw error;
