@@ -48,22 +48,10 @@ test.describe('Keyless mode @quickstart', () => {
     await app.teardown();
   });
 
-  test.skip('Navigates to non-existent page (/_not-found) without a infinite redirect loop.', async ({
-    page,
-    context,
-  }) => {
-    test.setTimeout(60000); // Increase timeout for this test
+  test('Navigates to non-existent page (/_not-found) without a infinite redirect loop.', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
-
-    // Wait for Clerk.js to load - use a longer timeout for keyless mode
-    await page
-      .waitForFunction(() => window.Clerk?.loaded, { timeout: 30000 })
-      .catch(() => {
-        // If Clerk.js doesn't load after 30s, it might be a redirect loop issue
-        // Continue to check for redirect loops anyway
-      });
-
+    await u.page.waitForClerkJsLoaded();
     await u.po.expect.toBeSignedOut();
 
     await u.po.keylessPopover.waitForMounted();
@@ -107,49 +95,26 @@ test.describe('Keyless mode @quickstart', () => {
 
     const claim = await u.po.keylessPopover.promptsToClaim();
 
-    // Verify the link href contains the expected claim URL pattern before clicking
-    const href = await claim.getAttribute('href');
-    expect(href).toContain('apps/claim');
-    expect(href).toContain('token=');
-
     const [newPage] = await Promise.all([context.waitForEvent('page'), claim.click()]);
 
     await newPage.waitForLoadState();
 
-    // Wait for navigation to either Clerk dashboard or Vercel SSO (which redirects to Clerk)
-    // The claim URL may redirect through Vercel SSO first
-    const urlToReturnTo = `${dashboardUrl}apps/claim?token=`;
+    await newPage.waitForURL(url => {
+      const urlToReturnTo = `${dashboardUrl}apps/claim?token=`;
 
-    await newPage.waitForURL(
-      url => {
-        // Check if we're on the Clerk dashboard claim sign-in page
-        if (url.hostname.includes('dashboard.clerk') && url.pathname === '/apps/claim/sign-in') {
-          const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
-          const signInForceRedirectUrl = url.searchParams.get('sign_in_force_redirect_url');
+      const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
 
-          const signUpForceRedirectUrlCheck =
-            signUpForceRedirectUrl?.startsWith(urlToReturnTo) ||
-            (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
-              signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
+      const signUpForceRedirectUrlCheck =
+        signUpForceRedirectUrl?.startsWith(urlToReturnTo) ||
+        (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
+          signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
 
-          return signInForceRedirectUrl?.startsWith(urlToReturnTo) && signUpForceRedirectUrlCheck;
-        }
-
-        // Check if we're on Vercel SSO (which will redirect to the claim URL)
-        // This is acceptable as it's part of the authentication flow
-        if (url.hostname.includes('vercel.com') && url.pathname === '/login') {
-          const nextParam = url.searchParams.get('next');
-          return (
-            nextParam?.includes(encodeURIComponent('dashboard.clerk')) &&
-            (nextParam?.includes(encodeURIComponent('apps/claim')) ||
-              nextParam?.includes(encodeURIComponent('sso-api')))
-          );
-        }
-
-        return false;
-      },
-      { timeout: 30000 },
-    );
+      return (
+        url.pathname === '/apps/claim/sign-in' &&
+        url.searchParams.get('sign_in_force_redirect_url')?.startsWith(urlToReturnTo) &&
+        signUpForceRedirectUrlCheck
+      );
+    });
   });
 
   test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({
