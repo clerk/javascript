@@ -1,6 +1,7 @@
 import {
   AccountlessApplicationAPI,
   ActorTokenAPI,
+  AgentTokenAPI,
   AllowlistIdentifierAPI,
   APIKeysAPI,
   BetaFeaturesAPI,
@@ -25,7 +26,6 @@ import {
   SignInTokenAPI,
   SignUpAPI,
   TestingTokenAPI,
-  TestSessionTokenAPI,
   UserAPI,
   WaitlistEntryAPI,
   WebhookAPI,
@@ -45,6 +45,10 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
       buildRequest({ ...options, requireSecretKey: false }),
     ),
     actorTokens: new ActorTokenAPI(request),
+    /**
+     * @experimental This is an experimental API for the Agent Tokens feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+     */
+    agentTokens: new AgentTokenAPI(request),
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
     apiKeys: new APIKeysAPI(
       buildRequest({
@@ -89,7 +93,6 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     sessions: new SessionAPI(request),
     signInTokens: new SignInTokenAPI(request),
     signUps: new SignUpAPI(request),
-    testSessionTokens: new TestSessionTokenAPI(request),
     testingTokens: new TestingTokenAPI(request),
     users: new UserAPI(request),
     waitlistEntries: new WaitlistEntryAPI(request),
