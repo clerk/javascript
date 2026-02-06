@@ -522,13 +522,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return uiProp.ClerkUI;
     }
 
-    // Support server-safe UI marker (react-server condition)
-    // When ui prop is present but ClerkUI is absent, dynamically import
-    if (uiProp?.__brand === '__clerkUI') {
-      const { ClerkUI } = await import('@clerk/ui/entry');
-      return ClerkUI;
-    }
-
     if (this.options.prefetchUI === false) {
       return undefined;
     }

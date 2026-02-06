@@ -73,7 +73,7 @@ export default defineConfig(overrideOptions => {
     clean: true,
     minify: false,
     sourcemap: true,
-    external: ['react', 'react-dom', '@clerk/ui/entry'],
+    external: ['react', 'react-dom'],
     // Bundle @clerk/ui/register inline at build time so consumers don't need
     // @clerk/ui as a dependency. The registration code sets up globalThis.__clerkSharedModules
     // to enable @clerk/ui's shared variant to use the host app's React.
