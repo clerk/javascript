@@ -157,7 +157,10 @@ export function getScriptNonceFromHeader(cspHeaderValue: string): string | undef
  * Fetches the nonce from request headers.
  * Uses React.cache to deduplicate calls within the same request.
  */
-export const getNonce = React.cache(async function getNonce(): Promise<string> {
+// React.cache is only available in RSC environments; provide a no-op fallback for tests/non-RSC contexts.
+const reactCache = typeof React.cache === 'function' ? React.cache : <T extends (...args: any[]) => any>(fn: T): T => fn;
+
+export const getNonce = reactCache(async function getNonce(): Promise<string> {
   try {
     // Dynamically import next/headers
     // @ts-expect-error: Cannot find module 'next/headers' or its corresponding type declarations.ts(2307)
