@@ -4,12 +4,9 @@ import { eventMethodCalled } from '../../telemetry/events';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkQuery } from '../clerk-rq/useQuery';
-import {
-  useAssertWrappedByClerkProvider,
-  useClerkInstanceContext,
-  useOrganizationContext,
-  useUserContext,
-} from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
+import { useOrganizationBase } from './base/useOrganizationBase';
+import { useUserBase } from './base/useUserBase';
 import { useBillingIsEnabled } from './useBillingIsEnabled';
 import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
 import { useSubscriptionCacheKeys } from './useSubscription.shared';
@@ -24,8 +21,8 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   useAssertWrappedByClerkProvider(HOOK_NAME);
 
   const clerk = useClerkInstanceContext();
-  const user = useUserContext();
-  const { organization } = useOrganizationContext();
+  const user = useUserBase();
+  const organization = useOrganizationBase();
 
   const billingEnabled = useBillingIsEnabled(params);
 

@@ -2,7 +2,8 @@ import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { EnvironmentResource } from '../../types/environment';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
-import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
+import { useUserBase } from './base/useUserBase';
 import { useOrganizationCreationDefaultsCacheKeys } from './useOrganizationCreationDefaults.shared';
 import type {
   UseOrganizationCreationDefaultsParams,
@@ -42,7 +43,7 @@ export function useOrganizationCreationDefaults(
 
   const { keepPreviousData = true, enabled = true } = params;
   const clerk = useClerkInstanceContext();
-  const user = useUserContext();
+  const user = useUserBase();
 
   // @ts-expect-error `__internal_environment` is not typed
   const environment = clerk.__internal_environment as unknown as EnvironmentResource | null | undefined;
