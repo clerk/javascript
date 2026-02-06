@@ -36,6 +36,17 @@ const appRouterAPWithClerkNextV6 = appRouterQuickstartV6
   .setName('next-app-router-ap-clerk-next-v6')
   .addDependency('@clerk/nextjs', '6');
 
+const cacheComponents = applicationConfig()
+  .setName('next-cache-components')
+  .useTemplate(templates['next-cache-components'])
+  .setEnvFormatter('public', key => `NEXT_PUBLIC_${key}`)
+  .addScript('setup', constants.E2E_NPM_FORCE ? 'pnpm install --force' : 'pnpm install')
+  .addScript('dev', 'pnpm dev')
+  .addScript('build', 'pnpm build')
+  .addScript('serve', 'pnpm start')
+  .addDependency('@clerk/nextjs', constants.E2E_CLERK_JS_VERSION || linkPackage('nextjs'))
+  .addDependency('@clerk/shared', linkPackage('shared'));
+
 export const next = {
   appRouter,
   appRouterTurbo,
@@ -43,4 +54,5 @@ export const next = {
   appRouterAPWithClerkNextLatest,
   appRouterAPWithClerkNextV6,
   appRouterQuickstartV6,
+  cacheComponents,
 } as const;
