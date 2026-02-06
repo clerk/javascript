@@ -69,8 +69,30 @@ runs:
           sleep 2
         done
         pnpm config set $(echo ${{ inputs.registry }} | sed -E 's/https?://')/:_authToken secretToken
-        # Verify proxy is working by trying to fetch a known package
-        pnpm view semver > /dev/null 2>&1 || echo "Warning: Could not fetch semver package, proxy might not be working"
+
+        # Verify proxy is working by testing multiple packages with retries
+        # These packages are known transitive dependencies that have caused CI failures
+        test_packages=("semver" "browserslist" "update-browserslist-db")
+        max_retries=3
+        retry_delay=2
+
+        for pkg in "${test_packages[@]}"; do
+          echo "Verifying proxy can fetch: $pkg"
+          for attempt in $(seq 1 $max_retries); do
+            if pnpm view "$pkg" version > /dev/null 2>&1; then
+              echo "✓ Successfully fetched $pkg"
+              break
+            fi
+            if [ $attempt -eq $max_retries ]; then
+              echo "✗ Failed to fetch $pkg after $max_retries attempts"
+              echo "Proxy verification failed - this may cause integration test failures"
+              exit 1
+            fi
+            echo "  Attempt $attempt failed, retrying in ${retry_delay}s..."
+            sleep $retry_delay
+          done
+        done
+        echo "Proxy verification complete - all test packages accessible"
 
     - name: Print published Clerk package versions
       shell: bash
