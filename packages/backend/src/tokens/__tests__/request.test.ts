@@ -10,7 +10,12 @@ import {
   mockJwtPayload,
   mockMalformedJwt,
 } from '../../fixtures';
-import { mockMachineAuthResponses, mockTokens, mockVerificationResults } from '../../fixtures/machine';
+import {
+  mockMachineAuthResponses,
+  mockSignedOAuthAccessTokenJwt,
+  mockTokens,
+  mockVerificationResults,
+} from '../../fixtures/machine';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
@@ -688,15 +693,15 @@ describe('tokens.authenticateRequest(options)', () => {
 
     const requestState = await authenticateRequest(
       mockRequestWithCookies(
-        {},
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
         {
           __client_uat: '0',
+          __clerk_db_jwt: mockJwt,
         },
       ),
       mockOptions({
-        secretKey: 'deadbeef',
+        secretKey: 'sk_test_deadbeef',
         publishableKey: PK_TEST,
-        clientUat: '0',
         isSatellite: true,
         signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
@@ -790,6 +795,84 @@ describe('tokens.authenticateRequest(options)', () => {
     expect(requestState.toAuth()).toBeSignedOutToAuth();
   });
 
+  test('cookieToken: returns signed out without handshake when satelliteAutoSync is false and no cookies', async () => {
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        { __client_uat: '0' },
+        `http://satellite.example/path`,
+      ),
+      mockOptions({
+        secretKey: 'deadbeef',
+        publishableKey: PK_LIVE,
+        signInUrl: 'https://primary.example/sign-in',
+        isSatellite: true,
+        domain: 'satellite.example',
+        satelliteAutoSync: false,
+      }),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: AuthErrorReason.SessionTokenAndUATMissing,
+      isSatellite: true,
+      domain: 'satellite.example',
+      signInUrl: 'https://primary.example/sign-in',
+    });
+    expect(requestState.toAuth()).toBeSignedOutToAuth();
+    // Should NOT have a location header (no handshake redirect)
+    expect(requestState.headers.get('location')).toBeNull();
+  });
+
+  test('cookieToken: triggers handshake when satelliteAutoSync is false but __clerk_synced=false is present', async () => {
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        { __client_uat: '0' },
+        `http://satellite.example/path?__clerk_synced=false`,
+      ),
+      mockOptions({
+        secretKey: 'deadbeef',
+        publishableKey: PK_LIVE,
+        signInUrl: 'https://primary.example/sign-in',
+        isSatellite: true,
+        domain: 'satellite.example',
+        satelliteAutoSync: false,
+      }),
+    );
+
+    expect(requestState).toMatchHandshake({
+      reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
+      isSatellite: true,
+      domain: 'satellite.example',
+      signInUrl: 'https://primary.example/sign-in',
+    });
+  });
+
+  test('cookieToken: returns signed out when __clerk_synced=true (completed) is present', async () => {
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        { __client_uat: '0' },
+        `http://satellite.example/path?__clerk_synced=true`,
+      ),
+      mockOptions({
+        secretKey: 'deadbeef',
+        publishableKey: PK_LIVE,
+        signInUrl: 'https://primary.example/sign-in',
+        isSatellite: true,
+        domain: 'satellite.example',
+      }),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: AuthErrorReason.SessionTokenAndUATMissing,
+      isSatellite: true,
+      domain: 'satellite.example',
+      signInUrl: 'https://primary.example/sign-in',
+    });
+    expect(requestState.toAuth()).toBeSignedOutToAuth();
+  });
+
   test('cookieToken: returns handshake when app is not satellite and responds to syncing on dev instances[12y]', async () => {
     const sp = new URLSearchParams();
     sp.set('__clerk_redirect_url', 'http://localhost:3000');
@@ -833,7 +916,35 @@ describe('tokens.authenticateRequest(options)', () => {
     const location = requestState.headers.get('location');
     expect(location).toBeTruthy();
     expect(location).toContain('localhost:3001/dashboard');
+    // Should contain the sync param (with Completed status)
     expect(location).toContain('__clerk_synced=true');
+  });
+
+  test('cookieToken: primary responds to syncing overwrites __clerk_synced=false with __clerk_synced=true (no duplicates)', async () => {
+    const sp = new URLSearchParams();
+    // Redirect URL already contains __clerk_synced=false (NeedsSync)
+    sp.set('__clerk_redirect_url', 'http://localhost:3001/dashboard?__clerk_synced=false');
+    sp.set('__clerk_db_jwt', mockJwt);
+    const requestUrl = `http://localhost:3000/sign-in?${sp.toString()}`;
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        { __client_uat: '12345', __session: mockJwt, __clerk_db_jwt: mockJwt },
+        requestUrl,
+      ),
+      mockOptions({ secretKey: 'sk_test_deadbeef', isSatellite: false }),
+    );
+
+    expect(requestState).toMatchHandshake({
+      reason: AuthErrorReason.PrimaryRespondsToSyncing,
+    });
+
+    const location = requestState.headers.get('location');
+    expect(location).toBeTruthy();
+    // Should overwrite __clerk_synced=false with __clerk_synced=true, not append
+    expect(location).toContain('__clerk_synced=true');
+    // Should NOT contain __clerk_synced=false anymore
+    expect(location).not.toContain('__clerk_synced=false');
   });
 
   test('cookieToken: returns signed out when no cookieToken and no clientUat in production [4y]', async () => {
@@ -1390,10 +1501,21 @@ describe('tokens.authenticateRequest(options)', () => {
           isAuthenticated: false,
         });
       });
+
+      test('rejects OAuth JWT token when acceptsToken is session_token', async () => {
+        const request = mockRequest({ authorization: `Bearer ${mockSignedOAuthAccessTokenJwt}` });
+        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'session_token' }));
+
+        expect(result).toBeSignedOut({
+          reason: AuthErrorReason.TokenTypeMismatch,
+          message: '',
+        });
+        expect(result.toAuth()).toBeSignedOutToAuth();
+      });
     });
 
     describe('Array of Accepted Token Types', () => {
-      test('accepts token when it is in the acceptsToken array', async () => {
+      test('accepts machine token when it is in the acceptsToken array', async () => {
         server.use(
           http.post(mockMachineAuthResponses.api_key.endpoint, () => {
             return HttpResponse.json(mockVerificationResults.api_key);
@@ -1409,7 +1531,64 @@ describe('tokens.authenticateRequest(options)', () => {
         expect(requestState).toBeMachineAuthenticated();
       });
 
-      test('returns unauthenticated state when token type is not in the acceptsToken array', async () => {
+      test('accepts session token in header when session_token is in the acceptsToken array', async () => {
+        server.use(
+          http.get('https://api.clerk.test/v1/jwks', () => {
+            return HttpResponse.json(mockJwks);
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${mockJwt}` });
+        const requestState = await authenticateRequest(
+          request,
+          mockOptions({ acceptsToken: ['session_token', 'api_key'] }),
+        );
+
+        expect(requestState).toBeSignedIn();
+        expect(requestState.toAuth()).toBeSignedInToAuth();
+      });
+
+      test('accepts session token in cookie when session_token is in the acceptsToken array', async () => {
+        server.use(
+          http.get('https://api.clerk.test/v1/jwks', () => {
+            return HttpResponse.json(mockJwks);
+          }),
+        );
+
+        const requestState = await authenticateRequest(
+          mockRequestWithCookies(
+            {},
+            {
+              __session: mockJwt,
+              __client_uat: '12345',
+            },
+          ),
+          mockOptions({ acceptsToken: ['session_token', 'api_key'] }),
+        );
+
+        // The key assertion: session token is accepted (not rejected as invalid token)
+        // Cookie-based auth may trigger handshake flow, but should not return TokenTypeMismatch
+        expect(requestState.tokenType).not.toBeNull();
+        expect(requestState.reason).not.toBe(AuthErrorReason.TokenTypeMismatch);
+      });
+
+      test('accepts machine token when acceptsToken array contains mixed token types', async () => {
+        server.use(
+          http.post(mockMachineAuthResponses.m2m_token.endpoint, () => {
+            return HttpResponse.json(mockVerificationResults.m2m_token);
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
+        const requestState = await authenticateRequest(
+          request,
+          mockOptions({ acceptsToken: ['session_token', 'm2m_token'] }),
+        );
+
+        expect(requestState).toBeMachineAuthenticated();
+      });
+
+      test('returns unauthenticated state when machine token type is not in the acceptsToken array', async () => {
         const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
         const requestState = await authenticateRequest(
           request,
@@ -1424,6 +1603,43 @@ describe('tokens.authenticateRequest(options)', () => {
         expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: null,
           isAuthenticated: false,
+        });
+      });
+
+      test('returns unauthenticated state when session token is provided but not in the acceptsToken array', async () => {
+        const request = mockRequest({ authorization: `Bearer ${mockJwt}` });
+        const requestState = await authenticateRequest(
+          request,
+          mockOptions({ acceptsToken: ['api_key', 'oauth_token'] }),
+        );
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: null,
+          reason: AuthErrorReason.TokenTypeMismatch,
+          message: '',
+        });
+        expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
+          tokenType: null,
+          isAuthenticated: false,
+        });
+      });
+
+      test('returns unauthenticated state when no token is provided and acceptsToken array contains only machine tokens', async () => {
+        const requestState = await authenticateRequest(
+          mockRequestWithCookies(
+            {},
+            {
+              __session: mockJwt,
+              __client_uat: '12345',
+            },
+          ),
+          mockOptions({ acceptsToken: ['api_key', 'm2m_token'] }),
+        );
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: null,
+          reason: AuthErrorReason.TokenTypeMismatch,
+          message: '',
         });
       });
     });

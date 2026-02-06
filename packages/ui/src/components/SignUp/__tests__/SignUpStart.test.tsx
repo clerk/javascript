@@ -89,12 +89,24 @@ describe('SignUpStart', () => {
     });
 
     it('should keep email optional when phone is primary with password', async () => {
-      const { wrapper } = await createFixtures(f => {
+      const { wrapper: Wrapper } = await createFixtures(f => {
         f.withEmailAddress({ required: false });
         f.withPhoneNumber({ required: true });
         f.withPassword({ required: true });
       });
-      render(<SignUpStart />, { wrapper });
+
+      const wrapperWithOptionalFields = ({ children }: { children: React.ReactNode }) => (
+        <Wrapper>
+          <AppearanceProvider
+            appearanceKey={'signUp'}
+            appearance={{ options: { showOptionalFields: true } }}
+          >
+            {children}
+          </AppearanceProvider>
+        </Wrapper>
+      );
+
+      render(<SignUpStart />, { wrapper: wrapperWithOptionalFields });
 
       const emailAddress = screen.getByLabelText('Email address', { selector: 'input' });
       expect(emailAddress.ariaRequired).toBe('false');
@@ -168,12 +180,24 @@ describe('SignUpStart', () => {
     });
 
     it('enables optional phone number', async () => {
-      const { wrapper } = await createFixtures(f => {
+      const { wrapper: Wrapper } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
         f.withPhoneNumber({ required: false });
         f.withPassword({ required: true });
       });
-      render(<SignUpStart />, { wrapper });
+
+      const wrapperWithOptionalFields = ({ children }: { children: React.ReactNode }) => (
+        <Wrapper>
+          <AppearanceProvider
+            appearanceKey={'signUp'}
+            appearance={{ options: { showOptionalFields: true } }}
+          >
+            {children}
+          </AppearanceProvider>
+        </Wrapper>
+      );
+
+      render(<SignUpStart />, { wrapper: wrapperWithOptionalFields });
       expect(screen.getByText('Phone number').nextElementSibling?.textContent).toBe('Optional');
     });
 
@@ -287,7 +311,7 @@ describe('SignUpStart', () => {
   describe('initialValues', () => {
     it('prefills the emailAddress field with the correct initial value', async () => {
       const { wrapper, props } = await createFixtures(f => {
-        f.withEmailAddress();
+        f.withEmailAddress({ required: true });
       });
       props.setProps({ initialValues: { emailAddress: 'foo@clerk.com' } });
 
@@ -297,7 +321,7 @@ describe('SignUpStart', () => {
 
     it('prefills the phoneNumber field with the correct initial value', async () => {
       const { wrapper, props } = await createFixtures(f => {
-        f.withPhoneNumber();
+        f.withPhoneNumber({ required: true });
       });
       props.setProps({ initialValues: { phoneNumber: '+306911111111' } });
 
@@ -307,7 +331,7 @@ describe('SignUpStart', () => {
 
     it('prefills the username field with the correct initial value', async () => {
       const { wrapper, props } = await createFixtures(f => {
-        f.withUsername();
+        f.withUsername({ required: true });
       });
 
       props.setProps({ initialValues: { username: 'foo' } });
@@ -379,7 +403,11 @@ describe('SignUpStart', () => {
       );
 
       await waitFor(() =>
-        expect(fixtures.signUp.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' }),
+        expect(fixtures.signUp.create).toHaveBeenCalledWith({
+          strategy: 'ticket',
+          ticket: 'test_ticket',
+          unsafeMetadata: undefined,
+        }),
       );
 
       //don't remove the query param quite yet
@@ -387,6 +415,39 @@ describe('SignUpStart', () => {
         undefined,
         '',
         expect.not.stringContaining('__clerk_ticket'),
+      );
+    });
+
+    it('passes unsafeMetadata to signUp.create when ticket is detected', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+      });
+      fixtures.signUp.create.mockResolvedValueOnce({} as SignUpResource);
+      props.setProps({ unsafeMetadata: { foo: 'bar', nested: { value: 123 } } });
+
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: { href: 'http://localhost/sign-up?__clerk_ticket=test_ticket' },
+      });
+      Object.defineProperty(window, 'history', {
+        writable: true,
+        value: { replaceState: vi.fn() },
+      });
+
+      render(
+        <CardStateProvider>
+          <SignUpStart />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await waitFor(() =>
+        expect(fixtures.signUp.create).toHaveBeenCalledWith({
+          strategy: 'ticket',
+          ticket: 'test_ticket',
+          unsafeMetadata: { foo: 'bar', nested: { value: 123 } },
+        }),
       );
     });
 
@@ -414,7 +475,11 @@ describe('SignUpStart', () => {
       );
 
       await waitFor(() =>
-        expect(fixtures.signUp.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' }),
+        expect(fixtures.signUp.create).toHaveBeenCalledWith({
+          strategy: 'ticket',
+          ticket: 'test_ticket',
+          unsafeMetadata: undefined,
+        }),
       );
 
       expect(window.history.replaceState).toHaveBeenCalledWith(

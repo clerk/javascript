@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import meow from 'meow';
 
-import { getOldPackageName, getTargetPackageName, loadConfig } from './config.js';
+import { getAvailableReleases, getOldPackageName, getTargetPackageName, loadConfig } from './config.js';
 import {
   createSpinner,
   promptConfirm,
@@ -53,14 +53,14 @@ const cli = meow(
   {
     importMeta: import.meta,
     flags: {
-      sdk: { type: 'string' },
       dir: { type: 'string', default: process.cwd() },
+      dryRun: { type: 'boolean', default: false },
       glob: { type: 'string', default: '**/*.(js|jsx|ts|tsx|mjs|cjs)' },
       ignore: { type: 'string', isMultiple: true },
-      skipUpgrade: { type: 'boolean', default: false },
       release: { type: 'string' },
-      dryRun: { type: 'boolean', default: false },
+      sdk: { type: 'string' },
       skipCodemods: { type: 'boolean', default: false },
+      skipUpgrade: { type: 'boolean', default: false },
     },
   },
 );
@@ -70,12 +70,12 @@ async function main() {
 
   const options = {
     dir: cli.flags.dir,
+    dryRun: cli.flags.dryRun,
     glob: cli.flags.glob,
     ignore: cli.flags.ignore,
-    skipUpgrade: cli.flags.skipUpgrade,
     release: cli.flags.release,
-    dryRun: cli.flags.dryRun,
     skipCodemods: cli.flags.skipCodemods,
+    skipUpgrade: cli.flags.skipUpgrade,
   };
 
   if (options.dryRun) {
@@ -119,15 +119,52 @@ async function main() {
   const currentVersion = getSdkVersion(sdk, options.dir);
   const packageManager = detectPackageManager(options.dir);
 
-  // Step 3: Load version config
-  const config = await loadConfig(sdk, currentVersion, options.release);
+  // Step 3: If version couldn't be detected and no release specified, prompt user
+  let release = options.release;
+
+  if (currentVersion === null && !release) {
+    const availableReleases = getAvailableReleases();
+
+    if (availableReleases.length === 0) {
+      renderError('No upgrade configurations found.');
+      process.exit(1);
+    }
+
+    renderWarning(
+      `Could not detect your @clerk/${sdk} version (you may be using catalog: protocol or a non-standard version specifier).`,
+    );
+    renderNewline();
+
+    if (!isInteractive) {
+      renderError('Please provide --release flag in non-interactive mode.');
+      renderText('Available releases: ' + availableReleases.join(', '));
+      process.exit(1);
+    }
+
+    const releaseOptions = availableReleases.map(r => ({
+      label: r.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase()),
+      value: r,
+    }));
+
+    release = await promptSelect('Which upgrade would you like to perform?', releaseOptions);
+
+    if (!release) {
+      renderError('No release selected. Exiting.');
+      process.exit(1);
+    }
+
+    renderNewline();
+  }
+
+  // Step 4: Load version config
+  const config = await loadConfig(sdk, currentVersion, release);
 
   if (!config) {
     renderError(`No upgrade path found for @clerk/${sdk}. Your version may be too old for this upgrade tool.`);
     process.exit(1);
   }
 
-  // Step 4: Display configuration
+  // Step 5: Display configuration
   renderConfig({
     sdk,
     currentVersion,
@@ -145,7 +182,7 @@ async function main() {
 
   console.log('');
 
-  // Step 5: Handle upgrade status
+  // Step 6: Handle upgrade status
   if (options.skipUpgrade) {
     renderText('Skipping package upgrade (--skip-upgrade flag)', 'yellow');
     renderNewline();
@@ -155,7 +192,7 @@ async function main() {
     await performUpgrade(sdk, packageManager, config, options);
   }
 
-  // Step 6: Run codemods
+  // Step 7: Run codemods
   if (config.codemods?.length > 0) {
     renderText(`Running ${config.codemods.length} codemod(s)...`, 'blue');
     await runCodemods(config, sdk, options);
@@ -163,14 +200,14 @@ async function main() {
     renderNewline();
   }
 
-  // Step 7: Run scans
+  // Step 8: Run scans
   if (config.changes?.length > 0) {
     renderText('Scanning for additional breaking changes...', 'blue');
     const results = await runScans(config, sdk, options);
     renderScanResults(results, config.docsUrl);
   }
 
-  // Step 8: Done
+  // Step 9: Done
   renderComplete(sdk, config.docsUrl);
 }
 

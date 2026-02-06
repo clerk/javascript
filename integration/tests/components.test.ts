@@ -93,6 +93,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('component
 
   const signOut = async ({ app, page, context }) => {
     const u = createTestUtils({ app, page, context });
+    await u.page.waitForClerkJsLoaded();
     await u.page.evaluate(async () => {
       await window.Clerk.signOut();
     });

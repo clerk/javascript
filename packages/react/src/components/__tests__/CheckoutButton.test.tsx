@@ -46,7 +46,7 @@ describe('CheckoutButton', () => {
 
       // Expect the component to throw an error
       expect(() => render(<CheckoutButton planId='test_plan' />)).toThrow(
-        'Ensure that `<CheckoutButton />` is rendered inside a `<SignedIn />` component.',
+        'Ensure that `<CheckoutButton />` is rendered only when the user is signed in (wrap with `<Show when="signed-in">` or guard with `useAuth()`).',
       );
     });
 

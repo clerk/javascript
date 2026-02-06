@@ -51,7 +51,7 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
   getMemberships: GetMemberships;
   getInvitations: (params?: GetInvitationsParams) => Promise<ClerkPaginatedResponse<OrganizationInvitationResource>>;
-  getRoles: (params?: GetRolesParams) => Promise<ClerkPaginatedResponse<RoleResource>>;
+  getRoles: (params?: GetRolesParams) => Promise<GetRolesResponse>;
   getDomains: (params?: GetDomainsParams) => Promise<ClerkPaginatedResponse<OrganizationDomainResource>>;
   getMembershipRequests: (
     params?: GetMembershipRequestParams,
@@ -69,6 +69,10 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
 }
 
 export type GetRolesParams = ClerkPaginationParams;
+
+export interface GetRolesResponse extends ClerkPaginatedResponse<RoleResource> {
+  has_role_set_migration?: boolean;
+}
 
 export type GetMembersParams = ClerkPaginationParams<{
   role?: OrganizationCustomRoleKey[];

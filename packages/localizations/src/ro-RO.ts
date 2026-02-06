@@ -372,6 +372,13 @@ export const roRO: LocalizationResource = {
         tableHeader__role: 'Rol',
         tableHeader__user: 'Utilizator',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Actualizăm rolurile disponibile. Odată ce acest lucru este finalizat, veți putea actualiza din nou rolurile.',
+          title: 'Rolurile sunt temporar blocate',
+        },
+      },
       detailsTitle__emptyRow: 'Nu sunt membri de afișat',
       invitationsTab: {
         autoInvitations: {
@@ -760,6 +767,10 @@ export const roRO: LocalizationResource = {
       subtitle: 'Pentru a continua, introdu codul generat de aplicația ta de autentificare',
       title: 'Verificare în doi pași',
     },
+    web3Solana: {
+      subtitle: 'Selectați un portofel mai jos pentru a vă conecta',
+      title: 'Conectare cu Solana',
+    },
   },
   signInEnterPasswordTitle: 'Introdu parola',
   signUp: {
@@ -853,15 +864,24 @@ export const roRO: LocalizationResource = {
       title: 'Creează-ți contul',
       titleCombined: 'Creează-ți contul',
     },
+    web3Solana: {
+      subtitle: 'Selectați un portofel mai jos pentru a vă înregistra',
+      title: 'Înregistrare cu Solana',
+    },
   },
   socialButtonsBlockButton: 'Continuă cu {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Există deja o organizație pentru numele companiei detectate ({{organizationName}}) și {{organizationDomain}}. Alătură-te prin invitație.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Creează organizație nouă',
       action__invitationAccept: 'Alătură-te',
       action__suggestionsAccept: 'Solicită alăturarea',
       subtitle: 'Alătură-te unei organizații existente sau creează una nouă',
+      subtitle__createOrganizationDisabled: 'Alătură-te unei organizații existente',
       suggestionsAcceptedLabel: 'În așteptare',
       title: 'Alege o organizație',
     },
@@ -874,6 +894,10 @@ export const roRO: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Introdu detaliile organizației pentru a continua',
       title: 'Configurează-ți organizația',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'Contactează administratorul organizației tale pentru o invitație.',
+      title: 'Trebuie să aparții unei organizații',
     },
     signOut: {
       actionLink: 'Deconectează-te',
@@ -889,6 +913,69 @@ export const roRO: LocalizationResource = {
     subtitle: undefined,
     title: undefined,
   },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} este deja membru al organizației.',
     avatar_file_size_exceeded:
@@ -899,6 +986,8 @@ export const roRO: LocalizationResource = {
     captcha_unavailable:
       'Înregistrarea a eșuat din cauza validării anti-bot. Reîmprospătează pagina sau contactează suportul.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Serviciile de e-mail temporare nu sunt acceptate. Vă rugăm să folosiți adresa dvs. de e-mail obișnuită pentru a crea un cont.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -915,9 +1004,12 @@ export const roRO: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Parola este prea scurtă. Trebuie să aibă cel puțin 8 caractere.',
     form_password_not_strong_enough: 'Parola ta nu este suficient de puternică.',
+    form_password_or_identifier_incorrect:
+      'Parola sau adresa de e-mail este incorectă. Încearcă din nou sau folosește o altă metodă.',
     form_password_pwned:
       'Această parolă a fost găsită într-o breșă de securitate și nu poate fi folosită. Te rugăm alege alta.',
     form_password_pwned__sign_in:
@@ -958,6 +1050,9 @@ export const roRO: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Nu am găsit o extensie pentru portofel Web3. Te rugăm instalează una pentru a continua.',
+    web3_signature_request_rejected: 'Ați respins solicitarea de semnătură. Încercați din nou pentru a continua.',
+    web3_solana_signature_generation_failed:
+      'A apărut o eroare la generarea semnăturii. Încercați din nou pentru a continua.',
     zxcvbn: {
       couldBeStronger: 'Parola ta funcționează, dar ar putea fi mai puternică. Încearcă să adaugi mai multe caractere.',
       goodPassword: 'Parola ta îndeplinește toate cerințele necesare.',
@@ -1326,6 +1421,10 @@ export const roRO: LocalizationResource = {
         detailsAction__nonPrimary: 'Setează ca principal',
         primaryButton: 'Conectează portofel',
         title: 'Portofele Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selectați un portofel Solana pentru a-l conecta la contul dvs.',
+          title: 'Adăugați un portofel Solana',
+        },
       },
     },
     usernamePage: {
@@ -1360,5 +1459,11 @@ export const roRO: LocalizationResource = {
       subtitle: 'Te vom contacta când îți vine rândul',
       title: 'Mulțumim pentru înscriere!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Conectează cu {{walletName}}',
+    continue: 'Continuă cu {{walletName}}',
+    noneAvailable:
+      'Nu s-au detectat portofele Solana Web3. Instalați un {{ solanaWalletsLink || link("wallet extension") }} compatibil cu Web3.',
   },
 } as const;

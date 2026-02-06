@@ -1,6 +1,7 @@
 export { auth } from './auth';
 export { clerkClient } from './clerkClient';
 export { clerkMiddleware } from './clerkMiddleware';
+export type { ClerkMiddlewareOptions, ClerkMiddlewareOptionsCallback } from './types';
 
 /**
  * Re-export resource types from @clerk/backend

@@ -1,6 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
-import { loadClerkJsScript, loadClerkUiScript } from '@clerk/shared/loadClerkJsScript';
+import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
@@ -18,6 +18,7 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  AuthenticateWithSolanaParams,
   BillingNamespace,
   Clerk,
   ClerkAuthenticateWithWeb3Params,
@@ -32,6 +33,7 @@ import type {
   HandleOAuthCallbackParams,
   JoinWaitlistParams,
   ListenerCallback,
+  ListenerOptions,
   LoadedClerk,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -39,6 +41,7 @@ import type {
   OrganizationSwitcherProps,
   PricingTableProps,
   RedirectOptions,
+  Resources,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -49,6 +52,7 @@ import type {
   State,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
+  TaskSetupMFAProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
   UserAvatarProps,
@@ -86,7 +90,7 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
-  __internal_ClerkUiCtor?: ClerkUiConstructor;
+  __internal_ClerkUICtor?: ClerkUiConstructor;
 }
 
 declare const global: Global;
@@ -154,12 +158,16 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   private premountTaskResetPasswordNodes = new Map<HTMLDivElement, TaskResetPasswordProps | undefined>();
+  private premountTaskSetupMfaNodes = new Map<HTMLDivElement, TaskSetupMFAProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
     {
-      unsubscribe: UnsubscribeCallback;
-      nativeUnsubscribe?: UnsubscribeCallback;
+      options?: ListenerOptions;
+      handlers: {
+        unsubscribe: UnsubscribeCallback;
+        nativeUnsubscribe?: UnsubscribeCallback;
+      };
     }
   >();
   private loadedListeners: Array<() => void> = [];
@@ -460,12 +468,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
-      const clerkUiCtor = this.getClerkUiEntryChunk();
+      const clerkUICtor = await this.getClerkUiEntryChunk();
       const clerk = await this.getClerkJsEntryChunk();
 
       if (!clerk.loaded) {
         this.beforeLoad(clerk);
-        await clerk.load({ ...this.options, clerkUiCtor });
+        await clerk.load({ ...this.options, clerkUICtor });
       }
       if (clerk.loaded) {
         this.replayInterceptedInvocations(clerk);
@@ -483,7 +491,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (!this.options.Clerk && !__BUILD_DISABLE_RHC__) {
       // the UMD script sets the global.Clerk instance
       // we do not want to await here as we
-      await loadClerkJsScript({
+      await loadClerkJSScript({
         ...this.options,
         publishableKey: this.#publishableKey,
         proxyUrl: this.proxyUrl,
@@ -507,26 +515,29 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return global.Clerk;
   }
 
-  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor> {
-    if (this.options.clerkUiCtor) {
-      return this.options.clerkUiCtor;
+  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor | undefined> {
+    // Honor explicit clerkUICtor even when prefetchUI=false
+    if (this.options.clerkUICtor) {
+      return this.options.clerkUICtor;
     }
 
-    await loadClerkUiScript({
+    if (this.options.prefetchUI === false) {
+      return undefined;
+    }
+
+    await loadClerkUIScript({
       ...this.options,
-      clerkUiVersion: this.options.ui?.version,
-      clerkUiUrl: this.options.ui?.url || this.options.clerkUiUrl,
       publishableKey: this.#publishableKey,
       proxyUrl: this.proxyUrl,
       domain: this.domain,
       nonce: this.options.nonce,
     });
 
-    if (!global.__internal_ClerkUiCtor) {
+    if (!global.__internal_ClerkUICtor) {
       throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
     }
 
-    return global.__internal_ClerkUiCtor;
+    return global.__internal_ClerkUICtor;
   }
 
   public on: Clerk['on'] = (...args) => {
@@ -582,8 +593,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.clerkjs = clerkjs;
 
     this.premountMethodCalls.forEach(cb => cb());
-    this.premountAddListenerCalls.forEach((listenerHandlers, listener) => {
-      listenerHandlers.nativeUnsubscribe = clerkjs.addListener(listener);
+    this.premountAddListenerCalls.forEach((listenerExtras, listener) => {
+      listenerExtras.handlers.nativeUnsubscribe = clerkjs.addListener(listener, listenerExtras.options);
     });
 
     this.#eventBus.internal.retrieveListeners('status')?.forEach(listener => {
@@ -694,6 +705,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountTaskResetPassword(node, props);
     });
 
+    this.premountTaskSetupMfaNodes.forEach((props, node) => {
+      clerkjs.mountTaskSetupMfa(node, props);
+    });
+
     /**
      * Only update status in case `clerk.status` is missing. In any other case, `clerk-js` should be the orchestrator.
      */
@@ -801,6 +816,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return (clerkjs as any).__internal_updateProps(props);
     }
   };
+
+  get __internal_lastEmittedResources(): Resources | undefined {
+    return this.clerkjs?.__internal_lastEmittedResources;
+  }
 
   /**
    * `setActive` can be used to set the active session and/or organization.
@@ -1254,18 +1273,34 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  addListener = (listener: ListenerCallback): UnsubscribeCallback => {
+  mountTaskSetupMfa = (node: HTMLDivElement, props?: TaskSetupMFAProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountTaskSetupMfa(node, props);
+    } else {
+      this.premountTaskSetupMfaNodes.set(node, props);
+    }
+  };
+
+  unmountTaskSetupMfa = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountTaskSetupMfa(node);
+    } else {
+      this.premountTaskSetupMfaNodes.delete(node);
+    }
+  };
+
+  addListener = (listener: ListenerCallback, options?: ListenerOptions): UnsubscribeCallback => {
     if (this.clerkjs) {
-      return this.clerkjs.addListener(listener);
+      return this.clerkjs.addListener(listener, options);
     } else {
       const unsubscribe = () => {
-        const listenerHandlers = this.premountAddListenerCalls.get(listener);
-        if (listenerHandlers) {
-          listenerHandlers.nativeUnsubscribe?.();
+        const listenerExtras = this.premountAddListenerCalls.get(listener);
+        if (listenerExtras?.handlers) {
+          listenerExtras?.handlers.nativeUnsubscribe?.();
           this.premountAddListenerCalls.delete(listener);
         }
       };
-      this.premountAddListenerCalls.set(listener, { unsubscribe, nativeUnsubscribe: undefined });
+      this.premountAddListenerCalls.set(listener, { options, handlers: { unsubscribe, nativeUnsubscribe: undefined } });
       return unsubscribe;
     }
   };
@@ -1465,6 +1500,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithOKXWallet', callback);
+    }
+  };
+
+  authenticateWithSolana = async (params: AuthenticateWithSolanaParams) => {
+    const callback = () => this.clerkjs?.authenticateWithSolana(params);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('authenticateWithSolana', callback);
     }
   };
 

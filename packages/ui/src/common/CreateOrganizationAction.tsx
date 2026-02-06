@@ -1,6 +1,5 @@
 import { useUser } from '@clerk/shared/react/index';
 
-import { useEnvironment } from '../contexts';
 import { Action } from '../elements/Actions';
 import { Add } from '../icons';
 
@@ -8,12 +7,8 @@ type CreateOrganizationActionProps = Omit<React.ComponentProps<typeof Action>, '
 
 export const CreateOrganizationAction = (props: CreateOrganizationActionProps) => {
   const { user } = useUser();
-  const { organizationSettings } = useEnvironment();
 
-  const currentMembershipCount = (user?.organizationMemberships ?? []).length;
-  const canCreateAdditionalMembership = currentMembershipCount < organizationSettings.maxAllowedMemberships;
-
-  if (!user?.createOrganizationEnabled || !canCreateAdditionalMembership) {
+  if (!user?.createOrganizationEnabled) {
     return null;
   }
 

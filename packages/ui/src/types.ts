@@ -20,11 +20,15 @@ import type {
   SignUpProps,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
+  TaskSetupMFAProps,
   UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
 } from '@clerk/shared/types';
+import type { MutableRefObject } from 'react';
+
+import type { WithInternalRouting } from './internal';
 
 export type {
   __internal_OAuthConsentProps,
@@ -60,28 +64,29 @@ export type AvailableComponentProps =
   | __internal_PlanDetailsProps
   | APIKeysProps
   | TaskChooseOrganizationProps
-  | TaskResetPasswordProps;
+  | TaskResetPasswordProps
+  | TaskSetupMFAProps;
 
 type ComponentMode = 'modal' | 'mounted';
 type SignInMode = 'modal' | 'redirect';
 
-export type SignInCtx = SignInProps & {
+export type SignInCtx = WithInternalRouting<SignInProps> & {
   componentName: 'SignIn';
   mode?: ComponentMode;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl;
 
-export type UserVerificationCtx = __internal_UserVerificationProps & {
+export type UserVerificationCtx = WithInternalRouting<__internal_UserVerificationProps> & {
   componentName: 'UserVerification';
   mode?: ComponentMode;
 };
 
-export type UserProfileCtx = UserProfileProps & {
+export type UserProfileCtx = WithInternalRouting<UserProfileProps> & {
   componentName: 'UserProfile';
   mode?: ComponentMode;
 };
 
-export type SignUpCtx = SignUpProps & {
+export type SignUpCtx = WithInternalRouting<SignUpProps> & {
   componentName: 'SignUp';
   mode?: ComponentMode;
   emailLinkRedirectUrl?: string;
@@ -98,12 +103,12 @@ export type UserAvatarCtx = UserAvatarProps & {
   componentName: 'UserAvatar';
 };
 
-export type OrganizationProfileCtx = OrganizationProfileProps & {
+export type OrganizationProfileCtx = WithInternalRouting<OrganizationProfileProps> & {
   componentName: 'OrganizationProfile';
   mode?: ComponentMode;
 };
 
-export type CreateOrganizationCtx = CreateOrganizationProps & {
+export type CreateOrganizationCtx = WithInternalRouting<CreateOrganizationProps> & {
   componentName: 'CreateOrganization';
   mode?: ComponentMode;
 };
@@ -144,6 +149,7 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 
 export type SessionTasksCtx = {
   redirectUrlComplete: string;
+  redirectOnActiveSession?: MutableRefObject<boolean>;
 };
 
 export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {
@@ -152,6 +158,10 @@ export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {
 
 export type TaskResetPasswordCtx = TaskResetPasswordProps & {
   componentName: 'TaskResetPassword';
+};
+
+export type TaskSetupMFACtx = TaskSetupMFAProps & {
+  componentName: 'TaskSetupMFA';
 };
 
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
@@ -186,5 +196,6 @@ export type AvailableComponentCtx =
   | SubscriptionDetailsCtx
   | PlanDetailsCtx
   | TaskChooseOrganizationCtx
-  | TaskResetPasswordCtx;
+  | TaskResetPasswordCtx
+  | TaskSetupMFACtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

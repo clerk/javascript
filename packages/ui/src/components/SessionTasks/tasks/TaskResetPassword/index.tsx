@@ -75,7 +75,7 @@ const TaskResetPasswordInternal = () => {
 
   const resetPassword = () => {
     return card.runAsync(async () => {
-      if (!clerk.user) {
+      if (!canSubmit || !clerk.user) {
         return;
       }
 
@@ -93,8 +93,8 @@ const TaskResetPasswordInternal = () => {
         // Update session to have the latest list of tasks (eg: if reset-password gets resolved)
         await clerk.setActive({
           session: clerk.session,
-          navigate: async ({ session }) => {
-            await navigateOnSetActive?.({ session, redirectUrlComplete });
+          navigate: async ({ session, decorateUrl }) => {
+            await navigateOnSetActive?.({ session, redirectUrlComplete, decorateUrl });
           },
         });
       } catch (e: any) {

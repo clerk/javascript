@@ -1,4 +1,5 @@
 export * from './childrenUtils';
+export * from './envVariables';
 export * from './isConstructor';
 export * from './useMaxAllowedInstancesGuard';
 export * from './useCustomElementPortal';

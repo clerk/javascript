@@ -364,6 +364,13 @@ export const nlBE: LocalizationResource = {
         tableHeader__role: 'Rol',
         tableHeader__user: 'Gebruiker',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'We zijn de beschikbare rollen aan het bijwerken. Zodra dit klaar is, kunt u de rollen opnieuw bijwerken.',
+          title: 'Rollen zijn tijdelijk vergrendeld',
+        },
+      },
       detailsTitle__emptyRow: 'Geen leden gevonden',
       invitationsTab: {
         autoInvitations: {
@@ -749,6 +756,10 @@ export const nlBE: LocalizationResource = {
       subtitle: '',
       title: 'Tweestapsverificatie',
     },
+    web3Solana: {
+      subtitle: 'Selecteer hieronder een wallet om in te loggen',
+      title: 'Inloggen met Solana',
+    },
   },
   signInEnterPasswordTitle: 'Vul je wachtwoord in',
   signUp: {
@@ -840,31 +851,44 @@ export const nlBE: LocalizationResource = {
       title: 'Maak je account aan',
       titleCombined: 'Maak je account aan',
     },
+    web3Solana: {
+      subtitle: 'Selecteer hieronder een wallet om je te registreren',
+      title: 'Registreren met Solana',
+    },
   },
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: 'Ga verder met {{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Er bestaat al een organisatie voor de gedetecteerde bedrijfsnaam ({{organizationName}}) en {{organizationDomain}}. Word lid via uitnodiging.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Nieuwe organisatie aanmaken',
+      action__invitationAccept: 'Deelnemen',
+      action__suggestionsAccept: 'Verzoek om deel te nemen',
+      subtitle: 'Deelnemen aan een bestaande organisatie of een nieuwe aanmaken',
+      subtitle__createOrganizationDisabled: 'Deelnemen aan een bestaande organisatie',
+      suggestionsAcceptedLabel: 'Wachten op goedkeuring',
+      title: 'Kies een organisatie',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Annuleren',
+      formButtonSubmit: 'Doorgaan',
+      formFieldInputPlaceholder__name: 'Mijn organisatie',
+      formFieldInputPlaceholder__slug: 'mijn-organisatie',
+      formFieldLabel__name: 'Naam',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Voer de gegevens van je organisatie in om door te gaan',
+      title: 'Stel je organisatie in',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'Neem contact op met de beheerder van je organisatie voor een uitnodiging.',
+      title: 'Je moet tot een organisatie behoren',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Uitloggen',
+      actionText: 'Ingelogd als {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -876,6 +900,69 @@ export const nlBE: LocalizationResource = {
     subtitle: undefined,
     title: undefined,
   },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Je bent al lid van de organisatie.',
     avatar_file_size_exceeded: 'Bestandsgrootte overschrijdt de maximale limiet van 10 MB. Kies een kleiner bestand.',
@@ -885,6 +972,8 @@ export const nlBE: LocalizationResource = {
     captcha_unavailable:
       'Aanmelding mislukt vanwege mislukte botvalidatie. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
     form_code_incorrect: 'De ingevoerde code is incorrect.',
+    form_email_address_blocked:
+      'Tijdelijke e-maildiensten worden niet ondersteund. Gebruik uw normale e-mailadres om een account aan te maken.',
     form_identifier_exists__email_address: 'Dit e-mailadres is al in gebruik.',
     form_identifier_exists__phone_number: 'Dit telefoonnummer is al in gebruik.',
     form_identifier_exists__username: 'Deze gebruikersnaam is al in gebruik.',
@@ -901,9 +990,12 @@ export const nlBE: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'De waarde die je hebt ingevoerd is ongeldig.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Het wachtwoord is incorrect.',
     form_password_length_too_short: 'Het wachtwoord is te kort.',
     form_password_not_strong_enough: 'Je wachtwoord is niet sterk genoeg.',
+    form_password_or_identifier_incorrect:
+      'Het wachtwoord of het e-mailadres is onjuist. Probeer het opnieuw of gebruik een andere methode.',
     form_password_pwned: 'Dit wachtwoord is in een datalek gevonden.',
     form_password_pwned__sign_in: 'Als je dit wachtwoord elders gebruikt, moet je het wijzigen.',
     form_password_size_in_bytes_exceeded:
@@ -940,6 +1032,10 @@ export const nlBE: LocalizationResource = {
     phone_number_exists: 'Dit telefoonnummer is al in gebruik. Probeer een ander nummer.',
     session_exists: 'Je bent al ingelogd.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected:
+      'Je hebt het handtekeningverzoek afgewezen. Probeer het opnieuw om verder te gaan.',
+    web3_solana_signature_generation_failed:
+      'Er is een fout opgetreden bij het genereren van de handtekening. Probeer het opnieuw om verder te gaan.',
     zxcvbn: {
       couldBeStronger: 'Je wachtwoord werkt, maar kan sterker zijn. Probeer meer tekens toe te voegen.',
       goodPassword: 'Je wachtwoord voldoet aan alle vereisten.',
@@ -1307,6 +1403,10 @@ export const nlBE: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 portefeuilles',
         title: 'Web3 portefeuilles',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selecteer een Solana-wallet om aan je account te koppelen.',
+          title: 'Solana-wallet toevoegen',
+        },
       },
     },
     usernamePage: {
@@ -1341,5 +1441,11 @@ export const nlBE: LocalizationResource = {
       subtitle: 'Je ontvangt een bericht zodra er ruimte beschikbaar is.',
       title: 'Succes!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Verbinden met {{walletName}}',
+    continue: 'Doorgaan met {{walletName}}',
+    noneAvailable:
+      'Geen Solana Web3-wallets gedetecteerd. Installeer een Web3-ondersteunde {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

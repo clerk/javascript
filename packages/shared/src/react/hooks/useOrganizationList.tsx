@@ -10,9 +10,10 @@ import type {
   SetActive,
   UserOrganizationInvitationResource,
 } from '../../types';
-import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
+import { useUserBase } from './base/useUserBase';
 import { createCacheKeys } from './createCacheKeys';
 import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
@@ -278,7 +279,7 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
   });
 
   const clerk = useClerkInstanceContext();
-  const user = useUserContext();
+  const user = useUserBase();
 
   clerk.telemetry?.record(eventMethodCalled('useOrganizationList'));
 
@@ -316,13 +317,13 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
       keepPreviousData: userMembershipsSafeValues.keepPreviousData,
       infinite: userMembershipsSafeValues.infinite,
       enabled: !!userMembershipsParams,
-      isSignedIn: Boolean(user),
+      isSignedIn: user !== null,
       initialPage: userMembershipsSafeValues.initialPage,
       pageSize: userMembershipsSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.USER_MEMBERSHIPS_KEY,
-      authenticated: Boolean(user),
+      authenticated: true,
       tracked: {
         userId: user?.id,
       },
@@ -339,13 +340,13 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
       infinite: userInvitationsSafeValues.infinite,
       // In useOrganizationList, you need to opt in by passing an object or `true`.
       enabled: !!userInvitationsParams,
-      isSignedIn: Boolean(user),
+      isSignedIn: user !== null,
       initialPage: userInvitationsSafeValues.initialPage,
       pageSize: userInvitationsSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.USER_INVITATIONS_KEY,
-      authenticated: Boolean(user),
+      authenticated: true,
       tracked: {
         userId: user?.id,
       },
@@ -361,13 +362,13 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
       keepPreviousData: userSuggestionsSafeValues.keepPreviousData,
       infinite: userSuggestionsSafeValues.infinite,
       enabled: !!userSuggestionsParams,
-      isSignedIn: Boolean(user),
+      isSignedIn: user !== null,
       initialPage: userSuggestionsSafeValues.initialPage,
       pageSize: userSuggestionsSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.USER_SUGGESTIONS_KEY,
-      authenticated: Boolean(user),
+      authenticated: true,
       tracked: {
         userId: user?.id,
       },

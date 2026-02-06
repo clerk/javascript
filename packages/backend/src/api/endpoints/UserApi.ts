@@ -41,6 +41,8 @@ type UserListParams = ClerkPaginationRequest<
       | 'last_sign_in_at'
     >;
     last_active_at_since?: number;
+    lastSignInAtAfter?: number;
+    lastSignInAtBefore?: number;
     organizationId?: string[];
   }
 >;
@@ -197,6 +199,10 @@ type DeleteWeb3WalletParams = {
 type DeleteUserExternalAccountParams = {
   userId: string;
   externalAccountId: string;
+};
+
+type SetPasswordCompromisedParams = {
+  revokeAllSessions?: boolean;
 };
 
 type UserID = {
@@ -448,14 +454,25 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  public async __experimental_passwordCompromised(userId: string) {
+  public async setPasswordCompromised(
+    userId: string,
+    params: SetPasswordCompromisedParams = {
+      revokeAllSessions: false,
+    },
+  ) {
     this.requireId(userId);
     return this.request<User>({
       method: 'POST',
-      path: joinPaths(basePath, userId, 'password_compromised'),
-      bodyParams: {
-        revokeAllSessions: false,
-      },
+      path: joinPaths(basePath, userId, 'password', 'set_compromised'),
+      bodyParams: params,
+    });
+  }
+
+  public async unsetPasswordCompromised(userId: string) {
+    this.requireId(userId);
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'password', 'unset_compromised'),
     });
   }
 }

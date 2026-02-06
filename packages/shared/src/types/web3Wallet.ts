@@ -31,10 +31,12 @@ export interface AuthenticateWithWeb3Params {
   identifier: string;
   generateSignature: GenerateSignature;
   strategy?: Web3Strategy;
+  walletName?: string;
 }
 
 export interface GenerateSignatureParams {
   identifier: string;
   nonce: string;
-  provider?: Web3Provider;
+  provider: Web3Provider;
+  walletName?: string;
 }

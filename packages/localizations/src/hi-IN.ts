@@ -366,6 +366,13 @@ export const hiIN: LocalizationResource = {
         tableHeader__role: 'भूमिका',
         tableHeader__user: 'उपयोगकर्ता',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'हम उपलब्ध भूमिकाओं को अपडेट कर रहे हैं। एक बार यह हो जाने के बाद, आप फिर से भूमिकाएं अपडेट कर सकेंगे।',
+          title: 'भूमिकाएं अस्थायी रूप से लॉक हैं',
+        },
+      },
       detailsTitle__emptyRow: 'प्रदर्शित करने के लिए कोई सदस्य नहीं',
       invitationsTab: {
         autoInvitations: {
@@ -752,6 +759,10 @@ export const hiIN: LocalizationResource = {
       subtitle: 'जारी रखने के लिए, कृपया अपने प्रमाणकर्ता ऐप द्वारा जनरेट किए गए कोड को दर्ज करें',
       title: 'दो-चरण सत्यापन',
     },
+    web3Solana: {
+      subtitle: 'साइन इन करने के लिए नीचे एक वॉलेट चुनें',
+      title: 'Solana के साथ साइन इन करें',
+    },
   },
   signInEnterPasswordTitle: 'अपना पासवर्ड दर्ज करें',
   signUp: {
@@ -845,31 +856,44 @@ export const hiIN: LocalizationResource = {
       title: 'अपना खाता बनाएं',
       titleCombined: 'अपना खाता बनाएं',
     },
+    web3Solana: {
+      subtitle: 'साइन अप करने के लिए नीचे एक वॉलेट चुनें',
+      title: 'Solana के साथ साइन अप करें',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}} के साथ जारी रखें',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'पता लगाई गई कंपनी के नाम ({{organizationName}}) और {{organizationDomain}} के लिए एक संगठन पहले से मौजूद है। आमंत्रण द्वारा शामिल हों।',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'नया संगठन बनाएं',
+      action__invitationAccept: 'शामिल हों',
+      action__suggestionsAccept: 'शामिल होने का अनुरोध करें',
+      subtitle: 'मौजूदा संगठन में शामिल हों या नया बनाएं',
+      subtitle__createOrganizationDisabled: 'मौजूदा संगठन में शामिल हों',
+      suggestionsAcceptedLabel: 'अनुमोदन की प्रतीक्षा',
+      title: 'एक संगठन चुनें',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'रद्द करें',
+      formButtonSubmit: 'जारी रखें',
+      formFieldInputPlaceholder__name: 'मेरा संगठन',
+      formFieldInputPlaceholder__slug: 'mera-sangathan',
+      formFieldLabel__name: 'नाम',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'जारी रखने के लिए अपने संगठन का विवरण दर्ज करें',
+      title: 'अपने संगठन को सेटअप करें',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'आमंत्रण के लिए अपने संगठन के व्यवस्थापक से संपर्क करें।',
+      title: 'आपको किसी संगठन से संबंधित होना चाहिए',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'साइन आउट',
+      actionText: '{{identifier}} के रूप में साइन इन किया गया',
     },
   },
   taskResetPassword: {
@@ -881,6 +905,69 @@ export const hiIN: LocalizationResource = {
     subtitle: undefined,
     title: undefined,
   },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} पहले से ही संगठन का सदस्य है।',
     avatar_file_size_exceeded: 'फ़ाइल का आकार 10MB की अधिकतम सीमा से अधिक है। कृपया एक छोटी फ़ाइल चुनें।',
@@ -890,6 +977,8 @@ export const hiIN: LocalizationResource = {
     captcha_unavailable:
       'असफल बॉट सत्यापन के कारण साइन अप असफल रहा। पुनः प्रयास करने के लिए कृपया पृष्ठ को रिफ्रेश करें या अधिक सहायता के लिए सपोर्ट से संपर्क करें।',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'अस्थायी ईमेल सेवाएं समर्थित नहीं हैं। कृपया खाता बनाने के लिए अपना नियमित ईमेल पता उपयोग करें।',
     form_identifier_exists__email_address: 'यह ईमेल पता पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_exists__phone_number: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_exists__username: 'यह उपयोगकर्ता नाम पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
@@ -906,9 +995,12 @@ export const hiIN: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'दर्ज किया गया मान अमान्य है। कृपया इसे सही करें।',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'आपके द्वारा दर्ज किया गया पासवर्ड गलत है। कृपया पुनः प्रयास करें।',
     form_password_length_too_short: 'आपका पासवर्ड बहुत छोटा है। इसमें कम से कम 8 अक्षर होने चाहिए।',
     form_password_not_strong_enough: 'आपका पासवर्ड पर्याप्त मजबूत नहीं है।',
+    form_password_or_identifier_incorrect:
+      'पासवर्ड या ईमेल पता गलत है। कृपया पुनः प्रयास करें या किसी अन्य विधि का उपयोग करें।',
     form_password_pwned:
       'यह पासवर्ड डेटा उल्लंघन के हिस्से के रूप में पाया गया है और इसका उपयोग नहीं किया जा सकता, कृपया इसके बजाय दूसरा पासवर्ड आज़माएं।',
     form_password_pwned__sign_in:
@@ -951,6 +1043,10 @@ export const hiIN: LocalizationResource = {
     phone_number_exists: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 वॉलेट एक्सटेंशन नहीं मिल सका। जारी रखने के लिए कृपया एक इंस्टॉल करें।',
+    web3_signature_request_rejected:
+      'आपने सिग्नेचर अनुरोध अस्वीकार कर दिया है। जारी रखने के लिए कृपया फिर से प्रयास करें।',
+    web3_solana_signature_generation_failed:
+      'सिग्नेचर बनाते समय एक त्रुटि हुई। जारी रखने के लिए कृपया फिर से प्रयास करें।',
     zxcvbn: {
       couldBeStronger: 'आपका पासवर्ड काम करता है, लेकिन मजबूत हो सकता है। अधिक अक्षर जोड़ने का प्रयास करें।',
       goodPassword: 'आपका पासवर्ड सभी आवश्यक आवश्यकताओं को पूरा करता है।',
@@ -1320,6 +1416,10 @@ export const hiIN: LocalizationResource = {
         detailsAction__nonPrimary: 'प्राथमिक के रूप में सेट करें',
         primaryButton: 'वॉलेट कनेक्ट करें',
         title: 'Web3 वॉलेट',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'अपने खाते से कनेक्ट करने के लिए एक Solana वॉलेट चुनें।',
+          title: 'Solana वॉलेट जोड़ें',
+        },
       },
     },
     usernamePage: {
@@ -1354,5 +1454,11 @@ export const hiIN: LocalizationResource = {
       subtitle: 'जब आपका स्थान तैयार होगा तो हम आपसे संपर्क करेंगे',
       title: 'प्रतीक्षा सूची में शामिल होने के लिए धन्यवाद!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} के साथ कनेक्ट करें',
+    continue: '{{walletName}} के साथ जारी रखें',
+    noneAvailable:
+      'कोई Solana Web3 वॉलेट नहीं मिला। कृपया Web3 समर्थित {{ solanaWalletsLink || link("wallet extension") }} इंस्टॉल करें।',
   },
 } as const;

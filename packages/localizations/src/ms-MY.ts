@@ -366,6 +366,13 @@ export const msMY: LocalizationResource = {
         tableHeader__role: 'Peranan',
         tableHeader__user: 'Pengguna',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Kami sedang mengemas kini peranan yang tersedia. Setelah selesai, anda akan dapat mengemas kini peranan semula.',
+          title: 'Peranan dikunci buat sementara waktu',
+        },
+      },
       detailsTitle__emptyRow: 'Tiada ahli untuk dipaparkan',
       invitationsTab: {
         autoInvitations: {
@@ -754,6 +761,10 @@ export const msMY: LocalizationResource = {
       subtitle: 'Untuk meneruskan, sila masukkan kod pengesahan yang dijana oleh aplikasi pengesah anda',
       title: 'Pengesahan dua langkah',
     },
+    web3Solana: {
+      subtitle: 'Pilih dompet di bawah untuk log masuk',
+      title: 'Log masuk dengan Solana',
+    },
   },
   signInEnterPasswordTitle: 'Masukkan kata laluan anda',
   signUp: {
@@ -848,31 +859,44 @@ export const msMY: LocalizationResource = {
       title: 'Cipta akaun anda',
       titleCombined: 'Cipta akaun anda',
     },
+    web3Solana: {
+      subtitle: 'Pilih dompet di bawah untuk mendaftar',
+      title: 'Daftar dengan Solana',
+    },
   },
   socialButtonsBlockButton: 'Teruskan dengan {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Organisasi sudah wujud untuk nama syarikat yang dikesan ({{organizationName}}) dan {{organizationDomain}}. Sertai melalui jemputan.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Cipta organisasi baharu',
+      action__invitationAccept: 'Sertai',
+      action__suggestionsAccept: 'Minta untuk menyertai',
+      subtitle: 'Sertai organisasi sedia ada atau cipta yang baharu',
+      subtitle__createOrganizationDisabled: 'Sertai organisasi sedia ada',
+      suggestionsAcceptedLabel: 'Menunggu kelulusan',
+      title: 'Pilih organisasi',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Batal',
+      formButtonSubmit: 'Teruskan',
+      formFieldInputPlaceholder__name: 'Organisasi Saya',
+      formFieldInputPlaceholder__slug: 'organisasi-saya',
+      formFieldLabel__name: 'Nama',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Masukkan butiran organisasi anda untuk meneruskan',
+      title: 'Sediakan organisasi anda',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'Hubungi pentadbir organisasi anda untuk jemputan.',
+      title: 'Anda mesti menjadi ahli organisasi',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Daftar keluar',
+      actionText: 'Log masuk sebagai {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -884,6 +908,69 @@ export const msMY: LocalizationResource = {
     subtitle: undefined,
     title: undefined,
   },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi ahli organisasi.',
     avatar_file_size_exceeded: 'Saiz fail melebihi had maksimum 10MB. Sila pilih fail yang lebih kecil.',
@@ -893,6 +980,8 @@ export const msMY: LocalizationResource = {
     captcha_unavailable:
       'Pendaftaran tidak berjaya kerana pengesahan bot gagal. Sila muat semula halaman untuk mencuba lagi atau hubungi sokongan untuk bantuan lebih lanjut.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Perkhidmatan e-mel sementara tidak disokong. Sila gunakan alamat e-mel biasa anda untuk membuat akaun.',
     form_identifier_exists__email_address: 'Alamat e-mel ini telah diambil. Sila cuba yang lain.',
     form_identifier_exists__phone_number: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini telah diambil. Sila cuba yang lain.',
@@ -910,9 +999,12 @@ export const msMY: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Nilai yang dimasukkan tidak sah. Sila betulkannya.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Kata laluan yang anda masukkan tidak betul. Sila cuba lagi.',
     form_password_length_too_short: 'Kata laluan anda terlalu pendek. Ia mesti sekurang-kurangnya 8 aksara panjang.',
     form_password_not_strong_enough: 'Kata laluan anda tidak cukup kuat.',
+    form_password_or_identifier_incorrect:
+      'Kata laluan atau alamat e-mel tidak betul. Cuba lagi atau gunakan kaedah lain.',
     form_password_pwned:
       'Kata laluan ini telah dijumpai sebagai sebahagian daripada pelanggaran dan tidak boleh digunakan, sila cuba kata laluan lain.',
     form_password_pwned__sign_in:
@@ -956,6 +1048,9 @@ export const msMY: LocalizationResource = {
     phone_number_exists: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     session_exists: undefined,
     web3_missing_identifier: 'Sambungan Dompet Web3 tidak dapat dijumpai. Sila pasang satu untuk meneruskan.',
+    web3_signature_request_rejected: 'Anda telah menolak permintaan tandatangan. Sila cuba lagi untuk meneruskan.',
+    web3_solana_signature_generation_failed:
+      'Ralat berlaku semasa menjana tandatangan. Sila cuba lagi untuk meneruskan.',
     zxcvbn: {
       couldBeStronger: 'Kata laluan anda berfungsi, tetapi boleh lebih kuat. Cuba tambah lebih banyak aksara.',
       goodPassword: 'Kata laluan anda memenuhi semua keperluan yang diperlukan.',
@@ -1328,6 +1423,10 @@ export const msMY: LocalizationResource = {
         detailsAction__nonPrimary: 'Tetapkan sebagai utama',
         primaryButton: 'Sambung dompet',
         title: 'Dompet web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Pilih dompet Solana untuk disambungkan ke akaun anda.',
+          title: 'Tambah dompet Solana',
+        },
       },
     },
     usernamePage: {
@@ -1362,5 +1461,11 @@ export const msMY: LocalizationResource = {
       subtitle: 'Kami akan menghubungi anda apabila tempat anda sudah bersedia',
       title: 'Terima kasih kerana menyertai senarai menunggu!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Sambung dengan {{walletName}}',
+    continue: 'Teruskan dengan {{walletName}}',
+    noneAvailable:
+      'Tiada dompet Solana Web3 dikesan. Sila pasang {{ solanaWalletsLink || link("wallet extension") }} yang menyokong Web3.',
   },
 } as const;

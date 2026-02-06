@@ -11,22 +11,22 @@ import { withClerk } from './withClerk';
  *
  * @example
  * ```tsx
- * import { SignedIn } from '@clerk/react';
+ * import { Show } from '@clerk/react';
  * import { PlanDetailsButton } from '@clerk/react/experimental';
  *
  * // Basic usage with default "Plan details" text
  * function BasicPlanDetails() {
- *   return (
- *     <PlanDetailsButton planId="plan_123" />
- *   );
+ *   return <PlanDetailsButton planId="plan_123" />;
  * }
  *
  * // Custom button with custom text
  * function CustomPlanDetails() {
  *   return (
- *     <PlanDetailsButton planId="plan_123">
- *       <button>View Plan Details</button>
- *     </PlanDetailsButton>
+ *     <Show when="signed-in">
+ *       <PlanDetailsButton planId="plan_123">
+ *         <button>View Plan Details</button>
+ *       </PlanDetailsButton>
+ *     </Show>
  *   );
  * }
  * ```
@@ -35,7 +35,7 @@ import { withClerk } from './withClerk';
  */
 export const PlanDetailsButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__experimental_PlanDetailsButtonProps>>) => {
-    const { plan, planId, initialPlanPeriod, planDetailsProps, ...rest } = props;
+    const { plan, planId, initialPlanPeriod, planDetailsProps, getContainer, component, ...rest } = props;
 
     children = normalizeWithDefaultValue(children, 'Plan details');
     const child = assertSingleChild(children)('PlanDetailsButton');

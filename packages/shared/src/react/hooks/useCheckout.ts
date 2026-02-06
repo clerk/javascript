@@ -2,7 +2,8 @@ import { useCallback, useSyncExternalStore } from 'react';
 
 import type { CheckoutSignalValue } from '../../types/clerk';
 import type { __experimental_CheckoutProvider } from '../contexts';
-import { useCheckoutContext, useClerkInstanceContext, useOrganizationContext } from '../contexts';
+import { useCheckoutContext, useClerkInstanceContext } from '../contexts';
+import { useOrganizationBase } from './base/useOrganizationBase';
 import { useUser } from './useUser';
 
 type UseCheckoutParams = Parameters<typeof __experimental_CheckoutProvider>[0];
@@ -17,12 +18,12 @@ type UseCheckoutParams = Parameters<typeof __experimental_CheckoutProvider>[0];
 export const useCheckout = (options?: UseCheckoutParams): CheckoutSignalValue => {
   const contextOptions = useCheckoutContext();
   const { for: forOrganization, planId, planPeriod } = options || contextOptions;
-  const { organization } = useOrganizationContext();
+  const organization = useOrganizationBase();
   const { isLoaded, user } = useUser();
   const clerk = useClerkInstanceContext();
 
   if (user === null && isLoaded) {
-    throw new Error('Clerk: Ensure that `useCheckout` is inside a component wrapped with `<SignedIn />`.');
+    throw new Error('Clerk: Ensure that `useCheckout` is inside a component wrapped with `<Show when="signed-in" />`.');
   }
 
   if (isLoaded && forOrganization === 'organization' && organization === null) {

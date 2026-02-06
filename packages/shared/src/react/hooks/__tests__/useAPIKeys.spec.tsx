@@ -89,13 +89,7 @@ describe('useApiKeys', () => {
       await result.current.paginated.revalidate();
     });
 
-    const isRQ = Boolean((globalThis as any).__CLERK_USE_RQ__);
-
-    if (isRQ) {
-      await waitFor(() => expect(getAllSpy.mock.calls.length).toBeGreaterThanOrEqual(2));
-    } else {
-      await waitFor(() => expect(getAllSpy).toHaveBeenCalledTimes(1));
-    }
+    await waitFor(() => expect(getAllSpy.mock.calls.length).toBeGreaterThanOrEqual(2));
   });
 
   it('handles revalidation with different pageSize configurations', async () => {
@@ -125,15 +119,8 @@ describe('useApiKeys', () => {
       await result.current.small.revalidate();
     });
 
-    const isRQ = Boolean((globalThis as any).__CLERK_USE_RQ__);
-
     await waitFor(() => expect(getAllSpy.mock.calls.length).toBeGreaterThanOrEqual(1));
-
-    if (isRQ) {
-      await waitFor(() => expect(getAllSpy.mock.calls.length).toBeGreaterThanOrEqual(2));
-    } else {
-      expect(getAllSpy).toHaveBeenCalledTimes(2);
-    }
+    await waitFor(() => expect(getAllSpy.mock.calls.length).toBeGreaterThanOrEqual(2));
   });
 
   it('handles revalidation with different query filters', async () => {
@@ -163,15 +150,8 @@ describe('useApiKeys', () => {
       await result.current.defaultQuery.revalidate();
     });
 
-    const isRQ = Boolean((globalThis as any).__CLERK_USE_RQ__);
-
     await waitFor(() => expect(getAllSpy.mock.calls.length).toBeGreaterThanOrEqual(1));
-
-    if (isRQ) {
-      await waitFor(() => expect(getAllSpy.mock.calls.length).toBeGreaterThanOrEqual(2));
-    } else {
-      expect(getAllSpy).toHaveBeenCalledTimes(2);
-    }
+    await waitFor(() => expect(getAllSpy.mock.calls.length).toBeGreaterThanOrEqual(2));
   });
 
   it('does not cascade revalidation across different subjects', async () => {

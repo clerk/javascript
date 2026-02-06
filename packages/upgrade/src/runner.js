@@ -2,8 +2,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import chalk from 'chalk';
-import { convertPathToPattern, globby } from 'globby';
 import indexToPosition from 'index-to-position';
+import { glob } from 'tinyglobby';
 
 import { getCodemodConfig, runCodemod } from './codemods/index.js';
 import { createSpinner, renderCodemodResults } from './render.js';
@@ -18,8 +18,6 @@ const GLOBBY_IGNORE = [
   '**/build/**',
   '.next/**',
   '**/.next/**',
-  'package.json',
-  '**/package.json',
   'package-lock.json',
   '**/package-lock.json',
   'yarn.lock',
@@ -37,13 +35,20 @@ export async function runCodemods(config, sdk, options) {
     return;
   }
 
-  const glob = typeof options.glob === 'string' ? options.glob.split(/[ ,]/).filter(Boolean) : options.glob;
+  const patterns = typeof options.glob === 'string' ? options.glob.split(/[ ,]/).filter(Boolean) : options.glob;
 
-  for (const transform of codemods) {
+  for (const codemod of codemods) {
+    const transform = typeof codemod === 'string' ? codemod : codemod.name;
+    const packages = typeof codemod === 'string' ? ['*'] : codemod.packages || ['*'];
+
+    if (!packages.includes('*') && !packages.includes(sdk)) {
+      continue;
+    }
+
     const spinner = createSpinner(`Running codemod: ${transform}`);
 
     try {
-      const result = await runCodemod(transform, glob, options);
+      const result = await runCodemod(transform, patterns, options);
       spinner.success(`Codemod applied: ${chalk.dim(transform)}`);
       renderCodemodResults(transform, result);
 
@@ -68,8 +73,10 @@ export async function runScans(config, sdk, options) {
   const spinner = createSpinner('Scanning files for breaking changes...');
 
   try {
-    const pattern = convertPathToPattern(path.resolve(options.dir));
-    const files = await globby(pattern, {
+    const cwd = path.resolve(options.dir);
+    const files = await glob('**/*', {
+      cwd,
+      absolute: true,
       ignore: [...GLOBBY_IGNORE, ...(options.ignore || [])],
     });
 

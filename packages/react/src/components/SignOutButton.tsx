@@ -13,7 +13,7 @@ export type SignOutButtonProps = {
 
 export const SignOutButton = withClerk(
   ({ clerk, children, ...props }: React.PropsWithChildren<WithClerkProp<SignOutButtonProps>>) => {
-    const { redirectUrl = '/', signOutOptions, ...rest } = props;
+    const { redirectUrl = '/', signOutOptions, getContainer, component, ...rest } = props;
 
     children = normalizeWithDefaultValue(children, 'Sign out');
     const child = assertSingleChild(children)('SignOutButton');

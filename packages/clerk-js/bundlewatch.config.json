@@ -1,19 +1,20 @@
 {
   "files": [
-    { "maxSize": "840KB", "path": "./dist/clerk.js" },
-    { "maxSize": "81KB", "path": "./dist/clerk.browser.js" },
-    { "maxSize": "95KB", "path": "./dist/clerk.experimental.browser.js" },
-    { "maxSize": "81KB", "path": "./dist/clerk.channel.browser.js" },
-    { "maxSize": "123KB", "path": "./dist/clerk.legacy.browser.js" },
-    { "maxSize": "63KB", "path": "./dist/clerk.chips.browser.js" },
-    { "maxSize": "305KB", "path": "./dist/clerk.no-rhc.js" },
-    { "maxSize": "65KB", "path": "./dist/clerk.headless*.js" },
-    { "maxSize": "7KB", "path": "./dist/vendors*.js" },
-    { "maxSize": "36KB", "path": "./dist/coinbase*.js" },
-    { "maxSize": "203KB", "path": "./dist/base-account-sdk*.js" },
-    { "maxSize": "1KB", "path": "./dist/stripe-vendors*.js" },
-    { "maxSize": "11KB", "path": "./dist/query-core-vendors*.js" },
-    { "maxSize": "12KB", "path": "./dist/zxcvbn-ts-core*.js" },
-    { "maxSize": "226KB", "path": "./dist/zxcvbn-common*.js" }
+    { "path": "./dist/clerk.js", "maxSize": "840KB" },
+    { "path": "./dist/clerk.browser.js", "maxSize": "81KB" },
+    { "path": "./dist/clerk.experimental.browser.js", "maxSize": "95KB" },
+    { "path": "./dist/clerk.channel.browser.js", "maxSize": "81KB" },
+    { "path": "./dist/clerk.chips.browser.js", "maxSize": "66KB" },
+    { "path": "./dist/clerk.legacy.browser.js", "maxSize": "123KB" },
+    { "path": "./dist/clerk.no-rhc.js", "maxSize": "305KB" },
+    { "path": "./dist/clerk.native.js", "maxSize": "65KB" },
+    { "path": "./dist/clerk.headless*.js", "maxSize": "65KB" },
+    { "path": "./dist/vendors*.js", "maxSize": "7KB" },
+    { "path": "./dist/coinbase*.js", "maxSize": "36KB" },
+    { "path": "./dist/base-account-sdk*.js", "maxSize": "203KB" },
+    { "path": "./dist/stripe-vendors*.js", "maxSize": "1KB" },
+    { "path": "./dist/query-core-vendors*.js", "maxSize": "11KB" },
+    { "path": "./dist/zxcvbn-ts-core*.js", "maxSize": "12KB" },
+    { "path": "./dist/zxcvbn-common*.js", "maxSize": "226KB" }
   ]
 }

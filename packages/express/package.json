@@ -43,6 +43,14 @@
         "default": "./dist/webhooks.js"
       }
     },
+    "./types": {
+      "import": {
+        "types": "./dist/types.d.mts"
+      },
+      "require": {
+        "types": "./dist/types.d.ts"
+      }
+    },
     "./env": "./env.d.ts",
     "./package.json": "./package.json"
   },

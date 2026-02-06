@@ -123,6 +123,9 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     legal_consent_enabled: false,
     mode: 'public',
     progressive: true,
+    mfa: {
+      required: false,
+    },
   };
   social: OAuthProviders = {} as OAuthProviders;
   usernameSettings: UsernameSettingsData = {} as UsernameSettingsData;
@@ -187,7 +190,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   }
 
   get instanceIsPasswordBased() {
-    return Boolean(this.attributes?.password?.enabled && this.attributes.password?.required);
+    return Boolean(this.attributes?.password?.enabled);
   }
 
   get hasValidAuthFactor() {

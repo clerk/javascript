@@ -1,5 +1,5 @@
 ---
-import { UserButton, SignInButton, SignedIn, SignedOut } from '@clerk/astro/components';
+import { Show, UserButton, SignInButton } from '@clerk/astro/components';
 import { OrganizationSwitcher } from '@clerk/astro/react';
 import Layout from '../layouts/Layout.astro';
 
@@ -7,16 +7,22 @@ export const prerender = false;
 ---
 
 <Layout title='Home'>
-  <SignedOut isStatic={false}>
+  <Show
+    when='signed-out'
+    isStatic={false}
+  >
     <h1>Signed out</h1>
     <SignInButton
       mode='modal'
       fallbackRedirectUrl='/'
     />
-  </SignedOut>
-  <SignedIn isStatic={false}>
+  </Show>
+  <Show
+    when='signed-in'
+    isStatic={false}
+  >
     <h1>Signed in</h1>
     <UserButton />
     <OrganizationSwitcher client:load />
-  </SignedIn>
+  </Show>
 </Layout>

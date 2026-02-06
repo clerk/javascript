@@ -1,5 +1,6 @@
 import { SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
+  DecorateUrl,
   LoadedClerk,
   PhoneCodeChannel,
   PhoneCodeStrategy,
@@ -24,7 +25,12 @@ type HandleCombinedFlowTransferProps = {
   redirectUrlComplete?: string;
   passwordEnabled: boolean;
   alternativePhoneCodeChannel?: PhoneCodeChannel | null;
-  navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
+  navigateOnSetActive: (opts: {
+    session: SessionResource;
+    redirectUrl: string;
+    decorateUrl: DecorateUrl;
+  }) => Promise<unknown>;
+  unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
 /**
@@ -45,6 +51,7 @@ export function handleCombinedFlowTransfer({
   passwordEnabled,
   navigateOnSetActive,
   alternativePhoneCodeChannel,
+  unsafeMetadata,
 }: HandleCombinedFlowTransferProps): Promise<unknown> | void {
   if (signUpMode === SIGN_UP_MODES.WAITLIST) {
     const waitlistUrl = clerk.buildWaitlistUrl(
@@ -85,6 +92,7 @@ export function handleCombinedFlowTransfer({
       .create({
         [identifierAttribute]: identifierValue,
         ...alternativePhoneCodeChannelParams,
+        unsafeMetadata,
       })
       .then(async res => {
         const completeSignUpFlow = await lazyCompleteSignUpFlow();
@@ -95,8 +103,8 @@ export function handleCombinedFlowTransfer({
           handleComplete: () =>
             clerk.setActive({
               session: res.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
               },
             }),
           navigate,
