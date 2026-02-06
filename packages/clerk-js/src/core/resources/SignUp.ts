@@ -1,3 +1,4 @@
+import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
@@ -24,6 +25,7 @@ import type {
   SignUpField,
   SignUpFutureCreateParams,
   SignUpFutureEmailCodeVerifyParams,
+  SignUpFutureEmailLinkSendParams,
   SignUpFutureFinalizeParams,
   SignUpFuturePasswordParams,
   SignUpFuturePhoneCodeSendParams,
@@ -591,7 +593,12 @@ export class SignUp extends BaseResource implements SignUpResource {
 
 type SignUpFutureVerificationsMethods = Pick<
   SignUpFutureVerifications,
-  'sendEmailCode' | 'verifyEmailCode' | 'sendPhoneCode' | 'verifyPhoneCode'
+  | 'sendEmailCode'
+  | 'verifyEmailCode'
+  | 'sendEmailLink'
+  | 'waitForEmailLinkVerification'
+  | 'sendPhoneCode'
+  | 'verifyPhoneCode'
 >;
 
 class SignUpFutureVerifications implements SignUpFutureVerificationsType {
@@ -599,6 +606,8 @@ class SignUpFutureVerifications implements SignUpFutureVerificationsType {
 
   sendEmailCode: SignUpFutureVerificationsType['sendEmailCode'];
   verifyEmailCode: SignUpFutureVerificationsType['verifyEmailCode'];
+  sendEmailLink: SignUpFutureVerificationsType['sendEmailLink'];
+  waitForEmailLinkVerification: SignUpFutureVerificationsType['waitForEmailLinkVerification'];
   sendPhoneCode: SignUpFutureVerificationsType['sendPhoneCode'];
   verifyPhoneCode: SignUpFutureVerificationsType['verifyPhoneCode'];
 
@@ -606,6 +615,8 @@ class SignUpFutureVerifications implements SignUpFutureVerificationsType {
     this.#resource = resource;
     this.sendEmailCode = methods.sendEmailCode;
     this.verifyEmailCode = methods.verifyEmailCode;
+    this.sendEmailLink = methods.sendEmailLink;
+    this.waitForEmailLinkVerification = methods.waitForEmailLinkVerification;
     this.sendPhoneCode = methods.sendPhoneCode;
     this.verifyPhoneCode = methods.verifyPhoneCode;
   }
@@ -625,6 +636,30 @@ class SignUpFutureVerifications implements SignUpFutureVerificationsType {
   get externalAccount() {
     return this.#resource.verifications.externalAccount;
   }
+
+  get emailLinkVerification() {
+    if (!inBrowser()) {
+      return null;
+    }
+
+    const status = getClerkQueryParam('__clerk_status') as 'verified' | 'expired' | 'failed' | 'client_mismatch';
+    const createdSessionId = getClerkQueryParam('__clerk_created_session');
+
+    if (!status || !createdSessionId) {
+      return null;
+    }
+
+    const verifiedFromTheSameClient =
+      status === 'verified' &&
+      typeof SignUp.clerk.client !== 'undefined' &&
+      SignUp.clerk.client.sessions.some(s => s.id === createdSessionId);
+
+    return {
+      status,
+      createdSessionId,
+      verifiedFromTheSameClient,
+    };
+  }
 }
 
 class SignUpFuture implements SignUpFutureResource {
@@ -638,6 +673,8 @@ class SignUpFuture implements SignUpFutureResource {
     this.verifications = new SignUpFutureVerifications(this.#resource, {
       sendEmailCode: this.sendEmailCode.bind(this),
       verifyEmailCode: this.verifyEmailCode.bind(this),
+      sendEmailLink: this.sendEmailLink.bind(this),
+      waitForEmailLinkVerification: this.waitForEmailLinkVerification.bind(this),
       sendPhoneCode: this.sendPhoneCode.bind(this),
       verifyPhoneCode: this.verifyPhoneCode.bind(this),
     });
@@ -829,6 +866,46 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy: 'email_code', code },
         action: 'attempt_verification',
+      });
+    });
+  }
+
+  async sendEmailLink(params: SignUpFutureEmailLinkSendParams): Promise<{ error: ClerkError | null }> {
+    const { verificationUrl } = params;
+    return runAsyncResourceTask(this.#resource, async () => {
+      let absoluteVerificationUrl = verificationUrl;
+      try {
+        new URL(verificationUrl);
+      } catch {
+        absoluteVerificationUrl = window.location.origin + verificationUrl;
+      }
+
+      await this.#resource.__internal_basePost({
+        body: { strategy: 'email_link', redirectUrl: absoluteVerificationUrl },
+        action: 'prepare_verification',
+      });
+    });
+  }
+
+  async waitForEmailLinkVerification(): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
+      const { run, stop } = Poller();
+      await new Promise((resolve, reject) => {
+        void run(() => {
+          return this.#resource
+            .reload()
+            .then(res => {
+              const status = res.verifications.emailAddress.status;
+              if (status === 'verified' || status === 'expired') {
+                stop();
+                resolve(res);
+              }
+            })
+            .catch(err => {
+              stop();
+              reject(err);
+            });
+        });
       });
     });
   }
