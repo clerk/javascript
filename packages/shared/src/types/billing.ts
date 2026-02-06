@@ -207,6 +207,10 @@ export interface BillingPlanResource extends ClerkResource {
    */
   features: FeatureResource[];
   /**
+   * Per-unit pricing tiers for this Plan (for example, seats).
+   */
+  unitPrices?: BillingPlanUnitPrice[];
+  /**
    * The number of days of the free trial for the Plan. `null` if the Plan does not have a free trial.
    */
   freeTrialDays: number | null;
@@ -214,6 +218,102 @@ export interface BillingPlanResource extends ClerkResource {
    * Whether the Plan has a free trial.
    */
   freeTrialEnabled: boolean;
+}
+
+/**
+ * The `BillingSubscriptionItemSeats` type represents seat entitlements attached to a subscription item.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingSubscriptionItemSeats {
+  /**
+   * The seat limit active while the parent subscription item was active. `null` means unlimited.
+   */
+  quantity: number | null;
+}
+
+/**
+ * The `BillingPlanUnitPriceTier` type represents a single pricing tier for a unit type on a plan.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPlanUnitPriceTier {
+  /**
+   * The unique identifier of the unit price tier.
+   */
+  id: string;
+  /**
+   * The first block number this tier applies to.
+   */
+  startsAtBlock: number;
+  /**
+   * The final block this tier applies to. `null` means unlimited.
+   */
+  endsAfterBlock: number | null;
+  /**
+   * The fee charged for each block in this tier.
+   */
+  feePerBlock: BillingMoneyAmount;
+}
+
+/**
+ * The `BillingPlanUnitPrice` type represents unit pricing for a specific unit type (for example, seats) on a plan.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPlanUnitPrice {
+  /**
+   * The unit name, for example `seats`.
+   */
+  name: string;
+  /**
+   * Number of units represented by one billable block.
+   */
+  blockSize: number;
+  /**
+   * Tiers that define how each block range is priced.
+   */
+  tiers: BillingPlanUnitPriceTier[];
+}
+
+/**
+ * The `BillingPerUnitTotalTier` type represents the cost breakdown for a single tier in checkout totals.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPerUnitTotalTier {
+  /**
+   * The quantity billed within this tier. `null` means unlimited.
+   */
+  quantity: number | null;
+  /**
+   * The fee charged per block for this tier.
+   */
+  feePerBlock: BillingMoneyAmount;
+  /**
+   * The total billed amount for this tier.
+   */
+  total: BillingMoneyAmount;
+}
+
+/**
+ * The `BillingPerUnitTotal` type represents the per-unit cost breakdown in checkout totals.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPerUnitTotal {
+  /**
+   * The unit name, for example `seats`.
+   */
+  name: string;
+  /**
+   * Number of units represented by one billable block.
+   */
+  blockSize: number;
+  /**
+   * Detailed tier breakdown for this unit total.
+   */
+  tiers: BillingPerUnitTotalTier[];
 }
 
 /**
@@ -594,6 +694,11 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
     amount: BillingMoneyAmount;
   };
   /**
+   * Seat entitlement details for this subscription item. Only set for organization subscription items with
+   * seat-based billing.
+   */
+  seats?: BillingSubscriptionItemSeats;
+  /**
    * A function to cancel the subscription item. Accepts the following parameters:
    * <ul>
    *  <li>`orgId?` (`string`): The ID of the Organization to cancel the subscription item from.</li>
@@ -708,6 +813,10 @@ export interface BillingCheckoutTotals {
    * The amount of tax included in the checkout.
    */
   taxTotal: BillingMoneyAmount;
+  /**
+   * Per-unit cost breakdown for this checkout (for example, seats).
+   */
+  perUnitTotals?: BillingPerUnitTotal[];
   /**
    * The amount that needs to be immediately paid to complete the checkout.
    */
