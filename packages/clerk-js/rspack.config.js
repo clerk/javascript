@@ -5,27 +5,34 @@ const path = require('path');
 const { merge } = require('webpack-merge');
 const ReactRefreshPlugin = require('@rspack/plugin-react-refresh');
 const { RsdoctorRspackPlugin } = require('@rsdoctor/rspack-plugin');
-const { svgLoader, typescriptLoaderProd, typescriptLoaderDev } = require('../../scripts/rspack-common');
 
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
 
 const variants = {
   clerk: 'clerk',
-  clerkNoRHC: 'clerk.no-rhc', // Omit Remotely Hosted Code
   clerkBrowser: 'clerk.browser',
+  clerkBrowserNoRHC: 'clerk.browser.no-rhc',
+  clerkCHIPS: 'clerk.chips.browser',
+  clerkChannelBrowser: 'clerk.channel.browser',
+  clerkExperimentalBrowser: 'clerk.experimental.browser',
+
   clerkNative: 'clerk.native', // For React Native (no chunk splitting)
   clerkLegacyBrowser: 'clerk.legacy.browser',
-  clerkCHIPS: 'clerk.chips.browser',
+  clerkNoRHC: 'clerk.no-rhc', // Omit Remotely Hosted Code
 };
 
 const variantToSourceFile = {
   [variants.clerk]: './src/index.ts',
-  [variants.clerkNoRHC]: './src/index.ts',
   [variants.clerkBrowser]: './src/index.browser.ts',
+  [variants.clerkBrowserNoRHC]: './src/index.browser.ts',
+  [variants.clerkCHIPS]: './src/index.browser.ts',
+  [variants.clerkChannelBrowser]: './src/index.browser.ts',
+  [variants.clerkExperimentalBrowser]: './src/index.browser.ts',
+
   [variants.clerkNative]: './src/index.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
-  [variants.clerkCHIPS]: './src/index.browser.ts',
+  [variants.clerkNoRHC]: './src/index.ts',
 };
 
 /**
@@ -49,15 +56,17 @@ const common = ({ mode, variant, disableRHC = false }) => {
     },
     plugins: [
       new rspack.DefinePlugin({
-        __DEV__: isDevelopment(mode),
-        __PKG_VERSION__: JSON.stringify(packageJSON.version),
-        __PKG_NAME__: JSON.stringify(packageJSON.name),
         /**
          * Build time feature flags.
          */
-        __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
         __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
+        __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
+        __BUILD_VARIANT_CHANNEL__: variant === variants.clerkChannelBrowser,
         __BUILD_VARIANT_CHIPS__: variant === variants.clerkCHIPS,
+        __BUILD_VARIANT_EXPERIMENTAL__: variant === variants.clerkExperimentalBrowser,
+        __DEV__: isDevelopment(mode),
+        __PKG_NAME__: JSON.stringify(packageJSON.name),
+        __PKG_VERSION__: JSON.stringify(packageJSON.version),
       }),
       new rspack.EnvironmentPlugin({
         CLERK_ENV: mode,
@@ -153,6 +162,139 @@ const common = ({ mode, variant, disableRHC = false }) => {
   };
 };
 
+/** @type { () => (import('@rspack/core').RuleSetRule) }  */
+const svgLoader = () => {
+  return {
+    test: /\.svg$/,
+    resolve: {
+      fullySpecified: false,
+    },
+    use: {
+      loader: '@svgr/webpack',
+      options: {
+        svgo: true,
+        svgoConfig: {
+          floatPrecision: 3,
+          transformPrecision: 1,
+          plugins: ['preset-default', 'removeDimensions', 'removeStyleElement'],
+        },
+      },
+    },
+  };
+};
+
+/** @type { () => (import('@rspack/core').RuleSetRule) }  */
+const workerLoader = () => {
+  return {
+    test: /\.worker\.ts$/,
+    type: 'asset/source',
+    use: {
+      loader: 'builtin:swc-loader',
+      options: {
+        jsc: {
+          parser: {
+            syntax: 'typescript',
+          },
+          minify: {
+            compress: true,
+            mangle: true,
+          },
+        },
+        minify: true,
+      },
+    },
+  };
+};
+
+/** @type { (opts?: { targets?: string, useCoreJs?: boolean }) => (import('@rspack/core').RuleSetRule[]) } */
+const typescriptLoaderProd = (
+  { targets = packageJSON.browserslist, useCoreJs = false } = { targets: packageJSON.browserslist, useCoreJs: false },
+) => {
+  return [
+    {
+      test: /\.(jsx?|tsx?)$/,
+      exclude: [/node_modules/, /\.worker\.ts$/],
+      use: {
+        loader: 'builtin:swc-loader',
+        options: {
+          env: {
+            targets,
+            ...(useCoreJs
+              ? {
+                  mode: 'usage',
+                  coreJs: require('core-js/package.json').version,
+                }
+              : {}),
+          },
+          jsc: {
+            parser: {
+              syntax: 'typescript',
+              tsx: true,
+            },
+            externalHelpers: true,
+            transform: {
+              react: {
+                runtime: 'automatic',
+                importSource: '@emotion/react',
+                development: false,
+                refresh: false,
+              },
+            },
+          },
+        },
+      },
+    },
+    {
+      test: /\.m?js$/,
+      exclude: /node_modules[\\/]core-js/,
+      use: {
+        loader: 'builtin:swc-loader',
+        options: {
+          env: {
+            targets,
+            ...(useCoreJs
+              ? {
+                  mode: 'usage',
+                  coreJs: '3.41.0',
+                }
+              : {}),
+          },
+          isModule: 'unknown',
+        },
+      },
+    },
+  ];
+};
+
+/** @type { () => (import('@rspack/core').RuleSetRule[]) } */
+const typescriptLoaderDev = () => {
+  return [
+    {
+      test: /\.(jsx?|tsx?)$/,
+      exclude: [/node_modules/, /\.worker\.ts$/],
+      loader: 'builtin:swc-loader',
+      options: {
+        jsc: {
+          target: 'esnext',
+          parser: {
+            syntax: 'typescript',
+            tsx: true,
+          },
+          externalHelpers: true,
+          transform: {
+            react: {
+              runtime: 'automatic',
+              importSource: '@emotion/react',
+              development: true,
+              refresh: true,
+            },
+          },
+        },
+      },
+    },
+  ];
+};
+
 /**
  * Used for production builds that have dynamicly loaded chunks.
  * @type { (opts?: { targets?: string, useCoreJs?: boolean }) => (import('@rspack/core').Configuration) }
@@ -162,7 +304,7 @@ const commonForProdChunked = (
 ) => {
   return {
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
+      rules: [workerLoader(), svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
     },
   };
 };
@@ -176,7 +318,7 @@ const commonForProdBundled = (
 ) => {
   return {
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
+      rules: [workerLoader(), svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
     },
   };
 };
@@ -269,6 +411,13 @@ const prodConfig = ({ mode, env, analysis }) => {
         }
       : {},
     common({ mode, variant: variants.clerkBrowser }),
+    commonForProd(),
+    commonForProdChunked(),
+  );
+
+  const clerkExperimentalBrowser = merge(
+    entryForVariant(variants.clerkExperimentalBrowser),
+    common({ mode, variant: variants.clerkExperimentalBrowser }),
     commonForProd(),
     commonForProdChunked(),
   );
@@ -412,7 +561,17 @@ const prodConfig = ({ mode, env, analysis }) => {
     return [clerkBrowser];
   }
 
-  return [clerkBrowser, clerkLegacyBrowser, clerkNative, clerkCHIPS, clerkEsm, clerkEsmNoRHC, clerkCjs, clerkCjsNoRHC];
+  return [
+    clerkBrowser,
+    clerkExperimentalBrowser,
+    clerkLegacyBrowser,
+    clerkNative,
+    clerkCHIPS,
+    clerkEsm,
+    clerkEsmNoRHC,
+    clerkCjs,
+    clerkCjsNoRHC,
+  ];
 };
 
 /**
@@ -434,7 +593,7 @@ const devConfig = ({ mode, env }) => {
   const commonForDev = () => {
     return {
       module: {
-        rules: [svgLoader(), ...typescriptLoaderDev()],
+        rules: [workerLoader(), svgLoader(), ...typescriptLoaderDev()],
       },
       plugins: [
         new ReactRefreshPlugin(/** @type {any} **/ ({ overlay: { sockHost: devUrl.host } })),
@@ -502,14 +661,25 @@ const devConfig = ({ mode, env }) => {
       common({ mode, disableRHC: true, variant: variants.clerkBrowserNoRHC }),
       commonForDev(),
     ),
-    [variants.clerkNative]: merge(
-      entryForVariant(variants.clerkNative),
-      common({ mode, variant: variants.clerkNative }),
-      commonForDev(),
-    ),
     [variants.clerkCHIPS]: merge(
       entryForVariant(variants.clerkCHIPS),
       common({ mode, variant: variants.clerkCHIPS }),
+      commonForDev(),
+    ),
+    [variants.clerkChannelBrowser]: merge(
+      entryForVariant(variants.clerkChannelBrowser),
+      common({ mode, variant: variants.clerkChannelBrowser }),
+      commonForDev(),
+    ),
+    [variants.clerkExperimentalBrowser]: merge(
+      entryForVariant(variants.clerkExperimentalBrowser),
+      common({ mode, variant: variants.clerkExperimentalBrowser }),
+      commonForDev(),
+    ),
+
+    [variants.clerkNative]: merge(
+      entryForVariant(variants.clerkNative),
+      common({ mode, variant: variants.clerkNative }),
       commonForDev(),
     ),
   };

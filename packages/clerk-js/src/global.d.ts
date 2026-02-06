@@ -3,16 +3,22 @@ declare module '*.svg' {
   export default value;
 }
 
-const __PKG_NAME__: string;
-const __PKG_VERSION__: string;
-const __DEV__: boolean;
+declare module '*.worker.ts' {
+  const value: string;
+  export default value;
+}
 
 /**
  * Build time feature flags.
  */
-const __BUILD_DISABLE_RHC__: string;
-const __BUILD_VARIANT_CHANNEL__: boolean;
-const __BUILD_VARIANT_CHIPS__: boolean;
+declare const __BUILD_DISABLE_RHC__: string;
+declare const __BUILD_VARIANT_CHANNEL__: boolean;
+declare const __BUILD_VARIANT_CHIPS__: boolean;
+declare const __BUILD_VARIANT_EXPERIMENTAL__: boolean;
+
+declare const __DEV__: boolean;
+declare const __PKG_NAME__: string;
+declare const __PKG_VERSION__: string;
 
 interface Window {
   __internal_onBeforeSetActive: (intent?: 'sign-out') => Promise<void> | void;
