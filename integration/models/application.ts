@@ -144,25 +144,48 @@ export const application = (
     get serveOutput() {
       return serveOutput;
     },
-    serve: async (opts: { port?: number; manualStart?: boolean } = {}) => {
+    serve: async (opts: { port?: number; manualStart?: boolean; detached?: boolean; serverUrl?: string } = {}) => {
       const log = logger.child({ prefix: 'serve' }).info;
       const port = opts.port || (await getPort());
-      // TODO: get serverUrl as in dev()
-      const serverUrl = `http://localhost:${port}`;
-      // If this is ever used as a background process, we need to make sure
-      // it's not using the log function. See the dev() method above
+      const getServerUrl = () => {
+        if (opts.serverUrl) {
+          return opts.serverUrl.includes(':') ? opts.serverUrl : `${opts.serverUrl}:${port}`;
+        }
+        return serverUrl || `http://localhost:${port}`;
+      };
+      const runtimeServerUrl = getServerUrl();
+      log(`Will try to serve app at ${runtimeServerUrl}`);
+
+      if (opts.manualStart) {
+        state.serverUrl = runtimeServerUrl;
+        return { port, serverUrl: runtimeServerUrl };
+      }
+
       const proc = run(scripts.serve, {
         cwd: appDirPath,
         env: { PORT: port.toString() },
-        log: (msg: string) => {
-          serveOutput += `\n${msg}`;
-          log(msg);
-        },
+        detached: opts.detached,
+        stdout: opts.detached ? fs.openSync(stdoutFilePath, 'a') : undefined,
+        stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
+        log: opts.detached
+          ? undefined
+          : (msg: string) => {
+              serveOutput += `\n${msg}`;
+              log(msg);
+            },
       });
+
+      if (opts.detached) {
+        const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
+        await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
+      } else {
+        await waitForIdleProcess(proc);
+      }
+
+      log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
       cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
-      await waitForIdleProcess(proc);
-      state.serverUrl = serverUrl;
-      return { port, serverUrl, pid: proc };
+      state.serverUrl = runtimeServerUrl;
+      return { port, serverUrl: runtimeServerUrl, pid: proc.pid };
     },
     stop: async () => {
       logger.info('Stopping...');

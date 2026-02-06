@@ -100,10 +100,16 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
           throw error;
         }
         try {
-          const { port, serverUrl, pid } = await app.dev({ detached: true });
+          await app.build();
+        } catch (error) {
+          console.error('Error during app build:', error);
+          throw error;
+        }
+        try {
+          const { port, serverUrl, pid } = await app.serve({ detached: true });
           stateFile.addLongRunningApp({ port, serverUrl, pid, id, appDir: app.appDir, env: params.env.toJson() });
         } catch (error) {
-          console.error('Error during app dev:', error);
+          console.error('Error during app serve:', error);
           throw error;
         }
       },
@@ -126,9 +132,7 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
       setup: () => Promise.resolve(),
       withEnv: () => Promise.resolve(),
       teardown: () => Promise.resolve(),
-      build: () => {
-        throw new Error('build for long running apps is not supported yet');
-      },
+      build: () => Promise.resolve(),
       get name() {
         return name;
       },
