@@ -15,6 +15,6 @@ export default defineConfig({
     react(),
   ],
   server: {
-    port: Number(process.env.PORT),
+    port: process.env.PORT ? Number(process.env.PORT) : undefined,
   },
 });

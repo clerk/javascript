@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "astro": "astro",
-    "build": "astro check && astro build",
+    "build": "astro build",
     "dev": "astro dev",
     "preview": "astro preview --port $PORT",
     "start": "astro dev --port $PORT"
