@@ -105,7 +105,10 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           }
 
           clerk.value = window.Clerk;
-          const loadOptions = { ...options, ui: { ...pluginOptions.ui, ClerkUI: clerkUICtorPromise } } as unknown as ClerkOptions;
+          const loadOptions = {
+            ...options,
+            ui: { ...pluginOptions.ui, ClerkUI: clerkUICtorPromise },
+          } as unknown as ClerkOptions;
           await window.Clerk.load(loadOptions);
           loaded.value = true;
 
