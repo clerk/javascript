@@ -147,7 +147,10 @@ test.describe('Keyless mode @quickstart', () => {
     });
   });
 
-  test('Signed-in user sees updated prompt content.', async ({ page, context }) => {
+  // Skipped: This test requires creating a user via backend API, which needs CLERK_SECRET_KEY.
+  // Keyless mode is designed to work without keys, so we skip this test for now.
+  // TODO: Revisit when we have a way to test signed-in states in keyless mode without backend API access.
+  test.skip('Signed-in user sees updated prompt content.', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     // Create and sign in a user
