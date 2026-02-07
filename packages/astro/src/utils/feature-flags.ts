@@ -12,6 +12,6 @@ function hasFileSystemSupport(): boolean {
 }
 
 const KEYLESS_DISABLED =
-  isTruthy(import.meta.env.PUBLIC_CLERK_KEYLESS_DISABLED) || isTruthy(import.meta.env.CLERK_KEYLESS_DISABLED) || false;
+  isTruthy(process.env.PUBLIC_CLERK_KEYLESS_DISABLED) || isTruthy(process.env.CLERK_KEYLESS_DISABLED) || false;
 
 export const canUseKeyless = isDevelopmentEnvironment() && !KEYLESS_DISABLED && hasFileSystemSupport();
