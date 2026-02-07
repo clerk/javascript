@@ -34,6 +34,7 @@ declare namespace App {
     runtime: { env: InternalEnv };
     keylessClaimUrl?: string;
     keylessApiKeysUrl?: string;
+    keylessPublishableKey?: string;
   }
 }
 

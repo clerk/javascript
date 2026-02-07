@@ -27,7 +27,8 @@ function getSafeEnv(context: ContextOrLocals) {
     domain: getContextEnvVar('PUBLIC_CLERK_DOMAIN', context),
     isSatellite: getContextEnvVar('PUBLIC_CLERK_IS_SATELLITE', context) === 'true',
     proxyUrl: getContextEnvVar('PUBLIC_CLERK_PROXY_URL', context),
-    pk: getContextEnvVar('PUBLIC_CLERK_PUBLISHABLE_KEY', context),
+    // Use keyless publishable key if available, otherwise read from env
+    pk: locals.keylessPublishableKey || getContextEnvVar('PUBLIC_CLERK_PUBLISHABLE_KEY', context),
     sk: getContextEnvVar('CLERK_SECRET_KEY', context),
     machineSecretKey: getContextEnvVar('CLERK_MACHINE_SECRET_KEY', context),
     signInUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_IN_URL', context),
@@ -62,6 +63,8 @@ function getClientSafeEnv(context: ContextOrLocals) {
     proxyUrl: getContextEnvVar('PUBLIC_CLERK_PROXY_URL', context),
     signInUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_IN_URL', context),
     signUpUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_UP_URL', context),
+    // In keyless mode, pass the resolved publishable key to client
+    publishableKey: locals.keylessPublishableKey || getContextEnvVar('PUBLIC_CLERK_PUBLISHABLE_KEY', context),
     // Read from locals (set by middleware) instead of env vars
     keylessClaimUrl: locals.keylessClaimUrl,
     keylessApiKeysUrl: locals.keylessApiKeysUrl,

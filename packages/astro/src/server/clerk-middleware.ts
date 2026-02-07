@@ -139,10 +139,14 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     decorateAstroLocal(clerkRequest, authObjectFn, context, requestState);
 
-    // Store keyless URLs for injection into client
+    // Store keyless data for injection into client
     if (keylessClaimUrl || keylessApiKeysUrl) {
       context.locals.keylessClaimUrl = keylessClaimUrl;
       context.locals.keylessApiKeysUrl = keylessApiKeysUrl;
+      // Also store the resolved publishable key so client can use it
+      if (keylessOptions?.publishableKey) {
+        context.locals.keylessPublishableKey = keylessOptions.publishableKey;
+      }
     }
 
     /**
