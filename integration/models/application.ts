@@ -179,9 +179,19 @@ export const application = (
       log(`Serve process spawned: pid=${proc.pid}`);
 
       if (opts.detached) {
-        proc.on('exit', (code, signal) => {
-          log(`Serve process exited: code=${code}, signal=${signal}`);
-        });
+        // Give the process a moment to start, then check its state
+        await new Promise(res => setTimeout(res, 3000));
+        try {
+          const procExists = execSync(`kill -0 ${proc.pid} 2>&1 && echo "alive" || echo "dead"`, {
+            encoding: 'utf-8',
+          }).trim();
+          log(`Serve process ${proc.pid} status after 3s: ${procExists}`);
+          const ssOut = execSync(`ss -tlnp 2>&1 | head -20 || true`, { encoding: 'utf-8' });
+          log(`Listening ports:\n${ssOut}`);
+        } catch {
+          log('Could not check serve process status');
+        }
+
         const shouldExit = () => {
           if (proc.exitCode != null) {
             log(`Serve process has exitCode=${proc.exitCode}`);
@@ -192,25 +202,6 @@ export const application = (
         try {
           await waitForServer(runtimeServerUrl, { log, maxAttempts: 120, shouldExit });
         } catch (e) {
-          // Check what the serve process is actually doing
-          try {
-            const lsofOut = execSync(`lsof -i -P -n -p ${proc.pid} 2>&1 || true`, { encoding: 'utf-8' });
-            log(`lsof for serve pid ${proc.pid}:\n${lsofOut || '(no output)'}`);
-          } catch {
-            log(`Could not run lsof for pid ${proc.pid}`);
-          }
-          try {
-            const psOut = execSync('ps aux 2>&1 || true', { encoding: 'utf-8' });
-            const serveLines = psOut
-              .split('\n')
-              .filter(
-                l =>
-                  l.includes(String(proc.pid)) || l.includes('react-router') || l.includes('vite') || l.includes(String(port)),
-              );
-            log(`Related processes:\n${serveLines.join('\n') || '(none found)'}`);
-          } catch {
-            log('Could not run ps');
-          }
           try {
             const stdoutContent = await fs.readFile(stdoutFilePath, 'utf-8');
             const stderrContent = await fs.readFile(stderrFilePath, 'utf-8');
