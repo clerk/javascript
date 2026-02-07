@@ -1,6 +1,7 @@
 import type { ClerkOptions } from '@clerk/shared/types';
 import type { AstroIntegration } from 'astro';
 import { envField } from 'astro/config';
+import { loadEnv } from 'vite';
 
 import { name as packageName, version as packageVersion } from '../../package.json';
 import { resolveKeysWithKeylessFallback } from '../server/keyless/utils';
@@ -32,10 +33,24 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             logger.error('Missing adapter, please update your Astro config to use one.');
           }
 
-          const envPublishableKey = process.env.PUBLIC_CLERK_PUBLISHABLE_KEY;
-          const envSecretKey = process.env.CLERK_SECRET_KEY;
-
           const isDev = command === 'dev';
+
+          // Load environment variables from .env files
+          // Astro's integration hook runs before .env is loaded, so we need to do it manually
+          const mode = isDev ? 'development' : 'production';
+          const envDir = config.root.pathname;
+          const loadedEnv = loadEnv(mode, envDir, '');
+
+          console.log('[Integration Debug] Loaded env from .env files:', {
+            PUBLIC_CLERK_PUBLISHABLE_KEY: loadedEnv.PUBLIC_CLERK_PUBLISHABLE_KEY?.substring(0, 20) + '...',
+            CLERK_SECRET_KEY: loadedEnv.CLERK_SECRET_KEY?.substring(0, 20) + '...',
+            allClerkKeys: Object.keys(loadedEnv).filter(k => k.includes('CLERK')),
+          });
+
+          // Try .env files first, then fall back to process.env
+          const envPublishableKey = loadedEnv.PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.PUBLIC_CLERK_PUBLISHABLE_KEY;
+          const envSecretKey = loadedEnv.CLERK_SECRET_KEY || process.env.CLERK_SECRET_KEY;
+
           let resolvedKeys = {
             publishableKey: envPublishableKey,
             secretKey: envSecretKey,
