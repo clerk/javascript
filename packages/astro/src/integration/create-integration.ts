@@ -45,10 +45,20 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
 
           if (isDev) {
             try {
-              resolvedKeys = await resolveKeysWithKeylessFallback(envPublishableKey, envSecretKey);
-            } catch {
+              resolvedKeys = await resolveKeysWithKeylessFallback(envPublishableKey, envSecretKey, isDev);
+              if (resolvedKeys.publishableKey) {
+                logger.info(`Clerk: Using ${resolvedKeys.claimUrl ? 'keyless' : 'configured'} keys`);
+              }
+            } catch (error) {
               logger.warn('Keyless mode initialization failed, using configured keys');
+              logger.debug(`Keyless error: ${error}`);
             }
+          }
+
+          if (!resolvedKeys.publishableKey && !resolvedKeys.secretKey) {
+            logger.error(
+              'Missing Clerk keys. Set PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY environment variables, or let keyless mode generate them automatically.',
+            );
           }
 
           const internalParams: ClerkOptions = {

@@ -10,16 +10,20 @@ export async function keyless() {
   if (!keylessServiceInstance) {
     const storage = await createFileStorage();
 
+    const mockContext = {
+      locals: { runtime: { env: {} } },
+    } as unknown as APIContext;
+
     keylessServiceInstance = createKeylessService({
       storage,
       api: {
         async createAccountlessApplication(requestHeaders?: Headers) {
           try {
-            const mockContext = {
-              locals: { runtime: { env: {} } },
-            } as unknown as APIContext;
-
-            return await clerkClient(mockContext).__experimental_accountlessApplications.createAccountlessApplication({
+            return await clerkClient(mockContext, {
+              secretKey: process.env.CLERK_SECRET_KEY,
+              publishableKey: process.env.PUBLIC_CLERK_PUBLISHABLE_KEY,
+              apiUrl: process.env.CLERK_API_URL,
+            }).__experimental_accountlessApplications.createAccountlessApplication({
               requestHeaders,
             });
           } catch {
@@ -28,13 +32,11 @@ export async function keyless() {
         },
         async completeOnboarding(requestHeaders?: Headers) {
           try {
-            const mockContext = {
-              locals: { runtime: { env: {} } },
-            } as unknown as APIContext;
-
-            return await clerkClient(
-              mockContext,
-            ).__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
+            return await clerkClient(mockContext, {
+              secretKey: process.env.CLERK_SECRET_KEY,
+              publishableKey: process.env.PUBLIC_CLERK_PUBLISHABLE_KEY,
+              apiUrl: process.env.CLERK_API_URL,
+            }).__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
               requestHeaders,
             });
           } catch {

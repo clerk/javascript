@@ -14,13 +14,14 @@ export interface KeylessResult {
 export async function resolveKeysWithKeylessFallback(
   configuredPublishableKey: string | undefined,
   configuredSecretKey: string | undefined,
+  isDev: boolean = false,
 ): Promise<KeylessResult> {
   let publishableKey = configuredPublishableKey;
   let secretKey = configuredSecretKey;
   let claimUrl: string | undefined;
   let apiKeysUrl: string | undefined;
 
-  if (!canUseKeyless) {
+  if (!isDev || !canUseKeyless) {
     return { publishableKey, secretKey, claimUrl, apiKeysUrl };
   }
 
