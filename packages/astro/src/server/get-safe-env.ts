@@ -38,6 +38,8 @@ function getSafeEnv(context: ContextOrLocals) {
     apiUrl: getContextEnvVar('CLERK_API_URL', context),
     telemetryDisabled: isTruthy(getContextEnvVar('PUBLIC_CLERK_TELEMETRY_DISABLED', context)),
     telemetryDebug: isTruthy(getContextEnvVar('PUBLIC_CLERK_TELEMETRY_DEBUG', context)),
+    keylessClaimUrl: getContextEnvVar('PUBLIC_CLERK_KEYLESS_CLAIM_URL', context),
+    keylessApiKeysUrl: getContextEnvVar('PUBLIC_CLERK_KEYLESS_API_KEYS_URL', context),
   };
 }
 
@@ -55,6 +57,8 @@ function getClientSafeEnv(context: ContextOrLocals) {
     proxyUrl: getContextEnvVar('PUBLIC_CLERK_PROXY_URL', context),
     signInUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_IN_URL', context),
     signUpUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_UP_URL', context),
+    keylessClaimUrl: getContextEnvVar('PUBLIC_CLERK_KEYLESS_CLAIM_URL', context),
+    keylessApiKeysUrl: getContextEnvVar('PUBLIC_CLERK_KEYLESS_API_KEYS_URL', context),
   };
 }
 

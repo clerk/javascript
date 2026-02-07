@@ -56,6 +56,8 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
       disabled: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DISABLED),
       debug: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DEBUG),
     },
+    __internal_keylessClaimUrl: import.meta.env.PUBLIC_CLERK_KEYLESS_CLAIM_URL,
+    __internal_keylessApiKeysUrl: import.meta.env.PUBLIC_CLERK_KEYLESS_API_KEYS_URL,
     ...rest,
   };
 };

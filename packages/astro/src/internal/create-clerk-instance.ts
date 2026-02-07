@@ -54,12 +54,17 @@ async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroC
     $clerk.set(clerkJSInstance);
   }
 
+  const keylessClaimUrl = (options as any)?.__internal_keylessClaimUrl;
+  const keylessApiKeysUrl = (options as any)?.__internal_keylessApiKeysUrl;
+
   const clerkOptions = {
     routerPush: createNavigationHandler(window.history.pushState.bind(window.history)),
     routerReplace: createNavigationHandler(window.history.replaceState.bind(window.history)),
     ...options,
     // Pass the clerk-ui constructor promise to clerk.load()
     clerkUICtor,
+    ...(keylessClaimUrl && { __internal_keyless_claimKeylessApplicationUrl: keylessClaimUrl }),
+    ...(keylessApiKeysUrl && { __internal_keyless_copyInstanceKeysUrl: keylessApiKeysUrl }),
   } as unknown as ClerkOptions;
 
   initOptions = clerkOptions;
