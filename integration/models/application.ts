@@ -1,4 +1,3 @@
-import { execSync } from 'node:child_process';
 import * as path from 'node:path';
 
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -162,7 +161,6 @@ export const application = (
         return { port, serverUrl: runtimeServerUrl };
       }
 
-      log(`Running serve command: "${scripts.serve}" with PORT=${port}, detached=${opts.detached}`);
       const proc = run(scripts.serve, {
         cwd: appDirPath,
         env: { PORT: port.toString() },
@@ -176,47 +174,10 @@ export const application = (
               log(msg);
             },
       });
-      log(`Serve process spawned: pid=${proc.pid}`);
 
       if (opts.detached) {
-        // Give the process a moment to start, then check its state
-        await new Promise(res => setTimeout(res, 10000));
-        try {
-          const procAlive = execSync(`kill -0 ${proc.pid} 2>&1 && echo "alive" || echo "dead"`, {
-            encoding: 'utf-8',
-          }).trim();
-          log(`Serve process ${proc.pid} status after 10s: ${procAlive}`);
-          // Check port binding
-          const portCheck = execSync(`lsof -i :${port} -P -n 2>&1 || echo "(lsof: no results)"`, { encoding: 'utf-8' });
-          log(`Port ${port} check:\n${portCheck}`);
-          // Check process tree
-          const pstree = execSync(`pstree -p ${proc.pid} 2>&1 || echo "(pstree failed)"`, { encoding: 'utf-8' });
-          log(`Process tree:\n${pstree}`);
-        } catch (debugErr) {
-          log(`Debug check error: ${debugErr}`);
-        }
-
-        const shouldExit = () => {
-          if (proc.exitCode != null) {
-            log(`Serve process has exitCode=${proc.exitCode}`);
-            return true;
-          }
-          return false;
-        };
-        try {
-          await waitForServer(runtimeServerUrl, { log, maxAttempts: 120, shouldExit });
-        } catch (e) {
-          try {
-            const stdoutContent = await fs.readFile(stdoutFilePath, 'utf-8');
-            const stderrContent = await fs.readFile(stderrFilePath, 'utf-8');
-            log(`Serve stdout:\n${stdoutContent || '(empty)'}`);
-            log(`Serve stderr:\n${stderrContent || '(empty)'}`);
-          } catch {
-            log('Could not read serve log files');
-          }
-          log(`Serve process exitCode=${proc.exitCode}, killed=${proc.killed}, pid=${proc.pid}`);
-          throw e;
-        }
+        const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
+        await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
       } else {
         await waitForIdleProcess(proc);
       }
