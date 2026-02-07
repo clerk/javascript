@@ -40,7 +40,6 @@ describe('getAuth', () => {
   it('should throw an error when middleware context is missing', async () => {
     const mockContext = {
       get: vi.fn().mockReturnValue(null),
-      set: vi.fn(),
     };
 
     const args = {
