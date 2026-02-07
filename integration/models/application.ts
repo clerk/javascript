@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import * as path from 'node:path';
 
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -161,6 +162,7 @@ export const application = (
         return { port, serverUrl: runtimeServerUrl };
       }
 
+      log(`Running serve command: "${scripts.serve}" with PORT=${port}, detached=${opts.detached}`);
       const proc = run(scripts.serve, {
         cwd: appDirPath,
         env: { PORT: port.toString() },
@@ -174,21 +176,46 @@ export const application = (
               log(msg);
             },
       });
+      log(`Serve process spawned: pid=${proc.pid}`);
 
       if (opts.detached) {
         proc.on('exit', (code, signal) => {
           log(`Serve process exited: code=${code}, signal=${signal}`);
         });
-        const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
+        const shouldExit = () => {
+          if (proc.exitCode != null) {
+            log(`Serve process has exitCode=${proc.exitCode}`);
+            return true;
+          }
+          return false;
+        };
         try {
           await waitForServer(runtimeServerUrl, { log, maxAttempts: 120, shouldExit });
         } catch (e) {
-          // Dump log files for debugging
+          // Check what the serve process is actually doing
           try {
-            const stdout = await fs.readFile(stdoutFilePath, 'utf-8');
-            const stderr = await fs.readFile(stderrFilePath, 'utf-8');
-            log(`Serve stdout log:\n${stdout}`);
-            log(`Serve stderr log:\n${stderr}`);
+            const lsofOut = execSync(`lsof -i -P -n -p ${proc.pid} 2>&1 || true`, { encoding: 'utf-8' });
+            log(`lsof for serve pid ${proc.pid}:\n${lsofOut || '(no output)'}`);
+          } catch {
+            log(`Could not run lsof for pid ${proc.pid}`);
+          }
+          try {
+            const psOut = execSync('ps aux 2>&1 || true', { encoding: 'utf-8' });
+            const serveLines = psOut
+              .split('\n')
+              .filter(
+                l =>
+                  l.includes(String(proc.pid)) || l.includes('react-router') || l.includes('vite') || l.includes(String(port)),
+              );
+            log(`Related processes:\n${serveLines.join('\n') || '(none found)'}`);
+          } catch {
+            log('Could not run ps');
+          }
+          try {
+            const stdoutContent = await fs.readFile(stdoutFilePath, 'utf-8');
+            const stderrContent = await fs.readFile(stderrFilePath, 'utf-8');
+            log(`Serve stdout:\n${stdoutContent || '(empty)'}`);
+            log(`Serve stderr:\n${stderrContent || '(empty)'}`);
           } catch {
             log('Could not read serve log files');
           }
