@@ -3,6 +3,7 @@ import type { AstroIntegration } from 'astro';
 import { envField } from 'astro/config';
 
 import { name as packageName, version as packageVersion } from '../../package.json';
+import { resolveKeysWithKeylessFallback } from '../server/keyless/utils';
 import type { AstroClerkIntegrationParams } from '../types';
 import { vitePluginAstroConfig } from './vite-plugin-astro-config';
 
@@ -28,17 +29,29 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
     return {
       name: '@clerk/astro/integration',
       hooks: {
-        'astro:config:setup': ({ config, injectScript, updateConfig, logger, command }) => {
+        'astro:config:setup': async ({ config, injectScript, updateConfig, logger, command }) => {
           if (['server', 'hybrid'].includes(config.output) && !config.adapter) {
             logger.error('Missing adapter, please update your Astro config to use one.');
           }
 
-          const isDev = command === 'dev';
-
-          // Read keys from process.env for vite.define injection
-          // Note: Keyless mode is now handled by middleware per-request, not here
           const envPublishableKey = process.env.PUBLIC_CLERK_PUBLISHABLE_KEY;
           const envSecretKey = process.env.CLERK_SECRET_KEY;
+
+          const isDev = command === 'dev';
+          let resolvedKeys = {
+            publishableKey: envPublishableKey,
+            secretKey: envSecretKey,
+            claimUrl: undefined as string | undefined,
+            apiKeysUrl: undefined as string | undefined,
+          };
+
+          if (isDev) {
+            try {
+              resolvedKeys = await resolveKeysWithKeylessFallback(envPublishableKey, envSecretKey);
+            } catch {
+              logger.warn('Keyless mode initialization failed, using configured keys');
+            }
+          }
 
           const internalParams: ClerkOptions = {
             ...params,
@@ -71,9 +84,10 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                   prefetchUI === false || hasUI ? 'false' : undefined,
                   'PUBLIC_CLERK_PREFETCH_UI',
                 ),
-                ...buildEnvVarFromOption(envPublishableKey, 'PUBLIC_CLERK_PUBLISHABLE_KEY'),
-                ...buildEnvVarFromOption(envSecretKey, 'CLERK_SECRET_KEY'),
-                // Keyless URLs are now handled by middleware, not vite.define
+                ...buildEnvVarFromOption(resolvedKeys.publishableKey, 'PUBLIC_CLERK_PUBLISHABLE_KEY'),
+                ...buildEnvVarFromOption(resolvedKeys.secretKey, 'CLERK_SECRET_KEY'),
+                ...buildEnvVarFromOption(resolvedKeys.claimUrl, 'PUBLIC_CLERK_KEYLESS_CLAIM_URL'),
+                ...buildEnvVarFromOption(resolvedKeys.apiKeysUrl, 'PUBLIC_CLERK_KEYLESS_API_KEYS_URL'),
               },
 
               ssr: {
@@ -189,7 +203,18 @@ function createClerkEnvSchema() {
     PUBLIC_CLERK_UI_URL: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
     PUBLIC_CLERK_TELEMETRY_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_TELEMETRY_DEBUG: envField.boolean({ context: 'client', access: 'public', optional: true }),
-    // Note: KEYLESS_CLAIM_URL and KEYLESS_API_KEYS_URL are dynamically resolved by middleware, not user-configurable
+    PUBLIC_CLERK_KEYLESS_CLAIM_URL: envField.string({
+      context: 'client',
+      access: 'public',
+      optional: true,
+      url: true,
+    }),
+    PUBLIC_CLERK_KEYLESS_API_KEYS_URL: envField.string({
+      context: 'client',
+      access: 'public',
+      optional: true,
+      url: true,
+    }),
     PUBLIC_CLERK_KEYLESS_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
     CLERK_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
     CLERK_MACHINE_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),

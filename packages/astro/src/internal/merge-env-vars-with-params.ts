@@ -58,10 +58,8 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
       disabled: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DISABLED),
       debug: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DEBUG),
     },
-    // Read from params (server-injected via __CLERK_ASTRO_SAFE_VARS__)
-    // These are dynamically resolved by middleware, not from env vars
-    __internal_keylessClaimUrl: (params as any)?.keylessClaimUrl,
-    __internal_keylessApiKeysUrl: (params as any)?.keylessApiKeysUrl,
+    __internal_keylessClaimUrl: import.meta.env.PUBLIC_CLERK_KEYLESS_CLAIM_URL,
+    __internal_keylessApiKeysUrl: import.meta.env.PUBLIC_CLERK_KEYLESS_API_KEYS_URL,
     ...rest,
   };
 };
