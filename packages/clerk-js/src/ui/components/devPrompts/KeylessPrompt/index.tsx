@@ -2,6 +2,7 @@ import { useUser } from '@clerk/shared/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
 import type { PropsWithChildren } from 'react';
+import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -536,9 +537,221 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
   );
 };
 
+const WIDTH_OPEN = '18rem';
+const WIDTH_CLOSED = '15rem';
+const DURATION_OPEN = '220ms';
+const DURATION_CLOSE = '180ms';
+const EASE_BEZIER = 'cubic-bezier(0.2, 0, 0, 1)';
+
+const getDuration = (isOpen: boolean) => (isOpen ? DURATION_OPEN : DURATION_CLOSE);
+
+function Keyless() {
+  const id = React.useId();
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div
+      data-expanded={isOpen}
+      css={css`
+        position: fixed;
+        bottom: 1.25rem;
+        right: 1.25rem;
+        border-radius: ${isOpen ? '0.75rem' : '2.5rem'};
+        background-color: #1f1f1f;
+        box-shadow:
+          0px 0px 0px 0.5px #2f3037 inset,
+          0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset,
+          0px 0px 0.8px 0.8px rgba(255, 255, 255, 0.2) inset,
+          0px 0px 0px 0px rgba(255, 255, 255, 0.72),
+          0px 16px 36px -6px rgba(0, 0, 0, 0.36),
+          0px 6px 16px -2px rgba(0, 0, 0, 0.2);
+        height: auto;
+        isolation: isolate;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        width: ${isOpen ? WIDTH_OPEN : WIDTH_CLOSED};
+        transition:
+          border-radius ${getDuration(isOpen)} cubic-bezier(0.2, 0, 0, 1),
+          width ${getDuration(isOpen)} ${EASE_BEZIER};
+        &:has(button:focus-visible) {
+          outline: 2px solid #6c47ff;
+          outline-offset: 2px;
+        }
+        &::before {
+          content: '';
+          pointer-events: none;
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background-image: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+          opacity: 0.16;
+          transition: opacity ${getDuration(isOpen)} ${EASE_BEZIER};
+        }
+        &[data-expanded='true']::before,
+        &:hover::before {
+          opacity: 0.2;
+        }
+      `}
+    >
+      <button
+        type='button'
+        aria-controls={id}
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen(p => !p)}
+        css={css`
+          display: flex;
+          align-items: center;
+          width: 100%;
+          border-radius: inherit;
+          padding-inline: 0.75rem;
+          gap: 0.25rem;
+          height: 2.5rem;
+          outline: none;
+        `}
+      >
+        <svg
+          css={css`
+            width: 1rem;
+            height: 1rem;
+            flex-shrink: 0;
+          `}
+          fill='none'
+          viewBox='0 0 128 128'
+        >
+          <circle
+            cx='64'
+            cy='64'
+            r='20'
+            fill='#fff'
+          />
+          <path
+            fill='#fff'
+            fillOpacity='.4'
+            d='M99.572 10.788c1.999 1.34 2.17 4.156.468 5.858L85.424 31.262c-1.32 1.32-3.37 1.53-5.033.678A35.846 35.846 0 0 0 64 28c-19.882 0-36 16.118-36 36a35.846 35.846 0 0 0 3.94 16.391c.851 1.663.643 3.712-.678 5.033L16.646 100.04c-1.702 1.702-4.519 1.531-5.858-.468C3.974 89.399 0 77.163 0 64 0 28.654 28.654 0 64 0c13.163 0 25.399 3.974 35.572 10.788Z'
+          />
+          <path
+            fill='#fff'
+            d='M100.04 111.354c1.702 1.702 1.531 4.519-.468 5.858C89.399 124.026 77.164 128 64 128c-13.164 0-25.399-3.974-35.572-10.788-2-1.339-2.17-4.156-.468-5.858l14.615-14.616c1.322-1.32 3.37-1.53 5.033-.678A35.847 35.847 0 0 0 64 100a35.846 35.846 0 0 0 16.392-3.94c1.662-.852 3.712-.643 5.032.678l14.616 14.616Z'
+          />
+        </svg>
+        <span
+          css={css`
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #d9d9d9;
+            white-space: nowrap;
+          `}
+        >
+          Configure your application
+        </span>
+        <svg
+          css={css`
+            width: 1rem;
+            height: 1rem;
+            flex-shrink: 0;
+            color: #d9d9d9;
+            margin-inline-start: auto;
+            opacity: ${isOpen ? 1 : 0};
+            transition: opacity ${getDuration(isOpen)} ease-out;
+          `}
+          viewBox='0 0 16 16'
+          fill='none'
+          aria-hidden='true'
+          xmlns='http://www.w3.org/2000/svg'
+        >
+          <path
+            d='M3.75 8H12.25'
+            stroke='currentColor'
+            strokeWidth='1.5'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+          />
+        </svg>
+      </button>
+      <div
+        id={id}
+        css={css`
+          display: grid;
+          grid-template-rows: ${isOpen ? '1fr' : '0fr'};
+          transition: grid-template-rows ${getDuration(isOpen)} ${EASE_BEZIER};
+        `}
+      >
+        <div
+          css={css`
+            min-height: 0;
+            overflow: hidden;
+          `}
+        >
+          <div
+            css={css`
+              width: ${WIDTH_OPEN};
+              padding-inline: 0.75rem;
+              padding-block-end: 0.75rem;
+              opacity: ${isOpen ? 1 : 0};
+              transition: opacity ${getDuration(isOpen)} ${EASE_BEZIER};
+            `}
+          >
+            <p
+              css={css`
+                color: #b4b4b4;
+                font-size: 0.8125rem;
+                font-weight: 400;
+                line-height: 1rem;
+                text-box-trim: trim-start;
+              `}
+            >
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos qui laboriosam sit fugiat, ipsam
+              animi minima neque alias mollitia expedita.
+            </p>
+
+            <a
+              href='https://clerk.com/dashboard'
+              target='_blank'
+              rel='noopener noreferrer'
+              css={css`
+                margin: 0.75rem 0 0;
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 1.75rem;
+                padding: 0.25rem 0.625rem;
+                border-radius: 0.375rem;
+                font-size: 0.75rem;
+                font-weight: 500;
+                letter-spacing: 0.12px;
+                color: #fde047;
+                text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
+                white-space: nowrap;
+                user-select: none;
+                cursor: pointer;
+                background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
+                box-shadow:
+                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
+                  0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
+                outline: none;
+                &:focus-visible {
+                  outline: 2px solid #6c47ff;
+                  outline-offset: 2px;
+                }
+              `}
+            >
+              Configure your application
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const KeylessPrompt = (props: KeylessPromptProps) => (
   <InternalThemeProvider>
-    <KeylessPromptInternal {...props} />
+    <Keyless />
+    {/* <KeylessPromptInternal {...props} /> */}
   </InternalThemeProvider>
 );
 
