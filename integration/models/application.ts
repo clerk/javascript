@@ -180,16 +180,23 @@ export const application = (
 
       if (opts.detached) {
         // Give the process a moment to start, then check its state
-        await new Promise(res => setTimeout(res, 3000));
+        await new Promise(res => setTimeout(res, 10000));
         try {
-          const procExists = execSync(`kill -0 ${proc.pid} 2>&1 && echo "alive" || echo "dead"`, {
+          const procAlive = execSync(`kill -0 ${proc.pid} 2>&1 && echo "alive" || echo "dead"`, {
             encoding: 'utf-8',
           }).trim();
-          log(`Serve process ${proc.pid} status after 3s: ${procExists}`);
-          const ssOut = execSync(`ss -tlnp 2>&1 | head -20 || true`, { encoding: 'utf-8' });
-          log(`Listening ports:\n${ssOut}`);
-        } catch {
-          log('Could not check serve process status');
+          log(`Serve process ${proc.pid} status after 10s: ${procAlive}`);
+          // Check port binding
+          const portCheck = execSync(
+            `lsof -i :${port} -P -n 2>&1 || echo "(lsof: no results)"`,
+            { encoding: 'utf-8' },
+          );
+          log(`Port ${port} check:\n${portCheck}`);
+          // Check process tree
+          const pstree = execSync(`pstree -p ${proc.pid} 2>&1 || echo "(pstree failed)"`, { encoding: 'utf-8' });
+          log(`Process tree:\n${pstree}`);
+        } catch (debugErr) {
+          log(`Debug check error: ${debugErr}`);
         }
 
         const shouldExit = () => {
