@@ -8,7 +8,10 @@ import type { AstroClerkIntegrationParams } from '../types';
 import { vitePluginAstroConfig } from './vite-plugin-astro-config';
 
 const buildEnvVarFromOption = (valueToBeStored: unknown, envName: keyof InternalEnv) => {
-  return valueToBeStored ? { [`import.meta.env.${envName}`]: JSON.stringify(valueToBeStored) } : {};
+  // Always return a value to ensure Vite properly replaces previous definitions
+  // For undefined values, use the literal 'undefined' identifier instead of a string
+  const value = valueToBeStored !== undefined ? JSON.stringify(valueToBeStored) : 'undefined';
+  return { [`import.meta.env.${envName}`]: value };
 };
 
 type HotloadAstroClerkIntegrationParams = AstroClerkIntegrationParams & {
