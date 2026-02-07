@@ -37,7 +37,7 @@ function getSafeEnv(context: ContextOrLocals) {
     clerkUIUrl: getContextEnvVar('PUBLIC_CLERK_UI_URL', context),
     prefetchUI: getContextEnvVar('PUBLIC_CLERK_PREFETCH_UI', context) === 'false' ? false : undefined,
     apiVersion: getContextEnvVar('CLERK_API_VERSION', context),
-    apiUrl: getContextEnvVar('PUBLIC_CLERK_API_URL', context),
+    apiUrl: getContextEnvVar('CLERK_API_URL', context),
     telemetryDisabled: isTruthy(getContextEnvVar('PUBLIC_CLERK_TELEMETRY_DISABLED', context)),
     telemetryDebug: isTruthy(getContextEnvVar('PUBLIC_CLERK_TELEMETRY_DEBUG', context)),
     // Read from locals (set by middleware) instead of env vars
@@ -54,7 +54,7 @@ function getSafeEnv(context: ContextOrLocals) {
  * This is a way to get around it.
  */
 function getClientSafeEnv(context: ContextOrLocals) {
-  const locals = 'locals' in context ? context.locals : context;
+  const locals = ('locals' in context ? context.locals : context) as any;
 
   return {
     domain: getContextEnvVar('PUBLIC_CLERK_DOMAIN', context),

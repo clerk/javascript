@@ -1,7 +1,6 @@
 import type { ClerkOptions } from '@clerk/shared/types';
 import type { AstroIntegration } from 'astro';
 import { envField } from 'astro/config';
-import { loadEnv } from 'vite';
 
 import { name as packageName, version as packageVersion } from '../../package.json';
 import type { AstroClerkIntegrationParams } from '../types';
@@ -34,18 +33,10 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
 
           const isDev = command === 'dev';
 
-          // Load environment variables from .env files
-          // Astro's integration hook runs before .env is loaded, so we need to do it manually
-          const mode = isDev ? 'development' : 'production';
-          const envDir = config.root.pathname;
-          const loadedEnv = loadEnv(mode, envDir, '');
-
-          // Try .env files first, then fall back to process.env
-          const envPublishableKey = loadedEnv.PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.PUBLIC_CLERK_PUBLISHABLE_KEY;
-          const envSecretKey = loadedEnv.CLERK_SECRET_KEY || process.env.CLERK_SECRET_KEY;
-
-          // Note: Keyless mode is now handled by middleware, not integration hook
-          // Keys missing error removed - middleware will handle keyless fallback
+          // Read keys from process.env for vite.define injection
+          // Note: Keyless mode is now handled by middleware per-request, not here
+          const envPublishableKey = process.env.PUBLIC_CLERK_PUBLISHABLE_KEY;
+          const envSecretKey = process.env.CLERK_SECRET_KEY;
 
           const internalParams: ClerkOptions = {
             ...params,
