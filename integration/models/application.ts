@@ -177,7 +177,7 @@ export const application = (
 
       if (opts.detached) {
         const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
-        await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
+        await waitForServer(runtimeServerUrl, { log, maxAttempts: 120, shouldExit });
       } else {
         await waitForIdleProcess(proc);
       }

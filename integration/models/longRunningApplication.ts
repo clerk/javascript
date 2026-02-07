@@ -109,7 +109,10 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
         }
         try {
           log('Building app...');
-          await app.build();
+          const buildTimeout = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error(`Build timed out after 120s for ${name}`)), 120_000),
+          );
+          await Promise.race([app.build(), buildTimeout]);
           log('Build complete');
         } catch (error) {
           console.error('Error during app build:', error);
