@@ -187,10 +187,7 @@ export const application = (
           }).trim();
           log(`Serve process ${proc.pid} status after 10s: ${procAlive}`);
           // Check port binding
-          const portCheck = execSync(
-            `lsof -i :${port} -P -n 2>&1 || echo "(lsof: no results)"`,
-            { encoding: 'utf-8' },
-          );
+          const portCheck = execSync(`lsof -i :${port} -P -n 2>&1 || echo "(lsof: no results)"`, { encoding: 'utf-8' });
           log(`Port ${port} check:\n${portCheck}`);
           // Check process tree
           const pstree = execSync(`pstree -p ${proc.pid} 2>&1 || echo "(pstree failed)"`, { encoding: 'utf-8' });
