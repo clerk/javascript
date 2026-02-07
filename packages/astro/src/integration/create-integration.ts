@@ -41,12 +41,6 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
           const envDir = config.root.pathname;
           const loadedEnv = loadEnv(mode, envDir, '');
 
-          console.log('[Integration Debug] Loaded env from .env files:', {
-            PUBLIC_CLERK_PUBLISHABLE_KEY: loadedEnv.PUBLIC_CLERK_PUBLISHABLE_KEY?.substring(0, 20) + '...',
-            CLERK_SECRET_KEY: loadedEnv.CLERK_SECRET_KEY?.substring(0, 20) + '...',
-            allClerkKeys: Object.keys(loadedEnv).filter(k => k.includes('CLERK')),
-          });
-
           // Try .env files first, then fall back to process.env
           const envPublishableKey = loadedEnv.PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.PUBLIC_CLERK_PUBLISHABLE_KEY;
           const envSecretKey = loadedEnv.CLERK_SECRET_KEY || process.env.CLERK_SECRET_KEY;
