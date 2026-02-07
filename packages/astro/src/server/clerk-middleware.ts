@@ -24,10 +24,12 @@ import type { APIContext } from 'astro';
 
 import { authAsyncStorage } from '#async-local-storage';
 
+import { canUseKeyless } from '../utils/feature-flags';
 import { buildClerkHotloadScript } from './build-clerk-hotload-script';
 import { clerkClient } from './clerk-client';
 import { createCurrentUser } from './current-user';
 import { getClientSafeEnv, getSafeEnv } from './get-safe-env';
+import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import { serverRedirectWithAuth } from './server-redirect-with-auth';
 import type {
   AstroMiddleware,
@@ -79,9 +81,42 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     const clerkRequest = createClerkRequest(context.request);
 
+    // Resolve keyless URLs per-request in development
+    let keylessClaimUrl: string | undefined;
+    let keylessApiKeysUrl: string | undefined;
+    let keylessOptions = options;
+
+    if (canUseKeyless) {
+      try {
+        const env = getSafeEnv(context);
+        const configuredPublishableKey = options?.publishableKey || env.pk;
+        const configuredSecretKey = options?.secretKey || env.sk;
+
+        const keylessResult = await resolveKeysWithKeylessFallback(
+          configuredPublishableKey,
+          configuredSecretKey,
+          true, // isDev - keyless only works in dev
+        );
+
+        keylessClaimUrl = keylessResult.claimUrl;
+        keylessApiKeysUrl = keylessResult.apiKeysUrl;
+
+        // Override keys with keyless values if returned
+        if (keylessResult.publishableKey || keylessResult.secretKey) {
+          keylessOptions = {
+            ...options,
+            ...(keylessResult.publishableKey && { publishableKey: keylessResult.publishableKey }),
+            ...(keylessResult.secretKey && { secretKey: keylessResult.secretKey }),
+          };
+        }
+      } catch (error) {
+        // Silently fail - continue without keyless
+      }
+    }
+
     const requestState = await clerkClient(context).authenticateRequest(
       clerkRequest,
-      createAuthenticateRequestOptions(clerkRequest, options, context),
+      createAuthenticateRequestOptions(clerkRequest, keylessOptions, context),
     );
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
@@ -103,6 +138,12 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
 
     decorateAstroLocal(clerkRequest, authObjectFn, context, requestState);
+
+    // Store keyless URLs for injection into client
+    if (keylessClaimUrl || keylessApiKeysUrl) {
+      context.locals.keylessClaimUrl = keylessClaimUrl;
+      context.locals.keylessApiKeysUrl = keylessApiKeysUrl;
+    }
 
     /**
      * ALS is crucial for guaranteeing SSR in UI frameworks like React.

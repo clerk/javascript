@@ -4,7 +4,6 @@ import { envField } from 'astro/config';
 import { loadEnv } from 'vite';
 
 import { name as packageName, version as packageVersion } from '../../package.json';
-import { resolveKeysWithKeylessFallback } from '../server/keyless/utils';
 import type { AstroClerkIntegrationParams } from '../types';
 import { vitePluginAstroConfig } from './vite-plugin-astro-config';
 
@@ -28,7 +27,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
     return {
       name: '@clerk/astro/integration',
       hooks: {
-        'astro:config:setup': async ({ config, injectScript, updateConfig, logger, command }) => {
+        'astro:config:setup': ({ config, injectScript, updateConfig, logger, command }) => {
           if (['server', 'hybrid'].includes(config.output) && !config.adapter) {
             logger.error('Missing adapter, please update your Astro config to use one.');
           }
@@ -45,30 +44,8 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
           const envPublishableKey = loadedEnv.PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.PUBLIC_CLERK_PUBLISHABLE_KEY;
           const envSecretKey = loadedEnv.CLERK_SECRET_KEY || process.env.CLERK_SECRET_KEY;
 
-          let resolvedKeys = {
-            publishableKey: envPublishableKey,
-            secretKey: envSecretKey,
-            claimUrl: undefined as string | undefined,
-            apiKeysUrl: undefined as string | undefined,
-          };
-
-          if (isDev) {
-            try {
-              resolvedKeys = await resolveKeysWithKeylessFallback(envPublishableKey, envSecretKey, isDev);
-              if (resolvedKeys.publishableKey) {
-                logger.info(`Clerk: Using ${resolvedKeys.claimUrl ? 'keyless' : 'configured'} keys`);
-              }
-            } catch (error) {
-              logger.warn('Keyless mode initialization failed, using configured keys');
-              logger.debug(`Keyless error: ${error}`);
-            }
-          }
-
-          if (!resolvedKeys.publishableKey && !resolvedKeys.secretKey) {
-            logger.error(
-              'Missing Clerk keys. Set PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY environment variables, or let keyless mode generate them automatically.',
-            );
-          }
+          // Note: Keyless mode is now handled by middleware, not integration hook
+          // Keys missing error removed - middleware will handle keyless fallback
 
           const internalParams: ClerkOptions = {
             ...params,
@@ -97,10 +74,9 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 ...buildEnvVarFromOption(clerkJSUrl, 'PUBLIC_CLERK_JS_URL'),
                 ...buildEnvVarFromOption(clerkJSVersion, 'PUBLIC_CLERK_JS_VERSION'),
                 ...buildEnvVarFromOption(prefetchUI === false ? 'false' : undefined, 'PUBLIC_CLERK_PREFETCH_UI'),
-                ...buildEnvVarFromOption(resolvedKeys.publishableKey, 'PUBLIC_CLERK_PUBLISHABLE_KEY'),
-                ...buildEnvVarFromOption(resolvedKeys.secretKey, 'CLERK_SECRET_KEY'),
-                ...buildEnvVarFromOption(resolvedKeys.claimUrl, 'PUBLIC_CLERK_KEYLESS_CLAIM_URL'),
-                ...buildEnvVarFromOption(resolvedKeys.apiKeysUrl, 'PUBLIC_CLERK_KEYLESS_API_KEYS_URL'),
+                ...buildEnvVarFromOption(envPublishableKey, 'PUBLIC_CLERK_PUBLISHABLE_KEY'),
+                ...buildEnvVarFromOption(envSecretKey, 'CLERK_SECRET_KEY'),
+                // Keyless URLs are now handled by middleware, not vite.define
               },
 
               ssr: {

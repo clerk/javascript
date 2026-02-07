@@ -21,6 +21,8 @@ function getContextEnvVar(envVarName: keyof InternalEnv, contextOrLocals: Contex
  * @internal
  */
 function getSafeEnv(context: ContextOrLocals) {
+  const locals = 'locals' in context ? context.locals : context;
+
   return {
     domain: getContextEnvVar('PUBLIC_CLERK_DOMAIN', context),
     isSatellite: getContextEnvVar('PUBLIC_CLERK_IS_SATELLITE', context) === 'true',
@@ -35,11 +37,12 @@ function getSafeEnv(context: ContextOrLocals) {
     clerkUIUrl: getContextEnvVar('PUBLIC_CLERK_UI_URL', context),
     prefetchUI: getContextEnvVar('PUBLIC_CLERK_PREFETCH_UI', context) === 'false' ? false : undefined,
     apiVersion: getContextEnvVar('CLERK_API_VERSION', context),
-    apiUrl: getContextEnvVar('CLERK_API_URL', context),
+    apiUrl: getContextEnvVar('PUBLIC_CLERK_API_URL', context),
     telemetryDisabled: isTruthy(getContextEnvVar('PUBLIC_CLERK_TELEMETRY_DISABLED', context)),
     telemetryDebug: isTruthy(getContextEnvVar('PUBLIC_CLERK_TELEMETRY_DEBUG', context)),
-    keylessClaimUrl: getContextEnvVar('PUBLIC_CLERK_KEYLESS_CLAIM_URL', context),
-    keylessApiKeysUrl: getContextEnvVar('PUBLIC_CLERK_KEYLESS_API_KEYS_URL', context),
+    // Read from locals (set by middleware) instead of env vars
+    keylessClaimUrl: locals.keylessClaimUrl,
+    keylessApiKeysUrl: locals.keylessApiKeysUrl,
   };
 }
 
@@ -51,14 +54,17 @@ function getSafeEnv(context: ContextOrLocals) {
  * This is a way to get around it.
  */
 function getClientSafeEnv(context: ContextOrLocals) {
+  const locals = 'locals' in context ? context.locals : context;
+
   return {
     domain: getContextEnvVar('PUBLIC_CLERK_DOMAIN', context),
     isSatellite: getContextEnvVar('PUBLIC_CLERK_IS_SATELLITE', context) === 'true',
     proxyUrl: getContextEnvVar('PUBLIC_CLERK_PROXY_URL', context),
     signInUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_IN_URL', context),
     signUpUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_UP_URL', context),
-    keylessClaimUrl: getContextEnvVar('PUBLIC_CLERK_KEYLESS_CLAIM_URL', context),
-    keylessApiKeysUrl: getContextEnvVar('PUBLIC_CLERK_KEYLESS_API_KEYS_URL', context),
+    // Read from locals (set by middleware) instead of env vars
+    keylessClaimUrl: locals.keylessClaimUrl,
+    keylessApiKeysUrl: locals.keylessApiKeysUrl,
   };
 }
 
