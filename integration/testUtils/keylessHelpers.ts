@@ -4,7 +4,7 @@ import type { Page } from '@playwright/test';
  * Mocks the environment API call to return a claimed instance.
  * Used in keyless mode tests to simulate an instance that has been claimed.
  */
-export const mockClaimedInstanceEnvironmentCall = async (page: Page) => {
+export const mockClaimedInstanceEnvironmentCall = async (page: Page): Promise<void> => {
   await page.route('*/**/v1/environment*', async route => {
     const response = await route.fetch();
     const json = await response.json();

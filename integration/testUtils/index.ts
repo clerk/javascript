@@ -88,4 +88,3 @@ export const createTestUtils = <
 };
 
 export { testAgainstRunningApps } from './testAgainstRunningApps';
-export { mockClaimedInstanceEnvironmentCall } from './keylessHelpers';

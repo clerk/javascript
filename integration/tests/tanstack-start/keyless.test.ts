@@ -2,7 +2,8 @@ import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
-import { createTestUtils, mockClaimedInstanceEnvironmentCall } from '../../testUtils';
+import { createTestUtils } from '../../testUtils';
+import { mockClaimedInstanceEnvironmentCall } from '../../testUtils/keylessHelpers';
 
 const commonSetup = appConfigs.tanstack.reactStart.clone();
 

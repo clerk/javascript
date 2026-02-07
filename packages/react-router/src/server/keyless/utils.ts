@@ -61,12 +61,12 @@ export async function resolveKeysWithKeylessFallback(
       return { publishableKey, secretKey, claimUrl, apiKeysUrl };
     }
 
-    if (!publishableKey || !secretKey) {
+    if (!publishableKey && !secretKey) {
       const keylessApp: AccountlessApplication | null = await keylessService.getOrCreateKeys();
 
       if (keylessApp) {
-        publishableKey = publishableKey || keylessApp.publishableKey;
-        secretKey = secretKey || keylessApp.secretKey;
+        publishableKey = keylessApp.publishableKey;
+        secretKey = keylessApp.secretKey;
         claimUrl = keylessApp.claimUrl;
         apiKeysUrl = keylessApp.apiKeysUrl;
 
