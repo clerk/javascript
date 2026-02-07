@@ -59,6 +59,8 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
       // will be called by global.setup.ts and by the test runner
       // the first time this is called, the app starts and the state is persisted in the state file
       init: async () => {
+        const log = (msg: string) => console.log(`[${name}] ${msg}`);
+        log('Starting init...');
         try {
           const publishableKey = params.env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
           const secretKey = params.env.privateVariables.get('CLERK_SECRET_KEY');
@@ -66,8 +68,9 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
           const { instanceType, frontendApi: frontendApiUrl } = parsePublishableKey(publishableKey);
 
           if (instanceType !== 'development') {
-            console.log('Clerk: skipping setup of testing tokens for non-development instance');
+            log('Skipping setup of testing tokens for non-development instance');
           } else {
+            log('Setting up testing tokens...');
             await clerkSetup({
               publishableKey,
               frontendApiUrl,
@@ -76,13 +79,16 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
               apiUrl,
               dotenv: false,
             });
+            log('Testing tokens setup complete');
           }
         } catch (error) {
           console.error('Error setting up testing tokens:', error);
           throw error;
         }
         try {
+          log('Committing config...');
           app = await config.commit();
+          log(`Config committed, appDir: ${app.appDir}`);
         } catch (error) {
           console.error('Error committing config:', error);
           throw error;
@@ -94,23 +100,29 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
           throw error;
         }
         try {
+          log('Running setup (pnpm install)...');
           await app.setup();
+          log('Setup complete');
         } catch (error) {
           console.error('Error during app setup:', error);
           throw error;
         }
         try {
+          log('Building app...');
           await app.build();
+          log('Build complete');
         } catch (error) {
           console.error('Error during app build:', error);
           throw error;
         }
         try {
+          log('Starting serve (detached)...');
           const serveResult = await app.serve({ detached: true });
           port = serveResult.port;
           serverUrl = serveResult.serverUrl;
           pid = serveResult.pid;
           appDir = app.appDir;
+          log(`Serve complete: port=${port}, serverUrl=${serverUrl}, pid=${pid}`);
           stateFile.addLongRunningApp({ port, serverUrl, pid, id, appDir, env: params.env.toJson() });
         } catch (error) {
           console.error('Error during app serve:', error);

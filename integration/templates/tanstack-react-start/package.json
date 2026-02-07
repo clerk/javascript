@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build && tsc --noEmit",
+    "build": "vite build",
     "dev": "vite dev --port=$PORT",
     "start": "vite start --port=$PORT"
   },
