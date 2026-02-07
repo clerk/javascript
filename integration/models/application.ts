@@ -176,8 +176,25 @@ export const application = (
       });
 
       if (opts.detached) {
+        proc.on('exit', (code, signal) => {
+          log(`Serve process exited: code=${code}, signal=${signal}`);
+        });
         const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
-        await waitForServer(runtimeServerUrl, { log, maxAttempts: 120, shouldExit });
+        try {
+          await waitForServer(runtimeServerUrl, { log, maxAttempts: 120, shouldExit });
+        } catch (e) {
+          // Dump log files for debugging
+          try {
+            const stdout = await fs.readFile(stdoutFilePath, 'utf-8');
+            const stderr = await fs.readFile(stderrFilePath, 'utf-8');
+            log(`Serve stdout log:\n${stdout}`);
+            log(`Serve stderr log:\n${stderr}`);
+          } catch {
+            log('Could not read serve log files');
+          }
+          log(`Serve process exitCode=${proc.exitCode}, killed=${proc.killed}, pid=${proc.pid}`);
+          throw e;
+        }
       } else {
         await waitForIdleProcess(proc);
       }
