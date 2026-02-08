@@ -31,11 +31,13 @@ export async function testToggleCollapsePopoverAndClaim({
   context,
   app,
   dashboardUrl,
+  framework,
 }: {
   page: Page;
   context: BrowserContext;
   app: Application;
   dashboardUrl: string;
+  framework: string;
 }): Promise<void> {
   const u = createTestUtils({ app, page, context });
   await u.page.goToAppHome();
@@ -55,20 +57,28 @@ export async function testToggleCollapsePopoverAndClaim({
   await newPage.waitForLoadState();
 
   await newPage.waitForURL(url => {
-    const urlToReturnTo = `${dashboardUrl}apps/claim?token=`;
-
+    const signInForceRedirectUrl = url.searchParams.get('sign_in_force_redirect_url');
     const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
 
-    const signUpForceRedirectUrlCheck =
-      signUpForceRedirectUrl?.startsWith(urlToReturnTo) ||
-      (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
-        signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
+    const signInHasRequiredParams =
+      signInForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) &&
+      signInForceRedirectUrl?.includes('token=') &&
+      signInForceRedirectUrl?.includes(`framework=${framework}`);
 
-    return (
-      url.pathname === '/apps/claim/sign-in' &&
-      url.searchParams.get('sign_in_force_redirect_url')?.startsWith(urlToReturnTo) &&
-      signUpForceRedirectUrlCheck
-    );
+    const signUpRegularCase =
+      signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) &&
+      signUpForceRedirectUrl?.includes('token=') &&
+      signUpForceRedirectUrl?.includes(`framework=${framework}`);
+
+    const signUpPrepareAccountCase =
+      signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
+      signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim')) &&
+      signUpForceRedirectUrl?.includes(encodeURIComponent('token=')) &&
+      signUpForceRedirectUrl?.includes(encodeURIComponent(`framework=${framework}`));
+
+    const signUpHasRequiredParams = signUpRegularCase || signUpPrepareAccountCase;
+
+    return url.pathname === '/apps/claim/sign-in' && signInHasRequiredParams && signUpHasRequiredParams;
   });
 }
 

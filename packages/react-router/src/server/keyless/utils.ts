@@ -1,3 +1,4 @@
+import { resolveKeysWithKeylessFallback as sharedResolveKeysWithKeylessFallback } from '@clerk/shared/keyless';
 export type { KeylessResult } from '@clerk/shared/keyless';
 
 import { canUseKeyless } from '../../utils/feature-flags';
@@ -15,16 +16,10 @@ export async function resolveKeysWithKeylessFallback(
   options?: ClerkMiddlewareOptions,
 ) {
   const keylessService = await keyless(args, options);
-
-  // If keyless is not available or not enabled, return configured keys as-is
-  if (!keylessService || !canUseKeyless) {
-    return {
-      publishableKey: configuredPublishableKey,
-      secretKey: configuredSecretKey,
-      claimUrl: undefined,
-      apiKeysUrl: undefined,
-    };
-  }
-
-  return keylessService.resolveKeysWithKeylessFallback(configuredPublishableKey, configuredSecretKey);
+  return sharedResolveKeysWithKeylessFallback(
+    configuredPublishableKey,
+    configuredSecretKey,
+    keylessService,
+    canUseKeyless,
+  );
 }
