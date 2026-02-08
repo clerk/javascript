@@ -21,7 +21,7 @@ function canUseFileSystem(): boolean {
  * Returns null for non-Node.js runtimes (e.g., Cloudflare Workers).
  */
 export async function keyless(
-  args?: DataFunctionArgs,
+  args: DataFunctionArgs,
   options?: ClerkMiddlewareOptions,
 ): Promise<ReturnType<typeof createKeylessService> | null> {
   if (!canUseFileSystem()) {
@@ -45,8 +45,10 @@ export async function keyless(
         api: {
           async createAccountlessApplication(requestHeaders?: Headers) {
             try {
-              const client = args ? clerkClient(args, options) : clerkClient({} as any, options);
-              return await client.__experimental_accountlessApplications.createAccountlessApplication({
+              return await clerkClient(
+                args,
+                options,
+              ).__experimental_accountlessApplications.createAccountlessApplication({
                 requestHeaders,
               });
             } catch {
@@ -55,8 +57,10 @@ export async function keyless(
           },
           async completeOnboarding(requestHeaders?: Headers) {
             try {
-              const client = args ? clerkClient(args, options) : clerkClient({} as any, options);
-              return await client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
+              return await clerkClient(
+                args,
+                options,
+              ).__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
                 requestHeaders,
               });
             } catch {
