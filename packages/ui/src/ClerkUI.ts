@@ -9,8 +9,8 @@ import { type MountComponentRenderer, mountComponentRenderer } from './Component
 import { MIN_CLERK_JS_VERSION } from './constants';
 
 export class ClerkUI implements ClerkUIInstance {
-  static version = __PKG_VERSION__;
-  version = __PKG_VERSION__;
+  static version = PACKAGE_VERSION;
+  version = PACKAGE_VERSION;
 
   #componentRenderer: ReturnType<MountComponentRenderer>;
 

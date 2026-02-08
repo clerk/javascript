@@ -11,7 +11,6 @@ declare global {
   declare const __DEV__: boolean;
   declare const PACKAGE_NAME: string;
   declare const PACKAGE_VERSION: string;
-  declare const __PKG_VERSION__: string;
   declare const __BUILD_DISABLE_RHC__: string;
   interface Window {
     Clerk?: Clerk & { __internal_last_error?: any };
