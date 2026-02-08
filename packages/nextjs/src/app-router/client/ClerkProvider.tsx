@@ -97,7 +97,9 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
   if (uiProp?.__brand && !uiProp?.ClerkUI) {
     // @ts-expect-error - @clerk/ui/entry is resolved by the user's Next.js bundler at runtime, not at package build time
     // eslint-disable-next-line import/no-unresolved
-    _resolvedClerkUI ??= import('@clerk/ui/entry').then((m: { ClerkUI: ClerkUIConstructor }) => m.ClerkUI);
+    _resolvedClerkUI ??= import(/* webpackIgnore: true */ '@clerk/ui/entry').then(
+      (m: { ClerkUI: ClerkUIConstructor }) => m.ClerkUI,
+    );
     mergedProps.ui = { ...mergedProps.ui, ClerkUI: _resolvedClerkUI };
   }
 
