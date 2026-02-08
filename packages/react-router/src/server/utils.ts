@@ -63,7 +63,7 @@ export const injectRequestStateIntoResponse = async (
   // set the correct content-type header in case the user returned a `Response` directly
   clone.headers.set(constants.Headers.ContentType, constants.ContentTypes.Json);
 
-  // Only add Clerk headers if requested (for legacy mode)
+  // Only add Clerk headers if requested
   if (includeClerkHeaders) {
     headers.forEach((value, key) => {
       clone.headers.append(key, value);
