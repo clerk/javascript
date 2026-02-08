@@ -41,7 +41,7 @@ export async function keyless() {
           }
         },
       },
-      framework: '@clerk/astro',
+      framework: 'astro',
       frameworkVersion: PACKAGE_VERSION,
     });
   }

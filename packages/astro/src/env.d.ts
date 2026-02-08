@@ -20,8 +20,6 @@ interface InternalEnv {
   readonly PUBLIC_CLERK_SIGN_UP_URL?: string;
   readonly PUBLIC_CLERK_TELEMETRY_DISABLED?: string;
   readonly PUBLIC_CLERK_TELEMETRY_DEBUG?: string;
-  readonly PUBLIC_CLERK_KEYLESS_CLAIM_URL?: string;
-  readonly PUBLIC_CLERK_KEYLESS_API_KEYS_URL?: string;
   readonly PUBLIC_CLERK_KEYLESS_DISABLED?: string;
 }
 

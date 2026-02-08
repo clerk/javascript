@@ -92,11 +92,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
         const configuredPublishableKey = options?.publishableKey || env.pk;
         const configuredSecretKey = options?.secretKey || env.sk;
 
-        const keylessResult = await resolveKeysWithKeylessFallback(
-          configuredPublishableKey,
-          configuredSecretKey,
-          true, // isDev - keyless only works in dev
-        );
+        const keylessResult = await resolveKeysWithKeylessFallback(configuredPublishableKey, configuredSecretKey);
 
         keylessClaimUrl = keylessResult.claimUrl;
         keylessApiKeysUrl = keylessResult.apiKeysUrl;

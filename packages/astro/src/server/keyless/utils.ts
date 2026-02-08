@@ -11,17 +11,19 @@ export interface KeylessResult {
   apiKeysUrl: string | undefined;
 }
 
+/**
+ * Resolves Clerk keys, falling back to keyless mode in development if configured keys are missing.
+ */
 export async function resolveKeysWithKeylessFallback(
   configuredPublishableKey: string | undefined,
   configuredSecretKey: string | undefined,
-  isDev: boolean = false,
 ): Promise<KeylessResult> {
   let publishableKey = configuredPublishableKey;
   let secretKey = configuredSecretKey;
   let claimUrl: string | undefined;
   let apiKeysUrl: string | undefined;
 
-  if (!isDev || !canUseKeyless) {
+  if (!canUseKeyless) {
     return { publishableKey, secretKey, claimUrl, apiKeysUrl };
   }
 
