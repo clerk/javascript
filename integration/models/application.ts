@@ -174,9 +174,26 @@ export const application = (
         return { port, serverUrl: runtimeServerUrl };
       }
 
+      // Read .env file and pass as process env vars since production servers
+      // may not auto-load .env files (e.g., react-router-serve)
+      const envFromFile: Record<string, string> = {};
+      const envFilePath = path.resolve(appDirPath, '.env');
+      if (fs.existsSync(envFilePath)) {
+        const envContent = fs.readFileSync(envFilePath, 'utf-8');
+        for (const line of envContent.split('\n')) {
+          const trimmed = line.trim();
+          if (trimmed && !trimmed.startsWith('#')) {
+            const eqIdx = trimmed.indexOf('=');
+            if (eqIdx > 0) {
+              envFromFile[trimmed.slice(0, eqIdx)] = trimmed.slice(eqIdx + 1);
+            }
+          }
+        }
+      }
+
       const proc = run(scripts.serve, {
         cwd: appDirPath,
-        env: { PORT: port.toString() },
+        env: { ...envFromFile, PORT: port.toString() },
         detached: opts.detached,
         stdout: opts.detached ? fs.openSync(stdoutFilePath, 'a') : undefined,
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
