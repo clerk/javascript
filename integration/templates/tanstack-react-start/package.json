@@ -5,7 +5,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite dev --port=$PORT",
-    "start": "srvx --static dist/client dist/server/server.js"
+    "start": "srvx --static ../client dist/server/server.js"
   },
   "dependencies": {
     "@tanstack/react-router": "1.157.16",
