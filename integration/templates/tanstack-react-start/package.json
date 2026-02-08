@@ -5,7 +5,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite dev --port=$PORT",
-    "start": "vite start --port=$PORT"
+    "start": "node .output/server/index.mjs"
   },
   "dependencies": {
     "@tanstack/react-router": "1.157.16",
