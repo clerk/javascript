@@ -131,7 +131,7 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
 
     // Handle Frontend API proxy requests early, before authentication
     if (proxyEnabled) {
-      const requestPath = request.originalUrl || request.url;
+      const requestPath = new URL(request.originalUrl || request.url, `http://${request.headers.host}`).pathname;
       if (requestPath === proxyPath || requestPath.startsWith(proxyPath + '/')) {
         // Convert Express request to Fetch API Request
         const proxyRequest = requestToProxyRequest(request);

@@ -1,6 +1,17 @@
 import type { Request, RequestHandler, Response } from 'express';
 import { vi } from 'vitest';
 
+const { mockClerkFrontendApiProxy } = vi.hoisted(() => ({
+  mockClerkFrontendApiProxy: vi.fn(),
+}));
+vi.mock('@clerk/backend/proxy', async () => {
+  const actual = await vi.importActual('@clerk/backend/proxy');
+  return {
+    ...actual,
+    clerkFrontendApiProxy: mockClerkFrontendApiProxy,
+  };
+});
+
 import { clerkMiddleware } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
 import { assertNoDebugHeaders, assertSignedOutDebugHeaders, runMiddleware, runMiddlewareOnPath } from './helpers';
@@ -116,6 +127,22 @@ describe('clerkMiddleware', () => {
   });
 
   describe('Frontend API proxy handling', () => {
+    beforeEach(() => {
+      mockClerkFrontendApiProxy.mockReset();
+    });
+
+    it('intercepts proxy path with query parameters', async () => {
+      mockClerkFrontendApiProxy.mockResolvedValueOnce(new globalThis.Response('proxied', { status: 200 }));
+
+      const response = await runMiddlewareOnPath(
+        clerkMiddleware({ frontendApiProxy: { enabled: true } }),
+        '/__clerk?_clerk_js_version=5.0.0',
+        {},
+      ).expect(200);
+
+      expect(mockClerkFrontendApiProxy).toHaveBeenCalled();
+    });
+
     it('authenticates default path when custom proxy path is set', async () => {
       // When using a custom path, the default /__clerk should be authenticated
       const response = await runMiddlewareOnPath(
