@@ -108,7 +108,7 @@ function updateClerkOptions<TUi extends Ui = Ui>(options: AstroClerkUpdateOption
 async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCreateInstanceParams<TUi>): Promise<void> {
   const jsProp = options as { js?: { ClerkJS?: BrowserClerkConstructor } } | undefined;
   if (jsProp?.js?.ClerkJS) {
-    window.Clerk = new jsProp.js.ClerkJS(options!.publishableKey, {
+    window.Clerk = new jsProp.js.ClerkJS(options?.publishableKey as string, {
       proxyUrl: options?.proxyUrl as string,
       domain: options?.domain as string,
     }) as any;
