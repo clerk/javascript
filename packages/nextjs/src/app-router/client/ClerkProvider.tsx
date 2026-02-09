@@ -2,6 +2,7 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
 import type { Ui } from '@clerk/react/internal';
 import { InitialStateProvider } from '@clerk/shared/react';
+import type { BrowserClerkConstructor } from '@clerk/shared/types';
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
@@ -22,6 +23,7 @@ import { useAwaitableReplace } from './useAwaitableReplace';
 // In RSC, the ui prop from @clerk/ui is serialized without the ClerkUI constructor
 // (not serializable). This re-imports it on the client when needed.
 let _resolvedClerkUI: Promise<ClerkUIConstructor> | undefined;
+let _resolvedClerkJS: Promise<BrowserClerkConstructor> | undefined;
 
 /**
  * LazyCreateKeylessApplication should only be loaded if the conditions below are met.
@@ -103,6 +105,20 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
       (m: { ClerkUI: ClerkUIConstructor }) => m.ClerkUI,
     );
     mergedProps.ui = { ...mergedProps.ui, ClerkUI: _resolvedClerkUI };
+  }
+
+  // Resolve ClerkJS for RSC: when the js prop is serialized through React Server Components,
+  // the ClerkJS constructor is stripped (not serializable). Re-import it on the client.
+  const jsProp = mergedProps.js as { __brand?: string; ClerkJS?: unknown } | undefined;
+  if (jsProp?.__brand && !jsProp?.ClerkJS) {
+    // webpackIgnore prevents the bundler from statically resolving @clerk/clerk-js/entry at build time,
+    // since this import is only needed when the js prop is passed.
+    // @ts-expect-error - @clerk/clerk-js/entry is resolved by the user's Next.js bundler at runtime
+    // eslint-disable-next-line import/no-unresolved
+    _resolvedClerkJS ??= import(/* webpackIgnore: true */ '@clerk/clerk-js/entry').then(
+      (m: { ClerkJS: BrowserClerkConstructor }) => m.ClerkJS,
+    );
+    mergedProps.js = { ...mergedProps.js, ClerkJS: _resolvedClerkJS };
   }
 
   return (

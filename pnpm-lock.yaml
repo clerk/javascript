@@ -1116,6 +1116,9 @@ importers:
         specifier: workspace:^
         version: link:../shared
     devDependencies:
+      '@clerk/clerk-js':
+        specifier: workspace:*
+        version: link:../clerk-js
       '@clerk/ui':
         specifier: workspace:^
         version: link:../ui

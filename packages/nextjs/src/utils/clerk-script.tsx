@@ -38,7 +38,7 @@ function ClerkScript(props: ClerkScriptProps) {
 }
 
 export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] }) {
-  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkUIUrl, nonce, prefetchUI, ui } = useClerkNextOptions();
+  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkUIUrl, nonce, prefetchUI, ui, js } = useClerkNextOptions();
   const { domain, proxyUrl } = useClerk();
 
   if (!publishableKey) {
@@ -57,12 +57,14 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
 
   return (
     <>
-      <ClerkScript
-        scriptUrl={clerkJSScriptUrl(opts)}
-        attributes={buildClerkJSScriptAttributes(opts)}
-        dataAttribute='data-clerk-js-script'
-        router={router}
-      />
+      {!js && (
+        <ClerkScript
+          scriptUrl={clerkJSScriptUrl(opts)}
+          attributes={buildClerkJSScriptAttributes(opts)}
+          dataAttribute='data-clerk-js-script'
+          router={router}
+        />
+      )}
       {/* Use <link rel='preload'> instead of <script> for the UI bundle.
           This tells the browser to download the resource immediately (high priority)
           but doesn't execute it, avoiding race conditions with __clerkSharedModules

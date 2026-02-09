@@ -1152,6 +1152,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     ui?: { ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor> };
     /**
+     * Clerk JS module. Pass the `js` export from `@clerk/clerk-js/bundled` to bundle
+     * clerk-js with your application instead of loading it from the CDN.
+     */
+    js?: { ClerkJS?: BrowserClerkConstructor | Promise<BrowserClerkConstructor> };
+    /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     // TODO @nikos

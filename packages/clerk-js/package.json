@@ -62,7 +62,7 @@
       "default": "./dist/esm/entry.mjs"
     },
     "./internal": {
-      "types": "./dist/esm/internal/index.d.mts",
+      "types": "./dist/types/internal/index.d.ts",
       "import": "./dist/esm/internal/index.mjs",
       "default": "./dist/esm/internal/index.mjs"
     }

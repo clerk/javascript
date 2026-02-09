@@ -2,6 +2,7 @@ import { inBrowser } from '@clerk/shared/browser';
 import { deriveState } from '@clerk/shared/deriveState';
 import { loadClerkJSScript, type LoadClerkJSScriptOptions, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type {
+  BrowserClerkConstructor,
   Clerk,
   ClerkOptions,
   ClientResource,
@@ -12,6 +13,7 @@ import type {
   Without,
 } from '@clerk/shared/types';
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
+import type { Js } from '@clerk/clerk-js/internal';
 import type { Appearance, Ui } from '@clerk/ui/internal';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
@@ -23,7 +25,7 @@ declare global {
   }
 }
 
-export type PluginOptions<TUi extends Ui = Ui> = Without<IsomorphicClerkOptions, 'domain' | 'proxyUrl' | 'appearance'> &
+export type PluginOptions<TUi extends Ui = Ui, TJs extends Js = Js> = Without<IsomorphicClerkOptions, 'domain' | 'proxyUrl' | 'appearance'> &
   MultiDomainAndOrProxy & {
     initialState?: InitialState;
     appearance?: Appearance<TUi>;
@@ -33,6 +35,12 @@ export type PluginOptions<TUi extends Ui = Ui> = Without<IsomorphicClerkOptions,
      * When omitted, UI is loaded from Clerk's CDN.
      */
     ui?: TUi;
+    /**
+     * Optional object to use the bundled Clerk JS instead of loading from CDN.
+     * Import `js` from `@clerk/clerk-js/bundled` and pass it here to bundle clerk-js with your application.
+     * When omitted, clerk-js is loaded from Clerk's CDN.
+     */
+    js?: TJs;
   };
 
 const SDK_METADATA = {
@@ -83,7 +91,17 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
     if (inBrowser()) {
       void (async () => {
         try {
-          const clerkPromise = loadClerkJSScript(options);
+          // Support bundled JS via js.ClerkJS prop
+          const jsProp = pluginOptions.js as { ClerkJS?: BrowserClerkConstructor } | undefined;
+          const clerkPromise = jsProp?.ClerkJS
+            ? (async () => {
+                (window as any).Clerk = new jsProp.ClerkJS!(options.publishableKey, {
+                  proxyUrl: pluginOptions.proxyUrl as string,
+                  domain: pluginOptions.domain as string,
+                });
+              })()
+            : loadClerkJSScript(options);
+
           // Support bundled UI via ui.ClerkUI prop
           const uiProp = pluginOptions.ui;
           const clerkUICtorPromise = uiProp?.ClerkUI

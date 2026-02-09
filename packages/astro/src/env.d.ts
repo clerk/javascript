@@ -8,6 +8,7 @@ interface InternalEnv {
   readonly PUBLIC_CLERK_UI_URL?: string;
   readonly PUBLIC_CLERK_UI_VERSION?: string;
   readonly PUBLIC_CLERK_PREFETCH_UI?: string;
+  readonly PUBLIC_CLERK_SKIP_JS_CDN?: string;
   readonly CLERK_API_KEY?: string;
   readonly CLERK_API_URL?: string;
   readonly CLERK_API_VERSION?: string;

@@ -76,7 +76,6 @@ import type {
   HeadlessBrowserClerkConstructor,
   IsomorphicClerkOptions,
 } from './types';
-import { JS_BRAND } from './types';
 import { isConstructor } from './utils';
 
 if (typeof globalThis.__BUILD_DISABLE_RHC__ === 'undefined') {
@@ -489,17 +488,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   private async getClerkJsEntryChunk(): Promise<HeadlessBrowserClerk | BrowserClerk> {
     // Support bundled JS via js.ClerkJS prop
-    const jsProp = (this.options as { js?: { __brand?: string; ClerkJS?: BrowserClerkConstructor } }).js;
+    const jsProp = (this.options as { js?: { __brand?: string; ClerkJS?: BrowserClerkConstructor | Promise<BrowserClerkConstructor> } }).js;
     if (jsProp?.ClerkJS) {
-      global.Clerk = new jsProp.ClerkJS(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain });
-      return global.Clerk;
-    }
-
-    // Support server-safe JS marker (react-server condition)
-    // When js prop is present but ClerkJS is absent, dynamically import
-    if (jsProp?.__brand === JS_BRAND) {
-      const { ClerkJs } = await import('@clerk/clerk-js/entry');
-      global.Clerk = new ClerkJs(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain });
+      const ClerkJS = await Promise.resolve(jsProp.ClerkJS);
+      global.Clerk = new ClerkJS(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain });
       return global.Clerk;
     }
 
@@ -511,8 +503,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return global.Clerk;
     }
 
-    // Hotload bundle from CDN
-    if (!__BUILD_DISABLE_RHC__) {
+    // Hotload bundle from CDN (skip when js prop is passed — constructor should be resolved by framework provider)
+    if (!jsProp && !__BUILD_DISABLE_RHC__) {
       // the UMD script sets the global.Clerk instance
       await loadClerkJSScript({
         ...this.options,

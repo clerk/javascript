@@ -16,7 +16,6 @@ export default defineConfig(({ watch }) => {
     define: {
       PACKAGE_NAME: `"${clerkJsPackage.name}"`,
       PACKAGE_VERSION: `"${clerkJsPackage.version}"`,
-      __PKG_VERSION__: `"${clerkJsPackage.version}"`,
       __DEV__: `${watch}`,
       __BUILD_DISABLE_RHC__: JSON.stringify(false),
     },

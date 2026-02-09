@@ -17,3 +17,4 @@ export {
 } from '@clerk/shared/loadClerkJsScript';
 
 export type { Ui } from '@clerk/ui/internal';
+export type { Js } from '@clerk/clerk-js/internal';

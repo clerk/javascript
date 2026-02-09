@@ -35,6 +35,7 @@ function getSafeEnv(context: ContextOrLocals) {
     clerkUIUrl: getContextEnvVar('PUBLIC_CLERK_UI_URL', context),
     clerkUIVersion: getContextEnvVar('PUBLIC_CLERK_UI_VERSION', context),
     prefetchUI: getContextEnvVar('PUBLIC_CLERK_PREFETCH_UI', context) === 'false' ? false : undefined,
+    skipJsCdn: getContextEnvVar('PUBLIC_CLERK_SKIP_JS_CDN', context) === 'true',
     apiVersion: getContextEnvVar('CLERK_API_VERSION', context),
     apiUrl: getContextEnvVar('CLERK_API_URL', context),
     telemetryDisabled: isTruthy(getContextEnvVar('PUBLIC_CLERK_TELEMETRY_DISABLED', context)),

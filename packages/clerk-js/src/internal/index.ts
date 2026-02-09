@@ -31,5 +31,5 @@ export type Js = Tagged<
      */
     version?: string;
   },
-  'ClerkJs'
+  'ClerkJS'
 >;
