@@ -1,7 +1,6 @@
-import { Readable } from 'stream';
-
 import { isTruthy } from '@clerk/shared/underscore';
 import type { Request as ExpressRequest } from 'express';
+import { Readable } from 'stream';
 
 import type { ExpressRequestWithAuth } from './types';
 

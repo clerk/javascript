@@ -40,6 +40,7 @@ afterAll(() => {
 });
 
 beforeEach(() => {
+  authenticateRequestMock.mockClear();
   vi.mocked(clerkClient).mockResolvedValue({
     authenticateRequest: authenticateRequestMock,
     // @ts-expect-error - mock
@@ -1048,6 +1049,7 @@ describe('frontendApiProxy multi-domain support', () => {
     await clerkMiddleware({ frontendApiProxy: { enabled: shouldProxy } })(req1, {} as NextFetchEvent);
     expect((await clerkClient()).authenticateRequest).not.toBeCalled();
 
+    authenticateRequestMock.mockClear();
     vi.mocked(clerkClient).mockClear();
     vi.mocked(clerkClient).mockResolvedValue({
       authenticateRequest: authenticateRequestMock,
@@ -1060,6 +1062,7 @@ describe('frontendApiProxy multi-domain support', () => {
     await clerkMiddleware({ frontendApiProxy: { enabled: shouldProxy } })(req2, {} as NextFetchEvent);
     expect((await clerkClient()).authenticateRequest).not.toBeCalled();
 
+    authenticateRequestMock.mockClear();
     vi.mocked(clerkClient).mockClear();
     vi.mocked(clerkClient).mockResolvedValue({
       authenticateRequest: authenticateRequestMock,
@@ -1088,6 +1091,7 @@ describe('frontendApiProxy multi-domain support', () => {
     await clerkMiddleware({ frontendApiProxy: { enabled: shouldProxy } })(req1, {} as NextFetchEvent);
     expect((await clerkClient()).authenticateRequest).toBeCalled();
 
+    authenticateRequestMock.mockClear();
     vi.mocked(clerkClient).mockClear();
     vi.mocked(clerkClient).mockResolvedValue({
       authenticateRequest: authenticateRequestMock,

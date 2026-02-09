@@ -1,5 +1,3 @@
-import { Readable } from 'stream';
-
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH } from '@clerk/backend/proxy';
@@ -8,6 +6,7 @@ import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type { RequestHandler, Response } from 'express';
+import { Readable } from 'stream';
 
 import { clerkClient as defaultClerkClient } from './clerkClient';
 import { satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from './errors';
