@@ -1,4 +1,3 @@
-import { resolveKeysWithKeylessFallback as sharedResolveKeysWithKeylessFallback } from '@clerk/shared/keyless';
 export type { KeylessResult } from '@clerk/shared/keyless';
 
 import { canUseKeyless } from '../../utils/feature-flags';
@@ -15,5 +14,17 @@ export function resolveKeysWithKeylessFallback(
   configuredPublishableKey: string | undefined,
   configuredSecretKey: string | undefined,
 ) {
-  return sharedResolveKeysWithKeylessFallback(configuredPublishableKey, configuredSecretKey, keyless(), canUseKeyless);
+  const keylessService = keyless();
+
+  // If keyless is not available or not enabled, return configured keys as-is
+  if (!keylessService || !canUseKeyless) {
+    return Promise.resolve({
+      publishableKey: configuredPublishableKey,
+      secretKey: configuredSecretKey,
+      claimUrl: undefined,
+      apiKeysUrl: undefined,
+    });
+  }
+
+  return keylessService.resolveKeysWithKeylessFallback(configuredPublishableKey, configuredSecretKey);
 }
