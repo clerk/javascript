@@ -440,7 +440,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
 };
 
 const WIDTH_OPEN = '18rem';
-const WIDTH_CLOSED = '15rem';
+const WIDTH_CLOSED = '14.25rem';
 const DURATION_OPEN = '220ms';
 const DURATION_CLOSE = '180ms';
 const EASE_BEZIER = 'cubic-bezier(0.2, 0, 0, 1)';
@@ -481,6 +481,7 @@ type STATES = 'idle' | 'userCreated' | 'completed';
  * Each state maps to UI content including title, description, and button text.
  */
 type ContentItem = {
+  triggerWidth: string;
   title: string;
   description: React.ReactNode | ((...args: any[]) => React.ReactNode);
   buttonText: string;
@@ -488,6 +489,7 @@ type ContentItem = {
 
 const CONTENT: Record<STATES, ContentItem> = {
   idle: {
+    triggerWidth: '14.25rem',
     title: 'Configure your application',
     description: (
       <>
@@ -503,14 +505,37 @@ const CONTENT: Record<STATES, ContentItem> = {
     buttonText: 'Confirgure your application',
   },
   userCreated: {
-    title: 'Clerk is in keyless mode',
-    description: <p>TODO</p>,
-    buttonText: 'Claim application',
+    triggerWidth: '15.75rem',
+    title: "You've created your first user!",
+    description: (
+      <>
+        <p>Head to the dashboard to customize authentication settings, view user info, and explore more features.</p>
+        <ul>
+          {['Add SSO connections (eg. GitHub)', 'Set up B2B authentication', 'Enable MFA'].map(item => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </>
+    ),
+    buttonText: 'Configure your application',
   },
   completed: {
-    title: 'Claim completed',
-    description: (_appName: string, _instanceUrlToDashboard: string) => <p>TODO</p>,
-    buttonText: 'TODO',
+    triggerWidth: '10.5rem',
+    title: 'Your app is ready',
+    description: (appName: string, instanceUrlToDashboard: string) => (
+      <p>
+        Your application{' '}
+        <a
+          href={instanceUrlToDashboard}
+          target='_blank'
+          rel='noopener noreferrer'
+        >
+          {appName}
+        </a>{' '}
+        has been configured. You may now customize your settings in the Clerk dashboard.
+      </p>
+    ),
+    buttonText: 'Dismiss',
   },
 };
 
@@ -519,6 +544,7 @@ const CONTENT: Record<STATES, ContentItem> = {
  * You can modify this logic to match your state management needs.
  */
 const getCurrentState = (claimed: boolean, success: boolean, isSignedIn: boolean): STATES => {
+  return 'completed';
   if (success) {
     return 'completed';
   }
@@ -557,7 +583,13 @@ function Keyless() {
   const instanceUrlToDashboard = 'https://dashboard.clerk.com';
 
   const [isOpen, setIsOpen] = useState(false);
-  const [currentState, setCurrentState] = useState<STATES>(getCurrentState(claimed, success, isSignedIn));
+  const currentState = getCurrentState(claimed, success, isSignedIn);
+
+  const title = getContent(currentState).title;
+  const description = renderDescription(getContent(currentState).description, appName, instanceUrlToDashboard);
+  const buttonText = getContent(currentState).buttonText;
+  const triggerWidth = getContent(currentState).triggerWidth;
+
   return (
     <div
       data-expanded={isOpen}
@@ -579,7 +611,7 @@ function Keyless() {
         isolation: isolate;
         transform: translateZ(0);
         backface-visibility: hidden;
-        width: ${isOpen ? WIDTH_OPEN : WIDTH_CLOSED};
+        width: ${isOpen ? WIDTH_OPEN : triggerWidth};
         transition:
           border-radius ${getDuration(isOpen)} cubic-bezier(0.2, 0, 0, 1),
           width ${getDuration(isOpen)} ${EASE_BEZIER};
@@ -656,7 +688,7 @@ function Keyless() {
             white-space: nowrap;
           `}
         >
-          {getContent(currentState).title}
+          {title}
         </span>
         <svg
           css={css`
@@ -684,6 +716,7 @@ function Keyless() {
       </button>
       <div
         id={id}
+        {...(!isOpen && { inert: '' as any })}
         css={css`
           ${CSS_RESET};
           display: grid;
@@ -730,9 +763,18 @@ function Keyless() {
                 line-height: 1rem;
                 text-wrap: pretty;
               }
+              & a {
+                color: #fde047;
+                font-weight: 500;
+                outline: none;
+                &:focus-visible {
+                  outline: 2px solid #6c47ff;
+                  outline-offset: 2px;
+                }
+              }
             `}
           >
-            {renderDescription(getContent(currentState).description, appName, instanceUrlToDashboard)}
+            {description}
 
             <a
               href='https://clerk.com/dashboard'
@@ -775,7 +817,7 @@ function Keyless() {
                 }
               `}
             >
-              {getContent(currentState).buttonText}
+              {buttonText}
             </a>
           </div>
         </div>
