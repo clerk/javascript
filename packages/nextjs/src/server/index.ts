@@ -81,7 +81,6 @@ export { reverificationErrorResponse, reverificationError } from '@clerk/backend
 export {
   clerkFrontendApiProxy,
   createFrontendApiProxyHandlers,
-  DEFAULT_PROXY_PATH,
   type FrontendApiProxyHandlers,
   type FrontendApiProxyOptions,
   type NextFrontendApiProxyOptions,
