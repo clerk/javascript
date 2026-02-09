@@ -2800,7 +2800,7 @@ describe('Clerk singleton', () => {
     });
   });
 
-  describe('clerkUICtor backwards compatibility', () => {
+  describe('ui.ClerkUI option', () => {
     beforeEach(() => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
@@ -2818,7 +2818,20 @@ describe('Clerk singleton', () => {
       );
     });
 
-    it('uses clerkUICtor when provided with correct casing', async () => {
+    it('uses ui.ClerkUI when provided', async () => {
+      const mockClerkUIInstance = { mount: vi.fn() };
+      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({
+        ...mockedLoadOptions,
+        ui: { ClerkUI: mockClerkUICtor },
+      });
+
+      expect(mockClerkUICtor).toHaveBeenCalled();
+    });
+
+    it('supports legacy clerkUICtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
       const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
 
@@ -2826,42 +2839,22 @@ describe('Clerk singleton', () => {
       await sut.load({
         ...mockedLoadOptions,
         clerkUICtor: mockClerkUICtor,
-      });
+      } as any);
 
       expect(mockClerkUICtor).toHaveBeenCalled();
     });
 
-    it('uses clerkUiCtor (legacy casing) for backwards compatibility', async () => {
+    it('supports legacy clerkUiCtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
       const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
 
       const sut = new Clerk(productionPublishableKey);
-      // Use legacy casing - cast to bypass TypeScript since clerkUiCtor is not in the type
       await sut.load({
         ...mockedLoadOptions,
         clerkUiCtor: mockClerkUICtor,
-      } as Parameters<typeof sut.load>[0]);
+      } as any);
 
       expect(mockClerkUICtor).toHaveBeenCalled();
-    });
-
-    it('prefers clerkUICtor over clerkUiCtor when both are provided', async () => {
-      const mockClerkUIInstanceCorrect = { mount: vi.fn() };
-      const mockClerkUICtorCorrect = vi.fn(() => mockClerkUIInstanceCorrect);
-
-      const mockClerkUIInstanceLegacy = { mount: vi.fn() };
-      const mockClerkUICtorLegacy = vi.fn(() => mockClerkUIInstanceLegacy);
-
-      const sut = new Clerk(productionPublishableKey);
-      // Provide both - the correct casing should take precedence
-      await sut.load({
-        ...mockedLoadOptions,
-        clerkUICtor: mockClerkUICtorCorrect,
-        clerkUiCtor: mockClerkUICtorLegacy,
-      } as Parameters<typeof sut.load>[0]);
-
-      expect(mockClerkUICtorCorrect).toHaveBeenCalled();
-      expect(mockClerkUICtorLegacy).not.toHaveBeenCalled();
     });
   });
 });

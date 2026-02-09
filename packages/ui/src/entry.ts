@@ -1,1 +1,1 @@
-export { ClerkUi } from './ClerkUi';
+export { ClerkUI } from './ClerkUI';
