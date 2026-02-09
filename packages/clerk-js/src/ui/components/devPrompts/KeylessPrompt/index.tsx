@@ -419,6 +419,11 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                 display: flex;
                 flex-direction: column;
                 gap: 0.5rem;
+                & ul {
+                  ${CSS_RESET};
+                  list-style: disc;
+                  padding-left: 1rem;
+                }
                 & p,
                 & li {
                   ${CSS_RESET};
@@ -427,11 +432,6 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                   font-weight: 400;
                   line-height: 1rem;
                   text-wrap: pretty;
-                }
-                & ul {
-                  ${CSS_RESET};
-                  list-style: disc;
-                  padding-left: 1rem;
                 }
                 & a {
                   color: #fde047;
