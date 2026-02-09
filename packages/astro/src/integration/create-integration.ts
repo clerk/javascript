@@ -127,9 +127,10 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             }
 
             if (transitionEnabledOnThisPage()) {
-              const { navigate, swapFunctions } = await import('astro:transitions/client');
+              // We must do the dynamic imports within the event listeners because otherwise we may race and miss initial astro:page-load
+              document.addEventListener('astro:before-swap', async (e) => {
+                const { swapFunctions } = await import('astro:transitions/client');
 
-              document.addEventListener('astro:before-swap', (e) => {
                 const clerkComponents = document.querySelector('#clerk-components');
                 // Keep the div element added by Clerk
                 if (clerkComponents) {
@@ -141,6 +142,8 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
               });
 
               document.addEventListener('astro:page-load', async (e) => {
+                const { navigate } = await import('astro:transitions/client');
+
                 await runInjectionScript({
                   ...${JSON.stringify(internalParams)},
                   routerPush: navigate,
