@@ -1,8 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
-import * as React from 'react';
-import { useMemo, useState } from 'react';
+import { type ReactNode, useId, useMemo, useState } from 'react';
 
 import { InternalThemeProvider } from '../../../styledSystem';
 import { handleDashboardUrlParsing } from '../shared';
@@ -100,14 +99,10 @@ const ctaButtonStyles = css`
 
 type STATES = 'idle' | 'userCreated' | 'claimed' | 'completed';
 
-/**
- * Content structure for each state in the KeylessPrompt component.
- * Each state maps to UI content including title, description, and button text.
- */
 type ContentItem = {
   triggerWidth: string;
   title: string;
-  description: React.ReactNode | ((context: { appName: string; instanceUrl: string }) => React.ReactNode);
+  description: ReactNode | ((context: { appName: string; instanceUrl: string }) => ReactNode);
   buttonText: string;
   buttonOnClick?: (onDismiss: (() => Promise<unknown>) | undefined | null) => void;
   buttonHref?: string | ((urls: { claimUrl: string; instanceUrl: string }) => string);
@@ -176,10 +171,6 @@ const CONTENT: Record<STATES, ContentItem> = {
   },
 };
 
-/**
- * Determines the current state based on component props and environment.
- * You can modify this logic to match your state management needs.
- */
 function getCurrentState(claimed: boolean, success: boolean, isSignedIn: boolean): STATES {
   if (success) {
     return 'completed';
@@ -193,28 +184,8 @@ function getCurrentState(claimed: boolean, success: boolean, isSignedIn: boolean
   return 'idle';
 }
 
-/**
- * Gets the content object for a given state.
- */
-function getContent(state: STATES): ContentItem {
-  return CONTENT[state];
-}
-
-/**
- * Renders the description content, handling both ReactNode and function cases.
- */
-function renderDescription(
-  description: ContentItem['description'],
-  context: { appName: string; instanceUrl: string },
-): React.ReactNode {
-  if (typeof description === 'function') {
-    return description(context);
-  }
-  return description;
-}
-
 function KeylessPromptInternal(props: KeylessPromptProps) {
-  const id = React.useId();
+  const id = useId();
 
   const claimed = false;
   const success = false;
@@ -250,13 +221,40 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
     triggerWidth,
     buttonHref: rawButtonHref,
     buttonOnClick: rawButtonOnClick,
-  } = getContent(currentState);
-  const renderedDescription = renderDescription(description, { appName, instanceUrl: instanceUrlToDashboard });
+  } = CONTENT[currentState];
+
+  const descriptionContext = { appName, instanceUrl: instanceUrlToDashboard };
+  const renderedDescription = typeof description === 'function' ? description(descriptionContext) : description;
+
   const resolvedButtonHref =
     typeof rawButtonHref === 'function'
       ? rawButtonHref({ claimUrl: claimUrlToDashboard, instanceUrl: instanceUrlToDashboard })
       : rawButtonHref;
   const resolvedButtonOnClick = rawButtonOnClick ? () => rawButtonOnClick(props.onDismiss) : undefined;
+
+  let ctaElement: ReactNode = null;
+  if (resolvedButtonOnClick) {
+    ctaElement = (
+      <button
+        type='button'
+        onClick={resolvedButtonOnClick}
+        css={ctaButtonStyles}
+      >
+        {buttonText}
+      </button>
+    );
+  } else if (resolvedButtonHref) {
+    ctaElement = (
+      <a
+        href={resolvedButtonHref}
+        target='_blank'
+        rel='noopener noreferrer'
+        css={ctaButtonStyles}
+      >
+        {buttonText}
+      </a>
+    );
+  }
 
   return (
     <div
@@ -421,7 +419,8 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                 display: flex;
                 flex-direction: column;
                 gap: 0.5rem;
-                & p {
+                & p,
+                & li {
                   ${CSS_RESET};
                   color: #b4b4b4;
                   font-size: 0.8125rem;
@@ -433,14 +432,6 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                   ${CSS_RESET};
                   list-style: disc;
                   padding-left: 1rem;
-                }
-                & li {
-                  ${CSS_RESET};
-                  color: #b4b4b4;
-                  font-size: 0.8125rem;
-                  font-weight: 400;
-                  line-height: 1rem;
-                  text-wrap: pretty;
                 }
                 & a {
                   color: #fde047;
@@ -457,24 +448,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
               {renderedDescription}
             </div>
 
-            {resolvedButtonOnClick ? (
-              <button
-                type='button'
-                onClick={resolvedButtonOnClick}
-                css={ctaButtonStyles}
-              >
-                {buttonText}
-              </button>
-            ) : resolvedButtonHref ? (
-              <a
-                href={resolvedButtonHref}
-                target='_blank'
-                rel='noopener noreferrer'
-                css={ctaButtonStyles}
-              >
-                {buttonText}
-              </a>
-            ) : null}
+            {ctaElement}
           </div>
         </div>
       </div>
