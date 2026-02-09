@@ -1,3 +1,4 @@
+import type { Js } from '@clerk/clerk-js/internal';
 import type {
   Clerk,
   InitialState,
@@ -10,7 +11,6 @@ import type {
 } from '@clerk/shared/types';
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { Appearance, ExtractAppearanceType, Ui } from '@clerk/ui/internal';
-import type { Js } from '@clerk/clerk-js/internal';
 import type React from 'react';
 
 // Re-export types from @clerk/shared that are used by other modules
