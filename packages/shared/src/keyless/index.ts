@@ -6,6 +6,9 @@ export {
 } from './devCache';
 export type { ClerkDevCache } from './devCache';
 
+export { createFileStorage } from './createFileStorage';
+export type { FileStorageOptions } from './createFileStorage';
+
 export { createNodeFileStorage } from './nodeFileStorage';
 export type { FileSystemAdapter, NodeFileStorageOptions, PathAdapter } from './nodeFileStorage';
 

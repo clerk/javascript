@@ -38,7 +38,7 @@ export async function keyless(
 
   keylessInitPromise = (async () => {
     try {
-      const storage = await createFileStorage();
+      const storage = createFileStorage();
 
       const service = createKeylessService({
         storage,

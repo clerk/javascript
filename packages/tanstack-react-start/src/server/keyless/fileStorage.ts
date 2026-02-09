@@ -1,19 +1,11 @@
-import * as fs from 'node:fs';
-import * as path from 'node:path';
+import { createFileStorage as sharedCreateFileStorage } from '@clerk/shared/keyless';
+export type { KeylessStorage } from '@clerk/shared/keyless';
 
-import { createNodeFileStorage, type KeylessStorage } from '@clerk/shared/keyless';
-
-export type { KeylessStorage };
-
-export interface FileStorageOptions {
-  cwd?: () => string;
-}
-
-export function createFileStorage(options: FileStorageOptions = {}): KeylessStorage {
-  const { cwd = () => process.cwd() } = options;
-
-  return createNodeFileStorage(fs, path, {
-    cwd,
+/**
+ * Creates a file-based storage adapter for keyless mode.
+ */
+export function createFileStorage() {
+  return sharedCreateFileStorage({
     frameworkPackageName: '@clerk/tanstack-react-start',
   });
 }
