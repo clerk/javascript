@@ -6,7 +6,7 @@ import { TextDecoder, TextEncoder } from 'node:util';
 import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from 'vitest';
 
-configure({});
+configure({ asyncUtilTimeout: 5000 });
 
 // Track all timers created during tests to clean them up
 const activeTimers = new Set<ReturnType<typeof setTimeout>>();

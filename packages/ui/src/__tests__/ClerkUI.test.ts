@@ -16,10 +16,10 @@ import { ClerkRuntimeError } from '@clerk/shared/error';
 import { logger } from '@clerk/shared/logger';
 import type { Clerk, ClerkOptions } from '@clerk/shared/types';
 
-import { ClerkUi } from '../ClerkUi';
+import { ClerkUI } from '../ClerkUI';
 import { MIN_CLERK_JS_VERSION } from '../constants';
 
-describe('ClerkUi version check', () => {
+describe('ClerkUI version check', () => {
   const mockModuleManager = { load: vi.fn(), unload: vi.fn(), isLoaded: vi.fn() };
   const mockOptions: ClerkOptions = {};
   const getEnvironment = () => null;
@@ -33,7 +33,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: MIN_CLERK_JS_VERSION, instanceType: 'production' }) as Clerk;
 
       expect(() => {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
       }).not.toThrow();
     });
 
@@ -41,7 +41,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: '6.5.0', instanceType: 'production' }) as Clerk;
 
       expect(() => {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
       }).not.toThrow();
     });
 
@@ -49,7 +49,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: '6.0.0-canary.123', instanceType: 'production' }) as Clerk;
 
       expect(() => {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
       }).not.toThrow();
     });
 
@@ -57,7 +57,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: '6.1.0-snapshot.456', instanceType: 'production' }) as Clerk;
 
       expect(() => {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
       }).not.toThrow();
     });
   });
@@ -67,7 +67,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: '5.0.0', instanceType: 'development' }) as Clerk;
 
       expect(() => {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
       }).toThrow(ClerkRuntimeError);
     });
 
@@ -75,7 +75,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: '5.0.0', instanceType: 'development' }) as Clerk;
 
       try {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
         expect.fail('Should have thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(ClerkRuntimeError);
@@ -87,7 +87,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: '5.0.0', instanceType: 'development' }) as Clerk;
 
       try {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
         expect.fail('Should have thrown');
       } catch (error) {
         expect((error as Error).message).toContain('@clerk/ui@');
@@ -98,7 +98,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: '5.0.0', instanceType: 'development' }) as Clerk;
 
       try {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
         expect.fail('Should have thrown');
       } catch (error) {
         expect((error as Error).message).toContain('@clerk/clerk-js@5.0.0');
@@ -109,7 +109,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: '5.0.0', instanceType: 'development' }) as Clerk;
 
       try {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
         expect.fail('Should have thrown');
       } catch (error) {
         expect((error as Error).message).toContain(`>=${MIN_CLERK_JS_VERSION}`);
@@ -120,7 +120,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: '5.0.0', instanceType: 'development' }) as Clerk;
 
       try {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
         expect.fail('Should have thrown');
       } catch (error) {
         expect((error as Error).message).toContain('Please upgrade');
@@ -131,7 +131,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: '4.999.999', instanceType: 'development' }) as Clerk;
 
       expect(() => {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
       }).toThrow(ClerkRuntimeError);
     });
   });
@@ -141,7 +141,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: '5.0.0', instanceType: 'production' }) as Clerk;
 
       expect(() => {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
       }).not.toThrow();
 
       expect(logger.warnOnce).toHaveBeenCalledTimes(1);
@@ -151,7 +151,7 @@ describe('ClerkUi version check', () => {
     test('warning includes version details', () => {
       const getClerk = () => ({ version: '5.0.0', instanceType: 'production' }) as Clerk;
 
-      new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+      new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
 
       expect(logger.warnOnce).toHaveBeenCalledWith(expect.stringContaining('@clerk/clerk-js@5.0.0'));
       expect(logger.warnOnce).toHaveBeenCalledWith(expect.stringContaining(`>=${MIN_CLERK_JS_VERSION}`));
@@ -163,7 +163,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: undefined, instanceType: 'production' }) as Clerk;
 
       expect(() => {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
       }).not.toThrow();
     });
 
@@ -171,7 +171,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: '', instanceType: 'production' }) as Clerk;
 
       expect(() => {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
       }).not.toThrow();
     });
 
@@ -179,7 +179,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: 'invalid', instanceType: 'production' }) as Clerk;
 
       expect(() => {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, mockModuleManager as any);
       }).not.toThrow();
     });
 
@@ -187,7 +187,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: undefined, instanceType: 'development' }) as Clerk;
 
       expect(() => {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, null as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, null as any);
       }).toThrow(ClerkRuntimeError);
     });
 
@@ -195,7 +195,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: undefined, instanceType: 'production' }) as Clerk;
 
       expect(() => {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, null as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, null as any);
       }).not.toThrow();
 
       expect(logger.warnOnce).toHaveBeenCalledTimes(1);
@@ -205,7 +205,7 @@ describe('ClerkUi version check', () => {
       const getClerk = () => ({ version: undefined, instanceType: 'development' }) as Clerk;
 
       try {
-        new ClerkUi(getClerk, getEnvironment, mockOptions, null as any);
+        new ClerkUI(getClerk, getEnvironment, mockOptions, null as any);
         expect.fail('Should have thrown');
       } catch (error) {
         expect((error as ClerkRuntimeError).code).toBe('clerk_ui_version_mismatch');
