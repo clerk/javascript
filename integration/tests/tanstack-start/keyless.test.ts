@@ -68,44 +68,28 @@ test.describe('Keyless mode @tanstack-react-start', () => {
 
     await newPage.waitForLoadState();
 
-    await newPage.waitForURL(
-      url => {
-        // Log the URL to help debug
-        console.log('Current URL:', url.href);
-        console.log('Pathname:', url.pathname);
+    await newPage.waitForURL(url => {
+      const signInForceRedirectUrl = url.searchParams.get('sign_in_force_redirect_url');
+      const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
 
-        // Accept Vercel login redirect (which contains the dashboard claim URL with framework param)
-        if (url.hostname === 'vercel.com' && url.pathname === '/login') {
-          // Decode the nested URL to check if it contains our claim URL with framework param
-          const decodedUrl = decodeURIComponent(url.href);
-          if (
-            decodedUrl.includes('dashboard.clerkstage.dev/apps/claim') &&
-            decodedUrl.includes('token=') &&
-            decodedUrl.includes('framework=tanstack-react-start')
-          ) {
-            console.log('Found Vercel SSO redirect with correct claim URL and framework parameter');
-            return true;
-          }
-        }
+      if (!signInForceRedirectUrl) return false;
 
-        // Also accept if we're directly on the dashboard
-        const isDashboard = url.href.includes(dashboardUrl);
-        if (isDashboard) {
-          const isClaimPage = url.pathname.includes('/apps/claim') || url.pathname.includes('/sign-in');
-          if (isClaimPage) {
-            const signInForceRedirectUrl = url.searchParams.get('sign_in_force_redirect_url');
-            if (signInForceRedirectUrl && signInForceRedirectUrl.includes('token=')) {
-              console.log('Found dashboard claim page with token');
-              return true;
-            }
-          }
-        }
+      try {
+        const signInRedirectUrl = new URL(signInForceRedirectUrl);
+        const hasClaimPath = signInRedirectUrl.pathname === '/apps/claim';
+        const hasToken = signInRedirectUrl.searchParams.has('token');
 
-        console.log('Still waiting...');
+        const signUpRedirectIsValid =
+          (signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) &&
+            signUpForceRedirectUrl?.includes('token=')) ||
+          (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
+            signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
+
+        return url.pathname === '/apps/claim/sign-in' && hasClaimPath && hasToken && signUpRedirectIsValid;
+      } catch {
         return false;
-      },
-      { timeout: 45000 },
-    );
+      }
+    });
   });
 
   test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({
