@@ -69,20 +69,20 @@ test.describe('Keyless mode @tanstack-react-start', () => {
     await newPage.waitForLoadState();
 
     await newPage.waitForURL(url => {
-      const urlToReturnTo = `${dashboardUrl}apps/claim?token=`;
-
+      const signInForceRedirectUrl = url.searchParams.get('sign_in_force_redirect_url');
       const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
 
-      const signUpForceRedirectUrlCheck =
-        signUpForceRedirectUrl?.startsWith(urlToReturnTo) ||
+      // Parse the redirect URLs to check structure instead of using startsWith
+      const signInRedirectHasClaimToken =
+        signInForceRedirectUrl && new URL(signInForceRedirectUrl).searchParams.has('token');
+
+      const signUpRedirectIsValid =
+        (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}apps/claim`) &&
+          new URL(signUpForceRedirectUrl).searchParams.has('token')) ||
         (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
           signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
 
-      return (
-        url.pathname === '/apps/claim/sign-in' &&
-        url.searchParams.get('sign_in_force_redirect_url')?.startsWith(urlToReturnTo) &&
-        signUpForceRedirectUrlCheck
-      );
+      return url.pathname === '/apps/claim/sign-in' && signInRedirectHasClaimToken && signUpRedirectIsValid;
     });
   });
 
