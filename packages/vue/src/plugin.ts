@@ -1,3 +1,4 @@
+import type { Js } from '@clerk/clerk-js/internal';
 import { inBrowser } from '@clerk/shared/browser';
 import { deriveState } from '@clerk/shared/deriveState';
 import { loadClerkJSScript, type LoadClerkJSScriptOptions, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
@@ -13,7 +14,6 @@ import type {
   Without,
 } from '@clerk/shared/types';
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
-import type { Js } from '@clerk/clerk-js/internal';
 import type { Appearance, Ui } from '@clerk/ui/internal';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
@@ -98,7 +98,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           const jsProp = pluginOptions.js as { ClerkJS?: BrowserClerkConstructor } | undefined;
           const clerkPromise = jsProp?.ClerkJS
             ? (async () => {
-                (window as any).Clerk = new jsProp.ClerkJS!(options.publishableKey, {
+                (window as any).Clerk = new (jsProp.ClerkJS as BrowserClerkConstructor)(options.publishableKey, {
                   proxyUrl: pluginOptions.proxyUrl as string,
                   domain: pluginOptions.domain as string,
                 });
