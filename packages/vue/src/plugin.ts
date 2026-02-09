@@ -11,7 +11,7 @@ import type {
   Resources,
   Without,
 } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { Appearance, Ui } from '@clerk/ui/internal';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
@@ -19,7 +19,7 @@ import { computed, ref, shallowRef, triggerRef } from 'vue';
 import { ClerkInjectionKey } from './keys';
 declare global {
   interface Window {
-    __internal_ClerkUICtor?: ClerkUiConstructor;
+    __internal_ClerkUICtor?: ClerkUIConstructor;
   }
 }
 
@@ -84,22 +84,19 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
       void (async () => {
         try {
           const clerkPromise = loadClerkJSScript(options);
-          // Honor explicit clerkUICtor even when prefetchUI={false}
-          // Also support bundled UI via ui.ClerkUI prop
+          // Support bundled UI via ui.ClerkUI prop
           const uiProp = pluginOptions.ui;
-          const clerkUICtorPromise = pluginOptions.clerkUICtor
-            ? Promise.resolve(pluginOptions.clerkUICtor)
-            : uiProp?.ClerkUI
-              ? Promise.resolve(uiProp.ClerkUI)
-              : pluginOptions.prefetchUI === false
-                ? Promise.resolve(undefined)
-                : (async () => {
-                    await loadClerkUIScript(options);
-                    if (!window.__internal_ClerkUICtor) {
-                      throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
-                    }
-                    return window.__internal_ClerkUICtor;
-                  })();
+          const clerkUICtorPromise = uiProp?.ClerkUI
+            ? Promise.resolve(uiProp.ClerkUI)
+            : uiProp || pluginOptions.prefetchUI === false
+              ? Promise.resolve(undefined)
+              : (async () => {
+                  await loadClerkUIScript(options);
+                  if (!window.__internal_ClerkUICtor) {
+                    throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+                  }
+                  return window.__internal_ClerkUICtor;
+                })();
 
           await clerkPromise;
 
@@ -108,7 +105,10 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           }
 
           clerk.value = window.Clerk;
-          const loadOptions = { ...options, clerkUICtor: clerkUICtorPromise } as unknown as ClerkOptions;
+          const loadOptions = {
+            ...options,
+            ui: { ...pluginOptions.ui, ClerkUI: clerkUICtorPromise },
+          } as unknown as ClerkOptions;
           await window.Clerk.load(loadOptions);
           loaded.value = true;
 

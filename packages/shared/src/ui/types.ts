@@ -24,7 +24,7 @@ export type ComponentControls = {
 };
 
 // Instance shape that the class will implement
-export interface ClerkUiInstance {
+export interface ClerkUIInstance {
   version: string;
   ensureMounted: (opts?: { preloadHint?: string }) => Promise<ComponentControls>;
 }
@@ -36,11 +36,8 @@ export interface ClerkUIConstructor {
     getEnvironment: () => EnvironmentResource | null | undefined,
     options: ClerkOptions,
     moduleManager: ModuleManager,
-  ): ClerkUiInstance;
+  ): ClerkUIInstance;
   version: string;
 }
 
-export type ClerkUi = ClerkUiInstance;
-
-// Alias for compatibility with main branch naming convention
-export type ClerkUiConstructor = ClerkUIConstructor;
+export type ClerkUI = ClerkUIInstance;
