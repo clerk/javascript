@@ -6,7 +6,7 @@ import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { Flex, Link } from '../../../customizables';
+import { Flex } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { InternalThemeProvider } from '../../../styledSystem';
 import {
@@ -54,6 +54,10 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
   const claimed = Boolean(environment.authConfig.claimedAt);
   const success = typeof _props.onDismiss === 'function' && claimed;
   const appName = environment.displayConfig.applicationName;
+
+  // Mock state to 'idle' for now
+  const currentState: keyof typeof STATES = 'idle';
+  const content = getContent(currentState);
 
   const isForcedExpanded = claimed || success || isExpanded;
   const claimUrlToDashboard = useMemo(() => {
@@ -245,10 +249,8 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             )}
 
             <p
-              data-text='Clerk is in keyless mode'
-              aria-label={
-                success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'
-              }
+              data-text={content.title}
+              aria-label={content.ariaLabel}
               css={css`
                 ${basePromptElementStyles};
                 color: #d9d9d9;
@@ -258,7 +260,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                 cursor: pointer;
               `}
             >
-              {success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
+              {content.title}
             </p>
           </Flex>
 
@@ -334,107 +336,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                 }
               `}
             >
-              {success ? (
-                <p
-                  css={css`
-                    ${basePromptElementStyles};
-                    color: #b4b4b4;
-                    font-size: 0.8125rem;
-                    font-weight: 400;
-                    line-height: 1rem;
-                  `}
-                >
-                  Your application{' '}
-                  <span
-                    css={css`
-                      ${basePromptElementStyles};
-                      display: inline-block;
-                      white-space: nowrap;
-                      overflow: hidden;
-                      text-overflow: ellipsis;
-                      max-width: 8.125rem;
-                      vertical-align: bottom;
-                      font-size: 0.8125rem;
-                      font-weight: 500;
-                      color: #d5d5d5;
-                    `}
-                  >
-                    {appName}
-                  </span>{' '}
-                  has been claimed. Configure settings from the{' '}
-                  <Link
-                    isExternal
-                    aria-label='Go to Dashboard to configure settings'
-                    href={instanceUrlToDashboard}
-                    sx={t => ({
-                      color: t.colors.$whiteAlpha600,
-                      textDecoration: 'underline solid',
-                      transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
-                      ':hover': {
-                        color: t.colors.$whiteAlpha800,
-                      },
-                    })}
-                  >
-                    Clerk Dashboard
-                  </Link>
-                </p>
-              ) : claimed ? (
-                <p
-                  css={css`
-                    ${basePromptElementStyles};
-                    color: #b4b4b4;
-                    font-size: 0.8125rem;
-                    font-weight: 400;
-                    line-height: 1rem;
-                  `}
-                >
-                  You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk
-                  Dashboard.
-                </p>
-              ) : isSignedIn ? (
-                <p
-                  css={css`
-                    ${basePromptElementStyles};
-                    color: #b4b4b4;
-                    font-size: 0.8125rem;
-                    font-weight: 400;
-                    line-height: 1rem;
-                  `}
-                >
-                  <span>
-                    You&apos;ve created your first user! Link this application to your Clerk account to explore the
-                    Dashboard.
-                  </span>
-                </p>
-              ) : (
-                <>
-                  <p
-                    css={css`
-                      ${basePromptElementStyles};
-                      color: #b4b4b4;
-                      font-size: 0.8125rem;
-                      font-weight: 400;
-                      line-height: 1rem;
-                      text-wrap: pretty;
-                    `}
-                  >
-                    Temporary API keys are enabled so you can get started immediately.
-                  </p>
-                  <p
-                    css={css`
-                      ${basePromptElementStyles};
-                      color: #b4b4b4;
-                      font-size: 0.8125rem;
-                      font-weight: 400;
-                      line-height: 1rem;
-                      text-wrap: pretty;
-                    `}
-                  >
-                    Claim this application to access the Clerk Dashboard where you can manage auth settings and explore
-                    more Clerk features.
-                  </p>
-                </>
-              )}
+              {renderDescription(content.description)}
             </div>
           </div>
 
@@ -502,7 +404,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                     }
                   `}
                 >
-                  {claimed ? 'Get API keys' : 'Claim application'}
+                  {content.buttonText}
                 </a>
               </Flex>
             ))}
@@ -572,9 +474,90 @@ const CSS_RESET = css`
 
 const getDuration = (isOpen: boolean) => (isOpen ? DURATION_OPEN : DURATION_CLOSE);
 
+type STATES = 'idle' | 'userCreated' | 'completed';
+
+/**
+ * Content structure for each state in the KeylessPrompt component.
+ * Each state maps to UI content including title, description, and button text.
+ */
+type ContentItem = {
+  title: string;
+  description: React.ReactNode | ((...args: any[]) => React.ReactNode);
+  buttonText: string;
+};
+
+const CONTENT: Record<STATES, ContentItem> = {
+  idle: {
+    title: 'Configure your application',
+    description: (
+      <>
+        <p>Temporary API keys are enabled so you can get started immediately.</p>
+        <ul>
+          {['Add SSO connections (eg. GitHub)', 'Set up B2B authentication', 'Enable MFA'].map(item => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+        <p>Access the dashboard to customize auth settings and explore Clerk features.</p>
+      </>
+    ),
+    buttonText: 'Confirgure your application',
+  },
+  userCreated: {
+    title: 'Clerk is in keyless mode',
+    description: <p>TODO</p>,
+    buttonText: 'Claim application',
+  },
+  completed: {
+    title: 'Claim completed',
+    description: (_appName: string, _instanceUrlToDashboard: string) => <p>TODO</p>,
+    buttonText: 'TODO',
+  },
+};
+
+/**
+ * Determines the current state based on component props and environment.
+ * You can modify this logic to match your state management needs.
+ */
+const getCurrentState = (claimed: boolean, success: boolean, isSignedIn: boolean): STATES => {
+  if (success) {
+    return 'completed';
+  }
+  if (claimed) {
+    return 'completed';
+  }
+  if (isSignedIn) {
+    return 'userCreated';
+  }
+  return 'idle';
+};
+
+/**
+ * Gets the content object for a given state.
+ */
+const getContent = (state: STATES) => CONTENT[state];
+
+/**
+ * Renders the description content, handling both ReactNode and function cases.
+ * For function descriptions, pass the required parameters.
+ */
+const renderDescription = (description: ContentItem['description'], ...args: any[]): React.ReactNode => {
+  if (typeof description === 'function') {
+    return description(...args);
+  }
+  return description;
+};
+
 function Keyless() {
   const id = React.useId();
+
+  const claimed = false;
+  const success = false;
+  const isSignedIn = false;
+  const appName = 'My App';
+  const instanceUrlToDashboard = 'https://dashboard.clerk.com';
+
   const [isOpen, setIsOpen] = useState(false);
+  const [currentState, setCurrentState] = useState<STATES>(getCurrentState(claimed, success, isSignedIn));
   return (
     <div
       data-expanded={isOpen}
@@ -673,7 +656,7 @@ function Keyless() {
             white-space: nowrap;
           `}
         >
-          Configure your application
+          {getContent(currentState).title}
         </span>
         <svg
           css={css`
@@ -723,60 +706,33 @@ function Keyless() {
               padding-block-end: 0.75rem;
               opacity: ${isOpen ? 1 : 0};
               transition: opacity ${getDuration(isOpen)} ${EASE_BEZIER};
+              display: flex;
+              flex-direction: column;
+              gap: 0.5rem;
+              & p {
+                ${CSS_RESET};
+                color: #b4b4b4;
+                font-size: 0.8125rem;
+                font-weight: 400;
+                line-height: 1rem;
+                text-wrap: pretty;
+              }
+              & ul {
+                ${CSS_RESET};
+                list-style: disc;
+                padding-left: 1rem;
+              }
+              & li {
+                ${CSS_RESET};
+                color: #b4b4b4;
+                font-size: 0.8125rem;
+                font-weight: 400;
+                line-height: 1rem;
+                text-wrap: pretty;
+              }
             `}
           >
-            <p
-              css={css`
-                ${CSS_RESET};
-                color: #b4b4b4;
-                font-size: 0.8125rem;
-                font-weight: 400;
-                line-height: 1rem;
-                text-box-trim: trim-start;
-              `}
-            >
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos qui laboriosam sit fugiat, ipsam
-              animi minima neque alias mollitia expedita.
-            </p>
-            <ul
-              css={css`
-                ${CSS_RESET};
-                margin-top: 0.5rem;
-                padding-inline-start: 1rem;
-                list-style: disc;
-              `}
-            >
-              {['Add SSO connections (eg. GitHub)', 'Set up B2B authentication', 'Enable MFA'].map(item => (
-                <li
-                  key={item}
-                  css={css`
-                    ${CSS_RESET};
-                    color: #b4b4b4;
-                    font-size: 0.8125rem;
-                    font-weight: 400;
-                    line-height: 1rem;
-                    &:not(:first-child) {
-                      margin-top: 0.25rem;
-                    }
-                  `}
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <p
-              css={css`
-                ${CSS_RESET};
-                margin-top: 0.5rem;
-                color: #b4b4b4;
-                font-size: 0.8125rem;
-                font-weight: 400;
-                line-height: 1rem;
-              `}
-            >
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos qui laboriosam sit fugiat, ipsam
-              animi minima neque alias mollitia expedita.
-            </p>
+            {renderDescription(getContent(currentState).description, appName, instanceUrlToDashboard)}
 
             <a
               href='https://clerk.com/dashboard'
@@ -819,7 +775,7 @@ function Keyless() {
                 }
               `}
             >
-              Configure your application
+              {getContent(currentState).buttonText}
             </a>
           </div>
         </div>
