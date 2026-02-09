@@ -36,7 +36,8 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
     telemetry: paramTelemetry,
     clerkJSUrl: paramClerkJSUrl,
     clerkJSVersion: paramClerkJSVersion,
-    clerkUIUrl: paramClerkUiUrl,
+    clerkUIUrl: paramClerkUIUrl,
+    clerkUIVersion: paramClerkUIVersion,
     prefetchUI: paramPrefetchUI,
     ...rest
   } = params || {};
@@ -50,7 +51,8 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
     publishableKey: paramPublishableKey || import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '',
     clerkJSUrl: paramClerkJSUrl || import.meta.env.PUBLIC_CLERK_JS_URL,
     clerkJSVersion: paramClerkJSVersion || import.meta.env.PUBLIC_CLERK_JS_VERSION,
-    clerkUIUrl: paramClerkUiUrl || import.meta.env.PUBLIC_CLERK_UI_URL,
+    clerkUIUrl: paramClerkUIUrl || import.meta.env.PUBLIC_CLERK_UI_URL,
+    clerkUIVersion: paramClerkUIVersion || import.meta.env.PUBLIC_CLERK_UI_VERSION,
     prefetchUI: mergePrefetchUIConfig(paramPrefetchUI),
     telemetry: paramTelemetry || {
       disabled: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DISABLED),
