@@ -92,16 +92,18 @@ test.describe('Keyless mode @quickstart', () => {
       const signInForceRedirectUrl = url.searchParams.get('sign_in_force_redirect_url');
       const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
 
-      // Check that sign-in redirect URL contains the claim URL with token (query params can be in any order)
-      const signInRedirectHasClaimAndToken =
-        signInForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) && signInForceRedirectUrl?.includes('token=');
-
       const signUpForceRedirectUrlCheck =
         (signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) && signUpForceRedirectUrl?.includes('token=')) ||
         (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
           signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
 
-      return url.pathname === '/apps/claim/sign-in' && signInRedirectHasClaimAndToken && signUpForceRedirectUrlCheck;
+      return (
+        url.pathname === '/apps/claim/sign-in' &&
+        signInForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) &&
+        signInForceRedirectUrl?.includes('token=') &&
+        signInForceRedirectUrl?.includes('framework=nextjs') &&
+        signUpForceRedirectUrlCheck
+      );
     });
   });
 
