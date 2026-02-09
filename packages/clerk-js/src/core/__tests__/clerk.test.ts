@@ -2830,5 +2830,31 @@ describe('Clerk singleton', () => {
 
       expect(mockClerkUICtor).toHaveBeenCalled();
     });
+
+    it('supports legacy clerkUICtor option for backwards compatibility', async () => {
+      const mockClerkUIInstance = { mount: vi.fn() };
+      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({
+        ...mockedLoadOptions,
+        clerkUICtor: mockClerkUICtor,
+      } as any);
+
+      expect(mockClerkUICtor).toHaveBeenCalled();
+    });
+
+    it('supports legacy clerkUiCtor option for backwards compatibility', async () => {
+      const mockClerkUIInstance = { mount: vi.fn() };
+      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({
+        ...mockedLoadOptions,
+        clerkUiCtor: mockClerkUICtor,
+      } as any);
+
+      expect(mockClerkUICtor).toHaveBeenCalled();
+    });
   });
 });
