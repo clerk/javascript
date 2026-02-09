@@ -60,7 +60,10 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 ...buildEnvVarFromOption(clerkJSUrl, 'PUBLIC_CLERK_JS_URL'),
                 ...buildEnvVarFromOption(clerkJSVersion, 'PUBLIC_CLERK_JS_VERSION'),
                 ...buildEnvVarFromOption(clerkUIVersion, 'PUBLIC_CLERK_UI_VERSION'),
-                ...buildEnvVarFromOption(prefetchUI === false || hasUI ? 'false' : undefined, 'PUBLIC_CLERK_PREFETCH_UI'),
+                ...buildEnvVarFromOption(
+                  prefetchUI === false || hasUI ? 'false' : undefined,
+                  'PUBLIC_CLERK_PREFETCH_UI',
+                ),
               },
 
               ssr: {
