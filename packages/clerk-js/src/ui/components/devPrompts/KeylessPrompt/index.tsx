@@ -542,6 +542,33 @@ const WIDTH_CLOSED = '15rem';
 const DURATION_OPEN = '220ms';
 const DURATION_CLOSE = '180ms';
 const EASE_BEZIER = 'cubic-bezier(0.2, 0, 0, 1)';
+const CSS_RESET = css`
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background: none;
+  border: none;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    avenir next,
+    avenir,
+    segoe ui,
+    helvetica neue,
+    helvetica,
+    Cantarell,
+    Ubuntu,
+    roboto,
+    noto,
+    arial,
+    sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-decoration: none;
+  color: inherit;
+  appearance: none;
+`;
 
 const getDuration = (isOpen: boolean) => (isOpen ? DURATION_OPEN : DURATION_CLOSE);
 
@@ -552,6 +579,7 @@ function Keyless() {
     <div
       data-expanded={isOpen}
       css={css`
+        ${CSS_RESET};
         position: fixed;
         bottom: 1.25rem;
         right: 1.25rem;
@@ -598,6 +626,7 @@ function Keyless() {
         aria-expanded={isOpen}
         onClick={() => setIsOpen(p => !p)}
         css={css`
+          ${CSS_RESET};
           display: flex;
           align-items: center;
           width: 100%;
@@ -606,6 +635,8 @@ function Keyless() {
           gap: 0.25rem;
           height: 2.5rem;
           outline: none;
+          cursor: pointer;
+          user-select: none;
         `}
       >
         <svg
@@ -635,6 +666,7 @@ function Keyless() {
         </svg>
         <span
           css={css`
+            ${CSS_RESET};
             font-size: 0.875rem;
             font-weight: 500;
             color: #d9d9d9;
@@ -670,6 +702,7 @@ function Keyless() {
       <div
         id={id}
         css={css`
+          ${CSS_RESET};
           display: grid;
           grid-template-rows: ${isOpen ? '1fr' : '0fr'};
           transition: grid-template-rows ${getDuration(isOpen)} ${EASE_BEZIER};
@@ -677,12 +710,14 @@ function Keyless() {
       >
         <div
           css={css`
+            ${CSS_RESET};
             min-height: 0;
             overflow: hidden;
           `}
         >
           <div
             css={css`
+              ${CSS_RESET};
               width: ${WIDTH_OPEN};
               padding-inline: 0.75rem;
               padding-block-end: 0.75rem;
@@ -692,11 +727,51 @@ function Keyless() {
           >
             <p
               css={css`
+                ${CSS_RESET};
                 color: #b4b4b4;
                 font-size: 0.8125rem;
                 font-weight: 400;
                 line-height: 1rem;
                 text-box-trim: trim-start;
+              `}
+            >
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos qui laboriosam sit fugiat, ipsam
+              animi minima neque alias mollitia expedita.
+            </p>
+            <ul
+              css={css`
+                ${CSS_RESET};
+                margin-top: 0.5rem;
+                padding-inline-start: 1rem;
+                list-style: disc;
+              `}
+            >
+              {['Add SSO connections (eg. GitHub)', 'Set up B2B authentication', 'Enable MFA'].map(item => (
+                <li
+                  key={item}
+                  css={css`
+                    ${CSS_RESET};
+                    color: #b4b4b4;
+                    font-size: 0.8125rem;
+                    font-weight: 400;
+                    line-height: 1rem;
+                    &:not(:first-child) {
+                      margin-top: 0.25rem;
+                    }
+                  `}
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <p
+              css={css`
+                ${CSS_RESET};
+                margin-top: 0.5rem;
+                color: #b4b4b4;
+                font-size: 0.8125rem;
+                font-weight: 400;
+                line-height: 1rem;
               `}
             >
               Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos qui laboriosam sit fugiat, ipsam
@@ -708,6 +783,7 @@ function Keyless() {
               target='_blank'
               rel='noopener noreferrer'
               css={css`
+                ${CSS_RESET};
                 margin: 0.75rem 0 0;
                 box-sizing: border-box;
                 display: flex;
@@ -733,6 +809,10 @@ function Keyless() {
                   0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
                   0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
                 outline: none;
+                &:hover {
+                  background: #4b4b4b;
+                  transition: background-color 120ms ease-in-out;
+                }
                 &:focus-visible {
                   outline: 2px solid #6c47ff;
                   outline-offset: 2px;
