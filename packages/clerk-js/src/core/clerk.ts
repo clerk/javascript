@@ -3277,9 +3277,18 @@ export class Clerk implements ClerkInterface {
   };
 
   #initOptions = (options?: ClerkOptions): ClerkOptions => {
+    // Support legacy clerkUICtor / clerkUiCtor options from older SDK versions.
+    // Convert to the new ui.ClerkUI format so the rest of the codebase only checks one path.
+    const legacy = options as Record<string, unknown> | undefined;
+    const legacyCtor = legacy?.clerkUICtor ?? legacy?.clerkUiCtor;
+    const ui = legacyCtor
+      ? { ...options?.ui, ClerkUI: legacyCtor as NonNullable<ClerkOptions['ui']>['ClerkUI'] }
+      : options?.ui;
+
     return {
       ...defaultOptions,
       ...options,
+      ui,
       allowedRedirectOrigins: createAllowedRedirectOrigins(
         options?.allowedRedirectOrigins,
         this.frontendApi,
