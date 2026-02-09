@@ -1,7 +1,6 @@
+import { Clerk } from './core/clerk';
 import type { Js } from './internal';
 import { JS_BRAND } from './internal';
-
-import { Clerk } from './core/clerk';
 
 declare const PACKAGE_VERSION: string;
 
