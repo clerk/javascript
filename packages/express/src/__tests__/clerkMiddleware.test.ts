@@ -134,7 +134,7 @@ describe('clerkMiddleware', () => {
     it('intercepts proxy path with query parameters', async () => {
       mockClerkFrontendApiProxy.mockResolvedValueOnce(new globalThis.Response('proxied', { status: 200 }));
 
-      const response = await runMiddlewareOnPath(
+      await runMiddlewareOnPath(
         clerkMiddleware({ frontendApiProxy: { enabled: true } }),
         '/__clerk?_clerk_js_version=5.0.0',
         {},
