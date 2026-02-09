@@ -92,23 +92,16 @@ test.describe('Keyless mode @quickstart', () => {
       const signInForceRedirectUrl = url.searchParams.get('sign_in_force_redirect_url');
       const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
 
-      if (!signInForceRedirectUrl) return false;
+      // Check that sign-in redirect URL contains the claim URL with token (query params can be in any order)
+      const signInRedirectHasClaimAndToken =
+        signInForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) && signInForceRedirectUrl?.includes('token=');
 
-      try {
-        const signInRedirectUrl = new URL(signInForceRedirectUrl);
-        const hasClaimPath = signInRedirectUrl.pathname === '/apps/claim';
-        const hasToken = signInRedirectUrl.searchParams.has('token');
+      const signUpForceRedirectUrlCheck =
+        (signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) && signUpForceRedirectUrl?.includes('token=')) ||
+        (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
+          signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
 
-        const signUpRedirectIsValid =
-          (signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) &&
-            signUpForceRedirectUrl?.includes('token=')) ||
-          (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
-            signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
-
-        return url.pathname === '/apps/claim/sign-in' && hasClaimPath && hasToken && signUpRedirectIsValid;
-      } catch {
-        return false;
-      }
+      return url.pathname === '/apps/claim/sign-in' && signInRedirectHasClaimAndToken && signUpForceRedirectUrlCheck;
     });
   });
 
