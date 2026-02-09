@@ -62,7 +62,7 @@
       "default": "./dist/esm/entry.mjs"
     },
     "./internal": {
-      "types": "./dist/types/internal/index.d.ts",
+      "types": "./dist/esm/internal/index.d.mts",
       "import": "./dist/esm/internal/index.mjs",
       "default": "./dist/esm/internal/index.mjs"
     }
@@ -93,7 +93,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports --ignore-rules false-cjs",
+    "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports --ignore-rules false-cjs --ignore-rules cjs-resolves-to-esm",
     "lint:publint": "publint || true",
     "postbuild:disabled": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs",
     "test": "vitest --watch=false",
