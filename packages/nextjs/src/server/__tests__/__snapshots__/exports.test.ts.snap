@@ -2,11 +2,14 @@
 
 exports[`/server public exports > should not include a breaking change 1`] = `
 [
+  "DEFAULT_PROXY_PATH",
   "auth",
   "buildClerkProps",
   "clerkClient",
+  "clerkFrontendApiProxy",
   "clerkMiddleware",
   "createClerkClient",
+  "createFrontendApiProxyHandlers",
   "createRouteMatcher",
   "currentUser",
   "getAuth",

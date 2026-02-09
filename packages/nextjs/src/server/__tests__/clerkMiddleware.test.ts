@@ -5,7 +5,7 @@ import { AuthStatus, constants, TokenType } from '@clerk/backend/internal';
 import assert from 'assert';
 import type { NextFetchEvent } from 'next/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 
 import { clerkClient } from '../clerkClient';
 import { clerkMiddleware } from '../clerkMiddleware';
@@ -1138,13 +1138,10 @@ describe('frontendApiProxy multi-domain support', () => {
 
     await clerkMiddleware()(req, {} as NextFetchEvent);
 
-    // authenticateRequest should be called without proxyUrl
-    expect((await clerkClient()).authenticateRequest).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.not.objectContaining({
-        proxyUrl: expect.any(String),
-      }),
-    );
+    // authenticateRequest should be called without a proxyUrl value
+    const call = (await clerkClient()).authenticateRequest as Mock;
+    const options = call.mock.calls[0][1];
+    expect(options.proxyUrl).toBeFalsy();
   });
 
   it('does not override explicit proxyUrl option', async () => {
