@@ -18,6 +18,7 @@ export type ClerkState = {
     __clerk_debug: any;
     __clerkJSUrl: string | undefined;
     __clerkJSVersion: string | undefined;
+    __clerkUIUrl: string | undefined;
     __prefetchUI: boolean | undefined;
     __telemetryDisabled: boolean | undefined;
     __telemetryDebug: boolean | undefined;
