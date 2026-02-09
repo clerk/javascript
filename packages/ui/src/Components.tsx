@@ -55,7 +55,7 @@ import { disambiguateRedirectOptions } from './utils/disambiguateRedirectOptions
 import { extractCssLayerNameFromAppearance } from './utils/extractCssLayerNameFromAppearance';
 import { warnAboutCustomizationWithoutPinning } from './utils/warnAboutCustomizationWithoutPinning';
 
-// Re-export for ClerkUi
+// Re-export for ClerkUI
 export { extractCssLayerNameFromAppearance };
 
 /**

@@ -18,7 +18,6 @@ export default defineConfig(({ watch }) => {
     define: {
       PACKAGE_NAME: `"${uiPackage.name}"`,
       PACKAGE_VERSION: `"${uiPackage.version}"`,
-      __PKG_VERSION__: `"${uiPackage.version}"`,
       __DEV__: `${watch}`,
       __BUILD_DISABLE_RHC__: JSON.stringify(false),
     },
@@ -30,6 +29,7 @@ export default defineConfig(({ watch }) => {
       entry: [
         './src/index.ts',
         './src/entry.ts',
+        './src/server.ts',
         './src/internal/index.ts',
         './src/themes/index.ts',
         './src/themes/experimental.ts',
