@@ -522,7 +522,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return uiProp.ClerkUI;
     }
 
-    if (this.options.prefetchUI === false) {
+    // Skip CDN prefetch when ui prop is passed (bundled UI) or prefetchUI is false
+    if (uiProp || this.options.prefetchUI === false) {
       return undefined;
     }
 

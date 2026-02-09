@@ -23,6 +23,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
     const clerkJSVersion = (params as any)?.clerkJSVersion as string | undefined;
     const clerkUIVersion = (params as any)?.clerkUIVersion as string | undefined;
     const prefetchUI = (params as any)?.prefetchUI as boolean | undefined;
+    const hasUI = !!(params as any)?.ui;
 
     return {
       name: '@clerk/astro/integration',
@@ -59,7 +60,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 ...buildEnvVarFromOption(clerkJSUrl, 'PUBLIC_CLERK_JS_URL'),
                 ...buildEnvVarFromOption(clerkJSVersion, 'PUBLIC_CLERK_JS_VERSION'),
                 ...buildEnvVarFromOption(clerkUIVersion, 'PUBLIC_CLERK_UI_VERSION'),
-                ...buildEnvVarFromOption(prefetchUI === false ? 'false' : undefined, 'PUBLIC_CLERK_PREFETCH_UI'),
+                ...buildEnvVarFromOption(prefetchUI === false || hasUI ? 'false' : undefined, 'PUBLIC_CLERK_PREFETCH_UI'),
               },
 
               ssr: {

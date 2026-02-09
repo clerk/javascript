@@ -88,7 +88,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           const uiProp = pluginOptions.ui;
           const clerkUICtorPromise = uiProp?.ClerkUI
             ? Promise.resolve(uiProp.ClerkUI)
-            : pluginOptions.prefetchUI === false
+            : uiProp || pluginOptions.prefetchUI === false
               ? Promise.resolve(undefined)
               : (async () => {
                   await loadClerkUIScript(options);

@@ -121,7 +121,8 @@ async function getClerkUIEntryChunk<TUi extends Ui = Ui>(
     return options.ui.ClerkUI;
   }
 
-  if (options?.prefetchUI === false) {
+  // Skip CDN prefetch when ui prop is passed (bundled UI) or prefetchUI is false
+  if (options?.ui || options?.prefetchUI === false) {
     return undefined;
   }
 
