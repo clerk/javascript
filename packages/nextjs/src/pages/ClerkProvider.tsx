@@ -8,11 +8,11 @@ import React from 'react';
 import { useSafeLayoutEffect } from '../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider } from '../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../types';
-import { ClerkScripts } from './ClerkScripts';
 import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
 import { removeBasePath } from '../utils/removeBasePath';
 import { RouterTelemetry } from '../utils/router-telemetry';
+import { ClerkScripts } from './ClerkScripts';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 setClerkJSLoadingErrorPackageName(PACKAGE_NAME);
