@@ -4,15 +4,8 @@ import NextScript from 'next/script';
 import React from 'react';
 
 import { useClerkNextOptions } from '../client-boundary/NextOptionsContext';
-import { ClerkScriptTags } from './clerk-script-tags';
 
-type ClerkScriptProps = {
-  scriptUrl: string;
-  attributes: Record<string, string>;
-  dataAttribute: string;
-};
-
-function ClerkScript(props: ClerkScriptProps) {
+function ClerkScript(props: { scriptUrl: string; attributes: Record<string, string>; dataAttribute: string }) {
   const { scriptUrl, attributes, dataAttribute } = props;
 
   return (
@@ -29,27 +22,12 @@ function ClerkScript(props: ClerkScriptProps) {
   );
 }
 
-export function ClerkScripts({ router }: { router: 'app' | 'pages' }) {
+export function ClerkScripts() {
   const { publishableKey, clerkJSUrl, clerkJSVersion, clerkUIUrl, nonce, prefetchUI, ui } = useClerkNextOptions();
   const { domain, proxyUrl } = useClerk();
 
   if (!publishableKey) {
     return null;
-  }
-
-  if (router === 'app') {
-    return (
-      <ClerkScriptTags
-        publishableKey={publishableKey}
-        clerkJSUrl={clerkJSUrl}
-        clerkJSVersion={clerkJSVersion}
-        clerkUIUrl={clerkUIUrl}
-        nonce={nonce}
-        domain={domain}
-        proxyUrl={proxyUrl}
-        prefetchUI={prefetchUI}
-      />
-    );
   }
 
   const opts = {

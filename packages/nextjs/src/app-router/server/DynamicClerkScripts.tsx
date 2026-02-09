@@ -1,7 +1,25 @@
+import { headers } from 'next/headers';
 import React from 'react';
 
 import { ClerkScriptTags } from '../../utils/clerk-script-tags';
-import { getNonce } from './utils';
+import { getScriptNonceFromHeader, isPrerenderingBailout } from './utils';
+
+async function getNonce(): Promise<string> {
+  try {
+    const headersList = await headers();
+    const nonce = headersList.get('X-Nonce');
+    return nonce
+      ? nonce
+      : // Fallback to extracting from CSP header
+        getScriptNonceFromHeader(headersList.get('Content-Security-Policy') || '') || '';
+  } catch (e) {
+    if (isPrerenderingBailout(e)) {
+      throw e;
+    }
+    // Graceful degradation — scripts load without nonce
+    return '';
+  }
+}
 
 type DynamicClerkScriptsProps = {
   publishableKey: string;
