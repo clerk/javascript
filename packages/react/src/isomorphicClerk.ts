@@ -488,7 +488,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   private async getClerkJsEntryChunk(): Promise<HeadlessBrowserClerk | BrowserClerk> {
     // Support bundled JS via js.ClerkJS prop
-    const jsProp = (this.options as { js?: { __brand?: string; ClerkJS?: BrowserClerkConstructor | Promise<BrowserClerkConstructor> } }).js;
+    const jsProp = (
+      this.options as {
+        js?: { __brand?: string; ClerkJS?: BrowserClerkConstructor | Promise<BrowserClerkConstructor> };
+      }
+    ).js;
     if (jsProp?.ClerkJS) {
       const ClerkJS = await Promise.resolve(jsProp.ClerkJS);
       global.Clerk = new ClerkJS(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain });

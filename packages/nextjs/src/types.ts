@@ -2,7 +2,10 @@ import type { ClerkProviderProps } from '@clerk/react';
 import type { Js, Ui } from '@clerk/react/internal';
 import type { Without } from '@clerk/shared/types';
 
-export type NextClerkProviderProps<TUi extends Ui = Ui, TJs extends Js = Js> = Without<ClerkProviderProps<TUi, TJs>, 'publishableKey'> & {
+export type NextClerkProviderProps<TUi extends Ui = Ui, TJs extends Js = Js> = Without<
+  ClerkProviderProps<TUi, TJs>,
+  'publishableKey'
+> & {
   /**
    * Used to override the default NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY env variable if needed.
    * This is optional for NextJS as the ClerkProvider will automatically use the NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY env variable if it exists.

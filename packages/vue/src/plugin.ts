@@ -25,7 +25,10 @@ declare global {
   }
 }
 
-export type PluginOptions<TUi extends Ui = Ui, TJs extends Js = Js> = Without<IsomorphicClerkOptions, 'domain' | 'proxyUrl' | 'appearance'> &
+export type PluginOptions<TUi extends Ui = Ui, TJs extends Js = Js> = Without<
+  IsomorphicClerkOptions,
+  'domain' | 'proxyUrl' | 'appearance'
+> &
   MultiDomainAndOrProxy & {
     initialState?: InitialState;
     appearance?: Appearance<TUi>;
