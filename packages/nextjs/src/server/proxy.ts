@@ -4,7 +4,7 @@ import {
   type FrontendApiProxyOptions,
 } from '@clerk/backend/proxy';
 
-import { PUBLISHABLE_KEY, SECRET_KEY } from './server/constants';
+import { PUBLISHABLE_KEY, SECRET_KEY } from './constants';
 
 export { DEFAULT_PROXY_PATH, type FrontendApiProxyOptions } from '@clerk/backend/proxy';
 
