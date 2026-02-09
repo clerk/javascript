@@ -2,4 +2,4 @@
 '@clerk/nextjs': patch
 ---
 
-Fix Turbopack compatibility for `ui` prop by removing `webpackIgnore` magic comment from dynamic `@clerk/ui/entry` import. Turbopack does not support `webpackIgnore`, causing the bare module specifier to reach the browser and fail at runtime.
+Fix Turbopack compatibility for `ui` prop by adding `turbopackIgnore` magic comment alongside `webpackIgnore` on the dynamic `@clerk/ui/entry` import. This prevents both bundlers from statically resolving the optional dependency at build time.

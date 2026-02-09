@@ -93,13 +93,15 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
 
   // Resolve ClerkUI for RSC: when the ui prop is serialized through React Server Components,
   // the ClerkUI constructor is stripped (not serializable). Re-import it on the client.
-  // This code path only executes when the user explicitly passes `ui={ui}` from @clerk/ui,
-  // so the package is guaranteed to be installed and resolvable by the bundler.
   const uiProp = mergedProps.ui as { __brand?: string; ClerkUI?: unknown } | undefined;
   if (uiProp?.__brand && !uiProp?.ClerkUI) {
+    // webpackIgnore/turbopackIgnore prevent the bundler from statically resolving @clerk/ui/entry at build time,
+    // since @clerk/ui is an optional dependency that may not be installed.
     // @ts-expect-error - @clerk/ui is an optional peer dependency, not declared in this package's dependencies
     // eslint-disable-next-line import/no-unresolved
-    _resolvedClerkUI ??= import('@clerk/ui/entry').then((m: { ClerkUI: ClerkUIConstructor }) => m.ClerkUI);
+    _resolvedClerkUI ??= import(/* webpackIgnore: true */ /* turbopackIgnore: true */ '@clerk/ui/entry').then(
+      (m: { ClerkUI: ClerkUIConstructor }) => m.ClerkUI,
+    );
     mergedProps.ui = { ...mergedProps.ui, ClerkUI: _resolvedClerkUI };
   }
 
