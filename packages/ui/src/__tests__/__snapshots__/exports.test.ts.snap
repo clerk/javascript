@@ -10,6 +10,7 @@ exports[`module exports > default export (index.ts) > should have the expected s
 
 exports[`module exports > server export (server.ts) > should have the expected shape 1`] = `
 [
+  "ClerkUI",
   "__brand",
   "version",
 ]
