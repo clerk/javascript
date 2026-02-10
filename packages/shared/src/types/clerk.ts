@@ -1,6 +1,6 @@
 import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 
-import type { ClerkUiConstructor } from '../ui/types';
+import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   BillingCheckoutResource,
@@ -43,7 +43,7 @@ import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel, Without } from './utils';
-import type { WaitlistResource } from './waitlist';
+import type { JoinWaitlistParams, WaitlistResource } from './waitlist';
 
 /**
  * Global appearance type registry that can be augmented by packages that depend on `@clerk/ui`.
@@ -135,8 +135,43 @@ export type SDKMetadata = {
 };
 
 export type ListenerCallback = (emission: Resources) => void;
+export type ListenerOptions = { skipInitialEmit?: boolean };
 export type UnsubscribeCallback = () => void;
-export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
+
+/**
+ * A function to decorate URLs for Safari ITP workaround.
+ *
+ * Safari's Intelligent Tracking Prevention (ITP) caps cookies set via fetch/XHR requests to 7 days.
+ * This function returns a URL that goes through the `/v1/client/touch` endpoint when the ITP fix is needed,
+ * allowing the cookie to be refreshed via a full page navigation.
+ *
+ * @param url - The destination URL to potentially decorate
+ * @returns The decorated URL if ITP fix is needed, otherwise the original URL unchanged
+ *
+ * @example
+ * ```typescript
+ * const url = decorateUrl('/dashboard');
+ * // When ITP fix is needed: 'https://clerk.example.com/v1/client/touch?redirect_url=https://app.example.com/dashboard'
+ * // When not needed: '/dashboard'
+ *
+ * // decorateUrl may return an external URL when Safari ITP fix is needed
+ * if (url.startsWith('https')) {
+ *   window.location.href = url;  // External redirect
+ * } else {
+ *   router.push(url);  // Client-side navigation
+ * }
+ * ```
+ */
+export type DecorateUrl = (url: string) => string;
+
+export type SetActiveNavigate = (params: {
+  session: SessionResource;
+  /**
+   * Decorate the destination URL to enable Safari ITP cookie refresh when needed.
+   * @see {@link DecorateUrl}
+   */
+  decorateUrl: DecorateUrl;
+}) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -244,6 +279,13 @@ export interface Clerk {
 
   /** Current User. */
   user: UserResource | null | undefined;
+
+  /**
+   * Last emitted resources, maintains a stable reference to the resources between emits.
+   *
+   * @internal
+   */
+  __internal_lastEmittedResources: Resources | undefined;
 
   /**
    * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
@@ -673,6 +715,23 @@ export interface Clerk {
   unmountTaskResetPassword: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts a TaskSetupMFA component at the target element.
+   * This component allows users to set up multi-factor authentication.
+   *
+   * @param targetNode - Target node to mount the TaskSetupMFA component.
+   * @param props - configuration parameters.
+   */
+  mountTaskSetupMfa: (targetNode: HTMLDivElement, props?: TaskSetupMFAProps) => void;
+
+  /**
+   * Unmount a TaskSetupMFA component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode - Target node to unmount the TaskSetupMFA component from.
+   */
+  unmountTaskSetupMfa: (targetNode: HTMLDivElement) => void;
+
+  /**
    * @internal
    * Loads Stripe libraries for commerce functionality
    */
@@ -688,9 +747,10 @@ export interface Clerk {
    *    When a session is loading, user and session will be undefined.
    *
    * @param callback - Callback function receiving the most updated Clerk resources after a change.
+   * @param options.skipInitialEmit - If true, the callback will not be called immediately after registration.
    * @returns - Unsubscribe callback
    */
-  addListener: (callback: ListenerCallback) => UnsubscribeCallback;
+  addListener: (callback: ListenerCallback, options?: ListenerOptions) => UnsubscribeCallback;
 
   /**
    * Registers an event handler for a specific Clerk event.
@@ -914,6 +974,11 @@ export interface Clerk {
   authenticateWithBase: (params?: AuthenticateWithBaseParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using their Solana supported Web3 wallet browser extension
+   */
+  authenticateWithSolana: (params: AuthenticateWithSolanaParams) => Promise<unknown>;
+
+  /**
    * Authenticates user using their Web3 Wallet browser extension
    */
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
@@ -1026,6 +1091,10 @@ export type HandleOAuthCallbackParams = TransferableOption &
      * The underlying resource to optionally reload before processing an OAuth callback.
      */
     reloadResource?: 'signIn' | 'signUp';
+    /**
+     * Additional arbitrary metadata to be stored alongside the User object when a sign-up transfer occurs.
+     */
+    unsafeMetadata?: SignUpUnsafeMetadata;
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
@@ -1056,6 +1125,18 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
+type ClerkUnsafeOptions = {
+  /**
+   * Disables the console warning that is logged when Clerk is initialized with development keys.
+   *
+   * [WARNING] The development mode warning is intended to ensure that you don't go to production with a non-production
+   * Clerk instance. If you're disabling it, please make sure you don't ship with a non-production Clerk instance!
+   *
+   * More information: https://clerk.com/docs/guides/development/deployment/production
+   */
+  unsafe_disableDevelopmentModeConsoleWarning?: boolean;
+};
+
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
@@ -1063,13 +1144,15 @@ export type ClerkOptions = ClerkOptionsNavigation &
   SignUpFallbackRedirectUrl &
   NewSubscriptionRedirectUrl &
   AfterSignOutUrl &
-  AfterMultiSessionSingleSignOutUrl & {
+  AfterMultiSessionSingleSignOutUrl &
+  ClerkUnsafeOptions & {
     /**
-     * Clerk UI entrypoint.
+     * Clerk UI module. Pass the `ui` export from `@clerk/ui` to bundle the UI
+     * with your application instead of loading it from the CDN.
      */
-    clerkUiCtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
+    ui?: { ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor> };
     /**
-     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
+     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     // TODO @nikos
     appearance?: any;
@@ -1114,6 +1197,20 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * This option defines that the application is a satellite application.
      */
     isSatellite?: boolean | ((url: URL) => boolean);
+    /**
+     * Controls whether satellite apps automatically sync with the primary domain on initial page load.
+     *
+     * When `false` (default), satellite apps will skip the automatic handshake if no session cookies exist,
+     * and only trigger the handshake after an explicit sign-in action. This provides the best performance
+     * by showing the satellite app immediately without attempting to sync state first.
+     *
+     * When `true`, satellite apps will automatically trigger a handshake redirect to sync authentication
+     * state with the primary domain on first load, even if no session cookies exist. Use this if you want
+     * users who are already signed in on the primary domain to be automatically recognized on the satellite.
+     *
+     * @default false
+     */
+    satelliteAutoSync?: boolean;
     /**
      * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/guides/how-clerk-works/security/clerk-telemetry). If set to `debug`, telemetry events are only logged to the console and not sent to Clerk.
      */
@@ -1318,18 +1415,27 @@ export type SetActiveParams = {
    *
    * When provided, it takes precedence over the `redirectUrl` parameter for navigation.
    *
+   * The callback receives a `decorateUrl` function that should be used to wrap destination URLs.
+   * This enables Safari ITP cookie refresh when needed. The decorated URL may be an external URL
+   * (starting with `https://`) that requires `window.location.href` instead of client-side navigation.
+   *
    * @example
    * ```typescript
    * await clerk.setActive({
    *   session,
-   *   navigate: async ({ session }) => {
-   *     const currentTask = session.currentTask;
-   *     if (currentTask) {
-   *       await router.push(`/onboarding/${currentTask.key}`)
-   *       return
-   *     }
+   *   navigate: async ({ session, decorateUrl }) => {
+   *     const destination = session.currentTask
+   *       ? `/onboarding/${session.currentTask.key}`
+   *       : '/dashboard';
    *
-   *     router.push('/dashboard');
+   *     const url = decorateUrl(destination);
+   *
+   *     // decorateUrl may return an external URL when Safari ITP fix is needed
+   *     if (url.startsWith('https')) {
+   *       window.location.href = url;
+   *     } else {
+   *       router.push(url);
+   *     }
    *   }
    * });
    * ```
@@ -1344,7 +1450,7 @@ export type SetActive = (setActiveParams: SetActiveParams) => Promise<void>;
 
 export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
-  | { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> };
+  | { path?: never; routing?: Extract<RoutingStrategy, 'hash'> };
 
 export type SignInProps = RoutingOptions & {
   /**
@@ -1422,9 +1528,22 @@ export interface TransferableOption {
   transferable?: boolean;
 }
 
-export type SignInModalProps = WithoutRouting<SignInProps>;
+export type SignInModalProps = WithoutRouting<SignInProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 export type __internal_UserVerificationProps = RoutingOptions & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
   /**
    * Non-awaitable callback for when verification is completed successfully
    */
@@ -1566,7 +1685,14 @@ export type SignUpProps = RoutingOptions & {
   SignInForceRedirectUrl &
   AfterSignOutUrl;
 
-export type SignUpModalProps = WithoutRouting<SignUpProps>;
+export type SignUpModalProps = WithoutRouting<SignUpProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 export type UserProfileProps = RoutingOptions & {
   /**
@@ -1608,7 +1734,14 @@ export type UserProfileProps = RoutingOptions & {
   };
 };
 
-export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
+export type UserProfileModalProps = WithoutRouting<UserProfileProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 export type OrganizationProfileProps = RoutingOptions & {
   /**
@@ -1651,7 +1784,14 @@ export type OrganizationProfileProps = RoutingOptions & {
   };
 };
 
-export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
+export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 export type CreateOrganizationProps = RoutingOptions & {
   /**
@@ -1677,7 +1817,14 @@ export type CreateOrganizationProps = RoutingOptions & {
   appearance?: ClerkAppearanceTheme;
 };
 
-export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
+export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 type UserProfileMode = 'modal' | 'navigation';
 type UserButtonProfileMode =
@@ -1900,7 +2047,14 @@ export type WaitlistProps = {
   signInUrl?: string;
 };
 
-export type WaitlistModalProps = WaitlistProps;
+export type WaitlistModalProps = WaitlistProps & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
 
 type PricingTableDefaultProps = {
   /**
@@ -2218,6 +2372,14 @@ export type TaskResetPasswordProps = {
   appearance?: ClerkAppearanceTheme;
 };
 
+export type TaskSetupMFAProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   */
+  redirectUrlComplete: string;
+  appearance?: ClerkAppearanceTheme;
+};
+
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;
   role: OrganizationCustomRoleKey;
@@ -2250,11 +2412,8 @@ export interface ClerkAuthenticateWithWeb3Params {
   strategy: Web3Strategy;
   legalAccepted?: boolean;
   secondFactorUrl?: string;
+  walletName?: string;
 }
-
-export type JoinWaitlistParams = {
-  emailAddress: string;
-};
 
 export interface AuthenticateWithMetamaskParams {
   customNavigate?: (to: string) => Promise<unknown>;
@@ -2293,6 +2452,15 @@ export interface AuthenticateWithBaseParams {
   legalAccepted?: boolean;
 }
 
+export interface AuthenticateWithSolanaParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  legalAccepted?: boolean;
+  walletName: string;
+}
+
 export interface HeadlessBrowserClerkConstructor {
   new (publishableKey: string, options?: DomainOrProxyUrl): HeadlessBrowserClerk;
 }
@@ -2326,17 +2494,17 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   clerkJSUrl?: string;
   /**
-   * If your web application only uses [Control Components](https://clerk.com/docs/reference/components/overview#control-components), you can set this value to `'headless'` and load a minimal ClerkJS bundle for optimal page performance.
-   */
-  clerkJSVariant?: 'headless' | '';
-  /**
    * The npm version for `@clerk/clerk-js`.
    */
   clerkJSVersion?: string;
   /**
    * The URL that `@clerk/ui` should be hot-loaded from.
    */
-  clerkUiUrl?: string;
+  clerkUIUrl?: string;
+  /**
+   * The npm version for `@clerk/ui`.
+   */
+  clerkUIVersion?: string;
   /**
    * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
    */
@@ -2346,11 +2514,11 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   nonce?: string;
   /**
-   * @internal
-   * This is a structural-only type for the `ui` object that can be passed
-   * to Clerk.load() and ClerkProvider
+   * Controls prefetching of the `@clerk/ui` script.
+   * - `false` - Skip prefetching the UI (for custom UIs using Control Components)
+   * - `undefined` (default) - Prefetch UI normally
    */
-  ui?: { version: string; url?: string };
+  prefetchUI?: boolean;
 } & MultiDomainAndOrProxy;
 
 export interface LoadedClerk extends Clerk {

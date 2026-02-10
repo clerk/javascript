@@ -370,6 +370,12 @@ export const viVN: LocalizationResource = {
         tableHeader__role: 'Vai trò',
         tableHeader__user: 'Người dùng',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Chúng tôi đang cập nhật các vai trò có sẵn. Sau khi hoàn tất, bạn sẽ có thể cập nhật vai trò lại.',
+          title: 'Các vai trò tạm thời bị khóa',
+        },
+      },
       detailsTitle__emptyRow: 'Không có thành viên để hiển thị',
       invitationsTab: {
         autoInvitations: {
@@ -756,6 +762,10 @@ export const viVN: LocalizationResource = {
       subtitle: 'Để tiếp tục, vui lòng nhập mã xác minh được tạo bởi ứng dụng xác thực của bạn',
       title: 'Xác thực hai bước',
     },
+    web3Solana: {
+      subtitle: 'Chọn ví bên dưới để đăng nhập',
+      title: 'Đăng nhập với Solana',
+    },
   },
   signInEnterPasswordTitle: 'Nhập mật khẩu',
   signUp: {
@@ -848,31 +858,44 @@ export const viVN: LocalizationResource = {
       title: 'Tạo tài khoản của bạn',
       titleCombined: 'Tạo tài khoản của bạn',
     },
+    web3Solana: {
+      subtitle: 'Chọn ví bên dưới để đăng ký',
+      title: 'Đăng ký với Solana',
+    },
   },
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Một tổ chức đã tồn tại cho tên công ty được phát hiện ({{organizationName}}) và {{organizationDomain}}. Tham gia bằng lời mời.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Tạo tổ chức mới',
+      action__invitationAccept: 'Tham gia',
+      action__suggestionsAccept: 'Yêu cầu tham gia',
+      subtitle: 'Tham gia một tổ chức hiện có hoặc tạo mới',
+      subtitle__createOrganizationDisabled: 'Tham gia một tổ chức hiện có',
+      suggestionsAcceptedLabel: 'Đang chờ phê duyệt',
+      title: 'Chọn tổ chức',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Hủy',
+      formButtonSubmit: 'Tiếp tục',
+      formFieldInputPlaceholder__name: 'Tổ chức của tôi',
+      formFieldInputPlaceholder__slug: 'to-chuc-cua-toi',
+      formFieldLabel__name: 'Tên',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Nhập thông tin chi tiết tổ chức của bạn để tiếp tục',
+      title: 'Thiết lập tổ chức của bạn',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để nhận lời mời.',
+      title: 'Bạn phải thuộc về một tổ chức',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Đăng xuất',
+      actionText: 'Đã đăng nhập với {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -884,6 +907,69 @@ export const viVN: LocalizationResource = {
     subtitle: undefined,
     title: undefined,
   },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} đã là thành viên của tổ chức.',
     avatar_file_size_exceeded: 'Kích thước tệp vượt quá giới hạn tối đa 10MB. Vui lòng chọn tệp nhỏ hơn.',
@@ -892,6 +978,8 @@ export const viVN: LocalizationResource = {
     captcha_unavailable:
       'Đăng ký không thành công do lỗi bot. Vui lòng tải lại trang để thử lại hoặc liên hệ hỗ trợ để được hỗ trợ.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Các dịch vụ email tạm thời không được hỗ trợ. Vui lòng sử dụng địa chỉ email thông thường của bạn để tạo tài khoản.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -908,9 +996,12 @@ export const viVN: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Mật khẩu của bạn quá ngắn. Nó phải có ít nhất 8 ký tự.',
     form_password_not_strong_enough: 'Mật khẩu của bạn không đủ mạnh.',
+    form_password_or_identifier_incorrect:
+      'Mật khẩu hoặc địa chỉ email không đúng. Vui lòng thử lại hoặc sử dụng phương thức khác.',
     form_password_pwned:
       'Mật khẩu này đã được tìm thấy trong một rò rỉ và không thể được sử dụng, vui lòng thử một mật khẩu khác.',
     form_password_pwned__sign_in:
@@ -947,6 +1038,8 @@ export const viVN: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Không tìm thấy phần mở rộng Web3 Wallet. Vui lòng cài đặt một phần mở rộng để tiếp tục.',
+    web3_signature_request_rejected: 'Bạn đã từ chối yêu cầu ký. Vui lòng thử lại để tiếp tục.',
+    web3_solana_signature_generation_failed: 'Đã xảy ra lỗi khi tạo chữ ký. Vui lòng thử lại để tiếp tục.',
     zxcvbn: {
       couldBeStronger: 'Mật khẩu của bạn hoạt động, nhưng có thể mạnh hơn. Hãy thử thêm nhiều ký tự.',
       goodPassword: 'Mật khẩu của bạn đáp ứng tất cả các yêu cầu cần thiết.',
@@ -1318,6 +1411,10 @@ export const viVN: LocalizationResource = {
         detailsAction__nonPrimary: 'Đặt làm chính',
         primaryButton: 'Kết nối ví',
         title: 'Ví Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Chọn một ví Solana để kết nối với tài khoản của bạn.',
+          title: 'Thêm ví Solana',
+        },
       },
     },
     usernamePage: {
@@ -1352,5 +1449,11 @@ export const viVN: LocalizationResource = {
       subtitle: 'Chúng tôi sẽ liên hệ khi vị trí của bạn đã sẵn sàng',
       title: 'Cảm ơn bạn đã tham gia danh sách chờ!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Kết nối với {{walletName}}',
+    continue: 'Tiếp tục với {{walletName}}',
+    noneAvailable:
+      'Không phát hiện ví Solana Web3 nào. Vui lòng cài đặt {{ solanaWalletsLink || link("wallet extension") }} hỗ trợ Web3.',
   },
 } as const;

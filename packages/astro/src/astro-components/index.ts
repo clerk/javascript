@@ -1,9 +1,7 @@
 /**
  * Control Components
  */
-export { default as SignedIn } from './control/SignedIn.astro';
-export { default as SignedOut } from './control/SignedOut.astro';
-export { default as Protect } from './control/Protect.astro';
+export { default as Show } from './control/Show.astro';
 export { default as AuthenticateWithRedirectCallback } from './control/AuthenticateWithRedirectCallback.astro';
 
 /**

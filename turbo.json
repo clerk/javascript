@@ -1,5 +1,5 @@
 {
-  "$schema": "https://turborepo.org/schema.json",
+  "$schema": "https://turborepo.dev/schema.v2.json",
   "remoteCache": {
     "signature": true
   },
@@ -7,8 +7,6 @@
   "globalDependencies": [
     ".github/.cache-version",
     ".npmrc",
-    "eslint.config.mjs",
-    "jest.*.ts",
     "package.json",
     "pnpm-lock.yaml",
     "pnpm-workspace.yaml",
@@ -79,17 +77,14 @@
       "dependsOn": ["^build", "dev"],
       "persistent": true
     },
-    "dev:sandbox": {
-      "cache": false,
-      "dependsOn": ["^build"],
-      "persistent": true
-    },
     "clean": {
       "cache": false
     },
     "test": {
       "dependsOn": ["build"],
       "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/jest.*.ts",
         "*.d.ts",
         "bundlewatch.config.json",
         "jest.*",
@@ -114,6 +109,8 @@
     "lint": {
       "dependsOn": ["^build"],
       "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/eslint.config.mjs",
         "**/*.js",
         "**/*.jsx",
         "**/*.ts",
@@ -134,12 +131,13 @@
     },
     "lint:publint": {
       "dependsOn": ["build"],
-      "outputs": [],
-      "cache": false
+      "inputs": ["dist/**", "package.json"],
+      "outputs": []
     },
     "lint:attw": {
-      "outputs": [],
-      "cache": false
+      "dependsOn": ["build"],
+      "inputs": ["dist/**", "package.json"],
+      "outputs": []
     },
     "bundlewatch": {
       "dependsOn": ["build"],

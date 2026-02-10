@@ -14,11 +14,11 @@ import type { UserResource } from './user';
 /**
  * @inline
  */
-type CheckAuthorizationSignedOut = undefined;
+type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 /**
  * @inline
  */
-type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
+type CheckAuthorizationSignedOut = CheckAuthorizationWithoutOrgOrUser;
 
 /**
  * @inline
@@ -71,6 +71,11 @@ export type UseAuthReturn =
       signOut: SignOut;
       /**
        * A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](https://clerk.com/docs/reference/javascript/session#get-token).
+       *
+       * > [!NOTE]
+       * > To access auth data server-side, see the [`Auth` object reference doc](https://clerk.com/docs/reference/backend/types/auth-object).
+       *
+       * @throws {ClerkRuntimeError} When called in a non-browser environment (code: `clerk_runtime_not_browser`)
        */
       getToken: GetToken;
     }

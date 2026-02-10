@@ -1,5 +1,6 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type { ModuleManager } from '@clerk/shared/moduleManager';
+import { UNSAFE_PortalProvider } from '@clerk/shared/react';
 import React, { lazy, Suspense } from 'react';
 
 import type { FlowMetadata } from '../elements/contexts';
@@ -10,7 +11,7 @@ import type { AvailableComponentCtx } from '../types';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
 
-const CoreClerkContextWrapper = lazy(() => import('../contexts').then(m => ({ default: m.CoreClerkContextWrapper })));
+const ClerkContextProvider = lazy(() => import('../contexts').then(m => ({ default: m.ClerkContextProvider })));
 const EnvironmentProvider = lazy(() => import('../contexts').then(m => ({ default: m.EnvironmentProvider })));
 const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m.OptionsProvider })));
 const ModuleManagerProvider = lazy(() => import('../contexts').then(m => ({ default: m.ModuleManagerProvider })));
@@ -49,11 +50,11 @@ export const LazyProviders = (props: LazyProvidersProps) => {
       cssLayerName={props.options.appearance?.cssLayerName}
     >
       <ModuleManagerProvider moduleManager={props.moduleManager}>
-        <CoreClerkContextWrapper clerk={props.clerk}>
+        <ClerkContextProvider clerk={props.clerk}>
           <EnvironmentProvider value={props.environment}>
             <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
           </EnvironmentProvider>
-        </CoreClerkContextWrapper>
+        </ClerkContextProvider>
       </ModuleManagerProvider>
     </StyleCacheProvider>
   );
@@ -85,16 +86,18 @@ export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
       appearanceKey={props.appearanceKey}
       appearance={props.componentAppearance}
     >
-      <Portal
-        node={props.node}
-        component={
-          ClerkComponents[props.componentName as ClerkComponentName] as React.ComponentType<
-            Omit<AvailableComponentCtx, 'componentName'>
-          >
-        }
-        props={props.componentProps}
-        componentName={props.componentName}
-      />
+      <UNSAFE_PortalProvider getContainer={props?.componentProps?.getContainer}>
+        <Portal
+          node={props.node}
+          component={
+            ClerkComponents[props.componentName as ClerkComponentName] as React.ComponentType<
+              Omit<AvailableComponentCtx, 'componentName'>
+            >
+          }
+          props={props.componentProps}
+          componentName={props.componentName}
+        />
+      </UNSAFE_PortalProvider>
     </AppearanceProvider>
   );
 };
@@ -113,6 +116,7 @@ type LazyModalRendererProps = React.PropsWithChildren<
     canCloseModal?: boolean;
     modalId?: string;
     modalStyle?: React.CSSProperties;
+    getContainer: () => HTMLElement | null;
   } & AppearanceProviderProps
 >;
 
@@ -126,27 +130,29 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
       >
         <FlowMetadataProvider flow={props.flowName || ('' as any)}>
           <InternalThemeProvider>
-            <Modal
-              id={props.modalId}
-              style={props.modalStyle}
-              handleClose={props.onClose}
-              containerSx={props.modalContainerSx}
-              contentSx={props.modalContentSx}
-              canCloseModal={props.canCloseModal}
-            >
-              {props.startPath ? (
-                <Suspense>
-                  <VirtualRouter
-                    startPath={props.startPath}
-                    onExternalNavigate={props.onExternalNavigate}
-                  >
-                    {props.children}
-                  </VirtualRouter>
-                </Suspense>
-              ) : (
-                props.children
-              )}
-            </Modal>
+            <UNSAFE_PortalProvider getContainer={props.getContainer}>
+              <Modal
+                id={props.modalId}
+                style={props.modalStyle}
+                handleClose={props.onClose}
+                containerSx={props.modalContainerSx}
+                contentSx={props.modalContentSx}
+                canCloseModal={props.canCloseModal}
+              >
+                {props.startPath ? (
+                  <Suspense>
+                    <VirtualRouter
+                      startPath={props.startPath}
+                      onExternalNavigate={props.onExternalNavigate}
+                    >
+                      {props.children}
+                    </VirtualRouter>
+                  </Suspense>
+                ) : (
+                  props.children
+                )}
+              </Modal>
+            </UNSAFE_PortalProvider>
           </InternalThemeProvider>
         </FlowMetadataProvider>
       </AppearanceProvider>

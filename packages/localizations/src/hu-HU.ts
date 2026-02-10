@@ -364,6 +364,12 @@ export const huHU: LocalizationResource = {
         tableHeader__role: 'Beosztás',
         tableHeader__user: 'Felhasználó',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Frissítjük az elérhető szerepköröket. Ha ez befejeződött, újra frissítheti a szerepköröket.',
+          title: 'A szerepkörök ideiglenesen zárolva vannak',
+        },
+      },
       detailsTitle__emptyRow: 'Nincsenek listázható tagok',
       invitationsTab: {
         autoInvitations: {
@@ -749,6 +755,10 @@ export const huHU: LocalizationResource = {
       subtitle: 'A folytatáshoz, kérlek írd be a visszaigazoló kódot, amit a hitelesítő app készített.',
       title: 'Két lépécsős azonosítás',
     },
+    web3Solana: {
+      subtitle: 'Válasszon alább egy tárcát a bejelentkezéshez',
+      title: 'Bejelentkezés Solanával',
+    },
   },
   signInEnterPasswordTitle: 'Írd be a jelszavad',
   signUp: {
@@ -839,31 +849,44 @@ export const huHU: LocalizationResource = {
       title: 'Fiók létrehozása',
       titleCombined: 'Fiók létrehozása',
     },
+    web3Solana: {
+      subtitle: 'Válasszon alább egy tárcát a regisztrációhoz',
+      title: 'Regisztráció Solanával',
+    },
   },
   socialButtonsBlockButton: 'Folytatás {{provider|titleize}} segítségével',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Már létezik szervezet az észlelt cégnévhez ({{organizationName}}) és {{organizationDomain}}. Csatlakozz meghívással.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Szervezet létrehozása',
+      action__invitationAccept: 'Csatlakozás',
+      action__suggestionsAccept: 'Csatlakozás kérése',
+      subtitle: 'Csatlakozz egy meglévő szervezethez vagy hozz létre újat',
+      subtitle__createOrganizationDisabled: 'Csatlakozz egy meglévő szervezethez',
+      suggestionsAcceptedLabel: 'Elfogadásra vár',
+      title: 'Válassz szervezetet',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Mégse',
+      formButtonSubmit: 'Folytatás',
+      formFieldInputPlaceholder__name: 'Az én szervezetem',
+      formFieldInputPlaceholder__slug: 'az-en-szervezetem',
+      formFieldLabel__name: 'Név',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Adja meg szervezete adatait a folytatáshoz',
+      title: 'Állítsa be szervezetét',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'Kérjen meghívót a szervezet adminisztrátorától.',
+      title: 'Egy szervezethez kell tartoznia',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Kijelentkezés',
+      actionText: 'Bejelentkezve: {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -875,6 +898,69 @@ export const huHU: LocalizationResource = {
     subtitle: undefined,
     title: undefined,
   },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     avatar_file_size_exceeded: 'A fájl mérete meghaladja a 10 MB-os maximális korlátot. Kérlek válassz kisebb fájlt.',
@@ -884,6 +970,8 @@ export const huHU: LocalizationResource = {
     captcha_unavailable:
       'Bot érvényesítése miatt, a regisztráció sikertelen volt. Kérlek frissítsd az oldalt, hogy újra próbálhasd, vagy kérj támogatást.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Az ideiglenes e-mail szolgáltatások nem támogatottak. Kérlek, használd a szokásos e-mail címedet a fiók létrehozásához.',
     form_identifier_exists__email_address: 'Ez az email cím már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__phone_number: 'Ez a telefonszám már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__username: 'Ez a felhasználónév már foglalt. Kérlek próbálj egy másikat.',
@@ -900,9 +988,12 @@ export const huHU: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'A jelszó nem elég erős',
+    form_password_or_identifier_incorrect:
+      'A jelszó vagy az e-mail cím helytelen. Próbáld újra vagy használj másik módszert.',
     form_password_pwned:
       'Úgy látjuk, hogy ez a jelszó kiszivárgott, ezért ezt nem használhatod, kérlek próbálj egy másik jelszót.',
     form_password_pwned__sign_in:
@@ -941,6 +1032,9 @@ export const huHU: LocalizationResource = {
     phone_number_exists: 'Ez a telefonszám már foglalt. Kérlek próbálj meg egy másikat.',
     session_exists: 'Már be vagy jelentkezve.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Elutasította az aláírási kérelmet. Kérjük, próbálja meg újra a folytatáshoz.',
+    web3_solana_signature_generation_failed:
+      'Hiba történt az aláírás létrehozása közben. Kérjük, próbálja meg újra a folytatáshoz.',
     zxcvbn: {
       couldBeStronger: 'A jelszavad, jó, de lehetne erősebb. Adj hozzá több karaktert.',
       goodPassword: 'A jelszavad megfelel az elvárásoknak.',
@@ -1312,6 +1406,10 @@ export const huHU: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 tárcák',
         title: 'Web3 tárcák',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Válasszon egy Solana tárcát a fiókjához való csatlakozáshoz.',
+          title: 'Solana tárca hozzáadása',
+        },
       },
     },
     usernamePage: {
@@ -1335,16 +1433,22 @@ export const huHU: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Bejelentkezés',
+      actionText: 'Már van hozzáférésed?',
+      formButton: 'Csatlakozás a várólistához',
+      subtitle: 'Add meg az e-mail címedet, és értesítünk, amikor a helyed elkészül',
+      title: 'Csatlakozás a várólistához',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Hamarosan átirányítunk...',
+      subtitle: 'Visszajelzünk, amikor a helyed elkészül',
+      title: 'Köszönjük, hogy csatlakoztál a várólistához!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Csatlakozás: {{walletName}}',
+    continue: 'Folytatás: {{walletName}}',
+    noneAvailable:
+      'Nem észlelhető Solana Web3 tárca. Kérjük, telepítsen egy Web3-kompatibilis {{ solanaWalletsLink || link("wallet extension") }}-t.',
   },
 } as const;

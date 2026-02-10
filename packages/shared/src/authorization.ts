@@ -65,6 +65,9 @@ const ALLOWED_LEVELS = new Set<SessionVerificationLevel>(['first_factor', 'secon
 
 const ALLOWED_TYPES = new Set<SessionVerificationTypes>(['strict_mfa', 'strict', 'moderate', 'lax']);
 
+const ORG_SCOPES = new Set(['o', 'org', 'organization']);
+const USER_SCOPES = new Set(['u', 'user']);
+
 // Helper functions
 const isValidMaxAge = (maxAge: any) => typeof maxAge === 'number' && maxAge > 0;
 const isValidLevel = (level: any) => ALLOWED_LEVELS.has(level);
@@ -100,17 +103,26 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
 
 const checkForFeatureOrPlan = (claim: string, featureOrPlan: string) => {
   const { org: orgFeatures, user: userFeatures } = splitByScope(claim);
-  const [scope, _id] = featureOrPlan.split(':');
-  const id = _id || scope;
+  const [rawScope, rawId] = featureOrPlan.split(':');
+  const hasExplicitScope = rawId !== undefined;
+  const scope = rawScope;
+  const id = rawId || rawScope;
 
-  if (scope === 'org') {
-    return orgFeatures.includes(id);
-  } else if (scope === 'user') {
-    return userFeatures.includes(id);
-  } else {
-    // Since org scoped features will not exist if there is not an active org, merging is safe.
-    return [...orgFeatures, ...userFeatures].includes(id);
+  if (hasExplicitScope && !ORG_SCOPES.has(scope) && !USER_SCOPES.has(scope)) {
+    throw new Error(`Invalid scope: ${scope}`);
   }
+
+  if (hasExplicitScope) {
+    if (ORG_SCOPES.has(scope)) {
+      return orgFeatures.includes(id);
+    }
+    if (USER_SCOPES.has(scope)) {
+      return userFeatures.includes(id);
+    }
+  }
+
+  // Since org scoped features will not exist if there is not an active org, merging is safe.
+  return [...orgFeatures, ...userFeatures].includes(id);
 };
 
 const checkBillingAuthorization: CheckBillingAuthorization = (params, options) => {
@@ -127,13 +139,34 @@ const checkBillingAuthorization: CheckBillingAuthorization = (params, options) =
 };
 
 const splitByScope = (fea: string | null | undefined) => {
-  const features = fea ? fea.split(',').map(f => f.trim()) : [];
+  const org: string[] = [];
+  const user: string[] = [];
 
-  // TODO: make this more efficient
-  return {
-    org: features.filter(f => f.split(':')[0].includes('o')).map(f => f.split(':')[1]),
-    user: features.filter(f => f.split(':')[0].includes('u')).map(f => f.split(':')[1]),
-  };
+  if (!fea) {
+    return { org, user };
+  }
+
+  const parts = fea.split(',');
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i].trim();
+    const colonIndex = part.indexOf(':');
+    if (colonIndex === -1) {
+      throw new Error(`Invalid claim element (missing colon): ${part}`);
+    }
+    const scope = part.slice(0, colonIndex);
+    const value = part.slice(colonIndex + 1);
+
+    if (scope === 'o') {
+      org.push(value);
+    } else if (scope === 'u') {
+      user.push(value);
+    } else if (scope === 'ou' || scope === 'uo') {
+      org.push(value);
+      user.push(value);
+    }
+  }
+
+  return { org, user };
 };
 
 const validateReverificationConfig = (config: ReverificationConfig | undefined | null) => {
@@ -260,86 +293,86 @@ const resolveAuthState = ({
 }: AuthStateOptions): UseAuthReturn | undefined => {
   if (sessionId === undefined && userId === undefined) {
     return {
+      actor: undefined,
+      getToken,
+      has: () => false,
       isLoaded: false,
       isSignedIn: undefined,
-      sessionId,
-      sessionClaims: undefined,
-      userId,
-      actor: undefined,
       orgId: undefined,
       orgRole: undefined,
       orgSlug: undefined,
-      has: undefined,
+      sessionClaims: undefined,
+      sessionId,
       signOut,
-      getToken,
+      userId,
     } as const;
   }
 
   if (sessionId === null && userId === null) {
     return {
+      actor: null,
+      getToken,
+      has: () => false,
       isLoaded: true,
       isSignedIn: false,
-      sessionId,
-      userId,
-      sessionClaims: null,
-      actor: null,
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has: () => false,
+      sessionClaims: null,
+      sessionId,
       signOut,
-      getToken,
+      userId,
     } as const;
   }
 
   if (treatPendingAsSignedOut && sessionStatus === 'pending') {
     return {
+      actor: null,
+      getToken,
+      has: () => false,
       isLoaded: true,
       isSignedIn: false,
-      sessionId: null,
-      userId: null,
-      sessionClaims: null,
-      actor: null,
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has: () => false,
+      sessionClaims: null,
+      sessionId: null,
       signOut,
-      getToken,
+      userId: null,
     } as const;
   }
 
   if (!!sessionId && !!sessionClaims && !!userId && !!orgId && !!orgRole) {
     return {
+      actor: actor || null,
+      getToken,
+      has,
       isLoaded: true,
       isSignedIn: true,
-      sessionId,
-      sessionClaims,
-      userId,
-      actor: actor || null,
       orgId,
       orgRole,
       orgSlug: orgSlug || null,
-      has,
+      sessionClaims,
+      sessionId,
       signOut,
-      getToken,
+      userId,
     } as const;
   }
 
   if (!!sessionId && !!sessionClaims && !!userId && !orgId) {
     return {
+      actor: actor || null,
+      getToken,
+      has,
       isLoaded: true,
       isSignedIn: true,
-      sessionId,
-      sessionClaims,
-      userId,
-      actor: actor || null,
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has,
+      sessionClaims,
+      sessionId,
       signOut,
-      getToken,
+      userId,
     } as const;
   }
 };

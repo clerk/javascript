@@ -103,7 +103,8 @@ export type FlowMetadata = {
     | 'tasks'
     | 'taskChooseOrganization'
     | 'enableOrganizations'
-    | 'taskResetPassword';
+    | 'taskResetPassword'
+    | 'taskSetupMfa';
   part?:
     | 'start'
     | 'emailCode'
@@ -128,7 +129,10 @@ export type FlowMetadata = {
     | 'complete'
     | 'accountSwitcher'
     | 'chooseOrganization'
-    | 'enterpriseConnections';
+    | 'chooseWallet'
+    | 'enterpriseConnections'
+    | 'organizationCreationDisabled'
+    | 'methodSelectionMFA';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');

@@ -13,4 +13,17 @@ export default defineConfig({
     tailwindcss(),
     viteReact(),
   ],
+  // See https://github.com/TanStack/router/issues/5738
+  resolve: {
+    dedupe: ['react', 'react-dom'],
+    alias: [
+      {
+        find: 'use-sync-external-store/shim/index.js',
+        replacement: 'react',
+      },
+    ],
+  },
+  ssr: {
+    noExternal: [/@clerk\/.*/, 'swr'],
+  },
 });

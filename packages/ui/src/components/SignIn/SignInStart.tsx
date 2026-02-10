@@ -235,12 +235,14 @@ function SignInStartInternal(): JSX.Element {
           }
           case 'needs_second_factor':
             return navigate('factor-two');
+          case 'needs_client_trust':
+            return navigate('client-trust');
           case 'complete':
             removeClerkQueryParam('__clerk_ticket');
             return clerk.setActive({
               session: res.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
               },
             });
           default: {
@@ -295,6 +297,7 @@ function SignInStartInternal(): JSX.Element {
           case ERROR_CODES.FRAUD_ACTION_BLOCKED:
           case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
           case ERROR_CODES.USER_BANNED:
+          case ERROR_CODES.USER_DEACTIVATED:
             card.setError(error);
             break;
           default:
@@ -390,11 +393,13 @@ function SignInStartInternal(): JSX.Element {
         }
         case 'needs_second_factor':
           return navigate('factor-two');
+        case 'needs_client_trust':
+          return navigate('client-trust');
         case 'complete':
           return clerk.setActive({
             session: res.createdSessionId,
-            navigate: async ({ session }) => {
-              await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+            navigate: async ({ session, decorateUrl }) => {
+              await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
             },
           });
         default: {
@@ -447,8 +452,8 @@ function SignInStartInternal(): JSX.Element {
     } else if (sessionAlreadyExistsError) {
       await clerk.setActive({
         session: clerk.client.lastActiveSessionId,
-        navigate: async ({ session }) => {
-          await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+        navigate: async ({ session, decorateUrl }) => {
+          await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
         },
       });
     } else if (alreadySignedInError) {
@@ -456,8 +461,8 @@ function SignInStartInternal(): JSX.Element {
       const sid = alreadySignedInError.meta!.sessionId!;
       await clerk.setActive({
         session: sid,
-        navigate: async ({ session }) => {
-          await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+        navigate: async ({ session, decorateUrl }) => {
+          await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
         },
       });
     } else if (isCombinedFlow && accountDoesNotExistError) {
@@ -501,6 +506,7 @@ function SignInStartInternal(): JSX.Element {
             attribute,
             identifierField.value,
           ),
+        unsafeMetadata: ctx.unsafeMetadata,
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);

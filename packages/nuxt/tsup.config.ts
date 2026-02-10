@@ -14,6 +14,7 @@ export default defineConfig(() => {
       './src/runtime/server/*.ts',
       './src/runtime/errors.ts',
       './src/runtime/webhooks.ts',
+      './src/runtime/types/index.ts',
     ],
     format: ['esm'],
     // Make sure to not bundle the imports

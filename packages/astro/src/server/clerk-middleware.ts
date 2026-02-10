@@ -300,6 +300,7 @@ function decorateAstroLocal(
           signInUrl: requestState.signInUrl,
           signUpUrl: requestState.signUpUrl,
           sessionStatus: requestState.toAuth()?.sessionStatus,
+          isSatellite: requestState.isSatellite,
         }).redirectToSignIn({
           returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl.toString(),
         });
@@ -422,6 +423,7 @@ const handleControlFlowErrors = (
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         publishableKey: getSafeEnv(context).pk!,
         sessionStatus: requestState.toAuth()?.sessionStatus,
+        isSatellite: requestState.isSatellite,
       }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
     default:
       throw e;

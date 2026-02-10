@@ -359,6 +359,12 @@ export type ElementsConfig = {
   taskChooseOrganizationCreateOrganizationActionButton: WithOptions;
   taskChooseOrganizationPreviewButton: WithOptions;
 
+  taskSetupMfaMethodSelectionItem: WithOptions;
+  taskSetupMfaMethodSelectionItems: WithOptions;
+  taskSetupMfaPhoneSelectionItems: WithOptions;
+  taskSetupMfaPhoneSelectionItem: WithOptions;
+  taskSetupMfaPhoneSelectionAddPhoneAction: WithOptions;
+
   userAvatarBox: WithOptions;
   userAvatarImage: WithOptions;
 
@@ -650,6 +656,17 @@ export type ElementsConfig = {
   enterpriseConnectionsRoot: WithOptions;
   enterpriseConnectionButton: WithOptions;
   enterpriseConnectionButtonText: WithOptions;
+
+  web3SolanaWalletButtonsRoot: WithOptions;
+  web3SolanaWalletButtons: WithOptions;
+  web3SolanaWalletButtonsIconButton: WithOptions<string, LoadingState>;
+  web3SolanaWalletButtonsBlockButton: WithOptions<string, LoadingState>;
+  web3SolanaWalletButtonsBlockButtonText: WithOptions<string>;
+  web3SolanaWalletButtonsWalletIcon: WithOptions<string, LoadingState>;
+  web3SolanaWalletButtonsWalletInitialIcon: WithOptions<string, LoadingState>;
+
+  walletIcon: WithOptions<string, LoadingState>;
+  walletInitialIcon: WithOptions<string, LoadingState>;
 };
 
 export type Elements = {
@@ -985,6 +1002,7 @@ export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
 export type TaskChooseOrganizationTheme = Theme;
 export type TaskResetPasswordTheme = Theme;
+export type TaskSetupMFATheme = Theme;
 
 type GlobalAppearanceOptions = {
   /**

@@ -7,11 +7,11 @@ export {
   useSessionList,
   useSignIn,
   useSignUp,
+  useWaitlist,
   useUser,
   useReverification,
 } from '@clerk/react';
 
-export * from './useSignInWithApple';
 export * from './useSSO';
 export * from './useOAuth';
 export * from './useAuth';

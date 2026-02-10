@@ -7,7 +7,8 @@ import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { Badge, Box, Flex, Image, localizationKeys, Text } from '../../customizables';
+import { ProviderIcon } from '../../common';
+import { Badge, Box, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
@@ -72,10 +73,11 @@ export const Web3Section = withCardStateProvider(
                     >
                       <Flex sx={t => ({ alignItems: 'center', gap: t.space.$2, width: '100%' })}>
                         {strategyToDisplayData[strategy].iconUrl && (
-                          <Image
-                            src={strategyToDisplayData[strategy].iconUrl}
+                          <ProviderIcon
+                            id={strategyToDisplayData[strategy].id}
+                            iconUrl={strategyToDisplayData[strategy].iconUrl}
+                            name={strategyToDisplayData[strategy].name}
                             alt={strategyToDisplayData[strategy].name}
-                            sx={theme => ({ width: theme.sizes.$4 })}
                           />
                         )}
                         <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
@@ -95,7 +97,10 @@ export const Web3Section = withCardStateProvider(
                           </Flex>
                         </Box>
                       </Flex>
-                      <Web3WalletMenu walletId={walletId} />
+                      <Web3WalletMenu
+                        walletId={walletId}
+                        isVerified={wallet.verification.status === 'verified'}
+                      />
                     </ProfileSection.Item>
 
                     <Action.Open value={`remove-${walletId}`}>
@@ -108,14 +113,14 @@ export const Web3Section = withCardStateProvider(
               );
             })}
           </ProfileSection.ItemList>
-          {shouldAllowCreation && <AddWeb3WalletActionMenu onClick={() => setActionValue(null)} />}
+          {shouldAllowCreation && <AddWeb3WalletActionMenu />}
         </Action.Root>
       </ProfileSection.Root>
     );
   },
 );
 
-const Web3WalletMenu = ({ walletId }: { walletId: string }) => {
+const Web3WalletMenu = ({ walletId, isVerified }: { walletId: string; isVerified: boolean }) => {
   const card = useCardState();
   const { open } = useActionContext();
   const { user } = useUser();
@@ -126,7 +131,8 @@ const Web3WalletMenu = ({ walletId }: { walletId: string }) => {
 
   const actions = (
     [
-      !isPrimary
+      // Only allow setting as primary if the wallet is verified and not already primary
+      !isPrimary && isVerified
         ? {
             label: localizationKeys('userProfile.start.web3WalletsSection.detailsAction__nonPrimary'),
             onClick: () => {

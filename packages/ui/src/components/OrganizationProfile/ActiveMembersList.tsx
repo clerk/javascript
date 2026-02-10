@@ -20,7 +20,7 @@ export const ActiveMembersList = ({ memberships, pageSize }: ActiveMembersListPr
   const card = useCardState();
   const { organization } = useOrganization();
 
-  const { options, isLoading: loadingRoles } = useFetchRoles();
+  const { options, isLoading: loadingRoles, hasRoleSetMigration } = useFetchRoles();
 
   if (!organization) {
     return null;
@@ -49,10 +49,13 @@ export const ActiveMembersList = ({ memberships, pageSize }: ActiveMembersListPr
       isLoading={(memberships?.isLoading && !memberships?.data.length) || loadingRoles}
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
       headers={[
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__joined'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__role'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
+        { key: localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user') },
+        { key: localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__joined') },
+        { key: localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__role') },
+        {
+          key: localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
+          align: 'right',
+        },
       ]}
       rows={(memberships?.data || []).map(m => (
         <MemberRow
@@ -61,6 +64,7 @@ export const ActiveMembersList = ({ memberships, pageSize }: ActiveMembersListPr
           options={options}
           onRoleChange={handleRoleChange(m)}
           onRemove={handleRemove(m)}
+          hasRoleSetMigration={hasRoleSetMigration}
         />
       ))}
     />
@@ -73,8 +77,9 @@ const MemberRow = (props: {
   onRemove: () => unknown;
   options: Parameters<typeof RoleSelect>[0]['roles'];
   onRoleChange: (role: string) => unknown;
+  hasRoleSetMigration: boolean;
 }) => {
-  const { membership, onRemove, onRoleChange, options } = props;
+  const { membership, onRemove, onRoleChange, options, hasRoleSetMigration } = props;
   const { localizeCustomRole } = useLocalizeCustomRoles();
   const card = useCardState();
   const { user } = useUser();
@@ -112,7 +117,7 @@ const MemberRow = (props: {
           }
         >
           <RoleSelect
-            isDisabled={card.isLoading || !onRoleChange}
+            isDisabled={card.isLoading || !onRoleChange || hasRoleSetMigration}
             value={membership.role}
             fallbackLabel={membership.roleName}
             onChange={onRoleChange}
@@ -120,7 +125,7 @@ const MemberRow = (props: {
           />
         </Protect>
       </Td>
-      <Td>
+      <Td sx={{ textAlign: 'right' }}>
         <Protect permission={'org:sys_memberships:manage'}>
           <ThreeDotsMenu
             actions={[

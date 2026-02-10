@@ -35,10 +35,17 @@ vi.mock('../../contexts', () => {
   return {
     useAssertWrappedByClerkProvider: () => {},
     useClerkInstanceContext: () => mockClerk,
-    useUserContext: () => (mockClerk.loaded ? mockUser : null),
-    useOrganizationContext: () => ({ organization: mockClerk.loaded ? mockOrganization : null }),
+    useInitialStateContext: () => undefined,
   };
 });
+
+vi.mock('../base/useUserBase', () => ({
+  useUserBase: () => (mockClerk.loaded ? mockUser : null),
+}));
+
+vi.mock('../base/useOrganizationBase', () => ({
+  useOrganizationBase: () => (mockClerk.loaded ? mockOrganization : null),
+}));
 
 describe('usePlans', () => {
   beforeEach(() => {
@@ -261,19 +268,9 @@ describe('usePlans', () => {
       await result.current.userPlans.revalidate();
     });
 
-    const isRQ = Boolean((globalThis as any).__CLERK_USE_RQ__);
-    const calls = getPlansSpy.mock.calls.map(call => call[0]?.for);
+    await waitFor(() => expect(getPlansSpy.mock.calls.length).toBeGreaterThanOrEqual(1));
 
-    if (isRQ) {
-      await waitFor(() => expect(getPlansSpy.mock.calls.length).toBeGreaterThanOrEqual(1));
-      expect(calls.every(value => value === 'user')).toBe(true);
-    } else {
-      await waitFor(() => expect(getPlansSpy.mock.calls.length).toBe(1));
-      expect(getPlansSpy.mock.calls[0][0]).toEqual(
-        expect.objectContaining({
-          for: 'user',
-        }),
-      );
-    }
+    const calls = getPlansSpy.mock.calls.map(call => call[0]?.for);
+    expect(calls.every(value => value === 'user')).toBe(true);
   });
 });

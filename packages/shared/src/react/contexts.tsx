@@ -1,27 +1,57 @@
 'use client';
 
 import type { PropsWithChildren } from 'react';
-import React from 'react';
+import React, { useState } from 'react';
 
-import type {
-  BillingSubscriptionPlanPeriod,
-  ClerkOptions,
-  ClientResource,
-  ForPayerType,
-  LoadedClerk,
-  OrganizationResource,
-  SignedInSessionResource,
-  UserResource,
-} from '../types';
+import type { BillingSubscriptionPlanPeriod, ClerkOptions, ForPayerType, InitialState, LoadedClerk } from '../types';
 import { createContextAndHook } from './hooks/createContextAndHook';
-import { SWRConfigCompat } from './providers/SWRConfigCompat';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
-const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
-const [ClientContext, useClientContext] = createContextAndHook<ClientResource | null | undefined>('ClientContext');
-const [SessionContext, useSessionContext] = createContextAndHook<SignedInSessionResource | null | undefined>(
-  'SessionContext',
-);
+
+const [InitialStateContext, _useInitialStateContext] = createContextAndHook<
+  InitialState | Promise<InitialState> | undefined
+>('InitialStateContext');
+
+/**
+ * Provides initial Clerk state (session, user, organization data) from server-side rendering
+ * to child components via React context.
+ *
+ * Passing in a promise is only supported for React >= 19.
+ *
+ * The initialState is snapshotted on mount and cannot change during the component lifecycle.
+ *
+ * Note that different parts of the React tree can use separate InitialStateProvider instances
+ * with different initialState values if needed.
+ */
+export function InitialStateProvider({
+  children,
+  initialState,
+}: {
+  children: React.ReactNode;
+  initialState: InitialState | Promise<InitialState> | undefined;
+}) {
+  // The initialState is not allowed to change, we snapshot it to turn that expectation into a guarantee.
+  // Note that despite this, it could still be different for different parts of the React tree which is fine,
+  // but that requires using a separate provider.
+  // eslint-disable-next-line react/hook-use-state
+  const [initialStateSnapshot] = useState(initialState);
+  const initialStateCtx = React.useMemo(() => ({ value: initialStateSnapshot }), [initialStateSnapshot]);
+  return <InitialStateContext.Provider value={initialStateCtx}>{children}</InitialStateContext.Provider>;
+}
+
+export function useInitialStateContext(): InitialState | undefined {
+  const initialState = _useInitialStateContext();
+
+  if (initialState instanceof Promise) {
+    if ('use' in React && typeof React.use === 'function') {
+      return React.use(initialState);
+    } else {
+      throw new Error('initialState cannot be a promise if React version is less than 19');
+    }
+  }
+
+  return initialState;
+}
 
 const OptionsContext = React.createContext<ClerkOptions>({});
 
@@ -62,36 +92,6 @@ function useOptionsContext(): ClerkOptions {
   return context;
 }
 
-type OrganizationContextProps = {
-  organization: OrganizationResource | null | undefined;
-};
-const [OrganizationContextInternal, useOrganizationContext] = createContextAndHook<{
-  organization: OrganizationResource | null | undefined;
-}>('OrganizationContext');
-
-const OrganizationProvider = ({
-  children,
-  organization,
-  swrConfig,
-}: PropsWithChildren<
-  OrganizationContextProps & {
-    // Exporting inferred types  directly from SWR will result in error while building declarations
-    swrConfig?: any;
-  }
->) => {
-  return (
-    <SWRConfigCompat swrConfig={swrConfig}>
-      <OrganizationContextInternal.Provider
-        value={{
-          value: { organization },
-        }}
-      >
-        {children}
-      </OrganizationContextInternal.Provider>
-    </SWRConfigCompat>
-  );
-};
-
 /**
  * @internal
  */
@@ -119,17 +119,9 @@ Learn more: https://clerk.com/docs/components/clerk-provider`.trim(),
 export {
   __experimental_CheckoutProvider,
   ClerkInstanceContext,
-  ClientContext,
   OptionsContext,
-  OrganizationProvider,
-  SessionContext,
   useAssertWrappedByClerkProvider,
   useCheckoutContext,
   useClerkInstanceContext,
-  useClientContext,
   useOptionsContext,
-  useOrganizationContext,
-  UserContext,
-  useSessionContext,
-  useUserContext,
 };

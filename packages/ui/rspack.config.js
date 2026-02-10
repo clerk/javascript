@@ -3,11 +3,13 @@ import rspack from '@rspack/core';
 import packageJSON from './package.json' with { type: 'json' };
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 import { merge } from 'webpack-merge';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
+import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 import { svgLoader, typescriptLoaderProd, typescriptLoaderDev } from '../../scripts/rspack-common.js';
 
-const isRsdoctorEnabled = !!process.env.RSDOCTOR;
+const require = createRequire(import.meta.url);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,12 +17,30 @@ const __dirname = path.dirname(__filename);
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
 
+const SHARED_REACT_MODULES = ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime'];
+
+/**
+ * Externals handler for the shared variant that reads React from globalThis.__clerkSharedModules.
+ * This allows the host application's React to be shared with @clerk/ui.
+ * @type {import('@rspack/core').ExternalItemFunctionData}
+ */
+const sharedReactExternalsHandler = ({ request }, callback) => {
+  if (SHARED_REACT_MODULES.includes(request)) {
+    return callback(null, ['__clerkSharedModules', request], 'root');
+  }
+  callback();
+};
+
 const variants = {
   uiBrowser: 'ui.browser',
+  uiLegacyBrowser: 'ui.legacy.browser',
+  uiSharedBrowser: 'ui.shared.browser',
 };
 
 const variantToSourceFile = {
   [variants.uiBrowser]: './src/index.browser.ts',
+  [variants.uiLegacyBrowser]: './src/index.legacy.browser.ts',
+  [variants.uiSharedBrowser]: './src/index.browser.ts', // Same entry, different externals
 };
 
 /**
@@ -44,13 +64,20 @@ const common = ({ mode, variant }) => {
       new rspack.DefinePlugin({
         __DEV__: isDevelopment(mode),
         PACKAGE_VERSION: JSON.stringify(packageJSON.version),
-        __PKG_VERSION__: JSON.stringify(packageJSON.version),
         PACKAGE_NAME: JSON.stringify(packageJSON.name),
         __BUILD_DISABLE_RHC__: JSON.stringify(false),
       }),
       new rspack.EnvironmentPlugin({
         NODE_ENV: mode,
       }),
+      process.env.RSDOCTOR &&
+        new RsdoctorRspackPlugin({
+          mode: process.env.RSDOCTOR === 'brief' ? 'brief' : 'normal',
+          disableClientServer: process.env.RSDOCTOR === 'brief',
+          supports: {
+            generateTileGraph: true,
+          },
+        }),
     ].filter(Boolean),
     output: {
       chunkFilename: `[name]_ui_[fullhash:6]_${packageJSON.version}.js`,
@@ -67,7 +94,20 @@ const common = ({ mode, variant }) => {
           },
           defaultVendors: {
             minChunks: 1,
-            test: /[\\/]node_modules[\\/]/,
+            test: module => {
+              if (!(module instanceof rspack.NormalModule) || !module.resource) {
+                return false;
+              }
+              // Exclude Solana packages and their known transitive dependencies
+              if (
+                /[\\/]node_modules[\\/](@solana|@solana-mobile|@wallet-standard|bn\.js|borsh|buffer|superstruct|bs58|jayson|rpc-websockets|qrcode)[\\/]/.test(
+                  module.resource,
+                )
+              ) {
+                return false;
+              }
+              return /[\\/]node_modules[\\/]/.test(module.resource);
+            },
             name: 'vendors',
             priority: -10,
           },
@@ -97,9 +137,12 @@ const entryForVariant = variant => {
 
 /**
  * Common production configuration for chunked browser builds
+ * @param {object} [options]
+ * @param {string} [options.targets] - Browserslist targets
+ * @param {boolean} [options.useCoreJs] - Whether to use core-js polyfills
  * @returns {import('@rspack/core').Configuration}
  */
-const commonForProdBrowser = () => {
+const commonForProdBrowser = ({ targets = 'last 2 years', useCoreJs = false } = {}) => {
   return {
     devtool: false,
     output: {
@@ -109,7 +152,7 @@ const commonForProdBrowser = () => {
       globalObject: 'globalThis',
     },
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd({ targets: 'last 2 years' })],
+      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
     },
     optimization: {
       minimize: true,
@@ -128,54 +171,71 @@ const commonForProdBrowser = () => {
         }),
       ],
     },
+    ...(useCoreJs
+      ? {
+          resolve: {
+            alias: {
+              'core-js': path.dirname(require.resolve('core-js/package.json')),
+            },
+          },
+        }
+      : {}),
   };
 };
 
 /**
- * Production configuration - builds UMD browser variant only
- * @param {'development'|'production'} mode
- * @returns {Promise<import('@rspack/core').Configuration>}
+ * Production configuration - builds UMD browser variants
+ * @param {object} config
+ * @param {'development'|'production'} config.mode
+ * @param {boolean} config.analysis
+ * @returns {import('@rspack/core').Configuration[]}
  */
-const prodConfig = async mode => {
-  /** @type {import('@rspack/core').Configuration['plugins']} */
-  const plugins = [];
-
-  if (isRsdoctorEnabled) {
-    const { RsdoctorRspackPlugin } = await import('@rsdoctor/rspack-plugin');
-    plugins.push(
-      new RsdoctorRspackPlugin({
-        supports: {
-          generateTileGraph: true,
-        },
-        linter: {
-          rules: {
-            'ecma-version-check': 'off',
-          },
-        },
-      }),
-    );
-  }
-
+const prodConfig = ({ mode, analysis }) => {
   // Browser bundle with chunks (UMD)
   const uiBrowser = merge(
     entryForVariant(variants.uiBrowser),
     common({ mode, variant: variants.uiBrowser }),
     commonForProdBrowser(),
-    { plugins },
   );
 
-  return uiBrowser;
+  // Legacy browser bundle with chunks (UMD) for Safari 12 support
+  const uiLegacyBrowser = merge(
+    entryForVariant(variants.uiLegacyBrowser),
+    common({ mode, variant: variants.uiLegacyBrowser }),
+    commonForProdBrowser({ targets: packageJSON.browserslistLegacy, useCoreJs: true }),
+  );
+
+  // Shared variant - externalizes react/react-dom to use host app's versions
+  // Expects host to provide these via globalThis.__clerkSharedModules
+  const uiSharedBrowser = merge(
+    entryForVariant(variants.uiSharedBrowser),
+    common({ mode, variant: variants.uiSharedBrowser }),
+    commonForProdBrowser(),
+    {
+      externals: [sharedReactExternalsHandler],
+    },
+  );
+
+  // webpack-bundle-analyzer only supports a single build, use uiBrowser as that's the default build we serve
+  if (analysis) {
+    return [uiBrowser];
+  }
+
+  return [uiBrowser, uiLegacyBrowser, uiSharedBrowser];
 };
 
 /**
  * Development configuration - only builds browser bundle with dev server
  * @param {'development'|'production'} mode
  * @param {object} env
+ * @param {boolean} [env.shared] - If true, externalize React to globalThis.__clerkSharedModules (for use with @clerk/react).
+ *                                  If false/unset, bundle React normally (for standalone or non-React framework usage).
  * @returns {import('@rspack/core').Configuration}
  */
 const devConfig = (mode, env) => {
   const devUrl = new URL(env.devOrigin || 'https://ui.lclclerk.com');
   const port = Number(new URL(env.devOrigin ?? 'http://localhost:4011').port || 4011);
+  const useSharedReact = Boolean(env.shared);
 
   return merge(entryForVariant(variants.uiBrowser), common({ mode, variant: variants.uiBrowser }), {
     module: {
@@ -216,10 +276,14 @@ const devConfig = (mode, env) => {
         type: 'memory',
       },
     },
+    // Only externalize React when using the shared variant (e.g., with @clerk/react).
+    // For standalone usage or non-React frameworks, bundle React normally.
+    ...(useSharedReact ? { externals: [sharedReactExternalsHandler] } : {}),
   });
 };
 
 export default async env => {
   const mode = env.production ? 'production' : 'development';
-  return isProduction(mode) ? prodConfig(mode) : devConfig(mode, env);
+  const analysis = !!env.analyze;
+  return isProduction(mode) ? prodConfig({ mode, analysis }) : devConfig(mode, env);
 };

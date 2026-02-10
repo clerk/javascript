@@ -1,10 +1,8 @@
 import type { Ui } from '@clerk/react/internal';
 import type { InitialState, Without } from '@clerk/shared/types';
 import { headers } from 'next/headers';
-import type { ReactNode } from 'react';
 import React from 'react';
 
-import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
@@ -33,67 +31,29 @@ export async function ClerkProvider<TUi extends Ui = Ui>(
 ) {
   const { children, dynamic, ...rest } = props;
 
-  async function generateStatePromise() {
-    if (!dynamic) {
-      return Promise.resolve(null);
-    }
-    return getDynamicClerkState();
-  }
-
-  async function generateNonce() {
-    if (!dynamic) {
-      return Promise.resolve('');
-    }
-    return getNonceHeaders();
-  }
+  const statePromiseOrValue = dynamic ? getDynamicClerkState() : undefined;
+  const noncePromiseOrValue = dynamic ? getNonceHeaders() : '';
 
   const propsWithEnvs = mergeNextClerkPropsWithEnv({
     ...rest,
+    // Even though we always cast to InitialState here, this might still be a promise.
+    // While not reflected in the public types, we do support this for React >= 19 for internal use.
+    initialState: statePromiseOrValue as InitialState | undefined,
+    nonce: await noncePromiseOrValue,
   });
 
   const { shouldRunAsKeyless, runningWithClaimedKeys } = await getKeylessStatus(propsWithEnvs);
 
-  let output: ReactNode;
-
-  try {
-    const detectKeylessEnvDrift = await import('../../server/keyless-telemetry.js').then(
-      mod => mod.detectKeylessEnvDrift,
-    );
-    await detectKeylessEnvDrift();
-  } catch {
-    // ignore
-  }
-
   if (shouldRunAsKeyless) {
-    output = (
+    return (
       <KeylessProvider
         rest={propsWithEnvs}
-        generateNonce={generateNonce}
-        generateStatePromise={generateStatePromise}
         runningWithClaimedKeys={runningWithClaimedKeys}
       >
         {children}
       </KeylessProvider>
     );
-  } else {
-    output = (
-      <ClientClerkProvider
-        {...propsWithEnvs}
-        nonce={await generateNonce()}
-        initialState={await generateStatePromise()}
-      >
-        {children}
-      </ClientClerkProvider>
-    );
   }
 
-  if (dynamic) {
-    return (
-      // TODO: fix types so AuthObject is compatible with InitialState
-      <PromisifiedAuthProvider authPromise={generateStatePromise() as unknown as Promise<InitialState>}>
-        {output}
-      </PromisifiedAuthProvider>
-    );
-  }
-  return output;
+  return <ClientClerkProvider {...propsWithEnvs}>{children}</ClientClerkProvider>;
 }

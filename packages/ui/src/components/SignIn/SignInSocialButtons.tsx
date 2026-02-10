@@ -42,8 +42,8 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
       if (sessionAlreadyExistsError) {
         return clerk.setActive({
           session: clerk.client.lastActiveSessionId,
-          navigate: async ({ session }) => {
-            await ctx.navigateOnSetActive({ session, redirectUrl: ctx.afterSignInUrl });
+          navigate: async ({ session, decorateUrl }) => {
+            await ctx.navigateOnSetActive({ session, redirectUrl: ctx.afterSignInUrl, decorateUrl });
           },
         });
       }
@@ -80,6 +80,10 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
           .catch(err => handleError(err));
       }}
       web3Callback={strategy => {
+        if (strategy === 'web3_solana_signature') {
+          return navigate(`choose-wallet?strategy=${strategy}`);
+        }
+
         return clerk
           .authenticateWithWeb3({
             customNavigate: navigate,

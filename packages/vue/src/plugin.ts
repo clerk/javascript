@@ -1,6 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { deriveState } from '@clerk/shared/deriveState';
-import { loadClerkJsScript, type LoadClerkJsScriptOptions, loadClerkUiScript } from '@clerk/shared/loadClerkJsScript';
+import { loadClerkJSScript, type LoadClerkJSScriptOptions, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   Clerk,
   ClerkOptions,
@@ -11,7 +11,7 @@ import type {
   Resources,
   Without,
 } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { Appearance, Ui } from '@clerk/ui/internal';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
@@ -19,7 +19,7 @@ import { computed, ref, shallowRef, triggerRef } from 'vue';
 import { ClerkInjectionKey } from './keys';
 declare global {
   interface Window {
-    __internal_ClerkUiCtor?: ClerkUiConstructor;
+    __internal_ClerkUICtor?: ClerkUIConstructor;
   }
 }
 
@@ -27,6 +27,12 @@ export type PluginOptions<TUi extends Ui = Ui> = Without<IsomorphicClerkOptions,
   MultiDomainAndOrProxy & {
     initialState?: InitialState;
     appearance?: Appearance<TUi>;
+    /**
+     * Optional object to use the bundled Clerk UI instead of loading from CDN.
+     * Import `ui` from `@clerk/ui` and pass it here to bundle the UI with your application.
+     * When omitted, UI is loaded from Clerk's CDN.
+     */
+    ui?: TUi;
   };
 
 const SDK_METADATA = {
@@ -70,23 +76,27 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
     const options = {
       ...pluginOptions,
       sdkMetadata: pluginOptions.sdkMetadata || SDK_METADATA,
-    } as LoadClerkJsScriptOptions;
+    } as LoadClerkJSScriptOptions;
 
     // We need this check for SSR apps like Nuxt as it will try to run this code on the server
-    // and loadClerkJsScript contains browser-specific code
+    // and loadClerkJSScript contains browser-specific code
     if (inBrowser()) {
       void (async () => {
         try {
-          const clerkPromise = loadClerkJsScript(options);
-          const clerkUiCtorPromise = pluginOptions.clerkUiCtor
-            ? Promise.resolve(pluginOptions.clerkUiCtor)
-            : (async () => {
-                await loadClerkUiScript(options);
-                if (!window.__internal_ClerkUiCtor) {
-                  throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
-                }
-                return window.__internal_ClerkUiCtor;
-              })();
+          const clerkPromise = loadClerkJSScript(options);
+          // Support bundled UI via ui.ClerkUI prop
+          const uiProp = pluginOptions.ui;
+          const clerkUICtorPromise = uiProp?.ClerkUI
+            ? Promise.resolve(uiProp.ClerkUI)
+            : uiProp || pluginOptions.prefetchUI === false
+              ? Promise.resolve(undefined)
+              : (async () => {
+                  await loadClerkUIScript(options);
+                  if (!window.__internal_ClerkUICtor) {
+                    throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+                  }
+                  return window.__internal_ClerkUICtor;
+                })();
 
           await clerkPromise;
 
@@ -95,7 +105,10 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           }
 
           clerk.value = window.Clerk;
-          const loadOptions = { ...options, clerkUiCtor: clerkUiCtorPromise } as unknown as ClerkOptions;
+          const loadOptions = {
+            ...options,
+            ui: { ...pluginOptions.ui, ClerkUI: clerkUICtorPromise },
+          } as unknown as ClerkOptions;
           await window.Clerk.load(loadOptions);
           loaded.value = true;
 

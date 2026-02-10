@@ -11,14 +11,11 @@ import type {
   OrganizationMembershipResource,
   OrganizationResource,
 } from '../../types';
-import {
-  useAssertWrappedByClerkProvider,
-  useClerkInstanceContext,
-  useOrganizationContext,
-  useSessionContext,
-} from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
+import { useOrganizationBase } from './base/useOrganizationBase';
+import { useSessionBase } from './base/useSessionBase';
 import { createCacheKeys } from './createCacheKeys';
 import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
@@ -283,8 +280,8 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
   useAssertWrappedByClerkProvider('useOrganization');
   useAttemptToEnableOrganizations('useOrganization');
 
-  const { organization } = useOrganizationContext();
-  const session = useSessionContext();
+  const organization = useOrganizationBase();
+  const session = useSessionBase();
 
   const domainSafeValues = useWithSafeValues(domainListParams, {
     initialPage: 1,
@@ -366,13 +363,13 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       keepPreviousData: domainSafeValues.keepPreviousData,
       infinite: domainSafeValues.infinite,
       enabled: !!domainParams,
-      isSignedIn: Boolean(organization),
+      isSignedIn: organization !== null,
       initialPage: domainSafeValues.initialPage,
       pageSize: domainSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.DOMAINS_KEY,
-      authenticated: Boolean(organization),
+      authenticated: true,
       tracked: {
         organizationId: organization?.id,
       },
@@ -388,13 +385,13 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       keepPreviousData: membershipRequestSafeValues.keepPreviousData,
       infinite: membershipRequestSafeValues.infinite,
       enabled: !!membershipRequestParams,
-      isSignedIn: Boolean(organization),
+      isSignedIn: organization !== null,
       initialPage: membershipRequestSafeValues.initialPage,
       pageSize: membershipRequestSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.MEMBERSHIP_REQUESTS_KEY,
-      authenticated: Boolean(organization),
+      authenticated: true,
       tracked: {
         organizationId: organization?.id,
       },
@@ -410,13 +407,13 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       keepPreviousData: membersSafeValues.keepPreviousData,
       infinite: membersSafeValues.infinite,
       enabled: !!membersParams,
-      isSignedIn: Boolean(organization),
+      isSignedIn: organization !== null,
       initialPage: membersSafeValues.initialPage,
       pageSize: membersSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.MEMBERSHIPS_KEY,
-      authenticated: Boolean(organization),
+      authenticated: true,
       tracked: {
         organizationId: organization?.id,
       },
@@ -432,13 +429,13 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       keepPreviousData: invitationsSafeValues.keepPreviousData,
       infinite: invitationsSafeValues.infinite,
       enabled: !!invitationsParams,
-      isSignedIn: Boolean(organization),
+      isSignedIn: organization !== null,
       initialPage: invitationsSafeValues.initialPage,
       pageSize: invitationsSafeValues.pageSize,
     },
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.INVITATIONS_KEY,
-      authenticated: Boolean(organization),
+      authenticated: true,
       tracked: {
         organizationId: organization?.id,
       },

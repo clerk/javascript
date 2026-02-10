@@ -374,6 +374,13 @@ export const deDE: LocalizationResource = {
         tableHeader__role: 'Rolle',
         tableHeader__user: 'Benutzer',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Wir aktualisieren die verfügbaren Rollen. Sobald dies abgeschlossen ist, können Sie die Rollen wieder aktualisieren.',
+          title: 'Rollen sind vorübergehend gesperrt',
+        },
+      },
       detailsTitle__emptyRow: 'Keine Mitglieder zum Anzeigen',
       invitationsTab: {
         autoInvitations: {
@@ -764,6 +771,10 @@ export const deDE: LocalizationResource = {
         'Um fortzufahren, geben Sie bitte den Verifizierungscode ein, der von Ihrer Authenticator-App generiert wurde.',
       title: 'Bestätigung in zwei Schritten',
     },
+    web3Solana: {
+      subtitle: 'Wähle unten eine Wallet aus, um dich anzumelden',
+      title: 'Mit Solana anmelden',
+    },
   },
   signInEnterPasswordTitle: 'Geben Sie Ihr Passwort ein',
   signUp: {
@@ -855,15 +866,24 @@ export const deDE: LocalizationResource = {
       title: 'Erstellen Sie Ihr Konto',
       titleCombined: 'Erstellen Sie Ihr Konto',
     },
+    web3Solana: {
+      subtitle: 'Wählen Sie unten eine Wallet aus, um sich zu registrieren',
+      title: 'Mit Solana registrieren',
+    },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Für den erkannten Firmennamen ({{organizationName}}) und {{organizationDomain}} existiert bereits eine Organisation. Treten Sie per Einladung bei.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Neue Organisation erstellen',
       action__invitationAccept: 'Beitreten',
       action__suggestionsAccept: 'Beitritt beantragen',
       subtitle: 'Einer bestehenden Organisation beitreten oder eine neue erstellen',
+      subtitle__createOrganizationDisabled: 'Einer bestehenden Organisation beitreten',
       suggestionsAcceptedLabel: 'Genehmigung ausstehend',
       title: 'Organisation auswählen',
     },
@@ -876,6 +896,10 @@ export const deDE: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Geben Sie Ihre Organisationsdetails ein, um fortzufahren',
       title: 'Organisation einrichten',
+    },
+    organizationCreationDisabled: {
+      subtitle: 'Kontaktieren Sie Ihren Organisationsadministrator für eine Einladung.',
+      title: 'Sie müssen einer Organisation angehören',
     },
     signOut: {
       actionLink: 'Abmelden',
@@ -891,6 +915,69 @@ export const deDE: LocalizationResource = {
     subtitle: undefined,
     title: undefined,
   },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
     avatar_file_size_exceeded:
@@ -902,6 +989,8 @@ export const deDE: LocalizationResource = {
     captcha_unavailable:
       'Die Anmeldung ist aufgrund einer fehlgeschlagenen Bot-Validierung fehlgeschlagen. Bitte aktualisieren Sie die Seite, um es erneut zu versuchen, oder wenden Sie sich an den Support, um weitere Unterstützung zu erhalten.',
     form_code_incorrect: 'Der eingegebene Code ist falsch. Bitte überprüfen Sie ihn und versuchen Sie es erneut.',
+    form_email_address_blocked:
+      'Temporäre E-Mail-Dienste werden nicht unterstützt. Bitte verwenden Sie Ihre reguläre E-Mail-Adresse, um ein Konto zu erstellen.',
     form_identifier_exists__email_address: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen anderen.',
@@ -918,9 +1007,12 @@ export const deDE: LocalizationResource = {
     form_param_type_invalid__email_address: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
     form_param_type_invalid__phone_number: 'Bitte geben Sie eine gültige Telefonnummer ein.',
     form_param_value_invalid: 'Der eingegebene Wert ist ungültig.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Das eingegebene Passwort ist falsch.',
     form_password_length_too_short: 'Das Passwort ist zu kurz. Es muss mindestens 8 Zeichen lang sein.',
     form_password_not_strong_enough: 'Passwort nicht stark genug.',
+    form_password_or_identifier_incorrect:
+      'Passwort oder E-Mail-Adresse ist falsch. Versuchen Sie es erneut oder verwenden Sie eine andere Methode.',
     form_password_pwned:
       'Das gewählte Passwort wurde bei einem Datenleck im Internet gefunden. Wählen Sie aus Sicherheitsgründen bitte ein anderes Passwort.',
     form_password_pwned__sign_in:
@@ -968,6 +1060,10 @@ export const deDE: LocalizationResource = {
     session_exists: 'Sie sind bereits angemeldet.',
     web3_missing_identifier:
       'Eine Web3 Wallet-Erweiterung wurde nicht gefunden. Bitte installieren Sie eine, um fortzufahren.',
+    web3_signature_request_rejected:
+      'Du hast die Signaturanfrage abgelehnt. Bitte versuche es erneut, um fortzufahren.',
+    web3_solana_signature_generation_failed:
+      'Beim Erstellen der Signatur ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut, um fortzufahren.',
     zxcvbn: {
       couldBeStronger: 'Ihr Passwort funktioniert, könnte aber besser sein. Versuchen Sie, mehr Zeichen hinzuzufügen.',
       goodPassword: 'Ihr Passwort erfüllt alle notwendigen Anforderungen.',
@@ -1343,6 +1439,10 @@ export const deDE: LocalizationResource = {
         detailsAction__nonPrimary: 'Als primär festlegen',
         primaryButton: 'Web3-Wallets',
         title: 'Web3-Wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Wählen Sie eine Solana-Wallet aus, um sie mit Ihrem Konto zu verbinden.',
+          title: 'Solana-Wallet hinzufügen',
+        },
       },
     },
     usernamePage: {
@@ -1378,5 +1478,11 @@ export const deDE: LocalizationResource = {
       subtitle: 'Vielen Dank für Ihre Geduld. Sie erhalten eine Benachrichtigung, sobald der Zugang freigegeben wird.',
       title: 'Erfolgreich auf die Warteliste gesetzt',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Mit {{walletName}} verbinden',
+    continue: 'Weiter mit {{walletName}}',
+    noneAvailable:
+      'Keine Solana-Web3-Wallets erkannt. Bitte installieren Sie eine Web3-unterstützte {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;
