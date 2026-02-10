@@ -28,17 +28,22 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
     return {
       name: '@clerk/astro/integration',
       hooks: {
-        'astro:config:setup': ({ config, injectScript, updateConfig, logger, command }) => {
+        'astro:config:setup': async ({ config, injectScript, updateConfig, logger, command }) => {
           if (['server', 'hybrid'].includes(config.output) && !config.adapter) {
             logger.error('Missing adapter, please update your Astro config to use one.');
           }
+
+          const isDev = command === 'dev';
+
+          // Note: Keyless mode is now handled by middleware per-request, not here
+          // Keys are read directly from process.env by server code - no vite.define injection needed
 
           const internalParams: ClerkOptions = {
             ...params,
             sdkMetadata: {
               version: packageVersion,
               name: packageName,
-              environment: command === 'dev' ? 'development' : 'production',
+              environment: isDev ? 'development' : 'production',
             },
           };
 
@@ -64,6 +69,8 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                   prefetchUI === false || hasUI ? 'false' : undefined,
                   'PUBLIC_CLERK_PREFETCH_UI',
                 ),
+                // Keys read directly from process.env by server code - no vite.define needed
+                // Keyless handled by middleware at runtime, not compile-time
               },
 
               ssr: {
@@ -166,7 +173,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
 
 function createClerkEnvSchema() {
   return {
-    PUBLIC_CLERK_PUBLISHABLE_KEY: envField.string({ context: 'client', access: 'public' }),
+    PUBLIC_CLERK_PUBLISHABLE_KEY: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_SIGN_IN_URL: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_SIGN_UP_URL: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_IS_SATELLITE: envField.boolean({ context: 'client', access: 'public', optional: true }),
@@ -179,7 +186,20 @@ function createClerkEnvSchema() {
     PUBLIC_CLERK_UI_URL: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
     PUBLIC_CLERK_TELEMETRY_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_TELEMETRY_DEBUG: envField.boolean({ context: 'client', access: 'public', optional: true }),
-    CLERK_SECRET_KEY: envField.string({ context: 'server', access: 'secret' }),
+    PUBLIC_CLERK_KEYLESS_CLAIM_URL: envField.string({
+      context: 'client',
+      access: 'public',
+      optional: true,
+      url: true,
+    }),
+    PUBLIC_CLERK_KEYLESS_API_KEYS_URL: envField.string({
+      context: 'client',
+      access: 'public',
+      optional: true,
+      url: true,
+    }),
+    PUBLIC_CLERK_KEYLESS_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
+    CLERK_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
     CLERK_MACHINE_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
     CLERK_JWT_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
   };
