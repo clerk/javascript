@@ -1,3 +1,4 @@
+import type { Js } from '@clerk/clerk-js/internal';
 import type {
   Clerk,
   InitialState,
@@ -36,7 +37,10 @@ declare global {
 /**
  * @interface
  */
-export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<IsomorphicClerkOptions, 'appearance'> & {
+export type ClerkProviderProps<TUi extends Ui = Ui, TJs extends Js = Js> = Omit<
+  IsomorphicClerkOptions,
+  'appearance'
+> & {
   children: React.ReactNode;
   /**
    * Provide an initial state of the Clerk client during server-side rendering. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).
@@ -59,6 +63,12 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<IsomorphicClerkOption
    * Note: When `ui` is used, appearance is automatically typed based on the specific UI version.
    */
   ui?: TUi;
+  /**
+   * Optional object to use the bundled Clerk JS instead of loading from CDN.
+   * Import `js` from `@clerk/clerk-js/bundled` and pass it here to bundle clerk-js with your application.
+   * When omitted, clerk-js is loaded from Clerk's CDN.
+   */
+  js?: TJs;
 };
 
 export type WithClerkProp<T = unknown> = T & {

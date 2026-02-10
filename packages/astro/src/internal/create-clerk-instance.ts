@@ -3,7 +3,7 @@ import {
   loadClerkUIScript,
   setClerkJSLoadingErrorPackageName,
 } from '@clerk/shared/loadClerkJsScript';
-import type { ClerkOptions } from '@clerk/shared/types';
+import type { BrowserClerkConstructor, ClerkOptions } from '@clerk/shared/types';
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { Ui } from '@clerk/ui/internal';
 
@@ -102,9 +102,18 @@ function updateClerkOptions<TUi extends Ui = Ui>(options: AstroClerkUpdateOption
 
 /**
  * Loads clerk-js script if not already loaded.
+ * Uses bundled ClerkJS constructor when js.ClerkJS is present.
  * Returns early if window.Clerk already exists.
  */
 async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCreateInstanceParams<TUi>): Promise<void> {
+  const jsProp = options as { js?: { ClerkJS?: BrowserClerkConstructor } } | undefined;
+  if (jsProp?.js?.ClerkJS) {
+    window.Clerk = new jsProp.js.ClerkJS(options?.publishableKey as string, {
+      proxyUrl: options?.proxyUrl as string,
+      domain: options?.domain as string,
+    }) as any;
+    return;
+  }
   await loadClerkJSScript(options);
 }
 

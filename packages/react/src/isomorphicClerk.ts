@@ -487,10 +487,29 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   private async getClerkJsEntryChunk(): Promise<HeadlessBrowserClerk | BrowserClerk> {
-    // Hotload bundle
-    if (!this.options.Clerk && !__BUILD_DISABLE_RHC__) {
+    // Support bundled JS via js.ClerkJS prop
+    const jsProp = (
+      this.options as {
+        js?: { __brand?: string; ClerkJS?: BrowserClerkConstructor | Promise<BrowserClerkConstructor> };
+      }
+    ).js;
+    if (jsProp?.ClerkJS) {
+      const ClerkJS = await Promise.resolve(jsProp.ClerkJS);
+      global.Clerk = new ClerkJS(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain });
+      return global.Clerk;
+    }
+
+    // Legacy: Support bundled Clerk via Clerk prop
+    if (this.options.Clerk) {
+      global.Clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk)
+        ? new this.options.Clerk(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain })
+        : this.options.Clerk;
+      return global.Clerk;
+    }
+
+    // Hotload bundle from CDN (skip when js prop is passed — constructor should be resolved by framework provider)
+    if (!jsProp && !__BUILD_DISABLE_RHC__) {
       // the UMD script sets the global.Clerk instance
-      // we do not want to await here as we
       await loadClerkJSScript({
         ...this.options,
         publishableKey: this.#publishableKey,
@@ -498,13 +517,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         domain: this.domain,
         nonce: this.options.nonce,
       });
-    }
-
-    // Otherwise, set global.Clerk to the bundled ctor or instance
-    if (this.options.Clerk) {
-      global.Clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk)
-        ? new this.options.Clerk(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain })
-        : this.options.Clerk;
     }
 
     if (!global.Clerk) {

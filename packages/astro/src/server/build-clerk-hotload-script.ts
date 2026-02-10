@@ -12,6 +12,30 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const domain = env.domain!;
 
+  // Skip ClerkJS CDN script when js prop is bundled
+  if (env.skipJsCdn) {
+    if (env.prefetchUI === false) {
+      return '\n';
+    }
+
+    const clerkUIScriptSrc = clerkUIScriptUrl({
+      clerkUIUrl: env.clerkUIUrl,
+      clerkUIVersion: env.clerkUIVersion,
+      domain,
+      proxyUrl,
+      publishableKey,
+    });
+
+    const clerkUIPreload = `
+  <link rel="preload"
+  href="${clerkUIScriptSrc}"
+  as="script"
+  crossOrigin="anonymous"
+  />`;
+
+    return clerkUIPreload + '\n';
+  }
+
   const clerkJsScriptSrc = clerkJSScriptUrl({
     clerkJSUrl: env.clerkJsUrl,
     clerkJSVersion: env.clerkJsVersion,

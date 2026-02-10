@@ -67,6 +67,7 @@
     "@clerk/shared": "workspace:^"
   },
   "devDependencies": {
+    "@clerk/clerk-js": "workspace:*",
     "@clerk/ui": "workspace:^",
     "@testing-library/vue": "^8.1.0",
     "@vitejs/plugin-vue": "^5.2.4",

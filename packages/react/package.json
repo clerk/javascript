@@ -107,6 +107,7 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
+    "@clerk/clerk-js": "workspace:*",
     "@clerk/localizations": "workspace:*",
     "@clerk/ui": "workspace:*",
     "@types/semver": "^7.7.1",

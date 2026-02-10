@@ -29,6 +29,8 @@ export default defineConfig({
     __BUILD_VARIANT_CHIPS__: JSON.stringify(false),
     __PKG_NAME__: JSON.stringify('@clerk/clerk-js'),
     __PKG_VERSION__: JSON.stringify('test'),
+    PACKAGE_NAME: JSON.stringify('@clerk/clerk-js'),
+    PACKAGE_VERSION: JSON.stringify('0.0.0-test'),
   },
   test: {
     coverage: {
