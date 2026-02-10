@@ -110,7 +110,7 @@ export const enUS: LocalizationResource = {
     },
     credit: 'Credit',
     creditRemainder: 'Credit for the remainder of your current subscription.',
-    accountCreditRemainder: 'Credit from account balance.',
+    payerCreditRemainder: 'Credit from account balance.',
     defaultFreePlanActive: "You're currently on the Free plan",
     free: 'Free',
     getStarted: 'Get started',

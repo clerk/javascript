@@ -22,9 +22,7 @@ export function CheckoutAccountCredit(): MockScenario {
   const subscriptionHandler = http.get('https://*.clerk.accounts.dev/v1/me/billing/subscription', () => {
     return HttpResponse.json({
       response: {
-        data: {
-          account_credit: 100,
-        },
+        data: {},
       },
     });
   });
@@ -32,9 +30,7 @@ export function CheckoutAccountCredit(): MockScenario {
   const paymentMethodsHandler = http.get('https://*.clerk.accounts.dev/v1/me/billing/payment_methods', () => {
     return HttpResponse.json({
       response: {
-        data: {
-          account_credit: 100,
-        },
+        data: {},
       },
     });
   });
@@ -161,11 +157,38 @@ export function CheckoutAccountCredit(): MockScenario {
             currency: 'string',
             currency_symbol: '$',
           },
-          account_credit: {
-            amount: 1,
-            amount_formatted: '10.00',
-            currency: 'string',
-            currency_symbol: '$',
+          credits: {
+            proration: {
+              amount: {
+                amount: 1,
+                amount_formatted: '5.00',
+                currency: 'string',
+                currency_symbol: '$',
+              },
+              cycle_days_remaining: 1,
+              cycle_days_total: 1,
+              cycle_remaining_percent: 1,
+            },
+            payer_credit: {
+              remaining_balance: {
+                amount: 1,
+                amount_formatted: '100.00',
+                currency: 'string',
+                currency_symbol: '$',
+              },
+              applied_amount: {
+                amount: 1,
+                amount_formatted: '10.00',
+                currency: 'string',
+                currency_symbol: '$',
+              },
+            },
+            total: {
+              amount: 1,
+              amount_formatted: '15.00',
+              currency: 'string',
+              currency_symbol: '$',
+            },
           },
         },
         subscription_item: {
