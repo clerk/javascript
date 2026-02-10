@@ -1,7 +1,7 @@
-import { createClerkClient } from '@clerk/backend';
 import { createKeylessService } from '@clerk/shared/keyless';
 import type { APIContext } from 'astro';
 
+import { clerkClient } from '../clerk-client';
 import type { ClerkAstroMiddlewareOptions } from '../clerk-middleware';
 import { createFileStorage } from './file-storage.js';
 
@@ -45,14 +45,7 @@ export async function keyless(
         api: {
           async createAccountlessApplication(requestHeaders?: Headers) {
             try {
-              // Reuse existing clerkClient factory with keys from process.env
-              const client = createClerkClient({
-                secretKey: process.env.CLERK_SECRET_KEY,
-                publishableKey: process.env.PUBLIC_CLERK_PUBLISHABLE_KEY,
-                apiUrl: process.env.CLERK_API_URL,
-                userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
-              });
-              return await client.__experimental_accountlessApplications.createAccountlessApplication({
+              return await clerkClient(context).__experimental_accountlessApplications.createAccountlessApplication({
                 requestHeaders,
               });
             } catch {
@@ -61,14 +54,9 @@ export async function keyless(
           },
           async completeOnboarding(requestHeaders?: Headers) {
             try {
-              // Reuse existing clerkClient factory with keys from process.env
-              const client = createClerkClient({
-                secretKey: process.env.CLERK_SECRET_KEY,
-                publishableKey: process.env.PUBLIC_CLERK_PUBLISHABLE_KEY,
-                apiUrl: process.env.CLERK_API_URL,
-                userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
-              });
-              return await client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
+              return await clerkClient(
+                context,
+              ).__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
                 requestHeaders,
               });
             } catch {
