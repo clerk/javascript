@@ -388,9 +388,12 @@ describe('Clerk singleton', () => {
 
         // Track emissions after initial state
         const emissions: Array<{ orgId: string | null | undefined }> = [];
-        sut.addListener(({ organization }) => {
-          emissions.push({ orgId: organization?.id ?? (organization as any) });
-        }, { skipInitialEmit: true });
+        sut.addListener(
+          ({ organization }) => {
+            emissions.push({ orgId: organization?.id ?? (organization as any) });
+          },
+          { skipInitialEmit: true },
+        );
 
         // No navigate or redirectUrl — no transitive state
         await sut.setActive({ organization: orgB.id });
