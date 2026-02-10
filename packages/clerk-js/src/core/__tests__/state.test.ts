@@ -7,7 +7,7 @@ import { signInResourceSignal, signUpResourceSignal } from '../signals';
 import { State } from '../state';
 
 describe('State', () => {
-  let state: State;
+  let _state: State;
 
   // Capture original static clerk references to restore after tests
   const originalSignUpClerk = SignUp.clerk;
@@ -18,7 +18,7 @@ describe('State', () => {
     signUpResourceSignal({ resource: null });
     signInResourceSignal({ resource: null });
     // Create a new State instance which registers event handlers
-    state = new State();
+    _state = new State();
   });
 
   afterEach(() => {
@@ -52,7 +52,7 @@ describe('State', () => {
         expect(existingSignUp.__internal_future.canBeDiscarded).toBe(false);
 
         // Act: Emit a resource update with a null SignUp (simulating client refresh with null sign_up)
-        const nullSignUp = new SignUp(null);
+        const _nullSignUp = new SignUp(null);
 
         // Assert: Signal should NOT be updated - should still have the existing SignUp
         expect(signUpResourceSignal().resource).toBe(existingSignUp);
@@ -127,7 +127,7 @@ describe('State', () => {
 
       it('should allow resource update when new resource has an id (not a null update)', () => {
         // Arrange: Set up a SignUp with id
-        const existingSignUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
+        const _existingSignUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
         expect(signUpResourceSignal().resource?.id).toBe('signup_123');
 
         // Act: Emit a resource update with a different SignUp that also has an id
@@ -159,7 +159,7 @@ describe('State', () => {
         expect(existingSignIn.__internal_future.canBeDiscarded).toBe(false);
 
         // Act: Emit a resource update with a null SignIn (simulating client refresh with null sign_in)
-        const nullSignIn = new SignIn(null);
+        const _nullSignIn = new SignIn(null);
 
         // Assert: Signal should NOT be updated - should still have the existing SignIn
         expect(signInResourceSignal().resource).toBe(existingSignIn);
@@ -224,7 +224,7 @@ describe('State', () => {
 
       it('should allow resource update when new resource has an id (not a null update)', () => {
         // Arrange: Set up a SignIn with id
-        const existingSignIn = new SignIn({ id: 'signin_123', status: 'needs_identifier' } as any);
+        const _existingSignIn = new SignIn({ id: 'signin_123', status: 'needs_identifier' } as any);
         expect(signInResourceSignal().resource?.id).toBe('signin_123');
 
         // Act: Emit a resource update with a different SignIn that also has an id
@@ -240,19 +240,19 @@ describe('State', () => {
   describe('Edge cases', () => {
     it('should handle rapid successive updates correctly', () => {
       // First update with valid SignUp
-      const signUp1 = new SignUp({ id: 'signup_1', status: 'missing_requirements' } as any);
+      const _signUp1 = new SignUp({ id: 'signup_1', status: 'missing_requirements' } as any);
       expect(signUpResourceSignal().resource?.id).toBe('signup_1');
 
       // Second update with another valid SignUp
-      const signUp2 = new SignUp({ id: 'signup_2', status: 'missing_requirements' } as any);
+      const _signUp2 = new SignUp({ id: 'signup_2', status: 'missing_requirements' } as any);
       expect(signUpResourceSignal().resource?.id).toBe('signup_2');
 
       // Null update should be ignored
-      const nullSignUp = new SignUp(null);
+      const _nullSignUp = new SignUp(null);
       expect(signUpResourceSignal().resource?.id).toBe('signup_2');
 
       // Another valid update should work
-      const signUp3 = new SignUp({ id: 'signup_3', status: 'complete' } as any);
+      const _signUp3 = new SignUp({ id: 'signup_3', status: 'complete' } as any);
       expect(signUpResourceSignal().resource?.id).toBe('signup_3');
     });
 
