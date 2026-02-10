@@ -28,7 +28,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
     return {
       name: '@clerk/astro/integration',
       hooks: {
-        'astro:config:setup': async ({ config, injectScript, updateConfig, logger, command }) => {
+        'astro:config:setup': ({ config, injectScript, updateConfig, logger, command }) => {
           if (['server', 'hybrid'].includes(config.output) && !config.adapter) {
             logger.error('Missing adapter, please update your Astro config to use one.');
           }
