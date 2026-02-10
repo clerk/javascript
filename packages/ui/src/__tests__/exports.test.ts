@@ -33,8 +33,9 @@ describe('module exports', () => {
       expect((serverUi as any).__brand).toBe('__clerkUI');
     });
 
-    it('should NOT include ClerkUI constructor', () => {
-      expect((serverUi as any).ClerkUI).toBeUndefined();
+    it('should include ClerkUI constructor for RSC client reference', () => {
+      expect((serverUi as any).ClerkUI).toBeDefined();
+      expect(typeof (serverUi as any).ClerkUI).toBe('function');
     });
 
     it('should include version', () => {

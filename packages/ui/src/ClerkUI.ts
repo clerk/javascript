@@ -1,3 +1,5 @@
+'use client';
+
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { logger } from '@clerk/shared/logger';
 import type { ModuleManager } from '@clerk/shared/moduleManager';
