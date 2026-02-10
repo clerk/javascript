@@ -8,7 +8,7 @@ import type {
   SignUpRedirectOptions,
   TasksRedirectOptions,
 } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { Appearance, ExtractAppearanceType, Ui } from '@clerk/ui/internal';
 import type React from 'react';
 
@@ -29,7 +29,7 @@ declare global {
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: Clerk['proxyUrl'];
     __clerk_domain?: Clerk['domain'];
-    __internal_ClerkUiCtor?: ClerkUiConstructor;
+    __internal_ClerkUICtor?: ClerkUIConstructor;
   }
 }
 
@@ -41,7 +41,7 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<IsomorphicClerkOption
   /**
    * Provide an initial state of the Clerk client during server-side rendering. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).
    */
-  initialState?: InitialState;
+  initialState?: InitialState; // For React >= 19, Promise<InitialState> is also supported for internal use, but not reflected in the types
   /**
    * Indicates to silently fail the initialization process when the publishable keys is not provided, instead of throwing an error.
    * @default false
@@ -53,8 +53,9 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<IsomorphicClerkOption
    */
   appearance?: ExtractAppearanceType<TUi, Appearance>;
   /**
-   * Optional object to pin the UI version your app will be using. Useful when you've extensively customize the look and feel of the
-   * components using the appearance prop.
+   * Optional object to use the bundled Clerk UI instead of loading from CDN.
+   * Import `ui` from `@clerk/ui` and pass it here to bundle the UI with your application.
+   * When omitted, UI is loaded from Clerk's CDN.
    * Note: When `ui` is used, appearance is automatically typed based on the specific UI version.
    */
   ui?: TUi;

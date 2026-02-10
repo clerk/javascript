@@ -1,4 +1,4 @@
-import { EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import { ClerkOfflineError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -364,6 +364,81 @@ describe('Clerk singleton', () => {
         expect(navigate).toHaveBeenCalled();
       });
 
+      it('passes decorateUrl to the navigate callback', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        const navigate = vi.fn();
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource, navigate });
+
+        expect(navigate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            session: expect.any(Object),
+            decorateUrl: expect.any(Function),
+          }),
+        );
+      });
+
+      it('decorateUrl returns touch URL when isEligibleForTouch is true', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            cookieExpiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+            isEligibleForTouch: () => true,
+            buildTouchUrl: ({ redirectUrl }: { redirectUrl: URL }) =>
+              `https://clerk.example.com/v1/client/touch?redirect_url=${encodeURIComponent(redirectUrl.href)}`,
+          }),
+        );
+
+        let capturedDecorateUrl: ((url: string) => string) | undefined;
+        const navigate = vi.fn(({ decorateUrl }) => {
+          capturedDecorateUrl = decorateUrl;
+        });
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource, navigate });
+
+        expect(capturedDecorateUrl).toBeDefined();
+        const decoratedUrl = capturedDecorateUrl!('/dashboard');
+
+        // Should return touch URL when ITP fix is needed
+        expect(decoratedUrl).toContain('/v1/client/touch');
+        expect(decoratedUrl).toContain('redirect_url=');
+        expect(decoratedUrl).toContain('%2Fdashboard');
+      });
+
+      it('decorateUrl returns original URL when isEligibleForTouch is false', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            cookieExpiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
+            isEligibleForTouch: () => false,
+            buildTouchUrl: ({ redirectUrl }: { redirectUrl: URL }) =>
+              `https://clerk.example.com/v1/client/touch?redirect_url=${encodeURIComponent(redirectUrl.href)}`,
+          }),
+        );
+
+        let capturedDecorateUrl: ((url: string) => string) | undefined;
+        const navigate = vi.fn(({ decorateUrl }) => {
+          capturedDecorateUrl = decorateUrl;
+        });
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource, navigate });
+
+        expect(capturedDecorateUrl).toBeDefined();
+        const decoratedUrl = capturedDecorateUrl!('/dashboard');
+
+        // Should return original URL when ITP fix is not needed
+        expect(decoratedUrl).toBe('/dashboard');
+      });
+
       mockNativeRuntime(() => {
         it('calls session.touch in a non-standard browser', async () => {
           mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
@@ -568,6 +643,73 @@ describe('Clerk singleton', () => {
 
         await sut.setActive({ organization: null });
         expect(sut.session).toMatchObject(mockSessionWithOrganization);
+      });
+    });
+
+    describe('when offline', () => {
+      const mockSession = {
+        id: '1',
+        remove: vi.fn(),
+        status: 'active',
+        user: {},
+        touch: vi.fn(() => Promise.resolve()),
+        getToken: vi.fn(),
+        lastActiveToken: { getRawString: () => 'mocked-token' },
+      };
+      let eventBusSpy: ReturnType<typeof vi.spyOn>;
+
+      beforeEach(() => {
+        eventBusSpy = vi.spyOn(eventBus, 'emit');
+      });
+
+      afterEach(() => {
+        mockSession.remove.mockReset();
+        mockSession.touch.mockReset();
+        mockSession.getToken.mockReset();
+        eventBusSpy?.mockRestore();
+      });
+
+      it('does not emit TokenUpdate with null when getToken throws ClerkOfflineError', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.getToken.mockRejectedValue(new ClerkOfflineError('Network request failed while offline.'));
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+
+        expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
+
+        const tokenUpdateCalls = eventBusSpy.mock.calls.filter(call => call[0] === 'token:update');
+        const nullTokenCalls = tokenUpdateCalls.filter(call => call[1]?.token === null);
+        expect(nullTokenCalls.length).toBe(0);
+      });
+
+      it('preserves existing auth state when offline during setActive', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.getToken.mockRejectedValue(new ClerkOfflineError('Network request failed while offline.'));
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+
+        expect(sut.session).toBeDefined();
+      });
+
+      it('re-throws non-offline errors from getToken', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.getToken.mockRejectedValue(new Error('Some other error'));
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await expect(sut.setActive({ session: mockSession as any as ActiveSessionResource })).rejects.toThrow(
+          'Some other error',
+        );
       });
     });
   });
@@ -2655,6 +2797,64 @@ describe('Clerk singleton', () => {
         expect(result?.isEnabled).toBe(true);
         expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('ui.ClerkUI option', () => {
+    beforeEach(() => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => true,
+          isDevelopmentOrStaging: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+        }),
+      );
+    });
+
+    it('uses ui.ClerkUI when provided', async () => {
+      const mockClerkUIInstance = { mount: vi.fn() };
+      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({
+        ...mockedLoadOptions,
+        ui: { ClerkUI: mockClerkUICtor },
+      });
+
+      expect(mockClerkUICtor).toHaveBeenCalled();
+    });
+
+    it('supports legacy clerkUICtor option for backwards compatibility', async () => {
+      const mockClerkUIInstance = { mount: vi.fn() };
+      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({
+        ...mockedLoadOptions,
+        clerkUICtor: mockClerkUICtor,
+      } as any);
+
+      expect(mockClerkUICtor).toHaveBeenCalled();
+    });
+
+    it('supports legacy clerkUiCtor option for backwards compatibility', async () => {
+      const mockClerkUIInstance = { mount: vi.fn() };
+      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({
+        ...mockedLoadOptions,
+        clerkUiCtor: mockClerkUICtor,
+      } as any);
+
+      expect(mockClerkUICtor).toHaveBeenCalled();
     });
   });
 });

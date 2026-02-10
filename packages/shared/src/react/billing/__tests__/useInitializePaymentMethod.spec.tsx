@@ -38,10 +38,17 @@ vi.mock('../../contexts', () => {
   return {
     useAssertWrappedByClerkProvider: () => {},
     useClerkInstanceContext: () => mockClerk,
-    useUserContext: () => (mockClerk.loaded ? mockUser : null),
-    useOrganizationContext: () => ({ organization: mockClerk.loaded ? mockOrganization : null }),
+    useInitialStateContext: () => undefined,
   };
 });
+
+vi.mock('../../hooks/base/useUserBase', () => ({
+  useUserBase: () => (mockClerk.loaded ? mockUser : null),
+}));
+
+vi.mock('../../hooks/base/useOrganizationBase', () => ({
+  useOrganizationBase: () => (mockClerk.loaded ? mockOrganization : null),
+}));
 
 describe('useInitializePaymentMethod', () => {
   beforeEach(() => {
@@ -66,8 +73,9 @@ describe('useInitializePaymentMethod', () => {
     expect(result.current.initializePaymentMethod).toBeInstanceOf(Function);
   });
 
-  it('does not fetch when billing disabled for user', () => {
+  it('does not fetch when billing disabled', () => {
     mockClerk.__internal_environment.commerceSettings.billing.user.enabled = false;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = false;
 
     const { result } = renderHook(() => useInitializePaymentMethod(), { wrapper });
 

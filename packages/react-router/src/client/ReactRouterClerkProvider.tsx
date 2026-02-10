@@ -62,10 +62,13 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
     __signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl,
     __clerkJSUrl,
-    __clerkUiUrl,
     __clerkJSVersion,
+    __clerkUIUrl,
+    __prefetchUI,
     __telemetryDisabled,
     __telemetryDebug,
+    __keylessClaimUrl,
+    __keylessApiKeysUrl,
   } = clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
@@ -90,13 +93,21 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
     signInFallbackRedirectUrl: __signInFallbackRedirectUrl,
     signUpFallbackRedirectUrl: __signUpFallbackRedirectUrl,
     clerkJSUrl: __clerkJSUrl,
-    clerkUiUrl: __clerkUiUrl,
     clerkJSVersion: __clerkJSVersion,
+    clerkUIUrl: __clerkUIUrl,
+    prefetchUI: __prefetchUI,
     telemetry: {
       disabled: __telemetryDisabled,
       debug: __telemetryDebug,
     },
   };
+
+  const keylessProps = __keylessClaimUrl
+    ? {
+        __internal_keyless_claimKeylessApplicationUrl: __keylessClaimUrl,
+        __internal_keyless_copyInstanceKeysUrl: __keylessApiKeysUrl,
+      }
+    : {};
 
   return (
     <ClerkReactRouterOptionsProvider options={mergedProps}>
@@ -106,6 +117,7 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
         initialState={__clerk_ssr_state}
         sdkMetadata={SDK_METADATA}
         {...mergedProps}
+        {...keylessProps}
         {...restProps}
       >
         {children}

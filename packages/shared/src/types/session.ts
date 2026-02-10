@@ -335,14 +335,13 @@ export interface SessionTask {
   /**
    * A unique identifier for the task
    */
-  key: 'choose-organization' | 'reset-password';
+  key: 'choose-organization' | 'reset-password' | 'setup-mfa';
 }
 
 export type GetTokenOptions = {
-  template?: string;
   organizationId?: string;
-  leewayInSeconds?: number;
   skipCache?: boolean;
+  template?: string;
 };
 /**
  * @inline

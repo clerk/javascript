@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')!).render(
       <div className='flex w-full max-w-sm flex-col gap-6'>
         <ClerkProvider
           clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL as string}
-          clerkUiUrl={import.meta.env.VITE_CLERK_UI_URL as string}
+          clerkUIUrl={import.meta.env.VITE_CLERK_UI_URL as string}
           appearance={{
             options: {
               showOptionalFields: true,

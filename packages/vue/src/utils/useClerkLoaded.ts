@@ -17,7 +17,9 @@ import { useClerk } from '../composables';
 export const useClerkLoaded = (callback: (clerk: LoadedClerk) => void) => {
   const clerk = useClerk();
 
-  watch(
+  let unwatch: (() => void) | undefined;
+  // eslint-disable-next-line prefer-const
+  unwatch = watch(
     clerk,
     unwrappedClerk => {
       if (!unwrappedClerk?.loaded) {
@@ -25,6 +27,7 @@ export const useClerkLoaded = (callback: (clerk: LoadedClerk) => void) => {
       }
 
       callback(unwrappedClerk as LoadedClerk);
+      unwatch?.();
     },
     { immediate: true },
   );

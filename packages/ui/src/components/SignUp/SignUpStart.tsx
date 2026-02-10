@@ -170,8 +170,8 @@ function SignUpStartInternal(): JSX.Element {
             removeClerkQueryParam('__clerk_invitation_token');
             return setActive({
               session: signUp.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
               },
             });
           },
@@ -224,6 +224,7 @@ function SignUpStartInternal(): JSX.Element {
           case ERROR_CODES.FRAUD_ACTION_BLOCKED:
           case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
           case ERROR_CODES.USER_BANNED:
+          case ERROR_CODES.USER_DEACTIVATED:
             card.setError(error);
             break;
           default:
@@ -347,8 +348,8 @@ function SignUpStartInternal(): JSX.Element {
           handleComplete: () =>
             setActive({
               session: res.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
               },
             }),
           navigate,

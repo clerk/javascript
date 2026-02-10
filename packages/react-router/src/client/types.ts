@@ -19,10 +19,13 @@ export type ClerkState = {
     __signUpFallbackRedirectUrl: string | undefined;
     __clerk_debug: any;
     __clerkJSUrl: string | undefined;
-    __clerkUiUrl: string | undefined;
     __clerkJSVersion: string | undefined;
+    __clerkUIUrl: string | undefined;
+    __prefetchUI: boolean | undefined;
     __telemetryDisabled: boolean | undefined;
     __telemetryDebug: boolean | undefined;
+    __keylessClaimUrl?: string;
+    __keylessApiKeysUrl?: string;
   };
 };
 

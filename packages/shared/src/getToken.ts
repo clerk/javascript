@@ -37,9 +37,12 @@ function getWindowClerk(): LoadedClerk | undefined {
 
 async function waitForClerk(): Promise<LoadedClerk> {
   if (!inBrowser()) {
-    throw new ClerkRuntimeError('getToken can only be used in browser environments.', {
-      code: 'clerk_runtime_not_browser',
-    });
+    throw new ClerkRuntimeError(
+      'getToken can only be used in browser environments. To access auth data server-side, see the Auth object reference doc: https://clerk.com/docs/reference/backend/types/auth-object',
+      {
+        code: 'clerk_runtime_not_browser',
+      },
+    );
   }
 
   const clerk = getWindowClerk();
@@ -96,13 +99,15 @@ async function waitForClerk(): Promise<LoadedClerk> {
  * @param options - Optional configuration for token retrieval
  * @param options.template - The name of a JWT template to use
  * @param options.organizationId - Organization ID to include in the token
- * @param options.leewayInSeconds - Number of seconds of leeway for token expiration
  * @param options.skipCache - Whether to skip the token cache
  * @returns A Promise that resolves to the session token, or `null` if the user is not signed in
  *
  * @throws {ClerkRuntimeError} When called in a non-browser environment (code: `clerk_runtime_not_browser`)
  *
  * @throws {ClerkRuntimeError} When Clerk fails to load within timeout (code: `clerk_runtime_load_timeout`)
+ *
+ * @throws {ClerkOfflineError} When the browser is offline and unable to fetch a token (code: `clerk_offline`).
+ * Use `ClerkOfflineError.is(error)` to check for this error type.
  *
  * @example
  * ```typescript

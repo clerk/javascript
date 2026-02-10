@@ -36,7 +36,9 @@ export async function ClerkProvider<TUi extends Ui = Ui>(
 
   const propsWithEnvs = mergeNextClerkPropsWithEnv({
     ...rest,
-    initialState: (await statePromiseOrValue) as InitialState | undefined,
+    // Even though we always cast to InitialState here, this might still be a promise.
+    // While not reflected in the public types, we do support this for React >= 19 for internal use.
+    initialState: statePromiseOrValue as InitialState | undefined,
     nonce: await noncePromiseOrValue,
   });
 
