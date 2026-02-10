@@ -3,4 +3,4 @@
 '@clerk/ui': patch
 ---
 
-Support user_deactivated error code on SignIn and SignUp Start components
+Display message for `user_deactivated` error code on `SignIn` and `SignUp` 
