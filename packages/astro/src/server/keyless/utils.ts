@@ -3,7 +3,6 @@ import type { APIContext } from 'astro';
 export type { KeylessResult } from '@clerk/shared/keyless';
 
 import { canUseKeyless } from '../../utils/feature-flags';
-import type { ClerkAstroMiddlewareOptions } from '../clerk-middleware';
 import { keyless } from './index';
 
 /**
@@ -13,9 +12,8 @@ export async function resolveKeysWithKeylessFallback(
   configuredPublishableKey: string | undefined,
   configuredSecretKey: string | undefined,
   context: APIContext,
-  options?: ClerkAstroMiddlewareOptions,
 ) {
-  const keylessService = await keyless(context, options);
+  const keylessService = await keyless(context);
   return sharedResolveKeysWithKeylessFallback(
     configuredPublishableKey,
     configuredSecretKey,

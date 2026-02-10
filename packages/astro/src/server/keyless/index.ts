@@ -2,7 +2,6 @@ import { createKeylessService } from '@clerk/shared/keyless';
 import type { APIContext } from 'astro';
 
 import { clerkClient } from '../clerk-client';
-import type { ClerkAstroMiddlewareOptions } from '../clerk-middleware';
 import { createFileStorage } from './file-storage.js';
 
 let keylessServiceInstance: ReturnType<typeof createKeylessService> | null = null;
@@ -20,10 +19,7 @@ function canUseFileSystem(): boolean {
  * Gets or creates the keyless service singleton.
  * Returns null for non-Node.js runtimes (e.g., Cloudflare Workers).
  */
-export async function keyless(
-  context: APIContext,
-  options?: ClerkAstroMiddlewareOptions,
-): Promise<ReturnType<typeof createKeylessService> | null> {
+export async function keyless(context: APIContext): Promise<ReturnType<typeof createKeylessService> | null> {
   if (!canUseFileSystem()) {
     return null;
   }
@@ -45,10 +41,7 @@ export async function keyless(
         api: {
           async createAccountlessApplication(requestHeaders?: Headers) {
             try {
-              return await clerkClient(
-                context,
-                options,
-              ).__experimental_accountlessApplications.createAccountlessApplication({
+              return await clerkClient(context).__experimental_accountlessApplications.createAccountlessApplication({
                 requestHeaders,
               });
             } catch {
@@ -59,7 +52,6 @@ export async function keyless(
             try {
               return await clerkClient(
                 context,
-                options,
               ).__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
                 requestHeaders,
               });

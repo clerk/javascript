@@ -96,7 +96,6 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
           configuredPublishableKey,
           configuredSecretKey,
           context,
-          options,
         );
 
         keylessClaimUrl = keylessResult.claimUrl;
