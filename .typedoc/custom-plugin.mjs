@@ -73,6 +73,7 @@ const LINK_REPLACEMENTS = [
   ['phone-number', '/docs/reference/backend/types/backend-phone-number'],
   ['saml-account', '/docs/reference/backend/types/backend-saml-account'],
   ['web3-wallet', '/docs/reference/backend/types/backend-web3-wallet'],
+  ['invitation', '/docs/reference/backend/types/backend-invitation'],
   ['verify-token-options', '#verify-token-options'],
   ['localization-resource', '/docs/guides/customizing-clerk/localization'],
   ['confirm-checkout-params', '/docs/reference/javascript/types/billing-checkout-resource#parameters'],
