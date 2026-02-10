@@ -95,11 +95,11 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
   // the ClerkUI constructor is stripped (not serializable). Re-import it on the client.
   const uiProp = mergedProps.ui as { __brand?: string; ClerkUI?: unknown } | undefined;
   if (uiProp?.__brand && !uiProp?.ClerkUI) {
-    // webpackIgnore prevents the bundler from statically resolving @clerk/ui/entry at build time,
+    // webpackIgnore/turbopackIgnore prevent the bundler from statically resolving @clerk/ui/entry at build time,
     // since @clerk/ui is an optional dependency that may not be installed.
-    // @ts-expect-error - @clerk/ui/entry is resolved by the user's Next.js bundler at runtime, not at package build time
+    // @ts-expect-error - @clerk/ui is an optional peer dependency, not declared in this package's dependencies
     // eslint-disable-next-line import/no-unresolved
-    _resolvedClerkUI ??= import(/* webpackIgnore: true */ '@clerk/ui/entry').then(
+    _resolvedClerkUI ??= import(/* webpackIgnore: true */ /* turbopackIgnore: true */ '@clerk/ui/entry').then(
       (m: { ClerkUI: ClerkUIConstructor }) => m.ClerkUI,
     );
     mergedProps.ui = { ...mergedProps.ui, ClerkUI: _resolvedClerkUI };
