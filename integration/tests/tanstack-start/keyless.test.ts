@@ -72,18 +72,25 @@ test.describe('Keyless mode @tanstack-react-start', () => {
       const signInForceRedirectUrl = url.searchParams.get('sign_in_force_redirect_url');
       const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
 
-      const signUpForceRedirectUrlCheck =
-        (signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) && signUpForceRedirectUrl?.includes('token=')) ||
-        (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
-          signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim')) &&
-          signUpForceRedirectUrl?.includes(encodeURIComponent('token=')));
-
-      return (
-        url.pathname === '/apps/claim/sign-in' &&
+      const signInHasRequiredParams =
         signInForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) &&
         signInForceRedirectUrl?.includes('token=') &&
-        signUpForceRedirectUrlCheck
-      );
+        signInForceRedirectUrl?.includes('framework=tanstack-react-start');
+
+      const signUpRegularCase =
+        signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) &&
+        signUpForceRedirectUrl?.includes('token=') &&
+        signUpForceRedirectUrl?.includes('framework=tanstack-react-start');
+
+      const signUpPrepareAccountCase =
+        signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
+        signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim')) &&
+        signUpForceRedirectUrl?.includes(encodeURIComponent('token=')) &&
+        signUpForceRedirectUrl?.includes(encodeURIComponent('framework=tanstack-react-start'));
+
+      const signUpHasRequiredParams = signUpRegularCase || signUpPrepareAccountCase;
+
+      return url.pathname === '/apps/claim/sign-in' && signInHasRequiredParams && signUpHasRequiredParams;
     });
   });
 
