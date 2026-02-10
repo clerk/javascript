@@ -1,7 +1,7 @@
 import { useClerk, useUser } from '@clerk/react';
 import { Platform } from 'expo-modules-core';
 import { useEffect, useState } from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, ViewProps, Image } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet, StyleProp, ViewStyle, Image } from 'react-native';
 
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
@@ -35,7 +35,12 @@ interface NativeUser {
 /**
  * Props for the UserButton component.
  */
-export interface UserButtonProps extends ViewProps {
+export interface UserButtonProps {
+  /**
+   * Custom style for the button container.
+   */
+  style?: StyleProp<ViewStyle>;
+
   /**
    * Callback fired when the user button is pressed.
    *
@@ -126,7 +131,7 @@ export interface UserButtonProps extends ViewProps {
  * @see {@link UserProfileView} The profile view that opens when tapped
  * @see {@link https://clerk.com/docs/components/user/user-button} Clerk UserButton Documentation
  */
-export function UserButton({ onPress, onSignOut, style, ...props }: UserButtonProps) {
+export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
   const [nativeUser, setNativeUser] = useState<NativeUser | null>(null);
   const clerk = useClerk();
   // Use the reactive user hook from clerk-react to observe sign-out state changes
@@ -253,10 +258,7 @@ export function UserButton({ onPress, onSignOut, style, ...props }: UserButtonPr
   // Show fallback when native modules aren't available
   if (!isNativeSupported || !ClerkExpo) {
     return (
-      <View
-        style={[styles.button, style]}
-        {...props}
-      >
+      <View style={[styles.button, style]}>
         <Text style={styles.text}>?</Text>
       </View>
     );
@@ -266,7 +268,6 @@ export function UserButton({ onPress, onSignOut, style, ...props }: UserButtonPr
     <TouchableOpacity
       onPress={handlePress}
       style={[styles.button, style]}
-      {...props}
     >
       {user?.imageUrl ? (
         <Image

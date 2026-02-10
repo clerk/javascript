@@ -26,6 +26,5 @@ export default defineConfig(overrideOptions => {
     },
   };
 
-  // Note: declarations build disabled due to pre-existing TS errors
-  return runAfterLast([/* 'pnpm build:declarations', */ shouldPublish && 'pnpm publish:local'])(options);
+  return runAfterLast(['pnpm build:declarations', shouldPublish && 'pnpm publish:local'])(options);
 });

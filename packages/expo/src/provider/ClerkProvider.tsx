@@ -4,9 +4,10 @@ import { ClerkProvider as ClerkReactProvider } from '@clerk/react';
 import type { Ui } from '@clerk/react/internal';
 import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import type { TokenCache } from '../cache/types';
+import { useNativeAuthEvents } from '../hooks/useNativeAuthEvents';
 import { isNative, isWeb } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
@@ -57,6 +58,11 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
   } = props;
   const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
 
+  // Track pending native session to sync after clerk loads
+  const pendingNativeSessionRef = useRef<string | null>(null);
+  const initStartedRef = useRef(false);
+  const sessionSyncedRef = useRef(false);
+
   // Get the Clerk instance for syncing
   const clerkInstance = isNative()
     ? getClerkInstance({
@@ -67,37 +73,79 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       })
     : null;
 
-  // Configure native Clerk SDK (iOS and Android) and sync session state
+  // Configure native Clerk SDK and set up session sync callback
   useEffect(() => {
-    if ((Platform.OS === 'ios' || Platform.OS === 'android') && pk) {
-      const configureAndSyncClerk = async () => {
+    if ((Platform.OS === 'ios' || Platform.OS === 'android') && pk && !initStartedRef.current) {
+      initStartedRef.current = true;
+
+      const configureNativeClerk = async () => {
         try {
           const { requireNativeModule } = require('expo-modules-core');
           const ClerkExpo = requireNativeModule('ClerkExpo');
+
           if (ClerkExpo?.configure) {
             await ClerkExpo.configure(pk);
-            console.log(`[ClerkProvider] Configured Clerk ${Platform.OS} SDK`);
 
-            // Check if native SDK has an existing session and sync to JS
-            if (ClerkExpo?.getSession) {
-              const nativeSession = await ClerkExpo.getSession();
-              // Check for actual session data, not just truthy object (empty {} is truthy)
-              if (nativeSession?.session) {
-                console.log(`[ClerkProvider] Native session found, syncing to JS SDK...`);
-                // Reload JS SDK state from backend to pick up the session
-                if ((clerkInstance as any)?.__internal_reloadInitialResources) {
-                  await (clerkInstance as any).__internal_reloadInitialResources();
-                  console.log(`[ClerkProvider] JS SDK state synced`);
+            // Poll for native session (matching iOS's 3-second max wait)
+            const MAX_WAIT_MS = 3000;
+            const POLL_INTERVAL_MS = 100;
+            let sessionId: string | null = null;
+
+            for (let elapsed = 0; elapsed < MAX_WAIT_MS; elapsed += POLL_INTERVAL_MS) {
+              if (ClerkExpo?.getSession) {
+                const nativeSession = await ClerkExpo.getSession();
+                sessionId = nativeSession?.sessionId;
+                if (sessionId) {
+                  break;
+                }
+              }
+              await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+            }
+
+            if (sessionId && clerkInstance) {
+              pendingNativeSessionRef.current = sessionId;
+
+              // Wait for clerk to be loaded before syncing
+              const clerkAny = clerkInstance as any;
+
+              const waitForLoad = (): Promise<void> => {
+                return new Promise(resolve => {
+                  if (clerkAny.loaded) {
+                    resolve();
+                  } else if (typeof clerkAny.addOnLoaded === 'function') {
+                    clerkAny.addOnLoaded(() => resolve());
+                  } else {
+                    resolve();
+                  }
+                });
+              };
+
+              await waitForLoad();
+
+              if (!sessionSyncedRef.current && clerkInstance.setActive) {
+                sessionSyncedRef.current = true;
+                const pendingSession = pendingNativeSessionRef.current;
+
+                // If the native session is not in the client's sessions list,
+                // reload the client from the API so setActive can find it.
+                const sessionInClient = clerkInstance.client?.sessions?.some(
+                  (s: { id: string }) => s.id === pendingSession,
+                );
+                if (!sessionInClient && typeof clerkAny.__internal_reloadInitialResources === 'function') {
+                  await clerkAny.__internal_reloadInitialResources();
+                }
+
+                try {
+                  await clerkInstance.setActive({ session: pendingSession });
+                } catch (err) {
+                  console.error(`[ClerkProvider] Failed to sync native session:`, err);
                 }
               }
             }
           }
         } catch (error) {
-          // Native module not found is expected when the @clerk/expo plugin isn't configured
-          // This is fine - the JS SDK will work without native features
           const isNativeModuleNotFound = error instanceof Error && error.message.includes('Cannot find native module');
           if (isNativeModuleNotFound) {
-            // Silent in production, debug log only
             if (__DEV__) {
               console.debug(
                 `[ClerkProvider] Native Clerk module not available. ` +
@@ -109,9 +157,43 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
           }
         }
       };
-      configureAndSyncClerk();
+      configureNativeClerk();
     }
   }, [pk, clerkInstance]);
+
+  // Listen for native auth state changes and sync to JS SDK
+  const { nativeAuthState } = useNativeAuthEvents();
+
+  useEffect(() => {
+    if (!nativeAuthState || !clerkInstance) {
+      return;
+    }
+
+    const syncNativeAuthToJs = async () => {
+      try {
+        if (nativeAuthState.type === 'signedIn' && nativeAuthState.sessionId && clerkInstance.setActive) {
+          // Ensure the session exists in the client before calling setActive
+          const sessionInClient = clerkInstance.client?.sessions?.some(
+            (s: { id: string }) => s.id === nativeAuthState.sessionId,
+          );
+          if (!sessionInClient) {
+            const clerkAny = clerkInstance as any;
+            if (typeof clerkAny.__internal_reloadInitialResources === 'function') {
+              await clerkAny.__internal_reloadInitialResources();
+            }
+          }
+
+          await clerkInstance.setActive({ session: nativeAuthState.sessionId });
+        } else if (nativeAuthState.type === 'signedOut' && clerkInstance.signOut) {
+          await clerkInstance.signOut();
+        }
+      } catch (error) {
+        console.error(`[ClerkProvider] Failed to sync native auth state:`, error);
+      }
+    };
+
+    syncNativeAuthToJs();
+  }, [nativeAuthState, clerkInstance]);
 
   if (isWeb()) {
     // This is needed in order for useOAuth to work correctly on web.

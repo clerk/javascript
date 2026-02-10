@@ -20,10 +20,32 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     print("✅ [ClerkViewFactory] Registered with ClerkExpo module")
   }
 
+  @MainActor
   public func configure(publishableKey: String) async throws {
     print("🔧 [ClerkViewFactory] Configuring Clerk with key: \(publishableKey.prefix(20))...")
-    await Clerk.shared.configure(publishableKey: publishableKey)
-    print("✅ [ClerkViewFactory] Clerk configured successfully")
+    Clerk.shared.configure(publishableKey: publishableKey)
+    print("✅ [ClerkViewFactory] Clerk configured, now loading...")
+
+    // CRITICAL: Must call load() after configure() to restore session from keychain
+    do {
+      try await Clerk.shared.load()
+      print("✅ [ClerkViewFactory] Clerk load() completed")
+    } catch {
+      print("❌ [ClerkViewFactory] Clerk load() failed: \(error)")
+    }
+
+    // IMPORTANT: load() is async but session may be populated AFTER it returns
+    // The SDK uses Combine/ObservableObject pattern - session is published asynchronously
+    // We need to wait for the session to actually be populated
+    print("⏳ [ClerkViewFactory] Waiting for session to be populated...")
+    for i in 0..<30 {  // Wait up to 3 seconds
+      if Clerk.shared.session != nil {
+        print("✅ [ClerkViewFactory] Session found after \(i * 100)ms: \(Clerk.shared.session?.id ?? "unknown")")
+        return
+      }
+      try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
+    }
+    print("⚠️ [ClerkViewFactory] No session found after 3s, session: \(Clerk.shared.session?.id ?? "none")")
   }
 
   public func createAuthViewController(

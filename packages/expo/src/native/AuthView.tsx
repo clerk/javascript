@@ -5,15 +5,24 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import type { AuthViewProps } from './AuthView.types';
 
+// Type definition for the ClerkExpo native module
+interface ClerkExpoModule {
+  configure(config: { publishableKey: string }): Promise<void>;
+  presentAuth(options: { mode: string; dismissable: boolean }): Promise<{ sessionId?: string }>;
+  presentUserProfile(): Promise<void>;
+  getSession(): Promise<{ sessionId?: string; user?: Record<string, unknown> } | null>;
+  signOut(): Promise<void>;
+}
+
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
 // Get the native module for modal presentation
 // Wrapped in try/catch because the module may not be available if the plugin isn't configured
-let ClerkExpo: ReturnType<typeof requireNativeModule> | null = null;
+let ClerkExpo: ClerkExpoModule | null = null;
 if (isNativeSupported) {
   try {
-    ClerkExpo = requireNativeModule('ClerkExpo');
+    ClerkExpo = requireNativeModule('ClerkExpo') as ClerkExpoModule;
   } catch {
     // Native module not available - plugin not configured
     // This is expected when users use @clerk/expo without the native plugin
@@ -112,26 +121,43 @@ if (isNativeSupported) {
  */
 export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess, onError }: AuthViewProps) {
   const clerk = useClerk();
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
   // Track if we've already completed auth to prevent duplicate onSuccess calls
   const authCompletedRef = useRef(false);
   // Track the initial signed-in state to differentiate between "already signed in" vs "just signed in"
   const initialSignedInRef = useRef(isSignedIn);
+  // Track if we've started presenting
+  const hasStartedRef = useRef(false);
+
+  console.log(
+    `[AuthView] RENDER: isSignedIn=${isSignedIn}, isLoaded=${isLoaded}, authCompleted=${authCompletedRef.current}, initialSignedIn=${initialSignedInRef.current}, hasStarted=${hasStartedRef.current}`,
+  );
 
   useEffect(() => {
+    console.log(
+      `[AuthView] EFFECT: isNativeSupported=${isNativeSupported}, ClerkExpo=${!!ClerkExpo}, presentAuth=${!!ClerkExpo?.presentAuth}`,
+    );
+
     if (!isNativeSupported || !ClerkExpo?.presentAuth) {
+      console.log(`[AuthView] SKIP: Native not supported or presentAuth unavailable`);
       return;
     }
 
     // If auth already completed in this component instance, don't do anything
     if (authCompletedRef.current) {
-      console.log('[AuthView] Auth already completed, ignoring effect re-run');
+      console.log('[AuthView] SKIP: Auth already completed, ignoring effect re-run');
+      return;
+    }
+
+    // If we've already started presenting, don't start again
+    if (hasStartedRef.current) {
+      console.log('[AuthView] SKIP: Already started presenting');
       return;
     }
 
     // If user was already signed in when component mounted, call onSuccess once
     if (initialSignedInRef.current && isSignedIn) {
-      console.log('[AuthView] User was already signed in on mount, skipping auth modal');
+      console.log('[AuthView] SKIP: User was already signed in on mount (initialSignedIn=true, isSignedIn=true)');
       authCompletedRef.current = true;
       onSuccess?.();
       return;
@@ -139,85 +165,114 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
 
     // If isSignedIn became true after we started (sign-in completed), don't re-present modal
     if (isSignedIn && !initialSignedInRef.current) {
-      console.log('[AuthView] Sign-in completed (isSignedIn changed to true), not re-presenting modal');
+      console.log(
+        '[AuthView] SKIP: Sign-in completed externally (isSignedIn changed to true), not re-presenting modal',
+      );
       return;
     }
+
+    hasStartedRef.current = true;
+    console.log(`[AuthView] PRESENT: Starting modal presentation flow...`);
 
     const presentModal = async () => {
       // First check if native SDK has an existing session
       // If so, sync to JS and call onSuccess without showing modal
       if (ClerkExpo?.getSession) {
         try {
+          console.log(`[AuthView] CHECK_SESSION: Checking native session...`);
           const nativeSession = await ClerkExpo.getSession();
-          // Check for actual session data, not just truthy object (empty {} is truthy)
-          if (nativeSession?.session) {
-            console.log('[AuthView] Native SDK has existing session, syncing to JS...');
+          console.log(`[AuthView] CHECK_SESSION: Result:`, JSON.stringify(nativeSession));
+          // Native getSession returns { sessionId: "...", user: {...} } at top level
+          const sessionId = nativeSession?.sessionId;
+          if (sessionId) {
+            console.log('[AuthView] SYNC: Native SDK has existing session, syncing to JS via setActive...');
             authCompletedRef.current = true;
-            if ((clerk as any)?.__internal_reloadInitialResources) {
-              await (clerk as any).__internal_reloadInitialResources();
-              console.log('[AuthView] JS SDK state synced from native session');
+            if (clerk.setActive) {
+              await clerk.setActive({ session: sessionId });
+              console.log('[AuthView] SYNC: JS SDK state synced from native session');
             }
             onSuccess?.();
             return;
+          } else {
+            console.log(`[AuthView] CHECK_SESSION: No session found, will present modal`);
           }
         } catch (e) {
-          console.log('[AuthView] Could not check native session:', e);
+          console.log('[AuthView] CHECK_SESSION: Error checking native session:', e);
         }
       }
 
       try {
-        console.log(`[AuthView] Presenting native auth modal with mode: ${mode}`);
+        console.log(`[AuthView] MODAL: Presenting native auth modal with mode=${mode}, dismissable=${isDismissable}`);
         const result = await ClerkExpo.presentAuth({
           mode,
           dismissable: isDismissable,
         });
 
-        console.log(`[AuthView] Auth completed:`, result);
+        console.log(`[AuthView] MODAL: Auth completed, result:`, JSON.stringify(result));
 
         // Mark auth as completed to prevent duplicate onSuccess calls
         authCompletedRef.current = true;
 
-        // After native sign-in completes, reload the JS SDK state from the backend
-        // This syncs the native session with the JS ClerkProvider
-        console.log('[AuthView] clerk object:', typeof clerk, Object.keys(clerk || {}));
-        console.log(
-          '[AuthView] __internal_reloadInitialResources exists:',
-          !!(clerk as any)?.__internal_reloadInitialResources,
-        );
-        if ((clerk as any)?.__internal_reloadInitialResources) {
-          console.log('[AuthView] Reloading JS SDK state from backend...');
+        // After native sign-in completes, sync the session to JS SDK using setActive
+        if (result.sessionId && clerk.setActive) {
+          console.log(`[AuthView] SYNC: Syncing session=${result.sessionId} to JS SDK via setActive...`);
           try {
-            await (clerk as any).__internal_reloadInitialResources();
-            console.log('[AuthView] JS SDK state reloaded');
-          } catch (reloadError) {
-            console.error('[AuthView] Failed to reload JS SDK state:', reloadError);
+            // Wait for client to be loaded if needed
+            const clerkAny = clerk as any;
+            console.log(`[AuthView] SYNC: clerk.loaded=${clerkAny.loaded}`);
+            if (!clerkAny.loaded && clerkAny.addOnLoaded) {
+              console.log('[AuthView] SYNC: Waiting for client to load...');
+              await new Promise<void>(resolve => {
+                clerkAny.addOnLoaded(() => {
+                  console.log('[AuthView] SYNC: addOnLoaded callback fired');
+                  resolve();
+                });
+              });
+            }
+            await clerk.setActive({ session: result.sessionId });
+            console.log('[AuthView] SYNC: JS SDK session synced successfully');
+          } catch (syncError) {
+            console.error('[AuthView] SYNC: Failed to sync session:', syncError);
           }
         } else {
-          console.warn('[AuthView] __internal_reloadInitialResources not available on clerk object');
+          console.warn(`[AuthView] SYNC: Skipping - sessionId=${result.sessionId}, setActive=${!!clerk.setActive}`);
         }
 
+        console.log(`[AuthView] SUCCESS: Calling onSuccess callback`);
         onSuccess?.();
       } catch (err) {
         const error = err as Error;
+        console.log(`[AuthView] ERROR: ${error.message}`);
 
         // Handle "User is already signed in" error - this means native SDK has session but JS SDK doesn't know
         // This can happen when JS SDK failed to initialize (e.g., dev auth error) but native SDK has valid session
         if (error.message?.includes('already signed in')) {
-          console.log('[AuthView] Native SDK reports user already signed in, syncing JS SDK state...');
+          console.log(
+            '[AuthView] ALREADY_SIGNED_IN: Native SDK reports user already signed in, fetching native session...',
+          );
           authCompletedRef.current = true;
-          if ((clerk as any).__internal_reloadInitialResources) {
+
+          // Get the session from native SDK and sync to JS
+          // Native getSession returns { sessionId: "...", user: {...} } at top level
+          if (ClerkExpo?.getSession && clerk.setActive) {
             try {
-              await (clerk as any).__internal_reloadInitialResources();
-              console.log('[AuthView] JS SDK state synced from existing native session');
-              onSuccess?.();
-              return;
-            } catch (reloadErr) {
-              console.error('[AuthView] Failed to reload JS SDK state:', reloadErr);
+              const nativeSession = await ClerkExpo.getSession();
+              console.log(`[AuthView] ALREADY_SIGNED_IN: Native session:`, JSON.stringify(nativeSession));
+              if (nativeSession?.sessionId) {
+                const sessionId = nativeSession.sessionId;
+                console.log('[AuthView] ALREADY_SIGNED_IN: Syncing via setActive:', sessionId);
+                await clerk.setActive({ session: sessionId });
+                console.log('[AuthView] ALREADY_SIGNED_IN: JS SDK state synced');
+                onSuccess?.();
+                return;
+              }
+            } catch (syncErr) {
+              console.error('[AuthView] ALREADY_SIGNED_IN: Failed to sync native session:', syncErr);
             }
           }
         }
 
-        console.error('[AuthView] Auth error:', err);
+        console.error('[AuthView] ERROR: Auth error:', err);
         onError?.(error);
       }
     };
