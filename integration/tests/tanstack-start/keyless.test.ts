@@ -1,14 +1,26 @@
-import { test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
-import {
-  testClaimedAppWithMissingKeys,
-  testKeylessRemovedAfterEnvAndRestart,
-  testToggleCollapsePopoverAndClaim,
-} from '../../testUtils/keylessHelpers';
+import { createTestUtils } from '../../testUtils';
 
 const commonSetup = appConfigs.tanstack.reactStart.clone();
+
+const mockClaimedInstanceEnvironmentCall = async (page: Page) => {
+  await page.route('*/**/v1/environment*', async route => {
+    const response = await route.fetch();
+    const json = await response.json();
+    const newJson = {
+      ...json,
+      auth_config: {
+        ...json.auth_config,
+        claimed_at: Date.now(),
+      },
+    };
+    await route.fulfill({ response, json: newJson });
+  });
+};
 
 test.describe('Keyless mode @tanstack-react-start', () => {
   test.describe.configure({ mode: 'serial' });
@@ -39,17 +51,89 @@ test.describe('Keyless mode @tanstack-react-start', () => {
   });
 
   test('Toggle collapse popover and claim.', async ({ page, context }) => {
-    await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl });
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToAppHome();
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+
+    await u.po.keylessPopover.waitForMounted();
+
+    expect(await u.po.keylessPopover.isExpanded()).toBe(false);
+    await u.po.keylessPopover.toggle();
+    expect(await u.po.keylessPopover.isExpanded()).toBe(true);
+
+    const claim = await u.po.keylessPopover.promptsToClaim();
+
+    const [newPage] = await Promise.all([context.waitForEvent('page'), claim.click()]);
+
+    await newPage.waitForLoadState();
+
+    await newPage.waitForURL(url => {
+      const signInForceRedirectUrl = url.searchParams.get('sign_in_force_redirect_url');
+      const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
+
+      const signInHasRequiredParams =
+        signInForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) &&
+        signInForceRedirectUrl?.includes('token=') &&
+        signInForceRedirectUrl?.includes('framework=tanstack-react-start');
+
+      const signUpRegularCase =
+        signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) &&
+        signUpForceRedirectUrl?.includes('token=') &&
+        signUpForceRedirectUrl?.includes('framework=tanstack-react-start');
+
+      const signUpPrepareAccountCase =
+        signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
+        signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim')) &&
+        signUpForceRedirectUrl?.includes(encodeURIComponent('token=')) &&
+        signUpForceRedirectUrl?.includes(encodeURIComponent('framework=tanstack-react-start'));
+
+      const signUpHasRequiredParams = signUpRegularCase || signUpPrepareAccountCase;
+
+      return url.pathname === '/apps/claim/sign-in' && signInHasRequiredParams && signUpHasRequiredParams;
+    });
   });
 
   test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({
     page,
     context,
   }) => {
-    await testClaimedAppWithMissingKeys({ page, context, app, dashboardUrl });
+    await mockClaimedInstanceEnvironmentCall(page);
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToAppHome();
+    await u.page.waitForClerkJsLoaded();
+
+    await u.po.keylessPopover.waitForMounted();
+    expect(await u.po.keylessPopover.isExpanded()).toBe(true);
+    await expect(u.po.keylessPopover.promptToUseClaimedKeys()).toBeVisible();
+
+    const [newPage] = await Promise.all([
+      context.waitForEvent('page'),
+      u.po.keylessPopover.promptToUseClaimedKeys().click(),
+    ]);
+
+    await newPage.waitForLoadState();
+    await newPage.waitForURL(url => {
+      return url.href.startsWith(`${dashboardUrl}sign-in?redirect_url=${encodeURIComponent(dashboardUrl)}apps%2Fapp_`);
+    });
   });
 
   test('Keyless popover is removed after adding keys to .env and restarting.', async ({ page, context }) => {
-    await testKeylessRemovedAfterEnvAndRestart({ page, context, app });
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToAppHome();
+
+    await u.po.keylessPopover.waitForMounted();
+    expect(await u.po.keylessPopover.isExpanded()).toBe(false);
+
+    // Copy keys from keyless.json to .env
+    await app.keylessToEnv();
+
+    // Restart the dev server to pick up new env vars (Vite doesn't hot-reload .env)
+    await app.restart();
+
+    await u.page.goToAppHome();
+
+    // Keyless popover should no longer be present since we now have explicit keys
+    await u.po.keylessPopover.waitForUnmounted();
   });
 });
