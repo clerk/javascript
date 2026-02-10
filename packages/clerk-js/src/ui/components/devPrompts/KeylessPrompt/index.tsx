@@ -186,9 +186,10 @@ function getCurrentState(claimed: boolean, success: boolean, isSignedIn: boolean
 
 function KeylessPromptInternal(props: KeylessPromptProps) {
   const id = useId();
+  const environment = useRevalidateEnvironment();
 
-  const claimed = false;
-  const success = false;
+  const claimed = Boolean(environment.authConfig.claimedAt);
+  const success = typeof props.onDismiss === 'function' && claimed;
   const { isSignedIn } = useUser();
   const appName = useRevalidateEnvironment().displayConfig.applicationName;
 
