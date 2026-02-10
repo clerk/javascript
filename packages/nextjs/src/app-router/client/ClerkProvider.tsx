@@ -32,7 +32,7 @@ const LazyCreateKeylessApplication = dynamic(() =>
 );
 
 const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderProps<TUi>) => {
-  const { __internal_invokeMiddlewareOnAuthStateChange = true, __internal_skipScripts = false, children } = props;
+  const { __internal_invokeMiddlewareOnAuthStateChange = true, __internal_scriptsSlot, children } = props;
   const router = useRouter();
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
@@ -109,7 +109,7 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
     <ClerkNextOptionsProvider options={mergedProps}>
       <ReactClerkProvider {...mergedProps}>
         <RouterTelemetry />
-        {!__internal_skipScripts && <ClerkScripts />}
+        {__internal_scriptsSlot ?? <ClerkScripts />}
         {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>

@@ -32,11 +32,11 @@ export async function getKeylessStatus(
 type KeylessProviderProps = PropsWithChildren<{
   rest: Without<NextClerkProviderProps, '__internal_invokeMiddlewareOnAuthStateChange' | 'children'>;
   runningWithClaimedKeys: boolean;
-  __internal_skipScripts?: boolean;
+  __internal_scriptsSlot?: React.ReactNode;
 }>;
 
 export const KeylessProvider = async (props: KeylessProviderProps) => {
-  const { rest, runningWithClaimedKeys, __internal_skipScripts, children } = props;
+  const { rest, runningWithClaimedKeys, __internal_scriptsSlot, children } = props;
 
   // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
   const newOrReadKeys = await import('../../server/keyless-node.js')
@@ -53,7 +53,7 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
       <ClientClerkProvider
         {...mergeNextClerkPropsWithEnv(rest)}
         disableKeyless
-        __internal_skipScripts={__internal_skipScripts}
+        __internal_scriptsSlot={__internal_scriptsSlot}
       >
         {children}
       </ClientClerkProvider>
@@ -70,7 +70,7 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
         // Explicitly use `null` instead of `undefined` here to avoid persisting `deleteKeylessAction` during merging of options.
         __internal_keyless_dismissPrompt: runningWithClaimedKeys ? deleteKeylessAction : null,
       })}
-      __internal_skipScripts={__internal_skipScripts}
+      __internal_scriptsSlot={__internal_scriptsSlot}
     >
       {children}
     </ClientClerkProvider>

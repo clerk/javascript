@@ -1,6 +1,7 @@
 import type { ClerkProviderProps } from '@clerk/react';
 import type { Ui } from '@clerk/react/internal';
 import type { Without } from '@clerk/shared/types';
+import type React from 'react';
 
 export type NextClerkProviderProps<TUi extends Ui = Ui> = Without<ClerkProviderProps<TUi>, 'publishableKey'> & {
   /**
@@ -25,8 +26,8 @@ export type NextClerkProviderProps<TUi extends Ui = Ui> = Without<ClerkProviderP
   dynamic?: boolean;
   /**
    * @internal
-   * If set to true, the client ClerkProvider will not render ClerkScripts.
-   * Used when scripts are rendered server-side in a Suspense boundary.
+   * When provided, the client ClerkProvider will render this slot instead of the default ClerkScripts.
+   * Used by the server provider to pass scripts rendered in a Suspense boundary.
    */
-  __internal_skipScripts?: boolean;
+  __internal_scriptsSlot?: React.ReactNode;
 };

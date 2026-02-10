@@ -36,7 +36,7 @@ export async function ClerkProvider<TUi extends Ui = Ui>(
   // When dynamic mode is enabled, render scripts in a Suspense boundary to isolate
   // the nonce fetching (which calls headers()) from the rest of the page.
   // This allows the page to remain statically renderable / use PPR.
-  const dynamicScripts = dynamic ? (
+  const scriptsSlot = dynamic ? (
     <Suspense>
       <DynamicClerkScripts
         publishableKey={propsWithEnvs.publishableKey}
@@ -48,16 +48,15 @@ export async function ClerkProvider<TUi extends Ui = Ui>(
         prefetchUI={propsWithEnvs.prefetchUI}
       />
     </Suspense>
-  ) : null;
+  ) : undefined;
 
   if (shouldRunAsKeyless) {
     return (
       <KeylessProvider
         rest={propsWithEnvs}
         runningWithClaimedKeys={runningWithClaimedKeys}
-        __internal_skipScripts={dynamic}
+        __internal_scriptsSlot={scriptsSlot}
       >
-        {dynamicScripts}
         {children}
       </KeylessProvider>
     );
@@ -66,9 +65,8 @@ export async function ClerkProvider<TUi extends Ui = Ui>(
   return (
     <ClientClerkProvider
       {...propsWithEnvs}
-      __internal_skipScripts={dynamic}
+      __internal_scriptsSlot={scriptsSlot}
     >
-      {dynamicScripts}
       {children}
     </ClientClerkProvider>
   );
