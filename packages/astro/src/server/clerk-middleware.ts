@@ -51,7 +51,7 @@ type ClerkAstroMiddlewareHandler = (
   next: AstroMiddlewareNextParam,
 ) => AstroMiddlewareReturn | undefined;
 
-type ClerkAstroMiddlewareOptions = AuthenticateRequestOptions;
+export type ClerkAstroMiddlewareOptions = AuthenticateRequestOptions;
 
 /**
  * Middleware for Astro that handles authentication and authorization with Clerk.
@@ -92,7 +92,12 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
         const configuredPublishableKey = options?.publishableKey || env.pk;
         const configuredSecretKey = options?.secretKey || env.sk;
 
-        const keylessResult = await resolveKeysWithKeylessFallback(configuredPublishableKey, configuredSecretKey);
+        const keylessResult = await resolveKeysWithKeylessFallback(
+          configuredPublishableKey,
+          configuredSecretKey,
+          context,
+          options,
+        );
 
         keylessClaimUrl = keylessResult.claimUrl;
         keylessApiKeysUrl = keylessResult.apiKeysUrl;

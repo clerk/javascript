@@ -56,7 +56,7 @@ function getSafeEnv(context: ContextOrLocals) {
  * This is a way to get around it.
  */
 function getClientSafeEnv(context: ContextOrLocals) {
-  const locals = ('locals' in context ? context.locals : context) as any;
+  const locals = 'locals' in context ? context.locals : context;
 
   return {
     domain: getContextEnvVar('PUBLIC_CLERK_DOMAIN', context),
