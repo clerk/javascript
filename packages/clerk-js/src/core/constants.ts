@@ -41,6 +41,7 @@ export const ERROR_CODES = {
   FRAUD_ACTION_BLOCKED: 'action_blocked',
   SIGNUP_RATE_LIMIT_EXCEEDED: 'signup_rate_limit_exceeded',
   USER_BANNED: 'user_banned',
+  USER_DEACTIVATED: 'user_deactivated',
 } as const;
 
 export const SIGN_IN_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username'];
