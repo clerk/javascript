@@ -253,32 +253,27 @@ type ResolvedContent = {
 export function getResolvedContent(state: STATES, context: ResolvedContentContext): ResolvedContent {
   const content = CONTENT[state];
 
-  // Resolve description (static or function-based)
   const description =
     typeof content.description === 'function'
       ? content.description({ appName: context.appName, instanceUrl: context.instanceUrl })
       : content.description;
 
-  // Resolve CTA based on kind
-  let cta: ResolvedContent['cta'];
-  if (content.cta.kind === 'link') {
-    const linkCta = content.cta;
-    cta = {
-      kind: 'link',
-      text: linkCta.text,
-      href:
-        typeof linkCta.href === 'function'
-          ? linkCta.href({ claimUrl: context.claimUrl, instanceUrl: context.instanceUrl })
-          : linkCta.href,
-    };
-  } else {
-    const actionCta = content.cta;
-    cta = {
-      kind: 'action',
-      text: actionCta.text,
-      onClick: () => actionCta.onClick(context.onDismiss),
-    };
-  }
+  const ctaItem = content.cta;
+  const cta: ResolvedContent['cta'] =
+    ctaItem.kind === 'link'
+      ? {
+          kind: 'link',
+          text: ctaItem.text,
+          href:
+            typeof ctaItem.href === 'function'
+              ? ctaItem.href({ claimUrl: context.claimUrl, instanceUrl: context.instanceUrl })
+              : ctaItem.href,
+        }
+      : {
+          kind: 'action',
+          text: ctaItem.text,
+          onClick: () => ctaItem.onClick(context.onDismiss),
+        };
 
   return {
     state,
