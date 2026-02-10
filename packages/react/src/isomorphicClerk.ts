@@ -62,7 +62,7 @@ import type {
   WaitlistResource,
   Without,
 } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import { handleValueOrFn } from '@clerk/shared/utils';
 
 import { errorThrower } from './errors/errorThrower';
@@ -90,7 +90,7 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
-  __internal_ClerkUICtor?: ClerkUiConstructor;
+  __internal_ClerkUICtor?: ClerkUIConstructor;
 }
 
 declare const global: Global;
@@ -468,14 +468,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
+      // Only load UI scripts in standard browser environments (not native/headless)
+      const shouldLoadUi = !this.options.Clerk && this.options.standardBrowser !== false;
+      const ClerkUI = shouldLoadUi ? await this.getClerkUIEntryChunk() : undefined;
       const clerk = await this.getClerkJsEntryChunk();
 
       if (!clerk.loaded) {
         this.beforeLoad(clerk);
-        // Only load UI scripts in standard browser environments (not native/headless)
-        const shouldLoadUi = !this.options.Clerk && this.options.standardBrowser !== false;
-        const clerkUiCtor = shouldLoadUi ? await this.getClerkUiEntryChunk() : undefined;
-        await clerk.load({ ...this.options, clerkUiCtor });
+        await clerk.load({ ...this.options, ui: { ...this.options.ui, ClerkUI } });
       }
       if (clerk.loaded) {
         this.replayInterceptedInvocations(clerk);
@@ -517,13 +517,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return global.Clerk;
   }
 
-  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor | undefined> {
-    // Honor explicit clerkUICtor even when prefetchUI=false
-    if (this.options.clerkUICtor) {
-      return this.options.clerkUICtor;
+  private async getClerkUIEntryChunk(): Promise<ClerkUIConstructor | undefined> {
+    // Support bundled UI via ui.ClerkUI prop
+    const uiProp = (this.options as { ui?: { __brand?: string; ClerkUI?: ClerkUIConstructor } }).ui;
+    if (uiProp?.ClerkUI) {
+      return uiProp.ClerkUI;
     }
 
-    if (this.options.prefetchUI === false) {
+    // Skip CDN prefetch when ui prop is passed (bundled UI) or prefetchUI is false
+    if (uiProp || this.options.prefetchUI === false) {
       return undefined;
     }
 

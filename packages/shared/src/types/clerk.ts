@@ -1,6 +1,6 @@
 import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 
-import type { ClerkUiConstructor } from '../ui/types';
+import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   BillingCheckoutResource,
@@ -1147,9 +1147,10 @@ export type ClerkOptions = ClerkOptionsNavigation &
   AfterMultiSessionSingleSignOutUrl &
   ClerkUnsafeOptions & {
     /**
-     * Clerk UI entrypoint.
+     * Clerk UI module. Pass the `ui` export from `@clerk/ui` to bundle the UI
+     * with your application instead of loading it from the CDN.
      */
-    clerkUICtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
+    ui?: { ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor> };
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */

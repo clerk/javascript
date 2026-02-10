@@ -31,9 +31,9 @@ describe('warnAboutCustomizationWithoutPinning', () => {
   });
 
   describe('version pinning check', () => {
-    test('does not warn when ui is provided (version is pinned)', () => {
+    test('does not warn when ui is provided with __brand (version is pinned)', () => {
       warnAboutCustomizationWithoutPinning({
-        ui: { version: '1.0.0' } as any,
+        ui: { __brand: '__clerkUI', version: '1.0.0' } as any,
         appearance: {
           elements: { card: { '& > div': { color: 'red' } } },
         },
@@ -55,11 +55,11 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       expect(message).toContain('elements.card "& > div"');
     });
 
-    test('still warns when clerkUICtor is provided without ui (CDN scenario)', () => {
-      // clerkUICtor is always set when loading from CDN, but ui is only set
-      // when the user explicitly imports @clerk/ui
+    test('still warns when ui.ClerkUI is provided without explicit ui import (CDN scenario)', () => {
+      // ui.ClerkUI is always set when loading from CDN, but the user-provided
+      // ui object is only present when they explicitly import @clerk/ui
       warnAboutCustomizationWithoutPinning({
-        clerkUICtor: class MockClerkUi {} as any,
+        ui: { ClerkUI: class MockClerkUI {} as any },
         appearance: {
           elements: { card: { '& > div': { color: 'red' } } },
         },
@@ -301,7 +301,7 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       expect(message).toContain('CSS ".cl-card .inner"');
     });
 
-    test('does not warn for structural CSS when ui is provided', () => {
+    test('does not warn for structural CSS when ui is provided with __brand', () => {
       vi.mocked(detectStructuralClerkCss).mockReturnValue([
         {
           stylesheetHref: 'styles.css',
@@ -312,7 +312,7 @@ describe('warnAboutCustomizationWithoutPinning', () => {
       ]);
 
       warnAboutCustomizationWithoutPinning({
-        ui: { version: '1.0.0' } as any,
+        ui: { __brand: '__clerkUI', version: '1.0.0' } as any,
       });
 
       expect(logger.warnOnce).not.toHaveBeenCalled();
