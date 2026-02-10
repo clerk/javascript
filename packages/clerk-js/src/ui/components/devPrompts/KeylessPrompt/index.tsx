@@ -90,6 +90,10 @@ const ctaButtonStyles = css`
   &:hover {
     background: #4b4b4b;
     transition: background-color 120ms ease-in-out;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   }
   &:focus-visible {
     outline: 2px solid #6c47ff;
@@ -97,15 +101,27 @@ const ctaButtonStyles = css`
   }
 `;
 
-type STATES = 'idle' | 'userCreated' | 'claimed' | 'completed';
+export type STATES = 'idle' | 'userCreated' | 'claimed' | 'completed';
+
+type DescriptionContent = ReactNode | ((context: { appName: string; instanceUrl: string }) => ReactNode);
+
+type CtaLink = {
+  kind: 'link';
+  text: string;
+  href: string | ((urls: { claimUrl: string; instanceUrl: string }) => string);
+};
+
+type CtaAction = {
+  kind: 'action';
+  text: string;
+  onClick: (onDismiss: (() => Promise<unknown>) | undefined | null) => void;
+};
 
 type ContentItem = {
   triggerWidth: string;
   title: string;
-  description: ReactNode | ((context: { appName: string; instanceUrl: string }) => ReactNode);
-  buttonText: string;
-  buttonOnClick?: (onDismiss: (() => Promise<unknown>) | undefined | null) => void;
-  buttonHref?: string | ((urls: { claimUrl: string; instanceUrl: string }) => string);
+  description: DescriptionContent;
+  cta: CtaLink | CtaAction;
 };
 
 const CONTENT: Record<STATES, ContentItem> = {
@@ -123,8 +139,11 @@ const CONTENT: Record<STATES, ContentItem> = {
         <p>Access the dashboard to customize auth settings and explore Clerk features.</p>
       </>
     ),
-    buttonText: 'Configure your application',
-    buttonHref: ({ claimUrl }) => claimUrl,
+    cta: {
+      kind: 'link',
+      text: 'Configure your application',
+      href: ({ claimUrl }) => claimUrl,
+    },
   },
   userCreated: {
     triggerWidth: '15.75rem',
@@ -132,8 +151,11 @@ const CONTENT: Record<STATES, ContentItem> = {
     description: (
       <p>Head to the dashboard to customize authentication settings, view user info, and explore more features.</p>
     ),
-    buttonText: 'Configure your application',
-    buttonHref: ({ claimUrl }) => claimUrl,
+    cta: {
+      kind: 'link',
+      text: 'Configure your application',
+      href: ({ claimUrl }) => claimUrl,
+    },
   },
   claimed: {
     triggerWidth: '14.25rem',
@@ -143,8 +165,11 @@ const CONTENT: Record<STATES, ContentItem> = {
         You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk Dashboard.
       </p>
     ),
-    buttonText: 'Get API keys',
-    buttonHref: ({ claimUrl }) => claimUrl,
+    cta: {
+      kind: 'link',
+      text: 'Get API keys',
+      href: ({ claimUrl }) => claimUrl,
+    },
   },
   completed: {
     triggerWidth: '10.5rem',
@@ -162,16 +187,28 @@ const CONTENT: Record<STATES, ContentItem> = {
         has been configured. You may now customize your settings in the Clerk dashboard.
       </p>
     ),
-    buttonText: 'Dismiss',
-    buttonOnClick: onDismiss => {
-      void onDismiss?.().then(() => {
-        window.location.reload();
-      });
+    cta: {
+      kind: 'action',
+      text: 'Dismiss',
+      onClick: onDismiss => {
+        void onDismiss?.().then(() => {
+          window.location.reload();
+        });
+      },
     },
   },
 };
 
-function getCurrentState(claimed: boolean, success: boolean, isSignedIn: boolean): STATES {
+/**
+ * Determines the current state based on application lifecycle flags.
+ * State precedence: completed -> claimed -> userCreated -> idle
+ *
+ * Note: This is a structural refactor - the actual runtime behavior for
+ * `claimed` and `success` is determined by environment state and props.
+ * Currently, `claimed` comes from `environment.authConfig.claimedAt` and
+ * `success` is derived from `onDismiss` prop presence + claimed state.
+ */
+export function getCurrentState(claimed: boolean, success: boolean, isSignedIn: boolean): STATES {
   if (success) {
     return 'completed';
   }
@@ -184,6 +221,74 @@ function getCurrentState(claimed: boolean, success: boolean, isSignedIn: boolean
   return 'idle';
 }
 
+type ResolvedContentContext = {
+  appName: string;
+  instanceUrl: string;
+  claimUrl: string;
+  onDismiss: (() => Promise<unknown>) | undefined | null;
+};
+
+type ResolvedContent = {
+  state: STATES;
+  triggerWidth: string;
+  title: string;
+  description: ReactNode;
+  cta:
+    | {
+        kind: 'link';
+        text: string;
+        href: string;
+      }
+    | {
+        kind: 'action';
+        text: string;
+        onClick: () => void;
+      };
+};
+
+/**
+ * Gets resolved content from state and context.
+ * This is a pure function that can be easily unit tested.
+ */
+export function getResolvedContent(state: STATES, context: ResolvedContentContext): ResolvedContent {
+  const content = CONTENT[state];
+
+  // Resolve description (static or function-based)
+  const description =
+    typeof content.description === 'function'
+      ? content.description({ appName: context.appName, instanceUrl: context.instanceUrl })
+      : content.description;
+
+  // Resolve CTA based on kind
+  let cta: ResolvedContent['cta'];
+  if (content.cta.kind === 'link') {
+    const linkCta = content.cta;
+    cta = {
+      kind: 'link',
+      text: linkCta.text,
+      href:
+        typeof linkCta.href === 'function'
+          ? linkCta.href({ claimUrl: context.claimUrl, instanceUrl: context.instanceUrl })
+          : linkCta.href,
+    };
+  } else {
+    const actionCta = content.cta;
+    cta = {
+      kind: 'action',
+      text: actionCta.text,
+      onClick: () => actionCta.onClick(context.onDismiss),
+    };
+  }
+
+  return {
+    state,
+    triggerWidth: content.triggerWidth,
+    title: content.title,
+    description,
+    cta,
+  };
+}
+
 function KeylessPromptInternal(props: KeylessPromptProps) {
   const id = useId();
   const environment = useRevalidateEnvironment();
@@ -191,7 +296,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
   const claimed = Boolean(environment.authConfig.claimedAt);
   const success = typeof props.onDismiss === 'function' && claimed;
   const { isSignedIn } = useUser();
-  const appName = useRevalidateEnvironment().displayConfig.applicationName;
+  const appName = environment.displayConfig.applicationName;
 
   const claimUrlToDashboard = useMemo(() => {
     if (claimed) {
@@ -215,47 +320,36 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
   const [isOpen, setIsOpen] = useState(true);
   const currentState = getCurrentState(claimed, success, Boolean(isSignedIn));
 
-  const {
-    title,
-    description,
-    buttonText,
-    triggerWidth,
-    buttonHref: rawButtonHref,
-    buttonOnClick: rawButtonOnClick,
-  } = CONTENT[currentState];
+  const resolvedContent = useMemo(
+    () =>
+      getResolvedContent(currentState, {
+        appName,
+        instanceUrl: instanceUrlToDashboard,
+        claimUrl: claimUrlToDashboard,
+        onDismiss: props.onDismiss,
+      }),
+    [currentState, appName, instanceUrlToDashboard, claimUrlToDashboard, props.onDismiss],
+  );
 
-  const descriptionContext = { appName, instanceUrl: instanceUrlToDashboard };
-  const renderedDescription = typeof description === 'function' ? description(descriptionContext) : description;
-
-  const resolvedButtonHref =
-    typeof rawButtonHref === 'function'
-      ? rawButtonHref({ claimUrl: claimUrlToDashboard, instanceUrl: instanceUrlToDashboard })
-      : rawButtonHref;
-  const resolvedButtonOnClick = rawButtonOnClick ? () => rawButtonOnClick(props.onDismiss) : undefined;
-
-  let ctaElement: ReactNode = null;
-  if (resolvedButtonOnClick) {
-    ctaElement = (
-      <button
-        type='button'
-        onClick={resolvedButtonOnClick}
-        css={ctaButtonStyles}
-      >
-        {buttonText}
-      </button>
-    );
-  } else if (resolvedButtonHref) {
-    ctaElement = (
+  const ctaElement: ReactNode =
+    resolvedContent.cta.kind === 'link' ? (
       <a
-        href={resolvedButtonHref}
+        href={resolvedContent.cta.href}
         target='_blank'
         rel='noopener noreferrer'
         css={ctaButtonStyles}
       >
-        {buttonText}
+        {resolvedContent.cta.text}
       </a>
+    ) : (
+      <button
+        type='button'
+        onClick={resolvedContent.cta.onClick}
+        css={ctaButtonStyles}
+      >
+        {resolvedContent.cta.text}
+      </button>
     );
-  }
 
   return (
     <div
@@ -278,10 +372,14 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
         isolation: isolate;
         transform: translateZ(0);
         backface-visibility: hidden;
-        width: ${isOpen ? WIDTH_OPEN : triggerWidth};
+        width: ${isOpen ? WIDTH_OPEN : resolvedContent.triggerWidth};
         transition:
           border-radius ${getDuration(isOpen)} cubic-bezier(0.2, 0, 0, 1),
           width ${getDuration(isOpen)} ${EASE_BEZIER};
+
+        @media (prefers-reduced-motion: reduce) {
+          transition: none;
+        }
         &:has(button:focus-visible) {
           outline: 2px solid #6c47ff;
           outline-offset: 2px;
@@ -295,6 +393,10 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
           background-image: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
           opacity: 0.16;
           transition: opacity ${getDuration(isOpen)} ${EASE_BEZIER};
+
+          @media (prefers-reduced-motion: reduce) {
+            transition: none;
+          }
         }
         &[data-expanded='true']::before,
         &:hover::before {
@@ -355,7 +457,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
             white-space: nowrap;
           `}
         >
-          {title}
+          {resolvedContent.title}
         </span>
         <svg
           css={css`
@@ -366,6 +468,10 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
             margin-inline-start: auto;
             opacity: ${isOpen ? 0.5 : 0};
             transition: opacity ${getDuration(isOpen)} ease-out;
+
+            @media (prefers-reduced-motion: reduce) {
+              transition: none;
+            }
             ${isOpen &&
             css`
               button:hover & {
@@ -395,6 +501,10 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
           display: grid;
           grid-template-rows: ${isOpen ? '1fr' : '0fr'};
           transition: grid-template-rows ${getDuration(isOpen)} ${EASE_BEZIER};
+
+          @media (prefers-reduced-motion: reduce) {
+            transition: none;
+          }
         `}
       >
         <div
@@ -412,6 +522,10 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
               padding-block-end: 0.75rem;
               opacity: ${isOpen ? 1 : 0};
               transition: opacity ${getDuration(isOpen)} ${EASE_BEZIER};
+
+              @media (prefers-reduced-motion: reduce) {
+                transition: none;
+              }
             `}
           >
             <div
@@ -446,7 +560,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
                 }
               `}
             >
-              {renderedDescription}
+              {resolvedContent.description}
             </div>
 
             {ctaElement}
