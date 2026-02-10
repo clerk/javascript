@@ -284,6 +284,123 @@ describe('Clerk singleton', () => {
         });
       });
 
+      it('does not emit intermediate state to listeners when updateClient is called during setActive', async () => {
+        const orgA = { id: 'org_a', slug: 'org-a', name: 'Org A' };
+        const orgB = { id: 'org_b', slug: 'org-b', name: 'Org B' };
+
+        const mockSessionWithOrgs = {
+          id: 'sess_1',
+          status: 'active' as const,
+          lastActiveOrganizationId: orgA.id,
+          user: {
+            organizationMemberships: [
+              { id: 'orgmem_a', organization: orgA },
+              { id: 'orgmem_b', organization: orgB },
+            ],
+          },
+          touch: vi.fn(),
+          getToken: vi.fn(),
+          lastActiveToken: { getRawString: () => 'mocked-token' },
+        };
+
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSessionWithOrgs] }));
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        // Verify initial state has orgA
+        expect(sut.organization?.id).toBe(orgA.id);
+
+        // Simulate what happens in production: touch()'s API response triggers
+        // updateClient via BaseResource._baseFetch client piggybacking.
+        // The updated client from the server reflects the new org.
+        mockSessionWithOrgs.touch.mockImplementationOnce(() => {
+          const updatedSession = {
+            ...mockSessionWithOrgs,
+            lastActiveOrganizationId: orgB.id,
+          };
+          sut.updateClient({
+            signedInSessions: [updatedSession],
+          } as any);
+          return Promise.resolve();
+        });
+        mockSessionWithOrgs.getToken.mockReturnValue(Promise.resolve('mocked-token'));
+
+        // Track all emissions to listeners
+        const emissions: Array<{ orgId: string | null | undefined }> = [];
+        sut.addListener(({ organization }) => {
+          emissions.push({ orgId: organization?.id ?? (organization as any) });
+        });
+
+        const navigate = vi.fn();
+        await sut.setActive({ organization: orgB.id, navigate });
+
+        // The listener should never have seen orgB before transitive state (undefined).
+        // Without the fix, emissions would be: [orgB, undefined, orgB]
+        // With the fix, emissions should be: [undefined, orgB]
+        const orgBBeforeTransitive = emissions.findIndex((e, i) => {
+          return e.orgId === orgB.id && emissions.slice(i + 1).some(later => later.orgId === undefined);
+        });
+        expect(orgBBeforeTransitive).toBe(-1);
+
+        // Verify transitive state (undefined) appeared before the final orgB state
+        const transitiveIndex = emissions.findIndex(e => e.orgId === undefined);
+        const finalOrgBIndex = emissions.findLastIndex(e => e.orgId === orgB.id);
+        expect(transitiveIndex).toBeGreaterThanOrEqual(0);
+        expect(finalOrgBIndex).toBeGreaterThan(transitiveIndex);
+      });
+
+      it('does not emit intermediate state when updateClient is called during setActive without navigation', async () => {
+        const orgA = { id: 'org_a', slug: 'org-a', name: 'Org A' };
+        const orgB = { id: 'org_b', slug: 'org-b', name: 'Org B' };
+
+        const mockSessionWithOrgs = {
+          id: 'sess_1',
+          status: 'active' as const,
+          lastActiveOrganizationId: orgA.id,
+          user: {
+            organizationMemberships: [
+              { id: 'orgmem_a', organization: orgA },
+              { id: 'orgmem_b', organization: orgB },
+            ],
+          },
+          touch: vi.fn(),
+          getToken: vi.fn(),
+          lastActiveToken: { getRawString: () => 'mocked-token' },
+        };
+
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSessionWithOrgs] }));
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        expect(sut.organization?.id).toBe(orgA.id);
+
+        mockSessionWithOrgs.touch.mockImplementationOnce(() => {
+          const updatedSession = {
+            ...mockSessionWithOrgs,
+            lastActiveOrganizationId: orgB.id,
+          };
+          sut.updateClient({
+            signedInSessions: [updatedSession],
+          } as any);
+          return Promise.resolve();
+        });
+        mockSessionWithOrgs.getToken.mockReturnValue(Promise.resolve('mocked-token'));
+
+        // Track emissions after initial state
+        const emissions: Array<{ orgId: string | null | undefined }> = [];
+        sut.addListener(({ organization }) => {
+          emissions.push({ orgId: organization?.id ?? (organization as any) });
+        }, { skipInitialEmit: true });
+
+        // No navigate or redirectUrl — no transitive state
+        await sut.setActive({ organization: orgB.id });
+
+        // Without the fix, emissions would be: [orgB (from updateClient), orgB (from #updateAccessors)]
+        // With the fix, there should be exactly one emission with the final state
+        expect(emissions).toHaveLength(1);
+        expect(emissions[0].orgId).toBe(orgB.id);
+      });
+
       it('redirects the user to the /v1/client/touch endpoint if the cookie_expires_at is less than 8 days away', async () => {
         mockSession.touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(

@@ -2702,7 +2702,14 @@ export class Clerk implements ClerkInterface {
       eventBus.emit(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 
-    this.#emit();
+    // During setActive, we suppress intermediate emissions from piggybacked client
+    // updates (e.g. from touch). setActive will emit the final state itself via
+    // #setTransitiveState or #updateAccessors once the transition is complete.
+    // Without this guard, useSyncExternalStore causes a synchronous re-render with
+    // partially-updated state (new orgId before transitive state is set).
+    if (!this.__internal_setActiveInProgress) {
+      this.#emit();
+    }
   };
 
   get __internal_environment(): EnvironmentResource | null | undefined {
