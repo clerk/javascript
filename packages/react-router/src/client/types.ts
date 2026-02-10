@@ -24,6 +24,8 @@ export type ClerkState = {
     __prefetchUI: boolean | undefined;
     __telemetryDisabled: boolean | undefined;
     __telemetryDebug: boolean | undefined;
+    __keylessClaimUrl?: string;
+    __keylessApiKeysUrl?: string;
   };
 };
 
