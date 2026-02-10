@@ -386,7 +386,7 @@ importers:
         specifier: workspace:^
         version: link:../ui
       astro:
-        specifier: ^5.15.9
+        specifier: ^5.17.1
         version: 5.17.1(@types/node@22.19.0)(db0@0.3.4)(idb-keyval@6.2.1)(ioredis@5.8.2)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.53.1)(terser@5.44.1)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.8.1)
 
   packages/backend:
