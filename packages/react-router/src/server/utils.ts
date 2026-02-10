@@ -3,6 +3,7 @@ import cookie from 'cookie';
 import type { AppLoadContext, UNSAFE_DataWithResponseInit } from 'react-router';
 
 import { getPublicEnvVariables } from '../utils/env';
+import { canUseKeyless } from '../utils/feature-flags';
 import type { RequestStateWithRedirectUrls } from './types';
 
 export function isResponse(value: any): value is Response {
@@ -78,9 +79,10 @@ export const injectRequestStateIntoResponse = async (
  * @internal
  */
 export function getResponseClerkState(requestState: RequestStateWithRedirectUrls, context: AppLoadContext) {
-  const { reason, message, isSignedIn, ...rest } = requestState;
+  const { reason, message, isSignedIn, __keylessClaimUrl, __keylessApiKeysUrl, ...rest } = requestState;
   const envVars = getPublicEnvVariables(context);
-  const clerkState = wrapWithClerkState({
+
+  const baseState: Record<string, unknown> = {
     __clerk_ssr_state: rest.toAuth(),
     __publishableKey: requestState.publishableKey,
     __proxyUrl: requestState.proxyUrl,
@@ -99,7 +101,14 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __prefetchUI: envVars.prefetchUI,
     __telemetryDisabled: envVars.telemetryDisabled,
     __telemetryDebug: envVars.telemetryDebug,
-  });
+  };
+
+  if (canUseKeyless && __keylessClaimUrl) {
+    baseState.__keylessClaimUrl = __keylessClaimUrl;
+    baseState.__keylessApiKeysUrl = __keylessApiKeysUrl;
+  }
+
+  const clerkState = wrapWithClerkState(baseState);
 
   return {
     clerkState,

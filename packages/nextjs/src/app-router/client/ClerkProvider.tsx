@@ -2,7 +2,6 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
 import type { Ui } from '@clerk/react/internal';
 import { InitialStateProvider } from '@clerk/shared/react';
-import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -17,11 +16,6 @@ import { invalidateCacheAction } from '../server-actions';
 import { ClerkScripts } from './ClerkScripts';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
-
-// Cached promise for resolving ClerkUI constructor via dynamic import.
-// In RSC, the ui prop from @clerk/ui is serialized without the ClerkUI constructor
-// (not serializable). This re-imports it on the client when needed.
-let _resolvedClerkUI: Promise<ClerkUIConstructor> | undefined;
 
 /**
  * LazyCreateKeylessApplication should only be loaded if the conditions below are met.
@@ -90,20 +84,6 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
     // @ts-expect-error Error because of the stricter types of internal `replace`
     routerReplace: replace,
   });
-
-  // Resolve ClerkUI for RSC: when the ui prop is serialized through React Server Components,
-  // the ClerkUI constructor is stripped (not serializable). Re-import it on the client.
-  const uiProp = mergedProps.ui as { __brand?: string; ClerkUI?: unknown } | undefined;
-  if (uiProp?.__brand && !uiProp?.ClerkUI) {
-    // webpackIgnore/turbopackIgnore prevent the bundler from statically resolving @clerk/ui/entry at build time,
-    // since @clerk/ui is an optional dependency that may not be installed.
-    // @ts-expect-error - @clerk/ui is an optional peer dependency, not declared in this package's dependencies
-    // eslint-disable-next-line import/no-unresolved
-    _resolvedClerkUI ??= import(/* webpackIgnore: true */ /* turbopackIgnore: true */ '@clerk/ui/entry').then(
-      (m: { ClerkUI: ClerkUIConstructor }) => m.ClerkUI,
-    );
-    mergedProps.ui = { ...mergedProps.ui, ClerkUI: _resolvedClerkUI };
-  }
 
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
