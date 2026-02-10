@@ -2,8 +2,8 @@ import { resolveKeysWithKeylessFallback as sharedResolveKeysWithKeylessFallback 
 import type { APIContext } from 'astro';
 export type { KeylessResult } from '@clerk/shared/keyless';
 
-import type { ClerkAstroMiddlewareOptions } from '../clerk-middleware';
 import { canUseKeyless } from '../../utils/feature-flags';
+import type { ClerkAstroMiddlewareOptions } from '../clerk-middleware';
 import { keyless } from './index';
 
 /**

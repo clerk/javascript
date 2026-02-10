@@ -45,7 +45,10 @@ export async function keyless(
         api: {
           async createAccountlessApplication(requestHeaders?: Headers) {
             try {
-              return await clerkClient(context).__experimental_accountlessApplications.createAccountlessApplication({
+              return await clerkClient(
+                context,
+                options,
+              ).__experimental_accountlessApplications.createAccountlessApplication({
                 requestHeaders,
               });
             } catch {
@@ -56,6 +59,7 @@ export async function keyless(
             try {
               return await clerkClient(
                 context,
+                options,
               ).__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
                 requestHeaders,
               });

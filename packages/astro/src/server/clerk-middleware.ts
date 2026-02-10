@@ -110,7 +110,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
             ...(keylessResult.secretKey && { secretKey: keylessResult.secretKey }),
           };
         }
-      } catch (error) {
+      } catch {
         // Silently fail - continue without keyless
       }
     }
