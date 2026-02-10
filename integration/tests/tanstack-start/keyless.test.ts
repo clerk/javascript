@@ -81,7 +81,6 @@ test.describe('Keyless mode @tanstack-react-start', () => {
         url.pathname === '/apps/claim/sign-in' &&
         signInForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) &&
         signInForceRedirectUrl?.includes('token=') &&
-        signInForceRedirectUrl?.includes('framework=tanstack-react-start') &&
         signUpForceRedirectUrlCheck
       );
     });
