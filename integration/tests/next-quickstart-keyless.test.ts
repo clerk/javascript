@@ -89,20 +89,24 @@ test.describe('Keyless mode @quickstart', () => {
     await newPage.waitForLoadState();
 
     await newPage.waitForURL(url => {
-      const urlToReturnTo = `${dashboardUrl}apps/claim?token=`;
-
+      const signInForceRedirectUrl = url.searchParams.get('sign_in_force_redirect_url');
       const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
 
-      const signUpForceRedirectUrlCheck =
-        signUpForceRedirectUrl?.startsWith(urlToReturnTo) ||
-        (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
-          signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
+      // Backend adds framework=nextjs query param before token, so use .includes() instead of .startsWith()
+      const signInHasRequiredParams =
+        signInForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) && signInForceRedirectUrl?.includes('token=');
 
-      return (
-        url.pathname === '/apps/claim/sign-in' &&
-        url.searchParams.get('sign_in_force_redirect_url')?.startsWith(urlToReturnTo) &&
-        signUpForceRedirectUrlCheck
-      );
+      const signUpRegularCase =
+        signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) && signUpForceRedirectUrl?.includes('token=');
+
+      const signUpPrepareAccountCase =
+        signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
+        signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim')) &&
+        signUpForceRedirectUrl?.includes(encodeURIComponent('token='));
+
+      const signUpHasRequiredParams = signUpRegularCase || signUpPrepareAccountCase;
+
+      return url.pathname === '/apps/claim/sign-in' && signInHasRequiredParams && signUpHasRequiredParams;
     });
   });
 
