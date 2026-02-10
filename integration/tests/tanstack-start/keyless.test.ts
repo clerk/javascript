@@ -8,9 +8,9 @@ import {
   testToggleCollapsePopoverAndClaim,
 } from '../../testUtils/keylessHelpers';
 
-const commonSetup = appConfigs.tanstack.reactStart.clone();
+const commonSetup = appConfigs.reactRouter.reactRouterNode.clone();
 
-test.describe('Keyless mode @tanstack-react-start', () => {
+test.describe('Keyless mode @react-router', () => {
   test.describe.configure({ mode: 'serial' });
   test.setTimeout(90_000);
 
@@ -39,7 +39,7 @@ test.describe('Keyless mode @tanstack-react-start', () => {
   });
 
   test('Toggle collapse popover and claim.', async ({ page, context }) => {
-    await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl, framework: 'tanstack-react-start' });
+    await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl });
   });
 
   test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({
