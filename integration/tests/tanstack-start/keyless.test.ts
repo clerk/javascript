@@ -39,7 +39,7 @@ test.describe('Keyless mode @react-router', () => {
   });
 
   test('Toggle collapse popover and claim.', async ({ page, context }) => {
-    await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl });
+    await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl, framework: 'react-router' });
   });
 
   test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({
