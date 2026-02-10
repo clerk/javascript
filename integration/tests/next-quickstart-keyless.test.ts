@@ -93,13 +93,15 @@ test.describe('Keyless mode @quickstart', () => {
       const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
 
       const signUpForceRedirectUrlCheck =
-        signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) ||
+        (signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) && signUpForceRedirectUrl?.includes('token=')) ||
         (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
-          signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim')));
+          signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
 
       return (
         url.pathname === '/apps/claim/sign-in' &&
         signInForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) &&
+        signInForceRedirectUrl?.includes('token=') &&
+        signInForceRedirectUrl?.includes('framework=nextjs') &&
         signUpForceRedirectUrlCheck
       );
     });
