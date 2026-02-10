@@ -25,7 +25,7 @@ export function OAuthConsentInternal() {
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
 
-  const primaryEmailAddress = user?.emailAddresses.find(email => email.id === user.primaryEmailAddress?.id);
+  const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
 
   // Filter out offline_access from displayed scopes as it doesn't describe what can be accessed
   const displayedScopes = (scopes || []).filter(item => item.scope !== OFFLINE_ACCESS_SCOPE);
@@ -106,9 +106,7 @@ export function OAuthConsentInternal() {
               </ConnectionHeader>
             )}
             <Header.Title localizationKey={oAuthApplicationName} />
-            <Header.Subtitle
-              localizationKey={`wants to access ${applicationName} on behalf of ${primaryEmailAddress}`}
-            />
+            <Header.Subtitle localizationKey={`wants to access ${applicationName} on behalf of ${primaryIdentifier}`} />
           </Header.Root>
           <Box
             sx={t => ({

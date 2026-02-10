@@ -1,4 +1,4 @@
-import { useClerk, useOrganizationContext, useSession } from '@clerk/shared/react';
+import { __internal_useOrganizationBase, useClerk, useSession } from '@clerk/shared/react';
 import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/shared/types';
 import * as React from 'react';
 
@@ -105,7 +105,7 @@ function Card(props: CardProps) {
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
   // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
-  const organizationCtx = useOrganizationContext();
+  const organization = __internal_useOrganizationBase();
 
   const ctaPosition = pricingTableProps.ctaPosition || ctxCtaPosition || 'bottom';
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
@@ -138,7 +138,7 @@ function Card(props: CardProps) {
     plan,
     planPeriod,
     for: pricingTableProps.for,
-    hasActiveOrganization: !!organizationCtx?.organization,
+    hasActiveOrganization: !!organization,
   });
 
   return (

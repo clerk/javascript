@@ -9,8 +9,6 @@ import type { LoaderFunctionArgs } from 'react-router';
 import { IsOptIntoMiddleware } from '../server/utils';
 import { noLoaderArgsPassedInGetAuth } from '../utils/errors';
 import { authFnContext } from './clerkMiddleware';
-import { legacyAuthenticateRequest } from './legacyAuthenticateRequest';
-import { loadOptions } from './loadOptions';
 
 type GetAuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
@@ -22,25 +20,17 @@ export const getAuth: GetAuthFn<LoaderFunctionArgs, true> = (async (
     throw new Error(noLoaderArgsPassedInGetAuth);
   }
 
-  const { acceptsToken, treatPendingAsSignedOut, ...restOptions } = opts || {};
+  const { acceptsToken, treatPendingAsSignedOut } = opts || {};
 
-  // If the middleware is installed, use the auth function from the context
   const authObjectFn = IsOptIntoMiddleware(args.context) && args.context.get(authFnContext);
-  if (authObjectFn) {
-    return getAuthObjectForAcceptedToken({
-      authObject: authObjectFn({ treatPendingAsSignedOut }),
-      acceptsToken,
-    });
+  if (!authObjectFn) {
+    throw new Error(
+      'Clerk: clerkMiddleware() not detected. Make sure you have installed the clerkMiddleware in your root route.',
+    );
   }
 
-  // Fallback to the legacy authenticateRequest if the middleware is not installed
-  const loadedOptions = loadOptions(args, restOptions);
-  const requestState = await legacyAuthenticateRequest(args, {
-    ...loadedOptions,
-    acceptsToken: 'any',
+  return getAuthObjectForAcceptedToken({
+    authObject: authObjectFn({ treatPendingAsSignedOut }),
+    acceptsToken,
   });
-
-  const authObject = requestState.toAuth({ treatPendingAsSignedOut });
-
-  return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
 }) as GetAuthFn<LoaderFunctionArgs, true>;

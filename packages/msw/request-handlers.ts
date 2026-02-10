@@ -1,6 +1,9 @@
 import { http, HttpResponse } from 'msw';
 
 import type {
+  BillingPaymentMethodJSON,
+  BillingPayerJSON,
+  BillingPlanJSON,
   BillingSubscriptionJSON,
   OrganizationMembershipResource,
   OrganizationResource,
@@ -166,9 +169,226 @@ let currentOrganization: OrganizationResource | null = null;
 let currentMembership: OrganizationMembershipResource | null = null;
 let currentInvitations: any[] = [];
 let currentEnvironment: EnvironmentPreset = EnvironmentService.MULTI_SESSION;
+let currentBillingPlans: BillingPlanJSON[] = BillingService.createDefaultPlans();
 let currentSubscription: BillingSubscriptionJSON | null = null;
+let currentOrganizationSubscription: BillingSubscriptionJSON | null = null;
+
+function getSubscriptionPayerType(
+  subscription: BillingSubscriptionJSON | null | undefined,
+): BillingPlanJSON['for_payer_type'] | null {
+  return subscription?.subscription_items?.[0]?.plan?.for_payer_type ?? null;
+}
+
+function getBillingPlans(): BillingPlanJSON[] {
+  if (currentBillingPlans.length > 0) {
+    return currentBillingPlans;
+  }
+  return BillingService.createDefaultPlans();
+}
+
+function getBillingPlansForPayerType(payerType: BillingPlanJSON['for_payer_type']): BillingPlanJSON[] {
+  const plans = getBillingPlans().filter(plan => plan.for_payer_type === payerType);
+  if (plans.length > 0) {
+    return plans;
+  }
+  return BillingService.createDefaultPlans().filter(plan => plan.for_payer_type === payerType);
+}
+
+function getDefaultBillingPlan(payerType: BillingPlanJSON['for_payer_type']): BillingPlanJSON {
+  const plans = getBillingPlansForPayerType(payerType);
+  return (
+    plans.find(plan => plan.is_default) ??
+    plans[0] ??
+    BillingService.createPlan({
+      for_payer_type: payerType,
+      id: `plan_${payerType}_fallback`,
+      name: payerType === 'org' ? 'Organization Plan' : 'User Plan',
+      slug: `${payerType}-fallback`,
+    })
+  );
+}
+
+function resolveBillingPlan(payerType: BillingPlanJSON['for_payer_type'], planId?: string | null): BillingPlanJSON {
+  const plans = getBillingPlansForPayerType(payerType);
+  if (planId) {
+    const matchingPlan = plans.find(plan => plan.id === planId);
+    if (matchingPlan) {
+      return matchingPlan;
+    }
+  }
+  return getDefaultBillingPlan(payerType);
+}
+
+function getCurrentUserEmail(): string | null {
+  const safeUser = currentUser as any;
+  return (
+    safeUser?.primaryEmailAddress?.emailAddress ??
+    safeUser?.emailAddresses?.[0]?.emailAddress ??
+    (safeUser?.id ? `${safeUser.id}@example.com` : null)
+  );
+}
+
+function createBillingPayer(orgId?: string): BillingPayerJSON {
+  const safeUser = currentUser as any;
+  const payerType = orgId ? 'org' : 'user';
+
+  return BillingService.createPayer({
+    id: orgId ? `payer_org_${orgId}` : `payer_user_${currentUser?.id ?? 'mock'}`,
+    user_id: currentUser?.id ?? null,
+    email: getCurrentUserEmail(),
+    first_name: safeUser?.firstName ?? null,
+    last_name: safeUser?.lastName ?? null,
+    organization_id: orgId ?? null,
+    organization_name: payerType === 'org' ? ((currentOrganization as any)?.name ?? null) : null,
+  });
+}
+
+function getStoredSubscriptionForPayerType(
+  payerType: BillingPlanJSON['for_payer_type'],
+): BillingSubscriptionJSON | null {
+  if (payerType === 'org') {
+    return currentOrganizationSubscription;
+  }
+  return currentSubscription;
+}
+
+function setStoredSubscriptionForPayerType(
+  payerType: BillingPlanJSON['for_payer_type'],
+  subscription: BillingSubscriptionJSON | null,
+) {
+  if (payerType === 'org') {
+    currentOrganizationSubscription = subscription;
+    return;
+  }
+  currentSubscription = subscription;
+}
+
+function getBillingSubscriptionForPayerType(payerType: BillingPlanJSON['for_payer_type']): BillingSubscriptionJSON {
+  const storedSubscription = getStoredSubscriptionForPayerType(payerType);
+  if (storedSubscription && getSubscriptionPayerType(storedSubscription) === payerType) {
+    return storedSubscription;
+  }
+  const generatedSubscription = BillingService.createSubscription(getDefaultBillingPlan(payerType));
+  setStoredSubscriptionForPayerType(payerType, generatedSubscription);
+  return generatedSubscription;
+}
+
+function getNestedParams(body: Record<string, unknown>): Record<string, unknown> | null {
+  const nested = body.params;
+  if (nested && typeof nested === 'object' && !Array.isArray(nested)) {
+    return nested as Record<string, unknown>;
+  }
+  return null;
+}
+
+function readStringParam(
+  body: Record<string, unknown>,
+  keys: string[],
+  searchParams: URLSearchParams,
+): string | undefined {
+  const nested = getNestedParams(body);
+
+  for (const key of keys) {
+    const value = body[key];
+    if (typeof value === 'string' && value.length > 0) {
+      return value;
+    }
+
+    const loweredKey = key.toLowerCase();
+    const loweredValue = body[loweredKey];
+    if (typeof loweredValue === 'string' && loweredValue.length > 0) {
+      return loweredValue;
+    }
+
+    const nestedValue = nested?.[key];
+    if (typeof nestedValue === 'string' && nestedValue.length > 0) {
+      return nestedValue;
+    }
+
+    const nestedLoweredValue = nested?.[loweredKey];
+    if (typeof nestedLoweredValue === 'string' && nestedLoweredValue.length > 0) {
+      return nestedLoweredValue;
+    }
+  }
+
+  for (const key of keys) {
+    const fromQuery = searchParams.get(key) ?? searchParams.get(key.toLowerCase());
+    if (fromQuery) {
+      return fromQuery;
+    }
+  }
+
+  return undefined;
+}
+
+async function parseRequestBodyAsRecord(request: Request): Promise<Record<string, unknown>> {
+  const text = await request.text();
+  if (!text) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(text);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed as Record<string, unknown>;
+    }
+  } catch {
+    // noop
+  }
+
+  return parseUrlEncodedBody(text);
+}
+
+function parsePagination(searchParams: URLSearchParams): { limit?: number; offset?: number } {
+  const parseValue = (value: string | null): number | undefined => {
+    if (!value) {
+      return undefined;
+    }
+
+    const parsed = Number.parseInt(value, 10);
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined;
+  };
+
+  return {
+    limit: parseValue(searchParams.get('limit')),
+    offset: parseValue(searchParams.get('offset')),
+  };
+}
+
+function paginateCollection<T>(items: T[], limit?: number, offset?: number): { data: T[]; total_count: number } {
+  const safeOffset = typeof offset === 'number' && offset >= 0 ? offset : 0;
+  const safeLimit = typeof limit === 'number' && limit >= 0 ? limit : items.length;
+  return {
+    data: items.slice(safeOffset, safeOffset + safeLimit),
+    total_count: items.length,
+  };
+}
+
+function normalizePlanPeriod(value: string | null | undefined): 'month' | 'annual' {
+  const normalized = (value || '').toLowerCase();
+  if (['annual', 'year', 'yearly', 'annually'].includes(normalized)) {
+    return 'annual';
+  }
+  return 'month';
+}
+
+function createUnauthorizedResponse() {
+  return createNoStoreResponse({ error: 'No active session' }, { status: 401 });
+}
+
+function getDefaultPaymentMethods(): BillingPaymentMethodJSON[] {
+  return BillingService.createDefaultPaymentMethods();
+}
+
+function getPrimaryPaymentMethod(): BillingPaymentMethodJSON | undefined {
+  return getDefaultPaymentMethods()[0];
+}
 
 export function setClerkState(state: {
+  billing?: {
+    plans: BillingPlanJSON[];
+    subscription: BillingSubscriptionJSON;
+  };
   environment?: EnvironmentPreset;
   instance?: EnvironmentPreset;
   membership?: OrganizationMembershipResource | null;
@@ -181,7 +401,17 @@ export function setClerkState(state: {
   currentOrganization = state.organization ?? null;
   currentMembership = state.membership ?? null;
   currentInvitations = [];
+  currentBillingPlans = state.billing?.plans ?? BillingService.createDefaultPlans();
   currentSubscription = null;
+  currentOrganizationSubscription = null;
+  if (state.billing?.subscription) {
+    const payerType = getSubscriptionPayerType(state.billing.subscription);
+    if (payerType === 'org') {
+      currentOrganizationSubscription = state.billing.subscription;
+    } else {
+      currentSubscription = state.billing.subscription;
+    }
+  }
   SignUpService.reset();
   SignInService.reset();
 
@@ -1418,14 +1648,371 @@ export const clerkHandlers = [
     });
   }),
 
+  // Billing namespace endpoints
+  http.get('*/v1/billing/plans', ({ request }) => {
+    const url = new URL(request.url);
+    const payerTypeParam = url.searchParams.get('payer_type');
+    const payerType =
+      payerTypeParam === 'org' || payerTypeParam === 'user'
+        ? (payerTypeParam as BillingPlanJSON['for_payer_type'])
+        : undefined;
+    const { limit, offset } = parsePagination(url.searchParams);
+    const plans = payerType ? getBillingPlansForPayerType(payerType) : getBillingPlans();
+    return createNoStoreResponse(paginateCollection(plans, limit, offset));
+  }),
+
+  http.get('*/v1/billing/plans/:id', ({ params }) => {
+    const planId = params.id as string;
+    const plan = getBillingPlans().find(item => item.id === planId);
+
+    if (!plan) {
+      return createNoStoreResponse({ error: 'Plan not found' }, { status: 404 });
+    }
+
+    return createNoStoreResponse(plan);
+  }),
+
+  http.get('*/v1/me/billing/subscription', () => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    return createNoStoreResponse({ response: getBillingSubscriptionForPayerType('user') });
+  }),
+
+  http.get('*/v1/organizations/:orgId/billing/subscription', () => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    return createNoStoreResponse({ response: getBillingSubscriptionForPayerType('org') });
+  }),
+
+  http.get('*/v1/me/billing/statements', ({ request }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    const url = new URL(request.url);
+    const { limit, offset } = parsePagination(url.searchParams);
+    const subscription = getBillingSubscriptionForPayerType('user');
+    const plan = subscription.subscription_items?.[0]?.plan ?? getDefaultBillingPlan('user');
+    const response = paginateCollection([BillingService.createStatement(plan)], limit, offset);
+
+    return createNoStoreResponse({ response });
+  }),
+
+  http.get('*/v1/organizations/:orgId/billing/statements', ({ request }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    const url = new URL(request.url);
+    const { limit, offset } = parsePagination(url.searchParams);
+    const subscription = getBillingSubscriptionForPayerType('org');
+    const plan = subscription.subscription_items?.[0]?.plan ?? getDefaultBillingPlan('org');
+    const response = paginateCollection([BillingService.createStatement(plan)], limit, offset);
+
+    return createNoStoreResponse({ response });
+  }),
+
+  http.get('*/v1/me/billing/statements/:id', ({ params }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    const subscription = getBillingSubscriptionForPayerType('user');
+    const plan = subscription.subscription_items?.[0]?.plan ?? getDefaultBillingPlan('user');
+    const statement = BillingService.createStatement(plan, { id: params.id as string });
+
+    return createNoStoreResponse({ response: statement });
+  }),
+
+  http.get('*/v1/organizations/:orgId/billing/statements/:id', ({ params }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    const subscription = getBillingSubscriptionForPayerType('org');
+    const plan = subscription.subscription_items?.[0]?.plan ?? getDefaultBillingPlan('org');
+    const statement = BillingService.createStatement(plan, { id: params.id as string });
+
+    return createNoStoreResponse({ response: statement });
+  }),
+
+  http.get('*/v1/me/billing/payment_attempts', ({ request }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    const url = new URL(request.url);
+    const { limit, offset } = parsePagination(url.searchParams);
+    const subscription = getBillingSubscriptionForPayerType('user');
+    const plan = subscription.subscription_items?.[0]?.plan ?? getDefaultBillingPlan('user');
+
+    return createNoStoreResponse(paginateCollection([BillingService.createPaymentAttempt(plan)], limit, offset));
+  }),
+
+  http.get('*/v1/organizations/:orgId/billing/payment_attempts', ({ request }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    const url = new URL(request.url);
+    const { limit, offset } = parsePagination(url.searchParams);
+    const subscription = getBillingSubscriptionForPayerType('org');
+    const plan = subscription.subscription_items?.[0]?.plan ?? getDefaultBillingPlan('org');
+
+    return createNoStoreResponse(paginateCollection([BillingService.createPaymentAttempt(plan)], limit, offset));
+  }),
+
+  http.get('*/v1/me/billing/payment_attempts/:id', ({ params }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    const subscription = getBillingSubscriptionForPayerType('user');
+    const plan = subscription.subscription_items?.[0]?.plan ?? getDefaultBillingPlan('user');
+
+    return createNoStoreResponse(BillingService.createPaymentAttempt(plan, { id: params.id as string }));
+  }),
+
+  http.get('*/v1/organizations/:orgId/billing/payment_attempts/:id', ({ params }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    const subscription = getBillingSubscriptionForPayerType('org');
+    const plan = subscription.subscription_items?.[0]?.plan ?? getDefaultBillingPlan('org');
+
+    return createNoStoreResponse(BillingService.createPaymentAttempt(plan, { id: params.id as string }));
+  }),
+
+  http.get('*/v1/me/billing/payment_methods', ({ request }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    const url = new URL(request.url);
+    const { limit, offset } = parsePagination(url.searchParams);
+    const paginated = paginateCollection(getDefaultPaymentMethods(), limit, offset);
+
+    return createNoStoreResponse({
+      response: paginated,
+    });
+  }),
+
+  http.get('*/v1/organizations/:orgId/billing/payment_methods', ({ request }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    const url = new URL(request.url);
+    const { limit, offset } = parsePagination(url.searchParams);
+    const paginated = paginateCollection(getDefaultPaymentMethods(), limit, offset);
+
+    return createNoStoreResponse({
+      response: paginated,
+    });
+  }),
+
+  http.post('*/v1/me/billing/payment_methods/initialize', () => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    return createNoStoreResponse({
+      response: BillingService.createInitializedPaymentMethod(),
+    });
+  }),
+
+  http.post('*/v1/organizations/:orgId/billing/payment_methods/initialize', () => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    return createNoStoreResponse({
+      response: BillingService.createInitializedPaymentMethod(),
+    });
+  }),
+
+  http.post('*/v1/me/billing/payment_methods', async ({ request }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    try {
+      await request.text();
+    } catch {
+      // ignore body in mock mode
+    }
+
+    return createNoStoreResponse({
+      response: BillingService.createPaymentMethod({
+        card_type: 'visa',
+        last4: '4242',
+      }),
+    });
+  }),
+
+  http.post('*/v1/organizations/:orgId/billing/payment_methods', async ({ request }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    try {
+      await request.text();
+    } catch {
+      // ignore body in mock mode
+    }
+
+    return createNoStoreResponse({
+      response: BillingService.createPaymentMethod({
+        card_type: 'visa',
+        last4: '4242',
+      }),
+    });
+  }),
+
+  http.post('*/v1/me/billing/checkouts', async ({ request }) => {
+    if (!currentSession || !currentUser) {
+      return createNoStoreResponse({ error: 'No active session' }, { status: 401 });
+    }
+
+    const url = new URL(request.url);
+    const body = await parseRequestBodyAsRecord(request);
+    const planId = readStringParam(body, ['plan_id', 'planId', 'plan'], url.searchParams);
+    const rawPlanPeriod = readStringParam(
+      body,
+      ['plan_period', 'planPeriod', 'interval', 'billing_interval', 'billingInterval', 'period'],
+      url.searchParams,
+    );
+    const planPeriod = normalizePlanPeriod(rawPlanPeriod);
+    const plan = resolveBillingPlan('user', planId);
+    const paymentMethod = getPrimaryPaymentMethod();
+    const checkout = BillingService.createCheckout(plan, {
+      plan_period: planPeriod,
+      payer: createBillingPayer(),
+      payment_method: paymentMethod,
+      needs_payment_method: !paymentMethod,
+    });
+
+    return createNoStoreResponse({ response: checkout });
+  }),
+
+  http.post('*/v1/organizations/:orgId/billing/checkouts', async ({ params, request }) => {
+    if (!currentSession || !currentUser) {
+      return createNoStoreResponse({ error: 'No active session' }, { status: 401 });
+    }
+
+    const url = new URL(request.url);
+    const body = await parseRequestBodyAsRecord(request);
+    const planId = readStringParam(body, ['plan_id', 'planId', 'plan'], url.searchParams);
+    const rawPlanPeriod = readStringParam(
+      body,
+      ['plan_period', 'planPeriod', 'interval', 'billing_interval', 'billingInterval', 'period'],
+      url.searchParams,
+    );
+    const planPeriod = normalizePlanPeriod(rawPlanPeriod);
+    const plan = resolveBillingPlan('org', planId);
+    const paymentMethod = getPrimaryPaymentMethod();
+    const checkout = BillingService.createCheckout(plan, {
+      plan_period: planPeriod,
+      payer: createBillingPayer(params.orgId as string),
+      payment_method: paymentMethod,
+      needs_payment_method: !paymentMethod,
+    });
+
+    return createNoStoreResponse({ response: checkout });
+  }),
+
+  http.patch('*/v1/me/billing/checkouts/:checkoutId/confirm', async ({ params, request }) => {
+    if (!currentSession || !currentUser) {
+      return createNoStoreResponse({ error: 'No active session' }, { status: 401 });
+    }
+
+    const url = new URL(request.url);
+    const body = await parseRequestBodyAsRecord(request);
+    const planId = readStringParam(body, ['plan_id', 'planId', 'plan'], url.searchParams);
+    const rawPlanPeriod = readStringParam(
+      body,
+      ['plan_period', 'planPeriod', 'interval', 'billing_interval', 'billingInterval', 'period'],
+      url.searchParams,
+    );
+    const planPeriod = normalizePlanPeriod(rawPlanPeriod);
+    const plan = resolveBillingPlan('user', planId);
+    const paymentMethod = getPrimaryPaymentMethod();
+    const checkout = BillingService.createCheckout(plan, {
+      id: params.checkoutId as string,
+      plan_period: planPeriod,
+      status: 'completed',
+      payer: createBillingPayer(),
+      payment_method: paymentMethod,
+      needs_payment_method: !paymentMethod,
+    });
+
+    setStoredSubscriptionForPayerType(
+      'user',
+      BillingService.createSubscription(plan, {
+        subscription_items: [
+          BillingService.createSubscriptionItem(plan, {
+            plan_period: planPeriod,
+          }),
+        ],
+      }),
+    );
+
+    return createNoStoreResponse({ response: checkout });
+  }),
+
+  http.patch('*/v1/organizations/:orgId/billing/checkouts/:checkoutId/confirm', async ({ params, request }) => {
+    if (!currentSession || !currentUser) {
+      return createNoStoreResponse({ error: 'No active session' }, { status: 401 });
+    }
+
+    const url = new URL(request.url);
+    const body = await parseRequestBodyAsRecord(request);
+    const planId = readStringParam(body, ['plan_id', 'planId', 'plan'], url.searchParams);
+    const rawPlanPeriod = readStringParam(
+      body,
+      ['plan_period', 'planPeriod', 'interval', 'billing_interval', 'billingInterval', 'period'],
+      url.searchParams,
+    );
+    const planPeriod = normalizePlanPeriod(rawPlanPeriod);
+    const plan = resolveBillingPlan('org', planId);
+    const paymentMethod = getPrimaryPaymentMethod();
+    const checkout = BillingService.createCheckout(plan, {
+      id: params.checkoutId as string,
+      plan_period: planPeriod,
+      status: 'completed',
+      payer: createBillingPayer(params.orgId as string),
+      payment_method: paymentMethod,
+      needs_payment_method: !paymentMethod,
+    });
+
+    setStoredSubscriptionForPayerType(
+      'org',
+      BillingService.createSubscription(plan, {
+        subscription_items: [
+          BillingService.createSubscriptionItem(plan, {
+            plan_period: planPeriod,
+          }),
+        ],
+      }),
+    );
+
+    return createNoStoreResponse({ response: checkout });
+  }),
+
   // Commerce endpoints - Payment methods
   http.get('https://*.clerk.accounts.dev/v1/me/commerce/payment_methods', () => {
-    const result = BillingService.getPaymentSources(currentSession, currentUser);
-    if (!result.authorized) {
-      return createNoStoreResponse({ error: result.error }, { status: result.status });
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
     }
-    const data = result.data.data ?? result.data.response.data ?? [];
-    const total = result.data.total_count ?? result.data.response.total_count ?? data.length;
+
+    const data = getDefaultPaymentMethods();
+    const total = data.length;
+
     return createNoStoreResponse({
       data,
       response: {
@@ -1437,195 +2024,100 @@ export const clerkHandlers = [
   }),
 
   http.post('https://*.clerk.accounts.dev/v1/me/commerce/payment_methods/initialize', () => {
-    const result = BillingService.initializePaymentSource(currentSession, currentUser);
-    if (!result.authorized) {
-      return createNoStoreResponse({ error: result.error }, { status: result.status });
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
     }
-    return createNoStoreResponse(result.data);
+
+    return createNoStoreResponse({
+      response: BillingService.createInitializedPaymentMethod(),
+    });
   }),
 
   http.post('https://*.clerk.accounts.dev/v1/me/commerce/payment_methods', () => {
-    const result = BillingService.createPaymentSource(currentSession, currentUser);
-    if (!result.authorized) {
-      return createNoStoreResponse({ error: result.error }, { status: result.status });
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
     }
-    return createNoStoreResponse(result.data);
+
+    return createNoStoreResponse({
+      response: BillingService.createPaymentMethod({
+        card_type: 'visa',
+        last4: '4242',
+      }),
+    });
   }),
 
   http.patch('https://*.clerk.accounts.dev/v1/me/commerce/payment_methods/:id', () => {
-    const result = BillingService.updatePaymentSource(currentSession, currentUser);
-    if (!result.authorized) {
-      return createNoStoreResponse({ error: result.error }, { status: result.status });
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
     }
-    return createNoStoreResponse(result.data);
+
+    return createNoStoreResponse({
+      response: {
+        success: true,
+      },
+    });
   }),
 
-  http.delete('https://*.clerk.accounts.dev/v1/me/commerce/payment_methods/:id', () => {
-    const result = BillingService.deletePaymentSource(currentSession, currentUser);
-    if (!result.authorized) {
-      return createNoStoreResponse({ error: result.error }, { status: result.status });
+  http.delete('https://*.clerk.accounts.dev/v1/me/commerce/payment_methods/:id', ({ params }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
     }
-    return createNoStoreResponse(result.data);
+
+    return createNoStoreResponse({
+      response: {
+        deleted: true,
+        id: (params.id as string) ?? 'pm_mock_deleted',
+        object: 'commerce_payment_method',
+      },
+    });
   }),
 
   http.post('https://*.clerk.accounts.dev/v1/me/commerce/checkouts', async ({ request }) => {
     if (!currentSession || !currentUser) {
-      return createNoStoreResponse({ error: 'No active session' }, { status: 401 });
+      return createUnauthorizedResponse();
     }
 
-    let body: Record<string, any> = {};
-    let formBody: URLSearchParams | null = null;
-
-    // Read as text first (always works), then parse
-    const text = await request.text();
-    if (text) {
-      try {
-        body = JSON.parse(text);
-      } catch {
-        formBody = new URLSearchParams(text);
-        formBody.forEach((value, key) => {
-          body[key] = value;
-        });
-      }
-    }
-
+    const url = new URL(request.url);
+    const body = await parseRequestBodyAsRecord(request);
     const checkoutId = `chk_mock_${Math.random().toString(36).slice(2, 10)}`;
-    const paymentIntentId = `pi_mock_${Math.random().toString(36).slice(2, 10)}`;
-    const plansResponse = BillingService.getPlans();
-    const plans = plansResponse.response?.data ?? plansResponse.data ?? [];
-    const paymentSourcesResult = BillingService.getPaymentSources(currentSession, currentUser);
-    const paymentMethods = paymentSourcesResult.authorized
-      ? (paymentSourcesResult.data.data ?? paymentSourcesResult.data.response.data ?? [])
-      : [];
-    const normalizePlan = (input: any) => {
-      const safeArray = (value: any) => (Array.isArray(value) ? value : []);
-      const plan =
-        input ??
-        ({
-          annual_fee: null,
-          annual_monthly_fee: null,
-          avatar_url: '',
-          description: 'Mock plan',
-          fee: { amount: 999, amount_formatted: '9.99', currency: 'usd', currency_symbol: '$' },
-          for_payer_type: 'user',
-          free_trial_days: 14,
-          free_trial_enabled: true,
-          has_base_fee: true,
-          id: 'plan_mock_default',
-          is_default: true,
-          is_recurring: true,
-          name: 'Mock Plan',
-          object: 'commerce_plan',
-          publicly_visible: true,
-          slug: 'mock-plan',
-        } as any);
-
-      return {
-        ...plan,
-        annual_fee: plan.annual_fee ?? null,
-        annual_monthly_fee: plan.annual_monthly_fee ?? null,
-        avatar_url: plan.avatar_url ?? '',
-        description: plan.description ?? null,
-        features: safeArray((plan as any).features),
-        free_trial_days: plan.free_trial_days ?? null,
-        free_trial_enabled: plan.free_trial_enabled ?? false,
-        has_base_fee: plan.has_base_fee ?? false,
-        for_payer_type: plan.for_payer_type ?? 'user',
-        publicly_visible: plan.publicly_visible ?? true,
-      };
-    };
-    if (plans.length === 0) {
-      plans.push(normalizePlan(null));
-    }
-    const urlParams = new URL(request.url).searchParams;
-    const getParam = (key: string) => {
-      const lower = key.toLowerCase();
-      return (
-        body[key] ??
-        body?.params?.[key] ??
-        body[lower] ??
-        body?.params?.[lower] ??
-        formBody?.get(key) ??
-        formBody?.get(lower) ??
-        urlParams.get(key) ??
-        urlParams.get(lower)
-      );
-    };
-
-    const preferredPlanId = getParam('plan_id') || getParam('planId') || getParam('plan') || getParam('planId');
-    const rawPeriod =
-      getParam('plan_period') ||
-      getParam('planPeriod') ||
-      getParam('interval') ||
-      getParam('billing_interval') ||
-      getParam('billingInterval') ||
-      getParam('billing_period') ||
-      getParam('billingPeriod') ||
-      getParam('cycle') ||
-      getParam('billing_cycle') ||
-      getParam('billingCycle') ||
-      getParam('period');
-    const normalizePeriod = (value: any): 'month' | 'annual' => {
-      const v = typeof value === 'string' ? value.toLowerCase() : '';
-      if (v === 'month' || v === 'monthly') {
-        return 'month';
-      }
-      if (['annual', 'year', 'yearly', 'annually'].includes(v)) {
-        return 'annual';
-      }
-      // honor explicit values only; fall back to month when absent/unknown
-      return 'month';
-    };
-    const planPeriod: 'month' | 'annual' = rawPeriod ? normalizePeriod(rawPeriod) : 'month';
-    const plan = plans.find(item => item.id === preferredPlanId) ?? plans[0];
-    const normalizedPlan = normalizePlan(plan);
-    const now = Date.now();
-    const needsPaymentMethod = paymentMethods.length === 0;
-    const payer = {
-      created_at: now,
-      email: (currentUser as any).emailAddresses?.[0]?.emailAddress ?? `${currentUser?.id}@example.com`,
-      first_name: (currentUser as any).firstName ?? null,
-      id: `payer_${currentUser?.id ?? 'mock'}`,
-      last_name: (currentUser as any).lastName ?? null,
-      object: 'commerce_payer',
-      organization_id: null,
-      organization_name: null,
-      updated_at: now,
-      user_id: currentUser?.id ?? null,
-    };
-    const selectedFee =
-      planPeriod === 'annual' ? (normalizedPlan.annual_fee ?? normalizedPlan.fee) : normalizedPlan.fee;
-    const totals = {
-      grand_total: selectedFee,
-      subtotal: selectedFee,
-      tax_total: { amount: 0, amount_formatted: '0.00', currency: 'usd', currency_symbol: '$' },
-      total_due_after_free_trial: selectedFee,
-      total_due_now: selectedFee,
-    };
-    const paymentMethod = paymentMethods[0] ?? null;
+    const preferredPlanId = readStringParam(body, ['plan_id', 'planId', 'plan'], url.searchParams);
+    const rawPeriod = readStringParam(
+      body,
+      [
+        'plan_period',
+        'planPeriod',
+        'interval',
+        'billing_interval',
+        'billingInterval',
+        'billing_period',
+        'billingPeriod',
+        'cycle',
+        'billing_cycle',
+        'billingCycle',
+        'period',
+      ],
+      url.searchParams,
+    );
+    const planPeriod = normalizePlanPeriod(rawPeriod);
+    const plan = resolveBillingPlan('user', preferredPlanId);
+    const paymentMethod = getPrimaryPaymentMethod();
+    const checkout = BillingService.createCheckout(plan, {
+      id: checkoutId,
+      plan_period: planPeriod,
+      payer: createBillingPayer(),
+      payment_method: paymentMethod,
+      needs_payment_method: !paymentMethod,
+      external_client_secret: `mock_checkout_secret_${checkoutId}`,
+      external_gateway_id: 'mock_gateway',
+      status: 'needs_confirmation',
+    });
     const intervalLabel = planPeriod === 'annual' ? 'year' : 'month';
 
     return createNoStoreResponse({
       response: {
+        ...checkout,
         billing_interval: intervalLabel,
-        external_client_secret: `mock_checkout_secret_${checkoutId}`,
-        external_gateway_id: 'mock_gateway',
-        free_trial_ends_at: normalizedPlan.free_trial_enabled ? now + 14 * 24 * 60 * 60 * 1000 : null,
-        id: checkoutId,
         interval: intervalLabel,
-        is_immediate_plan_change: true,
-        needs_payment_method: needsPaymentMethod,
-        object: 'commerce_checkout',
-        payer,
-        payment_method: paymentMethod,
-        plan: {
-          ...normalizedPlan,
-          fee: planPeriod === 'annual' ? (normalizedPlan.annual_fee ?? normalizedPlan.fee) : normalizedPlan.fee,
-        },
-        plan_period: planPeriod,
-        plan_period_start: now,
-        status: 'needs_confirmation',
-        totals,
       },
     });
   }),
@@ -1634,204 +2126,129 @@ export const clerkHandlers = [
     'https://*.clerk.accounts.dev/v1/me/commerce/checkouts/:checkoutId/confirm',
     async ({ params, request }) => {
       if (!currentSession || !currentUser) {
-        return createNoStoreResponse({ error: 'No active session' }, { status: 401 });
+        return createUnauthorizedResponse();
       }
 
-      let body: Record<string, any> = {};
-      let formBody: URLSearchParams | null = null;
-
-      const text = await request.text();
-      if (text) {
-        try {
-          body = JSON.parse(text);
-        } catch {
-          formBody = new URLSearchParams(text);
-          formBody.forEach((value, key) => {
-            body[key] = value;
-          });
-        }
-      }
-
-      const urlParams = new URL(request.url).searchParams;
-      const getParam = (key: string) => {
-        const lower = key.toLowerCase();
-        return (
-          body[key] ??
-          body?.params?.[key] ??
-          body[lower] ??
-          body?.params?.[lower] ??
-          formBody?.get(key) ??
-          formBody?.get(lower) ??
-          urlParams.get(key) ??
-          urlParams.get(lower)
-        );
-      };
-
-      const plansResponse = BillingService.getPlans();
-      const plans = plansResponse.response?.data ?? plansResponse.data ?? [];
-      const preferredPlanId = getParam('plan_id') || getParam('planId') || getParam('plan');
-      const rawPeriod =
-        getParam('plan_period') ||
-        getParam('planPeriod') ||
-        getParam('interval') ||
-        getParam('billing_interval') ||
-        getParam('billingInterval') ||
-        getParam('billing_period') ||
-        getParam('billingPeriod') ||
-        getParam('cycle') ||
-        getParam('billing_cycle') ||
-        getParam('billingCycle') ||
-        getParam('period');
-      const normalizePeriod = (value: any): 'month' | 'annual' => {
-        const v = typeof value === 'string' ? value.toLowerCase() : '';
-        if (v === 'month' || v === 'monthly') {
-          return 'month';
-        }
-        if (['annual', 'year', 'yearly', 'annually'].includes(v)) {
-          return 'annual';
-        }
-        // honor explicit values only; fall back to month when absent/unknown
-        return 'month';
-      };
-      const planPeriod: 'month' | 'annual' = rawPeriod ? normalizePeriod(rawPeriod) : 'month';
-      const plan = plans.find(item => item.id === preferredPlanId) ?? plans[0];
-
-      const normalizePlan = (input: any) => {
-        const safeArray = (value: any) => (Array.isArray(value) ? value : []);
-        const planData =
-          input ??
-          ({
-            annual_fee: null,
-            annual_monthly_fee: null,
-            avatar_url: '',
-            description: 'Mock plan',
-            fee: { amount: 999, amount_formatted: '9.99', currency: 'usd', currency_symbol: '$' },
-            for_payer_type: 'user',
-            free_trial_days: 14,
-            free_trial_enabled: true,
-            has_base_fee: true,
-            id: 'plan_mock_default',
-            is_default: true,
-            is_recurring: true,
-            name: 'Mock Plan',
-            object: 'commerce_plan',
-            publicly_visible: true,
-            slug: 'mock-plan',
-          } as any);
-
-        return {
-          ...planData,
-          annual_fee: planData.annual_fee ?? null,
-          annual_monthly_fee: planData.annual_monthly_fee ?? null,
-          avatar_url: planData.avatar_url ?? '',
-          description: planData.description ?? null,
-          features: safeArray((planData as any).features),
-          free_trial_days: planData.free_trial_days ?? null,
-          free_trial_enabled: planData.free_trial_enabled ?? false,
-          has_base_fee: planData.has_base_fee ?? false,
-          for_payer_type: planData.for_payer_type ?? 'user',
-          publicly_visible: planData.publicly_visible ?? true,
-        };
-      };
-
-      const normalizedPlan = normalizePlan(plan);
-      const paymentSourcesResult = BillingService.getPaymentSources(currentSession, currentUser);
-      const paymentMethods = paymentSourcesResult.authorized
-        ? (paymentSourcesResult.data.data ?? paymentSourcesResult.data.response.data ?? [])
-        : [];
-      const needsPaymentMethod = paymentMethods.length === 0;
-      const selectedFee =
-        planPeriod === 'annual' ? (normalizedPlan.annual_fee ?? normalizedPlan.fee) : normalizedPlan.fee;
-      const totals = {
-        grand_total: selectedFee,
-        subtotal: selectedFee,
-        tax_total: { amount: 0, amount_formatted: '0.00', currency: 'usd', currency_symbol: '$' },
-        total_due_after_free_trial: selectedFee,
-        total_due_now: selectedFee,
-      };
-      const now = Date.now();
+      const url = new URL(request.url);
+      const body = await parseRequestBodyAsRecord(request);
+      const preferredPlanId = readStringParam(body, ['plan_id', 'planId', 'plan'], url.searchParams);
+      const rawPeriod = readStringParam(
+        body,
+        [
+          'plan_period',
+          'planPeriod',
+          'interval',
+          'billing_interval',
+          'billingInterval',
+          'billing_period',
+          'billingPeriod',
+          'cycle',
+          'billing_cycle',
+          'billingCycle',
+          'period',
+        ],
+        url.searchParams,
+      );
+      const planPeriod = normalizePlanPeriod(rawPeriod);
+      const plan = resolveBillingPlan('user', preferredPlanId);
+      const paymentMethod = getPrimaryPaymentMethod();
       const checkoutId = params.checkoutId as string;
+      const checkout = BillingService.createCheckout(plan, {
+        id: checkoutId,
+        plan_period: planPeriod,
+        status: 'completed',
+        payer: createBillingPayer(),
+        payment_method: paymentMethod,
+        needs_payment_method: !paymentMethod,
+        external_client_secret: `mock_checkout_secret_${checkoutId}`,
+        external_gateway_id: 'mock_gateway',
+      });
 
-      const payer = {
-        created_at: now,
-        email: (currentUser as any).emailAddresses?.[0]?.emailAddress ?? `${currentUser?.id}@example.com`,
-        first_name: (currentUser as any).firstName ?? null,
-        id: `payer_${currentUser?.id ?? 'mock'}`,
-        last_name: (currentUser as any).lastName ?? null,
-        object: 'commerce_payer',
-        organization_id: null,
-        organization_name: null,
-        updated_at: now,
-        user_id: currentUser?.id ?? null,
-      };
+      setStoredSubscriptionForPayerType(
+        'user',
+        BillingService.createSubscription(plan, {
+          subscription_items: [
+            BillingService.createSubscriptionItem(plan, {
+              plan_period: planPeriod,
+            }),
+          ],
+        }),
+      );
 
       return createNoStoreResponse({
-        response: {
-          external_client_secret: `mock_checkout_secret_${checkoutId}`,
-          external_gateway_id: 'mock_gateway',
-          free_trial_ends_at: normalizedPlan.free_trial_enabled ? now + 14 * 24 * 60 * 60 * 1000 : null,
-          id: checkoutId,
-          is_immediate_plan_change: true,
-          needs_payment_method: needsPaymentMethod,
-          object: 'commerce_checkout',
-          payer,
-          payment_method: paymentMethods[0] ?? null,
-          plan: {
-            ...normalizedPlan,
-            fee: planPeriod === 'annual' ? (normalizedPlan.annual_fee ?? normalizedPlan.fee) : normalizedPlan.fee,
-          },
-          plan_period: planPeriod,
-          plan_period_start: now,
-          status: 'completed',
-          totals,
-        },
+        response: checkout,
       });
     },
   ),
 
   // Commerce endpoints - Plans
-  http.get('*/v1/commerce/plans', () => {
-    return createNoStoreResponse(BillingService.getPlans());
+  http.get('*/v1/commerce/plans', ({ request }) => {
+    const url = new URL(request.url);
+    const payerTypeParam = url.searchParams.get('payer_type');
+    const payerType =
+      payerTypeParam === 'org' || payerTypeParam === 'user'
+        ? (payerTypeParam as BillingPlanJSON['for_payer_type'])
+        : undefined;
+    const { limit, offset } = parsePagination(url.searchParams);
+    const plans = payerType ? getBillingPlansForPayerType(payerType) : getBillingPlans();
+    const paginated = paginateCollection(plans, limit, offset);
+
+    return createNoStoreResponse({
+      data: paginated.data,
+      response: paginated,
+      total_count: paginated.total_count,
+    });
   }),
 
   // Commerce endpoints - User subscription creation (trial/start)
   http.post('*/v1/me/commerce/subscription', async ({ request }) => {
-    let body: any = {};
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
     try {
-      body = await request.json();
+      await request.json();
     } catch {
-      body = {};
+      // ignore request body, this endpoint only toggles trial state in mocks
     }
+    const trialPlan =
+      getBillingPlansForPayerType('user').find(plan => plan.free_trial_enabled) ?? getDefaultBillingPlan('user');
+    const subscription = BillingService.createFreeTrialSubscription(trialPlan);
+    setStoredSubscriptionForPayerType('user', subscription);
 
-    const result = BillingService.startFreeTrial(currentSession, currentUser);
-
-    if (!result.authorized) {
-      return createNoStoreResponse({ error: result.error }, { status: result.status });
-    }
-
-    currentSubscription = result.data.response;
-
-    return createNoStoreResponse(result.data);
+    return createNoStoreResponse({ response: subscription });
   }),
 
   // Commerce endpoints - User subscription (singular)
   http.get('*/v1/me/commerce/subscription', () => {
-    const result = BillingService.getSubscription(currentSession, currentUser, currentSubscription);
-
-    if (!result.authorized) {
-      return createNoStoreResponse({ error: result.error }, { status: result.status });
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
     }
-    return createNoStoreResponse(result.data);
+
+    return createNoStoreResponse({ response: getBillingSubscriptionForPayerType('user') });
   }),
 
   // Commerce endpoints - User subscriptions (plural)
   http.get('*/v1/me/commerce/subscriptions', () => {
-    return createNoStoreResponse(BillingService.getSubscriptions());
+    return createNoStoreResponse({
+      data: [getBillingSubscriptionForPayerType('user')],
+      total_count: 1,
+    });
   }),
 
   // Commerce endpoints - Statements
-  http.get('*/v1/me/commerce/statements', () => {
-    return createNoStoreResponse(BillingService.getStatements());
+  http.get('*/v1/me/commerce/statements', ({ request }) => {
+    if (!currentSession || !currentUser) {
+      return createUnauthorizedResponse();
+    }
+
+    const url = new URL(request.url);
+    const { limit, offset } = parsePagination(url.searchParams);
+    const subscription = getBillingSubscriptionForPayerType('user');
+    const plan = subscription.subscription_items?.[0]?.plan ?? getDefaultBillingPlan('user');
+    const statements = paginateCollection([BillingService.createStatement(plan)], limit, offset);
+
+    return createNoStoreResponse(statements);
   }),
 
   // Image endpoints

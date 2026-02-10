@@ -1,6 +1,6 @@
 import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 
-import type { ClerkUiConstructor } from '../ui/types';
+import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   BillingCheckoutResource,
@@ -715,6 +715,23 @@ export interface Clerk {
   unmountTaskResetPassword: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts a TaskSetupMFA component at the target element.
+   * This component allows users to set up multi-factor authentication.
+   *
+   * @param targetNode - Target node to mount the TaskSetupMFA component.
+   * @param props - configuration parameters.
+   */
+  mountTaskSetupMfa: (targetNode: HTMLDivElement, props?: TaskSetupMFAProps) => void;
+
+  /**
+   * Unmount a TaskSetupMFA component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode - Target node to unmount the TaskSetupMFA component from.
+   */
+  unmountTaskSetupMfa: (targetNode: HTMLDivElement) => void;
+
+  /**
    * @internal
    * Loads Stripe libraries for commerce functionality
    */
@@ -1130,9 +1147,10 @@ export type ClerkOptions = ClerkOptionsNavigation &
   AfterMultiSessionSingleSignOutUrl &
   ClerkUnsafeOptions & {
     /**
-     * Clerk UI entrypoint.
+     * Clerk UI module. Pass the `ui` export from `@clerk/ui` to bundle the UI
+     * with your application instead of loading it from the CDN.
      */
-    clerkUICtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
+    ui?: { ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor> };
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
@@ -2347,6 +2365,14 @@ export type TaskChooseOrganizationProps = {
 };
 
 export type TaskResetPasswordProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   */
+  redirectUrlComplete: string;
+  appearance?: ClerkAppearanceTheme;
+};
+
+export type TaskSetupMFAProps = {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
    */
