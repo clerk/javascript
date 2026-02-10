@@ -5,7 +5,7 @@ import { AuthStatus, constants, TokenType } from '@clerk/backend/internal';
 import assert from 'assert';
 import type { NextFetchEvent } from 'next/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { clerkClient } from '../clerkClient';
 import { clerkMiddleware } from '../clerkMiddleware';
@@ -976,7 +976,7 @@ describe('frontendApiProxy multi-domain support', () => {
     })(req, {} as NextFetchEvent);
 
     expect(shouldProxy).toHaveBeenCalledWith(expect.any(URL));
-    expect(shouldProxy.mock.calls[0]![0].hostname).toBe('myapp.replit.app');
+    expect(shouldProxy.mock.calls[0][0].hostname).toBe('myapp.replit.app');
     expect((await clerkClient()).authenticateRequest).not.toBeCalled();
     expect(resp).toBeDefined();
   });
@@ -992,7 +992,7 @@ describe('frontendApiProxy multi-domain support', () => {
     })(req, {} as NextFetchEvent);
 
     expect(shouldProxy).toHaveBeenCalledWith(expect.any(URL));
-    expect(shouldProxy.mock.calls[0]![0].hostname).toBe('myapp.com');
+    expect(shouldProxy.mock.calls[0][0].hostname).toBe('myapp.com');
     // Request should pass through to normal auth flow
     expect((await clerkClient()).authenticateRequest).toBeCalled();
     expect(resp?.status).toEqual(200);
