@@ -75,7 +75,8 @@ test.describe('Keyless mode @tanstack-react-start', () => {
       const signUpForceRedirectUrlCheck =
         (signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) && signUpForceRedirectUrl?.includes('token=')) ||
         (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
-          signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
+          signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim')) &&
+          signUpForceRedirectUrl?.includes(encodeURIComponent('token=')));
 
       return (
         url.pathname === '/apps/claim/sign-in' &&
