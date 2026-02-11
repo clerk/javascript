@@ -33,17 +33,12 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             logger.error('Missing adapter, please update your Astro config to use one.');
           }
 
-          const isDev = command === 'dev';
-
-          // Note: Keyless mode is now handled by middleware per-request, not here
-          // Keys are read directly from process.env by server code - no vite.define injection needed
-
           const internalParams: ClerkOptions = {
             ...params,
             sdkMetadata: {
               version: packageVersion,
               name: packageName,
-              environment: isDev ? 'development' : 'production',
+              environment: command === 'dev' ? 'development' : 'production',
             },
           };
 
