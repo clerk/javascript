@@ -2,4 +2,4 @@
 '@clerk/ui': patch
 ---
 
-Align ESM build SVGO config with rspack to preserve SVG viewBox
+Fix issue where SVG elements had unexpected width/height attributes
