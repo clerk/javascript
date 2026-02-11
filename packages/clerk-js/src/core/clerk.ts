@@ -176,6 +176,7 @@ import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
 import { Protect } from './protect';
+import type { Session } from './resources/internal';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
@@ -1550,13 +1551,53 @@ export class Clerk implements ClerkInterface {
         await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
       }
 
+      const taskUrl =
+        newSession?.status === 'pending' &&
+        newSession?.currentTask &&
+        this.#options.taskUrls?.[newSession?.currentTask.key];
+      const shouldNavigate = !!(redirectUrl || taskUrl || setActiveNavigate);
+
       //1. setLastActiveSession to passed user session (add a param).
       //   Note that this will also update the session's active organization
       //   id.
+      /*
+        The introduction of useSyncExternalStore introduced a bug here, where the
+        updateClient that happens as a result of this touch emitted and immediately
+        caused components to re-render. Previously, that emit was batched with the
+        setTransitiveState call.
+
+        This whole block should likely happen later, after the transitive state is set.
+
+        Because we want to minimize behavioral changes until we can tackle this properly,
+        this was refactored so that updateClient does not emit under these circumstances.
+      */
       if (inActiveBrowserTab() || !this.#options.standardBrowser) {
-        await this.#touchCurrentSession(newSession);
-        // reload session from updated client
-        newSession = this.#getSessionFromClient(newSession?.id);
+        let updatedClient: ClientResource | undefined;
+        if (shouldNavigate && newSession) {
+          try {
+            // __internal_touch does not call updateClient automatically
+            updatedClient = await (newSession as Session).__internal_touch();
+            if (updatedClient) {
+              // We call updateClient manually, but without letting it emit
+              // It's important that the setTransitiveState call happens somewhat
+              // quickly after this, as during this period, the internal Clerk
+              // state does not match the emitted state.
+              this.updateClient(updatedClient, { __internal_dangerouslySkipEmit: true });
+            }
+          } catch (e) {
+            if (is4xxError(e)) {
+              void this.handleUnauthenticated();
+            } else {
+              throw e;
+            }
+          }
+        } else {
+          await this.#touchCurrentSession(newSession);
+        }
+        // If we do have the updatedClient, read from that, otherwise getSessionFromClient
+        // will fallback to this.client. This makes no difference now, but will if we
+        // decide to move the `updateClient` call out of this block later.
+        newSession = this.#getSessionFromClient(newSession?.id, updatedClient);
       }
 
       // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
@@ -1583,12 +1624,7 @@ export class Clerk implements ClerkInterface {
       //   automatic reloading when reloading shouldn't be happening.
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
-      const taskUrl =
-        newSession?.status === 'pending' &&
-        newSession?.currentTask &&
-        this.#options.taskUrls?.[newSession?.currentTask.key];
-
-      if (redirectUrl || taskUrl || setActiveNavigate) {
+      if (shouldNavigate) {
         await tracker.track(async () => {
           if (!this.client) {
             // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
@@ -2657,7 +2693,10 @@ export class Clerk implements ClerkInterface {
     this.internal_last_error = value;
   }
 
-  updateClient = (newClient: ClientResource): void => {
+  // Skipping emit is dangerous because if there is a gap between setting these
+  // and emitting, library consumers that both read state directly and set up listeners
+  // could end up in a inconsistent state.
+  updateClient = (newClient: ClientResource, options?: { __internal_dangerouslySkipEmit?: boolean }): void => {
     if (!this.client) {
       // This is the first time client is being
       // set, so we also need to set session
@@ -2702,7 +2741,9 @@ export class Clerk implements ClerkInterface {
       eventBus.emit(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 
-    this.#emit();
+    if (!options?.__internal_dangerouslySkipEmit) {
+      this.#emit();
+    }
   };
 
   get __internal_environment(): EnvironmentResource | null | undefined {

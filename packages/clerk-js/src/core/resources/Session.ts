@@ -10,6 +10,7 @@ import { retry } from '@clerk/shared/retry';
 import type {
   ActClaim,
   CheckAuthorization,
+  ClientResource,
   EmailCodeConfig,
   EnterpriseSSOConfig,
   GetToken,
@@ -102,6 +103,32 @@ export class Session extends BaseResource implements SessionResource {
       }
       return res;
     });
+  };
+
+  /**
+   * Internal method to touch the session without updating the client or explicitly emitting the TokenUpdate event.
+   *
+   * Returns the piggybacked client resource if it exists, otherwise undefined.
+   *
+   * The caller is responsible for calling updateClient(result), which internally also emits TokenUpdate.
+   * If updateClient() is not called, the server state and client state will be out of sync.
+   *
+   * @internal
+   */
+  __internal_touch = async (): Promise<ClientResource | undefined> => {
+    const json = await BaseResource._fetch<SessionJSON>(
+      {
+        method: 'POST',
+        path: this.path('touch'),
+        body: { active_organization_id: this.lastActiveOrganizationId } as any,
+      },
+      { skipUpdateClient: true },
+    );
+
+    // Update session in-place from response (same as _baseMutate)
+    this.fromJSON((json?.response || json) as SessionJSON);
+
+    return BaseResource._getClientResourceFromPayload(json);
   };
 
   clearCache = (): void => {
