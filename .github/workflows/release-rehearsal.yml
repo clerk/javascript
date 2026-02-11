@@ -44,7 +44,7 @@ jobs:
       - name: Changeset status
         run: pnpm changeset status --output .changeset-status.json
 
-      # 2) Build and test (same path as production releases)
+      # 2) Build (same path as production releases)
       - name: Build
         run: pnpm build
 
