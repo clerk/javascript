@@ -100,11 +100,11 @@ const fetchCommitInfo = withLimit(async commit => {
           if (a.mergedAt === null && b.mergedAt === null) return 0;
           if (a.mergedAt === null) return 1;
           if (b.mergedAt === null) return -1;
-          return new Date(a.mergedAt) - new Date(b.mergedAt);
+          return new Date(b.mergedAt) - new Date(a.mergedAt);
         })[0]
       : null;
 
-  if (associatedPR) user = associatedPR.author;
+  if (associatedPR && associatedPR.author) user = associatedPR.author;
 
   const result = {
     user: user ? user.login : null,
