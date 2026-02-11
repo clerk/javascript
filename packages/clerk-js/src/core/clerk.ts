@@ -1573,7 +1573,7 @@ export class Clerk implements ClerkInterface {
       */
       if (inActiveBrowserTab() || !this.#options.standardBrowser) {
         let updatedClient: ClientResource | undefined;
-        if (shouldNavigate && newSession) {
+        if (shouldNavigate && newSession && '__internal_touch' in newSession) {
           try {
             // __internal_touch does not call updateClient automatically
             updatedClient = await (newSession as Session).__internal_touch();
