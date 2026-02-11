@@ -37,7 +37,9 @@ jobs:
 
       # 1) Validate changesets against base branch
       - name: Changeset status
-        run: pnpm changeset status --output .changeset-status.json
+        run: |
+          mkdir -p .release-artifacts
+          pnpm changeset status --output .release-artifacts/changeset-status.json
 
       # 2) Build (same path as production releases)
       - name: Build
@@ -62,20 +64,32 @@ jobs:
       # 5) Simulate publish by packing all public packages
       - name: Pack public packages
         run: |
-          mkdir -p .release-artifacts
-          pnpm -r exec -- sh -c '
-            if [ "$(node -p "Boolean(require(\"./package.json\").private)")" = "true" ]; then
-              echo "Skipping private package: $(node -p "require(\"./package.json\").name")"
-            else
-              npm pack --json
-            fi
-          ' > .release-artifacts/pack-output.json 2>&1
+          node -e '
+            const fs = require("fs");
+            const path = require("path");
+            const { execSync } = require("child_process");
+            const dirs = fs.readdirSync("packages", { withFileTypes: true })
+              .filter(d => d.isDirectory())
+              .map(d => path.join("packages", d.name));
+            const results = [];
+            for (const dir of dirs) {
+              const pkgPath = path.join(dir, "package.json");
+              if (!fs.existsSync(pkgPath)) continue;
+              const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+              if (pkg.private) {
+                console.log("Skipping private package:", pkg.name);
+                continue;
+              }
+              const out = execSync("npm pack --json", { cwd: dir, encoding: "utf8" });
+              results.push(...JSON.parse(out));
+            }
+            fs.writeFileSync(".release-artifacts/pack-output.json", JSON.stringify(results, null, 2));
+            console.log("Packed", results.length, "packages");
+          '
 
       - name: Upload preflight artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: release-preflight-artifacts
-          path: |
-            .changeset-status.json
-            .release-artifacts/pack-output.json
+          path: .release-artifacts/

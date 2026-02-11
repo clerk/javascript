@@ -90,7 +90,6 @@ sessions.pem
 .verdaccio
 
 # Release preflight
-.changeset-status.json
 .release-artifacts/
 
 # Workflow Outputs
