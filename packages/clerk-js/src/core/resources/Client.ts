@@ -134,8 +134,19 @@ export class Client extends BaseResource implements ClientResource {
     if (data) {
       this.id = data.id;
       this.sessions = (data.sessions || []).map(s => new Session(s));
-      this.signUp = new SignUp(data.sign_up);
-      this.signIn = new SignIn(data.sign_in);
+
+      if (data.sign_up && this.signUp instanceof SignUp && this.signUp.id === data.sign_up.id) {
+        this.signUp.__internal_updateFromJSON(data.sign_up);
+      } else {
+        this.signUp = new SignUp(data.sign_up);
+      }
+
+      if (data.sign_in && this.signIn instanceof SignIn && this.signIn.id === data.sign_in.id) {
+        this.signIn.__internal_updateFromJSON(data.sign_in);
+      } else {
+        this.signIn = new SignIn(data.sign_in);
+      }
+
       this.lastActiveSessionId = data.last_active_session_id;
       this.captchaBypass = data.captcha_bypass || false;
       this.cookieExpiresAt = data.cookie_expires_at ? unixEpochToDate(data.cookie_expires_at) : null;

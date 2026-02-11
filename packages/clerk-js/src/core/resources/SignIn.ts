@@ -574,6 +574,10 @@ export class SignIn extends BaseResource implements SignInResource {
     return this;
   }
 
+  public __internal_updateFromJSON(data: SignInJSON | SignInJSONSnapshot | null): this {
+    return this.fromJSON(data);
+  }
+
   public __internal_toSnapshot(): SignInJSONSnapshot {
     return {
       object: 'sign_in',
