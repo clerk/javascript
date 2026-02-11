@@ -23,7 +23,8 @@ function ClerkScript(props: { scriptUrl: string; attributes: Record<string, stri
 }
 
 export function ClerkScripts() {
-  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkUIUrl, nonce, prefetchUI, ui } = useClerkNextOptions();
+  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkUIUrl, clerkUIVersion, nonce, prefetchUI, ui } =
+    useClerkNextOptions();
   const { domain, proxyUrl } = useClerk();
 
   if (!publishableKey) {
@@ -35,6 +36,7 @@ export function ClerkScripts() {
     clerkJSUrl,
     clerkJSVersion,
     clerkUIUrl,
+    clerkUIVersion,
     nonce,
     domain,
     proxyUrl,
