@@ -303,7 +303,7 @@ describe('KeylessPrompt component', () => {
       { wrapper },
     );
 
-    const triggerButton = getByRole('button', { name: /configure your application/i });
+    const triggerButton = getByRole('button', { name: /keyless prompt/i });
     const promptContainer = container.querySelector('[data-expanded]');
 
     // Initially should be expanded (isOpen defaults to true)
