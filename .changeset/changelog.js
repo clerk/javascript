@@ -1,6 +1,166 @@
-const { getInfo, getInfoFromPullRequest } = require('@changesets/get-github-info');
-
 const repo = 'clerk/javascript';
+const [owner, repoName] = repo.split('/');
+
+// Cache to avoid duplicate fetches for the same commit/PR
+const cache = new Map();
+
+// Simple concurrency limiter to avoid hitting GitHub secondary rate limits
+const MAX_CONCURRENT = 6;
+let active = 0;
+const queue = [];
+
+function withLimit(fn) {
+  return (...args) =>
+    new Promise((resolve, reject) => {
+      const run = async () => {
+        active++;
+        try {
+          resolve(await fn(...args));
+        } catch (e) {
+          reject(e);
+        } finally {
+          active--;
+          if (queue.length > 0) queue.shift()();
+        }
+      };
+      if (active < MAX_CONCURRENT) run();
+      else queue.push(run);
+    });
+}
+
+async function graphql(query) {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) {
+    throw new Error('GITHUB_TOKEN environment variable is required');
+  }
+
+  const res = await fetch('https://api.github.com/graphql', {
+    method: 'POST',
+    headers: {
+      Authorization: `Token ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`GitHub API responded with ${res.status}: ${await res.text()}`);
+  }
+
+  const json = await res.json();
+  if (json.errors) {
+    throw new Error(`GitHub GraphQL error: ${JSON.stringify(json.errors, null, 2)}`);
+  }
+  if (!json.data) {
+    throw new Error(`Unexpected GitHub response: ${JSON.stringify(json)}`);
+  }
+  return json.data;
+}
+
+// Fetches commit info with a single small GraphQL query per commit
+const fetchCommitInfo = withLimit(async commit => {
+  const key = `commit:${commit}`;
+  if (cache.has(key)) return cache.get(key);
+
+  const data = await graphql(`query {
+    repository(owner: ${JSON.stringify(owner)}, name: ${JSON.stringify(repoName)}) {
+      object(expression: ${JSON.stringify(commit)}) {
+        ... on Commit {
+          commitUrl
+          associatedPullRequests(first: 50) {
+            nodes { number url mergedAt author { login url } }
+          }
+          author { user { login url } }
+        }
+      }
+    }
+  }`);
+
+  const obj = data.repository.object;
+  if (!obj) {
+    const result = {
+      user: null,
+      pull: null,
+      links: {
+        commit: `[\`${commit.slice(0, 7)}\`](https://github.com/${repo}/commit/${commit})`,
+        pull: null,
+        user: null,
+      },
+    };
+    cache.set(key, result);
+    return result;
+  }
+
+  let user = obj.author && obj.author.user ? obj.author.user : null;
+  const associatedPR =
+    obj.associatedPullRequests &&
+    obj.associatedPullRequests.nodes &&
+    obj.associatedPullRequests.nodes.length
+      ? obj.associatedPullRequests.nodes.sort((a, b) => {
+          if (a.mergedAt === null && b.mergedAt === null) return 0;
+          if (a.mergedAt === null) return 1;
+          if (b.mergedAt === null) return -1;
+          return new Date(a.mergedAt) - new Date(b.mergedAt);
+        })[0]
+      : null;
+
+  if (associatedPR) user = associatedPR.author;
+
+  const result = {
+    user: user ? user.login : null,
+    pull: associatedPR ? associatedPR.number : null,
+    links: {
+      commit: `[\`${commit.slice(0, 7)}\`](${obj.commitUrl})`,
+      pull: associatedPR ? `[#${associatedPR.number}](${associatedPR.url})` : null,
+      user: user ? `[@${user.login}](${user.url})` : null,
+    },
+  };
+  cache.set(key, result);
+  return result;
+});
+
+// Fetches pull request info with a single small GraphQL query per PR
+const fetchPullRequestInfo = withLimit(async pull => {
+  const key = `pull:${pull}`;
+  if (cache.has(key)) return cache.get(key);
+
+  const data = await graphql(`query {
+    repository(owner: ${JSON.stringify(owner)}, name: ${JSON.stringify(repoName)}) {
+      pullRequest(number: ${pull}) {
+        url
+        author { login url }
+        mergeCommit { commitUrl abbreviatedOid }
+      }
+    }
+  }`);
+
+  const pr = data.repository.pullRequest;
+  const user = pr && pr.author ? pr.author : null;
+  const mergeCommit = pr && pr.mergeCommit ? pr.mergeCommit : null;
+
+  const result = {
+    user: user ? user.login : null,
+    commit: mergeCommit ? mergeCommit.abbreviatedOid : null,
+    links: {
+      commit: mergeCommit
+        ? `[\`${mergeCommit.abbreviatedOid}\`](${mergeCommit.commitUrl})`
+        : null,
+      pull: `[#${pull}](https://github.com/${repo}/pull/${pull})`,
+      user: user ? `[@${user.login}](${user.url})` : null,
+    },
+  };
+  cache.set(key, result);
+  return result;
+});
+
+// Drop-in replacements for @changesets/get-github-info
+async function getInfo({ commit }) {
+  return fetchCommitInfo(commit);
+}
+
+async function getInfoFromPullRequest({ pull }) {
+  return fetchPullRequestInfo(pull);
+}
 
 const getDependencyReleaseLine = async (changesets, dependenciesUpdated) => {
   if (dependenciesUpdated.length === 0) return '';
@@ -10,7 +170,6 @@ const getDependencyReleaseLine = async (changesets, dependenciesUpdated) => {
       changesets.map(async cs => {
         if (cs.commit) {
           let { links } = await getInfo({
-            repo,
             commit: cs.commit,
           });
           return links.commit;
@@ -54,7 +213,6 @@ const getReleaseLine = async (changeset, type, options) => {
   const links = await (async () => {
     if (prFromSummary !== undefined) {
       let { links } = await getInfoFromPullRequest({
-        repo,
         pull: prFromSummary,
       });
       if (commitFromSummary) {
@@ -68,7 +226,6 @@ const getReleaseLine = async (changeset, type, options) => {
     const commitToFetchFrom = commitFromSummary || changeset.commit;
     if (commitToFetchFrom) {
       let { links } = await getInfo({
-        repo,
         commit: commitToFetchFrom,
       });
       return links;
