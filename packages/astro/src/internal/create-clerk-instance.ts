@@ -9,7 +9,7 @@ import type { Ui } from '@clerk/ui/internal';
 
 import { $clerkStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';
-import type { AstroClerkCreateInstanceParams, AstroClerkUpdateOptions } from '../types';
+import type { AstroClerkCreateInstanceParams, AstroClerkUpdateOptions, InternalRuntimeOptions } from '../types';
 import { invokeClerkAstroJSFunctions } from './invoke-clerk-astro-js-functions';
 import { mountAllClerkAstroJSComponents } from './mount-clerk-astro-js-components';
 import { runOnce } from './run-once';
@@ -54,8 +54,9 @@ async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroC
     $clerk.set(clerkJSInstance);
   }
 
-  const keylessClaimUrl = (options as any)?.__internal_keylessClaimUrl;
-  const keylessApiKeysUrl = (options as any)?.__internal_keylessApiKeysUrl;
+  const internalOptions = options as AstroClerkCreateInstanceParams<TUi> & InternalRuntimeOptions;
+  const keylessClaimUrl = internalOptions.__internal_keylessClaimUrl;
+  const keylessApiKeysUrl = internalOptions.__internal_keylessApiKeysUrl;
 
   const clerkOptions = {
     routerPush: createNavigationHandler(window.history.pushState.bind(window.history)),
