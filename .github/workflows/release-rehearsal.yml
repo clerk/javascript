@@ -6,9 +6,6 @@ on:
     branches: [main]
     paths:
       - '.changeset/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'packages/**'
 
 concurrency:
   group: release-rehearsal-${{ github.ref }}
@@ -54,6 +51,8 @@ jobs:
       # 3) Rehearse versioning (uses existing script: changeset version + lockfile update)
       - name: Version packages (rehearsal)
         run: pnpm version-packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
       # 4) Fail on unexpected file changes after versioning
       - name: Post-version diff guard
