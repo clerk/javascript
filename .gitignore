@@ -89,7 +89,7 @@ sessions.pem
 # Verdaccio
 .verdaccio
 
-# Release rehearsal
+# Release preflight
 .changeset-status.json
 .release-artifacts/
 

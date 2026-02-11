@@ -1,4 +1,4 @@
-name: Release Rehearsal
+name: Release Preflight
 
 on:
   workflow_dispatch:
@@ -6,17 +6,17 @@ on:
     branches: [main]
     paths:
       - '.changeset/**'
-      - '.github/workflows/release-rehearsal.yml'
+      - '.github/workflows/release-preflight.yml'
   push:
     branches: [main]
 
 concurrency:
-  group: release-rehearsal-${{ github.ref }}
+  group: release-preflight-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   rehearse:
-    name: Release Rehearsal
+    name: Release Preflight
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -48,8 +48,8 @@ jobs:
       - name: Build
         run: pnpm build
 
-      # 3) Rehearse versioning (uses existing script: changeset version + lockfile update)
-      - name: Version packages (rehearsal)
+      # 3) Version packages (uses existing script: changeset version + lockfile update)
+      - name: Version packages (preflight)
         run: pnpm version-packages
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -76,11 +76,11 @@ jobs:
             fi
           ' > .release-artifacts/pack-output.json 2>&1
 
-      - name: Upload rehearsal artifacts
+      - name: Upload preflight artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: release-rehearsal-artifacts
+          name: release-preflight-artifacts
           path: |
             .changeset-status.json
             .release-artifacts/pack-output.json
