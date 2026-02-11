@@ -64,8 +64,6 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                   prefetchUI === false || hasUI ? 'false' : undefined,
                   'PUBLIC_CLERK_PREFETCH_UI',
                 ),
-                // Keys read directly from process.env by server code - no vite.define needed
-                // Keyless handled by middleware at runtime, not compile-time
               },
 
               ssr: {
