@@ -1,0 +1,80 @@
+name: Release Rehearsal
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.changeset/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'packages/**'
+
+concurrency:
+  group: release-rehearsal-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rehearse:
+    name: Release Rehearsal
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+          fetch-tags: false
+          filter: 'blob:none'
+          show-progress: false
+
+      - name: Fetch main branch for changeset comparison
+        run: git fetch origin main:refs/remotes/origin/main --depth=100
+
+      - name: Setup
+        uses: ./.github/actions/init
+        with:
+          turbo-team: ''
+          turbo-token: ''
+
+      # 1) Validate changesets against base branch
+      - name: Changeset status
+        run: pnpm changeset status --output .changeset-status.json
+
+      # 2) Build and test (same path as production releases)
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+      # 3) Rehearse versioning (uses existing script: changeset version + lockfile update)
+      - name: Version packages (rehearsal)
+        run: pnpm version-packages
+
+      # 4) Fail on unexpected file changes after versioning
+      - name: Post-version diff guard
+        run: |
+          UNEXPECTED=$(git diff --name-only | grep -Ev '^(\.changeset/|package\.json$|pnpm-lock\.yaml$|packages/.*/package\.json$|packages/.*/CHANGELOG\.md$)' || true)
+          if [ -n "$UNEXPECTED" ]; then
+            echo "::error::Unexpected files changed after versioning:"
+            echo "$UNEXPECTED"
+            exit 1
+          fi
+
+      # 5) Simulate publish by packing all public packages
+      - name: Pack all packages
+        run: |
+          mkdir -p .release-artifacts
+          pnpm -r exec npm pack --json > .release-artifacts/pack-output.json 2>&1 || true
+
+      - name: Upload rehearsal artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-rehearsal-artifacts
+          path: |
+            .changeset-status.json
+            .release-artifacts/pack-output.json

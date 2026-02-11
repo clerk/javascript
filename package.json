@@ -30,6 +30,7 @@
     "nuke": "node ./scripts/nuke.mjs",
     "prepare": "husky install",
     "release": "changeset publish && git push --follow-tags",
+    "release:status": "changeset status --output .changeset-status.json",
     "release:canary": "changeset publish --tag canary --no-git-tag",
     "release:canary-core3": "changeset publish --tag canary-core3 --no-git-tag",
     "release:snapshot": "changeset publish --tag snapshot --no-git-tag",
