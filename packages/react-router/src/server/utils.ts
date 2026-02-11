@@ -98,6 +98,7 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __clerkJSUrl: envVars.clerkJsUrl,
     __clerkJSVersion: envVars.clerkJsVersion,
     __clerkUIUrl: envVars.clerkUIUrl,
+    __clerkUIVersion: envVars.clerkUIVersion,
     __prefetchUI: envVars.prefetchUI,
     __telemetryDisabled: envVars.telemetryDisabled,
     __telemetryDebug: envVars.telemetryDebug,

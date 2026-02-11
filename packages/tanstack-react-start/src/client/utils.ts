@@ -21,6 +21,7 @@ export const pickFromClerkInitState = (
     __clerkJSUrl,
     __clerkJSVersion,
     __clerkUIUrl,
+    __clerkUIVersion,
     __telemetryDisabled,
     __telemetryDebug,
     __signInForceRedirectUrl,
@@ -43,6 +44,7 @@ export const pickFromClerkInitState = (
     clerkJSUrl: __clerkJSUrl,
     clerkJSVersion: __clerkJSVersion,
     clerkUIUrl: __clerkUIUrl,
+    clerkUIVersion: __clerkUIVersion,
     prefetchUI: __prefetchUI,
     telemetry: {
       disabled: __telemetryDisabled,
@@ -69,6 +71,7 @@ export const mergeWithPublicEnvs = (restInitState: any) => {
     clerkJSUrl: restInitState.clerkJSUrl || envVars.clerkJsUrl,
     clerkJSVersion: restInitState.clerkJSVersion || envVars.clerkJsVersion,
     clerkUIUrl: restInitState.clerkUIUrl || envVars.clerkUIUrl,
+    clerkUIVersion: restInitState.clerkUIVersion || envVars.clerkUIVersion,
     signInForceRedirectUrl: restInitState.signInForceRedirectUrl,
     prefetchUI: restInitState.prefetchUI ?? envVars.prefetchUI,
   };
