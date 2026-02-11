@@ -693,6 +693,19 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2
 
+  packages/hono:
+    dependencies:
+      '@clerk/backend':
+        specifier: workspace:^
+        version: link:../backend
+      '@clerk/shared':
+        specifier: workspace:^
+        version: link:../shared
+    devDependencies:
+      hono:
+        specifier: ^4.7.4
+        version: 4.11.7
+
   packages/localizations:
     dependencies:
       '@clerk/shared':
