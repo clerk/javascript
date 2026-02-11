@@ -65,12 +65,19 @@ jobs:
           fi
 
       # 5) Simulate publish by packing all public packages
-      - name: Pack all packages
+      - name: Pack public packages
         run: |
           mkdir -p .release-artifacts
-          pnpm -r exec npm pack --json > .release-artifacts/pack-output.json 2>&1 || true
+          pnpm -r exec -- sh -c '
+            if [ "$(node -p "Boolean(require(\"./package.json\").private)")" = "true" ]; then
+              echo "Skipping private package: $(node -p "require(\"./package.json\").name")"
+            else
+              npm pack --json
+            fi
+          ' > .release-artifacts/pack-output.json 2>&1
 
       - name: Upload rehearsal artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: release-rehearsal-artifacts
