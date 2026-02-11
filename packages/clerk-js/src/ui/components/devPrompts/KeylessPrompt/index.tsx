@@ -401,6 +401,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
     >
       <button
         type='button'
+        aria-label='Keyless prompt'
         aria-controls={id}
         aria-expanded={isOpen}
         onClick={() => setIsOpen(p => !p)}
