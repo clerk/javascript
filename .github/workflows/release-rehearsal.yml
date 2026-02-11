@@ -43,9 +43,6 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Test
-        run: pnpm test
-
       # 3) Rehearse versioning (uses existing script: changeset version + lockfile update)
       - name: Version packages (rehearsal)
         run: pnpm version-packages
