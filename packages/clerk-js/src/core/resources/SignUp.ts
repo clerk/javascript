@@ -173,13 +173,6 @@ export class SignUp extends BaseResource implements SignUpResource {
       finalParams = { ...finalParams, ...captchaParams };
     }
 
-    if (finalParams.transfer && this.shouldBypassCaptchaForAttempt(finalParams)) {
-      const strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
-      if (strategy) {
-        finalParams = { ...finalParams, strategy: strategy as SignUpCreateParams['strategy'] };
-      }
-    }
-
     return this._basePost({
       path: this.pathRoot,
       body: normalizeUnsafeMetadata(finalParams),
