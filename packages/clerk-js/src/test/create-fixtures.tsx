@@ -93,7 +93,6 @@ const unboundCreateFixtures = (
         'SubscriptionDetails',
         'PlanDetails',
         'Checkout',
-        'KeylessPrompt',
       ];
       const contextWrappedChildren = !componentsWithoutContext.includes(componentName) ? (
         <ComponentContextProvider
