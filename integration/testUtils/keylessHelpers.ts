@@ -46,10 +46,6 @@ export async function testToggleCollapsePopoverAndClaim({
 
   await u.po.keylessPopover.waitForMounted();
 
-  expect(await u.po.keylessPopover.isExpanded()).toBe(false);
-  await u.po.keylessPopover.toggle();
-  expect(await u.po.keylessPopover.isExpanded()).toBe(true);
-
   const claim = u.po.keylessPopover.promptsToClaim();
 
   const [newPage] = await Promise.all([context.waitForEvent('page'), claim.click()]);

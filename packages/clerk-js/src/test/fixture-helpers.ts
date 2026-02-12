@@ -305,7 +305,10 @@ const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => {
   const withReverification = () => {
     ac.reverification = true;
   };
-  return { withMultiSessionMode, withReverification };
+  const withClaimedAt = (claimedAt: string | null) => {
+    ac.claimed_at = claimedAt;
+  };
+  return { withMultiSessionMode, withReverification, withClaimedAt };
 };
 
 const createDisplayConfigFixtureHelpers = (environment: EnvironmentJSON) => {

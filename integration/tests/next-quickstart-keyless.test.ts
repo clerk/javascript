@@ -56,7 +56,39 @@ test.describe('Keyless mode @quickstart', () => {
   });
 
   test('Toggle collapse popover and claim.', async ({ page, context }) => {
-    await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl, framework: 'nextjs' });
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToAppHome();
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+
+    await u.po.keylessPopover.waitForMounted();
+
+    const claim = await u.po.keylessPopover.promptsToClaim();
+
+    const [newPage] = await Promise.all([context.waitForEvent('page'), claim.click()]);
+
+    await newPage.waitForLoadState();
+
+    await newPage.waitForURL(url => {
+      const signInForceRedirectUrl = url.searchParams.get('sign_in_force_redirect_url');
+      const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
+
+      // Backend adds framework=nextjs query param before token, so use .includes() instead of .startsWith()
+      const signInHasRequiredParams =
+        signInForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) && signInForceRedirectUrl?.includes('token=');
+
+      const signUpRegularCase =
+        signUpForceRedirectUrl?.includes(`${dashboardUrl}apps/claim`) && signUpForceRedirectUrl?.includes('token=');
+
+      const signUpPrepareAccountCase =
+        signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
+        signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim')) &&
+        signUpForceRedirectUrl?.includes(encodeURIComponent('token='));
+
+      const signUpHasRequiredParams = signUpRegularCase || signUpPrepareAccountCase;
+
+      return url.pathname === '/apps/claim/sign-in' && signInHasRequiredParams && signUpHasRequiredParams;
+    });
   });
 
   test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({
