@@ -78,8 +78,6 @@ test.describe('Keyless mode @quickstart', () => {
 
     await u.po.keylessPopover.waitForMounted();
 
-    expect(await u.po.keylessPopover.isExpanded()).toBe(false);
-    await u.po.keylessPopover.toggle();
     expect(await u.po.keylessPopover.isExpanded()).toBe(true);
 
     const claim = await u.po.keylessPopover.promptsToClaim();
