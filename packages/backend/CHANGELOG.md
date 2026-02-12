@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.31.0
+
+### Minor Changes
+
+- Add `providerUserId` field to `ExternalAccount` resource as the preferred way to access the unique user ID from the OAuth provider. The existing `externalId` field is now deprecated in favor of `providerUserId` for better clarity and consistency across the API. ([#7778](https://github.com/clerk/javascript/pull/7778)) by [@Jibaru](https://github.com/Jibaru)
+
+- Add `createBulk()` method to `WaitlistEntryAPI` for bulk creating waitlist entries ([#7762](https://github.com/clerk/javascript/pull/7762)) by [@Jibaru](https://github.com/Jibaru)
+
+### Patch Changes
+
+- Updated dependencies [[`35bcbd1`](https://github.com/clerk/javascript/commit/35bcbd11f5753ee396cd090d3dd1848f3f2727e0)]:
+  - @clerk/shared@3.45.0
+  - @clerk/types@4.101.15
+
 ## 2.30.1
 
 ### Patch Changes

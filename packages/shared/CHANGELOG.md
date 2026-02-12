@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.45.0
+
+### Minor Changes
+
+- Add `username` field into `PublicUserData` object. ([#7837](https://github.com/clerk/javascript/pull/7837)) by [@Jibaru](https://github.com/Jibaru)
+
 ## 3.44.0
 
 ### Minor Changes
