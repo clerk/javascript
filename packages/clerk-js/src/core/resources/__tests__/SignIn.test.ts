@@ -99,7 +99,7 @@ describe('SignIn', () => {
       );
     });
 
-    it('includes captcha params when sign_up_if_missing is true', async () => {
+    it('includes captcha params when signUpIfMissing is true', async () => {
       vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
 
       const mockFetch = vi.fn().mockResolvedValue({
@@ -130,7 +130,7 @@ describe('SignIn', () => {
         },
       } as any;
 
-      await signIn.create({ identifier: 'user@example.com', sign_up_if_missing: true });
+      await signIn.create({ identifier: 'user@example.com', signUpIfMissing: true });
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -138,7 +138,7 @@ describe('SignIn', () => {
           path: '/client/sign_ins',
           body: expect.objectContaining({
             identifier: 'user@example.com',
-            sign_up_if_missing: true,
+            signUpIfMissing: true,
             captchaToken: 'mock_captcha_token',
             captchaWidgetType: 'invisible',
           }),
@@ -146,7 +146,7 @@ describe('SignIn', () => {
       );
     });
 
-    it('excludes captcha params when sign_up_if_missing is false', async () => {
+    it('excludes captcha params when signUpIfMissing is false', async () => {
       vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
 
       const mockFetch = vi.fn().mockResolvedValue({
@@ -177,7 +177,7 @@ describe('SignIn', () => {
         },
       } as any;
 
-      await signIn.create({ identifier: 'user@example.com', sign_up_if_missing: false });
+      await signIn.create({ identifier: 'user@example.com', signUpIfMissing: false });
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -361,7 +361,7 @@ describe('SignIn', () => {
         expect(result).toHaveProperty('error', mockError);
       });
 
-      it('includes captcha params when sign_up_if_missing is true', async () => {
+      it('includes captcha params when signUpIfMissing is true', async () => {
         vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
 
         const mockFetch = vi.fn().mockResolvedValue({
@@ -392,21 +392,21 @@ describe('SignIn', () => {
           },
         } as any;
 
-        await signIn.__internal_future.create({ identifier: 'user@example.com', sign_up_if_missing: true });
+        await signIn.__internal_future.create({ identifier: 'user@example.com', signUpIfMissing: true });
 
         expect(mockFetch).toHaveBeenCalledWith({
           method: 'POST',
           path: '/client/sign_ins',
           body: {
             identifier: 'user@example.com',
-            sign_up_if_missing: true,
+            signUpIfMissing: true,
             captchaToken: 'mock_captcha_token',
             captchaWidgetType: 'invisible',
           },
         });
       });
 
-      it('excludes captcha params when sign_up_if_missing is false', async () => {
+      it('excludes captcha params when signUpIfMissing is false', async () => {
         vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
 
         const mockFetch = vi.fn().mockResolvedValue({
@@ -437,19 +437,19 @@ describe('SignIn', () => {
           },
         } as any;
 
-        await signIn.__internal_future.create({ identifier: 'user@example.com', sign_up_if_missing: false });
+        await signIn.__internal_future.create({ identifier: 'user@example.com', signUpIfMissing: false });
 
         expect(mockFetch).toHaveBeenCalledWith({
           method: 'POST',
           path: '/client/sign_ins',
           body: {
             identifier: 'user@example.com',
-            sign_up_if_missing: false,
+            signUpIfMissing: false,
           },
         });
       });
 
-      it('excludes captcha params when sign_up_if_missing is not provided', async () => {
+      it('excludes captcha params when signUpIfMissing is not provided', async () => {
         vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
 
         const mockFetch = vi.fn().mockResolvedValue({

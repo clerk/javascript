@@ -168,7 +168,7 @@ export type SignInCreateParams = (
 ) & {
   transfer?: boolean;
   locale?: string;
-  sign_up_if_missing?: boolean;
+  signUpIfMissing?: boolean;
   captcha_token?: string;
   captcha_error?: unknown;
   captcha_widget_type?: string | null;

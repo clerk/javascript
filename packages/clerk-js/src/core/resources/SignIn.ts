@@ -627,11 +627,7 @@ export class SignIn extends BaseResource implements SignInResource {
   /**
    * Determines whether captcha is required based on the provided params.
    */
-  private shouldRequireCaptcha(params: {
-    strategy?: string;
-    transfer?: boolean;
-    sign_up_if_missing?: boolean;
-  }): boolean {
+  private shouldRequireCaptcha(params: { strategy?: string; transfer?: boolean; signUpIfMissing?: boolean }): boolean {
     // Always bypass for these conditions
     if (__BUILD_DISABLE_RHC__) {
       return false;
@@ -646,8 +642,8 @@ export class SignIn extends BaseResource implements SignInResource {
       return false;
     }
 
-    // Require captcha if sign_up_if_missing is present
-    return !!params.sign_up_if_missing;
+    // Require captcha if signUpIfMissing is present
+    return !!params.signUpIfMissing;
   }
 
   /**

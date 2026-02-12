@@ -43,10 +43,10 @@ export interface SignInFutureCreateParams {
    */
   locale?: string;
   /**
-   * When set to `true`, if a user does not exist, the sign-in will create a new account automatically.
-   * Captcha will be required when this is enabled.
+   * When set to `true`, if a user does not exist, the sign-up will prepare a transfer to sign up a new
+   * account. If bot sign-up protection is enabled, captcha will also be required on sign in.
    */
-  sign_up_if_missing?: boolean;
+  signUpIfMissing?: boolean;
   /**
    * The captcha token returned from the captcha challenge.
    *
