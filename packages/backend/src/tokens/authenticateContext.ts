@@ -283,12 +283,14 @@ class AuthenticateContext implements AuthenticateContext {
   private initCookieValues() {
     // suffixedCookies needs to be set first because it's used in getMultipleAppsCookie
     this.sessionTokenInCookie = this.getSuffixedOrUnSuffixedCookie(constants.Cookies.Session);
-    // Read the refresh token from the same cookie set as the session token, but fall back
-    // to the suffixed cookie for backwards compatibility (FAPI always sets the suffixed
-    // refresh cookie, so during the transition to suffixed cookies it may only exist there).
-    this.refreshTokenInCookie =
-      this.getSuffixedOrUnSuffixedCookie(constants.Cookies.Refresh) ||
-      this.getSuffixedCookie(constants.Cookies.Refresh);
+    // Read the refresh token from the same cookie set (suffixed vs unsuffixed) that
+    // usesSuffixedCookies() selects, so it stays in sync with the session token.
+    // When usesSuffixedCookies() is false but the unsuffixed refresh cookie doesn't
+    // exist yet (transition period), fall back to the suffixed cookie since FAPI
+    // always sets that one.
+    this.refreshTokenInCookie = this.usesSuffixedCookies()
+      ? this.getSuffixedCookie(constants.Cookies.Refresh)
+      : this.getCookie(constants.Cookies.Refresh) || this.getSuffixedCookie(constants.Cookies.Refresh);
     this.clientUat = Number.parseInt(this.getSuffixedOrUnSuffixedCookie(constants.Cookies.ClientUat) || '') || 0;
   }
 
