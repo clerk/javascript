@@ -7,12 +7,12 @@ import type { AstroClerkIntegrationParams } from '../types';
 import { buildBeforeHydrationSnippet, buildPageLoadSnippet } from './snippets';
 import { vitePluginAstroConfig } from './vite-plugin-astro-config';
 
-type HotloadAstroClerkIntegrationParams = AstroClerkIntegrationParams & {
-  enableEnvSchema?: boolean;
-};
-
 const buildEnvVarFromOption = (valueToBeStored: unknown, envName: keyof InternalEnv) => {
   return valueToBeStored ? { [`import.meta.env.${envName}`]: JSON.stringify(valueToBeStored) } : {};
+};
+
+type HotloadAstroClerkIntegrationParams = AstroClerkIntegrationParams & {
+  enableEnvSchema?: boolean;
 };
 
 function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() {
