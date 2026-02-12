@@ -25,6 +25,7 @@ export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, '
     clerkJSUrl: props.clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS_URL,
     clerkJSVersion: props.clerkJSVersion || process.env.NEXT_PUBLIC_CLERK_JS_VERSION,
     clerkUIUrl: props.clerkUIUrl || process.env.NEXT_PUBLIC_CLERK_UI_URL,
+    clerkUIVersion: props.clerkUIVersion || process.env.NEXT_PUBLIC_CLERK_UI_VERSION,
     prefetchUI: getPrefetchUIFromEnvAndProps(props.prefetchUI),
     proxyUrl: props.proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL || '',
     domain: props.domain || process.env.NEXT_PUBLIC_CLERK_DOMAIN || '',

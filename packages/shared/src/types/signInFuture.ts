@@ -166,6 +166,14 @@ export interface SignInFutureResetPasswordSubmitParams {
   signOutOfOtherSessions?: boolean;
 }
 
+export interface SignInFutureResetPasswordPhoneCodeSendParams {
+  /**
+   * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if
+   * [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled.
+   */
+  phoneNumber?: string;
+}
+
 export type SignInFuturePhoneCodeSendParams = {
   /**
    * The mechanism to use to send the code to the provided phone number. Defaults to `'sms'`.
@@ -190,6 +198,13 @@ export type SignInFuturePhoneCodeSendParams = {
 );
 
 export interface SignInFuturePhoneCodeVerifyParams {
+  /**
+   * The one-time code that was sent to the user.
+   */
+  code: string;
+}
+
+export interface SignInFutureResetPasswordPhoneCodeVerifyParams {
   /**
    * The one-time code that was sent to the user.
    */
@@ -477,6 +492,26 @@ export interface SignInFutureResource {
      * Used to verify a password reset code sent via email. Will cause `signIn.status` to become `'needs_new_password'`.
      */
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
+
+    /**
+     * Used to submit a new password, and move the `signIn.status` to `'complete'`.
+     */
+    submitPassword: (params: SignInFutureResetPasswordSubmitParams) => Promise<{ error: ClerkError | null }>;
+  };
+
+  /**
+   *
+   */
+  resetPasswordPhoneCode: {
+    /**
+     * Used to send a password reset code to the first phone number on the account
+     */
+    sendCode: (params?: SignInFutureResetPasswordPhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
+
+    /**
+     * Used to verify a password reset code sent via phone. Will cause `signIn.status` to become `'needs_new_password'`.
+     */
+    verifyCode: (params: SignInFutureResetPasswordPhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to submit a new password, and move the `signIn.status` to `'complete'`.

@@ -123,6 +123,9 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     legal_consent_enabled: false,
     mode: 'public',
     progressive: true,
+    mfa: {
+      required: false,
+    },
   };
   social: OAuthProviders = {} as OAuthProviders;
   usernameSettings: UsernameSettingsData = {} as UsernameSettingsData;

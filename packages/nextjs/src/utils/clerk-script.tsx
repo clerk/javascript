@@ -38,7 +38,8 @@ function ClerkScript(props: ClerkScriptProps) {
 }
 
 export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] }) {
-  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkUIUrl, nonce, prefetchUI } = useClerkNextOptions();
+  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkUIUrl, clerkUIVersion, nonce, prefetchUI, ui } =
+    useClerkNextOptions();
   const { domain, proxyUrl } = useClerk();
 
   if (!publishableKey) {
@@ -50,6 +51,7 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
     clerkJSUrl,
     clerkJSVersion,
     clerkUIUrl,
+    clerkUIVersion,
     nonce,
     domain,
     proxyUrl,
@@ -68,8 +70,9 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
           but doesn't execute it, avoiding race conditions with __clerkSharedModules
           registration (which happens when React code runs @clerk/ui/register).
           When loadClerkUIScript() later adds a <script> tag, the browser uses the
-          cached resource and executes it without re-downloading. */}
-      {prefetchUI !== false && (
+          cached resource and executes it without re-downloading.
+          Skip preload when ui prop is passed - the bundled UI will be used instead. */}
+      {prefetchUI !== false && !ui && (
         <link
           rel='preload'
           href={clerkUIScriptUrl(opts)}

@@ -36,7 +36,7 @@ export const UsernameSection = () => {
           <ProfileSection.Item
             id='username'
             sx={{
-              paddingLeft: !user.username ? '0' : undefined,
+              paddingInlineStart: !user.username ? '0' : undefined,
             }}
           >
             {user.username && (

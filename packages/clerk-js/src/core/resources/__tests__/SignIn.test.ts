@@ -1134,6 +1134,133 @@ describe('SignIn', () => {
       });
     });
 
+    describe('sendResetPasswordPhoneCode', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+      });
+
+      it('creates signIn with phoneNumber when no existing signIn', async () => {
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_123',
+              identifier: '+15551234567',
+              supported_first_factors: [
+                {
+                  strategy: 'reset_password_phone_code',
+                  phone_number_id: 'phone_123',
+                  safe_identifier: '+15551234567',
+                },
+              ],
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: { id: 'signin_123' },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.resetPasswordPhoneCode.sendCode({ phoneNumber: '+15551234567' });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(1, {
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: { identifier: '+15551234567' },
+        });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(2, {
+          method: 'POST',
+          path: '/client/sign_ins/signin_123/prepare_first_factor',
+          body: {
+            phoneNumberId: 'phone_123',
+            strategy: 'reset_password_phone_code',
+          },
+        });
+      });
+
+      it('prepares first factor with reset password phone code', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({
+          id: 'signin_123',
+          supported_first_factors: [
+            {
+              strategy: 'reset_password_phone_code',
+              phone_number_id: 'phone_123',
+              safe_identifier: '+15551234567',
+            },
+          ],
+        } as any);
+        await signIn.__internal_future.resetPasswordPhoneCode.sendCode();
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins/signin_123/prepare_first_factor',
+          body: {
+            phoneNumberId: 'phone_123',
+            strategy: 'reset_password_phone_code',
+          },
+        });
+      });
+
+      it('throws error when no signIn ID and no phoneNumber', async () => {
+        const signIn = new SignIn();
+
+        await expect(signIn.__internal_future.resetPasswordPhoneCode.sendCode()).rejects.toThrow();
+      });
+
+      it('returns error when reset password phone code factor not found', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signin_123',
+            identifier: '+15551234567',
+            supported_first_factors: [{ strategy: 'password' }],
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        const result = await signIn.__internal_future.resetPasswordPhoneCode.sendCode({ phoneNumber: '+15551234567' });
+
+        expect(result.error).toBeTruthy();
+        expect(result.error?.code).toBe('factor_not_found');
+      });
+    });
+
+    describe('verifyResetPasswordPhoneCode', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+      });
+
+      it('attempts first factor with reset password phone code', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({ id: 'signin_123' } as any);
+        await signIn.__internal_future.resetPasswordPhoneCode.verifyCode({ code: '123456' });
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins/signin_123/attempt_first_factor',
+          body: {
+            code: '123456',
+            strategy: 'reset_password_phone_code',
+          },
+        });
+      });
+    });
+
     describe('submitResetPassword', () => {
       afterEach(() => {
         vi.clearAllMocks();

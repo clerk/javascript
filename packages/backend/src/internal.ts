@@ -56,4 +56,10 @@ export { reverificationError, reverificationErrorResponse } from '@clerk/shared/
 
 export { verifyMachineAuthToken } from './tokens/verify';
 
-export { isMachineTokenByPrefix, isMachineTokenType, getMachineTokenType, isTokenTypeAccepted } from './tokens/machine';
+export {
+  isMachineTokenByPrefix,
+  isMachineTokenType,
+  getMachineTokenType,
+  isTokenTypeAccepted,
+  isMachineToken,
+} from './tokens/machine';

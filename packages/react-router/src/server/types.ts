@@ -63,11 +63,17 @@ export type RootAuthLoaderOptions = ClerkMiddlewareOptions & {
   loadOrganization?: boolean;
 };
 
+export interface KeylessUrls {
+  __keylessClaimUrl?: string;
+  __keylessApiKeysUrl?: string;
+}
+
 export type RequestStateWithRedirectUrls = RequestState &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
-  SignUpFallbackRedirectUrl;
+  SignUpFallbackRedirectUrl &
+  KeylessUrls;
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
   args: LoaderFunctionArgsWithAuth<Options>,

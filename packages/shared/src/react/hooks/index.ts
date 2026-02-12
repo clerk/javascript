@@ -31,3 +31,8 @@ export { useCheckout as __experimental_useCheckout } from './useCheckout';
 export { __internal_useStatementQuery } from './useStatementQuery';
 export { __internal_usePlanDetailsQuery } from './usePlanDetailsQuery';
 export { __internal_usePaymentAttemptQuery } from './usePaymentAttemptQuery';
+
+export { useUserBase as __internal_useUserBase } from './base/useUserBase';
+export { useClientBase as __internal_useClientBase } from './base/useClientBase';
+export { useSessionBase as __internal_useSessionBase } from './base/useSessionBase';
+export { useOrganizationBase as __internal_useOrganizationBase } from './base/useOrganizationBase';

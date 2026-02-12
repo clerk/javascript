@@ -50,7 +50,7 @@ test.describe('OAuth machine authentication @machine', () => {
       .commit();
 
     await app.setup();
-    await app.withEnv(appConfigs.envs.withEmailCodes);
+    await app.withEnv(appConfigs.envs.withAPIKeys);
     await app.dev();
 
     // Test user that will authorize the OAuth application

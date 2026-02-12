@@ -58,6 +58,9 @@ export type SignUpData = {
   captcha_enabled: boolean;
   mode: SignUpModes;
   legal_consent_enabled: boolean;
+  mfa?: {
+    required: boolean;
+  };
 };
 
 export type PasswordSettingsData = {

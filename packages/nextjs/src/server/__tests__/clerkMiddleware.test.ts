@@ -518,6 +518,31 @@ describe('clerkMiddleware(params)', () => {
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
+    it('returns 401 when protect is called, the user is signed out, and the request is a server action', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({
+          'next-url': '/protected',
+          'next-action': '1',
+        }),
+        appendDevBrowserCookie: true,
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedOut,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: null }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect();
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(401);
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
     it('throws an unauthorized error when protect is called and the machine auth token is invalid', async () => {
       const req = mockRequest({
         url: '/protected',
