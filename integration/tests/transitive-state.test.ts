@@ -163,4 +163,100 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitiv
       `${pathSwitched} - ${userAId}`,
     ]);
   });
+
+  test('should emit correct transitive auth state when signing out with navigation', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await context.clearCookies();
+
+    // Sign in as userA
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: userA.email, password: userA.password });
+    await u.po.expect.toBeSignedIn();
+
+    const pathA = '/transitive-state/sign-out';
+    const pathB = '/transitive-state/sign-out/sign-in';
+
+    // Navigate to sign-out page
+    await u.po.page.goToRelative(pathA);
+
+    // Wait for initial state to settle
+    await test
+      .expect(u.po.page.getByTestId('emission-log').locator(`li:has-text("${pathA} - ${userAId}")`))
+      .toBeVisible();
+
+    // Click SignOutButton
+    await u.page.getByRole('button', { name: 'Sign out' }).click();
+
+    // Wait for navigation to sign-in page
+    await test.expect(u.po.page.getByTestId('page-name')).toHaveText('sign-in');
+
+    // Assert emission sequence
+    const emissionItems = u.po.page.getByTestId('emission-log').locator('li');
+    const count = await emissionItems.count();
+    const texts: string[] = [];
+    for (let i = 0; i < count; i++) {
+      texts.push((await emissionItems.nth(i).textContent()) ?? '');
+    }
+
+    expect(texts.slice(-4)).toEqual([
+      `${pathA} - ${userAId}`,
+      `${pathA} - undefined`,
+      `${pathB} - undefined`,
+      `${pathB} - null`,
+    ]);
+  });
+
+  test('should emit correct transitive auth state when signing out with navigation (multi-session)', async ({
+    page,
+    context,
+  }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await context.clearCookies();
+
+    // Sign in as userA
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: userA.email, password: userA.password });
+    await u.po.expect.toBeSignedIn();
+
+    // Sign in as userB to create second session (multi-session)
+    await u.po.signIn.goTo();
+    await u.po.signIn.setIdentifier(userB.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.setPassword(userB.password);
+    await u.po.signIn.continue();
+
+    const pathA = '/transitive-state/sign-out';
+    const pathB = '/transitive-state/sign-out/sign-in';
+
+    // Navigate to sign-out page
+    await u.po.page.goToRelative(pathA);
+
+    // Wait for initial state to settle
+    await test
+      .expect(u.po.page.getByTestId('emission-log').locator(`li:has-text("${pathA} - ${userBId}")`))
+      .toBeVisible();
+
+    // Click SignOutButton
+    await u.page.getByRole('button', { name: 'Sign out' }).click();
+
+    // Wait for navigation to sign-in page
+    await test.expect(u.po.page.getByTestId('page-name')).toHaveText('sign-in');
+
+    // Assert emission sequence
+    const emissionItems = u.po.page.getByTestId('emission-log').locator('li');
+    const count = await emissionItems.count();
+    const texts: string[] = [];
+    for (let i = 0; i < count; i++) {
+      texts.push((await emissionItems.nth(i).textContent()) ?? '');
+    }
+
+    expect(texts.slice(-4)).toEqual([
+      `${pathA} - ${userBId}`,
+      `${pathA} - undefined`,
+      `${pathB} - undefined`,
+      `${pathB} - null`,
+    ]);
+  });
 });
