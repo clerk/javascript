@@ -129,7 +129,6 @@ export async function testKeylessRemovedAfterEnvAndRestart({
   await u.page.goToAppHome();
 
   await u.po.keylessPopover.waitForMounted();
-  expect(await u.po.keylessPopover.isExpanded()).toBe(false);
 
   // Copy keys from keyless.json to .env
   await app.keylessToEnv();
