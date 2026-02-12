@@ -79,7 +79,7 @@ export function fapiUrlFromPublishableKey(publishableKey: string): string {
  * Removes trailing slashes from a string without using regex
  * to avoid potential ReDoS concerns flagged by security scanners.
  */
-function stripTrailingSlashes(str: string): string {
+export function stripTrailingSlashes(str: string): string {
   while (str.endsWith('/')) {
     str = str.slice(0, -1);
   }

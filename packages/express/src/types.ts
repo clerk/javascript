@@ -15,7 +15,7 @@ export interface FrontendApiProxyOptions {
    * Enable Frontend API proxy handling. When true, requests to the proxy path
    * will be proxied to Clerk's Frontend API and the proxyUrl will be auto-derived.
    */
-  enabled?: boolean;
+  enabled: boolean;
   /**
    * The path prefix for proxy requests.
    *

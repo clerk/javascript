@@ -1,6 +1,6 @@
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
-import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH } from '@clerk/backend/proxy';
+import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, stripTrailingSlashes } from '@clerk/backend/proxy';
 import { deprecated } from '@clerk/shared/deprecated';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
@@ -98,17 +98,6 @@ const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): strin
   }
   return new URL(relativeOrAbsoluteUrl, baseUrl).toString();
 };
-
-/**
- * Removes trailing slashes from a string without using regex
- * to avoid potential ReDoS concerns flagged by security scanners.
- */
-function stripTrailingSlashes(str: string): string {
-  while (str.endsWith('/')) {
-    str = str.slice(0, -1);
-  }
-  return str;
-}
 
 export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
   const clerkClient = options.clerkClient || defaultClerkClient;
