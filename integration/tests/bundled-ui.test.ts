@@ -22,6 +22,24 @@ testAgainstRunningApps({ withPattern: ['next.appRouterBundledUI.*'] })(
       await app.teardown();
     });
 
+    test('does not fetch ui.browser.js from an external URL', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      const externalUiRequests: string[] = [];
+
+      page.on('request', request => {
+        const url = request.url();
+        if (url.includes('ui.browser.js') && !url.startsWith(app.serverUrl)) {
+          externalUiRequests.push(url);
+        }
+      });
+
+      await u.page.goToAppHome();
+      await u.page.waitForClerkJsLoaded();
+      await u.po.expect.toBeSignedOut();
+
+      expect(externalUiRequests).toEqual([]);
+    });
+
     test('Clerk client loads and renders sign-in/sign-up buttons on home page', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToAppHome();
