@@ -14,7 +14,13 @@ export default defineConfig(({ watch }) => {
     external: ['react', 'react-dom', '@clerk/localizations', '@clerk/shared'],
     format: ['esm'], // ESM only
     minify: false,
-    plugins: [svgr()],
+    plugins: [
+      svgr({
+        svgoConfig: {
+          plugins: ['preset-default', 'removeDimensions', 'removeStyleElement'],
+        },
+      }),
+    ],
     define: {
       PACKAGE_NAME: `"${uiPackage.name}"`,
       PACKAGE_VERSION: `"${uiPackage.version}"`,

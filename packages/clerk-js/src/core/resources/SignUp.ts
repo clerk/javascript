@@ -521,6 +521,10 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this;
   }
 
+  public __internal_updateFromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {
+    return this.fromJSON(data);
+  }
+
   public __internal_toSnapshot(): SignUpJSONSnapshot {
     return {
       object: 'sign_up',
