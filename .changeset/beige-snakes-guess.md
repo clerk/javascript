@@ -1,5 +1,5 @@
 ---
-'@clerk/clerk-js': patch
+'@clerk/ui': patch
 ---
 
-Updates Keyless Prompt content.
+Improved keyless content and animation.
