@@ -162,7 +162,7 @@ const OrganizationDomainsSection = () => {
               <Text
                 localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.subtitle')}
                 sx={t => ({
-                  paddingLeft: t.space.$9,
+                  paddingInlineStart: t.space.$9,
                 })}
                 colorScheme='secondary'
               />
@@ -198,7 +198,7 @@ const OrganizationLeaveSection = () => {
             sx={t => ({
               paddingTop: 0,
               paddingBottom: 0,
-              paddingLeft: t.space.$1,
+              paddingInlineStart: t.space.$1,
             })}
             id='organizationDanger'
           >
@@ -252,7 +252,7 @@ const OrganizationDeleteSection = () => {
             sx={t => ({
               paddingTop: 0,
               paddingBottom: 0,
-              paddingLeft: t.space.$1,
+              paddingInlineStart: t.space.$1,
             })}
             id={'organizationDanger'}
           >
