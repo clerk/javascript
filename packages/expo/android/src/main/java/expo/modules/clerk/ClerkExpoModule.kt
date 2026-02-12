@@ -11,6 +11,7 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.kotlin.records.Field
 import expo.modules.kotlin.records.Record
+import expo.modules.kotlin.views.ExpoView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -212,6 +213,19 @@ class ClerkExpoModule : Module() {
             promise.resolve(result)
         }
 
+        // Get the native Clerk client's bearer token from SharedPreferences
+        // This allows the JS SDK to use the same client as the native SDK
+        AsyncFunction("getClientToken") { promise: Promise ->
+            try {
+                val sharedPref = context.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
+                val deviceToken = sharedPref.getString("DEVICE_TOKEN", null)
+                promise.resolve(deviceToken)
+            } catch (e: Exception) {
+                Log.e(TAG, "getClientToken failed: ${e.message}")
+                promise.resolve(null)
+            }
+        }
+
         // Sign out the current user
         AsyncFunction("signOut") { promise: Promise ->
             if (!Clerk.isInitialized.value) {
@@ -242,6 +256,36 @@ class ClerkExpoModule : Module() {
                 CLERK_PROFILE_REQUEST_CODE -> {
                     handleProfileResult(resultCode, data)
                 }
+            }
+        }
+
+        // MARK: - Inline Native Views
+
+        View(ClerkAuthExpoView::class) {
+            Events("onAuthEvent")
+
+            Prop("mode") { view: ClerkAuthExpoView, mode: String? ->
+                view.mode = mode ?: "signInOrUp"
+            }
+
+            Prop("isDismissable") { view: ClerkAuthExpoView, dismissable: Boolean? ->
+                view.isDismissable = dismissable ?: true
+            }
+
+            OnViewDidUpdateProps { view ->
+                view.setupView()
+            }
+        }
+
+        View(ClerkUserProfileExpoView::class) {
+            Events("onProfileEvent")
+
+            Prop("isDismissable") { view: ClerkUserProfileExpoView, dismissable: Boolean? ->
+                view.isDismissable = dismissable ?: true
+            }
+
+            OnViewDidUpdateProps { view ->
+                view.setupView()
             }
         }
     }

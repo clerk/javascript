@@ -1,9 +1,14 @@
-import { useAuth, useClerk } from '@clerk/react';
+import { useAuth } from '@clerk/react';
 import { Platform, requireNativeModule } from 'expo-modules-core';
+import * as SecureStore from 'expo-secure-store';
 import { useEffect, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { getClerkInstance } from '../provider/singleton';
 import type { AuthViewProps } from './AuthView.types';
+
+// Token cache key used by the Clerk JS SDK (must match createClerkInstance.ts)
+const CLERK_CLIENT_JWT_KEY = '__clerk_client_jwt';
 
 // Type definition for the ClerkExpo native module
 interface ClerkExpoModule {
@@ -11,6 +16,7 @@ interface ClerkExpoModule {
   presentAuth(options: { mode: string; dismissable: boolean }): Promise<{ sessionId?: string }>;
   presentUserProfile(): Promise<void>;
   getSession(): Promise<{ sessionId?: string; user?: Record<string, unknown> } | null>;
+  getClientToken(): Promise<string | null>;
   signOut(): Promise<void>;
 }
 
@@ -119,8 +125,35 @@ if (isNativeSupported) {
  * @see {@link https://clerk.com/docs/components/authentication/sign-in} Clerk Sign-In Documentation
  * @see {@link https://clerk.com/docs/authentication/configuration/sign-up-sign-in-options} Authentication Options
  */
+
+async function syncNativeSession(sessionId: string): Promise<void> {
+  // Copy the native client's bearer token to the JS SDK's token cache
+  if (ClerkExpo?.getClientToken) {
+    const nativeClientToken = await ClerkExpo.getClientToken();
+    if (nativeClientToken) {
+      console.log('[AuthView] Got native client token, syncing to JS SDK...');
+      await SecureStore.setItemAsync(CLERK_CLIENT_JWT_KEY, nativeClientToken, {
+        keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
+      });
+    }
+  }
+
+  const clerkInstance = getClerkInstance()!;
+  const clerkAny = clerkInstance as any;
+
+  // Reload resources using the native client's token
+  if (typeof clerkAny.__internal_reloadInitialResources === 'function') {
+    await clerkAny.__internal_reloadInitialResources();
+    console.log('[AuthView] Resources reloaded with native client token');
+  }
+
+  if (clerkInstance?.setActive) {
+    await clerkInstance.setActive({ session: sessionId });
+    console.log('[AuthView] Session synced successfully');
+  }
+}
+
 export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess, onError }: AuthViewProps) {
-  const clerk = useClerk();
   const { isSignedIn, isLoaded } = useAuth();
   // Track if we've already completed auth to prevent duplicate onSuccess calls
   const authCompletedRef = useRef(false);
@@ -182,15 +215,11 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
           console.log(`[AuthView] CHECK_SESSION: Checking native session...`);
           const nativeSession = await ClerkExpo.getSession();
           console.log(`[AuthView] CHECK_SESSION: Result:`, JSON.stringify(nativeSession));
-          // Native getSession returns { sessionId: "...", user: {...} } at top level
           const sessionId = nativeSession?.sessionId;
           if (sessionId) {
-            console.log('[AuthView] SYNC: Native SDK has existing session, syncing to JS via setActive...');
+            console.log('[AuthView] SYNC: Native SDK has existing session, syncing to JS...');
             authCompletedRef.current = true;
-            if (clerk.setActive) {
-              await clerk.setActive({ session: sessionId });
-              console.log('[AuthView] SYNC: JS SDK state synced from native session');
-            }
+            await syncNativeSession(sessionId);
             onSuccess?.();
             return;
           } else {
@@ -213,29 +242,14 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
         // Mark auth as completed to prevent duplicate onSuccess calls
         authCompletedRef.current = true;
 
-        // After native sign-in completes, sync the session to JS SDK using setActive
-        if (result.sessionId && clerk.setActive) {
-          console.log(`[AuthView] SYNC: Syncing session=${result.sessionId} to JS SDK via setActive...`);
+        // Sync the native session to JS SDK
+        if (result.sessionId) {
+          console.log(`[AuthView] SYNC: Syncing session=${result.sessionId} to JS SDK...`);
           try {
-            // Wait for client to be loaded if needed
-            const clerkAny = clerk as any;
-            console.log(`[AuthView] SYNC: clerk.loaded=${clerkAny.loaded}`);
-            if (!clerkAny.loaded && clerkAny.addOnLoaded) {
-              console.log('[AuthView] SYNC: Waiting for client to load...');
-              await new Promise<void>(resolve => {
-                clerkAny.addOnLoaded(() => {
-                  console.log('[AuthView] SYNC: addOnLoaded callback fired');
-                  resolve();
-                });
-              });
-            }
-            await clerk.setActive({ session: result.sessionId });
-            console.log('[AuthView] SYNC: JS SDK session synced successfully');
+            await syncNativeSession(result.sessionId);
           } catch (syncError) {
             console.error('[AuthView] SYNC: Failed to sync session:', syncError);
           }
-        } else {
-          console.warn(`[AuthView] SYNC: Skipping - sessionId=${result.sessionId}, setActive=${!!clerk.setActive}`);
         }
 
         console.log(`[AuthView] SUCCESS: Calling onSuccess callback`);
@@ -253,16 +267,13 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
           authCompletedRef.current = true;
 
           // Get the session from native SDK and sync to JS
-          // Native getSession returns { sessionId: "...", user: {...} } at top level
-          if (ClerkExpo?.getSession && clerk.setActive) {
+          if (ClerkExpo?.getSession) {
             try {
               const nativeSession = await ClerkExpo.getSession();
               console.log(`[AuthView] ALREADY_SIGNED_IN: Native session:`, JSON.stringify(nativeSession));
               if (nativeSession?.sessionId) {
-                const sessionId = nativeSession.sessionId;
-                console.log('[AuthView] ALREADY_SIGNED_IN: Syncing via setActive:', sessionId);
-                await clerk.setActive({ session: sessionId });
-                console.log('[AuthView] ALREADY_SIGNED_IN: JS SDK state synced');
+                console.log('[AuthView] ALREADY_SIGNED_IN: Syncing session:', nativeSession.sessionId);
+                await syncNativeSession(nativeSession.sessionId);
                 onSuccess?.();
                 return;
               }
@@ -278,7 +289,7 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
     };
 
     presentModal();
-  }, [mode, isDismissable, clerk, onSuccess, onError, isSignedIn]);
+  }, [mode, isDismissable, onSuccess, onError, isSignedIn]);
 
   // Show a placeholder when native modules aren't available
   if (!isNativeSupported || !ClerkExpo) {

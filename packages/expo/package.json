@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "2.19.10",
+  "version": "2.19.24",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -64,7 +64,8 @@
     "./legacy": {
       "types": "./dist/legacy.d.ts",
       "default": "./dist/legacy.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "source": "./src/index.ts",

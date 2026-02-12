@@ -51,6 +51,10 @@
 
 export { AuthView } from './AuthView';
 export type { AuthViewProps, AuthViewMode } from './AuthView.types';
+export { InlineAuthView } from './InlineAuthView';
+export type { InlineAuthViewProps } from './InlineAuthView';
+export { InlineUserProfileView } from './InlineUserProfileView';
+export type { InlineUserProfileViewProps } from './InlineUserProfileView';
 export { UserButton } from './UserButton';
 export type { UserButtonProps } from './UserButton';
 export { UserProfileView } from './UserProfileView';

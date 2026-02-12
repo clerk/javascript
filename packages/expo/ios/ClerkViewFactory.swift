@@ -82,6 +82,48 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     return wrapper
   }
 
+  // MARK: - Inline View Creation
+
+  public func createAuthView(
+    mode: String,
+    dismissable: Bool,
+    onEvent: @escaping (String, [String: Any]) -> Void
+  ) -> UIView? {
+    let authMode: AuthView.Mode
+    switch mode {
+    case "signIn":
+      authMode = .signIn
+    case "signUp":
+      authMode = .signUp
+    default:
+      authMode = .signInOrUp
+    }
+
+    let hostingController = UIHostingController(
+      rootView: ClerkInlineAuthWrapperView(
+        mode: authMode,
+        dismissable: dismissable,
+        onEvent: onEvent
+      )
+    )
+    hostingController.view.backgroundColor = .clear
+    return hostingController.view
+  }
+
+  public func createUserProfileView(
+    dismissable: Bool,
+    onEvent: @escaping (String, [String: Any]) -> Void
+  ) -> UIView? {
+    let hostingController = UIHostingController(
+      rootView: ClerkInlineProfileWrapperView(
+        dismissable: dismissable,
+        onEvent: onEvent
+      )
+    )
+    hostingController.view.backgroundColor = .clear
+    return hostingController.view
+  }
+
   @MainActor
   public func getSession() async -> [String: Any]? {
     guard let session = Clerk.shared.session else {
@@ -233,6 +275,55 @@ struct ClerkProfileWrapperView: View {
 
   var body: some View {
     UserProfileView(isDismissable: dismissable)
+  }
+}
+
+// MARK: - Inline Auth View Wrapper (for embedded rendering)
+
+struct ClerkInlineAuthWrapperView: View {
+  let mode: AuthView.Mode
+  let dismissable: Bool
+  let onEvent: (String, [String: Any]) -> Void
+
+  var body: some View {
+    AuthView(mode: mode, isDismissable: dismissable)
+      .task {
+        for await event in Clerk.shared.authEventEmitter.events {
+          switch event {
+          case .signInCompleted(let signIn):
+            if let sessionId = signIn.createdSessionId {
+              onEvent("signInCompleted", ["sessionId": sessionId, "type": "signIn"])
+            }
+          case .signUpCompleted(let signUp):
+            if let sessionId = signUp.createdSessionId {
+              onEvent("signUpCompleted", ["sessionId": sessionId, "type": "signUp"])
+            }
+          default:
+            break
+          }
+        }
+      }
+  }
+}
+
+// MARK: - Inline Profile View Wrapper (for embedded rendering)
+
+struct ClerkInlineProfileWrapperView: View {
+  let dismissable: Bool
+  let onEvent: (String, [String: Any]) -> Void
+
+  var body: some View {
+    UserProfileView(isDismissable: dismissable)
+      .task {
+        for await event in Clerk.shared.authEventEmitter.events {
+          switch event {
+          case .signedOut(let session):
+            onEvent("signedOut", ["sessionId": session.id])
+          default:
+            break
+          }
+        }
+      }
   }
 }
 
