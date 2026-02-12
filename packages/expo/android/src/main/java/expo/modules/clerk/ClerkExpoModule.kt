@@ -14,10 +14,18 @@ import expo.modules.kotlin.records.Record
 import expo.modules.kotlin.views.ExpoView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 
 private const val TAG = "ClerkExpoModule"
+
+private fun debugLog(tag: String, message: String) {
+    if (BuildConfig.DEBUG) {
+        Log.d(tag, message)
+    }
+}
 
 // Parameter records
 class PresentAuthOptions : Record {
@@ -91,8 +99,21 @@ class ClerkExpoModule : Module() {
                     publishableKey = pubKey
                     Clerk.initialize(context, pubKey)
 
-                    // Wait for initialization to complete
-                    Clerk.isInitialized.first { it }
+                    // Wait for initialization to complete with timeout
+                    try {
+                        withTimeout(10_000L) {
+                            Clerk.isInitialized.first { it }
+                        }
+                    } catch (e: TimeoutCancellationException) {
+                        val initError = Clerk.initializationError.value
+                        val message = if (initError != null) {
+                            "Clerk initialization timed out: ${initError.message}"
+                        } else {
+                            "Clerk initialization timed out after 10 seconds"
+                        }
+                        promise.reject(CodedException(message))
+                        return@launch
+                    }
 
                     // Check for initialization errors
                     val error = Clerk.initializationError.value
@@ -125,6 +146,7 @@ class ClerkExpoModule : Module() {
                 return@AsyncFunction
             }
 
+            pendingAuthPromise?.reject(CodedException("Auth presentation was superseded"))
             pendingAuthPromise = promise
 
             val intent = Intent(activity, ClerkAuthActivity::class.java).apply {
@@ -147,6 +169,7 @@ class ClerkExpoModule : Module() {
                 return@AsyncFunction
             }
 
+            pendingProfilePromise?.reject(CodedException("Profile presentation was superseded"))
             pendingProfilePromise = promise
 
             val intent = Intent(activity, ClerkUserProfileActivity::class.java).apply {
@@ -159,10 +182,7 @@ class ClerkExpoModule : Module() {
 
         // Get current session and user data
         AsyncFunction("getSession") { promise: Promise ->
-            Log.d(TAG, "getSession called - isInitialized: ${Clerk.isInitialized.value}")
-
             if (!Clerk.isInitialized.value) {
-                Log.e(TAG, "getSession - Clerk not initialized")
                 promise.reject(ClerkNotInitializedException())
                 return@AsyncFunction
             }
@@ -170,12 +190,7 @@ class ClerkExpoModule : Module() {
             val session = Clerk.session
             val user = Clerk.user
 
-            Log.d(TAG, "getSession - session: ${session?.id}")
-            Log.d(TAG, "getSession - user: ${user?.id}")
-            Log.d(TAG, "getSession - user.firstName: ${user?.firstName}")
-            Log.d(TAG, "getSession - user.lastName: ${user?.lastName}")
-            Log.d(TAG, "getSession - user.imageUrl: ${user?.imageUrl?.take(50)}")
-            Log.d(TAG, "getSession - user.emailAddresses: ${user?.emailAddresses?.map { it.emailAddress }}")
+            debugLog(TAG, "getSession - session: ${session?.id}, user: ${user?.id}")
 
             val result = mutableMapOf<String, Any?>()
 
@@ -209,7 +224,6 @@ class ClerkExpoModule : Module() {
                 )
             }
 
-            Log.d(TAG, "getSession - returning result: $result")
             promise.resolve(result)
         }
 
@@ -291,7 +305,7 @@ class ClerkExpoModule : Module() {
     }
 
     private fun handleAuthResult(resultCode: Int, data: Intent?) {
-        Log.d(TAG, "handleAuthResult - resultCode: $resultCode")
+        debugLog(TAG, "handleAuthResult - resultCode: $resultCode")
 
         val promise = pendingAuthPromise ?: return
         pendingAuthPromise = null
@@ -300,11 +314,7 @@ class ClerkExpoModule : Module() {
             val session = Clerk.session
             val user = Clerk.user
 
-            Log.d(TAG, "handleAuthResult - session: ${session?.id}")
-            Log.d(TAG, "handleAuthResult - user: ${user?.id}")
-            Log.d(TAG, "handleAuthResult - user.firstName: ${user?.firstName}")
-            Log.d(TAG, "handleAuthResult - user.lastName: ${user?.lastName}")
-            Log.d(TAG, "handleAuthResult - user.imageUrl: ${user?.imageUrl?.take(50)}")
+            debugLog(TAG, "handleAuthResult - session: ${session?.id}, user: ${user?.id}")
 
             val result = mutableMapOf<String, Any?>()
 
@@ -328,11 +338,9 @@ class ClerkExpoModule : Module() {
                 )
             }
 
-            Log.d(TAG, "handleAuthResult - returning: $result")
             promise.resolve(result)
         } else {
-            Log.d(TAG, "handleAuthResult - user cancelled")
-            // User cancelled or dismissed
+            debugLog(TAG, "handleAuthResult - user cancelled")
             promise.resolve(mapOf("cancelled" to true))
         }
     }

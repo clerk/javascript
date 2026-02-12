@@ -167,73 +167,58 @@ export function UserProfileView({ isDismissable = true, onSignOut, style, ...pro
   // Track if we've already triggered sign-out to prevent double-calls
   const signOutTriggered = useRef(false);
 
+  // Stable refs for callbacks/values to avoid re-triggering the effect
+  const onSignOutRef = useRef(onSignOut);
+  onSignOutRef.current = onSignOut;
+  const clerkRef = useRef(clerk);
+  clerkRef.current = clerk;
+  const isSignedInRef = useRef(isSignedIn);
+  isSignedInRef.current = isSignedIn;
+
+  // Reset sign-out flag on mount only
+  useEffect(() => {
+    signOutTriggered.current = false;
+  }, []);
+
   useEffect(() => {
     if (!isNativeSupported || !ClerkExpo?.presentUserProfile) {
       return;
     }
 
-    // Reset sign-out flag when component mounts
-    signOutTriggered.current = false;
-
     const presentModal = async () => {
       try {
-        console.log('[UserProfileView] Presenting native profile modal');
-        const result = await ClerkExpo.presentUserProfile({
+        await ClerkExpo.presentUserProfile({
           dismissable: isDismissable,
         });
-
-        console.log('[UserProfileView] Profile modal closed, result:', result);
 
         // Check if native session still exists after modal closes
         // If session is null, user signed out from the native UI
         const sessionCheck = await ClerkExpo.getSession?.();
         const hasNativeSession = !!sessionCheck?.session;
 
-        console.log('[UserProfileView] Native session after close:', hasNativeSession);
-        console.log('[UserProfileView] JS SDK isSignedIn:', isSignedIn);
-
         if (!hasNativeSession && !signOutTriggered.current) {
           signOutTriggered.current = true;
-          console.log('[UserProfileView] User signed out from native profile');
 
           // Clear native session explicitly (may already be cleared, but ensure it)
           try {
-            console.log('[UserProfileView] Clearing native session...');
             await ClerkExpo.signOut?.();
-            console.log('[UserProfileView] Native session cleared');
-          } catch (nativeSignOutErr) {
-            console.warn('[UserProfileView] Native sign out error (may already be signed out):', nativeSignOutErr);
+          } catch {
+            // May already be signed out
           }
 
           // Sign out from JS SDK - this is critical to update isSignedIn state
-          // Use the clerk instance directly and wait for completion
-          if (clerk?.signOut) {
+          const currentClerk = clerkRef.current;
+          if (currentClerk?.signOut) {
             try {
-              console.log('[UserProfileView] Signing out from JS SDK...');
-              await clerk.signOut();
-              console.log('[UserProfileView] JS SDK signed out successfully');
+              await currentClerk.signOut();
             } catch (signOutErr) {
               console.warn('[UserProfileView] JS SDK sign out error:', signOutErr);
-              // Even if signOut throws, try to force reload to clear stale state
-              const clerkAny = clerk as { __internal_reloadInitialResources?: () => Promise<void> };
-              if (clerkAny?.__internal_reloadInitialResources) {
-                try {
-                  console.log('[UserProfileView] Force reloading JS SDK state...');
-                  await clerkAny.__internal_reloadInitialResources();
-                  console.log('[UserProfileView] JS SDK state reloaded');
-                } catch (reloadErr) {
-                  console.warn('[UserProfileView] Failed to reload JS SDK state:', reloadErr);
-                }
-              }
+              // TODO: Consider a public API for force-refreshing SDK state
             }
           }
 
           // Call onSignOut callback AFTER JS SDK sign-out completes
-          console.log('[UserProfileView] Calling onSignOut callback');
-          onSignOut?.();
-        } else if (hasNativeSession) {
-          console.log('[UserProfileView] User dismissed profile without signing out');
-          // User just closed the profile, don't trigger sign-out
+          onSignOutRef.current?.();
         }
       } catch (err) {
         console.error('[UserProfileView] Error:', err);
@@ -241,7 +226,7 @@ export function UserProfileView({ isDismissable = true, onSignOut, style, ...pro
     };
 
     void presentModal();
-  }, [isDismissable, onSignOut, clerk, isSignedIn]);
+  }, [isDismissable]);
 
   // Show a placeholder when native modules aren't available
   if (!isNativeSupported || !ClerkExpo) {

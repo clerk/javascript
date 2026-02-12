@@ -40,6 +40,7 @@ import type {
   OrganizationSwitcherProps,
   PricingTableProps,
   RedirectOptions,
+  Resources,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -311,9 +312,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         user: clerk.user ?? null,
         organization: clerk.organization ?? null,
       };
-      this.premountAddListenerCalls.forEach((_, listener) => {
-        listener(currentState as any);
-      });
+      if (currentState.client) {
+        this.premountAddListenerCalls.forEach((_, listener) => {
+          listener(currentState as Resources);
+        });
+      }
 
       // Emit status through eventBus
       this.#eventBus.emit(clerkEvents.Status, 'ready');
@@ -325,7 +328,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerk
         .load(this.options)
         .then(() => finishInit())
-        .catch(() => finishInit());
+        .catch(err => {
+          if (__DEV__) {
+            console.error('Clerk: Failed to load:', err);
+          }
+          finishInit();
+        });
     } else {
       finishInit();
     }

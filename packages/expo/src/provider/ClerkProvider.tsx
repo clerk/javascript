@@ -73,8 +73,13 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       })
     : null;
 
+  // Track whether the component is still mounted
+  const isMountedRef = useRef(true);
+
   // Configure native Clerk SDK and set up session sync callback
   useEffect(() => {
+    isMountedRef.current = true;
+
     if ((Platform.OS === 'ios' || Platform.OS === 'android') && pk && !initStartedRef.current) {
       initStartedRef.current = true;
 
@@ -86,12 +91,19 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
           if (ClerkExpo?.configure) {
             await ClerkExpo.configure(pk);
 
+            if (!isMountedRef.current) {
+              return;
+            }
+
             // Poll for native session (matching iOS's 3-second max wait)
             const MAX_WAIT_MS = 3000;
             const POLL_INTERVAL_MS = 100;
             let sessionId: string | null = null;
 
             for (let elapsed = 0; elapsed < MAX_WAIT_MS; elapsed += POLL_INTERVAL_MS) {
+              if (!isMountedRef.current) {
+                return;
+              }
               if (ClerkExpo?.getSession) {
                 const nativeSession = await ClerkExpo.getSession();
                 sessionId = nativeSession?.sessionId;
@@ -100,6 +112,10 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
                 }
               }
               await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+            }
+
+            if (!isMountedRef.current) {
+              return;
             }
 
             if (sessionId && clerkInstance) {
@@ -115,6 +131,9 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
                   } else if (typeof clerkAny.addOnLoaded === 'function') {
                     clerkAny.addOnLoaded(() => resolve());
                   } else {
+                    if (__DEV__) {
+                      console.warn('[ClerkProvider] Clerk instance has no loaded property or addOnLoaded method');
+                    }
                     resolve();
                   }
                 });
@@ -122,7 +141,11 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
 
               await waitForLoad();
 
-              if (!sessionSyncedRef.current && clerkInstance.setActive) {
+              if (!isMountedRef.current) {
+                return;
+              }
+
+              if (!sessionSyncedRef.current && typeof clerkInstance.setActive === 'function') {
                 sessionSyncedRef.current = true;
                 const pendingSession = pendingNativeSessionRef.current;
 
@@ -159,6 +182,10 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       };
       configureNativeClerk();
     }
+
+    return () => {
+      isMountedRef.current = false;
+    };
   }, [pk, clerkInstance]);
 
   // Listen for native auth state changes and sync to JS SDK

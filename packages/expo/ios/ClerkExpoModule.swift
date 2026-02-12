@@ -195,6 +195,8 @@ public class ClerkExpoModule: Module {
 
           if let rootVC = UIApplication.shared.keyWindow?.rootViewController {
             rootVC.present(vc, animated: true)
+          } else {
+            continuation.resume(throwing: NSError(domain: "ClerkExpo", code: 3, userInfo: [NSLocalizedDescriptionKey: "No root view controller available to present auth"]))
           }
         }
       }
@@ -224,6 +226,8 @@ public class ClerkExpoModule: Module {
 
           if let rootVC = UIApplication.shared.keyWindow?.rootViewController {
             rootVC.present(vc, animated: true)
+          } else {
+            continuation.resume(throwing: NSError(domain: "ClerkExpo", code: 3, userInfo: [NSLocalizedDescriptionKey: "No root view controller available to present profile"]))
           }
         }
       }

@@ -9,8 +9,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,6 +26,8 @@ import com.clerk.ui.auth.AuthView
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 private const val TAG = "ClerkAuthExpoView"
 
@@ -36,12 +40,21 @@ class ClerkAuthExpoView(context: Context, appContext: AppContext) : ExpoView(con
   private val activity: ComponentActivity? = findActivity(context)
 
   private val composeView = ComposeView(context).also { view ->
-    // Set view tree owners on the ComposeView so the windowRecomposer can be resolved
-    // before the view is measured. React Native's view hierarchy doesn't set these up.
-    activity?.let {
-      view.setViewTreeLifecycleOwner(it)
-      view.setViewTreeViewModelStoreOwner(it)
-      view.setViewTreeSavedStateRegistryOwner(it)
+    activity?.let { act ->
+      view.setViewTreeLifecycleOwner(act)
+      view.setViewTreeViewModelStoreOwner(act)
+      view.setViewTreeSavedStateRegistryOwner(act)
+
+      // Create an explicit Recomposer to bypass windowRecomposer resolution.
+      // In Compose 1.7+, windowRecomposer looks at rootView which may not have
+      // lifecycle owners in React Native Fabric's detached view trees.
+      // AndroidUiDispatcher.Main provides both a dispatcher and MonotonicFrameClock.
+      val recomposerContext = AndroidUiDispatcher.Main
+      val recomposer = Recomposer(recomposerContext)
+      view.setParentCompositionContext(recomposer)
+      CoroutineScope(recomposerContext).launch {
+        recomposer.runRecomposeAndApplyChanges()
+      }
     }
     addView(view, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
   }

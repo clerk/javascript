@@ -203,21 +203,28 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
         guard let self = self else { return }
         switch event {
         case .signInCompleted(let signIn):
-          print("✅ [ClerkAuth] Sign-in completed")
           if let sessionId = signIn.createdSessionId {
             self.completion(.success(["sessionId": sessionId, "type": "signIn"]))
             self.dismiss(animated: true)
+          } else {
+            self.completion(.failure(NSError(domain: "ClerkExpo", code: 4, userInfo: [NSLocalizedDescriptionKey: "Sign-in completed but no session was created"])))
+            self.dismiss(animated: true)
           }
         case .signUpCompleted(let signUp):
-          print("✅ [ClerkAuth] Sign-up completed")
           if let sessionId = signUp.createdSessionId {
             self.completion(.success(["sessionId": sessionId, "type": "signUp"]))
+            self.dismiss(animated: true)
+          } else {
+            self.completion(.failure(NSError(domain: "ClerkExpo", code: 4, userInfo: [NSLocalizedDescriptionKey: "Sign-up completed but no session was created"])))
             self.dismiss(animated: true)
           }
         default:
           break
         }
       }
+      // Stream ended without a completion event
+      guard let self = self else { return }
+      self.completion(.failure(NSError(domain: "ClerkExpo", code: 5, userInfo: [NSLocalizedDescriptionKey: "Auth event stream ended unexpectedly"])))
     }
   }
 }
@@ -259,13 +266,15 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
         guard let self = self else { return }
         switch event {
         case .signedOut(let session):
-          print("✅ [ClerkProfile] Signed out")
           self.completion(.success(["sessionId": session.id]))
           self.dismiss(animated: true)
         default:
           break
         }
       }
+      // Stream ended without a sign-out event
+      guard let self = self else { return }
+      self.completion(.failure(NSError(domain: "ClerkExpo", code: 5, userInfo: [NSLocalizedDescriptionKey: "Profile event stream ended unexpectedly"])))
     }
   }
 }

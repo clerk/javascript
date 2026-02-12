@@ -276,21 +276,14 @@ const withClerkIOS = config => {
       let sourceFile;
       const possiblePaths = [
         // Standard node_modules (npm, yarn)
-        path.join(
-          config.modRequest.projectRoot,
-          'node_modules',
-          '@clerk',
-          'clerk-expo',
-          'ios',
-          'ClerkViewFactory.swift',
-        ),
+        path.join(config.modRequest.projectRoot, 'node_modules', '@clerk', 'expo', 'ios', 'ClerkViewFactory.swift'),
         // pnpm hoisted node_modules
         path.join(
           config.modRequest.projectRoot,
           '..',
           'node_modules',
           '@clerk',
-          'clerk-expo',
+          'expo',
           'ios',
           'ClerkViewFactory.swift',
         ),

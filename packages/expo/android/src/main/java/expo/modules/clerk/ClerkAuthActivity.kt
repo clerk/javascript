@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import java.util.concurrent.atomic.AtomicBoolean
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,7 +55,15 @@ class ClerkAuthActivity : ComponentActivity() {
 
     companion object {
         private const val TAG = "ClerkAuthActivity"
+
+        private fun debugLog(tag: String, message: String) {
+            if (BuildConfig.DEBUG) {
+                Log.d(tag, message)
+            }
+        }
     }
+
+    private val authCompleteGuard = AtomicBoolean(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +73,7 @@ class ClerkAuthActivity : ComponentActivity() {
 
         // Track if we had a session when we started (to detect new sign-in)
         val initialSession = Clerk.session
-        Log.d(TAG, "onCreate - initialSession: ${initialSession?.id}, mode: $mode")
+        debugLog(TAG, "onCreate - initialSession: ${initialSession?.id}, mode: $mode")
 
         setContent {
             // Observe initialization state
@@ -85,21 +94,14 @@ class ClerkAuthActivity : ComponentActivity() {
             // Wait for SDK to be fully initialized AND client to sync
             // The client sync happens after isInitialized becomes true
             LaunchedEffect(isInitialized) {
-                Log.d(TAG, "LaunchedEffect - isInitialized: $isInitialized")
                 if (isInitialized) {
                     // Give the client a moment to sync after initialization
                     // The SDK needs time to fetch the environment configuration
                     var attempts = 0
                     while (attempts < 30) { // Wait up to 3 seconds
-                        // Check if client exists (environment is loaded)
                         val client = Clerk.client
-                        Log.d(TAG, "Waiting for client - attempt $attempts, client: ${client?.id}")
                         if (client != null) {
-                            Log.d(TAG, "Client is ready: ${client.id}")
-                            // Log detailed client state
-                            Log.d(TAG, "Client signIn status: ${client.signIn?.status}")
-                            Log.d(TAG, "Client signUp status: ${client.signUp?.status}")
-                            Log.d(TAG, "Client sessions count: ${client.sessions?.size ?: 0}")
+                            debugLog(TAG, "Client is ready: ${client.id}")
                             isClientReady = true
                             break
                         }
@@ -130,25 +132,8 @@ class ClerkAuthActivity : ComponentActivity() {
                         val signUp = client?.signUp
 
                         if (signUp != null && signUp.id != lastSignUpId) {
-                            // New signUp detected
                             lastSignUpId = signUp.id
-                            Log.d(TAG, ">>> NEW SIGNUP DETECTED <<<")
-                            Log.d(TAG, "SignUp.id: ${signUp.id}")
-                            Log.d(TAG, "SignUp.status: ${signUp.status}")
-                            Log.d(TAG, "SignUp.emailAddress: ${signUp.emailAddress}")
-
-                            // Log detailed verification info
-                            val emailVerification = signUp.verifications?.get("email_address")
-                            if (emailVerification != null) {
-                                Log.d(TAG, ">>> EMAIL VERIFICATION OBJECT <<<")
-                                Log.d(TAG, "  status: ${emailVerification.status}")
-                                Log.d(TAG, "  strategy: ${emailVerification.strategy}")
-                                Log.d(TAG, "  attempts: ${emailVerification.attempts}")
-                                Log.d(TAG, "  expireAt: ${emailVerification.expireAt}")
-                                Log.d(TAG, "  error: ${emailVerification.error}")
-                            } else {
-                                Log.d(TAG, ">>> NO EMAIL VERIFICATION OBJECT <<<")
-                            }
+                            debugLog(TAG, "New signUp detected: ${signUp.id}, status: ${signUp.status}")
                         }
 
                         // Manually trigger prepareVerification if needed
@@ -161,7 +146,6 @@ class ClerkAuthActivity : ComponentActivity() {
                             val emailVerification = signUp.verifications?.get("email_address")
                             // Only prepare if email is unverified
                             if (emailVerification?.status?.name == "UNVERIFIED") {
-                                Log.d(TAG, ">>> MANUALLY TRIGGERING prepareVerification for email <<<")
                                 preparedSignUpId = signUp.id
 
                                 try {
@@ -170,13 +154,13 @@ class ClerkAuthActivity : ComponentActivity() {
                                     )
                                     result
                                         .onSuccess {
-                                            Log.d(TAG, ">>> prepareVerification SUCCESS - email should be sent! <<<")
+                                            debugLog(TAG, "prepareVerification succeeded")
                                         }
                                         .onFailure { error ->
-                                            Log.e(TAG, ">>> prepareVerification FAILED: ${error.errorMessage} <<<")
+                                            Log.e(TAG, "prepareVerification failed: ${error.errorMessage}")
                                         }
                                 } catch (e: Exception) {
-                                    Log.e(TAG, ">>> prepareVerification EXCEPTION: ${e.message} <<<", e)
+                                    Log.e(TAG, "prepareVerification exception: ${e.message}")
                                 }
                             }
                         }
@@ -188,29 +172,21 @@ class ClerkAuthActivity : ComponentActivity() {
                             signIn.id != preparedSecondFactorSignInId &&
                             signIn.status == SignIn.Status.NEEDS_SECOND_FACTOR) {
 
-                            Log.d(TAG, ">>> SIGN-IN NEEDS SECOND FACTOR (MFA) <<<")
-                            Log.d(TAG, "SignIn.id: ${signIn.id}")
-                            Log.d(TAG, "SignIn.supportedSecondFactors: ${signIn.supportedSecondFactors?.map { "${it.strategy} (email: ${it.emailAddressId}, phone: ${it.phoneNumberId})" }}")
-
-                            // Mark this signIn as prepared to avoid duplicate calls
                             preparedSecondFactorSignInId = signIn.id
 
                             try {
-                                Log.d(TAG, ">>> MANUALLY TRIGGERING prepareSecondFactor <<<")
                                 val result = signIn.prepareSecondFactor()
                                 result
                                     .onSuccess { updatedSignIn ->
-                                        Log.d(TAG, ">>> prepareSecondFactor SUCCESS - MFA code should be sent! <<<")
-                                        Log.d(TAG, "Updated signIn status: ${updatedSignIn.status}")
-                                        Log.d(TAG, "Second factor verification: ${updatedSignIn.secondFactorVerification}")
+                                        debugLog(TAG, "prepareSecondFactor succeeded, status: ${updatedSignIn.status}")
                                     }
                                     .onFailure { error ->
-                                        Log.e(TAG, ">>> prepareSecondFactor FAILED: ${error.errorMessage} <<<")
+                                        Log.e(TAG, "prepareSecondFactor failed: ${error.errorMessage}")
                                         // Reset so we can retry
                                         preparedSecondFactorSignInId = null
                                     }
                             } catch (e: Exception) {
-                                Log.e(TAG, ">>> prepareSecondFactor EXCEPTION: ${e.message} <<<", e)
+                                Log.e(TAG, "prepareSecondFactor exception: ${e.message}")
                                 // Reset so we can retry
                                 preparedSecondFactorSignInId = null
                             }
@@ -218,12 +194,9 @@ class ClerkAuthActivity : ComponentActivity() {
 
                         // Check if auth completed - finish activity immediately
                         val currentSession = Clerk.session
-                        if (currentSession != null && !isAuthComplete) {
-                            Log.d(TAG, ">>> AUTH COMPLETED - Session detected in polling loop <<<")
-                            Log.d(TAG, "Session ID: ${currentSession.id}")
+                        if (currentSession != null && authCompleteGuard.compareAndSet(false, true)) {
                             isAuthComplete = true
 
-                            // Finish activity with success
                             val resultIntent = Intent().apply {
                                 putExtra("sessionId", currentSession.id)
                                 putExtra("userId", currentSession.user?.id ?: Clerk.user?.id)
@@ -236,41 +209,9 @@ class ClerkAuthActivity : ComponentActivity() {
                 }
             }
 
-            // Periodic logging of auth state for debugging (reduced frequency)
-            LaunchedEffect(isClientReady) {
-                if (isClientReady) {
-                    while (!isAuthComplete) {
-                        delay(2000) // Log every 2 seconds
-                        val client = Clerk.client
-                        val signIn = client?.signIn
-                        val signUp = client?.signUp
-
-                        Log.d(TAG, "=== Auth State Debug ===")
-                        Log.d(TAG, "Session: ${Clerk.session?.id}")
-                        Log.d(TAG, "User: ${Clerk.user?.id}")
-                        Log.d(TAG, "isAuthComplete: $isAuthComplete")
-
-                        if (signIn != null) {
-                            Log.d(TAG, "SignIn.id: ${signIn.id}")
-                            Log.d(TAG, "SignIn.status: ${signIn.status}")
-                        }
-
-                        if (signUp != null) {
-                            Log.d(TAG, "SignUp.id: ${signUp.id}")
-                            Log.d(TAG, "SignUp.status: ${signUp.status}")
-                        }
-                        Log.d(TAG, "========================")
-                    }
-                }
-            }
-
             // Backup: Also listen for session via Flow (in case polling misses it)
             LaunchedEffect(session) {
-                Log.d(TAG, "LaunchedEffect(session) - session: ${session?.id}, isAuthComplete: $isAuthComplete")
-
-                if (session != null && initialSession == null && !isAuthComplete) {
-                    Log.d(TAG, "Auth completed - session created: ${session?.id}")
-
+                if (session != null && initialSession == null && authCompleteGuard.compareAndSet(false, true)) {
                     // Mark auth as complete FIRST to hide AuthView
                     // This prevents the "NavDisplay backstack cannot be empty" crash
                     isAuthComplete = true
@@ -286,11 +227,6 @@ class ClerkAuthActivity : ComponentActivity() {
                     setResult(Activity.RESULT_OK, resultIntent)
                     finish()
                 }
-            }
-
-            // Log user state changes for debugging
-            LaunchedEffect(user) {
-                Log.d(TAG, "User state changed - user: ${user?.id}, firstName: ${user?.firstName}")
             }
 
             // Handle back press
@@ -363,14 +299,5 @@ class ClerkAuthActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    override fun onBackPressed() {
-        val dismissable = intent.getBooleanExtra(ClerkExpoModule.EXTRA_DISMISSABLE, true)
-        if (dismissable) {
-            setResult(Activity.RESULT_CANCELED)
-            super.onBackPressed()
-        }
-        // If not dismissable, ignore back press
     }
 }

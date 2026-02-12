@@ -142,7 +142,7 @@ All 3 public components share these internal building blocks:
 When you import and use these 3 components, you get **full access to ALL 107 files** and every single screen, flow, and feature from clerk-ios:
 
 ```typescript
-import { SignIn, UserButton, UserProfile } from '@clerk/clerk-expo/native'
+import { AuthView, UserButton, UserProfileView } from '@clerk/expo/native'
 
 // This ONE component gives you access to:
 // - 15+ sign-in screens
@@ -150,7 +150,7 @@ import { SignIn, UserButton, UserProfile } from '@clerk/clerk-expo/native'
 // - 10+ MFA screens
 // - 5+ password reset screens
 // - 50+ internal UI components
-<SignIn />
+<AuthView />
 
 // This ONE component gives you access to:
 // - User avatar
@@ -165,7 +165,7 @@ import { SignIn, UserButton, UserProfile } from '@clerk/clerk-expo/native'
 // - 10+ MFA configuration screens
 // - 10+ device management screens
 // - 40+ internal UI components
-<UserProfile />
+<UserProfileView />
 ```
 
 ## Complete Feature List

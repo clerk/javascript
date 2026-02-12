@@ -7,7 +7,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,6 +27,8 @@ import com.clerk.ui.userprofile.UserProfileView
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 private const val TAG = "ClerkUserProfileExpoView"
 
@@ -36,10 +40,17 @@ class ClerkUserProfileExpoView(context: Context, appContext: AppContext) : ExpoV
   private val activity = ClerkAuthExpoView.findActivity(context)
 
   private val composeView = ComposeView(context).also { view ->
-    activity?.let {
-      view.setViewTreeLifecycleOwner(it)
-      view.setViewTreeViewModelStoreOwner(it)
-      view.setViewTreeSavedStateRegistryOwner(it)
+    activity?.let { act ->
+      view.setViewTreeLifecycleOwner(act)
+      view.setViewTreeViewModelStoreOwner(act)
+      view.setViewTreeSavedStateRegistryOwner(act)
+
+      val recomposerContext = AndroidUiDispatcher.Main
+      val recomposer = Recomposer(recomposerContext)
+      view.setParentCompositionContext(recomposer)
+      CoroutineScope(recomposerContext).launch {
+        recomposer.runRecomposeAndApplyChanges()
+      }
     }
     addView(view, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
   }
