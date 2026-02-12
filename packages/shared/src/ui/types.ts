@@ -2,7 +2,7 @@ import type { ModuleManager } from '../moduleManager';
 import type { Clerk, ClerkOptions, EnvironmentResource } from '../types';
 
 // TODO @nikos
-type Appearance = any;
+export type Appearance = any;
 
 export type UIVersion = string;
 
