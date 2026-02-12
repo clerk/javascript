@@ -616,8 +616,6 @@ export class Clerk implements ClerkInterface {
       // Notify other tabs that user is signing out and clean up cookies.
       eventBus.emit(events.UserSignOut, null);
 
-      this.#setTransitiveState();
-
       await tracker.track(async () => {
         if (signOutCallback) {
           await signOutCallback();
@@ -641,7 +639,10 @@ export class Clerk implements ClerkInterface {
      * Since we are calling `onBeforeSetActive` before signing out, we should NOT pass `"sign-out"`.
      */
     await onBeforeSetActive();
+
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
+      this.#setTransitiveState();
+
       if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
       } else {
@@ -658,11 +659,13 @@ export class Clerk implements ClerkInterface {
     const session = this.client.signedInSessions.find(s => s.id === opts.sessionId);
     const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
 
-    await session?.remove();
-
     if (shouldSignOutCurrent) {
+      this.#setTransitiveState();
+      await session?.remove();
       await executeSignOut();
       debugLogger.info('signOut() complete', { redirectUrl: stripOrigin(redirectUrl) }, 'clerk');
+    } else {
+      await session?.remove();
     }
   };
 
