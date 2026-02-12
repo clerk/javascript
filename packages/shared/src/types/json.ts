@@ -338,6 +338,7 @@ export interface PublicUserDataJSON {
   has_image: boolean;
   identifier: string;
   user_id?: string;
+  username?: string;
 }
 
 export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
