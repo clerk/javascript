@@ -37,6 +37,11 @@ export const createLongRunningApps = () => {
     { id: 'next.appRouter.withSharedUIVariant', config: next.appRouter, env: envs.withSharedUIVariant },
 
     /**
+     * NextJS apps - bundled UI
+     */
+    { id: 'next.appRouterBundledUI.withEmailCodes', config: next.appRouterBundledUI, env: envs.withEmailCodes },
+
+    /**
      * NextJS apps - cache components
      */
     { id: 'next.cacheComponents', config: next.cacheComponents, env: envs.withEmailCodes },

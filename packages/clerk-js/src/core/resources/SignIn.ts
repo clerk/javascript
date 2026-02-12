@@ -48,6 +48,8 @@ import type {
   SignInFuturePasswordParams,
   SignInFuturePhoneCodeSendParams,
   SignInFuturePhoneCodeVerifyParams,
+  SignInFutureResetPasswordPhoneCodeSendParams,
+  SignInFutureResetPasswordPhoneCodeVerifyParams,
   SignInFutureResetPasswordSubmitParams,
   SignInFutureResource,
   SignInFutureSSOParams,
@@ -640,6 +642,12 @@ class SignInFuture implements SignInFutureResource {
     submitPassword: this.submitResetPassword.bind(this),
   };
 
+  resetPasswordPhoneCode = {
+    sendCode: this.sendResetPasswordPhoneCode.bind(this),
+    verifyCode: this.verifyResetPasswordPhoneCode.bind(this),
+    submitPassword: this.submitResetPassword.bind(this),
+  };
+
   phoneCode = {
     sendCode: this.sendPhoneCode.bind(this),
     verifyCode: this.verifyPhoneCode.bind(this),
@@ -746,6 +754,51 @@ class SignInFuture implements SignInFutureResource {
     return runAsyncResourceTask(this.#resource, async () => {
       await this.#resource.__internal_basePost({
         body: { code, strategy: 'reset_password_email_code' },
+        action: 'attempt_first_factor',
+      });
+    });
+  }
+
+  async sendResetPasswordPhoneCode(
+    params: SignInFutureResetPasswordPhoneCodeSendParams = {},
+  ): Promise<{ error: ClerkError | null }> {
+    const { phoneNumber } = params;
+    if (!this.#resource.id && !phoneNumber) {
+      throw new Error(
+        'signIn.resetPasswordPhoneCode.sendCode() cannot be called without a phoneNumber if an existing signIn does not exist.',
+      );
+    }
+
+    return runAsyncResourceTask(this.#resource, async () => {
+      if (phoneNumber) {
+        await this._create({ identifier: phoneNumber });
+      }
+
+      const resetPasswordPhoneCodeFactor = this.#resource.supportedFirstFactors?.find(
+        f => f.strategy === 'reset_password_phone_code',
+      );
+
+      if (!resetPasswordPhoneCodeFactor) {
+        throw new ClerkRuntimeError('Reset password phone code factor not found', {
+          code: 'factor_not_found',
+        });
+      }
+
+      const { phoneNumberId } = resetPasswordPhoneCodeFactor;
+      await this.#resource.__internal_basePost({
+        body: { phoneNumberId, strategy: 'reset_password_phone_code' },
+        action: 'prepare_first_factor',
+      });
+    });
+  }
+
+  async verifyResetPasswordPhoneCode(
+    params: SignInFutureResetPasswordPhoneCodeVerifyParams,
+  ): Promise<{ error: ClerkError | null }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePost({
+        body: { code, strategy: 'reset_password_phone_code' },
         action: 'attempt_first_factor',
       });
     });
