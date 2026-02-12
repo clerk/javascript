@@ -52,19 +52,19 @@ export interface SignInFutureCreateParams {
    *
    * @internal
    */
-  captcha_token?: string;
+  captchaToken?: string;
   /**
    * The captcha error if the captcha challenge failed.
    *
    * @internal
    */
-  captcha_error?: unknown;
+  captchaError?: unknown;
   /**
    * The type of captcha widget used ('smart', 'invisible', or null).
    *
    * @internal
    */
-  captcha_widget_type?: string | null;
+  captchaWidgetType?: string | null;
 }
 
 export type SignInFuturePasswordParams = {
