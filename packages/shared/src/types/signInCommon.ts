@@ -163,8 +163,7 @@ export type SignInCreateParams = (
       identifier: string;
     }
   | {
-      transfer: true;
-      strategy?: OAuthStrategy | EnterpriseSSOStrategy;
+      transfer?: boolean;
     }
 ) & {
   transfer?: boolean;

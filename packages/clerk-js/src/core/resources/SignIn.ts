@@ -184,15 +184,6 @@ export class SignIn extends BaseResource implements SignInResource {
       finalParams = { ...finalParams, ...captchaParams };
     }
 
-    if (params.transfer && this.shouldBypassCaptchaForAttempt(params)) {
-      const strategy = SignIn.clerk.client?.signUp.verifications.externalAccount.strategy;
-      if (strategy) {
-        // When transfer is true, we're in the OAuth/Enterprise SSO transfer case
-        type TransferParams = Extract<SignInCreateParams, { transfer: true }>;
-        (finalParams as TransferParams).strategy = strategy as TransferParams['strategy'];
-      }
-    }
-
     return this._basePost({
       path: this.pathRoot,
       body: finalParams,
