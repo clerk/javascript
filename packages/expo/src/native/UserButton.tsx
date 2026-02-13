@@ -139,7 +139,7 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
   const [nativeUser, setNativeUser] = useState<NativeUser | null>(null);
   const clerk = useClerk();
   // Use the reactive user hook from clerk-react to observe sign-out state changes
-  const { user: clerkUser, isSignedIn } = useUser();
+  const { user: clerkUser } = useUser();
 
   // Fetch native user data on mount and when clerk user changes
   useEffect(() => {
