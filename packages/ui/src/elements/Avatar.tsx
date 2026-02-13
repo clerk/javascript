@@ -159,6 +159,9 @@ export const Avatar = (props: AvatarProps) => {
           overflow: 'hidden',
           background: t.colors.$colorShimmer,
           position: 'absolute',
+          top: 0,
+          // eslint-disable-next-line custom-rules/no-physical-css-properties -- Shimmer effect uses translateX animation
+          left: 0,
           width: '25%',
           height: '100%',
           transition: `all ${t.transitionDuration.$slow} ${t.transitionTiming.$easeOut}`,
@@ -168,6 +171,9 @@ export const Avatar = (props: AvatarProps) => {
             boxSizing: 'border-box',
             content: "''",
             position: 'absolute',
+            top: 0,
+            // eslint-disable-next-line custom-rules/no-physical-css-properties -- Shimmer effect uses translateX animation
+            left: 0,
             width: '400%',
             height: '100%',
             transform: 'var(--cl-shimmer-hover-after-transform, skewX(45deg) translateX(75%))',

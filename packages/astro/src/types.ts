@@ -110,16 +110,7 @@ export type {
 // Backward compatibility alias
 export type ProtectProps = ProtectParams;
 
-export type ButtonProps<Tag> = {
-  /**
-   * @deprecated The `'as'` prop will be removed in a future version.
-   * Use the default slot with the `'asChild'` prop instead.
-   * @example
-   * <SignInButton asChild>
-   *   <button>Sign in</button>
-   * </SignInButton>
-   */
-  as: Tag;
+export type ButtonProps = {
   asChild?: boolean;
 };
 
