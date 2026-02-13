@@ -1,21 +1,15 @@
 ---
-import type { HTMLTag, Polymorphic } from 'astro/types';
 import type { SignInButtonProps } from '@clerk/shared/types';
 import type { ButtonProps } from '../../types';
-import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils';
+import { addUnstyledAttributeToFirstTag } from './utils';
 
-type Props<Tag extends HTMLTag = 'button'> = Polymorphic<ButtonProps<Tag>> & SignInButtonProps;
+type Props = ButtonProps & SignInButtonProps;
 
 import { generateSafeId } from '@clerk/astro/internal';
 
 const safeId = generateSafeId();
 
-if ('as' in Astro.props) {
-  logAsPropUsageDeprecation();
-}
-
 const {
-  as: Tag = 'button',
   asChild,
   forceRedirectUrl,
   fallbackRedirectUrl,
@@ -44,12 +38,12 @@ if (asChild) {
   asChild ? (
     <Fragment set:html={htmlElement} />
   ) : (
-    <Tag
+    <button
       {...props}
       data-clerk-unstyled-id={safeId}
     >
       <slot>Sign in</slot>
-    </Tag>
+    </button>
   )
 }
 
