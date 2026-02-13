@@ -169,12 +169,12 @@ export class SignIn extends BaseResource implements SignInResource {
   create = async (params: SignInCreateParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.create', { id: this.id, strategy: 'strategy' in params ? params.strategy : undefined });
 
-    let finalParams = { ...params };
+    let body: Record<string, unknown> = { ...params };
 
     // Inject browser locale
     const browserLocale = getBrowserLocale();
     if (browserLocale) {
-      finalParams.locale = browserLocale;
+      body.locale = browserLocale;
     }
 
     if (
@@ -188,12 +188,12 @@ export class SignIn extends BaseResource implements SignInResource {
       if (!captchaParams) {
         throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
       }
-      finalParams = { ...finalParams, ...captchaParams };
+      body = { ...body, ...captchaParams };
     }
 
     return this._basePost({
       path: this.pathRoot,
-      body: finalParams,
+      body: body,
     });
   };
 
