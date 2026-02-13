@@ -39,6 +39,9 @@ class ClerkUserProfileExpoView(context: Context, appContext: AppContext) : ExpoV
 
   private val activity = ClerkAuthExpoView.findActivity(context)
 
+  private var recomposer: Recomposer? = null
+  private var recomposerJob: kotlinx.coroutines.Job? = null
+
   private val composeView = ComposeView(context).also { view ->
     activity?.let { act ->
       view.setViewTreeLifecycleOwner(act)
@@ -46,13 +49,22 @@ class ClerkUserProfileExpoView(context: Context, appContext: AppContext) : ExpoV
       view.setViewTreeSavedStateRegistryOwner(act)
 
       val recomposerContext = AndroidUiDispatcher.Main
-      val recomposer = Recomposer(recomposerContext)
-      view.setParentCompositionContext(recomposer)
-      CoroutineScope(recomposerContext).launch {
-        recomposer.runRecomposeAndApplyChanges()
+      val newRecomposer = Recomposer(recomposerContext)
+      recomposer = newRecomposer
+      view.setParentCompositionContext(newRecomposer)
+      val scope = CoroutineScope(recomposerContext + kotlinx.coroutines.SupervisorJob())
+      recomposerJob = scope.coroutineContext[kotlinx.coroutines.Job]
+      scope.launch {
+        newRecomposer.runRecomposeAndApplyChanges()
       }
     }
     addView(view, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+  }
+
+  override fun onDetachedFromWindow() {
+    recomposer?.cancel()
+    recomposerJob?.cancel()
+    super.onDetachedFromWindow()
   }
 
   fun setupView() {

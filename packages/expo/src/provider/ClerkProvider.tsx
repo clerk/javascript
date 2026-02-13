@@ -208,10 +208,19 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
             if (typeof clerkAny.__internal_reloadInitialResources === 'function') {
               await clerkAny.__internal_reloadInitialResources();
             }
+            if (!isMountedRef.current) {
+              return;
+            }
           }
 
+          if (!isMountedRef.current) {
+            return;
+          }
           await clerkInstance.setActive({ session: nativeAuthState.sessionId });
         } else if (nativeAuthState.type === 'signedOut' && clerkInstance.signOut) {
+          if (!isMountedRef.current) {
+            return;
+          }
           await clerkInstance.signOut();
         }
       } catch (error) {

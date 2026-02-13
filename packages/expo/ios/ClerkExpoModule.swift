@@ -15,9 +15,9 @@ public protocol ClerkViewFactoryProtocol {
   func createAuthViewController(mode: String, dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) -> UIViewController?
   func createUserProfileViewController(dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) -> UIViewController?
 
-  // Inline rendering (new)
-  func createAuthView(mode: String, dismissable: Bool, onEvent: @escaping (String, [String: Any]) -> Void) -> UIView?
-  func createUserProfileView(dismissable: Bool, onEvent: @escaping (String, [String: Any]) -> Void) -> UIView?
+  // Inline rendering (new) — returns UIViewController to preserve SwiftUI lifecycle
+  func createAuthView(mode: String, dismissable: Bool, onEvent: @escaping (String, [String: Any]) -> Void) -> UIViewController?
+  func createUserProfileView(dismissable: Bool, onEvent: @escaping (String, [String: Any]) -> Void) -> UIViewController?
 
   // SDK operations
   func configure(publishableKey: String) async throws
@@ -44,7 +44,7 @@ public class ClerkAuthExpoView: ExpoView {
 
     guard let factory = clerkViewFactory else { return }
 
-    let view = factory.createAuthView(
+    guard let returnedController = factory.createAuthView(
       mode: currentMode,
       dismissable: currentDismissable,
       onEvent: { [weak self] eventName, data in
@@ -53,24 +53,21 @@ public class ClerkAuthExpoView: ExpoView {
           "data": data
         ])
       }
-    )
+    ) else { return }
 
-    guard let view = view else { return }
-
-    // Find the parent view controller to add the hosting controller
+    // Attach the returned UIHostingController as a child to preserve SwiftUI lifecycle
     if let parentVC = findViewController() {
-      let hostingVC = UIViewController()
-      hostingVC.view = view
-      parentVC.addChild(hostingVC)
-      view.frame = bounds
-      view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      addSubview(view)
-      hostingVC.didMove(toParent: parentVC)
-      hostingController = hostingVC
+      parentVC.addChild(returnedController)
+      returnedController.view.frame = bounds
+      returnedController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      addSubview(returnedController.view)
+      returnedController.didMove(toParent: parentVC)
+      hostingController = returnedController
     } else {
-      view.frame = bounds
-      view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      addSubview(view)
+      returnedController.view.frame = bounds
+      returnedController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      addSubview(returnedController.view)
+      hostingController = returnedController
     }
   }
 
@@ -109,7 +106,7 @@ public class ClerkUserProfileExpoView: ExpoView {
 
     guard let factory = clerkViewFactory else { return }
 
-    let view = factory.createUserProfileView(
+    guard let returnedController = factory.createUserProfileView(
       dismissable: currentDismissable,
       onEvent: { [weak self] eventName, data in
         self?.onProfileEvent([
@@ -117,23 +114,20 @@ public class ClerkUserProfileExpoView: ExpoView {
           "data": data
         ])
       }
-    )
-
-    guard let view = view else { return }
+    ) else { return }
 
     if let parentVC = findViewController() {
-      let hostingVC = UIViewController()
-      hostingVC.view = view
-      parentVC.addChild(hostingVC)
-      view.frame = bounds
-      view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      addSubview(view)
-      hostingVC.didMove(toParent: parentVC)
-      hostingController = hostingVC
+      parentVC.addChild(returnedController)
+      returnedController.view.frame = bounds
+      returnedController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      addSubview(returnedController.view)
+      returnedController.didMove(toParent: parentVC)
+      hostingController = returnedController
     } else {
-      view.frame = bounds
-      view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      addSubview(view)
+      returnedController.view.frame = bounds
+      returnedController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      addSubview(returnedController.view)
+      hostingController = returnedController
     }
   }
 

@@ -88,7 +88,7 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     mode: String,
     dismissable: Bool,
     onEvent: @escaping (String, [String: Any]) -> Void
-  ) -> UIView? {
+  ) -> UIViewController? {
     let authMode: AuthView.Mode
     switch mode {
     case "signIn":
@@ -107,13 +107,13 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
       )
     )
     hostingController.view.backgroundColor = .clear
-    return hostingController.view
+    return hostingController
   }
 
   public func createUserProfileView(
     dismissable: Bool,
     onEvent: @escaping (String, [String: Any]) -> Void
-  ) -> UIView? {
+  ) -> UIViewController? {
     let hostingController = UIHostingController(
       rootView: ClerkInlineProfileWrapperView(
         dismissable: dismissable,
@@ -121,7 +121,7 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
       )
     )
     hostingController.view.backgroundColor = .clear
-    return hostingController.view
+    return hostingController
   }
 
   @MainActor
@@ -207,17 +207,26 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
           if let sessionId = signIn.createdSessionId {
             self.completion(.success(["sessionId": sessionId, "type": "signIn"]))
             self.dismiss(animated: true)
+          } else {
+            self.completion(.failure(NSError(domain: "ClerkAuth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Sign-in completed but no session ID was created"])))
+            self.dismiss(animated: true)
           }
         case .signUpCompleted(let signUp):
           print("✅ [ClerkAuth] Sign-up completed")
           if let sessionId = signUp.createdSessionId {
             self.completion(.success(["sessionId": sessionId, "type": "signUp"]))
             self.dismiss(animated: true)
+          } else {
+            self.completion(.failure(NSError(domain: "ClerkAuth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Sign-up completed but no session ID was created"])))
+            self.dismiss(animated: true)
           }
         default:
           break
         }
       }
+      // Stream ended without an auth completion event
+      guard let self = self else { return }
+      self.completion(.failure(NSError(domain: "ClerkAuth", code: 2, userInfo: [NSLocalizedDescriptionKey: "Auth event stream ended unexpectedly"])))
     }
   }
 }
@@ -266,6 +275,9 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
           break
         }
       }
+      // Stream ended without a sign-out event
+      guard let self = self else { return }
+      self.completion(.failure(NSError(domain: "ClerkProfile", code: 2, userInfo: [NSLocalizedDescriptionKey: "Profile event stream ended unexpectedly"])))
     }
   }
 }

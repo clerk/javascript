@@ -39,6 +39,9 @@ class ClerkAuthExpoView(context: Context, appContext: AppContext) : ExpoView(con
 
   private val activity: ComponentActivity? = findActivity(context)
 
+  private var recomposer: Recomposer? = null
+  private var recomposerJob: kotlinx.coroutines.Job? = null
+
   private val composeView = ComposeView(context).also { view ->
     activity?.let { act ->
       view.setViewTreeLifecycleOwner(act)
@@ -50,13 +53,22 @@ class ClerkAuthExpoView(context: Context, appContext: AppContext) : ExpoView(con
       // lifecycle owners in React Native Fabric's detached view trees.
       // AndroidUiDispatcher.Main provides both a dispatcher and MonotonicFrameClock.
       val recomposerContext = AndroidUiDispatcher.Main
-      val recomposer = Recomposer(recomposerContext)
-      view.setParentCompositionContext(recomposer)
-      CoroutineScope(recomposerContext).launch {
-        recomposer.runRecomposeAndApplyChanges()
+      val newRecomposer = Recomposer(recomposerContext)
+      recomposer = newRecomposer
+      view.setParentCompositionContext(newRecomposer)
+      val scope = CoroutineScope(recomposerContext + kotlinx.coroutines.SupervisorJob())
+      recomposerJob = scope.coroutineContext[kotlinx.coroutines.Job]
+      scope.launch {
+        newRecomposer.runRecomposeAndApplyChanges()
       }
     }
     addView(view, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+  }
+
+  override fun onDetachedFromWindow() {
+    recomposer?.cancel()
+    recomposerJob?.cancel()
+    super.onDetachedFromWindow()
   }
 
   // Track the initial session to detect new sign-ins

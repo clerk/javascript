@@ -227,16 +227,22 @@ class ClerkExpoModule : Module() {
             promise.resolve(result)
         }
 
-        // Get the native Clerk client's bearer token from SharedPreferences
+        // Get the native Clerk client's bearer token
         // This allows the JS SDK to use the same client as the native SDK
         AsyncFunction("getClientToken") { promise: Promise ->
-            try {
-                val sharedPref = context.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
-                val deviceToken = sharedPref.getString("DEVICE_TOKEN", null)
-                promise.resolve(deviceToken)
-            } catch (e: Exception) {
-                Log.e(TAG, "getClientToken failed: ${e.message}")
-                promise.resolve(null)
+            coroutineScope.launch {
+                try {
+                    val session = Clerk.session
+                    if (session == null) {
+                        promise.resolve(null)
+                        return@launch
+                    }
+                    val token = session.fetchToken()
+                    promise.resolve(token?.jwt)
+                } catch (e: Exception) {
+                    debugLog(TAG, "getClientToken failed: ${e.message}")
+                    promise.resolve(null)
+                }
             }
         }
 

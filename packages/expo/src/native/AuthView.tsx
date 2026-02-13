@@ -137,15 +137,18 @@ async function syncNativeSession(sessionId: string): Promise<void> {
     }
   }
 
-  const clerkInstance = getClerkInstance()!;
-  const clerkAny = clerkInstance as any;
-
-  // Reload resources using the native client's token
-  if (typeof clerkAny.__internal_reloadInitialResources === 'function') {
-    await clerkAny.__internal_reloadInitialResources();
+  const clerkInstance = getClerkInstance();
+  if (!clerkInstance) {
+    throw new Error('[AuthView] Clerk instance not available');
   }
 
-  if (clerkInstance?.setActive) {
+  // Reload resources using the native client's token
+  const clerkRecord = clerkInstance as unknown as Record<string, unknown>;
+  if (typeof clerkRecord.__internal_reloadInitialResources === 'function') {
+    await (clerkRecord.__internal_reloadInitialResources as () => Promise<void>)();
+  }
+
+  if (typeof clerkInstance.setActive === 'function') {
     await clerkInstance.setActive({ session: sessionId });
   }
 }
@@ -229,18 +232,20 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
           dismissable: isDismissable,
         });
 
-        // Mark auth as completed to prevent duplicate onSuccess calls
-        authCompletedRef.current = true;
-
         // Sync the native session to JS SDK
         if (result.sessionId) {
           try {
             await syncNativeSession(result.sessionId);
+            authCompletedRef.current = true;
+            onSuccessRef.current?.();
           } catch (syncError) {
             console.error('[AuthView] Failed to sync session:', syncError);
+            onErrorRef.current?.(syncError as Error);
           }
+          return;
         }
 
+        authCompletedRef.current = true;
         onSuccessRef.current?.();
       } catch (err) {
         const error = err as Error & { code?: string };
