@@ -181,6 +181,58 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 });
 
+testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
+  'oauth popup with path-based routing @react',
+  ({ app }) => {
+    test.describe.configure({ mode: 'serial' });
+
+    let fakeUser: FakeUser;
+
+    test.beforeAll(async () => {
+      const client = createClerkClient({
+        secretKey: instanceKeys.get('oauth-provider').sk,
+        publishableKey: instanceKeys.get('oauth-provider').pk,
+      });
+      const users = createUserService(client);
+      fakeUser = users.createFakeUser({
+        withUsername: true,
+      });
+      await users.createBapiUser(fakeUser);
+    });
+
+    test.afterAll(async () => {
+      const u = createTestUtils({ app });
+      await fakeUser.deleteIfExists();
+      await u.services.users.deleteIfExists({ email: fakeUser.email });
+      await app.teardown();
+    });
+
+    test('sign in with popup OAuth and path-based routing completes sso-callback', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.page.goToRelative('/sign-in-popup');
+      await u.page.waitForClerkJsLoaded();
+      await u.po.signIn.waitForMounted();
+
+      const popupPromise = context.waitForEvent('page');
+      // Custom OAuth providers render with a single-letter avatar in compact mode
+      await u.page.getByRole('button', { name: 'E', exact: true }).click();
+      const popup = await popupPromise;
+      const popupUtils = createTestUtils({ app, page: popup, context });
+      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+
+      // Complete OAuth in the popup
+      await popupUtils.po.signIn.setIdentifier(fakeUser.email);
+      await popupUtils.po.signIn.continue();
+      await popupUtils.po.signIn.enterTestOtpCode();
+
+      // The parent page should navigate through sso-callback and land on the redirect URL
+      await u.page.waitForAppUrl('/protected');
+      await u.po.expect.toBeSignedIn();
+    });
+  },
+);
+
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
   'oauth flows with legal consent @nextjs',
   ({ app }) => {

@@ -5,11 +5,95 @@ import type { NavigateOptions } from '@clerk/shared/types';
 import React from 'react';
 import { flushSync } from 'react-dom';
 
-import { useWindowEventListener } from '../hooks';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';
 import { Route } from './Route';
 import { RouteContext } from './RouteContext';
+
+const hasNavigationAPI =
+  typeof window !== 'undefined' &&
+  'navigation' in window &&
+  typeof (window as any).navigation?.addEventListener === 'function';
+
+// Custom events that don't exist on WindowEventMap but are handled
+// by wrapping history.pushState/replaceState in the fallback path.
+type HistoryEvent = 'pushstate' | 'replacestate';
+type RefreshEvent = keyof WindowEventMap | HistoryEvent;
+
+// Maps refresh events to Navigation API navigationType values.
+const eventToNavigationType: Partial<Record<RefreshEvent, string>> = {
+  popstate: 'traverse',
+  pushstate: 'push',
+  replacestate: 'replace',
+};
+
+/**
+ * Observes history changes so the router's internal state stays in sync
+ * with the URL.
+ *
+ * With the Navigation API, listens to `currententrychange` filtered to
+ * the navigation types derived from the provided events.
+ * Falls back to wrapping history.pushState/replaceState (when pushstate/
+ * replacestate are in events) plus listening for the raw window events
+ * (popstate, hashchange, etc.).
+ */
+function useHistoryChangeObserver(events: Array<RefreshEvent> | undefined, callback: () => void): void {
+  const callbackRef = React.useRef(callback);
+  callbackRef.current = callback;
+
+  React.useEffect(() => {
+    if (!events) {
+      return;
+    }
+
+    const notify = () => callbackRef.current();
+    const cleanups: Array<() => void> = [];
+
+    if (hasNavigationAPI) {
+      const nav = (window as any).navigation;
+      const allowedTypes = new Set(events.map(e => eventToNavigationType[e]).filter(Boolean));
+      const handler = (e: { navigationType: string }) => {
+        if (allowedTypes.has(e.navigationType)) {
+          notify();
+        }
+      };
+      nav.addEventListener('currententrychange', handler);
+      return () => nav.removeEventListener('currententrychange', handler);
+    }
+
+    // Fallback: wrap pushState/replaceState for programmatic navigations
+    // when the corresponding events are requested.
+    if (events.includes('pushstate') || events.includes('replacestate')) {
+      const origPushState = history.pushState.bind(history);
+      const origReplaceState = history.replaceState.bind(history);
+
+      if (events.includes('pushstate')) {
+        history.pushState = (...args: Parameters<History['pushState']>) => {
+          origPushState(...args);
+          notify();
+        };
+      }
+      if (events.includes('replacestate')) {
+        history.replaceState = (...args: Parameters<History['replaceState']>) => {
+          origReplaceState(...args);
+          notify();
+        };
+      }
+
+      cleanups.push(() => {
+        history.pushState = origPushState;
+        history.replaceState = origReplaceState;
+      });
+    }
+
+    // Listen for native window events (popstate, hashchange, etc.).
+    const windowEvents = events.filter((e): e is keyof WindowEventMap => e !== 'pushstate' && e !== 'replacestate');
+    windowEvents.forEach(e => window.addEventListener(e, notify));
+    cleanups.push(() => windowEvents.forEach(e => window.removeEventListener(e, notify)));
+
+    return () => cleanups.forEach(fn => fn());
+  }, [events]);
+}
 
 interface BaseRouterProps {
   basePath: string;
@@ -17,7 +101,7 @@ interface BaseRouterProps {
   getPath: () => string;
   getQueryString: () => string;
   internalNavigate: (toURL: URL, options?: NavigateOptions) => Promise<any> | any;
-  refreshEvents?: Array<keyof WindowEventMap>;
+  refreshEvents?: Array<RefreshEvent>;
   preservedParams?: string[];
   urlStateParam?: {
     startPath: string;
@@ -88,7 +172,7 @@ export const BaseRouter = ({
     }
   }, [currentPath, currentQueryString, getPath, getQueryString]);
 
-  useWindowEventListener(refreshEvents, refresh);
+  useHistoryChangeObserver(refreshEvents, refresh);
 
   // TODO: Look into the real possible types of globalNavigate
   const baseNavigate = async (toURL: URL | undefined): Promise<unknown> => {
