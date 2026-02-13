@@ -9,11 +9,11 @@ import React from 'react';
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../../types';
-import { ClerkScripts } from '../../utils/clerk-script';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { RouterTelemetry } from '../../utils/router-telemetry';
 import { invalidateCacheAction } from '../server-actions';
+import { ClerkScripts } from './ClerkScripts';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
 
@@ -26,7 +26,7 @@ const LazyCreateKeylessApplication = dynamic(() =>
 );
 
 const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderProps<TUi>) => {
-  const { __internal_invokeMiddlewareOnAuthStateChange = true, children } = props;
+  const { __internal_invokeMiddlewareOnAuthStateChange = true, __internal_scriptsSlot, children } = props;
   const router = useRouter();
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
@@ -89,7 +89,7 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
     <ClerkNextOptionsProvider options={mergedProps}>
       <ReactClerkProvider {...mergedProps}>
         <RouterTelemetry />
-        <ClerkScripts router='app' />
+        {__internal_scriptsSlot ?? <ClerkScripts />}
         {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>

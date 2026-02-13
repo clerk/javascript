@@ -217,7 +217,7 @@ export const Action = (props: ActionProps) => {
             size={spinnerSize || 'xs'}
             elementDescriptor={descriptors.spinner}
             sx={t => ({
-              marginRight: t.space.$1,
+              marginInlineEnd: t.space.$1,
             })}
           />
         ) : (

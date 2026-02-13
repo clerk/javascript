@@ -36,6 +36,21 @@ const appRouterAPWithClerkNextV6 = appRouterQuickstartV6
   .setName('next-app-router-ap-clerk-next-v6')
   .addDependency('@clerk/nextjs', '6');
 
+const appRouterBundledUI = applicationConfig()
+  .setName('next-app-router-bundled-ui')
+  .useTemplate(templates['next-app-router-bundled-ui'])
+  .setEnvFormatter('public', key => `NEXT_PUBLIC_${key}`)
+  .addScript('setup', constants.E2E_NPM_FORCE ? 'pnpm install --force' : 'pnpm install')
+  .addScript('dev', 'pnpm dev')
+  .addScript('build', 'pnpm build')
+  .addScript('serve', 'pnpm start')
+  .addDependency('next', constants.E2E_NEXTJS_VERSION)
+  .addDependency('react', constants.E2E_REACT_VERSION)
+  .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
+  .addDependency('@clerk/nextjs', constants.E2E_CLERK_JS_VERSION || linkPackage('nextjs'))
+  .addDependency('@clerk/shared', linkPackage('shared'))
+  .addDependency('@clerk/ui', constants.E2E_CLERK_UI_VERSION || linkPackage('ui'));
+
 const cacheComponents = applicationConfig()
   .setName('next-cache-components')
   .useTemplate(templates['next-cache-components'])
@@ -54,5 +69,6 @@ export const next = {
   appRouterAPWithClerkNextLatest,
   appRouterAPWithClerkNextV6,
   appRouterQuickstartV6,
+  appRouterBundledUI,
   cacheComponents,
 } as const;
