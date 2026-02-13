@@ -7,5 +7,5 @@ import { THIRD_PARTY_COOKIE_DOMAINS } from '@clerk/shared/internal/clerk-js/thir
  * @returns {boolean} Whether the current origin prefers the popup flow.
  */
 export function originPrefersPopup(): boolean {
-  return inIframe() || THIRD_PARTY_COOKIE_DOMAINS.some(domain => window.location.origin.endsWith(domain));
+  return inIframe() || THIRD_PARTY_COOKIE_DOMAINS.some(domain => window.location.hostname.endsWith(domain));
 }
