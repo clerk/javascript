@@ -17,35 +17,23 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
   // Register this factory with the ClerkExpo module
   public static func register() {
     clerkViewFactory = shared
-    print("✅ [ClerkViewFactory] Registered with ClerkExpo module")
   }
 
   @MainActor
   public func configure(publishableKey: String) async throws {
-    print("🔧 [ClerkViewFactory] Configuring Clerk with key: \(publishableKey.prefix(20))...")
     Clerk.shared.configure(publishableKey: publishableKey)
-    print("✅ [ClerkViewFactory] Clerk configured, now loading...")
 
     // CRITICAL: Must call load() after configure() to restore session from keychain
-    do {
-      try await Clerk.shared.load()
-      print("✅ [ClerkViewFactory] Clerk load() completed")
-    } catch {
-      print("❌ [ClerkViewFactory] Clerk load() failed: \(error)")
-    }
+    try await Clerk.shared.load()
 
-    // IMPORTANT: load() is async but session may be populated AFTER it returns
-    // The SDK uses Combine/ObservableObject pattern - session is published asynchronously
-    // We need to wait for the session to actually be populated
-    print("⏳ [ClerkViewFactory] Waiting for session to be populated...")
-    for i in 0..<30 {  // Wait up to 3 seconds
+    // load() is async but session may be populated AFTER it returns.
+    // The SDK uses Combine/ObservableObject pattern — session is published asynchronously.
+    for _ in 0..<30 {  // Wait up to 3 seconds
       if Clerk.shared.session != nil {
-        print("✅ [ClerkViewFactory] Session found after \(i * 100)ms: \(Clerk.shared.session?.id ?? "unknown")")
         return
       }
       try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
     }
-    print("⚠️ [ClerkViewFactory] No session found after 3s, session: \(Clerk.shared.session?.id ?? "none")")
   }
 
   public func createAuthViewController(
@@ -88,7 +76,7 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     mode: String,
     dismissable: Bool,
     onEvent: @escaping (String, [String: Any]) -> Void
-  ) -> UIView? {
+  ) -> UIViewController? {
     let authMode: AuthView.Mode
     switch mode {
     case "signIn":
@@ -107,13 +95,13 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
       )
     )
     hostingController.view.backgroundColor = .clear
-    return hostingController.view
+    return hostingController
   }
 
   public func createUserProfileView(
     dismissable: Bool,
     onEvent: @escaping (String, [String: Any]) -> Void
-  ) -> UIView? {
+  ) -> UIViewController? {
     let hostingController = UIHostingController(
       rootView: ClerkInlineProfileWrapperView(
         dismissable: dismissable,
@@ -121,16 +109,14 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
       )
     )
     hostingController.view.backgroundColor = .clear
-    return hostingController.view
+    return hostingController
   }
 
   @MainActor
   public func getSession() async -> [String: Any]? {
     guard let session = Clerk.shared.session else {
-      print("📭 [ClerkViewFactory] No active session")
       return nil
     }
-    print("✅ [ClerkViewFactory] Found active session: \(session.id)")
 
     var result: [String: Any] = [
       "sessionId": session.id,
@@ -138,10 +124,7 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     ]
 
     // Include user details if available
-    // Try to get user from session first, then fallback to Clerk.shared.user
     let user = session.user ?? Clerk.shared.user
-    NSLog("🔍 [ClerkViewFactory] Clerk.shared.user: \(Clerk.shared.user?.id ?? "nil")")
-    NSLog("🔍 [ClerkViewFactory] session.user: \(session.user?.id ?? "nil")")
 
     if let user = user {
       var userDict: [String: Any] = [
@@ -160,18 +143,13 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
         userDict["primaryEmailAddress"] = firstEmail.emailAddress
       }
       result["user"] = userDict
-      NSLog("✅ [ClerkViewFactory] User found: \(user.firstName ?? "N/A") \(user.lastName ?? "")")
-    } else {
-      NSLog("⚠️ [ClerkViewFactory] No user available - all sources returned nil")
     }
 
     return result
   }
 
   public func signOut() async throws {
-    print("🔓 [ClerkViewFactory] Signing out...")
     try await Clerk.shared.signOut()
-    print("✅ [ClerkViewFactory] Signed out successfully")
   }
 }
 
@@ -180,6 +158,7 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
 class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> {
   private let completion: (Result<[String: Any], Error>) -> Void
   private var authEventTask: Task<Void, Never>?
+  private var completionCalled = false
 
   init(mode: AuthView.Mode, dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) {
     self.completion = completion
@@ -197,25 +176,31 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
     authEventTask?.cancel()
   }
 
+  private func completeOnce(_ result: Result<[String: Any], Error>) {
+    guard !completionCalled else { return }
+    completionCalled = true
+    completion(result)
+  }
+
   private func subscribeToAuthEvents() {
     authEventTask = Task { @MainActor [weak self] in
       for await event in Clerk.shared.authEventEmitter.events {
-        guard let self = self else { return }
+        guard let self = self, !self.completionCalled else { return }
         switch event {
         case .signInCompleted(let signIn):
           if let sessionId = signIn.createdSessionId {
-            self.completion(.success(["sessionId": sessionId, "type": "signIn"]))
+            self.completeOnce(.success(["sessionId": sessionId, "type": "signIn"]))
             self.dismiss(animated: true)
           } else {
-            self.completion(.failure(NSError(domain: "ClerkExpo", code: 4, userInfo: [NSLocalizedDescriptionKey: "Sign-in completed but no session was created"])))
+            self.completeOnce(.failure(NSError(domain: "ClerkExpo", code: 4, userInfo: [NSLocalizedDescriptionKey: "Sign-in completed but no session was created"])))
             self.dismiss(animated: true)
           }
         case .signUpCompleted(let signUp):
           if let sessionId = signUp.createdSessionId {
-            self.completion(.success(["sessionId": sessionId, "type": "signUp"]))
+            self.completeOnce(.success(["sessionId": sessionId, "type": "signUp"]))
             self.dismiss(animated: true)
           } else {
-            self.completion(.failure(NSError(domain: "ClerkExpo", code: 4, userInfo: [NSLocalizedDescriptionKey: "Sign-up completed but no session was created"])))
+            self.completeOnce(.failure(NSError(domain: "ClerkExpo", code: 4, userInfo: [NSLocalizedDescriptionKey: "Sign-up completed but no session was created"])))
             self.dismiss(animated: true)
           }
         default:
@@ -224,7 +209,7 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
       }
       // Stream ended without a completion event
       guard let self = self else { return }
-      self.completion(.failure(NSError(domain: "ClerkExpo", code: 5, userInfo: [NSLocalizedDescriptionKey: "Auth event stream ended unexpectedly"])))
+      self.completeOnce(.failure(NSError(domain: "ClerkExpo", code: 5, userInfo: [NSLocalizedDescriptionKey: "Auth event stream ended unexpectedly"])))
     }
   }
 }
@@ -243,6 +228,7 @@ struct ClerkAuthWrapperView: View {
 class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapperView> {
   private let completion: (Result<[String: Any], Error>) -> Void
   private var authEventTask: Task<Void, Never>?
+  private var completionCalled = false
 
   init(dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) {
     self.completion = completion
@@ -260,13 +246,19 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
     authEventTask?.cancel()
   }
 
+  private func completeOnce(_ result: Result<[String: Any], Error>) {
+    guard !completionCalled else { return }
+    completionCalled = true
+    completion(result)
+  }
+
   private func subscribeToAuthEvents() {
     authEventTask = Task { @MainActor [weak self] in
       for await event in Clerk.shared.authEventEmitter.events {
-        guard let self = self else { return }
+        guard let self = self, !self.completionCalled else { return }
         switch event {
         case .signedOut(let session):
-          self.completion(.success(["sessionId": session.id]))
+          self.completeOnce(.success(["sessionId": session.id]))
           self.dismiss(animated: true)
         default:
           break
@@ -274,7 +266,7 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
       }
       // Stream ended without a sign-out event
       guard let self = self else { return }
-      self.completion(.failure(NSError(domain: "ClerkExpo", code: 5, userInfo: [NSLocalizedDescriptionKey: "Profile event stream ended unexpectedly"])))
+      self.completeOnce(.failure(NSError(domain: "ClerkExpo", code: 5, userInfo: [NSLocalizedDescriptionKey: "Profile event stream ended unexpectedly"])))
     }
   }
 }

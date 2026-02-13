@@ -93,7 +93,8 @@
     "google",
     "apple",
     "expo-module.config.json",
-    "app.plugin.js"
+    "app.plugin.js",
+    "app.plugin.d.ts"
   ],
   "scripts": {
     "build": "tsup",
