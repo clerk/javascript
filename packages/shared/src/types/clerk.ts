@@ -188,13 +188,19 @@ export type SignOutOptions = {
 };
 
 /**
- * @inline
+ * Signs out the current user.
+ *
+ * Can be called in two ways:
+ * - `signOut()` or `signOut({ redirectUrl: '...' })` - with optional options
+ * - `signOut(callback)` or `signOut(callback, { redirectUrl: '...' })` - with callback and optional options
+ *
+ * @param optionsOrCallback - Either SignOutOptions or a callback function
+ * @param options - SignOutOptions when first param is a callback
  */
-export interface SignOut {
-  (options?: SignOutOptions): Promise<void>;
-
-  (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
-}
+export type SignOut = (
+  optionsOrCallback?: SignOutOptions | SignOutCallback,
+  options?: SignOutOptions,
+) => Promise<void>;
 
 type ClerkEvent = keyof ClerkEventPayload;
 type EventHandler<E extends ClerkEvent> = (payload: ClerkEventPayload[E]) => void;
@@ -2524,3 +2530,50 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
 export interface LoadedClerk extends Clerk {
   client: ClientResource;
 }
+
+/**
+ * Utility type that transforms function return types to allow void.
+ * This is needed for IsomorphicClerk which queues method calls when clerk-js
+ * isn't loaded yet, returning void immediately instead of the expected value.
+ */
+type WithVoidReturn<T> = T extends (...args: infer A) => infer R
+  ? (...args: A) => R extends Promise<infer U> ? Promise<U | void> : R | void
+  : T;
+
+/**
+ * Transforms all function properties of a type to allow void returns.
+ */
+type WithVoidReturnFunctions<T> = {
+  [K in keyof T]: WithVoidReturn<T[K]>;
+};
+
+/**
+ * Type representing what ClerkProvider passes to ClerkContextProvider.
+ *
+ * This is a relaxed version of LoadedClerk that:
+ * 1. Allows methods to return void (for pre-mount queuing in IsomorphicClerk)
+ * 2. Makes client, billing, apiKeys optional (may be undefined before clerk-js loads)
+ * 3. Omits internal browser-specific methods that IsomorphicClerk doesn't implement
+ *
+ * The ClerkContextProvider accepts this type and casts to LoadedClerk internally.
+ * This cast is safe because:
+ * - IsomorphicClerk implements all LoadedClerk methods at runtime
+ * - The mutable instance is fully functional by the time consumers use it
+ * - Consumers check status/loaded before calling methods
+ */
+export type ClerkProviderValue = WithVoidReturnFunctions<
+  Omit<
+    Clerk,
+    | '__internal_addNavigationListener'
+    | '__internal_getCachedResources'
+    | '__internal_reloadInitialResources'
+    | '__internal_setActiveInProgress'
+    | 'client'
+    | 'billing'
+    | 'apiKeys'
+  >
+> & {
+  client: ClientResource | undefined;
+  billing: BillingNamespace | undefined;
+  apiKeys: APIKeysNamespace | undefined;
+};
