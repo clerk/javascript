@@ -79,6 +79,7 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
             elementDescriptor={descriptors.switchThumb}
             sx={t => ({
               position: 'absolute',
+              // eslint-disable-next-line custom-rules/no-physical-css-properties -- Physical control - thumb uses translateX animation
               left: t.sizes.$0x5,
               width: t.sizes.$3,
               height: t.sizes.$3,

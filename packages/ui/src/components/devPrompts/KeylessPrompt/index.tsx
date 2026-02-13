@@ -118,10 +118,10 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
         sx={t => ({
           position: 'fixed',
           bottom: '1.25rem',
-          right: '1.25rem',
+          insetInlineEnd: '1.25rem',
           height: `${t.sizes.$10}`,
           minWidth: '13.4rem',
-          paddingLeft: `${t.space.$3}`,
+          paddingInlineStart: `${t.space.$3}`,
           borderRadius: '1.25rem',
           transition: 'all 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
 
@@ -520,6 +520,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           href={`#${buttonIdentifier}`}
           css={css`
             position: fixed;
+            /* eslint-disable-next-line custom-rules/no-physical-css-properties -- Skip link - visually hidden pattern */
             left: -999px;
             top: 1rem;
             z-index: 999999;
@@ -531,6 +532,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             text-decoration: underline;
 
             &:focus {
+              /* eslint-disable-next-line custom-rules/no-physical-css-properties -- Skip link - visually hidden pattern */
               left: 1rem;
               outline: 2px solid;
               outline-offset: 2px;

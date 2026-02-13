@@ -18,7 +18,7 @@ const getScopedPortalContainerStyles = (modalRoot?: React.MutableRefObject<HTMLE
     modalRoot
       ? t => ({
           position: 'absolute',
-          right: 0,
+          insetInlineEnd: 0,
           bottom: 0,
           backgroundColor: 'inherit',
           backdropFilter: `blur(${t.sizes.$2})`,

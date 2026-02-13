@@ -89,6 +89,9 @@ sessions.pem
 # Verdaccio
 .verdaccio
 
+# Release preflight
+.release-artifacts/
+
 # Workflow Outputs
 /packages/*/*.tgz
 /packages/*/tsconfig*.vitest-temp.json

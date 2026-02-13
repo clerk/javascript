@@ -43,8 +43,8 @@ const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: strin
       htmlFor={inputProps.id}
       isDisabled={inputProps.isDisabled}
       sx={t => ({
-        paddingLeft: t.space.$1x5,
-        textAlign: 'left',
+        paddingInlineStart: t.space.$1x5,
+        textAlign: 'start',
       })}
     >
       <Text
