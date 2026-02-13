@@ -129,7 +129,7 @@ describe('createClientUatCookie', () => {
     expect(result).toBe(0);
   });
 
-  it('should set cookies with None sameSite on .replit.dev origins', () => {
+  it('should set cookies with SameSite=None when the host requires it', () => {
     (requiresSameSiteNone as ReturnType<typeof vi.fn>).mockReturnValue(true);
     const cookieHandler = createClientUatCookie(mockCookieSuffix);
     cookieHandler.set({
