@@ -61,12 +61,16 @@ export function getNearestCorner(projectedTranslation: Point, corners: Record<Co
 export function getCornerStyles(corner: Corner): React.CSSProperties {
   switch (corner) {
     case 'top-left':
+      // eslint-disable-next-line -- Corner positioning should not be affected by RTL
       return { top: CORNER_OFFSET, left: CORNER_OFFSET };
     case 'top-right':
+      // eslint-disable-next-line -- Corner positioning should not be affected by RTL
       return { top: CORNER_OFFSET, right: CORNER_OFFSET };
     case 'bottom-left':
+      // eslint-disable-next-line -- Corner positioning should not be affected by RTL
       return { bottom: CORNER_OFFSET, left: CORNER_OFFSET };
     case 'bottom-right':
+      // eslint-disable-next-line -- Corner positioning should not be affected by RTL
       return { bottom: CORNER_OFFSET, right: CORNER_OFFSET };
   }
 }
@@ -215,7 +219,9 @@ export function useDragToCorner(): UseDragToCornerResult {
 
       const handleAnimationEnd = (e: TransitionEvent) => {
         // Ignore non-transform transitions (width, border-radius from Emotion CSS)
-        if (e.propertyName !== 'transform') return;
+        if (e.propertyName !== 'transform') {
+          return;
+        }
         el.removeEventListener('transitionend', handleAnimationEnd);
 
         saveCornerPreference(cornerTranslation.corner);
