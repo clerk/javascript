@@ -228,7 +228,6 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
       // Because the user is new to the app and legal consent is required,
       // the sign-up can't complete in the popup. The popup sends return_url
       // back to the parent, which navigates to /sso-callback via pushState.
-      // This exercises BaseRouter's history observation with path-based routing.
       await u.page.getByRole('heading', { name: 'Legal consent' }).waitFor();
       await u.page.getByLabel(/I agree to the/).check();
       await u.po.signIn.continue();
