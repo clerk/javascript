@@ -149,18 +149,6 @@ function createClerkEnvSchema() {
     PUBLIC_CLERK_PREFETCH_UI: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_TELEMETRY_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_TELEMETRY_DEBUG: envField.boolean({ context: 'client', access: 'public', optional: true }),
-    PUBLIC_CLERK_KEYLESS_CLAIM_URL: envField.string({
-      context: 'client',
-      access: 'public',
-      optional: true,
-      url: true,
-    }),
-    PUBLIC_CLERK_KEYLESS_API_KEYS_URL: envField.string({
-      context: 'client',
-      access: 'public',
-      optional: true,
-      url: true,
-    }),
     PUBLIC_CLERK_KEYLESS_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
     CLERK_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
     CLERK_MACHINE_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
