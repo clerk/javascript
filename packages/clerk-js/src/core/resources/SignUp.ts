@@ -782,22 +782,24 @@ class SignUpFuture implements SignUpFutureResource {
   }
 
   private shouldBypassCaptchaForAttempt(params: { strategy?: string; transfer?: boolean }) {
-    if (!params.strategy) {
-      return false;
-    }
-
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const captchaOauthBypass = SignUp.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
 
-    if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
+    // For transfers, inspect the SignIn strategy to determine bypass logic
+    if (params.transfer && SignUp.clerk.client?.signIn?.firstFactorVerification?.status === 'transferable') {
+      const signInStrategy = SignUp.clerk.client.signIn.firstFactorVerification.strategy;
+
+      // OAuth transfer: Check if strategy is in bypass list
+      if (signInStrategy?.startsWith('oauth_')) {
+        return captchaOauthBypass.some(strategy => strategy === signInStrategy);
+      }
+
+      // Non-OAuth transfer (signUpIfMissing): Captcha already validated during SignIn
       return true;
     }
 
-    if (
-      params.transfer &&
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      captchaOauthBypass.some(strategy => strategy === SignUp.clerk.client!.signIn.firstFactorVerification.strategy)
-    ) {
+    // For direct SignUp (not transfer), check OAuth bypass
+    if (params.strategy && captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
     }
 

@@ -38,33 +38,10 @@ export interface SignInFutureCreateParams {
    */
   ticket?: string;
   /**
-   * The locale to assign to the user in [BCP 47](https://developer.mozilla.org/en-US/docs/Glossary/BCP_47_language_tag)
-   * format (e.g., "en-US", "fr-FR"). Set from the browser's locale.
-   */
-  locale?: string;
-  /**
    * When set to `true`, if a user does not exist, the sign-up will prepare a transfer to sign up a new
    * account. If bot sign-up protection is enabled, captcha will also be required on sign in.
    */
   signUpIfMissing?: boolean;
-  /**
-   * The captcha token returned from the captcha challenge.
-   *
-   * @internal
-   */
-  captchaToken?: string;
-  /**
-   * The captcha error if the captcha challenge failed.
-   *
-   * @internal
-   */
-  captchaError?: unknown;
-  /**
-   * The type of captcha widget used ('smart', 'invisible', or null).
-   *
-   * @internal
-   */
-  captchaWidgetType?: string | null;
 }
 
 export type SignInFuturePasswordParams = {

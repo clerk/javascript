@@ -167,11 +167,7 @@ export type SignInCreateParams = (
     }
 ) & {
   transfer?: boolean;
-  locale?: string;
   signUpIfMissing?: boolean;
-  captchaToken?: string;
-  captchaError?: unknown;
-  captchaWidgetType?: string | null;
 };
 
 export type ResetPasswordParams = {

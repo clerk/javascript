@@ -16,6 +16,7 @@ import type {
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
+  CaptchaWidgetType,
   ClientTrustState,
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
@@ -176,11 +177,17 @@ export class SignIn extends BaseResource implements SignInResource {
       finalParams.locale = browserLocale;
     }
 
-    // Determine captcha requirement based on params
-    const requiresCaptcha = this.shouldRequireCaptcha(params);
-
-    if (requiresCaptcha) {
-      const captchaParams = await this.getCaptchaToken();
+    if (
+      this.shouldRequireCaptcha(params) &&
+      !__BUILD_DISABLE_RHC__ &&
+      !this.clientBypass() &&
+      !this.shouldBypassCaptchaForAttempt(params)
+    ) {
+      const captchaChallenge = new CaptchaChallenge(SignIn.clerk);
+      const captchaParams = await captchaChallenge.managedOrInvisible({ action: 'signin' });
+      if (!captchaParams) {
+        throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
+      }
       finalParams = { ...finalParams, ...captchaParams };
     }
 
@@ -593,31 +600,16 @@ export class SignIn extends BaseResource implements SignInResource {
     return this;
   }
 
+  private clientBypass() {
+    return SignIn.clerk.client?.captchaBypass;
+  }
+
   /**
-   * We delegate bot detection to the following providers, instead of relying on turnstile exclusively
-   *
-   * This is almost identical to SignUp.shouldBypassCaptchaForAttempt, but they differ because on transfer
-   * sign up needs to check the sign in, and sign in needs to check the sign up.
+   * Determines whether captcha is required for sign in based on the provided params.
+   * Add new conditions here as captcha requirements evolve.
    */
-  protected shouldBypassCaptchaForAttempt(params: { strategy?: string; transfer?: boolean }) {
-    if (!('strategy' in params) || !params.strategy) {
-      return false;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const captchaOauthBypass = SignIn.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
-
-    if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
-      return true;
-    }
-
-    if (
-      params.transfer &&
-      captchaOauthBypass.some(
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        strategy => strategy === SignIn.clerk.client!.signUp.verifications.externalAccount.strategy,
-      )
-    ) {
+  private shouldRequireCaptcha(params: SignInCreateParams): boolean {
+    if ('signUpIfMissing' in params && params.signUpIfMissing) {
       return true;
     }
 
@@ -625,38 +617,24 @@ export class SignIn extends BaseResource implements SignInResource {
   }
 
   /**
-   * Determines whether captcha is required based on the provided params.
+   * We delegate bot detection to the following providers, instead of relying on turnstile exclusively
    */
-  private shouldRequireCaptcha(params: { strategy?: string; transfer?: boolean; signUpIfMissing?: boolean }): boolean {
-    // Always bypass for these conditions
-    if (__BUILD_DISABLE_RHC__) {
-      return false;
+  protected shouldBypassCaptchaForAttempt(params: SignInCreateParams) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const captchaOauthBypass = SignIn.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
+
+    // Check transfer strategy against bypass list
+    if (params.transfer && SignIn.clerk.client?.signUp?.verifications?.externalAccount?.status === 'transferable') {
+      const signUpStrategy = SignIn.clerk.client.signUp.verifications.externalAccount.strategy;
+      return signUpStrategy ? captchaOauthBypass.some(strategy => strategy === signUpStrategy) : false;
     }
 
-    if (SignIn.clerk.client?.captchaBypass) {
-      return false;
+    // Check direct strategy against bypass list
+    if ('strategy' in params && params.strategy) {
+      return captchaOauthBypass.some(strategy => strategy === params.strategy);
     }
 
-    // Strategy-based bypass (OAuth, etc.)
-    if (this.shouldBypassCaptchaForAttempt(params)) {
-      return false;
-    }
-
-    // Require captcha if signUpIfMissing is present
-    return !!params.signUpIfMissing;
-  }
-
-  /**
-   * Gets captcha token and widget type from the captcha challenge.
-   * Throws if captcha is unavailable.
-   */
-  private async getCaptchaToken() {
-    const captchaChallenge = new CaptchaChallenge(SignIn.clerk);
-    const captchaParams = await captchaChallenge.managedOrInvisible({ action: 'signin' });
-    if (!captchaParams) {
-      throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
-    }
-    return captchaParams;
+    return false;
   }
 
   public __internal_updateFromJSON(data: SignInJSON | SignInJSONSnapshot | null): this {
@@ -897,20 +875,80 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
+  /**
+   * Determines whether captcha is required for sign in based on the provided params.
+   * Add new conditions here as captcha requirements evolve.
+   */
+  private shouldRequireCaptcha(params: { signUpIfMissing?: boolean }): boolean {
+    if (params.signUpIfMissing) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private shouldBypassCaptchaForAttempt(params: { strategy?: string; transfer?: boolean }) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const captchaOauthBypass = SignIn.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
+
+    // Check transfer strategy against bypass list
+    if (params.transfer && SignIn.clerk.client?.signUp?.verifications?.externalAccount?.status === 'transferable') {
+      const signUpStrategy = SignIn.clerk.client.signUp.verifications.externalAccount.strategy;
+      return signUpStrategy ? captchaOauthBypass.some(strategy => strategy === signUpStrategy) : false;
+    }
+
+    // Check direct strategy against bypass list
+    if (params.strategy) {
+      return captchaOauthBypass.some(strategy => strategy === params.strategy);
+    }
+
+    return false;
+  }
+
+  private async getCaptchaToken(
+    params: { strategy?: string; transfer?: boolean; signUpIfMissing?: boolean } = {},
+  ): Promise<{
+    captchaToken?: string;
+    captchaWidgetType?: CaptchaWidgetType;
+    captchaError?: unknown;
+  }> {
+    if (
+      !this.shouldRequireCaptcha(params) ||
+      __BUILD_DISABLE_RHC__ ||
+      SignIn.clerk.client?.captchaBypass ||
+      this.shouldBypassCaptchaForAttempt(params)
+    ) {
+      return {
+        captchaToken: undefined,
+        captchaWidgetType: undefined,
+        captchaError: undefined,
+      };
+    }
+
+    const captchaChallenge = new CaptchaChallenge(SignIn.clerk);
+    const response = await captchaChallenge.managedOrInvisible({ action: 'signin' });
+    if (!response) {
+      throw new Error('Captcha challenge failed');
+    }
+
+    const { captchaError, captchaToken, captchaWidgetType } = response;
+    return { captchaToken, captchaWidgetType, captchaError };
+  }
+
   private async _create(params: SignInFutureCreateParams): Promise<void> {
-    let body = { ...params };
+    const body: Record<string, unknown> = { ...params };
 
     const locale = getBrowserLocale();
     if (locale) {
       body.locale = locale;
     }
 
-    // Determine captcha requirement based on params
-    const requiresCaptcha = this.#resource['shouldRequireCaptcha'](body);
+    const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken(params);
 
-    if (requiresCaptcha) {
-      const captchaParams = await this.#resource['getCaptchaToken']();
-      body = { ...body, ...captchaParams };
+    if (captchaToken !== undefined) {
+      body.captchaToken = captchaToken;
+      body.captchaWidgetType = captchaWidgetType;
+      body.captchaError = captchaError;
     }
 
     await this.#resource.__internal_basePost({

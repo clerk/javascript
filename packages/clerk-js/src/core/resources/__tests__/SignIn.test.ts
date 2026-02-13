@@ -54,6 +54,11 @@ describe('SignIn', () => {
         client: {
           captchaBypass: false,
         },
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+          },
+        },
       } as any;
 
       await signIn.create({ identifier: 'user@example.com' });
@@ -83,6 +88,11 @@ describe('SignIn', () => {
       SignIn.clerk = {
         client: {
           captchaBypass: false,
+        },
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+          },
         },
       } as any;
 
