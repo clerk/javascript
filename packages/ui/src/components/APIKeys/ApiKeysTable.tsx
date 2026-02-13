@@ -42,7 +42,7 @@ export const APIKeysTable = ({
           <Tr>
             <Th>Name</Th>
             <Th>Last used</Th>
-            {canManageAPIKeys && <Th sx={{ textAlign: 'right' }}>Actions</Th>}
+            {canManageAPIKeys && <Th sx={{ textAlign: 'end' }}>Actions</Th>}
           </Tr>
         </Thead>
         <Tbody>
@@ -98,7 +98,7 @@ export const APIKeysTable = ({
                   </Box>
                 </Td>
                 {canManageAPIKeys && (
-                  <Td sx={{ textAlign: 'right' }}>
+                  <Td sx={{ textAlign: 'end' }}>
                     <ThreeDotsMenu
                       actions={[
                         {

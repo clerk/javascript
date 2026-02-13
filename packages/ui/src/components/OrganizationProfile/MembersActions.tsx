@@ -19,7 +19,7 @@ export const MembersActionsRow = ({ actionSlot }: MembersActionsRowProps) => {
           justify={actionSlot ? 'between' : 'end'}
           sx={t => ({
             width: '100%',
-            marginLeft: 'auto',
+            marginInlineStart: 'auto',
             padding: `${t.space.$none} ${t.space.$1}`,
           })}
           gap={actionSlot ? 2 : undefined}

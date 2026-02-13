@@ -33,6 +33,7 @@
     "release:canary": "changeset publish --tag canary --no-git-tag",
     "release:canary-core3": "changeset publish --tag canary-core3 --no-git-tag",
     "release:snapshot": "changeset publish --tag snapshot --no-git-tag",
+    "release:status": "changeset status --output .changeset-status.json",
     "release:verdaccio": "if [ \"$(npm config get registry)\" = \"https://registry.npmjs.org/\" ]; then echo 'Error: Using default registry' && exit 1; else TURBO_CONCURRENCY=1 pnpm build && changeset publish --no-git-tag; fi",
     "test": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-80%}",
     "test:cache:clear": "FORCE_COLOR=1 turbo test:cache:clear --continue --concurrency=${TURBO_CONCURRENCY:-80%}",
