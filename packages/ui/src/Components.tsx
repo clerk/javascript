@@ -30,6 +30,7 @@ import {
   CreateOrganizationModal,
   EnableOrganizationsPrompt,
   ImpersonationFab,
+  Inspector,
   KeylessPrompt,
   OrganizationProfileModal,
   preloadComponent,
@@ -713,6 +714,12 @@ const Components = (props: ComponentsProps) => {
               />
             </LazyImpersonationFabProvider>
           )}
+
+        {__DEV__ && (
+          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+            <Inspector />
+          </LazyImpersonationFabProvider>
+        )}
 
         <Suspense>{state.organizationSwitcherPrefetch && <OrganizationSwitcherPrefetch />}</Suspense>
       </LazyProviders>
