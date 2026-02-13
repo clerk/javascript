@@ -85,30 +85,12 @@ const common = ({ mode, variant }) => {
     optimization: {
       splitChunks: {
         cacheGroups: {
-          /**
-           * Sign up is shared between the SignUp component and the SignIn component.
-           */
-          signUp: {
-            minChunks: 1,
-            name: 'signup',
-            test: module =>
-              !!(
-                module instanceof rspack.NormalModule &&
-                module.resource &&
-                module.resource.includes('/components/SignUp')
-              ),
-          },
           common: {
             minChunks: 1,
             name: 'ui-common',
             priority: -20,
             test: module =>
-              !!(
-                module instanceof rspack.NormalModule &&
-                module.resource &&
-                !module.resource.includes('/components') &&
-                !module.resource.includes('node_modules')
-              ),
+              !!(module instanceof rspack.NormalModule && module.resource && !module.resource.includes('/components')),
           },
           defaultVendors: {
             minChunks: 1,
@@ -279,7 +261,14 @@ const devConfig = (mode, env) => {
       port,
       hot: true,
       liveReload: false,
-      client: { webSocketURL: `auto://${devUrl.host}/ws` },
+      client: {
+        overlay: {
+          errors: true,
+          warnings: true,
+          runtimeErrors: false,
+        },
+        webSocketURL: `auto://${devUrl.host}/ws`,
+      },
     },
     cache: false,
     experiments: {
@@ -293,7 +282,7 @@ const devConfig = (mode, env) => {
   });
 };
 
-export default env => {
+export default async env => {
   const mode = env.production ? 'production' : 'development';
   const analysis = !!env.analyze;
   return isProduction(mode) ? prodConfig({ mode, analysis }) : devConfig(mode, env);
