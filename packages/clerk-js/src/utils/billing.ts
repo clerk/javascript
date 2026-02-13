@@ -28,10 +28,10 @@ const billingCreditsFromJSON = (data: BillingCreditsJSON): BillingCredits => {
           cycleRemainingPercent: data.proration.cycle_remaining_percent,
         }
       : null,
-    payerCredit: data.payer_credit
+    payer: data.payer
       ? {
-          remainingBalance: billingMoneyAmountFromJSON(data.payer_credit.remaining_balance),
-          appliedAmount: billingMoneyAmountFromJSON(data.payer_credit.applied_amount),
+          remainingBalance: billingMoneyAmountFromJSON(data.payer.remaining_balance),
+          appliedAmount: billingMoneyAmountFromJSON(data.payer.applied_amount),
         }
       : null,
     total: billingMoneyAmountFromJSON(data.total),

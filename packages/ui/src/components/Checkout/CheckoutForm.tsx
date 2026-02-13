@@ -36,8 +36,7 @@ export const CheckoutForm = withCardStateProvider(() => {
   }
 
   const showProratedCredit = !!totals.credits?.proration?.amount && totals.credits.proration.amount.amount > 0;
-  const showAccountCredits =
-    !!totals.credits?.payerCredit?.appliedAmount && totals.credits.payerCredit.appliedAmount.amount > 0;
+  const showAccountCredits = !!totals.credits?.payer?.appliedAmount && totals.credits.payer.appliedAmount.amount > 0;
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
@@ -92,7 +91,7 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.payerCreditRemainder')} />
               <LineItems.Description
-                text={`- ${totals.credits?.payerCredit?.appliedAmount?.currencySymbol}${totals.credits?.payerCredit?.appliedAmount?.amountFormatted}`}
+                text={`- ${totals.credits?.payer?.appliedAmount?.currencySymbol}${totals.credits?.payer?.appliedAmount?.amountFormatted}`}
               />
             </LineItems.Group>
           )}

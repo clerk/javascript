@@ -704,7 +704,7 @@ export interface BillingPayerCredit {
 
 export interface BillingCredits {
   proration: BillingProrationCreditDetail | null;
-  payerCredit: BillingPayerCredit | null;
+  payer: BillingPayerCredit | null;
   total: BillingMoneyAmount;
 }
 

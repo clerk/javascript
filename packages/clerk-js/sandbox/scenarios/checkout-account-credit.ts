@@ -169,7 +169,7 @@ export function CheckoutAccountCredit(): MockScenario {
               cycle_days_total: 1,
               cycle_remaining_percent: 1,
             },
-            payer_credit: {
+            payer: {
               remaining_balance: {
                 amount: 1,
                 amount_formatted: '100.00',

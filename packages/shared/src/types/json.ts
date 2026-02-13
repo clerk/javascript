@@ -769,7 +769,7 @@ export interface BillingPayerCreditJSON {
  */
 export interface BillingCreditsJSON {
   proration: BillingProrationCreditDetailJSON | null;
-  payer_credit: BillingPayerCreditJSON | null;
+  payer: BillingPayerCreditJSON | null;
   total: BillingMoneyAmountJSON;
 }
 
