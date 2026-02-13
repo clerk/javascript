@@ -63,6 +63,7 @@ export const createLongRunningApps = () => {
     { id: 'react.vite.withEmailCodes', config: react.vite, env: envs.withEmailCodes },
     { id: 'react.vite.withEmailCodes_persist_client', config: react.vite, env: envs.withEmailCodes_destroy_client },
     { id: 'react.vite.withEmailLinks', config: react.vite, env: envs.withEmailLinks },
+    { id: 'react.vite.withLegalConsent', config: react.vite, env: envs.withLegalConsent },
     { id: 'vue.vite', config: vue.vite, env: envs.withCustomRoles },
 
     /**

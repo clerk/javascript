@@ -181,7 +181,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 });
 
-testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
+testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
   'oauth popup with path-based routing @react',
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });
@@ -207,7 +207,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
       await app.teardown();
     });
 
-    test('sign in with popup OAuth and path-based routing completes sso-callback', async ({ page, context }) => {
+    test('popup OAuth navigates through sso-callback with path-based routing', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/sign-in-popup');
@@ -215,8 +215,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
       await u.po.signIn.waitForMounted();
 
       const popupPromise = context.waitForEvent('page');
-      // Custom OAuth providers render with a single-letter avatar in compact mode
-      await u.page.getByRole('button', { name: 'E', exact: true }).click();
+      await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
       const popup = await popupPromise;
       const popupUtils = createTestUtils({ app, page: popup, context });
       await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
@@ -226,7 +225,14 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
       await popupUtils.po.signIn.continue();
       await popupUtils.po.signIn.enterTestOtpCode();
 
-      // The parent page should navigate through sso-callback and land on the redirect URL
+      // Because the user is new to the app and legal consent is required,
+      // the sign-up can't complete in the popup. The popup sends return_url
+      // back to the parent, which navigates to /sso-callback via pushState.
+      // This exercises BaseRouter's history observation with path-based routing.
+      await u.page.getByRole('heading', { name: 'Legal consent' }).waitFor();
+      await u.page.getByLabel(/I agree to the/).check();
+      await u.po.signIn.continue();
+
       await u.page.waitForAppUrl('/protected');
       await u.po.expect.toBeSignedIn();
     });
