@@ -5,7 +5,7 @@ import { AuthStatus, constants, TokenType } from '@clerk/backend/internal';
 import assert from 'assert';
 import type { NextFetchEvent } from 'next/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { clerkClient } from '../clerkClient';
 import { clerkMiddleware } from '../clerkMiddleware';
@@ -40,6 +40,7 @@ afterAll(() => {
 });
 
 beforeEach(() => {
+  authenticateRequestMock.mockClear();
   vi.mocked(clerkClient).mockResolvedValue({
     authenticateRequest: authenticateRequestMock,
     // @ts-expect-error - mock
@@ -960,6 +961,233 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
     );
     expect((await clerkClient()).authenticateRequest).toBeCalled();
+  });
+});
+
+describe('frontendApiProxy multi-domain support', () => {
+  it('calls proxy when enabled is true and path matches', async () => {
+    const req = mockRequest({ url: '/__clerk/v1/client' });
+
+    const resp = await clerkMiddleware({
+      frontendApiProxy: { enabled: true },
+    })(req, {} as NextFetchEvent);
+
+    // Proxy should intercept the request - we expect a response (not standard middleware response)
+    // The proxy returns a response without going through authenticateRequest
+    expect((await clerkClient()).authenticateRequest).not.toBeCalled();
+    expect(resp).toBeDefined();
+  });
+
+  it('does not call proxy when enabled is false', async () => {
+    const req = mockRequest({ url: '/__clerk/v1/client' });
+
+    const resp = await clerkMiddleware({
+      frontendApiProxy: { enabled: false },
+    })(req, {} as NextFetchEvent);
+
+    // Request should pass through to normal auth flow
+    expect((await clerkClient()).authenticateRequest).toBeCalled();
+    expect(resp?.status).toEqual(200);
+  });
+
+  it('calls proxy when enabled function returns true for the request URL', async () => {
+    const shouldProxy = vi.fn((url: URL) => url.hostname.endsWith('.replit.app'));
+    const req = new NextRequest('https://myapp.replit.app/__clerk/v1/client');
+
+    const resp = await clerkMiddleware({
+      frontendApiProxy: {
+        enabled: shouldProxy,
+      },
+    })(req, {} as NextFetchEvent);
+
+    expect(shouldProxy).toHaveBeenCalledWith(expect.any(URL));
+    expect(shouldProxy.mock.calls[0][0].hostname).toBe('myapp.replit.app');
+    expect((await clerkClient()).authenticateRequest).not.toBeCalled();
+    expect(resp).toBeDefined();
+  });
+
+  it('does not call proxy when enabled function returns false for the request URL', async () => {
+    const shouldProxy = vi.fn((url: URL) => url.hostname.endsWith('.replit.app'));
+    const req = new NextRequest('https://myapp.com/__clerk/v1/client');
+
+    const resp = await clerkMiddleware({
+      frontendApiProxy: {
+        enabled: shouldProxy,
+      },
+    })(req, {} as NextFetchEvent);
+
+    expect(shouldProxy).toHaveBeenCalledWith(expect.any(URL));
+    expect(shouldProxy.mock.calls[0][0].hostname).toBe('myapp.com');
+    // Request should pass through to normal auth flow
+    expect((await clerkClient()).authenticateRequest).toBeCalled();
+    expect(resp?.status).toEqual(200);
+  });
+
+  it('uses custom path when provided', async () => {
+    const req = mockRequest({ url: '/custom-proxy/v1/client' });
+
+    const resp = await clerkMiddleware({
+      frontendApiProxy: {
+        enabled: true,
+        path: '/custom-proxy',
+      },
+    })(req, {} as NextFetchEvent);
+
+    // Proxy should intercept the request with custom path
+    expect((await clerkClient()).authenticateRequest).not.toBeCalled();
+    expect(resp).toBeDefined();
+  });
+
+  it('does not match default path when custom path is provided', async () => {
+    const req = mockRequest({ url: '/__clerk/v1/client' });
+
+    const resp = await clerkMiddleware({
+      frontendApiProxy: {
+        enabled: true,
+        path: '/custom-proxy',
+      },
+    })(req, {} as NextFetchEvent);
+
+    // Request should pass through to normal auth flow since path doesn't match
+    expect((await clerkClient()).authenticateRequest).toBeCalled();
+    expect(resp?.status).toEqual(200);
+  });
+
+  it('uses default /__clerk path when path is not specified', async () => {
+    const req = mockRequest({ url: '/__clerk/v1/client' });
+
+    const resp = await clerkMiddleware({
+      frontendApiProxy: { enabled: true },
+    })(req, {} as NextFetchEvent);
+
+    // Proxy should intercept the request with default path
+    expect((await clerkClient()).authenticateRequest).not.toBeCalled();
+    expect(resp).toBeDefined();
+  });
+
+  it('correctly filters by multiple domain suffixes', async () => {
+    const PROXY_DOMAINS = ['.replit.app', '.replit.dev', '.vercel.app'];
+    const shouldProxy = (url: URL) => PROXY_DOMAINS.some(suffix => url.hostname.endsWith(suffix));
+
+    // Test replit.app - should proxy
+    const req1 = new NextRequest('https://myapp.replit.app/__clerk/v1/client');
+    await clerkMiddleware({ frontendApiProxy: { enabled: shouldProxy } })(req1, {} as NextFetchEvent);
+    expect((await clerkClient()).authenticateRequest).not.toBeCalled();
+
+    authenticateRequestMock.mockClear();
+    vi.mocked(clerkClient).mockClear();
+    vi.mocked(clerkClient).mockResolvedValue({
+      authenticateRequest: authenticateRequestMock,
+      // @ts-expect-error - mock
+      telemetry: { record: vi.fn() },
+    });
+
+    // Test vercel.app - should proxy
+    const req2 = new NextRequest('https://myapp.vercel.app/__clerk/v1/client');
+    await clerkMiddleware({ frontendApiProxy: { enabled: shouldProxy } })(req2, {} as NextFetchEvent);
+    expect((await clerkClient()).authenticateRequest).not.toBeCalled();
+
+    authenticateRequestMock.mockClear();
+    vi.mocked(clerkClient).mockClear();
+    vi.mocked(clerkClient).mockResolvedValue({
+      authenticateRequest: authenticateRequestMock,
+      // @ts-expect-error - mock
+      telemetry: { record: vi.fn() },
+    });
+
+    // Test custom domain - should not proxy
+    const req3 = new NextRequest('https://myapp.com/__clerk/v1/client');
+    await clerkMiddleware({ frontendApiProxy: { enabled: shouldProxy } })(req3, {} as NextFetchEvent);
+    expect((await clerkClient()).authenticateRequest).toBeCalled();
+  });
+
+  it('supports proxy everywhere except production pattern', async () => {
+    const shouldProxy = (url: URL) => {
+      // Don't proxy on production domain
+      if (url.hostname === 'myapp.com' || url.hostname === 'www.myapp.com') {
+        return false;
+      }
+      // Proxy everywhere else (staging, preview, dev)
+      return true;
+    };
+
+    // Test production - should not proxy
+    const req1 = new NextRequest('https://myapp.com/__clerk/v1/client');
+    await clerkMiddleware({ frontendApiProxy: { enabled: shouldProxy } })(req1, {} as NextFetchEvent);
+    expect((await clerkClient()).authenticateRequest).toBeCalled();
+
+    authenticateRequestMock.mockClear();
+    vi.mocked(clerkClient).mockClear();
+    vi.mocked(clerkClient).mockResolvedValue({
+      authenticateRequest: authenticateRequestMock,
+      // @ts-expect-error - mock
+      telemetry: { record: vi.fn() },
+    });
+
+    // Test staging - should proxy
+    const req2 = new NextRequest('https://staging.myapp.com/__clerk/v1/client');
+    await clerkMiddleware({ frontendApiProxy: { enabled: shouldProxy } })(req2, {} as NextFetchEvent);
+    expect((await clerkClient()).authenticateRequest).not.toBeCalled();
+  });
+
+  it('auto-derives proxyUrl from frontendApiProxy config for handshake redirects', async () => {
+    // Request to a non-proxy path should go through auth with derived proxyUrl
+    const req = new NextRequest('https://myapp.example.com/dashboard');
+
+    await clerkMiddleware({
+      frontendApiProxy: { enabled: true, path: '/__clerk' },
+    })(req, {} as NextFetchEvent);
+
+    // authenticateRequest should be called with the derived proxyUrl
+    expect((await clerkClient()).authenticateRequest).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        proxyUrl: 'https://myapp.example.com/__clerk',
+      }),
+    );
+  });
+
+  it('auto-derives proxyUrl with custom proxy path', async () => {
+    const req = new NextRequest('https://myapp.example.com/dashboard');
+
+    await clerkMiddleware({
+      frontendApiProxy: { enabled: true, path: '/custom-clerk-proxy' },
+    })(req, {} as NextFetchEvent);
+
+    expect((await clerkClient()).authenticateRequest).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        proxyUrl: 'https://myapp.example.com/custom-clerk-proxy',
+      }),
+    );
+  });
+
+  it('does not derive proxyUrl when frontendApiProxy is not configured', async () => {
+    const req = new NextRequest('https://myapp.example.com/dashboard');
+
+    await clerkMiddleware()(req, {} as NextFetchEvent);
+
+    // authenticateRequest should be called without a proxyUrl value
+    const call = (await clerkClient()).authenticateRequest as Mock;
+    const options = call.mock.calls[0][1];
+    expect(options.proxyUrl).toBeFalsy();
+  });
+
+  it('does not override explicit proxyUrl option', async () => {
+    const req = new NextRequest('https://myapp.example.com/dashboard');
+
+    await clerkMiddleware({
+      frontendApiProxy: { enabled: true, path: '/__clerk' },
+      proxyUrl: 'https://custom-proxy.example.com/__clerk',
+    })(req, {} as NextFetchEvent);
+
+    // Should use the explicit proxyUrl, not the derived one
+    expect((await clerkClient()).authenticateRequest).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        proxyUrl: 'https://custom-proxy.example.com/__clerk',
+      }),
+    );
   });
 });
 
