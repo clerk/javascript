@@ -115,14 +115,12 @@ export default defineNuxtModule<ModuleOptions>({
     addTypeTemplate(
       {
         filename: 'types/clerk.d.ts',
-        getContents: () => `import type { AuthFn, ClerkKeylessContext } from '@clerk/nuxt/server';
+        getContents: () => `import type { AuthFn } from '@clerk/nuxt/server';
           import type { InitialState } from '@clerk/shared/types';
 
           declare module 'h3' {
             interface H3EventContext {
               auth: AuthFn;
-              __clerk_initial_state?: InitialState;
-              __clerk_keyless?: ClerkKeylessContext;
             }
           }
         `,
