@@ -306,9 +306,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.#initialized = true;
       this.clerkjs = clerk;
       this.premountMethodCalls.forEach(cb => cb());
-      this.premountAddListenerCalls.forEach((listenerHandlers, listener) => {
-        const unsubscribe = clerk.addListener(listener);
-        listenerHandlers.nativeUnsubscribe = unsubscribe;
+      this.premountAddListenerCalls.forEach((listenerExtras, listener) => {
+        const unsubscribe = clerk.addListener(listener, listenerExtras.options);
+        listenerExtras.handlers.nativeUnsubscribe = unsubscribe;
       });
 
       // Emit current state to all listeners so React context gets updated with actual values

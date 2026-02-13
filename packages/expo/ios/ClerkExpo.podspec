@@ -9,7 +9,7 @@ if File.exist?(package_json_path)
   package = JSON.parse(File.read(package_json_path))
 else
   package = {
-    'version' => '2.16.1',
+    'version' => '0.0.0-FALLBACK',
     'description' => 'Clerk React Native/Expo library',
     'license' => 'MIT',
     'author' => 'Clerk',

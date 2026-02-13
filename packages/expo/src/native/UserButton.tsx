@@ -6,13 +6,17 @@ import { TouchableOpacity, View, Text, StyleSheet, StyleProp, ViewStyle, Image }
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
+// Raw result from native module (may vary by platform)
+interface NativeSessionResult {
+  sessionId?: string;
+  session?: { id: string };
+  user?: { id: string; firstName?: string; lastName?: string; imageUrl?: string; primaryEmailAddress?: string };
+}
+
 // Get the native module for modal presentation (use optional require to avoid crash if not available)
 let ClerkExpo: {
-  getSession: () => Promise<{
-    session?: { id: string };
-    user?: { id: string; firstName?: string; lastName?: string; imageUrl?: string; primaryEmailAddress?: string };
-  } | null>;
-  presentUserProfile: (options: { dismissable: boolean }) => Promise<{ session?: { id: string } } | null>;
+  getSession: () => Promise<NativeSessionResult | null>;
+  presentUserProfile: (options: { dismissable: boolean }) => Promise<NativeSessionResult | null>;
   signOut: () => Promise<void>;
 } | null = null;
 if (isNativeSupported) {
@@ -145,9 +149,10 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
       }
 
       try {
-        const session = await ClerkExpo.getSession();
-        if (session?.user) {
-          setNativeUser(session.user);
+        const result = await ClerkExpo.getSession();
+        const hasSession = !!(result?.sessionId || result?.session?.id);
+        if (hasSession && result?.user) {
+          setNativeUser(result.user);
         } else {
           // Clear local state if no native session
           setNativeUser(null);
@@ -181,64 +186,44 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
     }
 
     try {
-      console.log('[UserButton] Presenting native profile modal');
-      const result = await ClerkExpo.presentUserProfile({
+      await ClerkExpo.presentUserProfile({
         dismissable: true,
       });
-
-      console.log('[UserButton] Profile modal closed, result:', result);
 
       // Check if native session still exists after modal closes
       // If session is null, user signed out from the native UI
       const sessionCheck = await ClerkExpo.getSession?.();
-      const hasNativeSession = !!sessionCheck?.session;
-
-      console.log('[UserButton] Native session after close:', hasNativeSession);
+      const hasNativeSession = !!(sessionCheck?.sessionId || sessionCheck?.session?.id);
 
       if (!hasNativeSession) {
-        console.log('[UserButton] User signed out from native profile');
-        console.log('[UserButton] JS SDK isSignedIn:', isSignedIn);
-
         // Clear local state immediately for instant UI feedback
         setNativeUser(null);
 
         // Clear native session explicitly (may already be cleared, but ensure it)
         try {
-          console.log('[UserButton] Clearing native session...');
           await ClerkExpo.signOut?.();
-          console.log('[UserButton] Native session cleared');
         } catch (nativeSignOutErr) {
-          console.warn('[UserButton] Native sign out error (may already be signed out):', nativeSignOutErr);
+          // May already be signed out
         }
 
-        // Sign out from JS SDK - this is critical to update isSignedIn state
-        // This will trigger useUser() to update, causing parent components to re-render
+        // Sign out from JS SDK to update isSignedIn state
         if (clerk?.signOut) {
           try {
-            console.log('[UserButton] Signing out from JS SDK...');
             await clerk.signOut();
-            console.log('[UserButton] JS SDK signed out successfully');
           } catch (signOutErr) {
-            console.warn('[UserButton] JS SDK sign out error:', signOutErr);
             // Even if signOut throws, try to force reload to clear stale state
-            if ((clerk as any)?.__internal_reloadInitialResources) {
+            const clerkRecord = clerk as unknown as Record<string, unknown>;
+            if (typeof clerkRecord.__internal_reloadInitialResources === 'function') {
               try {
-                console.log('[UserButton] Force reloading JS SDK state...');
-                await (clerk as any).__internal_reloadInitialResources();
-                console.log('[UserButton] JS SDK state reloaded');
-              } catch (reloadErr) {
-                console.warn('[UserButton] Failed to reload JS SDK state:', reloadErr);
+                await (clerkRecord.__internal_reloadInitialResources as () => Promise<void>)();
+              } catch {
+                // Best effort
               }
             }
           }
         }
 
-        // Call the onSignOut callback AFTER JS SDK sign-out completes
-        console.log('[UserButton] Calling onSignOut callback');
         onSignOut?.();
-      } else {
-        console.log('[UserButton] User dismissed profile without signing out');
-        // User just closed the profile, don't trigger sign-out
       }
     } catch (err) {
       console.error('[UserButton] Error presenting profile:', err);

@@ -66,25 +66,29 @@ const withClerkAndroidPackaging: ConfigPlugin = config => {
 
     // Check if exclusion already exists
     if (buildGradle.includes('META-INF/versions/9/OSGI-INF/MANIFEST.MF')) {
-      console.log('✅ Clerk Android packaging exclusions already configured');
       return modConfig;
     }
 
-    // Find the existing packagingOptions block and add resources.excludes
-    const packagingOptionsMatch = buildGradle.match(/packagingOptions\s*\{/);
-    if (packagingOptionsMatch) {
-      // Add resources block inside packagingOptions
-      const resourcesExclude = `packagingOptions {
+    // AGP 8+ uses `packaging` DSL, older versions use `packagingOptions`
+    const packagingMatch = buildGradle.match(/packaging\s*\{/) || buildGradle.match(/packagingOptions\s*\{/);
+    if (packagingMatch) {
+      const blockName = packagingMatch[0].trim().replace(/\s*\{$/, '');
+      const resourcesExclude = `${blockName} {
         // Clerk Android SDK: exclude duplicate META-INF files
         resources {
             excludes += ['META-INF/versions/9/OSGI-INF/MANIFEST.MF']
         }`;
 
-      buildGradle = buildGradle.replace(/packagingOptions\s*\{/, resourcesExclude);
+      buildGradle = buildGradle.replace(new RegExp(`${blockName}\\s*\\{`), resourcesExclude);
       modConfig.modResults.contents = buildGradle;
-      console.log('✅ Clerk Android packaging exclusions added');
     } else {
-      console.warn('⚠️ Could not find packagingOptions block in build.gradle');
+      // No packaging block found; append one at the end of the android block
+      const androidBlockEnd = buildGradle.lastIndexOf('}');
+      if (androidBlockEnd !== -1) {
+        const packagingBlock = `\n    packaging {\n        resources {\n            excludes += ['META-INF/versions/9/OSGI-INF/MANIFEST.MF']\n        }\n    }\n`;
+        buildGradle = buildGradle.slice(0, androidBlockEnd) + packagingBlock + buildGradle.slice(androidBlockEnd);
+        modConfig.modResults.contents = buildGradle;
+      }
     }
 
     return modConfig;

@@ -151,6 +151,21 @@ public class ClerkUserProfileExpoView: ExpoView {
 // MARK: - Module Definition
 
 public class ClerkExpoModule: Module {
+  /// Returns the topmost presented view controller, avoiding deprecated `keyWindow`.
+  private static func topViewController() -> UIViewController? {
+    guard let scene = UIApplication.shared.connectedScenes
+      .compactMap({ $0 as? UIWindowScene })
+      .first(where: { $0.activationState == .foregroundActive }),
+      let rootVC = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController
+    else { return nil }
+
+    var top = rootVC
+    while let presented = top.presentedViewController {
+      top = presented
+    }
+    return top
+  }
+
   public func definition() -> ModuleDefinition {
     Name("ClerkExpo")
 
@@ -187,7 +202,7 @@ public class ClerkExpoModule: Module {
             return
           }
 
-          if let rootVC = UIApplication.shared.keyWindow?.rootViewController {
+          if let rootVC = Self.topViewController() {
             rootVC.present(vc, animated: true)
           } else {
             continuation.resume(throwing: NSError(domain: "ClerkExpo", code: 3, userInfo: [NSLocalizedDescriptionKey: "No root view controller available to present auth"]))
@@ -218,7 +233,7 @@ public class ClerkExpoModule: Module {
             return
           }
 
-          if let rootVC = UIApplication.shared.keyWindow?.rootViewController {
+          if let rootVC = Self.topViewController() {
             rootVC.present(vc, animated: true)
           } else {
             continuation.resume(throwing: NSError(domain: "ClerkExpo", code: 3, userInfo: [NSLocalizedDescriptionKey: "No root view controller available to present profile"]))

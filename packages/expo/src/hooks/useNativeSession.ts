@@ -4,11 +4,9 @@ import { useCallback, useEffect, useState } from 'react';
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
-// Native session data structure
+// Native session data structure (normalized)
 interface NativeSessionData {
-  session?: {
-    id: string;
-  };
+  sessionId?: string;
   user?: {
     id: string;
     firstName?: string;
@@ -18,9 +16,16 @@ interface NativeSessionData {
   };
 }
 
+// Raw result from the native module (may vary by platform)
+interface NativeSessionRawResult {
+  sessionId?: string;
+  session?: { id: string };
+  user?: NativeSessionData['user'];
+}
+
 // Get the native module (use optional require to avoid crash if not available)
 let ClerkExpo: {
-  getSession: () => Promise<NativeSessionData | null>;
+  getSession: () => Promise<NativeSessionRawResult | null>;
 } | null = null;
 
 if (isNativeSupported) {
@@ -49,9 +54,9 @@ export interface UseNativeSessionReturn {
   isSignedIn: boolean;
 
   /**
-   * The native session data, if available
+   * The native session ID, if available
    */
-  session: NativeSessionData['session'] | null;
+  sessionId: string | null;
 
   /**
    * The native user data, if available
@@ -96,7 +101,7 @@ export interface UseNativeSessionReturn {
  */
 export function useNativeSession(): UseNativeSessionReturn {
   const [isLoading, setIsLoading] = useState(isNativeSupported && !!ClerkExpo);
-  const [session, setSession] = useState<NativeSessionData['session'] | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [user, setUser] = useState<NativeSessionData['user'] | null>(null);
 
   const refresh = useCallback(async () => {
@@ -108,11 +113,13 @@ export function useNativeSession(): UseNativeSessionReturn {
     try {
       setIsLoading(true);
       const result = await ClerkExpo.getSession();
-      setSession(result?.session ?? null);
+      // Normalize: iOS returns { sessionId }, Android returns { session: { id } }
+      const id = result?.sessionId ?? result?.session?.id ?? null;
+      setSessionId(id);
       setUser(result?.user ?? null);
     } catch (error) {
       console.log('[useNativeSession] Error fetching native session:', error);
-      setSession(null);
+      setSessionId(null);
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -127,8 +134,8 @@ export function useNativeSession(): UseNativeSessionReturn {
   return {
     isAvailable: isNativeSupported && !!ClerkExpo,
     isLoading,
-    isSignedIn: !!session?.id,
-    session,
+    isSignedIn: !!sessionId,
+    sessionId,
     user,
     refresh,
   };

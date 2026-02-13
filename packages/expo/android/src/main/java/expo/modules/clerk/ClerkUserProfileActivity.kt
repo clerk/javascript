@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +29,12 @@ class ClerkUserProfileActivity : ComponentActivity() {
 
   companion object {
     private const val TAG = "ClerkUserProfileActivity"
+
+    private fun debugLog(tag: String, message: String) {
+      if (BuildConfig.DEBUG) {
+        Log.d(tag, message)
+      }
+    }
   }
 
   private var dismissed = false
@@ -39,18 +46,12 @@ class ClerkUserProfileActivity : ComponentActivity() {
     val dismissable = intent.getBooleanExtra(ClerkExpoModule.EXTRA_DISMISSABLE, true)
     val publishableKey = intent.getStringExtra(ClerkExpoModule.EXTRA_PUBLISHABLE_KEY)
 
-    // Log current state
-    Log.d(TAG, "onCreate - isInitialized: ${Clerk.isInitialized.value}")
-    Log.d(TAG, "onCreate - session: ${Clerk.session?.id}")
-    Log.d(TAG, "onCreate - user: ${Clerk.user?.id}")
-    Log.d(TAG, "onCreate - user.firstName: ${Clerk.user?.firstName}")
-    Log.d(TAG, "onCreate - user.lastName: ${Clerk.user?.lastName}")
-    Log.d(TAG, "onCreate - user.imageUrl: ${Clerk.user?.imageUrl?.take(50)}")
-    Log.d(TAG, "onCreate - user.emailAddresses: ${Clerk.user?.emailAddresses?.map { it.emailAddress }}")
+    debugLog(TAG, "onCreate - isInitialized: ${Clerk.isInitialized.value}")
+    debugLog(TAG, "onCreate - session: ${Clerk.session?.id}, user: ${Clerk.user?.id}")
 
     // Initialize Clerk if not already initialized
     if (publishableKey != null && !Clerk.isInitialized.value) {
-      Log.d(TAG, "Initializing Clerk with publishable key: ${publishableKey.take(20)}...")
+      debugLog(TAG, "Initializing Clerk...")
       Clerk.initialize(applicationContext, publishableKey)
     }
 
@@ -64,15 +65,13 @@ class ClerkUserProfileActivity : ComponentActivity() {
 
       // Log when user/session state changes
       LaunchedEffect(user, session) {
-        Log.d(TAG, "State changed - session: ${session?.id}, user: ${user?.id}")
-        Log.d(TAG, "State changed - user.firstName: ${user?.firstName}, user.lastName: ${user?.lastName}")
-        Log.d(TAG, "State changed - user.imageUrl: ${user?.imageUrl?.take(50)}")
+        debugLog(TAG, "State changed - session: ${session?.id}, user: ${user?.id}")
       }
 
       // Detect sign-out: if we had a session and now it's null, user signed out
       LaunchedEffect(session) {
         if (hadSession && session == null) {
-          Log.d(TAG, "Sign-out detected - session became null, dismissing activity")
+          debugLog(TAG, "Sign-out detected - session became null, dismissing activity")
           finishWithSuccess()
         }
         // Update hadSession if we get a session (handles edge cases)
@@ -96,21 +95,15 @@ class ClerkUserProfileActivity : ComponentActivity() {
       }
     }
 
-    // Handle back press
-    if (!dismissable) {
-      onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-          // Do nothing - not dismissable
+    // Handle back press via onBackPressedDispatcher (replaces deprecated onBackPressed)
+    onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() {
+        if (dismissable) {
+          finishWithSuccess()
         }
-      })
-    }
-  }
-
-  override fun onBackPressed() {
-    if (intent.getBooleanExtra(ClerkExpoModule.EXTRA_DISMISSABLE, true)) {
-      finishWithSuccess()
-    }
-    // Otherwise ignore back press
+        // Otherwise ignore back press
+      }
+    })
   }
 
   private fun finishWithSuccess() {

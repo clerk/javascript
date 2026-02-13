@@ -94,57 +94,60 @@ export function InlineAuthView({
 }: InlineAuthViewProps) {
   const authCompletedRef = useRef(false);
 
-  const syncSession = useCallback(
-    async (sessionId: string) => {
-      if (authCompletedRef.current) return;
-      authCompletedRef.current = true;
+  // Use stable refs for callbacks
+  const onSuccessRef = useRef(onSuccess);
+  onSuccessRef.current = onSuccess;
+  const onErrorRef = useRef(_onError);
+  onErrorRef.current = _onError;
 
-      console.log('[InlineAuthView] Syncing session:', sessionId);
-      try {
-        // The native SDK (clerk-ios/clerk-android) and JS SDK (clerk-js) use separate
-        // Clerk API clients. The native session won't appear in the JS client's sessions.
-        // To fix this, we copy the native client's bearer token to the JS SDK's token cache
-        // so both SDKs use the same Clerk API client.
-        if (ClerkExpoModule?.getClientToken) {
-          const nativeClientToken = await ClerkExpoModule.getClientToken();
-          if (nativeClientToken) {
-            console.log('[InlineAuthView] Got native client token, syncing to JS SDK...');
-            await SecureStore.setItemAsync(CLERK_CLIENT_JWT_KEY, nativeClientToken, {
-              keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
-            });
-          }
+  const syncSession = useCallback(async (sessionId: string) => {
+    if (authCompletedRef.current) return;
+    authCompletedRef.current = true;
+
+    try {
+      // The native SDK (clerk-ios/clerk-android) and JS SDK (clerk-js) use separate
+      // Clerk API clients. The native session won't appear in the JS client's sessions.
+      // To fix this, we copy the native client's bearer token to the JS SDK's token cache
+      // so both SDKs use the same Clerk API client.
+      if (ClerkExpoModule?.getClientToken) {
+        const nativeClientToken = await ClerkExpoModule.getClientToken();
+        if (nativeClientToken) {
+          await SecureStore.setItemAsync(CLERK_CLIENT_JWT_KEY, nativeClientToken, {
+            keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
+          });
         }
-
-        // Get the raw Clerk instance (not IsomorphicClerk from useClerk())
-        // because __internal_reloadInitialResources is stripped from IsomorphicClerk
-        const clerkInstance = getClerkInstance()!;
-        const clerkAny = clerkInstance as any;
-
-        // Reload the client from the API - now using the native client's token,
-        // so the JS SDK will see the same sessions as the native SDK
-        if (typeof clerkAny.__internal_reloadInitialResources === 'function') {
-          await clerkAny.__internal_reloadInitialResources();
-          console.log('[InlineAuthView] Resources reloaded with native client token');
-        }
-
-        if (clerkInstance?.setActive) {
-          await clerkInstance.setActive({ session: sessionId });
-          console.log('[InlineAuthView] Session synced successfully');
-        }
-      } catch (err) {
-        console.error('[InlineAuthView] Failed to sync session:', err);
       }
 
-      onSuccess?.();
-    },
-    [onSuccess],
-  );
+      // Get the raw Clerk instance (not IsomorphicClerk from useClerk())
+      // because __internal_reloadInitialResources is stripped from IsomorphicClerk
+      const clerkInstance = getClerkInstance();
+      if (!clerkInstance) {
+        throw new Error('[InlineAuthView] Clerk instance not available');
+      }
+
+      const clerkRecord = clerkInstance as unknown as Record<string, unknown>;
+
+      // Reload the client from the API - now using the native client's token,
+      // so the JS SDK will see the same sessions as the native SDK
+      if (typeof clerkRecord.__internal_reloadInitialResources === 'function') {
+        await (clerkRecord.__internal_reloadInitialResources as () => Promise<void>)();
+      }
+
+      if (typeof clerkInstance.setActive === 'function') {
+        await clerkInstance.setActive({ session: sessionId });
+      }
+
+      onSuccessRef.current?.();
+    } catch (err) {
+      console.error('[InlineAuthView] Failed to sync session:', err);
+      onErrorRef.current?.(err as Error);
+    }
+  }, []);
 
   // Handle native events from the ExpoView bridge
   const handleAuthEvent = useCallback(
     async (event: { nativeEvent: { type: string; data: Record<string, any> } }) => {
       const { type, data } = event.nativeEvent;
-      console.log('[InlineAuthView] Native event:', type, data);
 
       if (type === 'signInCompleted' || type === 'signUpCompleted') {
         const sessionId = data?.sessionId;
@@ -170,7 +173,6 @@ export function InlineAuthView({
       try {
         const session = await ClerkExpoModule!.getSession();
         if (session?.sessionId) {
-          console.log('[InlineAuthView] Poll detected session:', session.sessionId);
           clearInterval(interval);
           await syncSession(session.sessionId);
         }

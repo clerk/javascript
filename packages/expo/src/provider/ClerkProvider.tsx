@@ -69,6 +69,15 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
   const pendingNativeSessionRef = useRef<string | null>(null);
   const initStartedRef = useRef(false);
   const sessionSyncedRef = useRef(false);
+  const prevPkRef = useRef(pk);
+
+  // Reset refs when publishable key changes (hot-swap support)
+  if (prevPkRef.current !== pk) {
+    prevPkRef.current = pk;
+    pendingNativeSessionRef.current = null;
+    initStartedRef.current = false;
+    sessionSyncedRef.current = false;
+  }
 
   // Get the Clerk instance for syncing
   const clerkInstance = isNative()

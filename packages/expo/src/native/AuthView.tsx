@@ -245,8 +245,9 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
           return;
         }
 
-        authCompletedRef.current = true;
-        onSuccessRef.current?.();
+        // No sessionId means the user cancelled/dismissed the modal
+        // Reset hasStartedRef so the modal can be re-presented if needed
+        hasStartedRef.current = false;
       } catch (err) {
         const error = err as Error & { code?: string };
 
