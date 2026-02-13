@@ -122,7 +122,8 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
               }
               if (ClerkExpo?.getSession) {
                 const nativeSession = await ClerkExpo.getSession();
-                sessionId = nativeSession?.sessionId;
+                // Normalize: iOS returns { sessionId }, Android returns { session: { id } }
+                sessionId = nativeSession?.sessionId ?? (nativeSession as any)?.session?.id ?? null;
                 if (sessionId) {
                   break;
                 }

@@ -102,7 +102,6 @@ export function InlineAuthView({
 
   const syncSession = useCallback(async (sessionId: string) => {
     if (authCompletedRef.current) return;
-    authCompletedRef.current = true;
 
     try {
       // The native SDK (clerk-ios/clerk-android) and JS SDK (clerk-js) use separate
@@ -137,6 +136,8 @@ export function InlineAuthView({
         await clerkInstance.setActive({ session: sessionId });
       }
 
+      // Mark complete only after successful sync to allow retries on transient failures
+      authCompletedRef.current = true;
       onSuccessRef.current?.();
     } catch (err) {
       console.error('[InlineAuthView] Failed to sync session:', err);

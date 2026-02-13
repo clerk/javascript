@@ -158,6 +158,7 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
 class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> {
   private let completion: (Result<[String: Any], Error>) -> Void
   private var authEventTask: Task<Void, Never>?
+  private var completionCalled = false
 
   init(mode: AuthView.Mode, dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) {
     self.completion = completion
@@ -175,25 +176,31 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
     authEventTask?.cancel()
   }
 
+  private func completeOnce(_ result: Result<[String: Any], Error>) {
+    guard !completionCalled else { return }
+    completionCalled = true
+    completion(result)
+  }
+
   private func subscribeToAuthEvents() {
     authEventTask = Task { @MainActor [weak self] in
       for await event in Clerk.shared.authEventEmitter.events {
-        guard let self = self else { return }
+        guard let self = self, !self.completionCalled else { return }
         switch event {
         case .signInCompleted(let signIn):
           if let sessionId = signIn.createdSessionId {
-            self.completion(.success(["sessionId": sessionId, "type": "signIn"]))
+            self.completeOnce(.success(["sessionId": sessionId, "type": "signIn"]))
             self.dismiss(animated: true)
           } else {
-            self.completion(.failure(NSError(domain: "ClerkAuth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Sign-in completed but no session ID was created"])))
+            self.completeOnce(.failure(NSError(domain: "ClerkAuth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Sign-in completed but no session ID was created"])))
             self.dismiss(animated: true)
           }
         case .signUpCompleted(let signUp):
           if let sessionId = signUp.createdSessionId {
-            self.completion(.success(["sessionId": sessionId, "type": "signUp"]))
+            self.completeOnce(.success(["sessionId": sessionId, "type": "signUp"]))
             self.dismiss(animated: true)
           } else {
-            self.completion(.failure(NSError(domain: "ClerkAuth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Sign-up completed but no session ID was created"])))
+            self.completeOnce(.failure(NSError(domain: "ClerkAuth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Sign-up completed but no session ID was created"])))
             self.dismiss(animated: true)
           }
         default:
@@ -202,7 +209,7 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
       }
       // Stream ended without an auth completion event
       guard let self = self else { return }
-      self.completion(.failure(NSError(domain: "ClerkAuth", code: 2, userInfo: [NSLocalizedDescriptionKey: "Auth event stream ended unexpectedly"])))
+      self.completeOnce(.failure(NSError(domain: "ClerkAuth", code: 2, userInfo: [NSLocalizedDescriptionKey: "Auth event stream ended unexpectedly"])))
     }
   }
 }
@@ -221,6 +228,7 @@ struct ClerkAuthWrapperView: View {
 class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapperView> {
   private let completion: (Result<[String: Any], Error>) -> Void
   private var authEventTask: Task<Void, Never>?
+  private var completionCalled = false
 
   init(dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) {
     self.completion = completion
@@ -238,13 +246,19 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
     authEventTask?.cancel()
   }
 
+  private func completeOnce(_ result: Result<[String: Any], Error>) {
+    guard !completionCalled else { return }
+    completionCalled = true
+    completion(result)
+  }
+
   private func subscribeToAuthEvents() {
     authEventTask = Task { @MainActor [weak self] in
       for await event in Clerk.shared.authEventEmitter.events {
-        guard let self = self else { return }
+        guard let self = self, !self.completionCalled else { return }
         switch event {
         case .signedOut(let session):
-          self.completion(.success(["sessionId": session.id]))
+          self.completeOnce(.success(["sessionId": session.id]))
           self.dismiss(animated: true)
         default:
           break
@@ -252,7 +266,7 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
       }
       // Stream ended without a sign-out event
       guard let self = self else { return }
-      self.completion(.failure(NSError(domain: "ClerkProfile", code: 2, userInfo: [NSLocalizedDescriptionKey: "Profile event stream ended unexpectedly"])))
+      self.completeOnce(.failure(NSError(domain: "ClerkProfile", code: 2, userInfo: [NSLocalizedDescriptionKey: "Profile event stream ended unexpectedly"])))
     }
   }
 }
