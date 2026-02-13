@@ -225,6 +225,11 @@ export class StateProxy implements State {
           'verifyCode',
           'submitPassword',
         ] as const),
+        resetPasswordPhoneCode: this.wrapMethods(() => target().resetPasswordPhoneCode, [
+          'sendCode',
+          'verifyCode',
+          'submitPassword',
+        ] as const),
         phoneCode: this.wrapMethods(() => target().phoneCode, ['sendCode', 'verifyCode'] as const),
         mfa: this.wrapMethods(() => target().mfa, [
           'sendPhoneCode',
@@ -325,13 +330,21 @@ export class StateProxy implements State {
 
         verifications: this.wrapStruct(
           () => target().verifications,
-          ['sendEmailCode', 'verifyEmailCode', 'sendPhoneCode', 'verifyPhoneCode'] as const,
-          ['emailAddress', 'phoneNumber', 'web3Wallet', 'externalAccount'] as const,
+          [
+            'sendEmailCode',
+            'verifyEmailCode',
+            'sendEmailLink',
+            'waitForEmailLinkVerification',
+            'sendPhoneCode',
+            'verifyPhoneCode',
+          ] as const,
+          ['emailAddress', 'phoneNumber', 'web3Wallet', 'externalAccount', 'emailLinkVerification'] as const,
           {
             emailAddress: defaultSignUpVerificationResource(),
             phoneNumber: defaultSignUpVerificationResource(),
             web3Wallet: defaultSignUpVerificationResource(),
             externalAccount: defaultSignUpVerificationResource(),
+            emailLinkVerification: null,
           },
         ),
       },

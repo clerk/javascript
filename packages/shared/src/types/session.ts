@@ -326,6 +326,7 @@ export interface PublicUserData {
   hasImage: boolean;
   identifier: string;
   userId?: string;
+  username?: string;
 }
 
 /**

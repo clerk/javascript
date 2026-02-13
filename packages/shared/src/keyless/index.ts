@@ -12,4 +12,7 @@ export type { FileSystemAdapter, NodeFileStorageOptions, PathAdapter } from './n
 export { createKeylessService } from './service';
 export type { KeylessAPI, KeylessService, KeylessServiceOptions, KeylessStorage } from './service';
 
+export { resolveKeysWithKeylessFallback } from './resolveKeysWithKeylessFallback';
+export type { KeylessResult } from './resolveKeysWithKeylessFallback';
+
 export type { AccountlessApplication, PublicKeylessApplication } from './types';

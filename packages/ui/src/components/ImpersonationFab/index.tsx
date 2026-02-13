@@ -77,8 +77,8 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
     <Col
       sx={t => ({
         width: '100%',
-        paddingLeft: t.sizes.$4,
-        paddingRight: t.sizes.$6,
+        paddingInlineStart: t.sizes.$4,
+        paddingInlineEnd: t.sizes.$6,
         whiteSpace: 'nowrap',
       })}
     >
@@ -199,6 +199,7 @@ const ImpersonationFabInternal = () => {
           position: 'fixed',
           overflow: 'hidden',
           top: `var(${topProperty}, ${defaultTop}px)`,
+          // eslint-disable-next-line custom-rules/no-physical-css-properties -- Complex JS-based positioning via CSS custom properties
           right: `var(${rightProperty}, ${defaultRight}px)`,
           zIndex: t.zIndices.$fab,
           boxShadow: t.shadows.$fabShadow,

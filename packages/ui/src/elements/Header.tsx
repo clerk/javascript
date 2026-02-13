@@ -110,7 +110,12 @@ const BackLink = React.memo((props: PropsOfComponent<typeof Link>): JSX.Element 
     >
       <Icon
         icon={ArrowLeftIcon}
-        sx={t => ({ color: t.colors.$colorForeground })}
+        sx={t => ({
+          color: t.colors.$colorForeground,
+          '[dir="rtl"] &': {
+            transform: 'scaleX(-1)',
+          },
+        })}
       />
       {children}
     </Link>
