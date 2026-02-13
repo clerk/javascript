@@ -24,14 +24,6 @@ export default defineNuxtPlugin(nuxtApp => {
   const runtimeConfig = useRuntimeConfig();
   const clerkConfig = runtimeConfig.public.clerk ?? {};
 
-  // Add keyless mode props if present
-  const keylessProps = keylessContext.value
-    ? {
-        __internal_keyless_claimKeylessApplicationUrl: keylessContext.value.claimUrl,
-        __internal_keyless_copyInstanceKeysUrl: keylessContext.value.apiKeysUrl,
-      }
-    : {};
-
   nuxtApp.vueApp.use(clerkPlugin as any, {
     ...clerkConfig,
     // Map jsUrl/uiUrl to clerkJSUrl/clerkUIUrl as expected by the Vue plugin
@@ -45,6 +37,12 @@ export default defineNuxtPlugin(nuxtApp => {
     routerPush: (to: string) => navigateTo(to),
     routerReplace: (to: string) => navigateTo(to, { replace: true }),
     initialState: initialState.value,
-    ...keylessProps,
+    // Add keyless mode props if present
+    ...(keylessContext.value
+      ? {
+          __internal_keyless_claimKeylessApplicationUrl: keylessContext.value.claimUrl,
+          __internal_keyless_copyInstanceKeysUrl: keylessContext.value.apiKeysUrl,
+        }
+      : {}),
   });
 });
