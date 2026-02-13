@@ -14,6 +14,6 @@ export function createFileStorage(options: FileStorageOptions = {}): KeylessStor
 
   return createNodeFileStorage(fs, path, {
     cwd,
-    frameworkPackageName: '@clerk/react-router',
+    frameworkPackageName: '@clerk/astro',
   });
 }
