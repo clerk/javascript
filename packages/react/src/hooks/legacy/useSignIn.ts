@@ -6,7 +6,7 @@ import { useIsomorphicClerkContext } from '../../contexts/IsomorphicClerkContext
 import { useAssertWrappedByClerkProvider } from '../useAssertWrappedByClerkProvider';
 
 /**
- * The `useSignIn()` hook provides access to the [`SignIn`](https://clerk.com/docs/reference/javascript/sign-in) object, which allows you to check the current state of a sign-in attempt and manage the sign-in flow. You can use this to create a [custom sign-in flow](https://clerk.com/docs/guides/development/custom-flows/overview#sign-in-flow).
+ * The `useSignIn()` hook provides access to the [`SignIn`](https://clerk.com/docs/reference/javascript/sign-in) object, which allows you to check the current state of a sign-in attempt and manage the sign-in flow. You can use this to create a [custom sign-in flow](!custom-flow).
  *
  * @unionReturnHeadings
  * ["Initialization", "Loaded"]
