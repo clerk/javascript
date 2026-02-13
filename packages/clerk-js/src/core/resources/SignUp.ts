@@ -781,11 +781,42 @@ class SignUpFuture implements SignUpFutureResource {
     return this.#canBeDiscarded;
   }
 
-  private async getCaptchaToken(): Promise<{
+  private shouldBypassCaptchaForAttempt(params: { strategy?: string; transfer?: boolean }) {
+    if (!params.strategy) {
+      return false;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const captchaOauthBypass = SignUp.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
+
+    if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
+      return true;
+    }
+
+    if (
+      params.transfer &&
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      captchaOauthBypass.some(strategy => strategy === SignUp.clerk.client!.signIn.firstFactorVerification.strategy)
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private async getCaptchaToken(params: { strategy?: string; transfer?: boolean } = {}): Promise<{
     captchaToken?: string;
     captchaWidgetType?: CaptchaWidgetType;
     captchaError?: unknown;
   }> {
+    if (__BUILD_DISABLE_RHC__ || SignUp.clerk.client?.captchaBypass || this.shouldBypassCaptchaForAttempt(params)) {
+      return {
+        captchaToken: undefined,
+        captchaWidgetType: undefined,
+        captchaError: undefined,
+      };
+    }
+
     const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
     const response = await captchaChallenge.managedOrInvisible({ action: 'signup' });
     if (!response) {
@@ -797,7 +828,7 @@ class SignUpFuture implements SignUpFutureResource {
   }
 
   private async _create(params: SignUpFutureCreateParams): Promise<void> {
-    const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+    const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken(params);
 
     const body: Record<string, unknown> = {
       transfer: params.transfer,
@@ -950,7 +981,7 @@ class SignUpFuture implements SignUpFutureResource {
       popup,
     } = params;
     return runAsyncResourceTask(this.#resource, async () => {
-      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken({ strategy });
 
       let redirectUrlComplete = redirectUrl;
       try {
