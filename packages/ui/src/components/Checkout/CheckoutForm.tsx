@@ -84,7 +84,9 @@ export const CheckoutForm = withCardStateProvider(() => {
           {showProratedCredit && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.creditRemainder')} />
-              <LineItems.Description text={`- ${totals.credit?.currencySymbol}${totals.credit?.amountFormatted}`} />
+              <LineItems.Description
+                text={`- ${totals.credits?.proration?.amount.currencySymbol}${totals.credits?.proration?.amount.amountFormatted}`}
+              />
             </LineItems.Group>
           )}
           {showAccountCredits && (
