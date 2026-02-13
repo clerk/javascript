@@ -1,4 +1,4 @@
-import { EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import { ClerkOfflineError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -643,6 +643,73 @@ describe('Clerk singleton', () => {
 
         await sut.setActive({ organization: null });
         expect(sut.session).toMatchObject(mockSessionWithOrganization);
+      });
+    });
+
+    describe('when offline', () => {
+      const mockSession = {
+        id: '1',
+        remove: vi.fn(),
+        status: 'active',
+        user: {},
+        touch: vi.fn(() => Promise.resolve()),
+        getToken: vi.fn(),
+        lastActiveToken: { getRawString: () => 'mocked-token' },
+      };
+      let eventBusSpy: ReturnType<typeof vi.spyOn>;
+
+      beforeEach(() => {
+        eventBusSpy = vi.spyOn(eventBus, 'emit');
+      });
+
+      afterEach(() => {
+        mockSession.remove.mockReset();
+        mockSession.touch.mockReset();
+        mockSession.getToken.mockReset();
+        eventBusSpy?.mockRestore();
+      });
+
+      it('does not emit TokenUpdate with null when getToken throws ClerkOfflineError', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.getToken.mockRejectedValue(new ClerkOfflineError('Network request failed while offline.'));
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+
+        expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
+
+        const tokenUpdateCalls = eventBusSpy.mock.calls.filter(call => call[0] === 'token:update');
+        const nullTokenCalls = tokenUpdateCalls.filter(call => call[1]?.token === null);
+        expect(nullTokenCalls.length).toBe(0);
+      });
+
+      it('preserves existing auth state when offline during setActive', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.getToken.mockRejectedValue(new ClerkOfflineError('Network request failed while offline.'));
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+
+        expect(sut.session).toBeDefined();
+      });
+
+      it('re-throws non-offline errors from getToken', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.getToken.mockRejectedValue(new Error('Some other error'));
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await expect(sut.setActive({ session: mockSession as any as ActiveSessionResource })).rejects.toThrow(
+          'Some other error',
+        );
       });
     });
   });
@@ -2733,7 +2800,7 @@ describe('Clerk singleton', () => {
     });
   });
 
-  describe('clerkUICtor backwards compatibility', () => {
+  describe('ui.ClerkUI option', () => {
     beforeEach(() => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
@@ -2751,7 +2818,20 @@ describe('Clerk singleton', () => {
       );
     });
 
-    it('uses clerkUICtor when provided with correct casing', async () => {
+    it('uses ui.ClerkUI when provided', async () => {
+      const mockClerkUIInstance = { mount: vi.fn() };
+      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({
+        ...mockedLoadOptions,
+        ui: { ClerkUI: mockClerkUICtor },
+      });
+
+      expect(mockClerkUICtor).toHaveBeenCalled();
+    });
+
+    it('supports legacy clerkUICtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
       const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
 
@@ -2759,42 +2839,22 @@ describe('Clerk singleton', () => {
       await sut.load({
         ...mockedLoadOptions,
         clerkUICtor: mockClerkUICtor,
-      });
+      } as any);
 
       expect(mockClerkUICtor).toHaveBeenCalled();
     });
 
-    it('uses clerkUiCtor (legacy casing) for backwards compatibility', async () => {
+    it('supports legacy clerkUiCtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
       const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
 
       const sut = new Clerk(productionPublishableKey);
-      // Use legacy casing - cast to bypass TypeScript since clerkUiCtor is not in the type
       await sut.load({
         ...mockedLoadOptions,
         clerkUiCtor: mockClerkUICtor,
-      } as Parameters<typeof sut.load>[0]);
+      } as any);
 
       expect(mockClerkUICtor).toHaveBeenCalled();
-    });
-
-    it('prefers clerkUICtor over clerkUiCtor when both are provided', async () => {
-      const mockClerkUIInstanceCorrect = { mount: vi.fn() };
-      const mockClerkUICtorCorrect = vi.fn(() => mockClerkUIInstanceCorrect);
-
-      const mockClerkUIInstanceLegacy = { mount: vi.fn() };
-      const mockClerkUICtorLegacy = vi.fn(() => mockClerkUIInstanceLegacy);
-
-      const sut = new Clerk(productionPublishableKey);
-      // Provide both - the correct casing should take precedence
-      await sut.load({
-        ...mockedLoadOptions,
-        clerkUICtor: mockClerkUICtorCorrect,
-        clerkUiCtor: mockClerkUICtorLegacy,
-      } as Parameters<typeof sut.load>[0]);
-
-      expect(mockClerkUICtorCorrect).toHaveBeenCalled();
-      expect(mockClerkUICtorLegacy).not.toHaveBeenCalled();
     });
   });
 });

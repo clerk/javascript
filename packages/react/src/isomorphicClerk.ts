@@ -52,6 +52,7 @@ import type {
   State,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
+  TaskSetupMFAProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
   UserAvatarProps,
@@ -61,7 +62,7 @@ import type {
   WaitlistResource,
   Without,
 } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import { handleValueOrFn } from '@clerk/shared/utils';
 
 import { errorThrower } from './errors/errorThrower';
@@ -89,7 +90,7 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
-  __internal_ClerkUICtor?: ClerkUiConstructor;
+  __internal_ClerkUICtor?: ClerkUIConstructor;
 }
 
 declare const global: Global;
@@ -157,6 +158,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   private premountTaskResetPasswordNodes = new Map<HTMLDivElement, TaskResetPasswordProps | undefined>();
+  private premountTaskSetupMfaNodes = new Map<HTMLDivElement, TaskSetupMFAProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -466,12 +468,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
-      const clerkUICtor = await this.getClerkUiEntryChunk();
+      const ClerkUI = await this.getClerkUIEntryChunk();
       const clerk = await this.getClerkJsEntryChunk();
 
       if (!clerk.loaded) {
         this.beforeLoad(clerk);
-        await clerk.load({ ...this.options, clerkUICtor });
+        await clerk.load({ ...this.options, ui: { ...this.options.ui, ClerkUI } });
       }
       if (clerk.loaded) {
         this.replayInterceptedInvocations(clerk);
@@ -513,13 +515,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return global.Clerk;
   }
 
-  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor | undefined> {
-    // Honor explicit clerkUICtor even when prefetchUI=false
-    if (this.options.clerkUICtor) {
-      return this.options.clerkUICtor;
+  private async getClerkUIEntryChunk(): Promise<ClerkUIConstructor | undefined> {
+    // Support bundled UI via ui.ClerkUI prop
+    const uiProp = (this.options as { ui?: { __brand?: string; ClerkUI?: ClerkUIConstructor } }).ui;
+    if (uiProp?.ClerkUI) {
+      return uiProp.ClerkUI;
     }
 
-    if (this.options.prefetchUI === false) {
+    // Skip CDN prefetch when ui prop is passed (bundled UI) or prefetchUI is false
+    if (uiProp || this.options.prefetchUI === false) {
       return undefined;
     }
 
@@ -701,6 +705,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     this.premountTaskResetPasswordNodes.forEach((props, node) => {
       clerkjs.mountTaskResetPassword(node, props);
+    });
+
+    this.premountTaskSetupMfaNodes.forEach((props, node) => {
+      clerkjs.mountTaskSetupMfa(node, props);
     });
 
     /**
@@ -1264,6 +1272,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountTaskResetPassword(node);
     } else {
       this.premountTaskResetPasswordNodes.delete(node);
+    }
+  };
+
+  mountTaskSetupMfa = (node: HTMLDivElement, props?: TaskSetupMFAProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountTaskSetupMfa(node, props);
+    } else {
+      this.premountTaskSetupMfaNodes.set(node, props);
+    }
+  };
+
+  unmountTaskSetupMfa = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountTaskSetupMfa(node);
+    } else {
+      this.premountTaskSetupMfaNodes.delete(node);
     }
   };
 

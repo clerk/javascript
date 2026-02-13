@@ -17,11 +17,16 @@ export class ExternalAccount {
      */
     readonly provider: string,
     /**
+     * The unique ID of the user in the provider.
+     */
+    readonly providerUserId: string,
+    /**
      * The identification with which this external account is associated.
      */
     readonly identificationId: string,
     /**
      * The unique ID of the user in the provider.
+     * @deprecated Use providerUserId instead
      */
     readonly externalId: string,
     /**
@@ -70,6 +75,7 @@ export class ExternalAccount {
     return new ExternalAccount(
       data.id,
       data.provider,
+      data.provider_user_id,
       data.identification_id,
       data.provider_user_id,
       data.approved_scopes,

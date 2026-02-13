@@ -18,6 +18,7 @@ export default {
     'transform-remove-deprecated-appearance-props',
     'transform-appearance-layout-to-options',
     'transform-themes-to-ui-themes',
+    'transform-clerk-types-to-shared-types',
     'transform-align-experimental-unstable-prefixes',
     // React/JSX version of Protect→Show (handles .tsx, .jsx, .ts, .js files)
     {

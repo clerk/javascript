@@ -30,8 +30,11 @@ export default defineConfig({
   define: {
     __BUILD_DISABLE_RHC__: JSON.stringify(false),
     __BUILD_VARIANT_CHIPS__: JSON.stringify(false),
+    PACKAGE_NAME: JSON.stringify('@clerk/ui'),
+    PACKAGE_VERSION: JSON.stringify('0.0.0-test'),
+    // clerk-js modules are aliased into UI tests and use these constants
     __PKG_NAME__: JSON.stringify('@clerk/ui'),
-    __PKG_VERSION__: JSON.stringify('test'),
+    __PKG_VERSION__: JSON.stringify('0.0.0-test'),
   },
   test: {
     environment: 'jsdom',
@@ -63,6 +66,7 @@ export default defineConfig({
       { find: '@/utils/formatSafeIdentifier', replacement: `${uiPath}/utils/formatSafeIdentifier` },
       { find: '@/utils/intl', replacement: `${uiPath}/utils/intl` },
       { find: '@/utils/normalizeRoutingOptions', replacement: `${uiPath}/utils/normalizeRoutingOptions` },
+      { find: '@/utils/phoneUtils', replacement: `${uiPath}/utils/phoneUtils` },
       // Utils from clerk-js (needed by clerk-js core modules)
       { find: '@/utils', replacement: `${clerkJsPath}/utils` },
       // Catch-all for other @/ imports - UI package

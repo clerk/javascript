@@ -519,6 +519,31 @@ describe('clerkMiddleware(params)', () => {
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
+    it('returns 401 when protect is called, the user is signed out, and the request is a server action', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({
+          'next-url': '/protected',
+          'next-action': '1',
+        }),
+        appendDevBrowserCookie: true,
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedOut,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: null }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect();
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(401);
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
     it('throws an unauthorized error when protect is called and the machine auth token is invalid', async () => {
       const req = mockRequest({
         url: '/protected',
@@ -1163,5 +1188,59 @@ describe('frontendApiProxy multi-domain support', () => {
         proxyUrl: 'https://custom-proxy.example.com/__clerk',
       }),
     );
+  });
+});
+
+describe('contentSecurityPolicy option', () => {
+  it('forwards CSP headers as request headers when strict mode is enabled', async () => {
+    const resp = await clerkMiddleware({
+      contentSecurityPolicy: { strict: true },
+    })(mockRequest({ url: '/test' }), {} as NextFetchEvent);
+
+    expect(resp?.status).toEqual(200);
+
+    // Verify CSP response header is set
+    const cspHeader = resp?.headers.get('content-security-policy');
+    expect(cspHeader).toBeTruthy();
+    expect(cspHeader).toContain("'strict-dynamic'");
+    expect(cspHeader).toContain("'nonce-");
+
+    // Verify nonce response header is set
+    const nonceHeader = resp?.headers.get('x-nonce');
+    expect(nonceHeader).toBeTruthy();
+
+    // Verify CSP headers are forwarded as request headers via x-middleware-override-headers
+    const overrideHeaders = resp?.headers.get('x-middleware-override-headers');
+    expect(overrideHeaders).toContain('content-security-policy');
+    expect(overrideHeaders).toContain('x-nonce');
+
+    // Verify the actual request header values are set
+    const requestCSP = resp?.headers.get('x-middleware-request-content-security-policy');
+    expect(requestCSP).toEqual(cspHeader);
+
+    const requestNonce = resp?.headers.get('x-middleware-request-x-nonce');
+    expect(requestNonce).toEqual(nonceHeader);
+  });
+
+  it('forwards CSP headers as request headers when not in strict mode', async () => {
+    const resp = await clerkMiddleware({
+      contentSecurityPolicy: {},
+    })(mockRequest({ url: '/test' }), {} as NextFetchEvent);
+
+    expect(resp?.status).toEqual(200);
+
+    // Verify CSP response header is set
+    const cspHeader = resp?.headers.get('content-security-policy');
+    expect(cspHeader).toBeTruthy();
+
+    // No nonce in non-strict mode
+    expect(resp?.headers.get('x-nonce')).toBeNull();
+
+    // Verify CSP header is forwarded as request header
+    const overrideHeaders = resp?.headers.get('x-middleware-override-headers');
+    expect(overrideHeaders).toContain('content-security-policy');
+
+    const requestCSP = resp?.headers.get('x-middleware-request-content-security-policy');
+    expect(requestCSP).toEqual(cspHeader);
   });
 });
