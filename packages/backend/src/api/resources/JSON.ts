@@ -62,6 +62,7 @@ export const ObjectType = {
   Token: 'token',
   TotalCount: 'total_count',
   TestingToken: 'testing_token',
+  AgentToken: 'agent_token',
   Role: 'role',
   Permission: 'permission',
   BillingPayer: 'commerce_payer',
@@ -504,6 +505,16 @@ export interface SignInJSON extends ClerkResourceJSON {
 
 export interface SignInTokenJSON extends ClerkResourceJSON {
   object: typeof ObjectType.SignInToken;
+  user_id: string;
+  token: string;
+  status: 'pending' | 'accepted' | 'revoked';
+  url: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface AgentTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.AgentToken;
   user_id: string;
   token: string;
   status: 'pending' | 'accepted' | 'revoked';
