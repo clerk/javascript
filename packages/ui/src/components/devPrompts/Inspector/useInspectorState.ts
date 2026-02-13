@@ -19,6 +19,7 @@ export function useInspectorState() {
   });
 
   const copiedTimerRef = useRef<number | null>(null);
+  const tooltipRef = useRef<HTMLElement | null>(null);
 
   const toggle = useCallback(() => {
     setState(prev => ({
@@ -61,7 +62,17 @@ export function useInspectorState() {
 
   const handleClick = useCallback(
     (e: MouseEvent) => {
-      if (state.isFrozen || !state.inspectedData) {
+      if (state.isFrozen) {
+        // If clicking inside the tooltip, let it through (for copy buttons)
+        if (tooltipRef.current?.contains(e.target as Node)) {
+          return;
+        }
+        // Clicking outside the tooltip unfreezes
+        unfreeze();
+        return;
+      }
+
+      if (!state.inspectedData) {
         return;
       }
 
@@ -70,7 +81,7 @@ export function useInspectorState() {
       e.stopPropagation();
       setState(prev => ({ ...prev, isFrozen: true }));
     },
-    [state.inspectedData, state.isFrozen],
+    [state.inspectedData, state.isFrozen, unfreeze],
   );
 
   const handleKeyDown = useCallback(
@@ -120,6 +131,10 @@ export function useInspectorState() {
     };
   }, []);
 
+  const setTooltipRef = useCallback((el: HTMLElement | null) => {
+    tooltipRef.current = el;
+  }, []);
+
   return {
     isActive: state.isActive,
     inspectedData: state.inspectedData,
@@ -129,5 +144,6 @@ export function useInspectorState() {
     deactivate,
     unfreeze,
     setCopiedValue,
+    setTooltipRef,
   };
 }

@@ -63,7 +63,8 @@ function InspectorIcon() {
 }
 
 function InspectorInternal() {
-  const { isActive, inspectedData, isFrozen, copiedValue, toggle, unfreeze, setCopiedValue } = useInspectorState();
+  const { isActive, inspectedData, isFrozen, copiedValue, toggle, unfreeze, setCopiedValue, setTooltipRef } =
+    useInspectorState();
 
   return (
     <>
@@ -123,6 +124,7 @@ function InspectorInternal() {
             copiedValue={copiedValue}
             onCopy={setCopiedValue}
             onClose={unfreeze}
+            tooltipRef={setTooltipRef}
           />,
           document.body,
         )}

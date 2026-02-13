@@ -2,7 +2,7 @@
 import { css } from '@emotion/react';
 import { flip, offset, shift, useFloating } from '@floating-ui/react';
 import copy from 'copy-to-clipboard';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { InspectedData } from './parseClerkElement';
 
@@ -40,6 +40,7 @@ interface InspectorOverlayProps {
   copiedValue: string | null;
   onCopy: (value: string) => void;
   onClose: () => void;
+  tooltipRef: (el: HTMLElement | null) => void;
 }
 
 function CopyIcon() {
@@ -148,7 +149,14 @@ function CopyRow({ value, copiedValue, onCopy }: { value: string; copiedValue: s
   );
 }
 
-export function InspectorOverlay({ inspectedData, isFrozen, copiedValue, onCopy, onClose }: InspectorOverlayProps) {
+export function InspectorOverlay({
+  inspectedData,
+  isFrozen,
+  copiedValue,
+  onCopy,
+  onClose,
+  tooltipRef,
+}: InspectorOverlayProps) {
   const [rect, setRect] = useState<DOMRect | null>(null);
 
   useEffect(() => {
@@ -184,6 +192,14 @@ export function InspectorOverlay({ inspectedData, isFrozen, copiedValue, onCopy,
     },
   });
 
+  const mergedTooltipRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      refs.setFloating(node);
+      tooltipRef(node);
+    },
+    [refs.setFloating, tooltipRef],
+  );
+
   if (!rect) {
     return null;
   }
@@ -212,7 +228,7 @@ export function InspectorOverlay({ inspectedData, isFrozen, copiedValue, onCopy,
 
       {/* Tooltip */}
       <div
-        ref={refs.setFloating}
+        ref={mergedTooltipRef}
         style={{
           ...floatingStyles,
           pointerEvents: isFrozen ? 'auto' : 'none',
