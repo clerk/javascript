@@ -204,7 +204,23 @@ export const BaseRouter = ({
     }
   }, [currentPath, currentQueryString, getPath, getQueryString]);
 
-  useHistoryChangeObserver(refreshEvents, refresh);
+  // Suppresses the history observer during baseNavigate's internal navigation.
+  // Without this, the observer's microtask triggers a render before setActive's
+  // #updateAccessors sets clerk.session, causing task guards to see stale state.
+  const isNavigatingRef = React.useRef(false);
+
+  const observerRefresh = React.useCallback((): void => {
+    if (isNavigatingRef.current) {
+      return;
+    }
+    const newPath = getPath();
+    if (basePath && !newPath.startsWith('/' + basePath)) {
+      return;
+    }
+    refresh();
+  }, [basePath, getPath, refresh]);
+
+  useHistoryChangeObserver(refreshEvents, observerRefresh);
 
   // TODO: Look into the real possible types of globalNavigate
   const baseNavigate = async (toURL: URL | undefined): Promise<unknown> => {
@@ -234,6 +250,7 @@ export const BaseRouter = ({
 
       toURL.search = stringifyQueryParams(toQueryParams);
     }
+    isNavigatingRef.current = true;
     const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
     // We need to flushSync to guarantee the re-render happens before handing things back to the caller,
     // otherwise setActive might emit, and children re-render with the old navigation state.
@@ -242,6 +259,7 @@ export const BaseRouter = ({
     flushSync(() => {
       setRouteParts({ path: toURL.pathname, queryString: toURL.search });
     });
+    isNavigatingRef.current = false;
     return internalNavRes;
   };
 
