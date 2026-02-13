@@ -10,32 +10,60 @@ import { match } from './pathToRegexp';
 import { Route } from './Route';
 import { RouteContext } from './RouteContext';
 
-const hasNavigationAPI =
-  typeof window !== 'undefined' &&
-  'navigation' in window &&
-  typeof (window as any).navigation?.addEventListener === 'function';
-
 // Custom events that don't exist on WindowEventMap but are handled
 // by wrapping history.pushState/replaceState in the fallback path.
 type HistoryEvent = 'pushstate' | 'replacestate';
 type RefreshEvent = keyof WindowEventMap | HistoryEvent;
+type NavigationType = 'push' | 'replace' | 'traverse';
+
+const isWindowRefreshEvent = (event: RefreshEvent): event is keyof WindowEventMap => {
+  return event !== 'pushstate' && event !== 'replacestate';
+};
 
 // Maps refresh events to Navigation API navigationType values.
-const eventToNavigationType: Partial<Record<RefreshEvent, string>> = {
+const eventToNavigationType: Partial<Record<RefreshEvent, NavigationType>> = {
   popstate: 'traverse',
   pushstate: 'push',
   replacestate: 'replace',
 };
 
+// Global subscription sets for the history monkey-patching fallback.
+// Using a single patch with subscriber sets avoids conflicts when
+// multiple BaseRouter instances mount simultaneously.
+const pushStateSubscribers = new Set<() => void>();
+const replaceStateSubscribers = new Set<() => void>();
+let originalPushState: History['pushState'] | null = null;
+let originalReplaceState: History['replaceState'] | null = null;
+
+function ensurePushStatePatched(): void {
+  if (originalPushState) {
+    return;
+  }
+  originalPushState = history.pushState.bind(history);
+  history.pushState = (...args: Parameters<History['pushState']>) => {
+    originalPushState!(...args);
+    pushStateSubscribers.forEach(fn => fn());
+  };
+}
+
+function ensureReplaceStatePatched(): void {
+  if (originalReplaceState) {
+    return;
+  }
+  originalReplaceState = history.replaceState.bind(history);
+  history.replaceState = (...args: Parameters<History['replaceState']>) => {
+    originalReplaceState!(...args);
+    replaceStateSubscribers.forEach(fn => fn());
+  };
+}
+
 /**
  * Observes history changes so the router's internal state stays in sync
- * with the URL.
+ * with the URL. Uses the Navigation API when available, falling back to
+ * monkey-patching history.pushState/replaceState plus native window events.
  *
- * With the Navigation API, listens to `currententrychange` filtered to
- * the navigation types derived from the provided events.
- * Falls back to wrapping history.pushState/replaceState (when pushstate/
- * replacestate are in events) plus listening for the raw window events
- * (popstate, hashchange, etc.).
+ * Note: `events` should be a stable array reference to avoid
+ * re-subscribing on every render.
  */
 function useHistoryChangeObserver(events: Array<RefreshEvent> | undefined, callback: () => void): void {
   const callbackRef = React.useRef(callback);
@@ -47,51 +75,55 @@ function useHistoryChangeObserver(events: Array<RefreshEvent> | undefined, callb
     }
 
     const notify = () => callbackRef.current();
-    const cleanups: Array<() => void> = [];
+    const windowEvents = events.filter(isWindowRefreshEvent);
+    const navigationTypes = events
+      .map(e => eventToNavigationType[e])
+      .filter((type): type is NavigationType => Boolean(type));
+
+    const hasNavigationAPI =
+      typeof window !== 'undefined' &&
+      'navigation' in window &&
+      typeof (window as any).navigation?.addEventListener === 'function';
 
     if (hasNavigationAPI) {
       const nav = (window as any).navigation;
-      const allowedTypes = new Set(events.map(e => eventToNavigationType[e]).filter(Boolean));
-      const handler = (e: { navigationType: string }) => {
+      const allowedTypes = new Set(navigationTypes);
+      const handler = (e: { navigationType: NavigationType }) => {
         if (allowedTypes.has(e.navigationType)) {
-          notify();
+          Promise.resolve().then(notify);
         }
       };
       nav.addEventListener('currententrychange', handler);
-      return () => nav.removeEventListener('currententrychange', handler);
+
+      // Events without a navigationType mapping (e.g. hashchange) still
+      // need native listeners even when the Navigation API is available.
+      const unmappedEvents = windowEvents.filter(e => !eventToNavigationType[e]);
+      unmappedEvents.forEach(e => window.addEventListener(e, notify));
+
+      return () => {
+        nav.removeEventListener('currententrychange', handler);
+        unmappedEvents.forEach(e => window.removeEventListener(e, notify));
+      };
     }
 
-    // Fallback: wrap pushState/replaceState for programmatic navigations
-    // when the corresponding events are requested.
-    if (events.includes('pushstate') || events.includes('replacestate')) {
-      const origPushState = history.pushState.bind(history);
-      const origReplaceState = history.replaceState.bind(history);
-
-      if (events.includes('pushstate')) {
-        history.pushState = (...args: Parameters<History['pushState']>) => {
-          origPushState(...args);
-          notify();
-        };
-      }
-      if (events.includes('replacestate')) {
-        history.replaceState = (...args: Parameters<History['replaceState']>) => {
-          origReplaceState(...args);
-          notify();
-        };
-      }
-
-      cleanups.push(() => {
-        history.pushState = origPushState;
-        history.replaceState = origReplaceState;
-      });
+    // Fallback: use global subscriber sets for pushState/replaceState
+    // so that multiple BaseRouter instances don't conflict.
+    if (events.includes('pushstate')) {
+      ensurePushStatePatched();
+      pushStateSubscribers.add(notify);
+    }
+    if (events.includes('replacestate')) {
+      ensureReplaceStatePatched();
+      replaceStateSubscribers.add(notify);
     }
 
-    // Listen for native window events (popstate, hashchange, etc.).
-    const windowEvents = events.filter((e): e is keyof WindowEventMap => e !== 'pushstate' && e !== 'replacestate');
     windowEvents.forEach(e => window.addEventListener(e, notify));
-    cleanups.push(() => windowEvents.forEach(e => window.removeEventListener(e, notify)));
 
-    return () => cleanups.forEach(fn => fn());
+    return () => {
+      pushStateSubscribers.delete(notify);
+      replaceStateSubscribers.delete(notify);
+      windowEvents.forEach(e => window.removeEventListener(e, notify));
+    };
   }, [events]);
 }
 
