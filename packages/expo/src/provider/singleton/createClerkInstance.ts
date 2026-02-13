@@ -19,6 +19,11 @@ import {
 } from '../../cache';
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { errorThrower } from '../../errorThrower';
+import {
+  applyForceUpdateStatusFromErrorMeta,
+  attachNativeAppHeaders,
+  refreshForceUpdateStatus,
+} from '../../force-update/status-store';
 import { isNative } from '../../utils';
 import type { BuildClerkOptions } from './types';
 
@@ -33,7 +38,18 @@ type FapiRequestInit = RequestInit & {
 };
 
 type FapiResponse = Response & {
-  payload: { errors?: Array<{ code: string }> } | null;
+  payload:
+    | {
+        response?: unknown;
+        errors?: Array<{ code: string; meta?: Record<string, unknown> }>;
+      }
+    | null;
+};
+
+type EnvironmentResourceLike = {
+  __internal_toSnapshot: () => EnvironmentJSONSnapshot;
+  forceUpdate?: unknown;
+  force_update?: unknown;
 };
 
 const KEY = '__clerk_client_jwt';
@@ -124,10 +140,12 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           SessionJWTCache.init({ publishableKey, storage: createResourceCache });
 
           __internal_clerk.addListener(({ client }) => {
-            // @ts-expect-error - This is an internal API
-            const environment = __internal_clerk?.__internal_environment as EnvironmentResource;
+            const environment = (
+              __internal_clerk as { __internal_environment?: EnvironmentResourceLike } | undefined
+            )?.__internal_environment;
             if (environment) {
               void EnvironmentResourceCache.save(environment.__internal_toSnapshot());
+              void refreshForceUpdateStatus(environment as Parameters<typeof refreshForceUpdateStatus>[0]);
             }
 
             if (client) {
@@ -155,6 +173,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
               client = DUMMY_CLERK_CLIENT_RESOURCE;
               setTimeout(() => void retryInitilizeResourcesFromFAPI(), 3000);
             }
+            void refreshForceUpdateStatus(environment as Parameters<typeof refreshForceUpdateStatus>[0]);
             return { client, environment };
           };
         }
@@ -176,22 +195,37 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         if (isNative()) {
           (requestInit.headers as Headers).set('x-mobile', '1');
           (requestInit.headers as Headers).set('x-expo-sdk-version', packageJson.version);
+          await attachNativeAppHeaders(requestInit.headers as Headers);
         }
       });
 
       let nativeApiErrorShown = false;
       // @ts-expect-error - This is an internal API
-      __internal_clerk.__internal_onAfterResponse(async (_: FapiRequestInit, response: FapiResponse) => {
+      __internal_clerk.__internal_onAfterResponse(async (requestInit: FapiRequestInit, response: FapiResponse) => {
         const authHeader = response.headers.get('authorization');
         if (authHeader) {
           await saveToken(KEY, authHeader);
         }
 
-        if (!nativeApiErrorShown && response.payload?.errors?.[0]?.code === 'native_api_disabled') {
+        const firstError = response.payload?.errors?.[0];
+
+        if (!nativeApiErrorShown && firstError?.code === 'native_api_disabled') {
           console.error(
             'The Native API is disabled for this instance.\nGo to Clerk Dashboard > Configure > Native applications to enable it.\nOr, navigate here: https://dashboard.clerk.com/last-active?path=native-applications',
           );
           nativeApiErrorShown = true;
+        }
+
+        if (firstError?.code === 'unsupported_app_version') {
+          await applyForceUpdateStatusFromErrorMeta(firstError.meta);
+        }
+
+        if (requestInit.url?.pathname.endsWith('/v1/environment')) {
+          const internalEnvironment = (
+            __internal_clerk as { __internal_environment?: EnvironmentResourceLike } | undefined
+          )?.__internal_environment;
+          const forceUpdateSource = response.payload?.response || internalEnvironment;
+          await refreshForceUpdateStatus(forceUpdateSource as Parameters<typeof refreshForceUpdateStatus>[0]);
         }
       });
     }

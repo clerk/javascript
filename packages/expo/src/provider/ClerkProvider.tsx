@@ -6,6 +6,7 @@ import * as WebBrowser from 'expo-web-browser';
 
 import type { TokenCache } from '../cache/types';
 import { isNative, isWeb } from '../utils/runtime';
+import { ForceUpdateBlockingOverlay } from './ForceUpdateBlockingOverlay';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
 
@@ -93,6 +94,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       }}
     >
       {children}
+      {isNative() ? <ForceUpdateBlockingOverlay enabled /> : null}
     </ClerkReactProvider>
   );
 }

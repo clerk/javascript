@@ -16,6 +16,73 @@ import { APIKeySettings } from './APIKeySettings';
 import { AuthConfig, BaseResource, CommerceSettings, DisplayConfig, ProtectConfig, UserSettings } from './internal';
 import { OrganizationSettings } from './OrganizationSettings';
 
+type ForceUpdateResource = {
+  ios: Array<{
+    bundleId: string;
+    minimumVersion: string;
+    updateUrl: string | null;
+  }>;
+  android: Array<{
+    packageName: string;
+    minimumVersion: string;
+    updateUrl: string | null;
+  }>;
+};
+
+type ForceUpdateJSON = {
+  ios?: Array<{
+    bundle_id: string;
+    minimum_version: string;
+    update_url?: string | null;
+  }>;
+  android?: Array<{
+    package_name: string;
+    minimum_version: string;
+    update_url?: string | null;
+  }>;
+};
+
+const emptyForceUpdate = (): ForceUpdateResource => ({
+  ios: [],
+  android: [],
+});
+
+const deserializeForceUpdate = (value: ForceUpdateJSON | undefined): ForceUpdateResource => {
+  if (!value) {
+    return emptyForceUpdate();
+  }
+
+  return {
+    ios: (value.ios || []).map(policy => ({
+      bundleId: policy.bundle_id,
+      minimumVersion: policy.minimum_version,
+      updateUrl: policy.update_url ?? null,
+    })),
+    android: (value.android || []).map(policy => ({
+      packageName: policy.package_name,
+      minimumVersion: policy.minimum_version,
+      updateUrl: policy.update_url ?? null,
+    })),
+  };
+};
+
+const serializeForceUpdate = (
+  value: ForceUpdateResource | undefined,
+): ForceUpdateJSON => {
+  return {
+    ios: (value?.ios || []).map(policy => ({
+      bundle_id: policy.bundleId,
+      minimum_version: policy.minimumVersion,
+      update_url: policy.updateUrl,
+    })),
+    android: (value?.android || []).map(policy => ({
+      package_name: policy.packageName,
+      minimum_version: policy.minimumVersion,
+      update_url: policy.updateUrl,
+    })),
+  };
+};
+
 export class Environment extends BaseResource implements EnvironmentResource {
   private static instance: Environment;
 
@@ -29,6 +96,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
   commerceSettings: CommerceSettingsResource = new CommerceSettings();
   apiKeysSettings: APIKeySettings = new APIKeySettings();
   protectConfig: ProtectConfigResource = new ProtectConfig();
+  forceUpdate: ForceUpdateResource = emptyForceUpdate();
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
@@ -58,6 +126,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
     this.commerceSettings = new CommerceSettings(data.commerce_settings);
     this.apiKeysSettings = new APIKeySettings(data.api_keys_settings);
     this.protectConfig = new ProtectConfig(data.protect_config);
+    this.forceUpdate = deserializeForceUpdate((data as EnvironmentJSON & { force_update?: ForceUpdateJSON }).force_update);
 
     return this;
   }
@@ -100,7 +169,8 @@ export class Environment extends BaseResource implements EnvironmentResource {
       commerce_settings: this.commerceSettings.__internal_toSnapshot(),
       api_keys_settings: this.apiKeysSettings.__internal_toSnapshot(),
       protect_config: this.protectConfig.__internal_toSnapshot(),
-    };
+      force_update: serializeForceUpdate(this.forceUpdate),
+    } as EnvironmentJSONSnapshot;
   }
 
   async __internal_enableEnvironmentSetting(params: EnableEnvironmentSettingParams) {

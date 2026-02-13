@@ -230,5 +230,9 @@ export const DUMMY_CLERK_ENVIRONMENT_RESOURCE = {
     actions: { admin_delete: true },
     domains: { enabled: false, enrollment_modes: [], default_role: null },
   },
+  force_update: {
+    ios: [],
+    android: [],
+  },
   maintenance_mode: false,
 } as unknown as EnvironmentJSONSnapshot;

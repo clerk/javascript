@@ -87,10 +87,28 @@ export interface EnvironmentJSON extends ClerkResourceJSON {
   client_debug_mode?: boolean;
   commerce_settings: CommerceSettingsJSON;
   display_config: DisplayConfigJSON;
+  force_update?: ForceUpdateJSON;
   maintenance_mode: boolean;
   organization_settings: OrganizationSettingsJSON;
   user_settings: UserSettingsJSON;
   protect_config: ProtectConfigJSON;
+}
+
+export interface IOSForceUpdatePolicyJSON {
+  bundle_id: string;
+  minimum_version: string;
+  update_url?: string | null;
+}
+
+export interface AndroidForceUpdatePolicyJSON {
+  package_name: string;
+  minimum_version: string;
+  update_url?: string | null;
+}
+
+export interface ForceUpdateJSON {
+  ios?: IOSForceUpdatePolicyJSON[];
+  android?: AndroidForceUpdatePolicyJSON[];
 }
 
 export type LastAuthenticationStrategy =
