@@ -1,5 +1,7 @@
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { eventBus } from '../../events';
+import { signInErrorSignal, signInResourceSignal } from '../../signals';
 import { BaseResource } from '../internal';
 import { SignIn } from '../SignIn';
 
@@ -885,6 +887,133 @@ describe('SignIn', () => {
 
         expect(result.error).toBeTruthy();
         expect(result.error?.code).toBe('factor_not_found');
+      });
+    });
+
+    describe('sendResetPasswordPhoneCode', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+      });
+
+      it('creates signIn with phoneNumber when no existing signIn', async () => {
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_123',
+              identifier: '+15551234567',
+              supported_first_factors: [
+                {
+                  strategy: 'reset_password_phone_code',
+                  phone_number_id: 'phone_123',
+                  safe_identifier: '+15551234567',
+                },
+              ],
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: { id: 'signin_123' },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.resetPasswordPhoneCode.sendCode({ phoneNumber: '+15551234567' });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(1, {
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: { identifier: '+15551234567' },
+        });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(2, {
+          method: 'POST',
+          path: '/client/sign_ins/signin_123/prepare_first_factor',
+          body: {
+            phoneNumberId: 'phone_123',
+            strategy: 'reset_password_phone_code',
+          },
+        });
+      });
+
+      it('prepares first factor with reset password phone code', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({
+          id: 'signin_123',
+          supported_first_factors: [
+            {
+              strategy: 'reset_password_phone_code',
+              phone_number_id: 'phone_123',
+              safe_identifier: '+15551234567',
+            },
+          ],
+        } as any);
+        await signIn.__internal_future.resetPasswordPhoneCode.sendCode();
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins/signin_123/prepare_first_factor',
+          body: {
+            phoneNumberId: 'phone_123',
+            strategy: 'reset_password_phone_code',
+          },
+        });
+      });
+
+      it('throws error when no signIn ID and no phoneNumber', async () => {
+        const signIn = new SignIn();
+
+        await expect(signIn.__internal_future.resetPasswordPhoneCode.sendCode()).rejects.toThrow();
+      });
+
+      it('returns error when reset password phone code factor not found', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signin_123',
+            identifier: '+15551234567',
+            supported_first_factors: [{ strategy: 'password' }],
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        const result = await signIn.__internal_future.resetPasswordPhoneCode.sendCode({ phoneNumber: '+15551234567' });
+
+        expect(result.error).toBeTruthy();
+        expect(result.error?.code).toBe('factor_not_found');
+      });
+    });
+
+    describe('verifyResetPasswordPhoneCode', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+      });
+
+      it('attempts first factor with reset password phone code', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({ id: 'signin_123' } as any);
+        await signIn.__internal_future.resetPasswordPhoneCode.verifyCode({ code: '123456' });
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins/signin_123/attempt_first_factor',
+          body: {
+            code: '123456',
+            strategy: 'reset_password_phone_code',
+          },
+        });
       });
     });
 
@@ -1857,7 +1986,7 @@ describe('SignIn', () => {
         const mockSetActive = vi.fn().mockResolvedValue({});
 
         SignIn.clerk = {
-          client: { reload: mockReload },
+          client: { reload: mockReload, sessions: [] },
           setActive: mockSetActive,
         } as any;
 
@@ -1874,7 +2003,7 @@ describe('SignIn', () => {
         const mockNavigate = vi.fn();
 
         SignIn.clerk = {
-          client: { reload: mockReload },
+          client: { reload: mockReload, sessions: [] },
           setActive: mockSetActive,
         } as any;
 
@@ -1888,6 +2017,118 @@ describe('SignIn', () => {
         const signIn = new SignIn({ id: 'signin_123' } as any);
 
         await expect(signIn.__internal_future.finalize()).rejects.toThrow();
+      });
+    });
+
+    describe('reset', () => {
+      let mockClient: { signIn: SignIn; resetSignIn: ReturnType<typeof vi.fn> };
+
+      beforeEach(() => {
+        // Set up mock client with resetSignIn method that simulates what the real
+        // Client.resetSignIn does: creates a new SignIn, updates signals via events,
+        // and the State class responds by updating the actual signal values
+        mockClient = {
+          signIn: new SignIn(null),
+          resetSignIn: vi.fn().mockImplementation(function (this: typeof mockClient) {
+            const newSignIn = new SignIn(null);
+            this.signIn = newSignIn;
+            // Emit events like the real implementation
+            eventBus.emit('resource:error', { resource: newSignIn, error: null });
+            // Also update signals directly since State isn't set up in tests
+            signInResourceSignal({ resource: newSignIn });
+            signInErrorSignal({ error: null });
+          }),
+        };
+        SignIn.clerk = {
+          client: mockClient,
+        } as any;
+      });
+
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.restoreAllMocks();
+        // Reset signals to initial state
+        signInResourceSignal({ resource: null });
+        signInErrorSignal({ error: null });
+      });
+
+      it('does NOT emit resource:fetch with status fetching', async () => {
+        const emitSpy = vi.spyOn(eventBus, 'emit');
+        const mockFetch = vi.fn();
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({ id: 'signin_123', status: 'needs_first_factor' } as any);
+        await signIn.__internal_future.reset();
+
+        // Verify that resource:fetch was NOT called with status: 'fetching'
+        const fetchingCalls = emitSpy.mock.calls.filter(
+          call => call[0] === 'resource:fetch' && call[1]?.status === 'fetching',
+        );
+        expect(fetchingCalls).toHaveLength(0);
+        // Verify no API calls were made
+        expect(mockFetch).not.toHaveBeenCalled();
+      });
+
+      it('clears any previous errors by updating signInErrorSignal', async () => {
+        // Set an initial error
+        signInErrorSignal({ error: new Error('Previous error') });
+        expect(signInErrorSignal().error).toBeTruthy();
+
+        const signIn = new SignIn({ id: 'signin_123', status: 'needs_first_factor' } as any);
+        await signIn.__internal_future.reset();
+
+        // Verify that error signal was cleared
+        expect(signInErrorSignal().error).toBeNull();
+      });
+
+      it('returns error: null on success', async () => {
+        const signIn = new SignIn({ id: 'signin_123', status: 'needs_first_factor' } as any);
+        const result = await signIn.__internal_future.reset();
+
+        expect(result).toHaveProperty('error', null);
+      });
+
+      it('resets an existing signin with data to a fresh null state', async () => {
+        const signIn = new SignIn({
+          id: 'signin_123',
+          status: 'needs_first_factor',
+          identifier: 'user@example.com',
+        } as any);
+
+        // Verify initial state
+        expect(signIn.id).toBe('signin_123');
+        expect(signIn.status).toBe('needs_first_factor');
+        expect(signIn.identifier).toBe('user@example.com');
+
+        await signIn.__internal_future.reset();
+
+        // Verify that signInResourceSignal was updated with a new SignIn(null) instance
+        const updatedSignIn = signInResourceSignal().resource;
+        expect(updatedSignIn).toBeInstanceOf(SignIn);
+        expect(updatedSignIn?.id).toBeUndefined();
+        expect(updatedSignIn?.status).toBeNull();
+        expect(updatedSignIn?.identifier).toBeNull();
+      });
+
+      it('updates clerk.client.signIn with the fresh null instance', async () => {
+        const originalSignIn = new SignIn({
+          id: 'signin_123',
+          status: 'needs_first_factor',
+          identifier: 'user@example.com',
+        } as any);
+        mockClient.signIn = originalSignIn;
+
+        // Verify initial state
+        expect(mockClient.signIn.id).toBe('signin_123');
+        expect(mockClient.signIn.status).toBe('needs_first_factor');
+
+        await originalSignIn.__internal_future.reset();
+
+        // Verify that clerk.client.signIn was updated with a new SignIn(null) instance
+        expect(mockClient.signIn).toBeInstanceOf(SignIn);
+        expect(mockClient.signIn.id).toBeUndefined();
+        expect(mockClient.signIn.status).toBeNull();
+        expect(mockClient.signIn.identifier).toBeNull();
       });
     });
   });

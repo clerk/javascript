@@ -1,21 +1,21 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
 import type { Ui } from '@clerk/react/internal';
 // Override Clerk React error thrower to show that errors come from @clerk/nextjs
-import { setClerkJsLoadingErrorPackageName, setErrorThrowerOptions } from '@clerk/react/internal';
+import { setClerkJSLoadingErrorPackageName, setErrorThrowerOptions } from '@clerk/react/internal';
 import { useRouter } from 'next/router';
 import React from 'react';
 
 import { useSafeLayoutEffect } from '../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider } from '../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../types';
-import { ClerkScripts } from '../utils/clerk-script';
 import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
 import { removeBasePath } from '../utils/removeBasePath';
 import { RouterTelemetry } from '../utils/router-telemetry';
+import { ClerkScripts } from './ClerkScripts';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
-setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
+setClerkJSLoadingErrorPackageName(PACKAGE_NAME);
 
 export function ClerkProvider<TUi extends Ui = Ui>({ children, ...props }: NextClerkProviderProps<TUi>): JSX.Element {
   const { __internal_invokeMiddlewareOnAuthStateChange = true } = props;
@@ -56,7 +56,7 @@ export function ClerkProvider<TUi extends Ui = Ui>({ children, ...props }: NextC
         initialState={initialState}
       >
         <RouterTelemetry />
-        <ClerkScripts router='pages' />
+        <ClerkScripts />
         {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>

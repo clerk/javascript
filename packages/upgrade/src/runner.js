@@ -18,8 +18,6 @@ const GLOBBY_IGNORE = [
   '**/build/**',
   '.next/**',
   '**/.next/**',
-  'package.json',
-  '**/package.json',
   'package-lock.json',
   '**/package-lock.json',
   'yarn.lock',
@@ -39,7 +37,14 @@ export async function runCodemods(config, sdk, options) {
 
   const patterns = typeof options.glob === 'string' ? options.glob.split(/[ ,]/).filter(Boolean) : options.glob;
 
-  for (const transform of codemods) {
+  for (const codemod of codemods) {
+    const transform = typeof codemod === 'string' ? codemod : codemod.name;
+    const packages = typeof codemod === 'string' ? ['*'] : codemod.packages || ['*'];
+
+    if (!packages.includes('*') && !packages.includes(sdk)) {
+      continue;
+    }
+
     const spinner = createSpinner(`Running codemod: ${transform}`);
 
     try {

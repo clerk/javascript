@@ -1,7 +1,9 @@
+import { UNSAFE_PortalProvider } from '@clerk/shared/react';
+import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, waitFor } from '@/test/utils';
+import { render, screen, waitFor } from '@/test/utils';
 
 import { UserButton } from '../';
 
@@ -83,6 +85,39 @@ describe('UserButton', () => {
   });
 
   it.todo('navigates to sign in url when "Add account" is clicked');
+
+  describe('UserButton with PortalProvider', () => {
+    it('passes getContainer to openUserProfile when wrapped in PortalProvider', async () => {
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      const getContainer = () => container;
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({
+          first_name: 'First',
+          last_name: 'Last',
+          username: 'username1',
+          email_addresses: ['test@clerk.com'],
+        });
+      });
+
+      const { getByText, getByRole, userEvent } = render(
+        <UNSAFE_PortalProvider getContainer={getContainer}>
+          <UserButton />
+        </UNSAFE_PortalProvider>,
+        { wrapper },
+      );
+
+      await userEvent.click(getByRole('button', { name: 'Open user menu' }));
+      await waitFor(() => {
+        expect(screen.getByText('Manage account')).toBeInTheDocument();
+      });
+      await userEvent.click(screen.getByText('Manage account'));
+
+      expect(fixtures.clerk.openUserProfile).toHaveBeenCalledWith(expect.objectContaining({ getContainer }));
+
+      document.body.removeChild(container);
+    });
+  });
 
   describe('Multi Session Popover', () => {
     const initConfig = createFixtures.config(f => {

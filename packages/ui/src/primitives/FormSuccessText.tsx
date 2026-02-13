@@ -14,7 +14,7 @@ export const { applyVariants } = createVariants(theme => ({
     gap: theme.sizes.$1,
     position: 'absolute',
     top: '0',
-    textAlign: 'left',
+    textAlign: 'start',
   },
   variants: {},
 }));

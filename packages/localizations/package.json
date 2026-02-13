@@ -59,7 +59,7 @@
     "dev": "tsup --watch",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
-    "generate": "tsc src/utils/generate.ts && node src/utils/generate.js && prettier --write src/*.ts",
+    "generate": "tsc -p tsconfig.generate.json && node --experimental-vm-modules src/utils/generate.js && rimraf tmp && prettier --write src/*.ts",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16"
   },

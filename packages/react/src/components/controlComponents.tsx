@@ -1,9 +1,9 @@
 import { deprecated } from '@clerk/shared/deprecated';
+import { __internal_useSessionBase } from '@clerk/shared/react';
 import type { HandleOAuthCallbackParams, PendingSessionOptions, ShowWhenCondition } from '@clerk/shared/types';
 import React from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
-import { useSessionContext } from '../contexts/SessionContext';
 import { useAuth } from '../hooks';
 import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByClerkProvider';
 import type { RedirectToSignInProps, RedirectToSignUpProps, RedirectToTasksProps, WithClerkProp } from '../types';
@@ -209,6 +209,6 @@ export const AuthenticateWithRedirectCallback = withClerk(
 export const MultisessionAppSupport = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('MultisessionAppSupport');
 
-  const session = useSessionContext();
+  const session = __internal_useSessionBase();
   return <React.Fragment key={session ? session.id : 'no-users'}>{children}</React.Fragment>;
 };

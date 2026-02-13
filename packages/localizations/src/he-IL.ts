@@ -212,17 +212,17 @@ export const heIL: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'מחיקת חשבון',
-  formFieldInputPlaceholder__emailAddress: undefined,
+  formFieldInputPlaceholder__emailAddress: 'כתובת הדוא"ל שלך',
   formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses: 'example@email.com, example2@email.com',
-  formFieldInputPlaceholder__firstName: undefined,
-  formFieldInputPlaceholder__lastName: undefined,
+  formFieldInputPlaceholder__firstName: 'שם פרטי',
+  formFieldInputPlaceholder__lastName: 'שם משפחה',
   formFieldInputPlaceholder__organizationDomain: undefined,
   formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
-  formFieldInputPlaceholder__organizationName: undefined,
+  formFieldInputPlaceholder__organizationName: 'שם הארגון',
   formFieldInputPlaceholder__organizationSlug: 'הארגון-שלי',
-  formFieldInputPlaceholder__password: undefined,
-  formFieldInputPlaceholder__phoneNumber: undefined,
+  formFieldInputPlaceholder__password: 'הזן סיסמה',
+  formFieldInputPlaceholder__phoneNumber: 'הזן את מספר הטלפון שלך',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKey: 'מפתח API',
@@ -363,6 +363,12 @@ export const heIL: LocalizationResource = {
         tableHeader__role: 'תפקיד',
         tableHeader__user: 'משתמש',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'אנחנו מעדכנים את התפקידים הזמינים. לאחר שזה יסתיים, תוכל לעדכן תפקידים שוב.',
+          title: 'התפקידים נעולים זמנית',
+        },
+      },
       detailsTitle__emptyRow: 'אין חברים להצגה',
       invitationsTab: {
         autoInvitations: {
@@ -392,12 +398,6 @@ export const heIL: LocalizationResource = {
         headerTitle__invitations: 'הזמנות',
         headerTitle__members: 'חברים',
         headerTitle__requests: 'בקשות',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'התפקידים נעולים זמנית',
-          subtitle: 'אנחנו מעדכנים את התפקידים הזמינים. לאחר שזה יסתיים, תוכל לעדכן תפקידים שוב.',
-        },
       },
     },
     navbar: {
@@ -849,6 +849,10 @@ export const heIL: LocalizationResource = {
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'ארגון כבר קיים עבור שם החברה שזוהה ({{organizationName}}) ו-{{organizationDomain}}. הצטרף באמצעות הזמנה.',
+    },
     chooseOrganization: {
       action__createOrganization: 'צור ארגון חדש',
       action__invitationAccept: 'הצטרף',
@@ -869,16 +873,12 @@ export const heIL: LocalizationResource = {
       title: 'הגדר את הארגון שלך',
     },
     organizationCreationDisabled: {
-      title: 'עליך להשתייך לארגון',
       subtitle: 'פנה למנהל הארגון שלך לקבלת הזמנה.',
+      title: 'עליך להשתייך לארגון',
     },
     signOut: {
       actionLink: 'התנתק',
       actionText: 'מחובר כ-{{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'ארגון כבר קיים עבור שם החברה שזוהה ({{organizationName}}) ו-{{organizationDomain}}. הצטרף באמצעות הזמנה.',
     },
   },
   taskResetPassword: {
@@ -889,6 +889,69 @@ export const heIL: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} כבר חבר בארגון',
@@ -915,10 +978,11 @@ export const heIL: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect: 'הסיסמה או כתובת האימייל שגויים. נסה שוב או השתמש בשיטה אחרת.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'הסיסמה שלך אינה מספיק חזקה.',
+    form_password_or_identifier_incorrect: 'הסיסמה או כתובת האימייל שגויים. נסה שוב או השתמש בשיטה אחרת.',
     form_password_pwned: 'הסיסמה הזו נמצאה כחלק מהפרטים שנחשפו בהפרת נתונים ולא ניתן להשתמש בה, נסה סיסמה אחרת במקום.',
     form_password_pwned__sign_in:
       'הסיסמה הזו נמצאה כחלק מהפרטים שנחשפו בהפרת נתונים ולא ניתן להשתמש בה, אנא בצע איתחול לסיסמה שלך.',

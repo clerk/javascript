@@ -11,8 +11,10 @@ export const loadClientEnv = () => {
   return {
     publishableKey: process.env.CLERK_PUBLISHABLE_KEY || '',
     clerkJSUrl: process.env.CLERK_JS || process.env.CLERK_JS_URL || '',
-    clerkUiUrl: process.env.CLERK_UI_URL || '',
     clerkJSVersion: process.env.CLERK_JS_VERSION || '',
+    clerkUIUrl: process.env.CLERK_UI_URL || '',
+    clerkUIVersion: process.env.CLERK_UI_VERSION || '',
+    prefetchUI: process.env.CLERK_PREFETCH_UI === 'false' ? false : undefined,
   };
 };
 

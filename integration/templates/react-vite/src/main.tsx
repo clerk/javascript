@@ -28,10 +28,8 @@ const Root = () => {
   const navigate = useNavigate();
   return (
     <ClerkProvider
-      // @ts-ignore
-      publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string}
       clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL as string}
-      clerkUiUrl={import.meta.env.VITE_CLERK_UI_URL as string}
+      clerkUIUrl={import.meta.env.VITE_CLERK_UI_URL as string}
       routerPush={(to: string) => navigate(to)}
       routerReplace={(to: string) => navigate(to, { replace: true })}
       appearance={{

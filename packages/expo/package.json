@@ -53,6 +53,14 @@
       "types": "./dist/token-cache/index.d.ts",
       "default": "./dist/token-cache/index.js"
     },
+    "./google": {
+      "types": "./dist/google/index.d.ts",
+      "default": "./dist/google/index.js"
+    },
+    "./apple": {
+      "types": "./dist/apple/index.d.ts",
+      "default": "./dist/apple/index.js"
+    },
     "./resource-cache": {
       "types": "./dist/resource-cache/index.d.ts",
       "default": "./dist/resource-cache/index.js"
@@ -65,6 +73,7 @@
       "types": "./dist/legacy.d.ts",
       "default": "./dist/legacy.js"
     },
+    "./types": "./dist/types/index.d.ts",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -81,6 +90,8 @@
     "secure-store",
     "resource-cache",
     "token-cache",
+    "google",
+    "apple",
     "expo-module.config.json",
     "app.plugin.js"
   ],

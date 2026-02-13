@@ -10,7 +10,9 @@ export const commonEnvs = () => {
     // Public environment variables
     CLERK_JS_VERSION: publicEnvs.clerkJsVersion,
     CLERK_JS_URL: publicEnvs.clerkJsUrl,
-    CLERK_UI_URL: publicEnvs.clerkUiUrl,
+    CLERK_UI_URL: publicEnvs.clerkUIUrl,
+    CLERK_UI_VERSION: publicEnvs.clerkUIVersion,
+    PREFETCH_UI: publicEnvs.prefetchUI,
     PUBLISHABLE_KEY: publicEnvs.publishableKey,
     DOMAIN: publicEnvs.domain,
     PROXY_URL: publicEnvs.proxyUrl,

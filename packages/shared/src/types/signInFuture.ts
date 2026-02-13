@@ -138,6 +138,14 @@ export interface SignInFutureResetPasswordSubmitParams {
   signOutOfOtherSessions?: boolean;
 }
 
+export interface SignInFutureResetPasswordPhoneCodeSendParams {
+  /**
+   * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if
+   * [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled.
+   */
+  phoneNumber?: string;
+}
+
 export type SignInFuturePhoneCodeSendParams = {
   /**
    * The mechanism to use to send the code to the provided phone number. Defaults to `'sms'`.
@@ -162,6 +170,13 @@ export type SignInFuturePhoneCodeSendParams = {
 );
 
 export interface SignInFuturePhoneCodeVerifyParams {
+  /**
+   * The one-time code that was sent to the user.
+   */
+  code: string;
+}
+
+export interface SignInFutureResetPasswordPhoneCodeVerifyParams {
   /**
    * The one-time code that was sent to the user.
    */
@@ -344,11 +359,11 @@ export interface SignInFutureResource {
   readonly userData: UserData;
 
   /**
-   * Indicates that the sign-in has been finalized.
+   * Indicates that the sign-in can be discarded (has been finalized or explicitly reset).
    *
    * @internal
    */
-  readonly hasBeenFinalized: boolean;
+  readonly canBeDiscarded: boolean;
 
   /**
    * Creates a new `SignIn` instance initialized with the provided parameters. The instance maintains the sign-in
@@ -457,6 +472,26 @@ export interface SignInFutureResource {
   };
 
   /**
+   *
+   */
+  resetPasswordPhoneCode: {
+    /**
+     * Used to send a password reset code to the first phone number on the account
+     */
+    sendCode: (params?: SignInFutureResetPasswordPhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
+
+    /**
+     * Used to verify a password reset code sent via phone. Will cause `signIn.status` to become `'needs_new_password'`.
+     */
+    verifyCode: (params: SignInFutureResetPasswordPhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
+
+    /**
+     * Used to submit a new password, and move the `signIn.status` to `'complete'`.
+     */
+    submitPassword: (params: SignInFutureResetPasswordSubmitParams) => Promise<{ error: ClerkError | null }>;
+  };
+
+  /**
    * Used to perform OAuth authentication.
    */
   sso: (params: SignInFutureSSOParams) => Promise<{ error: ClerkError | null }>;
@@ -519,4 +554,14 @@ export interface SignInFutureResource {
    * session state (such as the `useUser()` hook) to update automatically.
    */
   finalize: (params?: SignInFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Resets the current sign-in attempt by clearing all local state back to null.
+   * This is useful when you want to allow users to go back to the beginning of
+   * the sign-in flow (e.g., to change their identifier during verification).
+   *
+   * Unlike other methods, `reset()` does not trigger the `fetchStatus` to change
+   * to `'fetching'` and does not make any API calls - it only clears local state.
+   */
+  reset: () => Promise<{ error: ClerkError | null }>;
 }

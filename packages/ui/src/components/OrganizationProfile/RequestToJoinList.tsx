@@ -33,9 +33,12 @@ export const RequestToJoinList = () => {
       isLoading={membershipRequests?.isLoading}
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.requestsTab.table__emptyRow')}
       headers={[
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
-        localizationKeys('organizationProfile.membersPage.requestsTab.tableHeader__requested'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
+        { key: localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user') },
+        { key: localizationKeys('organizationProfile.membersPage.requestsTab.tableHeader__requested') },
+        {
+          key: localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
+          align: 'right',
+        },
       ]}
       rows={(membershipRequests?.data || []).map(request => (
         <RequestRow
@@ -97,7 +100,7 @@ const RequestRow = withCardStateProvider(
           </Box>
         </Td>
 
-        <Td>
+        <Td sx={{ textAlign: 'end' }}>
           <AcceptRejectRequestButtons {...{ onAccept, onReject }} />
         </Td>
       </RowContainer>

@@ -13,6 +13,12 @@ export const PRESERVED_QUERYSTRING_PARAMS = [
 
 export const CLERK_MODAL_STATE = '__clerk_modal_state';
 export const CLERK_SYNCED = '__clerk_synced';
+export const CLERK_SYNCED_STATUS = {
+  /** Not synced - satellite needs handshake after returning from primary sign-in */
+  NeedsSync: 'false',
+  /** Sync completed - prevents re-sync loop after handshake completes */
+  Completed: 'true',
+} as const;
 export const CLERK_SUFFIXED_COOKIES = 'suffixed_cookies';
 export const CLERK_SATELLITE_URL = '__clerk_satellite_url';
 export const ERROR_CODES = {
@@ -41,6 +47,7 @@ export const ERROR_CODES = {
   FRAUD_ACTION_BLOCKED: 'action_blocked',
   SIGNUP_RATE_LIMIT_EXCEEDED: 'signup_rate_limit_exceeded',
   USER_BANNED: 'user_banned',
+  USER_DEACTIVATED: 'user_deactivated',
 } as const;
 
 export const SIGN_IN_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username'];

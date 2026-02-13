@@ -1,4 +1,4 @@
-import { Clerk } from '@clerk/clerk-js/headless';
+import { Clerk } from '@clerk/clerk-js';
 
 import { createClerkInstance } from './createClerkInstance';
 

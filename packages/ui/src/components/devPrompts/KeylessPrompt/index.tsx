@@ -118,10 +118,10 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
         sx={t => ({
           position: 'fixed',
           bottom: '1.25rem',
-          right: '1.25rem',
+          insetInlineEnd: '1.25rem',
           height: `${t.sizes.$10}`,
           minWidth: '13.4rem',
-          paddingLeft: `${t.space.$3}`,
+          paddingInlineStart: `${t.space.$3}`,
           borderRadius: '1.25rem',
           transition: 'all 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
 
@@ -133,7 +133,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             flexDirection: 'column',
             alignItems: 'flex-center',
             justifyContent: 'flex-center',
-            height: claimed || success ? 'fit-content' : isSignedIn ? '11rem' : '12rem',
+            height: claimed || success ? 'fit-content' : isSignedIn ? '8.5rem' : '12rem',
             overflow: 'hidden',
             width: 'fit-content',
             minWidth: '16.125rem',
@@ -321,13 +321,12 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             aria-labelledby={buttonIdentifier}
             hidden={!isForcedExpanded}
           >
-            <p
+            <div
               css={css`
-                ${basePromptElementStyles};
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
                 color: #b4b4b4;
-                font-size: 0.8125rem;
-                font-weight: 400;
-                line-height: 1rem;
                 max-width: 14.625rem;
                 animation: ${isForcedExpanded && 'show-description 500ms ease-in forwards'};
                 @keyframes show-description {
@@ -343,16 +342,26 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
               `}
             >
               {success ? (
-                <>
+                <p
+                  css={css`
+                    ${basePromptElementStyles};
+                    color: #b4b4b4;
+                    font-size: 0.8125rem;
+                    font-weight: 400;
+                    line-height: 1rem;
+                  `}
+                >
                   Your application{' '}
                   <span
                     css={css`
+                      ${basePromptElementStyles};
                       display: inline-block;
                       white-space: nowrap;
                       overflow: hidden;
                       text-overflow: ellipsis;
                       max-width: 8.125rem;
                       vertical-align: bottom;
+                      font-size: 0.8125rem;
                       font-weight: 500;
                       color: #d5d5d5;
                     `}
@@ -375,20 +384,65 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                   >
                     Clerk Dashboard
                   </Link>
-                </>
+                </p>
               ) : claimed ? (
-                <>
+                <p
+                  css={css`
+                    ${basePromptElementStyles};
+                    color: #b4b4b4;
+                    font-size: 0.8125rem;
+                    font-weight: 400;
+                    line-height: 1rem;
+                  `}
+                >
                   You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk
                   Dashboard.
-                </>
+                </p>
+              ) : isSignedIn ? (
+                <p
+                  css={css`
+                    ${basePromptElementStyles};
+                    color: #b4b4b4;
+                    font-size: 0.8125rem;
+                    font-weight: 400;
+                    line-height: 1rem;
+                  `}
+                >
+                  <span>
+                    You&apos;ve created your first user! Link this application to your Clerk account to explore the
+                    Dashboard.
+                  </span>
+                </p>
               ) : (
-                <span>
-                  {isSignedIn
-                    ? "You've created your first user! Link this application to your Clerk account to explore the Dashboard."
-                    : 'This app uses Clerk for authentication. We generated temporary API keys for you. Link this application to your Clerk account to configure it.'}
-                </span>
+                <>
+                  <p
+                    css={css`
+                      ${basePromptElementStyles};
+                      color: #b4b4b4;
+                      font-size: 0.8125rem;
+                      font-weight: 400;
+                      line-height: 1rem;
+                      text-wrap: pretty;
+                    `}
+                  >
+                    Temporary API keys are enabled so you can get started immediately.
+                  </p>
+                  <p
+                    css={css`
+                      ${basePromptElementStyles};
+                      color: #b4b4b4;
+                      font-size: 0.8125rem;
+                      font-weight: 400;
+                      line-height: 1rem;
+                      text-wrap: pretty;
+                    `}
+                  >
+                    Claim this application to access the Clerk Dashboard where you can manage auth settings and explore
+                    more Clerk features.
+                  </p>
+                </>
               )}
-            </p>
+            </div>
           </div>
 
           {isForcedExpanded &&
@@ -457,53 +511,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                 >
                   {claimed ? 'Get API keys' : 'Claim application'}
                 </a>
-
-                {!claimed && (
-                  <>
-                    <span
-                      css={css`
-                        height: 1px;
-                        background-color: #151515;
-                        width: 100%;
-                        box-shadow: 0px 1px 0px 0px #424242;
-                      `}
-                    />
-
-                    <a
-                      href={getKeysUrlFromLastActive}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      css={css`
-                        ${basePromptElementStyles};
-                        color: #ffffff9e;
-                        font-size: 0.75rem;
-                        transition: color 120ms ease-out;
-
-                        :hover {
-                          color: #ffffffcf;
-                          text-decoration: none;
-                        }
-
-                        animation: ${isForcedExpanded && isSignedIn
-                          ? 'show-secondary-CTA 800ms ease forwards'
-                          : 'show-secondary-CTA 650ms ease-in forwards'};
-
-                        @keyframes show-secondary-CTA {
-                          0%,
-                          9% {
-                            opacity: 0;
-                          }
-                          19%,
-                          100% {
-                            opacity: 1;
-                          }
-                        }
-                      `}
-                    >
-                      Already have a Clerk app? Get keys
-                    </a>
-                  </>
-                )}
               </Flex>
             ))}
         </Flex>
@@ -513,6 +520,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           href={`#${buttonIdentifier}`}
           css={css`
             position: fixed;
+            /* eslint-disable-next-line custom-rules/no-physical-css-properties -- Skip link - visually hidden pattern */
             left: -999px;
             top: 1rem;
             z-index: 999999;
@@ -524,6 +532,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             text-decoration: underline;
 
             &:focus {
+              /* eslint-disable-next-line custom-rules/no-physical-css-properties -- Skip link - visually hidden pattern */
               left: 1rem;
               outline: 2px solid;
               outline-offset: 2px;

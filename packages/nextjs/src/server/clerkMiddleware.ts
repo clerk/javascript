@@ -229,9 +229,15 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
           options.contentSecurityPolicy,
         );
 
+        const cspRequestHeaders: Record<string, string> = {};
         headers.forEach(([key, value]) => {
           setHeader(handlerResult, key, value);
+          cspRequestHeaders[key] = value;
         });
+
+        // Forward CSP headers as request headers so server components
+        // can access the nonce via headers()
+        setRequestHeadersOnNextResponse(handlerResult, clerkRequest, cspRequestHeaders);
 
         logger.debug('Clerk generated CSP', () => ({
           headers,
@@ -506,6 +512,7 @@ const handleControlFlowErrors = (
       signUpUrl: requestState.signUpUrl,
       publishableKey: requestState.publishableKey,
       sessionStatus: requestState.toAuth()?.sessionStatus,
+      isSatellite: requestState.isSatellite,
     });
 
     const { returnBackUrl } = e;

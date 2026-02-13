@@ -16,6 +16,8 @@ import type { ThemableCssProp } from '@/ui/styledSystem';
 import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
 
+const OFFLINE_ACCESS_SCOPE = 'offline_access';
+
 export function OAuthConsentInternal() {
   const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, oAuthApplicationUrl, redirectUrl, onDeny, onAllow } =
     useOAuthConsentContext();
@@ -23,7 +25,11 @@ export function OAuthConsentInternal() {
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
 
-  const primaryEmailAddress = user?.emailAddresses.find(email => email.id === user.primaryEmailAddress?.id);
+  const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
+
+  // Filter out offline_access from displayed scopes as it doesn't describe what can be accessed
+  const displayedScopes = (scopes || []).filter(item => item.scope !== OFFLINE_ACCESS_SCOPE);
+  const hasOfflineAccess = (scopes || []).some(item => item.scope === OFFLINE_ACCESS_SCOPE);
 
   function getRootDomain(): string {
     try {
@@ -75,7 +81,7 @@ export function OAuthConsentInternal() {
                     sx={t => ({
                       position: 'absolute',
                       bottom: `calc(${t.space.$3} * -1)`,
-                      right: `calc(${t.space.$3} * -1)`,
+                      insetInlineEnd: `calc(${t.space.$3} * -1)`,
                     })}
                   />
                 </Box>
@@ -100,13 +106,11 @@ export function OAuthConsentInternal() {
               </ConnectionHeader>
             )}
             <Header.Title localizationKey={oAuthApplicationName} />
-            <Header.Subtitle
-              localizationKey={`wants to access ${applicationName} on behalf of ${primaryEmailAddress}`}
-            />
+            <Header.Subtitle localizationKey={`wants to access ${applicationName} on behalf of ${primaryIdentifier}`} />
           </Header.Root>
           <Box
             sx={t => ({
-              textAlign: 'left',
+              textAlign: 'start',
               borderWidth: t.borderWidths.$normal,
               borderStyle: t.borderStyles.$solid,
               borderColor: t.colors.$borderAlpha100,
@@ -132,7 +136,7 @@ export function OAuthConsentInternal() {
               as='ul'
               sx={t => ({ margin: t.sizes.$none, padding: t.sizes.$none })}
             >
-              {(scopes || []).map(item => (
+              {displayedScopes.map(item => (
                 <Box
                   key={item.scope}
                   sx={t => ({
@@ -151,7 +155,7 @@ export function OAuthConsentInternal() {
                       background: t.colors.$colorMutedForeground,
                       borderRadius: t.radii.$circle,
                       transform: 'translateY(-0.1875rem)',
-                      marginRight: t.space.$2,
+                      marginInlineEnd: t.space.$2,
                       flexShrink: 0,
                     },
                   })}
@@ -240,6 +244,7 @@ export function OAuthConsentInternal() {
                 </Tooltip.Trigger>
                 <Tooltip.Content text={`View full URL`} />
               </Tooltip.Root>
+              .{hasOfflineAccess && " You'll stay signed in until you sign out or revoke access."}
             </Text>
           </Grid>
         </Card.Content>

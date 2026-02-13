@@ -1,17 +1,6 @@
-import { type Clerk } from '@clerk/clerk-js/headless';
+import { type Clerk } from '@clerk/clerk-js';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/react';
 import { is4xxError, isClerkRuntimeError } from '@clerk/shared/error';
-
-// Type definitions for FAPI callbacks - matches internal clerk-js types
-type FapiRequestInit = RequestInit & {
-  url?: URL;
-  path?: string;
-  search?: ConstructorParameters<typeof URLSearchParams>[0];
-};
-
-type FapiResponse = Response & {
-  payload: { errors?: Array<{ code?: string }> } | null;
-};
 import type {
   ClientJSONSnapshot,
   EnvironmentJSONSnapshot,
@@ -33,6 +22,20 @@ import { errorThrower } from '../../errorThrower';
 import { isNative } from '../../utils';
 import type { BuildClerkOptions } from './types';
 
+/**
+ * Internal types for FAPI client callbacks.
+ * These are simplified versions of the internal clerk-js types,
+ * used only for the __internal_onBeforeRequest and __internal_onAfterResponse hooks.
+ */
+type FapiRequestInit = RequestInit & {
+  url?: URL;
+  headers?: Headers;
+};
+
+type FapiResponse = Response & {
+  payload: { errors?: Array<{ code: string }> } | null;
+};
+
 const KEY = '__clerk_client_jwt';
 
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
@@ -40,7 +43,7 @@ let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
 export function createClerkInstance(ClerkClass: typeof Clerk) {
   return (options?: BuildClerkOptions): HeadlessBrowserClerk | BrowserClerk => {
     const {
-      publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '',
+      publishableKey = '',
       tokenCache = MemoryTokenCache,
       __experimental_resourceCache: createResourceCache,
     } = options || {};

@@ -14,7 +14,7 @@ import { AuthErrorReason, handshake, signedIn, signedOut, signedOutInvalidToken 
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
-import { getMachineTokenType, isMachineToken, isTokenTypeAccepted } from './machine';
+import { getMachineTokenType, isMachineToken, isOAuthJwt, isTokenTypeAccepted } from './machine';
 import { OrganizationMatcher } from './organizationMatcher';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
@@ -411,6 +411,19 @@ export const authenticateRequest: AuthenticateRequest = (async (
   async function authenticateRequestWithTokenInHeader() {
     const { tokenInHeader } = authenticateContext;
 
+    // Reject OAuth JWTs that may appear in headers when expecting session tokens.
+    // OAuth JWTs are valid Clerk-signed JWTs and will pass verifyToken() verification,
+    // but should not be accepted as session tokens.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    if (isOAuthJwt(tokenInHeader!)) {
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+    }
+
     try {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const { data, errors } = await verifyToken(tokenInHeader!, authenticateContext);
@@ -466,28 +479,77 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
     /**
      * Begin multi-domain sync flows
+     *
+     * Sync status values (__clerk_synced query param):
+     * - 'false' (NeedsSync): Trigger sync - satellite returning from primary sign-in
+     * - 'true' (Completed): Sync done - prevents re-sync loop
+     *
+     * With satelliteAutoSync=false:
+     * - Skip handshake on first visit if no cookies exist (return signedOut immediately)
+     * - Trigger handshake when __clerk_synced=false is present (post sign-in redirect)
+     * - Allow normal token verification flow when cookies exist (enables refresh)
      */
-    if (authenticateContext.instanceType === 'production' && isRequestEligibleForMultiDomainSync) {
-      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '');
+
+    // Check sync status param (__clerk_synced=false triggers sync, __clerk_synced=true means completed)
+    const syncedParam = authenticateContext.clerkUrl.searchParams.get(constants.QueryParameters.ClerkSynced);
+    const needsSync = syncedParam === constants.ClerkSyncStatus.NeedsSync;
+    const syncCompleted = syncedParam === constants.ClerkSyncStatus.Completed;
+
+    // Check if cookies exist (session token or active client UAT)
+    const hasCookies = hasSessionToken || hasActiveClient;
+
+    // Determine if we should skip handshake for satellites with no cookies
+    // satelliteAutoSync defaults to true, so we only skip when explicitly set to false
+    const shouldSkipSatelliteHandshake = authenticateContext.satelliteAutoSync === false && !hasCookies && !needsSync;
+
+    if (authenticateContext.instanceType === 'production' && isRequestEligibleForMultiDomainSync && !syncCompleted) {
+      // With satelliteAutoSync=false: skip handshake if no cookies and no sync trigger
+      if (shouldSkipSatelliteHandshake) {
+        return signedOut({
+          tokenType: TokenType.SessionToken,
+          authenticateContext,
+          reason: AuthErrorReason.SessionTokenAndUATMissing,
+        });
+      }
+
+      // If cookies exist, fall through to normal token verification flow (enables refresh)
+      // Only trigger handshake if no cookies exist (or sync was explicitly requested)
+      if (!hasCookies || needsSync) {
+        return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '');
+      }
+      // Fall through to normal token verification flow when cookies exist
     }
 
     // Multi-domain development sync flow
-    if (
-      authenticateContext.instanceType === 'development' &&
-      isRequestEligibleForMultiDomainSync &&
-      !authenticateContext.clerkUrl.searchParams.has(constants.QueryParameters.ClerkSynced)
-    ) {
-      // initiate MD sync
+    if (authenticateContext.instanceType === 'development' && isRequestEligibleForMultiDomainSync && !syncCompleted) {
+      // With satelliteAutoSync=false: skip sync if no cookies and no sync trigger
+      if (shouldSkipSatelliteHandshake) {
+        return signedOut({
+          tokenType: TokenType.SessionToken,
+          authenticateContext,
+          reason: AuthErrorReason.SessionTokenAndUATMissing,
+        });
+      }
 
-      // signInUrl exists, checked at the top of `authenticateRequest`
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const redirectURL = new URL(authenticateContext.signInUrl!);
-      redirectURL.searchParams.append(
-        constants.QueryParameters.ClerkRedirectUrl,
-        authenticateContext.clerkUrl.toString(),
-      );
-      const headers = new Headers({ [constants.Headers.Location]: redirectURL.toString() });
-      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
+      // If cookies exist, fall through to normal flow (enables refresh)
+      if (!hasCookies || needsSync) {
+        // initiate MD sync
+        // signInUrl exists, checked at the top of `authenticateRequest`
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const redirectURL = new URL(authenticateContext.signInUrl!);
+        redirectURL.searchParams.append(
+          constants.QueryParameters.ClerkRedirectUrl,
+          authenticateContext.clerkUrl.toString(),
+        );
+        const headers = new Headers({ [constants.Headers.Location]: redirectURL.toString() });
+        return handleMaybeHandshakeStatus(
+          authenticateContext,
+          AuthErrorReason.SatelliteCookieNeedsSyncing,
+          '',
+          headers,
+        );
+      }
+      // Fall through to normal token verification flow when cookies exist
     }
 
     // Multi-domain development sync flow - primary responds to syncing
@@ -507,7 +569,12 @@ export const authenticateRequest: AuthenticateRequest = (async (
           authenticateContext.devBrowserToken,
         );
       }
-      redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.ClerkSynced, 'true');
+      // Use set (not append) to ensure completion status overwrites any existing NeedsSync value
+      // This prevents sync loops when the redirect URL already contains __clerk_synced=false
+      redirectBackToSatelliteUrl.searchParams.set(
+        constants.QueryParameters.ClerkSynced,
+        constants.ClerkSyncStatus.Completed,
+      );
 
       const headers = new Headers({ [constants.Headers.Location]: redirectBackToSatelliteUrl.toString() });
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.PrimaryRespondsToSyncing, '', headers);

@@ -49,6 +49,7 @@ jobs:
         run: pnpm turbo build $TURBO_ARGS
 
       - name: Canary release
+        id: publish
         if: steps.version-packages.outputs.success == '1'
         run: pnpm release:canary
         env:
@@ -56,7 +57,7 @@ jobs:
           NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
-        if: steps.version-packages.outputs.success == '1'
+        if: steps.publish.outcome == 'success'
         uses: actions/github-script@v7
         with:
           result-encoding: string
@@ -73,7 +74,7 @@ jobs:
               repo: 'sdk-infra-workers',
               workflow_id: 'update-pkg-versions.yml',
               ref: 'main',
-              inputs: { clerkjsVersion, clerkUiVersion }
+              inputs: { clerkjsVersion, clerkUiVersion, sourceCommit: context.sha }
             })
 
             if (nextjsVersion.includes('canary')) {

@@ -394,8 +394,8 @@ test.describe('api keys component @machine', () => {
       // Wait for the table to be fully loaded first
       await u.page.locator('.cl-apiKeysTable').waitFor({ timeout: 10000 });
 
-      // Wait for any ongoing navigation/pagination to complete by waiting for network idle
-      await u.page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {
+      // Wait for any ongoing navigation/pagination to complete
+      await u.page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(() => {
         // Ignore timeout - continue with other checks
       });
 
@@ -595,23 +595,21 @@ test.describe('api keys component @machine', () => {
       const getAPIKeyCount = createAPIKeyCountHelper(u);
 
       // Create a specific search term that will match our new key
-      const searchTerm = 'search-test';
-      const newApiKeyName = `${searchTerm}-${Date.now()}`;
+      const timestamp = Date.now();
+      const searchTerm = `searchfilter-${timestamp}`;
+      const newApiKeyName = `${searchTerm}-key`;
 
       // Apply search filter first
       const searchInput = u.page.locator('input.cl-apiKeysSearchInput');
       await searchInput.fill(searchTerm);
 
-      // Wait for search to be applied (debounced) - wait for empty state or results
-      await u.page.waitForFunction(
-        () => {
-          const emptyMessage = document.querySelector('[data-localization-key*="emptyRow"]');
-          const hasResults =
-            document.querySelectorAll('.cl-apiKeysTable .cl-tableBody .cl-tableRow .cl-menuButton').length > 0;
-          return emptyMessage || hasResults;
-        },
-        { timeout: 2000 },
-      );
+      // Wait for search to actually filter results - either empty state appears
+      // or the loading/fetching state completes with no matching results.
+      await expect(async () => {
+        const emptyMessage = u.page.locator('[data-localization-key*="emptyRow"]');
+        const isEmptyVisible = await emptyMessage.isVisible().catch(() => false);
+        expect(isEmptyVisible).toBe(true);
+      }).toPass({ timeout: 10000 });
 
       // Verify no results initially match
       expect(await getAPIKeyCount()).toBe(0);
@@ -640,7 +638,7 @@ test.describe('api keys component @machine', () => {
         () => {
           return document.querySelectorAll('.cl-apiKeysTable .cl-tableBody .cl-tableRow .cl-menuButton').length > 0;
         },
-        { timeout: 2000 },
+        { timeout: 5000 },
       );
       await expect(table.locator('.cl-tableRow', { hasText: newApiKeyName })).toBeVisible();
     });

@@ -1,4 +1,4 @@
-import { createContextAndHook, useSafeLayoutEffect } from '@clerk/shared/react';
+import { createContextAndHook, usePortalRoot, useSafeLayoutEffect } from '@clerk/shared/react';
 import React, { useRef } from 'react';
 
 import { descriptors, Flex } from '../customizables';
@@ -27,6 +27,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
   const { disableScrollLock, enableScrollLock } = useScrollLock();
   const { handleClose, handleOpen, contentSx, containerSx, canCloseModal, id, style, portalRoot, initialFocusRef } =
     props;
+  const portalRootFromContext = usePortalRoot();
   const overlayRef = useRef<HTMLDivElement>(null);
   const { floating, isOpen, context, nodeId, toggle } = usePopover({
     defaultOpen: true,
@@ -52,13 +53,15 @@ export const Modal = withFloatingTree((props: ModalProps) => {
     };
   }, []);
 
+  const effectivePortalRoot = portalRoot ?? portalRootFromContext?.() ?? undefined;
+
   return (
     <Popover
       nodeId={nodeId}
       context={context}
       isOpen={isOpen}
       outsideElementsInert
-      root={portalRoot}
+      root={effectivePortalRoot}
       initialFocus={initialFocusRef}
     >
       <ModalContext.Provider value={modalCtx}>
@@ -78,6 +81,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
               width: '100vw',
               height: ['100vh', '-webkit-fill-available'],
               position: 'fixed',
+              // eslint-disable-next-line custom-rules/no-physical-css-properties -- Full-viewport centering (used with right: 0)
               left: 0,
               top: 0,
             }),
