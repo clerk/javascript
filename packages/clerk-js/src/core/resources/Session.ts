@@ -40,7 +40,7 @@ import { TokenId } from '@/utils/tokenId';
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
-import { BaseResource, PublicUserData, Token, User } from './internal';
+import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
 export class Session extends BaseResource implements SessionResource {
@@ -128,7 +128,7 @@ export class Session extends BaseResource implements SessionResource {
     // Update session in-place from response (same as _baseMutate)
     this.fromJSON((json?.response || json) as SessionJSON);
 
-    return BaseResource._getClientResourceFromPayload(json);
+    return getClientResourceFromPayload(json);
   };
 
   clearCache = (): void => {
