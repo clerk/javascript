@@ -13,6 +13,15 @@ export default function Home() {
 
       <SignInButton
         mode='modal'
+        oauthFlow='popup'
+        forceRedirectUrl='/protected'
+        signUpForceRedirectUrl='/protected'
+      >
+        Sign in button (force, popup)
+      </SignInButton>
+
+      <SignInButton
+        mode='modal'
         fallbackRedirectUrl='/protected'
       >
         Sign in button (fallback)
