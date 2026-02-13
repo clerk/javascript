@@ -293,7 +293,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
    */
   private loadHeadlessClerk(): void {
     const clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk)
-      ? new this.options.Clerk!(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain })
+      ? new this.options.Clerk(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain })
       : this.options.Clerk;
 
     if (!clerk) {
