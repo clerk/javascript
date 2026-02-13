@@ -81,6 +81,7 @@ export function useNativeAuthEvents(): UseNativeAuthEventsReturn {
 
     try {
       // expo-modules-core provides an EventEmitter class that wraps native module events
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { EventEmitter } = require('expo-modules-core');
       console.log(`[useNativeAuthEvents] SETUP: Creating EventEmitter for ClerkExpo`);
       const eventEmitter = new EventEmitter(ClerkExpo);

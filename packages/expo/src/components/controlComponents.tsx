@@ -2,8 +2,8 @@
 // These provide conditional rendering based on auth state
 export { ClerkLoaded, ClerkLoading, Show } from '@clerk/react';
 
-import type { PropsWithChildren, ReactNode } from 'react';
 import { Show } from '@clerk/react';
+import type { PropsWithChildren, ReactNode } from 'react';
 
 /**
  * Render children only when the user is signed in.

@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/react';
-import { requireNativeViewManager, Platform } from 'expo-modules-core';
+import { Platform, requireNativeViewManager } from 'expo-modules-core';
 import { useCallback, useRef } from 'react';
-import { StyleSheet, Text, View, type ViewStyle, type StyleProp } from 'react-native';
+import { type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
@@ -20,6 +20,7 @@ if (isNativeSupported) {
 let ClerkExpo: { signOut(): Promise<void>; getSession(): Promise<any> } | null = null;
 if (isNativeSupported) {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { requireNativeModule } = require('expo-modules-core');
     ClerkExpo = requireNativeModule('ClerkExpo');
   } catch {

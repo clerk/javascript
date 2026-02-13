@@ -126,7 +126,8 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           SessionJWTCache.init({ publishableKey, storage: createResourceCache });
 
           // At this point __internal_clerk is guaranteed to be defined (just created above)
-          const clerk = __internal_clerk!;
+
+          const clerk = __internal_clerk;
           clerk.addListener(({ client }) => {
             // @ts-expect-error - This is an internal API
             const environment = clerk?.__internal_environment as EnvironmentResource;
@@ -200,6 +201,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       });
     }
     // At this point __internal_clerk is guaranteed to be defined
-    return __internal_clerk!;
+
+    return __internal_clerk;
   };
 }

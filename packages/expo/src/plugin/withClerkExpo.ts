@@ -1,9 +1,9 @@
 import {
   type ConfigPlugin,
   createRunOncePlugin,
-  withInfoPlist,
   withAppBuildGradle,
   withDangerousMod,
+  withInfoPlist,
 } from '@expo/config-plugins';
 import * as fs from 'fs';
 import * as path from 'path';

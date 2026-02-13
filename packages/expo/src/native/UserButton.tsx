@@ -1,7 +1,8 @@
 import { useClerk, useUser } from '@clerk/react';
 import { Platform } from 'expo-modules-core';
 import { useEffect, useState } from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, StyleProp, ViewStyle, Image } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
@@ -21,10 +22,11 @@ let ClerkExpo: {
 } | null = null;
 if (isNativeSupported) {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { requireNativeModule } = require('expo-modules-core');
     ClerkExpo = requireNativeModule('ClerkExpo');
   } catch {
-    console.log('[UserButton] ClerkExpo native module not available on this platform');
+    // Native module not available
   }
 }
 
@@ -202,7 +204,7 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
         // Clear native session explicitly (may already be cleared, but ensure it)
         try {
           await ClerkExpo.signOut?.();
-        } catch (nativeSignOutErr) {
+        } catch {
           // May already be signed out
         }
 
@@ -210,7 +212,7 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
         if (clerk?.signOut) {
           try {
             await clerk.signOut();
-          } catch (signOutErr) {
+          } catch {
             // Even if signOut throws, try to force reload to clear stale state
             const clerkRecord = clerk as unknown as Record<string, unknown>;
             if (typeof clerkRecord.__internal_reloadInitialResources === 'function') {

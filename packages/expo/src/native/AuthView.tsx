@@ -28,7 +28,7 @@ const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 let ClerkExpo: ClerkExpoModule | null = null;
 if (isNativeSupported) {
   try {
-    ClerkExpo = requireNativeModule('ClerkExpo') as ClerkExpoModule;
+    ClerkExpo = requireNativeModule('ClerkExpo');
   } catch {
     // Native module not available - plugin not configured
     // This is expected when users use @clerk/expo without the native plugin
@@ -221,7 +221,7 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
             onSuccessRef.current?.();
             return;
           }
-        } catch (e) {
+        } catch {
           // Failed to check native session, continue to present modal
         }
       }

@@ -3,8 +3,8 @@ import '../polyfills';
 import { ClerkProvider as ClerkReactProvider } from '@clerk/react';
 import type { Ui } from '@clerk/react/internal';
 import * as WebBrowser from 'expo-web-browser';
-import { Platform } from 'react-native';
 import { useEffect, useRef } from 'react';
+import { Platform } from 'react-native';
 
 import type { TokenCache } from '../cache/types';
 import { useNativeAuthEvents } from '../hooks/useNativeAuthEvents';
@@ -101,6 +101,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
 
       const configureNativeClerk = async () => {
         try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { requireNativeModule } = require('expo-modules-core');
           const ClerkExpo = requireNativeModule('ClerkExpo');
 
@@ -123,7 +124,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
               if (ClerkExpo?.getSession) {
                 const nativeSession = await ClerkExpo.getSession();
                 // Normalize: iOS returns { sessionId }, Android returns { session: { id } }
-                sessionId = nativeSession?.sessionId ?? (nativeSession as any)?.session?.id ?? null;
+                sessionId = nativeSession?.sessionId ?? nativeSession?.session?.id ?? null;
                 if (sessionId) {
                   break;
                 }

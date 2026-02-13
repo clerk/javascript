@@ -1,7 +1,8 @@
-import { useClerk, useAuth } from '@clerk/react';
+import { useAuth, useClerk } from '@clerk/react';
 import { Platform } from 'expo-modules-core';
 import { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ViewProps } from 'react-native';
+import type { ViewProps } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
@@ -14,10 +15,11 @@ let ClerkExpo: {
 } | null = null;
 if (isNativeSupported) {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { requireNativeModule } = require('expo-modules-core');
     ClerkExpo = requireNativeModule('ClerkExpo');
   } catch {
-    console.log('[UserProfileView] ClerkExpo native module not available on this platform');
+    // Native module not available
   }
 }
 

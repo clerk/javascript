@@ -1,7 +1,7 @@
-import { requireNativeModule, requireNativeViewManager, Platform } from 'expo-modules-core';
+import { Platform, requireNativeModule, requireNativeViewManager } from 'expo-modules-core';
 import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, type ViewStyle, type StyleProp } from 'react-native';
+import { type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 
 import { getClerkInstance } from '../provider/singleton';
 import type { AuthViewMode } from './AuthView.types';
@@ -101,7 +101,9 @@ export function InlineAuthView({
   onErrorRef.current = _onError;
 
   const syncSession = useCallback(async (sessionId: string) => {
-    if (authCompletedRef.current) return;
+    if (authCompletedRef.current) {
+      return;
+    }
 
     try {
       // The native SDK (clerk-ios/clerk-android) and JS SDK (clerk-js) use separate
@@ -163,7 +165,9 @@ export function InlineAuthView({
   // Fallback: poll native session to detect auth completion
   // This handles cases where the native event bridge doesn't fire
   useEffect(() => {
-    if (!ClerkExpoModule?.getSession) return;
+    if (!ClerkExpoModule?.getSession) {
+      return;
+    }
 
     const interval = setInterval(async () => {
       if (authCompletedRef.current) {
@@ -172,7 +176,7 @@ export function InlineAuthView({
       }
 
       try {
-        const session = await ClerkExpoModule!.getSession();
+        const session = await ClerkExpoModule.getSession();
         if (session?.sessionId) {
           clearInterval(interval);
           await syncSession(session.sessionId);

@@ -30,6 +30,7 @@ let ClerkExpo: {
 
 if (isNativeSupported) {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { requireNativeModule } = require('expo-modules-core');
     ClerkExpo = requireNativeModule('ClerkExpo');
   } catch {
