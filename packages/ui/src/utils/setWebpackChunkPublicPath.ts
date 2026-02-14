@@ -1,5 +1,5 @@
 /**
- * A combination of settings a fixed __PKG_VERSION__ during build time
+ * A combination of settings a fixed PACKAGE_VERSION during build time
  * and the runtime __webpack_public_path__ config option (https://webpack.js.org/guides/public-path/).
  * We explicitly set the public path in order to account for all chunk caching scenarios.
  * A specific version of ui.browser.js file should always try to load its corresponding chunk versions,
@@ -22,7 +22,7 @@
  *  Solution:
  *  A given ui.browser.js file will only load its corresponding chunks using a fixed version. Example:
  *  - ui.browser.js loads from https://pk.accounts.dev/npm/@clerk/ui@canary/dist/ui.browser.js
- *  - all other chunks need to be loaded from https://pk.accounts.dev/npm/@clerk/ui@__PKG_VERSION__/dist/
+ *  - all other chunks need to be loaded from https://pk.accounts.dev/npm/@clerk/ui@PACKAGE_VERSION/dist/
  */
 if (!__DEV__) {
   const CLERK_UI_NPM_PATH_REGEX = /(^.*\/@clerk\/ui@)(.+?)(\/dist.*)/;
@@ -32,7 +32,7 @@ if (!__DEV__) {
       const scriptUrl = new URL(document.currentScript.src);
       let hrefWithoutFilename = new URL(scriptUrl.href.split('/').slice(0, -1).join('/')).href;
       hrefWithoutFilename += hrefWithoutFilename.endsWith('/') ? '' : '/';
-      __webpack_public_path__ = hrefWithoutFilename.replace(CLERK_UI_NPM_PATH_REGEX, `$1${__PKG_VERSION__}$3`);
+      __webpack_public_path__ = hrefWithoutFilename.replace(CLERK_UI_NPM_PATH_REGEX, `$1${PACKAGE_VERSION}$3`);
     } catch {
       //
     }

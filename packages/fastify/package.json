@@ -79,7 +79,7 @@
     "fastify-plugin": "^5.0.1"
   },
   "devDependencies": {
-    "fastify": "^5.6.1"
+    "fastify": "^5.7.2"
   },
   "peerDependencies": {
     "fastify": ">=5"

@@ -31,9 +31,20 @@ export const createLongRunningApps = () => {
     { id: 'next.appRouter.withSignInOrUpEmailLinksFlow', config: next.appRouter, env: envs.withSignInOrUpEmailLinksFlow },
     { id: 'next.appRouter.withSessionTasks', config: next.appRouter, env: envs.withSessionTasks },
     { id: 'next.appRouter.withSessionTasksResetPassword', config: next.appRouter, env: envs.withSessionTasksResetPassword },
+    { id: 'next.appRouter.withSessionTasksSetupMfa', config: next.appRouter, env: envs.withSessionTasksSetupMfa },
     { id: 'next.appRouter.withLegalConsent', config: next.appRouter, env: envs.withLegalConsent },
     { id: 'next.appRouter.withNeedsClientTrust', config: next.appRouter, env: envs.withNeedsClientTrust },
     { id: 'next.appRouter.withSharedUIVariant', config: next.appRouter, env: envs.withSharedUIVariant },
+
+    /**
+     * NextJS apps - bundled UI
+     */
+    { id: 'next.appRouterBundledUI.withEmailCodes', config: next.appRouterBundledUI, env: envs.withEmailCodes },
+
+    /**
+     * NextJS apps - cache components
+     */
+    { id: 'next.cacheComponents', config: next.cacheComponents, env: envs.withEmailCodes },
 
     /**
      * Quickstart apps
@@ -52,6 +63,7 @@ export const createLongRunningApps = () => {
     { id: 'react.vite.withEmailCodes', config: react.vite, env: envs.withEmailCodes },
     { id: 'react.vite.withEmailCodes_persist_client', config: react.vite, env: envs.withEmailCodes_destroy_client },
     { id: 'react.vite.withEmailLinks', config: react.vite, env: envs.withEmailLinks },
+    { id: 'react.vite.withLegalConsent', config: react.vite, env: envs.withLegalConsent },
     { id: 'vue.vite', config: vue.vite, env: envs.withCustomRoles },
 
     /**

@@ -47,10 +47,13 @@ export const InvitedMembersList = () => {
       isLoading={invitations?.isLoading || loadingRoles}
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.invitationsTab.table__emptyRow')}
       headers={[
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
-        localizationKeys('organizationProfile.membersPage.invitedMembersTab.tableHeader__invited'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__role'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
+        { key: localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user') },
+        { key: localizationKeys('organizationProfile.membersPage.invitedMembersTab.tableHeader__invited') },
+        { key: localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__role') },
+        {
+          key: localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
+          align: 'right',
+        },
       ]}
       rows={(invitations?.data || []).map(i => (
         <InvitationRow
@@ -98,7 +101,7 @@ const InvitationRow = (props: {
           localizationKey={localizeCustomRole(invitation.role) || unlocalizedRoleLabel}
         />
       </Td>
-      <Td>
+      <Td sx={{ textAlign: 'end' }}>
         <ThreeDotsMenu
           actions={[
             {

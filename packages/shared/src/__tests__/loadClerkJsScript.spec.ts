@@ -265,7 +265,7 @@ describe('buildClerkJsScriptAttributes()', () => {
 describe('loadClerkUIScript(options)', () => {
   const mockPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
 
-  const mockClerkUi = {
+  const mockClerkUI = {
     render: vi.fn(),
   };
 
@@ -290,7 +290,7 @@ describe('loadClerkUIScript(options)', () => {
   });
 
   test('returns null immediately when ClerkUI is already loaded', async () => {
-    (window as any).__internal_ClerkUICtor = mockClerkUi;
+    (window as any).__internal_ClerkUICtor = mockClerkUI;
 
     const result = await loadClerkUIScript({ publishableKey: mockPublishableKey });
     expect(result).toBeNull();
@@ -302,7 +302,7 @@ describe('loadClerkUIScript(options)', () => {
 
     // Simulate ClerkUI becoming available after 250ms
     setTimeout(() => {
-      (window as any).__internal_ClerkUICtor = mockClerkUi;
+      (window as any).__internal_ClerkUICtor = mockClerkUI;
     }, 250);
 
     // Advance timers to allow polling to detect ClerkUI
@@ -347,7 +347,7 @@ describe('loadClerkUIScript(options)', () => {
 
     // Simulate ClerkUI becoming available after 250ms
     setTimeout(() => {
-      (window as any).__internal_ClerkUICtor = mockClerkUi;
+      (window as any).__internal_ClerkUICtor = mockClerkUI;
     }, 250);
 
     // Advance timers to allow polling to detect ClerkUI
@@ -362,23 +362,23 @@ describe('loadClerkUIScript(options)', () => {
     const loadPromise = loadClerkUIScript({ publishableKey: mockPublishableKey, scriptLoadTimeout: 1000 });
 
     setTimeout(() => {
-      (window as any).__internal_ClerkUICtor = mockClerkUi;
+      (window as any).__internal_ClerkUICtor = mockClerkUI;
     }, 999);
 
     vi.advanceTimersByTime(1000);
 
     const result = await loadPromise;
     expect(result).toBeNull();
-    expect((window as any).__internal_ClerkUICtor).toBe(mockClerkUi);
+    expect((window as any).__internal_ClerkUICtor).toBe(mockClerkUI);
   });
 
   test('validates ClerkUI is properly loaded', async () => {
-    (window as any).__internal_ClerkUICtor = mockClerkUi;
+    (window as any).__internal_ClerkUICtor = mockClerkUI;
 
     const result = await loadClerkUIScript({ publishableKey: mockPublishableKey });
 
     expect(result).toBeNull();
-    expect((window as any).__internal_ClerkUICtor).toBe(mockClerkUi);
+    expect((window as any).__internal_ClerkUICtor).toBe(mockClerkUI);
   });
 });
 

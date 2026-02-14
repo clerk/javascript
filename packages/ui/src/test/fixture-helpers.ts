@@ -16,10 +16,10 @@ import type {
   VerificationJSON,
 } from '@clerk/shared/types';
 
+import { SIGN_UP_MODES } from '@/core/constants';
 import type { OrgParams } from '@/test/core-fixtures';
 import { createUser, getOrganizationId } from '@/test/core-fixtures';
 
-import { SIGN_UP_MODES } from '@/core/constants';
 import { createUserFixture } from './fixtures';
 
 export const createEnvironmentFixtureHelpers = (baseEnvironment: EnvironmentJSON) => {
@@ -305,7 +305,10 @@ const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => {
   const withReverification = () => {
     ac.reverification = true;
   };
-  return { withMultiSessionMode, withReverification };
+  const withClaimedAt = (claimedAt: string | null) => {
+    ac.claimed_at = claimedAt;
+  };
+  return { withMultiSessionMode, withReverification, withClaimedAt };
 };
 
 const createDisplayConfigFixtureHelpers = (environment: EnvironmentJSON) => {
@@ -581,6 +584,10 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     us.sign_up.mode = SIGN_UP_MODES.WAITLIST;
   };
 
+  const withMfaRequired = (required: boolean = true) => {
+    us.sign_up.mfa = { required };
+  };
+
   // TODO: Add the rest, consult pkg/generate/auth_config.go
 
   return {
@@ -601,5 +608,6 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withRestrictedMode,
     withLegalConsent,
     withWaitlistMode,
+    withMfaRequired,
   };
 };

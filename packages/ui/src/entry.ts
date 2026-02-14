@@ -1,1 +1,3 @@
-export { ClerkUi } from './ClerkUi';
+'use client';
+
+export { ClerkUI } from './ClerkUI';
