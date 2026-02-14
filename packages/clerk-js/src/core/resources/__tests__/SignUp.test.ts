@@ -44,7 +44,13 @@ describe('SignUp', () => {
 
     describe('create', () => {
       beforeEach(() => {
-        SignUp.clerk = {} as any;
+        SignUp.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
       });
 
       afterEach(() => {
@@ -152,6 +158,37 @@ describe('SignUp', () => {
         expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaWidgetType', undefined);
         expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaError', undefined);
       });
+
+      it('skips captcha challenge for non-OAuth transfer (sign_up_if_missing)', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+        SignUp.clerk = {
+          client: {
+            signIn: {
+              firstFactorVerification: {
+                status: 'transferable',
+                strategy: 'email_code',
+              },
+            },
+          },
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: ['oauth_google', 'oauth_apple'],
+            },
+          },
+        } as any;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.create({ transfer: true });
+
+        expect(CaptchaChallenge).not.toHaveBeenCalled();
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaToken', undefined);
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaWidgetType', undefined);
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaError', undefined);
+      });
     });
 
     describe('sendPhoneCode', () => {
@@ -161,6 +198,14 @@ describe('SignUp', () => {
       });
 
       it('creates signup with phoneNumber when no existing signup', async () => {
+        SignUp.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
         const mockFetch = vi
           .fn()
           .mockResolvedValueOnce({
@@ -590,7 +635,13 @@ describe('SignUp', () => {
 
     describe('web3', () => {
       beforeEach(() => {
-        SignUp.clerk = {} as any;
+        SignUp.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
       });
 
       afterEach(() => {
@@ -846,6 +897,16 @@ describe('SignUp', () => {
     });
 
     describe('password', () => {
+      beforeEach(() => {
+        SignUp.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+      });
+
       afterEach(() => {
         vi.clearAllMocks();
         vi.unstubAllGlobals();
@@ -911,6 +972,16 @@ describe('SignUp', () => {
     });
 
     describe('ticket', () => {
+      beforeEach(() => {
+        SignUp.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+      });
+
       afterEach(() => {
         vi.clearAllMocks();
         vi.unstubAllGlobals();
