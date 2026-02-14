@@ -1,25 +1,22 @@
 import { createKeylessService } from '@clerk/shared/keyless';
+import type { H3Event } from 'h3';
 
 import { clerkClient } from '../clerkClient';
-import type { DataFunctionArgs } from '../loadOptions';
-import type { ClerkMiddlewareOptions } from '../types';
 import { createFileStorage } from './fileStorage';
 
 // Lazily initialized keyless service singleton
 let keylessServiceInstance: ReturnType<typeof createKeylessService> | null = null;
 
-export function keyless(args: DataFunctionArgs, options?: ClerkMiddlewareOptions) {
+export function keyless(event: H3Event) {
   if (!keylessServiceInstance) {
     keylessServiceInstance = createKeylessService({
       storage: createFileStorage(),
       api: {
         async createAccountlessApplication(requestHeaders?: Headers) {
           try {
-            return await clerkClient(args, options).__experimental_accountlessApplications.createAccountlessApplication(
-              {
-                requestHeaders,
-              },
-            );
+            return await clerkClient(event).__experimental_accountlessApplications.createAccountlessApplication({
+              requestHeaders,
+            });
           } catch {
             return null;
           }
@@ -27,8 +24,7 @@ export function keyless(args: DataFunctionArgs, options?: ClerkMiddlewareOptions
         async completeOnboarding(requestHeaders?: Headers) {
           try {
             return await clerkClient(
-              args,
-              options,
+              event,
             ).__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
               requestHeaders,
             });
@@ -37,7 +33,7 @@ export function keyless(args: DataFunctionArgs, options?: ClerkMiddlewareOptions
           }
         },
       },
-      framework: 'react-router',
+      framework: 'nuxt',
     });
   }
   return keylessServiceInstance;
