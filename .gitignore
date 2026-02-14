@@ -61,8 +61,6 @@ lerna-debug.log
 .next
 .dev.vars
 .env.local
-.yalc
-yalc.lock
 playground/*/build
 playground/*/public/build
 playground/*/.cache

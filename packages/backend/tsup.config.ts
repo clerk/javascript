@@ -9,7 +9,7 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
-    entry: ['src/index.ts', 'src/errors.ts', 'src/internal.ts', 'src/jwt/index.ts', 'src/webhooks.ts', 'src/proxy.ts'],
+    entry: ['src/index.ts', 'src/errors.ts', 'src/internal.ts', 'src/jwt/index.ts', 'src/webhooks.ts'],
     onSuccess: `cpy 'src/runtime/**/*.{mjs,js,cjs}' dist/runtime`,
     sourcemap: true,
     define: {
@@ -34,5 +34,5 @@ export default defineConfig(overrideOptions => {
     format: 'cjs',
   };
 
-  return runAfterLast(['pnpm build:declarations', shouldPublish && 'pnpm publish:local'])(esm, cjs);
+  return runAfterLast(['pnpm build:declarations', shouldPublish && 'pkglab pub --ping'])(esm, cjs);
 });

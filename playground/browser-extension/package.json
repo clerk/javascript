@@ -12,11 +12,10 @@
     "debug:firefox": "plasmo dev --target=firefox-mv2 --verbose",
     "dev": "plasmo dev",
     "dev:firefox": "plasmo dev --target=firefox-mv2",
-    "start:firefox": "web-ext run --source-dir ./build/firefox-mv2-dev",
-    "yalc:add": "pnpm yalc add @clerk/chrome-extension @clerk/clerk-js"
+    "start:firefox": "web-ext run --source-dir ./build/firefox-mv2-dev"
   },
   "dependencies": {
-    "@clerk/chrome-extension": "file:.yalc/@clerk/chrome-extension",
+    "@clerk/chrome-extension": "workspace:*",
     "@radix-ui/react-slot": "^1.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
