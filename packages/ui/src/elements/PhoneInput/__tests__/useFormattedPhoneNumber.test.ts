@@ -1,7 +1,12 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 
+import { loadCountryCodeData } from '../countryCodeDataLoader';
 import { useFormattedPhoneNumber } from '../useFormattedPhoneNumber';
+
+beforeAll(async () => {
+  await loadCountryCodeData();
+});
 
 describe('useFormattedPhoneNumber', () => {
   afterEach(() => {

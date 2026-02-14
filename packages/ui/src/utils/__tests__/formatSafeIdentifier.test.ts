@@ -1,6 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
+import { loadCountryCodeData } from '../../elements/PhoneInput/countryCodeDataLoader';
 import { formatSafeIdentifier } from '../formatSafeIdentifier';
+
+beforeAll(async () => {
+  await loadCountryCodeData();
+});
 
 describe('formatSafeIdentifier', () => {
   const cases = [

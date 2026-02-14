@@ -98,6 +98,20 @@ const common = ({ mode, variant }) => {
                 module.resource.includes('/components/SignUp')
               ),
           },
+          /**
+           * Phone country code data is lazy-loaded via dynamic import
+           * and excluded from ui-common to keep it in its own async chunk.
+           */
+          phoneCountryData: {
+            name: 'phone-country-data',
+            test: module =>
+              !!(
+                module instanceof rspack.NormalModule &&
+                module.resource &&
+                module.resource.includes('/countryCodeData.')
+              ),
+            enforce: true,
+          },
           common: {
             minChunks: 1,
             name: 'ui-common',
@@ -107,7 +121,8 @@ const common = ({ mode, variant }) => {
                 module instanceof rspack.NormalModule &&
                 module.resource &&
                 !module.resource.includes('/components') &&
-                !module.resource.includes('node_modules')
+                !module.resource.includes('node_modules') &&
+                !module.resource.includes('/countryCodeData.')
               ),
           },
           defaultVendors: {

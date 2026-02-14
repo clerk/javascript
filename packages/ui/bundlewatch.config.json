@@ -32,6 +32,7 @@
     { "path": "./dist/op-plans-page*.js", "maxSize": "3KB" },
     { "path": "./dist/statement-page*.js", "maxSize": "5KB" },
     { "path": "./dist/payment-attempt-page*.js", "maxSize": "4KB" },
-    { "path": "./dist/web3-solana-wallet-buttons*.js", "maxSize": "79KB" }
+    { "path": "./dist/web3-solana-wallet-buttons*.js", "maxSize": "79KB" },
+    { "path": "./dist/phone-country-data*.js", "maxSize": "10KB" }
   ]
 }
