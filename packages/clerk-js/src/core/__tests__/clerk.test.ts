@@ -2607,6 +2607,35 @@ describe('Clerk singleton', () => {
         expect(mockOnAfterSetActive).toHaveBeenCalledTimes(1);
       });
     });
+
+    it('does not emit to listeners when __internal_dangerouslySkipEmit is true', () => {
+      const mockSession = {
+        id: 'session_1',
+        status: 'active',
+        user: { id: 'user_1' },
+        lastActiveToken: { getRawString: () => 'token_1' },
+      };
+
+      const mockClient = {
+        sessions: [mockSession],
+        signedInSessions: [mockSession],
+        lastActiveSessionId: 'session_1',
+      };
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.updateClient(mockClient as any);
+
+      const listener = vi.fn();
+      const unsubscribe = sut.addListener(listener, { skipInitialEmit: true });
+
+      listener.mockClear();
+
+      sut.updateClient(mockClient as any, { __internal_dangerouslySkipEmit: true });
+
+      unsubscribe();
+
+      expect(listener).not.toHaveBeenCalled();
+    });
   });
 
   describe('__internal_attemptToEnableEnvironmentSetting', () => {
