@@ -7,3 +7,5 @@ export * from './runtimeEnvironment';
 export { handleValueOrFn } from './handleValueOrFn';
 export { runIfFunctionOrReturn } from './runIfFunctionOrReturn';
 export { fastDeepMergeAndReplace, fastDeepMergeAndKeep } from './fastDeepMerge';
+export { unflattenObject } from './unflattenObject';
+export { validateLocalizationFormat } from './validateLocalizationFormat';

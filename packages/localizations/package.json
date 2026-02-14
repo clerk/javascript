@@ -36,6 +36,16 @@
         "default": "./dist/index.js"
       }
     },
+    "./utils": {
+      "import": {
+        "types": "./dist/utils/index.d.mts",
+        "default": "./dist/utils/index.mjs"
+      },
+      "require": {
+        "types": "./dist/utils/index.d.ts",
+        "default": "./dist/utils/index.js"
+      }
+    },
     "./*": {
       "import": {
         "types": "./dist/*.d.mts",
@@ -61,12 +71,16 @@
     "format:check": "node ../../scripts/format-package.mjs --check",
     "generate": "tsc -p tsconfig.generate.json && node --experimental-vm-modules src/utils/generate.js && rimraf tmp && prettier --write src/*.ts",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16"
+    "lint:attw": "attw --pack . --profile node16",
+    "test": "vitest --run"
   },
   "dependencies": {
     "@clerk/shared": "workspace:^"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@vitest/ui": "3.2.4",
+    "vitest": "3.2.4"
+  },
   "engines": {
     "node": ">=20.9.0"
   },
