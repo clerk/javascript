@@ -1,12 +1,17 @@
 import { waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
+import { loadCountryCodeData } from '@/ui/elements/PhoneInput/countryCodeDataLoader';
 
 import { SignUpVerifyPhone } from '../SignUpVerifyPhone';
 
 const { createFixtures } = bindCreateFixtures('SignUp');
+
+beforeAll(async () => {
+  await loadCountryCodeData();
+});
 
 describe('SignUpVerifyPhone', () => {
   it('renders the component', async () => {
