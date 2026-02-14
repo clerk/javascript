@@ -260,6 +260,9 @@ importers:
       lint-staged:
         specifier: ^14.0.1
         version: 14.0.1(enquirer@2.4.1)
+      pkglab:
+        specifier: ^0.0.25
+        version: 0.0.25
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -386,7 +389,7 @@ importers:
         specifier: workspace:^
         version: link:../ui
       astro:
-        specifier: ^5.17.1
+        specifier: ^5.15.9
         version: 5.17.1(@types/node@22.19.0)(db0@0.3.4)(idb-keyval@6.2.1)(ioredis@5.8.2)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.53.1)(terser@5.44.1)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.8.1)
 
   packages/backend:
@@ -10105,6 +10108,7 @@ packages:
   keygrip@1.1.0:
     resolution: {integrity: sha512-iYSchDJ+liQ8iwbSI2QqsQOvqv58eJCEanyJPJi+Khyu8smkcKSFUCbPwzFcL7YVtZ6eONjqRX/38caJ7QjRAQ==}
     engines: {node: '>= 0.6'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
@@ -11891,6 +11895,35 @@ packages:
   pkginfo@0.4.1:
     resolution: {integrity: sha512-8xCNE/aT/EXKenuMDZ+xTVwkT8gsoHN2z/Q29l80u0ppGEXVvsKRzNMbtKhg8LS8k1tJLAHHylf6p4VFmP6XUQ==}
     engines: {node: '>= 0.4.0'}
+
+  pkglab-darwin-arm64@0.0.25:
+    resolution: {integrity: sha512-8No1TCRcsp8n44I5EZGrTu7L8Nr6E8LMhsAASVXmgG/9cWk2rpGWao64tfsNqLj1WACpsdzZGHxndRbgA/pfuQ==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [darwin]
+
+  pkglab-darwin-x64@0.0.25:
+    resolution: {integrity: sha512-guyHnFX/yDeB+07kqSWcNOpnYEmgL9EzbSLDLOWfkcWQjnxgxqJUWaaP14O6oO38lTLxjhliNiX0RhyAOn7xgA==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [darwin]
+
+  pkglab-linux-arm64@0.0.25:
+    resolution: {integrity: sha512-PHBtWBZLA+1tsP+BFrVQao9Zcq4fAw6IRZTS5VJivFxFBGkqxmI7mb5K3OzbUSO9Q1N0WF2ECvdD1NJ54dzwyQ==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [linux]
+
+  pkglab-linux-x64@0.0.25:
+    resolution: {integrity: sha512-1d8JaRTaRJKmvOBcJgQxalPfCm3shZwsXRkMeP2o5vVr78oQYf94OvNTeCuePmVaadwHKUF0pB5L4REYC8SBcw==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [linux]
+
+  pkglab@0.0.25:
+    resolution: {integrity: sha512-ELpp3EJUG+uUN4CB+HWCDrtffU7qcnddmVxnqfCk+pU6HGJDgiH0+kLYbq/2Zhd2XXoe9ixK287Gi6L/pEXQIg==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   playwright-core@1.56.1:
     resolution: {integrity: sha512-hutraynyn31F+Bifme+Ps9Vq59hKuUCz7H1kDOcBs+2oGguKkWTU50bBWrtz34OUWmIwpBTWDxaRPXrIXkgvmQ==}
@@ -29340,6 +29373,25 @@ snapshots:
       pathe: 2.0.3
 
   pkginfo@0.4.1: {}
+
+  pkglab-darwin-arm64@0.0.25:
+    optional: true
+
+  pkglab-darwin-x64@0.0.25:
+    optional: true
+
+  pkglab-linux-arm64@0.0.25:
+    optional: true
+
+  pkglab-linux-x64@0.0.25:
+    optional: true
+
+  pkglab@0.0.25:
+    optionalDependencies:
+      pkglab-darwin-arm64: 0.0.25
+      pkglab-darwin-x64: 0.0.25
+      pkglab-linux-arm64: 0.0.25
+      pkglab-linux-x64: 0.0.25
 
   playwright-core@1.56.1: {}
 
