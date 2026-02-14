@@ -632,6 +632,13 @@ export const authenticateRequest: AuthenticateRequest = (async (
         throw errors[0];
       }
 
+      if (!data.azp) {
+        throw new TokenVerificationError({
+          reason: TokenVerificationErrorReason.TokenMissingAzp,
+          message: 'Session tokens from cookies must have an azp claim.',
+        });
+      }
+
       const signedInRequestState = signedIn({
         tokenType: TokenType.SessionToken,
         authenticateContext,
