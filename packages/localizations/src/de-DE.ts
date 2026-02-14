@@ -745,7 +745,7 @@ export const deDE: LocalizationResource = {
       detailsLabel: 'Bevor wir Ihr Passwort zurücksetzen können, müssen wir Ihre Identität überprüfen.',
     },
     start: {
-      actionLink: 'Anmelden',
+      actionLink: 'Registrieren',
       actionLink__join_waitlist: 'Warteliste beitreten',
       actionLink__use_email: 'E-Mail nutzen',
       actionLink__use_email_username: 'E-Mail oder Benutzernamen nutzen',
