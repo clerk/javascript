@@ -3,15 +3,34 @@ import { Clerk } from '@clerk/clerk-js/no-rhc';
 import {
   createClerkClient as _createClerkClient,
   type CreateClerkClientOptions as _CreateClerkClientOptions,
-} from '../internal';
-import { SCOPE } from '../types';
+} from '../utils/clerk-client';
 
-Clerk.mountComponentRenderer = undefined;
+/**
+ * @deprecated Use `createClerkClient` from `@clerk/chrome-extension/client` with `{ background: true }` instead.
+ *
+ * @example
+ * // Before (deprecated):
+ * import { createClerkClient } from '@clerk/chrome-extension/background';
+ * const clerk = await createClerkClient({ publishableKey: 'pk_...' });
+ *
+ * // After:
+ * import { createClerkClient } from '@clerk/chrome-extension/client';
+ * const clerk = await createClerkClient({ publishableKey: 'pk_...', background: true });
+ */
+export type CreateClerkClientOptions = Omit<_CreateClerkClientOptions, 'background'>;
 
-export type CreateClerkClientOptions = Omit<_CreateClerkClientOptions, 'scope'>;
-
-export async function createClerkClient(opts: CreateClerkClientOptions): Promise<Clerk> {
-  const clerk = await _createClerkClient({ ...opts, scope: SCOPE.BACKGROUND });
-  await clerk.load({ standardBrowser: false });
-  return clerk;
+/**
+ * @deprecated Use `createClerkClient` from `@clerk/chrome-extension/client` with `{ background: true }` instead.
+ *
+ * @example
+ * // Before (deprecated):
+ * import { createClerkClient } from '@clerk/chrome-extension/background';
+ * const clerk = await createClerkClient({ publishableKey: 'pk_...' });
+ *
+ * // After:
+ * import { createClerkClient } from '@clerk/chrome-extension/client';
+ * const clerk = await createClerkClient({ publishableKey: 'pk_...', background: true });
+ */
+export function createClerkClient(opts: CreateClerkClientOptions): Promise<Clerk> {
+  return _createClerkClient({ ...opts, background: true }) as Promise<Clerk>;
 }
