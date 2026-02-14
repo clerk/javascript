@@ -35,7 +35,8 @@ export const CheckoutForm = withCardStateProvider(() => {
     return null;
   }
 
-  const showCredits = !!totals.credit?.amount && totals.credit.amount > 0;
+  const showProratedCredit = !!totals.credits?.proration?.amount && totals.credits.proration.amount.amount > 0;
+  const showAccountCredits = !!totals.credits?.payer?.appliedAmount && totals.credits.payer.appliedAmount.amount > 0;
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
@@ -80,10 +81,20 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Title title={localizationKeys('billing.subtotal')} />
             <LineItems.Description text={`${totals.subtotal.currencySymbol}${totals.subtotal.amountFormatted}`} />
           </LineItems.Group>
-          {showCredits && (
+          {showProratedCredit && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.creditRemainder')} />
-              <LineItems.Description text={`- ${totals.credit?.currencySymbol}${totals.credit?.amountFormatted}`} />
+              <LineItems.Description
+                text={`- ${totals.credits?.proration?.amount.currencySymbol}${totals.credits?.proration?.amount.amountFormatted}`}
+              />
+            </LineItems.Group>
+          )}
+          {showAccountCredits && (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title title={localizationKeys('billing.payerCreditRemainder')} />
+              <LineItems.Description
+                text={`- ${totals.credits?.payer?.appliedAmount?.currencySymbol}${totals.credits?.payer?.appliedAmount?.amountFormatted}`}
+              />
             </LineItems.Group>
           )}
           {showPastDue && (

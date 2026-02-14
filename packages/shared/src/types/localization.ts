@@ -207,6 +207,7 @@ export type __internal_LocalizationResource = {
     subtotal: LocalizationValue;
     credit: LocalizationValue;
     creditRemainder: LocalizationValue;
+    payerCreditRemainder: LocalizationValue;
     totalDue: LocalizationValue;
     totalDueToday: LocalizationValue;
     pastDue: LocalizationValue;
