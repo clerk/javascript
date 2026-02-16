@@ -5,7 +5,6 @@ import type {
   ClerkAPIErrorJSON,
   ClerkResourceJSON,
   ClerkResourceReloadParams,
-  ClientResource,
   DeletedObjectJSON,
 } from '@clerk/shared/types';
 
@@ -14,8 +13,7 @@ import { debugLogger } from '@/utils/debug';
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
-import type { Clerk } from './internal';
-import { Client } from './internal';
+import { type Clerk, getClientResourceFromPayload } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & {
   forceUpdateClient?: boolean;
@@ -164,18 +162,8 @@ export abstract class BaseResource {
     return null;
   }
 
-  protected static _getClientResourceFromPayload<J>(
-    responseJSON: FapiResponseJSON<J> | null,
-  ): ClientResource | undefined {
-    if (!responseJSON) {
-      return undefined;
-    }
-    const clientJSON = responseJSON.client || responseJSON.meta?.client;
-    return clientJSON ? Client.getOrCreateInstance().fromJSON(clientJSON) : undefined;
-  }
-
   protected static _updateClient<J>(responseJSON: FapiResponseJSON<J> | null): void {
-    const client = this._getClientResourceFromPayload(responseJSON);
+    const client = getClientResourceFromPayload(responseJSON);
     if (client && BaseResource.clerk) {
       BaseResource.clerk.updateClient(client);
     }
