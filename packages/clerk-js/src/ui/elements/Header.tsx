@@ -8,9 +8,9 @@ import {
   Heading,
   Icon,
   Link,
+  type LocalizationKey,
   Text,
   useAppearance,
-  type LocalizationKey,
 } from '../customizables';
 import { ArrowLeftIcon } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
