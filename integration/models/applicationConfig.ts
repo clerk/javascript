@@ -151,6 +151,9 @@ export const applicationConfig = () => {
     get scripts() {
       return scripts;
     },
+    get clerkDependencies() {
+      return [...dependencies.keys()].filter(name => name.startsWith('@clerk/'));
+    },
     get copyKeylessToEnv() {
       const writer = async (appDir: string) => {
         const CONFIG_PATH = path.join(appDir, '.clerk', '.tmp', 'keyless.json');

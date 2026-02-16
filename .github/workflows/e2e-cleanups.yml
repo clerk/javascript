@@ -27,15 +27,15 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true
 
-      - name: Verdaccio
-        uses: ./.github/actions/verdaccio
-        with:
-          publish-cmd: |
-            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
+      - name: Build packages
+        run: pnpm turbo build $TURBO_ARGS --only
+
+      - name: Publish to local registry
+        run: pkglab pub --force
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
-        run: pnpm init && pnpm add @clerk/backend
+        run: pnpm init && pkglab add @clerk/backend
 
       - name: Run cleanup
         run: pnpm test:integration:cleanup

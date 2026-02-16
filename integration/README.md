@@ -19,6 +19,15 @@ Before you begin writing tests, you should already have:
 - Access to the **Integration testing** organization on Clerk (it owns the Clerk instances used in the tests)
 - Chromium installed. Run `pnpm playwright install chromium`.
 - WebKit installed. Run `pnpm playwright install webkit`.
+- pkglab installed. Run `npm install -g pkglab`.
+
+Integration tests install Clerk packages from a local Verdaccio registry managed by pkglab. Before running tests:
+
+1. Build packages: `pnpm turbo build --only`
+2. Publish to local registry: `pkglab pub`
+3. Run tests: `pnpm test:integration:base`
+
+After making changes to packages, re-run `pkglab pub` to update the registry.
 
 ## Initial setup
 

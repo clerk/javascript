@@ -13,10 +13,7 @@ const astroNode = applicationConfig()
   .addDependency('@clerk/astro', linkPackage('astro'))
   .addDependency('@clerk/backend', linkPackage('backend'))
   .addDependency('@clerk/shared', linkPackage('shared'))
-  .addDependency('@clerk/localizations', linkPackage('localizations'))
-  // Resolutions ensure the tarball's transitive dependencies use our local packages
-  .addResolution('@clerk/backend', linkPackage('backend'))
-  .addResolution('@clerk/shared', linkPackage('shared'));
+  .addDependency('@clerk/localizations', linkPackage('localizations'));
 
 const astroStatic = astroNode.clone().setName('astro-hybrid').useTemplate(templates['astro-hybrid']);
 

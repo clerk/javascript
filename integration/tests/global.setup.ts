@@ -1,3 +1,5 @@
+import { execSync } from 'node:child_process';
+
 import { test as setup } from '@playwright/test';
 
 import { constants } from '../constants';
@@ -6,6 +8,16 @@ import { fs, parseEnvOptions, startClerkJsHttpServer, startClerkUiHttpServer } f
 
 setup('start long running apps', async () => {
   setup.setTimeout(90_000);
+
+  // Verify pkglab registry is running
+  try {
+    execSync('curl -sf http://localhost:4873/ > /dev/null', { timeout: 5000 });
+  } catch {
+    throw new Error(
+      'pkglab registry is not running. Start it with: pkglab pub\n' +
+        'This publishes local packages to a Verdaccio registry for integration tests.',
+    );
+  }
 
   await fs.ensureDir(constants.TMP_DIR);
 
