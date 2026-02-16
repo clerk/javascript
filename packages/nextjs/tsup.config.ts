@@ -101,6 +101,6 @@ export default defineConfig(overrideOptions => {
     moveServerActions('cjs'),
     moveKeylessActions('esm'),
     moveKeylessActions('cjs'),
-    shouldPublish && 'pnpm publish:local',
+    shouldPublish && 'pkglab pub --ping',
   ])(esm, cjs, serverActionsEsm, serverActionsCjs, vendorsEsm, vendorsCjs);
 });

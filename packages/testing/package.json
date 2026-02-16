@@ -69,6 +69,7 @@
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
+    "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src"
