@@ -6,7 +6,7 @@ import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 
 /**
- * The `useSignUp()` hook provides access to the [`SignUp`](https://clerk.com/docs/reference/javascript/sign-up) object, which allows you to check the current state of a sign-up attempt and manage the sign-up flow. You can use this to create a [custom sign-up flow](!custom-flow)
+ * The `useSignUp()` hook provides access to the [`SignUp`](https://clerk.com/docs/reference/javascript/sign-up) object, which allows you to check the current state of a sign-up attempt and manage the sign-up flow. You can use this to create a [custom sign-up flow](!custom-flow).
  *
  * @unionReturnHeadings
  * ["Initialization", "Loaded"]
