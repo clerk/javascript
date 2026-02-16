@@ -261,8 +261,8 @@ importers:
         specifier: ^14.0.1
         version: 14.0.1(enquirer@2.4.1)
       pkglab:
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ^0.11.1
+        version: 0.11.1
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -2474,8 +2474,8 @@ packages:
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@expo/bunyan@4.0.1':
-    resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==, tarball: https://registry.npmjs.org/@expo/bunyan/-/bunyan-4.0.1.tgz}
-    engines: {node: '>=0.10.0'}
+    resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==, tarball: https://registry.npmjs.org/@expo/cli/-/cli-0.22.26.tgz}
@@ -9263,7 +9263,7 @@ packages:
     resolution: {integrity: sha512-8Sb3veuYCyrZL+VBt9LJfZjLUPWVvqn8tG28VqYNFCo43KHcKuq+b4EiXGeuaLAQWL2YmyDgMp2aSpH9JHsEQg==, tarball: https://registry.npmjs.org/idb-keyval/-/idb-keyval-6.2.1.tgz}
 
   ieee754@1.2.1:
-    resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==, tarball: https://registry.npmjs.org/ieee754/-/ieee754-1.2.1.tgz}
+    resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
 
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==, tarball: https://registry.npmjs.org/ignore/-/ignore-5.3.2.tgz}
@@ -11879,8 +11879,8 @@ packages:
     resolution: {integrity: sha512-8xCNE/aT/EXKenuMDZ+xTVwkT8gsoHN2z/Q29l80u0ppGEXVvsKRzNMbtKhg8LS8k1tJLAHHylf6p4VFmP6XUQ==, tarball: https://registry.npmjs.org/pkginfo/-/pkginfo-0.4.1.tgz}
     engines: {node: '>= 0.4.0'}
 
-  pkglab@0.10.0:
-    resolution: {integrity: sha512-JxdDAncfUZVa15ATWt1Ol5/KsOa35qNe4TJo5nej3L2O060rLHfMsEqyyfKgXT+tQXXZkB23REQSO2d9nStLHg==, tarball: https://registry.npmjs.org/pkglab/-/pkglab-0.10.0.tgz}
+  pkglab@0.11.1:
+    resolution: {integrity: sha512-FdcO24fiY1DE9Y5ZHpQWfihB67x13KTZm56WNfRpsHgCRALjbSLsJRe7B7Q0OPhCN7Vrmzfg2QULZYHNT+FBIA==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -29312,7 +29312,7 @@ snapshots:
 
   pkginfo@0.4.1: {}
 
-  pkglab@0.10.0: {}
+  pkglab@0.11.1: {}
 
   playwright-core@1.56.1: {}
 
