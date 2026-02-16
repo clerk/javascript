@@ -165,6 +165,7 @@ describe('Clerk singleton', () => {
         status: 'active',
         user: {},
         touch: vi.fn(() => Promise.resolve()),
+        __internal_touch: vi.fn(() => Promise.resolve()),
         getToken: vi.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
@@ -177,6 +178,7 @@ describe('Clerk singleton', () => {
       afterEach(() => {
         mockSession.remove.mockReset();
         mockSession.touch.mockReset();
+        mockSession.__internal_touch.mockReset();
 
         eventBusSpy?.mockRestore();
         // cleanup global window pollution
@@ -285,7 +287,7 @@ describe('Clerk singleton', () => {
       });
 
       it('redirects the user to the /v1/client/touch endpoint if the cookie_expires_at is less than 8 days away', async () => {
-        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.__internal_touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(
           Promise.resolve({
             signedInSessions: [mockSession],
@@ -309,7 +311,7 @@ describe('Clerk singleton', () => {
       });
 
       it('does not redirect the user to the /v1/client/touch endpoint if the cookie_expires_at is more than 8 days away', async () => {
-        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.__internal_touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(
           Promise.resolve({
             signedInSessions: [mockSession],
@@ -331,7 +333,7 @@ describe('Clerk singleton', () => {
       });
 
       it('does not redirect the user to the /v1/client/touch endpoint if the cookie_expires_at is not set', async () => {
-        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.__internal_touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(
           Promise.resolve({
             signedInSessions: [mockSession],
@@ -353,19 +355,19 @@ describe('Clerk singleton', () => {
       });
 
       it('calls `navigate`', async () => {
-        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.__internal_touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
         const navigate = vi.fn();
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
         await sut.setActive({ session: mockSession as any as PendingSessionResource, navigate });
-        expect(mockSession.touch).toHaveBeenCalled();
+        expect(mockSession.__internal_touch).toHaveBeenCalled();
         expect(navigate).toHaveBeenCalled();
       });
 
       it('passes decorateUrl to the navigate callback', async () => {
-        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.__internal_touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
         const navigate = vi.fn();
 
@@ -382,7 +384,7 @@ describe('Clerk singleton', () => {
       });
 
       it('decorateUrl returns touch URL when isEligibleForTouch is true', async () => {
-        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.__internal_touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(
           Promise.resolve({
             signedInSessions: [mockSession],
@@ -412,7 +414,7 @@ describe('Clerk singleton', () => {
       });
 
       it('decorateUrl returns original URL when isEligibleForTouch is false', async () => {
-        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.__internal_touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(
           Promise.resolve({
             signedInSessions: [mockSession],
@@ -468,6 +470,7 @@ describe('Clerk singleton', () => {
         status: 'pending',
         user: {},
         touch: vi.fn(() => Promise.resolve()),
+        __internal_touch: vi.fn(() => Promise.resolve()),
         getToken: vi.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
         tasks: [{ key: 'choose-organization' }],
@@ -493,6 +496,7 @@ describe('Clerk singleton', () => {
       afterEach(() => {
         mockSession.remove.mockReset();
         mockSession.touch.mockReset();
+        mockSession.__internal_touch?.mockReset();
 
         eventBusSpy?.mockRestore();
         // cleanup global window pollution
@@ -537,7 +541,7 @@ describe('Clerk singleton', () => {
       });
 
       it('navigate to `taskUrl` option', async () => {
-        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.__internal_touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
         const sut = new Clerk(productionPublishableKey);
@@ -548,19 +552,19 @@ describe('Clerk singleton', () => {
           },
         });
         await sut.setActive({ session: mockSession as any as PendingSessionResource });
-        expect(mockSession.touch).toHaveBeenCalled();
+        expect(mockSession.__internal_touch).toHaveBeenCalled();
         expect(sut.navigate).toHaveBeenCalledWith('/choose-organization');
       });
 
       it('calls `navigate`', async () => {
-        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockSession.__internal_touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
         const navigate = vi.fn();
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
         await sut.setActive({ session: mockSession as any as PendingSessionResource, navigate });
-        expect(mockSession.touch).toHaveBeenCalled();
+        expect(mockSession.__internal_touch).toHaveBeenCalled();
         expect(navigate).toHaveBeenCalled();
       });
     });
@@ -1045,11 +1049,12 @@ describe('Clerk singleton', () => {
           ...mockSession,
           remove: vi.fn(),
           touch: vi.fn(() => Promise.resolve()),
+          __internal_touch: vi.fn(() => Promise.resolve()),
           getToken: vi.fn(),
           reload: vi.fn(() => Promise.resolve(mockSession)),
         };
 
-        mockResource.touch.mockReturnValueOnce(Promise.resolve());
+        mockResource.__internal_touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(
           Promise.resolve({
             signedInSessions: [mockResource],
@@ -1587,6 +1592,7 @@ describe('Clerk singleton', () => {
         status: 'active',
         user: {},
         touch: vi.fn(() => Promise.resolve()),
+        __internal_touch: vi.fn(() => Promise.resolve()),
         getToken: vi.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
@@ -1648,6 +1654,7 @@ describe('Clerk singleton', () => {
         status: 'active',
         user: {},
         touch: vi.fn(() => Promise.resolve()),
+        __internal_touch: vi.fn(() => Promise.resolve()),
         getToken: vi.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
