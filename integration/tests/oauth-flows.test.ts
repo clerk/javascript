@@ -181,6 +181,63 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 });
 
+testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
+  'oauth popup with path-based routing @react',
+  ({ app }) => {
+    test.describe.configure({ mode: 'serial' });
+
+    let fakeUser: FakeUser;
+
+    test.beforeAll(async () => {
+      const client = createClerkClient({
+        secretKey: instanceKeys.get('oauth-provider').sk,
+        publishableKey: instanceKeys.get('oauth-provider').pk,
+      });
+      const users = createUserService(client);
+      fakeUser = users.createFakeUser({
+        withUsername: true,
+      });
+      await users.createBapiUser(fakeUser);
+    });
+
+    test.afterAll(async () => {
+      const u = createTestUtils({ app });
+      await fakeUser.deleteIfExists();
+      await u.services.users.deleteIfExists({ email: fakeUser.email });
+      await app.teardown();
+    });
+
+    test('popup OAuth navigates through sso-callback with path-based routing', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.page.goToRelative('/sign-in-popup');
+      await u.page.waitForClerkJsLoaded();
+      await u.po.signIn.waitForMounted();
+
+      const popupPromise = context.waitForEvent('page');
+      await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+      const popup = await popupPromise;
+      const popupUtils = createTestUtils({ app, page: popup, context });
+      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+
+      // Complete OAuth in the popup
+      await popupUtils.po.signIn.setIdentifier(fakeUser.email);
+      await popupUtils.po.signIn.continue();
+      await popupUtils.po.signIn.enterTestOtpCode();
+
+      // Because the user is new to the app and legal consent is required,
+      // the sign-up can't complete in the popup. The popup sends return_url
+      // back to the parent, which navigates to /sso-callback via pushState.
+      await u.page.getByRole('heading', { name: 'Legal consent' }).waitFor();
+      await u.page.getByLabel(/I agree to the/).check();
+      await u.po.signIn.continue();
+
+      await u.page.waitForAppUrl('/protected');
+      await u.po.expect.toBeSignedIn();
+    });
+  },
+);
+
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
   'oauth flows with legal consent @nextjs',
   ({ app }) => {

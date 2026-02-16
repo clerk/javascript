@@ -136,7 +136,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
 
 function createClerkEnvSchema() {
   return {
-    PUBLIC_CLERK_PUBLISHABLE_KEY: envField.string({ context: 'client', access: 'public' }),
+    PUBLIC_CLERK_PUBLISHABLE_KEY: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_SIGN_IN_URL: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_SIGN_UP_URL: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_IS_SATELLITE: envField.boolean({ context: 'client', access: 'public', optional: true }),
@@ -149,7 +149,8 @@ function createClerkEnvSchema() {
     PUBLIC_CLERK_PREFETCH_UI: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_TELEMETRY_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_TELEMETRY_DEBUG: envField.boolean({ context: 'client', access: 'public', optional: true }),
-    CLERK_SECRET_KEY: envField.string({ context: 'server', access: 'secret' }),
+    PUBLIC_CLERK_KEYLESS_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
+    CLERK_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
     CLERK_MACHINE_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
     CLERK_JWT_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
   };

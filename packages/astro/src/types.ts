@@ -51,6 +51,33 @@ type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegration
   publishableKey: string;
 };
 
+/**
+ * @internal
+ * Internal runtime options injected by the server for keyless mode support.
+ */
+export type InternalRuntimeOptions = {
+  /**
+   * Server-injected publishable key from keyless mode or context.locals
+   */
+  publishableKey?: string;
+  /**
+   * Keyless claim URL injected by middleware for the client-side banner
+   */
+  keylessClaimUrl?: string;
+  /**
+   * Keyless API keys URL injected by middleware for the client-side banner
+   */
+  keylessApiKeysUrl?: string;
+  /**
+   * Internal keyless claim URL passed to Clerk.load()
+   */
+  __internal_keylessClaimUrl?: string;
+  /**
+   * Internal keyless API keys URL passed to Clerk.load()
+   */
+  __internal_keylessApiKeysUrl?: string;
+};
+
 // Copied from `@clerk/react`
 export interface HeadlessBrowserClerk extends Clerk {
   load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;

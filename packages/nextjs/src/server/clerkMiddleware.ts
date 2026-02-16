@@ -20,6 +20,7 @@ import {
   makeAuthObjectSerializable,
   TokenType,
 } from '@clerk/backend/internal';
+import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath } from '@clerk/backend/proxy';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
@@ -50,7 +51,12 @@ import {
 } from './nextErrors';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
-import type { NextMiddlewareEvtParam, NextMiddlewareRequestParam, NextMiddlewareReturn } from './types';
+import type {
+  FrontendApiProxyOptions,
+  NextMiddlewareEvtParam,
+  NextMiddlewareRequestParam,
+  NextMiddlewareReturn,
+} from './types';
 import {
   assertKey,
   decorateRequest,
@@ -88,6 +94,12 @@ export interface ClerkMiddlewareOptions extends AuthenticateAnyRequestOptions {
    * When set, automatically injects a Content-Security-Policy header(s) compatible with Clerk.
    */
   contentSecurityPolicy?: ContentSecurityPolicyOptions;
+
+  /**
+   * When set, enables the middleware to proxy Frontend API requests to Clerk.
+   * This is useful when direct communication with Clerk's API is blocked.
+   */
+  frontendApiProxy?: FrontendApiProxyOptions;
 }
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
@@ -144,6 +156,25 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || keyless?.secretKey, () =>
         errorThrower.throwMissingSecretKeyError(),
       );
+
+      // Handle Frontend API proxy requests early, before authentication
+      const frontendApiProxyConfig = resolvedParams.frontendApiProxy;
+      if (frontendApiProxyConfig) {
+        const { enabled, path: proxyPath = DEFAULT_PROXY_PATH } = frontendApiProxyConfig;
+
+        // Resolve enabled - either boolean or function
+        const requestUrl = new URL(request.url);
+        const isEnabled = typeof enabled === 'function' ? enabled(requestUrl) : enabled;
+
+        if (isEnabled && matchProxyPath(request, { proxyPath })) {
+          return clerkFrontendApiProxy(request, {
+            proxyPath,
+            publishableKey,
+            secretKey,
+          });
+        }
+      }
+
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
       const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL;
 
@@ -368,9 +399,22 @@ export const createAuthenticateRequestOptions = (
   clerkRequest: ClerkRequest,
   options: ClerkMiddlewareOptions,
 ): Parameters<AuthenticateRequest>[1] => {
+  // Auto-derive proxyUrl from frontendApiProxy config if not explicitly set
+  let resolvedOptions = options;
+  if (options.frontendApiProxy && !options.proxyUrl) {
+    const { enabled, path: proxyPath = DEFAULT_PROXY_PATH } = options.frontendApiProxy;
+    const requestUrl = new URL(clerkRequest.url);
+    const isEnabled = typeof enabled === 'function' ? enabled(requestUrl) : enabled;
+
+    if (isEnabled) {
+      const derivedProxyUrl = `${requestUrl.origin}${proxyPath}`;
+      resolvedOptions = { ...options, proxyUrl: derivedProxyUrl };
+    }
+  }
+
   return {
-    ...options,
-    ...handleMultiDomainAndProxy(clerkRequest, options),
+    ...resolvedOptions,
+    ...handleMultiDomainAndProxy(clerkRequest, resolvedOptions),
     // TODO: Leaving the acceptsToken as 'any' opens up the possibility of
     // an economic attack. We should revisit this and only verify a token
     // when auth() or auth.protect() is invoked.
