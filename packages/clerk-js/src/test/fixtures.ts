@@ -208,6 +208,9 @@ const createBaseUserSettings = (): UserSettingsJSON => {
       captcha_enabled: false,
       disable_hibp: false,
       mode: 'public',
+      mfa: {
+        required: false,
+      },
     },
     restrictions: {
       allowlist: {

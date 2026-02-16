@@ -15,6 +15,7 @@ type PageProps = PropsOfComponent<typeof Col> & {
   headerTitleTextVariant?: PropsOfComponent<typeof Header.Title>['textVariant'];
   headerSubtitle?: LocalizationKey;
   headerSubtitleTextVariant?: PropsOfComponent<typeof Header.Subtitle>['variant'];
+  badgeText?: LocalizationKey;
 };
 
 export const FormContainer = (props: PageProps) => {
@@ -23,6 +24,7 @@ export const FormContainer = (props: PageProps) => {
     headerTitleTextVariant = 'h3',
     headerSubtitle,
     headerSubtitleTextVariant = 'body',
+    badgeText,
     children,
     sx,
     ...rest
@@ -37,7 +39,7 @@ export const FormContainer = (props: PageProps) => {
       sx={[sx]}
     >
       {(headerTitle || headerSubtitle) && (
-        <Header.Root>
+        <Header.Root badgeText={badgeText}>
           {headerTitle && (
             <Header.Title
               textVariant={headerTitleTextVariant}

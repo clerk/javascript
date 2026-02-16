@@ -15,6 +15,7 @@ import type {
   SubscriptionDetailsTheme,
   TaskChooseOrganizationTheme,
   TaskResetPasswordTheme,
+  TaskSetupMFATheme,
   UserAvatarTheme,
   UserButtonTheme,
   UserProfileTheme,
@@ -661,6 +662,22 @@ export interface Clerk {
    * @param targetNode - Target node to unmount the TaskResetPassword component from.
    */
   unmountTaskResetPassword: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a TaskSetupMFA component at the target element.
+   *
+   * @param targetNode - Target node to mount the TaskSetupMFA component.
+   * @param props - configuration parameters.
+   */
+  mountTaskSetupMfa: (targetNode: HTMLDivElement, props?: TaskSetupMFAProps) => void;
+
+  /**
+   * Unmount a TaskSetupMFA component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode - Target node to unmount the TaskSetupMFA component from.
+   */
+  unmountTaskSetupMfa: (targetNode: HTMLDivElement) => void;
 
   /**
    * @internal
@@ -2275,6 +2292,14 @@ export type TaskResetPasswordProps = {
    */
   redirectUrlComplete: string;
   appearance?: TaskResetPasswordTheme;
+};
+
+export type TaskSetupMFAProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   */
+  redirectUrlComplete: string;
+  appearance?: TaskSetupMFATheme;
 };
 
 export type CreateOrganizationInvitationParams = {
