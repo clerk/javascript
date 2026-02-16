@@ -39,6 +39,7 @@ import { TokenId } from '@/utils/tokenId';
 
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
+import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
@@ -92,17 +93,35 @@ export class Session extends BaseResource implements SessionResource {
     });
   };
 
-  touch = (): Promise<SessionResource> => {
-    return this._basePost({
-      action: 'touch',
-      body: { active_organization_id: this.lastActiveOrganizationId },
-    }).then(res => {
-      // touch() will potentially change the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
-      if (res.lastActiveToken) {
-        eventBus.emit(events.TokenUpdate, { token: res.lastActiveToken });
-      }
-      return res;
-    });
+  private _touchPost = async (
+    { skipUpdateClient }: { skipUpdateClient: boolean } = { skipUpdateClient: false },
+  ): Promise<FapiResponseJSON<SessionJSON> | null> => {
+    const json = await BaseResource._fetch<SessionJSON>(
+      {
+        method: 'POST',
+        path: this.path('touch'),
+        // any is how we type the body in the BaseMutateParams as well
+        body: { active_organization_id: this.lastActiveOrganizationId } as any,
+      },
+      { skipUpdateClient },
+    );
+
+    // Update session in-place from response (same as BaseResource._baseMutate)
+    this.fromJSON((json?.response || json) as SessionJSON);
+
+    return json;
+  };
+
+  touch = async (): Promise<SessionResource> => {
+    await this._touchPost();
+
+    // _touchPost() will have updated `this` in-place
+    // The post has potentially changed the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
+    if (this.lastActiveToken) {
+      eventBus.emit(events.TokenUpdate, { token: this.lastActiveToken });
+    }
+
+    return this;
   };
 
   /**
@@ -116,18 +135,7 @@ export class Session extends BaseResource implements SessionResource {
    * @internal
    */
   __internal_touch = async (): Promise<ClientResource | undefined> => {
-    const json = await BaseResource._fetch<SessionJSON>(
-      {
-        method: 'POST',
-        path: this.path('touch'),
-        body: { active_organization_id: this.lastActiveOrganizationId } as any,
-      },
-      { skipUpdateClient: true },
-    );
-
-    // Update session in-place from response (same as _baseMutate)
-    this.fromJSON((json?.response || json) as SessionJSON);
-
+    const json = await this._touchPost({ skipUpdateClient: true });
     return getClientResourceFromPayload(json);
   };
 
