@@ -410,12 +410,19 @@ jobs:
           npm init -y > /dev/null 2>&1
           echo "registry=http://127.0.0.1:16180" > .npmrc
           npm install "@clerk/nextjs@$VERSION" --ignore-scripts 2>&1 || echo "npm install FAILED"
-          echo "=== check npm version ==="
-          npm --version
-          echo "=== check user npmrc ==="
-          cat ~/.npmrc 2>/dev/null || echo "no user .npmrc"
-          echo "=== check npm config ==="
-          npm config list 2>&1
+          echo "=== npm install INSIDE pnpm exec ==="
+          TESTDIR2=$(mktemp -d)
+          cd $TESTDIR2
+          npm init -y > /dev/null 2>&1
+          echo "registry=http://127.0.0.1:16180" > .npmrc
+          pnpm exec npm install "@clerk/nextjs@$VERSION" --ignore-scripts 2>&1 || echo "pnpm exec npm install FAILED"
+          echo "=== env vars inside pnpm exec ==="
+          pnpm exec env 2>&1 | grep -i "npm_config\|registry" || true
+          echo "=== pkglab add inside pnpm exec ==="
+          TESTDIR3=$(mktemp -d)
+          cd $TESTDIR3
+          npm init -y > /dev/null 2>&1
+          pnpm exec pkglab add @clerk/nextjs 2>&1 || echo "pnpm exec pkglab add FAILED"
 
       - name: Install @clerk/clerk-js in os temp
         if: ${{ steps.task-status.outputs.affected == '1' }}
