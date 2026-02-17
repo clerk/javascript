@@ -119,10 +119,6 @@ runs:
       run: pnpm install
       shell: bash
 
-    - name: Install Bun
-      run: npm install -g bun
-      shell: bash
-
     - name: Add node_modules/.bin to PATH
       run: echo "${{ github.workspace }}/node_modules/.bin" >> $GITHUB_PATH
       shell: bash
