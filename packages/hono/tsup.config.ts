@@ -4,6 +4,7 @@ import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
+  const shouldPublish = !!overrideOptions.env?.publish;
 
   return {
     entry: {
@@ -17,6 +18,7 @@ export default defineConfig(overrideOptions => {
     minify: false,
     sourcemap: true,
     dts: true,
+    onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
