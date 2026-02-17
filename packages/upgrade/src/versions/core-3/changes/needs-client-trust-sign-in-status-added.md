@@ -5,7 +5,7 @@ category: 'breaking'
 
 We've added a new Sign-in status of `needs_client_trust` which, given the conditions listed, will need to be handled in your application.
 
-[TODO: Documentation Link]
+[Clerk Documentation: Client Trust](https://clerk.com/docs/guides/secure/client-trust)
 
 Prerequisites:
 
