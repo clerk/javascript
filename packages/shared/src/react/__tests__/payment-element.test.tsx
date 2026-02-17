@@ -128,6 +128,11 @@ describe('PaymentElement Localization', () => {
       totalDueNow: { amount: 1000, amountFormatted: '$10.00', currency: 'usd', currencySymbol: '$' },
       totalDueAfterFreeTrial: null,
       credit: { amount: 0, amountFormatted: '$0.00', currency: 'usd', currencySymbol: '$' },
+      credits: {
+        proration: null,
+        payer: null,
+        total: { amount: 0, amountFormatted: '$0.00', currency: 'usd', currencySymbol: '$' },
+      },
       pastDue: { amount: 0, amountFormatted: '$0.00', currency: 'usd', currencySymbol: '$' },
     },
     status: 'needs_confirmation' as const,

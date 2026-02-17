@@ -645,6 +645,24 @@ export interface BillingMoneyAmount {
   currencySymbol: string;
 }
 
+export interface BillingProrationCreditDetail {
+  amount: BillingMoneyAmount;
+  cycleDaysRemaining: number;
+  cycleDaysTotal: number;
+  cycleRemainingPercent: number;
+}
+
+export interface BillingPayerCredit {
+  remainingBalance: BillingMoneyAmount;
+  appliedAmount: BillingMoneyAmount;
+}
+
+export interface BillingCredits {
+  proration: BillingProrationCreditDetail | null;
+  payer: BillingPayerCredit | null;
+  total: BillingMoneyAmount;
+}
+
 /**
  * The `BillingCheckoutTotals` type represents the total costs, taxes, and other pricing details for a checkout session.
  *
@@ -671,6 +689,7 @@ export interface BillingCheckoutTotals {
    * Any credits (like account balance or promo credits) that are being applied to the checkout.
    */
   credit: BillingMoneyAmount | null;
+  credits: BillingCredits | null;
   /**
    * Any outstanding amount from previous unpaid invoices that is being collected as part of the checkout.
    */
