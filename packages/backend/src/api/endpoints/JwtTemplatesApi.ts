@@ -2,6 +2,7 @@ import type { ClerkPaginationRequest } from '@clerk/shared/types';
 import { joinPaths } from 'src/util/path';
 
 import type { DeletedObject, JwtTemplate } from '../resources';
+import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/jwt_templates';
@@ -48,7 +49,7 @@ type UpdateJWTTemplateParams = CreateJWTTemplateParams & {
 
 export class JwtTemplatesApi extends AbstractAPI {
   public async list(params: ClerkPaginationRequest = {}) {
-    return this.request<JwtTemplate[]>({
+    return this.request<PaginatedResourceResponse<JwtTemplate[]>>({
       method: 'GET',
       path: basePath,
       queryParams: { ...params, paginated: true },
