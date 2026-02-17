@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.45.1
+
+### Patch Changes
+
+- Set `SameSite=None` on cookies for `.replit.dev` origins and consolidate third-party domain list ([#7864](https://github.com/clerk/javascript/pull/7864)) by [@brkalow](https://github.com/brkalow)
+
 ## 3.45.0
 
 ### Minor Changes

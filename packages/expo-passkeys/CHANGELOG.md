@@ -1,5 +1,12 @@
 # @clerk/expo-passkeys
 
+## 0.4.35
+
+### Patch Changes
+
+- Updated dependencies [[`b17e4bb`](https://github.com/clerk/javascript/commit/b17e4bbbbad173969523e5494f2d8447d1887b95)]:
+  - @clerk/shared@3.45.1
+
 ## 0.4.34
 
 ### Patch Changes
