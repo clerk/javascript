@@ -5,6 +5,7 @@ import { getSuffixedCookieName } from '@clerk/shared/keys';
 
 import { inCrossOriginIframe } from '../../../utils';
 import { getSecureAttribute } from '../getSecureAttribute';
+import { requiresSameSiteNone } from './requireSameSiteNone';
 
 export type DevBrowserCookieHandler = {
   set: (jwt: string) => void;
@@ -13,7 +14,7 @@ export type DevBrowserCookieHandler = {
 };
 
 const getCookieAttributes = (): { sameSite: string; secure: boolean } => {
-  const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
+  const sameSite = inCrossOriginIframe() || requiresSameSiteNone() ? 'None' : 'Lax';
   const secure = getSecureAttribute(sameSite);
   return { sameSite, secure };
 };

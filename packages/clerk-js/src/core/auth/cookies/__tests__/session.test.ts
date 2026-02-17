@@ -4,12 +4,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { inCrossOriginIframe } from '../../../../utils';
 import { getSecureAttribute } from '../../getSecureAttribute';
+import { requiresSameSiteNone } from '../requireSameSiteNone';
 import { createSessionCookie } from '../session';
 
 vi.mock('@clerk/shared/cookie');
 vi.mock('@clerk/shared/date');
 vi.mock('../../../../utils');
 vi.mock('../../getSecureAttribute');
+vi.mock('../requireSameSiteNone');
 
 describe('createSessionCookie', () => {
   const mockCookieSuffix = 'test-suffix';
@@ -24,6 +26,7 @@ describe('createSessionCookie', () => {
     mockGet.mockReset();
     (addYears as ReturnType<typeof vi.fn>).mockReturnValue(mockExpires);
     (inCrossOriginIframe as ReturnType<typeof vi.fn>).mockReturnValue(false);
+    (requiresSameSiteNone as ReturnType<typeof vi.fn>).mockReturnValue(false);
     (getSecureAttribute as ReturnType<typeof vi.fn>).mockReturnValue(true);
     (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation(() => ({
       set: mockSet,
@@ -112,5 +115,18 @@ describe('createSessionCookie', () => {
     const result = cookieHandler.get();
 
     expect(result).toBe('non-suffixed-value');
+  });
+
+  it('should set cookies with None sameSite on .replit.dev origins', () => {
+    (requiresSameSiteNone as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    const cookieHandler = createSessionCookie(mockCookieSuffix);
+    cookieHandler.set(mockToken);
+
+    expect(mockSet).toHaveBeenCalledWith(mockToken, {
+      expires: mockExpires,
+      sameSite: 'None',
+      secure: true,
+      partitioned: false,
+    });
   });
 });

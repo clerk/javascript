@@ -6,6 +6,7 @@ import type { ClientResource } from '@clerk/shared/types';
 import { inCrossOriginIframe } from '../../../utils';
 import { getCookieDomain } from '../getCookieDomain';
 import { getSecureAttribute } from '../getSecureAttribute';
+import { requiresSameSiteNone } from './requireSameSiteNone';
 
 const CLIENT_UAT_COOKIE_NAME = '__client_uat';
 
@@ -37,7 +38,11 @@ export const createClientUatCookie = (cookieSuffix: string): ClientUatCookieHand
      * Generally, this is handled by redirectWithAuth() being called and relying on the dev browser ID in the URL,
      * but if that isn't used we rely on this. In production, nothing is cross-domain and Lax is used when client_uat is set from FAPI.
      */
-    const sameSite = __BUILD_VARIANT_CHIPS__ ? 'None' : inCrossOriginIframe() ? 'None' : 'Strict';
+    const sameSite = __BUILD_VARIANT_CHIPS__
+      ? 'None'
+      : inCrossOriginIframe() || requiresSameSiteNone()
+        ? 'None'
+        : 'Strict';
     const secure = getSecureAttribute(sameSite);
     const partitioned = __BUILD_VARIANT_CHIPS__ && secure;
     const domain = getCookieDomain();
