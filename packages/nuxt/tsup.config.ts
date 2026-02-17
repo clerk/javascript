@@ -2,7 +2,9 @@ import { defineConfig } from 'tsup';
 
 import { name, version } from './package.json';
 
-export default defineConfig(() => {
+export default defineConfig(overrideOptions => {
+  const shouldPublish = !!overrideOptions.env?.publish;
+
   return {
     clean: true,
     entry: [
@@ -23,6 +25,7 @@ export default defineConfig(() => {
     sourcemap: true,
     minify: false,
     dts: true,
+    onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
