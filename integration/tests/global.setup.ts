@@ -9,14 +9,19 @@ import { fs, parseEnvOptions, startClerkJsHttpServer, startClerkUiHttpServer } f
 setup('start long running apps', async () => {
   setup.setTimeout(90_000);
 
-  // Verify pkglab registry is running
+  // Ensure pkglab registry is running. The daemon may have exited between CI steps
+  // but packages persist on disk, so restarting picks them back up.
   try {
     execSync('pkglab status --health', { timeout: 5000 });
   } catch {
-    throw new Error(
-      'pkglab registry is not running. Start it with: pkglab pub\n' +
-        'This publishes local packages to a Verdaccio registry for integration tests.',
-    );
+    try {
+      execSync('pkglab up', { timeout: 10_000 });
+    } catch {
+      throw new Error(
+        'pkglab registry is not running and could not be started. Run: pkglab pub\n' +
+          'This publishes local packages to a Verdaccio registry for integration tests.',
+      );
+    }
   }
 
   await fs.ensureDir(constants.TMP_DIR);
