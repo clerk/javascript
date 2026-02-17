@@ -122,7 +122,7 @@ runs:
     # pkglab ships platform-specific binaries as optional deps (pkglab-linux-x64, etc.)
     # pnpm doesn't resolve these for workspace devDeps, so we install globally via npm
     - name: Install pkglab
-      run: npm install -g pkglab@0.12.1
+      run: npm install -g pkglab@latest
       shell: bash
 
     - name: Get Playwright Version

@@ -261,8 +261,8 @@ importers:
         specifier: ^14.0.1
         version: 14.0.1(enquirer@2.4.1)
       pkglab:
-        specifier: ^0.12.0
-        version: 0.12.0
+        specifier: ^0.12.2
+        version: 0.12.2
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -11690,8 +11690,8 @@ packages:
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
 
-  pkglab@0.12.0:
-    resolution: {integrity: sha512-dlKb8cr5KlD33u4hkzfBddjimOeUD1RIbHWdBdWAqch3iyQpSVzmemwnHUvcd/6xzvL5VpWLjSzQVvTfsyRgBg==}
+  pkglab@0.12.2:
+    resolution: {integrity: sha512-fI5DQMseMsYtoKr3ySWpbbKRLCKhOxdYh4AXcJ9EUvKR1rGU3jqBQNfFS1n0jb8RiVn/l5kxaalokvF3He84Qg==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -28795,7 +28795,7 @@ snapshots:
       exsolve: 1.0.7
       pathe: 2.0.3
 
-  pkglab@0.12.0: {}
+  pkglab@0.12.2: {}
 
   playwright-core@1.56.1: {}
 
