@@ -399,31 +399,23 @@ jobs:
           pkglab --version
           echo "=== pkglab status ==="
           pkglab status
-          echo "=== curl full packument ==="
-          curl -s http://127.0.0.1:16180/@clerk/nextjs | python3 -c "
-          import sys,json
-          d=json.load(sys.stdin)
-          v = d.get('dist-tags',{}).get('pkglab','N/A')
-          print('pkglab dist-tag:', v)
-          print('version exists:', v in d.get('versions',{}))
-          "
-          echo "=== curl abbreviated packument ==="
-          curl -s -H 'Accept: application/vnd.npm.install-v1+json' http://127.0.0.1:16180/@clerk/nextjs | python3 -c "
-          import sys,json
-          d=json.load(sys.stdin)
-          v = d.get('dist-tags',{}).get('pkglab','N/A')
-          print('pkglab dist-tag:', v)
-          print('version exists:', v in d.get('versions',{}))
-          "
-          echo "=== npm view from local registry ==="
-          npm view @clerk/nextjs@0.0.0-pkglab --registry http://127.0.0.1:16180 version 2>&1 || echo "npm view failed"
-          echo "=== test npm install in temp dir ==="
-          TMPDIR=$(mktemp -d)
-          cd $TMPDIR
+          echo "=== resolve exact version ==="
+          VERSION=$(curl -s http://127.0.0.1:16180/@clerk/nextjs | python3 -c "import sys,json; print(json.load(sys.stdin).get('dist-tags',{}).get('pkglab',''))")
+          echo "Resolved version: $VERSION"
+          echo "=== npm view exact version ==="
+          npm view "@clerk/nextjs@$VERSION" version --registry http://127.0.0.1:16180 2>&1 || echo "npm view FAILED"
+          echo "=== npm install exact version in temp dir ==="
+          TESTDIR=$(mktemp -d)
+          cd $TESTDIR
           npm init -y > /dev/null 2>&1
           echo "registry=http://127.0.0.1:16180" > .npmrc
-          cat .npmrc
-          npm install @clerk/nextjs@0.0.0-pkglab --ignore-scripts 2>&1 || echo "npm install failed"
+          npm install "@clerk/nextjs@$VERSION" --ignore-scripts 2>&1 || echo "npm install FAILED"
+          echo "=== check npm version ==="
+          npm --version
+          echo "=== check user npmrc ==="
+          cat ~/.npmrc 2>/dev/null || echo "no user .npmrc"
+          echo "=== check npm config ==="
+          npm config list 2>&1
 
       - name: Install @clerk/clerk-js in os temp
         if: ${{ steps.task-status.outputs.affected == '1' }}
