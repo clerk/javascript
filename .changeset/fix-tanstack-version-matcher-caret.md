@@ -2,4 +2,4 @@
 '@clerk/upgrade': patch
 ---
 
-Fix TanStack Start version matcher to correctly detect caret-prefixed versions (e.g., `^1.154.14`)
+Add version check warning when `@tanstack/react-start` is below the minimum required v1.157.0
