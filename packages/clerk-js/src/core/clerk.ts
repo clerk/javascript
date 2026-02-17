@@ -176,7 +176,6 @@ import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
 import { Protect } from './protect';
-import type { Session } from './resources/internal';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
@@ -1579,7 +1578,7 @@ export class Clerk implements ClerkInterface {
         if (shouldNavigate && newSession) {
           try {
             // __internal_touch does not call updateClient automatically
-            updatedClient = await (newSession as Session).__internal_touch();
+            updatedClient = await newSession.__internal_touch();
             if (updatedClient) {
               // We call updateClient manually, but without letting it emit
               // It's important that the setTransitiveState call happens somewhat
