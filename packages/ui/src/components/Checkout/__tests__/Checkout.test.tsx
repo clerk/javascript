@@ -309,6 +309,107 @@ describe('Checkout', () => {
     });
   });
 
+  it('renders credit details', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
+    });
+
+    fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
+      data: [],
+      total_count: 0,
+    });
+
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({
+      id: 'chk_credits_1',
+      status: 'needs_confirmation',
+      externalClientSecret: 'cs_test_credits_1',
+      externalGatewayId: 'gw_test',
+      totals: {
+        subtotal: { amount: 2500, amountFormatted: '25.00', currency: 'USD', currencySymbol: '$' },
+        grandTotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+        taxTotal: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        credits: {
+          proration: {
+            amount: { amount: 500, amountFormatted: '5.00', currency: 'USD', currencySymbol: '$' },
+            cycleDaysRemaining: 15,
+            cycleDaysTotal: 30,
+            cycleRemainingPercent: 50,
+          },
+          payer: {
+            remainingBalance: { amount: 2000, amountFormatted: '20.00', currency: 'USD', currencySymbol: '$' },
+            appliedAmount: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+          },
+          total: { amount: 1500, amountFormatted: '15.00', currency: 'USD', currencySymbol: '$' },
+        },
+        pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        totalDueNow: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+      },
+      isImmediatePlanChange: true,
+      planPeriod: 'month',
+      plan: {
+        id: 'plan_credits',
+        name: 'Pro',
+        description: 'Pro plan',
+        features: [],
+        fee: {
+          amount: 2500,
+          amountFormatted: '25.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        annualFee: {
+          amount: 30000,
+          amountFormatted: '300.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        annualMonthlyFee: {
+          amount: 2500,
+          amountFormatted: '25.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        slug: 'pro',
+        avatarUrl: '',
+        publiclyVisible: true,
+        isDefault: true,
+        isRecurring: true,
+        hasBaseFee: false,
+        forPayerType: 'user',
+        freeTrialDays: 7,
+        freeTrialEnabled: true,
+      },
+      paymentMethod: undefined,
+      confirm: vi.fn(),
+      freeTrialEndsAt: null,
+      needsPaymentMethod: false,
+    } as any);
+
+    const { getByRole, getByText } = render(
+      <Drawer.Root
+        open
+        onOpenChange={() => {}}
+      >
+        <Checkout
+          planId='plan_credits'
+          planPeriod='month'
+        />
+      </Drawer.Root>,
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
+    });
+
+    expect(getByText('Credit for the remainder of your current subscription.')).toBeVisible();
+    expect(getByText('Credit from account balance.')).toBeVisible();
+    expect(getByText('- $5.00')).toBeVisible();
+    expect(getByText('- $10.00')).toBeVisible();
+  });
+
   it('renders free trial details during confirmation stage', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
