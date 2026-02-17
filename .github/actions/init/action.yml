@@ -119,8 +119,8 @@ runs:
       run: pnpm install
       shell: bash
 
-    - name: Add node_modules/.bin to PATH
-      run: echo "$GITHUB_WORKSPACE/node_modules/.bin" >> $GITHUB_PATH
+    - name: Install pkglab
+      run: npm install -g pkglab@latest
       shell: bash
 
     - name: Get Playwright Version
