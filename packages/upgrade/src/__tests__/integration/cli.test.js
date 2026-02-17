@@ -73,6 +73,7 @@ describe('CLI Integration', () => {
       expect(result.stdout).toContain('--dry-run');
       expect(result.stdout).toContain('--skip-upgrade');
       expect(result.stdout).toContain('--release');
+      expect(result.stdout).toContain('--canary');
       expect(result.exitCode).toBe(0);
     });
   });
@@ -264,6 +265,25 @@ describe('CLI Integration', () => {
 
       const pkgAfter = fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8');
       expect(pkgAfter).toBe(pkgBefore);
+    });
+  });
+
+  describe('--canary flag', () => {
+    it('shows canary version in dry-run output', async () => {
+      const dir = getFixturePath('nextjs-v6');
+      const result = await runCli(['--dir', dir, '--canary', '--dry-run', '--skip-codemods'], { timeout: 15000 });
+
+      expect(result.stdout).toContain('canary');
+      expect(result.stdout).toContain('[dry run]');
+    });
+
+    it('allows upgrade even when already on target major version', async () => {
+      const dir = getFixturePath('nextjs-v7');
+      const result = await runCli(['--dir', dir, '--canary', '--dry-run', '--skip-codemods'], { timeout: 15000 });
+
+      expect(result.stdout).toContain('canary');
+      expect(result.stdout).toContain('[dry run]');
+      expect(result.stdout).not.toContain('already on the latest');
     });
   });
 
