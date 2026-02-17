@@ -1,6 +1,6 @@
 #!/usr/bin/env zx
 
-import { cp, mkdir, mkdtemp } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -14,7 +14,6 @@ try {
   const FULL_SITE_PATH = join(ROOT_PATH, SITE_PATH);
   const TMP_FOLDER = await mkdtemp(join(tmpdir(), 'clerk-site-'));
   const FULL_TMP_FOLDER = join(TMP_FOLDER, SITE_PATH);
-  process.env.SECCO_SOURCE_PATH = ROOT_PATH;
   process.env.FORCE_COLOR = '1';
 
   core.debug(`Path variables:
@@ -25,11 +24,6 @@ FULL_SITE_PATH: ${FULL_SITE_PATH}
 TMP_FOLDER: ${TMP_FOLDER}
 FULL_TMP_FOLDER: ${FULL_TMP_FOLDER}`);
 
-  // Installing secco
-  await core.group('Installing secco (if not already installed)', async () => {
-    await $`command -v secco || (command -v sudo && sudo npm install -g secco@latest) || npm install -g secco@latest`;
-  });
-
   // Create temporary folder setup
   await mkdir(FULL_TMP_FOLDER, { recursive: true });
 
@@ -37,10 +31,23 @@ FULL_TMP_FOLDER: ${FULL_TMP_FOLDER}`);
   core.info(`Copying ${chalk.bold(SITE_PATH)} into ${chalk.bold(FULL_TMP_FOLDER)}`);
   await cp(FULL_SITE_PATH, FULL_TMP_FOLDER, { recursive: true });
 
-  await core.group('Installing dependencies through secco', async () => {
-    cd(FULL_TMP_FOLDER);
-    await $`secco --force-verdaccio --scan-once`;
+  // Find @clerk/* dependencies in the site's package.json
+  const sitePkg = JSON.parse(await readFile(join(FULL_TMP_FOLDER, 'package.json'), 'utf-8'));
+  const clerkDeps = [...Object.keys(sitePkg.dependencies || {}), ...Object.keys(sitePkg.devDependencies || {})].filter(
+    name => name.startsWith('@clerk/'),
+  );
+
+  await core.group('Publishing packages to local registry', async () => {
+    cd(ROOT_PATH);
+    await $`pkglab pub --force`;
   });
+
+  if (clerkDeps.length > 0) {
+    await core.group('Installing @clerk/* dependencies via pkglab', async () => {
+      cd(FULL_TMP_FOLDER);
+      await $`pkglab add ${clerkDeps}`;
+    });
+  }
 
   core.exportVariable('FULL_TMP_FOLDER', FULL_TMP_FOLDER);
 } catch (e) {
