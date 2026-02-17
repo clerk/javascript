@@ -41,6 +41,9 @@ jobs:
       - name: Restore package.json files after pkglab publish
         run: git checkout -- 'packages/*/package.json'
 
+      - name: Disable frozen-lockfile for pkglab operations
+        run: echo 'frozen-lockfile=false' >> .npmrc
+
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
         run: |

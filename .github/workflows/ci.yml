@@ -391,8 +391,10 @@ jobs:
         if: ${{ steps.task-status.outputs.affected == '1' }}
         run: git checkout -- 'packages/*/package.json'
 
-      - name: Edit .npmrc [link-workspace-packages=false]
-        run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
+      - name: Edit .npmrc for integration tests
+        run: |
+          sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
+          echo 'frozen-lockfile=false' >> .npmrc
 
       - name: Install @clerk/backend in /integration
         if: ${{ steps.task-status.outputs.affected == '1' }}
