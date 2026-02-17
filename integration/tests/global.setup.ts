@@ -11,7 +11,7 @@ setup('start long running apps', async () => {
 
   // Verify pkglab registry is running
   try {
-    execSync('curl -sf http://localhost:16180/ > /dev/null', { timeout: 5000 });
+    execSync('curl -sf http://localhost:16180/-/ping > /dev/null', { timeout: 5000 });
   } catch {
     throw new Error(
       'pkglab registry is not running. Start it with: pkglab pub\n' +
