@@ -422,7 +422,7 @@ void (async () => {
       );
     },
     '/task-setup-mfa': () => {
-      Clerk.mountTaskSetupMfa(
+      Clerk.mountTaskSetupMFA(
         app,
         componentControls.taskSetupMFA.getProps() ?? {
           redirectUrlComplete: '/user-profile',
