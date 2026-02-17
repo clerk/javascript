@@ -392,6 +392,39 @@ jobs:
 
       # Install published packages from local registry to test against real npm install scenarios
       # rather than local monorepo builds. Validates package structure, dependencies, and entry points.
+      - name: Debug pkglab registry
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        run: |
+          echo "=== pkglab version ==="
+          pkglab --version
+          echo "=== pkglab status ==="
+          pkglab status
+          echo "=== curl full packument ==="
+          curl -s http://127.0.0.1:16180/@clerk/nextjs | python3 -c "
+          import sys,json
+          d=json.load(sys.stdin)
+          v = d.get('dist-tags',{}).get('pkglab','N/A')
+          print('pkglab dist-tag:', v)
+          print('version exists:', v in d.get('versions',{}))
+          "
+          echo "=== curl abbreviated packument ==="
+          curl -s -H 'Accept: application/vnd.npm.install-v1+json' http://127.0.0.1:16180/@clerk/nextjs | python3 -c "
+          import sys,json
+          d=json.load(sys.stdin)
+          v = d.get('dist-tags',{}).get('pkglab','N/A')
+          print('pkglab dist-tag:', v)
+          print('version exists:', v in d.get('versions',{}))
+          "
+          echo "=== npm view from local registry ==="
+          npm view @clerk/nextjs@0.0.0-pkglab --registry http://127.0.0.1:16180 version 2>&1 || echo "npm view failed"
+          echo "=== test npm install in temp dir ==="
+          TMPDIR=$(mktemp -d)
+          cd $TMPDIR
+          npm init -y > /dev/null 2>&1
+          echo "registry=http://127.0.0.1:16180" > .npmrc
+          cat .npmrc
+          npm install @clerk/nextjs@0.0.0-pkglab --ignore-scripts 2>&1 || echo "npm install failed"
+
       - name: Install @clerk/clerk-js in os temp
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
