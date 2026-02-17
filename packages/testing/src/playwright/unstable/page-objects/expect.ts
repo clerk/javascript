@@ -15,7 +15,7 @@ export const createExpectPageObject = ({ page }: { page: EnhancedPage }) => {
     toBeSignedOut: (args?: { timeOut: number }) => {
       return page.waitForFunction(
         () => {
-          return !window.Clerk?.user;
+          return window.Clerk?.user === null;
         },
         null,
         { timeout: args?.timeOut },
