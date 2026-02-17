@@ -125,7 +125,7 @@ runs:
     # (pnpm prepends node_modules/.bin to PATH when running scripts, shadowing globals).
     - name: Install pkglab
       run: |
-        npm install -g pkglab@latest
+        npm install -g pkglab@0.13.0
         rm -f node_modules/.bin/pkglab node_modules/.bin/pkgl
       shell: bash
 
