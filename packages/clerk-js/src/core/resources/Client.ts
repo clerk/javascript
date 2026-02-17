@@ -10,8 +10,17 @@ import type {
 
 import { unixEpochToDate } from '../../utils/date';
 import { eventBus } from '../events';
+import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, Session, SignIn, SignUp } from './internal';
+
+export function getClientResourceFromPayload<J>(responseJSON: FapiResponseJSON<J> | null): ClientResource | undefined {
+  if (!responseJSON) {
+    return undefined;
+  }
+  const clientJSON = responseJSON.client || responseJSON.meta?.client;
+  return clientJSON ? Client.getOrCreateInstance().fromJSON(clientJSON) : undefined;
+}
 
 export class Client extends BaseResource implements ClientResource {
   private static instance: Client | null | undefined;

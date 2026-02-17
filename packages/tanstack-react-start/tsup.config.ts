@@ -32,6 +32,6 @@ export default defineConfig(overrideOptions => {
 
   return runAfterLast([
     // 'pnpm build:declarations',
-    shouldPublish && 'pnpm publish:local',
+    shouldPublish && 'pkglab pub --ping',
   ])(common);
 });
