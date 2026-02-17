@@ -18,7 +18,7 @@ import {
 import { Route, Switch, useRouter } from '../../router';
 import { TaskChooseOrganization } from './tasks/TaskChooseOrganization';
 import { TaskResetPassword } from './tasks/TaskResetPassword';
-import { TaskSetupMFA } from './tasks/TaskSetupMfa';
+import { TaskSetupMFA } from './tasks/TaskSetupMFA';
 
 const SessionTasksStart = () => {
   const clerk = useClerk();
