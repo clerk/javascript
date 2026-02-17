@@ -1,7 +1,7 @@
 ---
 title: 'Minimum TanStack Start version increased'
 packages: ['tanstack-react-start']
-matcher: "@tanstack/react-start\":\\s*\"(?:^|~|>|=|\\s)*(?:1\\.1(?:[0-4]\\d|5[0-6]))\\..*?"
+matcher: "@tanstack/react-start\":\\s*\"(?:\\^|~|>|=|\\s)*(?:1\\.1(?:[0-4]\\d|5[0-6]))\\..*?"
 matcherFlags: 'm'
 category: 'version'
 warning: true
