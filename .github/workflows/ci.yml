@@ -387,6 +387,10 @@ jobs:
         if: ${{ steps.task-status.outputs.affected == '1' }}
         run: pkglab pub --force
 
+      - name: Restore package.json files after pkglab publish
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        run: git checkout -- 'packages/*/package.json'
+
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 

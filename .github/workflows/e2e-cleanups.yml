@@ -33,6 +33,9 @@ jobs:
       - name: Publish to local registry
         run: pkglab pub --force
 
+      - name: Restore package.json files after pkglab publish
+        run: git checkout -- 'packages/*/package.json'
+
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
         run: pnpm init && pkglab add @clerk/backend
