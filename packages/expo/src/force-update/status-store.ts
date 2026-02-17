@@ -44,7 +44,6 @@ type ForceUpdateSource = {
 type UnsupportedAppVersionMeta = {
   platform?: unknown;
   app_identifier?: unknown;
-  current_version?: unknown;
   minimum_version?: unknown;
   update_url?: unknown;
 };
@@ -62,17 +61,10 @@ const asNonEmptyString = (value: unknown): string | null => {
   return normalized ? normalized : null;
 };
 
-const supportedStatus = (
-  currentVersion: string | null,
-  minimumVersion: string | null,
-  updateURL: string | null,
-  reason: ForceUpdateStatus['reason'],
-): ForceUpdateStatus => ({
+const supportedStatus = (): ForceUpdateStatus => ({
   isSupported: true,
-  currentVersion,
-  minimumVersion,
-  updateURL,
-  reason,
+  minimumVersion: null,
+  updateURL: null,
 });
 
 const normalizeSnakeCaseForceUpdate = (
@@ -183,10 +175,8 @@ const findPolicy = (
 const isSameStatus = (left: ForceUpdateStatus, right: ForceUpdateStatus): boolean => {
   return (
     left.isSupported === right.isSupported &&
-    left.currentVersion === right.currentVersion &&
     left.minimumVersion === right.minimumVersion &&
-    left.updateURL === right.updateURL &&
-    left.reason === right.reason
+    left.updateURL === right.updateURL
   );
 };
 
@@ -215,37 +205,30 @@ export const resolveForceUpdateStatus = (
 ): ForceUpdateStatus => {
   const currentVersion = asNonEmptyString(appInfo.currentVersion);
   if (!currentVersion) {
-    return supportedStatus(null, null, null, 'missing_current_version');
+    return supportedStatus();
   }
 
   if (!isValidAppVersion(currentVersion)) {
-    return supportedStatus(currentVersion, null, null, 'invalid_current_version');
+    return supportedStatus();
   }
 
   const matchingPolicy = findPolicy(getForceUpdatePolicies(source), appInfo);
   if (!matchingPolicy) {
-    return supportedStatus(currentVersion, null, null, 'no_policy');
+    return supportedStatus();
   }
 
   if (!isValidAppVersion(matchingPolicy.minimumVersion)) {
-    return supportedStatus(
-      currentVersion,
-      matchingPolicy.minimumVersion,
-      matchingPolicy.updateURL,
-      'invalid_minimum_version',
-    );
+    return supportedStatus();
   }
 
   if (compareAppVersions(currentVersion, matchingPolicy.minimumVersion) >= 0) {
-    return supportedStatus(currentVersion, matchingPolicy.minimumVersion, matchingPolicy.updateURL, 'supported');
+    return supportedStatus();
   }
 
   return {
     isSupported: false,
-    currentVersion,
     minimumVersion: matchingPolicy.minimumVersion,
     updateURL: matchingPolicy.updateURL,
-    reason: 'below_minimum',
   };
 };
 
@@ -282,14 +265,10 @@ export const resolveForceUpdateStatusFromErrorMeta = (
     return null;
   }
 
-  const currentVersion = asNonEmptyString(normalizedMeta.current_version) || asNonEmptyString(appInfo.currentVersion);
-
   return {
     isSupported: false,
-    currentVersion,
     minimumVersion,
     updateURL: asNonEmptyString(normalizedMeta.update_url),
-    reason: 'server_rejected',
   };
 };
 

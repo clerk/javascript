@@ -5,10 +5,8 @@ const mocks = vi.hoisted(() => {
   return {
     status: {
       isSupported: true,
-      currentVersion: null,
       minimumVersion: null,
       updateURL: null,
-      reason: 'supported',
     },
     addListener: vi.fn(callback => {
       callback();

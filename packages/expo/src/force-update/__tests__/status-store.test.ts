@@ -60,7 +60,6 @@ describe('force-update status store', () => {
     });
 
     expect(status.isSupported).toBe(false);
-    expect(status.reason).toBe('below_minimum');
     expect(status.minimumVersion).toBe('1.3.0');
     expect(getForceUpdateStatus().isSupported).toBe(false);
   });
@@ -80,7 +79,7 @@ describe('force-update status store', () => {
     });
 
     expect(status.isSupported).toBe(true);
-    expect(status.reason).toBe('invalid_current_version');
+    expect(status.minimumVersion).toBeNull();
   });
 
   test('supports snake_case force_update payloads', () => {
@@ -98,7 +97,7 @@ describe('force-update status store', () => {
     );
 
     expect(status.isSupported).toBe(false);
-    expect(status.reason).toBe('below_minimum');
+    expect(status.minimumVersion).toBe('2.0.0');
   });
 
   test('supports partial camelCase forceUpdate payloads', () => {
@@ -124,7 +123,7 @@ describe('force-update status store', () => {
     );
 
     expect(status.isSupported).toBe(false);
-    expect(status.reason).toBe('below_minimum');
+    expect(status.minimumVersion).toBe('2.0.0');
   });
 
   test('injects iOS headers when app metadata is available', async () => {
@@ -174,7 +173,6 @@ describe('force-update status store', () => {
     });
 
     expect(status?.isSupported).toBe(false);
-    expect(status?.reason).toBe('server_rejected');
     expect(status?.minimumVersion).toBe('2.0.0');
   });
 });

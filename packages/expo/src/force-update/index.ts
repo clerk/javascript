@@ -1,2 +1,2 @@
-export type { ForceUpdateStatus, ForceUpdateReason } from './types';
+export type { ForceUpdateStatus } from './types';
 export { getForceUpdateStatus, subscribeForceUpdateStatus } from './status-store';
