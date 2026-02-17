@@ -1448,7 +1448,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public mountTaskSetupMfa = (node: HTMLDivElement, props?: TaskSetupMFAProps) => {
+  public mountTaskSetupMFA = (node: HTMLDivElement, props?: TaskSetupMFAProps) => {
     this.assertComponentsReady(this.#componentControls);
 
     void this.#componentControls.ensureMounted({ preloadHint: 'TaskSetupMFA' }).then(controls =>
@@ -1460,10 +1460,10 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('TaskSetupMfa', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('TaskSetupMFA', props));
   };
 
-  public unmountTaskSetupMfa = (node: HTMLDivElement) => {
+  public unmountTaskSetupMFA = (node: HTMLDivElement) => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
