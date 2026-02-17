@@ -404,10 +404,16 @@ describe('Checkout', () => {
       expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
     });
 
-    expect(getByText('Credit for the remainder of your current subscription.')).toBeVisible();
-    expect(getByText('Credit from account balance.')).toBeVisible();
-    expect(getByText('- $5.00')).toBeVisible();
-    expect(getByText('- $10.00')).toBeVisible();
+    const prorationCreditRow = getByText('Credit for the remainder of your current subscription.').closest(
+      '.cl-lineItemsGroup',
+    );
+    const accountCreditRow = getByText('Credit from account balance.').closest('.cl-lineItemsGroup');
+
+    expect(prorationCreditRow).toBeInTheDocument();
+    expect(accountCreditRow).toBeInTheDocument();
+
+    expect(prorationCreditRow).toHaveTextContent('- $5.00');
+    expect(accountCreditRow).toHaveTextContent('- $10.00');
   });
 
   it('renders free trial details during confirmation stage', async () => {
