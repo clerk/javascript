@@ -25,7 +25,7 @@ const componentImportPaths = {
     import(/* webpackChunkName: "taskChooseOrganization" */ '../components/SessionTasks/tasks/TaskChooseOrganization'),
   TaskResetPassword: () =>
     import(/* webpackChunkName: "taskResetPassword" */ '../components/SessionTasks/tasks/TaskResetPassword'),
-  TaskSetupMFA: () => import(/* webpackChunkName: "taskSetupMFA" */ '../components/SessionTasks/tasks/TaskSetupMFA'),
+  TaskSetupMFA: () => import(/* webpackChunkName: "taskSetupMFA" */ '../components/SessionTasks/tasks/TaskSetupMfa'),
   PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans/PlanDetails'),
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/APIKeys/APIKeys'),
