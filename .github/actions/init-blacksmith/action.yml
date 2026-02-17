@@ -119,6 +119,10 @@ runs:
       run: pnpm install
       shell: bash
 
+    - name: Install Bun
+      run: npm install -g bun
+      shell: bash
+
     - name: Install pkglab
       run: npm install -g pkglab@latest
       shell: bash
