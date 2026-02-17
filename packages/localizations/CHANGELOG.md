@@ -1,5 +1,12 @@
 # Change Log
 
+## 3.35.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.16
+
 ## 3.35.4
 
 ### Patch Changes

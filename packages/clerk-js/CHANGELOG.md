@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.123.1
+
+### Patch Changes
+
+- Set `SameSite=None` on cookies for `.replit.dev` origins and consolidate third-party domain list ([#7864](https://github.com/clerk/javascript/pull/7864)) by [@brkalow](https://github.com/brkalow)
+
+- fix(clerk-js): Handle missing window.location in React Native navigation ([#7854](https://github.com/clerk/javascript/pull/7854)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`b17e4bb`](https://github.com/clerk/javascript/commit/b17e4bbbbad173969523e5494f2d8447d1887b95)]:
+  - @clerk/shared@3.45.1
+  - @clerk/localizations@3.35.5
+
 ## 5.123.0
 
 ### Minor Changes
