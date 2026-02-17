@@ -4,6 +4,7 @@ import { getSuffixedCookieName } from '@clerk/shared/keys';
 
 import { inCrossOriginIframe } from '../../../utils';
 import { getSecureAttribute } from '../getSecureAttribute';
+import { requiresSameSiteNone } from './requireSameSiteNone';
 
 const SESSION_COOKIE_NAME = '__session';
 
@@ -14,7 +15,7 @@ export type SessionCookieHandler = {
 };
 
 const getCookieAttributes = (): { sameSite: string; secure: boolean; partitioned: boolean } => {
-  const sameSite = __BUILD_VARIANT_CHIPS__ ? 'None' : inCrossOriginIframe() ? 'None' : 'Lax';
+  const sameSite = __BUILD_VARIANT_CHIPS__ ? 'None' : inCrossOriginIframe() || requiresSameSiteNone() ? 'None' : 'Lax';
   const secure = getSecureAttribute(sameSite);
   const partitioned = __BUILD_VARIANT_CHIPS__ && secure;
   return { sameSite, secure, partitioned };
