@@ -38,9 +38,10 @@ function ensurePushStatePatched(): void {
   if (originalPushState) {
     return;
   }
-  originalPushState = history.pushState.bind(history);
+  const original = history.pushState.bind(history);
+  originalPushState = original;
   history.pushState = (...args: Parameters<History['pushState']>) => {
-    originalPushState!(...args);
+    original(...args);
     pushStateSubscribers.forEach(fn => fn());
   };
 }
@@ -49,9 +50,10 @@ function ensureReplaceStatePatched(): void {
   if (originalReplaceState) {
     return;
   }
-  originalReplaceState = history.replaceState.bind(history);
+  const original = history.replaceState.bind(history);
+  originalReplaceState = original;
   history.replaceState = (...args: Parameters<History['replaceState']>) => {
-    originalReplaceState!(...args);
+    original(...args);
     replaceStateSubscribers.forEach(fn => fn());
   };
 }
