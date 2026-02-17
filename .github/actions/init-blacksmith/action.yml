@@ -119,6 +119,10 @@ runs:
       run: pnpm install
       shell: bash
 
+    - name: Add node_modules/.bin to PATH
+      run: echo "$GITHUB_WORKSPACE/node_modules/.bin" >> $GITHUB_PATH
+      shell: bash
+
     - name: Get Playwright Version
       if: inputs.playwright-enabled == 'true'
       shell: bash
