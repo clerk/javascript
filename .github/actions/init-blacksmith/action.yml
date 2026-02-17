@@ -120,9 +120,12 @@ runs:
       shell: bash
 
     # pkglab ships platform-specific binaries as optional deps (pkglab-linux-x64, etc.)
-    # pnpm doesn't resolve these for workspace devDeps, so we install globally via npm
+    # pnpm doesn't resolve these for workspace devDeps, so we install globally via npm.
+    # Prepend npm global bin to PATH so the global pkglab is found before node_modules/.bin
     - name: Install pkglab
-      run: npm install -g pkglab@latest
+      run: |
+        npm install -g pkglab@latest
+        echo "$(npm config get prefix)/bin" >> $GITHUB_PATH
       shell: bash
 
     - name: Get Playwright Version
