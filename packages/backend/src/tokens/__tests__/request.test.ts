@@ -988,6 +988,58 @@ describe('tokens.authenticateRequest(options)', () => {
     expect(requestState.toAuth()).toBeNull();
   });
 
+  test('cookieToken: returns signedIn when no clientUat but in redirect loop with valid session (Safari ITP workaround)', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    // Simulate Safari ITP scenario: valid session token, no client_uat, redirect loop detected
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        {},
+        {
+          __clerk_db_jwt: 'deadbeef',
+          __session: mockJwt,
+          __clerk_redirect_count: '1', // Redirect loop counter > 0
+        },
+      ),
+      mockOptions({
+        secretKey: 'test_deadbeef',
+      }),
+    );
+
+    expect(requestState).toBeSignedIn();
+    expect(requestState.toAuth()).toBeSignedInToAuth();
+  });
+
+  test('cookieToken: returns handshake when no clientUat and redirect loop but invalid session token', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+    // Simulate scenario where we're in a redirect loop but the session token is invalid
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        {},
+        {
+          __clerk_db_jwt: 'deadbeef',
+          __session: mockMalformedJwt,
+          __clerk_redirect_count: '1',
+        },
+      ),
+      mockOptions({
+        secretKey: 'test_deadbeef',
+      }),
+    );
+
+    // Should still return handshake since token verification failed
+    expect(requestState).toMatchHandshake({ reason: AuthErrorReason.SessionTokenWithoutClientUAT });
+    expect(requestState.toAuth()).toBeNull();
+  });
+
   test('cookieToken: returns handshake when no cookies in development [5y]', async () => {
     const requestState = await authenticateRequest(
       mockRequestWithCookies({}),
