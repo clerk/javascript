@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/react';
+import type { ComponentType, ReactNode } from 'react';
 import { useMemo } from 'react';
-import { Linking, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useForceUpdateStatus } from '../hooks/useForceUpdateStatus';
 
@@ -27,6 +28,14 @@ type ClerkWithTheme = {
   } | null;
 };
 
+type FullWindowOverlayProps = {
+  children?: ReactNode;
+};
+
+type FullWindowOverlayModule = {
+  FullWindowOverlay?: ComponentType<FullWindowOverlayProps>;
+};
+
 const FALLBACK_COLORS = {
   backdrop: 'rgba(13, 15, 20, 0.75)',
   background: '#ffffff',
@@ -35,6 +44,14 @@ const FALLBACK_COLORS = {
   primary: '#6c47ff',
   buttonText: '#ffffff',
 };
+
+const FullWindowOverlay: ComponentType<FullWindowOverlayProps> | null = (() => {
+  try {
+    return (require('react-native-screens') as FullWindowOverlayModule).FullWindowOverlay || null;
+  } catch {
+    return null;
+  }
+})();
 
 const useOverlayColors = (): typeof FALLBACK_COLORS => {
   const clerk = useClerk();
@@ -77,14 +94,8 @@ export const ForceUpdateBlockingOverlay = ({ enabled }: ForceUpdateBlockingOverl
     void Linking.openURL(updateURL);
   };
 
-  return (
-    <Modal
-      animationType='fade'
-      onRequestClose={() => undefined}
-      statusBarTranslucent
-      transparent
-      visible
-    >
+  const overlay = (
+    <View style={styles.fullWindowContainer}>
       <View style={[styles.backdrop, { backgroundColor: colors.backdrop }]}>
         <View style={[styles.card, { backgroundColor: colors.background }]}>
           <Text style={[styles.title, { color: colors.text }]}>Update required</Text>
@@ -96,11 +107,34 @@ export const ForceUpdateBlockingOverlay = ({ enabled }: ForceUpdateBlockingOverl
           ) : null}
         </View>
       </View>
+    </View>
+  );
+
+  if (Platform.OS === 'ios' && FullWindowOverlay) {
+    return <FullWindowOverlay>{overlay}</FullWindowOverlay>;
+  }
+
+  return (
+    <Modal
+      animationType='fade'
+      onRequestClose={() => undefined}
+      statusBarTranslucent
+      transparent
+      visible
+    >
+      {overlay}
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
+  fullWindowContainer: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
   backdrop: {
     alignItems: 'center',
     flex: 1,
