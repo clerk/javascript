@@ -2,6 +2,7 @@ import type {
   BillingMoneyAmount,
   BillingSubscriptionItemJSON,
   BillingSubscriptionItemResource,
+  BillingSubscriptionItemSeats,
   BillingSubscriptionJSON,
   BillingSubscriptionPlanPeriod,
   BillingSubscriptionResource,
@@ -75,6 +76,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
   credit?: {
     amount: BillingMoneyAmount;
   };
+  seats?: BillingSubscriptionItemSeats;
   isFreeTrial!: boolean;
 
   constructor(data: BillingSubscriptionItemJSON) {
@@ -102,6 +104,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
     this.amount = data.amount ? billingMoneyAmountFromJSON(data.amount) : undefined;
     this.credit =
       data.credit && data.credit.amount ? { amount: billingMoneyAmountFromJSON(data.credit.amount) } : undefined;
+    this.seats = data.seats ? { quantity: data.seats.quantity } : undefined;
 
     this.isFreeTrial = this.withDefault(data.is_free_trial, false);
     return this;

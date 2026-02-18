@@ -599,6 +599,68 @@ export interface FeatureJSON extends ClerkResourceJSON {
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
+export interface BillingSubscriptionItemSeatsJSON {
+  /**
+   * The number of seats available. `null` means unlimited.
+   */
+  quantity: number | null;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ *
+ * Represents a single pricing tier for a unit type on a plan.
+ */
+export interface BillingPlanUnitPriceTierJSON extends ClerkResourceJSON {
+  id: string;
+  object: 'commerce_unit_price';
+  starts_at_block: number;
+  /**
+   * `null` means unlimited.
+   */
+  ends_after_block: number | null;
+  fee_per_block: BillingMoneyAmountJSON;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ *
+ * Represents unit pricing for a specific unit type (for example, seats) on a plan.
+ */
+export interface BillingPlanUnitPriceJSON {
+  name: string;
+  block_size: number;
+  tiers: BillingPlanUnitPriceTierJSON[];
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ *
+ * Represents the cost breakdown for a single tier in checkout totals.
+ */
+export interface BillingPerUnitTotalTierJSON {
+  /**
+   * `null` means unlimited.
+   */
+  quantity: number | null;
+  fee_per_block: BillingMoneyAmountJSON;
+  total: BillingMoneyAmountJSON;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ *
+ * Represents the per-unit cost breakdown in checkout totals.
+ */
+export interface BillingPerUnitTotalJSON {
+  name: string;
+  block_size: number;
+  tiers: BillingPerUnitTotalTierJSON[];
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
 export interface BillingPlanJSON extends ClerkResourceJSON {
   object: 'commerce_plan';
   id: string;
@@ -617,6 +679,10 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   features?: FeatureJSON[];
   free_trial_days?: number | null;
   free_trial_enabled?: boolean;
+  /**
+   * Per-unit pricing tiers for this plan (for example, seats).
+   */
+  unit_prices?: BillingPlanUnitPriceJSON[];
 }
 
 /**
@@ -695,6 +761,11 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   credit?: {
     amount: BillingMoneyAmountJSON;
   };
+  /**
+   * Seat entitlement details for this subscription item. Only set for organization subscription items with
+   * seat-based billing.
+   */
+  seats?: BillingSubscriptionItemSeatsJSON;
   plan: BillingPlanJSON;
   plan_period: BillingSubscriptionPlanPeriod;
   status: BillingSubscriptionStatus;
@@ -751,6 +822,10 @@ export interface BillingCheckoutTotalsJSON {
   grand_total: BillingMoneyAmountJSON;
   subtotal: BillingMoneyAmountJSON;
   tax_total: BillingMoneyAmountJSON;
+  /**
+   * Per-unit cost breakdown for this checkout (for example, seats).
+   */
+  per_unit_totals?: BillingPerUnitTotalJSON[];
   total_due_now: BillingMoneyAmountJSON;
   credit: BillingMoneyAmountJSON | null;
   past_due: BillingMoneyAmountJSON | null;
