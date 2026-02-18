@@ -29,7 +29,7 @@ describe('handleNetlifyCacheInDevInstance', () => {
       publishableKey: mockPublishableKey,
     });
 
-    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client, cookie=__session');
+    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client_uat, cookie=__session');
   });
 
   it('should set Netlify-Vary header even when handshake param is present', () => {
@@ -48,7 +48,7 @@ describe('handleNetlifyCacheInDevInstance', () => {
     });
 
     // Unlike cache-bust, we always want the vary header
-    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client, cookie=__session');
+    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client_uat, cookie=__session');
   });
 
   it('should not set Netlify-Vary header when not on Netlify', () => {
@@ -101,7 +101,7 @@ describe('handleNetlifyCacheInDevInstance', () => {
     });
 
     // Should still detect via NETLIFY env var
-    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client, cookie=__session');
+    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client_uat, cookie=__session');
   });
 });
 
@@ -128,7 +128,7 @@ describe('isNetlifyRuntime detection', () => {
       publishableKey: mockPublishableKey,
     });
 
-    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client, cookie=__session');
+    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client_uat, cookie=__session');
   });
 
   it('should detect Netlify via NETLIFY_DEV env var', () => {
@@ -145,7 +145,7 @@ describe('isNetlifyRuntime detection', () => {
       publishableKey: mockPublishableKey,
     });
 
-    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client, cookie=__session');
+    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client_uat, cookie=__session');
   });
 
   it('should detect Netlify via DEPLOY_PRIME_URL env var', () => {
@@ -162,7 +162,7 @@ describe('isNetlifyRuntime detection', () => {
       publishableKey: mockPublishableKey,
     });
 
-    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client, cookie=__session');
+    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client_uat, cookie=__session');
   });
 
   it('should detect Netlify via NETLIFY_FUNCTIONS_TOKEN env var', () => {
@@ -179,7 +179,7 @@ describe('isNetlifyRuntime detection', () => {
       publishableKey: mockPublishableKey,
     });
 
-    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client, cookie=__session');
+    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client_uat, cookie=__session');
   });
 
   it('should detect Netlify via netlify.app URL', () => {
@@ -196,7 +196,7 @@ describe('isNetlifyRuntime detection', () => {
       publishableKey: mockPublishableKey,
     });
 
-    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client, cookie=__session');
+    expect(requestStateHeaders.get('Netlify-Vary')).toBe('cookie=__client_uat, cookie=__session');
   });
 
   it('should not detect Netlify when no env vars are set', () => {

@@ -46,6 +46,6 @@ export function handleNetlifyCacheInDevInstance({
   if (isOnNetlify && isDevelopmentInstance) {
     // Set Netlify-Vary header to vary cache based on Clerk authentication cookies
     // This prevents Netlify from serving stale redirect responses during handshake flow
-    requestStateHeaders.set('Netlify-Vary', 'cookie=__client, cookie=__session');
+    requestStateHeaders.set('Netlify-Vary', 'cookie=__client_uat, cookie=__session');
   }
 }
