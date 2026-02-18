@@ -261,8 +261,8 @@ importers:
         specifier: ^14.0.1
         version: 14.0.1(enquirer@2.4.1)
       pkglab:
-        specifier: ^0.12.2
-        version: 0.12.2
+        specifier: ^0.13.2
+        version: 0.13.2
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -2472,7 +2472,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==}
@@ -11690,8 +11690,8 @@ packages:
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
 
-  pkglab@0.12.2:
-    resolution: {integrity: sha512-fI5DQMseMsYtoKr3ySWpbbKRLCKhOxdYh4AXcJ9EUvKR1rGU3jqBQNfFS1n0jb8RiVn/l5kxaalokvF3He84Qg==}
+  pkglab@0.13.2:
+    resolution: {integrity: sha512-E9HRCjhgB/M1OuEucAYCKhLOBlrJJeOfwAhBwW11QgWn/CdSJxmnvWnMpuHDVEPX8VFw8SAJ4+6bQcBbIJ0u3g==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -28795,7 +28795,7 @@ snapshots:
       exsolve: 1.0.7
       pathe: 2.0.3
 
-  pkglab@0.12.2: {}
+  pkglab@0.13.2: {}
 
   playwright-core@1.56.1: {}
 

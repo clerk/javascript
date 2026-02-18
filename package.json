@@ -129,7 +129,7 @@
     "json5": "2.2.3",
     "jsonwebtoken": "9.0.2",
     "lint-staged": "^14.0.1",
-    "pkglab": "^0.12.2",
+    "pkglab": "^0.13.2",
     "prettier": "^3.6.2",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-packagejson": "^2.5.15",

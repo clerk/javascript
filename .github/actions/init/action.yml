@@ -119,14 +119,11 @@ runs:
       run: pnpm install
       shell: bash
 
-    # The devDep pkglab@^0.12.x creates a node_modules/.bin/pkglab shim that
-    # doesn't have the PATH fallback added in 0.13.2. pnpm prepends
-    # node_modules/.bin to PATH, so the old shim shadows the global binary.
-    # Remove it so the global 0.13.2 is always used.
+    # pkglab needs a platform-specific binary (pkglab-linux-x64, etc.) that pnpm
+    # doesn't resolve for workspace devDeps. Install globally at the same version
+    # pnpm resolved so npm fetches the correct platform binary.
     - name: Install pkglab
-      run: |
-        npm install -g pkglab@0.13.2
-        rm -f node_modules/.bin/pkglab node_modules/.bin/pkgl
+      run: npm install -g pkglab@$(node -p "require('./node_modules/pkglab/package.json').version")
       shell: bash
 
     - name: Get Playwright Version
