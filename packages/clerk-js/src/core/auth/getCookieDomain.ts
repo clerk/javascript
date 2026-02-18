@@ -40,5 +40,10 @@ export function getCookieDomain(hostname = window.location.hostname, cookieHandl
     cookieHandler.remove({ domain: eTLD });
   }
 
-  return;
+  // Fallback to hostname to ensure domain-scoped cookie rather than host-only.
+  // In restricted contexts (e.g. cross-origin iframes), the set() will silently
+  // fail — which is preferable to creating a host-only cookie that conflicts
+  // with domain-scoped cookies set by non-iframe contexts.
+  cachedETLDPlusOne = hostname;
+  return hostname;
 }
