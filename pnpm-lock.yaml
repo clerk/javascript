@@ -261,11 +261,11 @@ importers:
         specifier: ^14.0.1
         version: 14.0.1(enquirer@2.4.1)
       pkglab:
-        specifier: ^0.13.2
-        version: 0.13.2
+        specifier: ^0.13.3
+        version: 0.13.3
       pkglab-linux-x64:
-        specifier: ^0.13.2
-        version: 0.13.2
+        specifier: ^0.13.3
+        version: 0.13.3
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -11693,32 +11693,32 @@ packages:
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
 
-  pkglab-darwin-arm64@0.13.2:
-    resolution: {integrity: sha512-hwh5EaG+c2g2Z8wJxTAfJJxaUC3pTLvzldiUGtKS58FqQneIjxh/CCedtPWuaR3gFReYbBgCy8/006ge+sh2wg==}
+  pkglab-darwin-arm64@0.13.3:
+    resolution: {integrity: sha512-ZY6qFLWKvF+gQeZpw+gExv5tZ7fRGsakHG1tu/dxk8sz8VnMdvOn2qhKUZFyHDKCeUssa41hF8FhArist7lv+w==}
     engines: {node: '>=18'}
     cpu: [arm64]
     os: [darwin]
 
-  pkglab-darwin-x64@0.13.2:
-    resolution: {integrity: sha512-6Zqmcq5zgxZPyLlnvYRtgWvvCW7FUmKC4Y0wg14yW7vzyiHDS7ETy/eYwEb0WFNPKrxiQMEkI9apa2xPFXbqfQ==}
+  pkglab-darwin-x64@0.13.3:
+    resolution: {integrity: sha512-c6xwaplg/3OaQ+kfM4iMoUFTik2DOJUSap5hBFy46tx4km0/oIRcFHtAPuzJEhAQwgrRE3AfzHNrdGuTy2CKTQ==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [darwin]
 
-  pkglab-linux-arm64@0.13.2:
-    resolution: {integrity: sha512-xTdVYbbpryps8RW/fyWwzLx+0GJsz706/SyRwKs5DjJecADQ4bJZWLhSM9/d+9xgEnLPt1exNfIXTRr0KShJLg==}
+  pkglab-linux-arm64@0.13.3:
+    resolution: {integrity: sha512-QawvGM3KSsb6yjVQxq22TtI03P6FOtreST8HgeXbf2xODx54UH2VQdH9OU5RLAEAiL/z3lV0yrIGksEC0QQExQ==}
     engines: {node: '>=18'}
     cpu: [arm64]
     os: [linux]
 
-  pkglab-linux-x64@0.13.2:
-    resolution: {integrity: sha512-BQD+cTWqKoReztNDvmJEq1XWVc9ZeaX7YB3EwsfcCTIlEypi7z/QXs7g/gontXrbLfCpIcKEpcMI3dm0G0I76g==}
+  pkglab-linux-x64@0.13.3:
+    resolution: {integrity: sha512-7bHbSrfMgU1Mv+OJm8Fw3pNjArsWCrZmYTMnoBuhwDAqInxR3RF6PY8HyY90LPB2OXhBRQvcUFQBzWvqgN97oA==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [linux]
 
-  pkglab@0.13.2:
-    resolution: {integrity: sha512-E9HRCjhgB/M1OuEucAYCKhLOBlrJJeOfwAhBwW11QgWn/CdSJxmnvWnMpuHDVEPX8VFw8SAJ4+6bQcBbIJ0u3g==}
+  pkglab@0.13.3:
+    resolution: {integrity: sha512-TB77W1mh0BGnRzPQbLreR+/zMmnhzZF9zfqQujU/lSN/rOwdvMd5cn9Nn2DuwTXARKv+u5YygT4VKlaeyxJx/g==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -28822,23 +28822,23 @@ snapshots:
       exsolve: 1.0.7
       pathe: 2.0.3
 
-  pkglab-darwin-arm64@0.13.2:
+  pkglab-darwin-arm64@0.13.3:
     optional: true
 
-  pkglab-darwin-x64@0.13.2:
+  pkglab-darwin-x64@0.13.3:
     optional: true
 
-  pkglab-linux-arm64@0.13.2:
+  pkglab-linux-arm64@0.13.3:
     optional: true
 
-  pkglab-linux-x64@0.13.2: {}
+  pkglab-linux-x64@0.13.3: {}
 
-  pkglab@0.13.2:
+  pkglab@0.13.3:
     optionalDependencies:
-      pkglab-darwin-arm64: 0.13.2
-      pkglab-darwin-x64: 0.13.2
-      pkglab-linux-arm64: 0.13.2
-      pkglab-linux-x64: 0.13.2
+      pkglab-darwin-arm64: 0.13.3
+      pkglab-darwin-x64: 0.13.3
+      pkglab-linux-arm64: 0.13.3
+      pkglab-linux-x64: 0.13.3
 
   playwright-core@1.56.1: {}
 
