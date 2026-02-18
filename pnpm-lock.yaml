@@ -2475,7 +2475,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {'0': node >=0.10.0}
+    engines: {node: '>=0.10.0'}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==}
@@ -11877,6 +11877,30 @@ packages:
   pkginfo@0.4.1:
     resolution: {integrity: sha512-8xCNE/aT/EXKenuMDZ+xTVwkT8gsoHN2z/Q29l80u0ppGEXVvsKRzNMbtKhg8LS8k1tJLAHHylf6p4VFmP6XUQ==}
     engines: {node: '>= 0.4.0'}
+
+  pkglab-darwin-arm64@0.11.1:
+    resolution: {integrity: sha512-gy2qv+HWlB1y3jr0cT6wjYkVT/tLoFu2UvqE0oJcY3Ca3FqnsAPnwss8let+L1rb79hzqTSZycOuC+yc6dMiaw==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [darwin]
+
+  pkglab-darwin-x64@0.11.1:
+    resolution: {integrity: sha512-cLXqfSZs2qkvNs4QIQOAICm7nM7p6DaVPz9Wj6RXa4ovkzd5KYD3EO+vQGFojACNKKlWpn28tpp9Z3zaEldvsQ==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [darwin]
+
+  pkglab-linux-arm64@0.11.1:
+    resolution: {integrity: sha512-xfXHvwHi+tt4/nRJ4dQZXbiB212YqweJQzIGinwWdHtEAvWl57PBx0giYfpQF3oOHsoVCh65vRCYHmDouLg0BQ==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [linux]
+
+  pkglab-linux-x64@0.11.1:
+    resolution: {integrity: sha512-JFICMlCTRBPi0s2zl8ZrDmh+biyK/c/DkuefdK8irfXPjAYTIq5obe7hrWYEz0v2rT/vDPrBRZ+wg6j1ThpB7Q==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [linux]
 
   pkglab@0.11.1:
     resolution: {integrity: sha512-FdcO24fiY1DE9Y5ZHpQWfihB67x13KTZm56WNfRpsHgCRALjbSLsJRe7B7Q0OPhCN7Vrmzfg2QULZYHNT+FBIA==}
@@ -29311,7 +29335,24 @@ snapshots:
 
   pkginfo@0.4.1: {}
 
-  pkglab@0.11.1: {}
+  pkglab-darwin-arm64@0.11.1:
+    optional: true
+
+  pkglab-darwin-x64@0.11.1:
+    optional: true
+
+  pkglab-linux-arm64@0.11.1:
+    optional: true
+
+  pkglab-linux-x64@0.11.1:
+    optional: true
+
+  pkglab@0.11.1:
+    optionalDependencies:
+      pkglab-darwin-arm64: 0.11.1
+      pkglab-darwin-x64: 0.11.1
+      pkglab-linux-arm64: 0.11.1
+      pkglab-linux-x64: 0.11.1
 
   playwright-core@1.56.1: {}
 
