@@ -390,40 +390,6 @@ jobs:
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 
-      # Install published packages from local registry to test against real npm install scenarios
-      # rather than local monorepo builds. Validates package structure, dependencies, and entry points.
-      - name: Debug pkglab registry
-        if: ${{ steps.task-status.outputs.affected == '1' }}
-        run: |
-          echo "=== pkglab version ==="
-          pkglab --version
-          echo "=== pkglab status ==="
-          pkglab status
-          echo "=== resolve exact version ==="
-          VERSION=$(curl -s http://127.0.0.1:16180/@clerk/nextjs | python3 -c "import sys,json; print(json.load(sys.stdin).get('dist-tags',{}).get('pkglab',''))")
-          echo "Resolved version: $VERSION"
-          echo "=== npm view exact version ==="
-          npm view "@clerk/nextjs@$VERSION" version --registry http://127.0.0.1:16180 2>&1 || echo "npm view FAILED"
-          echo "=== npm install exact version in temp dir ==="
-          TESTDIR=$(mktemp -d)
-          cd $TESTDIR
-          npm init -y > /dev/null 2>&1
-          echo "registry=http://127.0.0.1:16180" > .npmrc
-          npm install "@clerk/nextjs@$VERSION" --ignore-scripts 2>&1 || echo "npm install FAILED"
-          echo "=== npm install INSIDE pnpm exec ==="
-          TESTDIR2=$(mktemp -d)
-          cd $TESTDIR2
-          npm init -y > /dev/null 2>&1
-          echo "registry=http://127.0.0.1:16180" > .npmrc
-          pnpm exec npm install "@clerk/nextjs@$VERSION" --ignore-scripts 2>&1 || echo "pnpm exec npm install FAILED"
-          echo "=== env vars inside pnpm exec ==="
-          pnpm exec env 2>&1 | grep -i "npm_config\|registry" || true
-          echo "=== pkglab add inside pnpm exec ==="
-          TESTDIR3=$(mktemp -d)
-          cd $TESTDIR3
-          npm init -y > /dev/null 2>&1
-          pnpm exec pkglab add @clerk/nextjs 2>&1 || echo "pnpm exec pkglab add FAILED"
-
       - name: Install @clerk/clerk-js in os temp
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}

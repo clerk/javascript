@@ -50,16 +50,17 @@ export const application = (
         // Use pkglab add to pin @clerk/* packages to local registry versions and install
         const clerkDeps = config.clerkDependencies;
         if (clerkDeps.length > 0) {
-          // Debug: capture environment that will be inherited by pkglab/npm
-          log(`[debug] appDirPath: ${appDirPath}`);
-          log(`[debug] npm_config env vars:`);
+          // pnpm leaks npm_config_* env vars (e.g. npm_config_registry) into child
+          // processes. These override the .npmrc that pkglab writes, causing npm to
+          // resolve packages from the public registry instead of the local one.
+          // Strip them so pkglab's .npmrc takes effect.
+          const cleanEnv: Record<string, string> = {};
           for (const [k, v] of Object.entries(process.env)) {
-            if (k.toLowerCase().startsWith('npm_config') || k.toLowerCase().includes('registry')) {
-              log(`[debug]   ${k}=${v}`);
+            if (!k.startsWith('npm_config_') && !k.startsWith('npm_package_')) {
+              cleanEnv[k] = v as string;
             }
           }
-          await run('npm config get registry', { cwd: appDirPath, log });
-          await run(`pkglab add ${clerkDeps.join(' ')} --verbose`, { cwd: appDirPath, log });
+          await run(`pkglab add ${clerkDeps.join(' ')}`, { cwd: appDirPath, env: cleanEnv, log });
         } else {
           await run(scripts.setup, { cwd: appDirPath, log });
         }
