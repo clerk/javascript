@@ -45,7 +45,7 @@ export const createClientUatCookie = (cookieSuffix: string): ClientUatCookieHand
         : 'Strict';
     const secure = getSecureAttribute(sameSite);
     const partitioned = __BUILD_VARIANT_CHIPS__ && secure;
-    const domain = getCookieDomain();
+    const domain = getCookieDomain(undefined, undefined, { sameSite, secure });
 
     // '0' indicates the user is signed out
     let val = '0';
