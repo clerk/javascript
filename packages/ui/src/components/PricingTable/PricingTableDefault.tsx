@@ -1,5 +1,10 @@
 import { __internal_useOrganizationBase, useClerk, useSession } from '@clerk/shared/react';
-import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/shared/types';
+import type {
+  BillingPlanResource,
+  BillingSubscriptionPlanPeriod,
+  PricingTableProps,
+  BillingPlanUnitPrice,
+} from '@clerk/shared/types';
 import * as React from 'react';
 
 import { Switch } from '@/ui/elements/Switch';
@@ -21,7 +26,7 @@ import {
   Span,
   Text,
 } from '../../customizables';
-import { Check, Plus } from '../../icons';
+import { Check, Plus, Users } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { SubscriptionBadge } from '../Subscriptions/badge';
 import { getPricingFooterState } from './utils/pricing-footer-state';
@@ -99,6 +104,7 @@ interface CardProps {
 }
 
 function Card(props: CardProps) {
+  console.log('Card', props);
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const clerk = useClerk();
   const { isSignedIn } = useSession();
@@ -296,9 +302,32 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
       : plan.fee;
   }, [planSupportsAnnual, planPeriod, plan.fee, plan.annualMonthlyFee]);
 
+  const singleUnitPriceTierFee = React.useMemo(() => {
+    if (plan.hasBaseFee || !plan.unitPrices || plan.unitPrices.length !== 1) {
+      return null;
+    }
+
+    const [unitPrice] = plan.unitPrices;
+    if (unitPrice.tiers.length !== 1) {
+      return null;
+    }
+
+    return unitPrice.tiers[0].feePerBlock;
+  }, [plan.hasBaseFee, plan.unitPrices]);
+
+  const displayedFee = singleUnitPriceTierFee ?? fee;
+
   const feeFormatted = React.useMemo(() => {
-    return normalizeFormatted(fee.amountFormatted);
-  }, [fee.amountFormatted]);
+    return normalizeFormatted(displayedFee.amountFormatted);
+  }, [displayedFee.amountFormatted]);
+
+  const feePeriodText = React.useMemo(() => {
+    if (!plan.hasBaseFee && plan.unitPrices) {
+      return localizationKeys('billing.monthPerUnit', { unitName: plan.unitPrices[0].name });
+    }
+
+    return localizationKeys('billing.month');
+  }, [plan.unitPrices]);
 
   return (
     <Box
@@ -361,7 +390,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           variant={isCompact ? 'h2' : 'h1'}
           colorScheme='body'
         >
-          {fee.currencySymbol}
+          {displayedFee.currencySymbol}
           {feeFormatted}
         </Text>
         {!plan.isDefault ? (
@@ -376,7 +405,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
                 marginInlineEnd: t.space.$0x25,
               },
             })}
-            localizationKey={localizationKeys('billing.month')}
+            localizationKey={feePeriodText}
           />
         ) : null}
       </Flex>
@@ -454,6 +483,9 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
           padding: 0,
         })}
       >
+        {plan.unitPrices && (plan.hasBaseFee || plan.unitPrices[0].tiers.length > 1) ? (
+          <CardFeaturesListSeatCost plan={plan} />
+        ) : null}
         {plan.features.slice(0, hasMoreFeatures ? (isCompact ? 3 : 8) : totalFeatures).map(feature => (
           <Box
             elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
@@ -513,3 +545,94 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
     </Box>
   );
 });
+
+const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
+  const unitPrices = plan.unitPrices;
+
+  const seatPriceText = React.useMemo(() => {
+    if (!unitPrices) {
+      return null;
+    }
+
+    const seatUnitPrice = unitPrices.find(unitPrice => unitPrice.name.toLowerCase() === 'seats') ?? unitPrices[0];
+
+    if (!seatUnitPrice) {
+      return null;
+    }
+
+    const formatTierFee = (tier: BillingPlanUnitPrice['tiers'][number]) =>
+      `${tier.feePerBlock.currencySymbol}${normalizeFormatted(tier.feePerBlock.amountFormatted)}`;
+
+    if (seatUnitPrice.tiers.length === 1) {
+      const tier = seatUnitPrice.tiers[0];
+
+      if (tier.feePerBlock.amount === 0 && tier.endsAfterBlock !== null) {
+        const prefix = plan.fee.amount === 0 ? 'Free up to' : 'Up to';
+        return `${prefix} ${tier.endsAfterBlock} seats`;
+      }
+
+      if (tier.feePerBlock.amount !== 0) {
+        return `${formatTierFee(tier)}/mo per seat`;
+      }
+
+      return null;
+    }
+
+    if (seatUnitPrice.tiers.length === 2) {
+      const [includedTier, additionalTier] = seatUnitPrice.tiers;
+
+      if (
+        includedTier &&
+        additionalTier &&
+        includedTier.feePerBlock.amount === 0 &&
+        includedTier.endsAfterBlock !== null &&
+        additionalTier.feePerBlock.amount !== 0
+      ) {
+        const prefix = plan.fee.amount === 0 ? 'Free up to' : 'Up to';
+        return `${prefix} ${includedTier.endsAfterBlock} seats (${formatTierFee(additionalTier)}/mo for additional)`;
+      }
+    }
+
+    return null;
+  }, [plan.fee.amount, unitPrices]);
+
+  if (!seatPriceText) {
+    return null;
+  }
+
+  return (
+    <Box
+      elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
+      elementId={descriptors.pricingTableCardFeaturesListItem.setId('seats')}
+      as='li'
+      sx={t => ({
+        display: 'flex',
+        alignItems: 'baseline',
+        gap: t.space.$2,
+        margin: 0,
+        padding: 0,
+      })}
+    >
+      <Icon
+        icon={Users}
+        colorScheme='neutral'
+        size='sm'
+        aria-hidden
+        sx={t => ({
+          transform: `translateY(${t.space.$0x25})`,
+        })}
+      />
+      <Span elementDescriptor={descriptors.pricingTableCardFeaturesListItemContent}>
+        <Text
+          elementDescriptor={descriptors.pricingTableCardFeaturesListItemTitle}
+          colorScheme='body'
+          sx={t => ({
+            fontWeight: t.fontWeights.$normal,
+          })}
+        >
+          {seatPriceText}
+        </Text>
+      </Span>
+    </Box>
+  );
+};

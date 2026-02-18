@@ -175,7 +175,9 @@ export type __internal_LocalizationResource = {
   membershipRole__guestMember: LocalizationValue;
   billing: {
     month: LocalizationValue;
+    monthPerUnit: LocalizationValue<'unitName'>;
     year: LocalizationValue;
+    yearPerUnit: LocalizationValue<'unitName'>;
     free: LocalizationValue;
     getStarted: LocalizationValue;
     manage: LocalizationValue;

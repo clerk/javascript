@@ -119,6 +119,7 @@ export const enUS: LocalizationResource = {
     manage: 'Manage',
     manageSubscription: 'Manage subscription',
     month: 'Month',
+    monthPerUnit: 'Month per {{unitName}}',
     monthly: 'Monthly',
     pastDue: 'Past due',
     pay: 'Pay {{amount}}',
@@ -173,6 +174,7 @@ export const enUS: LocalizationResource = {
     viewFeatures: 'View features',
     viewPayment: 'View payment',
     year: 'Year',
+    yearPerUnit: 'Year per {{unitName}}',
   },
   createOrganization: {
     formButtonSubmit: 'Create organization',
