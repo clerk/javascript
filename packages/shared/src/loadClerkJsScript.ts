@@ -12,9 +12,13 @@ const errorThrower = buildErrorThrower({ packageName: '@clerk/shared' });
 
 export type LoadClerkJSScriptOptions = {
   publishableKey: string;
-  clerkJSUrl?: string;
-  /** @deprecated This option is deprecated. The Clerk SDK will automatically use the correct version. */
-  clerkJSVersion?: string;
+  /** @internal */
+  __internal_clerkJSUrl?: string;
+  /**
+   * @deprecated This option is deprecated. The Clerk SDK will automatically use the correct version.
+   * @internal
+   */
+  __internal_clerkJSVersion?: string;
   sdkMetadata?: SDKMetadata;
   proxyUrl?: string;
   domain?: string;
@@ -34,7 +38,8 @@ export type LoadClerkJsScriptOptions = LoadClerkJSScriptOptions;
 
 export type LoadClerkUIScriptOptions = {
   publishableKey: string;
-  clerkUIUrl?: string;
+  /** @internal */
+  __internal_clerkUIUrl?: string;
   proxyUrl?: string;
   domain?: string;
   nonce?: string;
@@ -220,22 +225,22 @@ export const loadClerkUIScript = async (opts?: LoadClerkUIScriptOptions): Promis
 };
 
 export const clerkJSScriptUrl = (opts: LoadClerkJSScriptOptions) => {
-  const { clerkJSUrl, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
+  const { __internal_clerkJSUrl, __internal_clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
 
-  if (clerkJSUrl) {
-    return clerkJSUrl;
+  if (__internal_clerkJSUrl) {
+    return __internal_clerkJSUrl;
   }
 
   const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
-  const version = versionSelector(clerkJSVersion);
+  const version = versionSelector(__internal_clerkJSVersion);
   return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.browser.js`;
 };
 
 export const clerkUIScriptUrl = (opts: LoadClerkUIScriptOptions) => {
-  const { clerkUIUrl, proxyUrl, domain, publishableKey } = opts;
+  const { __internal_clerkUIUrl, proxyUrl, domain, publishableKey } = opts;
 
-  if (clerkUIUrl) {
-    return clerkUIUrl;
+  if (__internal_clerkUIUrl) {
+    return __internal_clerkUIUrl;
   }
 
   const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });

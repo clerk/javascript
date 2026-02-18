@@ -34,9 +34,9 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & InternalR
     domain: paramDomain,
     publishableKey: paramPublishableKey,
     telemetry: paramTelemetry,
-    clerkJSUrl: paramClerkJSUrl,
-    clerkJSVersion: paramClerkJSVersion,
-    clerkUIUrl: paramClerkUIUrl,
+    __internal_clerkJSUrl: paramClerkJSUrl,
+    __internal_clerkJSVersion: paramClerkJSVersion,
+    __internal_clerkUIUrl: paramClerkUIUrl,
     prefetchUI: paramPrefetchUI,
     ...rest
   } = params || {};
@@ -52,9 +52,9 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & InternalR
     // In keyless mode, use server-injected publishableKey from params
     publishableKey:
       paramPublishableKey || internalOptions?.publishableKey || import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '',
-    clerkJSUrl: paramClerkJSUrl || import.meta.env.PUBLIC_CLERK_JS_URL,
-    clerkJSVersion: paramClerkJSVersion || import.meta.env.PUBLIC_CLERK_JS_VERSION,
-    clerkUIUrl: paramClerkUIUrl || import.meta.env.PUBLIC_CLERK_UI_URL,
+    __internal_clerkJSUrl: paramClerkJSUrl || import.meta.env.PUBLIC_CLERK_JS_URL,
+    __internal_clerkJSVersion: paramClerkJSVersion || import.meta.env.PUBLIC_CLERK_JS_VERSION,
+    __internal_clerkUIUrl: paramClerkUIUrl || import.meta.env.PUBLIC_CLERK_UI_URL,
     prefetchUI: mergePrefetchUIConfig(paramPrefetchUI),
     telemetry: paramTelemetry || {
       disabled: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DISABLED),

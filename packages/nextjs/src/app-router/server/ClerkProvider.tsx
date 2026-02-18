@@ -40,9 +40,9 @@ export async function ClerkProvider<TUi extends Ui = Ui>(
     <Suspense>
       <DynamicClerkScripts
         publishableKey={propsWithEnvs.publishableKey}
-        clerkJSUrl={propsWithEnvs.clerkJSUrl}
-        clerkJSVersion={propsWithEnvs.clerkJSVersion}
-        clerkUIUrl={propsWithEnvs.clerkUIUrl}
+        __internal_clerkJSUrl={propsWithEnvs.__internal_clerkJSUrl}
+        __internal_clerkJSVersion={propsWithEnvs.__internal_clerkJSVersion}
+        __internal_clerkUIUrl={propsWithEnvs.__internal_clerkUIUrl}
         domain={propsWithEnvs.domain}
         proxyUrl={propsWithEnvs.proxyUrl}
         prefetchUI={propsWithEnvs.prefetchUI}

@@ -13,8 +13,8 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
   const domain = env.domain!;
 
   const clerkJsScriptSrc = clerkJSScriptUrl({
-    clerkJSUrl: env.clerkJsUrl,
-    clerkJSVersion: env.clerkJsVersion,
+    __internal_clerkJSUrl: env.clerkJsUrl,
+    __internal_clerkJSVersion: env.clerkJsVersion,
     domain,
     proxyUrl,
     publishableKey,
@@ -35,7 +35,7 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
   }
 
   const clerkUIScriptSrc = clerkUIScriptUrl({
-    clerkUIUrl: env.clerkUIUrl,
+    __internal_clerkUIUrl: env.clerkUIUrl,
     domain,
     proxyUrl,
     publishableKey,

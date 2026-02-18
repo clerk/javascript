@@ -23,9 +23,9 @@ async function getNonce(): Promise<string> {
 
 type DynamicClerkScriptsProps = {
   publishableKey: string;
-  clerkJSUrl?: string;
-  clerkJSVersion?: string;
-  clerkUIUrl?: string;
+  __internal_clerkJSUrl?: string;
+  __internal_clerkJSVersion?: string;
+  __internal_clerkUIUrl?: string;
   domain?: string;
   proxyUrl?: string;
   prefetchUI?: boolean;
@@ -37,7 +37,7 @@ type DynamicClerkScriptsProps = {
  * nonce fetching from the rest of the page, allowing static rendering/PPR to work.
  */
 export async function DynamicClerkScripts(props: DynamicClerkScriptsProps) {
-  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkUIUrl, domain, proxyUrl, prefetchUI } = props;
+  const { publishableKey, __internal_clerkJSUrl, __internal_clerkJSVersion, __internal_clerkUIUrl, domain, proxyUrl, prefetchUI } = props;
 
   if (!publishableKey) {
     return null;
@@ -48,9 +48,9 @@ export async function DynamicClerkScripts(props: DynamicClerkScriptsProps) {
   return (
     <ClerkScriptTags
       publishableKey={publishableKey}
-      clerkJSUrl={clerkJSUrl}
-      clerkJSVersion={clerkJSVersion}
-      clerkUIUrl={clerkUIUrl}
+      __internal_clerkJSUrl={__internal_clerkJSUrl}
+      __internal_clerkJSVersion={__internal_clerkJSVersion}
+      __internal_clerkUIUrl={__internal_clerkUIUrl}
       nonce={nonce}
       domain={domain}
       proxyUrl={proxyUrl}

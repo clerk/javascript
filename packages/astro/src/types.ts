@@ -29,12 +29,21 @@ type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
 > &
   MultiDomainAndOrProxyPrimitives & {
     appearance?: Appearance<TUi>;
-    clerkJSUrl?: string;
-    clerkJSVersion?: string;
+    /**
+     * The URL that `@clerk/clerk-js` should be hot-loaded from.
+     * @internal
+     */
+    __internal_clerkJSUrl?: string;
+    /**
+     * The npm version for `@clerk/clerk-js`.
+     * @internal
+     */
+    __internal_clerkJSVersion?: string;
     /**
      * The URL that `@clerk/ui` should be hot-loaded from.
+     * @internal
      */
-    clerkUIUrl?: string;
+    __internal_clerkUIUrl?: string;
     /**
      * Controls prefetching of the `@clerk/ui` script.
      * - `false` - Skip prefetching the UI (for custom UIs using Control Components)

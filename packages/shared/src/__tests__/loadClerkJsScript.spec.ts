@@ -147,9 +147,9 @@ describe('clerkJsScriptUrl()', () => {
   const mockDevPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
   const mockProdPublishableKey = 'pk_live_ZXhhbXBsZS5jbGVyay5jb20k'; // example.clerk.com
 
-  test('returns clerkJSUrl when provided', () => {
+  test('returns __internal_clerkJSUrl when provided', () => {
     const customUrl = 'https://custom.clerk.com/clerk.js';
-    const result = clerkJsScriptUrl({ clerkJSUrl: customUrl, publishableKey: mockDevPublishableKey });
+    const result = clerkJsScriptUrl({ __internal_clerkJSUrl: customUrl, publishableKey: mockDevPublishableKey });
     expect(result).toBe(customUrl);
   });
 
@@ -165,8 +165,8 @@ describe('clerkJsScriptUrl()', () => {
     expect(result).toBe(`https://example.clerk.com/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`);
   });
 
-  test('uses provided clerkJSVersion', () => {
-    const result = clerkJsScriptUrl({ publishableKey: mockDevPublishableKey, clerkJSVersion: '6' });
+  test('uses provided __internal_clerkJSVersion', () => {
+    const result = clerkJsScriptUrl({ publishableKey: mockDevPublishableKey, __internal_clerkJSVersion: '6' });
     expect(result).toContain('/npm/@clerk/clerk-js@6/');
   });
 });
@@ -386,9 +386,9 @@ describe('clerkUIScriptUrl()', () => {
   const mockDevPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
   const mockProdPublishableKey = 'pk_live_ZXhhbXBsZS5jbGVyay5jb20k'; // example.clerk.com
 
-  test('returns clerkUIUrl when provided', () => {
+  test('returns __internal_clerkUIUrl when provided', () => {
     const customUrl = 'https://custom.clerk.com/ui.js';
-    const result = clerkUIScriptUrl({ clerkUIUrl: customUrl, publishableKey: mockDevPublishableKey });
+    const result = clerkUIScriptUrl({ __internal_clerkUIUrl: customUrl, publishableKey: mockDevPublishableKey });
     expect(result).toBe(customUrl);
   });
 

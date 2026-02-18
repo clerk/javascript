@@ -20,8 +20,8 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
     const { proxyUrl, isSatellite, domain, signInUrl, signUpUrl, enableEnvSchema = true } = params || {};
 
     // These are not provided when the "bundled" integration is used
-    const clerkJSUrl = (params as any)?.clerkJSUrl as string | undefined;
-    const clerkJSVersion = (params as any)?.clerkJSVersion as string | undefined;
+    const clerkJSUrl = (params as any)?.__internal_clerkJSUrl as string | undefined;
+    const clerkJSVersion = (params as any)?.__internal_clerkJSVersion as string | undefined;
     const prefetchUI = (params as any)?.prefetchUI as boolean | undefined;
     const hasUI = !!(params as any)?.ui;
 

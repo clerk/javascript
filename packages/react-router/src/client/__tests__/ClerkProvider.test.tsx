@@ -21,7 +21,7 @@ vi.mock('../../utils/assert', () => ({
   warnForSsr: vi.fn(),
 }));
 
-describe('ClerkProvider clerkUIUrl prop', () => {
+describe('ClerkProvider __internal_clerkUIUrl prop', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -30,13 +30,13 @@ describe('ClerkProvider clerkUIUrl prop', () => {
     vi.clearAllMocks();
   });
 
-  it('passes clerkUIUrl prop to the underlying ClerkProvider', async () => {
+  it('passes __internal_clerkUIUrl prop to the underlying ClerkProvider', async () => {
     const { ClerkProvider } = await import('../ReactRouterClerkProvider');
 
     render(
       <ClerkProvider
         publishableKey='pk_test_xxx'
-        clerkUIUrl='https://custom.clerk.ui/ui.js'
+        __internal_clerkUIUrl='https://custom.clerk.ui/ui.js'
       >
         <div>Test</div>
       </ClerkProvider>,
@@ -44,12 +44,12 @@ describe('ClerkProvider clerkUIUrl prop', () => {
 
     expect(mockClerkProvider).toHaveBeenCalledWith(
       expect.objectContaining({
-        clerkUIUrl: 'https://custom.clerk.ui/ui.js',
+        __internal_clerkUIUrl: 'https://custom.clerk.ui/ui.js',
       }),
     );
   });
 
-  it('passes clerkUIUrl as undefined when not provided', async () => {
+  it('passes __internal_clerkUIUrl as undefined when not provided', async () => {
     const { ClerkProvider } = await import('../ReactRouterClerkProvider');
 
     render(
@@ -60,19 +60,19 @@ describe('ClerkProvider clerkUIUrl prop', () => {
 
     expect(mockClerkProvider).toHaveBeenCalledWith(
       expect.objectContaining({
-        clerkUIUrl: undefined,
+        __internal_clerkUIUrl: undefined,
       }),
     );
   });
 
-  it('passes clerkUIUrl alongside other props', async () => {
+  it('passes __internal_clerkUIUrl alongside other props', async () => {
     const { ClerkProvider } = await import('../ReactRouterClerkProvider');
 
     render(
       <ClerkProvider
         publishableKey='pk_test_xxx'
-        clerkUIUrl='https://custom.clerk.ui/ui.js'
-        clerkJSUrl='https://custom.clerk.js/clerk.js'
+        __internal_clerkUIUrl='https://custom.clerk.ui/ui.js'
+        __internal_clerkJSUrl='https://custom.clerk.js/clerk.js'
         signInUrl='/sign-in'
         signUpUrl='/sign-up'
       >
@@ -82,8 +82,8 @@ describe('ClerkProvider clerkUIUrl prop', () => {
 
     expect(mockClerkProvider).toHaveBeenCalledWith(
       expect.objectContaining({
-        clerkUIUrl: 'https://custom.clerk.ui/ui.js',
-        clerkJSUrl: 'https://custom.clerk.js/clerk.js',
+        __internal_clerkUIUrl: 'https://custom.clerk.ui/ui.js',
+        __internal_clerkJSUrl: 'https://custom.clerk.js/clerk.js',
         signInUrl: '/sign-in',
         signUpUrl: '/sign-up',
       }),

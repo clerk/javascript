@@ -64,11 +64,11 @@ export default defineNuxtModule<ModuleOptions>({
           signUpForceRedirectUrl: options.signUpForceRedirectUrl,
           signUpUrl: options.signUpUrl,
           domain: options.domain,
-          // Using jsUrl/uiUrl instead of clerkJSUrl/clerkUIUrl to support
+          // Using jsUrl/uiUrl instead of __internal_clerkJSUrl/__internal_clerkUIUrl to support
           // NUXT_PUBLIC_CLERK_JS_URL and NUXT_PUBLIC_CLERK_UI_URL env vars.
-          jsUrl: options.clerkJSUrl,
-          uiUrl: options.clerkUIUrl,
-          clerkJSVersion: options.clerkJSVersion,
+          jsUrl: options.__internal_clerkJSUrl,
+          uiUrl: options.__internal_clerkUIUrl,
+          clerkJSVersion: options.__internal_clerkJSVersion,
           // prefetchUI config: can be false or undefined
           prefetchUI: options.prefetchUI,
           isSatellite: options.isSatellite,

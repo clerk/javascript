@@ -2491,17 +2491,20 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
   /**
    * The URL that `@clerk/clerk-js` should be hot-loaded from.
+   * @internal
    */
-  clerkJSUrl?: string;
+  __internal_clerkJSUrl?: string;
   /**
    * The npm version for `@clerk/clerk-js`.
    * @deprecated This prop is deprecated. The Clerk SDK will automatically use the correct version.
+   * @internal
    */
-  clerkJSVersion?: string;
+  __internal_clerkJSVersion?: string;
   /**
    * The URL that `@clerk/ui` should be hot-loaded from.
+   * @internal
    */
-  clerkUIUrl?: string;
+  __internal_clerkUIUrl?: string;
   /**
    * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
    */

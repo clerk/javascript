@@ -16,7 +16,7 @@ declare module 'nuxt/schema' {
     };
   }
   interface PublicRuntimeConfig {
-    clerk: Omit<PluginOptions, 'clerkJSUrl' | 'clerkUIUrl'> & {
+    clerk: Omit<PluginOptions, '__internal_clerkJSUrl' | '__internal_clerkUIUrl' | '__internal_clerkJSVersion'> & {
       /**
        * The URL that `@clerk/clerk-js` should be hot-loaded from.
        * Supports NUXT_PUBLIC_CLERK_JS_URL env var.
@@ -27,6 +27,10 @@ declare module 'nuxt/schema' {
        * Supports NUXT_PUBLIC_CLERK_UI_URL env var.
        */
       uiUrl?: string;
+      /**
+       * The npm version for `@clerk/clerk-js`.
+       */
+      clerkJSVersion?: string;
     };
   }
 }
