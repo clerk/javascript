@@ -4,6 +4,7 @@ import type {
   PricingTableProps,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
+  TaskSetupMFAProps,
   UserButtonProps,
   WaitlistProps,
 } from '@clerk/shared/types';
@@ -32,6 +33,7 @@ import {
   SessionTasksContext,
   TaskChooseOrganizationContext,
   TaskResetPasswordContext,
+  TaskSetupMFAContext,
 } from './components/SessionTasks';
 
 export function ComponentContextProvider({
@@ -142,6 +144,14 @@ export function ComponentContextProvider({
             {children}
           </SessionTasksContext.Provider>
         </TaskResetPasswordContext.Provider>
+      );
+    case 'TaskSetupMFA':
+      return (
+        <TaskSetupMFAContext.Provider value={{ componentName: 'TaskSetupMFA', ...(props as TaskSetupMFAProps) }}>
+          <SessionTasksContext.Provider value={{ ...(props as TaskSetupMFAProps) }}>
+            {children}
+          </SessionTasksContext.Provider>
+        </TaskSetupMFAContext.Provider>
       );
     default:
       throw new Error(`Unknown component context: ${componentName}`);

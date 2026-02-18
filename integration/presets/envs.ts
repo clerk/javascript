@@ -157,6 +157,12 @@ const withSessionTasksResetPassword = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-session-tasks-reset-password').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks-reset-password').pk);
 
+const withSessionTasksSetupMfa = base
+  .clone()
+  .setId('withSessionTasksSetupMfa')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-session-tasks-setup-mfa').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks-setup-mfa').pk);
+
 const withBillingJwtV2 = base
   .clone()
   .setId('withBillingJwtV2')
@@ -210,6 +216,7 @@ export const envs = {
   withReverification,
   withSessionTasks,
   withSessionTasksResetPassword,
+  withSessionTasksSetupMfa,
   withSignInOrUpEmailLinksFlow,
   withSignInOrUpFlow,
   withSignInOrUpwithRestrictedModeFlow,
