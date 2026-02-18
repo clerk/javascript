@@ -23,6 +23,8 @@ function isNetlifyRuntime(): boolean {
 
   return (
     Boolean(process.env.NETLIFY) ||
+    Boolean(process.env.NETLIFY_DEV) ||
+    Boolean(process.env.DEPLOY_PRIME_URL) ||
     Boolean(process.env.NETLIFY_FUNCTIONS_TOKEN) ||
     (typeof process.env.URL === 'string' && process.env.URL.endsWith('netlify.app'))
   );
