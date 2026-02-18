@@ -1,5 +1,32 @@
 # Change Log
 
+## 3.35.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.16
+
+## 3.35.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.15
+
+## 3.35.3
+
+### Patch Changes
+
+- Updated Hebrew localization placeholders for user input fields ([#7669](https://github.com/clerk/javascript/pull/7669)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Update translations for locales: Spanish (es-ES) billing page improvements, Portuguese (pt-BR) enterprise connections and password errors, and comprehensive Finnish (fi-FI) updates across authentication, billing, and organization management. ([#7683](https://github.com/clerk/javascript/pull/7683)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated es-ES translations for billing ([#7669](https://github.com/clerk/javascript/pull/7669)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.14
+
 ## 3.35.2
 
 ### Patch Changes

@@ -36,6 +36,7 @@ export {
   SignUpButton,
   TaskChooseOrganization,
   TaskResetPassword,
+  TaskSetupMFA,
   UserAvatar,
   UserButton,
   UserProfile,
@@ -51,6 +52,7 @@ export {
   useClerk,
   useEmailLink,
   useOrganization,
+  useOrganizationCreationDefaults,
   useOrganizationList,
   useReverification,
   useSession,
@@ -58,6 +60,10 @@ export {
   useSignIn,
   useSignUp,
   useUser,
+} from './client-boundary/hooks';
+export type {
+  UseOrganizationCreationDefaultsParams,
+  UseOrganizationCreationDefaultsReturn,
 } from './client-boundary/hooks';
 
 /**

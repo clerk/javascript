@@ -9,12 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root';
-import { Route as SignInRouteImport } from './routes/sign-in';
+import { Route as UserRouteImport } from './routes/user';
 import { Route as IndexRouteImport } from './routes/index';
+import { Route as SignInSplatRouteImport } from './routes/sign-in.$';
 
-const SignInRoute = SignInRouteImport.update({
-  id: '/sign-in',
-  path: '/sign-in',
+const UserRoute = UserRouteImport.update({
+  id: '/user',
+  path: '/user',
   getParentRoute: () => rootRouteImport,
 } as any);
 const IndexRoute = IndexRouteImport.update({
@@ -22,35 +23,51 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any);
+const SignInSplatRoute = SignInSplatRouteImport.update({
+  id: '/sign-in/$',
+  path: '/sign-in/$',
+  getParentRoute: () => rootRouteImport,
+} as any);
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute;
-  '/sign-in': typeof SignInRoute;
+  '/user': typeof UserRoute;
+  '/sign-in/$': typeof SignInSplatRoute;
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute;
-  '/sign-in': typeof SignInRoute;
+  '/user': typeof UserRoute;
+  '/sign-in/$': typeof SignInSplatRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   '/': typeof IndexRoute;
-  '/sign-in': typeof SignInRoute;
+  '/user': typeof UserRoute;
+  '/sign-in/$': typeof SignInSplatRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '/' | '/sign-in';
+  fullPaths: '/' | '/user' | '/sign-in/$';
   fileRoutesByTo: FileRoutesByTo;
-  to: '/' | '/sign-in';
-  id: '__root__' | '/' | '/sign-in';
+  to: '/' | '/user' | '/sign-in/$';
+  id: '__root__' | '/' | '/user' | '/sign-in/$';
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
-  SignInRoute: typeof SignInRoute;
+  UserRoute: typeof UserRoute;
+  SignInSplatRoute: typeof SignInSplatRoute;
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/user': {
+      id: '/user';
+      path: '/user';
+      fullPath: '/user';
+      preLoaderRoute: typeof UserRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/': {
       id: '/';
       path: '/';
@@ -58,11 +75,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    '/sign-in': {
-      id: '/sign-in';
-      path: '/sign-in';
-      fullPath: '/sign-in';
-      preLoaderRoute: typeof SignInRouteImport;
+    '/sign-in/$': {
+      id: '/sign-in/$';
+      path: '/sign-in/$';
+      fullPath: '/sign-in/$';
+      preLoaderRoute: typeof SignInSplatRouteImport;
       parentRoute: typeof rootRouteImport;
     };
   }
@@ -70,6 +87,17 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  SignInRoute: SignInRoute,
+  UserRoute: UserRoute,
+  SignInSplatRoute: SignInSplatRoute,
 };
 export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>();
+
+import type { getRouter } from './router.tsx';
+import type { startInstance } from './start.ts';
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true;
+    router: Awaited<ReturnType<typeof getRouter>>;
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>;
+  }
+}

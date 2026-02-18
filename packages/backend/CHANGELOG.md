@@ -1,5 +1,59 @@
 # Change Log
 
+## 2.31.1
+
+### Patch Changes
+
+- Updated dependencies [[`b17e4bb`](https://github.com/clerk/javascript/commit/b17e4bbbbad173969523e5494f2d8447d1887b95)]:
+  - @clerk/shared@3.45.1
+  - @clerk/types@4.101.16
+
+## 2.31.0
+
+### Minor Changes
+
+- Add `providerUserId` field to `ExternalAccount` resource as the preferred way to access the unique user ID from the OAuth provider. The existing `externalId` field is now deprecated in favor of `providerUserId` for better clarity and consistency across the API. ([#7778](https://github.com/clerk/javascript/pull/7778)) by [@Jibaru](https://github.com/Jibaru)
+
+- Add `createBulk()` method to `WaitlistEntryAPI` for bulk creating waitlist entries ([#7762](https://github.com/clerk/javascript/pull/7762)) by [@Jibaru](https://github.com/Jibaru)
+
+### Patch Changes
+
+- Updated dependencies [[`35bcbd1`](https://github.com/clerk/javascript/commit/35bcbd11f5753ee396cd090d3dd1848f3f2727e0)]:
+  - @clerk/shared@3.45.0
+  - @clerk/types@4.101.15
+
+## 2.30.1
+
+### Patch Changes
+
+- Improved token type validation in authentication requests ([#7764](https://github.com/clerk/javascript/pull/7764)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 2.30.0
+
+### Minor Changes
+
+- Add `lastSignInAtAfter` and `lastSignInAtBefore` filters to the Users API list and count endpoints. ([#7721](https://github.com/clerk/javascript/pull/7721)) by [@Jibaru](https://github.com/Jibaru)
+
+  These parameters are supported by `users.getUserList()` and are forwarded to `/v1/users` and `/v1/users/count` to filter users by last sign-in timestamp.
+
+### Patch Changes
+
+- Fixed an issue where JWT OAuth access tokens where not treated as a machine token ([#7756](https://github.com/clerk/javascript/pull/7756)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 2.29.7
+
+### Patch Changes
+
+- fix: correct `createInvitationBulk` return type to `Promise<Invitation[]>` ([#7702](https://github.com/clerk/javascript/pull/7702)) by [@jacekradko](https://github.com/jacekradko)
+
+## 2.29.6
+
+### Patch Changes
+
+- Updated dependencies [[`64a35f7`](https://github.com/clerk/javascript/commit/64a35f79e9a49dfc140b4c8a8df517b74d46d6c6)]:
+  - @clerk/shared@3.44.0
+  - @clerk/types@4.101.14
+
 ## 2.29.5
 
 ### Patch Changes

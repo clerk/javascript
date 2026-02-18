@@ -2,6 +2,8 @@ import { waitForElement } from '@clerk/shared/dom';
 import { loadScript } from '@clerk/shared/loadScript';
 import type { CaptchaAppearanceOptions, CaptchaWidgetType } from '@clerk/shared/types';
 
+import { debugLogger } from '@/utils/debug';
+
 import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
 import type { CaptchaOptions } from './types';
 
@@ -74,7 +76,23 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   const { siteKey, widgetType, invisibleSiteKey, nonce } = opts;
   const { modalContainerQuerySelector, modalWrapperQuerySelector, closeModal, openModal } = opts;
   const captcha: Turnstile.Turnstile = await loadCaptcha(nonce);
+
+  // Error codes array - used for actual error handling (unchanged from original behavior)
   const errorCodes: (string | number)[] = [];
+
+  // Diagnostic tracking - wrapped in try-catch to never affect production behavior
+  let startTime = 0;
+  const errorTimeline: Array<{ code: string | number; t: number }> = [];
+  let captchaAttemptId = '';
+  try {
+    startTime = Date.now();
+    captchaAttemptId =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : Math.random().toString(36).substring(2, 9);
+  } catch {
+    // Silently ignore - diagnostics should never break captcha flow
+  }
 
   let captchaToken = '';
   let id = '';
@@ -180,7 +198,14 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
             }
           },
           'error-callback': function (errorCode) {
+            // Track error for actual error handling (original behavior)
             errorCodes.push(errorCode);
+            // Track timing for diagnostics only
+            try {
+              errorTimeline.push({ code: errorCode, t: Date.now() - startTime });
+            } catch {
+              // Silently ignore - diagnostics should never break captcha flow
+            }
             /**
              * By setting retry to 'never' the responsibility for implementing retrying is ours
              * https://developers.cloudflare.com/turnstile/reference/client-side-errors/#retrying
@@ -219,6 +244,31 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       // After a failed challenge remove it
       captcha.remove(id);
     }
+
+    // Log failure with full error history for debugging - wrapped to never affect production
+    try {
+      const containerExistsAtFailure = widgetContainerQuerySelector
+        ? !!document.querySelector(widgetContainerQuerySelector)
+        : false;
+
+      debugLogger.error(
+        'Turnstile captcha challenge failed',
+        {
+          captchaAttemptId,
+          errorTimeline,
+          lastErrorCode: errorTimeline.length > 0 ? errorTimeline[errorTimeline.length - 1].code : null,
+          finalError: String(e),
+          retriesAttempted: retries,
+          widgetType: captchaTypeUsed,
+          containerExistsAtFailure,
+          totalDurationMs: Date.now() - startTime,
+        },
+        'captcha',
+      );
+    } catch {
+      // Silently ignore - diagnostics should never break captcha flow
+    }
+
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw {
       captchaError: e,

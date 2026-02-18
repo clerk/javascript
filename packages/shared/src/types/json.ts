@@ -338,6 +338,7 @@ export interface PublicUserDataJSON {
   has_image: boolean;
   identifier: string;
   user_id?: string;
+  username?: string;
 }
 
 export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
@@ -729,6 +730,7 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   credit?: {
     amount: BillingMoneyAmountJSON;
   };
+  credits?: BillingCreditsJSON;
   plan: BillingPlanJSON;
   plan_period: BillingSubscriptionPlanPeriod;
   status: BillingSubscriptionStatus;
@@ -779,6 +781,33 @@ export interface BillingMoneyAmountJSON {
 }
 
 /**
+ * Contains proration credit details including billing cycle information.
+ */
+export interface BillingProrationCreditDetailJSON {
+  amount: BillingMoneyAmountJSON;
+  cycle_days_remaining: number;
+  cycle_days_total: number;
+  cycle_remaining_percent: number;
+}
+
+/**
+ * Contains payer credit details including the available balance and the amount applied to this checkout.
+ */
+export interface BillingPayerCreditJSON {
+  remaining_balance: BillingMoneyAmountJSON;
+  applied_amount: BillingMoneyAmountJSON;
+}
+
+/**
+ * Unified credits breakdown for checkout totals. Can be used instead of `credit` field.
+ */
+export interface BillingCreditsJSON {
+  proration: BillingProrationCreditDetailJSON | null;
+  payer: BillingPayerCreditJSON | null;
+  total: BillingMoneyAmountJSON;
+}
+
+/**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingCheckoutTotalsJSON {
@@ -787,6 +816,8 @@ export interface BillingCheckoutTotalsJSON {
   tax_total: BillingMoneyAmountJSON;
   total_due_now: BillingMoneyAmountJSON;
   credit: BillingMoneyAmountJSON | null;
+  credits: BillingCreditsJSON | null;
+  account_credit: BillingMoneyAmountJSON | null;
   past_due: BillingMoneyAmountJSON | null;
   total_due_after_free_trial: BillingMoneyAmountJSON | null;
 }

@@ -1,5 +1,64 @@
 # @clerk/tanstack-react-start
 
+## 0.29.3
+
+### Patch Changes
+
+- Updated dependencies [[`b17e4bb`](https://github.com/clerk/javascript/commit/b17e4bbbbad173969523e5494f2d8447d1887b95)]:
+  - @clerk/shared@3.45.1
+  - @clerk/backend@2.31.1
+  - @clerk/clerk-react@5.60.2
+  - @clerk/types@4.101.16
+
+## 0.29.2
+
+### Patch Changes
+
+- Updated dependencies [[`35bcbd1`](https://github.com/clerk/javascript/commit/35bcbd11f5753ee396cd090d3dd1848f3f2727e0), [`5740640`](https://github.com/clerk/javascript/commit/57406404d516cf0fa8d3bb9b38a0d3d1d69dc88d), [`03c61c1`](https://github.com/clerk/javascript/commit/03c61c122cc1eb2cf35ecdc20586f2fbb0a1e7db)]:
+  - @clerk/shared@3.45.0
+  - @clerk/backend@2.31.0
+  - @clerk/clerk-react@5.60.1
+  - @clerk/types@4.101.15
+
+## 0.29.1
+
+### Patch Changes
+
+- Updated dependencies [[`a726252`](https://github.com/clerk/javascript/commit/a726252610ea0cbef2d971ec3ce8d0d4be3a3468)]:
+  - @clerk/backend@2.30.1
+
+## 0.29.0
+
+### Minor Changes
+
+- Bumped minimum required TanStack Start dependencies to 1.157.0+ and removed usage of deprecated `json()` in favor of standard Web APIs. ([#7720](https://github.com/clerk/javascript/pull/7720)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`7917ff4`](https://github.com/clerk/javascript/commit/7917ff4214fc9e1001e2698c7241bbfa4b68e5af), [`b0d28c1`](https://github.com/clerk/javascript/commit/b0d28c14815a6136c67a719efb1dc5496ffb5c82)]:
+  - @clerk/backend@2.30.0
+
+## 0.28.1
+
+### Patch Changes
+
+- Updated dependencies [[`559cd84`](https://github.com/clerk/javascript/commit/559cd84a320a1d808fb38c404f31437046198123)]:
+  - @clerk/backend@2.29.7
+
+## 0.28.0
+
+### Minor Changes
+
+- Export `useOrganizationCreationDefaults` hook to fetch suggested organization name and logo from default naming rules ([#7690](https://github.com/clerk/javascript/pull/7690)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`64a35f7`](https://github.com/clerk/javascript/commit/64a35f79e9a49dfc140b4c8a8df517b74d46d6c6)]:
+  - @clerk/shared@3.44.0
+  - @clerk/clerk-react@5.60.0
+  - @clerk/backend@2.29.6
+  - @clerk/types@4.101.14
+
 ## 0.27.17
 
 ### Patch Changes

@@ -1,5 +1,35 @@
 # @clerk/vue
 
+## 1.17.14
+
+### Patch Changes
+
+- Updated dependencies [[`b17e4bb`](https://github.com/clerk/javascript/commit/b17e4bbbbad173969523e5494f2d8447d1887b95)]:
+  - @clerk/shared@3.45.1
+  - @clerk/types@4.101.16
+
+## 1.17.13
+
+### Patch Changes
+
+- Updated dependencies [[`35bcbd1`](https://github.com/clerk/javascript/commit/35bcbd11f5753ee396cd090d3dd1848f3f2727e0)]:
+  - @clerk/shared@3.45.0
+  - @clerk/types@4.101.15
+
+## 1.17.12
+
+### Patch Changes
+
+- Fixed an error occurring in the composables where watchers attempted to call unwatch() within their own initialization. ([#7744](https://github.com/clerk/javascript/pull/7744)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 1.17.11
+
+### Patch Changes
+
+- Updated dependencies [[`64a35f7`](https://github.com/clerk/javascript/commit/64a35f79e9a49dfc140b4c8a8df517b74d46d6c6)]:
+  - @clerk/shared@3.44.0
+  - @clerk/types@4.101.14
+
 ## 1.17.10
 
 ### Patch Changes

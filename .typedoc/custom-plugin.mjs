@@ -33,6 +33,8 @@ const FILES_WITHOUT_HEADINGS = [
   'use-reverification-params.mdx',
   'payment-element-provider-props.mdx',
   'payment-element-props.mdx',
+  'use-organization-creation-defaults-return.mdx',
+  'use-organization-creation-defaults-params.mdx',
 ];
 
 /**
@@ -71,6 +73,7 @@ const LINK_REPLACEMENTS = [
   ['phone-number', '/docs/reference/backend/types/backend-phone-number'],
   ['saml-account', '/docs/reference/backend/types/backend-saml-account'],
   ['web3-wallet', '/docs/reference/backend/types/backend-web3-wallet'],
+  ['invitation', '/docs/reference/backend/types/backend-invitation'],
   ['verify-token-options', '#verify-token-options'],
   ['localization-resource', '/docs/guides/customizing-clerk/localization'],
   ['confirm-checkout-params', '/docs/reference/javascript/types/billing-checkout-resource#parameters'],
@@ -90,6 +93,7 @@ const LINK_REPLACEMENTS = [
   ['billing-payment-resource', '/docs/reference/javascript/types/billing-payment-resource'],
   ['deleted-object-resource', '/docs/reference/javascript/types/deleted-object-resource'],
   ['use-checkout-return', '/docs/reference/hooks/use-checkout#returns'],
+  ['organization-creation-defaults-resource', '#organization-creation-defaults-resource'],
 ];
 
 /**

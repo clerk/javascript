@@ -1,5 +1,23 @@
 # Change Log
 
+## 3.45.1
+
+### Patch Changes
+
+- Set `SameSite=None` on cookies for `.replit.dev` origins and consolidate third-party domain list ([#7864](https://github.com/clerk/javascript/pull/7864)) by [@brkalow](https://github.com/brkalow)
+
+## 3.45.0
+
+### Minor Changes
+
+- Add `username` field into `PublicUserData` object. ([#7837](https://github.com/clerk/javascript/pull/7837)) by [@Jibaru](https://github.com/Jibaru)
+
+## 3.44.0
+
+### Minor Changes
+
+- Export `useOrganizationCreationDefaults` hook to fetch suggested organization name and logo from default naming rules ([#7690](https://github.com/clerk/javascript/pull/7690)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 3.43.2
 
 ### Patch Changes

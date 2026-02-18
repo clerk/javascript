@@ -5,6 +5,7 @@ export { useSignUp } from './useSignUp';
 export {
   useClerk,
   useOrganization,
+  useOrganizationCreationDefaults,
   useOrganizationList,
   useSessionList,
   useUser,
@@ -16,3 +17,4 @@ export {
   __experimental_PaymentElementProvider,
   __experimental_PaymentElement,
 } from '@clerk/shared/react';
+export type { UseOrganizationCreationDefaultsParams, UseOrganizationCreationDefaultsReturn } from '@clerk/shared/react';
