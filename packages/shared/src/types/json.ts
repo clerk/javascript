@@ -611,7 +611,7 @@ export interface BillingSubscriptionItemSeatsJSON {
  *
  * Represents a single pricing tier for a unit type on a plan.
  */
-export interface BillingPlanUnitPriceTierJSON {
+export interface BillingPlanUnitPriceTierJSON extends ClerkResourceJSON {
   id: string;
   object: 'commerce_unit_price';
   starts_at_block: number;
