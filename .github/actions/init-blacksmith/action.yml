@@ -119,8 +119,14 @@ runs:
       run: pnpm install
       shell: bash
 
+    # The devDep pkglab@^0.12.x creates a node_modules/.bin/pkglab shim that
+    # doesn't have the PATH fallback added in 0.13.2. pnpm prepends
+    # node_modules/.bin to PATH, so the old shim shadows the global binary.
+    # Remove it so the global 0.13.2 is always used.
     - name: Install pkglab
-      run: npm install -g pkglab@0.13.2
+      run: |
+        npm install -g pkglab@0.13.2
+        rm -f node_modules/.bin/pkglab node_modules/.bin/pkgl
       shell: bash
 
     - name: Get Playwright Version
