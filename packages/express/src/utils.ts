@@ -14,6 +14,7 @@ export const loadClientEnv = () => {
     __internal_clerkJSUrl: process.env.CLERK_JS || process.env.CLERK_JS_URL || '',
     __internal_clerkJSVersion: process.env.CLERK_JS_VERSION || '',
     __internal_clerkUIUrl: process.env.CLERK_UI_URL || '',
+    __internal_clerkUIVersion: process.env.CLERK_UI_VERSION || '',
     prefetchUI: process.env.CLERK_PREFETCH_UI === 'false' ? false : undefined,
   };
 };

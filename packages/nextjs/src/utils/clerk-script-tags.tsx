@@ -6,6 +6,7 @@ type ClerkScriptTagsProps = {
   __internal_clerkJSUrl?: string;
   __internal_clerkJSVersion?: string;
   __internal_clerkUIUrl?: string;
+  __internal_clerkUIVersion?: string;
   nonce?: string;
   domain?: string;
   proxyUrl?: string;
@@ -23,6 +24,7 @@ export function ClerkScriptTags(props: ClerkScriptTagsProps) {
     __internal_clerkJSUrl,
     __internal_clerkJSVersion,
     __internal_clerkUIUrl,
+    __internal_clerkUIVersion,
     nonce,
     domain,
     proxyUrl,
@@ -34,6 +36,7 @@ export function ClerkScriptTags(props: ClerkScriptTagsProps) {
     __internal_clerkJSUrl,
     __internal_clerkJSVersion,
     __internal_clerkUIUrl,
+    __internal_clerkUIVersion,
     nonce,
     domain,
     proxyUrl,

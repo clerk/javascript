@@ -25,6 +25,7 @@ export default defineNuxtPlugin(nuxtApp => {
     __internal_clerkJSUrl: clerkConfig.jsUrl,
     __internal_clerkUIUrl: clerkConfig.uiUrl,
     __internal_clerkJSVersion: clerkConfig.clerkJSVersion,
+    __internal_clerkUIVersion: clerkConfig.clerkUIVersion,
     sdkMetadata: {
       name: PACKAGE_NAME,
       version: PACKAGE_VERSION,

@@ -26,6 +26,7 @@ type DynamicClerkScriptsProps = {
   __internal_clerkJSUrl?: string;
   __internal_clerkJSVersion?: string;
   __internal_clerkUIUrl?: string;
+  __internal_clerkUIVersion?: string;
   domain?: string;
   proxyUrl?: string;
   prefetchUI?: boolean;
@@ -42,6 +43,7 @@ export async function DynamicClerkScripts(props: DynamicClerkScriptsProps) {
     __internal_clerkJSUrl,
     __internal_clerkJSVersion,
     __internal_clerkUIUrl,
+    __internal_clerkUIVersion,
     domain,
     proxyUrl,
     prefetchUI,
@@ -59,6 +61,7 @@ export async function DynamicClerkScripts(props: DynamicClerkScriptsProps) {
       __internal_clerkJSUrl={__internal_clerkJSUrl}
       __internal_clerkJSVersion={__internal_clerkJSVersion}
       __internal_clerkUIUrl={__internal_clerkUIUrl}
+      __internal_clerkUIVersion={__internal_clerkUIVersion}
       nonce={nonce}
       domain={domain}
       proxyUrl={proxyUrl}

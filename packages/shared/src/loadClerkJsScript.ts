@@ -40,6 +40,8 @@ export type LoadClerkUIScriptOptions = {
   publishableKey: string;
   /** @internal */
   __internal_clerkUIUrl?: string;
+  /** @internal */
+  __internal_clerkUIVersion?: string;
   proxyUrl?: string;
   domain?: string;
   nonce?: string;
@@ -237,14 +239,14 @@ export const clerkJSScriptUrl = (opts: LoadClerkJSScriptOptions) => {
 };
 
 export const clerkUIScriptUrl = (opts: LoadClerkUIScriptOptions) => {
-  const { __internal_clerkUIUrl, proxyUrl, domain, publishableKey } = opts;
+  const { __internal_clerkUIUrl, __internal_clerkUIVersion, proxyUrl, domain, publishableKey } = opts;
 
   if (__internal_clerkUIUrl) {
     return __internal_clerkUIUrl;
   }
 
   const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
-  const version = versionSelector(undefined, UI_PACKAGE_VERSION);
+  const version = versionSelector(__internal_clerkUIVersion, UI_PACKAGE_VERSION);
   return `https://${scriptHost}/npm/@clerk/ui@${version}/dist/ui.browser.js`;
 };
 

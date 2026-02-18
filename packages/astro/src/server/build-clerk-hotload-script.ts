@@ -36,6 +36,7 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
 
   const clerkUIScriptSrc = clerkUIScriptUrl({
     __internal_clerkUIUrl: env.clerkUIUrl,
+    __internal_clerkUIVersion: env.clerkUIVersion,
     domain,
     proxyUrl,
     publishableKey,
