@@ -422,7 +422,7 @@ void (async () => {
       );
     },
     '/task-setup-mfa': () => {
-      Clerk.mountTaskSetupMfa(
+      Clerk.mountTaskSetupMFA(
         app,
         componentControls.taskSetupMFA.getProps() ?? {
           redirectUrlComplete: '/user-profile',
@@ -456,7 +456,7 @@ void (async () => {
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
-      clerkUICtor: window.__internal_ClerkUICtor,
+      ui: { ClerkUI: window.__internal_ClerkUICtor },
     });
     renderCurrentRoute();
     updateVariables();

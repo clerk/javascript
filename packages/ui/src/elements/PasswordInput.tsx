@@ -102,7 +102,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         //@ts-expect-error Type mismatch between ForwardRef and RefObject due to null
         ref={mergeRefs(ref, inputRef)}
         type={hidden ? 'password' : 'text'}
-        sx={theme => ({ paddingRight: theme.space.$10 })}
+        sx={theme => ({ paddingInlineEnd: theme.space.$10 })}
       />
       <IconButton
         elementDescriptor={descriptors.formFieldInputShowPasswordButton}
@@ -114,8 +114,8 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         onClick={() => setHidden(s => !s)}
         sx={theme => ({
           position: 'absolute',
-          right: 0,
-          marginRight: theme.space.$1,
+          insetInlineEnd: 0,
+          marginInlineEnd: theme.space.$1,
           color: theme.colors.$neutralAlpha400,
         })}
         icon={hidden ? Eye : EyeSlash}

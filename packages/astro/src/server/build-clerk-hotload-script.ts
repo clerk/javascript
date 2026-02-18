@@ -34,8 +34,9 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
     return clerkJsScript + '\n';
   }
 
-  const clerkUiScriptSrc = clerkUIScriptUrl({
+  const clerkUIScriptSrc = clerkUIScriptUrl({
     clerkUIUrl: env.clerkUIUrl,
+    clerkUIVersion: env.clerkUIVersion,
     domain,
     proxyUrl,
     publishableKey,
@@ -47,14 +48,14 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
   // registration (which happens when React code runs @clerk/ui/register).
   // When loadClerkUIScript() later adds a <script> tag, the browser uses the
   // cached resource and executes it without re-downloading.
-  const clerkUiPreload = `
+  const clerkUIPreload = `
   <link rel="preload"
-  href="${clerkUiScriptSrc}"
+  href="${clerkUIScriptSrc}"
   as="script"
   crossOrigin="anonymous"
   />`;
 
-  return clerkJsScript + clerkUiPreload + '\n';
+  return clerkJsScript + clerkUIPreload + '\n';
 }
 
 export { buildClerkHotloadScript };

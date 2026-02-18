@@ -32,3 +32,8 @@ export function proxyUrlToAbsoluteURL(url: string | undefined): string {
   }
   return isProxyUrlRelative(url) ? new URL(url, window.location.origin).toString() : url;
 }
+
+/**
+ * Function that determines whether proxy should be used for a given URL.
+ */
+export type ShouldProxyFn = (url: URL) => boolean;
