@@ -6,7 +6,7 @@ import type { APIKeyJSON } from './JSON';
 export class APIKey {
   constructor(
     /**
-     * A unique ID for the api key.
+     * A unique ID for the API key.
      */
     readonly id: string,
     /**
