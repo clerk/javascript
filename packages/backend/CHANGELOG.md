@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.31.2
+
+### Patch Changes
+
+- fix(backend): type JwtTemplatesApi.list as PaginatedResourceResponse ([#7868](https://github.com/clerk/javascript/pull/7868)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+- Updated dependencies [[`71bd53c`](https://github.com/clerk/javascript/commit/71bd53c67a5018bd7aa589c3baced2038123c228), [`935f780`](https://github.com/clerk/javascript/commit/935f780ab5b3871253da2ad46f0e44f9ce7e53e8)]:
+  - @clerk/shared@3.46.0
+  - @clerk/types@4.101.17
+
 ## 2.31.1
 
 ### Patch Changes
