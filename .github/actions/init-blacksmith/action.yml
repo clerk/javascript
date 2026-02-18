@@ -119,13 +119,6 @@ runs:
       run: pnpm install
       shell: bash
 
-    # pkglab needs a platform-specific binary (pkglab-linux-x64, etc.) that pnpm
-    # doesn't resolve for workspace devDeps. Install globally at the same version
-    # pnpm resolved so npm fetches the correct platform binary.
-    - name: Install pkglab
-      run: npm install -g pkglab@$(node -p "require('./node_modules/pkglab/package.json').version")
-      shell: bash
-
     - name: Get Playwright Version
       if: inputs.playwright-enabled == 'true'
       shell: bash
