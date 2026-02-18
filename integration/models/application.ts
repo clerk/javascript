@@ -50,7 +50,16 @@ export const application = (
         // Use pkglab add to pin @clerk/* packages to local registry versions and install
         const clerkDeps = config.clerkDependencies;
         if (clerkDeps.length > 0) {
-          await run(`pkglab add ${clerkDeps.join(' ')}`, { cwd: appDirPath, log });
+          // Debug: capture environment that will be inherited by pkglab/npm
+          log(`[debug] appDirPath: ${appDirPath}`);
+          log(`[debug] npm_config env vars:`);
+          for (const [k, v] of Object.entries(process.env)) {
+            if (k.toLowerCase().startsWith('npm_config') || k.toLowerCase().includes('registry')) {
+              log(`[debug]   ${k}=${v}`);
+            }
+          }
+          await run('npm config get registry', { cwd: appDirPath, log });
+          await run(`pkglab add ${clerkDeps.join(' ')} --verbose`, { cwd: appDirPath, log });
         } else {
           await run(scripts.setup, { cwd: appDirPath, log });
         }
