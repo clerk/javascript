@@ -1,5 +1,21 @@
 # Change Log
 
+## 6.38.0
+
+### Minor Changes
+
+- Introduces MFA setup session task for handling require MFA after sign-in and sign-up ([#7851](https://github.com/clerk/javascript/pull/7851)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Fix infinite handshake redirect loop when deploying Next.js apps with Clerk development instances to Netlify ([#7876](https://github.com/clerk/javascript/pull/7876)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- Updated dependencies [[`71bd53c`](https://github.com/clerk/javascript/commit/71bd53c67a5018bd7aa589c3baced2038123c228), [`935f780`](https://github.com/clerk/javascript/commit/935f780ab5b3871253da2ad46f0e44f9ce7e53e8), [`2471e31`](https://github.com/clerk/javascript/commit/2471e314b24eab485c78313d84d986ee30c63088)]:
+  - @clerk/clerk-react@5.61.0
+  - @clerk/shared@3.46.0
+  - @clerk/backend@2.31.2
+  - @clerk/types@4.101.17
+
 ## 6.37.5
 
 ### Patch Changes
