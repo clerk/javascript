@@ -1,5 +1,43 @@
 # Change Log
 
+## 5.123.1
+
+### Patch Changes
+
+- Set `SameSite=None` on cookies for `.replit.dev` origins and consolidate third-party domain list ([#7864](https://github.com/clerk/javascript/pull/7864)) by [@brkalow](https://github.com/brkalow)
+
+- fix(clerk-js): Handle missing window.location in React Native navigation ([#7854](https://github.com/clerk/javascript/pull/7854)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`b17e4bb`](https://github.com/clerk/javascript/commit/b17e4bbbbad173969523e5494f2d8447d1887b95)]:
+  - @clerk/shared@3.45.1
+  - @clerk/localizations@3.35.5
+
+## 5.123.0
+
+### Minor Changes
+
+- Add `username` field into `PublicUserData` object. ([#7837](https://github.com/clerk/javascript/pull/7837)) by [@Jibaru](https://github.com/Jibaru)
+
+- Add `providerUserId` field to `ExternalAccount` resource as the preferred way to access the unique user ID from the OAuth provider. The existing `externalId` field is now deprecated in favor of `providerUserId` for better clarity and consistency across the API. ([#7778](https://github.com/clerk/javascript/pull/7778)) by [@Jibaru](https://github.com/Jibaru)
+
+### Patch Changes
+
+- Updates Keyless Prompt content. ([#7798](https://github.com/clerk/javascript/pull/7798)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Disable ConsoleTransport for debug logger by default ([#7786](https://github.com/clerk/javascript/pull/7786)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fixed an issue where primary identifier shows undefined when signing in with phone number only ([#7797](https://github.com/clerk/javascript/pull/7797)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix infinite loading spinner when navigating to factor-two sign-in route without an active 2FA session ([#7787](https://github.com/clerk/javascript/pull/7787)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Display message for `user_deactivated` error code on `SignIn` and `SignUp` ([#7811](https://github.com/clerk/javascript/pull/7811)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Removed redundant `beforeunload` event listener from SafeLock that was disabling the browser's back-forward cache (bfcache), degrading navigation performance. ([#7818](https://github.com/clerk/javascript/pull/7818)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`35bcbd1`](https://github.com/clerk/javascript/commit/35bcbd11f5753ee396cd090d3dd1848f3f2727e0)]:
+  - @clerk/shared@3.45.0
+  - @clerk/localizations@3.35.4
+
 ## 5.122.1
 
 ### Patch Changes

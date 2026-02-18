@@ -32,6 +32,7 @@ export const createLongRunningApps = () => {
     { id: 'next.appRouter.withSignInOrUpEmailLinksFlow', config: next.appRouter, env: envs.withSignInOrUpEmailLinksFlow },
     { id: 'next.appRouter.withSessionTasks', config: next.appRouter, env: envs.withSessionTasks },
     { id: 'next.appRouter.withSessionTasksResetPassword', config: next.appRouter, env: envs.withSessionTasksResetPassword },
+    { id: 'next.appRouter.withSessionTasksSetupMfa', config: next.appRouter, env: envs.withSessionTasksSetupMfa },
     { id: 'next.appRouter.withLegalConsent', config: next.appRouter, env: envs.withLegalConsent },
 
     /**

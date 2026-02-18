@@ -1,10 +1,6 @@
-import type {
-  Attributes,
-  EmailAddressResource,
-  PhoneNumberResource,
-  UserResource,
-  Web3WalletResource,
-} from '@clerk/shared/types';
+import type { EmailAddressResource, PhoneNumberResource, Web3WalletResource } from '@clerk/shared/types';
+
+export { defaultFirst, getSecondFactors, getSecondFactorsAvailableToAdd } from '@/ui/utils/mfa';
 
 type IDable = { id: string };
 
@@ -13,36 +9,6 @@ export const primaryIdentificationFirst = (primaryId: string | null) => (val1: I
 };
 
 export const currentSessionFirst = (id: string) => (a: IDable) => (a.id === id ? -1 : 1);
-
-export const defaultFirst = (a: PhoneNumberResource) => (a.defaultSecondFactor ? -1 : 1);
-
-export function getSecondFactors(attributes: Partial<Attributes>): string[] {
-  const secondFactors: string[] = [];
-
-  Object.entries(attributes).forEach(([, attr]) => {
-    if (attr.used_for_second_factor) {
-      secondFactors.push(...attr.second_factors);
-    }
-  });
-
-  return secondFactors;
-}
-
-export function getSecondFactorsAvailableToAdd(attributes: Partial<Attributes>, user: UserResource): string[] {
-  let sfs = getSecondFactors(attributes);
-
-  // If user.totp_enabled, skip totp from the list of choices
-  if (user.totpEnabled) {
-    sfs = sfs.filter(f => f !== 'totp');
-  }
-
-  // Remove backup codes if already enabled or user doesn't have another MFA method added
-  if (user.backupCodeEnabled || !user.twoFactorEnabled) {
-    sfs = sfs.filter(f => f !== 'backup_code');
-  }
-
-  return sfs;
-}
 
 export function sortIdentificationBasedOnVerification<
   T extends Array<EmailAddressResource | PhoneNumberResource | Web3WalletResource>,
