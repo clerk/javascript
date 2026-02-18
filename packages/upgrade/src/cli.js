@@ -49,8 +49,12 @@ const cli = meow(
       $ npx @clerk/upgrade --canary
       $ npx @clerk/upgrade --dry-run
 
-    Non-interactive mode:
+    Non-interactive mode (CI):
       When running in CI or piped environments, --sdk is required if it cannot be auto-detected.
+      If your version cannot be resolved (e.g. catalog: protocol), also provide --release.
+
+      Example:
+        $ npx @clerk/upgrade --sdk=nextjs --release=core-3 --dir=./packages/web
 `,
   {
     importMeta: import.meta,
@@ -103,6 +107,8 @@ async function main() {
             .map(s => s.value)
             .join(', '),
       );
+      renderText('');
+      renderText('Example: npx @clerk/upgrade --sdk=nextjs --dir=./packages/web');
       process.exit(1);
     }
 
@@ -140,8 +146,10 @@ async function main() {
     renderNewline();
 
     if (!isInteractive) {
-      renderError('Please provide --release flag in non-interactive mode.');
+      renderError('Could not detect version. Please provide --release flag in non-interactive mode.');
       renderText('Available releases: ' + availableReleases.join(', '));
+      renderText('');
+      renderText(`Example: npx @clerk/upgrade --sdk=${sdk} --release=${availableReleases[0]}`);
       process.exit(1);
     }
 

@@ -116,6 +116,15 @@ describe('CLI Integration', () => {
       expect(output).toContain('--sdk');
       expect(result.exitCode).toBe(1);
     });
+
+    it('shows example command in non-interactive SDK detection error', async () => {
+      const dir = getFixturePath('no-clerk');
+      const result = await runCli(['--dir', dir, '--dry-run', '--skip-codemods'], { timeout: 5000 });
+
+      const output = result.stdout + result.stderr;
+      expect(output).toContain('Example:');
+      expect(output).toContain('npx @clerk/upgrade --sdk=');
+    });
   });
 
   describe('--sdk flag', () => {

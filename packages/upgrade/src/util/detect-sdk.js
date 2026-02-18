@@ -49,6 +49,33 @@ export function detectSdk(dir) {
   return null;
 }
 
+export function resolveCatalogVersion(packageName, dir) {
+  let current = path.resolve(dir);
+  const root = path.parse(current).root;
+
+  while (current !== root) {
+    const wsPath = path.join(current, 'pnpm-workspace.yaml');
+    if (fs.existsSync(wsPath)) {
+      try {
+        const content = fs.readFileSync(wsPath, 'utf8');
+        // Match both catalog.default and catalog.<name> sections
+        // Format: `'packageName': version` or `packageName: version` under catalog(s) sections
+        const escapedName = packageName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const pattern = new RegExp(`^\\s*['"]?${escapedName}['"]?\\s*:\\s*['"]?([^'"\\s#]+)['"]?`, 'm');
+        const match = content.match(pattern);
+        if (match) {
+          return match[1];
+        }
+      } catch {
+        /* continue */
+      }
+    }
+    current = path.dirname(current);
+  }
+
+  return null;
+}
+
 export function getSdkVersion(sdk, dir) {
   let pkg;
   try {
@@ -67,6 +94,14 @@ export function getSdkVersion(sdk, dir) {
     (oldPkgName && pkg.devDependencies?.[oldPkgName]);
 
   if (!version) {
+    return null;
+  }
+
+  if (version.startsWith('catalog:')) {
+    const resolvedVersion = resolveCatalogVersion(pkgName, dir) || (oldPkgName && resolveCatalogVersion(oldPkgName, dir));
+    if (resolvedVersion) {
+      return getMajorVersion(resolvedVersion);
+    }
     return null;
   }
 
