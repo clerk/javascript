@@ -9,6 +9,9 @@ describe('handleNetlifyCacheInDevInstance', () => {
   beforeEach(() => {
     delete process.env.URL;
     delete process.env.NETLIFY;
+    delete process.env.NETLIFY_DEV;
+    delete process.env.DEPLOY_PRIME_URL;
+    delete process.env.NETLIFY_FUNCTIONS_TOKEN;
   });
 
   it('should add cache bust parameter when on Netlify and in development', () => {
