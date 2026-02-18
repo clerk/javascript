@@ -8,7 +8,19 @@ import { createCookieHandler } from '@clerk/shared/cookie';
 let cachedETLDPlusOne: string;
 const eTLDCookie = createCookieHandler('__clerk_test_etld');
 
-export function getCookieDomain(hostname = window.location.hostname, cookieHandler = eTLDCookie) {
+/**
+ * @param hostname - The hostname to determine the eTLD+1 for.
+ * @param cookieHandler - The cookie handler to use for the eTLD+1 probe.
+ * @param cookieAttributes - Optional cookie attributes (sameSite, secure) to use
+ *   during the eTLD+1 probe. These should match the attributes that will be used
+ *   when setting the actual cookie, so the probe accurately reflects whether a
+ *   domain-scoped cookie can be set in the current context.
+ */
+export function getCookieDomain(
+  hostname = window.location.hostname,
+  cookieHandler = eTLDCookie,
+  cookieAttributes?: { sameSite?: string; secure?: boolean },
+) {
   // only compute it once per session to avoid unnecessary cookie ops
   if (cachedETLDPlusOne) {
     return cachedETLDPlusOne;
@@ -28,16 +40,16 @@ export function getCookieDomain(hostname = window.location.hostname, cookieHandl
   // we know for sure that the first entry is definitely a TLD, skip it
   for (let i = hostnameParts.length - 2; i >= 0; i--) {
     const eTLD = hostnameParts.slice(i).join('.');
-    cookieHandler.set('1', { domain: eTLD });
+    cookieHandler.set('1', { ...cookieAttributes, domain: eTLD });
 
     const res = cookieHandler.get();
     if (res === '1') {
-      cookieHandler.remove({ domain: eTLD });
+      cookieHandler.remove({ ...cookieAttributes, domain: eTLD });
       cachedETLDPlusOne = eTLD;
       return eTLD;
     }
 
-    cookieHandler.remove({ domain: eTLD });
+    cookieHandler.remove({ ...cookieAttributes, domain: eTLD });
   }
 
   // Fallback to hostname to ensure domain-scoped cookie rather than host-only.
