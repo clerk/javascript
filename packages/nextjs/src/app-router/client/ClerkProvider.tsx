@@ -32,37 +32,31 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
   const replace = useAwaitableReplace();
 
   useSafeLayoutEffect(() => {
-    window.__internal_onBeforeSetActive = intent => {
+    window.__internal_onBeforeSetActive = _intent => {
       /**
-       * We need to invalidate the cache in case the user is navigating to a page that
-       * was previously cached using the auth state that was active at the time.
+       * On Next.js 14, we invalidate the router cache before navigating so the
+       * destination page is not served with stale auth state. Without this, a
+       * cached 307 redirect can send the user to the wrong page after sign-out.
+       * See: https://nextjs.org/docs/app/building-your-application/caching#invalidation-1
        *
-       * We also need to await for the invalidation to happen before we navigate,
-       * otherwise the navigation will use the cached page.
-       *
-       * For example, if we did not invalidate the flow, the following scenario would be broken:
-       * - The middleware is configured in such a way that it redirects you back to the same page if a certain condition is true (eg, you need to pick an org)
-       * - The user has a <Link href=/> component in the page
-       * - The UB is mounted with afterSignOutUrl=/
-       * - The user clicks the Link. A nav to / happens, a 307 to the current page is returned so a navigation does not take place. The / navigation is now cached as a 307 to the current page
-       * - The user clicks sign out
-       * - We call router.refresh()
-       * - We navigate to / but its cached and instead, we 'redirect' to the current page
-       *
-       *  For more information on cache invalidation, see:
-       * https://nextjs.org/docs/app/building-your-application/caching#invalidation-1
+       * On Next.js 15+, the router cache is much less aggressive so this is a
+       * noop — `__internal_onAfterSetActive` calls `router.refresh()` after
+       * navigation which is sufficient.
        */
       return new Promise(resolve => {
         const nextVersion = window?.next?.version || '';
 
-        // On Next.js 15+ calling a server action that returns a 404 error when deployed on Vercel is prohibited, failing with 405 status code.
-        // When a user transitions from "signed in" to "signed out", we clear the `__session` cookie, then we call `__internal_onBeforeSetActive`.
-        // If we were to call `invalidateCacheAction` while the user is already signed out (deleted cookie), any page protected by `auth.protect()`
-        // will result to the server action returning a 404 error (this happens because server actions inherit the protection rules of the page they are called from).
-        // SOLUTION:
-        // To mitigate this, since the router cache on version 15+ is much less aggressive, we can treat this as a noop and simply resolve the promise.
-        // Once `setActive` performs the navigation, `__internal_onAfterSetActive` will kick in and perform a router.refresh ensuring shared layouts will also update with the correct authentication context.
-        if ((nextVersion.startsWith('15') || nextVersion.startsWith('16')) && intent === 'sign-out') {
+        // On Next.js 15+, the router cache is much less aggressive, so we can skip the server action
+        // and rely on `__internal_onAfterSetActive` calling `router.refresh()` to update shared layouts.
+        //
+        // Skipping the server action avoids two issues:
+        // 1. Sign-out: calling a server action after the `__session` cookie is cleared can return a 404/405
+        //    on Vercel when the page is protected by `auth.protect()`.
+        // 2. Sign-in: `cookies().delete()` in the server action triggers Next.js to re-render the current
+        //    page's RSC tree. In Safari, this RSC delivery fails ("TypeError: Load failed"), causing Next.js
+        //    to fall back to a hard browser navigation. For flows using one-time tokens (e.g. impersonation
+        //    via `__clerk_ticket`), the hard reload re-submits the spent token, resulting in a 400 error.
+        if (nextVersion.startsWith('15') || nextVersion.startsWith('16')) {
           resolve(); // noop
         } else {
           void invalidateCacheAction().then(() => resolve());
