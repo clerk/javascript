@@ -47,10 +47,10 @@ export const application = (
       const nodeModulesExist = await fs.pathExists(path.resolve(appDirPath, 'node_modules'));
       if (force || !nodeModulesExist) {
         const log = logger.child({ prefix: 'setup' }).info;
-        // Use pkglab add to pin @clerk/* packages to local registry versions and install
-        const clerkDeps = config.clerkDependencies;
-        if (clerkDeps.length > 0) {
-          await run(`pkglab add ${clerkDeps.join(' ')}`, { cwd: appDirPath, log });
+        // Use pkglab add to install packages from the local registry
+        const pkglabDeps = config.pkglabDependencies;
+        if (pkglabDeps.length > 0) {
+          await run(`pkglab add ${pkglabDeps.join(' ')}`, { cwd: appDirPath, log });
         } else {
           await run(scripts.setup, { cwd: appDirPath, log });
         }

@@ -1,9 +1,5 @@
 /**
- * Returns a version specifier for a local Clerk package.
- *
- * Requires pkglab to be running with packages published.
- * Run: pkglab pub
+ * Marker value indicating a dependency should be resolved from the local
+ * pkglab registry rather than npm. Use as the version in addDependency().
  */
-export function linkPackage(_pkg: string) {
-  return '*';
-}
+export const PKGLAB = 'pkglab';

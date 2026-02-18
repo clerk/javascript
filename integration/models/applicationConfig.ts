@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import type { AccountlessApplication } from '@clerk/backend';
 
 import { constants } from '../constants';
+import { PKGLAB } from '../presets/utils';
 import { createLogger, fs } from '../scripts';
 import { application } from './application';
 import type { EnvironmentConfig } from './environment';
@@ -115,12 +116,13 @@ export const applicationConfig = () => {
           }),
       );
 
-      // Adjust package.json dependencies
-      if (dependencies.size > 0) {
+      // Adjust package.json dependencies (skip pkglab deps, those are handled by pkglab add)
+      const npmDeps = [...dependencies.entries()].filter(([, version]) => version !== PKGLAB);
+      if (npmDeps.length > 0) {
         const packageJsonPath = path.resolve(appDirPath, 'package.json');
         logger.info(`Modifying dependencies in "${packageJsonPath}"`);
         const contents = await fs.readJSON(packageJsonPath);
-        contents.dependencies = { ...contents.dependencies, ...Object.fromEntries(dependencies) };
+        contents.dependencies = { ...contents.dependencies, ...Object.fromEntries(npmDeps) };
         await fs.writeJSON(packageJsonPath, contents, { spaces: 2 });
       }
 
@@ -135,8 +137,8 @@ export const applicationConfig = () => {
     get scripts() {
       return scripts;
     },
-    get clerkDependencies() {
-      return [...dependencies.keys()].filter(name => name.startsWith('@clerk/'));
+    get pkglabDependencies() {
+      return [...dependencies.entries()].filter(([, version]) => version === PKGLAB).map(([name]) => name);
     },
     get copyKeylessToEnv() {
       const writer = async (appDir: string) => {

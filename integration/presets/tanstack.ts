@@ -1,6 +1,6 @@
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
-import { linkPackage } from './utils';
+import { PKGLAB } from './utils';
 
 const reactStart = applicationConfig()
   .setName('tanstack-react-start')
@@ -10,7 +10,7 @@ const reactStart = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/tanstack-react-start', linkPackage('tanstack-react-start'));
+  .addDependency('@clerk/tanstack-react-start', PKGLAB);
 
 export const tanstack = {
   reactStart,

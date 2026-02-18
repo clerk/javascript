@@ -1,7 +1,7 @@
 import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
-import { linkPackage } from './utils';
+import { PKGLAB } from './utils';
 
 const appRouter = applicationConfig()
   .setName('next-app-router')
@@ -14,8 +14,8 @@ const appRouter = applicationConfig()
   .addDependency('next', constants.E2E_NEXTJS_VERSION)
   .addDependency('react', constants.E2E_REACT_VERSION)
   .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
-  .addDependency('@clerk/nextjs', constants.E2E_CLERK_JS_VERSION || linkPackage('nextjs'))
-  .addDependency('@clerk/shared', linkPackage('shared'));
+  .addDependency('@clerk/nextjs', PKGLAB)
+  .addDependency('@clerk/shared', PKGLAB);
 
 const appRouterTurbo = appRouter.clone().setName('next-app-router-turbopack').addScript('dev', 'pnpm dev');
 
@@ -47,9 +47,9 @@ const appRouterBundledUI = applicationConfig()
   .addDependency('next', constants.E2E_NEXTJS_VERSION)
   .addDependency('react', constants.E2E_REACT_VERSION)
   .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
-  .addDependency('@clerk/nextjs', constants.E2E_CLERK_JS_VERSION || linkPackage('nextjs'))
-  .addDependency('@clerk/shared', linkPackage('shared'))
-  .addDependency('@clerk/ui', constants.E2E_CLERK_UI_VERSION || linkPackage('ui'));
+  .addDependency('@clerk/nextjs', PKGLAB)
+  .addDependency('@clerk/shared', PKGLAB)
+  .addDependency('@clerk/ui', PKGLAB);
 
 const cacheComponents = applicationConfig()
   .setName('next-cache-components')
@@ -59,8 +59,8 @@ const cacheComponents = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/nextjs', constants.E2E_CLERK_JS_VERSION || linkPackage('nextjs'))
-  .addDependency('@clerk/shared', linkPackage('shared'));
+  .addDependency('@clerk/nextjs', PKGLAB)
+  .addDependency('@clerk/shared', PKGLAB);
 
 export const next = {
   appRouter,
