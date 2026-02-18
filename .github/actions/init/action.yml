@@ -119,14 +119,8 @@ runs:
       run: pnpm install
       shell: bash
 
-    # pkglab ships platform-specific binaries as optional deps (pkglab-linux-x64, etc.)
-    # pnpm doesn't resolve these for workspace devDeps, so we install globally via npm.
-    # Remove the broken node_modules shim so the global binary is always used
-    # (pnpm prepends node_modules/.bin to PATH when running scripts, shadowing globals).
     - name: Install pkglab
-      run: |
-        npm install -g pkglab@0.13.1
-        rm -f node_modules/.bin/pkglab node_modules/.bin/pkgl
+      run: npm install -g pkglab@0.13.2
       shell: bash
 
     - name: Get Playwright Version
