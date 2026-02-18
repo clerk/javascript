@@ -6,6 +6,7 @@ import { createBrowserRouter, Outlet, RouterProvider, useNavigate } from 'react-
 import App from './App.tsx';
 import Protected from './protected';
 import SignIn from './sign-in';
+import SignInPopup from './sign-in-popup';
 import SignUp from './sign-up';
 import UserProfile from './user';
 import UserProfileCustom from './custom-user-profile';
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
       {
         path: '/sign-in/*',
         element: <SignIn />,
+      },
+      {
+        path: '/sign-in-popup/*',
+        element: <SignInPopup />,
       },
       {
         path: '/sign-up/*',
