@@ -225,6 +225,11 @@ export class StateProxy implements State {
           'verifyCode',
           'submitPassword',
         ] as const),
+        resetPasswordPhoneCode: this.wrapMethods(() => target().resetPasswordPhoneCode, [
+          'sendCode',
+          'verifyCode',
+          'submitPassword',
+        ] as const),
         phoneCode: this.wrapMethods(() => target().phoneCode, ['sendCode', 'verifyCode'] as const),
         mfa: this.wrapMethods(() => target().mfa, [
           'sendPhoneCode',

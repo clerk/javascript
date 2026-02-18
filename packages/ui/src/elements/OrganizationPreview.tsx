@@ -69,7 +69,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
           sx={avatarSx}
           rounded={rounded}
         />
-        {icon && <Flex sx={{ position: 'absolute', left: 0, bottom: 0 }}>{icon}</Flex>}
+        {icon && <Flex sx={{ position: 'absolute', insetInlineStart: 0, bottom: 0 }}>{icon}</Flex>}
       </Flex>
       <Flex
         elementDescriptor={descriptors.organizationPreviewTextContainer}
@@ -77,7 +77,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
         direction='col'
         justify='center'
         as='span'
-        sx={{ minWidth: '0px', textAlign: 'left' }}
+        sx={{ minWidth: '0px', textAlign: 'start' }}
       >
         <Text
           elementDescriptor={descriptors.organizationPreviewMainIdentifier}

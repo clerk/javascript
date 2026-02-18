@@ -21,6 +21,7 @@ export const pickFromClerkInitState = (
     __clerkJSUrl,
     __clerkJSVersion,
     __clerkUIUrl,
+    __clerkUIVersion,
     __telemetryDisabled,
     __telemetryDebug,
     __signInForceRedirectUrl,
@@ -43,6 +44,7 @@ export const pickFromClerkInitState = (
     clerkJSUrl: __clerkJSUrl,
     clerkJSVersion: __clerkJSVersion,
     clerkUIUrl: __clerkUIUrl,
+    clerkUIVersion: __clerkUIVersion,
     prefetchUI: __prefetchUI,
     telemetry: {
       disabled: __telemetryDisabled,
@@ -69,7 +71,29 @@ export const mergeWithPublicEnvs = (restInitState: any) => {
     clerkJSUrl: restInitState.clerkJSUrl || envVars.clerkJsUrl,
     clerkJSVersion: restInitState.clerkJSVersion || envVars.clerkJsVersion,
     clerkUIUrl: restInitState.clerkUIUrl || envVars.clerkUIUrl,
+    clerkUIVersion: restInitState.clerkUIVersion || envVars.clerkUIVersion,
     signInForceRedirectUrl: restInitState.signInForceRedirectUrl,
     prefetchUI: restInitState.prefetchUI ?? envVars.prefetchUI,
   };
 };
+
+export type ParsedNavigationUrl = {
+  to: string;
+  search?: Record<string, string>;
+  hash?: string;
+};
+
+/**
+ * Parses a URL string into TanStack Router navigation options.
+ * TanStack Router doesn't parse query strings from the `to` parameter,
+ * so we need to extract pathname, search params, and hash separately.
+ */
+export function parseUrlForNavigation(to: string, baseUrl: string): ParsedNavigationUrl {
+  const url = new URL(to, baseUrl);
+  const searchParams = Object.fromEntries(url.searchParams);
+  return {
+    to: url.pathname,
+    search: Object.keys(searchParams).length > 0 ? searchParams : undefined,
+    hash: url.hash ? url.hash.slice(1) : undefined,
+  };
+}
