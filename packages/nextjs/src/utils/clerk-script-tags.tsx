@@ -18,7 +18,16 @@ type ClerkScriptTagsProps = {
  * No hooks or client-only imports — safe for both server and client components.
  */
 export function ClerkScriptTags(props: ClerkScriptTagsProps) {
-  const { publishableKey, __internal_clerkJSUrl, __internal_clerkJSVersion, __internal_clerkUIUrl, nonce, domain, proxyUrl, prefetchUI } = props;
+  const {
+    publishableKey,
+    __internal_clerkJSUrl,
+    __internal_clerkJSVersion,
+    __internal_clerkUIUrl,
+    nonce,
+    domain,
+    proxyUrl,
+    prefetchUI,
+  } = props;
 
   const opts = {
     publishableKey,

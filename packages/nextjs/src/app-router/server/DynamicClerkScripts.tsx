@@ -37,7 +37,15 @@ type DynamicClerkScriptsProps = {
  * nonce fetching from the rest of the page, allowing static rendering/PPR to work.
  */
 export async function DynamicClerkScripts(props: DynamicClerkScriptsProps) {
-  const { publishableKey, __internal_clerkJSUrl, __internal_clerkJSVersion, __internal_clerkUIUrl, domain, proxyUrl, prefetchUI } = props;
+  const {
+    publishableKey,
+    __internal_clerkJSUrl,
+    __internal_clerkJSVersion,
+    __internal_clerkUIUrl,
+    domain,
+    proxyUrl,
+    prefetchUI,
+  } = props;
 
   if (!publishableKey) {
     return null;
