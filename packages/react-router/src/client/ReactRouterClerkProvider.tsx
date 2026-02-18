@@ -64,7 +64,6 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
     __clerkJSUrl,
     __clerkJSVersion,
     __clerkUIUrl,
-    __clerkUIVersion,
     __prefetchUI,
     __telemetryDisabled,
     __telemetryDebug,
@@ -96,7 +95,6 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
     clerkJSUrl: __clerkJSUrl,
     clerkJSVersion: __clerkJSVersion,
     clerkUIUrl: __clerkUIUrl,
-    clerkUIVersion: __clerkUIVersion,
     prefetchUI: __prefetchUI,
     telemetry: {
       disabled: __telemetryDisabled,

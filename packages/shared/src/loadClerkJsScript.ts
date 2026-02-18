@@ -13,6 +13,7 @@ const errorThrower = buildErrorThrower({ packageName: '@clerk/shared' });
 export type LoadClerkJSScriptOptions = {
   publishableKey: string;
   clerkJSUrl?: string;
+  /** @deprecated This option is deprecated. The Clerk SDK will automatically use the correct version. */
   clerkJSVersion?: string;
   sdkMetadata?: SDKMetadata;
   proxyUrl?: string;
@@ -34,7 +35,6 @@ export type LoadClerkJsScriptOptions = LoadClerkJSScriptOptions;
 export type LoadClerkUIScriptOptions = {
   publishableKey: string;
   clerkUIUrl?: string;
-  clerkUIVersion?: string;
   proxyUrl?: string;
   domain?: string;
   nonce?: string;
@@ -232,14 +232,14 @@ export const clerkJSScriptUrl = (opts: LoadClerkJSScriptOptions) => {
 };
 
 export const clerkUIScriptUrl = (opts: LoadClerkUIScriptOptions) => {
-  const { clerkUIUrl, clerkUIVersion, proxyUrl, domain, publishableKey } = opts;
+  const { clerkUIUrl, proxyUrl, domain, publishableKey } = opts;
 
   if (clerkUIUrl) {
     return clerkUIUrl;
   }
 
   const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
-  const version = versionSelector(clerkUIVersion, UI_PACKAGE_VERSION);
+  const version = versionSelector(undefined, UI_PACKAGE_VERSION);
   return `https://${scriptHost}/npm/@clerk/ui@${version}/dist/ui.browser.js`;
 };
 

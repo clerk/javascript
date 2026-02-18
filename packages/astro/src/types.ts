@@ -36,10 +36,6 @@ type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
      */
     clerkUIUrl?: string;
     /**
-     * The npm version for `@clerk/ui`.
-     */
-    clerkUIVersion?: string;
-    /**
      * Controls prefetching of the `@clerk/ui` script.
      * - `false` - Skip prefetching the UI (for custom UIs using Control Components)
      * - `undefined` (default) - Prefetch UI normally

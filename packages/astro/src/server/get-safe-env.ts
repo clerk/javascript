@@ -36,7 +36,6 @@ function getSafeEnv(context: ContextOrLocals) {
     clerkJsUrl: getContextEnvVar('PUBLIC_CLERK_JS_URL', context),
     clerkJsVersion: getContextEnvVar('PUBLIC_CLERK_JS_VERSION', context),
     clerkUIUrl: getContextEnvVar('PUBLIC_CLERK_UI_URL', context),
-    clerkUIVersion: getContextEnvVar('PUBLIC_CLERK_UI_VERSION', context),
     prefetchUI: getContextEnvVar('PUBLIC_CLERK_PREFETCH_UI', context) === 'false' ? false : undefined,
     apiVersion: getContextEnvVar('CLERK_API_VERSION', context),
     apiUrl: getContextEnvVar('CLERK_API_URL', context),

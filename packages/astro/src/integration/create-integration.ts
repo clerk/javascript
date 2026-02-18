@@ -22,7 +22,6 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
     // These are not provided when the "bundled" integration is used
     const clerkJSUrl = (params as any)?.clerkJSUrl as string | undefined;
     const clerkJSVersion = (params as any)?.clerkJSVersion as string | undefined;
-    const clerkUIVersion = (params as any)?.clerkUIVersion as string | undefined;
     const prefetchUI = (params as any)?.prefetchUI as boolean | undefined;
     const hasUI = !!(params as any)?.ui;
 
@@ -60,7 +59,6 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 ...buildEnvVarFromOption(domain, 'PUBLIC_CLERK_DOMAIN'),
                 ...buildEnvVarFromOption(clerkJSUrl, 'PUBLIC_CLERK_JS_URL'),
                 ...buildEnvVarFromOption(clerkJSVersion, 'PUBLIC_CLERK_JS_VERSION'),
-                ...buildEnvVarFromOption(clerkUIVersion, 'PUBLIC_CLERK_UI_VERSION'),
                 ...buildEnvVarFromOption(
                   prefetchUI === false || hasUI ? 'false' : undefined,
                   'PUBLIC_CLERK_PREFETCH_UI',
@@ -145,7 +143,6 @@ function createClerkEnvSchema() {
     PUBLIC_CLERK_JS_URL: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
     PUBLIC_CLERK_JS_VERSION: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_UI_URL: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
-    PUBLIC_CLERK_UI_VERSION: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_PREFETCH_UI: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_TELEMETRY_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_TELEMETRY_DEBUG: envField.boolean({ context: 'client', access: 'public', optional: true }),

@@ -404,11 +404,6 @@ describe('clerkUIScriptUrl()', () => {
     expect(result).toBe(`https://example.clerk.com/npm/@clerk/ui@${uiPackageMajorVersion}/dist/ui.browser.js`);
   });
 
-  test('uses provided clerkUIVersion', () => {
-    const result = clerkUIScriptUrl({ publishableKey: mockDevPublishableKey, clerkUIVersion: '1' });
-    expect(result).toContain('/npm/@clerk/ui@1/');
-  });
-
   test('uses latest as default version when not specified', () => {
     const result = clerkUIScriptUrl({ publishableKey: mockDevPublishableKey });
     // When no version is specified, versionSelector should return the major version
