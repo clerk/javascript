@@ -6,12 +6,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getCookieDomain } from '../../getCookieDomain';
 import { getSecureAttribute } from '../../getSecureAttribute';
 import { createClientUatCookie } from '../clientUat';
+import { requiresSameSiteNone } from '../requireSameSiteNone';
 
 vi.mock('@clerk/shared/cookie');
 vi.mock('@clerk/shared/date');
 vi.mock('@clerk/shared/internal/clerk-js/runtime');
 vi.mock('../../getCookieDomain');
 vi.mock('../../getSecureAttribute');
+vi.mock('../requireSameSiteNone');
 
 describe('createClientUatCookie', () => {
   const mockCookieSuffix = 'test-suffix';
@@ -26,6 +28,7 @@ describe('createClientUatCookie', () => {
     mockGet.mockReset();
     (addYears as ReturnType<typeof vi.fn>).mockReturnValue(mockExpires);
     (inCrossOriginIframe as ReturnType<typeof vi.fn>).mockReturnValue(false);
+    (requiresSameSiteNone as ReturnType<typeof vi.fn>).mockReturnValue(false);
     (getCookieDomain as ReturnType<typeof vi.fn>).mockReturnValue(mockDomain);
     (getSecureAttribute as ReturnType<typeof vi.fn>).mockReturnValue(true);
     (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation(() => ({
@@ -124,5 +127,23 @@ describe('createClientUatCookie', () => {
     const result = cookieHandler.get();
 
     expect(result).toBe(0);
+  });
+
+  it('should set cookies with SameSite=None when the host requires it', () => {
+    (requiresSameSiteNone as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    const cookieHandler = createClientUatCookie(mockCookieSuffix);
+    cookieHandler.set({
+      id: 'test-client',
+      updatedAt: new Date('2024-01-01'),
+      signedInSessions: ['session1'],
+    });
+
+    expect(mockSet).toHaveBeenCalledWith('1704067200', {
+      domain: mockDomain,
+      expires: mockExpires,
+      sameSite: 'None',
+      secure: true,
+      partitioned: false,
+    });
   });
 });
