@@ -4,7 +4,7 @@ import { createContext, useContext } from 'react';
 import { getTaskEndpoint } from '@/core/sessionTasks';
 import { useRouter } from '@/ui/router';
 
-import type { SessionTasksCtx, TaskChooseOrganizationCtx, TaskResetPasswordCtx } from '../../types';
+import type { SessionTasksCtx, TaskChooseOrganizationCtx, TaskResetPasswordCtx, TaskSetupMFACtx } from '../../types';
 
 export const SessionTasksContext = createContext<SessionTasksCtx | null>(null);
 
@@ -63,6 +63,18 @@ export const useTaskResetPasswordContext = (): TaskResetPasswordCtx => {
 
   if (context === null) {
     throw new Error('Clerk: useTaskResetPasswordContext called outside of the mounted TaskResetPassword component.');
+  }
+
+  return context;
+};
+
+export const TaskSetupMFAContext = createContext<TaskSetupMFACtx | null>(null);
+
+export const useTaskSetupMFAContext = (): TaskSetupMFACtx => {
+  const context = useContext(TaskSetupMFAContext);
+
+  if (context === null) {
+    throw new Error('Clerk: useTaskSetupMFAContext called outside of the mounted TaskSetupMFA component.');
   }
 
   return context;
