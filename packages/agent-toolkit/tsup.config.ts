@@ -4,6 +4,7 @@ import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
   const isProd = overrideOptions.env?.NODE_ENV === 'production';
+  const shouldPublish = !!overrideOptions.env?.publish;
 
   return {
     entry: [
@@ -17,6 +18,7 @@ export default defineConfig(overrideOptions => {
     bundle: true,
     sourcemap: true,
     format: 'esm',
+    onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,

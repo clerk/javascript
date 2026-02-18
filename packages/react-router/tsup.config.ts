@@ -6,6 +6,7 @@ import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
+  const shouldPublish = !!overrideOptions.env?.publish;
 
   return {
     format: 'esm',
@@ -16,6 +17,7 @@ export default defineConfig(overrideOptions => {
     dts: true,
     minify: false,
     sourcemap: true,
+    onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,

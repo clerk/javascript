@@ -13,11 +13,11 @@ import { debugLogger } from '@/utils/debug';
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
-import type { Clerk } from './internal';
-import { Client } from './internal';
+import { type Clerk, getClientResourceFromPayload } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & {
   forceUpdateClient?: boolean;
+  skipUpdateClient?: boolean;
   fetchMaxTries?: number;
 };
 
@@ -123,7 +123,7 @@ export abstract class BaseResource {
     }
 
     // TODO: Link to Client payload piggybacking design document
-    if (requestInit.method !== 'GET' || opts.forceUpdateClient) {
+    if ((requestInit.method !== 'GET' || opts.forceUpdateClient) && !opts.skipUpdateClient) {
       this._updateClient<J>(payload);
     }
 
@@ -163,15 +163,9 @@ export abstract class BaseResource {
   }
 
   protected static _updateClient<J>(responseJSON: FapiResponseJSON<J> | null): void {
-    if (!responseJSON) {
-      return;
-    }
-
-    // TODO: Revise Client piggybacking
-    const client = responseJSON.client || responseJSON.meta?.client;
-
+    const client = getClientResourceFromPayload(responseJSON);
     if (client && BaseResource.clerk) {
-      BaseResource.clerk.updateClient(Client.getOrCreateInstance().fromJSON(client));
+      BaseResource.clerk.updateClient(client);
     }
   }
 

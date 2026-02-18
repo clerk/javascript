@@ -69,6 +69,7 @@ export default defineNuxtModule<ModuleOptions>({
           jsUrl: options.clerkJSUrl,
           uiUrl: options.clerkUIUrl,
           clerkJSVersion: options.clerkJSVersion,
+          clerkUIVersion: options.clerkUIVersion,
           // prefetchUI config: can be false or undefined
           prefetchUI: options.prefetchUI,
           isSatellite: options.isSatellite,

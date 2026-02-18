@@ -61,8 +61,8 @@ test.describe('multiple apps running on localhost using different Clerk instance
     expect(tab0Cookies.filter(c => c.name.startsWith('__clerk_db_jwt'))).toHaveLength(2);
     expect(tab0Cookies.filter(c => c.name.startsWith('__client_uat'))).toHaveLength(2);
 
-    await u[1].po.expect.toBeSignedOut();
     await u[1].po.signIn.goTo();
+    await u[1].po.expect.toBeSignedOut();
     await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
     await u[1].po.expect.toBeSignedIn();
 
