@@ -60,7 +60,7 @@ export const application = (
               cleanEnv[k] = v as string;
             }
           }
-          await run(`pkglab add ${clerkDeps.join(' ')}`, { cwd: appDirPath, env: cleanEnv, log });
+          await run(`pkglab add ${clerkDeps.join(' ')}`, { cwd: appDirPath, env: cleanEnv, extendEnv: false, log });
         } else {
           await run(scripts.setup, { cwd: appDirPath, log });
         }
