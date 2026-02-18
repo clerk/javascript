@@ -32,7 +32,7 @@ function isNetlifyRuntime(): boolean {
  * @internal
  */
 export function handleNetlifyCacheInDevInstance({
-  locationHeader,
+  locationHeader: _locationHeader,
   requestStateHeaders,
   publishableKey,
 }: {
