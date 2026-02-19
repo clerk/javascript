@@ -1,17 +1,10 @@
+import type { JwtPayload } from '@clerk/shared/types';
+
 import type { M2MTokenJSON } from './JSON';
 
-/**
- * Base JWT payload type for M2M tokens.
- * M2M tokens don't include session-specific claims like sid, so we use a simpler type.
- */
-type M2MJwtPayloadInput = {
-  iss?: string;
-  sub: string;
-  aud?: string[];
-  exp: number;
-  iat: number;
-  nbf?: number;
+type M2MJwtPayload = JwtPayload & {
   jti?: string;
+  aud?: string[];
   scopes?: string;
 };
 
@@ -53,7 +46,7 @@ export class M2MToken {
    * Creates an M2MToken from a JWT payload.
    * Maps standard JWT claims to token properties.
    */
-  static fromJwtPayload(payload: M2MJwtPayloadInput, clockSkewInMs = 5000): M2MToken {
+  static fromJwtPayload(payload: M2MJwtPayload, clockSkewInMs = 5000): M2MToken {
     return new M2MToken(
       payload.jti ?? '',
       payload.sub,

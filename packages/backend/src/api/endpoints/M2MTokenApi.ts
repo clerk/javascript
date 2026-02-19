@@ -20,8 +20,8 @@ type CreateM2MTokenParams = {
   claims?: Record<string, unknown> | null;
   /**
    * Format of the token to create.
-   * - 'opaque': Traditional opaque token with mt_ prefix
-   * - 'jwt': JSON Web Token signed with instance keys
+   * - 'opaque': Opaque token with mt_ prefix
+   * - 'jwt': JWT signed with instance keys
    *
    * @default 'opaque'
    */
@@ -67,7 +67,7 @@ export class M2MTokenApi extends AbstractAPI {
   }
 
   async createToken(params?: CreateM2MTokenParams) {
-    const { claims = null, machineSecretKey, secondsUntilExpiration = null, tokenFormat } = params || {};
+    const { claims = null, machineSecretKey, secondsUntilExpiration = null, tokenFormat = 'opaque' } = params || {};
 
     const requestOptions = this.#createRequestOptions(
       {
