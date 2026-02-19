@@ -62,4 +62,6 @@ export {
   getMachineTokenType,
   isTokenTypeAccepted,
   isMachineToken,
+  isM2MJwt,
+  isMachineJwt,
 } from './tokens/machine';

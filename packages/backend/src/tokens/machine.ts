@@ -46,6 +46,36 @@ export function isOAuthJwt(token: string): boolean {
 }
 
 /**
+ * Checks if a token is an M2M JWT token.
+ * Validates the JWT format and verifies the payload 'sub' field starts with 'mch_'.
+ *
+ * @param token - The token string to check
+ * @returns true if the token is a valid M2M JWT token
+ */
+export function isM2MJwt(token: string): boolean {
+  if (!isJwtFormat(token)) {
+    return false;
+  }
+  try {
+    const { data, errors } = decodeJwt(token);
+    return !errors && !!data && typeof data.payload.sub === 'string' && data.payload.sub.startsWith('mch_');
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Checks if a token is a machine JWT (OAuth JWT or M2M JWT).
+ * Useful for rejecting machine JWTs when expecting session tokens.
+ *
+ * @param token - The token string to check
+ * @returns true if the token is an OAuth or M2M JWT
+ */
+export function isMachineJwt(token: string): boolean {
+  return isOAuthJwt(token) || isM2MJwt(token);
+}
+
+/**
  * Checks if a token is a machine token by looking at its prefix.
  *
  * @remarks
@@ -60,17 +90,17 @@ export function isMachineTokenByPrefix(token: string): boolean {
 }
 
 /**
- * Checks if a token is a machine token by looking at its prefix or if it's an OAuth JWT access token (RFC 9068).
+ * Checks if a token is a machine token by looking at its prefix or if it's an OAuth/M2M JWT.
  *
  * @param token - The token string to check
  * @returns true if the token is a machine token
  */
 export function isMachineToken(token: string): boolean {
-  return isMachineTokenByPrefix(token) || isOAuthJwt(token);
+  return isMachineTokenByPrefix(token) || isOAuthJwt(token) || isM2MJwt(token);
 }
 
 /**
- * Gets the specific type of machine token based on its prefix.
+ * Gets the specific type of machine token based on its prefix or JWT claims.
  *
  * @remarks
  * In the future, this will support custom prefixes that can be prepended to the base prefixes
@@ -78,13 +108,15 @@ export function isMachineToken(token: string): boolean {
  *
  * @param token - The token string to check
  * @returns The specific MachineTokenType
- * @throws Error if the token doesn't match any known machine token prefix
+ * @throws Error if the token doesn't match any known machine token type
  */
 export function getMachineTokenType(token: string): MachineTokenType {
-  if (token.startsWith(M2M_TOKEN_PREFIX)) {
+  // M2M: prefix OR JWT with mch_ subject
+  if (token.startsWith(M2M_TOKEN_PREFIX) || isM2MJwt(token)) {
     return TokenType.M2MToken;
   }
 
+  // OAuth: prefix OR JWT with at+jwt typ
   if (token.startsWith(OAUTH_TOKEN_PREFIX) || isOAuthJwt(token)) {
     return TokenType.OAuthToken;
   }

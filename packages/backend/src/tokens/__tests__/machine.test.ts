@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { createJwt, mockOAuthAccessTokenJwtPayload } from '../../fixtures';
+import { createJwt, mockM2MJwtPayload, mockOAuthAccessTokenJwtPayload } from '../../fixtures';
 import { mockSignedOAuthAccessTokenJwt, mockSignedOAuthAccessTokenJwtApplicationTyp } from '../../fixtures/machine';
 import {
   API_KEY_PREFIX,
   getMachineTokenType,
   isJwtFormat,
+  isMachineJwt,
   isMachineToken,
   isMachineTokenByPrefix,
   isMachineTokenType,
+  isM2MJwt,
   isOAuthJwt,
   isTokenTypeAccepted,
   M2M_TOKEN_PREFIX,
@@ -68,16 +70,24 @@ describe('isMachineToken', () => {
     expect(isMachineToken(token)).toBe(true);
   });
 
+  it('returns true for M2M JWT with mch_ subject', () => {
+    const token = createJwt({
+      header: { typ: 'JWT', kid: 'ins_whatever' },
+      payload: mockM2MJwtPayload,
+    });
+    expect(isMachineToken(token)).toBe(true);
+  });
+
   it('returns false for tokens without a recognized prefix or OAuth JWT format', () => {
     expect(isMachineToken('unknown_prefix_token')).toBe(false);
     expect(isMachineToken('session_token_value')).toBe(false);
     expect(isMachineToken('jwt_token_value')).toBe(false);
   });
 
-  it('returns false for regular JWT tokens (not OAuth JWT)', () => {
+  it('returns false for regular JWT tokens (not machine JWT)', () => {
     const regularJwt = createJwt({
       header: { typ: 'JWT', kid: 'ins_whatever' },
-      payload: mockOAuthAccessTokenJwtPayload,
+      payload: { ...mockOAuthAccessTokenJwtPayload, sub: 'user_123' },
     });
     expect(isMachineToken(regularJwt)).toBe(false);
   });
@@ -110,6 +120,14 @@ describe('getMachineTokenType', () => {
       payload: mockOAuthAccessTokenJwtPayload,
     });
     expect(getMachineTokenType(token)).toBe('oauth_token');
+  });
+
+  it('returns "m2m_token" for M2M JWT with mch_ subject', () => {
+    const token = createJwt({
+      header: { typ: 'JWT', kid: 'ins_whatever' },
+      payload: mockM2MJwtPayload,
+    });
+    expect(getMachineTokenType(token)).toBe('m2m_token');
   });
 
   it('returns "api_key" for tokens with API key prefix', () => {
@@ -201,5 +219,61 @@ describe('isOAuthJwt', () => {
 
   it('returns false for non-JWT token', () => {
     expect(isOAuthJwt('not.a.jwt')).toBe(false);
+  });
+});
+
+describe('isM2MJwt', () => {
+  it('returns true for JWT with sub starting with mch_', () => {
+    const token = createJwt({
+      header: { typ: 'JWT', kid: 'ins_whatever' },
+      payload: mockM2MJwtPayload,
+    });
+    expect(isM2MJwt(token)).toBe(true);
+  });
+
+  it('returns false for OAuth JWT (different sub prefix)', () => {
+    expect(isM2MJwt(mockSignedOAuthAccessTokenJwt)).toBe(false);
+  });
+
+  it('returns false for regular JWT without mch_ sub', () => {
+    const token = createJwt({
+      header: { typ: 'JWT', kid: 'ins_whatever' },
+      payload: { ...mockM2MJwtPayload, sub: 'user_123' },
+    });
+    expect(isM2MJwt(token)).toBe(false);
+  });
+
+  it('returns false for non-JWT token', () => {
+    expect(isM2MJwt('mt_opaque_token')).toBe(false);
+    expect(isM2MJwt('not.a.jwt')).toBe(false);
+    expect(isM2MJwt('')).toBe(false);
+  });
+});
+
+describe('isMachineJwt', () => {
+  it('returns true for OAuth JWT', () => {
+    expect(isMachineJwt(mockSignedOAuthAccessTokenJwt)).toBe(true);
+  });
+
+  it('returns true for M2M JWT', () => {
+    const token = createJwt({
+      header: { typ: 'JWT', kid: 'ins_whatever' },
+      payload: mockM2MJwtPayload,
+    });
+    expect(isMachineJwt(token)).toBe(true);
+  });
+
+  it('returns false for regular session JWT', () => {
+    const token = createJwt({
+      header: { typ: 'JWT', kid: 'ins_whatever' },
+      payload: { sub: 'user_123', iat: 1666648250, exp: 1666648550 },
+    });
+    expect(isMachineJwt(token)).toBe(false);
+  });
+
+  it('returns false for opaque tokens', () => {
+    expect(isMachineJwt('mt_opaque_token')).toBe(false);
+    expect(isMachineJwt('oat_opaque_token')).toBe(false);
+    expect(isMachineJwt('ak_opaque_token')).toBe(false);
   });
 });
