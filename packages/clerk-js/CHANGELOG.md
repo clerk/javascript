@@ -1,5 +1,23 @@
 # Change Log
 
+## 5.124.0
+
+### Minor Changes
+
+- Introduces MFA setup session task for handling require MFA after sign-in and sign-up ([#7851](https://github.com/clerk/javascript/pull/7851)) by [@octoper](https://github.com/octoper)
+
+- Add support for account credits in checkout. ([#7870](https://github.com/clerk/javascript/pull/7870)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fix `__client_uat` cookie being set on two different domain scopes when app is loaded in both iframe and non-iframe contexts. `getCookieDomain()` now falls back to `hostname` instead of `undefined` when the eTLD+1 probe fails, and the eTLD+1 probe uses the same `SameSite`/`Secure` attributes as the actual cookie to ensure consistent behavior across contexts. ([#7882](https://github.com/clerk/javascript/pull/7882)) by [@brkalow](https://github.com/brkalow)
+
+- Fix BaseRouter state not syncing after popup OAuth by observing `pushState`/`replaceState` changes in addition to `popstate` ([#7863](https://github.com/clerk/javascript/pull/7863)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`71bd53c`](https://github.com/clerk/javascript/commit/71bd53c67a5018bd7aa589c3baced2038123c228), [`935f780`](https://github.com/clerk/javascript/commit/935f780ab5b3871253da2ad46f0e44f9ce7e53e8)]:
+  - @clerk/localizations@3.36.0
+  - @clerk/shared@3.46.0
+
 ## 5.123.1
 
 ### Patch Changes

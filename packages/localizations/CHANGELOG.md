@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.36.0
+
+### Minor Changes
+
+- Introduces MFA setup session task for handling require MFA after sign-in and sign-up ([#7851](https://github.com/clerk/javascript/pull/7851)) by [@octoper](https://github.com/octoper)
+
+- Add support for account credits in checkout. ([#7870](https://github.com/clerk/javascript/pull/7870)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.17
+
 ## 3.35.5
 
 ### Patch Changes
