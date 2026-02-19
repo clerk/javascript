@@ -35,6 +35,19 @@ describe('getCookieDomain', () => {
     expect(result).toBe(hostname);
   });
 
+  it('passes cookie attributes to the probe', () => {
+    const hostname = 'app.example.com';
+    const handler: CookieHandler = {
+      get: vi.fn().mockReturnValueOnce(undefined).mockReturnValueOnce('1'),
+      set: vi.fn().mockReturnValue(undefined),
+      remove: vi.fn().mockReturnValue(undefined),
+    };
+    const attrs = { sameSite: 'None', secure: true };
+    getCookieDomain(hostname, handler, attrs);
+    expect(handler.set).toHaveBeenCalledWith('1', { sameSite: 'None', secure: true, domain: 'example.com' });
+    expect(handler.set).toHaveBeenCalledWith('1', { sameSite: 'None', secure: true, domain: 'app.example.com' });
+  });
+
   it('handles localhost', () => {
     const hostname = 'localhost';
     const result = getCookieDomain(hostname);
@@ -53,7 +66,7 @@ describe('getCookieDomain', () => {
     expect(getCookieDomain('bryce-local')).toBe('bryce-local');
   });
 
-  it('returns undefined if the domain could not be determined', () => {
+  it('falls back to hostname if the domain could not be determined', () => {
     const handler: CookieHandler = {
       get: vi.fn().mockReturnValue(undefined),
       set: vi.fn().mockReturnValue(undefined),
@@ -61,7 +74,7 @@ describe('getCookieDomain', () => {
     };
     const hostname = 'app.hello.co.uk';
     const result = getCookieDomain(hostname, handler);
-    expect(result).toBeUndefined();
+    expect(result).toBe(hostname);
   });
 
   it('uses cached value if there is one', () => {
