@@ -4,14 +4,52 @@ import type { APIContext } from 'astro';
 type ContextOrLocals = APIContext | APIContext['locals'];
 
 /**
+ * Cached env object from `cloudflare:workers` for Astro v6+ Cloudflare adapter.
+ * - `undefined`: not yet attempted
+ * - `null`: attempted but not available (non-Cloudflare environment)
+ * - object: the env object from `cloudflare:workers`
+ */
+let cloudflareEnv: Record<string, string> | null | undefined;
+
+/**
+ * @internal
+ * Attempts to import env from `cloudflare:workers` and caches the result.
+ * This is needed for Astro v6+ where `locals.runtime.env` is no longer available.
+ * Safe to call in non-Cloudflare environments — will no-op.
+ */
+async function initCloudflareEnv(): Promise<void> {
+  if (cloudflareEnv !== undefined) {
+    return;
+  }
+  try {
+    // Use a variable to prevent TypeScript from resolving the module specifier
+    const moduleName = 'cloudflare:workers';
+    const mod = await import(/* @vite-ignore */ moduleName);
+    cloudflareEnv = mod.env;
+  } catch {
+    cloudflareEnv = null;
+  }
+}
+
+/**
  * @internal
  * Isomorphic handler for reading environment variables defined from Vite or are injected in the request context (CF Pages)
  */
 function getContextEnvVar(envVarName: keyof InternalEnv, contextOrLocals: ContextOrLocals): string | undefined {
   const locals = 'locals' in contextOrLocals ? contextOrLocals.locals : contextOrLocals;
 
-  if (locals?.runtime?.env) {
-    return locals.runtime.env[envVarName];
+  // Astro v4/v5 Cloudflare adapter: env is on locals.runtime.env
+  try {
+    if (locals?.runtime?.env) {
+      return locals.runtime.env[envVarName];
+    }
+  } catch {
+    // Astro v6 Cloudflare adapter throws when accessing locals.runtime.env
+  }
+
+  // Astro v6 Cloudflare adapter: env from cloudflare:workers
+  if (cloudflareEnv) {
+    return cloudflareEnv[envVarName];
   }
 
   return import.meta.env[envVarName];
@@ -72,4 +110,4 @@ function getClientSafeEnv(context: ContextOrLocals) {
   };
 }
 
-export { getSafeEnv, getClientSafeEnv };
+export { getSafeEnv, getClientSafeEnv, initCloudflareEnv };
