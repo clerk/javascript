@@ -127,7 +127,7 @@ describe('M2MToken', () => {
             return HttpResponse.json({
               ...mockM2MToken,
               token:
-                'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtY2hfeHh4eHgiLCJhdWQiOlsibWNoXzF4eHh4eCIsIm1jaF8yeHh4eHgiXSwic2NvcGVzIjoibWNoXzF4eHh4eCBtY2hfMnh4eHh4IiwiaWF0IjoxNzUzNzQzMzE2LCJleHAiOjE3NTM3NDY5MTZ9.signature',
+                'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imluc194eHh4eCJ9.eyJqdGkiOiJtdF94eHh4eCIsInN1YiI6Im1jaF94eHh4eCIsImF1ZCI6WyJtY2hfMXh4eHh4IiwibWNoXzJ4eHh4eCJdLCJzY29wZXMiOiJtY2hfMXh4eHh4IG1jaF8yeHh4eHgiLCJpYXQiOjE3NTM3NDMzMTYsImV4cCI6MTc1Mzc0NjkxNn0.signature',
             });
           }),
         ),
@@ -164,7 +164,7 @@ describe('M2MToken', () => {
               ...mockM2MToken,
               claims: customClaims,
               token:
-                'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtY2hfeHh4eHgiLCJhdWQiOlsibWNoXzF4eHh4eCIsIm1jaF8yeHh4eHgiXSwic2NvcGVzIjoibWNoXzF4eHh4eCBtY2hfMnh4eHh4Iiwicm9sZSI6InNlcnZpY2UiLCJ0aWVyIjoiZ29sZCIsImlhdCI6MTc1Mzc0MzMxNiwiZXhwIjoxNzUzNzQ2OTE2fQ.c2lnbmF0dXJl',
+                'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imluc194eHh4eCJ9.eyJqdGkiOiJtdF94eHh4eCIsInN1YiI6Im1jaF94eHh4eCIsImF1ZCI6WyJtY2hfMXh4eHh4IiwibWNoXzJ4eHh4eCJdLCJzY29wZXMiOiJtY2hfMXh4eHh4IG1jaF8yeHh4eHgiLCJyb2xlIjoic2VydmljZSIsInRpZXIiOiJnb2xkIiwiaWF0IjoxNzUzNzQzMzE2LCJleHAiOjE3NTM3NDY5MTZ9.signature',
             });
           }),
         ),
