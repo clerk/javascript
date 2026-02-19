@@ -4,7 +4,13 @@ import path from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { detectSdk, getMajorVersion, getSdkVersion, normalizeSdkName, resolveCatalogVersion } from '../../util/detect-sdk.js';
+import {
+  detectSdk,
+  getMajorVersion,
+  getSdkVersion,
+  normalizeSdkName,
+  resolveCatalogVersion,
+} from '../../util/detect-sdk.js';
 import { detectPackageManager, getInstallCommand, getUninstallCommand } from '../../util/package-manager.js';
 import { getFixturePath } from '../helpers/create-fixture.js';
 
@@ -180,19 +186,13 @@ describe('detectPackageManager', () => {
     });
 
     it('finds packageManager field in parent package.json', () => {
-      fs.writeFileSync(
-        path.join(tmpRoot, 'package.json'),
-        JSON.stringify({ packageManager: 'pnpm@9.0.0' }),
-      );
+      fs.writeFileSync(path.join(tmpRoot, 'package.json'), JSON.stringify({ packageManager: 'pnpm@9.0.0' }));
       expect(detectPackageManager(childDir)).toBe('pnpm');
     });
 
     it('prefers lockfile over packageManager field at same level', () => {
       fs.writeFileSync(path.join(tmpRoot, 'yarn.lock'), '');
-      fs.writeFileSync(
-        path.join(tmpRoot, 'package.json'),
-        JSON.stringify({ packageManager: 'pnpm@9.0.0' }),
-      );
+      fs.writeFileSync(path.join(tmpRoot, 'package.json'), JSON.stringify({ packageManager: 'pnpm@9.0.0' }));
       expect(detectPackageManager(childDir)).toBe('yarn');
     });
   });

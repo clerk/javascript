@@ -7,10 +7,18 @@ export function detectPackageManager(dir) {
   const root = path.parse(current).root;
 
   while (current !== root) {
-    if (fs.existsSync(path.join(current, 'pnpm-lock.yaml'))) return 'pnpm';
-    if (fs.existsSync(path.join(current, 'yarn.lock'))) return 'yarn';
-    if (fs.existsSync(path.join(current, 'bun.lockb')) || fs.existsSync(path.join(current, 'bun.lock'))) return 'bun';
-    if (fs.existsSync(path.join(current, 'package-lock.json'))) return 'npm';
+    if (fs.existsSync(path.join(current, 'pnpm-lock.yaml'))) {
+      return 'pnpm';
+    }
+    if (fs.existsSync(path.join(current, 'yarn.lock'))) {
+      return 'yarn';
+    }
+    if (fs.existsSync(path.join(current, 'bun.lockb')) || fs.existsSync(path.join(current, 'bun.lock'))) {
+      return 'bun';
+    }
+    if (fs.existsSync(path.join(current, 'package-lock.json'))) {
+      return 'npm';
+    }
 
     try {
       const pkgPath = path.join(current, 'package.json');
@@ -18,7 +26,9 @@ export function detectPackageManager(dir) {
         const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
         if (pkg.packageManager) {
           const pmName = pkg.packageManager.split('@')[0];
-          if (['pnpm', 'yarn', 'bun', 'npm'].includes(pmName)) return pmName;
+          if (['pnpm', 'yarn', 'bun', 'npm'].includes(pmName)) {
+            return pmName;
+          }
         }
       }
     } catch {
@@ -41,7 +51,9 @@ export function getInstallCommand(packageManager, packageName, version = 'latest
   switch (packageManager) {
     case 'pnpm': {
       const args = ['add', pkg];
-      if (cwd && isPnpmWorkspaceRoot(cwd)) args.push('-w');
+      if (cwd && isPnpmWorkspaceRoot(cwd)) {
+        args.push('-w');
+      }
       return ['pnpm', args];
     }
     case 'yarn':
@@ -58,7 +70,9 @@ export function getUninstallCommand(packageManager, packageName, cwd) {
   switch (packageManager) {
     case 'pnpm': {
       const args = ['remove', packageName];
-      if (cwd && isPnpmWorkspaceRoot(cwd)) args.push('-w');
+      if (cwd && isPnpmWorkspaceRoot(cwd)) {
+        args.push('-w');
+      }
       return ['pnpm', args];
     }
     case 'yarn':

@@ -98,7 +98,8 @@ export function getSdkVersion(sdk, dir) {
   }
 
   if (version.startsWith('catalog:')) {
-    const resolvedVersion = resolveCatalogVersion(pkgName, dir) || (oldPkgName && resolveCatalogVersion(oldPkgName, dir));
+    const resolvedVersion =
+      resolveCatalogVersion(pkgName, dir) || (oldPkgName && resolveCatalogVersion(oldPkgName, dir));
     if (resolvedVersion) {
       return getMajorVersion(resolvedVersion);
     }
