@@ -1,7 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-type GetSafeEnvModule = typeof import('../get-safe-env');
-
 describe('get-safe-env', () => {
   beforeEach(() => {
     vi.resetModules();
