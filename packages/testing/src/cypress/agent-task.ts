@@ -13,6 +13,7 @@ import { type CreateAgentTaskParams, createAgentTaskUrl as _createAgentTaskUrl }
 export function createAgentTaskUrl(params: CreateAgentTaskParams) {
   return _createAgentTaskUrl({
     ...params,
+    apiUrl: params.apiUrl || Cypress.env('CLERK_API_URL') || process.env.CLERK_API_URL,
     secretKey: params.secretKey || Cypress.env('CLERK_SECRET_KEY') || process.env.CLERK_SECRET_KEY,
   });
 }

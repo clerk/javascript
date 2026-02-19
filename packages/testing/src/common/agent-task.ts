@@ -3,6 +3,11 @@ import { createClerkClient } from '@clerk/backend';
 
 export type CreateAgentTaskParams = Parameters<ClerkClient['agentTasks']['create']>[0] & {
   /**
+   * The API URL for your Clerk instance.
+   * If not provided, falls back to the `CLERK_API_URL` environment variable.
+   */
+  apiUrl?: string;
+  /**
    * The secret key for your Clerk instance.
    * If not provided, falls back to the `CLERK_SECRET_KEY` environment variable.
    */
@@ -12,6 +17,9 @@ export type CreateAgentTaskParams = Parameters<ClerkClient['agentTasks']['create
 export const ERROR_MISSING_SECRET_KEY =
   'A secretKey is required to create agent tasks. ' +
   'Pass it directly or set the CLERK_SECRET_KEY environment variable.';
+
+export const ERROR_MISSING_API_URL =
+  'An apiUrl is required to create agent tasks. ' + 'Pass it directly or set the CLERK_API_URL environment variable.';
 
 export const ERROR_AGENT_TASK_FAILED = 'Failed to create agent task: ';
 
@@ -25,13 +33,17 @@ export const ERROR_AGENT_TASK_FAILED = 'Failed to create agent task: ';
  * and the clerk-js version to avoid breaking changes.
  */
 export async function createAgentTaskUrl(params: CreateAgentTaskParams) {
-  const { secretKey, ...taskParams } = params;
+  const { apiUrl, secretKey, ...taskParams } = params;
+
+  if (!apiUrl) {
+    throw new Error(ERROR_MISSING_API_URL);
+  }
 
   if (!secretKey) {
     throw new Error(ERROR_MISSING_SECRET_KEY);
   }
 
-  const clerkClient = createClerkClient({ secretKey });
+  const clerkClient = createClerkClient({ apiUrl, secretKey });
 
   try {
     const agentTask = await clerkClient.agentTasks.create(taskParams);
