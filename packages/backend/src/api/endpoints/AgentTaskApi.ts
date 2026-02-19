@@ -55,6 +55,9 @@ export class AgentTaskAPI extends AbstractAPI {
       method: 'POST',
       path: basePath,
       bodyParams: params,
+      options: {
+        deepSnakecaseBodyParamKeys: true,
+      },
     });
   }
 }
