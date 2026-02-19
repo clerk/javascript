@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-import { type CreateAgentTaskParams, createAgentTaskUrl as _createAgentTaskUrl } from '../common';
+import { type CreateAgentTaskParams, createAgentTestingTask as _createAgentTestingTask } from '../common';
 
 /**
  * Creates an agent task using the Clerk Backend API and returns its URL.
@@ -10,8 +10,8 @@ import { type CreateAgentTaskParams, createAgentTaskUrl as _createAgentTaskUrl }
  * and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version
  * and the clerk-js version to avoid breaking changes.
  */
-export function createAgentTaskUrl(params: CreateAgentTaskParams) {
-  return _createAgentTaskUrl({
+export function createAgentTestingTask(params: CreateAgentTaskParams) {
+  return _createAgentTestingTask({
     ...params,
     apiUrl: params.apiUrl || Cypress.env('CLERK_API_URL') || process.env.CLERK_API_URL,
     secretKey: params.secretKey || Cypress.env('CLERK_SECRET_KEY') || process.env.CLERK_SECRET_KEY,
