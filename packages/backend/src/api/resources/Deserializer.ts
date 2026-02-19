@@ -1,6 +1,6 @@
 import {
   ActorToken,
-  AgentToken,
+  AgentTask,
   AllowlistIdentifier,
   APIKey,
   BlocklistIdentifier,
@@ -170,8 +170,8 @@ function jsonToObject(item: any): any {
       return SamlConnection.fromJSON(item);
     case ObjectType.SignInToken:
       return SignInToken.fromJSON(item);
-    case ObjectType.AgentToken:
-      return AgentToken.fromJSON(item);
+    case ObjectType.AgentTask:
+      return AgentTask.fromJSON(item);
     case ObjectType.SignUpAttempt:
       return SignUpAttempt.fromJSON(item);
     case ObjectType.Session:

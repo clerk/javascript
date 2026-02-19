@@ -19,6 +19,7 @@ import type {
 export const ObjectType = {
   AccountlessApplication: 'accountless_application',
   ActorToken: 'actor_token',
+  AgentTask: 'agent_task',
   AllowlistIdentifier: 'allowlist_identifier',
   ApiKey: 'api_key',
   BlocklistIdentifier: 'blocklist_identifier',
@@ -62,7 +63,6 @@ export const ObjectType = {
   Token: 'token',
   TotalCount: 'total_count',
   TestingToken: 'testing_token',
-  AgentToken: 'agent_token',
   Role: 'role',
   Permission: 'permission',
   BillingPayer: 'commerce_payer',
@@ -513,8 +513,8 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface AgentTokenJSON extends ClerkResourceJSON {
-  object: typeof ObjectType.AgentToken;
+export interface AgentTaskJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.AgentTask;
   user_id: string;
   token: string;
   status: 'pending' | 'accepted' | 'revoked';

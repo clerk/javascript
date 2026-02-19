@@ -1,4 +1,4 @@
-import type { AgentTokenJSON } from './JSON';
+import type { AgentTaskJSON } from './JSON';
 
 /**
  * Represents a agent token resource.
@@ -6,7 +6,7 @@ import type { AgentTokenJSON } from './JSON';
  * Agent tokens are used for testing purposes and allow creating sessions
  * for users without requiring full authentication flows.
  */
-export class AgentToken {
+export class AgentTask {
   constructor(
     /**
      * The unique identifier for the agent token.
@@ -39,12 +39,12 @@ export class AgentToken {
   ) {}
 
   /**
-   * Creates a AgentToken instance from a JSON object.
+   * Creates a AgentTask instance from a JSON object.
    *
-   * @param data - The JSON object containing agent token data
-   * @returns A new AgentToken instance
+   * @param data - The JSON object containing agent task data
+   * @returns A new AgentTask instance
    */
-  static fromJSON(data: AgentTokenJSON): AgentToken {
-    return new AgentToken(data.id, data.user_id, data.token, data.status, data.url, data.created_at, data.updated_at);
+  static fromJSON(data: AgentTaskJSON): AgentTask {
+    return new AgentTask(data.id, data.user_id, data.token, data.status, data.url, data.created_at, data.updated_at);
   }
 }

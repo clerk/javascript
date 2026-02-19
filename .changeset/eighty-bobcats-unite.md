@@ -2,4 +2,4 @@
 '@clerk/backend': minor
 ---
 
-Add support for Agent Tokens API endpoint which allows developers to create agent tokens that can be used to impersonate users through automated flows.
+Add support for Agent Tasks API endpoint which allows developers to create agent tasks that can be used to act on behalf of users through automated flows.

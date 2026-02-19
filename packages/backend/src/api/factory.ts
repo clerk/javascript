@@ -1,7 +1,7 @@
 import {
   AccountlessApplicationAPI,
   ActorTokenAPI,
-  AgentTokenAPI,
+  AgentTaskAPI,
   AllowlistIdentifierAPI,
   APIKeysAPI,
   BetaFeaturesAPI,
@@ -46,9 +46,9 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     ),
     actorTokens: new ActorTokenAPI(request),
     /**
-     * @experimental This is an experimental API for the Agent Tokens feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+     * @experimental This is an experimental API for the Agent Tasks feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
      */
-    agentTokens: new AgentTokenAPI(request),
+    agentTasks: new AgentTaskAPI(request),
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
     apiKeys: new APIKeysAPI(
       buildRequest({
