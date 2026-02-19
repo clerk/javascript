@@ -1,7 +1,7 @@
 ---
 title: '`simple` theme export removed from `@clerk/ui`'
 matcher:
-  - "import.*simple.*from.*@clerk/ui"
+  - 'import.*simple.*from.*@clerk/ui'
   - '__experimental_simple'
   - 'experimental__simple'
 category: 'breaking'

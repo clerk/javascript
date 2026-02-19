@@ -10,9 +10,9 @@ category: 'breaking'
 ### Before (Core 2)
 
 ```tsx
-import { rootAuthLoader } from '@clerk/react-router/ssr.server'
+import { rootAuthLoader } from '@clerk/react-router/ssr.server';
 
-export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args)
+export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args);
 ```
 
 ### After (Core 3)
@@ -31,9 +31,9 @@ export default {
 2. Use `clerkMiddleware()` alongside `rootAuthLoader`:
 
 ```tsx
-import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/server'
+import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/server';
 
-export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
+export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
 
-export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args)
+export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args);
 ```
