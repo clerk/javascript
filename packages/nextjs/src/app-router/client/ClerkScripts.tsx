@@ -5,8 +5,15 @@ import { useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import { ClerkScriptTags } from '../../utils/clerk-script-tags';
 
 export function ClerkScripts() {
-  const { publishableKey, __internal_clerkJSUrl, __internal_clerkJSVersion, __internal_clerkUIUrl, nonce, prefetchUI } =
-    useClerkNextOptions();
+  const {
+    publishableKey,
+    __internal_clerkJSUrl,
+    __internal_clerkJSVersion,
+    __internal_clerkUIUrl,
+    __internal_clerkUIVersion,
+    nonce,
+    prefetchUI,
+  } = useClerkNextOptions();
   const { domain, proxyUrl } = useClerk();
 
   if (!publishableKey) {
@@ -19,6 +26,7 @@ export function ClerkScripts() {
       __internal_clerkJSUrl={__internal_clerkJSUrl}
       __internal_clerkJSVersion={__internal_clerkJSVersion}
       __internal_clerkUIUrl={__internal_clerkUIUrl}
+      __internal_clerkUIVersion={__internal_clerkUIVersion}
       nonce={nonce}
       domain={domain}
       proxyUrl={proxyUrl}

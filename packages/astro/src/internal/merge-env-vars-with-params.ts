@@ -26,7 +26,9 @@ function mergePrefetchUIConfig(paramPrefetchUI: AstroClerkIntegrationParams['pre
 /**
  * @internal
  */
-const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & InternalRuntimeOptions & InternalClerkScriptProps) => {
+const mergeEnvVarsWithParams = (
+  params?: AstroClerkIntegrationParams & InternalRuntimeOptions & InternalClerkScriptProps,
+) => {
   const {
     signInUrl: paramSignIn,
     signUpUrl: paramSignUp,
