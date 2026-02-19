@@ -12,31 +12,28 @@ import {
   updateRuntimeConfig,
 } from '@nuxt/kit';
 
-export type ModuleOptions = Without<
-  PluginOptions,
-  'routerPush' | 'routerReplace' | 'publishableKey' | 'initialState'
-> &
+export type ModuleOptions = Without<PluginOptions, 'routerPush' | 'routerReplace' | 'publishableKey' | 'initialState'> &
   InternalClerkScriptProps & {
     publishableKey?: string;
-  /**
-   * Skip the automatic server middleware registration. When enabled, you'll need to
-   * register the middleware manually in your application.
-   *
-   * @default false
-   *
-   * @example
-   *
-   * ```ts
-   * // server/middleware/clerk.ts
-   * import { clerkMiddleware } from '@clerk/nuxt/server'
-   *
-   * export default clerkMiddleware((event) => {
-   *   console.log('auth', event.context.auth())
-   * })
-   * ```
-   */
-  skipServerMiddleware?: boolean;
-};
+    /**
+     * Skip the automatic server middleware registration. When enabled, you'll need to
+     * register the middleware manually in your application.
+     *
+     * @default false
+     *
+     * @example
+     *
+     * ```ts
+     * // server/middleware/clerk.ts
+     * import { clerkMiddleware } from '@clerk/nuxt/server'
+     *
+     * export default clerkMiddleware((event) => {
+     *   console.log('auth', event.context.auth())
+     * })
+     * ```
+     */
+    skipServerMiddleware?: boolean;
+  };
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {

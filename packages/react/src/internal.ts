@@ -1,3 +1,10 @@
+import type { InternalClerkScriptProps } from '@clerk/shared/types';
+import type { Ui } from '@clerk/ui/internal';
+import type React from 'react';
+
+import { ClerkProvider } from './contexts/ClerkProvider';
+import type { ClerkProviderProps } from './types';
+
 export { setErrorThrowerOptions } from './errors/errorThrower';
 export { MultisessionAppSupport } from './components/controlComponents';
 export { useRoutingProps } from './hooks/useRoutingProps';
@@ -19,14 +26,6 @@ export {
 export type { Ui } from '@clerk/ui/internal';
 
 export type { InternalClerkScriptProps } from '@clerk/shared/types';
-
-import type { InternalClerkScriptProps } from '@clerk/shared/types';
-import type { Ui } from '@clerk/ui/internal';
-import type React from 'react';
-
-import type { ClerkProviderProps } from './types';
-
-import { ClerkProvider } from './contexts/ClerkProvider';
 
 /**
  * A wider-typed version of ClerkProvider that accepts internal script props.
