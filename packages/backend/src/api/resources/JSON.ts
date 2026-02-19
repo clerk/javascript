@@ -515,12 +515,9 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
 
 export interface AgentTaskJSON extends ClerkResourceJSON {
   object: typeof ObjectType.AgentTask;
-  user_id: string;
-  token: string;
-  status: 'pending' | 'accepted' | 'revoked';
+  agent_id: string;
+  task_id: string;
   url: string;
-  created_at: number;
-  updated_at: number;
 }
 
 export interface SignUpJSON extends ClerkResourceJSON {

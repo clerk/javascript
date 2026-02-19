@@ -9,33 +9,17 @@ import type { AgentTaskJSON } from './JSON';
 export class AgentTask {
   constructor(
     /**
-     * The unique identifier for the agent token.
+     * A stable identifier for the agent, unique per agent_name within an instance.
      */
-    readonly id: string,
+    readonly agentId: string,
     /**
-     * The unique identifier for the user associated with this token.
+     * A unique identifier for this agent task.
      */
-    readonly userId: string,
+    readonly taskId: string,
     /**
-     * The agent token string value.
-     */
-    readonly token: string,
-    /**
-     * The current status of the token: 'pending', 'accepted', or 'revoked'.
-     */
-    readonly status: 'pending' | 'accepted' | 'revoked',
-    /**
-     * The URL associated with the agent token.
+     * The FAPI URL that, when visited, creates a session for the user.
      */
     readonly url: string,
-    /**
-     * Unix timestamp (in milliseconds) indicating when the token was created.
-     */
-    readonly createdAt: number,
-    /**
-     * Unix timestamp (in milliseconds) indicating when the token was last updated.
-     */
-    readonly updatedAt: number,
   ) {}
 
   /**
@@ -45,6 +29,6 @@ export class AgentTask {
    * @returns A new AgentTask instance
    */
   static fromJSON(data: AgentTaskJSON): AgentTask {
-    return new AgentTask(data.id, data.user_id, data.token, data.status, data.url, data.created_at, data.updated_at);
+    return new AgentTask(data.agent_id, data.task_id, data.url);
   }
 }

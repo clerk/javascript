@@ -1,8 +1,6 @@
 import type { AgentTask } from '../resources/AgentTask';
 import { AbstractAPI } from './AbstractApi';
 
-// type AgentTaskOnBehalfOfParams = ;
-
 type CreateAgentTaskParams = {
   /**
    * The user to create an agent task for.
