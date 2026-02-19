@@ -1,3 +1,4 @@
+import { joinPaths } from '../../util/path';
 import type { AgentTask } from '../resources/AgentTask';
 import { AbstractAPI } from './AbstractApi';
 
@@ -58,6 +59,14 @@ export class AgentTaskAPI extends AbstractAPI {
       options: {
         deepSnakecaseBodyParamKeys: true,
       },
+    });
+  }
+
+  public async revoke(agentTaskId: string) {
+    this.requireId(agentTaskId);
+    return this.request<Omit<AgentTask, 'url'>>({
+      method: 'POST',
+      path: joinPaths(basePath, agentTaskId, 'revoke'),
     });
   }
 }

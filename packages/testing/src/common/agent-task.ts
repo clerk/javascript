@@ -12,6 +12,12 @@ export type CreateAgentTaskParams = Parameters<ClerkClient['agentTasks']['create
    * If not provided, falls back to the `CLERK_SECRET_KEY` environment variable.
    */
   secretKey?: string;
+
+  /**
+   * The Clerk client to use to create the agent task.
+   * If not provided, a new Clerk client will be created.
+   */
+  clerkClient?: ClerkClient;
 };
 
 export const ERROR_MISSING_SECRET_KEY =
@@ -34,10 +40,6 @@ export const ERROR_AGENT_TASK_FAILED = 'Failed to create agent task: ';
  */
 export async function createAgentTaskUrl(params: CreateAgentTaskParams) {
   const { apiUrl, secretKey, ...taskParams } = params;
-
-  if (!apiUrl) {
-    throw new Error(ERROR_MISSING_API_URL);
-  }
 
   if (!secretKey) {
     throw new Error(ERROR_MISSING_SECRET_KEY);
