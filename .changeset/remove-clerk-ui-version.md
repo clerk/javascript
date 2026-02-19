@@ -8,4 +8,4 @@
 '@clerk/nuxt': minor
 ---
 
-Remove `clerkUIVersion` prop and deprecate `clerkJSVersion` prop across all SDKs
+Remove `clerkUIVersion` and `clerkJSVersion` props across all SDKs. Use `@clerk/upgrade` to migrate to the new `__internal_` prefixed props if needed.

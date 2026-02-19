@@ -2496,7 +2496,6 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   __internal_clerkJSUrl?: string;
   /**
    * The npm version for `@clerk/clerk-js`.
-   * @deprecated This prop is deprecated. The Clerk SDK will automatically use the correct version.
    * @internal
    */
   __internal_clerkJSVersion?: string;

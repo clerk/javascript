@@ -14,10 +14,7 @@ export type LoadClerkJSScriptOptions = {
   publishableKey: string;
   /** @internal */
   __internal_clerkJSUrl?: string;
-  /**
-   * @deprecated This option is deprecated. The Clerk SDK will automatically use the correct version.
-   * @internal
-   */
+  /** @internal */
   __internal_clerkJSVersion?: string;
   sdkMetadata?: SDKMetadata;
   proxyUrl?: string;

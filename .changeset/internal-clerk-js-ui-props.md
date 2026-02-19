@@ -8,4 +8,4 @@
 '@clerk/nuxt': minor
 ---
 
-Rename `clerkJSUrl`, `clerkJSVersion`, and `clerkUIUrl` props to `__internal_clerkJSUrl`, `__internal_clerkJSVersion`, and `__internal_clerkUIUrl` to mark them as internal-only options.
+Remove `clerkJSUrl`, `clerkJSVersion`, `clerkUIUrl`, and `clerkUIVersion` props and replace with `__internal_clerkJSUrl`, `__internal_clerkJSVersion`, `__internal_clerkUIUrl`, and `__internal_clerkUIVersion` internal-only options. Use `@clerk/upgrade` to migrate.
