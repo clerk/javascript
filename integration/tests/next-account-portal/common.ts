@@ -182,3 +182,89 @@ export const testSSR = async ({ app, page, context, fakeUser }: TestParams) => {
 
   expect(await u.po.userButton.waitForMounted()).not.toBeUndefined();
 };
+
+export const testSignOut = async ({ app, page, context, fakeUser }: TestParams) => {
+  const u = createTestUtils({ app, page, context, useTestingToken: false });
+
+  // Sign in via Account Portal first
+  await u.page.goToAppHome();
+  await u.page.waitForClerkJsLoaded();
+  await u.po.expect.toBeSignedOut();
+
+  await u.page.getByRole('button', { name: /Sign in/i }).click();
+  await u.po.signIn.waitForMounted();
+  await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+  await u.page.waitForAppUrl('/');
+  await u.po.expect.toBeSignedIn();
+  await u.po.userButton.waitForMounted();
+
+  // Verify session cookie is set before sign-out
+  const sessionBefore = await context
+    .cookies(page.url())
+    .then(cookies => cookies.find(c => c.name === CLERK_SESSION_COOKIE_NAME)?.value);
+  expect(!!sessionBefore).toBeTruthy();
+
+  // Sign out via Clerk.signOut()
+  await page.evaluate(() => window.Clerk.signOut());
+  await u.po.expect.toBeSignedOut();
+
+  // Verify session cookie is cleared
+  const sessionAfter = await context
+    .cookies(page.url())
+    .then(cookies => cookies.find(c => c.name === CLERK_SESSION_COOKIE_NAME)?.value);
+  expect(!!sessionAfter).toBeFalsy();
+
+  // Reload and verify user stays signed out (no auto-sign-in from stale state)
+  await u.page.goToAppHome();
+  await u.page.waitForClerkJsLoaded();
+  await u.po.expect.toBeSignedOut();
+
+  // Navigate to AP again and verify sign-in form is shown (not auto-signed-in)
+  await u.page.getByRole('button', { name: /Sign in/i }).click();
+  await u.po.signIn.waitForMounted();
+  const apURL = page.url();
+  expect(apURL).toMatch(/\.accounts(stage\.dev|\.dev|\.stg)/);
+};
+
+export const testHandshakeRecovery = async ({ app, page, context, fakeUser }: TestParams) => {
+  const u = createTestUtils({ app, page, context, useTestingToken: false });
+
+  // Sign in via Account Portal
+  await u.page.goToAppHome();
+  await u.page.waitForClerkJsLoaded();
+  await u.po.expect.toBeSignedOut();
+
+  await u.page.getByRole('button', { name: /Sign in/i }).click();
+  await u.po.signIn.waitForMounted();
+  await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+  await u.page.waitForAppUrl('/');
+  await u.po.expect.toBeSignedIn();
+
+  // Delete the __session cookie to simulate an expired/invalid session.
+  // Keep __client_uat so the middleware detects a mismatch and triggers a handshake.
+  const appUrl = new URL(page.url());
+  await context.clearCookies({ name: CLERK_SESSION_COOKIE_NAME, domain: appUrl.hostname });
+
+  // Reload the page. The middleware should:
+  // 1. Detect missing session + present client_uat
+  // 2. Trigger a handshake redirect to FAPI
+  // 3. FAPI resolves the handshake and returns fresh cookies
+  // 4. User ends up signed in again (no redirect loop, no error)
+  await u.page.goToAppHome();
+  await u.page.waitForClerkJsLoaded();
+
+  // The page should load successfully (not stuck in a redirect loop).
+  // The user should be signed in because the handshake recovered the session.
+  await u.po.expect.toBeSignedIn();
+
+  // Verify the session cookie was re-established by the handshake
+  const sessionAfterRecovery = await context
+    .cookies(page.url())
+    .then(cookies => cookies.find(c => c.name === CLERK_SESSION_COOKIE_NAME)?.value);
+  expect(!!sessionAfterRecovery).toBeTruthy();
+
+  // Verify no leftover handshake params in the URL
+  const finalURL = new URL(page.url());
+  expect(finalURL.searchParams.has('__clerk_handshake')).toBeFalsy();
+  expect(finalURL.searchParams.has('__clerk_handshake_nonce')).toBeFalsy();
+};
