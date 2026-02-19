@@ -2,6 +2,7 @@ import type {
   Clerk,
   ClerkOptions,
   ClientResource,
+  InternalClerkScriptProps,
   MultiDomainAndOrProxyPrimitives,
   ProtectParams,
   ShowProps,
@@ -30,26 +31,6 @@ type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
   MultiDomainAndOrProxyPrimitives & {
     appearance?: Appearance<TUi>;
     /**
-     * The URL that `@clerk/clerk-js` should be hot-loaded from.
-     * @internal
-     */
-    __internal_clerkJSUrl?: string;
-    /**
-     * The npm version for `@clerk/clerk-js`.
-     * @internal
-     */
-    __internal_clerkJSVersion?: string;
-    /**
-     * The URL that `@clerk/ui` should be hot-loaded from.
-     * @internal
-     */
-    __internal_clerkUIUrl?: string;
-    /**
-     * The npm version for `@clerk/ui`.
-     * @internal
-     */
-    __internal_clerkUIVersion?: string;
-    /**
      * Controls prefetching of the `@clerk/ui` script.
      * - `false` - Skip prefetching the UI (for custom UIs using Control Components)
      * - `undefined` (default) - Prefetch UI normally
@@ -57,9 +38,10 @@ type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
     prefetchUI?: boolean;
   };
 
-type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegrationParams<TUi> & {
-  publishableKey: string;
-};
+type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegrationParams<TUi> &
+  InternalClerkScriptProps & {
+    publishableKey: string;
+  };
 
 /**
  * @internal

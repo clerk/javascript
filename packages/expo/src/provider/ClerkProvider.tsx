@@ -1,7 +1,7 @@
 import '../polyfills';
 
-import { ClerkProvider as ClerkReactProvider } from '@clerk/react';
-import type { Ui } from '@clerk/react/internal';
+import type { ClerkProviderProps as ReactClerkProviderProps } from '@clerk/react';
+import { InternalClerkProvider as ClerkReactProvider, type Ui } from '@clerk/react/internal';
 import * as WebBrowser from 'expo-web-browser';
 
 import type { TokenCache } from '../cache/types';
@@ -9,10 +9,7 @@ import { isNative, isWeb } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
 
-export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<
-  React.ComponentProps<typeof ClerkReactProvider<TUi>>,
-  'publishableKey'
-> & {
+export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<ReactClerkProviderProps<TUi>, 'publishableKey'> & {
   /**
    * Your Clerk publishable key, available in the Clerk Dashboard.
    * This is required for React Native / Expo apps. Environment variables inside node_modules

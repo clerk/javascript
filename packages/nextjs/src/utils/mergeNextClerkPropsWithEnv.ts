@@ -1,3 +1,4 @@
+import type { InternalClerkScriptProps } from '@clerk/react/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import { SDK_METADATA } from '../server/constants';
@@ -18,7 +19,9 @@ function getPrefetchUIFromEnvAndProps(propsPrefetchUI: NextClerkProviderProps['p
 }
 
 // @ts-ignore - https://github.com/microsoft/TypeScript/issues/47663
-export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, 'children'>): any => {
+export const mergeNextClerkPropsWithEnv = (
+  props: Omit<NextClerkProviderProps, 'children'> & InternalClerkScriptProps,
+): any => {
   return {
     ...props,
     publishableKey: props.publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',

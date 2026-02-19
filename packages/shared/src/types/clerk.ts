@@ -2487,6 +2487,17 @@ export type ClerkProp =
   | undefined
   | null;
 
+/**
+ * Internal props used by framework SDKs to configure script URLs and versions.
+ * These are omitted from consumer-facing types like ClerkProviderProps.
+ */
+export type InternalClerkScriptProps = {
+  __internal_clerkJSUrl?: string;
+  __internal_clerkJSVersion?: string;
+  __internal_clerkUIUrl?: string;
+  __internal_clerkUIVersion?: string;
+};
+
 export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
   /**

@@ -29,18 +29,12 @@ describe('ClerkProvider', () => {
     });
   });
 
-  describe('__internal_clerkUIUrl', () => {
-    const defaultProps = { children: '' };
-
-    it('accepts string URL for custom UI location', () => {
-      expectTypeOf({
-        ...defaultProps,
-        __internal_clerkUIUrl: 'https://custom.com/ui.js',
-      }).toMatchTypeOf<ClerkProviderProps>();
-    });
-
-    it('accepts undefined', () => {
-      expectTypeOf({ ...defaultProps, __internal_clerkUIUrl: undefined }).toMatchTypeOf<ClerkProviderProps>();
+  describe('internal script props', () => {
+    it('does not expose internal script props', () => {
+      expectTypeOf<ClerkProviderProps>().not.toHaveProperty('__internal_clerkUIUrl');
+      expectTypeOf<ClerkProviderProps>().not.toHaveProperty('__internal_clerkJSUrl');
+      expectTypeOf<ClerkProviderProps>().not.toHaveProperty('__internal_clerkUIVersion');
+      expectTypeOf<ClerkProviderProps>().not.toHaveProperty('__internal_clerkJSVersion');
     });
   });
 

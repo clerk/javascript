@@ -1,3 +1,4 @@
+import type { InternalClerkScriptProps } from '@clerk/shared/types';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import type { AstroClerkIntegrationParams, InternalRuntimeOptions } from '../types';
@@ -25,7 +26,7 @@ function mergePrefetchUIConfig(paramPrefetchUI: AstroClerkIntegrationParams['pre
 /**
  * @internal
  */
-const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & InternalRuntimeOptions) => {
+const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & InternalRuntimeOptions & InternalClerkScriptProps) => {
   const {
     signInUrl: paramSignIn,
     signUpUrl: paramSignUp,

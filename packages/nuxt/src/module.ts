@@ -1,4 +1,4 @@
-import type { Without } from '@clerk/shared/types';
+import type { InternalClerkScriptProps, Without } from '@clerk/shared/types';
 import type { PluginOptions } from '@clerk/vue';
 import {
   addComponent,
@@ -15,8 +15,9 @@ import {
 export type ModuleOptions = Without<
   PluginOptions,
   'routerPush' | 'routerReplace' | 'publishableKey' | 'initialState'
-> & {
-  publishableKey?: string;
+> &
+  InternalClerkScriptProps & {
+    publishableKey?: string;
   /**
    * Skip the automatic server middleware registration. When enabled, you'll need to
    * register the middleware manually in your application.

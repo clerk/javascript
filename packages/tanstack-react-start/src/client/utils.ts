@@ -1,3 +1,5 @@
+import type { InternalClerkScriptProps } from '@clerk/shared/types';
+
 import { getPublicEnvVariables } from '../utils/env';
 import type { TanstackStartClerkProviderProps } from './types';
 
@@ -5,11 +7,12 @@ type TanStackProviderAndInitialProps = Omit<TanstackStartClerkProviderProps, 'ch
 
 export const pickFromClerkInitState = (
   clerkInitState: any,
-): TanStackProviderAndInitialProps & {
-  clerkSsrState: any;
-  __keylessClaimUrl?: string;
-  __keylessApiKeysUrl?: string;
-} => {
+): TanStackProviderAndInitialProps &
+  InternalClerkScriptProps & {
+    clerkSsrState: any;
+    __keylessClaimUrl?: string;
+    __keylessApiKeysUrl?: string;
+  } => {
   const {
     __clerk_ssr_state,
     __publishableKey,

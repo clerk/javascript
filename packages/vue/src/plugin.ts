@@ -6,6 +6,7 @@ import type {
   ClerkOptions,
   ClientResource,
   InitialState,
+  InternalClerkScriptProps,
   IsomorphicClerkOptions,
   MultiDomainAndOrProxy,
   Resources,
@@ -23,7 +24,10 @@ declare global {
   }
 }
 
-export type PluginOptions<TUi extends Ui = Ui> = Without<IsomorphicClerkOptions, 'domain' | 'proxyUrl' | 'appearance'> &
+export type PluginOptions<TUi extends Ui = Ui> = Without<
+  IsomorphicClerkOptions,
+  'domain' | 'proxyUrl' | 'appearance' | keyof InternalClerkScriptProps
+> &
   MultiDomainAndOrProxy & {
     initialState?: InitialState;
     appearance?: Appearance<TUi>;
