@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getClientSafeEnv, getSafeEnv } from '../get-safe-env';
 
-function createLocals(overrides: Partial<App.Locals> = {}) {
+function createLocals(overrides: Partial<App.Locals> = {}): App.Locals {
   return {
     runtime: { env: {} as InternalEnv },
     ...overrides,
-  } as App.Locals;
+  } as unknown as App.Locals;
 }
 
 describe('getSafeEnv', () => {
