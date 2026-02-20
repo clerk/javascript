@@ -1,4 +1,9 @@
-import { DEV_BROWSER_JWT_HEADER, extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
+import {
+  DEV_BROWSER_JWT_HEADER,
+  DEV_BROWSER_JWT_KEY,
+  extractDevBrowserJWTFromURL,
+  setDevBrowserJWTInURL,
+} from '@clerk/shared/devBrowser';
 import { parseErrors } from '@clerk/shared/error';
 import type { ClerkAPIErrorJSON } from '@clerk/shared/types';
 
@@ -27,17 +32,53 @@ export type CreateDevBrowserOptions = {
 
 export function createDevBrowser({ cookieSuffix, frontendApi, fapiClient }: CreateDevBrowserOptions): DevBrowser {
   const devBrowserCookie = createDevBrowserCookie(cookieSuffix);
+  let inMemoryDevBrowserJWT: string | undefined;
+
+  const getStoredDevBrowserJWT = () => {
+    try {
+      if (typeof window === 'undefined') {
+        return undefined;
+      }
+      return window.localStorage.getItem(DEV_BROWSER_JWT_KEY) || undefined;
+    } catch {
+      return undefined;
+    }
+  };
+
+  const setStoredDevBrowserJWT = (jwt: string) => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(DEV_BROWSER_JWT_KEY, jwt);
+      }
+    } catch {
+      // Best effort only. Some embedded environments disable storage access.
+    }
+  };
+
+  const removeStoredDevBrowserJWT = () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem(DEV_BROWSER_JWT_KEY);
+      }
+    } catch {
+      // Best effort only.
+    }
+  };
 
   function getDevBrowserJWT() {
-    return devBrowserCookie.get();
+    return devBrowserCookie.get() || getStoredDevBrowserJWT() || inMemoryDevBrowserJWT;
   }
 
   function setDevBrowserJWT(jwt: string) {
+    inMemoryDevBrowserJWT = jwt;
     devBrowserCookie.set(jwt);
+    setStoredDevBrowserJWT(jwt);
   }
 
   function removeDevBrowserJWT() {
+    inMemoryDevBrowserJWT = undefined;
     devBrowserCookie.remove();
+    removeStoredDevBrowserJWT();
   }
 
   function clear() {
@@ -72,7 +113,7 @@ export function createDevBrowser({ cookieSuffix, frontendApi, fapiClient }: Crea
     }
 
     // 2. If no JWT is found in the first step, check if a JWT is already available in the __clerk_db_jwt JS cookie
-    if (devBrowserCookie.get()) {
+    if (getDevBrowserJWT()) {
       return;
     }
 
