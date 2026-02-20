@@ -266,7 +266,7 @@ jobs:
       - name: Run tests in packages
         run: |
           echo "Running tests: ${{ matrix.filter-label }}"
-          pnpm turbo test --affected $TURBO_ARGS ${{ matrix.test-filter }}
+          pnpm turbo test $TURBO_ARGS ${{ matrix.test-filter }}
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
