@@ -38,7 +38,7 @@ const serveFromTempDir = async (config: HttpServerConfig): Promise<{ pid: number
     stderr: fs.openSync(stderrFilePath, 'a'),
   });
 
-  await waitForServer(serverUrl, { log: console.log, maxAttempts: Infinity });
+  await waitForServer(serverUrl, { log: console.log, maxAttempts: 60 });
   console.log(`${config.name} is being served from`, serverUrl);
 
   return { pid: proc.pid, serverUrl };
