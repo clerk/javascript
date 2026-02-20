@@ -22,6 +22,7 @@ import {
 } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath } from '@clerk/backend/proxy';
 import { parsePublishableKey } from '@clerk/shared/keys';
+import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -222,7 +223,13 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       const locationHeader = requestState.headers.get(constants.Headers.Location);
       if (locationHeader) {
-        const res = NextResponse.redirect(locationHeader);
+        handleNetlifyCacheInDevInstance({
+          locationHeader,
+          requestStateHeaders: requestState.headers,
+          publishableKey: requestState.publishableKey,
+        });
+
+        const res = NextResponse.redirect(requestState.headers.get(constants.Headers.Location) || locationHeader);
         requestState.headers.forEach((value, key) => {
           if (key === constants.Headers.Location) {
             return;
