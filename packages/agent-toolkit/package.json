@@ -1,6 +1,6 @@
 {
   "name": "@clerk/agent-toolkit",
-  "version": "0.2.8",
+  "version": "0.3.0",
   "description": "Clerk Toolkit for AI Agents",
   "homepage": "https://clerk.com/",
   "bugs": {
