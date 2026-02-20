@@ -1,6 +1,6 @@
 {
   "name": "@clerk/dev-cli",
-  "version": "0.0.12",
+  "version": "1.0.0",
   "description": "CLI tool designed to simplify the process of iterating on packages within the clerk/javascript repository",
   "homepage": "https://clerk.com/",
   "bugs": {
