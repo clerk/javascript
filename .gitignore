@@ -108,3 +108,6 @@ CLAUDE.local.md
 
 # Claude Code local settings (user-specific permissions)
 .claude/settings.local.json
+
+# Git worktrees
+.worktrees

@@ -905,6 +905,26 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
+  async sendPhoneCode(params: SignUpFuturePhoneCodeSendParams): Promise<{ error: ClerkError | null }> {
+    const { channel = 'sms' } = params;
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePost({
+        body: { strategy: 'phone_code', channel },
+        action: 'prepare_verification',
+      });
+    });
+  }
+
+  async verifyPhoneCode(params: SignUpFuturePhoneCodeVerifyParams): Promise<{ error: ClerkError | null }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePost({
+        body: { strategy: 'phone_code', code },
+        action: 'attempt_verification',
+      });
+    });
+  }
+
   async sendEmailLink(params: SignUpFutureEmailLinkSendParams): Promise<{ error: ClerkError | null }> {
     const { verificationUrl } = params;
     return runAsyncResourceTask(this.#resource, async () => {
@@ -941,34 +961,6 @@ class SignUpFuture implements SignUpFutureResource {
               reject(err);
             });
         });
-      });
-    });
-  }
-
-  async sendPhoneCode(params: SignUpFuturePhoneCodeSendParams): Promise<{ error: ClerkError | null }> {
-    const { phoneNumber, channel = 'sms' } = params;
-    return runAsyncResourceTask(this.#resource, async () => {
-      if (!this.#resource.id) {
-        const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
-        await this.#resource.__internal_basePost({
-          path: this.#resource.pathRoot,
-          body: { phoneNumber, captchaToken, captchaWidgetType, captchaError },
-        });
-      }
-
-      await this.#resource.__internal_basePost({
-        body: { strategy: 'phone_code', channel },
-        action: 'prepare_verification',
-      });
-    });
-  }
-
-  async verifyPhoneCode(params: SignUpFuturePhoneCodeVerifyParams): Promise<{ error: ClerkError | null }> {
-    const { code } = params;
-    return runAsyncResourceTask(this.#resource, async () => {
-      await this.#resource.__internal_basePost({
-        body: { strategy: 'phone_code', code },
-        action: 'attempt_verification',
       });
     });
   }
