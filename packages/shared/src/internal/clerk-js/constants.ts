@@ -62,7 +62,8 @@ export const SIGN_UP_MODES = {
 } satisfies Record<string, SignUpModes>;
 
 // This is the currently supported version of the Frontend API
-export const SUPPORTED_FAPI_VERSION = '2025-11-10';
+export const SUPPORTED_FAPI_VERSION = '2026-03-01';
 
 export const CAPTCHA_ELEMENT_ID = 'clerk-captcha';
 export const CAPTCHA_INVISIBLE_CLASSNAME = 'clerk-invisible-captcha';
+export const PROTECT_CHECK_CONTAINER_ID = 'clerk-protect-check';

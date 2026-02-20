@@ -6,6 +6,7 @@ import type { FormControlState } from '@/ui/utils/useFormControl';
 
 import { Col, localizationKeys, useAppearance } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
+import { ProtectCheckElement } from '../../elements/ProtectCheckElement';
 import { mqu } from '../../styledSystem';
 import type { ActiveIdentifier, Fields } from './signUpFormHelpers';
 
@@ -116,6 +117,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
       )}
       <Col center>
         <CaptchaElement />
+        <ProtectCheckElement />
         <Col
           gap={6}
           sx={{

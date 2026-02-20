@@ -1,3 +1,4 @@
+import { PROTECT_CHECK_CONTAINER_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignUpResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
@@ -519,6 +520,25 @@ describe('SignUpStart', () => {
       );
 
       await waitFor(() => screen.getByText(/create your account/i));
+    });
+  });
+
+  describe('Protect check container', () => {
+    it('renders the protect check container element when form is shown', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress({ required: true });
+        f.withPassword({ required: true });
+      });
+      const { container } = render(<SignUpStart />, { wrapper });
+      expect(container.querySelector(`#${PROTECT_CHECK_CONTAINER_ID}`)).toBeTruthy();
+    });
+
+    it('renders the protect check container element when only OAuth is shown', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+      });
+      const { container } = render(<SignUpStart />, { wrapper });
+      expect(container.querySelector(`#${PROTECT_CHECK_CONTAINER_ID}`)).toBeTruthy();
     });
   });
 });

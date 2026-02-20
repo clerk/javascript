@@ -351,6 +351,7 @@ export interface SignUpVerificationsJSON {
   phone_number: SignUpVerificationJSON;
   web3_wallet: SignUpVerificationJSON;
   external_account: VerificationJSON;
+  protect_check: { url: string } | null;
 }
 
 export interface SignUpVerificationJSON extends VerificationJSON {
