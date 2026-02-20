@@ -2,6 +2,7 @@ import { SIGN_UP_INITIAL_VALUE_KEYS } from '@clerk/shared/internal/clerk-js/cons
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
+import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { useClerk } from '@clerk/shared/react';
 import type { DecorateUrl, SessionResource } from '@clerk/shared/types';
 import { isAbsoluteUrl } from '@clerk/shared/url';
@@ -135,7 +136,7 @@ export const useSignUpContext = (): SignUpContextType => {
       // If decorateUrl modified the URL (Safari ITP fix), do a full page navigation
       // The touch endpoint URL will be an absolute URL starting with http:// or https://
       if (decoratedUrl !== redirectUrl && /^https?:\/\//.test(decoratedUrl)) {
-        window.location.href = decoratedUrl;
+        windowNavigate(decoratedUrl);
         return;
       }
 
