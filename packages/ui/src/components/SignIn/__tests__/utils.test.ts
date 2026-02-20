@@ -1,6 +1,7 @@
 import type { SignInResource } from '@clerk/shared/types';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
+import { loadCountryCodeData } from '@/ui/elements/PhoneInput/countryCodeDataLoader';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 
 import {
@@ -9,6 +10,10 @@ import {
   getPreferredAlternativePhoneChannel,
   getPreferredAlternativePhoneChannelForCombinedFlow,
 } from '../utils';
+
+beforeAll(async () => {
+  await loadCountryCodeData();
+});
 
 describe('determineStrategy(signIn, displayConfig)', () => {
   describe('with password as the preferred sign in strategy', () => {

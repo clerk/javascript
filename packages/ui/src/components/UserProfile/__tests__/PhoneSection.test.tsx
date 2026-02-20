@@ -1,13 +1,18 @@
 import { act } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
+import { loadCountryCodeData } from '@/ui/elements/PhoneInput/countryCodeDataLoader';
 
 import { PhoneSection } from '../PhoneSection';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
+
+beforeAll(async () => {
+  await loadCountryCodeData();
+});
 
 const initConfig = createFixtures.config(f => {
   f.withPhoneNumber();

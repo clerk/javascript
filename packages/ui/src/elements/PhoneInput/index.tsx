@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import React, { forwardRef, memo, useEffect, useMemo, useRef } from 'react';
+import React, { forwardRef, memo, useEffect, useMemo, useRef, useState } from 'react';
 
 import { mergeRefs } from '@/ui/utils/mergeRefs';
 import type { FeedbackType } from '@/ui/utils/useFormControl';
@@ -9,7 +9,7 @@ import { Check, ChevronUpDown } from '../../icons';
 import { common, type PropsOfComponent } from '../../styledSystem';
 import { Select, SelectButton, SelectOptionList } from '../Select';
 import type { CountryEntry, CountryIso } from './countryCodeData';
-import { IsoToCountryMap } from './countryCodeData';
+import { getIsoToCountryMap, isCountryCodeDataLoaded, loadCountryCodeData } from './countryCodeDataLoader';
 import { useFormattedPhoneNumber } from './useFormattedPhoneNumber';
 
 const createSelectOption = (country: CountryEntry) => {
@@ -21,7 +21,17 @@ const createSelectOption = (country: CountryEntry) => {
   };
 };
 
-const countryOptions = [...IsoToCountryMap.values()].map(createSelectOption);
+function useCountryCodeData() {
+  const [loaded, setLoaded] = useState(isCountryCodeDataLoaded);
+
+  useEffect(() => {
+    if (!loaded) {
+      void loadCountryCodeData().then(() => setLoaded(true));
+    }
+  }, [loaded]);
+
+  return loaded;
+}
 
 type PhoneInputProps = PropsOfComponent<typeof Input> & { locationBasedCountryIso?: CountryIso };
 
@@ -34,6 +44,11 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
     locationBasedCountryIso,
   });
 
+  const countryOptions = useMemo(() => {
+    const map = getIsoToCountryMap();
+    return map ? [...map.values()].map(createSelectOption) : [];
+  }, []);
+
   const callOnChangeProp = () => {
     // Quick and dirty way to match this component's public API
     // with every other Input component, so we can use the same helpers
@@ -43,7 +58,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
 
   const selectedCountryOption = useMemo(() => {
     return countryOptions.find(o => o.country.iso === iso) || countryOptions[0];
-  }, [iso]);
+  }, [countryOptions, iso]);
 
   useEffect(callOnChangeProp, [numberWithCode]);
 
@@ -248,6 +263,11 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
 export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps & { feedbackType?: FeedbackType }>(
   (props, ref) => {
     const { __internal_country } = useClerk();
+    const dataLoaded = useCountryCodeData();
+
+    if (!dataLoaded) {
+      return null;
+    }
 
     return (
       <PhoneInputBase
