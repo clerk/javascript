@@ -35,4 +35,12 @@ export class BetaFeaturesAPI extends AbstractAPI {
       bodyParams: params,
     });
   }
+
+  public async get() {
+    // TODO: Remove - Strictly a test endpoint
+    return this.request<void>({
+      method: 'GET',
+      path: joinPaths(basePath),
+    });
+  }
 }
