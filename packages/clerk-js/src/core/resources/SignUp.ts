@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { PROTECT_CHECK_CONTAINER_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
@@ -56,6 +57,7 @@ import {
 } from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
+import { executeProtectCheck } from '../../utils/protectCheck';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
@@ -480,6 +482,36 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
+  runProtectCheck = async (): Promise<SignUpResource> => {
+    // 1. Prepare — backend returns script URL in verifications.protect_check
+    await this._basePost({ action: 'prepare_protect_check' });
+
+    const scriptUrl = this.verifications.protectCheck?.url;
+    if (!scriptUrl) {
+      throw new ClerkRuntimeError('No protect check script URL returned', {
+        code: 'protect_check_missing_url',
+      });
+    }
+
+    // 2. Get or create container
+    const container = this.getOrCreateProtectCheckContainer();
+
+    try {
+      // 3. Load and execute script
+      const result = await executeProtectCheck(scriptUrl, this, container);
+
+      // 4. Attempt with result
+      await this._basePost({
+        body: result,
+        action: 'attempt_protect_check',
+      });
+    } finally {
+      this.cleanupProtectCheckContainer(container);
+    }
+
+    return this;
+  };
+
   upsert = (params: SignUpCreateParams | SignUpUpdateParams): Promise<SignUpResource> => {
     return this.id ? this.update(params) : this.create(params);
   };
@@ -583,6 +615,25 @@ export class SignUp extends BaseResource implements SignUpResource {
     return false;
   }
 
+  private getOrCreateProtectCheckContainer(): HTMLDivElement {
+    let el = document.getElementById(PROTECT_CHECK_CONTAINER_ID) as HTMLDivElement | null;
+    if (!el) {
+      el = document.createElement('div');
+      el.id = PROTECT_CHECK_CONTAINER_ID;
+      document.body.appendChild(el);
+    }
+    return el;
+  }
+
+  private cleanupProtectCheckContainer(el: HTMLDivElement) {
+    // Only remove from DOM if we created it (i.e., the UI didn't provide it)
+    if (el.parentNode && !document.getElementById(PROTECT_CHECK_CONTAINER_ID)) {
+      el.remove();
+    }
+    // Always clear inner content
+    el.innerHTML = '';
+  }
+
   __experimental_getEnterpriseConnections = (): Promise<SignUpEnterpriseConnectionResource[]> => {
     return BaseResource._fetch({
       path: `/client/sign_ups/${this.id}/enterprise_connections`,
@@ -603,6 +654,7 @@ type SignUpFutureVerificationsMethods = Pick<
   | 'waitForEmailLinkVerification'
   | 'sendPhoneCode'
   | 'verifyPhoneCode'
+  | 'runProtectCheck'
 >;
 
 class SignUpFutureVerifications implements SignUpFutureVerificationsType {
@@ -614,6 +666,7 @@ class SignUpFutureVerifications implements SignUpFutureVerificationsType {
   waitForEmailLinkVerification: SignUpFutureVerificationsType['waitForEmailLinkVerification'];
   sendPhoneCode: SignUpFutureVerificationsType['sendPhoneCode'];
   verifyPhoneCode: SignUpFutureVerificationsType['verifyPhoneCode'];
+  runProtectCheck: SignUpFutureVerificationsType['runProtectCheck'];
 
   constructor(resource: SignUp, methods: SignUpFutureVerificationsMethods) {
     this.#resource = resource;
@@ -623,6 +676,7 @@ class SignUpFutureVerifications implements SignUpFutureVerificationsType {
     this.waitForEmailLinkVerification = methods.waitForEmailLinkVerification;
     this.sendPhoneCode = methods.sendPhoneCode;
     this.verifyPhoneCode = methods.verifyPhoneCode;
+    this.runProtectCheck = methods.runProtectCheck;
   }
 
   get emailAddress() {
@@ -639,6 +693,10 @@ class SignUpFutureVerifications implements SignUpFutureVerificationsType {
 
   get externalAccount() {
     return this.#resource.verifications.externalAccount;
+  }
+
+  get protectCheck() {
+    return this.#resource.verifications.protectCheck;
   }
 
   get emailLinkVerification() {
@@ -681,6 +739,7 @@ class SignUpFuture implements SignUpFutureResource {
       waitForEmailLinkVerification: this.waitForEmailLinkVerification.bind(this),
       sendPhoneCode: this.sendPhoneCode.bind(this),
       verifyPhoneCode: this.verifyPhoneCode.bind(this),
+      runProtectCheck: this._runProtectCheck.bind(this),
     });
   }
 
@@ -830,6 +889,46 @@ class SignUpFuture implements SignUpFutureResource {
 
     const { captchaError, captchaToken, captchaWidgetType } = response;
     return { captchaToken, captchaWidgetType, captchaError };
+  }
+
+  private async _runProtectCheck(): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
+      // 1. Prepare
+      await this.#resource.__internal_basePost({ action: 'prepare_protect_check' });
+
+      const scriptUrl = this.#resource.verifications.protectCheck?.url;
+      if (!scriptUrl) {
+        throw new ClerkRuntimeError('No protect check script URL returned', {
+          code: 'protect_check_missing_url',
+        });
+      }
+
+      // 2. Container
+      let container = document.getElementById(PROTECT_CHECK_CONTAINER_ID) as HTMLDivElement | null;
+      const createdContainer = !container;
+      if (!container) {
+        container = document.createElement('div');
+        container.id = PROTECT_CHECK_CONTAINER_ID;
+        document.body.appendChild(container);
+      }
+
+      try {
+        // 3. Execute script
+        const result = await executeProtectCheck(scriptUrl, this.#resource, container);
+
+        // 4. Attempt
+        await this.#resource.__internal_basePost({
+          body: result,
+          action: 'attempt_protect_check',
+        });
+      } finally {
+        if (createdContainer) {
+          container.remove();
+        } else {
+          container.innerHTML = '';
+        }
+      }
+    });
   }
 
   private async _create(params: SignUpFutureCreateParams): Promise<void> {

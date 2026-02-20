@@ -27,6 +27,22 @@ export const completeSignUpFlow = ({
   if (signUp.status === 'complete') {
     return handleComplete && handleComplete();
   } else if (signUp.status === 'missing_requirements') {
+    if (signUp.missingFields.some(mf => mf === 'protect_check')) {
+      return signUp.runProtectCheck().then(() => {
+        return completeSignUpFlow({
+          signUp,
+          verifyEmailPath,
+          verifyPhonePath,
+          continuePath,
+          navigate,
+          handleComplete,
+          redirectUrl,
+          redirectUrlComplete,
+          oidcPrompt,
+        });
+      });
+    }
+
     if (signUp.missingFields.some(mf => mf === 'enterprise_sso')) {
       return signUp.authenticateWithRedirect({
         strategy: 'enterprise_sso',
