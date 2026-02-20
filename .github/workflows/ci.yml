@@ -321,33 +321,16 @@ jobs:
             "nextjs" "quickstart" "cache-components"
           )
 
-          # Check if frontend packages changed. Turbo integration tasks only
-          # track integration/** as inputs, so they miss changes in packages
-          # that all E2E tests depend on. When these packages change, force
-          # all suites to run.
-          FORCE_ALL=false
-          BASE_REF="${{ github.event.pull_request.base.ref || 'main' }}"
-          git fetch origin "${BASE_REF}" --depth=1 2>/dev/null || true
-          CHANGED_FILES=$(git diff --name-only "origin/${BASE_REF}...HEAD" 2>/dev/null || true)
-          if echo "$CHANGED_FILES" | grep -qE '^packages/(clerk-js|ui|react|shared|nextjs|remix|tanstack-react-start|vue|nuxt|astro|express|react-router|backend|types)/src/'; then
-            echo "Frontend/SDK package source changes detected, forcing all suites"
-            FORCE_ALL=true
-          fi
-
           AFFECTED_JSON="{"
           FIRST=true
           for name in "${TEST_NAMES[@]}"; do
-            if [ "$FORCE_ALL" = "true" ]; then
-              IS_AFFECTED=true
-            else
-              TASK_COUNT=$(pnpm turbo run "test:integration:${name}" --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
-              [ "$TASK_COUNT" -gt 0 ] && IS_AFFECTED=true || IS_AFFECTED=false
-            fi
+            TASK_COUNT=$(pnpm turbo run "test:integration:${name}" --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
             $FIRST || AFFECTED_JSON+=","
-            AFFECTED_JSON+="\"${name}\":${IS_AFFECTED}"
-            if [ "$IS_AFFECTED" = "true" ]; then
+            if [ "$TASK_COUNT" -gt 0 ]; then
+              AFFECTED_JSON+="\"${name}\":true"
               echo "  affected: $name"
             else
+              AFFECTED_JSON+="\"${name}\":false"
               echo "  skipped:  $name"
             fi
             FIRST=false
