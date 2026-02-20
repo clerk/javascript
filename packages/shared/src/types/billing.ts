@@ -548,6 +548,7 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
      */
     amount: BillingMoneyAmount;
   };
+  credits?: BillingCredits;
   /**
    * A function to cancel the subscription item. Accepts the following parameters:
    * <ul>

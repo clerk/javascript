@@ -206,6 +206,8 @@ export type __internal_LocalizationResource = {
     availableFeatures: LocalizationValue;
     subtotal: LocalizationValue;
     credit: LocalizationValue;
+    prorationCredit: LocalizationValue;
+    accountCredit: LocalizationValue;
     creditRemainder: LocalizationValue;
     payerCreditRemainder: LocalizationValue;
     totalDue: LocalizationValue;
@@ -910,6 +912,7 @@ export type __internal_LocalizationResource = {
         empty: LocalizationValue;
         itemCaption__paidForPlan: LocalizationValue;
         itemCaption__proratedCredit: LocalizationValue;
+        itemCaption__payerCredit: LocalizationValue;
         itemCaption__subscribedAndPaidForPlan: LocalizationValue;
         notFound: LocalizationValue;
         tableHeader__date: LocalizationValue;
@@ -1148,6 +1151,7 @@ export type __internal_LocalizationResource = {
         empty: LocalizationValue;
         itemCaption__paidForPlan: LocalizationValue<'plan' | 'period'>;
         itemCaption__proratedCredit: LocalizationValue;
+        itemCaption__payerCredit: LocalizationValue;
         itemCaption__subscribedAndPaidForPlan: LocalizationValue<'plan' | 'period'>;
         notFound: LocalizationValue;
         tableHeader__date: LocalizationValue;
