@@ -90,6 +90,39 @@ jobs:
             pnpm changeset status --since=origin/main;
           fi
 
+      - name: Validate integration suite turbo config
+        run: |
+          # Every test:integration:* script in package.json must have a
+          # matching turbo.json task with dependsOn so that turbo --affected
+          # can detect SDK package changes. Without dependsOn, the suite
+          # would only react to integration/** file changes.
+          # Scripts that aren't test suites (utilities, disabled, base runner)
+          SKIP_SCRIPTS="test:integration:base test:integration:cleanup test:integration:deployment:nextjs test:integration:expo-web:disabled"
+          MISSING=()
+          SUITES=$(jq -r '.scripts | keys[] | select(startswith("test:integration:"))' package.json)
+          for script in $SUITES; do
+            if echo "$SKIP_SCRIPTS" | grep -qw "$script"; then
+              continue
+            fi
+            TASK_KEY="//#${script}"
+            DEPS=$(jq -r --arg k "$TASK_KEY" '(.tasks[$k].dependsOn // []) | length' turbo.json 2>/dev/null || echo "0")
+            if [ "$DEPS" = "0" ]; then
+              MISSING+=("$script")
+            fi
+          done
+          if [ ${#MISSING[@]} -gt 0 ]; then
+            echo "ERROR: The following integration suites are missing dependsOn in turbo.json:"
+            for s in "${MISSING[@]}"; do
+              echo "  - $s"
+            done
+            echo ""
+            echo "Add dependsOn with the framework SDK build task(s) the suite uses,"
+            echo "e.g.: \"dependsOn\": [\"@clerk/clerk-js#build\", \"@clerk/nextjs#build\"]"
+            echo "See existing entries in turbo.json for examples."
+            exit 1
+          fi
+          echo "All integration suites have dependsOn configured"
+
   build-packages:
     needs: [check-permissions]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
@@ -324,13 +357,25 @@ jobs:
           AFFECTED_JSON="{"
           FIRST=true
           for name in "${TEST_NAMES[@]}"; do
-            TASK_COUNT=$(pnpm turbo run "test:integration:${name}" --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
-            $FIRST || AFFECTED_JSON+=","
-            if [ "$TASK_COUNT" -gt 0 ]; then
-              AFFECTED_JSON+="\"${name}\":true"
-              echo "  affected: $name"
+            TASK_KEY="//#test:integration:${name}"
+            HAS_DEPS=$(jq -r --arg k "$TASK_KEY" '(.tasks[$k].dependsOn // []) | length' turbo.json 2>/dev/null || echo "0")
+
+            if [ "$HAS_DEPS" = "0" ]; then
+              # Safe default: suites without dependsOn always run.
+              # This prevents silent skipping when someone adds a suite
+              # but forgets to add dependsOn in turbo.json.
+              IS_AFFECTED=true
+              echo "  WARNING: $name has no dependsOn in turbo.json, forcing affected"
             else
-              AFFECTED_JSON+="\"${name}\":false"
+              TASK_COUNT=$(pnpm turbo run "test:integration:${name}" --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
+              [ "$TASK_COUNT" -gt 0 ] && IS_AFFECTED=true || IS_AFFECTED=false
+            fi
+
+            $FIRST || AFFECTED_JSON+=","
+            AFFECTED_JSON+="\"${name}\":${IS_AFFECTED}"
+            if [ "$IS_AFFECTED" = "true" ] && [ "$HAS_DEPS" != "0" ]; then
+              echo "  affected: $name"
+            elif [ "$IS_AFFECTED" != "true" ]; then
               echo "  skipped:  $name"
             fi
             FIRST=false
