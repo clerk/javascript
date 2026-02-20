@@ -151,6 +151,8 @@ export const isTokenTypeAccepted = (
   return tokenTypes.includes(tokenType);
 };
 
+const MACHINE_TOKEN_TYPES = new Set<string>([TokenType.ApiKey, TokenType.M2MToken, TokenType.OAuthToken]);
+
 /**
  * Checks if a token type string is a machine token type (api_key, m2m_token, or oauth_token).
  *
@@ -158,5 +160,5 @@ export const isTokenTypeAccepted = (
  * @returns true if the type is a machine token type
  */
 export function isMachineTokenType(type: string): type is MachineTokenType {
-  return type === TokenType.ApiKey || type === TokenType.M2MToken || type === TokenType.OAuthToken;
+  return MACHINE_TOKEN_TYPES.has(type);
 }

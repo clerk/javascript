@@ -1,11 +1,15 @@
-import type { JwtPayload } from '@clerk/shared/types';
-
 import type { M2MTokenJSON } from './JSON';
 
-type M2MJwtPayload = JwtPayload & {
+// Minimal JWT claims present in M2M tokens. M2M tokens are not session JWTs
+// and do not carry session-specific claims like `sid` or `__raw`.
+type M2MJwtPayload = {
+  sub: string;
+  exp: number;
+  iat: number;
   jti?: string;
   aud?: string[];
   scopes?: string;
+  [key: string]: unknown;
 };
 
 /**
@@ -50,14 +54,14 @@ export class M2MToken {
     return new M2MToken(
       payload.jti ?? '',
       payload.sub,
-      payload.aud ?? payload.scopes?.split(' ') ?? [],
+      payload.scopes?.split(' ') ?? payload.aud ?? [],
       null,
       false,
       null,
       payload.exp * 1000 <= Date.now() - clockSkewInMs,
-      payload.exp,
-      payload.iat,
-      payload.iat,
+      payload.exp, // seconds (raw JWT exp claim)
+      payload.iat, // seconds (raw JWT iat claim)
+      payload.iat, // seconds (raw JWT iat claim)
     );
   }
 }

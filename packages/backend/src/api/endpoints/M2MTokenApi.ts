@@ -6,6 +6,13 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/m2m_tokens';
 
+/**
+ * Format of the M2M token to create.
+ * - 'opaque': Opaque token with mt_ prefix
+ * - 'jwt': JWT signed with instance keys
+ */
+export type M2MTokenFormat = 'opaque' | 'jwt';
+
 type CreateM2MTokenParams = {
   /**
    * Custom machine secret key for authentication.
@@ -19,13 +26,9 @@ type CreateM2MTokenParams = {
   secondsUntilExpiration?: number | null;
   claims?: Record<string, unknown> | null;
   /**
-   * Format of the token to create.
-   * - 'opaque': Opaque token with mt_ prefix
-   * - 'jwt': JWT signed with instance keys
-   *
    * @default 'opaque'
    */
-  tokenFormat?: 'opaque' | 'jwt';
+  tokenFormat?: M2MTokenFormat;
 };
 
 type RevokeM2MTokenParams = {
@@ -67,7 +70,7 @@ export class M2MTokenApi extends AbstractAPI {
   }
 
   async createToken(params?: CreateM2MTokenParams) {
-    const { claims = null, machineSecretKey, secondsUntilExpiration = null, tokenFormat = 'opaque' } = params || {};
+    const { claims = null, machineSecretKey, secondsUntilExpiration = null, tokenFormat } = params || {};
 
     const requestOptions = this.#createRequestOptions(
       {
@@ -76,7 +79,8 @@ export class M2MTokenApi extends AbstractAPI {
         bodyParams: {
           secondsUntilExpiration,
           claims,
-          tokenFormat,
+          // Only send tokenFormat if explicitly specified; BAPI defaults to 'opaque'
+          ...(tokenFormat !== undefined ? { tokenFormat } : {}),
         },
       },
       machineSecretKey,
