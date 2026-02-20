@@ -17,7 +17,13 @@ import {
   renderWarning,
 } from './render.js';
 import { runCodemods, runScans } from './runner.js';
-import { detectSdk, getSdkVersion, getSupportedSdks, normalizeSdkName } from './util/detect-sdk.js';
+import {
+  detectSdk,
+  getSdkVersion,
+  getSdkVersionFromWorkspaces,
+  getSupportedSdks,
+  normalizeSdkName,
+} from './util/detect-sdk.js';
 import {
   detectPackageManager,
   getPackageManagerDisplayName,
@@ -126,7 +132,7 @@ async function main() {
   }
 
   // Step 2: Get current version and detect package manager
-  const currentVersion = getSdkVersion(sdk, options.dir);
+  const currentVersion = getSdkVersion(sdk, options.dir) ?? getSdkVersionFromWorkspaces(sdk, options.dir);
   const packageManager = detectPackageManager(options.dir);
 
   // Step 3: If version couldn't be detected and no release specified, prompt user

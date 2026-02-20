@@ -6,8 +6,11 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
   detectSdk,
+  findWorkspaceRoot,
   getMajorVersion,
   getSdkVersion,
+  getSdkVersionFromWorkspaces,
+  getWorkspacePackageDirs,
   normalizeSdkName,
   resolveCatalogVersion,
 } from '../../util/detect-sdk.js';
@@ -265,6 +268,57 @@ describe('isInPnpmWorkspace', () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'clerk-ws-test-'));
     try {
       expect(isInPnpmWorkspace(tmpDir)).toBe(false);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('findWorkspaceRoot', () => {
+  it('finds pnpm workspace root from the root directory', () => {
+    const root = findWorkspaceRoot(getFixturePath('monorepo-workspace-catalog'));
+    expect(root).toBe(getFixturePath('monorepo-workspace-catalog'));
+  });
+
+  it('finds pnpm workspace root from a subdirectory', () => {
+    const root = findWorkspaceRoot(path.join(getFixturePath('monorepo-workspace-catalog'), 'apps', 'web'));
+    expect(root).toBe(getFixturePath('monorepo-workspace-catalog'));
+  });
+
+  it('returns null when no workspace root exists', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'clerk-no-ws-'));
+    try {
+      expect(findWorkspaceRoot(tmpDir)).toBeNull();
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('getWorkspacePackageDirs', () => {
+  it('returns workspace package directories from pnpm-workspace.yaml', () => {
+    const root = getFixturePath('monorepo-workspace-catalog');
+    const dirs = getWorkspacePackageDirs(root);
+    expect(dirs).toHaveLength(1);
+    expect(dirs[0]).toContain(path.join('apps', 'web'));
+  });
+});
+
+describe('getSdkVersionFromWorkspaces', () => {
+  it('finds SDK version from a workspace package when not in root', () => {
+    const version = getSdkVersionFromWorkspaces('nextjs', getFixturePath('monorepo-workspace-catalog'));
+    expect(version).toBe(6);
+  });
+
+  it('returns null when SDK is not in any workspace package', () => {
+    const version = getSdkVersionFromWorkspaces('expo', getFixturePath('monorepo-workspace-catalog'));
+    expect(version).toBeNull();
+  });
+
+  it('returns null when not in a workspace', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'clerk-no-ws-'));
+    try {
+      expect(getSdkVersionFromWorkspaces('nextjs', tmpDir)).toBeNull();
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }

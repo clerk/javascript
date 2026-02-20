@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import { readPackageSync } from 'read-pkg';
 import semverRegex from 'semver-regex';
+import { globSync } from 'tinyglobby';
 
 import { getOldPackageName } from '../config.js';
 
@@ -179,6 +180,84 @@ export function getInstalledClerkPackages(dir) {
       .filter(([name]) => name.startsWith('@clerk/'))
       .map(([name, version]) => [name, getMajorVersion(version)]),
   );
+}
+
+export function findWorkspaceRoot(dir) {
+  let current = path.resolve(dir);
+  const root = path.parse(current).root;
+
+  while (current !== root) {
+    if (fs.existsSync(path.join(current, 'pnpm-workspace.yaml'))) {
+      return current;
+    }
+    try {
+      const pkgPath = path.join(current, 'package.json');
+      if (fs.existsSync(pkgPath)) {
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+        if (pkg.workspaces) {
+          return current;
+        }
+      }
+    } catch {
+      /* continue */
+    }
+    current = path.dirname(current);
+  }
+
+  return null;
+}
+
+export function getWorkspacePackageDirs(workspaceRoot) {
+  const pnpmWsPath = path.join(workspaceRoot, 'pnpm-workspace.yaml');
+
+  let packageGlobs = [];
+
+  if (fs.existsSync(pnpmWsPath)) {
+    const content = fs.readFileSync(pnpmWsPath, 'utf8');
+    const match = content.match(/^packages:\s*\n((?:\s+-\s+.+\n?)*)/m);
+    if (match) {
+      packageGlobs = match[1]
+        .split('\n')
+        .map(line => line.replace(/^\s*-\s+['"]?([^'"]+)['"]?\s*$/, '$1'))
+        .filter(Boolean);
+    }
+  } else {
+    try {
+      const pkgPath = path.join(workspaceRoot, 'package.json');
+      const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+      if (Array.isArray(pkg.workspaces)) {
+        packageGlobs = pkg.workspaces;
+      } else if (pkg.workspaces?.packages) {
+        packageGlobs = pkg.workspaces.packages;
+      }
+    } catch {
+      return [];
+    }
+  }
+
+  if (packageGlobs.length === 0) {
+    return [];
+  }
+
+  return globSync(packageGlobs, { cwd: workspaceRoot, onlyDirectories: true, absolute: true });
+}
+
+export function getSdkVersionFromWorkspaces(sdk, dir) {
+  const workspaceRoot = findWorkspaceRoot(dir);
+  if (!workspaceRoot) {
+    return null;
+  }
+
+  const packageDirs = getWorkspacePackageDirs(workspaceRoot);
+
+  for (const pkgDir of packageDirs) {
+    const version = getSdkVersion(sdk, pkgDir);
+    if (version !== null) {
+      return version;
+    }
+  }
+
+  return null;
 }
 
 export function normalizeSdkName(sdk) {
