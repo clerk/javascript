@@ -22,7 +22,7 @@ export const useAwaitableNavigate = () => {
     return new Promise(res => {
       startTransition(() => {
         resolveFunctionsRef.current.push(res);
-        res(navigate(options));
+        navigate(options);
       });
     });
   };
