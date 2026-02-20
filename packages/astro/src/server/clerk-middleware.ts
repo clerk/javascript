@@ -28,7 +28,7 @@ import { canUseKeyless } from '../utils/feature-flags';
 import { buildClerkHotloadScript } from './build-clerk-hotload-script';
 import { clerkClient } from './clerk-client';
 import { createCurrentUser } from './current-user';
-import { getClientSafeEnv, getSafeEnv } from './get-safe-env';
+import { getClientSafeEnv, getSafeEnv, initCloudflareEnv } from './get-safe-env';
 import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import { serverRedirectWithAuth } from './server-redirect-with-auth';
 import type {
@@ -78,6 +78,8 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     if (isPrerenderedPage(context)) {
       return next();
     }
+
+    await initCloudflareEnv();
 
     const clerkRequest = createClerkRequest(context.request);
 
