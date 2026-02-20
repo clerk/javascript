@@ -1,6 +1,6 @@
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
-import { linkPackage } from './utils';
+import { PKGLAB } from './utils';
 
 const vite = applicationConfig()
   .setName('express-vite')
@@ -10,9 +10,9 @@ const vite = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/express', linkPackage('express'))
-  .addDependency('@clerk/clerk-js', linkPackage('clerk-js'))
-  .addDependency('@clerk/ui', linkPackage('ui'));
+  .addDependency('@clerk/express', PKGLAB)
+  .addDependency('@clerk/clerk-js', PKGLAB)
+  .addDependency('@clerk/ui', PKGLAB);
 
 export const express = {
   vite,

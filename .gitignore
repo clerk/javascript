@@ -84,7 +84,7 @@ test-results
 sessions-key.pem
 sessions.pem
 
-# Verdaccio
+# pkglab / Verdaccio local registry
 .verdaccio
 
 # Release preflight

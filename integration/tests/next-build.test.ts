@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
-import { linkPackage } from '../presets/utils';
+import { PKGLAB } from '../presets/utils';
 
 type RenderingModeTestCase = {
   name: string;
@@ -32,7 +32,7 @@ test.describe('next build - bundled UI with react-server condition @nextjs', () 
     test.setTimeout(90_000); // Wait for app to be ready
     app = await appConfigs.next.appRouter
       .clone()
-      .addDependency('@clerk/ui', linkPackage('ui'))
+      .addDependency('@clerk/ui', PKGLAB)
       .addFile(
         'src/app/layout.tsx',
         () => `import './globals.css';
