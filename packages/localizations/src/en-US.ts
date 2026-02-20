@@ -454,6 +454,7 @@ export const enUS: LocalizationResource = {
     start: {
       headerTitle__general: 'General',
       headerTitle__members: 'Members',
+      headerSubtitle__members: '{{count}} of {{limit}} seats taken',
       profileSection: {
         primaryButton: 'Update profile',
         title: 'Organization Profile',
