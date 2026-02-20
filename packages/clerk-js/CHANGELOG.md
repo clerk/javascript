@@ -1,5 +1,194 @@
 # Change Log
 
+## 5.123.0
+
+### Minor Changes
+
+- Add `username` field into `PublicUserData` object. ([#7837](https://github.com/clerk/javascript/pull/7837)) by [@Jibaru](https://github.com/Jibaru)
+
+- Add `providerUserId` field to `ExternalAccount` resource as the preferred way to access the unique user ID from the OAuth provider. The existing `externalId` field is now deprecated in favor of `providerUserId` for better clarity and consistency across the API. ([#7778](https://github.com/clerk/javascript/pull/7778)) by [@Jibaru](https://github.com/Jibaru)
+
+### Patch Changes
+
+- Updates Keyless Prompt content. ([#7798](https://github.com/clerk/javascript/pull/7798)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Disable ConsoleTransport for debug logger by default ([#7786](https://github.com/clerk/javascript/pull/7786)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fixed an issue where primary identifier shows undefined when signing in with phone number only ([#7797](https://github.com/clerk/javascript/pull/7797)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix infinite loading spinner when navigating to factor-two sign-in route without an active 2FA session ([#7787](https://github.com/clerk/javascript/pull/7787)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Display message for `user_deactivated` error code on `SignIn` and `SignUp` ([#7811](https://github.com/clerk/javascript/pull/7811)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Removed redundant `beforeunload` event listener from SafeLock that was disabling the browser's back-forward cache (bfcache), degrading navigation performance. ([#7818](https://github.com/clerk/javascript/pull/7818)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`35bcbd1`](https://github.com/clerk/javascript/commit/35bcbd11f5753ee396cd090d3dd1848f3f2727e0)]:
+  - @clerk/shared@3.45.0
+  - @clerk/localizations@3.35.4
+
+
+## 5.122.1
+
+### Patch Changes
+
+- Improve captcha error diagnostics ([#7768](https://github.com/clerk/javascript/pull/7768)) by [@jacekradko](https://github.com/jacekradko)
+
+
+## 5.122.0
+
+### Minor Changes
+
+- Export `useOrganizationCreationDefaults` hook to fetch suggested organization name and logo from default naming rules ([#7690](https://github.com/clerk/javascript/pull/7690)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`64a35f7`](https://github.com/clerk/javascript/commit/64a35f79e9a49dfc140b4c8a8df517b74d46d6c6), [`71b20f1`](https://github.com/clerk/javascript/commit/71b20f126042a55148a9da146dcedd672a230811), [`aebb8df`](https://github.com/clerk/javascript/commit/aebb8df24f19a932ef4663ee2c7c93a535d314f9), [`71b20f1`](https://github.com/clerk/javascript/commit/71b20f126042a55148a9da146dcedd672a230811)]:
+  - @clerk/shared@3.44.0
+  - @clerk/localizations@3.35.3
+
+
+## 5.121.1
+
+### Patch Changes
+
+- fix: Ensure unsafeMetadata is passed with Sign Up Ticket flow ([#7657](https://github.com/clerk/javascript/pull/7657)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updates keyless prompt content. ([#7636](https://github.com/clerk/javascript/pull/7636)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix `unsafeMetadata` being lost when users are transferred between sign-in and sign-up flows during OAuth/SSO authentication ([#7647](https://github.com/clerk/javascript/pull/7647)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`b7a4e1e`](https://github.com/clerk/javascript/commit/b7a4e1eabe7aa61e7d2cb7f27cbd22671c49f2b1)]:
+  - @clerk/shared@3.43.2
+  - @clerk/localizations@3.35.2
+
+
+## 5.121.0
+
+### Minor Changes
+
+- Handle `offline_access` scope in OAuth consent screen by filtering it from the displayed scopes list (as it describes access duration rather than what can be accessed) and appending informational text about staying signed in when the scope is present. ([#7631](https://github.com/clerk/javascript/pull/7631)) by [@jfoshee](https://github.com/jfoshee)
+
+### Patch Changes
+
+- Fix `TaskChooseOrganization` to complete organization activation when logo upload fails ([#7635](https://github.com/clerk/javascript/pull/7635)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`c650a04`](https://github.com/clerk/javascript/commit/c650a04e624e7da5b81f2bdc12af0b6940c20f82), [`e995cc3`](https://github.com/clerk/javascript/commit/e995cc3572f85aa47bdee8f7b56130a383488a7f)]:
+  - @clerk/localizations@3.35.1
+  - @clerk/shared@3.43.1
+
+
+## 5.120.0
+
+### Minor Changes
+
+- Surface organization creation defaults with prefilled form fields and advisory warnings ([#7603](https://github.com/clerk/javascript/pull/7603)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Fix redirect conflicts when SignIn and SignUp components are used together on the same page. Added missing dependency arrays to useEffect hooks in redirect functions to prevent unwanted redirects during other component flows. ([#7614](https://github.com/clerk/javascript/pull/7614)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove opacity from `Select` placeholder ([#7575](https://github.com/clerk/javascript/pull/7575)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Display actual organization membership name in in-app enable organization prompt success message ([#7582](https://github.com/clerk/javascript/pull/7582)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`271ddeb`](https://github.com/clerk/javascript/commit/271ddeb0b47357f7da316eef389ae46b180c36da)]:
+  - @clerk/localizations@3.35.0
+  - @clerk/shared@3.43.0
+
+
+## 5.119.1
+
+### Patch Changes
+
+- Fix role select being disabled on `OrganizationProfile` invite members page when default role is not in roles list ([#7569](https://github.com/clerk/javascript/pull/7569)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+
+## 5.119.0
+
+### Minor Changes
+
+- Fix "You must belong to an organization" screen showing when user has existing memberships, invitations or suggestions ([#7557](https://github.com/clerk/javascript/pull/7557)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- When password is enabled at the instance level, but not required allow users to add a password in the user profile. ([#7549](https://github.com/clerk/javascript/pull/7549)) by [@austincalvelage](https://github.com/austincalvelage)
+
+### Patch Changes
+
+- Updated dependencies [[`c4dbcf7`](https://github.com/clerk/javascript/commit/c4dbcf70ec9d96b74bf31f138e7da357ba89e5e7)]:
+  - @clerk/localizations@3.34.0
+
+
+## 5.118.0
+
+### Minor Changes
+
+- Disable role selection in `OrganizationProfile` during role set migration ([#7541](https://github.com/clerk/javascript/pull/7541)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Add `data-variant` and `data-color` attributes to the Text component. ([#7535](https://github.com/clerk/javascript/pull/7535)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`a4e6932`](https://github.com/clerk/javascript/commit/a4e693262f734bfd3ab08ffac019168c874c2bd8)]:
+  - @clerk/localizations@3.33.0
+  - @clerk/shared@3.42.0
+
+
+## 5.117.0
+
+### Minor Changes
+
+- Improves resilience by keeping users logged in when Clerk's origin is temporarily unavailable using edge-based token generation ([#7516](https://github.com/clerk/javascript/pull/7516)) by [@bratsos](https://github.com/bratsos)
+
+### Patch Changes
+
+- Updated dependencies [[`03dd374`](https://github.com/clerk/javascript/commit/03dd37458eedf59198dc3574e12030b217efcb41)]:
+  - @clerk/shared@3.41.1
+  - @clerk/localizations@3.32.1
+
+
+## 5.116.0
+
+### Minor Changes
+
+- Display message in `TaskChooseOrganization` when user is not allowed to create organizations ([#7502](https://github.com/clerk/javascript/pull/7502)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Fix Web3 connection error handling in `<UserProfile />` ([#7489](https://github.com/clerk/javascript/pull/7489)) by [@kduprey](https://github.com/kduprey)
+
+- Add missing selected and hover states to `RolesListItem` option. ([#7497](https://github.com/clerk/javascript/pull/7497)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce radio group for `EnableOrganizationsPrompt` ([#7501](https://github.com/clerk/javascript/pull/7501)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`79eb5af`](https://github.com/clerk/javascript/commit/79eb5afd91d7b002faafd2980850d944acb37917), [`54cd476`](https://github.com/clerk/javascript/commit/54cd476625852983053725ec3eb42abc3ba370df), [`b3b02b4`](https://github.com/clerk/javascript/commit/b3b02b46dfa6d194ed12d2e6b9e332796ee73c4a), [`7b3024a`](https://github.com/clerk/javascript/commit/7b3024a71e6e45e926d83f1a9e887216e7c14424), [`2cd4da9`](https://github.com/clerk/javascript/commit/2cd4da9c72bc7385c0c7c71e2a7ca856d79ce630)]:
+  - @clerk/shared@3.41.0
+  - @clerk/localizations@3.32.0
+
+
+## 5.115.0
+
+### Minor Changes
+
+- Add Web3 Solana support to `<UserProfile />` ([#7435](https://github.com/clerk/javascript/pull/7435)) by [@kduprey](https://github.com/kduprey)
+
+- Add support for Sign in with Solana. ([#7293](https://github.com/clerk/javascript/pull/7293)) by [@kduprey](https://github.com/kduprey)
+
+### Patch Changes
+
+- Fix navigation that was not awaited when attempting to set the session active on password sign-in ([#7459](https://github.com/clerk/javascript/pull/7459)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`375a32d`](https://github.com/clerk/javascript/commit/375a32d0f44933605ffb513ff28f522ac5e851d6), [`175883b`](https://github.com/clerk/javascript/commit/175883b05228138c9ff55d0871cc1041bd68d7fe), [`f626046`](https://github.com/clerk/javascript/commit/f626046c589956022b1e1ac70382c986822f4733), [`a2cc94e`](https://github.com/clerk/javascript/commit/a2cc94eb008601d6d75cafed568fea1fb2634234), [`14342d2`](https://github.com/clerk/javascript/commit/14342d2b34fe0882f7676195aefaaa17f034af70)]:
+  - @clerk/localizations@3.31.0
+  - @clerk/shared@3.40.0
+
+
+## 5.114.1
+
+### Patch Changes
+
+- Updated dependencies [[`893d3e4`](https://github.com/clerk/javascript/commit/893d3e4c4ca1f4f7c9ee13961319ea9423628de9)]:
+  - @clerk/localizations@3.30.1
+
+
 ## 5.114.0
 
 ### Minor Changes

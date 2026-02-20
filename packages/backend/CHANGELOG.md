@@ -1,5 +1,162 @@
 # Change Log
 
+## 2.31.0
+
+### Minor Changes
+
+- Add `providerUserId` field to `ExternalAccount` resource as the preferred way to access the unique user ID from the OAuth provider. The existing `externalId` field is now deprecated in favor of `providerUserId` for better clarity and consistency across the API. ([#7778](https://github.com/clerk/javascript/pull/7778)) by [@Jibaru](https://github.com/Jibaru)
+
+- Add `createBulk()` method to `WaitlistEntryAPI` for bulk creating waitlist entries ([#7762](https://github.com/clerk/javascript/pull/7762)) by [@Jibaru](https://github.com/Jibaru)
+
+### Patch Changes
+
+- Updated dependencies [[`35bcbd1`](https://github.com/clerk/javascript/commit/35bcbd11f5753ee396cd090d3dd1848f3f2727e0)]:
+  - @clerk/shared@3.45.0
+  - @clerk/types@4.101.15
+
+
+## 2.30.1
+
+### Patch Changes
+
+- Improved token type validation in authentication requests ([#7764](https://github.com/clerk/javascript/pull/7764)) by [@wobsoriano](https://github.com/wobsoriano)
+
+
+## 2.30.0
+
+### Minor Changes
+
+- Add `lastSignInAtAfter` and `lastSignInAtBefore` filters to the Users API list and count endpoints. ([#7721](https://github.com/clerk/javascript/pull/7721)) by [@Jibaru](https://github.com/Jibaru)
+
+  These parameters are supported by `users.getUserList()` and are forwarded to `/v1/users` and `/v1/users/count` to filter users by last sign-in timestamp.
+
+### Patch Changes
+
+- Fixed an issue where JWT OAuth access tokens where not treated as a machine token ([#7756](https://github.com/clerk/javascript/pull/7756)) by [@wobsoriano](https://github.com/wobsoriano)
+
+
+## 2.29.7
+
+### Patch Changes
+
+- fix: correct `createInvitationBulk` return type to `Promise<Invitation[]>` ([#7702](https://github.com/clerk/javascript/pull/7702)) by [@jacekradko](https://github.com/jacekradko)
+
+
+## 2.29.6
+
+### Patch Changes
+
+- Updated dependencies [[`64a35f7`](https://github.com/clerk/javascript/commit/64a35f79e9a49dfc140b4c8a8df517b74d46d6c6)]:
+  - @clerk/shared@3.44.0
+  - @clerk/types@4.101.14
+
+
+## 2.29.5
+
+### Patch Changes
+
+- Updated dependencies [[`b7a4e1e`](https://github.com/clerk/javascript/commit/b7a4e1eabe7aa61e7d2cb7f27cbd22671c49f2b1)]:
+  - @clerk/shared@3.43.2
+  - @clerk/types@4.101.13
+
+
+## 2.29.4
+
+### Patch Changes
+
+- Updated dependencies [[`e995cc3`](https://github.com/clerk/javascript/commit/e995cc3572f85aa47bdee8f7b56130a383488a7f)]:
+  - @clerk/shared@3.43.1
+  - @clerk/types@4.101.12
+
+
+## 2.29.3
+
+### Patch Changes
+
+- Add optional `idToken` member to `OauthAccessToken` returned by `getUserOauthAccessToken`. The ID token is retrieved from OIDC providers and is only present for OIDC-compliant OAuth 2.0 providers when available. ([#7599](https://github.com/clerk/javascript/pull/7599)) by [@jfoshee](https://github.com/jfoshee)
+
+- Updated dependencies [[`271ddeb`](https://github.com/clerk/javascript/commit/271ddeb0b47357f7da316eef389ae46b180c36da)]:
+  - @clerk/shared@3.43.0
+  - @clerk/types@4.101.11
+
+
+## 2.29.2
+
+### Patch Changes
+
+- Fixed an issue when using multiple `acceptsToken` values in `authenticateRequest`. When `acceptsToken` is an array containing both session and machine token types (e.g., `['session_token', 'api_key']`), the function now correctly routes to the appropriate authentication handler based on the actual token type, instead of always treating them as machine tokens. ([#7556](https://github.com/clerk/javascript/pull/7556)) by [@wobsoriano](https://github.com/wobsoriano)
+
+
+## 2.29.1
+
+### Patch Changes
+
+- Move cookie to devDependencies and bundle it within @clerk/backend to fix module compatibility problems in TanStack Start apps. ([#7545](https://github.com/clerk/javascript/pull/7545)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`a4e6932`](https://github.com/clerk/javascript/commit/a4e693262f734bfd3ab08ffac019168c874c2bd8)]:
+  - @clerk/shared@3.42.0
+  - @clerk/types@4.101.10
+
+
+## 2.29.0
+
+### Minor Changes
+
+- Improves resilience by keeping users logged in when Clerk's origin is temporarily unavailable using edge-based token generation ([#7516](https://github.com/clerk/javascript/pull/7516)) by [@bratsos](https://github.com/bratsos)
+
+### Patch Changes
+
+- Updated dependencies [[`03dd374`](https://github.com/clerk/javascript/commit/03dd37458eedf59198dc3574e12030b217efcb41)]:
+  - @clerk/shared@3.41.1
+  - @clerk/types@4.101.9
+
+
+## 2.28.0
+
+### Minor Changes
+
+- Dropping the `__experimental_` prefix from `setPasswordCompromised` and `unsetPasswordCompromised` and marking them as stable ([#7503](https://github.com/clerk/javascript/pull/7503)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Renaming `__experimental_passwordCompromised` to `__experimental_setPasswordCompromised` and introducing `__experimental_unsetPasswordCompromised` ([#7477](https://github.com/clerk/javascript/pull/7477)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`79eb5af`](https://github.com/clerk/javascript/commit/79eb5afd91d7b002faafd2980850d944acb37917), [`b3b02b4`](https://github.com/clerk/javascript/commit/b3b02b46dfa6d194ed12d2e6b9e332796ee73c4a), [`7b3024a`](https://github.com/clerk/javascript/commit/7b3024a71e6e45e926d83f1a9e887216e7c14424), [`2cd4da9`](https://github.com/clerk/javascript/commit/2cd4da9c72bc7385c0c7c71e2a7ca856d79ce630)]:
+  - @clerk/shared@3.41.0
+  - @clerk/types@4.101.8
+
+
+## 2.27.1
+
+### Patch Changes
+
+- Fixed an issue where TanStack React Start middleware fails to properly handle requests. ([#7431](https://github.com/clerk/javascript/pull/7431)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`375a32d`](https://github.com/clerk/javascript/commit/375a32d0f44933605ffb513ff28f522ac5e851d6), [`175883b`](https://github.com/clerk/javascript/commit/175883b05228138c9ff55d0871cc1041bd68d7fe), [`f626046`](https://github.com/clerk/javascript/commit/f626046c589956022b1e1ac70382c986822f4733), [`14342d2`](https://github.com/clerk/javascript/commit/14342d2b34fe0882f7676195aefaaa17f034af70)]:
+  - @clerk/shared@3.40.0
+  - @clerk/types@4.101.7
+
+
+## 2.27.0
+
+### Minor Changes
+
+- Added API keys `get`, `delete` and `update` methods. ([#7400](https://github.com/clerk/javascript/pull/7400)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  await clerkClient.apiKeys.get('api_key_id');
+
+  await clerkClient.apiKeys.update({
+    apiKeyId: 'api_key_id',
+    scopes: ['scope1', 'scope2'],
+  });
+
+  await clerkClient.apiKeys.delete('api_key_id');
+  ```
+
+
 ## 2.26.0
 
 ### Minor Changes
