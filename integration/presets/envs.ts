@@ -1,4 +1,3 @@
-// CI perf verification trigger - revert after confirming pipeline works
 import { resolve } from 'node:path';
 
 import fs from 'fs-extra';
