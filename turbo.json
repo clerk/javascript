@@ -321,6 +321,12 @@
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
+    "//#test:integration:cache-components": {
+      "dependsOn": ["@clerk/clerk-js#build", "@clerk/testing#build", "@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
     "//#typedoc:generate": {
       "dependsOn": ["@clerk/nextjs#build", "@clerk/react#build", "@clerk/shared#build"],
       "inputs": ["tsconfig.typedoc.json", "typedoc.config.mjs"],
