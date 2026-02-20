@@ -312,7 +312,6 @@ jobs:
           E2E_CLERK_JS_VERSION: "latest"
           E2E_CLERK_UI_VERSION: "latest"
           E2E_PROJECT: "chrome"
-          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
         run: |
           TEST_NAMES=(
             "generic" "express" "ap-flows" "localhost"
