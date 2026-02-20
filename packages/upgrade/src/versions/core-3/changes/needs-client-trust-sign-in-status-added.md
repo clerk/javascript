@@ -17,11 +17,9 @@ Prerequisites:
 While your application may differ, we've provided an example change below. Please reach out to [Support](mailto:support@clerk.dev) if you have any questions.
 
 ```diff
-- const { signIn } = useSignIn()
-- signIn.attemptFirstFactor({ strategy: 'password', password: '...' })
-- if (signIn.status === 'complete') {/* ... */ }
-+ const { signIn } = useSignIn()
-+ signIn.attemptFirstFactor({ strategy: 'password', password: '...' })
+const { signIn } = useSignIn()
+// ...
+- if (signIn.status === 'complete') { /* ... */ }
 + if (signIn.status === 'needs_client_trust') { /* ... */ }
-+ else if (signIn.status === 'complete') { /* ... */ }
++ else if (signIn.status === 'complete') {  /* ... */ }
 ```
