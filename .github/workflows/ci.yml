@@ -69,10 +69,10 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        # with:
-        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-        # turbo-team: ${{ vars.TURBO_TEAM }}
-        # turbo-token: ${{ secrets.TURBO_TOKEN }}
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Verify lockfile is deduped
         run: pnpm dedupe --check
@@ -117,11 +117,11 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        # with:
-        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-        # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-        # turbo-team: ${{ vars.TURBO_TEAM }}
-        # turbo-token: ${{ secrets.TURBO_TOKEN }}
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Turbo Build
         run: pnpm turbo build $TURBO_ARGS --only
@@ -136,7 +136,7 @@ jobs:
           retention-days: 5
 
   static-analysis:
-    needs: [check-permissions, build-packages]
+    needs: [check-permissions]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Static analysis
     permissions:
@@ -163,11 +163,11 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        # with:
-        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-        # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-        # turbo-team: ${{ vars.TURBO_TEAM }}
-        # turbo-token: ${{ secrets.TURBO_TOKEN }}
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Check size using bundlewatch
         continue-on-error: true
@@ -199,7 +199,7 @@ jobs:
           retention-days: 5
 
   unit-tests:
-    needs: [check-permissions, build-packages]
+    needs: [check-permissions]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Unit Tests (${{ matrix.filter-label }})
     permissions:
@@ -237,10 +237,10 @@ jobs:
         with:
           # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (20)`.
           node-version: ${{ matrix.node-version }}
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Run tests in packages
         run: |
@@ -272,61 +272,18 @@ jobs:
           path: .turbo/runs
           retention-days: 5
 
-  integration-tests:
-    # needs: [check-permissions, build-packages]
+  compute-integration-matrix:
     needs: [check-permissions]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
-    permissions:
-      contents: read
-      actions: write # needed for actions/upload-artifact
+    name: Compute Integration Matrix
     runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
         shell: bash
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        test-name:
-          [
-            "generic",
-            "express",
-            "ap-flows",
-            "localhost",
-            "sessions",
-            "sessions:staging",
-            "handshake",
-            "handshake:staging",
-            "astro",
-            "tanstack-react-start",
-            "vue",
-            "nuxt",
-            "react-router",
-            "custom",
-          ]
-        test-project: ["chrome"]
-        include:
-          - test-name: "billing"
-            test-project: "chrome"
-          - test-name: "machine"
-            test-project: "chrome"
-          - test-name: "nextjs"
-            test-project: "chrome"
-            next-version: "15"
-          - test-name: "nextjs"
-            test-project: "chrome"
-            next-version: "16"
-          - test-name: "quickstart"
-            test-project: "chrome"
-            next-version: "15"
-          - test-name: "quickstart"
-            test-project: "chrome"
-            next-version: "16"
-          - test-name: "cache-components"
-            test-project: "chrome"
-            next-version: "16"
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    outputs:
+      matrix: ${{ steps.compute.outputs.matrix }}
+      has-affected: ${{ steps.compute.outputs.has-affected }}
 
     steps:
       - name: Checkout Repo
@@ -341,50 +298,141 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
-          playwright-enabled: true
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
-      - name: Verify jq is installed
-        shell: bash
-        run: |
-          if ! command -v jq &> /dev/null; then
-            echo "jq not found, installing..."
-            sudo apt-get update && sudo apt-get install -y jq
-          fi
-          jq --version
+      - name: Build packages
+        run: pnpm turbo build $TURBO_ARGS --only
 
-      - name: Task Status
-        id: task-status
+      - name: Compute affected integration suites
+        id: compute
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
           E2E_CLERK_JS_VERSION: "latest"
           E2E_CLERK_UI_VERSION: "latest"
-          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
-          E2E_PROJECT: ${{ matrix.test-project }}
+          E2E_PROJECT: "chrome"
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
         run: |
-          # Use turbo's built-in --affected flag to detect changes
-          # This automatically uses GITHUB_BASE_REF in GitHub Actions
-          TASK_COUNT=$(pnpm turbo run test:integration:${{ matrix.test-name }} --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
+          # All possible test-name values from the static matrix
+          TEST_NAMES=(
+            "generic"
+            "express"
+            "ap-flows"
+            "localhost"
+            "sessions"
+            "sessions:staging"
+            "handshake"
+            "handshake:staging"
+            "astro"
+            "tanstack-react-start"
+            "vue"
+            "nuxt"
+            "react-router"
+            "custom"
+            "billing"
+            "machine"
+            "nextjs"
+            "quickstart"
+            "cache-components"
+          )
 
-          if [ "$TASK_COUNT" -gt 0 ]; then
-            AFFECTED=1
-          else
-            AFFECTED=0
+          AFFECTED_NAMES=()
+          for name in "${TEST_NAMES[@]}"; do
+            TASK_COUNT=$(pnpm turbo run "test:integration:${name}" --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
+            if [ "$TASK_COUNT" -gt 0 ]; then
+              AFFECTED_NAMES+=("$name")
+              echo "  affected: $name"
+            else
+              echo "  skipped:  $name"
+            fi
+          done
+
+          if [ ${#AFFECTED_NAMES[@]} -eq 0 ]; then
+            echo "has-affected=false" >> $GITHUB_OUTPUT
+            echo 'matrix={"include":[]}' >> $GITHUB_OUTPUT
+            echo "No integration suites affected."
+            exit 0
           fi
 
-          echo "affected=${AFFECTED}"
-          echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
+          echo "has-affected=true" >> $GITHUB_OUTPUT
+
+          # Build the matrix JSON, expanding entries that have extra fields (next-version)
+          MATRIX='{"include":['
+          FIRST=true
+          for name in "${AFFECTED_NAMES[@]}"; do
+            case "$name" in
+              nextjs)
+                for ver in "15" "16"; do
+                  $FIRST || MATRIX+=','
+                  MATRIX+="{\"test-name\":\"nextjs\",\"test-project\":\"chrome\",\"next-version\":\"${ver}\"}"
+                  FIRST=false
+                done
+                ;;
+              quickstart)
+                for ver in "15" "16"; do
+                  $FIRST || MATRIX+=','
+                  MATRIX+="{\"test-name\":\"quickstart\",\"test-project\":\"chrome\",\"next-version\":\"${ver}\"}"
+                  FIRST=false
+                done
+                ;;
+              cache-components)
+                $FIRST || MATRIX+=','
+                MATRIX+="{\"test-name\":\"cache-components\",\"test-project\":\"chrome\",\"next-version\":\"16\"}"
+                FIRST=false
+                ;;
+              *)
+                $FIRST || MATRIX+=','
+                MATRIX+="{\"test-name\":\"${name}\",\"test-project\":\"chrome\"}"
+                FIRST=false
+                ;;
+            esac
+          done
+          MATRIX+=']}'
+
+          echo "matrix=${MATRIX}" >> $GITHUB_OUTPUT
+          echo "Matrix: ${MATRIX}"
+
+  integration-tests:
+    needs: [compute-integration-matrix]
+    if: ${{ needs.compute-integration-matrix.outputs.has-affected == 'true' }}
+    name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
+    permissions:
+      contents: read
+      actions: write # needed for actions/upload-artifact
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.compute-integration-matrix.outputs.matrix) }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true
 
       - name: Version packages for snapshot
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         run: npm run version-packages:snapshot ci
 
       - name: Verdaccio
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
@@ -394,7 +442,6 @@ jobs:
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 
       - name: Install @clerk/backend in /integration
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration
         run: |
           pnpm init
@@ -404,7 +451,6 @@ jobs:
       # Install published packages from Verdaccio to test against real npm install scenarios
       # rather than local monorepo builds. Validates package structure, dependencies, and entry points.
       - name: Install @clerk/clerk-js in os temp
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-js && cd clerk-js
@@ -413,7 +459,6 @@ jobs:
           pnpm add @clerk/clerk-js
 
       - name: Install @clerk/ui in os temp
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-ui && cd clerk-ui
@@ -426,7 +471,6 @@ jobs:
         run: cd packages/astro && pnpm copy:components
 
       - name: Write all ENV certificates to files in integration/certs
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: actions/github-script@v7
         env:
           INTEGRATION_CERTS: "${{secrets.INTEGRATION_CERTS}}"
@@ -444,12 +488,10 @@ jobs:
             }
 
       - name: LS certs
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration/certs
         run: ls -la && pwd
 
       - name: Run Integration Tests
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
         timeout-minutes: 25
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
@@ -477,7 +519,7 @@ jobs:
   pkg-pr-new:
     name: Publish with pkg-pr-new
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    needs: [check-permissions, build-packages]
+    needs: [check-permissions]
     runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
@@ -500,10 +542,10 @@ jobs:
         with:
           turbo-enabled: true
           node-version: 22
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Publish with pkg-pr-new
-        run: pnpm run build && pnpx pkg-pr-new@${{ vars.PKG_PR_NEW_VERSION || '0.0.49' }} publish --compact --pnpm './packages/*'
+        run: pnpm turbo build $TURBO_ARGS && pnpx pkg-pr-new@${{ vars.PKG_PR_NEW_VERSION || '0.0.49' }} publish --compact --pnpm './packages/*'
