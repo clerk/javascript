@@ -439,6 +439,10 @@ jobs:
           echo "affected=${AFFECTED}"
           echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
 
+      - name: Build packages
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        run: pnpm turbo build $TURBO_ARGS --only
+
       - name: Download Verdaccio Storage
         if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: actions/download-artifact@v6
