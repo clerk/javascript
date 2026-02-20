@@ -17,7 +17,14 @@ import {
   renderWarning,
 } from './render.js';
 import { runCodemods, runScans } from './runner.js';
-import { detectSdk, getSdkVersion, getSupportedSdks, normalizeSdkName } from './util/detect-sdk.js';
+import {
+  detectSdk,
+  findWorkspaceRoot,
+  getSdkVersion,
+  getSdkVersionFromWorkspaces,
+  getSupportedSdks,
+  normalizeSdkName,
+} from './util/detect-sdk.js';
 import {
   detectPackageManager,
   getPackageManagerDisplayName,
@@ -49,8 +56,12 @@ const cli = meow(
       $ npx @clerk/upgrade --canary
       $ npx @clerk/upgrade --dry-run
 
-    Non-interactive mode:
+    Non-interactive mode (CI):
       When running in CI or piped environments, --sdk is required if it cannot be auto-detected.
+      If your version cannot be resolved (e.g. catalog: protocol), also provide --release.
+
+      Example:
+        $ npx @clerk/upgrade --sdk=nextjs --release=core-3 --dir=./packages/web
 `,
   {
     importMeta: import.meta,
@@ -95,14 +106,27 @@ async function main() {
   }
 
   if (!sdk) {
+    const isWorkspace = !!findWorkspaceRoot(options.dir);
+
     if (!isInteractive) {
       renderError('Could not detect Clerk SDK. Please provide --sdk flag in non-interactive mode.');
-      renderText(
-        'Supported SDKs: ' +
-          getSupportedSdks()
-            .map(s => s.value)
-            .join(', '),
-      );
+      if (isWorkspace) {
+        renderText('');
+        renderText('It looks like you are in a monorepo. Try pointing to a specific workspace package:');
+        renderText('  npx @clerk/upgrade --dir=./apps/web');
+        renderText('');
+        renderText('Or specify the SDK directly:');
+        renderText('  npx @clerk/upgrade --sdk=nextjs');
+      } else {
+        renderText(
+          'Supported SDKs: ' +
+            getSupportedSdks()
+              .map(s => s.value)
+              .join(', '),
+        );
+        renderText('');
+        renderText('Example: npx @clerk/upgrade --sdk=nextjs');
+      }
       process.exit(1);
     }
 
@@ -120,7 +144,7 @@ async function main() {
   }
 
   // Step 2: Get current version and detect package manager
-  const currentVersion = getSdkVersion(sdk, options.dir);
+  const currentVersion = getSdkVersion(sdk, options.dir) ?? getSdkVersionFromWorkspaces(sdk, options.dir);
   const packageManager = detectPackageManager(options.dir);
 
   // Step 3: If version couldn't be detected and no release specified, prompt user
@@ -134,14 +158,26 @@ async function main() {
       process.exit(1);
     }
 
+    const isWorkspace = !!findWorkspaceRoot(options.dir);
+
     renderWarning(
-      `Could not detect your @clerk/${sdk} version (you may be using catalog: protocol or a non-standard version specifier).`,
+      `Could not detect your @clerk/${sdk} version (you may be using workspace:, catalog:, or a non-standard version specifier).`,
     );
     renderNewline();
 
     if (!isInteractive) {
-      renderError('Please provide --release flag in non-interactive mode.');
-      renderText('Available releases: ' + availableReleases.join(', '));
+      if (isWorkspace) {
+        renderText('It looks like you are in a monorepo. Try pointing to a specific workspace package:');
+        renderText(`  npx @clerk/upgrade --dir=./apps/web`);
+        renderText('');
+        renderText('Or specify the release directly:');
+        renderText(`  npx @clerk/upgrade --sdk=${sdk} --release=${availableReleases[0]}`);
+      } else {
+        renderError('Could not detect version. Please provide --release flag in non-interactive mode.');
+        renderText('Available releases: ' + availableReleases.join(', '));
+        renderText('');
+        renderText(`Example: npx @clerk/upgrade --sdk=${sdk} --release=${availableReleases[0]}`);
+      }
       process.exit(1);
     }
 
@@ -164,7 +200,20 @@ async function main() {
   const config = await loadConfig(sdk, currentVersion, release);
 
   if (!config) {
-    renderError(`No upgrade path found for @clerk/${sdk}. Your version may be too old for this upgrade tool.`);
+    const isWorkspace = !!findWorkspaceRoot(options.dir);
+    renderError(`No upgrade path found for @clerk/${sdk}.`);
+
+    if (isWorkspace) {
+      renderText('');
+      renderText('It looks like you are in a monorepo. Try pointing to a specific workspace package:');
+      renderText('  npx @clerk/upgrade --dir=./apps/web');
+      renderText('');
+      renderText('Or specify the SDK and release directly:');
+      renderText(`  npx @clerk/upgrade --sdk=nextjs --release=${getAvailableReleases()[0] || 'core-3'}`);
+    } else {
+      renderText('Your version may be too old for this upgrade tool.');
+    }
+
     process.exit(1);
   }
 

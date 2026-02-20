@@ -3,28 +3,69 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export function detectPackageManager(dir) {
-  if (fs.existsSync(path.join(dir, 'pnpm-lock.yaml'))) {
-    return 'pnpm';
-  }
-  if (fs.existsSync(path.join(dir, 'yarn.lock'))) {
-    return 'yarn';
-  }
-  if (fs.existsSync(path.join(dir, 'bun.lockb')) || fs.existsSync(path.join(dir, 'bun.lock'))) {
-    return 'bun';
-  }
-  if (fs.existsSync(path.join(dir, 'package-lock.json'))) {
-    return 'npm';
+  let current = path.resolve(dir);
+  const root = path.parse(current).root;
+
+  while (current !== root) {
+    if (fs.existsSync(path.join(current, 'pnpm-lock.yaml'))) {
+      return 'pnpm';
+    }
+    if (fs.existsSync(path.join(current, 'yarn.lock'))) {
+      return 'yarn';
+    }
+    if (fs.existsSync(path.join(current, 'bun.lockb')) || fs.existsSync(path.join(current, 'bun.lock'))) {
+      return 'bun';
+    }
+    if (fs.existsSync(path.join(current, 'package-lock.json'))) {
+      return 'npm';
+    }
+
+    try {
+      const pkgPath = path.join(current, 'package.json');
+      if (fs.existsSync(pkgPath)) {
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+        if (pkg.packageManager) {
+          const pmName = pkg.packageManager.split('@')[0];
+          if (['pnpm', 'yarn', 'bun', 'npm'].includes(pmName)) {
+            return pmName;
+          }
+        }
+      }
+    } catch {
+      /* continue */
+    }
+
+    current = path.dirname(current);
   }
 
   return 'npm';
 }
 
-export function getInstallCommand(packageManager, packageName, version = 'latest') {
+export function isInPnpmWorkspace(dir) {
+  let current = path.resolve(dir);
+  const root = path.parse(current).root;
+
+  while (current !== root) {
+    if (fs.existsSync(path.join(current, 'pnpm-workspace.yaml'))) {
+      return true;
+    }
+    current = path.dirname(current);
+  }
+
+  return false;
+}
+
+export function getInstallCommand(packageManager, packageName, version = 'latest', cwd) {
   const pkg = version === 'latest' ? packageName : `${packageName}@${version}`;
 
   switch (packageManager) {
-    case 'pnpm':
-      return ['pnpm', ['add', pkg]];
+    case 'pnpm': {
+      const args = ['add', pkg];
+      if (cwd && isInPnpmWorkspace(cwd)) {
+        args.push('-w');
+      }
+      return ['pnpm', args];
+    }
     case 'yarn':
       return ['yarn', ['add', pkg]];
     case 'bun':
@@ -35,10 +76,15 @@ export function getInstallCommand(packageManager, packageName, version = 'latest
   }
 }
 
-export function getUninstallCommand(packageManager, packageName) {
+export function getUninstallCommand(packageManager, packageName, cwd) {
   switch (packageManager) {
-    case 'pnpm':
-      return ['pnpm', ['remove', packageName]];
+    case 'pnpm': {
+      const args = ['remove', packageName];
+      if (cwd && isInPnpmWorkspace(cwd)) {
+        args.push('-w');
+      }
+      return ['pnpm', args];
+    }
     case 'yarn':
       return ['yarn', ['remove', packageName]];
     case 'bun':
@@ -81,12 +127,12 @@ export async function runPackageManagerCommand(command, args, cwd) {
 }
 
 export async function upgradePackage(packageManager, packageName, version, cwd) {
-  const [cmd, args] = getInstallCommand(packageManager, packageName, version);
+  const [cmd, args] = getInstallCommand(packageManager, packageName, version, cwd);
   return runPackageManagerCommand(cmd, args, cwd);
 }
 
 export async function removePackage(packageManager, packageName, cwd) {
-  const [cmd, args] = getUninstallCommand(packageManager, packageName);
+  const [cmd, args] = getUninstallCommand(packageManager, packageName, cwd);
   return runPackageManagerCommand(cmd, args, cwd);
 }
 
