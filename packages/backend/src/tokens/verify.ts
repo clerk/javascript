@@ -1,7 +1,7 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { Jwt, JwtPayload, Simplify } from '@clerk/shared/types';
 
-import { type APIKey, IdPOAuthAccessToken, type M2MToken } from '../api';
+import { type APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
 import { createBackendApiClient } from '../api/factory';
 import {
   MachineTokenVerificationError,
@@ -192,55 +192,19 @@ function handleClerkAPIError(
   };
 }
 
-async function verifyM2MToken(
+/**
+ * Verifies a pre-decoded machine JWT using the provided key resolution options.
+ * Shared by M2M and OAuth JWT verification paths to eliminate duplication.
+ */
+async function verifyDecodedJwtMachineToken<T>(
   token: string,
-  options: VerifyTokenOptions & { machineSecretKey?: string },
-): Promise<MachineTokenReturnType<M2MToken, MachineTokenVerificationError>> {
-  try {
-    const client = createBackendApiClient(options);
-    const verifiedToken = await client.m2m.verify({ token });
-    return { data: verifiedToken, tokenType: TokenType.M2MToken, errors: undefined };
-  } catch (err: any) {
-    return handleClerkAPIError(TokenType.M2MToken, err, 'Machine token not found');
-  }
-}
-
-async function verifyJwtOAuthToken(
-  accessToken: string,
+  decodedResult: Jwt,
   options: VerifyTokenOptions,
-): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
-  let decoded: JwtReturnType<Jwt, TokenVerificationError>;
-  try {
-    decoded = decodeJwt(accessToken);
-  } catch (e) {
-    return {
-      data: undefined,
-      tokenType: TokenType.OAuthToken,
-      errors: [
-        new MachineTokenVerificationError({
-          code: MachineTokenVerificationErrorCode.TokenInvalid,
-          message: (e as Error).message,
-        }),
-      ],
-    };
-  }
-
-  const { data: decodedResult, errors } = decoded;
-  if (errors) {
-    return {
-      data: undefined,
-      tokenType: TokenType.OAuthToken,
-      errors: [
-        new MachineTokenVerificationError({
-          code: MachineTokenVerificationErrorCode.TokenInvalid,
-          message: errors[0].message,
-        }),
-      ],
-    };
-  }
-
-  const { header } = decodedResult;
-  const { kid } = header;
+  tokenType: MachineTokenType,
+  fromPayload: (payload: JwtPayload, clockSkewInMs?: number) => T,
+  headerType?: string[],
+): Promise<MachineTokenReturnType<T, MachineTokenVerificationError>> {
+  const { kid } = decodedResult.header;
   let key: JsonWebKey;
 
   try {
@@ -251,7 +215,7 @@ async function verifyJwtOAuthToken(
     } else {
       return {
         data: undefined,
-        tokenType: TokenType.OAuthToken,
+        tokenType,
         errors: [
           new MachineTokenVerificationError({
             action: TokenVerificationErrorAction.SetClerkJWTKey,
@@ -262,16 +226,16 @@ async function verifyJwtOAuthToken(
       };
     }
 
-    const { data: payload, errors: verifyErrors } = await verifyJwt(accessToken, {
+    const { data: payload, errors: verifyErrors } = await verifyJwt(token, {
       ...options,
       key,
-      headerType: OAUTH_ACCESS_TOKEN_TYPES,
+      ...(headerType ? { headerType } : {}),
     });
 
     if (verifyErrors) {
       return {
         data: undefined,
-        tokenType: TokenType.OAuthToken,
+        tokenType,
         errors: [
           new MachineTokenVerificationError({
             code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
@@ -281,12 +245,11 @@ async function verifyJwtOAuthToken(
       };
     }
 
-    const token = IdPOAuthAccessToken.fromJwtPayload(payload, options.clockSkewInMs);
-
-    return { data: token, tokenType: TokenType.OAuthToken, errors: undefined };
+    return { data: fromPayload(payload, options.clockSkewInMs), tokenType, errors: undefined };
   } catch (error) {
     return {
-      tokenType: TokenType.OAuthToken,
+      data: undefined,
+      tokenType,
       errors: [
         new MachineTokenVerificationError({
           code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
@@ -297,14 +260,23 @@ async function verifyJwtOAuthToken(
   }
 }
 
+async function verifyM2MToken(
+  token: string,
+  options: VerifyTokenOptions,
+): Promise<MachineTokenReturnType<M2MToken, MachineTokenVerificationError>> {
+  try {
+    const client = createBackendApiClient(options);
+    const verifiedToken = await client.m2m.verify({ token });
+    return { data: verifiedToken, tokenType: TokenType.M2MToken, errors: undefined };
+  } catch (err: any) {
+    return handleClerkAPIError(TokenType.M2MToken, err, 'Machine token not found');
+  }
+}
+
 async function verifyOAuthToken(
   accessToken: string,
   options: VerifyTokenOptions,
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
-  if (isJwtFormat(accessToken)) {
-    return verifyJwtOAuthToken(accessToken, options);
-  }
-
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.idPOAuthAccessToken.verify(accessToken);
@@ -328,16 +300,79 @@ async function verifyAPIKey(
 }
 
 /**
- * Verifies any type of machine token by detecting its type from the prefix.
+ * Verifies any type of machine token by detecting its type from the prefix or JWT claims.
+ * For JWTs, decodes once and routes based on claims to avoid redundant decoding.
  *
- * @param token - The token to verify (e.g. starts with "m2m_", "oauth_", "api_key_", etc.)
+ * @param token - The token to verify (e.g. starts with "mt_", "oat_", "ak_", or a JWT)
  * @param options - Options including secretKey for BAPI authorization
  */
 export async function verifyMachineAuthToken(token: string, options: VerifyTokenOptions) {
+  // JWT format: decode once and route based on claims
+  if (isJwtFormat(token)) {
+    let decodedResult: Jwt;
+    try {
+      const { data, errors: decodeErrors } = decodeJwt(token);
+      if (decodeErrors) {
+        return {
+          data: undefined,
+          tokenType: TokenType.M2MToken,
+          errors: [
+            new MachineTokenVerificationError({
+              code: MachineTokenVerificationErrorCode.TokenInvalid,
+              message: decodeErrors[0].message,
+            }),
+          ],
+        } as MachineTokenReturnType<never, MachineTokenVerificationError>;
+      }
+      decodedResult = data;
+    } catch (e) {
+      return {
+        data: undefined,
+        tokenType: TokenType.M2MToken,
+        errors: [
+          new MachineTokenVerificationError({
+            code: MachineTokenVerificationErrorCode.TokenInvalid,
+            message: (e as Error).message,
+          }),
+        ],
+      } as MachineTokenReturnType<never, MachineTokenVerificationError>;
+    }
+
+    // M2M JWT: sub starts with mch_
+    if (decodedResult.payload.sub.startsWith('mch_')) {
+      return verifyDecodedJwtMachineToken(token, decodedResult, options, TokenType.M2MToken, M2MToken.fromJwtPayload);
+    }
+
+    // OAuth JWT: typ is at+jwt or application/at+jwt
+    if (OAUTH_ACCESS_TOKEN_TYPES.includes(decodedResult.header.typ as string)) {
+      return verifyDecodedJwtMachineToken(
+        token,
+        decodedResult,
+        options,
+        TokenType.OAuthToken,
+        IdPOAuthAccessToken.fromJwtPayload,
+        OAUTH_ACCESS_TOKEN_TYPES,
+      );
+    }
+
+    // JWT format but unrecognized machine token type
+    return {
+      data: undefined,
+      tokenType: TokenType.OAuthToken,
+      errors: [
+        new MachineTokenVerificationError({
+          code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: `Invalid JWT type: ${decodedResult.header.typ ?? 'missing'}. Expected one of: ${OAUTH_ACCESS_TOKEN_TYPES.join(', ')} for OAuth, or sub starting with 'mch_' for M2M`,
+        }),
+      ],
+    } as MachineTokenReturnType<never, MachineTokenVerificationError>;
+  }
+
+  // Opaque token routing by prefix
   if (token.startsWith(M2M_TOKEN_PREFIX)) {
     return verifyM2MToken(token, options);
   }
-  if (token.startsWith(OAUTH_TOKEN_PREFIX) || isJwtFormat(token)) {
+  if (token.startsWith(OAUTH_TOKEN_PREFIX)) {
     return verifyOAuthToken(token, options);
   }
   if (token.startsWith(API_KEY_PREFIX)) {
