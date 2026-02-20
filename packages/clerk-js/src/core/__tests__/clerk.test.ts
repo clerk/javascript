@@ -2075,6 +2075,134 @@ describe('Clerk singleton', () => {
         expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/reset-password');
       });
     });
+
+    it('reads redirect_url from URL search params and uses it as the redirect destination', async () => {
+      // Set window.location to include redirect_url in search params
+      const customRedirectUrl = '/custom-redirect-from-url';
+      Object.defineProperty(global.window, 'location', {
+        value: {
+          ...mockWindowLocation,
+          search: `?redirect_url=${encodeURIComponent(customRedirectUrl)}`,
+        },
+      });
+
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'complete',
+            first_factor_verification: {
+              status: 'verified',
+              strategy: 'oauth_google',
+              external_verification_redirect_url: null,
+              error: null,
+            },
+            second_factor_verification: null,
+            identifier: 'test@example.com',
+            user_data: null,
+            created_session_id: 'sess_123',
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const mockSetActive = vi.fn(async ({ navigate }) => {
+        // Simulate the navigate callback being called
+        await navigate({ session: { currentTask: null } });
+      });
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      sut.setActive = mockSetActive;
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockSetActive).toHaveBeenCalled();
+        // The redirect should include the custom redirect URL from URL search params
+        expect(mockNavigate.mock.calls[0][0]).toContain(customRedirectUrl);
+      });
+    });
+
+    it('uses redirect_url from URL search params over props', async () => {
+      const customRedirectUrl = '/custom-redirect-from-url';
+      Object.defineProperty(global.window, 'location', {
+        value: {
+          ...mockWindowLocation,
+          search: `?redirect_url=${encodeURIComponent(customRedirectUrl)}`,
+        },
+      });
+
+      const redirectOptions = {
+        signInUrl: 'http://test.host/sign-in',
+        signUpUrl: 'http://test.host/sign-up',
+        afterSignInUrl: '/after-sign-in',
+        afterSignUpUrl: '/after-sign-up',
+        // TODO: it may be required to override force redirects as well. USER-3111
+        // signInForceRedirectUrl: '/force-after-sign-in',
+        // signUpForceRedirectUrl: '/force-after-sign-up',
+      };
+
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'complete',
+            first_factor_verification: {
+              status: 'verified',
+              strategy: 'oauth_google',
+              external_verification_redirect_url: null,
+              error: null,
+            },
+            second_factor_verification: null,
+            identifier: 'test@example.com',
+            user_data: null,
+            created_session_id: 'sess_123',
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const mockSetActive = vi.fn(async ({ navigate }) => {
+        await navigate({ session: { currentTask: null } });
+      });
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ...redirectOptions });
+      sut.setActive = mockSetActive;
+
+      await sut.handleRedirectCallback(redirectOptions);
+
+      await waitFor(() => {
+        expect(mockSetActive).toHaveBeenCalled();
+        // redirect_url from the doc request (URL search params) takes precedence over all other redirect props
+        expect(mockNavigate.mock.calls[0][0]).toContain(customRedirectUrl);
+      });
+    });
   });
 
   describe('.handleEmailLinkVerification()', () => {
