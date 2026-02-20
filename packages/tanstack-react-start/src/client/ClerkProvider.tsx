@@ -1,5 +1,4 @@
-import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
-import type { Ui } from '@clerk/react/internal';
+import { InternalClerkProvider as ReactClerkProvider, type Ui } from '@clerk/react/internal';
 import { ScriptOnce } from '@tanstack/react-router';
 import { getGlobalStartContext } from '@tanstack/react-start';
 import { useEffect } from 'react';

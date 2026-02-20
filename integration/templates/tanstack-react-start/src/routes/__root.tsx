@@ -28,8 +28,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ClerkProvider
-          clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL}
-          clerkUIUrl={import.meta.env.VITE_CLERK_UI_URL}
+          __internal_clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL}
+          __internal_clerkUIUrl={import.meta.env.VITE_CLERK_UI_URL}
           appearance={{
             options: {
               showOptionalFields: true,

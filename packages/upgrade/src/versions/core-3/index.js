@@ -31,5 +31,6 @@ export default {
     // Migrate @clerk/react-router/api.server → @clerk/react-router/server
     { name: 'transform-react-router-api-server', packages: ['react-router'] },
     { name: 'transform-satellite-auto-sync', packages: ['nextjs', 'react', 'expo', 'astro', 'tanstack-react-start'] },
+    'transform-internal-clerk-js-ui-props',
   ],
 };
