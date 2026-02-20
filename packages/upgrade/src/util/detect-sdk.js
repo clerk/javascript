@@ -49,7 +49,7 @@ export function detectSdk(dir) {
   return null;
 }
 
-export function resolveCatalogVersion(packageName, dir) {
+export function resolveCatalogVersion(packageName, dir, catalogName) {
   let current = path.resolve(dir);
   const root = path.parse(current).root;
 
@@ -58,13 +58,14 @@ export function resolveCatalogVersion(packageName, dir) {
     if (fs.existsSync(wsPath)) {
       try {
         const content = fs.readFileSync(wsPath, 'utf8');
-        // Match both catalog.default and catalog.<name> sections
-        // Format: `'packageName': version` or `packageName: version` under catalog(s) sections
-        const escapedName = packageName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const pattern = new RegExp(`^\\s*['"]?${escapedName}['"]?\\s*:\\s*['"]?([^'"\\s#]+)['"]?`, 'm');
-        const match = content.match(pattern);
-        if (match) {
-          return match[1];
+        const section = catalogName ? getNamedCatalogSection(content, catalogName) : getDefaultCatalogSection(content);
+        if (section) {
+          const escapedName = packageName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const pattern = new RegExp(`^\\s*['"]?${escapedName}['"]?\\s*:\\s*['"]?([^'"\\s#]+)['"]?`, 'm');
+          const match = section.match(pattern);
+          if (match) {
+            return match[1];
+          }
         }
       } catch {
         /* continue */
@@ -74,6 +75,44 @@ export function resolveCatalogVersion(packageName, dir) {
   }
 
   return null;
+}
+
+function getDefaultCatalogSection(content) {
+  // Match `catalog:` (singular) but not `catalogs:`
+  const match = content.match(/^catalog:\s*$/m);
+  if (!match) {
+    return null;
+  }
+  const start = match.index + match[0].length;
+  // Extract indented lines until the next top-level key
+  const rest = content.slice(start);
+  const end = rest.search(/^\S/m);
+  return end === -1 ? rest : rest.slice(0, end);
+}
+
+function getNamedCatalogSection(content, catalogName) {
+  // Find the `catalogs:` (plural) section, then the named subsection
+  const catalogsMatch = content.match(/^catalogs:\s*$/m);
+  if (!catalogsMatch) {
+    return null;
+  }
+  const catalogsStart = catalogsMatch.index + catalogsMatch[0].length;
+  const catalogsRest = content.slice(catalogsStart);
+  // End of catalogs section is the next non-indented line
+  const catalogsEnd = catalogsRest.search(/^\S/m);
+  const catalogsBody = catalogsEnd === -1 ? catalogsRest : catalogsRest.slice(0, catalogsEnd);
+
+  // Find the named catalog subsection (2-space indented key)
+  const escapedCatalogName = catalogName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const nameMatch = catalogsBody.match(new RegExp(`^  ${escapedCatalogName}:\\s*$`, 'm'));
+  if (!nameMatch) {
+    return null;
+  }
+  const nameStart = nameMatch.index + nameMatch[0].length;
+  const nameRest = catalogsBody.slice(nameStart);
+  // End of this named section is the next line at 2-space indent level (sibling catalog) or less
+  const nameEnd = nameRest.search(/^ {2}\S/m);
+  return nameEnd === -1 ? nameRest : nameRest.slice(0, nameEnd);
 }
 
 export function getSdkVersion(sdk, dir) {
@@ -98,8 +137,10 @@ export function getSdkVersion(sdk, dir) {
   }
 
   if (version.startsWith('catalog:')) {
+    const catalogName = version.slice('catalog:'.length) || undefined;
     const resolvedVersion =
-      resolveCatalogVersion(pkgName, dir) || (oldPkgName && resolveCatalogVersion(oldPkgName, dir));
+      resolveCatalogVersion(pkgName, dir, catalogName) ||
+      (oldPkgName && resolveCatalogVersion(oldPkgName, dir, catalogName));
     if (resolvedVersion) {
       return getMajorVersion(resolvedVersion);
     }

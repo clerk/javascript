@@ -11,7 +11,12 @@ import {
   normalizeSdkName,
   resolveCatalogVersion,
 } from '../../util/detect-sdk.js';
-import { detectPackageManager, getInstallCommand, getUninstallCommand } from '../../util/package-manager.js';
+import {
+  detectPackageManager,
+  getInstallCommand,
+  getUninstallCommand,
+  isInPnpmWorkspace,
+} from '../../util/package-manager.js';
 import { getFixturePath } from '../helpers/create-fixture.js';
 
 describe('detectSdk', () => {
@@ -75,6 +80,11 @@ describe('getSdkVersion', () => {
   it('resolves catalog: protocol versions from pnpm-workspace.yaml', () => {
     const version = getSdkVersion('nextjs', getFixturePath('nextjs-catalog-resolved'));
     expect(version).toBe(6);
+  });
+
+  it('resolves named catalog: protocol versions from pnpm-workspace.yaml', () => {
+    const version = getSdkVersion('nextjs', getFixturePath('nextjs-named-catalog'));
+    expect(version).toBe(7);
   });
 });
 
@@ -221,6 +231,44 @@ describe('resolveCatalogVersion', () => {
     const version = resolveCatalogVersion('@clerk/nextjs', srcDir);
     expect(version).toBe('^6.0.0');
   });
+
+  it('resolves version from a named catalog section', () => {
+    const version = resolveCatalogVersion('@clerk/nextjs', getFixturePath('nextjs-named-catalog'), 'clerk');
+    expect(version).toBe('^7.0.0');
+  });
+
+  it('resolves correct version when package exists in multiple named catalogs', () => {
+    const peerVersion = resolveCatalogVersion('react', getFixturePath('nextjs-named-catalog'), 'peer-react');
+    expect(peerVersion).toBe('^18.0.0');
+
+    const pinnedVersion = resolveCatalogVersion('react', getFixturePath('nextjs-named-catalog'), 'react');
+    expect(pinnedVersion).toBe('18.3.1');
+  });
+
+  it('returns null when named catalog does not exist', () => {
+    const version = resolveCatalogVersion('@clerk/nextjs', getFixturePath('nextjs-named-catalog'), 'nonexistent');
+    expect(version).toBeNull();
+  });
+});
+
+describe('isInPnpmWorkspace', () => {
+  it('returns true when pnpm-workspace.yaml exists in current directory', () => {
+    expect(isInPnpmWorkspace(getFixturePath('nextjs-catalog-resolved'))).toBe(true);
+  });
+
+  it('returns true when pnpm-workspace.yaml exists in parent directory', () => {
+    const srcDir = path.join(getFixturePath('nextjs-catalog-resolved'), 'src');
+    expect(isInPnpmWorkspace(srcDir)).toBe(true);
+  });
+
+  it('returns false when no pnpm-workspace.yaml exists in any parent', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'clerk-ws-test-'));
+    try {
+      expect(isInPnpmWorkspace(tmpDir)).toBe(false);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
 });
 
 describe('getInstallCommand', () => {
@@ -231,11 +279,22 @@ describe('getInstallCommand', () => {
     expect(args).toContain('-w');
   });
 
-  it('does not add -w flag for pnpm without pnpm-workspace.yaml', () => {
-    const dir = getFixturePath('nextjs-v6');
-    const [cmd, args] = getInstallCommand('pnpm', '@clerk/nextjs', '7.0.0', dir);
+  it('adds -w flag for pnpm from a workspace subdirectory', () => {
+    const srcDir = path.join(getFixturePath('nextjs-catalog-resolved'), 'src');
+    const [cmd, args] = getInstallCommand('pnpm', '@clerk/nextjs', '7.0.0', srcDir);
     expect(cmd).toBe('pnpm');
-    expect(args).not.toContain('-w');
+    expect(args).toContain('-w');
+  });
+
+  it('does not add -w flag for pnpm outside a workspace', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'clerk-no-ws-'));
+    try {
+      const [cmd, args] = getInstallCommand('pnpm', '@clerk/nextjs', '7.0.0', tmpDir);
+      expect(cmd).toBe('pnpm');
+      expect(args).not.toContain('-w');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
   });
 
   it('does not add -w flag for non-pnpm managers', () => {
@@ -254,10 +313,21 @@ describe('getUninstallCommand', () => {
     expect(args).toContain('-w');
   });
 
-  it('does not add -w flag for pnpm without pnpm-workspace.yaml', () => {
-    const dir = getFixturePath('nextjs-v6');
-    const [cmd, args] = getUninstallCommand('pnpm', '@clerk/nextjs', dir);
+  it('adds -w flag for pnpm from a workspace subdirectory', () => {
+    const srcDir = path.join(getFixturePath('nextjs-catalog-resolved'), 'src');
+    const [cmd, args] = getUninstallCommand('pnpm', '@clerk/nextjs', srcDir);
     expect(cmd).toBe('pnpm');
-    expect(args).not.toContain('-w');
+    expect(args).toContain('-w');
+  });
+
+  it('does not add -w flag for pnpm outside a workspace', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'clerk-no-ws-'));
+    try {
+      const [cmd, args] = getUninstallCommand('pnpm', '@clerk/nextjs', tmpDir);
+      expect(cmd).toBe('pnpm');
+      expect(args).not.toContain('-w');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
   });
 });
