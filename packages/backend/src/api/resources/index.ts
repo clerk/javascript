@@ -1,4 +1,5 @@
 export * from './AccountlessApplication';
+export * from './AgentTask';
 export * from './ActorToken';
 export * from './AllowlistIdentifier';
 export * from './APIKey';
