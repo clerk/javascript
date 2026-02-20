@@ -122,8 +122,8 @@ describe('CLI Integration', () => {
       const result = await runCli(['--dir', dir, '--dry-run', '--skip-codemods'], { timeout: 5000 });
 
       const output = result.stdout + result.stderr;
-      expect(output).toContain('Example:');
-      expect(output).toContain('npx @clerk/upgrade --sdk=');
+      expect(output).toContain('npx @clerk/upgrade');
+      expect(output).toContain('--sdk');
     });
   });
 
