@@ -23,7 +23,7 @@ declare global {
 }
 
 export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
-  const codesWithRetries = ['crashed', 'undefined_error', '102', '103', '104', '106', '110600', '300', '600'];
+  const codesWithRetries = ['crashed', 'undefined_error', '102', '103', '104', '106', '110600', '200', '300', '600'];
   return !!codesWithRetries.find(w => errorCode.startsWith(w));
 };
 
@@ -117,7 +117,8 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
 
   // smart widget with container provided by user
   if (!widgetContainerQuerySelector && widgetType === 'smart') {
-    const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
+    // Use waitForElement to ensure the element is ready, similar to modal approach
+    const visibleDiv = await waitForElement(`#${CAPTCHA_ELEMENT_ID}`).catch(() => null);
     if (visibleDiv) {
       captchaTypeUsed = 'smart';
       captchaWidgetType = 'smart';
@@ -147,8 +148,15 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   }
 
   const handleCaptchaTokenGeneration = async (): Promise<[string, string]> => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
+        // Re-verify element exists right before render to prevent 200100 errors
+        const containerElement = await waitForElement(widgetContainerQuerySelector);
+        if (!containerElement) {
+          reject(['Widget container element not found', undefined]);
+          return;
+        }
+
         const id = captcha.render(widgetContainerQuerySelector, {
           sitekey: turnstileSiteKey,
           appearance: 'interaction-only',
