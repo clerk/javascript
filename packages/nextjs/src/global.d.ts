@@ -33,6 +33,7 @@ interface Window {
     {
       fun: NavigationFunction;
       promisesBuffer: Array<() => void> | undefined;
+      pendingDestination: string | undefined;
     }
   >;
   __clerk_nav_await: Array<(value: void) => void>;

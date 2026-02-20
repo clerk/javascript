@@ -80,13 +80,13 @@
     "build": "tsup --onSuccess \"pnpm build:dts\" && pnpm copy:components",
     "build:dts": "tsc --emitDeclarationOnly --declaration",
     "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
-    "dev": "tsup --watch --onSuccess \"pnpm build:dts\"",
+    "dev": "tsup --watch",
+    "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src env.d.ts",
     "lint:attw": "attw --pack . --profile esm-only --ignore-rules internal-resolution-error",
     "lint:publint": "pnpm copy:components && publint",
-    "publish:local": "pnpm yalc push --replace --sig",
     "test": "vitest run"
   },
   "dependencies": {
@@ -97,7 +97,7 @@
   },
   "devDependencies": {
     "@clerk/ui": "workspace:^",
-    "astro": "^5.15.9"
+    "astro": "^5.17.1"
   },
   "peerDependencies": {
     "astro": "^4.15.0 || ^5.0.0"

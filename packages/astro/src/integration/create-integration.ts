@@ -4,6 +4,7 @@ import { envField } from 'astro/config';
 
 import { name as packageName, version as packageVersion } from '../../package.json';
 import type { AstroClerkIntegrationParams } from '../types';
+import { buildBeforeHydrationSnippet, buildPageLoadSnippet } from './snippets';
 import { vitePluginAstroConfig } from './vite-plugin-astro-config';
 
 const buildEnvVarFromOption = (valueToBeStored: unknown, envName: keyof InternalEnv) => {
@@ -94,63 +95,32 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
            */
 
           /**
-           * The above script will run before client frameworks like React hydrate.
+           * The before-hydration script will run before client frameworks like React hydrate.
            * This makes sure that we have initialized a Clerk instance and populated stores in order to avoid hydration issues.
            */
           injectScript(
             'before-hydration',
-            `
-            ${command === 'dev' ? `console.log('${packageName}',"Initialize Clerk: before-hydration")` : ''}
-            import { runInjectionScript } from "${buildImportPath}";
-            await runInjectionScript(${JSON.stringify(internalParams)});`,
+            buildBeforeHydrationSnippet({
+              command,
+              packageName,
+              buildImportPath,
+              internalParams,
+            }),
           );
 
           /**
-           * The above script only executes if a client framework like React needs to hydrate.
-           * We need to run the same script again for each page in order to initialize Clerk even if no UI framework is used in the client
-           * If no UI framework is used in the client, the above script with `before-hydration` will never run
+           * The page script only executes if a client framework like React needs to hydrate.
+           * We need to run the same script again for each page in order to initialize Clerk even if no UI framework is used in the client.
+           * If no UI framework is used in the client, the before-hydration script will never run.
            */
-
           injectScript(
             'page',
-            `
-            ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: page")` : ''}
-            import { runInjectionScript, swapDocument } from "${buildImportPath}";
-
-            // Taken from https://github.com/withastro/astro/blob/e10b03e88c22592fbb42d7245b65c4f486ab736d/packages/astro/src/transitions/router.ts#L39.
-            // Importing it directly from astro:transitions/client breaks custom client-side routing
-            // even when View Transitions is disabled.
-            const transitionEnabledOnThisPage = () => {
-              return !!document.querySelector('[name="astro-view-transitions-enabled"]');
-            }
-
-            if (transitionEnabledOnThisPage()) {
-              // We must do the dynamic imports within the event listeners because otherwise we may race and miss initial astro:page-load
-              document.addEventListener('astro:before-swap', async (e) => {
-                const { swapFunctions } = await import('astro:transitions/client');
-
-                const clerkComponents = document.querySelector('#clerk-components');
-                // Keep the div element added by Clerk
-                if (clerkComponents) {
-                  const clonedEl = clerkComponents.cloneNode(true);
-                  e.newDocument.body.appendChild(clonedEl);
-                }
-
-                e.swap = () => swapDocument(swapFunctions, e.newDocument);
-              });
-
-              document.addEventListener('astro:page-load', async (e) => {
-                const { navigate } = await import('astro:transitions/client');
-
-                await runInjectionScript({
-                  ...${JSON.stringify(internalParams)},
-                  routerPush: navigate,
-                  routerReplace: (url) => navigate(url, { history: 'replace' }),
-                });
-              })
-            } else {
-              await runInjectionScript(${JSON.stringify(internalParams)});
-            }`,
+            buildPageLoadSnippet({
+              command,
+              packageName,
+              buildImportPath,
+              internalParams,
+            }),
           );
         },
         'astro:config:done': ({ injectTypes }) => {
@@ -166,7 +136,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
 
 function createClerkEnvSchema() {
   return {
-    PUBLIC_CLERK_PUBLISHABLE_KEY: envField.string({ context: 'client', access: 'public' }),
+    PUBLIC_CLERK_PUBLISHABLE_KEY: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_SIGN_IN_URL: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_SIGN_UP_URL: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_IS_SATELLITE: envField.boolean({ context: 'client', access: 'public', optional: true }),
@@ -179,7 +149,8 @@ function createClerkEnvSchema() {
     PUBLIC_CLERK_PREFETCH_UI: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_TELEMETRY_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_TELEMETRY_DEBUG: envField.boolean({ context: 'client', access: 'public', optional: true }),
-    CLERK_SECRET_KEY: envField.string({ context: 'server', access: 'secret' }),
+    PUBLIC_CLERK_KEYLESS_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
+    CLERK_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
     CLERK_MACHINE_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
     CLERK_JWT_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
   };
