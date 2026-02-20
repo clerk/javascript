@@ -346,13 +346,8 @@ jobs:
           E2E_CLERK_UI_VERSION: "latest"
           E2E_PROJECT: "chrome"
         run: |
-          TEST_NAMES=(
-            "generic" "express" "ap-flows" "localhost"
-            "sessions" "sessions:staging" "handshake" "handshake:staging"
-            "astro" "tanstack-react-start" "vue" "nuxt"
-            "react-router" "custom" "billing" "machine"
-            "nextjs" "quickstart" "cache-components"
-          )
+          # Derive suite names from turbo.json (single source of truth)
+          readarray -t TEST_NAMES < <(jq -r '.tasks | keys[] | select(startswith("//#test:integration:")) | sub("^//#test:integration:"; "")' turbo.json)
 
           AFFECTED_JSON="{"
           FIRST=true
