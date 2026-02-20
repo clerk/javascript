@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { shouldRetryTurnstileErrorCode } from '../captcha/turnstile';
 import type { CaptchaOptions } from '../captcha/types';
@@ -248,5 +248,148 @@ describe('Nonce support', () => {
         }),
       );
     });
+  });
+});
+
+describe('getTurnstileToken container guard', () => {
+  let mockRender: ReturnType<typeof vi.fn>;
+  let mockReset: ReturnType<typeof vi.fn>;
+  let mockRemove: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.resetModules();
+
+    mockRender = vi.fn();
+    mockReset = vi.fn();
+    mockRemove = vi.fn();
+
+    (window as any).turnstile = {
+      render: mockRender,
+      reset: mockReset,
+      remove: mockRemove,
+    };
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    delete (window as any).turnstile;
+    document.body.innerHTML = '';
+  });
+
+  const baseOpts: CaptchaOptions = {
+    siteKey: 'test-site-key',
+    widgetType: 'invisible',
+    invisibleSiteKey: 'test-invisible-key',
+    captchaProvider: 'turnstile',
+  };
+
+  it('should reject immediately when container is removed before retry fires', async () => {
+    const { getTurnstileToken } = await import('../captcha/turnstile');
+
+    let errorCallback: (code: string) => void;
+
+    mockRender.mockImplementation((_selector: string, opts: any) => {
+      errorCallback = opts['error-callback'];
+      return 'widget-1';
+    });
+
+    const tokenPromise = getTurnstileToken(baseOpts);
+    // Attach handler early to prevent PromiseRejectionHandledWarning
+    const rejection = tokenPromise.catch(e => e);
+    // Flush microtask queue so async setup (loadCaptcha, container creation) completes
+    await vi.advanceTimersByTimeAsync(0);
+
+    // Trigger a retriable error
+    errorCallback!('300010');
+
+    // Remove the invisible container before the retry setTimeout fires
+    const invisibleWidget = document.querySelector('.clerk-invisible-captcha');
+    if (invisibleWidget) {
+      document.body.removeChild(invisibleWidget);
+    }
+
+    // Advance past the 250ms retry delay
+    await vi.advanceTimersByTimeAsync(300);
+
+    const error = await rejection;
+    expect(error).toMatchObject({
+      captchaError: expect.stringContaining('300010'),
+    });
+
+    expect(mockReset).not.toHaveBeenCalled();
+  });
+
+  it('should proceed with captcha.reset when container still exists', async () => {
+    const { getTurnstileToken } = await import('../captcha/turnstile');
+
+    let errorCallback: (code: string) => void;
+
+    mockRender.mockImplementation((_selector: string, opts: any) => {
+      errorCallback = opts['error-callback'];
+      return 'widget-1';
+    });
+
+    const tokenPromise = getTurnstileToken(baseOpts);
+    await vi.advanceTimersByTimeAsync(0);
+
+    // Trigger a retriable error - container still exists
+    errorCallback!('300010');
+
+    // Advance past the 250ms retry delay (container is still in the DOM)
+    await vi.advanceTimersByTimeAsync(300);
+
+    expect(mockReset).toHaveBeenCalledWith('widget-1');
+
+    // Trigger a non-retriable error to end the test (retries exhausted after 2 more)
+    errorCallback!('300010');
+    await vi.advanceTimersByTimeAsync(300);
+    errorCallback!('300010');
+
+    await expect(tokenPromise).rejects.toMatchObject({
+      captchaError: expect.stringContaining('300010'),
+    });
+  });
+
+  it('should include all accumulated error codes when rejecting due to missing container', async () => {
+    const { getTurnstileToken } = await import('../captcha/turnstile');
+
+    let errorCallback: (code: string) => void;
+
+    mockRender.mockImplementation((_selector: string, opts: any) => {
+      errorCallback = opts['error-callback'];
+      return 'widget-1';
+    });
+
+    const tokenPromise = getTurnstileToken(baseOpts);
+    const rejection = tokenPromise.catch(e => e);
+    await vi.advanceTimersByTimeAsync(0);
+
+    // First error triggers retry
+    errorCallback!('600010');
+
+    // Let the first retry fire (container still exists)
+    await vi.advanceTimersByTimeAsync(300);
+    expect(mockReset).toHaveBeenCalledTimes(1);
+
+    // Second error triggers another retry
+    errorCallback!('600010');
+
+    // Remove container before second retry fires
+    const invisibleWidget = document.querySelector('.clerk-invisible-captcha');
+    if (invisibleWidget) {
+      document.body.removeChild(invisibleWidget);
+    }
+
+    await vi.advanceTimersByTimeAsync(300);
+
+    // Should reject with both error codes
+    const error = await rejection;
+    expect(error).toMatchObject({
+      captchaError: expect.stringContaining('600010,600010'),
+    });
+
+    // captcha.reset should only have been called once (the first retry)
+    expect(mockReset).toHaveBeenCalledTimes(1);
   });
 });
