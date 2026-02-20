@@ -24,6 +24,8 @@ const GLOBBY_IGNORE = [
   '**/yarn.lock',
   'pnpm-lock.yaml',
   '**/pnpm-lock.yaml',
+  '**/*.md',
+  '**/*.tsbuildinfo',
   '**/*.{png,webp,svg,gif,jpg,jpeg}',
   '**/*.{mp4,mkv,wmv,m4v,mov,avi,flv,webm,flac,mka,m4a,aac,ogg}',
 ];
