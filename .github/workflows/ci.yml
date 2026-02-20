@@ -97,6 +97,7 @@ jobs:
     runs-on: "blacksmith-8vcpu-ubuntu-2204"
     permissions:
       contents: read
+      actions: write
     defaults:
       run:
         shell: bash
@@ -127,7 +128,8 @@ jobs:
         run: pnpm turbo build $TURBO_ARGS --only
 
       - name: Save Turbo Cache
-        uses: useblacksmith/cache/save@v5
+        run: mkdir -p .turbo-cache
+      - uses: useblacksmith/cache/save@v5
         with:
           path: .turbo-cache
           key: turbo-build-${{ github.sha }}
