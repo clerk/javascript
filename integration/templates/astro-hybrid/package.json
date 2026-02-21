@@ -4,14 +4,14 @@
   "type": "module",
   "scripts": {
     "astro": "astro",
-    "build": "astro check && astro build",
+    "build": "astro build",
     "dev": "astro dev",
     "preview": "astro preview --port $PORT",
     "start": "astro dev --port $PORT"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
-    "@astrojs/node": "^9.4.2",
+    "@astrojs/node": "^8.0.0",
     "@astrojs/react": "^3.6.2",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",

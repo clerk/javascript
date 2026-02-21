@@ -9,6 +9,31 @@ import type { EnvironmentConfig } from './environment.js';
 
 export type Application = ReturnType<typeof application>;
 
+/**
+ * Resolves the server URL for a dev/serve process, ensuring the runtime port
+ * is always reflected in the URL. Uses the URL constructor to detect whether
+ * an explicit port is present (avoiding false positives from the scheme colon).
+ */
+export const resolveServerUrl = (
+  optsServerUrl: string | undefined,
+  fallbackServerUrl: string | undefined,
+  port: number,
+): string => {
+  if (optsServerUrl) {
+    try {
+      const parsed = new URL(optsServerUrl);
+      if (!parsed.port) {
+        parsed.port = String(port);
+      }
+      return parsed.origin;
+    } catch {
+      // Bare host (e.g. "localhost"), not a full URL
+      return `${optsServerUrl}:${port}`;
+    }
+  }
+  return fallbackServerUrl || `http://localhost:${port}`;
+};
+
 export const application = (
   config: ApplicationConfig,
   appDirPath: string,
@@ -58,13 +83,7 @@ export const application = (
     dev: async (opts: { port?: number; manualStart?: boolean; detached?: boolean; serverUrl?: string } = {}) => {
       const log = logger.child({ prefix: 'dev' }).info;
       const port = opts.port || (await getPort());
-      const getServerUrl = () => {
-        if (opts.serverUrl) {
-          return opts.serverUrl.includes(':') ? opts.serverUrl : `${opts.serverUrl}:${port}`;
-        }
-        return serverUrl || `http://localhost:${port}`;
-      };
-      const runtimeServerUrl = getServerUrl();
+      const runtimeServerUrl = resolveServerUrl(opts.serverUrl, serverUrl, port);
       log(`Will try to serve app at ${runtimeServerUrl}`);
       if (opts.manualStart) {
         // for debugging, you can start the dev server manually by cd'ing into the temp dir
@@ -144,25 +163,59 @@ export const application = (
     get serveOutput() {
       return serveOutput;
     },
-    serve: async (opts: { port?: number; manualStart?: boolean } = {}) => {
+    serve: async (opts: { port?: number; manualStart?: boolean; detached?: boolean; serverUrl?: string } = {}) => {
       const log = logger.child({ prefix: 'serve' }).info;
       const port = opts.port || (await getPort());
-      // TODO: get serverUrl as in dev()
-      const serverUrl = `http://localhost:${port}`;
-      // If this is ever used as a background process, we need to make sure
-      // it's not using the log function. See the dev() method above
+      const runtimeServerUrl = resolveServerUrl(opts.serverUrl, serverUrl, port);
+      log(`Will try to serve app at ${runtimeServerUrl}`);
+
+      if (opts.manualStart) {
+        state.serverUrl = runtimeServerUrl;
+        return { port, serverUrl: runtimeServerUrl };
+      }
+
+      // Read .env file and pass as process env vars since production servers
+      // may not auto-load .env files (e.g., react-router-serve)
+      const envFromFile: Record<string, string> = {};
+      const envFilePath = path.resolve(appDirPath, '.env');
+      if (fs.existsSync(envFilePath)) {
+        const envContent = fs.readFileSync(envFilePath, 'utf-8');
+        for (const line of envContent.split('\n')) {
+          const trimmed = line.trim();
+          if (trimmed && !trimmed.startsWith('#')) {
+            const eqIdx = trimmed.indexOf('=');
+            if (eqIdx > 0) {
+              envFromFile[trimmed.slice(0, eqIdx)] = trimmed.slice(eqIdx + 1);
+            }
+          }
+        }
+      }
+
       const proc = run(scripts.serve, {
         cwd: appDirPath,
-        env: { PORT: port.toString() },
-        log: (msg: string) => {
-          serveOutput += `\n${msg}`;
-          log(msg);
-        },
+        env: { ...envFromFile, PORT: port.toString() },
+        detached: opts.detached,
+        stdout: opts.detached ? fs.openSync(stdoutFilePath, 'a') : undefined,
+        stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
+        log: opts.detached
+          ? undefined
+          : (msg: string) => {
+              serveOutput += `\n${msg}`;
+              log(msg);
+            },
       });
+
+      if (opts.detached) {
+        const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
+        await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
+      } else {
+        await waitForIdleProcess(proc);
+      }
+
+      log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
       cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
-      await waitForIdleProcess(proc);
-      state.serverUrl = serverUrl;
-      return { port, serverUrl, pid: proc };
+      state.serverUrl = runtimeServerUrl;
+      return { port, serverUrl: runtimeServerUrl, pid: proc.pid };
     },
     stop: async () => {
       logger.info('Stopping...');
