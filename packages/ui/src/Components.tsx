@@ -221,15 +221,17 @@ export const mountComponentRenderer = (
   return {
     ensureMounted: (opts?: { preloadHint: ClerkComponentName }) => {
       const { preloadHint } = opts || {};
+      // Always preload, even if ensureMounted was already called.
+      // preloadComponent is idempotent (returns cached promise on subsequent calls).
+      if (preloadHint) {
+        void preloadComponent(preloadHint);
+      }
       // This mechanism ensures that mountComponentControls will only be called once
       // and any calls to .mount before mountComponentControls resolves will fire in order.
       // Otherwise, we risk having components rendered multiple times, or having
       // .unmountComponent incorrectly called before the component is rendered
       if (!componentsControlsResolver) {
         const deferredPromise = createDeferredPromise();
-        if (preloadHint) {
-          void preloadComponent(preloadHint);
-        }
         componentsControlsResolver = import('./lazyModules/common').then(({ createRoot }) => {
           createRoot(clerkRoot).render(
             <Components
