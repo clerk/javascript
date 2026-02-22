@@ -1,5 +1,4 @@
-import type { DeriveStateReturnType } from '@clerk/shared/deriveState';
-import { deriveFromClientSideState, deriveFromSsrInitialState } from '@clerk/shared/deriveState';
+import { deriveState, type DeriveStateReturnType } from '@clerk/shared/deriveState';
 import { useClerkInstanceContext, useInitialStateContext } from '@clerk/shared/react';
 import type {
   ActClaim,
@@ -59,7 +58,9 @@ export function useAuthBase(): AuthStateValue {
     if (!state) {
       return defaultDerivedInitialState;
     }
-    const fullState = isInitialState(state) ? deriveFromSsrInitialState(state) : deriveFromClientSideState(state);
+    const fullState = isInitialState(state)
+      ? deriveState(false, {} as Resources, state)
+      : deriveState(true, state, undefined);
     return authStateFromFull(fullState);
   }, [state]);
 
