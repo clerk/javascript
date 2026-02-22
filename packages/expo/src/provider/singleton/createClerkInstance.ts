@@ -1,6 +1,6 @@
-import { type Clerk, isClerkRuntimeError } from '@clerk/clerk-js';
+import { type Clerk } from '@clerk/clerk-js';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/react';
-import { is4xxError } from '@clerk/shared/error';
+import { is4xxError, isClerkRuntimeError } from '@clerk/shared/error';
 import type {
   ClientJSONSnapshot,
   EnvironmentJSONSnapshot,
@@ -104,11 +104,13 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         };
 
         if (createResourceCache) {
+          const isClerkNetworkError = (err: unknown): boolean =>
+            isClerkRuntimeError(err) && err.code === 'network_error';
+
           const retryInitilizeResourcesFromFAPI = async () => {
-            const isClerkNetworkError = (err: unknown) => isClerkRuntimeError(err) && err.code === 'network_error';
             try {
               await __internal_clerk?.__internal_reloadInitialResources();
-            } catch (err) {
+            } catch (err: unknown) {
               // Retry after 3 seconds if the error is a network error or a 5xx error
               if (isClerkNetworkError(err) || !is4xxError(err)) {
                 // Retry after 2 seconds if the error is a network error
@@ -123,9 +125,12 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           ClientResourceCache.init({ publishableKey, storage: createResourceCache });
           SessionJWTCache.init({ publishableKey, storage: createResourceCache });
 
-          __internal_clerk.addListener(({ client }) => {
+          // At this point __internal_clerk is guaranteed to be defined (just created above)
+
+          const clerk = __internal_clerk;
+          clerk.addListener(({ client }) => {
             // @ts-expect-error - This is an internal API
-            const environment = __internal_clerk?.__internal_environment as EnvironmentResource;
+            const environment = clerk?.__internal_environment as EnvironmentResource;
             if (environment) {
               void EnvironmentResourceCache.save(environment.__internal_toSnapshot());
             }
@@ -144,7 +149,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             }
           });
 
-          __internal_clerk.__internal_getCachedResources = async (): Promise<{
+          clerk.__internal_getCachedResources = async (): Promise<{
             client: ClientJSONSnapshot | null;
             environment: EnvironmentJSONSnapshot | null;
           }> => {
@@ -195,6 +200,8 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         }
       });
     }
+    // At this point __internal_clerk is guaranteed to be defined
+
     return __internal_clerk;
   };
 }

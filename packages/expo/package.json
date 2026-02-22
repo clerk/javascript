@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "2.19.10",
+  "version": "2.19.24",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -27,6 +27,11 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./app.plugin.js": "./app.plugin.js",
+    "./native": {
+      "types": "./dist/native/index.d.ts",
+      "default": "./dist/native/index.js"
     },
     "./web": {
       "types": "./dist/web/index.d.ts",
@@ -69,7 +74,7 @@
       "default": "./dist/legacy.js"
     },
     "./types": "./dist/types/index.d.ts",
-    "./app.plugin.js": "./app.plugin.js"
+    "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "source": "./src/index.ts",
@@ -78,10 +83,18 @@
     "dist",
     "android",
     "ios",
+    "native",
+    "web",
+    "local-credentials",
+    "passkeys",
+    "secure-store",
+    "resource-cache",
+    "token-cache",
     "google",
     "apple",
     "expo-module.config.json",
-    "app.plugin.js"
+    "app.plugin.js",
+    "app.plugin.d.ts"
   ],
   "scripts": {
     "build": "tsup",
@@ -107,6 +120,7 @@
     "@clerk/expo-passkeys": "workspace:*",
     "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
+    "esbuild": "^0.19.0",
     "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "^5.4.0",
     "expo-constants": "^18.0.0",
