@@ -321,7 +321,7 @@ export interface SignUpFutureVerifications {
   /**
    * Used to send a phone code to verify a phone number.
    */
-  sendPhoneCode: (params: SignUpFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
+  sendPhoneCode: (params?: SignUpFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to verify a code sent via phone.

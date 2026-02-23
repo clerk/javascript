@@ -905,8 +905,8 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async sendPhoneCode(params: SignUpFuturePhoneCodeSendParams): Promise<{ error: ClerkError | null }> {
-    const { channel = 'sms' } = params;
+  async sendPhoneCode(params?: SignUpFuturePhoneCodeSendParams): Promise<{ error: ClerkError | null }> {
+    const { channel = 'sms' } = params || {};
     return runAsyncResourceTask(this.#resource, async () => {
       await this.#resource.__internal_basePost({
         body: { strategy: 'phone_code', channel },
