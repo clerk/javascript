@@ -58,7 +58,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Impersona
     // Pass through the ticket flow
     const searchParams = new URLSearchParams();
     searchParams.set('__clerk_ticket', actorTokenResponse.token);
-    await u.po.signIn.goTo({ searchParams });
+    // We don't use u.signIn.goTo here since the navigation can happen so quickly
+    // that Playwright can miss catching the sign in component having been mounted
+    await u.page.goToRelative('/sign-in', { searchParams });
 
     // Ensure that the impersonation flow is successful
     await u.po.expect.toBeSignedInAsActor();

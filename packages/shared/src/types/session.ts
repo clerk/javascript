@@ -1,3 +1,4 @@
+import type { ClientResource } from './client';
 import type {
   BackupCodeAttempt,
   EmailCodeAttempt,
@@ -260,6 +261,7 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   verifyWithPasskey: () => Promise<SessionVerificationResource>;
   __internal_toSnapshot: () => SessionJSONSnapshot;
+  __internal_touch: () => Promise<ClientResource | undefined>;
 }
 
 /**

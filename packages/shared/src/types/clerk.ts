@@ -721,7 +721,7 @@ export interface Clerk {
    * @param targetNode - Target node to mount the TaskSetupMFA component.
    * @param props - configuration parameters.
    */
-  mountTaskSetupMfa: (targetNode: HTMLDivElement, props?: TaskSetupMFAProps) => void;
+  mountTaskSetupMFA: (targetNode: HTMLDivElement, props?: TaskSetupMFAProps) => void;
 
   /**
    * Unmount a TaskSetupMFA component from the target element.
@@ -729,7 +729,7 @@ export interface Clerk {
    *
    * @param targetNode - Target node to unmount the TaskSetupMFA component from.
    */
-  unmountTaskSetupMfa: (targetNode: HTMLDivElement) => void;
+  unmountTaskSetupMFA: (targetNode: HTMLDivElement) => void;
 
   /**
    * @internal

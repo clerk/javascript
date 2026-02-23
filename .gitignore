@@ -61,8 +61,6 @@ lerna-debug.log
 .next
 .dev.vars
 .env.local
-.yalc
-yalc.lock
 playground/*/build
 playground/*/public/build
 playground/*/.cache
@@ -110,3 +108,6 @@ CLAUDE.local.md
 
 # Claude Code local settings (user-specific permissions)
 .claude/settings.local.json
+
+# Git worktrees
+.worktrees

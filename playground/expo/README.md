@@ -10,7 +10,6 @@
 In the project root, run:
 
 ```bash
-   pnpm run yalc:add 
    pnpm install
 ```
 ```bash

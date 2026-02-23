@@ -6,13 +6,11 @@ At repository level:
 
 ```bash
 pnpm build
-pnpm yalc:all
 ```
 
 At current directory level:
 
 ```bash
-pnpm yalc:add
 npm i
 ```
 
@@ -25,9 +23,6 @@ yarn dev
 ```
 
 This starts your app in development mode, rebuilding assets on file changes.
-
-To get the latest unpublished changes from the `packages` (if they are not auto updated) use `pnpm yalc:all` in repository level or `yalc push --replace` from the updated package
-after an `pnpm build` is being executed.
 
 ## Getting Started
 
