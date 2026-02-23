@@ -1,12 +1,12 @@
 import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { mockJwtPayload, mockJwks, mockM2MJwtPayload, signingJwks } from '../../fixtures';
+import { mockJwks, mockJwtPayload, mockM2MJwtPayload, signingJwks } from '../../fixtures';
 import { signJwt } from '../../jwt/signJwt';
 import { server, validateHeaders } from '../../mock-server';
-import { buildRequest } from '../request';
-import { createBackendApiClient } from '../factory';
 import { M2MTokenApi } from '../endpoints/M2MTokenApi';
+import { createBackendApiClient } from '../factory';
+import { buildRequest } from '../request';
 
 describe('M2MToken', () => {
   const m2mId = 'mt_xxxxx';

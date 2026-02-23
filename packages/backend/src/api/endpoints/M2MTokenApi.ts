@@ -62,6 +62,11 @@ type VerifyM2MTokenParams = {
 export class M2MTokenApi extends AbstractAPI {
   #verifyOptions: JwtMachineVerifyOptions;
 
+  /**
+   * @param verifyOptions - JWT verification options (secretKey, apiUrl, etc.).
+   * Passed explicitly because BuildRequestOptions are captured inside the buildRequest closure
+   * and are not accessible from the RequestFunction itself.
+   */
   constructor(request: RequestFunction, verifyOptions: JwtMachineVerifyOptions = {}) {
     super(request);
     this.#verifyOptions = verifyOptions;
