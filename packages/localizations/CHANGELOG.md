@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.37.0
+
+### Minor Changes
+
+- Add support for displaying proration and account credits on payment attempts and statements. ([#7885](https://github.com/clerk/javascript/pull/7885)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.18
+
 ## 3.36.0
 
 ### Minor Changes
