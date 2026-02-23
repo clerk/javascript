@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.32.1
+
+### Patch Changes
+
+- Updates `OrganizationInvitationStatus` to include `expired` to match the API updates. ([#7909](https://github.com/clerk/javascript/pull/7909)) by [@austincalvelage](https://github.com/austincalvelage)
+
 ## 2.32.0
 
 ### Minor Changes
