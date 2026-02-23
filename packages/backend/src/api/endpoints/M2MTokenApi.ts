@@ -70,7 +70,7 @@ export class M2MTokenApi extends AbstractAPI {
   }
 
   async createToken(params?: CreateM2MTokenParams) {
-    const { claims = null, machineSecretKey, secondsUntilExpiration = null, tokenFormat } = params || {};
+    const { claims = null, machineSecretKey, secondsUntilExpiration = null, tokenFormat = 'opaque' } = params || {};
 
     const requestOptions = this.#createRequestOptions(
       {
@@ -79,8 +79,7 @@ export class M2MTokenApi extends AbstractAPI {
         bodyParams: {
           secondsUntilExpiration,
           claims,
-          // Only send tokenFormat if explicitly specified; BAPI defaults to 'opaque'
-          ...(tokenFormat !== undefined ? { tokenFormat } : {}),
+          tokenFormat,
         },
       },
       machineSecretKey,
