@@ -124,7 +124,7 @@ describe('get-safe-env', () => {
       expect(env.sk).toBe('sk_from_cf_workers');
     });
 
-    it('prefers locals.runtime.env over cloudflareEnv', async () => {
+    it('prefers cloudflareEnv over locals.runtime.env', async () => {
       vi.doMock('cloudflare:workers', () => ({
         env: { CLERK_SECRET_KEY: 'sk_from_cf_workers' },
       }));
@@ -134,7 +134,7 @@ describe('get-safe-env', () => {
 
       const locals = { runtime: { env: { CLERK_SECRET_KEY: 'sk_from_runtime' } } };
       const env = getSafeEnv({ locals } as any);
-      expect(env.sk).toBe('sk_from_runtime');
+      expect(env.sk).toBe('sk_from_cf_workers');
     });
   });
 });

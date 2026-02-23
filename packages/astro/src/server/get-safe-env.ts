@@ -38,6 +38,13 @@ async function initCloudflareEnv(): Promise<void> {
 function getContextEnvVar(envVarName: keyof InternalEnv, contextOrLocals: ContextOrLocals): string | undefined {
   const locals = 'locals' in contextOrLocals ? contextOrLocals.locals : contextOrLocals;
 
+  // Astro v6+ Cloudflare adapter: env from cloudflare:workers
+  // Checked first to avoid the expensive try/catch on locals.runtime.env,
+  // which throws on every call in Astro v6 Cloudflare environments.
+  if (cloudflareEnv) {
+    return cloudflareEnv[envVarName];
+  }
+
   // Astro v4/v5 Cloudflare adapter: env is on locals.runtime.env
   try {
     if (locals?.runtime?.env) {
@@ -45,11 +52,6 @@ function getContextEnvVar(envVarName: keyof InternalEnv, contextOrLocals: Contex
     }
   } catch {
     // Astro v6 Cloudflare adapter throws when accessing locals.runtime.env
-  }
-
-  // Astro v6 Cloudflare adapter: env from cloudflare:workers
-  if (cloudflareEnv) {
-    return cloudflareEnv[envVarName];
   }
 
   // Prefer process.env for runtime environments (e.g., Node.js adapter)
