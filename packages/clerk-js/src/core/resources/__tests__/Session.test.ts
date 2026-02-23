@@ -261,8 +261,6 @@ describe('Session', () => {
 
     describe('with offline browser and network failure', () => {
       beforeEach(() => {
-        // Use real timers for offline tests to avoid unhandled rejection issues with retry logic
-        vi.useRealTimers();
         Object.defineProperty(window.navigator, 'onLine', {
           writable: true,
           value: false,
@@ -274,10 +272,9 @@ describe('Session', () => {
           writable: true,
           value: true,
         });
-        vi.useFakeTimers();
       });
 
-      it('throws ClerkOfflineError when offline', async () => {
+      it('throws ClerkOfflineError after retries when offline', async () => {
         const session = new Session({
           status: 'active',
           id: 'session_1',
@@ -292,15 +289,15 @@ describe('Session', () => {
         mockNetworkFailedFetch();
         BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
 
-        try {
-          await session.getToken({ skipCache: true });
-          expect.fail('Expected ClerkOfflineError to be thrown');
-        } catch (error) {
-          expect(ClerkOfflineError.is(error)).toBe(true);
-        }
+        const errorPromise = session.getToken({ skipCache: true }).catch(e => e);
+
+        await vi.advanceTimersByTimeAsync(60_000);
+
+        const error = await errorPromise;
+        expect(ClerkOfflineError.is(error)).toBe(true);
       });
 
-      it('throws ClerkOfflineError after fetch fails while offline', async () => {
+      it('retries 3 times before throwing when offline', async () => {
         const session = new Session({
           status: 'active',
           id: 'session_1',
@@ -315,10 +312,39 @@ describe('Session', () => {
         mockNetworkFailedFetch();
         BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
 
-        await expect(session.getToken({ skipCache: true })).rejects.toThrow(ClerkOfflineError);
+        const errorPromise = session.getToken({ skipCache: true }).catch(e => e);
 
-        // Fetch should have been called at least once
-        expect(global.fetch).toHaveBeenCalled();
+        await vi.advanceTimersByTimeAsync(60_000);
+
+        await errorPromise;
+
+        expect(global.fetch).toHaveBeenCalledTimes(4);
+      });
+
+      it('does not emit token:update with an empty token when offline', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        mockNetworkFailedFetch();
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        const errorPromise = session.getToken({ skipCache: true }).catch(e => e);
+        await vi.advanceTimersByTimeAsync(60_000);
+        await errorPromise;
+
+        const emptyTokenUpdates = dispatchSpy.mock.calls.filter(
+          (call: unknown[]) =>
+            call[0] === 'token:update' && !(call[1] as { token: { getRawString(): string } })?.token?.getRawString(),
+        );
+        expect(emptyTokenUpdates).toHaveLength(0);
       });
     });
 
@@ -586,6 +612,48 @@ describe('Session', () => {
         const freshToken = await session.getToken();
         expect(freshToken).toEqual(newMockJwt);
         expect(requestSpy).not.toHaveBeenCalled();
+      });
+
+      it('does not emit token:update with an empty token when background refresh fires while offline', async () => {
+        BaseResource.clerk = clerkMock();
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        await Promise.resolve();
+        requestSpy.mockClear();
+        dispatchSpy.mockClear();
+
+        // Go offline before the refresh timer fires
+        Object.defineProperty(window.navigator, 'onLine', { writable: true, value: false });
+        mockNetworkFailedFetch();
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        // Advance to trigger the refresh timer (~43s) and let the refresh complete
+        await vi.advanceTimersByTimeAsync(44 * 1000);
+
+        const emptyTokenUpdates = dispatchSpy.mock.calls.filter(
+          (call: unknown[]) =>
+            call[0] === 'token:update' && !(call[1] as { token: { getRawString(): string } })?.token?.getRawString(),
+        );
+        expect(emptyTokenUpdates).toHaveLength(0);
+
+        // Come back online and restore mock
+        Object.defineProperty(window.navigator, 'onLine', { writable: true, value: true });
+        BaseResource.clerk = clerkMock();
+
+        const token = await session.getToken();
+        expect(token).toEqual(mockJwt);
       });
 
       it('does not make API call when token has plenty of time remaining', async () => {
