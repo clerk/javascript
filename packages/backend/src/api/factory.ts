@@ -83,6 +83,10 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
         requireSecretKey: false,
         useMachineSecretKey: true,
       }),
+      {
+        secretKey: options.secretKey,
+        apiUrl: options.apiUrl,
+      },
     ),
     oauthApplications: new OAuthApplicationsApi(request),
     organizations: new OrganizationAPI(request),

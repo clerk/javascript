@@ -1,8 +1,12 @@
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { mockJwtPayload, mockJwks, mockM2MJwtPayload, signingJwks } from '../../fixtures';
+import { signJwt } from '../../jwt/signJwt';
 import { server, validateHeaders } from '../../mock-server';
+import { buildRequest } from '../request';
 import { createBackendApiClient } from '../factory';
+import { M2MTokenApi } from '../endpoints/M2MTokenApi';
 
 describe('M2MToken', () => {
   const m2mId = 'mt_xxxxx';
@@ -404,6 +408,72 @@ describe('M2MToken', () => {
         .catch(err => err);
 
       expect(errResponse.status).toBe(401);
+    });
+  });
+
+  async function createSignedM2MJwt(payload = mockM2MJwtPayload) {
+    const { data } = await signJwt(payload, signingJwks, {
+      algorithm: 'RS256',
+      header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+    });
+    return data!;
+  }
+
+  describe('verify — JWT format', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(mockJwtPayload.iat * 1000));
+    });
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('verifies a JWT M2M token using secretKey (JWKS lookup)', async () => {
+      const m2mApi = new M2MTokenApi(
+        buildRequest({ apiUrl: 'https://api.clerk.test', skipApiVersionInUrl: true, requireSecretKey: false }),
+        { secretKey: 'sk_test_xxxxx', apiUrl: 'https://api.clerk.test', skipJwksCache: true },
+      );
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => HttpResponse.json(mockJwks)),
+        ),
+      );
+
+      const jwtToken = await createSignedM2MJwt();
+      const result = await m2mApi.verify({ token: jwtToken });
+
+      expect(result.id).toBe('mt_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE');
+      expect(result.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
+      expect(result.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+    });
+
+    it('throws when JWT signature cannot be verified', async () => {
+      const m2mApi = new M2MTokenApi(
+        buildRequest({ apiUrl: 'https://api.clerk.test', skipApiVersionInUrl: true, requireSecretKey: false }),
+        { secretKey: 'sk_test_xxxxx', apiUrl: 'https://api.clerk.test', skipJwksCache: true },
+      );
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => HttpResponse.json({ keys: [] })),
+        ),
+      );
+
+      const jwtToken = await createSignedM2MJwt();
+      await expect(m2mApi.verify({ token: jwtToken })).rejects.toThrow();
+    });
+
+    it('throws when no secretKey or jwtKey is provided', async () => {
+      const m2mApi = new M2MTokenApi(
+        buildRequest({ apiUrl: 'https://api.clerk.test', skipApiVersionInUrl: true, requireSecretKey: false }),
+        { apiUrl: 'https://api.clerk.test' },
+      );
+
+      const jwtToken = await createSignedM2MJwt();
+      await expect(m2mApi.verify({ token: jwtToken })).rejects.toThrow('Failed to resolve JWK during verification');
     });
   });
 });

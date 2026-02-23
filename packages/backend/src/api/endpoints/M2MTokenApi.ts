@@ -1,7 +1,13 @@
 import { joinPaths } from '../../util/path';
 import { deprecated } from '../../util/shared';
-import type { ClerkBackendApiRequestOptions } from '../request';
-import type { M2MToken } from '../resources/M2MToken';
+import { MachineTokenVerificationError, MachineTokenVerificationErrorCode } from '../../errors';
+import { decodeJwt } from '../../jwt/verifyJwt';
+import type { JwtMachineVerifyOptions } from '../../jwt/verifyMachineJwt';
+import { verifyDecodedJwtMachineToken } from '../../jwt/verifyMachineJwt';
+import { isJwtFormat } from '../../tokens/machine';
+import { TokenType } from '../../tokens/tokenTypes';
+import type { ClerkBackendApiRequestOptions, RequestFunction } from '../request';
+import { M2MToken } from '../resources/M2MToken';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/m2m_tokens';
@@ -55,6 +61,13 @@ type VerifyM2MTokenParams = {
 };
 
 export class M2MTokenApi extends AbstractAPI {
+  #verifyOptions: JwtMachineVerifyOptions;
+
+  constructor(request: RequestFunction, verifyOptions: JwtMachineVerifyOptions = {}) {
+    super(request);
+    this.#verifyOptions = verifyOptions;
+  }
+
   #createRequestOptions(options: ClerkBackendApiRequestOptions, machineSecretKey?: string) {
     if (machineSecretKey) {
       return {
@@ -109,6 +122,34 @@ export class M2MTokenApi extends AbstractAPI {
 
   async verify(params: VerifyM2MTokenParams) {
     const { token, machineSecretKey } = params;
+
+    if (isJwtFormat(token)) {
+      let decodedResult;
+      try {
+        const { data, errors } = decodeJwt(token);
+        if (errors) throw errors[0];
+        decodedResult = data!;
+      } catch (e) {
+        throw new MachineTokenVerificationError({
+          code: MachineTokenVerificationErrorCode.TokenInvalid,
+          message: (e as Error).message,
+        });
+      }
+
+      const result = await verifyDecodedJwtMachineToken(
+        token,
+        decodedResult,
+        this.#verifyOptions,
+        TokenType.M2MToken,
+        (payload, skew) => M2MToken.fromJwtPayload(payload, skew),
+      );
+
+      if (result.errors) {
+        throw result.errors[0];
+      }
+
+      return result.data!;
+    }
 
     const requestOptions = this.#createRequestOptions(
       {
