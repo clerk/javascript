@@ -42,18 +42,7 @@ describe('getSafeEnv', () => {
     delete process.env.CLERK_SECRET_KEY;
   });
 
-  it('reads from import.meta.env when runtime.env is not available', () => {
-    vi.stubEnv('PUBLIC_CLERK_PUBLISHABLE_KEY', 'pk_from_meta');
-    vi.stubEnv('CLERK_SECRET_KEY', 'sk_from_meta');
-
-    const locals = createLocals({ runtime: { env: undefined as unknown as InternalEnv } });
-    const env = getSafeEnv(locals);
-
-    expect(env.pk).toBe('pk_from_meta');
-    expect(env.sk).toBe('sk_from_meta');
-  });
-
-  it('falls back to process.env when import.meta.env has no value', () => {
+  it('reads from process.env when runtime.env is not available', () => {
     process.env.PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_from_process';
     process.env.CLERK_SECRET_KEY = 'sk_from_process';
 
@@ -68,7 +57,6 @@ describe('getSafeEnv', () => {
   });
 
   it('returns undefined when no env source has the value', () => {
-    // Clean process.env so the fallback finds nothing
     delete process.env.PUBLIC_CLERK_PUBLISHABLE_KEY;
     delete process.env.CLERK_SECRET_KEY;
 
@@ -103,7 +91,7 @@ describe('getClientSafeEnv', () => {
     vi.unstubAllEnvs();
   });
 
-  it('falls back to process.env for publishableKey', () => {
+  it('reads from process.env for publishableKey', () => {
     process.env.PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_from_process';
 
     const locals = createLocals({ runtime: { env: undefined as unknown as InternalEnv } });
@@ -114,7 +102,7 @@ describe('getClientSafeEnv', () => {
     delete process.env.PUBLIC_CLERK_PUBLISHABLE_KEY;
   });
 
-  it('falls back to process.env for all public env vars', () => {
+  it('reads from process.env for all public env vars', () => {
     process.env.PUBLIC_CLERK_DOMAIN = 'test.domain.com';
     process.env.PUBLIC_CLERK_SIGN_IN_URL = '/sign-in';
     process.env.PUBLIC_CLERK_SIGN_UP_URL = '/sign-up';

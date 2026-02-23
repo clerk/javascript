@@ -1,5 +1,5 @@
 ---
-'@clerk/astro': patch
+'@clerk/astro': major
 ---
 
-Fix `PUBLIC_CLERK_PUBLISHABLE_KEY` not readable from runtime environment when using the Astro Node adapter. Added `process.env` as a fallback in `getContextEnvVar()` for cases where `import.meta.env.PUBLIC_*` is statically replaced at build time by Vite.
+Changed environment variable resolution order in `getContextEnvVar()` to prefer `process.env` over `import.meta.env`. Runtime environment variables (e.g., set in the Node.js adapter) now take precedence over build-time values statically replaced by Vite. This ensures that environment variables set at runtime behave as expected when deploying with the Astro Node adapter or similar runtime environments.
