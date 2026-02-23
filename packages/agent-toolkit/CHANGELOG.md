@@ -1,5 +1,12 @@
 # @clerk/agent-toolkit
 
+## 0.2.26
+
+### Patch Changes
+
+- Updated dependencies [[`c15c8a2`](https://github.com/clerk/javascript/commit/c15c8a2cd263bd777fd94fb4bdeae2cfb4a70aca)]:
+  - @clerk/backend@2.32.1
+
 ## 0.2.25
 
 ### Patch Changes
