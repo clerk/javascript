@@ -46,10 +46,6 @@ export class M2MToken {
     );
   }
 
-  /**
-   * Creates an M2MToken from a JWT payload.
-   * Maps standard JWT claims to token properties.
-   */
   static fromJwtPayload(payload: M2MJwtPayload, clockSkewInMs = 5000): M2MToken {
     return new M2MToken(
       payload.jti ?? '',

@@ -13,7 +13,7 @@ import {
 import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
-import { verifyDecodedJwtMachineToken } from '../jwt/verifyMachineJwt';
+import { verifyM2MJwt, verifyOAuthJwt } from '../jwt/verifyMachineJwt';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
 import { API_KEY_PREFIX, isJwtFormat, M2M_TOKEN_PREFIX, OAUTH_ACCESS_TOKEN_TYPES, OAUTH_TOKEN_PREFIX } from './machine';
@@ -256,21 +256,12 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
 
     // M2M JWT: sub starts with mch_
     if (decodedResult.payload.sub.startsWith('mch_')) {
-      return verifyDecodedJwtMachineToken(token, decodedResult, options, TokenType.M2MToken, (payload, skew) =>
-        M2MToken.fromJwtPayload(payload, skew),
-      );
+      return verifyM2MJwt(token, decodedResult, options);
     }
 
     // OAuth JWT: typ is at+jwt or application/at+jwt
     if (OAUTH_ACCESS_TOKEN_TYPES.includes(decodedResult.header.typ as string)) {
-      return verifyDecodedJwtMachineToken(
-        token,
-        decodedResult,
-        options,
-        TokenType.OAuthToken,
-        (payload, skew) => IdPOAuthAccessToken.fromJwtPayload(payload, skew),
-        OAUTH_ACCESS_TOKEN_TYPES,
-      );
+      return verifyOAuthJwt(token, decodedResult, options);
     }
 
     return {

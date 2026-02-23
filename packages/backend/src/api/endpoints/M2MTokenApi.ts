@@ -1,13 +1,12 @@
 import { MachineTokenVerificationError, MachineTokenVerificationErrorCode } from '../../errors';
 import { decodeJwt } from '../../jwt/verifyJwt';
 import type { JwtMachineVerifyOptions } from '../../jwt/verifyMachineJwt';
-import { verifyDecodedJwtMachineToken } from '../../jwt/verifyMachineJwt';
+import { verifyM2MJwt } from '../../jwt/verifyMachineJwt';
 import { isJwtFormat } from '../../tokens/machine';
-import { TokenType } from '../../tokens/tokenTypes';
 import { joinPaths } from '../../util/path';
 import { deprecated } from '../../util/shared';
 import type { ClerkBackendApiRequestOptions, RequestFunction } from '../request';
-import { M2MToken } from '../resources/M2MToken';
+import type { M2MToken } from '../resources/M2MToken';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/m2m_tokens';
@@ -83,7 +82,7 @@ export class M2MTokenApi extends AbstractAPI {
   }
 
   async createToken(params?: CreateM2MTokenParams) {
-    const { claims = null, machineSecretKey, secondsUntilExpiration = null, tokenFormat } = params || {};
+    const { claims = null, machineSecretKey, secondsUntilExpiration = null, tokenFormat = 'opaque' } = params || {};
 
     const requestOptions = this.#createRequestOptions(
       {
@@ -92,8 +91,7 @@ export class M2MTokenApi extends AbstractAPI {
         bodyParams: {
           secondsUntilExpiration,
           claims,
-          // Only send tokenFormat if explicitly specified; BAPI defaults to 'opaque'
-          ...(tokenFormat !== undefined ? { tokenFormat } : {}),
+          tokenFormat,
         },
       },
       machineSecretKey,
@@ -121,37 +119,33 @@ export class M2MTokenApi extends AbstractAPI {
     return this.request<M2MToken>(requestOptions);
   }
 
+  async #verifyJwtFormat(token: string): Promise<M2MToken> {
+    let decoded;
+    try {
+      const { data, errors } = decodeJwt(token);
+      if (errors) {
+        throw errors[0];
+      }
+      decoded = data;
+    } catch (e) {
+      throw new MachineTokenVerificationError({
+        code: MachineTokenVerificationErrorCode.TokenInvalid,
+        message: (e as Error).message,
+      });
+    }
+
+    const result = await verifyM2MJwt(token, decoded, this.#verifyOptions);
+    if (result.errors) {
+      throw result.errors[0];
+    }
+    return result.data;
+  }
+
   async verify(params: VerifyM2MTokenParams) {
     const { token, machineSecretKey } = params;
 
     if (isJwtFormat(token)) {
-      let decodedResult;
-      try {
-        const { data, errors } = decodeJwt(token);
-        if (errors) {
-          throw errors[0];
-        }
-        decodedResult = data!;
-      } catch (e) {
-        throw new MachineTokenVerificationError({
-          code: MachineTokenVerificationErrorCode.TokenInvalid,
-          message: (e as Error).message,
-        });
-      }
-
-      const result = await verifyDecodedJwtMachineToken(
-        token,
-        decodedResult,
-        this.#verifyOptions,
-        TokenType.M2MToken,
-        (payload, skew) => M2MToken.fromJwtPayload(payload, skew),
-      );
-
-      if (result.errors) {
-        throw result.errors[0];
-      }
-
-      return result.data;
+      return this.#verifyJwtFormat(token);
     }
 
     const requestOptions = this.#createRequestOptions(

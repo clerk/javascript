@@ -412,7 +412,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     const { tokenInHeader } = authenticateContext;
 
     // Reject machine JWTs (OAuth or M2M) that may appear in headers when expecting session tokens.
-    // These are valid Clerk-signed JWTs and will pass verifyToken() verification,
+    // These are valid Clerk-signed JWTs and will pass verify() verification,
     // but should not be accepted as session tokens.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (isMachineJwt(tokenInHeader!)) {
