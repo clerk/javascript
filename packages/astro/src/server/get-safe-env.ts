@@ -14,7 +14,14 @@ function getContextEnvVar(envVarName: keyof InternalEnv, contextOrLocals: Contex
     return locals.runtime.env[envVarName];
   }
 
-  return import.meta.env[envVarName];
+  // Prefer process.env for runtime environments (e.g., Node.js adapter)
+  // where import.meta.env.PUBLIC_* is statically replaced at build time by Vite.
+  // Runtime values should take precedence over build-time values.
+  if (typeof process !== 'undefined' && process.env?.[envVarName]) {
+    return process.env[envVarName];
+  }
+
+  return import.meta.env[envVarName] || undefined;
 }
 
 /**
