@@ -13,6 +13,7 @@ import {
 import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
+import { verifyDecodedJwtMachineToken } from '../jwt/verifyMachineJwt';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
 import { API_KEY_PREFIX, isJwtFormat, M2M_TOKEN_PREFIX, OAUTH_ACCESS_TOKEN_TYPES, OAUTH_TOKEN_PREFIX } from './machine';
@@ -117,7 +118,6 @@ export async function verifyToken(
     if (options.jwtKey) {
       key = loadClerkJwkFromPem({ kid, pem: options.jwtKey });
     } else if (options.secretKey) {
-      // Fetch JWKS from Backend API using the key
       key = await loadClerkJWKFromRemote({ ...options, kid });
     } else {
       return {
@@ -137,12 +137,6 @@ export async function verifyToken(
   }
 }
 
-/**
- * Handles errors from Clerk API responses for machine tokens
- * @param tokenType - The type of machine token
- * @param err - The error from the Clerk API
- * @param notFoundMessage - Custom message for 404 errors
- */
 function handleClerkAPIError(
   tokenType: MachineTokenType,
   err: any,
@@ -192,74 +186,6 @@ function handleClerkAPIError(
   };
 }
 
-/**
- * Verifies a pre-decoded machine JWT using the provided key resolution options.
- * Shared by M2M and OAuth JWT verification paths to eliminate duplication.
- */
-async function verifyDecodedJwtMachineToken<T>(
-  token: string,
-  decodedResult: Jwt,
-  options: VerifyTokenOptions,
-  tokenType: MachineTokenType,
-  fromPayload: (payload: JwtPayload, clockSkewInMs?: number) => T,
-  headerType?: string[],
-): Promise<MachineTokenReturnType<T, MachineTokenVerificationError>> {
-  const { kid } = decodedResult.header;
-  let key: JsonWebKey;
-
-  try {
-    if (options.jwtKey) {
-      key = loadClerkJwkFromPem({ kid, pem: options.jwtKey });
-    } else if (options.secretKey) {
-      key = await loadClerkJWKFromRemote({ ...options, kid });
-    } else {
-      return {
-        data: undefined,
-        tokenType,
-        errors: [
-          new MachineTokenVerificationError({
-            action: TokenVerificationErrorAction.SetClerkJWTKey,
-            message: 'Failed to resolve JWK during verification.',
-            code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
-          }),
-        ],
-      };
-    }
-
-    const { data: payload, errors: verifyErrors } = await verifyJwt(token, {
-      ...options,
-      key,
-      ...(headerType ? { headerType } : {}),
-    });
-
-    if (verifyErrors) {
-      return {
-        data: undefined,
-        tokenType,
-        errors: [
-          new MachineTokenVerificationError({
-            code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
-            message: verifyErrors[0].message,
-          }),
-        ],
-      };
-    }
-
-    return { data: fromPayload(payload, options.clockSkewInMs), tokenType, errors: undefined };
-  } catch (error) {
-    return {
-      data: undefined,
-      tokenType,
-      errors: [
-        new MachineTokenVerificationError({
-          code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
-          message: (error as Error).message,
-        }),
-      ],
-    };
-  }
-}
-
 async function verifyM2MToken(
   token: string,
   options: VerifyTokenOptions,
@@ -307,22 +233,12 @@ async function verifyAPIKey(
  * @param options - Options including secretKey for BAPI authorization
  */
 export async function verifyMachineAuthToken(token: string, options: VerifyTokenOptions) {
-  // JWT format: decode once and route based on claims
   if (isJwtFormat(token)) {
     let decodedResult: Jwt;
     try {
       const { data, errors: decodeErrors } = decodeJwt(token);
       if (decodeErrors) {
-        return {
-          data: undefined,
-          tokenType: TokenType.M2MToken,
-          errors: [
-            new MachineTokenVerificationError({
-              code: MachineTokenVerificationErrorCode.TokenInvalid,
-              message: decodeErrors[0].message,
-            }),
-          ],
-        } as MachineTokenReturnType<never, MachineTokenVerificationError>;
+        throw decodeErrors[0];
       }
       decodedResult = data;
     } catch (e) {
@@ -340,7 +256,9 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
 
     // M2M JWT: sub starts with mch_
     if (decodedResult.payload.sub.startsWith('mch_')) {
-      return verifyDecodedJwtMachineToken(token, decodedResult, options, TokenType.M2MToken, M2MToken.fromJwtPayload);
+      return verifyDecodedJwtMachineToken(token, decodedResult, options, TokenType.M2MToken, (payload, skew) =>
+        M2MToken.fromJwtPayload(payload, skew),
+      );
     }
 
     // OAuth JWT: typ is at+jwt or application/at+jwt
@@ -350,12 +268,11 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
         decodedResult,
         options,
         TokenType.OAuthToken,
-        IdPOAuthAccessToken.fromJwtPayload,
+        (payload, skew) => IdPOAuthAccessToken.fromJwtPayload(payload, skew),
         OAUTH_ACCESS_TOKEN_TYPES,
       );
     }
 
-    // JWT format but unrecognized machine token type
     return {
       data: undefined,
       tokenType: TokenType.OAuthToken,
