@@ -1,11 +1,11 @@
-import { joinPaths } from '../../util/path';
-import { deprecated } from '../../util/shared';
 import { MachineTokenVerificationError, MachineTokenVerificationErrorCode } from '../../errors';
 import { decodeJwt } from '../../jwt/verifyJwt';
 import type { JwtMachineVerifyOptions } from '../../jwt/verifyMachineJwt';
 import { verifyDecodedJwtMachineToken } from '../../jwt/verifyMachineJwt';
 import { isJwtFormat } from '../../tokens/machine';
 import { TokenType } from '../../tokens/tokenTypes';
+import { joinPaths } from '../../util/path';
+import { deprecated } from '../../util/shared';
 import type { ClerkBackendApiRequestOptions, RequestFunction } from '../request';
 import { M2MToken } from '../resources/M2MToken';
 import { AbstractAPI } from './AbstractApi';
@@ -83,7 +83,7 @@ export class M2MTokenApi extends AbstractAPI {
   }
 
   async createToken(params?: CreateM2MTokenParams) {
-    const { claims = null, machineSecretKey, secondsUntilExpiration = null, tokenFormat = 'opaque' } = params || {};
+    const { claims = null, machineSecretKey, secondsUntilExpiration = null, tokenFormat } = params || {};
 
     const requestOptions = this.#createRequestOptions(
       {
@@ -92,7 +92,8 @@ export class M2MTokenApi extends AbstractAPI {
         bodyParams: {
           secondsUntilExpiration,
           claims,
-          tokenFormat,
+          // Only send tokenFormat if explicitly specified; BAPI defaults to 'opaque'
+          ...(tokenFormat !== undefined ? { tokenFormat } : {}),
         },
       },
       machineSecretKey,
@@ -127,7 +128,9 @@ export class M2MTokenApi extends AbstractAPI {
       let decodedResult;
       try {
         const { data, errors } = decodeJwt(token);
-        if (errors) throw errors[0];
+        if (errors) {
+          throw errors[0];
+        }
         decodedResult = data!;
       } catch (e) {
         throw new MachineTokenVerificationError({
@@ -148,7 +151,7 @@ export class M2MTokenApi extends AbstractAPI {
         throw result.errors[0];
       }
 
-      return result.data!;
+      return result.data;
     }
 
     const requestOptions = this.#createRequestOptions(
