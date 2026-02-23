@@ -4,9 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockClerkProvider = vi.fn(({ children }: { children: React.ReactNode }) => <div>{children}</div>);
 
-vi.mock('@clerk/react', () => ({
-  ClerkProvider: (props: any) => mockClerkProvider(props),
+vi.mock('@clerk/react/internal', () => ({
+  InternalClerkProvider: (props: any) => mockClerkProvider(props),
 }));
+
+vi.mock('@clerk/react', () => ({}));
 
 vi.mock('react-router', () => ({
   useNavigate: () => vi.fn(),
@@ -17,11 +19,11 @@ vi.mock('react-router', () => ({
 vi.mock('../../utils/assert', () => ({
   assertPublishableKeyInSpaMode: vi.fn(),
   assertValidClerkState: vi.fn(),
-  isSpaMode: () => true,
+  isSpaMode: () => false,
   warnForSsr: vi.fn(),
 }));
 
-describe('ClerkProvider clerkUIUrl prop', () => {
+describe('ClerkProvider __internal_clerkUIUrl via clerkState', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -30,26 +32,32 @@ describe('ClerkProvider clerkUIUrl prop', () => {
     vi.clearAllMocks();
   });
 
-  it('passes clerkUIUrl prop to the underlying ClerkProvider', async () => {
+  it('passes __internal_clerkUIUrl from clerkState to the underlying ClerkProvider', async () => {
     const { ClerkProvider } = await import('../ReactRouterClerkProvider');
 
+    const clerkState = {
+      __type: 'clerkState' as const,
+      __internal_clerk_state: {
+        __clerk_ssr_state: undefined,
+        __publishableKey: 'pk_test_xxx',
+        __clerkUIUrl: 'https://custom.clerk.ui/ui.js',
+      },
+    };
+
     render(
-      <ClerkProvider
-        publishableKey='pk_test_xxx'
-        clerkUIUrl='https://custom.clerk.ui/ui.js'
-      >
+      <ClerkProvider loaderData={{ clerkState }}>
         <div>Test</div>
       </ClerkProvider>,
     );
 
     expect(mockClerkProvider).toHaveBeenCalledWith(
       expect.objectContaining({
-        clerkUIUrl: 'https://custom.clerk.ui/ui.js',
+        __internal_clerkUIUrl: 'https://custom.clerk.ui/ui.js',
       }),
     );
   });
 
-  it('passes clerkUIUrl as undefined when not provided', async () => {
+  it('passes __internal_clerkUIUrl as undefined when not in clerkState', async () => {
     const { ClerkProvider } = await import('../ReactRouterClerkProvider');
 
     render(
@@ -60,30 +68,36 @@ describe('ClerkProvider clerkUIUrl prop', () => {
 
     expect(mockClerkProvider).toHaveBeenCalledWith(
       expect.objectContaining({
-        clerkUIUrl: undefined,
+        __internal_clerkUIUrl: undefined,
       }),
     );
   });
 
-  it('passes clerkUIUrl alongside other props', async () => {
+  it('passes __internal_clerkUIUrl alongside other props from clerkState', async () => {
     const { ClerkProvider } = await import('../ReactRouterClerkProvider');
 
+    const clerkState = {
+      __type: 'clerkState' as const,
+      __internal_clerk_state: {
+        __clerk_ssr_state: undefined,
+        __publishableKey: 'pk_test_xxx',
+        __clerkUIUrl: 'https://custom.clerk.ui/ui.js',
+        __clerkJSUrl: 'https://custom.clerk.js/clerk.js',
+        __signInUrl: '/sign-in',
+        __signUpUrl: '/sign-up',
+      },
+    };
+
     render(
-      <ClerkProvider
-        publishableKey='pk_test_xxx'
-        clerkUIUrl='https://custom.clerk.ui/ui.js'
-        clerkJSUrl='https://custom.clerk.js/clerk.js'
-        signInUrl='/sign-in'
-        signUpUrl='/sign-up'
-      >
+      <ClerkProvider loaderData={{ clerkState }}>
         <div>Test</div>
       </ClerkProvider>,
     );
 
     expect(mockClerkProvider).toHaveBeenCalledWith(
       expect.objectContaining({
-        clerkUIUrl: 'https://custom.clerk.ui/ui.js',
-        clerkJSUrl: 'https://custom.clerk.js/clerk.js',
+        __internal_clerkUIUrl: 'https://custom.clerk.ui/ui.js',
+        __internal_clerkJSUrl: 'https://custom.clerk.js/clerk.js',
         signInUrl: '/sign-in',
         signUpUrl: '/sign-up',
       }),
