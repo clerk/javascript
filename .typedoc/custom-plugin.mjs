@@ -18,7 +18,8 @@ const FILES_WITHOUT_HEADINGS = [
   'verify-token-options.mdx',
   'public-organization-data-json.mdx',
   'organization-membership-public-user-data.mdx',
-  'use-checkout-return.mdx',
+  'checkout-signal-value.mdx',
+  'checkout-flow-resource.mdx',
   'use-checkout-options.mdx',
   'use-payment-element-return.mdx',
   'use-payment-methods-return.mdx',
@@ -90,7 +91,7 @@ const LINK_REPLACEMENTS = [
   ['billing-statement-totals', '/docs/reference/javascript/types/billing-statement-totals'],
   ['billing-payment-resource', '/docs/reference/javascript/types/billing-payment-resource'],
   ['deleted-object-resource', '/docs/reference/javascript/types/deleted-object-resource'],
-  ['use-checkout-return', '/docs/reference/hooks/use-checkout#returns'],
+  ['checkout-flow-resource', '/docs/reference/hooks/use-checkout#checkout-flow-resource'],
 ];
 
 /**

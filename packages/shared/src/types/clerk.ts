@@ -93,7 +93,7 @@ export type CheckoutErrors = {
 };
 
 /**
- * The value returned by the `useCheckout` hook.
+ * @interface
  */
 export interface CheckoutSignalValue {
   /**
