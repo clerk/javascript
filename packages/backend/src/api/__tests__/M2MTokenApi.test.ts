@@ -224,8 +224,8 @@ describe('M2MToken', () => {
           validateHeaders(async ({ request }) => {
             expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
             const body = (await request.json()) as Record<string, unknown>;
-            // tokenFormat should be undefined, BAPI will default to opaque
-            expect(body.token_format).toBeUndefined();
+            // tokenFormat defaults to 'opaque' when omitted
+            expect(body.token_format).toBe('opaque');
             return HttpResponse.json(mockM2MToken);
           }),
         ),

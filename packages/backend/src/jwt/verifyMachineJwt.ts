@@ -80,8 +80,6 @@ async function resolveKeyAndVerifyJwt(
 
 /**
  * Verifies a pre-decoded M2M JWT (identified by `sub` starting with `mch_`).
- * Delegates key resolution and signature verification to `resolveKeyAndVerifyJwt`,
- * then maps the verified payload to an `M2MToken` via `M2MToken.fromJwtPayload`.
  */
 export async function verifyM2MJwt(
   token: string,
@@ -103,8 +101,6 @@ export async function verifyM2MJwt(
 
 /**
  * Verifies a pre-decoded OAuth access token JWT (identified by `typ: at+jwt` or `application/at+jwt`).
- * Delegates key resolution and signature verification to `resolveKeyAndVerifyJwt` with the
- * allowed OAuth header types, then maps the verified payload to an `IdPOAuthAccessToken`.
  */
 export async function verifyOAuthJwt(
   token: string,
