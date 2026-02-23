@@ -1,8 +1,9 @@
+import type { InternalClerkScriptProps } from '@clerk/react/internal';
 import React from 'react';
 
 import type { NextClerkProviderProps } from '../types';
 
-type ClerkNextContextValue = Partial<Omit<NextClerkProviderProps, 'children'>>;
+type ClerkNextContextValue = Partial<Omit<NextClerkProviderProps, 'children'> & InternalClerkScriptProps>;
 
 const ClerkNextOptionsCtx = React.createContext<{ value: ClerkNextContextValue } | undefined>(undefined);
 ClerkNextOptionsCtx.displayName = 'ClerkNextOptionsCtx';
