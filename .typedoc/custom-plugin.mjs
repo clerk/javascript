@@ -56,7 +56,7 @@ const LINK_REPLACEMENTS = [
   ['organization-membership-resource', '/docs/reference/javascript/types/organization-membership'],
   ['organization-suggestion-resource', '/docs/reference/javascript/types/organization-suggestion'],
   ['organization-resource', '/docs/reference/javascript/organization'],
-  ['organization-domain-resource', '/docs/reference/javascript/types/organization-domain'],
+  ['organization-domain-resource', '/docs/reference/javascript/types/organization-domain-resource'],
   ['organization-invitation-resource', '/docs/reference/javascript/types/organization-invitation'],
   ['organization-membership-request-resource', '/docs/reference/javascript/types/organization-membership-request'],
   ['session', '/docs/reference/backend/types/backend-session'],
