@@ -691,7 +691,9 @@ export class Clerk implements ClerkInterface {
     }
     this.assertComponentsReady(this.#clerkUI);
     const component = 'SignIn';
-    void this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.openModal('signIn', props || {}));
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls => controls.openModal('signIn', props || {}));
 
     const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
     this.telemetry?.record(eventPrebuiltComponentOpened(component, props, additionalData));
@@ -865,7 +867,9 @@ export class Clerk implements ClerkInterface {
       return;
     }
     this.assertComponentsReady(this.#clerkUI);
-    void this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.openModal('signUp', props || {}));
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: 'SignUp' }))
+      .then(controls => controls.openModal('signUp', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('SignUp', props));
   };
@@ -884,7 +888,9 @@ export class Clerk implements ClerkInterface {
       return;
     }
     this.assertComponentsReady(this.#clerkUI);
-    void this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.openModal('userProfile', props || {}));
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: 'UserProfile' }))
+      .then(controls => controls.openModal('userProfile', props || {}));
 
     const additionalData = (props?.customPages?.length || 0) > 0 ? { customPages: true } : undefined;
     this.telemetry?.record(eventPrebuiltComponentOpened('UserProfile', props, additionalData));
@@ -920,7 +926,7 @@ export class Clerk implements ClerkInterface {
 
     this.assertComponentsReady(this.#clerkUI);
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: 'OrganizationProfile' }))
       .then(controls => controls.openModal('organizationProfile', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('OrganizationProfile', props));
@@ -947,7 +953,7 @@ export class Clerk implements ClerkInterface {
 
     this.assertComponentsReady(this.#clerkUI);
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: 'CreateOrganization' }))
       .then(controls => controls.openModal('createOrganization', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('CreateOrganization', props));
@@ -959,7 +965,9 @@ export class Clerk implements ClerkInterface {
 
   public openWaitlist = (props?: WaitlistProps): void => {
     this.assertComponentsReady(this.#clerkUI);
-    void this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.openModal('waitlist', props || {}));
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: 'Waitlist' }))
+      .then(controls => controls.openModal('waitlist', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('Waitlist', props));
   };
@@ -972,7 +980,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'SignIn';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -994,7 +1002,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'UserAvatar';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1015,7 +1023,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'SignUp';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1044,7 +1052,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'UserProfile';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1090,7 +1098,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OrganizationProfile';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1125,7 +1133,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'CreateOrganization';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1160,7 +1168,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OrganizationSwitcher';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1205,7 +1213,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OrganizationList';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1231,7 +1239,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'UserButton';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1257,7 +1265,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'Waitlist';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1286,7 +1294,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'PricingTable';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1307,7 +1315,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OAuthConsent';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1362,7 +1370,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'APIKeys';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1405,7 +1413,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'TaskChooseOrganization';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1427,7 +1435,7 @@ export class Clerk implements ClerkInterface {
 
     const component = 'TaskResetPassword';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1449,7 +1457,7 @@ export class Clerk implements ClerkInterface {
 
     const component = 'TaskSetupMFA';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,

@@ -1,3 +1,4 @@
+import type { InternalClerkScriptProps } from '@clerk/shared/types';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import type { AstroClerkIntegrationParams, InternalRuntimeOptions } from '../types';
@@ -25,7 +26,9 @@ function mergePrefetchUIConfig(paramPrefetchUI: AstroClerkIntegrationParams['pre
 /**
  * @internal
  */
-const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & InternalRuntimeOptions) => {
+const mergeEnvVarsWithParams = (
+  params?: AstroClerkIntegrationParams & InternalRuntimeOptions & InternalClerkScriptProps,
+) => {
   const {
     signInUrl: paramSignIn,
     signUpUrl: paramSignUp,
@@ -34,10 +37,10 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & InternalR
     domain: paramDomain,
     publishableKey: paramPublishableKey,
     telemetry: paramTelemetry,
-    clerkJSUrl: paramClerkJSUrl,
-    clerkJSVersion: paramClerkJSVersion,
-    clerkUIUrl: paramClerkUIUrl,
-    clerkUIVersion: paramClerkUIVersion,
+    __internal_clerkJSUrl: paramClerkJSUrl,
+    __internal_clerkJSVersion: paramClerkJSVersion,
+    __internal_clerkUIUrl: paramClerkUIUrl,
+    __internal_clerkUIVersion: paramClerkUIVersion,
     prefetchUI: paramPrefetchUI,
     ...rest
   } = params || {};
@@ -53,10 +56,10 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & InternalR
     // In keyless mode, use server-injected publishableKey from params
     publishableKey:
       paramPublishableKey || internalOptions?.publishableKey || import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '',
-    clerkJSUrl: paramClerkJSUrl || import.meta.env.PUBLIC_CLERK_JS_URL,
-    clerkJSVersion: paramClerkJSVersion || import.meta.env.PUBLIC_CLERK_JS_VERSION,
-    clerkUIUrl: paramClerkUIUrl || import.meta.env.PUBLIC_CLERK_UI_URL,
-    clerkUIVersion: paramClerkUIVersion || import.meta.env.PUBLIC_CLERK_UI_VERSION,
+    __internal_clerkJSUrl: paramClerkJSUrl || import.meta.env.PUBLIC_CLERK_JS_URL,
+    __internal_clerkJSVersion: paramClerkJSVersion || import.meta.env.PUBLIC_CLERK_JS_VERSION,
+    __internal_clerkUIUrl: paramClerkUIUrl || import.meta.env.PUBLIC_CLERK_UI_URL,
+    __internal_clerkUIVersion: paramClerkUIVersion || import.meta.env.PUBLIC_CLERK_UI_VERSION,
     prefetchUI: mergePrefetchUIConfig(paramPrefetchUI),
     telemetry: paramTelemetry || {
       disabled: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DISABLED),
