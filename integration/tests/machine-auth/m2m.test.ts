@@ -187,6 +187,7 @@ test.describe('machine-to-machine auth @machine', () => {
     });
     expect(res.status()).toBe(200);
     expect(await res.text()).toBe('Protected response ' + emailServer.id);
-    await client.m2m.revokeToken({ m2mTokenId: jwtToken.id });
+    // JWT-format tokens are self-contained and not stored in BAPI, so revocation
+    // is not applicable — they expire naturally via the exp claim.
   });
 });
