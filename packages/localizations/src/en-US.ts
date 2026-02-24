@@ -148,6 +148,7 @@ export const enUS: LocalizationResource = {
         upToSeats: 'Up to {{endsAfterBlock}} seats',
         perSeat: '{{feePerBlockAmount}}/{{periodAbbreviation}} per seat',
         additionalSeats: '({{additionalTierFeePerBlockAmount}}/{{periodAbbreviation}} for additional)',
+        unlimitedSeats: 'Unlimited seats',
         tooltip: {
           freeForUpToSeats: 'Free for up to {{endsAfterBlock}} seats.',
           additionalSeatsEach: 'Additional seats are {{feePerBlockAmount}}/{{period}} each.',

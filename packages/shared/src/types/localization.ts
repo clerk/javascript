@@ -264,6 +264,7 @@ export type __internal_LocalizationResource = {
         upToSeats: LocalizationValue<'endsAfterBlock'>;
         perSeat: LocalizationValue<'feePerBlockAmount' | 'periodAbbreviation'>;
         additionalSeats: LocalizationValue<'additionalTierFeePerBlockAmount' | 'periodAbbreviation'>;
+        unlimitedSeats: LocalizationValue;
         tooltip: {
           freeForUpToSeats: LocalizationValue<'endsAfterBlock'>;
           additionalSeatsEach: LocalizationValue<'feePerBlockAmount' | 'period'>;

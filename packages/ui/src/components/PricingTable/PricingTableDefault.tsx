@@ -591,6 +591,12 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
         };
       }
 
+      if (tier.feePerBlock.amount === 0 && tier.endsAfterBlock === null) {
+        return {
+          baseText: localizationKeys('billing.pricingTable.seatCost.unlimitedSeats'),
+        };
+      }
+
       return null;
     }
 

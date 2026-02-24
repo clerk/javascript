@@ -324,6 +324,40 @@ export function PricingTableSBB(): MockScenario {
             },
           ],
         },
+        {
+          object: 'commerce_plan',
+          id: 'plan_h_sbb',
+          name: 'Plan H',
+          fee: money(12989),
+          annual_fee: money(10000),
+          annual_monthly_fee: money(833),
+          description: null,
+          is_default: false,
+          is_recurring: true,
+          has_base_fee: true,
+          for_payer_type: 'org',
+          publicly_visible: true,
+          slug: 'plan-h-sbb',
+          avatar_url: null,
+          features: mockFeatures,
+          free_trial_enabled: false,
+          free_trial_days: null,
+          unit_prices: [
+            {
+              name: 'seat',
+              block_size: 1,
+              tiers: [
+                {
+                  id: 'tier_plan_h_seats_1',
+                  object: 'commerce_unit_price',
+                  starts_at_block: 1,
+                  ends_after_block: null,
+                  fee_per_block: money(0),
+                },
+              ],
+            },
+          ],
+        },
       ] as BillingPlanJSON[],
     });
   });
