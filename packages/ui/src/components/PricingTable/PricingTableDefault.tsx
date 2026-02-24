@@ -105,7 +105,6 @@ interface CardProps {
 }
 
 function Card(props: CardProps) {
-  console.log('Card', props);
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const clerk = useClerk();
   const { isSignedIn } = useSession();
