@@ -14,10 +14,15 @@ export type SessionCookieHandler = {
   get: () => string | undefined;
 };
 
-const getCookieAttributes = () => {
-  const sameSite = __BUILD_VARIANT_CHIPS__ ? 'None' : inCrossOriginIframe() || requiresSameSiteNone() ? 'None' : 'Lax';
+export type SessionCookieOptions = {
+  usePartitionedCookies: () => boolean;
+};
+
+const getCookieAttributes = (options: SessionCookieOptions) => {
+  const isPartitioned = options.usePartitionedCookies();
+  const sameSite = isPartitioned ? 'None' : inCrossOriginIframe() || requiresSameSiteNone() ? 'None' : 'Lax';
   const secure = getSecureAttribute(sameSite);
-  const partitioned = __BUILD_VARIANT_CHIPS__ && secure;
+  const partitioned = isPartitioned && secure;
   return { sameSite, secure, partitioned } as const;
 };
 
@@ -26,19 +31,19 @@ const getCookieAttributes = () => {
  * The cookie is used by the Clerk backend SDKs to identify
  * the authenticated user.
  */
-export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler => {
+export const createSessionCookie = (cookieSuffix: string, options: SessionCookieOptions): SessionCookieHandler => {
   const sessionCookie = createCookieHandler(SESSION_COOKIE_NAME);
   const suffixedSessionCookie = createCookieHandler(getSuffixedCookieName(SESSION_COOKIE_NAME, cookieSuffix));
 
   const remove = () => {
-    const attributes = getCookieAttributes();
+    const attributes = getCookieAttributes(options);
     sessionCookie.remove(attributes);
     suffixedSessionCookie.remove(attributes);
   };
 
   const set = (token: string) => {
     const expires = addYears(Date.now(), 1);
-    const { sameSite, secure, partitioned } = getCookieAttributes();
+    const { sameSite, secure, partitioned } = getCookieAttributes(options);
 
     // If setting Partitioned to true, remove the existing session cookies.
     // This is to avoid conflicts with the same cookie name without Partitioned attribute.
