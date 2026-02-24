@@ -207,7 +207,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
             <Text
               as='span'
               colorScheme='inherit'
-              localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__members', {
+              localizationKey={localizationKeys('organizationProfile.start.membershipSeatUsageLabel', {
                 count: memberships.count + (invitations?.count ?? 0),
                 limit: organizationSettings.maxAllowedMemberships,
               })}
