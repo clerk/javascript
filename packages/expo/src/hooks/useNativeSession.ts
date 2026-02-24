@@ -1,5 +1,7 @@
-import { Platform } from 'expo-modules-core';
 import { useCallback, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
+
+import NativeClerkModule from '../specs/NativeClerkModule';
 
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
@@ -23,16 +25,12 @@ interface NativeSessionRawResult {
   user?: NativeSessionData['user'];
 }
 
-// Get the native module (use optional require to avoid crash if not available)
-let ClerkExpo: {
-  getSession: () => Promise<NativeSessionRawResult | null>;
-} | null = null;
+// Safely get the native module
+let ClerkExpo: typeof NativeClerkModule | null = null;
 
 if (isNativeSupported) {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { requireNativeModule } = require('expo-modules-core');
-    ClerkExpo = requireNativeModule('ClerkExpo');
+    ClerkExpo = NativeClerkModule;
   } catch {
     // Native module not available - this is expected when expo plugin is not installed
   }
@@ -113,7 +111,7 @@ export function useNativeSession(): UseNativeSessionReturn {
 
     try {
       setIsLoading(true);
-      const result = await ClerkExpo.getSession();
+      const result = (await ClerkExpo.getSession()) as NativeSessionRawResult | null;
       // Normalize: iOS returns { sessionId }, Android returns { session: { id } }
       const id = result?.sessionId ?? result?.session?.id ?? null;
       setSessionId(id);

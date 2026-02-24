@@ -1,35 +1,21 @@
 import { useAuth, useClerk } from '@clerk/react';
-import { Platform, requireNativeViewManager } from 'expo-modules-core';
 import { useCallback, useEffect, useRef } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+
+import NativeClerkModule from '../specs/NativeClerkModule';
+import NativeClerkUserProfileView from '../specs/NativeClerkUserProfileView';
 
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
-// Get the native module for modal presentation and session operations
-let ClerkExpo: {
-  presentUserProfile: (options: { dismissable: boolean }) => Promise<{ session?: { id: string } } | null>;
-  signOut: () => Promise<void>;
-  getSession: () => Promise<{ session?: { id: string } } | null>;
-} | null = null;
+// Safely get the native module
+let ClerkExpo: typeof NativeClerkModule | null = null;
 if (isNativeSupported) {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { requireNativeModule } = require('expo-modules-core');
-    ClerkExpo = requireNativeModule('ClerkExpo');
+    ClerkExpo = NativeClerkModule;
   } catch {
-    // Native module not available
-  }
-}
-
-// Get the native view component for inline rendering
-let NativeUserProfileView: any = null;
-if (isNativeSupported) {
-  try {
-    NativeUserProfileView = requireNativeViewManager('ClerkExpo', 'ClerkUserProfileExpoView');
-  } catch {
-    NativeUserProfileView = null;
+    ClerkExpo = null;
   }
 }
 
@@ -135,6 +121,7 @@ export function UserProfileView({
     <ModalPresentation
       isDismissable={isDismissable}
       onSignOut={onSignOut}
+      onDismiss={onDismiss}
       style={style}
       {...props}
     />
@@ -146,15 +133,18 @@ export function UserProfileView({
 function ModalPresentation({
   isDismissable,
   onSignOut,
+  onDismiss,
   style,
   ...props
-}: Omit<UserProfileViewProps, 'presentation' | 'onDismiss'>) {
+}: Omit<UserProfileViewProps, 'presentation'>) {
   const clerk = useClerk();
   const { isSignedIn } = useAuth();
   const signOutTriggered = useRef(false);
 
   const onSignOutRef = useRef(onSignOut);
   onSignOutRef.current = onSignOut;
+  const onDismissRef = useRef(onDismiss);
+  onDismissRef.current = onDismiss;
   const clerkRef = useRef(clerk);
   clerkRef.current = clerk;
   const isSignedInRef = useRef(isSignedIn);
@@ -175,7 +165,7 @@ function ModalPresentation({
           dismissable: isDismissable ?? true,
         });
 
-        const sessionCheck = await ClerkExpo.getSession?.();
+        const sessionCheck = (await ClerkExpo.getSession?.()) as { session?: { id: string } } | null;
         const hasNativeSession = !!sessionCheck?.session;
 
         if (!hasNativeSession && !signOutTriggered.current) {
@@ -198,8 +188,9 @@ function ModalPresentation({
 
           onSignOutRef.current?.();
         }
-      } catch (err) {
-        console.error('[UserProfileView] Error:', err);
+      } catch {
+        // Modal was dismissed by the user
+        onDismissRef.current?.();
       }
     };
 
@@ -221,12 +212,7 @@ function ModalPresentation({
     );
   }
 
-  return (
-    <View
-      style={[styles.container, style]}
-      {...props}
-    />
-  );
+  return null;
 }
 
 // MARK: - Inline Presentation
@@ -241,7 +227,7 @@ function InlinePresentation({
   const signOutTriggered = useRef(false);
 
   const handleProfileEvent = useCallback(
-    async (event: { nativeEvent: { type: string; data: Record<string, any> } }) => {
+    async (event: { nativeEvent: { type: string; data: string } }) => {
       const { type } = event.nativeEvent;
 
       if (type === 'signedOut' && !signOutTriggered.current) {
@@ -269,7 +255,7 @@ function InlinePresentation({
     [clerk, onSignOut, onDismiss],
   );
 
-  if (!isNativeSupported || !NativeUserProfileView) {
+  if (!isNativeSupported || !NativeClerkUserProfileView) {
     return (
       <View style={[styles.container, style]}>
         <Text style={styles.text}>
@@ -282,7 +268,7 @@ function InlinePresentation({
   }
 
   return (
-    <NativeUserProfileView
+    <NativeClerkUserProfileView
       style={[styles.container, style]}
       isDismissable={isDismissable}
       onProfileEvent={handleProfileEvent}

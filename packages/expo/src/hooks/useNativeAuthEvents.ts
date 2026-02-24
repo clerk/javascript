@@ -1,15 +1,17 @@
-import { Platform, requireNativeModule } from 'expo-modules-core';
 import { useEffect, useState } from 'react';
+import { NativeEventEmitter, Platform } from 'react-native';
+
+import NativeClerkModule from '../specs/NativeClerkModule';
 
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
 // Get the native module for event listening
-let ClerkExpo: ReturnType<typeof requireNativeModule> | null = null;
+let ClerkExpo: typeof NativeClerkModule | null = null;
 
 if (isNativeSupported) {
   try {
-    ClerkExpo = requireNativeModule('ClerkExpo');
+    ClerkExpo = NativeClerkModule;
   } catch {
     // Native module not available - plugin not configured
     ClerkExpo = null;
@@ -76,15 +78,11 @@ export function useNativeAuthEvents(): UseNativeAuthEventsReturn {
       return;
     }
 
-    // Import EventEmitter dynamically to avoid issues when module isn't available
     let subscription: { remove: () => void } | null = null;
 
     try {
-      // expo-modules-core provides an EventEmitter class that wraps native module events
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { EventEmitter } = require('expo-modules-core');
-      console.log(`[useNativeAuthEvents] SETUP: Creating EventEmitter for ClerkExpo`);
-      const eventEmitter = new EventEmitter(ClerkExpo);
+      console.log(`[useNativeAuthEvents] SETUP: Creating NativeEventEmitter for ClerkExpo`);
+      const eventEmitter = new NativeEventEmitter(ClerkExpo as any);
 
       console.log(`[useNativeAuthEvents] LISTEN: Adding listener for 'onAuthStateChange' events`);
       subscription = eventEmitter.addListener('onAuthStateChange', (event: NativeAuthStateEvent) => {

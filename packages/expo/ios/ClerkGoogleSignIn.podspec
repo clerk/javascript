@@ -15,9 +15,10 @@ Pod::Spec.new do |s|
   s.source         = { :git => 'https://github.com/clerk/javascript.git' }
   s.static_framework = true
 
-  s.dependency 'ExpoModulesCore'
   s.dependency 'GoogleSignIn', '~> 9.0'
 
-  # Only include the Google Sign-In module file, not ClerkViewFactory.swift which uses `import ClerkKit` (SPM)
-  s.source_files = 'ClerkGoogleSignInModule.swift'
+  # Only include the Google Sign-In module files
+  s.source_files = 'ClerkGoogleSignInModule.swift', 'ClerkGoogleSignInModule.m'
+
+  install_modules_dependencies(s)
 end

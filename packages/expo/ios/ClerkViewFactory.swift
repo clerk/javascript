@@ -4,6 +4,7 @@
 
 import UIKit
 import SwiftUI
+import Security
 import ClerkKit
 import ClerkKitUI
 import ClerkExpo  // Import the pod to access ClerkViewFactoryProtocol
@@ -21,17 +22,107 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
   }
 
   @MainActor
-  public func configure(publishableKey: String) async throws {
+  public func configure(publishableKey: String, bearerToken: String? = nil) async throws {
+    // Sync JS SDK's client token to native keychain so both SDKs share the same client.
+    // This handles the case where the user signed in via JS SDK but the native SDK
+    // has no device token (e.g., after app reinstall or first launch).
+    if let token = bearerToken, !token.isEmpty {
+      Self.writeNativeDeviceTokenIfNeeded(token)
+    } else {
+      Self.syncJSTokenToNativeKeychainIfNeeded()
+    }
+
     Clerk.configure(publishableKey: publishableKey)
 
-    // configure() handles session restoration internally, but session may be
-    // populated asynchronously via Combine/ObservableObject pattern.
+    // Wait for Clerk to finish loading (cached data + API refresh).
+    // The static configure() fires off async refreshes; poll until loaded.
     for _ in 0..<30 {  // Wait up to 3 seconds
-      if Clerk.shared.session != nil {
+      if Clerk.shared.isLoaded && Clerk.shared.session != nil {
         return
       }
       try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
     }
+  }
+
+  /// Copies the JS SDK's client JWT from expo-secure-store to the native SDK's
+  /// keychain entry, but only if the native SDK doesn't already have a device token.
+  /// Both expo-secure-store and the native Clerk SDK use the iOS Keychain with the
+  /// bundle identifier as the service name, making cross-SDK token sharing possible.
+  private static func syncJSTokenToNativeKeychainIfNeeded() {
+    guard let service = Bundle.main.bundleIdentifier, !service.isEmpty else { return }
+
+    let jsTokenKey = "__clerk_client_jwt"
+    let nativeTokenKey = "clerkDeviceToken"
+
+    // Check if native SDK already has a device token — don't overwrite
+    let checkQuery: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: nativeTokenKey,
+      kSecReturnData as String: false,
+      kSecMatchLimit as String: kSecMatchLimitOne,
+    ]
+    if SecItemCopyMatching(checkQuery as CFDictionary, nil) == errSecSuccess {
+      return  // Native token exists, don't overwrite
+    }
+
+    // Read JS SDK's client JWT from keychain (stored by expo-secure-store)
+    var result: CFTypeRef?
+    let readQuery: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: jsTokenKey,
+      kSecReturnData as String: true,
+      kSecMatchLimit as String: kSecMatchLimitOne,
+    ]
+    guard SecItemCopyMatching(readQuery as CFDictionary, &result) == errSecSuccess,
+          let data = result as? Data,
+          let jsToken = String(data: data, encoding: .utf8),
+          !jsToken.isEmpty else {
+      return  // No JS token available
+    }
+
+    // Write JS token as native device token
+    guard let tokenData = jsToken.data(using: .utf8) else { return }
+    let writeQuery: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: nativeTokenKey,
+      kSecValueData as String: tokenData,
+      kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+    ]
+    SecItemAdd(writeQuery as CFDictionary, nil)
+  }
+
+  /// Writes the provided bearer token as the native SDK's device token,
+  /// but only if the native SDK doesn't already have one.
+  private static func writeNativeDeviceTokenIfNeeded(_ token: String) {
+    guard let service = Bundle.main.bundleIdentifier, !service.isEmpty else { return }
+
+    let nativeTokenKey = "clerkDeviceToken"
+
+    // Check if native SDK already has a device token — don't overwrite
+    let checkQuery: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: nativeTokenKey,
+      kSecReturnData as String: false,
+      kSecMatchLimit as String: kSecMatchLimitOne,
+    ]
+    if SecItemCopyMatching(checkQuery as CFDictionary, nil) == errSecSuccess {
+      return
+    }
+
+    // Write the provided token as native device token
+    guard let tokenData = token.data(using: .utf8) else { return }
+    let writeQuery: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: nativeTokenKey,
+      kSecValueData as String: tokenData,
+      kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+    ]
+    SecItemAdd(writeQuery as CFDictionary, nil)
   }
 
   public func createAuthViewController(
@@ -176,6 +267,13 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
     authEventTask?.cancel()
   }
 
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    if isBeingDismissed {
+      completeOnce(.failure(NSError(domain: "ClerkAuth", code: 3, userInfo: [NSLocalizedDescriptionKey: "Auth modal was dismissed"])))
+    }
+  }
+
   private func completeOnce(_ result: Result<[String: Any], Error>) {
     guard !completionCalled else { return }
     completionCalled = true
@@ -192,7 +290,7 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
             self.completeOnce(.success(["sessionId": sessionId, "type": "signIn"]))
             self.dismiss(animated: true)
           } else {
-            self.completeOnce(.failure(NSError(domain: "ClerkExpo", code: 4, userInfo: [NSLocalizedDescriptionKey: "Sign-in completed but no session was created"])))
+            self.completeOnce(.failure(NSError(domain: "ClerkAuth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Sign-in completed but no session ID was created"])))
             self.dismiss(animated: true)
           }
         case .signUpCompleted(let signUp):
@@ -200,16 +298,16 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
             self.completeOnce(.success(["sessionId": sessionId, "type": "signUp"]))
             self.dismiss(animated: true)
           } else {
-            self.completeOnce(.failure(NSError(domain: "ClerkExpo", code: 4, userInfo: [NSLocalizedDescriptionKey: "Sign-up completed but no session was created"])))
+            self.completeOnce(.failure(NSError(domain: "ClerkAuth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Sign-up completed but no session ID was created"])))
             self.dismiss(animated: true)
           }
         default:
           break
         }
       }
-      // Stream ended without a completion event
+      // Stream ended without an auth completion event
       guard let self = self else { return }
-      self.completeOnce(.failure(NSError(domain: "ClerkExpo", code: 5, userInfo: [NSLocalizedDescriptionKey: "Auth event stream ended unexpectedly"])))
+      self.completeOnce(.failure(NSError(domain: "ClerkAuth", code: 2, userInfo: [NSLocalizedDescriptionKey: "Auth event stream ended unexpectedly"])))
     }
   }
 }
@@ -247,6 +345,13 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
     authEventTask?.cancel()
   }
 
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    if isBeingDismissed {
+      completeOnce(.failure(NSError(domain: "ClerkProfile", code: 3, userInfo: [NSLocalizedDescriptionKey: "Profile modal was dismissed"])))
+    }
+  }
+
   private func completeOnce(_ result: Result<[String: Any], Error>) {
     guard !completionCalled else { return }
     completionCalled = true
@@ -267,7 +372,7 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
       }
       // Stream ended without a sign-out event
       guard let self = self else { return }
-      self.completeOnce(.failure(NSError(domain: "ClerkExpo", code: 5, userInfo: [NSLocalizedDescriptionKey: "Profile event stream ended unexpectedly"])))
+      self.completeOnce(.failure(NSError(domain: "ClerkProfile", code: 2, userInfo: [NSLocalizedDescriptionKey: "Profile event stream ended unexpectedly"])))
     }
   }
 }

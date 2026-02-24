@@ -71,8 +71,8 @@ android {
 // Note: kotlin-stdlib exclusions are handled in the clerk-android-ui dependency declaration
 
 dependencies {
-  // Expo modules core
-  implementation project(':expo-modules-core')
+  // React Native
+  implementation 'com.facebook.react:react-native:+'
 
   // Credential Manager for Google Sign-In with nonce support
   implementation "androidx.credentials:credentials:$credentialsVersion"

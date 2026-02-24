@@ -3,6 +3,7 @@ package expo.modules.clerk
 import android.content.Context
 import android.content.ContextWrapper
 import android.util.Log
+import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -23,17 +24,15 @@ import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.clerk.api.Clerk
 import com.clerk.ui.auth.AuthView
-import expo.modules.kotlin.AppContext
-import expo.modules.kotlin.viewevent.EventDispatcher
-import expo.modules.kotlin.views.ExpoView
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.ReactContext
+import com.facebook.react.uimanager.events.RCTEventEmitter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 private const val TAG = "ClerkAuthExpoView"
 
-class ClerkAuthExpoView(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
-  private val onAuthEvent by EventDispatcher()
-
+class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
   var mode: String = "signInOrUp"
   var isDismissable: Boolean = true
 
@@ -51,7 +50,6 @@ class ClerkAuthExpoView(context: Context, appContext: AppContext) : ExpoView(con
       // Create an explicit Recomposer to bypass windowRecomposer resolution.
       // In Compose 1.7+, windowRecomposer looks at rootView which may not have
       // lifecycle owners in React Native Fabric's detached view trees.
-      // AndroidUiDispatcher.Main provides both a dispatcher and MonotonicFrameClock.
       val recomposerContext = AndroidUiDispatcher.Main
       val newRecomposer = Recomposer(recomposerContext)
       recomposer = newRecomposer
@@ -85,12 +83,9 @@ class ClerkAuthExpoView(context: Context, appContext: AppContext) : ExpoView(con
         val currentSession = session
         if (currentSession != null && initialSessionId == null) {
           Log.d(TAG, "Auth completed - session: ${currentSession.id}")
-          onAuthEvent(mapOf(
-            "type" to "signInCompleted",
-            "data" to mapOf(
-              "sessionId" to currentSession.id,
-              "type" to "signIn"
-            )
+          sendEvent("signInCompleted", mapOf(
+            "sessionId" to currentSession.id,
+            "type" to "signIn"
           ))
         }
       }
@@ -123,6 +118,22 @@ class ClerkAuthExpoView(context: Context, appContext: AppContext) : ExpoView(con
         content()
       }
     }
+  }
+
+  private fun sendEvent(type: String, data: Map<String, Any?>) {
+    val reactContext = context as? ReactContext ?: return
+    val eventData = Arguments.createMap().apply {
+      putString("type", type)
+      // Serialize data as JSON string for codegen event
+      val jsonString = try {
+        org.json.JSONObject(data).toString()
+      } catch (e: Exception) {
+        "{}"
+      }
+      putString("data", jsonString)
+    }
+    reactContext.getJSModule(RCTEventEmitter::class.java)
+      .receiveEvent(id, "onAuthEvent", eventData)
   }
 
   companion object {

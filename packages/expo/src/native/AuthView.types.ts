@@ -70,6 +70,14 @@ export interface AuthViewProps {
   onError?: (error: Error) => void;
 
   /**
+   * Callback fired when the modal is dismissed without completing authentication.
+   *
+   * Only applies to `presentation="modal"`. Use this to update your UI state
+   * (e.g., navigate back or show a landing screen).
+   */
+  onDismiss?: () => void;
+
+  /**
    * Style applied to the container view (inline mode only).
    */
   style?: StyleProp<ViewStyle>;

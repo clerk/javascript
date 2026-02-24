@@ -1,28 +1,18 @@
 import { useClerk } from '@clerk/react';
-import { Platform, requireNativeViewManager } from 'expo-modules-core';
 import { useCallback, useRef } from 'react';
-import { type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { type StyleProp, StyleSheet, Text, View, type ViewStyle, Platform } from 'react-native';
+
+import NativeClerkModule from '../specs/NativeClerkModule';
+import NativeClerkUserProfileView from '../specs/NativeClerkUserProfileView';
 
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
-// Get the native view component for inline rendering
-let NativeUserProfileView: any = null;
+// Safely get the native module
+let ClerkExpo: typeof NativeClerkModule | null = null;
 if (isNativeSupported) {
   try {
-    NativeUserProfileView = requireNativeViewManager('ClerkExpo', 'ClerkUserProfileExpoView');
-  } catch {
-    NativeUserProfileView = null;
-  }
-}
-
-// Get the native module for session operations
-let ClerkExpo: { signOut(): Promise<void>; getSession(): Promise<any> } | null = null;
-if (isNativeSupported) {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { requireNativeModule } = require('expo-modules-core');
-    ClerkExpo = requireNativeModule('ClerkExpo');
+    ClerkExpo = NativeClerkModule;
   } catch {
     ClerkExpo = null;
   }
@@ -82,7 +72,7 @@ export function InlineUserProfileView({
   const signOutTriggered = useRef(false);
 
   const handleProfileEvent = useCallback(
-    async (event: { nativeEvent: { type: string; data: Record<string, any> } }) => {
+    async (event: { nativeEvent: { type: string; data: string } }) => {
       const { type } = event.nativeEvent;
 
       if (type === 'signedOut' && !signOutTriggered.current) {
@@ -112,7 +102,7 @@ export function InlineUserProfileView({
     [clerk, onSignOut, onDismiss],
   );
 
-  if (!isNativeSupported || !NativeUserProfileView) {
+  if (!isNativeSupported || !NativeClerkUserProfileView) {
     return (
       <View style={[styles.container, style]}>
         <Text style={styles.text}>
@@ -125,7 +115,7 @@ export function InlineUserProfileView({
   }
 
   return (
-    <NativeUserProfileView
+    <NativeClerkUserProfileView
       style={[styles.container, style]}
       isDismissable={isDismissable}
       onProfileEvent={handleProfileEvent}

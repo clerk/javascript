@@ -1,8 +1,9 @@
 import { useClerk, useUser } from '@clerk/react';
-import { Platform } from 'expo-modules-core';
 import { useEffect, useState } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import NativeClerkModule from '../specs/NativeClerkModule';
 
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
@@ -14,19 +15,13 @@ interface NativeSessionResult {
   user?: { id: string; firstName?: string; lastName?: string; imageUrl?: string; primaryEmailAddress?: string };
 }
 
-// Get the native module for modal presentation (use optional require to avoid crash if not available)
-let ClerkExpo: {
-  getSession: () => Promise<NativeSessionResult | null>;
-  presentUserProfile: (options: { dismissable: boolean }) => Promise<NativeSessionResult | null>;
-  signOut: () => Promise<void>;
-} | null = null;
+// Safely get the native module
+let ClerkExpo: typeof NativeClerkModule | null = null;
 if (isNativeSupported) {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { requireNativeModule } = require('expo-modules-core');
-    ClerkExpo = requireNativeModule('ClerkExpo');
+    ClerkExpo = NativeClerkModule;
   } catch {
-    // Native module not available
+    ClerkExpo = null;
   }
 }
 
@@ -151,7 +146,7 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
       }
 
       try {
-        const result = await ClerkExpo.getSession();
+        const result = (await ClerkExpo.getSession()) as NativeSessionResult | null;
         const hasSession = !!(result?.sessionId || result?.session?.id);
         if (hasSession && result?.user) {
           setNativeUser(result.user);
@@ -194,7 +189,7 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
 
       // Check if native session still exists after modal closes
       // If session is null, user signed out from the native UI
-      const sessionCheck = await ClerkExpo.getSession?.();
+      const sessionCheck = (await ClerkExpo.getSession?.()) as NativeSessionResult | null;
       const hasNativeSession = !!(sessionCheck?.sessionId || sessionCheck?.session?.id);
 
       if (!hasNativeSession) {
@@ -227,8 +222,8 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
 
         onSignOut?.();
       }
-    } catch (err) {
-      console.error('[UserButton] Error presenting profile:', err);
+    } catch {
+      // Modal was dismissed by the user — not an error
     }
   };
 

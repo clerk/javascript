@@ -29,15 +29,17 @@ Pod::Spec.new do |s|
   s.source         = { git: 'https://github.com/clerk/javascript' }
   s.static_framework = true
 
-  s.dependency 'ExpoModulesCore'
-
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     'SWIFT_COMPILATION_MODE' => 'wholemodule'
   }
 
-  # Only include the minimal module file in the pod.
+  # Only include the module files in the pod (both Swift and ObjC bridges).
   # ClerkViewFactory.swift (with views) is injected into the app target by the config plugin
   # because it uses `import ClerkKit` which is only available via SPM in the app target.
-  s.source_files = "ClerkExpoModule.swift"
+  s.source_files = "ClerkExpoModule.swift", "ClerkExpoModule.m",
+                   "ClerkAuthViewManager.swift", "ClerkAuthViewManager.m",
+                   "ClerkUserProfileViewManager.swift", "ClerkUserProfileViewManager.m"
+
+  install_modules_dependencies(s)
 end

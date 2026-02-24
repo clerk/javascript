@@ -9,6 +9,7 @@ import { Platform } from 'react-native';
 
 import type { TokenCache } from '../cache/types';
 import { useNativeAuthEvents } from '../hooks/useNativeAuthEvents';
+import NativeClerkModule from '../specs/NativeClerkModule';
 import { isNative, isWeb } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
@@ -102,9 +103,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
 
       const configureNativeClerk = async () => {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { requireNativeModule } = require('expo-modules-core');
-          const ClerkExpo = requireNativeModule('ClerkExpo');
+          const ClerkExpo = NativeClerkModule;
 
           if (ClerkExpo?.configure) {
             // Read the JS SDK's client JWT to sync with the native SDK
@@ -132,7 +131,10 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
                 return;
               }
               if (ClerkExpo?.getSession) {
-                const nativeSession = await ClerkExpo.getSession();
+                const nativeSession = (await ClerkExpo.getSession()) as {
+                  sessionId?: string;
+                  session?: { id: string };
+                } | null;
                 // Normalize: iOS returns { sessionId }, Android returns { session: { id } }
                 sessionId = nativeSession?.sessionId ?? nativeSession?.session?.id ?? null;
                 if (sessionId) {
@@ -195,7 +197,10 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
             }
           }
         } catch (error) {
-          const isNativeModuleNotFound = error instanceof Error && error.message.includes('Cannot find native module');
+          const isNativeModuleNotFound =
+            error instanceof Error &&
+            (error.message.includes('Cannot find native module') ||
+              error.message.includes("TurboModuleRegistry.getEnforcing(...): 'ClerkExpo'"));
           if (isNativeModuleNotFound) {
             if (__DEV__) {
               console.debug(

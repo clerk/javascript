@@ -267,6 +267,13 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
     authEventTask?.cancel()
   }
 
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    if isBeingDismissed {
+      completeOnce(.failure(NSError(domain: "ClerkAuth", code: 3, userInfo: [NSLocalizedDescriptionKey: "Auth modal was dismissed"])))
+    }
+  }
+
   private func completeOnce(_ result: Result<[String: Any], Error>) {
     guard !completionCalled else { return }
     completionCalled = true
@@ -336,6 +343,13 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
 
   deinit {
     authEventTask?.cancel()
+  }
+
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    if isBeingDismissed {
+      completeOnce(.failure(NSError(domain: "ClerkProfile", code: 3, userInfo: [NSLocalizedDescriptionKey: "Profile modal was dismissed"])))
+    }
   }
 
   private func completeOnce(_ result: Result<[String: Any], Error>) {

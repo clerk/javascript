@@ -1,45 +1,26 @@
 import { useAuth } from '@clerk/react';
-import { Platform, requireNativeModule, requireNativeViewManager } from 'expo-modules-core';
 import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 
 import { getClerkInstance } from '../provider/singleton';
+import NativeClerkAuthView from '../specs/NativeClerkAuthView';
+import NativeClerkModule from '../specs/NativeClerkModule';
 import type { AuthViewProps } from './AuthView.types';
 
 // Token cache key used by the Clerk JS SDK (must match createClerkInstance.ts)
 const CLERK_CLIENT_JWT_KEY = '__clerk_client_jwt';
 
-// Type definition for the ClerkExpo native module
-interface ClerkExpoModule {
-  configure(config: { publishableKey: string }): Promise<void>;
-  presentAuth(options: { mode: string; dismissable: boolean }): Promise<{ sessionId?: string }>;
-  presentUserProfile(): Promise<void>;
-  getSession(): Promise<{ sessionId?: string; user?: Record<string, unknown> } | null>;
-  getClientToken(): Promise<string | null>;
-  signOut(): Promise<void>;
-}
-
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
-// Get the native module for modal presentation
-let ClerkExpo: ClerkExpoModule | null = null;
+// Safely get the native module
+let ClerkExpo: typeof NativeClerkModule | null = null;
 if (isNativeSupported) {
   try {
-    ClerkExpo = requireNativeModule('ClerkExpo');
+    ClerkExpo = NativeClerkModule;
   } catch {
     ClerkExpo = null;
-  }
-}
-
-// Get the native view component for inline rendering
-let NativeAuthView: any = null;
-if (isNativeSupported) {
-  try {
-    NativeAuthView = requireNativeViewManager('ClerkExpo', 'ClerkAuthExpoView');
-  } catch {
-    NativeAuthView = null;
   }
 }
 
@@ -119,6 +100,7 @@ export function AuthView({
   isDismissable = true,
   onSuccess,
   onError,
+  onDismiss,
   style,
 }: AuthViewProps) {
   if (presentation === 'inline') {
@@ -139,6 +121,7 @@ export function AuthView({
       isDismissable={isDismissable}
       onSuccess={onSuccess}
       onError={onError}
+      onDismiss={onDismiss}
     />
   );
 }
@@ -150,7 +133,8 @@ function ModalPresentation({
   isDismissable,
   onSuccess,
   onError,
-}: Pick<AuthViewProps, 'mode' | 'isDismissable' | 'onSuccess' | 'onError'>) {
+  onDismiss,
+}: Pick<AuthViewProps, 'mode' | 'isDismissable' | 'onSuccess' | 'onError' | 'onDismiss'>) {
   const { isSignedIn } = useAuth();
   const authCompletedRef = useRef(false);
   const initialSignedInRef = useRef(isSignedIn);
@@ -160,6 +144,8 @@ function ModalPresentation({
   onSuccessRef.current = onSuccess;
   const onErrorRef = useRef(onError);
   onErrorRef.current = onError;
+  const onDismissRef = useRef(onDismiss);
+  onDismissRef.current = onDismiss;
 
   useEffect(() => {
     if (!isNativeSupported || !ClerkExpo?.presentAuth) {
@@ -189,13 +175,22 @@ function ModalPresentation({
     const presentModal = async () => {
       if (ClerkExpo?.getSession) {
         try {
-          const nativeSession = await ClerkExpo.getSession();
+          const nativeSession = (await ClerkExpo.getSession()) as { sessionId?: string } | null;
           const sessionId = nativeSession?.sessionId;
           if (sessionId) {
-            authCompletedRef.current = true;
-            await syncNativeSession(sessionId);
-            onSuccessRef.current?.();
-            return;
+            if (isSignedIn) {
+              // JS SDK agrees we're signed in — sync native session and complete
+              authCompletedRef.current = true;
+              await syncNativeSession(sessionId);
+              onSuccessRef.current?.();
+              return;
+            }
+            // JS SDK is signed out but native has a stale session — clear it
+            try {
+              await ClerkExpo.signOut?.();
+            } catch {
+              // Best effort
+            }
           }
         } catch {
           // Failed to check native session, continue to present modal
@@ -203,10 +198,10 @@ function ModalPresentation({
       }
 
       try {
-        const result = await ClerkExpo.presentAuth({
+        const result = (await ClerkExpo.presentAuth({
           mode: mode ?? 'signInOrUp',
           dismissable: isDismissable ?? true,
-        });
+        })) as { sessionId?: string };
 
         if (result.sessionId) {
           try {
@@ -220,7 +215,9 @@ function ModalPresentation({
           return;
         }
 
+        // Modal was dismissed without completing auth (resolved with no sessionId)
         hasStartedRef.current = false;
+        onDismissRef.current?.();
       } catch (err) {
         const error = err as Error & { code?: string };
 
@@ -229,7 +226,7 @@ function ModalPresentation({
 
           if (ClerkExpo?.getSession) {
             try {
-              const nativeSession = await ClerkExpo.getSession();
+              const nativeSession = (await ClerkExpo.getSession()) as { sessionId?: string } | null;
               if (nativeSession?.sessionId) {
                 await syncNativeSession(nativeSession.sessionId);
                 onSuccessRef.current?.();
@@ -241,6 +238,9 @@ function ModalPresentation({
           }
         }
 
+        // Modal was dismissed (native promise rejected) — reset so remounting works
+        hasStartedRef.current = false;
+        onDismissRef.current?.();
         onErrorRef.current?.(error);
       }
     };
@@ -260,7 +260,7 @@ function ModalPresentation({
     );
   }
 
-  return <View style={styles.container} />;
+  return null;
 }
 
 // MARK: - Inline Presentation
@@ -295,8 +295,9 @@ function InlinePresentation({
   }, []);
 
   const handleAuthEvent = useCallback(
-    async (event: { nativeEvent: { type: string; data: Record<string, any> } }) => {
-      const { type, data } = event.nativeEvent;
+    async (event: { nativeEvent: { type: string; data: string } }) => {
+      const { type, data: rawData } = event.nativeEvent;
+      const data: Record<string, any> = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
 
       if (type === 'signInCompleted' || type === 'signUpCompleted') {
         const sessionId = data?.sessionId;
@@ -321,7 +322,7 @@ function InlinePresentation({
       }
 
       try {
-        const session = await ClerkExpo.getSession();
+        const session = (await ClerkExpo.getSession()) as { sessionId?: string } | null;
         if (session?.sessionId) {
           clearInterval(interval);
           await syncSession(session.sessionId);
@@ -334,7 +335,7 @@ function InlinePresentation({
     return () => clearInterval(interval);
   }, [syncSession]);
 
-  if (!isNativeSupported || !NativeAuthView) {
+  if (!isNativeSupported || !NativeClerkAuthView) {
     return (
       <View style={[styles.container, style]}>
         <Text style={styles.text}>
@@ -347,7 +348,7 @@ function InlinePresentation({
   }
 
   return (
-    <NativeAuthView
+    <NativeClerkAuthView
       style={[styles.container, style]}
       mode={mode}
       isDismissable={isDismissable}

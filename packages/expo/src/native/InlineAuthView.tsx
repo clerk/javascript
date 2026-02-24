@@ -1,9 +1,10 @@
-import { Platform, requireNativeModule, requireNativeViewManager } from 'expo-modules-core';
 import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useRef } from 'react';
-import { type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { type StyleProp, StyleSheet, Text, View, type ViewStyle, Platform } from 'react-native';
 
 import { getClerkInstance } from '../provider/singleton';
+import NativeClerkAuthView from '../specs/NativeClerkAuthView';
+import NativeClerkModule from '../specs/NativeClerkModule';
 import type { AuthViewMode } from './AuthView.types';
 
 // Check if native module is supported on this platform
@@ -12,20 +13,11 @@ const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 // Token cache key used by the Clerk JS SDK (must match createClerkInstance.ts)
 const CLERK_CLIENT_JWT_KEY = '__clerk_client_jwt';
 
-// Get the native view component for inline rendering
-let NativeAuthView: any = null;
-let ClerkExpoModule: {
-  getSession(): Promise<{ sessionId?: string } | null>;
-  getClientToken(): Promise<string | null>;
-} | null = null;
+// Safely get the native module
+let ClerkExpoModule: typeof NativeClerkModule | null = null;
 if (isNativeSupported) {
   try {
-    NativeAuthView = requireNativeViewManager('ClerkExpo', 'ClerkAuthExpoView');
-  } catch {
-    NativeAuthView = null;
-  }
-  try {
-    ClerkExpoModule = requireNativeModule('ClerkExpo');
+    ClerkExpoModule = NativeClerkModule;
   } catch {
     ClerkExpoModule = null;
   }
@@ -147,10 +139,11 @@ export function InlineAuthView({
     }
   }, []);
 
-  // Handle native events from the ExpoView bridge
+  // Handle native events from the view bridge
   const handleAuthEvent = useCallback(
-    async (event: { nativeEvent: { type: string; data: Record<string, any> } }) => {
-      const { type, data } = event.nativeEvent;
+    async (event: { nativeEvent: { type: string; data: string } }) => {
+      const { type, data: rawData } = event.nativeEvent;
+      const data: Record<string, any> = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
 
       if (type === 'signInCompleted' || type === 'signUpCompleted') {
         const sessionId = data?.sessionId;
@@ -176,7 +169,7 @@ export function InlineAuthView({
       }
 
       try {
-        const session = await ClerkExpoModule.getSession();
+        const session = (await ClerkExpoModule.getSession()) as { sessionId?: string } | null;
         if (session?.sessionId) {
           clearInterval(interval);
           await syncSession(session.sessionId);
@@ -189,7 +182,7 @@ export function InlineAuthView({
     return () => clearInterval(interval);
   }, [syncSession]);
 
-  if (!isNativeSupported || !NativeAuthView) {
+  if (!isNativeSupported || !NativeClerkAuthView) {
     return (
       <View style={[styles.container, style]}>
         <Text style={styles.text}>
@@ -202,7 +195,7 @@ export function InlineAuthView({
   }
 
   return (
-    <NativeAuthView
+    <NativeClerkAuthView
       style={[styles.container, style]}
       mode={mode}
       isDismissable={isDismissable}

@@ -2,6 +2,7 @@ package expo.modules.clerk
 
 import android.content.Context
 import android.util.Log
+import android.widget.FrameLayout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -9,11 +10,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,20 +25,18 @@ import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.clerk.api.Clerk
 import com.clerk.ui.userprofile.UserProfileView
-import expo.modules.kotlin.AppContext
-import expo.modules.kotlin.viewevent.EventDispatcher
-import expo.modules.kotlin.views.ExpoView
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.ReactContext
+import com.facebook.react.uimanager.events.RCTEventEmitter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 private const val TAG = "ClerkUserProfileExpoView"
 
-class ClerkUserProfileExpoView(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
-  private val onProfileEvent by EventDispatcher()
-
+class ClerkUserProfileNativeView(context: Context) : FrameLayout(context) {
   var isDismissable: Boolean = true
 
-  private val activity = ClerkAuthExpoView.findActivity(context)
+  private val activity = ClerkAuthNativeView.findActivity(context)
 
   private var recomposer: Recomposer? = null
   private var recomposerJob: kotlinx.coroutines.Job? = null
@@ -78,10 +77,7 @@ class ClerkUserProfileExpoView(context: Context, appContext: AppContext) : ExpoV
       LaunchedEffect(session) {
         if (hadSession && session == null) {
           Log.d(TAG, "Sign-out detected")
-          onProfileEvent(mapOf(
-            "type" to "signedOut",
-            "data" to emptyMap<String, Any>()
-          ))
+          sendEvent("signedOut", emptyMap())
         }
         if (session != null) {
           hadSession = true
@@ -98,10 +94,7 @@ class ClerkUserProfileExpoView(context: Context, appContext: AppContext) : ExpoV
               clerkTheme = Clerk.customTheme,
               onDismiss = {
                 Log.d(TAG, "Profile dismissed")
-                onProfileEvent(mapOf(
-                  "type" to "dismissed",
-                  "data" to emptyMap<String, Any>()
-                ))
+                sendEvent("dismissed", emptyMap())
               }
             )
           }
@@ -120,5 +113,20 @@ class ClerkUserProfileExpoView(context: Context, appContext: AppContext) : ExpoV
         content()
       }
     }
+  }
+
+  private fun sendEvent(type: String, data: Map<String, Any?>) {
+    val reactContext = context as? ReactContext ?: return
+    val eventData = Arguments.createMap().apply {
+      putString("type", type)
+      val jsonString = try {
+        org.json.JSONObject(data).toString()
+      } catch (e: Exception) {
+        "{}"
+      }
+      putString("data", jsonString)
+    }
+    reactContext.getJSModule(RCTEventEmitter::class.java)
+      .receiveEvent(id, "onProfileEvent", eventData)
   }
 }
