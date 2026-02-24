@@ -42,4 +42,12 @@ describe('getAuth(req)', () => {
     expect(result.userId).toBeNull();
     expect(result.orgId).toBeNull();
   });
+
+  it('returns an unauthenticated session auth object when m2m_token is present but session_token is expected', () => {
+    const req = { auth: { tokenType: 'm2m_token', id: 'mt_1234', subject: 'mch_1234' } } as unknown as FastifyRequest;
+    const result = getAuth(req, { acceptsToken: 'session_token' });
+    expect(result.tokenType).toBe('session_token');
+    expect(result.userId).toBeNull();
+    expect(result.isAuthenticated).toBe(false);
+  });
 });

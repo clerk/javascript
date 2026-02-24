@@ -48,4 +48,12 @@ describe('getAuth', () => {
     expect(result.userId).toBeNull();
     expect(result.orgId).toBeNull();
   });
+
+  it('returns an unauthenticated session auth object when m2m_token is present but session_token is expected', () => {
+    const req = mockRequestWithAuth({ tokenType: 'm2m_token', id: 'mt_1234', subject: 'mch_1234' });
+    const result = getAuth(req, { acceptsToken: 'session_token' });
+    expect(result.tokenType).toBe('session_token');
+    expect(result.userId).toBeNull();
+    expect(result.isAuthenticated).toBe(false);
+  });
 });
