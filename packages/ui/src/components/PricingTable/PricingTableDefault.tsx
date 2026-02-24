@@ -25,6 +25,7 @@ import {
   SimpleButton,
   Span,
   Text,
+  useLocalizations,
 } from '../../customizables';
 import { Check, Plus, Users } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
@@ -547,9 +548,12 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
 });
 
 const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
+  const { t } = useLocalizations();
   const unitPrices = plan.unitPrices;
+  const period = t(localizationKeys('billing.month'));
+  const periodAbbreviation = t(localizationKeys('billing.monthAbbreviation'));
 
-  const seatPriceText = React.useMemo(() => {
+  const seatPriceContent = React.useMemo(() => {
     if (!unitPrices) {
       return null;
     }
@@ -567,12 +571,25 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
       const tier = seatUnitPrice.tiers[0];
 
       if (tier.feePerBlock.amount === 0 && tier.endsAfterBlock !== null) {
-        const prefix = plan.fee.amount === 0 ? 'Free up to' : 'Up to';
-        return `${prefix} ${tier.endsAfterBlock} seats`;
+        return {
+          baseText: localizationKeys(
+            plan.fee.amount === 0
+              ? 'billing.pricingTable.seatCost.freeUpToSeats'
+              : 'billing.pricingTable.seatCost.upToSeats',
+            {
+              endsAfterBlock: tier.endsAfterBlock,
+            },
+          ),
+        };
       }
 
       if (tier.feePerBlock.amount !== 0) {
-        return `${formatTierFee(tier)}/mo per seat`;
+        return {
+          baseText: localizationKeys('billing.pricingTable.seatCost.perSeat', {
+            feePerBlockAmount: formatTierFee(tier),
+            periodAbbreviation,
+          }),
+        };
       }
 
       return null;
@@ -588,15 +605,46 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
         includedTier.endsAfterBlock !== null &&
         additionalTier.feePerBlock.amount !== 0
       ) {
-        const prefix = plan.fee.amount === 0 ? 'Free up to' : 'Up to';
-        return `${prefix} ${includedTier.endsAfterBlock} seats (${formatTierFee(additionalTier)}/mo for additional)`;
+        const additionalTierFeePerBlockAmount = formatTierFee(additionalTier);
+        const tooltipPrefixText = t(
+          localizationKeys(
+            plan.fee.amount === 0
+              ? 'billing.pricingTable.seatCost.tooltip.freeForUpToSeats'
+              : 'billing.pricingTable.seatCost.tooltip.firstSeatsIncludedInPlan',
+            {
+              endsAfterBlock: includedTier.endsAfterBlock,
+            },
+          ),
+        );
+        const tooltipAdditionalText = t(
+          localizationKeys('billing.pricingTable.seatCost.tooltip.additionalSeatsEach', {
+            feePerBlockAmount: additionalTierFeePerBlockAmount,
+            period,
+          }),
+        );
+
+        return {
+          baseText: localizationKeys(
+            plan.fee.amount === 0
+              ? 'billing.pricingTable.seatCost.freeUpToSeats'
+              : 'billing.pricingTable.seatCost.upToSeats',
+            {
+              endsAfterBlock: includedTier.endsAfterBlock,
+            },
+          ),
+          additionalText: localizationKeys('billing.pricingTable.seatCost.additionalSeats', {
+            additionalTierFeePerBlockAmount,
+            periodAbbreviation,
+          }),
+          additionalTooltipText: `${tooltipPrefixText} ${tooltipAdditionalText}`,
+        };
       }
     }
 
     return null;
-  }, [plan.fee.amount, unitPrices]);
+  }, [period, periodAbbreviation, plan.fee.amount, t, unitPrices]);
 
-  if (!seatPriceText) {
+  if (!seatPriceContent) {
     return null;
   }
 
@@ -630,7 +678,25 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
             fontWeight: t.fontWeights.$normal,
           })}
         >
-          {seatPriceText}
+          <Span localizationKey={seatPriceContent.baseText} />
+          {seatPriceContent.additionalText ? (
+            <>
+              {' '}
+              {seatPriceContent.additionalTooltipText ? (
+                <Tooltip.Root>
+                  <Tooltip.Trigger>
+                    <Span
+                      localizationKey={seatPriceContent.additionalText}
+                      sx={{ textDecoration: 'underline dotted' }}
+                    />
+                  </Tooltip.Trigger>
+                  <Tooltip.Content text={seatPriceContent.additionalTooltipText} />
+                </Tooltip.Root>
+              ) : (
+                <Span localizationKey={seatPriceContent.additionalText} />
+              )}
+            </>
+          ) : null}
         </Text>
       </Span>
     </Box>

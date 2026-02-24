@@ -119,6 +119,7 @@ export const enUS: LocalizationResource = {
     manage: 'Manage',
     manageSubscription: 'Manage subscription',
     month: 'Month',
+    monthAbbreviation: 'mo',
     monthPerUnit: 'Month per {{unitName}}',
     monthly: 'Monthly',
     pastDue: 'Past due',
@@ -142,6 +143,17 @@ export const enUS: LocalizationResource = {
     pricingTable: {
       billingCycle: 'Billing cycle',
       included: 'Included',
+      seatCost: {
+        freeUpToSeats: 'Free up to {{endsAfterBlock}} seats',
+        upToSeats: 'Up to {{endsAfterBlock}} seats',
+        perSeat: '{{feePerBlockAmount}}/{{periodAbbreviation}} per seat',
+        additionalSeats: '({{additionalTierFeePerBlockAmount}}/{{periodAbbreviation}} for additional)',
+        tooltip: {
+          freeForUpToSeats: 'Free for up to {{endsAfterBlock}} seats.',
+          additionalSeatsEach: 'Additional seats are {{feePerBlockAmount}}/{{period}} each.',
+          firstSeatsIncludedInPlan: 'First {{endsAfterBlock}} seats are included in the plan.',
+        },
+      },
     },
     reSubscribe: 'Resubscribe',
     seeAllFeatures: 'See all features',
@@ -174,6 +186,7 @@ export const enUS: LocalizationResource = {
     viewFeatures: 'View features',
     viewPayment: 'View payment',
     year: 'Year',
+    yearAbbreviation: 'yr',
     yearPerUnit: 'Year per {{unitName}}',
   },
   createOrganization: {
