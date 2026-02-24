@@ -4,6 +4,7 @@ import type { MachineTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
 
 export const M2M_TOKEN_PREFIX = 'mt_';
+export const M2M_SUBJECT_PREFIX = 'mch_';
 export const OAUTH_TOKEN_PREFIX = 'oat_';
 export const API_KEY_PREFIX = 'ak_';
 
@@ -58,7 +59,7 @@ export function isM2MJwt(token: string): boolean {
   }
   try {
     const { data, errors } = decodeJwt(token);
-    return !errors && !!data && typeof data.payload.sub === 'string' && data.payload.sub.startsWith('mch_');
+    return !errors && !!data && typeof data.payload.sub === 'string' && data.payload.sub.startsWith(M2M_SUBJECT_PREFIX);
   } catch {
     return false;
   }

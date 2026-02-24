@@ -130,8 +130,13 @@ export function createProtect(opts: {
     };
 
     const handleUnauthorized = () => {
-      // For machine tokens, return a 401 response
-      if (authObject.tokenType !== TokenType.SessionToken) {
+      // Return 401 for machine token contexts: either the auth object itself is a machine token,
+      // or the endpoint was configured to accept machine tokens but auth failed (e.g. middleware
+      // bypassed, so authObject fell back to a signed-out session object).
+      if (
+        authObject.tokenType !== TokenType.SessionToken ||
+        !isTokenTypeAccepted(TokenType.SessionToken, requestedToken)
+      ) {
         return unauthorized();
       }
 

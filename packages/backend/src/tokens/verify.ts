@@ -16,7 +16,14 @@ import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
 import { verifyM2MJwt, verifyOAuthJwt } from '../jwt/verifyMachineJwt';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
-import { API_KEY_PREFIX, isJwtFormat, M2M_TOKEN_PREFIX, OAUTH_ACCESS_TOKEN_TYPES, OAUTH_TOKEN_PREFIX } from './machine';
+import {
+  API_KEY_PREFIX,
+  isJwtFormat,
+  M2M_SUBJECT_PREFIX,
+  M2M_TOKEN_PREFIX,
+  OAUTH_ACCESS_TOKEN_TYPES,
+  OAUTH_TOKEN_PREFIX,
+} from './machine';
 import type { MachineTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
 
@@ -254,8 +261,7 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
       } as MachineTokenReturnType<never, MachineTokenVerificationError>;
     }
 
-    // M2M JWT: sub starts with mch_
-    if (decodedResult.payload.sub.startsWith('mch_')) {
+    if (decodedResult.payload.sub.startsWith(M2M_SUBJECT_PREFIX)) {
       return verifyM2MJwt(token, decodedResult, options);
     }
 
