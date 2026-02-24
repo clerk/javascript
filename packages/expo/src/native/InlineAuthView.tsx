@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useRef } from 'react';
-import { type StyleProp, StyleSheet, Text, View, type ViewStyle, Platform } from 'react-native';
+import { Platform, type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 
 import { getClerkInstance } from '../provider/singleton';
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';

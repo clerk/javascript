@@ -2,10 +2,10 @@ import type { TurboModule } from 'react-native';
 import { TurboModuleRegistry } from 'react-native';
 
 export interface Spec extends TurboModule {
-  configure(params: Object): void;
-  signIn(params: Object | null): Promise<Object>;
-  createAccount(params: Object | null): Promise<Object>;
-  presentExplicitSignIn(params: Object | null): Promise<Object>;
+  configure(params: object): void;
+  signIn(params: object | null): Promise<object>;
+  createAccount(params: object | null): Promise<object>;
+  presentExplicitSignIn(params: object | null): Promise<object>;
   signOut(): Promise<void>;
 }
 

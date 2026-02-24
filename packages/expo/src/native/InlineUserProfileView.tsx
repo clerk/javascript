@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/react';
 import { useCallback, useRef } from 'react';
-import { type StyleProp, StyleSheet, Text, View, type ViewStyle, Platform } from 'react-native';
+import { Platform, type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 
 import NativeClerkModule from '../specs/NativeClerkModule';
 import NativeClerkUserProfileView from '../specs/NativeClerkUserProfileView';

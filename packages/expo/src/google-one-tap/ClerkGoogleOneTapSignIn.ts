@@ -1,5 +1,4 @@
 import NativeClerkGoogleSignIn from '../specs/NativeClerkGoogleSignIn';
-
 import type {
   CancelledResponse,
   ConfigureParams,

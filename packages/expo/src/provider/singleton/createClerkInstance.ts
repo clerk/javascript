@@ -201,7 +201,6 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       });
     }
     // At this point __internal_clerk is guaranteed to be defined
-
-    return __internal_clerk!;
+    return __internal_clerk;
   };
 }
