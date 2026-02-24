@@ -224,7 +224,7 @@ export const mountComponentRenderer = (
       // Always preload, even if ensureMounted was already called.
       // preloadComponent is idempotent (returns cached promise on subsequent calls).
       if (preloadHint) {
-        void preloadComponent(preloadHint);
+        void preloadComponent(preloadHint).catch(() => {});
       }
       // This mechanism ensures that mountComponentControls will only be called once
       // and any calls to .mount before mountComponentControls resolves will fire in order.
