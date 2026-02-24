@@ -43,7 +43,6 @@ export class Billing implements BillingNamespace {
       method: 'GET',
       search: convertPageToOffsetSearchParams(searchParams),
     }).then(res => {
-      console.log('getPlans', { res });
       const { data: plans, total_count } = res as unknown as ClerkPaginatedResponse<BillingPlanJSON>;
 
       return {
