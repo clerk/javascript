@@ -38,6 +38,6 @@ Pod::Spec.new do |s|
 
   # Only include the minimal module file in the pod.
   # ClerkViewFactory.swift (with views) is injected into the app target by the config plugin
-  # because it uses `import Clerk` which is only available via SPM in the app target.
+  # because it uses `import ClerkKit` which is only available via SPM in the app target.
   s.source_files = "ClerkExpoModule.swift"
 end

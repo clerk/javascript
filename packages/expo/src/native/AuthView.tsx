@@ -1,7 +1,7 @@
 import { useAuth } from '@clerk/react';
-import { Platform, requireNativeModule } from 'expo-modules-core';
+import { Platform, requireNativeModule, requireNativeViewManager } from 'expo-modules-core';
 import * as SecureStore from 'expo-secure-store';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { getClerkInstance } from '../provider/singleton';
@@ -24,107 +24,24 @@ interface ClerkExpoModule {
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
 // Get the native module for modal presentation
-// Wrapped in try/catch because the module may not be available if the plugin isn't configured
 let ClerkExpo: ClerkExpoModule | null = null;
 if (isNativeSupported) {
   try {
     ClerkExpo = requireNativeModule('ClerkExpo');
   } catch {
-    // Native module not available - plugin not configured
-    // This is expected when users use @clerk/expo without the native plugin
     ClerkExpo = null;
   }
 }
 
-/**
- * A pre-built native authentication component that handles sign-in and sign-up flows.
- *
- * `AuthView` presents a comprehensive, native UI for authentication powered by:
- * - **iOS**: clerk-ios (SwiftUI) - https://github.com/clerk/clerk-ios
- * - **Android**: clerk-android (Jetpack Compose) - https://github.com/clerk/clerk-android
- *
- * ## Supported Authentication Methods
- *
- * AuthView automatically presents the authentication methods enabled in your
- * [Clerk Dashboard](https://dashboard.clerk.com):
- *
- * - **Email/Password** - Traditional email and password sign-in/sign-up
- * - **Phone Number** - SMS-based authentication
- * - **Username/Password** - Username-based authentication
- * - **OAuth Providers** - Google, Apple, GitHub, Microsoft, and 20+ providers
- * - **Passkeys** - WebAuthn/FIDO2 biometric authentication
- * - **Multi-factor Authentication** - SMS, TOTP (authenticator apps), backup codes
- * - **Magic Links** - Passwordless email authentication
- * - **Enterprise SSO** - SAML and OIDC providers
- *
- * ## Session Synchronization
- *
- * When authentication completes successfully, `AuthView` automatically syncs
- * the native session with the JavaScript SDK. After `onSuccess` is called,
- * all `@clerk/expo` hooks will reflect the authenticated state:
- *
- * - `useUser()` - Returns the authenticated user
- * - `useAuth()` - Returns `isSignedIn: true` and session tokens
- * - `useOrganization()` - Returns active organization (if applicable)
- * - `useSession()` - Returns the active session
- *
- * ## Usage with JS SDK APIs
- *
- * After native authentication, you have full access to all JS SDK APIs:
- *
- * ```tsx
- * import { AuthView } from '@clerk/expo/native';
- * import { useUser } from '@clerk/expo';
- *
- * function App() {
- *   const { user } = useUser();
- *
- *   if (!user) {
- *     return <AuthView onSuccess={() => console.log('Authenticated!')} />;
- *   }
- *
- *   // Full JS SDK APIs available after auth:
- *   const updateName = () => user.update({ firstName: 'New Name' });
- *   const addEmail = () => user.createEmailAddress({ email: 'new@example.com' });
- *   const setupTOTP = () => user.createTOTP();
- *
- *   return <ProfileScreen />;
- * }
- * ```
- *
- * @example Basic usage
- * ```tsx
- * import { AuthView } from '@clerk/expo/native';
- *
- * export default function SignInScreen() {
- *   return (
- *     <AuthView
- *       onSuccess={() => router.replace('/home')}
- *       onError={(error) => console.error(error)}
- *     />
- *   );
- * }
- * ```
- *
- * @example Sign-up only mode
- * ```tsx
- * <AuthView
- *   mode="signUp"
- *   onSuccess={() => router.replace('/onboarding')}
- * />
- * ```
- *
- * @example Non-dismissable (required auth)
- * ```tsx
- * <AuthView
- *   isDismissable={false}
- *   onSuccess={() => router.replace('/dashboard')}
- * />
- * ```
- *
- * @see {@link https://clerk.com/docs/components/authentication/sign-in} Clerk Sign-In Documentation
- * @see {@link https://clerk.com/docs/authentication/configuration/sign-up-sign-in-options} Authentication Options
- */
+// Get the native view component for inline rendering
+let NativeAuthView: any = null;
+if (isNativeSupported) {
+  try {
+    NativeAuthView = requireNativeViewManager('ClerkExpo', 'ClerkAuthExpoView');
+  } catch {
+    NativeAuthView = null;
+  }
+}
 
 async function syncNativeSession(sessionId: string): Promise<void> {
   // Copy the native client's bearer token to the JS SDK's token cache
@@ -164,16 +81,81 @@ function isAlreadySignedInError(error: Error & { code?: string }): boolean {
   return /already signed in/i.test(error.message ?? '');
 }
 
-export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess, onError }: AuthViewProps) {
+/**
+ * A pre-built native authentication component that handles sign-in and sign-up flows.
+ *
+ * `AuthView` presents a comprehensive, native UI for authentication powered by:
+ * - **iOS**: clerk-ios (SwiftUI) - https://github.com/clerk/clerk-ios
+ * - **Android**: clerk-android (Jetpack Compose) - https://github.com/clerk/clerk-android
+ *
+ * @example Modal presentation (default)
+ * ```tsx
+ * import { AuthView } from '@clerk/expo/native';
+ *
+ * export default function SignInScreen() {
+ *   return (
+ *     <AuthView
+ *       onSuccess={() => router.replace('/home')}
+ *       onError={(error) => console.error(error)}
+ *     />
+ *   );
+ * }
+ * ```
+ *
+ * @example Inline presentation
+ * ```tsx
+ * <AuthView
+ *   presentation="inline"
+ *   style={{ flex: 1 }}
+ *   onSuccess={() => router.replace('/home')}
+ * />
+ * ```
+ *
+ * @see {@link https://clerk.com/docs/components/authentication/sign-in} Clerk Sign-In Documentation
+ */
+export function AuthView({
+  presentation = 'modal',
+  mode = 'signInOrUp',
+  isDismissable = true,
+  onSuccess,
+  onError,
+  style,
+}: AuthViewProps) {
+  if (presentation === 'inline') {
+    return (
+      <InlinePresentation
+        mode={mode}
+        isDismissable={isDismissable}
+        onSuccess={onSuccess}
+        onError={onError}
+        style={style}
+      />
+    );
+  }
+
+  return (
+    <ModalPresentation
+      mode={mode}
+      isDismissable={isDismissable}
+      onSuccess={onSuccess}
+      onError={onError}
+    />
+  );
+}
+
+// MARK: - Modal Presentation
+
+function ModalPresentation({
+  mode,
+  isDismissable,
+  onSuccess,
+  onError,
+}: Pick<AuthViewProps, 'mode' | 'isDismissable' | 'onSuccess' | 'onError'>) {
   const { isSignedIn } = useAuth();
-  // Track if we've already completed auth to prevent duplicate onSuccess calls
   const authCompletedRef = useRef(false);
-  // Track the initial signed-in state to differentiate between "already signed in" vs "just signed in"
   const initialSignedInRef = useRef(isSignedIn);
-  // Track if we've started presenting
   const hasStartedRef = useRef(false);
 
-  // Stable refs for callbacks to avoid re-triggering the effect
   const onSuccessRef = useRef(onSuccess);
   onSuccessRef.current = onSuccess;
   const onErrorRef = useRef(onError);
@@ -184,24 +166,20 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
       return;
     }
 
-    // If auth already completed in this component instance, don't do anything
     if (authCompletedRef.current) {
       return;
     }
 
-    // If we've already started presenting, don't start again
     if (hasStartedRef.current) {
       return;
     }
 
-    // If user was already signed in when component mounted, call onSuccess once
     if (initialSignedInRef.current && isSignedIn) {
       authCompletedRef.current = true;
       onSuccessRef.current?.();
       return;
     }
 
-    // If isSignedIn became true after we started (sign-in completed), don't re-present modal
     if (isSignedIn && !initialSignedInRef.current) {
       return;
     }
@@ -209,8 +187,6 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
     hasStartedRef.current = true;
 
     const presentModal = async () => {
-      // First check if native SDK has an existing session
-      // If so, sync to JS and call onSuccess without showing modal
       if (ClerkExpo?.getSession) {
         try {
           const nativeSession = await ClerkExpo.getSession();
@@ -228,11 +204,10 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
 
       try {
         const result = await ClerkExpo.presentAuth({
-          mode,
-          dismissable: isDismissable,
+          mode: mode ?? 'signInOrUp',
+          dismissable: isDismissable ?? true,
         });
 
-        // Sync the native session to JS SDK
         if (result.sessionId) {
           try {
             await syncNativeSession(result.sessionId);
@@ -245,18 +220,13 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
           return;
         }
 
-        // No sessionId means the user cancelled/dismissed the modal
-        // Reset hasStartedRef so the modal can be re-presented if needed
         hasStartedRef.current = false;
       } catch (err) {
         const error = err as Error & { code?: string };
 
-        // Handle "User is already signed in" error - this means native SDK has session but JS SDK doesn't know
-        // This can happen when JS SDK failed to initialize (e.g., dev auth error) but native SDK has valid session
         if (isAlreadySignedInError(error)) {
           authCompletedRef.current = true;
 
-          // Get the session from native SDK and sync to JS
           if (ClerkExpo?.getSession) {
             try {
               const nativeSession = await ClerkExpo.getSession();
@@ -278,7 +248,6 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
     presentModal();
   }, [mode, isDismissable, isSignedIn]);
 
-  // Show a placeholder when native modules aren't available
   if (!isNativeSupported || !ClerkExpo) {
     return (
       <View style={styles.container}>
@@ -292,6 +261,99 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = true, onSuccess,
   }
 
   return <View style={styles.container} />;
+}
+
+// MARK: - Inline Presentation
+
+function InlinePresentation({
+  mode,
+  isDismissable,
+  onSuccess,
+  onError,
+  style,
+}: Pick<AuthViewProps, 'mode' | 'isDismissable' | 'onSuccess' | 'onError' | 'style'>) {
+  const authCompletedRef = useRef(false);
+
+  const onSuccessRef = useRef(onSuccess);
+  onSuccessRef.current = onSuccess;
+  const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
+
+  const syncSession = useCallback(async (sessionId: string) => {
+    if (authCompletedRef.current) {
+      return;
+    }
+
+    try {
+      await syncNativeSession(sessionId);
+      authCompletedRef.current = true;
+      onSuccessRef.current?.();
+    } catch (err) {
+      console.error('[AuthView] Failed to sync session:', err);
+      onErrorRef.current?.(err as Error);
+    }
+  }, []);
+
+  const handleAuthEvent = useCallback(
+    async (event: { nativeEvent: { type: string; data: Record<string, any> } }) => {
+      const { type, data } = event.nativeEvent;
+
+      if (type === 'signInCompleted' || type === 'signUpCompleted') {
+        const sessionId = data?.sessionId;
+        if (sessionId) {
+          await syncSession(sessionId);
+        }
+      }
+    },
+    [syncSession],
+  );
+
+  // Fallback: poll native session to detect auth completion
+  useEffect(() => {
+    if (!ClerkExpo?.getSession) {
+      return;
+    }
+
+    const interval = setInterval(async () => {
+      if (authCompletedRef.current) {
+        clearInterval(interval);
+        return;
+      }
+
+      try {
+        const session = await ClerkExpo.getSession();
+        if (session?.sessionId) {
+          clearInterval(interval);
+          await syncSession(session.sessionId);
+        }
+      } catch {
+        // ignore polling errors
+      }
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, [syncSession]);
+
+  if (!isNativeSupported || !NativeAuthView) {
+    return (
+      <View style={[styles.container, style]}>
+        <Text style={styles.text}>
+          {!isNativeSupported
+            ? 'Native AuthView is only available on iOS and Android'
+            : 'Native AuthView requires the @clerk/expo plugin. Add "@clerk/expo" to your app.json plugins array.'}
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <NativeAuthView
+      style={[styles.container, style]}
+      mode={mode}
+      isDismissable={isDismissable}
+      onAuthEvent={handleAuthEvent}
+    />
+  );
 }
 
 const styles = StyleSheet.create({

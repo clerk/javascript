@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.clerk.api.Clerk
+import com.clerk.api.network.serialization.ClerkResult
+import com.clerk.api.session.fetchToken
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.modules.Module
@@ -93,10 +95,22 @@ class ClerkExpoModule : Module() {
         Name("ClerkExpo")
 
         // Initialize Clerk SDK with publishable key
-        AsyncFunction("configure") { pubKey: String, promise: Promise ->
+        AsyncFunction("configure") { pubKey: String, bearerToken: String?, promise: Promise ->
             coroutineScope.launch {
                 try {
                     publishableKey = pubKey
+
+                    // If the JS SDK has a bearer token, write it to the native SDK's
+                    // SharedPreferences so both SDKs share the same Clerk API client.
+                    // This mirrors the iOS behavior where the token is written to the Keychain.
+                    if (!bearerToken.isNullOrEmpty()) {
+                        context.getSharedPreferences("clerk_preferences", android.content.Context.MODE_PRIVATE)
+                            .edit()
+                            .putString("DEVICE_TOKEN", bearerToken)
+                            .apply()
+                        debugLog(TAG, "configure - wrote JS bearer token to native SharedPreferences")
+                    }
+
                     Clerk.initialize(context, pubKey)
 
                     // Wait for initialization to complete with timeout
@@ -227,22 +241,18 @@ class ClerkExpoModule : Module() {
             promise.resolve(result)
         }
 
-        // Get the native Clerk client's bearer token
-        // This allows the JS SDK to use the same client as the native SDK
+        // Get the native Clerk client's device token (client JWT)
+        // This is stored in SharedPreferences by clerk-android and is the
+        // equivalent of the __clerk_client_jwt used by the JS SDK.
         AsyncFunction("getClientToken") { promise: Promise ->
-            coroutineScope.launch {
-                try {
-                    val session = Clerk.session
-                    if (session == null) {
-                        promise.resolve(null)
-                        return@launch
-                    }
-                    val token = session.fetchToken()
-                    promise.resolve(token?.jwt)
-                } catch (e: Exception) {
-                    debugLog(TAG, "getClientToken failed: ${e.message}")
-                    promise.resolve(null)
-                }
+            try {
+                val prefs = context.getSharedPreferences("clerk_preferences", android.content.Context.MODE_PRIVATE)
+                val deviceToken = prefs.getString("DEVICE_TOKEN", null)
+                debugLog(TAG, "getClientToken - deviceToken: ${if (deviceToken != null) "found" else "null"}")
+                promise.resolve(deviceToken)
+            } catch (e: Exception) {
+                debugLog(TAG, "getClientToken failed: ${e.message}")
+                promise.resolve(null)
             }
         }
 
@@ -255,7 +265,7 @@ class ClerkExpoModule : Module() {
 
             coroutineScope.launch {
                 try {
-                    Clerk.signOut()
+                    Clerk.auth.signOut()
                     promise.resolve(null)
                 } catch (e: Exception) {
                     promise.reject(
@@ -323,6 +333,9 @@ class ClerkExpoModule : Module() {
             debugLog(TAG, "handleAuthResult - session: ${session?.id}, user: ${user?.id}")
 
             val result = mutableMapOf<String, Any?>()
+
+            // Top-level sessionId for JS SDK compatibility (matches iOS response format)
+            result["sessionId"] = session?.id
 
             session?.let {
                 result["session"] = mapOf(

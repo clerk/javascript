@@ -1,3 +1,5 @@
+import type { StyleProp, ViewStyle } from 'react-native';
+
 /**
  * Authentication mode that determines which flows are available to the user.
  *
@@ -14,6 +16,16 @@ export type AuthViewMode = 'signIn' | 'signUp' | 'signInOrUp';
  * sign-in and sign-up flows with support for multiple authentication methods.
  */
 export interface AuthViewProps {
+  /**
+   * How the auth view is presented.
+   *
+   * - `'modal'` - Presents a full-screen native modal (default)
+   * - `'inline'` - Renders directly within the React Native view hierarchy
+   *
+   * @default 'modal'
+   */
+  presentation?: 'modal' | 'inline';
+
   /**
    * Authentication mode that determines which flows are available.
    *
@@ -47,40 +59,18 @@ export interface AuthViewProps {
    *
    * After this callback, all `@clerk/expo` hooks (`useUser()`, `useAuth()`,
    * `useOrganization()`, etc.) will reflect the authenticated state.
-   *
-   * @example
-   * ```tsx
-   * <AuthView
-   *   onSuccess={() => {
-   *     // User is now authenticated
-   *     // useUser(), useAuth(), etc. will return user data
-   *     router.replace('/home');
-   *   }}
-   * />
-   * ```
    */
   onSuccess?: () => void;
 
   /**
    * Callback fired when an error occurs during authentication.
    *
-   * Common errors include:
-   * - Network errors
-   * - Invalid credentials
-   * - Account locked
-   * - User cancelled (on some platforms)
-   *
    * @param error - The error that occurred
-   *
-   * @example
-   * ```tsx
-   * <AuthView
-   *   onError={(error) => {
-   *     console.error('Auth failed:', error.message);
-   *     Alert.alert('Error', error.message);
-   *   }}
-   * />
-   * ```
    */
   onError?: (error: Error) => void;
+
+  /**
+   * Style applied to the container view (inline mode only).
+   */
+  style?: StyleProp<ViewStyle>;
 }

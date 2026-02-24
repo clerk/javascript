@@ -1,10 +1,12 @@
 // ClerkViewFactory - Provides Clerk view controllers to the ClerkExpo module
 // This file is injected into the app target by the config plugin.
-// It uses `import Clerk` (SPM) which is only accessible from the app target.
+// It uses `import ClerkKit` (SPM) which is only accessible from the app target.
 
 import UIKit
 import SwiftUI
-import Clerk
+import Security
+import ClerkKit
+import ClerkKitUI
 import ClerkExpo  // Import the pod to access ClerkViewFactoryProtocol
 
 // MARK: - View Factory Implementation
@@ -20,20 +22,107 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
   }
 
   @MainActor
-  public func configure(publishableKey: String) async throws {
-    Clerk.shared.configure(publishableKey: publishableKey)
+  public func configure(publishableKey: String, bearerToken: String? = nil) async throws {
+    // Sync JS SDK's client token to native keychain so both SDKs share the same client.
+    // This handles the case where the user signed in via JS SDK but the native SDK
+    // has no device token (e.g., after app reinstall or first launch).
+    if let token = bearerToken, !token.isEmpty {
+      Self.writeNativeDeviceTokenIfNeeded(token)
+    } else {
+      Self.syncJSTokenToNativeKeychainIfNeeded()
+    }
 
-    // CRITICAL: Must call load() after configure() to restore session from keychain
-    try await Clerk.shared.load()
+    Clerk.configure(publishableKey: publishableKey)
 
-    // load() is async but session may be populated AFTER it returns.
-    // The SDK uses Combine/ObservableObject pattern — session is published asynchronously.
+    // Wait for Clerk to finish loading (cached data + API refresh).
+    // The static configure() fires off async refreshes; poll until loaded.
     for _ in 0..<30 {  // Wait up to 3 seconds
-      if Clerk.shared.session != nil {
+      if Clerk.shared.isLoaded && Clerk.shared.session != nil {
         return
       }
       try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
     }
+  }
+
+  /// Copies the JS SDK's client JWT from expo-secure-store to the native SDK's
+  /// keychain entry, but only if the native SDK doesn't already have a device token.
+  /// Both expo-secure-store and the native Clerk SDK use the iOS Keychain with the
+  /// bundle identifier as the service name, making cross-SDK token sharing possible.
+  private static func syncJSTokenToNativeKeychainIfNeeded() {
+    guard let service = Bundle.main.bundleIdentifier, !service.isEmpty else { return }
+
+    let jsTokenKey = "__clerk_client_jwt"
+    let nativeTokenKey = "clerkDeviceToken"
+
+    // Check if native SDK already has a device token — don't overwrite
+    let checkQuery: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: nativeTokenKey,
+      kSecReturnData as String: false,
+      kSecMatchLimit as String: kSecMatchLimitOne,
+    ]
+    if SecItemCopyMatching(checkQuery as CFDictionary, nil) == errSecSuccess {
+      return  // Native token exists, don't overwrite
+    }
+
+    // Read JS SDK's client JWT from keychain (stored by expo-secure-store)
+    var result: CFTypeRef?
+    let readQuery: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: jsTokenKey,
+      kSecReturnData as String: true,
+      kSecMatchLimit as String: kSecMatchLimitOne,
+    ]
+    guard SecItemCopyMatching(readQuery as CFDictionary, &result) == errSecSuccess,
+          let data = result as? Data,
+          let jsToken = String(data: data, encoding: .utf8),
+          !jsToken.isEmpty else {
+      return  // No JS token available
+    }
+
+    // Write JS token as native device token
+    guard let tokenData = jsToken.data(using: .utf8) else { return }
+    let writeQuery: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: nativeTokenKey,
+      kSecValueData as String: tokenData,
+      kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+    ]
+    SecItemAdd(writeQuery as CFDictionary, nil)
+  }
+
+  /// Writes the provided bearer token as the native SDK's device token,
+  /// but only if the native SDK doesn't already have one.
+  private static func writeNativeDeviceTokenIfNeeded(_ token: String) {
+    guard let service = Bundle.main.bundleIdentifier, !service.isEmpty else { return }
+
+    let nativeTokenKey = "clerkDeviceToken"
+
+    // Check if native SDK already has a device token — don't overwrite
+    let checkQuery: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: nativeTokenKey,
+      kSecReturnData as String: false,
+      kSecMatchLimit as String: kSecMatchLimitOne,
+    ]
+    if SecItemCopyMatching(checkQuery as CFDictionary, nil) == errSecSuccess {
+      return
+    }
+
+    // Write the provided token as native device token
+    guard let tokenData = token.data(using: .utf8) else { return }
+    let writeQuery: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: nativeTokenKey,
+      kSecValueData as String: tokenData,
+      kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+    ]
+    SecItemAdd(writeQuery as CFDictionary, nil)
   }
 
   public func createAuthViewController(
@@ -148,8 +237,10 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     return result
   }
 
+  @MainActor
   public func signOut() async throws {
-    try await Clerk.shared.signOut()
+    guard let sessionId = Clerk.shared.session?.id else { return }
+    try await Clerk.shared.auth.signOut(sessionId: sessionId)
   }
 }
 
@@ -184,7 +275,7 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
 
   private func subscribeToAuthEvents() {
     authEventTask = Task { @MainActor [weak self] in
-      for await event in Clerk.shared.authEventEmitter.events {
+      for await event in Clerk.shared.auth.events {
         guard let self = self, !self.completionCalled else { return }
         switch event {
         case .signInCompleted(let signIn):
@@ -220,6 +311,7 @@ struct ClerkAuthWrapperView: View {
 
   var body: some View {
     AuthView(mode: mode, isDismissable: dismissable)
+      .environment(Clerk.shared)
   }
 }
 
@@ -254,7 +346,7 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
 
   private func subscribeToAuthEvents() {
     authEventTask = Task { @MainActor [weak self] in
-      for await event in Clerk.shared.authEventEmitter.events {
+      for await event in Clerk.shared.auth.events {
         guard let self = self, !self.completionCalled else { return }
         switch event {
         case .signedOut(let session):
@@ -276,6 +368,7 @@ struct ClerkProfileWrapperView: View {
 
   var body: some View {
     UserProfileView(isDismissable: dismissable)
+      .environment(Clerk.shared)
   }
 }
 
@@ -288,8 +381,9 @@ struct ClerkInlineAuthWrapperView: View {
 
   var body: some View {
     AuthView(mode: mode, isDismissable: dismissable)
+      .environment(Clerk.shared)
       .task {
-        for await event in Clerk.shared.authEventEmitter.events {
+        for await event in Clerk.shared.auth.events {
           switch event {
           case .signInCompleted(let signIn):
             if let sessionId = signIn.createdSessionId {
@@ -315,8 +409,9 @@ struct ClerkInlineProfileWrapperView: View {
 
   var body: some View {
     UserProfileView(isDismissable: dismissable)
+      .environment(Clerk.shared)
       .task {
-        for await event in Clerk.shared.authEventEmitter.events {
+        for await event in Clerk.shared.auth.events {
           switch event {
           case .signedOut(let session):
             onEvent("signedOut", ["sessionId": session.id])

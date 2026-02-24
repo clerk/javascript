@@ -73,7 +73,7 @@ class ClerkViewFactory : ClerkViewFactoryInterface {
   }
 
   override suspend fun signOut() {
-    val result = Clerk.signOut()
+    val result = Clerk.auth.signOut()
     when (result) {
       is ClerkResult.Success -> {
         println("[ClerkViewFactory] Sign out successful")

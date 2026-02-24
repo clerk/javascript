@@ -1,10 +1,11 @@
 // ClerkViewFactory - Provides Clerk view controllers to the ClerkExpo module
 // This file is injected into the app target by the config plugin.
-// It uses `import Clerk` (SPM) which is only accessible from the app target.
+// It uses `import ClerkKit` (SPM) which is only accessible from the app target.
 
 import UIKit
 import SwiftUI
-import Clerk
+import ClerkKit
+import ClerkKitUI
 import ClerkExpo  // Import the pod to access ClerkViewFactoryProtocol
 
 // MARK: - View Factory Implementation
@@ -21,13 +22,10 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
 
   @MainActor
   public func configure(publishableKey: String) async throws {
-    Clerk.shared.configure(publishableKey: publishableKey)
+    Clerk.configure(publishableKey: publishableKey)
 
-    // CRITICAL: Must call load() after configure() to restore session from keychain
-    try await Clerk.shared.load()
-
-    // load() is async but session may be populated AFTER it returns.
-    // The SDK uses Combine/ObservableObject pattern — session is published asynchronously.
+    // configure() handles session restoration internally, but session may be
+    // populated asynchronously via Combine/ObservableObject pattern.
     for _ in 0..<30 {  // Wait up to 3 seconds
       if Clerk.shared.session != nil {
         return
@@ -148,8 +146,10 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     return result
   }
 
+  @MainActor
   public func signOut() async throws {
-    try await Clerk.shared.signOut()
+    guard let sessionId = Clerk.shared.session?.id else { return }
+    try await Clerk.shared.auth.signOut(sessionId: sessionId)
   }
 }
 
@@ -184,7 +184,7 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
 
   private func subscribeToAuthEvents() {
     authEventTask = Task { @MainActor [weak self] in
-      for await event in Clerk.shared.authEventEmitter.events {
+      for await event in Clerk.shared.auth.events {
         guard let self = self, !self.completionCalled else { return }
         switch event {
         case .signInCompleted(let signIn):
@@ -220,6 +220,7 @@ struct ClerkAuthWrapperView: View {
 
   var body: some View {
     AuthView(mode: mode, isDismissable: dismissable)
+      .environment(Clerk.shared)
   }
 }
 
@@ -254,7 +255,7 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
 
   private func subscribeToAuthEvents() {
     authEventTask = Task { @MainActor [weak self] in
-      for await event in Clerk.shared.authEventEmitter.events {
+      for await event in Clerk.shared.auth.events {
         guard let self = self, !self.completionCalled else { return }
         switch event {
         case .signedOut(let session):
@@ -276,6 +277,7 @@ struct ClerkProfileWrapperView: View {
 
   var body: some View {
     UserProfileView(isDismissable: dismissable)
+      .environment(Clerk.shared)
   }
 }
 
@@ -288,8 +290,9 @@ struct ClerkInlineAuthWrapperView: View {
 
   var body: some View {
     AuthView(mode: mode, isDismissable: dismissable)
+      .environment(Clerk.shared)
       .task {
-        for await event in Clerk.shared.authEventEmitter.events {
+        for await event in Clerk.shared.auth.events {
           switch event {
           case .signInCompleted(let signIn):
             if let sessionId = signIn.createdSessionId {
@@ -315,8 +318,9 @@ struct ClerkInlineProfileWrapperView: View {
 
   var body: some View {
     UserProfileView(isDismissable: dismissable)
+      .environment(Clerk.shared)
       .task {
-        for await event in Clerk.shared.authEventEmitter.events {
+        for await event in Clerk.shared.auth.events {
           switch event {
           case .signedOut(let session):
             onEvent("signedOut", ["sessionId": session.id])

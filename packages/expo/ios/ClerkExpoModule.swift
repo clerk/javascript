@@ -20,7 +20,7 @@ public protocol ClerkViewFactoryProtocol {
   func createUserProfileView(dismissable: Bool, onEvent: @escaping (String, [String: Any]) -> Void) -> UIViewController?
 
   // SDK operations
-  func configure(publishableKey: String) async throws
+  func configure(publishableKey: String, bearerToken: String?) async throws
   func getSession() async -> [String: Any]?
   func signOut() async throws
 }
@@ -169,12 +169,12 @@ public class ClerkExpoModule: Module {
   public func definition() -> ModuleDefinition {
     Name("ClerkExpo")
 
-    // Configure Clerk with publishable key
-    AsyncFunction("configure") { (publishableKey: String) in
+    // Configure Clerk with publishable key and optional bearer token for session sync
+    AsyncFunction("configure") { (publishableKey: String, bearerToken: String?) in
       guard let factory = clerkViewFactory else {
         throw NSError(domain: "ClerkExpo", code: 1, userInfo: [NSLocalizedDescriptionKey: "Clerk not initialized. Make sure ClerkViewFactory is registered."])
       }
-      try await factory.configure(publishableKey: publishableKey)
+      try await factory.configure(publishableKey: publishableKey, bearerToken: bearerToken)
     }
 
     // Present sign-in/sign-up modal

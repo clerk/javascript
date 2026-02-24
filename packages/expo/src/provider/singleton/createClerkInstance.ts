@@ -62,7 +62,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
       const getToken = tokenCache.getToken;
       const saveToken = tokenCache.saveToken;
-      __internal_clerk = new ClerkClass(publishableKey);
+      __internal_clerk = new ClerkClass(publishableKey) as unknown as BrowserClerk;
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API
@@ -202,6 +202,6 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
     }
     // At this point __internal_clerk is guaranteed to be defined
 
-    return __internal_clerk;
+    return __internal_clerk!;
   };
 }

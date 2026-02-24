@@ -21,40 +21,15 @@
  *
  * ## Components
  *
- * - {@link AuthView} - Authentication flow (sign-in/sign-up)
- * - {@link UserProfileView} - User profile and account management
+ * - {@link AuthView} - Authentication flow (sign-in/sign-up), supports `presentation="modal"` (default) or `presentation="inline"`
+ * - {@link UserProfileView} - User profile and account management, supports `presentation="modal"` (default) or `presentation="inline"`
  * - {@link UserButton} - Avatar button that opens profile
- *
- * ## Usage with JS SDK
- *
- * After authenticating with native components, all `@clerk/expo` hooks work normally:
- *
- * ```tsx
- * import { AuthView } from '@clerk/expo/native';
- * import { useUser, useOrganization } from '@clerk/expo';
- *
- * function App() {
- *   const { user } = useUser();
- *   const { organization } = useOrganization();
- *
- *   if (!user) {
- *     return <AuthView onSuccess={() => console.log('Ready!')} />;
- *   }
- *
- *   // All JS SDK APIs available after native auth
- *   return <Dashboard />;
- * }
- * ```
  *
  * @module @clerk/expo/native
  */
 
 export { AuthView } from './AuthView';
 export type { AuthViewProps, AuthViewMode } from './AuthView.types';
-export { InlineAuthView } from './InlineAuthView';
-export type { InlineAuthViewProps } from './InlineAuthView';
-export { InlineUserProfileView } from './InlineUserProfileView';
-export type { InlineUserProfileViewProps } from './InlineUserProfileView';
 export { UserButton } from './UserButton';
 export type { UserButtonProps } from './UserButton';
 export { UserProfileView } from './UserProfileView';

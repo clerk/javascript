@@ -2,6 +2,7 @@ import '../polyfills';
 
 import { ClerkProvider as ClerkReactProvider } from '@clerk/react';
 import type { Ui } from '@clerk/react/internal';
+import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
@@ -106,7 +107,16 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
           const ClerkExpo = requireNativeModule('ClerkExpo');
 
           if (ClerkExpo?.configure) {
-            await ClerkExpo.configure(pk);
+            // Read the JS SDK's client JWT to sync with the native SDK
+            let bearerToken: string | null = null;
+            try {
+              bearerToken = await SecureStore.getItemAsync('__clerk_client_jwt', {
+                keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
+              });
+            } catch {
+              // SecureStore may not be available
+            }
+            await ClerkExpo.configure(pk, bearerToken);
 
             if (!isMountedRef.current) {
               return;

@@ -1,13 +1,13 @@
 import { useAuth, useClerk } from '@clerk/react';
-import { Platform } from 'expo-modules-core';
-import { useEffect, useRef } from 'react';
-import type { ViewProps } from 'react-native';
+import { Platform, requireNativeViewManager } from 'expo-modules-core';
+import { useCallback, useEffect, useRef } from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, Text, View } from 'react-native';
 
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
-// Get the native module for modal presentation (use optional require to avoid crash if not available)
+// Get the native module for modal presentation and session operations
 let ClerkExpo: {
   presentUserProfile: (options: { dismissable: boolean }) => Promise<{ session?: { id: string } } | null>;
   signOut: () => Promise<void>;
@@ -23,10 +23,30 @@ if (isNativeSupported) {
   }
 }
 
+// Get the native view component for inline rendering
+let NativeUserProfileView: any = null;
+if (isNativeSupported) {
+  try {
+    NativeUserProfileView = requireNativeViewManager('ClerkExpo', 'ClerkUserProfileExpoView');
+  } catch {
+    NativeUserProfileView = null;
+  }
+}
+
 /**
  * Props for the UserProfileView component.
  */
-export interface UserProfileViewProps extends ViewProps {
+export interface UserProfileViewProps {
+  /**
+   * How the profile view is presented.
+   *
+   * - `'modal'` - Presents a full-screen native modal (default)
+   * - `'inline'` - Renders directly within the React Native view hierarchy
+   *
+   * @default 'modal'
+   */
+  presentation?: 'modal' | 'inline';
+
   /**
    * Whether the profile view can be dismissed by the user.
    *
@@ -49,6 +69,16 @@ export interface UserProfileViewProps extends ViewProps {
    * After this callback, `useAuth()` will return `isSignedIn: false`.
    */
   onSignOut?: () => void;
+
+  /**
+   * Callback fired when the user dismisses the profile view (inline mode only).
+   */
+  onDismiss?: () => void;
+
+  /**
+   * Style applied to the container view.
+   */
+  style?: StyleProp<ViewStyle>;
 }
 
 /**
@@ -58,87 +88,7 @@ export interface UserProfileViewProps extends ViewProps {
  * - **iOS**: clerk-ios (SwiftUI) - https://github.com/clerk/clerk-ios
  * - **Android**: clerk-android (Jetpack Compose) - https://github.com/clerk/clerk-android
  *
- * ## Profile Sections
- *
- * The profile view includes all user management features enabled in your
- * [Clerk Dashboard](https://dashboard.clerk.com):
- *
- * ### Profile Information
- * - View and edit profile photo
- * - Update first name, last name, username
- * - View account creation date
- *
- * ### Email Addresses
- * - View all email addresses
- * - Add new email addresses
- * - Verify email addresses
- * - Remove email addresses
- * - Set primary email address
- *
- * ### Phone Numbers
- * - View all phone numbers
- * - Add new phone numbers
- * - Verify phone numbers via SMS
- * - Remove phone numbers
- * - Set primary phone number
- *
- * ### Password & Security
- * - Change password
- * - Set password (if using passwordless auth)
- *
- * ### Multi-Factor Authentication
- * - Enable/disable SMS verification
- * - Enable/disable TOTP (authenticator apps)
- * - View and regenerate backup codes
- *
- * ### Passkeys
- * - View registered passkeys
- * - Add new passkeys
- * - Remove passkeys
- *
- * ### Connected Accounts
- * - View connected OAuth providers (Google, Apple, GitHub, etc.)
- * - Connect new OAuth accounts
- * - Disconnect OAuth accounts
- *
- * ### Active Sessions
- * - View all active sessions/devices
- * - Sign out from other devices
- * - See session details (IP, location, browser)
- *
- * ### Account Actions
- * - Sign out
- * - Delete account (if enabled)
- *
- * ## Usage with JS SDK APIs
- *
- * While `UserProfileView` provides a native UI for common operations, you can
- * also use JS SDK APIs directly for custom implementations:
- *
- * ```tsx
- * import { useUser } from '@clerk/expo';
- *
- * function CustomProfile() {
- *   const { user } = useUser();
- *
- *   // Profile updates
- *   await user.update({ firstName: 'New Name' });
- *
- *   // Email management
- *   await user.createEmailAddress({ email: 'new@example.com' });
- *   await emailAddress.prepareVerification({ strategy: 'email_code' });
- *   await emailAddress.attemptVerification({ code: '123456' });
- *
- *   // MFA setup
- *   const totp = await user.createTOTP();
- *   await totp.attemptVerification({ code: '123456' });
- *
- *   // Passkey management
- *   await user.createPasskey();
- * }
- * ```
- *
- * @example Basic usage
+ * @example Modal presentation (default)
  * ```tsx
  * import { UserProfileView } from '@clerk/expo/native';
  *
@@ -151,25 +101,58 @@ export interface UserProfileViewProps extends ViewProps {
  * }
  * ```
  *
- * @example Non-dismissable profile
+ * @example Inline presentation
  * ```tsx
  * <UserProfileView
- *   isDismissable={false}
- *   onSignOut={() => router.replace('/sign-in')}
+ *   presentation="inline"
  *   style={{ flex: 1 }}
+ *   onSignOut={() => router.replace('/sign-in')}
  * />
  * ```
  *
  * @see {@link https://clerk.com/docs/components/user/user-profile} Clerk UserProfile Documentation
- * @see {@link https://clerk.com/docs/users/overview} User Management Documentation
  */
-export function UserProfileView({ isDismissable = true, onSignOut, style, ...props }: UserProfileViewProps) {
+export function UserProfileView({
+  presentation = 'modal',
+  isDismissable = true,
+  onSignOut,
+  onDismiss,
+  style,
+  ...props
+}: UserProfileViewProps) {
+  if (presentation === 'inline') {
+    return (
+      <InlinePresentation
+        isDismissable={isDismissable}
+        onSignOut={onSignOut}
+        onDismiss={onDismiss}
+        style={style}
+      />
+    );
+  }
+
+  return (
+    <ModalPresentation
+      isDismissable={isDismissable}
+      onSignOut={onSignOut}
+      style={style}
+      {...props}
+    />
+  );
+}
+
+// MARK: - Modal Presentation
+
+function ModalPresentation({
+  isDismissable,
+  onSignOut,
+  style,
+  ...props
+}: Omit<UserProfileViewProps, 'presentation' | 'onDismiss'>) {
   const clerk = useClerk();
   const { isSignedIn } = useAuth();
-  // Track if we've already triggered sign-out to prevent double-calls
   const signOutTriggered = useRef(false);
 
-  // Stable refs for callbacks/values to avoid re-triggering the effect
   const onSignOutRef = useRef(onSignOut);
   onSignOutRef.current = onSignOut;
   const clerkRef = useRef(clerk);
@@ -177,7 +160,6 @@ export function UserProfileView({ isDismissable = true, onSignOut, style, ...pro
   const isSignedInRef = useRef(isSignedIn);
   isSignedInRef.current = isSignedIn;
 
-  // Reset sign-out flag on mount only
   useEffect(() => {
     signOutTriggered.current = false;
   }, []);
@@ -190,36 +172,30 @@ export function UserProfileView({ isDismissable = true, onSignOut, style, ...pro
     const presentModal = async () => {
       try {
         await ClerkExpo.presentUserProfile({
-          dismissable: isDismissable,
+          dismissable: isDismissable ?? true,
         });
 
-        // Check if native session still exists after modal closes
-        // If session is null, user signed out from the native UI
         const sessionCheck = await ClerkExpo.getSession?.();
         const hasNativeSession = !!sessionCheck?.session;
 
         if (!hasNativeSession && !signOutTriggered.current) {
           signOutTriggered.current = true;
 
-          // Clear native session explicitly (may already be cleared, but ensure it)
           try {
             await ClerkExpo.signOut?.();
           } catch {
             // May already be signed out
           }
 
-          // Sign out from JS SDK - this is critical to update isSignedIn state
           const currentClerk = clerkRef.current;
           if (currentClerk?.signOut) {
             try {
               await currentClerk.signOut();
             } catch (signOutErr) {
               console.warn('[UserProfileView] JS SDK sign out error:', signOutErr);
-              // TODO: Consider a public API for force-refreshing SDK state
             }
           }
 
-          // Call onSignOut callback AFTER JS SDK sign-out completes
           onSignOutRef.current?.();
         }
       } catch (err) {
@@ -230,7 +206,6 @@ export function UserProfileView({ isDismissable = true, onSignOut, style, ...pro
     void presentModal();
   }, [isDismissable]);
 
-  // Show a placeholder when native modules aren't available
   if (!isNativeSupported || !ClerkExpo) {
     return (
       <View
@@ -250,6 +225,67 @@ export function UserProfileView({ isDismissable = true, onSignOut, style, ...pro
     <View
       style={[styles.container, style]}
       {...props}
+    />
+  );
+}
+
+// MARK: - Inline Presentation
+
+function InlinePresentation({
+  isDismissable,
+  onSignOut,
+  onDismiss,
+  style,
+}: Pick<UserProfileViewProps, 'isDismissable' | 'onSignOut' | 'onDismiss' | 'style'>) {
+  const clerk = useClerk();
+  const signOutTriggered = useRef(false);
+
+  const handleProfileEvent = useCallback(
+    async (event: { nativeEvent: { type: string; data: Record<string, any> } }) => {
+      const { type } = event.nativeEvent;
+
+      if (type === 'signedOut' && !signOutTriggered.current) {
+        signOutTriggered.current = true;
+
+        try {
+          await ClerkExpo?.signOut();
+        } catch {
+          // May already be signed out
+        }
+
+        if (clerk?.signOut) {
+          try {
+            await clerk.signOut();
+          } catch (err) {
+            console.warn('[UserProfileView] JS SDK sign out error:', err);
+          }
+        }
+
+        onSignOut?.();
+      } else if (type === 'dismissed') {
+        onDismiss?.();
+      }
+    },
+    [clerk, onSignOut, onDismiss],
+  );
+
+  if (!isNativeSupported || !NativeUserProfileView) {
+    return (
+      <View style={[styles.container, style]}>
+        <Text style={styles.text}>
+          {!isNativeSupported
+            ? 'Native UserProfileView is only available on iOS and Android'
+            : 'Native UserProfileView requires the @clerk/expo plugin. Add "@clerk/expo" to your app.json plugins array.'}
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <NativeUserProfileView
+      style={[styles.container, style]}
+      isDismissable={isDismissable}
+      onProfileEvent={handleProfileEvent}
     />
   );
 }

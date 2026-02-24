@@ -12,7 +12,7 @@ const path = require('path');
 const fs = require('fs');
 
 const CLERK_IOS_REPO = 'https://github.com/clerk/clerk-ios.git';
-const CLERK_IOS_VERSION = '0.68.1';
+const CLERK_IOS_VERSION = '1.0.0';
 
 const CLERK_MIN_IOS_VERSION = '17.0';
 
@@ -150,16 +150,23 @@ const withClerkIOS = config => {
         },
       };
 
-      // Add package product dependency
-      const productUuid = xcodeProject.generateUuid();
+      // Add package product dependencies (ClerkKit + ClerkKitUI)
+      const productUuidKit = xcodeProject.generateUuid();
+      const productUuidKitUI = xcodeProject.generateUuid();
       if (!xcodeProject.hash.project.objects.XCSwiftPackageProductDependency) {
         xcodeProject.hash.project.objects.XCSwiftPackageProductDependency = {};
       }
 
-      xcodeProject.hash.project.objects.XCSwiftPackageProductDependency[productUuid] = {
+      xcodeProject.hash.project.objects.XCSwiftPackageProductDependency[productUuidKit] = {
         isa: 'XCSwiftPackageProductDependency',
         package: packageUuid,
-        productName: 'Clerk',
+        productName: 'ClerkKit',
+      };
+
+      xcodeProject.hash.project.objects.XCSwiftPackageProductDependency[productUuidKitUI] = {
+        isa: 'XCSwiftPackageProductDependency',
+        package: packageUuid,
+        productName: 'ClerkKitUI',
       };
 
       // Add package to project's package references
@@ -184,22 +191,29 @@ const withClerkIOS = config => {
         });
       }
 
-      // Add package product to main app target
+      // Add package products to main app target
       const nativeTarget = xcodeProject.hash.project.objects.PBXNativeTarget[targetUuid];
       if (!nativeTarget.packageProductDependencies) {
         nativeTarget.packageProductDependencies = [];
       }
 
-      const productAlreadyAdded = nativeTarget.packageProductDependencies.some(dep => dep.value === productUuid);
-
-      if (!productAlreadyAdded) {
+      const kitAlreadyAdded = nativeTarget.packageProductDependencies.some(dep => dep.value === productUuidKit);
+      if (!kitAlreadyAdded) {
         nativeTarget.packageProductDependencies.push({
-          value: productUuid,
-          comment: 'Clerk',
+          value: productUuidKit,
+          comment: 'ClerkKit',
         });
       }
 
-      // Also add package to ClerkExpo pod target if it exists
+      const kitUIAlreadyAdded = nativeTarget.packageProductDependencies.some(dep => dep.value === productUuidKitUI);
+      if (!kitUIAlreadyAdded) {
+        nativeTarget.packageProductDependencies.push({
+          value: productUuidKitUI,
+          comment: 'ClerkKitUI',
+        });
+      }
+
+      // Also add packages to ClerkExpo pod target if it exists
       const allTargets = xcodeProject.hash.project.objects.PBXNativeTarget;
       for (const [uuid, target] of Object.entries(allTargets)) {
         if (target && target.name === 'ClerkExpo') {
@@ -207,15 +221,23 @@ const withClerkIOS = config => {
             target.packageProductDependencies = [];
           }
 
-          const podProductAlreadyAdded = target.packageProductDependencies.some(dep => dep.value === productUuid);
-
-          if (!podProductAlreadyAdded) {
+          const podKitAdded = target.packageProductDependencies.some(dep => dep.value === productUuidKit);
+          if (!podKitAdded) {
             target.packageProductDependencies.push({
-              value: productUuid,
-              comment: 'Clerk',
+              value: productUuidKit,
+              comment: 'ClerkKit',
             });
-            console.log(`✅ Added Clerk package to ClerkExpo pod target`);
           }
+
+          const podKitUIAdded = target.packageProductDependencies.some(dep => dep.value === productUuidKitUI);
+          if (!podKitUIAdded) {
+            target.packageProductDependencies.push({
+              value: productUuidKitUI,
+              comment: 'ClerkKitUI',
+            });
+          }
+
+          console.log(`✅ Added ClerkKit and ClerkKitUI packages to ClerkExpo pod target`);
         }
       }
 
@@ -263,7 +285,7 @@ const withClerkIOS = config => {
   ]);
 
   // Then inject ClerkViewFactory.swift into the app target
-  // This is required because the file uses `import Clerk` which is only available
+  // This is required because the file uses `import ClerkKit` which is only available
   // via SPM in the app target (CocoaPods targets can't see SPM packages)
   config = withXcodeProject(config, config => {
     try {
