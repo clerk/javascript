@@ -187,5 +187,6 @@ test.describe('machine-to-machine auth @machine', () => {
     });
     expect(res.status()).toBe(200);
     expect(await res.text()).toBe('Protected response ' + emailServer.id);
+    await client.m2m.revokeToken({ m2mTokenId: jwtToken.id });
   });
 });

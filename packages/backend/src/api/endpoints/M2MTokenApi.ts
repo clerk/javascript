@@ -2,7 +2,7 @@ import { MachineTokenVerificationError, MachineTokenVerificationErrorCode } from
 import { decodeJwt } from '../../jwt/verifyJwt';
 import type { JwtMachineVerifyOptions } from '../../jwt/verifyMachineJwt';
 import { verifyM2MJwt } from '../../jwt/verifyMachineJwt';
-import { isJwtFormat } from '../../tokens/machine';
+import { isM2MJwt } from '../../tokens/machine';
 import { joinPaths } from '../../util/path';
 import { deprecated } from '../../util/shared';
 import type { ClerkBackendApiRequestOptions, RequestFunction } from '../request';
@@ -149,7 +149,7 @@ export class M2MTokenApi extends AbstractAPI {
   async verify(params: VerifyM2MTokenParams) {
     const { token, machineSecretKey } = params;
 
-    if (isJwtFormat(token)) {
+    if (isM2MJwt(token)) {
       return this.#verifyJwtFormat(token);
     }
 

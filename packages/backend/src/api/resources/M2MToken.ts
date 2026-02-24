@@ -55,9 +55,9 @@ export class M2MToken {
       false,
       null,
       payload.exp * 1000 <= Date.now() - clockSkewInMs,
-      payload.exp, // seconds (raw JWT exp claim)
-      payload.iat, // seconds — createdAt, mapped from JWT iat claim
-      payload.iat, // seconds — updatedAt, no JWT equivalent; defaults to iat
+      payload.exp * 1000, // milliseconds — expiration, converted from JWT exp claim
+      payload.iat * 1000, // milliseconds — createdAt, converted from JWT iat claim
+      payload.iat * 1000, // milliseconds — updatedAt, no JWT equivalent; defaults to iat
     );
   }
 }

@@ -33,9 +33,9 @@ describe('M2MToken', () => {
       expect(token.revoked).toBe(false);
       expect(token.revocationReason).toBeNull();
       expect(token.expired).toBe(false);
-      expect(token.expiration).toBe(1666648550);
-      expect(token.createdAt).toBe(1666648250);
-      expect(token.updatedAt).toBe(1666648250);
+      expect(token.expiration).toBe(1666648550 * 1000);
+      expect(token.createdAt).toBe(1666648250 * 1000);
+      expect(token.updatedAt).toBe(1666648250 * 1000);
     });
 
     it('prefers scopes claim over aud when both are present', () => {
