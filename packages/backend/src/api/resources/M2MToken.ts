@@ -6,7 +6,7 @@ type M2MJwtPayload = {
   sub: string;
   exp: number;
   iat: number;
-  jti?: string;
+  jti: string;
   aud?: string[];
   scopes?: string;
   [key: string]: unknown;
@@ -48,7 +48,7 @@ export class M2MToken {
 
   static fromJwtPayload(payload: M2MJwtPayload, clockSkewInMs = 5000): M2MToken {
     return new M2MToken(
-      payload.jti ?? '',
+      payload.jti,
       payload.sub,
       payload.scopes?.split(' ') ?? payload.aud ?? [],
       null,

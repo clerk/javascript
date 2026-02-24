@@ -205,7 +205,7 @@ describe('getAuthDataFromRequest', () => {
     {
       tokenType: 'm2m_token' as const,
       token: 'mt_123',
-      data: { id: 'm2m_123', subject: 'mch_123' },
+      data: { id: 'mt_123', subject: 'mch_123' },
     },
   ])(
     'returns authenticated $tokenType object when token is valid and acceptsToken is $tokenType',

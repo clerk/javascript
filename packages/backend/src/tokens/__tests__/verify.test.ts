@@ -150,7 +150,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(result.errors).toBeUndefined();
 
     const data = result.data as M2MToken;
-    expect(data.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
+    expect(data.id).toBe('mt_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.claims).toEqual({ foo: 'bar' });
     expect(data.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
@@ -180,7 +180,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(result.errors).toBeUndefined();
 
     const data = result.data as M2MToken;
-    expect(data.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
+    expect(data.id).toBe('mt_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.claims).toEqual({ foo: 'bar' });
     expect(data.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
