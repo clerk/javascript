@@ -23,7 +23,7 @@ export default {
     // React/JSX version of Protect→Show (handles .tsx, .jsx, .ts, .js files)
     {
       name: 'transform-protect-to-show',
-      packages: ['nextjs', 'react', 'expo', 'react-router', 'tanstack-react-start', 'astro'],
+      packages: ['nextjs', 'react', 'expo', 'react-router', 'tanstack-react-start'],
     },
     // Vue SFC version of Protect→Show (handles .vue files)
     { name: 'transform-protect-to-show-vue', packages: ['vue', 'nuxt'] },
@@ -31,5 +31,6 @@ export default {
     // Migrate @clerk/react-router/api.server → @clerk/react-router/server
     { name: 'transform-react-router-api-server', packages: ['react-router'] },
     { name: 'transform-satellite-auto-sync', packages: ['nextjs', 'react', 'expo', 'astro', 'tanstack-react-start'] },
+    'transform-internal-clerk-js-ui-props',
   ],
 };

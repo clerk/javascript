@@ -39,12 +39,14 @@ const cli = meow(
       --ignore           Directories/files to ignore (can be used multiple times)
       --skip-upgrade     Skip the upgrade step
       --release          Name of the release you're upgrading to (e.g. core-3)
+      --canary           Upgrade to the latest canary version instead of the stable release
       --dry-run          Show what would be done without making changes
 
     Examples
       $ npx @clerk/upgrade
       $ npx @clerk/upgrade --sdk=nextjs
       $ npx @clerk/upgrade --dir=./src --ignore=**/test/**
+      $ npx @clerk/upgrade --canary
       $ npx @clerk/upgrade --dry-run
 
     Non-interactive mode:
@@ -59,6 +61,7 @@ const cli = meow(
       ignore: { type: 'string', isMultiple: true },
       release: { type: 'string' },
       sdk: { type: 'string' },
+      canary: { type: 'boolean', default: false },
       skipCodemods: { type: 'boolean', default: false },
       skipUpgrade: { type: 'boolean', default: false },
     },
@@ -69,6 +72,7 @@ async function main() {
   renderHeader();
 
   const options = {
+    canary: cli.flags.canary,
     dir: cli.flags.dir,
     dryRun: cli.flags.dryRun,
     glob: cli.flags.glob,
@@ -186,9 +190,9 @@ async function main() {
   if (options.skipUpgrade) {
     renderText('Skipping package upgrade (--skip-upgrade flag)', 'yellow');
     renderNewline();
-  } else if (config.alreadyUpgraded) {
+  } else if (config.alreadyUpgraded && !options.canary) {
     renderSuccess(`You're already on the latest major version of @clerk/${sdk}`);
-  } else if (config.needsUpgrade) {
+  } else if (config.needsUpgrade || options.canary) {
     await performUpgrade(sdk, packageManager, config, options);
   }
 
@@ -214,7 +218,7 @@ async function main() {
 async function performUpgrade(sdk, packageManager, config, options) {
   const targetPackage = getTargetPackageName(sdk);
   const oldPackage = getOldPackageName(sdk);
-  const targetVersion = config.sdkVersions?.[sdk]?.to;
+  const targetVersion = options.canary ? 'canary' : config.sdkVersions?.[sdk]?.to;
 
   if (options.dryRun) {
     renderText(`[dry run] Would upgrade ${targetPackage} to version ${targetVersion}`, 'yellow');

@@ -11,10 +11,10 @@ export const requestHasAuthObject = (req: ExpressRequest): req is ExpressRequest
 export const loadClientEnv = () => {
   return {
     publishableKey: process.env.CLERK_PUBLISHABLE_KEY || '',
-    clerkJSUrl: process.env.CLERK_JS || process.env.CLERK_JS_URL || '',
-    clerkJSVersion: process.env.CLERK_JS_VERSION || '',
-    clerkUIUrl: process.env.CLERK_UI_URL || '',
-    clerkUIVersion: process.env.CLERK_UI_VERSION || '',
+    __internal_clerkJSUrl: process.env.CLERK_JS || process.env.CLERK_JS_URL || '',
+    __internal_clerkJSVersion: process.env.CLERK_JS_VERSION || '',
+    __internal_clerkUIUrl: process.env.CLERK_UI_URL || '',
+    __internal_clerkUIVersion: process.env.CLERK_UI_VERSION || '',
     prefetchUI: process.env.CLERK_PREFETCH_UI === 'false' ? false : undefined,
   };
 };

@@ -1,7 +1,7 @@
 ---
 title: '`getAuth()` helper removed'
 packages: ['nuxt']
-matcher: 'getAuth\\('
+matcher: 'getAuth\('
 category: 'deprecation-removal'
 ---
 

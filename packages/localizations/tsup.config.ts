@@ -1,6 +1,8 @@
 import { defineConfig } from 'tsup';
 
-export default defineConfig(_overrideOptions => {
+export default defineConfig(overrideOptions => {
+  const shouldPublish = !!overrideOptions.env?.publish;
+
   return {
     entry: ['src/*.ts'],
     format: ['cjs', 'esm'],
@@ -10,5 +12,6 @@ export default defineConfig(_overrideOptions => {
     sourcemap: true,
     dts: true,
     splitting: false,
+    onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
   };
 });

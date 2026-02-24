@@ -57,6 +57,7 @@
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
+    "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "generate": "tsc -p tsconfig.generate.json && node --experimental-vm-modules src/utils/generate.js && rimraf tmp && prettier --write src/*.ts",

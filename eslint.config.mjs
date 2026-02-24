@@ -257,7 +257,6 @@ export default tseslint.config([
       '.next',
       '.turbo',
       '.vscode',
-      '.yalc',
       '!.*.js',
       '**/.turbo/*',
       '**/build/*',

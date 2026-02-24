@@ -5,6 +5,7 @@ import { type ReactNode, useId, useMemo, useState } from 'react';
 
 import { InternalThemeProvider } from '../../../styledSystem';
 import { handleDashboardUrlParsing } from '../shared';
+import { useDragToCorner } from './use-drag-to-corner';
 import { useRevalidateEnvironment } from './use-revalidate-environment';
 
 type KeylessPromptProps = {
@@ -287,6 +288,7 @@ export function getResolvedContent(state: STATES, context: ResolvedContentContex
 function KeylessPromptInternal(props: KeylessPromptProps) {
   const id = useId();
   const environment = useRevalidateEnvironment();
+  const { isDragging, cornerStyle, containerRef, onPointerDown, preventClick, isInitialized } = useDragToCorner();
 
   const claimed = Boolean(environment.authConfig.claimedAt);
   const success = typeof props.onDismiss === 'function' && claimed;
@@ -348,12 +350,16 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
 
   return (
     <div
+      ref={containerRef}
+      onPointerDown={isOpen ? undefined : onPointerDown}
+      style={{
+        ...cornerStyle,
+        opacity: isInitialized ? undefined : 0,
+      }}
       data-expanded={isOpen}
       css={css`
         ${CSS_RESET};
         position: fixed;
-        bottom: 1.25rem;
-        right: 1.25rem;
         border-radius: ${isOpen ? '0.75rem' : '2.5rem'};
         background-color: #1f1f1f;
         box-shadow:
@@ -368,9 +374,13 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
         transform: translateZ(0);
         backface-visibility: hidden;
         width: ${isOpen ? WIDTH_OPEN : resolvedContent.triggerWidth};
-        transition:
-          border-radius ${getDuration(isOpen)} cubic-bezier(0.2, 0, 0, 1),
-          width ${getDuration(isOpen)} ${EASE_BEZIER};
+        cursor: ${isDragging ? 'grabbing' : isOpen ? 'default' : 'grab'};
+        touch-action: none;
+        transition: ${isDragging
+          ? 'none'
+          : isInitialized
+            ? `width ${getDuration(isOpen)} ${EASE_BEZIER}, border-radius ${getDuration(isOpen)} cubic-bezier(0.2, 0, 0, 1)`
+            : 'none'};
 
         @media (prefers-reduced-motion: reduce) {
           transition: none;
@@ -404,7 +414,12 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
         aria-label='Keyless prompt'
         aria-controls={id}
         aria-expanded={isOpen}
-        onClick={() => setIsOpen(p => !p)}
+        onClick={() => {
+          if (preventClick) {
+            return;
+          }
+          setIsOpen(p => !p);
+        }}
         css={css`
           ${CSS_RESET};
           display: flex;
