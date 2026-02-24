@@ -1,5 +1,6 @@
 ---
 "@clerk/backend": minor
+"@clerk/nextjs": minor
 ---
 
 Added support for JWT token format when creating and verifying machine-to-machine (M2M) tokens. This enables fully **networkless verification** when using the public JWT key.
