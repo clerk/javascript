@@ -4,6 +4,11 @@ plugins {
   id 'org.jetbrains.kotlin.plugin.compose' version '2.1.20'
 }
 
+def isNewArchitectureEnabled = project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+if (isNewArchitectureEnabled) {
+  apply plugin: "com.facebook.react"
+}
+
 group = 'com.clerk.expo'
 version = '1.0.0'
 
@@ -64,6 +69,9 @@ android {
   sourceSets {
     main {
       java.srcDirs = ['src/main/java']
+      if (isNewArchitectureEnabled) {
+        java.srcDirs += ["${project.buildDir}/generated/source/codegen/java"]
+      }
     }
   }
 }
