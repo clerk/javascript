@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.125.1
+
+### Patch Changes
+
+- Fix "You must belong to an organization" screen showing after accepting an organization invitation ([#7921](https://github.com/clerk/javascript/pull/7921)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 5.125.0
 
 ### Minor Changes
