@@ -5,6 +5,7 @@ import type { ClerkAPIErrorJSON } from '@clerk/shared/types';
 import { isDevOrStagingUrl } from '../../utils';
 import { clerkErrorDevInitFailed } from '../errors';
 import type { FapiClient } from '../fapiClient';
+import type { DevBrowserCookieOptions } from './cookies/devBrowser';
 import { createDevBrowserCookie } from './cookies/devBrowser';
 
 export interface DevBrowser {
@@ -23,10 +24,16 @@ export type CreateDevBrowserOptions = {
   frontendApi: string;
   cookieSuffix: string;
   fapiClient: FapiClient;
+  cookieOptions: DevBrowserCookieOptions;
 };
 
-export function createDevBrowser({ cookieSuffix, frontendApi, fapiClient }: CreateDevBrowserOptions): DevBrowser {
-  const devBrowserCookie = createDevBrowserCookie(cookieSuffix);
+export function createDevBrowser({
+  cookieSuffix,
+  frontendApi,
+  fapiClient,
+  cookieOptions,
+}: CreateDevBrowserOptions): DevBrowser {
+  const devBrowserCookie = createDevBrowserCookie(cookieSuffix, cookieOptions);
 
   function getDevBrowserJWT() {
     return devBrowserCookie.get();

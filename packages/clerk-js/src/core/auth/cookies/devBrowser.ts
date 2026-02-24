@@ -13,10 +13,16 @@ export type DevBrowserCookieHandler = {
   remove: () => void;
 };
 
-const getCookieAttributes = () => {
-  const sameSite = inCrossOriginIframe() || requiresSameSiteNone() ? 'None' : 'Lax';
+export type DevBrowserCookieOptions = {
+  usePartitionedCookies: () => boolean;
+};
+
+const getCookieAttributes = (options: DevBrowserCookieOptions) => {
+  const isPartitioned = options.usePartitionedCookies();
+  const sameSite = isPartitioned ? 'None' : inCrossOriginIframe() || requiresSameSiteNone() ? 'None' : 'Lax';
   const secure = getSecureAttribute(sameSite);
-  return { sameSite, secure } as const;
+  const partitioned = isPartitioned && secure;
+  return { sameSite, secure, partitioned } as const;
 };
 
 /**
@@ -25,7 +31,10 @@ const getCookieAttributes = () => {
  * The cookie is used to authenticate FAPI requests and pass
  * authentication from AP to the app.
  */
-export const createDevBrowserCookie = (cookieSuffix: string): DevBrowserCookieHandler => {
+export const createDevBrowserCookie = (
+  cookieSuffix: string,
+  options: DevBrowserCookieOptions,
+): DevBrowserCookieHandler => {
   const devBrowserCookie = createCookieHandler(DEV_BROWSER_JWT_KEY);
   const suffixedDevBrowserCookie = createCookieHandler(getSuffixedCookieName(DEV_BROWSER_JWT_KEY, cookieSuffix));
 
@@ -33,14 +42,14 @@ export const createDevBrowserCookie = (cookieSuffix: string): DevBrowserCookieHa
 
   const set = (jwt: string) => {
     const expires = addYears(Date.now(), 1);
-    const { sameSite, secure } = getCookieAttributes();
+    const { sameSite, secure, partitioned } = getCookieAttributes(options);
 
-    suffixedDevBrowserCookie.set(jwt, { expires, sameSite, secure });
-    devBrowserCookie.set(jwt, { expires, sameSite, secure });
+    suffixedDevBrowserCookie.set(jwt, { expires, sameSite, secure, partitioned });
+    devBrowserCookie.set(jwt, { expires, sameSite, secure, partitioned });
   };
 
   const remove = () => {
-    const attributes = getCookieAttributes();
+    const attributes = getCookieAttributes(options);
     suffixedDevBrowserCookie.remove(attributes);
     devBrowserCookie.remove(attributes);
   };

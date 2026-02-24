@@ -88,6 +88,7 @@ export class AuthCookieService {
       frontendApi: clerk.frontendApi,
       fapiClient,
       cookieSuffix,
+      cookieOptions,
     });
   }
 
