@@ -40,7 +40,6 @@ export default defineConfig({
         'src/**/*.d.ts',
         'src/**/index.ts',
         'src/**/index.browser.ts',
-        'src/**/index.chips.browser.ts',
         'src/**/index.legacy.browser.ts',
         'src/**/coverage/**',
         'src/**/dist/**',
