@@ -48,7 +48,7 @@ export class M2MToken {
 
   static fromJwtPayload(payload: M2MJwtPayload, clockSkewInMs = 5000): M2MToken {
     return new M2MToken(
-      payload.jti ?? '',
+      payload.jti ?? '', // jti should always be present in Clerk-issued M2M JWTs
       payload.sub,
       payload.scopes?.split(' ') ?? payload.aud ?? [],
       null,
@@ -56,8 +56,8 @@ export class M2MToken {
       null,
       payload.exp * 1000 <= Date.now() - clockSkewInMs,
       payload.exp, // seconds (raw JWT exp claim)
-      payload.iat, // seconds (raw JWT iat claim)
-      payload.iat, // seconds (raw JWT iat claim)
+      payload.iat, // seconds — createdAt, mapped from JWT iat claim
+      payload.iat, // seconds — updatedAt, no JWT equivalent; defaults to iat
     );
   }
 }

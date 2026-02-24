@@ -38,6 +38,21 @@ describe('M2MToken', () => {
       expect(token.updatedAt).toBe(1666648250);
     });
 
+    it('prefers scopes claim over aud when both are present', () => {
+      const payload = {
+        sub: 'mch_test',
+        exp: 1666648550,
+        iat: 1666648250,
+        jti: 'mt_test',
+        scopes: 'scope1 scope2',
+        aud: ['aud1', 'aud2'],
+      };
+
+      const token = M2MToken.fromJwtPayload(payload);
+
+      expect(token.scopes).toEqual(['scope1', 'scope2']);
+    });
+
     it('parses scopes from space-separated string when aud is missing', () => {
       const payload = {
         sub: 'mch_test',
