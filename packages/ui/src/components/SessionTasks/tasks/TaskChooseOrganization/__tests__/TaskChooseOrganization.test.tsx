@@ -6,13 +6,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
 import {
+  createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,
   createFakeUserOrganizationSuggestion,
 } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
 import { clearFetchCache } from '@/ui/hooks/useFetch';
 
-import { TaskChooseOrganization } from '..';
 import type { FakeOrganizationParams } from '../../../../CreateOrganization/__tests__/CreateOrganization.test';
+import { TaskChooseOrganization } from '..';
 
 type FakeOrganizationParams = {
   id: string;
@@ -317,6 +318,55 @@ describe('TaskChooseOrganization', () => {
       expect(await findByText(/you must belong to an organization/i)).toBeInTheDocument();
       expect(await findByText(/contact your organization admin for an invitation/i)).toBeInTheDocument();
       expect(queryByText(/create new organization/i)).not.toBeInTheDocument();
+    });
+
+    it('automatically selects organization after accepting an invitation', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withForceOrganizationSelection();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          create_organization_enabled: false,
+          tasks: [{ key: 'choose-organization' }],
+        });
+      });
+
+      const fakeOrg = createFakeOrganization({
+        id: 'org1',
+        name: 'Acme Inc',
+        slug: 'acme',
+        membersCount: 5,
+        adminDeleteEnabled: false,
+        maxAllowedMemberships: 10,
+        pendingInvitationsCount: 1,
+      });
+
+      const fakeInvitation = createFakeUserOrganizationInvitation({
+        id: 'inv1',
+        emailAddress: 'test@clerk.com',
+        publicOrganizationData: { id: 'org1', name: 'Acme Inc', slug: 'acme' },
+      });
+
+      (fakeInvitation.accept as ReturnType<typeof vi.fn>).mockResolvedValue({ ...fakeInvitation, status: 'accepted' });
+      fixtures.clerk.getOrganization = vi.fn().mockResolvedValue(fakeOrg);
+
+      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
+        Promise.resolve({ data: [fakeInvitation], total_count: 1 }),
+      );
+
+      const { findByRole, queryByText } = render(<TaskChooseOrganization />, { wrapper });
+
+      const joinButton = await findByRole('button', { name: /join/i });
+      await userEvent.click(joinButton);
+
+      await waitFor(() => {
+        expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
+          expect.objectContaining({
+            organization: fakeOrg,
+          }),
+        );
+        expect(queryByText(/you must belong to an organization/i)).not.toBeInTheDocument();
+      });
     });
 
     it('with existing memberships or suggestions, displays create organization screen', async () => {

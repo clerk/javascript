@@ -5,7 +5,7 @@ import type {
   OrganizationSuggestionResource,
   UserOrganizationInvitationResource,
 } from '@clerk/shared/types';
-import React, { useState } from 'react';
+import React from 'react';
 
 import { CreateOrganizationAction } from '@/common/CreateOrganizationAction';
 import {
@@ -178,8 +178,9 @@ const MembershipPreview = (props: { organization: OrganizationResource }) => {
 const InvitationPreview = (props: UserOrganizationInvitationResource) => {
   const card = useCardState();
   const { getOrganization } = useClerk();
-  const [acceptedOrganization, setAcceptedOrganization] = useState<OrganizationResource | null>(null);
-  const { userInvitations } = useOrganizationList({
+  const { navigateOnSetActive } = useSessionTasksContext();
+  const { redirectUrlComplete } = useTaskChooseOrganizationContext();
+  const { isLoaded, setActive, userInvitations } = useOrganizationList({
     userInvitations: organizationListParams.userInvitations,
   });
 
@@ -190,20 +191,20 @@ const InvitationPreview = (props: UserOrganizationInvitationResource) => {
         .runAsync(async () => {
           const updatedItem = await props.accept();
           const organization = await getOrganization(props.publicOrganizationData.id);
-          return [updatedItem, organization] as const;
-        })
-        .then(([updatedItem, organization]) => {
           // Update cache in case another listener depends on it
           void userInvitations?.setData?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages, 'negative'));
-          setAcceptedOrganization(organization);
+          if (isLoaded && organization) {
+            await setActive({
+              organization,
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrlComplete, decorateUrl });
+              },
+            });
+          }
         })
         .catch(err => handleError(err, [], card.setError))
     );
   };
-
-  if (acceptedOrganization) {
-    return <MembershipPreview organization={acceptedOrganization} />;
-  }
 
   return (
     <OrganizationPreviewListItem
