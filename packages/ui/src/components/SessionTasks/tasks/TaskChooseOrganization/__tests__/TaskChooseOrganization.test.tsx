@@ -333,8 +333,8 @@ describe('TaskChooseOrganization', () => {
 
       const fakeOrg = createFakeOrganization({
         id: 'org1',
-        name: 'Acme Inc',
-        slug: 'acme',
+        name: 'Test Org',
+        slug: 'test-org',
         membersCount: 5,
         adminDeleteEnabled: false,
         maxAllowedMemberships: 10,
@@ -344,7 +344,7 @@ describe('TaskChooseOrganization', () => {
       const fakeInvitation = createFakeUserOrganizationInvitation({
         id: 'inv1',
         emailAddress: 'test@clerk.com',
-        publicOrganizationData: { id: 'org1', name: 'Acme Inc', slug: 'acme' },
+        publicOrganizationData: { id: 'org1', name: 'Test Org', slug: 'test-org' },
       });
 
       (fakeInvitation.accept as ReturnType<typeof vi.fn>).mockResolvedValue({ ...fakeInvitation, status: 'accepted' });
