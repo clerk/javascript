@@ -4,8 +4,10 @@ import com.facebook.react.common.MapBuilder
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
+import com.facebook.react.viewmanagers.ClerkAuthViewManagerInterface
 
-class ClerkAuthViewManager : SimpleViewManager<ClerkAuthNativeView>() {
+class ClerkAuthViewManager : SimpleViewManager<ClerkAuthNativeView>(),
+    ClerkAuthViewManagerInterface<ClerkAuthNativeView> {
 
   override fun getName(): String = "ClerkAuthView"
 
@@ -14,13 +16,13 @@ class ClerkAuthViewManager : SimpleViewManager<ClerkAuthNativeView>() {
   }
 
   @ReactProp(name = "mode")
-  fun setMode(view: ClerkAuthNativeView, mode: String?) {
+  override fun setMode(view: ClerkAuthNativeView, mode: String?) {
     view.mode = mode ?: "signInOrUp"
     view.setupView()
   }
 
   @ReactProp(name = "isDismissable")
-  fun setIsDismissable(view: ClerkAuthNativeView, isDismissable: Boolean) {
+  override fun setIsDismissable(view: ClerkAuthNativeView, isDismissable: Boolean) {
     view.isDismissable = isDismissable
     view.setupView()
   }

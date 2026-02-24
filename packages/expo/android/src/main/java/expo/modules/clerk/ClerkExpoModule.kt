@@ -8,7 +8,6 @@ import com.clerk.api.Clerk
 import com.facebook.react.bridge.ActivityEventListener
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableNativeMap
@@ -28,7 +27,7 @@ private fun debugLog(tag: String, message: String) {
 }
 
 class ClerkExpoModule(reactContext: ReactApplicationContext) :
-    ReactContextBaseJavaModule(reactContext),
+    NativeClerkModuleSpec(reactContext),
     ActivityEventListener {
 
     companion object {
@@ -63,7 +62,7 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     // MARK: - configure
 
     @ReactMethod
-    fun configure(pubKey: String, bearerToken: String?, promise: Promise) {
+    override fun configure(pubKey: String, bearerToken: String?, promise: Promise) {
         coroutineScope.launch {
             try {
                 publishableKey = pubKey
@@ -112,7 +111,7 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     // MARK: - presentAuth
 
     @ReactMethod
-    fun presentAuth(options: ReadableMap, promise: Promise) {
+    override fun presentAuth(options: ReadableMap, promise: Promise) {
         val activity = getCurrentActivity() ?: run {
             promise.reject("E_ACTIVITY_UNAVAILABLE", "No activity available to present Clerk UI.")
             return
@@ -146,7 +145,7 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     // MARK: - presentUserProfile
 
     @ReactMethod
-    fun presentUserProfile(options: ReadableMap, promise: Promise) {
+    override fun presentUserProfile(options: ReadableMap, promise: Promise) {
         val activity = getCurrentActivity() ?: run {
             promise.reject("E_ACTIVITY_UNAVAILABLE", "No activity available to present Clerk UI.")
             return
@@ -173,7 +172,7 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     // MARK: - getSession
 
     @ReactMethod
-    fun getSession(promise: Promise) {
+    override fun getSession(promise: Promise) {
         if (!Clerk.isInitialized.value) {
             promise.reject("E_NOT_INITIALIZED", "Clerk SDK is not initialized. Call configure() first.")
             return
@@ -214,7 +213,7 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     // MARK: - getClientToken
 
     @ReactMethod
-    fun getClientToken(promise: Promise) {
+    override fun getClientToken(promise: Promise) {
         try {
             val prefs = reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
             val deviceToken = prefs.getString("DEVICE_TOKEN", null)
@@ -229,7 +228,7 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     // MARK: - signOut
 
     @ReactMethod
-    fun signOut(promise: Promise) {
+    override fun signOut(promise: Promise) {
         if (!Clerk.isInitialized.value) {
             promise.reject("E_NOT_INITIALIZED", "Clerk SDK is not initialized. Call configure() first.")
             return

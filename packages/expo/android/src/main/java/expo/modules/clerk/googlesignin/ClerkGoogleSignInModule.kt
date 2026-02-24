@@ -11,8 +11,8 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import expo.modules.clerk.NativeClerkGoogleSignInSpec
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableNativeMap
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
@@ -24,7 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ClerkGoogleSignInModule(reactContext: ReactApplicationContext) :
-    ReactContextBaseJavaModule(reactContext) {
+    NativeClerkGoogleSignInSpec(reactContext) {
 
   private var webClientId: String? = null
   private var hostedDomain: String? = null
@@ -39,7 +39,7 @@ class ClerkGoogleSignInModule(reactContext: ReactApplicationContext) :
   // MARK: - configure
 
   @ReactMethod
-  fun configure(params: ReadableMap) {
+  override fun configure(params: ReadableMap) {
     webClientId = if (params.hasKey("webClientId")) params.getString("webClientId") else null
     hostedDomain = if (params.hasKey("hostedDomain")) params.getString("hostedDomain") else null
     autoSelectEnabled = if (params.hasKey("autoSelectEnabled")) params.getBoolean("autoSelectEnabled") else false
@@ -48,7 +48,7 @@ class ClerkGoogleSignInModule(reactContext: ReactApplicationContext) :
   // MARK: - signIn
 
   @ReactMethod
-  fun signIn(params: ReadableMap?, promise: Promise) {
+  override fun signIn(params: ReadableMap?, promise: Promise) {
     val clientId = webClientId ?: run {
       promise.reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.")
       return
@@ -102,7 +102,7 @@ class ClerkGoogleSignInModule(reactContext: ReactApplicationContext) :
   // MARK: - createAccount
 
   @ReactMethod
-  fun createAccount(params: ReadableMap?, promise: Promise) {
+  override fun createAccount(params: ReadableMap?, promise: Promise) {
     val clientId = webClientId ?: run {
       promise.reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.")
       return
@@ -152,7 +152,7 @@ class ClerkGoogleSignInModule(reactContext: ReactApplicationContext) :
   // MARK: - presentExplicitSignIn
 
   @ReactMethod
-  fun presentExplicitSignIn(params: ReadableMap?, promise: Promise) {
+  override fun presentExplicitSignIn(params: ReadableMap?, promise: Promise) {
     val clientId = webClientId ?: run {
       promise.reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.")
       return
@@ -199,7 +199,7 @@ class ClerkGoogleSignInModule(reactContext: ReactApplicationContext) :
   // MARK: - signOut
 
   @ReactMethod
-  fun signOut(promise: Promise) {
+  override fun signOut(promise: Promise) {
     mainScope.launch {
       try {
         credentialManager.clearCredentialState(ClearCredentialStateRequest())

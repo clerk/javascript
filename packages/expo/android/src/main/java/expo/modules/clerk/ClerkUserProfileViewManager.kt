@@ -4,8 +4,10 @@ import com.facebook.react.common.MapBuilder
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
+import com.facebook.react.viewmanagers.ClerkUserProfileViewManagerInterface
 
-class ClerkUserProfileViewManager : SimpleViewManager<ClerkUserProfileNativeView>() {
+class ClerkUserProfileViewManager : SimpleViewManager<ClerkUserProfileNativeView>(),
+    ClerkUserProfileViewManagerInterface<ClerkUserProfileNativeView> {
 
   override fun getName(): String = "ClerkUserProfileView"
 
@@ -14,7 +16,7 @@ class ClerkUserProfileViewManager : SimpleViewManager<ClerkUserProfileNativeView
   }
 
   @ReactProp(name = "isDismissable")
-  fun setIsDismissable(view: ClerkUserProfileNativeView, isDismissable: Boolean) {
+  override fun setIsDismissable(view: ClerkUserProfileNativeView, isDismissable: Boolean) {
     view.isDismissable = isDismissable
     view.setupView()
   }

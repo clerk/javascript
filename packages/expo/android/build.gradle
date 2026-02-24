@@ -4,8 +4,8 @@ plugins {
   id 'org.jetbrains.kotlin.plugin.compose' version '2.1.20'
 }
 
-def isNewArchitectureEnabled = project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
-if (isNewArchitectureEnabled) {
+// Required for React Native codegen to generate Fabric component descriptors
+if (project.hasProperty("newArchEnabled") && project.newArchEnabled == "true") {
   apply plugin: "com.facebook.react"
 }
 
@@ -68,10 +68,7 @@ android {
 
   sourceSets {
     main {
-      java.srcDirs = ['src/main/java']
-      if (isNewArchitectureEnabled) {
-        java.srcDirs += ["${project.buildDir}/generated/source/codegen/java"]
-      }
+      java.srcDirs = ['src/main/java', "${project.buildDir}/generated/source/codegen/java"]
     }
   }
 }
