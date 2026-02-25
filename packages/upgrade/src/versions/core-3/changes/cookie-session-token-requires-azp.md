@@ -14,5 +14,6 @@ Previously, cookie-based session tokens without an `azp` claim were accepted. No
 This change is transparent for most applications. The `azp` claim is automatically set by Clerk's backend when the browser includes an `Origin` header, which is the standard behavior for all modern browsers.
 
 You may be affected if:
+
 - You are manually constructing or forwarding session cookies without going through a standard browser flow
 - You are using a custom proxy that strips the `Origin` header from requests to Clerk's Frontend API
