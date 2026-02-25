@@ -139,3 +139,16 @@ export function getPackageManagerDisplayName(packageManager) {
       return 'npm';
   }
 }
+
+export function hasPackage(packageName, cwd) {
+  const pkgPath = path.join(path.resolve(cwd), 'package.json');
+  if (!fs.existsSync(pkgPath)) {
+    return false;
+  }
+  try {
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+    return !!(pkg.dependencies?.[packageName] || pkg.devDependencies?.[packageName]);
+  } catch {
+    return false;
+  }
+}
