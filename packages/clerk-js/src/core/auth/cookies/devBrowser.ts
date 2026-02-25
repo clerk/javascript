@@ -19,7 +19,7 @@ export type DevBrowserCookieOptions = {
 
 const getCookieAttributes = (options: DevBrowserCookieOptions) => {
   const isPartitioned = options.usePartitionedCookies();
-  const sameSite = isPartitioned ? 'None' : inCrossOriginIframe() || requiresSameSiteNone() ? 'None' : 'Lax';
+  const sameSite = isPartitioned || inCrossOriginIframe() || requiresSameSiteNone() ? 'None' : 'Lax';
   const secure = getSecureAttribute(sameSite);
   const partitioned = isPartitioned && secure;
   return { sameSite, secure, partitioned } as const;
@@ -44,10 +44,8 @@ export const createDevBrowserCookie = (
     const expires = addYears(Date.now(), 1);
     const { sameSite, secure, partitioned } = getCookieAttributes(options);
 
-    // If setting Partitioned to true, remove the existing non-partitioned cookies.
-    // A partitioned and non-partitioned cookie with the same name are treated as
-    // different cookies by the browser, so we need to explicitly remove the old
-    // non-partitioned versions. Plain remove() (without attributes) targets them.
+    // Remove old non-partitioned cookies — the browser treats partitioned and
+    // non-partitioned cookies with the same name as distinct cookies.
     if (partitioned) {
       suffixedDevBrowserCookie.remove();
       devBrowserCookie.remove();

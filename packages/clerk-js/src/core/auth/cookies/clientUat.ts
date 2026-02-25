@@ -46,7 +46,7 @@ export const createClientUatCookie = (
      * but if that isn't used we rely on this. In production, nothing is cross-domain and Lax is used when client_uat is set from FAPI.
      */
     const isPartitioned = options.usePartitionedCookies();
-    const sameSite = isPartitioned ? 'None' : inCrossOriginIframe() || requiresSameSiteNone() ? 'None' : 'Strict';
+    const sameSite = isPartitioned || inCrossOriginIframe() || requiresSameSiteNone() ? 'None' : 'Strict';
     const secure = getSecureAttribute(sameSite);
     const partitioned = isPartitioned && secure;
     const domain = getCookieDomain(undefined, undefined, { sameSite, secure });
