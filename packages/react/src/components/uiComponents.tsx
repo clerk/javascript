@@ -742,8 +742,8 @@ export const TaskSetupMFA = withClerk(
         {clerk.loaded && (
           <ClerkHostRenderer
             component={component}
-            mount={clerk.mountTaskSetupMfa}
-            unmount={clerk.unmountTaskSetupMfa}
+            mount={clerk.mountTaskSetupMFA}
+            unmount={clerk.unmountTaskSetupMFA}
             updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}

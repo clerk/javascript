@@ -3,7 +3,7 @@
     { "path": "./dist/clerk.js", "maxSize": "539KB" },
     { "path": "./dist/clerk.browser.js", "maxSize": "66KB" },
     { "path": "./dist/clerk.chips.browser.js", "maxSize": "66KB" },
-    { "path": "./dist/clerk.legacy.browser.js", "maxSize": "107KB" },
+    { "path": "./dist/clerk.legacy.browser.js", "maxSize": "108KB" },
     { "path": "./dist/clerk.no-rhc.js", "maxSize": "307KB" },
     { "path": "./dist/clerk.native.js", "maxSize": "65KB" },
     { "path": "./dist/vendors*.js", "maxSize": "7KB" },

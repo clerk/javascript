@@ -12,8 +12,10 @@ const errorThrower = buildErrorThrower({ packageName: '@clerk/shared' });
 
 export type LoadClerkJSScriptOptions = {
   publishableKey: string;
-  clerkJSUrl?: string;
-  clerkJSVersion?: string;
+  /** @internal */
+  __internal_clerkJSUrl?: string;
+  /** @internal */
+  __internal_clerkJSVersion?: string;
   sdkMetadata?: SDKMetadata;
   proxyUrl?: string;
   domain?: string;
@@ -33,8 +35,10 @@ export type LoadClerkJsScriptOptions = LoadClerkJSScriptOptions;
 
 export type LoadClerkUIScriptOptions = {
   publishableKey: string;
-  clerkUIUrl?: string;
-  clerkUIVersion?: string;
+  /** @internal */
+  __internal_clerkUIUrl?: string;
+  /** @internal */
+  __internal_clerkUIVersion?: string;
   proxyUrl?: string;
   domain?: string;
   nonce?: string;
@@ -220,26 +224,26 @@ export const loadClerkUIScript = async (opts?: LoadClerkUIScriptOptions): Promis
 };
 
 export const clerkJSScriptUrl = (opts: LoadClerkJSScriptOptions) => {
-  const { clerkJSUrl, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
+  const { __internal_clerkJSUrl, __internal_clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
 
-  if (clerkJSUrl) {
-    return clerkJSUrl;
+  if (__internal_clerkJSUrl) {
+    return __internal_clerkJSUrl;
   }
 
   const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
-  const version = versionSelector(clerkJSVersion);
+  const version = versionSelector(__internal_clerkJSVersion);
   return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.browser.js`;
 };
 
 export const clerkUIScriptUrl = (opts: LoadClerkUIScriptOptions) => {
-  const { clerkUIUrl, clerkUIVersion, proxyUrl, domain, publishableKey } = opts;
+  const { __internal_clerkUIUrl, __internal_clerkUIVersion, proxyUrl, domain, publishableKey } = opts;
 
-  if (clerkUIUrl) {
-    return clerkUIUrl;
+  if (__internal_clerkUIUrl) {
+    return __internal_clerkUIUrl;
   }
 
   const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
-  const version = versionSelector(clerkUIVersion, UI_PACKAGE_VERSION);
+  const version = versionSelector(__internal_clerkUIVersion, UI_PACKAGE_VERSION);
   return `https://${scriptHost}/npm/@clerk/ui@${version}/dist/ui.browser.js`;
 };
 

@@ -4,28 +4,78 @@ import type { APIContext } from 'astro';
 type ContextOrLocals = APIContext | APIContext['locals'];
 
 /**
+ * Cached env object from `cloudflare:workers` for Astro v6+ Cloudflare adapter.
+ * - `undefined`: not yet attempted
+ * - `null`: attempted but not available (non-Cloudflare environment)
+ * - object: the env object from `cloudflare:workers`
+ */
+let cloudflareEnv: Record<string, string> | null | undefined;
+
+/**
+ * @internal
+ * Attempts to import env from `cloudflare:workers` and caches the result.
+ * This is needed for Astro v6+ where `locals.runtime.env` is no longer available.
+ * Safe to call in non-Cloudflare environments — will no-op.
+ */
+async function initCloudflareEnv(): Promise<void> {
+  if (cloudflareEnv !== undefined) {
+    return;
+  }
+  try {
+    // Use a variable to prevent TypeScript from resolving the module specifier
+    const moduleName = 'cloudflare:workers';
+    const mod = await import(/* @vite-ignore */ moduleName);
+    cloudflareEnv = mod.env;
+  } catch {
+    cloudflareEnv = null;
+  }
+}
+
+/**
  * @internal
  * Isomorphic handler for reading environment variables defined from Vite or are injected in the request context (CF Pages)
  */
 function getContextEnvVar(envVarName: keyof InternalEnv, contextOrLocals: ContextOrLocals): string | undefined {
   const locals = 'locals' in contextOrLocals ? contextOrLocals.locals : contextOrLocals;
 
-  if (locals?.runtime?.env) {
-    return locals.runtime.env[envVarName];
+  // Astro v6+ Cloudflare adapter: env from cloudflare:workers
+  // Checked first to avoid the expensive try/catch on locals.runtime.env,
+  // which throws on every call in Astro v6 Cloudflare environments.
+  if (cloudflareEnv) {
+    return cloudflareEnv[envVarName];
   }
 
-  return import.meta.env[envVarName];
+  // Astro v4/v5 Cloudflare adapter: env is on locals.runtime.env
+  try {
+    if (locals?.runtime?.env) {
+      return locals.runtime.env[envVarName];
+    }
+  } catch {
+    // Astro v6 Cloudflare adapter throws when accessing locals.runtime.env
+  }
+
+  // Prefer process.env for runtime environments (e.g., Node.js adapter)
+  // where import.meta.env.PUBLIC_* is statically replaced at build time by Vite.
+  // Runtime values should take precedence over build-time values.
+  if (typeof process !== 'undefined' && process.env?.[envVarName]) {
+    return process.env[envVarName];
+  }
+
+  return import.meta.env[envVarName] || undefined;
 }
 
 /**
  * @internal
  */
 function getSafeEnv(context: ContextOrLocals) {
+  const locals = 'locals' in context ? context.locals : context;
+
   return {
     domain: getContextEnvVar('PUBLIC_CLERK_DOMAIN', context),
     isSatellite: getContextEnvVar('PUBLIC_CLERK_IS_SATELLITE', context) === 'true',
     proxyUrl: getContextEnvVar('PUBLIC_CLERK_PROXY_URL', context),
-    pk: getContextEnvVar('PUBLIC_CLERK_PUBLISHABLE_KEY', context),
+    // Use keyless publishable key if available, otherwise read from env
+    pk: locals.keylessPublishableKey || getContextEnvVar('PUBLIC_CLERK_PUBLISHABLE_KEY', context),
     sk: getContextEnvVar('CLERK_SECRET_KEY', context),
     machineSecretKey: getContextEnvVar('CLERK_MACHINE_SECRET_KEY', context),
     signInUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_IN_URL', context),
@@ -39,6 +89,9 @@ function getSafeEnv(context: ContextOrLocals) {
     apiUrl: getContextEnvVar('CLERK_API_URL', context),
     telemetryDisabled: isTruthy(getContextEnvVar('PUBLIC_CLERK_TELEMETRY_DISABLED', context)),
     telemetryDebug: isTruthy(getContextEnvVar('PUBLIC_CLERK_TELEMETRY_DEBUG', context)),
+    // Read from locals (set by middleware) instead of env vars
+    keylessClaimUrl: locals.keylessClaimUrl,
+    keylessApiKeysUrl: locals.keylessApiKeysUrl,
   };
 }
 
@@ -50,13 +103,20 @@ function getSafeEnv(context: ContextOrLocals) {
  * This is a way to get around it.
  */
 function getClientSafeEnv(context: ContextOrLocals) {
+  const locals = 'locals' in context ? context.locals : context;
+
   return {
     domain: getContextEnvVar('PUBLIC_CLERK_DOMAIN', context),
     isSatellite: getContextEnvVar('PUBLIC_CLERK_IS_SATELLITE', context) === 'true',
     proxyUrl: getContextEnvVar('PUBLIC_CLERK_PROXY_URL', context),
     signInUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_IN_URL', context),
     signUpUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_UP_URL', context),
+    // In keyless mode, pass the resolved publishable key to client
+    publishableKey: locals.keylessPublishableKey || getContextEnvVar('PUBLIC_CLERK_PUBLISHABLE_KEY', context),
+    // Read from locals (set by middleware) instead of env vars
+    keylessClaimUrl: locals.keylessClaimUrl,
+    keylessApiKeysUrl: locals.keylessApiKeysUrl,
   };
 }
 
-export { getSafeEnv, getClientSafeEnv };
+export { getSafeEnv, getClientSafeEnv, initCloudflareEnv };

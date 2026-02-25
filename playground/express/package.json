@@ -3,17 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "ts-node ./src/server.ts",
-    "yalc:add": "pnpm yalc add -- @clerk/express @clerk/types @clerk/backend @clerk/shared",
-    "dev:fromlocal": " nodemon --watch .yalc --watch src --exec \"pnpm yalc:add && pnpm start\""
+    "start": "ts-node ./src/server.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@clerk/backend": "file:.yalc/@clerk/backend",
-    "@clerk/express": "file:.yalc/@clerk/express",
-    "@clerk/shared": "file:.yalc/@clerk/shared",
-    "@clerk/types": "file:.yalc/@clerk/types",
+    "@clerk/backend": "workspace:*",
+    "@clerk/express": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.6",
     "express": "^4.21.0",

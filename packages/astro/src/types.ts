@@ -2,6 +2,7 @@ import type {
   Clerk,
   ClerkOptions,
   ClientResource,
+  InternalClerkScriptProps,
   MultiDomainAndOrProxyPrimitives,
   ProtectParams,
   ShowProps,
@@ -29,16 +30,6 @@ type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
 > &
   MultiDomainAndOrProxyPrimitives & {
     appearance?: Appearance<TUi>;
-    clerkJSUrl?: string;
-    clerkJSVersion?: string;
-    /**
-     * The URL that `@clerk/ui` should be hot-loaded from.
-     */
-    clerkUIUrl?: string;
-    /**
-     * The npm version for `@clerk/ui`.
-     */
-    clerkUIVersion?: string;
     /**
      * Controls prefetching of the `@clerk/ui` script.
      * - `false` - Skip prefetching the UI (for custom UIs using Control Components)
@@ -47,8 +38,36 @@ type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
     prefetchUI?: boolean;
   };
 
-type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegrationParams<TUi> & {
-  publishableKey: string;
+type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegrationParams<TUi> &
+  InternalClerkScriptProps & {
+    publishableKey: string;
+  };
+
+/**
+ * @internal
+ * Internal runtime options injected by the server for keyless mode support.
+ */
+export type InternalRuntimeOptions = {
+  /**
+   * Server-injected publishable key from keyless mode or context.locals
+   */
+  publishableKey?: string;
+  /**
+   * Keyless claim URL injected by middleware for the client-side banner
+   */
+  keylessClaimUrl?: string;
+  /**
+   * Keyless API keys URL injected by middleware for the client-side banner
+   */
+  keylessApiKeysUrl?: string;
+  /**
+   * Internal keyless claim URL passed to Clerk.load()
+   */
+  __internal_keylessClaimUrl?: string;
+  /**
+   * Internal keyless API keys URL passed to Clerk.load()
+   */
+  __internal_keylessApiKeysUrl?: string;
 };
 
 // Copied from `@clerk/react`

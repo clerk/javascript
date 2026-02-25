@@ -37,5 +37,5 @@ export default defineConfig(overrideOptions => {
     outDir: './dist/cjs',
   };
 
-  return runAfterLast(['pnpm build:declarations', shouldPublish && 'pnpm publish:local'])(esm, cjs);
+  return runAfterLast(['pnpm build:declarations', shouldPublish && 'pkglab pub --ping'])(esm, cjs);
 });

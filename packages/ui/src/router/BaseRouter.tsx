@@ -5,11 +5,127 @@ import type { NavigateOptions } from '@clerk/shared/types';
 import React from 'react';
 import { flushSync } from 'react-dom';
 
-import { useWindowEventListener } from '../hooks';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';
 import { Route } from './Route';
 import { RouteContext } from './RouteContext';
+
+// Custom events that don't exist on WindowEventMap but are handled
+// by wrapping history.pushState/replaceState in the fallback path.
+type HistoryEvent = 'pushstate' | 'replacestate';
+type RefreshEvent = keyof WindowEventMap | HistoryEvent;
+type NavigationType = 'push' | 'replace' | 'traverse';
+
+const isWindowRefreshEvent = (event: RefreshEvent): event is keyof WindowEventMap => {
+  return event !== 'pushstate' && event !== 'replacestate';
+};
+
+// Maps refresh events to Navigation API navigationType values.
+const eventToNavigationType: Partial<Record<RefreshEvent, NavigationType>> = {
+  popstate: 'traverse',
+  pushstate: 'push',
+  replacestate: 'replace',
+};
+
+// Global subscription sets for the history monkey-patching fallback.
+// Using a single patch with subscriber sets avoids conflicts when
+// multiple BaseRouter instances mount simultaneously.
+const pushStateSubscribers = new Set<() => void>();
+const replaceStateSubscribers = new Set<() => void>();
+let originalPushState: History['pushState'] | null = null;
+let originalReplaceState: History['replaceState'] | null = null;
+
+function ensurePushStatePatched(): void {
+  if (originalPushState) {
+    return;
+  }
+  originalPushState = history.pushState.bind(history);
+  history.pushState = (...args: Parameters<History['pushState']>) => {
+    originalPushState!(...args);
+    pushStateSubscribers.forEach(fn => fn());
+  };
+}
+
+function ensureReplaceStatePatched(): void {
+  if (originalReplaceState) {
+    return;
+  }
+  originalReplaceState = history.replaceState.bind(history);
+  history.replaceState = (...args: Parameters<History['replaceState']>) => {
+    originalReplaceState!(...args);
+    replaceStateSubscribers.forEach(fn => fn());
+  };
+}
+
+/**
+ * Observes history changes so the router's internal state stays in sync
+ * with the URL. Uses the Navigation API when available, falling back to
+ * monkey-patching history.pushState/replaceState plus native window events.
+ *
+ * Note: `events` should be a stable array reference to avoid
+ * re-subscribing on every render.
+ */
+function useHistoryChangeObserver(events: Array<RefreshEvent> | undefined, callback: () => void): void {
+  const callbackRef = React.useRef(callback);
+  callbackRef.current = callback;
+
+  React.useEffect(() => {
+    if (!events) {
+      return;
+    }
+
+    const notify = () => callbackRef.current();
+    const windowEvents = events.filter(isWindowRefreshEvent);
+    const navigationTypes = events
+      .map(e => eventToNavigationType[e])
+      .filter((type): type is NavigationType => Boolean(type));
+
+    const hasNavigationAPI =
+      typeof window !== 'undefined' &&
+      'navigation' in window &&
+      typeof (window as any).navigation?.addEventListener === 'function';
+
+    if (hasNavigationAPI) {
+      const nav = (window as any).navigation;
+      const allowedTypes = new Set(navigationTypes);
+      const handler = (e: { navigationType: NavigationType }) => {
+        if (allowedTypes.has(e.navigationType)) {
+          Promise.resolve().then(notify);
+        }
+      };
+      nav.addEventListener('currententrychange', handler);
+
+      // Events without a navigationType mapping (e.g. hashchange) still
+      // need native listeners even when the Navigation API is available.
+      const unmappedEvents = windowEvents.filter(e => !eventToNavigationType[e]);
+      unmappedEvents.forEach(e => window.addEventListener(e, notify));
+
+      return () => {
+        nav.removeEventListener('currententrychange', handler);
+        unmappedEvents.forEach(e => window.removeEventListener(e, notify));
+      };
+    }
+
+    // Fallback: use global subscriber sets for pushState/replaceState
+    // so that multiple BaseRouter instances don't conflict.
+    if (events.includes('pushstate')) {
+      ensurePushStatePatched();
+      pushStateSubscribers.add(notify);
+    }
+    if (events.includes('replacestate')) {
+      ensureReplaceStatePatched();
+      replaceStateSubscribers.add(notify);
+    }
+
+    windowEvents.forEach(e => window.addEventListener(e, notify));
+
+    return () => {
+      pushStateSubscribers.delete(notify);
+      replaceStateSubscribers.delete(notify);
+      windowEvents.forEach(e => window.removeEventListener(e, notify));
+    };
+  }, [events]);
+}
 
 interface BaseRouterProps {
   basePath: string;
@@ -17,7 +133,7 @@ interface BaseRouterProps {
   getPath: () => string;
   getQueryString: () => string;
   internalNavigate: (toURL: URL, options?: NavigateOptions) => Promise<any> | any;
-  refreshEvents?: Array<keyof WindowEventMap>;
+  refreshEvents?: Array<RefreshEvent>;
   preservedParams?: string[];
   urlStateParam?: {
     startPath: string;
@@ -88,7 +204,23 @@ export const BaseRouter = ({
     }
   }, [currentPath, currentQueryString, getPath, getQueryString]);
 
-  useWindowEventListener(refreshEvents, refresh);
+  // Suppresses the history observer during baseNavigate's internal navigation.
+  // Without this, the observer's microtask triggers a render before setActive's
+  // #updateAccessors sets clerk.session, causing task guards to see stale state.
+  const isNavigatingRef = React.useRef(false);
+
+  const observerRefresh = React.useCallback((): void => {
+    if (isNavigatingRef.current) {
+      return;
+    }
+    const newPath = getPath();
+    if (basePath && !newPath.startsWith('/' + basePath)) {
+      return;
+    }
+    refresh();
+  }, [basePath, getPath, refresh]);
+
+  useHistoryChangeObserver(refreshEvents, observerRefresh);
 
   // TODO: Look into the real possible types of globalNavigate
   const baseNavigate = async (toURL: URL | undefined): Promise<unknown> => {
@@ -118,15 +250,20 @@ export const BaseRouter = ({
 
       toURL.search = stringifyQueryParams(toQueryParams);
     }
-    const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
-    // We need to flushSync to guarantee the re-render happens before handing things back to the caller,
-    // otherwise setActive might emit, and children re-render with the old navigation state.
-    // An alternative solution here could be to return a deferred promise, set that to state together
-    // with the routeParts and resolve it in an effect. That way we could avoid the flushSync performance penalty.
-    flushSync(() => {
-      setRouteParts({ path: toURL.pathname, queryString: toURL.search });
-    });
-    return internalNavRes;
+    isNavigatingRef.current = true;
+    try {
+      const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
+      // We need to flushSync to guarantee the re-render happens before handing things back to the caller,
+      // otherwise setActive might emit, and children re-render with the old navigation state.
+      // An alternative solution here could be to return a deferred promise, set that to state together
+      // with the routeParts and resolve it in an effect. That way we could avoid the flushSync performance penalty.
+      flushSync(() => {
+        setRouteParts({ path: toURL.pathname, queryString: toURL.search });
+      });
+      return internalNavRes;
+    } finally {
+      isNavigatingRef.current = false;
+    }
   };
 
   return (
