@@ -20,7 +20,7 @@ export const UserButtonTopLevelIdentifier = ({ showName }: UserButtonTopLevelIde
       elementDescriptor={descriptors.userButtonOuterIdentifier}
       sx={[
         t => ({
-          paddingLeft: t.space.$2,
+          paddingInlineStart: t.space.$2,
         }),
       ]}
     >

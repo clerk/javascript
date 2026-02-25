@@ -4,7 +4,7 @@ import { createVariants } from '../styledSystem';
 
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
-    marginRight: theme.space.$2x5,
+    marginInlineEnd: theme.space.$2x5,
     width: theme.sizes.$4,
     height: theme.sizes.$4,
   },

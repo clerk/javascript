@@ -1,5 +1,125 @@
 # Change Log
 
+## 3.35.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.15
+
+
+## 3.35.3
+
+### Patch Changes
+
+- Updated Hebrew localization placeholders for user input fields ([#7669](https://github.com/clerk/javascript/pull/7669)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Update translations for locales: Spanish (es-ES) billing page improvements, Portuguese (pt-BR) enterprise connections and password errors, and comprehensive Finnish (fi-FI) updates across authentication, billing, and organization management. ([#7683](https://github.com/clerk/javascript/pull/7683)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated es-ES translations for billing ([#7669](https://github.com/clerk/javascript/pull/7669)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.14
+
+
+## 3.35.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.13
+
+
+## 3.35.1
+
+### Patch Changes
+
+- Improved Greek (el-GR), French (fr-FR), and Korean (ko-KR) translations. ([#7619](https://github.com/clerk/javascript/pull/7619)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.12
+
+
+## 3.35.0
+
+### Minor Changes
+
+- Surface organization creation defaults with prefilled form fields and advisory warnings ([#7603](https://github.com/clerk/javascript/pull/7603)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.11
+
+
+## 3.34.0
+
+### Minor Changes
+
+- Fix "You must belong to an organization" screen showing when user has existing memberships, invitations or suggestions ([#7557](https://github.com/clerk/javascript/pull/7557)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+
+## 3.33.0
+
+### Minor Changes
+
+- Disable role selection in `OrganizationProfile` during role set migration ([#7541](https://github.com/clerk/javascript/pull/7541)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.10
+
+
+## 3.32.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.9
+
+
+## 3.32.0
+
+### Minor Changes
+
+- Display message in `TaskChooseOrganization` when user is not allowed to create organizations ([#7502](https://github.com/clerk/javascript/pull/7502)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Added waitlist translations. ([#7483](https://github.com/clerk/javascript/pull/7483)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.8
+
+
+## 3.31.0
+
+### Minor Changes
+
+- Add Web3 Solana support to `<UserProfile />` ([#7435](https://github.com/clerk/javascript/pull/7435)) by [@kduprey](https://github.com/kduprey)
+
+- Add support for Sign in with Solana. ([#7293](https://github.com/clerk/javascript/pull/7293)) by [@kduprey](https://github.com/kduprey)
+
+### Patch Changes
+
+- Added temporary email services support error localization key. ([#7436](https://github.com/clerk/javascript/pull/7436)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fixed incorrect word in `da-DK` localization ([#7462](https://github.com/clerk/javascript/pull/7462)) by [@jacekradko](https://github.com/jacekradko)
+
+- Added missing password or identifier incorrect error localization. ([#7437](https://github.com/clerk/javascript/pull/7437)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.7
+
+
+## 3.30.1
+
+### Patch Changes
+
+- Added translations for Polish in UI elements for Organizations ([#7390](https://github.com/clerk/javascript/pull/7390)) by [@kamil-homer](https://github.com/kamil-homer)
+
+
 ## 3.30.0
 
 ### Minor Changes

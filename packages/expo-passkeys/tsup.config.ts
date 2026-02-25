@@ -26,5 +26,5 @@ export default defineConfig(overrideOptions => {
     },
   };
 
-  return runAfterLast(['pnpm build:declarations', shouldPublish && 'pnpm publish:local'])(options);
+  return runAfterLast(['pnpm build:declarations', shouldPublish && 'pkglab pub --ping'])(options);
 });

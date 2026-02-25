@@ -21,7 +21,7 @@ export const OrganizationProfileAvatarUploader = (
       <Text
         variant='subtitle'
         sx={t => ({
-          textAlign: 'left',
+          textAlign: 'start',
           marginBottom: t.space.$2,
         })}
         localizationKey={localizationKeys('organizationProfile.start.profileSection.uploadAction__title')}

@@ -168,6 +168,7 @@ export const DomainList = withProtect(
                 display: 'flex',
                 margin: 'auto',
                 position: 'absolute',
+                // eslint-disable-next-line custom-rules/no-physical-css-properties -- Centering with transform: translateX(-50%)
                 left: '50%',
                 top: '50%',
                 transform: 'translateY(-50%) translateX(-50%)',

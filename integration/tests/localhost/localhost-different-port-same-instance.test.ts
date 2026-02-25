@@ -93,6 +93,8 @@ test.describe('multiple apps running on localhost using same Clerk instance @loc
 
     // sign out from tab1
     await u[1].page.goToAppHome();
+    // This also ensures Clerk has loaded before evaluating the signOut
+    await u[1].po.expect.toBeSignedIn();
     await u[1].page.evaluate(() => window.Clerk.signOut());
     await u[1].po.expect.toBeSignedOut();
 

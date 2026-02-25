@@ -20,15 +20,15 @@ const { applyVariants, filterProps } = createVariants(theme => {
         borderBottomWidth: '0px',
         borderTopWidth: '1px',
         borderStyle: 'solid',
-        borderLeftWidth: '0px',
-        borderRightWidth: '0px',
+        borderInlineStartWidth: '0px',
+        borderInlineEndWidth: '0px',
         borderColor: theme.colors.$borderAlpha150,
       },
       'td:not(:first-of-type)': {
-        paddingLeft: theme.space.$2,
+        paddingInlineStart: theme.space.$2,
       },
       'th:not(:first-of-type)': {
-        paddingLeft: theme.space.$2,
+        paddingInlineStart: theme.space.$2,
       },
       'tr > td': {
         borderTopWidth: theme.borderWidths.$normal,
@@ -36,25 +36,25 @@ const { applyVariants, filterProps } = createVariants(theme => {
         borderTopColor: theme.colors.$borderAlpha150,
         paddingBottom: theme.space.$2,
         paddingTop: theme.space.$2,
-        paddingLeft: theme.space.$4,
-        paddingRight: theme.space.$4,
+        paddingInlineStart: theme.space.$4,
+        paddingInlineEnd: theme.space.$4,
       },
       'tbody > :not([hidden])~:not([hidden])': {
         borderBottomWidth: '0px',
         borderTopWidth: '1px',
         borderStyle: 'solid',
-        borderLeftWidth: '0px',
-        borderRightWidth: '0px',
+        borderInlineStartWidth: '0px',
+        borderInlineEndWidth: '0px',
         borderColor: theme.colors.$borderAlpha150,
       },
       'tr:hover td:first-of-type': {
-        borderBottomLeftRadius: theme.radii.$lg,
+        borderEndStartRadius: theme.radii.$lg,
       },
       'tr:hover td:last-of-type': {
-        borderBottomRightRadius: theme.radii.$lg,
+        borderEndEndRadius: theme.radii.$lg,
       },
       'tr > th:first-of-type': {
-        paddingLeft: theme.space.$5,
+        paddingInlineStart: theme.space.$5,
       },
       'thead::after': {
         content: '""',

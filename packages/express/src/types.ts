@@ -1,11 +1,31 @@
 import type { createClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
+import type { ShouldProxyFn } from '@clerk/shared/proxy';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { Request as ExpressRequest } from 'express';
 
 export type ExpressRequestWithAuth = ExpressRequest & {
   auth: (options?: PendingSessionOptions) => SignedInAuthObject | SignedOutAuthObject;
 };
+
+/**
+ * Options for configuring Frontend API proxy in clerkMiddleware
+ */
+export interface FrontendApiProxyOptions {
+  /**
+   * Enable proxy handling. Can be:
+   * - `true` - enable for all domains
+   * - `false` - disable for all domains
+   * - A function: (url: URL) => boolean - enable based on the request URL
+   */
+  enabled: boolean | ShouldProxyFn;
+  /**
+   * The path prefix for proxy requests.
+   *
+   * @default '/__clerk'
+   */
+  path?: string;
+}
 
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;
@@ -18,6 +38,24 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
    * @default true
    */
   enableHandshake?: boolean;
+  /**
+   * Configure Frontend API proxy handling. When set, requests to the proxy path
+   * will skip authentication, and the proxyUrl will be automatically derived
+   * for handshake redirects.
+   *
+   * @example
+   * // Enable with defaults (path: '/__clerk')
+   * clerkMiddleware({ frontendApiProxy: { enabled: true } })
+   *
+   * @example
+   * // Custom path
+   * clerkMiddleware({ frontendApiProxy: { enabled: true, path: '/my-proxy' } })
+   *
+   * @example
+   * // Disable proxy handling
+   * clerkMiddleware({ frontendApiProxy: { enabled: false } })
+   */
+  frontendApiProxy?: FrontendApiProxyOptions;
 };
 
 type ClerkClient = ReturnType<typeof createClerkClient>;

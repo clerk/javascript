@@ -126,6 +126,9 @@ export function createProtect(opts: {
         // TODO: Handle runtime values. What happens if runtime values are set in middleware and in ClerkProvider as well?
         return redirectToSignIn();
       }
+      if (isServerActionRequest(request)) {
+        return unauthorized();
+      }
       return notFound();
     };
 

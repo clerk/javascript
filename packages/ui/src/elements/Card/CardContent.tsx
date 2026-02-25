@@ -71,7 +71,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
             zIndex: t.zIndices.$modal,
             position: 'absolute',
             top: t.space.$2,
-            right: t.space.$2,
+            insetInlineEnd: t.space.$2,
             padding: t.space.$3,
           })}
         />

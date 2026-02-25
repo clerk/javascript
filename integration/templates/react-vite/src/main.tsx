@@ -6,6 +6,7 @@ import { createBrowserRouter, Outlet, RouterProvider, useNavigate } from 'react-
 import App from './App.tsx';
 import Protected from './protected';
 import SignIn from './sign-in';
+import SignInPopup from './sign-in-popup';
 import SignUp from './sign-up';
 import UserProfile from './user';
 import UserProfileCustom from './custom-user-profile';
@@ -28,8 +29,8 @@ const Root = () => {
   const navigate = useNavigate();
   return (
     <ClerkProvider
-      clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL as string}
-      clerkUIUrl={import.meta.env.VITE_CLERK_UI_URL as string}
+      __internal_clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL as string}
+      __internal_clerkUIUrl={import.meta.env.VITE_CLERK_UI_URL as string}
       routerPush={(to: string) => navigate(to)}
       routerReplace={(to: string) => navigate(to, { replace: true })}
       appearance={{
@@ -60,6 +61,10 @@ const router = createBrowserRouter([
       {
         path: '/sign-in/*',
         element: <SignIn />,
+      },
+      {
+        path: '/sign-in-popup/*',
+        element: <SignInPopup />,
       },
       {
         path: '/sign-up/*',

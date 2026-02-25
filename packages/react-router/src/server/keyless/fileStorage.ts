@@ -1,3 +1,6 @@
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+
 import { createNodeFileStorage, type KeylessStorage } from '@clerk/shared/keyless';
 
 export type { KeylessStorage };
@@ -6,24 +9,11 @@ export interface FileStorageOptions {
   cwd?: () => string;
 }
 
-/**
- * Creates a file-based storage adapter for keyless mode.
- * Uses dynamic imports to avoid bundler issues with edge runtimes.
- */
-export async function createFileStorage(options: FileStorageOptions = {}): Promise<KeylessStorage> {
+export function createFileStorage(options: FileStorageOptions = {}): KeylessStorage {
   const { cwd = () => process.cwd() } = options;
 
-  try {
-    const [fs, path] = await Promise.all([import('node:fs'), import('node:path')]);
-
-    return createNodeFileStorage(fs, path, {
-      cwd,
-      frameworkPackageName: '@clerk/react-router',
-    });
-  } catch {
-    throw new Error(
-      'Keyless mode requires a Node.js runtime with file system access. ' +
-        'Set VITE_CLERK_KEYLESS_DISABLED=1 to disable keyless mode.',
-    );
-  }
+  return createNodeFileStorage(fs, path, {
+    cwd,
+    frameworkPackageName: '@clerk/react-router',
+  });
 }
