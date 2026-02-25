@@ -11,7 +11,7 @@ import type {
   PhoneCodeSecondFactorConfig,
   TOTPAttempt,
 } from './factors';
-import type { ActClaim } from './jwtv2';
+import type { ActClaim, AgentActClaim } from './jwtv2';
 import type {
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
@@ -226,6 +226,7 @@ export interface SessionResource extends ClerkResource {
   lastActiveOrganizationId: string | null;
   lastActiveAt: Date;
   actor: ActClaim | null;
+  agent: AgentActClaim | null;
   tasks: Array<SessionTask> | null;
   currentTask?: SessionTask;
   /**
