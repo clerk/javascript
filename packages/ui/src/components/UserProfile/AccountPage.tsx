@@ -31,8 +31,6 @@ export const AccountPage = withCardStateProvider(() => {
   const isPhoneImmutable = immutableAttributes.has('phone_number');
   const isUsernameImmutable = immutableAttributes.has('username');
 
-  console.log('[clerk-ui] immutableAttributes:', [...immutableAttributes]);
-
   return (
     <Col
       elementDescriptor={descriptors.page}
