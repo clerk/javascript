@@ -197,50 +197,25 @@ describe('SignUp', () => {
         vi.unstubAllGlobals();
       });
 
-      it('creates signup with phoneNumber when no existing signup', async () => {
-        SignUp.clerk = {
-          __internal_environment: {
-            displayConfig: {
-              captchaOauthBypass: [],
-            },
-          },
-        } as any;
-
-        const mockFetch = vi
-          .fn()
-          .mockResolvedValueOnce({
-            client: null,
-            response: { id: 'signup_123', status: 'missing_requirements' },
-          })
-          .mockResolvedValueOnce({
-            client: null,
-            response: { id: 'signup_123' },
-          });
+      it('calls prepare verification directly even with no existing signup', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123' },
+        });
         BaseResource._fetch = mockFetch;
 
         const signUp = new SignUp();
         await signUp.__internal_future.verifications.sendPhoneCode({ phoneNumber: '+15551234567' });
 
-        // First call should create signup with phoneNumber
-        expect(mockFetch).toHaveBeenNthCalledWith(
-          1,
+        // Should call prepare verification directly
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledWith(
           expect.objectContaining({
             method: 'POST',
             path: '/client/sign_ups',
             body: expect.objectContaining({
-              phoneNumber: '+15551234567',
-            }),
-          }),
-        );
-
-        // Second call should prepare verification
-        expect(mockFetch).toHaveBeenNthCalledWith(
-          2,
-          expect.objectContaining({
-            method: 'POST',
-            path: '/client/sign_ups/signup_123/prepare_verification',
-            body: expect.objectContaining({
               strategy: 'phone_code',
+              channel: 'sms',
             }),
           }),
         );
