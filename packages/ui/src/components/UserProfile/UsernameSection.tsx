@@ -18,11 +18,34 @@ const UsernameScreen = () => {
   );
 };
 
-export const UsernameSection = () => {
+export const UsernameSection = ({ isImmutable }: { isImmutable?: boolean }) => {
   const { user } = useUser();
 
   if (!user) {
     return null;
+  }
+
+  if (isImmutable) {
+    if (!user.username) {
+      return null;
+    }
+
+    return (
+      <ProfileSection.Root
+        title={localizationKeys('userProfile.start.usernameSection.title')}
+        id='username'
+        sx={{ alignItems: 'center', [mqu.md]: { alignItems: 'flex-start' } }}
+      >
+        <ProfileSection.Item id='username'>
+          <Text
+            truncate
+            sx={t => ({ color: t.colors.$colorForeground })}
+          >
+            {user.username}
+          </Text>
+        </ProfileSection.Item>
+      </ProfileSection.Root>
+    );
   }
 
   return (
