@@ -308,7 +308,7 @@ export class SignIn extends BaseResource implements SignInResource {
           return this.reload()
             .then(res => {
               const status = res[verificationKey].status;
-              if (status === 'verified' || status === 'expired') {
+              if (status === 'verified' || status === 'expired' || status === 'transferable') {
                 stop();
                 resolve(res);
               }

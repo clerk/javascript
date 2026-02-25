@@ -81,6 +81,12 @@ export type UsernameSettingsData = {
   max_length: number;
 };
 
+export type AttackProtectionData = {
+  enumeration_protection: {
+    enabled: boolean;
+  };
+};
+
 export type PasskeySettingsData = {
   allow_autofill: boolean;
   show_sign_in_button: boolean;
@@ -120,6 +126,7 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   password_settings: PasswordSettingsData;
   passkey_settings: PasskeySettingsData;
   username_settings: UsernameSettingsData;
+  attack_protection: AttackProtectionData;
 }
 
 export interface UserSettingsResource extends ClerkResource {
@@ -134,6 +141,7 @@ export interface UserSettingsResource extends ClerkResource {
   signUp: SignUpData;
   passwordSettings: PasswordSettingsData;
   usernameSettings: UsernameSettingsData;
+  attackProtection: AttackProtectionData;
   passkeySettings: PasskeySettingsData;
   socialProviderStrategies: OAuthStrategy[];
   authenticatableSocialStrategies: OAuthStrategy[];

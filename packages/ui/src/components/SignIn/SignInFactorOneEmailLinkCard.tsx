@@ -9,11 +9,12 @@ import { handleError } from '@/ui/utils/errorHandler';
 
 import { EmailLinkStatusCard } from '../../common';
 import { buildVerificationRedirectUrl } from '../../common/redirects';
-import { useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
 import { useEmailLink } from '../../hooks/useEmailLink';
 import { useRouter } from '../../router/RouteContext';
+import { handleSignUpIfMissingTransfer } from './handleSignUpIfMissingTransfer';
 
 type SignInFactorOneEmailLinkCardProps = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   factor: EmailLinkFactor;
@@ -26,10 +27,10 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const card = useCardState();
   const signIn = useCoreSignIn();
   const signInContext = useSignInContext();
-  const { signInUrl } = signInContext;
+  const { signInUrl, afterSignInUrl, afterSignUpUrl, isCombinedFlow, navigateOnSetActive } = signInContext;
   const { navigate } = useRouter();
-  const { afterSignInUrl } = useSignInContext();
   const { setActive } = useClerk();
+  const { userSettings } = useEnvironment();
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signIn);
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
   const clerk = useClerk();
@@ -63,6 +64,18 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
     const ver = si.firstFactorVerification;
     if (ver.status === 'expired') {
       card.setError(t(localizationKeys('formFieldError__verificationLinkExpired')));
+    } else if (
+      isCombinedFlow &&
+      userSettings.attackProtection.enumeration_protection.enabled &&
+      ver.status === 'transferable'
+    ) {
+      return handleSignUpIfMissingTransfer({
+        clerk,
+        navigate,
+        afterSignUpUrl,
+        navigateOnSetActive,
+        unsafeMetadata: signInContext.unsafeMetadata,
+      });
     } else if (ver.verifiedFromTheSameClient()) {
       setShowVerifyModal(true);
     } else {

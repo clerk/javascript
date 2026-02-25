@@ -375,7 +375,19 @@ function SignInStartInternal(): JSX.Element {
       } as any);
     }
     try {
-      const res = await safePasswordSignInForEnterpriseSSOInstance(signIn.create(buildSignInParams(fields)), fields);
+      // Sign up if missing sign-in-or-sign-up flows do not currently support password
+      // sign in, since this is not enumeration-safe.
+      const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
+      const shouldSignUpIfMissing =
+        isCombinedFlow && userSettings.attackProtection.enumeration_protection.enabled && !hasPassword;
+
+      const res = await safePasswordSignInForEnterpriseSSOInstance(
+        signIn.create({
+          ...buildSignInParams(fields),
+          ...(shouldSignUpIfMissing && { signUpIfMissing: true }),
+        }),
+        fields,
+      );
 
       switch (res.status) {
         case 'needs_identifier':
