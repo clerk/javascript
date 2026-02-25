@@ -28,6 +28,7 @@ import {
 import {
   detectPackageManager,
   getPackageManagerDisplayName,
+  hasPackage,
   removePackage,
   upgradePackage,
 } from './util/package-manager.js';
@@ -245,6 +246,11 @@ async function main() {
     await performUpgrade(sdk, packageManager, config, options);
   }
 
+  // Step 6b: Handle package replacements
+  if (config.packageReplacements?.length > 0 && !options.skipUpgrade) {
+    await performPackageReplacements(packageManager, config, options);
+  }
+
   // Step 7: Run codemods
   if (config.codemods?.length > 0) {
     renderText(`Running ${config.codemods.length} codemod(s)...`, 'blue');
@@ -299,6 +305,36 @@ async function performUpgrade(sdk, packageManager, config, options) {
     spinner.error(`Failed to upgrade ${targetPackage}`);
     renderError(error.message);
     process.exit(1);
+  }
+}
+
+async function performPackageReplacements(packageManager, config, options) {
+  const replacements = config.packageReplacements;
+  if (!replacements?.length) {
+    return;
+  }
+
+  for (const { from, to } of replacements) {
+    if (!hasPackage(from, options.dir)) {
+      continue;
+    }
+
+    const targetVersion = options.canary ? 'canary' : 'latest';
+
+    if (options.dryRun) {
+      renderText(`[dry run] Would replace ${from} with ${to}@${targetVersion}`, 'yellow');
+      continue;
+    }
+
+    const spinner = createSpinner(`Replacing ${from} with ${to}...`);
+    try {
+      await removePackage(packageManager, from, options.dir);
+      await upgradePackage(packageManager, to, targetVersion, options.dir);
+      spinner.success(`Replaced ${from} with ${to}@${targetVersion}`);
+    } catch (error) {
+      spinner.error(`Failed to replace ${from} with ${to}`);
+      renderWarning(`You may need to manually run: npm install ${to} && npm uninstall ${from}`);
+    }
   }
 }
 
