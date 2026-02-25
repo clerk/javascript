@@ -176,7 +176,22 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
     }
     
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        return UIApplication.shared.keyWindow!;
+        // Prefer the foreground-active window scene
+        if let scene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+           // scene.keyWindow can be nil before first window is visible; scene.windows deprecated in iOS 17 but needed as fallback
+           let window = scene.keyWindow ?? scene.windows.first {
+            return window
+        }
+        // Fallback: any connected window scene with a window
+        if let scene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { !$0.windows.isEmpty }),
+           // scene.keyWindow can be nil before first window is visible; scene.windows deprecated in iOS 17 but needed as fallback
+           let window = scene.keyWindow ?? scene.windows.first {
+            return window
+        }
+        fatalError("No UIWindowScene with a window found — this indicates a misconfigured app")
     }
 }
 
