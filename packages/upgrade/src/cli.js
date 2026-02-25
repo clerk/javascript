@@ -326,14 +326,25 @@ async function performPackageReplacements(packageManager, config, options) {
       continue;
     }
 
-    const spinner = createSpinner(`Replacing ${from} with ${to}...`);
+    const removeSpinner = createSpinner(`Removing ${from}...`);
     try {
       await removePackage(packageManager, from, options.dir);
-      await upgradePackage(packageManager, to, targetVersion, options.dir);
-      spinner.success(`Replaced ${from} with ${to}@${targetVersion}`);
+      removeSpinner.success(`Removed ${from}`);
     } catch (error) {
-      spinner.error(`Failed to replace ${from} with ${to}`);
-      renderWarning(`You may need to manually run: npm install ${to} && npm uninstall ${from}`);
+      removeSpinner.error(`Failed to remove ${from}`);
+      renderError(error.message);
+      renderWarning(`You may need to manually remove ${from} and install ${to}`);
+      continue;
+    }
+
+    const installSpinner = createSpinner(`Installing ${to}@${targetVersion}...`);
+    try {
+      await upgradePackage(packageManager, to, targetVersion, options.dir);
+      installSpinner.success(`Installed ${to}@${targetVersion}`);
+    } catch (error) {
+      installSpinner.error(`Failed to install ${to}`);
+      renderError(error.message);
+      renderWarning(`${from} was removed but ${to} could not be installed. Please run: ${packageManager} add ${to}`);
     }
   }
 }
