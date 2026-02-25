@@ -22,7 +22,12 @@ const APP_2_ENV_KEY = process.env.E2E_SESSIONS_APP_2_ENV_KEY;
  * that listens to port 443. We can't run them in parallel because they would conflict with each other, unless
  * we use more custom domains to avoid collision.
  */
-test.describe('root and subdomain production apps @sessions', () => {
+// TODO(jacek): Unskip once the test setup preserves Origin/sec-fetch-dest headers.
+// The --disable-web-security Chromium flag (required for the proxy setup) suppresses the Origin
+// header, so the backend never sets the azp claim on session tokens. Our azp validation then
+// triggers a handshake, but the same flag also suppresses sec-fetch-dest, making the request
+// ineligible for handshake and resulting in a signed-out state.
+test.describe.skip('root and subdomain production apps @sessions', () => {
   test.describe.configure({ mode: 'serial' });
 
   /**

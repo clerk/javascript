@@ -111,7 +111,7 @@ export function generateConfig({ mode, matchedKeys = true }: { mode: 'test' | 'l
     state: 'active' | 'expired' | 'early';
     extraClaims?: Map<string, any>;
   }) => {
-    const claims = { sub: 'user_12345' } as Claims;
+    const claims = { sub: 'user_12345', azp: 'http://localhost' } as Claims;
 
     const now = Math.floor(Date.now() / 1000);
     if (state === 'active') {

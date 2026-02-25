@@ -115,6 +115,7 @@ export const AuthErrorReason = {
   SessionTokenIATBeforeClientUAT: 'session-token-iat-before-client-uat',
   SessionTokenNBF: 'session-token-nbf',
   SessionTokenIatInTheFuture: 'session-token-iat-in-the-future',
+  SessionTokenMissingAzp: 'session-token-missing-azp',
   SessionTokenWithoutClientUAT: 'session-token-but-no-client-uat',
   ActiveOrganizationMismatch: 'active-organization-mismatch',
   TokenTypeMismatch: 'token-type-mismatch',
