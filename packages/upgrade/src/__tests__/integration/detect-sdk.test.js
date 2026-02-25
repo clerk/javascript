@@ -18,7 +18,7 @@ import {
   detectPackageManager,
   getInstallCommand,
   getUninstallCommand,
-  isInPnpmWorkspace,
+  isPnpmWorkspaceRoot,
 } from '../../util/package-manager.js';
 import { getFixturePath } from '../helpers/create-fixture.js';
 
@@ -254,20 +254,20 @@ describe('resolveCatalogVersion', () => {
   });
 });
 
-describe('isInPnpmWorkspace', () => {
+describe('isPnpmWorkspaceRoot', () => {
   it('returns true when pnpm-workspace.yaml exists in current directory', () => {
-    expect(isInPnpmWorkspace(getFixturePath('nextjs-catalog-resolved'))).toBe(true);
+    expect(isPnpmWorkspaceRoot(getFixturePath('nextjs-catalog-resolved'))).toBe(true);
   });
 
-  it('returns true when pnpm-workspace.yaml exists in parent directory', () => {
+  it('returns false when pnpm-workspace.yaml exists only in parent directory', () => {
     const srcDir = path.join(getFixturePath('nextjs-catalog-resolved'), 'src');
-    expect(isInPnpmWorkspace(srcDir)).toBe(true);
+    expect(isPnpmWorkspaceRoot(srcDir)).toBe(false);
   });
 
-  it('returns false when no pnpm-workspace.yaml exists in any parent', () => {
+  it('returns false when no pnpm-workspace.yaml exists', () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'clerk-ws-test-'));
     try {
-      expect(isInPnpmWorkspace(tmpDir)).toBe(false);
+      expect(isPnpmWorkspaceRoot(tmpDir)).toBe(false);
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
@@ -333,11 +333,11 @@ describe('getInstallCommand', () => {
     expect(args).toContain('-w');
   });
 
-  it('adds -w flag for pnpm from a workspace subdirectory', () => {
+  it('does not add -w flag for pnpm from a workspace subdirectory', () => {
     const srcDir = path.join(getFixturePath('nextjs-catalog-resolved'), 'src');
     const [cmd, args] = getInstallCommand('pnpm', '@clerk/nextjs', '7.0.0', srcDir);
     expect(cmd).toBe('pnpm');
-    expect(args).toContain('-w');
+    expect(args).not.toContain('-w');
   });
 
   it('does not add -w flag for pnpm outside a workspace', () => {
@@ -367,11 +367,11 @@ describe('getUninstallCommand', () => {
     expect(args).toContain('-w');
   });
 
-  it('adds -w flag for pnpm from a workspace subdirectory', () => {
+  it('does not add -w flag for pnpm from a workspace subdirectory', () => {
     const srcDir = path.join(getFixturePath('nextjs-catalog-resolved'), 'src');
     const [cmd, args] = getUninstallCommand('pnpm', '@clerk/nextjs', srcDir);
     expect(cmd).toBe('pnpm');
-    expect(args).toContain('-w');
+    expect(args).not.toContain('-w');
   });
 
   it('does not add -w flag for pnpm outside a workspace', () => {

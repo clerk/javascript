@@ -41,18 +41,8 @@ export function detectPackageManager(dir) {
   return 'npm';
 }
 
-export function isInPnpmWorkspace(dir) {
-  let current = path.resolve(dir);
-  const root = path.parse(current).root;
-
-  while (current !== root) {
-    if (fs.existsSync(path.join(current, 'pnpm-workspace.yaml'))) {
-      return true;
-    }
-    current = path.dirname(current);
-  }
-
-  return false;
+export function isPnpmWorkspaceRoot(dir) {
+  return fs.existsSync(path.join(path.resolve(dir), 'pnpm-workspace.yaml'));
 }
 
 export function getInstallCommand(packageManager, packageName, version = 'latest', cwd) {
@@ -61,7 +51,7 @@ export function getInstallCommand(packageManager, packageName, version = 'latest
   switch (packageManager) {
     case 'pnpm': {
       const args = ['add', pkg];
-      if (cwd && isInPnpmWorkspace(cwd)) {
+      if (cwd && isPnpmWorkspaceRoot(cwd)) {
         args.push('-w');
       }
       return ['pnpm', args];
@@ -80,7 +70,7 @@ export function getUninstallCommand(packageManager, packageName, cwd) {
   switch (packageManager) {
     case 'pnpm': {
       const args = ['remove', packageName];
-      if (cwd && isInPnpmWorkspace(cwd)) {
+      if (cwd && isPnpmWorkspaceRoot(cwd)) {
         args.push('-w');
       }
       return ['pnpm', args];
