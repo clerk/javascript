@@ -45,10 +45,13 @@ export const createSessionCookie = (cookieSuffix: string, options: SessionCookie
     const expires = addYears(Date.now(), 1);
     const { sameSite, secure, partitioned } = getCookieAttributes(options);
 
-    // If setting Partitioned to true, remove the existing session cookies.
-    // This is to avoid conflicts with the same cookie name without Partitioned attribute.
+    // If setting Partitioned to true, remove the existing non-partitioned cookies.
+    // A partitioned and non-partitioned cookie with the same name are treated as
+    // different cookies by the browser, so we need to explicitly remove the old
+    // non-partitioned versions. Plain remove() (without attributes) targets them.
     if (partitioned) {
-      remove();
+      sessionCookie.remove();
+      suffixedSessionCookie.remove();
     }
 
     sessionCookie.set(token, { expires, sameSite, secure, partitioned });

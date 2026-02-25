@@ -18,6 +18,8 @@ export interface DevBrowser {
   setDevBrowserJWT(jwt: string): void;
 
   removeDevBrowserJWT(): void;
+
+  refreshCookies(): void;
 }
 
 export type CreateDevBrowserOptions = {
@@ -106,11 +108,19 @@ export function createDevBrowser({
     setDevBrowserJWT(data?.id);
   }
 
+  function refreshCookies() {
+    const jwt = getDevBrowserJWT();
+    if (jwt) {
+      setDevBrowserJWT(jwt);
+    }
+  }
+
   return {
     clear,
     setup,
     getDevBrowserJWT,
     setDevBrowserJWT,
     removeDevBrowserJWT,
+    refreshCookies,
   };
 }
