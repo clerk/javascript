@@ -16,12 +16,7 @@ public class ClerkExpoPasskeysModule: Module {
         }
         
         AsyncFunction("autofill") { (challenge: String, rpId:String, promise: Promise) in
-            if #available(iOS 16.0, *) {
-                self.credentialManager.beginAutoFillAssistedPasskeySignIn(challengeBase64URL: challenge, rpId: rpId, promise: promise)
-            } else {
-                // Fallback on earlier versions
-            }
-         
+            self.credentialManager.beginAutoFillAssistedPasskeySignIn(challengeBase64URL: challenge, rpId: rpId, promise: promise)
         }
     }
 }

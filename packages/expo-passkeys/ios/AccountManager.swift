@@ -90,7 +90,6 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
         
     }
     
-    @available(iOS 16.0, *)
     func beginAutoFillAssistedPasskeySignIn(challengeBase64URL: String, rpId: String,  promise: Promise) {
         let publicKeyCredentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: rpId)
 
@@ -128,7 +127,6 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
     }
   
   
-  @available(iOS 16.0, *)
   func cancelAutoFillAssistedPasskeySignIn() {
     if authController != nil {
       self.authController?.cancel()
