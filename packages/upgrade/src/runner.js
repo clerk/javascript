@@ -24,6 +24,8 @@ const GLOBBY_IGNORE = [
   '**/yarn.lock',
   'pnpm-lock.yaml',
   '**/pnpm-lock.yaml',
+  '**/*.md',
+  '**/*.tsbuildinfo',
   '**/*.{png,webp,svg,gif,jpg,jpeg}',
   '**/*.{mp4,mkv,wmv,m4v,mov,avi,flv,webm,flac,mka,m4a,aac,ogg}',
 ];
@@ -49,7 +51,11 @@ export async function runCodemods(config, sdk, options) {
 
     try {
       const result = await runCodemod(transform, patterns, options);
-      spinner.success(`Codemod applied: ${chalk.dim(transform)}`);
+      if (result.error > 0) {
+        spinner.error(`Codemod applied with errors: ${chalk.dim(transform)}`);
+      } else {
+        spinner.success(`Codemod applied: ${chalk.dim(transform)}`);
+      }
       renderCodemodResults(transform, result);
 
       const codemodConfig = getCodemodConfig(transform);
