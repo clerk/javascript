@@ -1,0 +1,59 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { width: 300px; min-height: 300px; background: #111; color: #fff; font-family: system-ui, sans-serif; }
+#app { display: flex; flex-direction: column; min-height: 300px; }
+#content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; text-align: center; }
+h1 { font-size: 1.1rem; font-weight: 600; }
+#nav { display: flex; align-items: center; justify-content: center; padding: 0.75rem 1rem; background: #222; border-top: 1px solid #333; }
+#sign-in-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+#sign-in-btn:hover { background: #1d4ed8; }
+#sign-in-btn:active { background: #1e40af; }
+
+.user-card {
+  width: 100%;
+  margin-top: 0.75rem;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 0.75rem;
+  text-align: left;
+}
+.user-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.user-name {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.user-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  font-size: 0.8rem;
+  border-top: 1px solid #2a2a2a;
+}
+.info-label {
+  color: #888;
+}
+.info-value {
+  color: #fff;
+  text-align: right;
+  word-break: break-all;
+}

@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Clerk Extension JS Demo",
+  "description": "A Chrome extension demo using @clerk/chrome-extension with plain TypeScript.",
+  "version": "0.0.1",
+  "permissions": ["cookies", "storage"],
+  "host_permissions": ["http://localhost/*"],
+  "action": {
+    "default_title": "Clerk Extension Demo",
+    "default_popup": "popup.html"
+  }
+}

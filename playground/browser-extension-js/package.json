@@ -1,0 +1,21 @@
+{
+  "name": "browser-extension-js",
+  "private": true,
+  "version": "0.0.1",
+  "description": "A Chrome extension demo using @clerk/chrome-extension with plain TypeScript.",
+  "author": "Clerk",
+  "type": "module",
+  "scripts": {
+    "build": "bun build src/popup.ts --outfile build/popup.js",
+    "dev": "bun build src/popup.ts --outfile build/popup.js --watch",
+    "pkglab:add": "pnpm pkglab add @clerk/chrome-extension",
+    "pkglab:ls": "pnpm pkglab pkg ls"
+  },
+  "dependencies": {
+    "@clerk/chrome-extension": "0.0.0-pkglab.1772058954745"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.12",
+    "typescript": "5.8.3"
+  }
+}
