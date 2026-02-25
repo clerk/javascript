@@ -4,13 +4,13 @@ import os
 
 import ExpoModulesCore
 
-@available(iOS 15.0, *)
+@available(iOS 16.0, *)
 struct AuthorizationResponse {
     var registration: ASAuthorizationPlatformPublicKeyCredentialRegistration?
     var assertion: ASAuthorizationPlatformPublicKeyCredentialAssertion?
 }
 
-@available(iOS 15.0, *)
+@available(iOS 16.0, *)
 class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProviding, ASAuthorizationControllerDelegate {
     private var authCallback: ((AuthorizationResponse?,ASAuthorizationError.Code?) -> Void)?
     var authController: ASAuthorizationController?
