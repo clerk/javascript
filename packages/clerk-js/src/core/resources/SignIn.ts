@@ -936,20 +936,15 @@ class SignInFuture implements SignInFutureResource {
   }
 
   private async _create(params: SignInFutureCreateParams): Promise<void> {
-    const body: Record<string, unknown> = { ...params };
-
-    const locale = getBrowserLocale();
-    if (locale) {
-      body.locale = locale;
-    }
-
     const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken(params);
 
-    if (captchaToken !== undefined) {
-      body.captchaToken = captchaToken;
-      body.captchaWidgetType = captchaWidgetType;
-      body.captchaError = captchaError;
-    }
+    const body: Record<string, unknown> = {
+      ...params,
+      captchaToken,
+      captchaWidgetType,
+      captchaError,
+      locale: getBrowserLocale() || undefined,
+    };
 
     await this.#resource.__internal_basePost({
       path: this.#resource.pathRoot,
