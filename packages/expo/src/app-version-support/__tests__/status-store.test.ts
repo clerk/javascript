@@ -24,17 +24,17 @@ vi.mock('../nativeAppInfo', () => {
 });
 
 import {
-  __internal_resetForceUpdateStatus,
-  applyForceUpdateStatusFromErrorMeta,
+  __internal_resetAppVersionSupportStatus,
+  applyAppVersionSupportStatusFromErrorMeta,
   attachNativeAppHeaders,
-  getForceUpdateStatus,
-  refreshForceUpdateStatus,
-  resolveForceUpdateStatus,
+  getAppVersionSupportStatus,
+  refreshAppVersionSupportStatus,
+  resolveAppVersionSupportStatus,
 } from '../status-store';
 
-describe('force-update status store', () => {
+describe('app-version-support status store', () => {
   beforeEach(() => {
-    __internal_resetForceUpdateStatus();
+    __internal_resetAppVersionSupportStatus();
     mocks.getNativeAppInfo.mockReset();
     mocks.platformOS = 'ios';
   });
@@ -46,22 +46,24 @@ describe('force-update status store', () => {
       packageName: null,
     });
 
-    const status = await refreshForceUpdateStatus({
-      forceUpdate: {
-        ios: [
-          {
-            bundleId: 'com.example.app',
-            minimumVersion: '1.3.0',
-            updateUrl: 'https://apps.apple.com/id123',
-          },
-        ],
-        android: [],
+    const status = await refreshAppVersionSupportStatus({
+      nativeAppSettings: {
+        minimumSupportedVersion: {
+          ios: [
+            {
+              bundleId: 'com.example.app',
+              minimumVersion: '1.3.0',
+              updateUrl: 'https://apps.apple.com/id123',
+            },
+          ],
+          android: [],
+        },
       },
     });
 
     expect(status.isSupported).toBe(false);
     expect(status.minimumVersion).toBe('1.3.0');
-    expect(getForceUpdateStatus().isSupported).toBe(false);
+    expect(getAppVersionSupportStatus().isSupported).toBe(false);
   });
 
   test('fails open when current app version is invalid', async () => {
@@ -71,10 +73,12 @@ describe('force-update status store', () => {
       packageName: null,
     });
 
-    const status = await refreshForceUpdateStatus({
-      forceUpdate: {
-        ios: [{ bundleId: 'com.example.app', minimumVersion: '1.3.0', updateUrl: null }],
-        android: [],
+    const status = await refreshAppVersionSupportStatus({
+      nativeAppSettings: {
+        minimumSupportedVersion: {
+          ios: [{ bundleId: 'com.example.app', minimumVersion: '1.3.0', updateUrl: null }],
+          android: [],
+        },
       },
     });
 
@@ -82,11 +86,15 @@ describe('force-update status store', () => {
     expect(status.minimumVersion).toBeNull();
   });
 
-  test('supports snake_case force_update payloads', () => {
-    const status = resolveForceUpdateStatus(
+  test('supports snake_case native_app_settings payloads', () => {
+    const status = resolveAppVersionSupportStatus(
       {
-        force_update: {
-          ios: [{ bundle_id: 'com.example.app', minimum_version: '2.0.0', update_url: 'https://apps.apple.com/id123' }],
+        native_app_settings: {
+          minimum_supported_version: {
+            ios: [
+              { bundle_id: 'com.example.app', minimum_version: '2.0.0', update_url: 'https://apps.apple.com/id123' },
+            ],
+          },
         },
       },
       {
@@ -100,19 +108,21 @@ describe('force-update status store', () => {
     expect(status.minimumVersion).toBe('2.0.0');
   });
 
-  test('supports partial camelCase forceUpdate payloads', () => {
+  test('supports partial camelCase nativeAppSettings payloads', () => {
     mocks.platformOS = 'android';
 
-    const status = resolveForceUpdateStatus(
+    const status = resolveAppVersionSupportStatus(
       {
-        forceUpdate: {
-          android: [
-            {
-              packageName: 'com.example.android',
-              minimumVersion: '2.0.0',
-              updateUrl: 'https://play.google.com/store/apps/details?id=com.example.android',
-            },
-          ],
+        nativeAppSettings: {
+          minimumSupportedVersion: {
+            android: [
+              {
+                packageName: 'com.example.android',
+                minimumVersion: '2.0.0',
+                updateUrl: 'https://play.google.com/store/apps/details?id=com.example.android',
+              },
+            ],
+          },
         },
       },
       {
@@ -164,7 +174,7 @@ describe('force-update status store', () => {
       packageName: null,
     });
 
-    const status = await applyForceUpdateStatusFromErrorMeta({
+    const status = await applyAppVersionSupportStatusFromErrorMeta({
       platform: 'ios',
       app_identifier: 'com.example.app',
       current_version: '1.0.0',

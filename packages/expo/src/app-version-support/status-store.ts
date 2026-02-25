@@ -1,43 +1,47 @@
 import { Platform } from 'react-native';
 
 import { getNativeAppInfo, type NativeAppInfo } from './nativeAppInfo';
-import { defaultForceUpdateStatus, type ForceUpdateStatus } from './types';
+import { type AppVersionSupportStatus, defaultAppVersionSupportStatus } from './types';
 import { compareAppVersions, isValidAppVersion } from './version';
 
-type ForceUpdatePolicySnakeCase = {
+type MinimumSupportedVersionPolicySnakeCase = {
   bundle_id?: unknown;
   package_name?: unknown;
   minimum_version?: unknown;
   update_url?: unknown;
 };
 
-type IOSForceUpdatePolicy = {
+type IOSMinimumSupportedVersionPolicy = {
   bundleId: string;
   minimumVersion: string;
   updateUrl: string | null;
 };
 
-type AndroidForceUpdatePolicy = {
+type AndroidMinimumSupportedVersionPolicy = {
   packageName: string;
   minimumVersion: string;
   updateUrl: string | null;
 };
 
-type ForceUpdateResource = {
-  ios?: IOSForceUpdatePolicy[];
-  android?: AndroidForceUpdatePolicy[];
+type MinimumSupportedVersionResource = {
+  ios?: IOSMinimumSupportedVersionPolicy[];
+  android?: AndroidMinimumSupportedVersionPolicy[];
 };
 
-type NormalizedForceUpdateResource = {
-  ios: IOSForceUpdatePolicy[];
-  android: AndroidForceUpdatePolicy[];
+type NormalizedAppVersionSupportResource = {
+  ios: IOSMinimumSupportedVersionPolicy[];
+  android: AndroidMinimumSupportedVersionPolicy[];
 };
 
-type ForceUpdateSource = {
-  forceUpdate?: ForceUpdateResource | null;
-  force_update?: {
-    ios?: ForceUpdatePolicySnakeCase[];
-    android?: ForceUpdatePolicySnakeCase[];
+type AppVersionSupportSource = {
+  nativeAppSettings?: {
+    minimumSupportedVersion?: MinimumSupportedVersionResource | null;
+  } | null;
+  native_app_settings?: {
+    minimum_supported_version?: {
+      ios?: MinimumSupportedVersionPolicySnakeCase[];
+      android?: MinimumSupportedVersionPolicySnakeCase[];
+    } | null;
   } | null;
 };
 
@@ -50,7 +54,7 @@ type UnsupportedAppVersionMeta = {
 
 const subscribers = new Set<() => void>();
 
-let currentForceUpdateStatus: ForceUpdateStatus = defaultForceUpdateStatus();
+let currentAppVersionSupportStatus: AppVersionSupportStatus = defaultAppVersionSupportStatus();
 
 const asNonEmptyString = (value: unknown): string | null => {
   if (typeof value !== 'string') {
@@ -61,17 +65,18 @@ const asNonEmptyString = (value: unknown): string | null => {
   return normalized ? normalized : null;
 };
 
-const supportedStatus = (): ForceUpdateStatus => ({
+const supportedStatus = (): AppVersionSupportStatus => ({
   isSupported: true,
   minimumVersion: null,
   updateURL: null,
 });
 
-const normalizeSnakeCaseForceUpdate = (
-  source: NonNullable<ForceUpdateSource['force_update']>,
-): NormalizedForceUpdateResource => {
+const normalizeSnakeCaseMinimumSupportedVersion = (
+  source: NonNullable<AppVersionSupportSource['native_app_settings']>,
+): NormalizedAppVersionSupportResource => {
+  const minimumSupportedVersion = source.minimum_supported_version;
   return {
-    ios: (source.ios || []).flatMap(policy => {
+    ios: (minimumSupportedVersion?.ios || []).flatMap(policy => {
       const bundleId = asNonEmptyString(policy.bundle_id);
       const minimumVersion = asNonEmptyString(policy.minimum_version);
       if (!bundleId || !minimumVersion) {
@@ -86,7 +91,7 @@ const normalizeSnakeCaseForceUpdate = (
         },
       ];
     }),
-    android: (source.android || []).flatMap(policy => {
+    android: (minimumSupportedVersion?.android || []).flatMap(policy => {
       const packageName = asNonEmptyString(policy.package_name);
       const minimumVersion = asNonEmptyString(policy.minimum_version);
       if (!packageName || !minimumVersion) {
@@ -104,31 +109,36 @@ const normalizeSnakeCaseForceUpdate = (
   };
 };
 
-const normalizeForceUpdate = (source: ForceUpdateResource): NormalizedForceUpdateResource => {
+const normalizeMinimumSupportedVersion = (
+  source: NonNullable<AppVersionSupportSource['nativeAppSettings']>,
+): NormalizedAppVersionSupportResource => {
+  const minimumSupportedVersion = source.minimumSupportedVersion;
   return {
-    ios: source.ios || [],
-    android: source.android || [],
+    ios: minimumSupportedVersion?.ios || [],
+    android: minimumSupportedVersion?.android || [],
   };
 };
 
-const getForceUpdatePolicies = (source: ForceUpdateSource | null | undefined): NormalizedForceUpdateResource | null => {
+const getAppVersionSupportPolicies = (
+  source: AppVersionSupportSource | null | undefined,
+): NormalizedAppVersionSupportResource | null => {
   if (!source) {
     return null;
   }
 
-  if (source.forceUpdate) {
-    return normalizeForceUpdate(source.forceUpdate);
+  if (source.nativeAppSettings) {
+    return normalizeMinimumSupportedVersion(source.nativeAppSettings);
   }
 
-  if (source.force_update) {
-    return normalizeSnakeCaseForceUpdate(source.force_update);
+  if (source.native_app_settings) {
+    return normalizeSnakeCaseMinimumSupportedVersion(source.native_app_settings);
   }
 
   return null;
 };
 
 const findPolicy = (
-  policies: NormalizedForceUpdateResource | null,
+  policies: NormalizedAppVersionSupportResource | null,
   appInfo: NativeAppInfo,
 ): { minimumVersion: string; updateURL: string | null } | null => {
   if (!policies) {
@@ -172,7 +182,7 @@ const findPolicy = (
   return null;
 };
 
-const isSameStatus = (left: ForceUpdateStatus, right: ForceUpdateStatus): boolean => {
+const isSameStatus = (left: AppVersionSupportStatus, right: AppVersionSupportStatus): boolean => {
   return (
     left.isSupported === right.isSupported &&
     left.minimumVersion === right.minimumVersion &&
@@ -180,18 +190,18 @@ const isSameStatus = (left: ForceUpdateStatus, right: ForceUpdateStatus): boolea
   );
 };
 
-const setForceUpdateStatus = (nextStatus: ForceUpdateStatus): void => {
-  if (isSameStatus(currentForceUpdateStatus, nextStatus)) {
+const setAppVersionSupportStatus = (nextStatus: AppVersionSupportStatus): void => {
+  if (isSameStatus(currentAppVersionSupportStatus, nextStatus)) {
     return;
   }
 
-  currentForceUpdateStatus = nextStatus;
+  currentAppVersionSupportStatus = nextStatus;
   subscribers.forEach(subscriber => subscriber());
 };
 
-export const getForceUpdateStatus = (): ForceUpdateStatus => currentForceUpdateStatus;
+export const getAppVersionSupportStatus = (): AppVersionSupportStatus => currentAppVersionSupportStatus;
 
-export const subscribeForceUpdateStatus = (subscriber: () => void): (() => void) => {
+export const subscribeAppVersionSupportStatus = (subscriber: () => void): (() => void) => {
   subscribers.add(subscriber);
 
   return () => {
@@ -199,10 +209,10 @@ export const subscribeForceUpdateStatus = (subscriber: () => void): (() => void)
   };
 };
 
-export const resolveForceUpdateStatus = (
-  source: ForceUpdateSource | null | undefined,
+export const resolveAppVersionSupportStatus = (
+  source: AppVersionSupportSource | null | undefined,
   appInfo: NativeAppInfo,
-): ForceUpdateStatus => {
+): AppVersionSupportStatus => {
   const currentVersion = asNonEmptyString(appInfo.currentVersion);
   if (!currentVersion) {
     return supportedStatus();
@@ -212,7 +222,7 @@ export const resolveForceUpdateStatus = (
     return supportedStatus();
   }
 
-  const matchingPolicy = findPolicy(getForceUpdatePolicies(source), appInfo);
+  const matchingPolicy = findPolicy(getAppVersionSupportPolicies(source), appInfo);
   if (!matchingPolicy) {
     return supportedStatus();
   }
@@ -232,17 +242,19 @@ export const resolveForceUpdateStatus = (
   };
 };
 
-export const refreshForceUpdateStatus = async (source: ForceUpdateSource | null | undefined): Promise<ForceUpdateStatus> => {
+export const refreshAppVersionSupportStatus = async (
+  source: AppVersionSupportSource | null | undefined,
+): Promise<AppVersionSupportStatus> => {
   const appInfo = await getNativeAppInfo();
-  const nextStatus = resolveForceUpdateStatus(source, appInfo);
-  setForceUpdateStatus(nextStatus);
+  const nextStatus = resolveAppVersionSupportStatus(source, appInfo);
+  setAppVersionSupportStatus(nextStatus);
   return nextStatus;
 };
 
-export const resolveForceUpdateStatusFromErrorMeta = (
+export const resolveAppVersionSupportStatusFromErrorMeta = (
   meta: unknown,
   appInfo: NativeAppInfo,
-): ForceUpdateStatus | null => {
+): AppVersionSupportStatus | null => {
   if (!meta || typeof meta !== 'object') {
     return null;
   }
@@ -254,7 +266,8 @@ export const resolveForceUpdateStatusFromErrorMeta = (
     return null;
   }
 
-  const expectedIdentifier = Platform.OS === 'ios' ? asNonEmptyString(appInfo.bundleId) : asNonEmptyString(appInfo.packageName);
+  const expectedIdentifier =
+    Platform.OS === 'ios' ? asNonEmptyString(appInfo.bundleId) : asNonEmptyString(appInfo.packageName);
   const appIdentifier = asNonEmptyString(normalizedMeta.app_identifier);
   if (expectedIdentifier && appIdentifier && expectedIdentifier !== appIdentifier) {
     return null;
@@ -272,14 +285,16 @@ export const resolveForceUpdateStatusFromErrorMeta = (
   };
 };
 
-export const applyForceUpdateStatusFromErrorMeta = async (meta: unknown): Promise<ForceUpdateStatus | null> => {
+export const applyAppVersionSupportStatusFromErrorMeta = async (
+  meta: unknown,
+): Promise<AppVersionSupportStatus | null> => {
   const appInfo = await getNativeAppInfo();
-  const nextStatus = resolveForceUpdateStatusFromErrorMeta(meta, appInfo);
+  const nextStatus = resolveAppVersionSupportStatusFromErrorMeta(meta, appInfo);
   if (!nextStatus) {
     return null;
   }
 
-  setForceUpdateStatus(nextStatus);
+  setAppVersionSupportStatus(nextStatus);
   return nextStatus;
 };
 
@@ -306,7 +321,7 @@ export const attachNativeAppHeaders = async (headers: Headers): Promise<void> =>
   }
 };
 
-export const __internal_resetForceUpdateStatus = (): void => {
-  currentForceUpdateStatus = defaultForceUpdateStatus();
+export const __internal_resetAppVersionSupportStatus = (): void => {
+  currentAppVersionSupportStatus = defaultAppVersionSupportStatus();
   subscribers.clear();
 };

@@ -11,6 +11,11 @@ import { Platform } from 'react-native';
 
 import packageJson from '../../../package.json';
 import {
+  applyAppVersionSupportStatusFromErrorMeta,
+  attachNativeAppHeaders,
+  refreshAppVersionSupportStatus,
+} from '../../app-version-support/status-store';
+import {
   ClientResourceCache,
   DUMMY_CLERK_CLIENT_RESOURCE,
   DUMMY_CLERK_ENVIRONMENT_RESOURCE,
@@ -19,11 +24,6 @@ import {
 } from '../../cache';
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { errorThrower } from '../../errorThrower';
-import {
-  applyForceUpdateStatusFromErrorMeta,
-  attachNativeAppHeaders,
-  refreshForceUpdateStatus,
-} from '../../force-update/status-store';
 import { isNative } from '../../utils';
 import type { BuildClerkOptions } from './types';
 
@@ -38,18 +38,16 @@ type FapiRequestInit = RequestInit & {
 };
 
 type FapiResponse = Response & {
-  payload:
-    | {
-        response?: unknown;
-        errors?: Array<{ code: string; meta?: Record<string, unknown> }>;
-      }
-    | null;
+  payload: {
+    response?: unknown;
+    errors?: Array<{ code: string; meta?: Record<string, unknown> }>;
+  } | null;
 };
 
 type EnvironmentResourceLike = {
   __internal_toSnapshot: () => EnvironmentJSONSnapshot;
-  forceUpdate?: unknown;
-  force_update?: unknown;
+  nativeAppSettings?: unknown;
+  native_app_settings?: unknown;
 };
 
 const KEY = '__clerk_client_jwt';
@@ -140,12 +138,11 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           SessionJWTCache.init({ publishableKey, storage: createResourceCache });
 
           __internal_clerk.addListener(({ client }) => {
-            const environment = (
-              __internal_clerk as { __internal_environment?: EnvironmentResourceLike } | undefined
-            )?.__internal_environment;
+            const environment = (__internal_clerk as { __internal_environment?: EnvironmentResourceLike } | undefined)
+              ?.__internal_environment;
             if (environment) {
               void EnvironmentResourceCache.save(environment.__internal_toSnapshot());
-              void refreshForceUpdateStatus(environment as Parameters<typeof refreshForceUpdateStatus>[0]);
+              void refreshAppVersionSupportStatus(environment as Parameters<typeof refreshAppVersionSupportStatus>[0]);
             }
 
             if (client) {
@@ -173,7 +170,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
               client = DUMMY_CLERK_CLIENT_RESOURCE;
               setTimeout(() => void retryInitilizeResourcesFromFAPI(), 3000);
             }
-            void refreshForceUpdateStatus(environment as Parameters<typeof refreshForceUpdateStatus>[0]);
+            void refreshAppVersionSupportStatus(environment as Parameters<typeof refreshAppVersionSupportStatus>[0]);
             return { client, environment };
           };
         }
@@ -217,15 +214,17 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         }
 
         if (firstError?.code === 'unsupported_app_version') {
-          await applyForceUpdateStatusFromErrorMeta(firstError.meta);
+          await applyAppVersionSupportStatusFromErrorMeta(firstError.meta);
         }
 
         if (requestInit.url?.pathname.endsWith('/v1/environment')) {
           const internalEnvironment = (
             __internal_clerk as { __internal_environment?: EnvironmentResourceLike } | undefined
           )?.__internal_environment;
-          const forceUpdateSource = response.payload?.response || internalEnvironment;
-          await refreshForceUpdateStatus(forceUpdateSource as Parameters<typeof refreshForceUpdateStatus>[0]);
+          const appVersionSupportSource = response.payload?.response || internalEnvironment;
+          await refreshAppVersionSupportStatus(
+            appVersionSupportSource as Parameters<typeof refreshAppVersionSupportStatus>[0],
+          );
         }
       });
     }

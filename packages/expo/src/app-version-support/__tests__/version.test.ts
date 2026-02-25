@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { compareAppVersions, isValidAppVersion } from '../version';
 
-describe('force-update version comparator', () => {
+describe('app-version-support version comparator', () => {
   test('validates numeric dot-segment versions', () => {
     expect(isValidAppVersion('1')).toBe(true);
     expect(isValidAppVersion('1.2.0')).toBe(true);

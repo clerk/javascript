@@ -3,9 +3,9 @@ import type { ComponentType, ReactNode } from 'react';
 import { useMemo } from 'react';
 import { Linking, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { useForceUpdateStatus } from '../hooks/useForceUpdateStatus';
+import { useAppVersionSupportStatus } from '../hooks/useAppVersionSupportStatus';
 
-type ForceUpdateBlockingOverlayProps = {
+type AppVersionSupportBlockingOverlayProps = {
   enabled: boolean;
 };
 
@@ -47,6 +47,7 @@ const FALLBACK_COLORS = {
 
 const FullWindowOverlay: ComponentType<FullWindowOverlayProps> | null = (() => {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- optional dependency in Expo apps
     return (require('react-native-screens') as FullWindowOverlayModule).FullWindowOverlay || null;
   } catch {
     return null;
@@ -77,9 +78,11 @@ const buildMessage = (minimumVersion: string | null): string => {
   return `This version of the app is no longer supported. Please update to version ${minimumVersion} or newer.`;
 };
 
-export const ForceUpdateBlockingOverlay = ({ enabled }: ForceUpdateBlockingOverlayProps): JSX.Element | null => {
+export const AppVersionSupportBlockingOverlay = ({
+  enabled,
+}: AppVersionSupportBlockingOverlayProps): JSX.Element | null => {
   const colors = useOverlayColors();
-  const status = useForceUpdateStatus();
+  const status = useAppVersionSupportStatus();
 
   if (!enabled || status.isSupported) {
     return null;
@@ -101,7 +104,10 @@ export const ForceUpdateBlockingOverlay = ({ enabled }: ForceUpdateBlockingOverl
           <Text style={[styles.title, { color: colors.text }]}>Update required</Text>
           <Text style={[styles.message, { color: colors.mutedText }]}>{buildMessage(status.minimumVersion)}</Text>
           {status.updateURL ? (
-            <Pressable onPress={onPressUpdate} style={[styles.button, { backgroundColor: colors.primary }]}>
+            <Pressable
+              onPress={onPressUpdate}
+              style={[styles.button, { backgroundColor: colors.primary }]}
+            >
               <Text style={[styles.buttonLabel, { color: colors.buttonText }]}>Update now</Text>
             </Pressable>
           ) : null}

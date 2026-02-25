@@ -9,7 +9,7 @@ export type { IStorage, BuildClerkOptions } from '../provider/singleton/types';
 // OAuth/SSO hook types
 export type { UseOAuthFlowParams, StartOAuthFlowParams, StartOAuthFlowReturnType } from '../hooks/useOAuth';
 export type { StartSSOFlowParams, StartSSOFlowReturnType } from '../hooks/useSSO';
-export type { ForceUpdateStatus } from '../force-update/types';
+export type { AppVersionSupportStatus } from '../app-version-support/types';
 
 // Google Sign-In types
 export type {

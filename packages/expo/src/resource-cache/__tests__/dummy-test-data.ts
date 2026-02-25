@@ -222,9 +222,11 @@ export const DUMMY_TEST_LARGE_JSON = {
     actions: { admin_delete: true },
     domains: { enabled: false, enrollment_modes: [], default_role: null },
   },
-  force_update: {
-    ios: [],
-    android: [],
+  native_app_settings: {
+    minimum_supported_version: {
+      ios: [],
+      android: [],
+    },
   },
   maintenance_mode: false,
 } as const;

@@ -9,21 +9,25 @@ import type { ClerkResource } from './resource';
 import type { EnvironmentJSONSnapshot } from './snapshots';
 import type { UserSettingsResource } from './userSettings';
 
-export interface IOSForceUpdatePolicyResource {
+export interface IOSMinimumSupportedVersionPolicyResource {
   bundleId: string;
   minimumVersion: string;
   updateUrl: string | null;
 }
 
-export interface AndroidForceUpdatePolicyResource {
+export interface AndroidMinimumSupportedVersionPolicyResource {
   packageName: string;
   minimumVersion: string;
   updateUrl: string | null;
 }
 
-export interface ForceUpdateResource {
-  ios: IOSForceUpdatePolicyResource[];
-  android: AndroidForceUpdatePolicyResource[];
+export interface MinimumSupportedVersionResource {
+  ios: IOSMinimumSupportedVersionPolicyResource[];
+  android: AndroidMinimumSupportedVersionPolicyResource[];
+}
+
+export interface NativeAppSettingsResource {
+  minimumSupportedVersion: MinimumSupportedVersionResource;
 }
 
 export interface EnvironmentResource extends ClerkResource {
@@ -40,7 +44,7 @@ export interface EnvironmentResource extends ClerkResource {
   onWindowLocationHost: () => boolean;
   maintenanceMode: boolean;
   clientDebugMode: boolean;
-  forceUpdate?: ForceUpdateResource;
+  nativeAppSettings: NativeAppSettingsResource;
   __internal_toSnapshot: () => EnvironmentJSONSnapshot;
   __internal_enableEnvironmentSetting: (params: EnableEnvironmentSettingParams) => Promise<void>;
 }

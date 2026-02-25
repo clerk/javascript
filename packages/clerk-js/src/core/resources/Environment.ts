@@ -16,7 +16,7 @@ import { APIKeySettings } from './APIKeySettings';
 import { AuthConfig, BaseResource, CommerceSettings, DisplayConfig, ProtectConfig, UserSettings } from './internal';
 import { OrganizationSettings } from './OrganizationSettings';
 
-type ForceUpdateResource = {
+type MinimumSupportedVersionResource = {
   ios: Array<{
     bundleId: string;
     minimumVersion: string;
@@ -29,7 +29,11 @@ type ForceUpdateResource = {
   }>;
 };
 
-type ForceUpdateJSON = {
+type NativeAppSettingsResource = {
+  minimumSupportedVersion: MinimumSupportedVersionResource;
+};
+
+type MinimumSupportedVersionJSON = {
   ios?: Array<{
     bundle_id: string;
     minimum_version: string;
@@ -42,14 +46,24 @@ type ForceUpdateJSON = {
   }>;
 };
 
-const emptyForceUpdate = (): ForceUpdateResource => ({
+type NativeAppSettingsJSON = {
+  minimum_supported_version?: MinimumSupportedVersionJSON;
+};
+
+const emptyMinimumSupportedVersion = (): MinimumSupportedVersionResource => ({
   ios: [],
   android: [],
 });
 
-const deserializeForceUpdate = (value: ForceUpdateJSON | undefined): ForceUpdateResource => {
+const emptyNativeAppSettings = (): NativeAppSettingsResource => ({
+  minimumSupportedVersion: emptyMinimumSupportedVersion(),
+});
+
+const deserializeMinimumSupportedVersion = (
+  value: MinimumSupportedVersionJSON | undefined,
+): MinimumSupportedVersionResource => {
   if (!value) {
-    return emptyForceUpdate();
+    return emptyMinimumSupportedVersion();
   }
 
   return {
@@ -66,9 +80,9 @@ const deserializeForceUpdate = (value: ForceUpdateJSON | undefined): ForceUpdate
   };
 };
 
-const serializeForceUpdate = (
-  value: ForceUpdateResource | undefined,
-): ForceUpdateJSON => {
+const serializeMinimumSupportedVersion = (
+  value: MinimumSupportedVersionResource | undefined,
+): MinimumSupportedVersionJSON => {
   return {
     ios: (value?.ios || []).map(policy => ({
       bundle_id: policy.bundleId,
@@ -80,6 +94,22 @@ const serializeForceUpdate = (
       minimum_version: policy.minimumVersion,
       update_url: policy.updateUrl,
     })),
+  };
+};
+
+const deserializeNativeAppSettings = (value: NativeAppSettingsJSON | undefined): NativeAppSettingsResource => {
+  if (!value) {
+    return emptyNativeAppSettings();
+  }
+
+  return {
+    minimumSupportedVersion: deserializeMinimumSupportedVersion(value.minimum_supported_version),
+  };
+};
+
+const serializeNativeAppSettings = (value: NativeAppSettingsResource | undefined): NativeAppSettingsJSON => {
+  return {
+    minimum_supported_version: serializeMinimumSupportedVersion(value?.minimumSupportedVersion),
   };
 };
 
@@ -96,7 +126,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
   commerceSettings: CommerceSettingsResource = new CommerceSettings();
   apiKeysSettings: APIKeySettings = new APIKeySettings();
   protectConfig: ProtectConfigResource = new ProtectConfig();
-  forceUpdate: ForceUpdateResource = emptyForceUpdate();
+  nativeAppSettings: NativeAppSettingsResource = emptyNativeAppSettings();
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
@@ -126,7 +156,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
     this.commerceSettings = new CommerceSettings(data.commerce_settings);
     this.apiKeysSettings = new APIKeySettings(data.api_keys_settings);
     this.protectConfig = new ProtectConfig(data.protect_config);
-    this.forceUpdate = deserializeForceUpdate((data as EnvironmentJSON & { force_update?: ForceUpdateJSON }).force_update);
+    this.nativeAppSettings = deserializeNativeAppSettings(data.native_app_settings);
 
     return this;
   }
@@ -169,7 +199,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
       commerce_settings: this.commerceSettings.__internal_toSnapshot(),
       api_keys_settings: this.apiKeysSettings.__internal_toSnapshot(),
       protect_config: this.protectConfig.__internal_toSnapshot(),
-      force_update: serializeForceUpdate(this.forceUpdate),
+      native_app_settings: serializeNativeAppSettings(this.nativeAppSettings),
     } as EnvironmentJSONSnapshot;
   }
 

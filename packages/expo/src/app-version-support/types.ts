@@ -1,10 +1,10 @@
-export type ForceUpdateStatus = {
+export type AppVersionSupportStatus = {
   isSupported: boolean;
   minimumVersion: string | null;
   updateURL: string | null;
 };
 
-export const defaultForceUpdateStatus = (): ForceUpdateStatus => ({
+export const defaultAppVersionSupportStatus = (): AppVersionSupportStatus => ({
   isSupported: true,
   minimumVersion: null,
   updateURL: null,
