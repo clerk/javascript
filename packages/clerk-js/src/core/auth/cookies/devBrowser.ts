@@ -59,6 +59,13 @@ export const createDevBrowserCookie = (
     const attributes = getCookieAttributes(options);
     suffixedDevBrowserCookie.remove(attributes);
     devBrowserCookie.remove(attributes);
+
+    // Also remove non-partitioned variants — the browser treats partitioned and
+    // non-partitioned cookies with the same name as distinct cookies.
+    if (attributes.partitioned) {
+      suffixedDevBrowserCookie.remove();
+      devBrowserCookie.remove();
+    }
   };
 
   return {

@@ -39,6 +39,13 @@ export const createSessionCookie = (cookieSuffix: string, options: SessionCookie
     const attributes = getCookieAttributes(options);
     sessionCookie.remove(attributes);
     suffixedSessionCookie.remove(attributes);
+
+    // Also remove non-partitioned variants — the browser treats partitioned and
+    // non-partitioned cookies with the same name as distinct cookies.
+    if (attributes.partitioned) {
+      sessionCookie.remove();
+      suffixedSessionCookie.remove();
+    }
   };
 
   const set = (token: string) => {
