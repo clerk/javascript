@@ -74,3 +74,14 @@ export type {
  * Utilities for reverification
  */
 export { reverificationErrorResponse, reverificationError } from '@clerk/backend/internal';
+
+/**
+ * Frontend API proxy exports
+ */
+export {
+  clerkFrontendApiProxy,
+  createFrontendApiProxyHandlers,
+  type FrontendApiProxyHandlers,
+  type FrontendApiProxyOptions,
+  type NextFrontendApiProxyOptions,
+} from './proxy';

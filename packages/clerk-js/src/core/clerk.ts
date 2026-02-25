@@ -615,8 +615,6 @@ export class Clerk implements ClerkInterface {
       // Notify other tabs that user is signing out and clean up cookies.
       eventBus.emit(events.UserSignOut, null);
 
-      this.#setTransitiveState();
-
       await tracker.track(async () => {
         if (signOutCallback) {
           await signOutCallback();
@@ -640,7 +638,10 @@ export class Clerk implements ClerkInterface {
      * Since we are calling `onBeforeSetActive` before signing out, we should NOT pass `"sign-out"`.
      */
     await onBeforeSetActive();
+
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
+      this.#setTransitiveState();
+
       if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
       } else {
@@ -657,11 +658,13 @@ export class Clerk implements ClerkInterface {
     const session = this.client.signedInSessions.find(s => s.id === opts.sessionId);
     const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
 
-    await session?.remove();
-
     if (shouldSignOutCurrent) {
+      this.#setTransitiveState();
+      await session?.remove();
       await executeSignOut();
       debugLogger.info('signOut() complete', { redirectUrl: stripOrigin(redirectUrl) }, 'clerk');
+    } else {
+      await session?.remove();
     }
   };
 
@@ -688,7 +691,9 @@ export class Clerk implements ClerkInterface {
     }
     this.assertComponentsReady(this.#clerkUI);
     const component = 'SignIn';
-    void this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.openModal('signIn', props || {}));
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls => controls.openModal('signIn', props || {}));
 
     const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
     this.telemetry?.record(eventPrebuiltComponentOpened(component, props, additionalData));
@@ -862,7 +867,9 @@ export class Clerk implements ClerkInterface {
       return;
     }
     this.assertComponentsReady(this.#clerkUI);
-    void this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.openModal('signUp', props || {}));
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: 'SignUp' }))
+      .then(controls => controls.openModal('signUp', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('SignUp', props));
   };
@@ -881,7 +888,9 @@ export class Clerk implements ClerkInterface {
       return;
     }
     this.assertComponentsReady(this.#clerkUI);
-    void this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.openModal('userProfile', props || {}));
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: 'UserProfile' }))
+      .then(controls => controls.openModal('userProfile', props || {}));
 
     const additionalData = (props?.customPages?.length || 0) > 0 ? { customPages: true } : undefined;
     this.telemetry?.record(eventPrebuiltComponentOpened('UserProfile', props, additionalData));
@@ -917,7 +926,7 @@ export class Clerk implements ClerkInterface {
 
     this.assertComponentsReady(this.#clerkUI);
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: 'OrganizationProfile' }))
       .then(controls => controls.openModal('organizationProfile', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('OrganizationProfile', props));
@@ -944,7 +953,7 @@ export class Clerk implements ClerkInterface {
 
     this.assertComponentsReady(this.#clerkUI);
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: 'CreateOrganization' }))
       .then(controls => controls.openModal('createOrganization', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('CreateOrganization', props));
@@ -956,7 +965,9 @@ export class Clerk implements ClerkInterface {
 
   public openWaitlist = (props?: WaitlistProps): void => {
     this.assertComponentsReady(this.#clerkUI);
-    void this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.openModal('waitlist', props || {}));
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: 'Waitlist' }))
+      .then(controls => controls.openModal('waitlist', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('Waitlist', props));
   };
@@ -969,7 +980,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'SignIn';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -991,7 +1002,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'UserAvatar';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1012,7 +1023,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'SignUp';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1041,7 +1052,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'UserProfile';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1087,7 +1098,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OrganizationProfile';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1122,7 +1133,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'CreateOrganization';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1157,7 +1168,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OrganizationSwitcher';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1202,7 +1213,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OrganizationList';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1228,7 +1239,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'UserButton';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1254,7 +1265,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'Waitlist';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1283,7 +1294,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'PricingTable';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1304,7 +1315,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OAuthConsent';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1359,7 +1370,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'APIKeys';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1402,7 +1413,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'TaskChooseOrganization';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1424,7 +1435,7 @@ export class Clerk implements ClerkInterface {
 
     const component = 'TaskResetPassword';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1441,12 +1452,12 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
-  public mountTaskSetupMfa = (node: HTMLDivElement, props?: TaskSetupMFAProps) => {
+  public mountTaskSetupMFA = (node: HTMLDivElement, props?: TaskSetupMFAProps) => {
     this.assertComponentsReady(this.#clerkUI);
 
     const component = 'TaskSetupMFA';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1456,10 +1467,10 @@ export class Clerk implements ClerkInterface {
         }),
       );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('TaskSetupMfa', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('TaskSetupMFA', props));
   };
 
-  public unmountTaskSetupMfa = (node: HTMLDivElement) => {
+  public unmountTaskSetupMFA = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
@@ -1550,13 +1561,53 @@ export class Clerk implements ClerkInterface {
         await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
       }
 
+      const taskUrl =
+        newSession?.status === 'pending' &&
+        newSession?.currentTask &&
+        this.#options.taskUrls?.[newSession?.currentTask.key];
+      const shouldNavigate = !!(redirectUrl || taskUrl || setActiveNavigate);
+
       //1. setLastActiveSession to passed user session (add a param).
       //   Note that this will also update the session's active organization
       //   id.
+      /*
+        The introduction of useSyncExternalStore introduced a bug here, where the
+        updateClient that happens as a result of this touch emitted and immediately
+        caused components to re-render. Previously, that emit was batched with the
+        setTransitiveState call.
+
+        This whole block should likely happen later, after the transitive state is set.
+
+        Because we want to minimize behavioral changes until we can tackle this properly,
+        this was refactored so that updateClient does not emit under these circumstances.
+      */
       if (inActiveBrowserTab() || !this.#options.standardBrowser) {
-        await this.#touchCurrentSession(newSession);
-        // reload session from updated client
-        newSession = this.#getSessionFromClient(newSession?.id);
+        let updatedClient: ClientResource | undefined;
+        if (shouldNavigate && newSession) {
+          try {
+            // __internal_touch does not call updateClient automatically
+            updatedClient = await newSession.__internal_touch();
+            if (updatedClient) {
+              // We call updateClient manually, but without letting it emit
+              // It's important that the setTransitiveState call happens somewhat
+              // quickly after this, as during this period, the internal Clerk
+              // state does not match the emitted state.
+              this.updateClient(updatedClient, { __internal_dangerouslySkipEmit: true });
+            }
+          } catch (e) {
+            if (is4xxError(e)) {
+              void this.handleUnauthenticated();
+            } else {
+              throw e;
+            }
+          }
+        } else {
+          await this.#touchCurrentSession(newSession);
+        }
+        // If we do have the updatedClient, read from that, otherwise getSessionFromClient
+        // will fallback to this.client. This makes no difference now, but will if we
+        // decide to move the `updateClient` call out of this block later.
+        newSession = this.#getSessionFromClient(newSession?.id, updatedClient);
       }
 
       // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
@@ -1583,12 +1634,7 @@ export class Clerk implements ClerkInterface {
       //   automatic reloading when reloading shouldn't be happening.
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
-      const taskUrl =
-        newSession?.status === 'pending' &&
-        newSession?.currentTask &&
-        this.#options.taskUrls?.[newSession?.currentTask.key];
-
-      if (redirectUrl || taskUrl || setActiveNavigate) {
+      if (shouldNavigate) {
         await tracker.track(async () => {
           if (!this.client) {
             // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
@@ -2657,7 +2703,10 @@ export class Clerk implements ClerkInterface {
     this.internal_last_error = value;
   }
 
-  updateClient = (newClient: ClientResource): void => {
+  // Skipping emit is dangerous because if there is a gap between setting these
+  // and emitting, library consumers that both read state directly and set up listeners
+  // could end up in a inconsistent state.
+  updateClient = (newClient: ClientResource, options?: { __internal_dangerouslySkipEmit?: boolean }): void => {
     if (!this.client) {
       // This is the first time client is being
       // set, so we also need to set session
@@ -2702,7 +2751,9 @@ export class Clerk implements ClerkInterface {
       eventBus.emit(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 
-    this.#emit();
+    if (!options?.__internal_dangerouslySkipEmit) {
+      this.#emit();
+    }
   };
 
   get __internal_environment(): EnvironmentResource | null | undefined {

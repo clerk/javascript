@@ -98,13 +98,13 @@ const FieldLabelIcon = (props: { icon?: React.ComponentType }) => {
       as={'span'}
       title={t(localizationKeys('formFieldHintText__slug'))}
       sx={{
-        marginRight: 'auto',
+        marginInlineEnd: 'auto',
       }}
     >
       <IconCustomizable
         icon={props.icon}
         sx={theme => ({
-          marginLeft: theme.space.$0x5,
+          marginInlineStart: theme.space.$0x5,
           color: theme.colors.$neutralAlpha400,
           width: theme.sizes.$4,
           height: theme.sizes.$4,

@@ -12,6 +12,7 @@ import { debugLogger } from '@/utils/debug';
 import { clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
+import { Environment } from '../resources/Environment';
 import { createActiveContextCookie } from './cookies/activeContext';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
@@ -74,16 +75,27 @@ export class AuthCookieService {
 
     eventBus.on(events.UserSignOut, () => this.handleSignOut());
 
+    // After Environment resolves, re-write dev browser cookies with correct
+    // partitioned attributes. Dev browser cookies are initially written before
+    // Environment is fetched, so they may have stale attributes.
+    eventBus.on(events.EnvironmentUpdate, () => {
+      this.devBrowser.refreshCookies();
+    });
+
     this.refreshTokenOnFocus();
     this.startPollingForToken();
 
-    this.clientUat = createClientUatCookie(cookieSuffix);
-    this.sessionCookie = createSessionCookie(cookieSuffix);
+    const cookieOptions = {
+      usePartitionedCookies: () => Environment.getInstance().partitionedCookies,
+    };
+    this.clientUat = createClientUatCookie(cookieSuffix, cookieOptions);
+    this.sessionCookie = createSessionCookie(cookieSuffix, cookieOptions);
     this.activeCookie = createActiveContextCookie();
     this.devBrowser = createDevBrowser({
       frontendApi: clerk.frontendApi,
       fapiClient,
       cookieSuffix,
+      cookieOptions,
     });
   }
 

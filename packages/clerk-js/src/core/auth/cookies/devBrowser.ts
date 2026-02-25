@@ -5,6 +5,7 @@ import { inCrossOriginIframe } from '@clerk/shared/internal/clerk-js/runtime';
 import { getSuffixedCookieName } from '@clerk/shared/keys';
 
 import { getSecureAttribute } from '../getSecureAttribute';
+import { requiresSameSiteNone } from './requireSameSiteNone';
 
 export type DevBrowserCookieHandler = {
   set: (jwt: string) => void;
@@ -12,10 +13,16 @@ export type DevBrowserCookieHandler = {
   remove: () => void;
 };
 
-const getCookieAttributes = () => {
-  const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
+export type DevBrowserCookieOptions = {
+  usePartitionedCookies: () => boolean;
+};
+
+const getCookieAttributes = (options: DevBrowserCookieOptions) => {
+  const isPartitioned = options.usePartitionedCookies();
+  const sameSite = isPartitioned || inCrossOriginIframe() || requiresSameSiteNone() ? 'None' : 'Lax';
   const secure = getSecureAttribute(sameSite);
-  return { sameSite, secure } as const;
+  const partitioned = isPartitioned && secure;
+  return { sameSite, secure, partitioned } as const;
 };
 
 /**
@@ -24,7 +31,10 @@ const getCookieAttributes = () => {
  * The cookie is used to authenticate FAPI requests and pass
  * authentication from AP to the app.
  */
-export const createDevBrowserCookie = (cookieSuffix: string): DevBrowserCookieHandler => {
+export const createDevBrowserCookie = (
+  cookieSuffix: string,
+  options: DevBrowserCookieOptions,
+): DevBrowserCookieHandler => {
   const devBrowserCookie = createCookieHandler(DEV_BROWSER_JWT_KEY);
   const suffixedDevBrowserCookie = createCookieHandler(getSuffixedCookieName(DEV_BROWSER_JWT_KEY, cookieSuffix));
 
@@ -32,16 +42,30 @@ export const createDevBrowserCookie = (cookieSuffix: string): DevBrowserCookieHa
 
   const set = (jwt: string) => {
     const expires = addYears(Date.now(), 1);
-    const { sameSite, secure } = getCookieAttributes();
+    const { sameSite, secure, partitioned } = getCookieAttributes(options);
 
-    suffixedDevBrowserCookie.set(jwt, { expires, sameSite, secure });
-    devBrowserCookie.set(jwt, { expires, sameSite, secure });
+    // Remove old non-partitioned cookies — the browser treats partitioned and
+    // non-partitioned cookies with the same name as distinct cookies.
+    if (partitioned) {
+      suffixedDevBrowserCookie.remove();
+      devBrowserCookie.remove();
+    }
+
+    suffixedDevBrowserCookie.set(jwt, { expires, sameSite, secure, partitioned });
+    devBrowserCookie.set(jwt, { expires, sameSite, secure, partitioned });
   };
 
   const remove = () => {
-    const attributes = getCookieAttributes();
+    const attributes = getCookieAttributes(options);
     suffixedDevBrowserCookie.remove(attributes);
     devBrowserCookie.remove(attributes);
+
+    // Also remove non-partitioned variants — the browser treats partitioned and
+    // non-partitioned cookies with the same name as distinct cookies.
+    if (attributes.partitioned) {
+      suffixedDevBrowserCookie.remove();
+      devBrowserCookie.remove();
+    }
   };
 
   return {

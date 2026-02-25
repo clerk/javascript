@@ -2,7 +2,6 @@
   "search.exclude": {
     "**/.tsup": true,
     "**/.turbo": true,
-    "**/.yalc": true,
     "**/node_modules": true,
     ".temp_integration": true,
     "packages/*/dist": true,

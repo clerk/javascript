@@ -75,6 +75,16 @@
         "default": "./dist/webhooks.js"
       }
     },
+    "./proxy": {
+      "import": {
+        "types": "./dist/proxy.d.ts",
+        "default": "./dist/proxy.mjs"
+      },
+      "require": {
+        "types": "./dist/proxy.d.ts",
+        "default": "./dist/proxy.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -83,7 +93,8 @@
     "errors",
     "internal",
     "jwt",
-    "webhooks"
+    "webhooks",
+    "proxy"
   ],
   "scripts": {
     "build": "tsup",
@@ -92,13 +103,12 @@
     "build:runtime": "cpy 'src/runtime/**/*.{mjs,js,cjs}' dist/runtime",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "pnpm dev -- --env.publish",
+    "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules false-cjs",
     "lint:publint": "publint",
-    "publish:local": "pnpm yalc push --replace --sig",
     "test": "run-s test:node test:edge-runtime test:cloudflare-miniflare",
     "test:cloudflare-miniflare": "vitest run --environment miniflare",
     "test:edge-runtime": "vitest run --environment edge-runtime",
