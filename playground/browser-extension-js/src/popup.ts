@@ -14,7 +14,7 @@ const contentEl = document.getElementById('content') as HTMLDivElement;
 const navEl = document.getElementById('nav') as HTMLDivElement;
 
 function render() {
-  contentEl.innerHTML = '<h1>Clerk JS Chrome Extension Quickstart</h1>';
+  contentEl.innerHTML = '';
   navEl.innerHTML = '';
 
   if (clerk.user) {
@@ -49,7 +49,7 @@ function render() {
     }
 
     if (clerk.session) {
-      card.appendChild(createInfoRow('Session ID', clerk.session.id));
+      card.appendChild(createInfoRow('Session ID', truncate(clerk.session.id)));
     }
 
     if (user.lastSignInAt) {
@@ -64,9 +64,15 @@ function render() {
 
     const userBtnEl = document.createElement('div');
     navEl.appendChild(userBtnEl);
-    clerk.mountUserButton(userBtnEl, {
-      afterSignOutUrl: POPUP_URL,
+    clerk.mountUserButton(userBtnEl);
+
+    const signOutBtn = document.createElement('button');
+    signOutBtn.textContent = 'Sign Out';
+    signOutBtn.id = 'sign-out-btn';
+    signOutBtn.addEventListener('click', () => {
+      clerk.signOut({ redirectUrl: POPUP_URL });
     });
+    navEl.appendChild(signOutBtn);
   } else {
     const signInBtn = document.createElement('button');
     signInBtn.textContent = 'Sign In';
@@ -76,6 +82,14 @@ function render() {
     });
     navEl.appendChild(signInBtn);
   }
+}
+
+function truncate(str: string): string {
+  if (str.length <= 15) return str;
+  const charsToKeep = str.length - 15;
+  const front = Math.ceil(charsToKeep / 2);
+  const back = Math.floor(charsToKeep / 2);
+  return `${str.slice(0, front)}...${str.slice(str.length - back)}`;
 }
 
 function createInfoRow(label: string, value: string): HTMLDivElement {
@@ -93,6 +107,7 @@ clerk
     allowedRedirectProtocols: ['chrome-extension:'],
   })
   .then(() => {
+    console.log('working')
     clerk.addListener(render);
     render();
   });

@@ -57,10 +57,16 @@ pnpm pkglab:add
 
 ### 4. Install dependencies
 
-This playground is not a pnpm workspace member, so use `bun install` to install dependencies:
+This playground is not a pnpm workspace member, so use `pnpm install` to install dependencies:
 
 ```bash
-bun install
+pnpm install --ignore-workspace
+```
+
+The first time you install packages you will will may to approve builds. Use:
+
+```bash
+pnpm approve-builds --ignore-workspace
 ```
 
 ### 5. Set up environment
@@ -104,10 +110,17 @@ When you make changes to `@clerk/chrome-extension` (or its dependencies), rebuil
 
 ```bash
 # From repo root
-pnpm turbo build --filter=@clerk/chrome-extension...
-pnpm pkglab pub @clerk/chrome-extension
+pnpm turbo build --filter=@clerk/chrome-extension... && pnpm pkglab pub @clerk/chrome-extension
+
 
 # From this playground
-bun install
-pnpm build
+
+# If you haven't approved build yet
+pnpm install --ignore-workspace
+pnpm approve-builds
+pnpm dev 
+
+# If you have approved builds already
+pnpm install
+pnpm dev
 ```
