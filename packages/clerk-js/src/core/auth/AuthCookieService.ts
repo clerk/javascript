@@ -181,7 +181,11 @@ export class AuthCookieService {
     if (sessions?.length > 1 && token) {
       debugLogger.info(
         'Updating session cookie (multi-session client)',
-        { activeSessionId: this.clerk.session?.id, sessionCount: sessions.length, hasActor: !!this.clerk.session?.actor },
+        {
+          activeSessionId: this.clerk.session?.id,
+          sessionCount: sessions.length,
+          hasActor: !!this.clerk.session?.actor,
+        },
         'authCookieService',
       );
     }

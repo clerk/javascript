@@ -2352,7 +2352,7 @@ export class Clerk implements ClerkInterface {
       {
         activeSessionId: this.session.id,
         hasActor: !!this.session.actor,
-        totalSessions: this.client.sessions.length,
+        totalSessions: this.client.sessions?.length ?? 0,
       },
       'clerk',
     );
