@@ -109,9 +109,9 @@ export function createDevBrowser({
   }
 
   function refreshCookies() {
-    const jwt = getDevBrowserJWT();
-    if (jwt) {
-      setDevBrowserJWT(jwt);
+    const devBrowser = getDevBrowser();
+    if (devBrowser) {
+      setDevBrowser(devBrowser);
     }
   }
 

@@ -51,8 +51,8 @@ export const createDevBrowserCookie = (
       devBrowserCookie.remove();
     }
 
-    suffixedDevBrowserCookie.set(jwt, { expires, sameSite, secure, partitioned });
-    devBrowserCookie.set(jwt, { expires, sameSite, secure, partitioned });
+    suffixedDevBrowserCookie.set(devBrowser, { expires, sameSite, secure, partitioned });
+    devBrowserCookie.set(devBrowser, { expires, sameSite, secure, partitioned });
   };
 
   const remove = () => {

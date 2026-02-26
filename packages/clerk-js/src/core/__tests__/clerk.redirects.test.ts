@@ -18,6 +18,7 @@ vi.mock('../auth/devBrowser', () => ({
     getDevBrowser: vi.fn(() => 'deadbeef'),
     setDevBrowser: vi.fn(),
     removeDevBrowser: vi.fn(),
+    refreshCookies: vi.fn(),
   }),
 }));
 
