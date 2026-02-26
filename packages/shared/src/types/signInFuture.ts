@@ -37,6 +37,11 @@ export interface SignInFutureCreateParams {
    * generated from the Backend API. **Required** if `strategy` is set to `'ticket'`.
    */
   ticket?: string;
+  /**
+   * When set to `true`, if a user does not exist, the sign-up will prepare a transfer to sign up a new
+   * account. If bot sign-up protection is enabled, captcha will also be required on sign in.
+   */
+  signUpIfMissing?: boolean;
 }
 
 export type SignInFuturePasswordParams = {
@@ -443,7 +448,7 @@ export interface SignInFutureResource {
     /**
      * Used to send a phone code to sign-in
      */
-    sendCode: (params: SignInFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
+    sendCode: (params?: SignInFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to verify a code sent via phone to sign-in
