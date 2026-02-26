@@ -22,7 +22,7 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
   await u.page.waitForClerkJsLoaded();
   await u.po.expect.toBeSignedOut();
 
-  // Get the Initial DevBrowser JWT
+  // Get the initial dev browser
   const initialDbJwt = await context
     .cookies(page.url())
     .then(cookies => cookies.find(c => c.name === CLERK_DB_JWT_COOKIE_NAME)?.value);
@@ -34,7 +34,7 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
   const accountPortalURL = page.url();
   // Check that we are in Account Portal (dev or staging)
   expect(accountPortalURL).toMatch(/\.accounts(stage\.dev|\.dev|\.stg)/);
-  // Check that the DevBrowser JWT between localhost and AP is the same
+  // Check that the dev browser between localhost and AP is the same
   const accountPortalDbJwt = await context
     .cookies(accountPortalURL)
     .then(cookies => cookies.find(c => c.name === CLERK_DB_JWT_COOKIE_NAME)?.value);
@@ -48,12 +48,12 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
   await u.po.expect.toBeSignedIn();
   await u.po.userButton.waitForMounted();
 
-  // Get the new DevBrowser JWT that was set after signing in the Account Portal
+  // Get the new dev browser that was set after signing in the Account Portal
   const appDbJwtAfterSignIn = await context
     .cookies(accountPortalURL)
     .then(cookies => cookies.find(c => c.name === CLERK_DB_JWT_COOKIE_NAME)?.value);
 
-  // Get the new DevBrowser JWT
+  // Get the new dev browser
   const newLocalhostDbJwt = await context
     .cookies(page.url())
     .then(cookies => cookies.find(c => c.name === CLERK_DB_JWT_COOKIE_NAME)?.value);
@@ -63,8 +63,8 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
     .cookies(page.url())
     .then(cookies => cookies.find(c => c.name === CLERK_SESSION_COOKIE_NAME)?.value);
 
-  // Check that the new localhost DevBrowser JWT is the same as the one set after signing in the Account Portal
-  // and the same as the initial DevBrowser JWT
+  // Check that the new localhost dev browser is the same as the one set after signing in the Account Portal
+  // and the same as the initial dev browser
   expect(newLocalhostDbJwt).toEqual(appDbJwtAfterSignIn);
   expect(newLocalhostDbJwt).toEqual(initialDbJwt);
 
@@ -73,7 +73,7 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
 
   expect(await u.po.userButton.waitForMounted()).not.toBeUndefined();
 
-  // cleanup the search params after consuming the dev browser jwt
+  // cleanup the search params after consuming the dev browser
   const finalURL = new URL(u.page.url());
   expect(finalURL.searchParams.size).toEqual(0);
 };
@@ -87,7 +87,7 @@ export const testSignUp = async ({ app, page, context }: TestParams) => {
   await u.page.waitForClerkJsLoaded();
   await u.po.expect.toBeSignedOut();
 
-  // Get the Initial DevBrowser JWT
+  // Get the initial dev browser
   const initialDbJwt = await context
     .cookies(page.url())
     .then(cookies => cookies.find(c => c.name === CLERK_DB_JWT_COOKIE_NAME)?.value);
@@ -96,7 +96,7 @@ export const testSignUp = async ({ app, page, context }: TestParams) => {
   await u.page.getByRole('button', { name: /Sign up/i }).click();
   await u.po.signUp.waitForMounted();
 
-  // Check that the DevBrowser JWT between localhost and AP is the same
+  // Check that the dev browser between localhost and AP is the same
   const accountPortalURL = page.url();
   // Check that we are in Account Portal (dev or staging)
   expect(accountPortalURL).toMatch(/\.accounts(stage\.dev|\.dev|\.stg)/);
@@ -115,12 +115,12 @@ export const testSignUp = async ({ app, page, context }: TestParams) => {
   await u.po.expect.toBeSignedIn();
   await u.po.userButton.waitForMounted();
 
-  // Get the new DevBrowser JWT that was set after signing in the Account Portal
+  // Get the new dev browser that was set after signing in the Account Portal
   const appDbJwtAfterSignIn = await context
     .cookies(accountPortalURL)
     .then(cookies => cookies.find(c => c.name === CLERK_DB_JWT_COOKIE_NAME)?.value);
 
-  // Get the new DevBrowser JWT
+  // Get the new dev browser
   const newLocalhostDbJwt = await context
     .cookies(u.page.url())
     .then(cookies => cookies.find(c => c.name === CLERK_DB_JWT_COOKIE_NAME)?.value);
@@ -130,8 +130,8 @@ export const testSignUp = async ({ app, page, context }: TestParams) => {
     .cookies(u.page.url())
     .then(cookies => cookies.find(c => c.name === CLERK_SESSION_COOKIE_NAME)?.value);
 
-  // Check that the new localhost DevBrowser JWT is the same as the one set after signing in the Account Portal
-  // and the same as the initial DevBrowser JWT
+  // Check that the new localhost dev browser is the same as the one set after signing in the Account Portal
+  // and the same as the initial dev browser
   expect(newLocalhostDbJwt).toEqual(appDbJwtAfterSignIn);
   expect(newLocalhostDbJwt).toEqual(initialDbJwt);
 
@@ -140,7 +140,7 @@ export const testSignUp = async ({ app, page, context }: TestParams) => {
 
   expect(await u.po.userButton.waitForMounted()).not.toBeUndefined();
 
-  // cleanup the search params after consuming the dev browser jwt
+  // cleanup the search params after consuming the dev browser
   const finalURL = new URL(u.page.url());
   expect(finalURL.searchParams.size).toEqual(0);
 

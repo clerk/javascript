@@ -1,72 +1,68 @@
-export const DEV_BROWSER_JWT_KEY = '__clerk_db_jwt';
-export const DEV_BROWSER_JWT_HEADER = 'Clerk-Db-Jwt';
+export const DEV_BROWSER_KEY = '__clerk_db_jwt';
+export const DEV_BROWSER_HEADER = 'Clerk-Db-Jwt';
 
-// Sets the dev_browser JWT in the hash or the search
-/**
- *
- */
-export function setDevBrowserJWTInURL(url: URL, jwt: string): URL {
+export function setDevBrowserInURL(url: URL, devBrowser: string): URL {
   const resultURL = new URL(url);
 
-  // extract & strip existing jwt from search
-  const jwtFromSearch = resultURL.searchParams.get(DEV_BROWSER_JWT_KEY);
-  resultURL.searchParams.delete(DEV_BROWSER_JWT_KEY);
+  // extract & strip existing dev browser from search
+  const existing = resultURL.searchParams.get(DEV_BROWSER_KEY);
+  resultURL.searchParams.delete(DEV_BROWSER_KEY);
 
-  // Existing jwt takes precedence
-  const jwtToSet = jwtFromSearch || jwt;
+  // Existing value takes precedence
+  const value = existing || devBrowser;
 
-  if (jwtToSet) {
-    resultURL.searchParams.set(DEV_BROWSER_JWT_KEY, jwtToSet);
+  if (value) {
+    resultURL.searchParams.set(DEV_BROWSER_KEY, value);
   }
 
   return resultURL;
 }
 
 /**
- * Gets the __clerk_db_jwt JWT from either the hash or the search
+ * Gets the __clerk_db_jwt dev browser from either the hash or the search
  * Side effect:
- * Removes __clerk_db_jwt JWT from the URL (hash and searchParams) and updates the browser history
+ * Removes __clerk_db_jwt from the URL (hash and searchParams) and updates the browser history
  */
-export function extractDevBrowserJWTFromURL(url: URL): string {
-  const jwt = readDevBrowserJwtFromSearchParams(url);
-  const cleanUrl = removeDevBrowserJwt(url);
+export function extractDevBrowserFromURL(url: URL): string {
+  const devBrowser = readDevBrowserFromSearchParams(url);
+  const cleanUrl = removeDevBrowserFromURL(url);
   if (cleanUrl.href !== url.href && typeof globalThis.history !== 'undefined') {
-    globalThis.history.replaceState(null, '', removeDevBrowserJwt(url));
+    globalThis.history.replaceState(null, '', cleanUrl);
   }
-  return jwt;
+  return devBrowser;
 }
 
-const readDevBrowserJwtFromSearchParams = (url: URL) => {
-  return url.searchParams.get(DEV_BROWSER_JWT_KEY) || '';
+const readDevBrowserFromSearchParams = (url: URL) => {
+  return url.searchParams.get(DEV_BROWSER_KEY) || '';
 };
 
-const removeDevBrowserJwt = (url: URL) => {
-  return removeDevBrowserJwtFromURLSearchParams(removeLegacyDevBrowserJwt(url));
+const removeDevBrowserFromURL = (url: URL) => {
+  return removeDevBrowserFromURLSearchParams(removeLegacyDevBrowser(url));
 };
 
-const removeDevBrowserJwtFromURLSearchParams = (_url: URL) => {
+const removeDevBrowserFromURLSearchParams = (_url: URL) => {
   const url = new URL(_url);
-  url.searchParams.delete(DEV_BROWSER_JWT_KEY);
+  url.searchParams.delete(DEV_BROWSER_KEY);
   return url;
 };
 
 /**
- * Removes the __clerk_db_jwt JWT from the URL hash, as well as
- * the legacy __dev_session JWT from the URL searchParams
+ * Removes the __clerk_db_jwt dev browser from the URL hash, as well as
+ * the legacy __dev_session from the URL searchParams
  * We no longer need to use this value, however, we should remove it from the URL
- * Existing v4 apps will write the JWT to the hash and the search params in order to ensure
+ * Existing v4 apps will write the dev browser to the hash and the search params in order to ensure
  * backwards compatibility with older v4 apps.
  * The only use case where this is needed now is when a user upgrades to clerk@5 locally
  * without changing the component's version on their dashboard.
- * In this scenario, the AP@4 -> localhost@5 redirect will still have the JWT in the hash,
+ * In this scenario, the AP@4 -> localhost@5 redirect will still have the value in the hash,
  * in which case we need to remove it.
  */
-const removeLegacyDevBrowserJwt = (_url: URL) => {
-  const DEV_BROWSER_JWT_MARKER_REGEXP = /__clerk_db_jwt\[(.*)\]/;
-  const DEV_BROWSER_JWT_LEGACY_KEY = '__dev_session';
+const removeLegacyDevBrowser = (_url: URL) => {
+  const DEV_BROWSER_MARKER_REGEXP = /__clerk_db_jwt\[(.*)\]/;
+  const DEV_BROWSER_LEGACY_KEY = '__dev_session';
   const url = new URL(_url);
-  url.searchParams.delete(DEV_BROWSER_JWT_LEGACY_KEY);
-  url.hash = decodeURI(url.hash).replace(DEV_BROWSER_JWT_MARKER_REGEXP, '');
+  url.searchParams.delete(DEV_BROWSER_LEGACY_KEY);
+  url.hash = decodeURI(url.hash).replace(DEV_BROWSER_MARKER_REGEXP, '');
   if (url.href.endsWith('#')) {
     url.hash = '';
   }

@@ -29,7 +29,6 @@ export default defineConfig({
   plugins: [react({ jsxRuntime: 'automatic', jsxImportSource: '@emotion/react' }), viteSvgMockPlugin()],
   define: {
     __BUILD_DISABLE_RHC__: JSON.stringify(false),
-    __BUILD_VARIANT_CHIPS__: JSON.stringify(false),
     PACKAGE_NAME: JSON.stringify('@clerk/ui'),
     PACKAGE_VERSION: JSON.stringify('0.0.0-test'),
     // clerk-js modules are aliased into UI tests and use these constants
