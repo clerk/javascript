@@ -44,7 +44,7 @@ export const HashRouter = ({ preservedParams, children }: HashRouterProps): JSX.
       startPath={''}
       getQueryString={getQueryString}
       internalNavigate={internalNavigate}
-      refreshEvents={['popstate', 'hashchange']}
+      refreshEvents={['pushstate', 'replacestate', 'popstate', 'hashchange']}
       preservedParams={preservedParams}
     >
       {children}
