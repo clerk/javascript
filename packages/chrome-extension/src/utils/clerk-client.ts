@@ -24,5 +24,13 @@ export function createClerkClient(opts: CreateClerkClientOptions): Clerk | Promi
     version: PACKAGE_VERSION,
   };
 
-  return new Clerk(opts.publishableKey, {});
+  const clerk = new Clerk(opts.publishableKey, {});
+
+  const originalLoad = clerk.load.bind(clerk);
+  clerk.load = async (loadOpts?: Parameters<typeof clerk.load>[0]) => {
+    const { ui } = await import('@clerk/ui');
+    return originalLoad({ ...loadOpts, ui });
+  };
+
+  return clerk;
 }
