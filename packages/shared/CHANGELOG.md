@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.47.1
+
+### Patch Changes
+
+- Don't display impersonation for agents ([#7934](https://github.com/clerk/javascript/pull/7934)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 3.47.0
 
 ### Minor Changes
