@@ -82,7 +82,6 @@ export class M2MTokenApi extends AbstractAPI {
 
   /**
    * Retrieves a list of M2M tokens for a given machine.
-   * Note: The API returns m2m_tokens which is converted to data by the deserializer.
    */
   async list(queryParams: GetM2MTokenListParams) {
     return this.request<PaginatedResourceResponse<M2MToken[]>>({
