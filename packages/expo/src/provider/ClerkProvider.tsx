@@ -3,7 +3,6 @@ import '../polyfills';
 import type { ClerkProviderProps as ReactClerkProviderProps } from '@clerk/react';
 import { InternalClerkProvider as ClerkReactProvider, type Ui } from '@clerk/react/internal';
 import * as SecureStore from 'expo-secure-store';
-import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 
@@ -263,7 +262,13 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
 
   if (isWeb()) {
     // This is needed in order for useOAuth to work correctly on web.
-    WebBrowser.maybeCompleteAuthSession();
+    // Must stay synchronous during render to catch the redirect URL before children mount.
+    try {
+      const WebBrowser = require('expo-web-browser');
+      WebBrowser.maybeCompleteAuthSession();
+    } catch {
+      // expo-web-browser not installed — SSO/OAuth on web won't work
+    }
   }
 
   return (
