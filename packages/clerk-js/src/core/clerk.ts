@@ -2347,6 +2347,16 @@ export class Clerk implements ClerkInterface {
     if (!this.client || !this.session) {
       return;
     }
+    debugLogger.warn(
+      'handleUnauthenticated triggered',
+      {
+        activeSessionId: this.session.id,
+        hasActor: !!this.session.actor,
+        totalSessions: this.client.sessions.length,
+        signedInSessions: this.client.signedInSessions.map(s => ({ id: s.id, hasActor: !!s.actor })),
+      },
+      'clerk',
+    );
     try {
       const newClient = await Client.getOrCreateInstance().fetch();
       this.updateClient(newClient);
