@@ -1,8 +1,9 @@
 import { useClerk } from '@clerk/react';
 import type { ComponentType, ReactNode } from 'react';
-import { useMemo } from 'react';
-import { Linking, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Easing, Linking, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import type { AppVersionSupportStatus } from '../app-version-support/types';
 import { useAppVersionSupportStatus } from '../hooks/useAppVersionSupportStatus';
 
 type AppVersionSupportBlockingOverlayProps = {
@@ -45,6 +46,11 @@ const FALLBACK_COLORS = {
   buttonText: '#ffffff',
 };
 
+const ENTER_DELAY_MS = 90;
+const ENTER_DURATION_MS = 220;
+const EXIT_DURATION_MS = 180;
+const CONTENT_OFFSET_Y = 12;
+
 const FullWindowOverlay: ComponentType<FullWindowOverlayProps> | null = (() => {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- optional dependency in Expo apps
@@ -83,13 +89,126 @@ export const AppVersionSupportBlockingOverlay = ({
 }: AppVersionSupportBlockingOverlayProps): JSX.Element | null => {
   const colors = useOverlayColors();
   const status = useAppVersionSupportStatus();
+  const shouldBlock = enabled && !status.isSupported;
+  const [isPresented, setIsPresented] = useState(shouldBlock);
+  const [presentationStatus, setPresentationStatus] = useState<AppVersionSupportStatus>(status);
+  const overlayOpacity = useRef(new Animated.Value(shouldBlock ? 1 : 0)).current;
+  const contentOpacity = useRef(new Animated.Value(0)).current;
+  const contentTranslateY = useRef(new Animated.Value(CONTENT_OFFSET_Y)).current;
+  const enterDelayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  if (!enabled || status.isSupported) {
+  const clearEnterDelay = useCallback((): void => {
+    if (!enterDelayTimeoutRef.current) {
+      return;
+    }
+
+    clearTimeout(enterDelayTimeoutRef.current);
+    enterDelayTimeoutRef.current = null;
+  }, []);
+
+  const startEntranceAnimation = useCallback((): void => {
+    clearEnterDelay();
+    overlayOpacity.stopAnimation();
+    contentOpacity.stopAnimation();
+    contentTranslateY.stopAnimation();
+
+    overlayOpacity.setValue(1);
+    contentOpacity.setValue(0);
+    contentTranslateY.setValue(CONTENT_OFFSET_Y);
+
+    enterDelayTimeoutRef.current = setTimeout(() => {
+      Animated.parallel([
+        Animated.timing(contentOpacity, {
+          toValue: 1,
+          duration: ENTER_DURATION_MS,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(contentTranslateY, {
+          toValue: 0,
+          duration: ENTER_DURATION_MS,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]).start();
+      enterDelayTimeoutRef.current = null;
+    }, ENTER_DELAY_MS);
+  }, [clearEnterDelay, contentOpacity, contentTranslateY, overlayOpacity]);
+
+  const startExitAnimation = useCallback((): void => {
+    clearEnterDelay();
+    overlayOpacity.stopAnimation();
+    contentOpacity.stopAnimation();
+    contentTranslateY.stopAnimation();
+
+    Animated.parallel([
+      Animated.timing(overlayOpacity, {
+        toValue: 0,
+        duration: EXIT_DURATION_MS,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(contentOpacity, {
+        toValue: 0,
+        duration: EXIT_DURATION_MS,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(contentTranslateY, {
+        toValue: CONTENT_OFFSET_Y,
+        duration: EXIT_DURATION_MS,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start(({ finished }) => {
+      if (!finished) {
+        return;
+      }
+
+      setIsPresented(false);
+      overlayOpacity.setValue(0);
+      contentOpacity.setValue(0);
+      contentTranslateY.setValue(CONTENT_OFFSET_Y);
+    });
+  }, [clearEnterDelay, contentOpacity, contentTranslateY, overlayOpacity]);
+
+  useEffect(() => {
+    if (shouldBlock) {
+      setPresentationStatus(status);
+    }
+  }, [shouldBlock, status]);
+
+  useEffect(() => {
+    if (shouldBlock) {
+      if (!isPresented) {
+        setIsPresented(true);
+        return;
+      }
+
+      startEntranceAnimation();
+      return;
+    }
+
+    if (isPresented) {
+      startExitAnimation();
+    }
+  }, [isPresented, shouldBlock, startEntranceAnimation, startExitAnimation]);
+
+  useEffect(() => {
+    return () => {
+      clearEnterDelay();
+      overlayOpacity.stopAnimation();
+      contentOpacity.stopAnimation();
+      contentTranslateY.stopAnimation();
+    };
+  }, [clearEnterDelay, contentOpacity, contentTranslateY, overlayOpacity]);
+
+  if (!isPresented) {
     return null;
   }
 
   const onPressUpdate = (): void => {
-    const updateURL = status.updateURL;
+    const updateURL = presentationStatus.updateURL;
     if (!updateURL) {
       return;
     }
@@ -98,12 +217,23 @@ export const AppVersionSupportBlockingOverlay = ({
   };
 
   const overlay = (
-    <View style={styles.fullWindowContainer}>
+    <Animated.View style={[styles.fullWindowContainer, { opacity: overlayOpacity }]}>
       <View style={[styles.backdrop, { backgroundColor: colors.backdrop }]}>
-        <View style={[styles.card, { backgroundColor: colors.background }]}>
+        <Animated.View
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.background,
+              opacity: contentOpacity,
+              transform: [{ translateY: contentTranslateY }],
+            },
+          ]}
+        >
           <Text style={[styles.title, { color: colors.text }]}>Update required</Text>
-          <Text style={[styles.message, { color: colors.mutedText }]}>{buildMessage(status.minimumVersion)}</Text>
-          {status.updateURL ? (
+          <Text style={[styles.message, { color: colors.mutedText }]}>
+            {buildMessage(presentationStatus.minimumVersion)}
+          </Text>
+          {presentationStatus.updateURL ? (
             <Pressable
               onPress={onPressUpdate}
               style={[styles.button, { backgroundColor: colors.primary }]}
@@ -111,9 +241,9 @@ export const AppVersionSupportBlockingOverlay = ({
               <Text style={[styles.buttonLabel, { color: colors.buttonText }]}>Update now</Text>
             </Pressable>
           ) : null}
-        </View>
+        </Animated.View>
       </View>
-    </View>
+    </Animated.View>
   );
 
   if (Platform.OS === 'ios' && FullWindowOverlay) {
@@ -122,11 +252,11 @@ export const AppVersionSupportBlockingOverlay = ({
 
   return (
     <Modal
-      animationType='fade'
+      animationType='none'
       onRequestClose={() => undefined}
       statusBarTranslucent
       transparent
-      visible
+      visible={isPresented}
     >
       {overlay}
     </Modal>

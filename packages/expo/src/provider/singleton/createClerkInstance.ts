@@ -13,6 +13,7 @@ import packageJson from '../../../package.json';
 import {
   applyAppVersionSupportStatusFromErrorMeta,
   attachNativeAppHeaders,
+  getAppVersionSupportStatus,
   refreshAppVersionSupportStatus,
 } from '../../app-version-support/status-store';
 import {
@@ -123,6 +124,10 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             try {
               await __internal_clerk?.__internal_reloadInitialResources();
             } catch (err) {
+              if (!getAppVersionSupportStatus().isSupported) {
+                return;
+              }
+
               // Retry after 3 seconds if the error is a network error or a 5xx error
               if (isClerkNetworkError(err) || !is4xxError(err)) {
                 // Retry after 2 seconds if the error is a network error
