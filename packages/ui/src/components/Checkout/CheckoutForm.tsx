@@ -1,5 +1,10 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import type { BillingPaymentMethodResource, ConfirmCheckoutParams, RemoveFunctions } from '@clerk/shared/types';
+import type {
+  BillingPaymentMethodResource,
+  ConfirmCheckoutParams,
+  RemoveFunctions,
+  BillingPerUnitTotal,
+} from '@clerk/shared/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -30,6 +35,7 @@ export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
 
   const { plan, totals, isImmediatePlanChange, planPeriod, freeTrialEndsAt } = checkout;
+  console.log({ checkout });
 
   if (!plan) {
     return null;
@@ -37,6 +43,9 @@ export const CheckoutForm = withCardStateProvider(() => {
 
   const showProratedCredit = !!totals.credits?.proration?.amount && totals.credits.proration.amount.amount > 0;
   const showAccountCredits = !!totals.credits?.payer?.appliedAmount && totals.credits.payer.appliedAmount.amount > 0;
+  const showSeats =
+    !!totals.perUnitTotals && totals.perUnitTotals.length > 0 && totals.perUnitTotals.some(put => put.name === 'seats');
+  const seatsPerUnitTotal = totals.perUnitTotals?.find(put => put.name === 'seats');
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
@@ -74,6 +83,7 @@ export const CheckoutForm = withCardStateProvider(() => {
               suffix={localizationKeys('billing.checkout.perMonth')}
             />
           </LineItems.Group>
+          {totals.perUnitTotals && <SeatsLineItems perUnitTotals={totals.perUnitTotals} />}
           <LineItems.Group
             borderTop
             variant='tertiary'
@@ -507,3 +517,27 @@ const ExistingPaymentMethodForm = withCardStateProvider(
     );
   },
 );
+
+const SeatsLineItems = ({ perUnitTotals }: { perUnitTotals: BillingPerUnitTotal[] }) => {
+  const seatsPerUnitTotal = perUnitTotals.find(put => put.name === 'seats');
+  if (!seatsPerUnitTotal) {
+    return null;
+  }
+
+  return (
+    <>
+      {seatsPerUnitTotal.tiers
+        // only render tiers that impact the total
+        .filter(tier => tier.total.amount > 0)
+        .map((tier, i) => (
+          <LineItems.Group key={`${seatsPerUnitTotal.name}-${i}`}>
+            <LineItems.Title title={'Seats'} />
+            <LineItems.Description
+              text={`${tier.quantity} x ${tier.feePerBlock.currencySymbol}${tier.feePerBlock.amountFormatted}`}
+              suffix={localizationKeys('billing.checkout.perMonth')}
+            />
+          </LineItems.Group>
+        ))}
+    </>
+  );
+};

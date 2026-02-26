@@ -21,6 +21,7 @@ export const billingMoneyAmountFromJSON = (data: BillingMoneyAmountJSON): Billin
 };
 
 const billingPerUnitTotalsFromJSON = (data: BillingPerUnitTotalJSON[]): BillingPerUnitTotal[] => {
+  console.log({ billingPerUnitTotalsFromJSON: data });
   return data.map(unitTotal => ({
     name: unitTotal.name,
     blockSize: unitTotal.block_size,
@@ -55,6 +56,7 @@ const billingCreditsFromJSON = (data: BillingCreditsJSON): BillingCredits => {
 export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | BillingCheckoutTotalsJSON>(
   data: T,
 ): T extends { total_due_now: BillingMoneyAmountJSON } ? BillingCheckoutTotals : BillingStatementTotals => {
+  console.log({ billingTotalsFromJSON: data });
   const totals: Partial<BillingCheckoutTotals & BillingStatementTotals> = {
     grandTotal: billingMoneyAmountFromJSON(data.grand_total),
     subtotal: billingMoneyAmountFromJSON(data.subtotal),
@@ -68,6 +70,7 @@ export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | Bil
     totals.credit = data.credit ? billingMoneyAmountFromJSON(data.credit) : null;
   }
   if ('per_unit_totals' in data) {
+    console.log({ perUnitTotals: data.per_unit_totals });
     totals.perUnitTotals = data.per_unit_totals ? billingPerUnitTotalsFromJSON(data.per_unit_totals) : undefined;
   }
 

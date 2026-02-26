@@ -57,7 +57,8 @@ const FetchStatus = ({
   children: React.ReactNode;
   status: 'idle' | 'fetching' | 'generic_error' | 'invalid_plan_change' | 'missing_payer_email';
 }) => {
-  const { errors, fetchStatus } = useCheckout();
+  const { checkout, errors, fetchStatus } = useCheckout();
+  console.log({ checkout });
 
   const internalFetchStatus = useMemo(() => {
     if (errors.global) {
