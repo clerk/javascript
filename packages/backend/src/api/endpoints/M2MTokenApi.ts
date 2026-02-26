@@ -80,9 +80,6 @@ export class M2MTokenApi extends AbstractAPI {
     return options;
   }
 
-  /**
-   * Retrieves a list of M2M tokens for a given machine.
-   */
   async list(queryParams: GetM2MTokenListParams) {
     return this.request<PaginatedResourceResponse<M2MToken[]>>({
       method: 'GET',
