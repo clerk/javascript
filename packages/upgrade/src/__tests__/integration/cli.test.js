@@ -350,7 +350,9 @@ describe('CLI Integration', () => {
     it('does not show replacement when package is not present', async () => {
       const noThemesFixture = createTempFixture('nextjs-v6');
       try {
-        const result = await runCli(['--dir', noThemesFixture.path, '--dry-run', '--skip-codemods'], { timeout: 15000 });
+        const result = await runCli(['--dir', noThemesFixture.path, '--dry-run', '--skip-codemods'], {
+          timeout: 15000,
+        });
 
         expect(result.stdout).not.toContain('Would replace');
       } finally {
