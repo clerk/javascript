@@ -27,6 +27,7 @@ import {
 } from './util/detect-sdk.js';
 import {
   detectPackageManager,
+  getInstallCommand,
   getPackageManagerDisplayName,
   hasPackage,
   removePackage,
@@ -344,7 +345,9 @@ async function performPackageReplacements(packageManager, config, options) {
     } catch (error) {
       installSpinner.error(`Failed to install ${to}`);
       renderError(error.message);
-      renderWarning(`${from} was removed but ${to} could not be installed. Please run: ${packageManager} add ${to}`);
+      const [cmd, args] = getInstallCommand(packageManager, to, targetVersion, options.dir);
+      renderWarning(`${from} was removed but ${to} could not be installed. Please run: ${cmd} ${args.join(' ')}`);
+      throw new Error(`Package replacement failed: ${from} -> ${to}`);
     }
   }
 }
