@@ -1526,4 +1526,57 @@ describe('Session', () => {
       expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('agent', () => {
+    it('sets agent to null when actor is null', () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      expect(session.actor).toBeNull();
+      expect(session.agent).toBeNull();
+    });
+
+    it('sets agent to null when actor has no type (impersonation)', () => {
+      const actor = { sub: 'user_2' };
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      expect(session.actor).toEqual(actor);
+      expect(session.agent).toBeNull();
+    });
+
+    it('sets agent to the actor when actor has type "agent"', () => {
+      const actor = { sub: 'user_2', type: 'agent' as const };
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      expect(session.actor).toEqual(actor);
+      expect(session.agent).toEqual(actor);
+      expect(session.agent?.type).toBe('agent');
+    });
+  });
 });

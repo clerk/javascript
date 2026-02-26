@@ -1,5 +1,4 @@
 import { joinPaths } from '../../util/path';
-import { deprecated } from '../../util/shared';
 import type { ClerkBackendApiRequestOptions } from '../request';
 import type { M2MToken } from '../resources/M2MToken';
 import { AbstractAPI } from './AbstractApi';
@@ -108,13 +107,5 @@ export class M2MTokenApi extends AbstractAPI {
     );
 
     return this.request<M2MToken>(requestOptions);
-  }
-
-  /**
-   * @deprecated Use `verify()` instead. This method will be removed in the next major release.
-   */
-  async verifyToken(params: VerifyM2MTokenParams) {
-    deprecated('m2m.verifyToken()', 'Use `m2m.verify()` instead.');
-    return this.verify(params);
   }
 }

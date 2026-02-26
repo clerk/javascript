@@ -85,7 +85,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       page,
       context,
     }) => {
-      // Simulate "Needs new dev browser, when db jwt exists but does not match the instance".
+      // Simulate "Needs new dev browser, when dev browser exists but does not match the instance".
 
       const response = {
         status: 401,
