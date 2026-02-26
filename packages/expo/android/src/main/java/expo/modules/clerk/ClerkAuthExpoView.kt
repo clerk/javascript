@@ -32,6 +32,12 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "ClerkAuthExpoView"
 
+private fun debugLog(tag: String, message: String) {
+  if (BuildConfig.DEBUG) {
+    Log.d(tag, message)
+  }
+}
+
 class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
   var mode: String = "signInOrUp"
   var isDismissable: Boolean = true
@@ -73,7 +79,7 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
   private var initialSessionId: String? = Clerk.session?.id
 
   fun setupView() {
-    Log.d(TAG, "setupView - mode: $mode, isDismissable: $isDismissable, activity: $activity")
+    debugLog(TAG, "setupView - mode: $mode, isDismissable: $isDismissable, activity: $activity")
 
     composeView.setContent {
       val session by Clerk.sessionFlow.collectAsStateWithLifecycle()
@@ -82,7 +88,7 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
       LaunchedEffect(session) {
         val currentSession = session
         if (currentSession != null && initialSessionId == null) {
-          Log.d(TAG, "Auth completed - session: ${currentSession.id}")
+          debugLog(TAG, "Auth completed - session present: true")
           sendEvent("signInCompleted", mapOf(
             "sessionId" to currentSession.id,
             "type" to "signIn"

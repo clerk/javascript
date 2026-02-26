@@ -24,6 +24,7 @@ Pod::Spec.new do |s|
   s.license        = package['license']
   s.author         = package['author']
   s.homepage       = package['homepage']
+  # NOTE: Must match CLERK_MIN_IOS_VERSION in app.plugin.js
   s.platforms      = { :ios => '17.0' }  # Clerk iOS SDK requires iOS 17
   s.swift_version  = '5.10'
   s.source         = { git: 'https://github.com/clerk/javascript' }

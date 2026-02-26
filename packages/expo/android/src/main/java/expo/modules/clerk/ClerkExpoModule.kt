@@ -181,7 +181,7 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
         val session = Clerk.session
         val user = Clerk.user
 
-        debugLog(TAG, "getSession - session: ${session?.id}, user: ${user?.id}")
+        debugLog(TAG, "getSession - hasSession: ${session != null}, hasUser: ${user != null}")
 
         val result = WritableNativeMap()
 
@@ -267,7 +267,7 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
             val session = Clerk.session
             val user = Clerk.user
 
-            debugLog(TAG, "handleAuthResult - session: ${session?.id}, user: ${user?.id}")
+            debugLog(TAG, "handleAuthResult - hasSession: ${session != null}, hasUser: ${user != null}")
 
             val result = WritableNativeMap()
 

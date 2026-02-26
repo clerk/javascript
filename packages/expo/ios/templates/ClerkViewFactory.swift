@@ -14,6 +14,9 @@ import ClerkExpo  // Import the pod to access ClerkViewFactoryProtocol
 public class ClerkViewFactory: ClerkViewFactoryProtocol {
   public static let shared = ClerkViewFactory()
 
+  private static let clerkLoadMaxAttempts = 30
+  private static let clerkLoadIntervalNs: UInt64 = 100_000_000
+
   private init() {}
 
   // Register this factory with the ClerkExpo module
@@ -36,11 +39,11 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
 
     // Wait for Clerk to finish loading (cached data + API refresh).
     // The static configure() fires off async refreshes; poll until loaded.
-    for _ in 0..<30 {  // Wait up to 3 seconds
+    for _ in 0..<Self.clerkLoadMaxAttempts {
       if Clerk.shared.isLoaded && Clerk.shared.session != nil {
         return
       }
-      try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
+      try? await Task.sleep(nanoseconds: Self.clerkLoadIntervalNs)
     }
   }
 

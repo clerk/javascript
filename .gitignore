@@ -87,6 +87,10 @@ sessions.pem
 # Verdaccio
 .verdaccio
 
+# yalc
+.yalc/
+yalc.lock
+
 # Release preflight
 .release-artifacts/
 

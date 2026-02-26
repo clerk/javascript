@@ -47,7 +47,7 @@ class ClerkUserProfileActivity : ComponentActivity() {
     val publishableKey = intent.getStringExtra(ClerkExpoModule.EXTRA_PUBLISHABLE_KEY)
 
     debugLog(TAG, "onCreate - isInitialized: ${Clerk.isInitialized.value}")
-    debugLog(TAG, "onCreate - session: ${Clerk.session?.id}, user: ${Clerk.user?.id}")
+    debugLog(TAG, "onCreate - hasSession: ${Clerk.session != null}, hasUser: ${Clerk.user != null}")
 
     // Initialize Clerk if not already initialized
     if (publishableKey != null && !Clerk.isInitialized.value) {
@@ -65,7 +65,7 @@ class ClerkUserProfileActivity : ComponentActivity() {
 
       // Log when user/session state changes
       LaunchedEffect(user, session) {
-        debugLog(TAG, "State changed - session: ${session?.id}, user: ${user?.id}")
+        debugLog(TAG, "State changed - hasSession: ${session != null}, hasUser: ${user != null}")
       }
 
       // Detect sign-out: if we had a session and now it's null, user signed out

@@ -55,6 +55,9 @@ class ClerkAuthActivity : ComponentActivity() {
 
     companion object {
         private const val TAG = "ClerkAuthActivity"
+        private const val CLIENT_SYNC_MAX_ATTEMPTS = 30
+        private const val CLIENT_SYNC_INTERVAL_MS = 100L
+        private const val POLL_INTERVAL_MS = 500L
 
         private fun debugLog(tag: String, message: String) {
             if (BuildConfig.DEBUG) {
@@ -73,7 +76,7 @@ class ClerkAuthActivity : ComponentActivity() {
 
         // Track if we had a session when we started (to detect new sign-in)
         val initialSession = Clerk.session
-        debugLog(TAG, "onCreate - initialSession: ${initialSession?.id}, mode: $mode")
+        debugLog(TAG, "onCreate - hasInitialSession: ${initialSession != null}, mode: $mode")
 
         setContent {
             // Observe initialization state
@@ -98,14 +101,14 @@ class ClerkAuthActivity : ComponentActivity() {
                     // Give the client a moment to sync after initialization
                     // The SDK needs time to fetch the environment configuration
                     var attempts = 0
-                    while (attempts < 30) { // Wait up to 3 seconds
+                    while (attempts < CLIENT_SYNC_MAX_ATTEMPTS) {
                         val client = Clerk.client
                         if (client != null) {
-                            debugLog(TAG, "Client is ready: ${client.id}")
+                            debugLog(TAG, "Client is ready")
                             isClientReady = true
                             break
                         }
-                        delay(100)
+                        delay(CLIENT_SYNC_INTERVAL_MS)
                         attempts++
                     }
                     if (!isClientReady) {
@@ -127,13 +130,13 @@ class ClerkAuthActivity : ComponentActivity() {
             LaunchedEffect(isClientReady) {
                 if (isClientReady) {
                     while (true) {
-                        delay(500) // Check every 500ms
+                        delay(POLL_INTERVAL_MS)
                         val client = Clerk.client
                         val signUp = client?.signUp
 
                         if (signUp != null && signUp.id != lastSignUpId) {
                             lastSignUpId = signUp.id
-                            debugLog(TAG, "New signUp detected: ${signUp.id}, status: ${signUp.status}")
+                            debugLog(TAG, "New signUp detected, status: ${signUp.status}")
                         }
 
                         // Manually trigger prepareVerification if needed

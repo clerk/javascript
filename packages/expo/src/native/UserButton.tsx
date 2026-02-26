@@ -1,5 +1,5 @@
 import { useClerk, useUser } from '@clerk/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -134,6 +134,7 @@ export interface UserButtonProps {
  */
 export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
   const [nativeUser, setNativeUser] = useState<NativeUser | null>(null);
+  const presentingRef = useRef(false);
   const clerk = useClerk();
   // Use the reactive user hook from clerk-react to observe sign-out state changes
   const { user: clerkUser } = useUser();
@@ -176,12 +177,17 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
       : null);
 
   const handlePress = async () => {
+    if (presentingRef.current) {
+      return;
+    }
+
     onPress?.();
 
     if (!isNativeSupported || !ClerkExpo?.presentUserProfile) {
       return;
     }
 
+    presentingRef.current = true;
     try {
       await ClerkExpo.presentUserProfile({
         dismissable: true,
@@ -224,6 +230,8 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
       }
     } catch {
       // Modal was dismissed by the user — not an error
+    } finally {
+      presentingRef.current = false;
     }
   };
 
