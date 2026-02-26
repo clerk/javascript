@@ -1,10 +1,47 @@
+import type { ClerkPaginationRequest } from '@clerk/shared/types';
+
 import { joinPaths } from '../../util/path';
 import { deprecated } from '../../util/shared';
 import type { ClerkBackendApiRequestOptions } from '../request';
 import type { M2MToken } from '../resources/M2MToken';
+import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/m2m_tokens';
+
+/**
+ * Response type for M2M token list endpoint.
+ * Note: The Clerk Backend API returns m2m_tokens property which is converted to data by the deserializer.
+ */
+type M2MTokenListResponse = {
+  /**
+   * Array of machine-to-machine tokens
+   */
+  m2m_tokens: M2MToken[];
+  /**
+   * The total count of M2M tokens
+   */
+  total_count: number;
+};
+
+type GetM2MTokenListParams = ClerkPaginationRequest<{
+  /**
+   * The machine ID to query machine-to-machine tokens by
+   */
+  subject: string;
+  /**
+   * Whether to include revoked machine-to-machine tokens.
+   *
+   * @default false
+   */
+  revoked?: boolean;
+  /**
+   * Whether to include expired machine-to-machine tokens.
+   *
+   * @default false
+   */
+  expired?: boolean;
+}>;
 
 type CreateM2MTokenParams = {
   /**
@@ -56,6 +93,18 @@ export class M2MTokenApi extends AbstractAPI {
     }
 
     return options;
+  }
+
+  /**
+   * Retrieves a list of M2M tokens for a given machine.
+   * Note: The API returns m2m_tokens which is converted to data by the deserializer.
+   */
+  async list(queryParams: GetM2MTokenListParams) {
+    return this.request<PaginatedResourceResponse<M2MToken[]>>({
+      method: 'GET',
+      path: basePath,
+      queryParams,
+    });
   }
 
   async createToken(params?: CreateM2MTokenParams) {
