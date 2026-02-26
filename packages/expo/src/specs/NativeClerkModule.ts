@@ -10,4 +10,4 @@ export interface Spec extends TurboModule {
   signOut(): Promise<void>;
 }
 
-export default TurboModuleRegistry.getEnforcing<Spec>('ClerkExpo');
+export default TurboModuleRegistry.get<Spec>('ClerkExpo');
