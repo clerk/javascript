@@ -3,26 +3,11 @@ import type { ClerkPaginationRequest } from '@clerk/shared/types';
 import { joinPaths } from '../../util/path';
 import { deprecated } from '../../util/shared';
 import type { ClerkBackendApiRequestOptions } from '../request';
-import type { M2MToken } from '../resources/M2MToken';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
+import type { M2MToken } from '../resources/M2MToken';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/m2m_tokens';
-
-/**
- * Response type for M2M token list endpoint.
- * Note: The Clerk Backend API returns m2m_tokens property which is converted to data by the deserializer.
- */
-type M2MTokenListResponse = {
-  /**
-   * Array of machine-to-machine tokens
-   */
-  m2m_tokens: M2MToken[];
-  /**
-   * The total count of M2M tokens
-   */
-  total_count: number;
-};
 
 type GetM2MTokenListParams = ClerkPaginationRequest<{
   /**
