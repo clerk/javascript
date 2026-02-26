@@ -114,7 +114,7 @@ function isPaginated(payload: unknown): payload is PaginatedResponseJSON {
  *
  * @see https://clerk.com/docs/reference/backend-api/tag/m2m-tokens/get/m2m_tokens
  */
-function isM2MTokenResponse(payload: unknown): payload is { m2m_tokens: unknown[]; total_count?: number } {
+function isM2MTokenResponse(payload: unknown): payload is { m2m_tokens: unknown[]; total_count: number } {
   if (!payload || typeof payload !== 'object' || !('m2m_tokens' in payload)) {
     return false;
   }
