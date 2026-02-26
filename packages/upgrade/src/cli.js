@@ -27,7 +27,9 @@ import {
 } from './util/detect-sdk.js';
 import {
   detectPackageManager,
+  getInstallCommand,
   getPackageManagerDisplayName,
+  hasPackage,
   removePackage,
   upgradePackage,
 } from './util/package-manager.js';
@@ -245,6 +247,11 @@ async function main() {
     await performUpgrade(sdk, packageManager, config, options);
   }
 
+  // Step 6b: Handle package replacements
+  if (config.packageReplacements?.length > 0 && !options.skipUpgrade) {
+    await performPackageReplacements(packageManager, config, options);
+  }
+
   // Step 7: Run codemods
   if (config.codemods?.length > 0) {
     renderText(`Running ${config.codemods.length} codemod(s)...`, 'blue');
@@ -299,6 +306,49 @@ async function performUpgrade(sdk, packageManager, config, options) {
     spinner.error(`Failed to upgrade ${targetPackage}`);
     renderError(error.message);
     process.exit(1);
+  }
+}
+
+async function performPackageReplacements(packageManager, config, options) {
+  const replacements = config.packageReplacements;
+  if (!replacements?.length) {
+    return;
+  }
+
+  for (const { from, to } of replacements) {
+    if (!hasPackage(from, options.dir)) {
+      continue;
+    }
+
+    const targetVersion = options.canary ? 'canary' : 'latest';
+
+    if (options.dryRun) {
+      renderText(`[dry run] Would replace ${from} with ${to}@${targetVersion}`, 'yellow');
+      continue;
+    }
+
+    const removeSpinner = createSpinner(`Removing ${from}...`);
+    try {
+      await removePackage(packageManager, from, options.dir);
+      removeSpinner.success(`Removed ${from}`);
+    } catch (error) {
+      removeSpinner.error(`Failed to remove ${from}`);
+      renderError(error.message);
+      renderWarning(`You may need to manually remove ${from} and install ${to}`);
+      continue;
+    }
+
+    const installSpinner = createSpinner(`Installing ${to}@${targetVersion}...`);
+    try {
+      await upgradePackage(packageManager, to, targetVersion, options.dir);
+      installSpinner.success(`Installed ${to}@${targetVersion}`);
+    } catch (error) {
+      installSpinner.error(`Failed to install ${to}`);
+      renderError(error.message);
+      const [cmd, args] = getInstallCommand(packageManager, to, targetVersion, options.dir);
+      renderWarning(`${from} was removed but ${to} could not be installed. Please run: ${cmd} ${args.join(' ')}`);
+      throw new Error(`Package replacement failed: ${from} -> ${to}`);
+    }
   }
 }
 

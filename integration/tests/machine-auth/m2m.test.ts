@@ -42,9 +42,9 @@ test.describe('machine-to-machine auth @machine', () => {
 
         app.get('/api/protected', async (req, res) => {
           const token = req.get('Authorization')?.split(' ')[1];
-          
+
           try {
-            const m2mToken = await clerkClient.m2m.verifyToken({ token });
+            const m2mToken = await clerkClient.m2m.verify({ token });
             res.send('Protected response ' + m2mToken.id);
           } catch {
             res.status(401).send('Unauthorized');

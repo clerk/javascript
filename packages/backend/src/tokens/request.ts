@@ -632,6 +632,12 @@ export const authenticateRequest: AuthenticateRequest = (async (
         throw errors[0];
       }
 
+      if (!data.azp) {
+        console.warn(
+          'Clerk: Session token from cookie is missing the azp claim. In a future version of Clerk, this token will be considered invalid. Please contact Clerk support if you see this warning.',
+        );
+      }
+
       const signedInRequestState = signedIn({
         tokenType: TokenType.SessionToken,
         authenticateContext,

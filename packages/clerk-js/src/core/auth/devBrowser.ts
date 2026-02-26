@@ -1,4 +1,4 @@
-import { DEV_BROWSER_JWT_HEADER, extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
+import { DEV_BROWSER_HEADER, extractDevBrowserFromURL, setDevBrowserInURL } from '@clerk/shared/devBrowser';
 import { parseErrors } from '@clerk/shared/error';
 import type { ClerkAPIErrorJSON } from '@clerk/shared/types';
 
@@ -13,11 +13,11 @@ export interface DevBrowser {
 
   setup(): Promise<void>;
 
-  getDevBrowserJWT(): string | undefined;
+  getDevBrowser(): string | undefined;
 
-  setDevBrowserJWT(jwt: string): void;
+  setDevBrowser(devBrowser: string): void;
 
-  removeDevBrowserJWT(): void;
+  removeDevBrowser(): void;
 
   refreshCookies(): void;
 }
@@ -37,20 +37,20 @@ export function createDevBrowser({
 }: CreateDevBrowserOptions): DevBrowser {
   const devBrowserCookie = createDevBrowserCookie(cookieSuffix, cookieOptions);
 
-  function getDevBrowserJWT() {
+  function getDevBrowser() {
     return devBrowserCookie.get();
   }
 
-  function setDevBrowserJWT(jwt: string) {
-    devBrowserCookie.set(jwt);
+  function setDevBrowser(devBrowser: string) {
+    devBrowserCookie.set(devBrowser);
   }
 
-  function removeDevBrowserJWT() {
+  function removeDevBrowser() {
     devBrowserCookie.remove();
   }
 
   function clear() {
-    removeDevBrowserJWT();
+    removeDevBrowser();
   }
 
   async function setup(): Promise<void> {
@@ -58,34 +58,34 @@ export function createDevBrowser({
       return;
     }
 
-    // 1. Set network interceptors to Pass dev
+    // Set network interceptors to pass dev browser
     fapiClient.onBeforeRequest(request => {
-      const devBrowserJWT = getDevBrowserJWT();
-      if (devBrowserJWT && request?.url) {
-        request.url = setDevBrowserJWTInURL(request.url, devBrowserJWT);
+      const devBrowser = getDevBrowser();
+      if (devBrowser && request?.url) {
+        request.url = setDevBrowserInURL(request.url, devBrowser);
       }
     });
 
     fapiClient.onAfterResponse((_, response) => {
-      const newDevBrowserJWT = response?.headers?.get(DEV_BROWSER_JWT_HEADER);
-      if (newDevBrowserJWT) {
-        setDevBrowserJWT(newDevBrowserJWT);
+      const newDevBrowser = response?.headers?.get(DEV_BROWSER_HEADER);
+      if (newDevBrowser) {
+        setDevBrowser(newDevBrowser);
       }
     });
 
-    // 1. Get the JWT from search parameters when the redirection comes from AP
-    const devBrowserToken = extractDevBrowserJWTFromURL(new URL(window.location.href));
-    if (devBrowserToken) {
-      setDevBrowserJWT(devBrowserToken);
+    // 1. Get the dev browser from search parameters when the redirection comes from AP
+    const devBrowserFromURL = extractDevBrowserFromURL(new URL(window.location.href));
+    if (devBrowserFromURL) {
+      setDevBrowser(devBrowserFromURL);
       return;
     }
 
-    // 2. If no JWT is found in the first step, check if a JWT is already available in the __clerk_db_jwt JS cookie
+    // 2. If no dev browser is found in the first step, check if one is already available in the __clerk_db_jwt JS cookie
     if (devBrowserCookie.get()) {
       return;
     }
 
-    // 3. Otherwise, fetch a new DevBrowser JWT from FAPI and set it in the __clerk_db_jwt JS cookie
+    // 3. Otherwise, fetch a new dev browser from FAPI and set it in the __clerk_db_jwt JS cookie
     const createDevBrowserUrl = fapiClient.buildUrl({
       path: '/dev_browser',
     });
@@ -105,22 +105,22 @@ export function createDevBrowser({
     }
 
     const data = await response.json();
-    setDevBrowserJWT(data?.id);
+    setDevBrowser(data?.id);
   }
 
   function refreshCookies() {
-    const jwt = getDevBrowserJWT();
-    if (jwt) {
-      setDevBrowserJWT(jwt);
+    const devBrowser = getDevBrowser();
+    if (devBrowser) {
+      setDevBrowser(devBrowser);
     }
   }
 
   return {
     clear,
     setup,
-    getDevBrowserJWT,
-    setDevBrowserJWT,
-    removeDevBrowserJWT,
+    getDevBrowser,
+    setDevBrowser,
+    removeDevBrowser,
     refreshCookies,
   };
 }

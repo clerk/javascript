@@ -1,6 +1,6 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
-import { DEV_BROWSER_JWT_KEY } from '@clerk/shared/devBrowser';
+import { DEV_BROWSER_KEY } from '@clerk/shared/devBrowser';
 import { inCrossOriginIframe } from '@clerk/shared/internal/clerk-js/runtime';
 import { getSuffixedCookieName } from '@clerk/shared/keys';
 
@@ -8,7 +8,7 @@ import { getSecureAttribute } from '../getSecureAttribute';
 import { requiresSameSiteNone } from './requireSameSiteNone';
 
 export type DevBrowserCookieHandler = {
-  set: (jwt: string) => void;
+  set: (devBrowser: string) => void;
   get: () => string | undefined;
   remove: () => void;
 };
@@ -35,12 +35,12 @@ export const createDevBrowserCookie = (
   cookieSuffix: string,
   options: DevBrowserCookieOptions,
 ): DevBrowserCookieHandler => {
-  const devBrowserCookie = createCookieHandler(DEV_BROWSER_JWT_KEY);
-  const suffixedDevBrowserCookie = createCookieHandler(getSuffixedCookieName(DEV_BROWSER_JWT_KEY, cookieSuffix));
+  const devBrowserCookie = createCookieHandler(DEV_BROWSER_KEY);
+  const suffixedDevBrowserCookie = createCookieHandler(getSuffixedCookieName(DEV_BROWSER_KEY, cookieSuffix));
 
   const get = () => suffixedDevBrowserCookie.get() || devBrowserCookie.get();
 
-  const set = (jwt: string) => {
+  const set = (devBrowser: string) => {
     const expires = addYears(Date.now(), 1);
     const { sameSite, secure, partitioned } = getCookieAttributes(options);
 
@@ -51,8 +51,8 @@ export const createDevBrowserCookie = (
       devBrowserCookie.remove();
     }
 
-    suffixedDevBrowserCookie.set(jwt, { expires, sameSite, secure, partitioned });
-    devBrowserCookie.set(jwt, { expires, sameSite, secure, partitioned });
+    suffixedDevBrowserCookie.set(devBrowser, { expires, sameSite, secure, partitioned });
+    devBrowserCookie.set(devBrowser, { expires, sameSite, secure, partitioned });
   };
 
   const remove = () => {
