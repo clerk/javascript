@@ -413,15 +413,6 @@ export class Session extends BaseResource implements SessionResource {
     SessionTokenCache.set({ tokenId, tokenResolver });
 
     return tokenResolver.then(token => {
-      const returnedSid = token.jwt?.claims?.sid;
-      if (returnedSid && returnedSid !== this.id) {
-        debugLogger.warn(
-          'Token session mismatch: requested token for one session but received token for another',
-          { requestedSessionId: this.id, returnedSessionId: returnedSid, tokenId, hasActor: !!this.actor },
-          'session',
-        );
-      }
-
       if (shouldDispatchTokenUpdate) {
         eventBus.emit(events.TokenUpdate, { token });
 
