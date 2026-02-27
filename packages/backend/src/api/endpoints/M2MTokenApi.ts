@@ -6,6 +6,12 @@ import { isM2MJwt } from '../../tokens/machine';
 import { joinPaths } from '../../util/path';
 import { deprecated } from '../../util/shared';
 import type { ClerkBackendApiRequestOptions, RequestFunction } from '../request';
+import type { ClerkPaginationRequest } from '@clerk/shared/types';
+
+import { joinPaths } from '../../util/path';
+import { deprecated } from '../../util/shared';
+import type { ClerkBackendApiRequestOptions } from '../request';
+import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { M2MToken } from '../resources/M2MToken';
 import { AbstractAPI } from './AbstractApi';
 
@@ -17,6 +23,25 @@ const basePath = '/m2m_tokens';
  * - 'jwt': JWT signed with instance keys
  */
 export type M2MTokenFormat = 'opaque' | 'jwt';
+
+type GetM2MTokenListParams = ClerkPaginationRequest<{
+  /**
+   * The machine ID to query machine-to-machine tokens by
+   */
+  subject: string;
+  /**
+   * Whether to include revoked machine-to-machine tokens.
+   *
+   * @default false
+   */
+  revoked?: boolean;
+  /**
+   * Whether to include expired machine-to-machine tokens.
+   *
+   * @default false
+   */
+  expired?: boolean;
+}>;
 
 type CreateM2MTokenParams = {
   /**
@@ -84,6 +109,14 @@ export class M2MTokenApi extends AbstractAPI {
     }
 
     return options;
+  }
+
+  async list(queryParams: GetM2MTokenListParams) {
+    return this.request<PaginatedResourceResponse<M2MToken[]>>({
+      method: 'GET',
+      path: basePath,
+      queryParams,
+    });
   }
 
   async createToken(params?: CreateM2MTokenParams) {

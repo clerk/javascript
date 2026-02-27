@@ -15,13 +15,20 @@ export type ClientUatCookieHandler = {
   get: () => number;
 };
 
+export type ClientUatCookieOptions = {
+  usePartitionedCookies: () => boolean;
+};
+
 /**
  * Create a long-lived JS cookie to store the client last updated_at timestamp
  * for development instances (for production instance is set by FAPI).
  * The cookie is used as hint from the Clerk Backend packages to identify
  * if the user is authenticated or not.
  */
-export const createClientUatCookie = (cookieSuffix: string): ClientUatCookieHandler => {
+export const createClientUatCookie = (
+  cookieSuffix: string,
+  options: ClientUatCookieOptions,
+): ClientUatCookieHandler => {
   const clientUatCookie = createCookieHandler(CLIENT_UAT_COOKIE_NAME);
   const suffixedClientUatCookie = createCookieHandler(getSuffixedCookieName(CLIENT_UAT_COOKIE_NAME, cookieSuffix));
 
@@ -38,13 +45,10 @@ export const createClientUatCookie = (cookieSuffix: string): ClientUatCookieHand
      * Generally, this is handled by redirectWithAuth() being called and relying on the dev browser ID in the URL,
      * but if that isn't used we rely on this. In production, nothing is cross-domain and Lax is used when client_uat is set from FAPI.
      */
-    const sameSite = __BUILD_VARIANT_CHIPS__
-      ? 'None'
-      : inCrossOriginIframe() || requiresSameSiteNone()
-        ? 'None'
-        : 'Strict';
+    const isPartitioned = options.usePartitionedCookies();
+    const sameSite = isPartitioned || inCrossOriginIframe() || requiresSameSiteNone() ? 'None' : 'Strict';
     const secure = getSecureAttribute(sameSite);
-    const partitioned = __BUILD_VARIANT_CHIPS__ && secure;
+    const partitioned = isPartitioned && secure;
     const domain = getCookieDomain(undefined, undefined, { sameSite, secure });
 
     // '0' indicates the user is signed out

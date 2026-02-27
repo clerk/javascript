@@ -9,14 +9,14 @@ import { createBackendApiClient } from '../factory';
 import { buildRequest } from '../request';
 
 describe('M2MToken', () => {
-  const m2mId = 'mt_xxxxx';
-  const m2mSecret = 'mt_secret_xxxxx';
+  const m2mId = 'mt_1xxxxxxxxxxxxx';
+  const m2mSecret = 'mt_secret_1xxxxxxxxxxxxx';
 
   const mockM2MToken = {
     object: 'machine_to_machine_token',
     id: m2mId,
-    subject: 'mch_xxxxx',
-    scopes: ['mch_1xxxxx', 'mch_2xxxxx'],
+    subject: 'mch_1xxxxxxxxxxxxx',
+    scopes: ['mch_1xxxxxxxxxxxxx', 'mch_2xxxxxxxxxxxxx'],
     claims: { foo: 'bar' },
     token: m2mSecret,
     revoked: false,
@@ -50,7 +50,7 @@ describe('M2MToken', () => {
 
       expect(response.id).toBe(m2mId);
       expect(response.token).toBe(m2mSecret);
-      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.scopes).toEqual(['mch_1xxxxxxxxxxxxx', 'mch_2xxxxxxxxxxxxx']);
       expect(response.claims).toEqual({ foo: 'bar' });
     });
 
@@ -76,7 +76,7 @@ describe('M2MToken', () => {
 
       expect(response.id).toBe(m2mId);
       expect(response.token).toBe(m2mSecret);
-      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.scopes).toEqual(['mch_1xxxxxxxxxxxxx', 'mch_2xxxxxxxxxxxxx']);
       expect(response.claims).toEqual({ foo: 'bar' });
     });
 
@@ -244,8 +244,8 @@ describe('M2MToken', () => {
     const mockRevokedM2MToken = {
       object: 'machine_to_machine_token',
       id: m2mId,
-      subject: 'mch_xxxxx',
-      scopes: ['mch_1xxxxx', 'mch_2xxxxx'],
+      subject: 'mch_1xxxxxxxxxxxxx',
+      scopes: ['mch_1xxxxxxxxxxxxx', 'mch_2xxxxxxxxxxxxx'],
       claims: { foo: 'bar' },
       revoked: true,
       revocation_reason: 'revoked by test',
@@ -279,7 +279,7 @@ describe('M2MToken', () => {
       expect(response.revoked).toBe(true);
       expect(response.token).toBeUndefined();
       expect(response.revocationReason).toBe('revoked by test');
-      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.scopes).toEqual(['mch_1xxxxxxxxxxxxx', 'mch_2xxxxxxxxxxxxx']);
       expect(response.claims).toEqual({ foo: 'bar' });
     });
 
@@ -357,7 +357,7 @@ describe('M2MToken', () => {
 
       expect(response.id).toBe(m2mId);
       expect(response.token).toBe(m2mSecret);
-      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.scopes).toEqual(['mch_1xxxxxxxxxxxxx', 'mch_2xxxxxxxxxxxxx']);
       expect(response.claims).toEqual({ foo: 'bar' });
     });
 
@@ -383,7 +383,7 @@ describe('M2MToken', () => {
 
       expect(response.id).toBe(m2mId);
       expect(response.token).toBe(m2mSecret);
-      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.scopes).toEqual(['mch_1xxxxxxxxxxxxx', 'mch_2xxxxxxxxxxxxx']);
       expect(response.claims).toEqual({ foo: 'bar' });
     });
 
@@ -474,6 +474,186 @@ describe('M2MToken', () => {
 
       const jwtToken = await createSignedM2MJwt();
       await expect(m2mApi.verify({ token: jwtToken })).rejects.toThrow('Failed to resolve JWK during verification');
+  describe('list', () => {
+    const machineId = 'mch_1xxxxxxxxxxxxx';
+    const mockM2MTokenList = {
+      m2m_tokens: [
+        {
+          ...mockM2MToken,
+          id: 'mt_1xxxxxxxxxxxxx',
+        },
+        {
+          ...mockM2MToken,
+          id: 'mt_2xxxxxxxxxxxxx',
+          revoked: true,
+        },
+      ],
+      total_count: 2,
+    };
+
+    it('lists m2m tokens with machine secret key', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        machineSecretKey: 'ak_xxxxx',
+      });
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/m2m_tokens',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+            const url = new URL(request.url);
+            expect(url.searchParams.get('subject')).toBe(machineId);
+            expect(url.searchParams.get('limit')).toBe('10');
+            return HttpResponse.json(mockM2MTokenList);
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2m.list({
+        subject: machineId,
+        limit: 10,
+      });
+
+      expect(response.data).toHaveLength(2);
+      expect(response.data[0].id).toBe('mt_1xxxxxxxxxxxxx');
+      expect(response.data[1].id).toBe('mt_2xxxxxxxxxxxxx');
+      expect(response.totalCount).toBe(2);
+    });
+
+    it('lists m2m tokens with instance secret key', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/m2m_tokens',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer sk_xxxxx');
+            return HttpResponse.json(mockM2MTokenList);
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2m.list({
+        subject: machineId,
+      });
+
+      expect(response.data).toHaveLength(2);
+      expect(response.totalCount).toBe(2);
+    });
+
+    it('lists m2m tokens with revoked filter', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/m2m_tokens',
+          validateHeaders(({ request }) => {
+            const url = new URL(request.url);
+            expect(url.searchParams.get('revoked')).toBe('true');
+            return HttpResponse.json(mockM2MTokenList);
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2m.list({
+        subject: machineId,
+        revoked: true,
+      });
+
+      expect(response.data).toHaveLength(2);
+    });
+
+    it('lists m2m tokens with expired filter', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/m2m_tokens',
+          validateHeaders(({ request }) => {
+            const url = new URL(request.url);
+            expect(url.searchParams.get('expired')).toBe('true');
+            return HttpResponse.json(mockM2MTokenList);
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2m.list({
+        subject: machineId,
+        expired: true,
+      });
+
+      expect(response.data).toHaveLength(2);
+    });
+
+    it('lists m2m tokens with pagination', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/m2m_tokens',
+          validateHeaders(({ request }) => {
+            const url = new URL(request.url);
+            expect(url.searchParams.get('limit')).toBe('5');
+            expect(url.searchParams.get('offset')).toBe('10');
+            return HttpResponse.json(mockM2MTokenList);
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2m.list({
+        subject: machineId,
+        limit: 5,
+        offset: 10,
+      });
+
+      expect(response.data).toHaveLength(2);
+      expect(response.totalCount).toBe(2);
+    });
+
+    it('requires a machine secret or instance secret to list m2m tokens', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+      });
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/m2m_tokens',
+          validateHeaders(() => {
+            return HttpResponse.json(
+              {
+                errors: [
+                  {
+                    message: 'Unauthorized',
+                    code: 'unauthorized',
+                  },
+                ],
+              },
+              { status: 401 },
+            );
+          }),
+        ),
+      );
+
+      const errResponse = await apiClient.m2m
+        .list({
+          subject: machineId,
+        })
+        .catch(err => err);
+
+      expect(errResponse.status).toBe(401);
     });
   });
 });

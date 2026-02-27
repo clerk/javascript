@@ -12,6 +12,7 @@ import { debugLogger } from '@/utils/debug';
 import { clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
+import { Environment } from '../resources/Environment';
 import { createActiveContextCookie } from './cookies/activeContext';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
@@ -74,16 +75,27 @@ export class AuthCookieService {
 
     eventBus.on(events.UserSignOut, () => this.handleSignOut());
 
+    // After Environment resolves, re-write dev browser cookies with correct
+    // partitioned attributes. Dev browser cookies are initially written before
+    // Environment is fetched, so they may have stale attributes.
+    eventBus.on(events.EnvironmentUpdate, () => {
+      this.devBrowser.refreshCookies();
+    });
+
     this.refreshTokenOnFocus();
     this.startPollingForToken();
 
-    this.clientUat = createClientUatCookie(cookieSuffix);
-    this.sessionCookie = createSessionCookie(cookieSuffix);
+    const cookieOptions = {
+      usePartitionedCookies: () => Environment.getInstance().partitionedCookies,
+    };
+    this.clientUat = createClientUatCookie(cookieSuffix, cookieOptions);
+    this.sessionCookie = createSessionCookie(cookieSuffix, cookieOptions);
     this.activeCookie = createActiveContextCookie();
     this.devBrowser = createDevBrowser({
       frontendApi: clerk.frontendApi,
       fapiClient,
       cookieSuffix,
+      cookieOptions,
     });
   }
 
@@ -177,6 +189,19 @@ export class AuthCookieService {
       return;
     }
 
+    const sessions = (this.clerk.client as any)?.sessions;
+    if (sessions?.length > 1 && token) {
+      debugLogger.info(
+        'Updating session cookie (multi-session client)',
+        {
+          activeSessionId: this.clerk.session?.id,
+          sessionCount: sessions.length,
+          hasActor: !!this.clerk.session?.actor,
+        },
+        'authCookieService',
+      );
+    }
+
     if (!token && !isValidBrowserOnline()) {
       debugLogger.warn('Removing session cookie (offline)', { sessionId: this.clerk.session?.id }, 'authCookieService');
     }
@@ -205,6 +230,11 @@ export class AuthCookieService {
 
     //sign user out if a 4XX error
     if (is4xxError(e)) {
+      debugLogger.warn(
+        'Token fetch failed with 4xx, triggering unauthenticated flow',
+        { errorCode: isClerkAPIResponseError(e) ? e.errors[0]?.code : undefined, sessionId: this.clerk.session?.id },
+        'authCookieService',
+      );
       void this.clerk.handleUnauthenticated().catch(noop);
       return;
     }
@@ -212,10 +242,11 @@ export class AuthCookieService {
     // The poller failed to fetch a fresh session token, update status to `degraded`.
     this.clerkEventBus.emit(clerkEvents.Status, 'degraded');
 
-    // --------
-    // Treat any other error as a noop
-    // TODO(debug-logs): Once debug logs is available log this error.
-    // --------
+    debugLogger.warn(
+      'Token fetch failed, status degraded',
+      { errorName: e?.name, sessionId: this.clerk.session?.id },
+      'authCookieService',
+    );
   }
 
   private handleSignOut() {
