@@ -1,11 +1,12 @@
 import type { TurboModule } from 'react-native';
+import type { UnsafeObject } from 'react-native/Libraries/Types/CodegenTypesNamespace';
 import { TurboModuleRegistry } from 'react-native';
 
 export interface Spec extends TurboModule {
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
-  presentAuth(options: object): Promise<object>;
-  presentUserProfile(options: object): Promise<object | null>;
-  getSession(): Promise<object | null>;
+  presentAuth(options: UnsafeObject): Promise<UnsafeObject>;
+  presentUserProfile(options: UnsafeObject): Promise<UnsafeObject | null>;
+  getSession(): Promise<UnsafeObject | null>;
   getClientToken(): Promise<string | null>;
   signOut(): Promise<void>;
 }
