@@ -87,6 +87,11 @@ export class FraudProtection {
   }
 
   public managedChallenge(clerk: Clerk) {
+    // In React Native environments, DOM-based captcha challenges are not supported.
+    // Return a no-op result to avoid hanging on DOM APIs that don't exist.
+    if (typeof document === 'undefined') {
+      return Promise.resolve({ captchaError: 'modal_component_not_ready' });
+    }
     return new this.CaptchaChallengeImpl(clerk).managedInModal({ action: 'verify' });
   }
 
