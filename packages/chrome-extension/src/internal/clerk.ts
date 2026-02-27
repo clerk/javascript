@@ -1,5 +1,5 @@
 import { Clerk } from '@clerk/clerk-js/no-rhc';
-import { DEV_BROWSER_JWT_KEY } from '@clerk/shared/devBrowser';
+import { DEV_BROWSER_KEY } from '@clerk/shared/devBrowser';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import browser from 'webextension-polyfill';
 
@@ -65,7 +65,7 @@ export function createClerkClient({
   // @ts-expect-error - TODO: sync is evaluating to true vs boolean
   const jwtOptions: JWTHandlerParams = {
     frontendApi: key.frontendApi,
-    name: isProd ? CLIENT_JWT_KEY : DEV_BROWSER_JWT_KEY,
+    name: isProd ? CLIENT_JWT_KEY : DEV_BROWSER_KEY,
     url,
     sync: sync,
   };

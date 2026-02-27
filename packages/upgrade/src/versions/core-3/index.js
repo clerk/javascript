@@ -33,4 +33,5 @@ export default {
     { name: 'transform-satellite-auto-sync', packages: ['nextjs', 'react', 'expo', 'astro', 'tanstack-react-start'] },
     'transform-internal-clerk-js-ui-props',
   ],
+  packageReplacements: [{ from: '@clerk/themes', to: '@clerk/ui' }],
 };

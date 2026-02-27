@@ -15,9 +15,10 @@ vi.mock('../auth/devBrowser', () => ({
   createDevBrowser: (): DevBrowser => ({
     clear: vi.fn(),
     setup: vi.fn(),
-    getDevBrowserJWT: vi.fn(() => 'deadbeef'),
-    setDevBrowserJWT: vi.fn(),
-    removeDevBrowserJWT: vi.fn(),
+    getDevBrowser: vi.fn(() => 'deadbeef'),
+    setDevBrowser: vi.fn(),
+    removeDevBrowser: vi.fn(),
+    refreshCookies: vi.fn(),
   }),
 }));
 
