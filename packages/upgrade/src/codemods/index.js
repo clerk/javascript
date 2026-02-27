@@ -55,6 +55,7 @@ export async function runCodemod(transform = 'transform-async-request', patterns
     ...options,
     dry: true,
     silent: true,
+    verbose: 0,
   });
 
   let result = {};
@@ -64,6 +65,7 @@ export async function runCodemod(transform = 'transform-async-request', patterns
       ...options,
       dry: false,
       silent: true,
+      verbose: 0,
     });
   }
 
