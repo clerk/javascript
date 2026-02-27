@@ -474,6 +474,9 @@ describe('M2MToken', () => {
 
       const jwtToken = await createSignedM2MJwt();
       await expect(m2mApi.verify({ token: jwtToken })).rejects.toThrow('Failed to resolve JWK during verification');
+    });
+  });
+
   describe('list', () => {
     const machineId = 'mch_1xxxxxxxxxxxxx';
     const mockM2MTokenList = {

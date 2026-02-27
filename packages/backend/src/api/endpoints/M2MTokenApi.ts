@@ -1,3 +1,5 @@
+import type { ClerkPaginationRequest } from '@clerk/shared/types';
+
 import { MachineTokenVerificationError, MachineTokenVerificationErrorCode } from '../../errors';
 import { decodeJwt } from '../../jwt/verifyJwt';
 import type { JwtMachineVerifyOptions } from '../../jwt/verifyMachineJwt';
@@ -6,11 +8,6 @@ import { isM2MJwt } from '../../tokens/machine';
 import { joinPaths } from '../../util/path';
 import { deprecated } from '../../util/shared';
 import type { ClerkBackendApiRequestOptions, RequestFunction } from '../request';
-import type { ClerkPaginationRequest } from '@clerk/shared/types';
-
-import { joinPaths } from '../../util/path';
-import { deprecated } from '../../util/shared';
-import type { ClerkBackendApiRequestOptions } from '../request';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { M2MToken } from '../resources/M2MToken';
 import { AbstractAPI } from './AbstractApi';
