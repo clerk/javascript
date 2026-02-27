@@ -74,8 +74,8 @@ Please see the latest extension [authentication support matrix](https://clerk.co
 
 ## Example repositories
 
-- [Standalone](https://github.com/clerk/clerk-chrome-extension-starter/tree/main): The extension is using its own authentication
-- [WebSSO](https://github.com/clerk/clerk-chrome-extension-starter/tree/webapp_sso): The extensions shares authentication with a website in the same browser
+- [Quickstart](https://github.com/clerk/clerk-chrome-extension-quickstart): The extension is using its own authentication
+- [SyncHost, Service Workers and `react-router`](https://github.com/clerk/clerk-chrome-extension-demo): The extension shares auth with a website in the same browser, needs to access user information from Clerk in a service worker or needs to use `react-router`
 
 ## Support
 
