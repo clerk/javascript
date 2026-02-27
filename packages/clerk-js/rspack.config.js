@@ -16,7 +16,6 @@ const variants = {
   clerkHeadless: 'clerk.headless',
   clerkHeadlessBrowser: 'clerk.headless.browser',
   clerkLegacyBrowser: 'clerk.legacy.browser',
-  clerkCHIPS: 'clerk.chips.browser',
 };
 
 const variantToSourceFile = {
@@ -26,7 +25,6 @@ const variantToSourceFile = {
   [variants.clerkHeadless]: './src/index.headless.ts',
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
-  [variants.clerkCHIPS]: './src/index.browser.ts',
 };
 
 /**
@@ -58,7 +56,6 @@ const common = ({ mode, variant, disableRHC = false }) => {
          */
         __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
         __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
-        __BUILD_VARIANT_CHIPS__: variant === variants.clerkCHIPS,
       }),
       new rspack.EnvironmentPlugin({
         CLERK_ENV: mode,
@@ -447,13 +444,6 @@ const prodConfig = ({ mode, env, analysis }) => {
     // externalsForHeadless(),
   );
 
-  const clerkCHIPS = merge(
-    entryForVariant(variants.clerkCHIPS),
-    common({ mode, variant: variants.clerkCHIPS }),
-    commonForProd(),
-    commonForProdChunked(),
-  );
-
   const clerkEsm = merge(
     entryForVariant(variants.clerk),
     common({ mode, variant: variants.clerk }),
@@ -567,7 +557,6 @@ const prodConfig = ({ mode, env, analysis }) => {
     clerkLegacyBrowser,
     clerkHeadless,
     clerkHeadlessBrowser,
-    clerkCHIPS,
     clerkEsm,
     clerkEsmNoRHC,
     clerkCjs,
@@ -669,11 +658,6 @@ const devConfig = ({ mode, env }) => {
       common({ mode, variant: variants.clerkHeadlessBrowser }),
       commonForDev(),
       // externalsForHeadless(),
-    ),
-    [variants.clerkCHIPS]: merge(
-      entryForVariant(variants.clerkCHIPS),
-      common({ mode, variant: variants.clerkCHIPS }),
-      commonForDev(),
     ),
   };
 
