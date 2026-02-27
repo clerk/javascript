@@ -2,6 +2,7 @@ import type { User } from '@clerk/backend';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 
 import { clerkClient } from '../../server/clerkClient';
+import { assertServerOnly } from './assertServerOnly';
 import { auth } from './auth';
 import { ClerkUseCacheError, isClerkUseCacheError, isNextjsUseCacheError, USE_CACHE_ERROR_MESSAGE } from './utils';
 
@@ -29,8 +30,7 @@ type CurrentUserOptions = PendingSessionOptions;
  * ```
  */
 export async function currentUser(opts?: CurrentUserOptions): Promise<User | null> {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('server-only');
+  assertServerOnly();
 
   try {
     const { userId } = await auth({ treatPendingAsSignedOut: opts?.treatPendingAsSignedOut });
