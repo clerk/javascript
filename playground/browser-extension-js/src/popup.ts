@@ -95,7 +95,14 @@ function truncate(str: string): string {
 function createInfoRow(label: string, value: string): HTMLDivElement {
   const row = document.createElement('div');
   row.className = 'user-info-row';
-  row.innerHTML = `<span class="info-label">${label}</span><span class="info-value">${value}</span>`;
+  const labelSpan = document.createElement('span');
+  labelSpan.className = 'info-label';
+  labelSpan.textContent = label;
+  const valueSpan = document.createElement('span');
+  valueSpan.className = 'info-value';
+  valueSpan.textContent = value;
+  row.appendChild(labelSpan);
+  row.appendChild(valueSpan);
   return row;
 }
 
