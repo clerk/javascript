@@ -1,5 +1,54 @@
 # @clerk/testing
 
+## 1.14.2
+
+### Patch Changes
+
+- Updated dependencies [[`8a0c404`](https://github.com/clerk/javascript/commit/8a0c404d05a88697fcc3a609fef25bd5ff9f9ef0)]:
+  - @clerk/shared@3.47.1
+  - @clerk/backend@2.32.2
+  - @clerk/types@4.101.19
+
+## 1.14.1
+
+### Patch Changes
+
+- Updated dependencies [[`c15c8a2`](https://github.com/clerk/javascript/commit/c15c8a2cd263bd777fd94fb4bdeae2cfb4a70aca)]:
+  - @clerk/backend@2.32.1
+
+## 1.14.0
+
+### Minor Changes
+
+- Add support for Agent Tasks API endpoint which allows developers to create agent tasks that can be used to act on behalf of users through automated flows. ([#7897](https://github.com/clerk/javascript/pull/7897)) by [@tmilewski](https://github.com/tmilewski)
+
+  Export `createAgentTestingTask` helper for creating agent tasks via the Clerk Backend API from both `@clerk/testing/playwright` and `@clerk/testing/cypress` subpaths.
+
+### Patch Changes
+
+- Updated dependencies [[`c00c524`](https://github.com/clerk/javascript/commit/c00c5246f340cf0339c5725cade90cfcd118727d), [`9c935ad`](https://github.com/clerk/javascript/commit/9c935adeda94af60219ed8b7c7f1f9c34fbd410d)]:
+  - @clerk/shared@3.47.0
+  - @clerk/backend@2.32.0
+  - @clerk/types@4.101.18
+
+## 1.13.38
+
+### Patch Changes
+
+- Updated dependencies [[`71bd53c`](https://github.com/clerk/javascript/commit/71bd53c67a5018bd7aa589c3baced2038123c228), [`935f780`](https://github.com/clerk/javascript/commit/935f780ab5b3871253da2ad46f0e44f9ce7e53e8), [`2471e31`](https://github.com/clerk/javascript/commit/2471e314b24eab485c78313d84d986ee30c63088)]:
+  - @clerk/shared@3.46.0
+  - @clerk/backend@2.31.2
+  - @clerk/types@4.101.17
+
+## 1.13.37
+
+### Patch Changes
+
+- Updated dependencies [[`b17e4bb`](https://github.com/clerk/javascript/commit/b17e4bbbbad173969523e5494f2d8447d1887b95)]:
+  - @clerk/shared@3.45.1
+  - @clerk/backend@2.31.1
+  - @clerk/types@4.101.16
+
 ## 1.13.36
 
 ### Patch Changes

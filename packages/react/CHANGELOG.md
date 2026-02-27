@@ -1,5 +1,38 @@
 # Change Log
 
+## 5.61.2
+
+### Patch Changes
+
+- Updated dependencies [[`8a0c404`](https://github.com/clerk/javascript/commit/8a0c404d05a88697fcc3a609fef25bd5ff9f9ef0)]:
+  - @clerk/shared@3.47.1
+
+## 5.61.1
+
+### Patch Changes
+
+- Updated dependencies [[`c00c524`](https://github.com/clerk/javascript/commit/c00c5246f340cf0339c5725cade90cfcd118727d)]:
+  - @clerk/shared@3.47.0
+
+## 5.61.0
+
+### Minor Changes
+
+- Introduces MFA setup session task for handling require MFA after sign-in and sign-up ([#7851](https://github.com/clerk/javascript/pull/7851)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Updated dependencies [[`71bd53c`](https://github.com/clerk/javascript/commit/71bd53c67a5018bd7aa589c3baced2038123c228), [`935f780`](https://github.com/clerk/javascript/commit/935f780ab5b3871253da2ad46f0e44f9ce7e53e8)]:
+  - @clerk/shared@3.46.0
+
+## 5.60.2
+
+### Patch Changes
+
+- Updated dependencies [[`b17e4bb`](https://github.com/clerk/javascript/commit/b17e4bbbbad173969523e5494f2d8447d1887b95)]:
+  - @clerk/shared@3.45.1
+
+
 ## 5.60.1
 
 ### Patch Changes
