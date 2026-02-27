@@ -189,6 +189,19 @@ export class AuthCookieService {
       return;
     }
 
+    const sessions = (this.clerk.client as any)?.sessions;
+    if (sessions?.length > 1 && token) {
+      debugLogger.info(
+        'Updating session cookie (multi-session client)',
+        {
+          activeSessionId: this.clerk.session?.id,
+          sessionCount: sessions.length,
+          hasActor: !!this.clerk.session?.actor,
+        },
+        'authCookieService',
+      );
+    }
+
     if (!token && !isValidBrowserOnline()) {
       debugLogger.warn('Removing session cookie (offline)', { sessionId: this.clerk.session?.id }, 'authCookieService');
     }
@@ -217,6 +230,11 @@ export class AuthCookieService {
 
     //sign user out if a 4XX error
     if (is4xxError(e)) {
+      debugLogger.warn(
+        'Token fetch failed with 4xx, triggering unauthenticated flow',
+        { errorCode: isClerkAPIResponseError(e) ? e.errors[0]?.code : undefined, sessionId: this.clerk.session?.id },
+        'authCookieService',
+      );
       void this.clerk.handleUnauthenticated().catch(noop);
       return;
     }
@@ -224,10 +242,11 @@ export class AuthCookieService {
     // The poller failed to fetch a fresh session token, update status to `degraded`.
     this.clerkEventBus.emit(clerkEvents.Status, 'degraded');
 
-    // --------
-    // Treat any other error as a noop
-    // TODO(debug-logs): Once debug logs is available log this error.
-    // --------
+    debugLogger.warn(
+      'Token fetch failed, status degraded',
+      { errorName: e?.name, sessionId: this.clerk.session?.id },
+      'authCookieService',
+    );
   }
 
   private handleSignOut() {
