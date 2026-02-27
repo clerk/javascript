@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.47.2
+
+### Patch Changes
+
+- Remove CHIPS build variant and use `partitioned_cookies` environment flag from the Clerk API to control partitioned cookie behavior at runtime. ([#7946](https://github.com/clerk/javascript/pull/7946)) by [@brkalow](https://github.com/brkalow)
+
 ## 3.47.1
 
 ### Patch Changes

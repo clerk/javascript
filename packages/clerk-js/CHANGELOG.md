@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.125.3
+
+### Patch Changes
+
+- Add debug logging to detect session token swaps in multi-session scenarios ([#7945](https://github.com/clerk/javascript/pull/7945)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove CHIPS build variant and use `partitioned_cookies` environment flag from the Clerk API to control partitioned cookie behavior at runtime. ([#7946](https://github.com/clerk/javascript/pull/7946)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`7955e9d`](https://github.com/clerk/javascript/commit/7955e9dd90419c02fd51226d4fe335d42e7096a5)]:
+  - @clerk/shared@3.47.2
+  - @clerk/localizations@3.37.2
+
 ## 5.125.2
 
 ### Patch Changes
