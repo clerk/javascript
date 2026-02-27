@@ -93,9 +93,11 @@ export const AppVersionSupportBlockingOverlay = ({
   const [isPresented, setIsPresented] = useState(shouldBlock);
   const [presentationStatus, setPresentationStatus] = useState<AppVersionSupportStatus>(status);
   const overlayOpacity = useRef(new Animated.Value(shouldBlock ? 1 : 0)).current;
-  const contentOpacity = useRef(new Animated.Value(0)).current;
-  const contentTranslateY = useRef(new Animated.Value(CONTENT_OFFSET_Y)).current;
+  const contentOpacity = useRef(new Animated.Value(shouldBlock ? 1 : 0)).current;
+  const contentTranslateY = useRef(new Animated.Value(shouldBlock ? 0 : CONTENT_OFFSET_Y)).current;
   const enterDelayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previousShouldBlockRef = useRef(shouldBlock);
+  const shouldAnimateOnPresentationRef = useRef(false);
 
   const clearEnterDelay = useCallback((): void => {
     if (!enterDelayTimeoutRef.current) {
@@ -179,20 +181,50 @@ export const AppVersionSupportBlockingOverlay = ({
   }, [shouldBlock, status]);
 
   useEffect(() => {
+    const didTransitionToUnsupported = shouldBlock && !previousShouldBlockRef.current;
+    if (didTransitionToUnsupported) {
+      shouldAnimateOnPresentationRef.current = true;
+    } else if (!shouldBlock) {
+      shouldAnimateOnPresentationRef.current = false;
+    }
+    previousShouldBlockRef.current = shouldBlock;
+  }, [shouldBlock]);
+
+  useEffect(() => {
     if (shouldBlock) {
       if (!isPresented) {
         setIsPresented(true);
         return;
       }
 
-      startEntranceAnimation();
+      if (shouldAnimateOnPresentationRef.current) {
+        startEntranceAnimation();
+        shouldAnimateOnPresentationRef.current = false;
+      } else {
+        clearEnterDelay();
+        overlayOpacity.stopAnimation();
+        contentOpacity.stopAnimation();
+        contentTranslateY.stopAnimation();
+        overlayOpacity.setValue(1);
+        contentOpacity.setValue(1);
+        contentTranslateY.setValue(0);
+      }
       return;
     }
 
     if (isPresented) {
       startExitAnimation();
     }
-  }, [isPresented, shouldBlock, startEntranceAnimation, startExitAnimation]);
+  }, [
+    clearEnterDelay,
+    contentOpacity,
+    contentTranslateY,
+    isPresented,
+    overlayOpacity,
+    shouldBlock,
+    startEntranceAnimation,
+    startExitAnimation,
+  ]);
 
   useEffect(() => {
     return () => {

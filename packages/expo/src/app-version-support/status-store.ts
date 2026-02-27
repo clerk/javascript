@@ -245,6 +245,10 @@ export const resolveAppVersionSupportStatus = (
 export const refreshAppVersionSupportStatus = async (
   source: AppVersionSupportSource | null | undefined,
 ): Promise<AppVersionSupportStatus> => {
+  if (!source && !currentAppVersionSupportStatus.isSupported) {
+    return currentAppVersionSupportStatus;
+  }
+
   const appInfo = await getNativeAppInfo();
   const nextStatus = resolveAppVersionSupportStatus(source, appInfo);
   setAppVersionSupportStatus(nextStatus);

@@ -185,4 +185,24 @@ describe('app-version-support status store', () => {
     expect(status?.isSupported).toBe(false);
     expect(status?.minimumVersion).toBe('2.0.0');
   });
+
+  test('keeps unsupported status when refresh source is unavailable', async () => {
+    mocks.getNativeAppInfo.mockResolvedValue({
+      currentVersion: '1.0.0',
+      bundleId: 'com.example.app',
+      packageName: null,
+    });
+
+    await applyAppVersionSupportStatusFromErrorMeta({
+      platform: 'ios',
+      app_identifier: 'com.example.app',
+      minimum_version: '2.0.0',
+      update_url: 'https://apps.apple.com/id123',
+    });
+
+    const status = await refreshAppVersionSupportStatus(null);
+
+    expect(status.isSupported).toBe(false);
+    expect(status.minimumVersion).toBe('2.0.0');
+  });
 });
