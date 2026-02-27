@@ -2489,6 +2489,12 @@ export class Clerk implements ClerkInterface {
     }
   };
 
+  public __internal_handleUnauthenticatedDevBrowser = async (): Promise<void> => {
+    if (this.#authService) {
+      await this.#authService.handleUnauthenticatedDevBrowser();
+    }
+  };
+
   public authenticateWithGoogleOneTap = async (
     params: AuthenticateWithGoogleOneTapParams,
   ): Promise<SignInResource | SignUpResource> => {
