@@ -205,7 +205,7 @@ describe('getAuthDataFromRequest', () => {
     {
       tokenType: 'm2m_token' as const,
       token: 'mt_123',
-      data: { id: 'm2m_123', subject: 'mch_123' },
+      data: { id: 'mt_123', subject: 'mch_123' },
     },
   ])(
     'returns authenticated $tokenType object when token is valid and acceptsToken is $tokenType',
@@ -297,5 +297,60 @@ describe('getAuthDataFromRequest', () => {
     expect(auth.tokenType).toBe('session_token');
     expect((auth as SignedOutAuthObject).userId).toBeNull();
     expect(auth.isAuthenticated).toBe(false);
+  });
+
+  describe('JWT-format machine token rejection', () => {
+    // Constructs a JWT-format M2M token (sub: 'mch_...') without an encrypted auth object.
+    // This simulates a request that bypasses middleware and sends a raw JWT-format M2M token.
+    const toBase64Url = (str: string) => btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    const mockM2MJwt = [
+      toBase64Url(JSON.stringify({ alg: 'RS256', typ: 'JWT' })),
+      toBase64Url(JSON.stringify({ sub: 'mch_testmachine123', exp: 9999999999, iat: 1666648250 })),
+      'fakesignature',
+    ].join('.');
+
+    it('returns signed-out when JWT-format M2M token is sent to a session-only endpoint', () => {
+      const req = mockRequest({
+        url: '/api/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: `Bearer ${mockM2MJwt}`,
+        }),
+      });
+
+      const auth = getAuthDataFromRequest(req, { acceptsToken: 'session_token' });
+
+      expect(auth.tokenType).toBe('session_token');
+      expect((auth as SignedOutAuthObject).userId).toBeNull();
+      expect(auth.isAuthenticated).toBe(false);
+    });
+
+    it('returns signed-out when JWT-format M2M token is sent with default (session) acceptsToken', () => {
+      const req = mockRequest({
+        url: '/api/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: `Bearer ${mockM2MJwt}`,
+        }),
+      });
+
+      const auth = getAuthDataFromRequest(req);
+
+      expect(auth.tokenType).toBe('session_token');
+      expect((auth as SignedOutAuthObject).userId).toBeNull();
+      expect(auth.isAuthenticated).toBe(false);
+    });
+
+    it('returns signed-out when JWT-format M2M token is sent but no encrypted auth object is present', () => {
+      const req = mockRequest({
+        url: '/api/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: `Bearer ${mockM2MJwt}`,
+        }),
+      });
+
+      // m2m_token is accepted but no encrypted machineAuthObject was set by middleware
+      const auth = getAuthDataFromRequest(req, { acceptsToken: ['api_key', 'm2m_token'] });
+
+      expect(auth.isAuthenticated).toBe(false);
+    });
   });
 });
