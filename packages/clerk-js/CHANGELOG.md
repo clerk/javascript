@@ -1,5 +1,64 @@
 # Change Log
 
+## 5.125.2
+
+### Patch Changes
+
+- Don't display impersonation for agents ([#7934](https://github.com/clerk/javascript/pull/7934)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`8a0c404`](https://github.com/clerk/javascript/commit/8a0c404d05a88697fcc3a609fef25bd5ff9f9ef0)]:
+  - @clerk/shared@3.47.1
+  - @clerk/localizations@3.37.1
+
+## 5.125.1
+
+### Patch Changes
+
+- Fix "You must belong to an organization" screen showing after accepting an organization invitation ([#7921](https://github.com/clerk/javascript/pull/7921)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 5.125.0
+
+### Minor Changes
+
+- Add support for displaying proration and account credits on payment attempts and statements. ([#7885](https://github.com/clerk/javascript/pull/7885)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`c00c524`](https://github.com/clerk/javascript/commit/c00c5246f340cf0339c5725cade90cfcd118727d)]:
+  - @clerk/localizations@3.37.0
+  - @clerk/shared@3.47.0
+
+## 5.124.0
+
+### Minor Changes
+
+- Introduces MFA setup session task for handling require MFA after sign-in and sign-up ([#7851](https://github.com/clerk/javascript/pull/7851)) by [@octoper](https://github.com/octoper)
+
+- Add support for account credits in checkout. ([#7870](https://github.com/clerk/javascript/pull/7870)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fix `__client_uat` cookie being set on two different domain scopes when app is loaded in both iframe and non-iframe contexts. `getCookieDomain()` now falls back to `hostname` instead of `undefined` when the eTLD+1 probe fails, and the eTLD+1 probe uses the same `SameSite`/`Secure` attributes as the actual cookie to ensure consistent behavior across contexts. ([#7882](https://github.com/clerk/javascript/pull/7882)) by [@brkalow](https://github.com/brkalow)
+
+- Fix BaseRouter state not syncing after popup OAuth by observing `pushState`/`replaceState` changes in addition to `popstate` ([#7863](https://github.com/clerk/javascript/pull/7863)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`71bd53c`](https://github.com/clerk/javascript/commit/71bd53c67a5018bd7aa589c3baced2038123c228), [`935f780`](https://github.com/clerk/javascript/commit/935f780ab5b3871253da2ad46f0e44f9ce7e53e8)]:
+  - @clerk/localizations@3.36.0
+  - @clerk/shared@3.46.0
+
+## 5.123.1
+
+### Patch Changes
+
+- Set `SameSite=None` on cookies for `.replit.dev` origins and consolidate third-party domain list ([#7864](https://github.com/clerk/javascript/pull/7864)) by [@brkalow](https://github.com/brkalow)
+
+- fix(clerk-js): Handle missing window.location in React Native navigation ([#7854](https://github.com/clerk/javascript/pull/7854)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`b17e4bb`](https://github.com/clerk/javascript/commit/b17e4bbbbad173969523e5494f2d8447d1887b95)]:
+  - @clerk/shared@3.45.1
+  - @clerk/localizations@3.35.5
+
+
 ## 5.123.0
 
 ### Minor Changes

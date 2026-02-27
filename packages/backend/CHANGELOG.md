@@ -1,5 +1,52 @@
 # Change Log
 
+## 2.32.2
+
+### Patch Changes
+
+- Updated dependencies [[`8a0c404`](https://github.com/clerk/javascript/commit/8a0c404d05a88697fcc3a609fef25bd5ff9f9ef0)]:
+  - @clerk/shared@3.47.1
+  - @clerk/types@4.101.19
+
+## 2.32.1
+
+### Patch Changes
+
+- Updates `OrganizationInvitationStatus` to include `expired` to match the API updates. ([#7909](https://github.com/clerk/javascript/pull/7909)) by [@austincalvelage](https://github.com/austincalvelage)
+
+## 2.32.0
+
+### Minor Changes
+
+- Add support for Agent Tasks API endpoint which allows developers to create agent tasks that can be used to act on behalf of users through automated flows. ([#7897](https://github.com/clerk/javascript/pull/7897)) by [@tmilewski](https://github.com/tmilewski)
+
+  Export `createAgentTestingTask` helper for creating agent tasks via the Clerk Backend API from both `@clerk/testing/playwright` and `@clerk/testing/cypress` subpaths.
+
+### Patch Changes
+
+- Updated dependencies [[`c00c524`](https://github.com/clerk/javascript/commit/c00c5246f340cf0339c5725cade90cfcd118727d)]:
+  - @clerk/shared@3.47.0
+  - @clerk/types@4.101.18
+
+## 2.31.2
+
+### Patch Changes
+
+- fix(backend): type JwtTemplatesApi.list as PaginatedResourceResponse ([#7868](https://github.com/clerk/javascript/pull/7868)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+- Updated dependencies [[`71bd53c`](https://github.com/clerk/javascript/commit/71bd53c67a5018bd7aa589c3baced2038123c228), [`935f780`](https://github.com/clerk/javascript/commit/935f780ab5b3871253da2ad46f0e44f9ce7e53e8)]:
+  - @clerk/shared@3.46.0
+  - @clerk/types@4.101.17
+
+## 2.31.1
+
+### Patch Changes
+
+- Updated dependencies [[`b17e4bb`](https://github.com/clerk/javascript/commit/b17e4bbbbad173969523e5494f2d8447d1887b95)]:
+  - @clerk/shared@3.45.1
+  - @clerk/types@4.101.16
+
+
 ## 2.31.0
 
 ### Minor Changes
