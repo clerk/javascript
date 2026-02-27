@@ -142,7 +142,7 @@ describe('M2MToken', () => {
       });
       expect(response.id).toBe(m2mId);
       expect(response.token).toMatch(/^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+$/);
-      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.scopes).toEqual(['mch_1xxxxxxxxxxxxx', 'mch_2xxxxxxxxxxxxx']);
     });
 
     it('creates a jwt m2m token with custom claims and scopes', async () => {
@@ -182,7 +182,7 @@ describe('M2MToken', () => {
       expect(response.id).toBe(m2mId);
       expect(response.token).toMatch(/^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+$/);
       expect(response.claims).toEqual(customClaims);
-      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.scopes).toEqual(['mch_1xxxxxxxxxxxxx', 'mch_2xxxxxxxxxxxxx']);
     });
 
     it('creates an opaque format m2m token when explicitly specified', async () => {
