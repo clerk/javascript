@@ -1,7 +1,6 @@
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, stripTrailingSlashes } from '@clerk/backend/proxy';
-import { deprecated } from '@clerk/shared/deprecated';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
@@ -101,7 +100,6 @@ const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): strin
 
 export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
   const clerkClient = options.clerkClient || defaultClerkClient;
-  const enableHandshake = options.enableHandshake ?? true;
 
   // Extract proxy configuration
   const frontendApiProxy = options.frontendApiProxy;
@@ -196,32 +194,15 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
         options: resolvedOptions,
       });
 
-      if (enableHandshake) {
-        const err = setResponseHeaders(requestState, response);
-        if (err) {
-          return next(err);
-        }
-        if (response.writableEnded) {
-          return;
-        }
+      const err = setResponseHeaders(requestState, response);
+      if (err) {
+        return next(err);
+      }
+      if (response.writableEnded) {
+        return;
       }
 
-      // TODO: For developers coming from the clerk-sdk-node package, we gave them examples
-      // to use `req.auth` without calling it as a function. We need to keep this for backwards compatibility.
-      const authHandler = (opts: Parameters<typeof requestState.toAuth>[0]) => requestState.toAuth(opts);
-      const authObject = requestState.toAuth();
-
-      const auth = new Proxy(authHandler, {
-        get(target, prop, receiver) {
-          deprecated('req.auth', 'Use `req.auth()` as a function instead.');
-          // If the property exists on the function, return it
-          if (prop in target) {
-            return Reflect.get(target, prop, receiver);
-          }
-          // Otherwise, get it from the authObject
-          return authObject?.[prop as keyof typeof authObject];
-        },
-      });
+      const auth = (opts: Parameters<typeof requestState.toAuth>[0]) => requestState.toAuth(opts);
 
       Object.assign(request, { auth });
 

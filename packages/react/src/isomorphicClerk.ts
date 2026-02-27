@@ -488,7 +488,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   private async getClerkJsEntryChunk(): Promise<HeadlessBrowserClerk | BrowserClerk> {
     // Hotload bundle
-    if (!this.options.Clerk && !__BUILD_DISABLE_RHC__) {
+    if ((!this.options.Clerk || this.options.__internal_clerkJSUrl) && !__BUILD_DISABLE_RHC__) {
       // the UMD script sets the global.Clerk instance
       // we do not want to await here as we
       await loadClerkJSScript({
@@ -501,7 +501,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     // Otherwise, set global.Clerk to the bundled ctor or instance
-    if (this.options.Clerk) {
+    if (this.options.Clerk && !this.options.__internal_clerkJSUrl) {
       global.Clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk)
         ? new this.options.Clerk(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain })
         : this.options.Clerk;
@@ -518,12 +518,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private async getClerkUIEntryChunk(): Promise<ClerkUIConstructor | undefined> {
     // Support bundled UI via ui.ClerkUI prop
     const uiProp = (this.options as { ui?: { __brand?: string; ClerkUI?: ClerkUIConstructor } }).ui;
-    if (uiProp?.ClerkUI) {
+    const hasInternalUrl = !!this.options.__internal_clerkUIUrl;
+    if (uiProp?.ClerkUI && !hasInternalUrl) {
       return uiProp.ClerkUI;
     }
 
     // Skip CDN prefetch when ui prop is passed (bundled UI) or prefetchUI is false
-    if (uiProp || this.options.prefetchUI === false) {
+    if ((uiProp || this.options.prefetchUI === false) && !hasInternalUrl) {
       return undefined;
     }
 
