@@ -1,5 +1,87 @@
 # Change Log
 
+## 2.33.0
+
+### Minor Changes
+
+- Added support for JWT token format when creating and verifying machine-to-machine (M2M) tokens. This enables fully **networkless verification** when using the public JWT key. ([#7883](https://github.com/clerk/javascript/pull/7883)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  **Creating a JWT-format M2M token**
+
+  ```ts
+  const clerkClient = createClerkClient({
+    machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY,
+  });
+
+  const m2mToken = await clerkClient.m2m.createToken({
+    tokenFormat: 'jwt',
+  });
+
+  console.log('M2M token created:', m2mToken.token);
+  ```
+
+  **Verifying a token**
+
+  ```ts
+  const clerkClient = createClerkClient({
+    machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY,
+  });
+
+  const authHeader = req.headers.get('Authorization');
+  const token = authHeader.slice(7);
+
+  const verified = await clerkClient.m2m.verify(token);
+
+  console.log('Verified M2M token:', verified);
+  ```
+
+  **Networkless verification**
+
+  ```ts
+  const clerkClient = createClerkClient({
+    jwtKey: process.env.CLERK_JWT_KEY,
+  });
+
+  const authHeader = req.headers.get('Authorization');
+  const token = authHeader.slice(7);
+
+  const verified = await clerkClient.m2m.verify(token);
+
+  console.log('Verified M2M token:', verified);
+  ```
+
+- Add `list()` method to M2M tokens API to retrieve a list of machine-to-machine tokens for a given machine. ([#7939](https://github.com/clerk/javascript/pull/7939)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```ts
+  // Retrieve M2M tokens for a specific machine
+  const response = await clerkClient.m2m.list({
+    subject: 'mch_1xxxxxxxxxxxxx',
+  });
+
+  console.log(response.data); // M2MToken[]
+  console.log(response.totalCount); // number
+  ```
+
+  Filter by revoked or expired tokens:
+
+  ```ts
+  const revokedTokens = await clerkClient.m2m.list({
+    subject: 'mch_1xxxxxxxxxxxxx',
+    revoked: true,
+  });
+
+  const expiredTokens = await clerkClient.m2m.list({
+    subject: 'mch_1xxxxxxxxxxxxx',
+    expired: true,
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`7955e9d`](https://github.com/clerk/javascript/commit/7955e9dd90419c02fd51226d4fe335d42e7096a5)]:
+  - @clerk/shared@3.47.2
+  - @clerk/types@4.101.20
+
 ## 2.32.2
 
 ### Patch Changes
