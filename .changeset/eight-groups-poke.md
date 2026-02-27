@@ -1,5 +1,5 @@
 ---
-'@clerk/upgrade': minor
+'@clerk/upgrade': major
 ---
 
 Add support for the latest versions of the following packages:

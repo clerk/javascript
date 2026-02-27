@@ -1,6 +1,6 @@
 ---
 '@clerk/shared': major
-'@clerk/upgrade': minor
+'@clerk/upgrade': major
 ---
 
 Update `ClerkAPIError.kind` value to match class name

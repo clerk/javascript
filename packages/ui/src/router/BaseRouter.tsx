@@ -232,10 +232,12 @@ export const BaseRouter = ({
     const isOutsideOfUIComponent = !toURL.pathname.startsWith('/' + basePath);
 
     if (isOutsideOfUIComponent || isCrossOrigin) {
-      const res = await clerkNavigate(toURL.href);
-      // TODO: Since we are closing the modal, why do we need to refresh ? wouldn't that unmount everything causing the state to refresh ?
-      refresh();
-      return res;
+      isNavigatingRef.current = true;
+      try {
+        return await clerkNavigate(toURL.href);
+      } finally {
+        isNavigatingRef.current = false;
+      }
     }
 
     // For internal navigation, preserve any query params

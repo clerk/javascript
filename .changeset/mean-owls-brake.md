@@ -2,9 +2,10 @@
 "@clerk/astro": major
 "@clerk/chrome-extension": major
 "@clerk/clerk-js": major
-"@clerk/dev-cli": major
+"@clerk/dev-cli": minor
 "@clerk/expo": major
 "@clerk/express": major
+"@clerk/fastify": major
 "@clerk/localizations": major
 "@clerk/nuxt": major
 "@clerk/tanstack-react-start": major
