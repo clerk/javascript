@@ -34,7 +34,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const [query, setQuery] = useState('');
   const [search, setSearch] = useState('');
 
-  const { membershipRequests, memberships, invitations } = useOrganization({
+  const { membershipRequests, memberships, invitations, organization } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
     invitations: canManageMemberships || undefined,
     memberships: canReadMemberships
@@ -44,6 +44,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
         }
       : undefined,
   });
+  organization?.maxAllowedMemberships;
 
   if (canManageMemberships === null) {
     return null;
@@ -176,7 +177,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
         </Action.Root>
       </Col>
 
-      {canReadMemberships && !!memberships?.count && (
+      {canReadMemberships && !!memberships?.count && organization?.maxAllowedMemberships && (
         <Box
           sx={theme => ({
             position: 'absolute',
@@ -209,7 +210,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
               colorScheme='inherit'
               localizationKey={localizationKeys('organizationProfile.start.membershipSeatUsageLabel', {
                 count: memberships.count + (invitations?.count ?? 0),
-                limit: organizationSettings.maxAllowedMemberships,
+                limit: organization.maxAllowedMemberships,
               })}
             />
           </Text>
