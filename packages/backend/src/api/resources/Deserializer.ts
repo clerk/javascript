@@ -77,6 +77,12 @@ export function deserialize<U = any>(payload: unknown): PaginatedResourceRespons
   if (Array.isArray(payload)) {
     const data = payload.map(item => jsonToObject(item)) as U;
     return { data };
+  } else if (isM2MTokenResponse(payload)) {
+    // Handle M2M token list responses with m2m_tokens property
+    data = payload.m2m_tokens.map(item => jsonToObject(item)) as U;
+    totalCount = payload.total_count;
+
+    return { data, totalCount };
   } else if (isPaginated(payload)) {
     data = payload.data.map(item => jsonToObject(item)) as U;
     totalCount = payload.total_count;
@@ -93,6 +99,27 @@ function isPaginated(payload: unknown): payload is PaginatedResponseJSON {
   }
 
   return Array.isArray(payload.data) && payload.data !== undefined;
+}
+
+/**
+ * Detects M2M token list responses from the Backend API.
+ *
+ * The Clerk Backend API returns M2M token lists with `m2m_tokens` and `total_count` properties.
+ * This function identifies those responses and normalizes them to the standard `data` and
+ * `totalCount` format for consistency with other paginated API methods across the SDK.
+ *
+ * This approach avoids making breaking changes to BAPI Proxy or supporting both response
+ * formats. Once BAPI Proxy is updated to return the standard `data` property format,
+ * this function can be safely removed.
+ *
+ * @see https://clerk.com/docs/reference/backend-api/tag/m2m-tokens/get/m2m_tokens
+ */
+function isM2MTokenResponse(payload: unknown): payload is { m2m_tokens: unknown[]; total_count: number } {
+  if (!payload || typeof payload !== 'object' || !('m2m_tokens' in payload)) {
+    return false;
+  }
+
+  return Array.isArray(payload.m2m_tokens);
 }
 
 function getCount(item: PaginatedResponseJSON) {
