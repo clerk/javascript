@@ -56,7 +56,7 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 100 # Enough for changeset status comparison, much faster than full history
           fetch-tags: false
@@ -69,10 +69,10 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        # with:
-        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-        # turbo-team: ${{ vars.TURBO_TEAM }}
-        # turbo-token: ${{ secrets.TURBO_TOKEN }}
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Verify lockfile is deduped
         run: pnpm dedupe --check
@@ -97,6 +97,7 @@ jobs:
     runs-on: "blacksmith-8vcpu-ubuntu-2204"
     permissions:
       contents: read
+      actions: write
     defaults:
       run:
         shell: bash
@@ -107,7 +108,7 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
           fetch-tags: false
@@ -117,17 +118,24 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        # with:
-        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-        # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-        # turbo-team: ${{ vars.TURBO_TEAM }}
-        # turbo-token: ${{ secrets.TURBO_TOKEN }}
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Turbo Build
         run: pnpm turbo build $TURBO_ARGS --only
 
+      - name: Save Turbo Cache
+        run: mkdir -p .turbo-cache
+      - uses: useblacksmith/cache/save@v5
+        with:
+          path: .turbo-cache
+          key: turbo-build-${{ github.sha }}
+
       - name: Upload Turbo Summary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
         continue-on-error: true
         with:
@@ -153,7 +161,7 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
           fetch-tags: false
@@ -163,11 +171,17 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        # with:
-        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-        # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-        # turbo-team: ${{ vars.TURBO_TEAM }}
-        # turbo-token: ${{ secrets.TURBO_TOKEN }}
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Restore Turbo Cache
+        uses: useblacksmith/cache/restore@v5
+        with:
+          path: .turbo-cache
+          key: turbo-build-${{ github.sha }}
 
       - name: Check size using bundlewatch
         continue-on-error: true
@@ -178,19 +192,13 @@ jobs:
           CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
           CI_REPO_NAME: ${{ vars.REPO_NAME }}
           CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
-        run: pnpm turbo bundlewatch $TURBO_ARGS
+        run: pnpm turbo bundlewatch --affected $TURBO_ARGS
 
-      - name: Lint packages using publint
-        run: pnpm turbo lint:publint $TURBO_ARGS
-
-      - name: Lint types using attw
-        run: pnpm turbo lint:attw $TURBO_ARGS
-
-      - name: Run lint
-        run: pnpm turbo lint $TURBO_ARGS
+      - name: Run linting (publint, attw, eslint)
+        run: pnpm turbo lint:publint lint:attw lint --affected $TURBO_ARGS
 
       - name: Upload Turbo Summary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
         continue-on-error: true
         with:
@@ -219,12 +227,22 @@ jobs:
       matrix:
         include:
           - node-version: 22
-            test-filter: "**"
-            filter-label: "**"
+            test-filter: "--filter=@clerk/backend"
+            filter-label: "@clerk/backend"
+          - node-version: 22
+            test-filter: "--filter=@clerk/clerk-js"
+            filter-label: "@clerk/clerk-js"
+          - node-version: 22
+            test-filter: "--filter=@clerk/shared --filter=@clerk/nextjs --filter=@clerk/react"
+            filter-label: "@clerk/shared, @clerk/nextjs, @clerk/react"
+          - node-version: 22
+            test-filter: "--filter=!@clerk/backend --filter=!@clerk/clerk-js --filter=!@clerk/shared --filter=!@clerk/nextjs --filter=!@clerk/react"
+            filter-label: "remaining packages"
+            run-typedoc: true
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
           fetch-tags: false
@@ -235,46 +253,88 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
-          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (20)`.
           node-version: ${{ matrix.node-version }}
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Restore Turbo Cache
+        uses: useblacksmith/cache/restore@v5
+        with:
+          path: .turbo-cache
+          key: turbo-build-${{ github.sha }}
 
       - name: Run tests in packages
         run: |
-          if [ "${{ matrix.test-filter }}" = "**" ]; then
-            echo "Running full test suite on Node ${{ matrix.node-version }}"
-            pnpm turbo test $TURBO_ARGS
-          else
-            echo "Running tests: ${{ matrix.filter-label }}"
-            pnpm turbo test $TURBO_ARGS ${{ matrix.test-filter }}
-          fi
+          echo "Running tests: ${{ matrix.filter-label }}"
+          pnpm turbo test $TURBO_ARGS ${{ matrix.test-filter }}
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
       - name: Run Typedoc tests
-        run: |
-          # Only run Typedoc tests for one matrix version and main test run
-          if [ "${{ matrix.node-version }}" == "22" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
-            pnpm turbo run //#test:typedoc
-          fi
+        if: ${{ matrix.run-typedoc }}
+        run: pnpm turbo run //#test:typedoc
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
       - name: Upload Turbo Summary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
         continue-on-error: true
         with:
-          name: turbo-summary-report-unit-${{ github.run_id }}-${{ github.run_attempt }}-node-${{ matrix.node-version }}
+          name: turbo-summary-report-unit-${{ github.run_id }}-${{ github.run_attempt }}-${{ strategy.job-index }}
           path: .turbo/runs
           retention-days: 5
 
-  integration-tests:
-    # needs: [check-permissions, build-packages]
+  integration-setup:
     needs: [check-permissions]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    name: Integration Test Setup
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    permissions:
+      contents: read
+      actions: write
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Version packages for snapshot
+        run: npm run version-packages:snapshot ci
+
+      - name: Verdaccio
+        uses: ./.github/actions/verdaccio
+        with:
+          publish-cmd: |
+            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag --tag latest; fi
+
+      - name: Upload Verdaccio Storage
+        uses: actions/upload-artifact@v6
+        with:
+          name: verdaccio-storage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .verdaccio/storage
+          retention-days: 1
+
+  integration-tests:
+    needs: [check-permissions, integration-setup]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
     permissions:
@@ -330,7 +390,7 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
           fetch-tags: false
@@ -341,9 +401,9 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true
 
       - name: Verify jq is installed
@@ -379,16 +439,31 @@ jobs:
           echo "affected=${AFFECTED}"
           echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
 
-      - name: Version packages for snapshot
+      - name: Build packages
         if: ${{ steps.task-status.outputs.affected == '1' }}
-        run: npm run version-packages:snapshot ci
+        run: pnpm turbo build $TURBO_ARGS --only
 
-      - name: Verdaccio
+      - name: Download Verdaccio Storage
         if: ${{ steps.task-status.outputs.affected == '1' }}
-        uses: ./.github/actions/verdaccio
+        uses: actions/download-artifact@v6
         with:
-          publish-cmd: |
-            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag --tag latest; fi
+          name: verdaccio-storage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .verdaccio/storage
+
+      - name: Start Verdaccio
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        run: |
+          pnpm set registry http://localhost:4873
+          nohup ./node_modules/.bin/verdaccio --config ./verdaccio.install.yaml &
+          for i in {1..10}; do
+            if curl -f http://localhost:4873/ > /dev/null 2>&1; then
+              echo "Verdaccio is up and running"
+              break
+            fi
+            echo "Waiting for Verdaccio to start (attempt $i)..."
+            sleep 2
+          done
+          pnpm config set //localhost:4873/:_authToken secretToken
 
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
@@ -468,7 +543,7 @@ jobs:
 
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
           path: integration/test-results
@@ -488,7 +563,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
           fetch-tags: false
@@ -500,10 +575,16 @@ jobs:
         with:
           turbo-enabled: true
           node-version: 22
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Restore Turbo Cache
+        uses: useblacksmith/cache/restore@v5
+        with:
+          path: .turbo-cache
+          key: turbo-build-${{ github.sha }}
 
       - name: Publish with pkg-pr-new
         run: pnpm run build && pnpx pkg-pr-new@${{ vars.PKG_PR_NEW_VERSION || '0.0.49' }} publish --compact --pnpm './packages/*'
