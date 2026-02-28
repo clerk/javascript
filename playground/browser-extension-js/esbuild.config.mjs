@@ -1,7 +1,10 @@
-import dotenv from 'dotenv';
 import esbuild from 'esbuild';
 
-dotenv.config();
+process.loadEnvFile();
+
+if (!process.env.CLERK_PUBLISHABLE_KEY) {
+  throw new Error('Missing CLERK_PUBLISHABLE_KEY in .env');
+}
 
 const watch = process.argv.includes('--watch');
 

@@ -1,9 +1,6 @@
 import { createClerkClient } from '@clerk/chrome-extension/client';
 
 const publishableKey = process.env.CLERK_PUBLISHABLE_KEY;
-if (!publishableKey) {
-  throw new Error('Missing CLERK_PUBLISHABLE_KEY in .env');
-}
 
 const EXTENSION_URL = chrome.runtime.getURL('.');
 const POPUP_URL = `${EXTENSION_URL}popup.html`;
