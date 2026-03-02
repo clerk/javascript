@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.125.4
+
+### Patch Changes
+
+- Fix a crash in the Turnstile CAPTCHA retry logic where captcha.reset() was called after the widget's DOM container had already been removed, causing an unhandled error ([#7957](https://github.com/clerk/javascript/pull/7957)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 5.125.3
 
 ### Patch Changes
