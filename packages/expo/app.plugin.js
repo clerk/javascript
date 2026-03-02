@@ -104,8 +104,8 @@ const withClerkIOS = config => {
         isa: 'XCRemoteSwiftPackageReference',
         repositoryURL: CLERK_IOS_REPO,
         requirement: {
-          kind: 'upToNextMajorVersion',
-          minimumVersion: CLERK_IOS_VERSION,
+          kind: 'exactVersion',
+          version: CLERK_IOS_VERSION,
         },
       };
 
@@ -553,10 +553,28 @@ const withClerkGoogleSignIn = config => {
  * Native modules are registered via react-native.config.js and standard
  * React Native autolinking (RCTViewManager / ReactPackage).
  */
-const withClerkExpo = config => {
+/**
+ * Write ClerkKeychainService to Info.plist when keychainService is provided.
+ * This allows extension apps (watch, widget, app clip) to share the same
+ * keychain entry as the main app by using a custom service identifier.
+ */
+const withClerkKeychainService = (config, { keychainService } = {}) => {
+  if (!keychainService) {
+    return config;
+  }
+
+  return withInfoPlist(config, modConfig => {
+    modConfig.modResults.ClerkKeychainService = keychainService;
+    console.log(`✅ Set ClerkKeychainService in Info.plist: ${keychainService}`);
+    return modConfig;
+  });
+};
+
+const withClerkExpo = (config, props = {}) => {
   config = withClerkIOS(config);
   config = withClerkGoogleSignIn(config);
   config = withClerkAndroid(config);
+  config = withClerkKeychainService(config, props);
   return config;
 };
 

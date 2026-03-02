@@ -1,6 +1,5 @@
 import { useClerk, useUser } from '@clerk/react';
 import { useEffect, useRef, useState } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import NativeClerkModule from '../specs/NativeClerkModule';
@@ -36,65 +35,16 @@ interface NativeUser {
 /**
  * Props for the UserButton component.
  */
-export interface UserButtonProps {
-  /**
-   * Custom style for the button container.
-   */
-  style?: StyleProp<ViewStyle>;
-
-  /**
-   * Callback fired when the user button is pressed.
-   *
-   * This is called immediately when the button is tapped, before the
-   * profile modal is presented. Use this for analytics or custom behavior.
-   */
-  onPress?: () => void;
-
-  /**
-   * Callback fired when the user signs out from the profile modal.
-   *
-   * This is called after:
-   * 1. The native session is cleared
-   * 2. The JS SDK session is cleared
-   *
-   * After this callback, `useAuth()` will return `isSignedIn: false`.
-   */
-  onSignOut?: () => void;
-}
+export interface UserButtonProps {}
 
 /**
  * A pre-built native button component that displays the user's avatar and opens their profile.
  *
  * `UserButton` renders a circular button showing the user's profile image (or initials if
- * no image is available). When tapped, it presents the {@link UserProfileView} modal for
- * account management.
+ * no image is available). When tapped, it presents the native profile management modal.
  *
- * This component is powered by:
- * - **iOS**: clerk-ios (SwiftUI) - https://github.com/clerk/clerk-ios
- * - **Android**: clerk-android (Jetpack Compose) - https://github.com/clerk/clerk-android
- *
- * ## Features
- *
- * - **Profile Image**: Displays the user's profile photo from their Clerk account
- * - **Initials Fallback**: Shows user's initials when no profile image is set
- * - **Profile Modal**: Opens {@link UserProfileView} with full account management
- * - **Sign Out Handling**: Properly syncs sign-out between native and JS SDKs
- *
- * ## Avatar Display
- *
- * The button displays the user's avatar in this order of preference:
- * 1. User's profile image from Clerk (if available)
- * 2. First letter of first name + first letter of last name
- * 3. "U" as a fallback
- *
- * ## Styling
- *
- * The button is 36x36 pixels by default with circular border radius.
- * You can customize the size using the `style` prop:
- *
- * ```tsx
- * <UserButton style={{ width: 44, height: 44 }} />
- * ```
+ * Sign-out is detected automatically and synced with the JS SDK, causing `useAuth()` to
+ * update reactively. Use `useAuth()` in a `useEffect` to react to sign-out.
  *
  * @example Basic usage in a header
  * ```tsx
@@ -110,29 +60,26 @@ export interface UserButtonProps {
  * }
  * ```
  *
- * @example With sign-out handling
+ * @example Reacting to sign-out
  * ```tsx
- * <UserButton
- *   onSignOut={() => router.replace('/sign-in')}
- *   style={{ width: 40, height: 40 }}
- * />
- * ```
+ * import { UserButton } from '@clerk/expo/native';
+ * import { useAuth } from '@clerk/expo';
  *
- * @example With press tracking
- * ```tsx
- * <UserButton
- *   onPress={() => analytics.track('profile_opened')}
- *   onSignOut={() => {
- *     analytics.track('signed_out');
- *     router.replace('/sign-in');
- *   }}
- * />
+ * export default function Header() {
+ *   const { isSignedIn } = useAuth();
+ *
+ *   useEffect(() => {
+ *     if (!isSignedIn) router.replace('/sign-in');
+ *   }, [isSignedIn]);
+ *
+ *   return <UserButton style={{ width: 40, height: 40 }} />;
+ * }
  * ```
  *
  * @see {@link UserProfileView} The profile view that opens when tapped
  * @see {@link https://clerk.com/docs/components/user/user-button} Clerk UserButton Documentation
  */
-export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
+export function UserButton(_props: UserButtonProps) {
   const [nativeUser, setNativeUser] = useState<NativeUser | null>(null);
   const presentingRef = useRef(false);
   const clerk = useClerk();
@@ -181,8 +128,6 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
       return;
     }
 
-    onPress?.();
-
     if (!isNativeSupported || !ClerkExpo?.presentUserProfile) {
       return;
     }
@@ -225,8 +170,6 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
             }
           }
         }
-
-        onSignOut?.();
       }
     } catch {
       // Modal was dismissed by the user — not an error
@@ -248,7 +191,7 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
   // Show fallback when native modules aren't available
   if (!isNativeSupported || !ClerkExpo) {
     return (
-      <View style={[styles.button, style]}>
+      <View style={styles.button}>
         <Text style={styles.text}>?</Text>
       </View>
     );
@@ -257,7 +200,7 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
   return (
     <TouchableOpacity
       onPress={handlePress}
-      style={[styles.button, style]}
+      style={styles.button}
     >
       {user?.imageUrl ? (
         <Image
@@ -275,9 +218,8 @@ export function UserButton({ onPress, onSignOut, style }: UserButtonProps) {
 
 const styles = StyleSheet.create({
   button: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: '100%',
+    height: '100%',
     overflow: 'hidden',
   },
   avatar: {
@@ -289,7 +231,6 @@ const styles = StyleSheet.create({
   avatarImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 18,
   },
   avatarText: {
     color: 'white',
