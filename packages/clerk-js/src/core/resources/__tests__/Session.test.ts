@@ -390,6 +390,38 @@ describe('Session', () => {
       });
     });
 
+    it('does not emit token:update with an empty token even when online', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+      const fetchSpy = vi.spyOn(BaseResource, '_fetch' as any).mockResolvedValue(null);
+
+      try {
+        const promise = session.getToken();
+        promise.catch(() => {});
+        await vi.advanceTimersByTimeAsync(200_000);
+        await expect(promise).rejects.toThrow();
+
+        const emptyTokenUpdates = dispatchSpy.mock.calls.filter(
+          (call: unknown[]) =>
+            call[0] === 'token:update' && !(call[1] as { token: { getRawString(): string } })?.token?.getRawString(),
+        );
+        expect(emptyTokenUpdates).toHaveLength(0);
+      } finally {
+        fetchSpy.mockRestore();
+      }
+    });
+
     it(`uses the current session's lastActiveOrganizationId by default, not clerk.organization.id`, async () => {
       BaseResource.clerk = clerkMock({
         organization: new Organization({ id: 'oldActiveOrganization' } as OrganizationJSON),

@@ -450,8 +450,9 @@ export class Session extends BaseResource implements SessionResource {
       // Proactive refresh is handled by timers scheduled in the cache
       // Prefer synchronous read to avoid microtask overhead when token is already resolved
       const cachedToken = cacheResult.entry.resolvedToken ?? (await cacheResult.entry.tokenResolver);
-      // Don't emit empty token update when offline — preserve session cookie
-      if (shouldDispatchTokenUpdate && (cachedToken.getRawString() || isValidBrowserOnline())) {
+      // Only emit token updates when we have an actual token — emitting with an empty
+      // token causes AuthCookieService to remove the __session cookie (looks like sign-out).
+      if (shouldDispatchTokenUpdate && cachedToken.getRawString()) {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
       result = cachedToken.getRawString() || null;
@@ -496,9 +497,9 @@ export class Session extends BaseResource implements SessionResource {
       return;
     }
 
-    // Don't dispatch empty tokens when offline — this would cause AuthCookieService
-    // to remove the session cookie even though the user is still authenticated.
-    if (!token.getRawString() && !isValidBrowserOnline()) {
+    // Never dispatch empty tokens — this would cause AuthCookieService to remove
+    // the __session cookie even though the user is still authenticated.
+    if (!token.getRawString()) {
       return;
     }
 
@@ -565,9 +566,9 @@ export class Session extends BaseResource implements SessionResource {
     // This allows concurrent calls to continue using the stale token
     tokenResolver
       .then(token => {
-        // Don't cache or dispatch empty tokens from offline failures —
-        // preserve the stale-but-valid token in cache instead.
-        if (!token.getRawString() && !isValidBrowserOnline()) {
+        // Never cache or dispatch empty tokens — preserve the stale-but-valid
+        // token in cache instead of replacing it with an empty one.
+        if (!token.getRawString()) {
           return;
         }
 
