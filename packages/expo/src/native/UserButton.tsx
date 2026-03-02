@@ -35,6 +35,7 @@ interface NativeUser {
 /**
  * Props for the UserButton component.
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UserButtonProps {}
 
 /**
@@ -107,7 +108,7 @@ export function UserButton(_props: UserButtonProps) {
       }
     };
 
-    fetchUser();
+    void fetchUser();
   }, [clerkUser?.id]); // Re-fetch when clerk user changes (including sign-out)
 
   // Derive the user to display - prefer native data, fall back to clerk-react data
@@ -199,7 +200,7 @@ export function UserButton(_props: UserButtonProps) {
 
   return (
     <TouchableOpacity
-      onPress={handlePress}
+      onPress={() => void handlePress()}
       style={styles.button}
     >
       {user?.imageUrl ? (

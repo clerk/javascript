@@ -115,6 +115,7 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = false }: AuthVie
       return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     const interval = setInterval(async () => {
       if (authCompletedRef.current) {
         clearInterval(interval);

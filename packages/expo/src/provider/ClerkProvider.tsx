@@ -209,7 +209,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
           }
         }
       };
-      configureNativeClerk();
+      void configureNativeClerk();
     }
 
     return () => {
@@ -257,13 +257,14 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       }
     };
 
-    syncNativeAuthToJs();
+    void syncNativeAuthToJs();
   }, [nativeAuthState, clerkInstance]);
 
   if (isWeb()) {
     // This is needed in order for useOAuth to work correctly on web.
     // Must stay synchronous during render to catch the redirect URL before children mount.
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const WebBrowser = require('expo-web-browser');
       WebBrowser.maybeCompleteAuthSession();
     } catch {
