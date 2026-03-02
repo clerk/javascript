@@ -13,17 +13,10 @@ Refactor React SDK hooks to subscribe to auth state via `useSyncExternalStore`. 
 
 Breaking changes:
 
-* All `@clerk/react`-based packages: Removes ability to pass in `initialAuthState` to `useAuth`
+* Removes ability to pass in `initialAuthState` to `useAuth`
   * This was added for internal use and is no longer needed
   * Instead pass in `initialState` to the `<ClerkProvider>`, or `dynamic` if using the Next package
   * See your specific SDK documentation for more information on Server Rendering
-* `@clerk/shared`: Removes now unused contexts `ClientContext`, `SessionContext`, `UserContext` and `OrganizationProvider`
-  * We do not anticipate public use of these
-  * If you were using any of these, file an issue to discuss a path forward as they are no longer available even internally
-
-New features:
-
-* `@clerk/clerk-js`: `addListener` now takes a `skipInitialEmit` option that can be used to avoid emitting immediately after subscribing
 
 Fixes:
 
