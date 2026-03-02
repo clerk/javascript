@@ -48,7 +48,9 @@ export function useSSO() {
     }
 
     // Dynamically import expo-auth-session and expo-web-browser only when needed
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- dynamic import of optional dependency
     let AuthSession: typeof import('expo-auth-session');
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- dynamic import of optional dependency
     let WebBrowserModule: typeof import('expo-web-browser');
     try {
       [AuthSession, WebBrowserModule] = await Promise.all([import('expo-auth-session'), import('expo-web-browser')]);
