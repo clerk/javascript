@@ -1,5 +1,5 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { isValidBrowserOnline } from '@clerk/shared/browser';
+import { isBrowserOnline, isValidBrowserOnline } from '@clerk/shared/browser';
 import {
   ClerkOfflineError,
   ClerkRuntimeError,
@@ -457,7 +457,7 @@ export class Session extends BaseResource implements SessionResource {
       }
       result = cachedToken.getRawString() || null;
     } else {
-      if (!isValidBrowserOnline()) {
+      if (!isBrowserOnline()) {
         throw new ClerkRuntimeError('Browser is offline, skipping token fetch', { code: 'network_error' });
       }
       result = await this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
