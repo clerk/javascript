@@ -54,6 +54,9 @@ android {
 
   kotlinOptions {
     jvmTarget = "17"
+    // clerk-android is compiled with Kotlin 2.3.x, but Expo uses Kotlin 2.1.20.
+    // This flag allows the compiler to read metadata from a newer Kotlin version.
+    freeCompilerArgs += ['-Xskip-metadata-version-check']
   }
 
   buildFeatures {

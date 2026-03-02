@@ -21,9 +21,9 @@
  *
  * ## Components
  *
- * - {@link AuthView} - Authentication flow (sign-in/sign-up), supports `presentation="modal"` (default) or `presentation="inline"`
- * - {@link UserProfileView} - User profile and account management, supports `presentation="modal"` (default) or `presentation="inline"`
- * - {@link UserButton} - Avatar button that opens profile
+ * - {@link AuthView} - Authentication flow (sign-in/sign-up), renders inline
+ * - {@link UserProfileView} - User profile and account management, renders inline
+ * - {@link UserButton} - Avatar button that opens native profile modal
  *
  * @module @clerk/expo/native
  */

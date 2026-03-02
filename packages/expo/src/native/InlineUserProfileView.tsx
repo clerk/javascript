@@ -21,20 +21,9 @@ if (isNativeSupported) {
 export interface InlineUserProfileViewProps {
   /**
    * Whether the profile view can be dismissed by the user.
-   * @default true
+   * @default false
    */
   isDismissable?: boolean;
-
-  /**
-   * Callback fired when the user signs out from the profile view.
-   * After this callback, `useAuth()` will return `isSignedIn: false`.
-   */
-  onSignOut?: () => void;
-
-  /**
-   * Callback fired when the user dismisses the profile view.
-   */
-  onDismiss?: () => void;
 
   /**
    * Style applied to the container view.
@@ -43,31 +32,30 @@ export interface InlineUserProfileViewProps {
 }
 
 /**
- * An inline native user profile component that renders in-place (not as a modal).
+ * An inline native user profile component that renders in-place.
  *
- * Unlike `UserProfileView` which presents a full-screen modal, `InlineUserProfileView`
- * renders directly within your React Native view hierarchy.
+ * `InlineUserProfileView` renders directly within your React Native view hierarchy.
+ *
+ * Sign-out is detected automatically and synced with the JS SDK. Use `useAuth()` in a
+ * `useEffect` to react to sign-out.
  *
  * @example
  * ```tsx
  * import { InlineUserProfileView } from '@clerk/expo/native';
+ * import { useAuth } from '@clerk/expo';
  *
  * export default function ProfileScreen() {
- *   return (
- *     <InlineUserProfileView
- *       style={{ flex: 1 }}
- *       onSignOut={() => router.replace('/sign-in')}
- *     />
- *   );
+ *   const { isSignedIn } = useAuth();
+ *
+ *   useEffect(() => {
+ *     if (!isSignedIn) router.replace('/sign-in');
+ *   }, [isSignedIn]);
+ *
+ *   return <InlineUserProfileView style={{ flex: 1 }} />;
  * }
  * ```
  */
-export function InlineUserProfileView({
-  isDismissable = true,
-  onSignOut,
-  onDismiss,
-  style,
-}: InlineUserProfileViewProps) {
+export function InlineUserProfileView({ isDismissable = false, style }: InlineUserProfileViewProps) {
   const clerk = useClerk();
   const signOutTriggered = useRef(false);
 
@@ -93,13 +81,9 @@ export function InlineUserProfileView({
             console.warn('[InlineUserProfileView] JS SDK sign out error:', err);
           }
         }
-
-        onSignOut?.();
-      } else if (type === 'dismissed') {
-        onDismiss?.();
       }
     },
-    [clerk, onSignOut, onDismiss],
+    [clerk],
   );
 
   if (!isNativeSupported || !NativeClerkUserProfileView) {

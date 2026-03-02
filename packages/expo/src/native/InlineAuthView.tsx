@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useRef } from 'react';
-import { Platform, type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 
 import { getClerkInstance } from '../provider/singleton';
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';
@@ -32,65 +32,43 @@ export interface InlineAuthViewProps {
 
   /**
    * Whether the authentication view can be dismissed by the user.
-   * @default true
+   * @default false
    */
   isDismissable?: boolean;
-
-  /**
-   * Callback fired when authentication completes successfully.
-   * After this callback, all `@clerk/expo` hooks will reflect the authenticated state.
-   */
-  onSuccess?: () => void;
-
-  /**
-   * Callback fired when an error occurs during authentication.
-   */
-  onError?: (error: Error) => void;
-
-  /**
-   * Style applied to the container view.
-   */
-  style?: StyleProp<ViewStyle>;
 }
 
 /**
- * An inline native authentication component that renders in-place (not as a modal).
+ * An inline native authentication component that renders in-place.
  *
- * Unlike `AuthView` which presents a full-screen modal, `InlineAuthView` renders
- * directly within your React Native view hierarchy, allowing you to embed the
- * native authentication UI anywhere in your layout.
+ * `InlineAuthView` renders directly within your React Native view hierarchy,
+ * allowing you to embed the native authentication UI anywhere in your layout.
+ *
+ * After authentication completes, the session is automatically synced with the JS SDK.
+ * Use `useAuth()`, `useUser()`, or `useSession()` in a `useEffect` to react to state changes.
  *
  * @example
  * ```tsx
  * import { InlineAuthView } from '@clerk/expo/native';
+ * import { useAuth } from '@clerk/expo';
  *
  * export default function SignInScreen() {
+ *   const { isSignedIn } = useAuth();
+ *
+ *   useEffect(() => {
+ *     if (isSignedIn) router.replace('/home');
+ *   }, [isSignedIn]);
+ *
  *   return (
  *     <View style={{ flex: 1 }}>
  *       <Text style={{ fontSize: 24, padding: 16 }}>Welcome</Text>
- *       <InlineAuthView
- *         style={{ flex: 1 }}
- *         onSuccess={() => router.replace('/home')}
- *       />
+ *       <InlineAuthView />
  *     </View>
  *   );
  * }
  * ```
  */
-export function InlineAuthView({
-  mode = 'signInOrUp',
-  isDismissable = true,
-  onSuccess,
-  onError: _onError,
-  style,
-}: InlineAuthViewProps) {
+export function InlineAuthView({ mode = 'signInOrUp', isDismissable = false }: InlineAuthViewProps) {
   const authCompletedRef = useRef(false);
-
-  // Use stable refs for callbacks
-  const onSuccessRef = useRef(onSuccess);
-  onSuccessRef.current = onSuccess;
-  const onErrorRef = useRef(_onError);
-  onErrorRef.current = _onError;
 
   const syncSession = useCallback(async (sessionId: string) => {
     if (authCompletedRef.current) {
@@ -132,10 +110,8 @@ export function InlineAuthView({
 
       // Mark complete only after successful sync to allow retries on transient failures
       authCompletedRef.current = true;
-      onSuccessRef.current?.();
     } catch (err) {
       console.error('[InlineAuthView] Failed to sync session:', err);
-      onErrorRef.current?.(err as Error);
     }
   }, []);
 
@@ -184,7 +160,7 @@ export function InlineAuthView({
 
   if (!isNativeSupported || !NativeClerkAuthView) {
     return (
-      <View style={[styles.container, style]}>
+      <View style={[styles.container, styles.fallback]}>
         <Text style={styles.text}>
           {!isNativeSupported
             ? 'Native InlineAuthView is only available on iOS and Android'
@@ -196,7 +172,7 @@ export function InlineAuthView({
 
   return (
     <NativeClerkAuthView
-      style={[styles.container, style]}
+      style={styles.container}
       mode={mode}
       isDismissable={isDismissable}
       onAuthEvent={handleAuthEvent}
@@ -207,6 +183,10 @@ export function InlineAuthView({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  fallback: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   text: {
     fontSize: 16,
