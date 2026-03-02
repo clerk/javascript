@@ -18,7 +18,8 @@ const FILES_WITHOUT_HEADINGS = [
   'verify-token-options.mdx',
   'public-organization-data-json.mdx',
   'organization-membership-public-user-data.mdx',
-  'use-checkout-return.mdx',
+  'checkout-signal-value.mdx',
+  'checkout-flow-resource.mdx',
   'use-checkout-options.mdx',
   'use-payment-element-return.mdx',
   'use-payment-methods-return.mdx',
@@ -56,7 +57,7 @@ const LINK_REPLACEMENTS = [
   ['organization-membership-resource', '/docs/reference/javascript/types/organization-membership'],
   ['organization-suggestion-resource', '/docs/reference/javascript/types/organization-suggestion'],
   ['organization-resource', '/docs/reference/javascript/organization'],
-  ['organization-domain-resource', '/docs/reference/javascript/types/organization-domain'],
+  ['organization-domain-resource', '/docs/reference/javascript/types/organization-domain-resource'],
   ['organization-invitation-resource', '/docs/reference/javascript/types/organization-invitation'],
   ['organization-membership-request-resource', '/docs/reference/javascript/types/organization-membership-request'],
   ['session', '/docs/reference/backend/types/backend-session'],
@@ -71,6 +72,7 @@ const LINK_REPLACEMENTS = [
   ['phone-number', '/docs/reference/backend/types/backend-phone-number'],
   ['saml-account', '/docs/reference/backend/types/backend-saml-account'],
   ['web3-wallet', '/docs/reference/backend/types/backend-web3-wallet'],
+  ['invitation', '/docs/reference/backend/types/backend-invitation'],
   ['verify-token-options', '#verify-token-options'],
   ['localization-resource', '/docs/guides/customizing-clerk/localization'],
   ['confirm-checkout-params', '/docs/reference/javascript/types/billing-checkout-resource#parameters'],
@@ -89,7 +91,7 @@ const LINK_REPLACEMENTS = [
   ['billing-statement-totals', '/docs/reference/javascript/types/billing-statement-totals'],
   ['billing-payment-resource', '/docs/reference/javascript/types/billing-payment-resource'],
   ['deleted-object-resource', '/docs/reference/javascript/types/deleted-object-resource'],
-  ['use-checkout-return', '/docs/reference/hooks/use-checkout#returns'],
+  ['checkout-flow-resource', '/docs/reference/hooks/use-checkout#checkout-flow-resource'],
 ];
 
 /**

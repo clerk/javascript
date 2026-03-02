@@ -168,6 +168,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
             isRequired
             autoFocus={!user.passwordEnabled}
             isDisabled={passwordEditDisabled}
+            autoComplete='new-password'
           />
         </Form.ControlRow>
         <Form.ControlRow elementId={confirmField.id}>
@@ -181,6 +182,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
             }}
             isRequired
             isDisabled={passwordEditDisabled}
+            autoComplete='new-password'
           />
         </Form.ControlRow>
         <Form.ControlRow elementId={sessionsField.id}>

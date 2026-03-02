@@ -2,16 +2,17 @@ import { isValidBrowserOnline } from '@clerk/shared/browser';
 import type { createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { clerkEvents } from '@clerk/shared/clerkEventBus';
 import type { createCookieHandler } from '@clerk/shared/cookie';
-import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
+import { setDevBrowserInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
 import type { Clerk, InstanceType } from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
 
 import { debugLogger } from '@/utils/debug';
 
-import { clerkMissingDevBrowserJwt } from '../errors';
+import { clerkMissingDevBrowser } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
+import { Environment } from '../resources/Environment';
 import { createActiveContextCookie } from './cookies/activeContext';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
@@ -37,7 +38,7 @@ import { SessionCookiePoller } from './SessionCookiePoller';
  *   - cookie setup for production / development instances
  * It also provides the following helpers:
  *   - isSignedOut(): check if the current user is signed-out using cookies
- *   - decorateUrlWithDevBrowserToken(): decorates url with auth related info (eg dev browser jwt)
+ *   - decorateUrlWithDevBrowserToken(): decorates url with auth related info (eg dev browser)
  *   - handleUnauthenticatedDevBrowser(): resets dev browser in case of invalid dev browser
  */
 export class AuthCookieService {
@@ -74,16 +75,27 @@ export class AuthCookieService {
 
     eventBus.on(events.UserSignOut, () => this.handleSignOut());
 
+    // After Environment resolves, re-write dev browser cookies with correct
+    // partitioned attributes. Dev browser cookies are initially written before
+    // Environment is fetched, so they may have stale attributes.
+    eventBus.on(events.EnvironmentUpdate, () => {
+      this.devBrowser.refreshCookies();
+    });
+
     this.refreshTokenOnFocus();
     this.startPollingForToken();
 
-    this.clientUat = createClientUatCookie(cookieSuffix);
-    this.sessionCookie = createSessionCookie(cookieSuffix);
+    const cookieOptions = {
+      usePartitionedCookies: () => Environment.getInstance().partitionedCookies,
+    };
+    this.clientUat = createClientUatCookie(cookieSuffix, cookieOptions);
+    this.sessionCookie = createSessionCookie(cookieSuffix, cookieOptions);
     this.activeCookie = createActiveContextCookie();
     this.devBrowser = createDevBrowser({
       frontendApi: clerk.frontendApi,
       fapiClient,
       cookieSuffix,
+      cookieOptions,
     });
   }
 
@@ -108,12 +120,12 @@ export class AuthCookieService {
   }
 
   public decorateUrlWithDevBrowserToken(url: URL): URL {
-    const devBrowserJwt = this.devBrowser.getDevBrowserJWT();
-    if (!devBrowserJwt) {
-      return clerkMissingDevBrowserJwt();
+    const devBrowser = this.devBrowser.getDevBrowser();
+    if (!devBrowser) {
+      return clerkMissingDevBrowser();
     }
 
-    return setDevBrowserJWTInURL(url, devBrowserJwt);
+    return setDevBrowserInURL(url, devBrowser);
   }
 
   private async setupDevelopment() {

@@ -42,10 +42,9 @@ test.describe('machine-to-machine auth @machine', () => {
 
         app.get('/api/protected', async (req, res) => {
           const token = req.get('Authorization')?.split(' ')[1];
-          
           try {
-            const m2mToken = await clerkClient.m2m.verifyToken({ token });
-            res.send('Protected response ' + m2mToken.id);
+            const m2mToken = await clerkClient.m2m.verify({ token });
+            res.send('Protected response ' + m2mToken.subject);
           } catch {
             res.status(401).send('Unauthorized');
           }
@@ -150,7 +149,7 @@ test.describe('machine-to-machine auth @machine', () => {
       },
     });
     expect(res.status()).toBe(200);
-    expect(await res.text()).toBe('Protected response ' + emailServerM2MToken.id);
+    expect(await res.text()).toBe('Protected response ' + emailServer.id);
 
     // Analytics server can access primary API server after adding scope
     await u.services.clerk.machines.createScope(analyticsServer.id, primaryApiServer.id);
@@ -165,9 +164,30 @@ test.describe('machine-to-machine auth @machine', () => {
       },
     });
     expect(res2.status()).toBe(200);
-    expect(await res2.text()).toBe('Protected response ' + m2mToken.id);
+    expect(await res2.text()).toBe('Protected response ' + analyticsServer.id);
     await u.services.clerk.m2m.revokeToken({
       m2mTokenId: m2mToken.id,
     });
+  });
+
+  test('verifies JWT format M2M token via local verification', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    const client = createClerkClient({
+      secretKey: instanceKeys.get('with-api-keys').sk,
+    });
+    const jwtToken = await client.m2m.createToken({
+      machineSecretKey: emailServer.secretKey,
+      secondsUntilExpiration: 60 * 30,
+      tokenFormat: 'jwt',
+    });
+
+    const res = await u.page.request.get(app.serverUrl + '/api/protected', {
+      headers: { Authorization: `Bearer ${jwtToken.token}` },
+    });
+    expect(res.status()).toBe(200);
+    expect(await res.text()).toBe('Protected response ' + emailServer.id);
+    // JWT-format tokens are self-contained and not stored in BAPI, so revocation
+    // is not applicable — they expire naturally via the exp claim.
   });
 });
