@@ -1,5 +1,32 @@
 # Change Log
 
+## 3.47.1
+
+### Patch Changes
+
+- Don't display impersonation for agents ([#7934](https://github.com/clerk/javascript/pull/7934)) by [@tmilewski](https://github.com/tmilewski)
+
+## 3.47.0
+
+### Minor Changes
+
+- Add support for displaying proration and account credits on payment attempts and statements. ([#7885](https://github.com/clerk/javascript/pull/7885)) by [@dstaley](https://github.com/dstaley)
+
+## 3.46.0
+
+### Minor Changes
+
+- Introduces MFA setup session task for handling require MFA after sign-in and sign-up ([#7851](https://github.com/clerk/javascript/pull/7851)) by [@octoper](https://github.com/octoper)
+
+- Add support for account credits in checkout. ([#7870](https://github.com/clerk/javascript/pull/7870)) by [@dstaley](https://github.com/dstaley)
+
+## 3.45.1
+
+### Patch Changes
+
+- Set `SameSite=None` on cookies for `.replit.dev` origins and consolidate third-party domain list ([#7864](https://github.com/clerk/javascript/pull/7864)) by [@brkalow](https://github.com/brkalow)
+
+
 ## 3.45.0
 
 ### Minor Changes

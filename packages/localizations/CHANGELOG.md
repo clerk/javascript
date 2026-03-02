@@ -1,5 +1,44 @@
 # Change Log
 
+## 3.37.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.19
+
+## 3.37.0
+
+### Minor Changes
+
+- Add support for displaying proration and account credits on payment attempts and statements. ([#7885](https://github.com/clerk/javascript/pull/7885)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.18
+
+## 3.36.0
+
+### Minor Changes
+
+- Introduces MFA setup session task for handling require MFA after sign-in and sign-up ([#7851](https://github.com/clerk/javascript/pull/7851)) by [@octoper](https://github.com/octoper)
+
+- Add support for account credits in checkout. ([#7870](https://github.com/clerk/javascript/pull/7870)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.17
+
+## 3.35.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.16
+
+
 ## 3.35.4
 
 ### Patch Changes
