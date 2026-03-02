@@ -25,27 +25,8 @@ export const UsernameSection = ({ isImmutable }: { isImmutable?: boolean }) => {
     return null;
   }
 
-  if (isImmutable) {
-    if (!user.username) {
-      return null;
-    }
-
-    return (
-      <ProfileSection.Root
-        title={localizationKeys('userProfile.start.usernameSection.title')}
-        id='username'
-        sx={{ alignItems: 'center', [mqu.md]: { alignItems: 'flex-start' } }}
-      >
-        <ProfileSection.Item id='username'>
-          <Text
-            truncate
-            sx={t => ({ color: t.colors.$colorForeground })}
-          >
-            {user.username}
-          </Text>
-        </ProfileSection.Item>
-      </ProfileSection.Root>
-    );
+  if (isImmutable && !user.username) {
+    return null;
   }
 
   return (
@@ -71,16 +52,18 @@ export const UsernameSection = ({ isImmutable }: { isImmutable?: boolean }) => {
               </Text>
             )}
 
-            <Action.Trigger value='edit'>
-              <ProfileSection.Button
-                id='username'
-                localizationKey={
-                  user.username
-                    ? localizationKeys('userProfile.start.usernameSection.primaryButton__updateUsername')
-                    : localizationKeys('userProfile.start.usernameSection.primaryButton__setUsername')
-                }
-              />
-            </Action.Trigger>
+            {!isImmutable && (
+              <Action.Trigger value='edit'>
+                <ProfileSection.Button
+                  id='username'
+                  localizationKey={
+                    user.username
+                      ? localizationKeys('userProfile.start.usernameSection.primaryButton__updateUsername')
+                      : localizationKeys('userProfile.start.usernameSection.primaryButton__setUsername')
+                  }
+                />
+              </Action.Trigger>
+            )}
           </ProfileSection.Item>
         </Action.Closed>
 
