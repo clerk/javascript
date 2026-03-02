@@ -15,8 +15,9 @@ export function createClerkClient(opts: Omit<CreateClerkClientOptions, 'backgrou
 export function createClerkClient(opts: CreateClerkClientOptions): Clerk | Promise<Clerk> {
   if (opts.background) {
     const { background: _, ...rest } = opts;
-    const clerk = _createClerkClient({ ...rest, scope: SCOPE.BACKGROUND });
-    return clerk.load({ standardBrowser: false }).then(() => clerk);
+    return _createClerkClient({ ...rest, scope: SCOPE.BACKGROUND }).then(clerk =>
+      clerk.load({ standardBrowser: false }).then(() => clerk),
+    );
   }
 
   Clerk.sdkMetadata = {
@@ -25,12 +26,6 @@ export function createClerkClient(opts: CreateClerkClientOptions): Clerk | Promi
   };
 
   const clerk = new Clerk(opts.publishableKey, {});
-
-  const originalLoad = clerk.load.bind(clerk);
-  clerk.load = async (loadOpts?: Parameters<typeof clerk.load>[0]) => {
-    const { ui } = await import('@clerk/ui');
-    return originalLoad({ ...loadOpts, ui });
-  };
 
   return clerk;
 }
