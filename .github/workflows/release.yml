@@ -47,18 +47,21 @@ jobs:
           # turbo-team: ${{ vars.TURBO_TEAM }}
           # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
+      - name: Build release
+        run: pnpm turbo build $TURBO_ARGS --force
+
       - name: Create Release PR
         id: changesets
         uses: changesets/action@v1
         with:
-          commit: 'ci(repo): Version packages'
-          title: 'ci(repo): Version packages'
-          publish: pnpm turbo build $TURBO_ARGS --force=true && pnpm release
+          commit: "ci(repo): Version packages"
+          title: "ci(repo): Version packages"
+          publish: pnpm release
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: pnpm version-packages
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
-          HUSKY: '0'
+          HUSKY: "0"
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
@@ -139,12 +142,12 @@ jobs:
         with:
           fetch-depth: 1
           fetch-tags: false
-          filter: 'blob:none'
+          filter: "blob:none"
           show-progress: false
 
       - name: Cache node_modules (Node v${{ matrix.version }})
         uses: ./.github/actions/init
         with:
           node-version: ${{ matrix.version }}
-          turbo-team: ''
-          turbo-token: ''
+          turbo-team: ""
+          turbo-token: ""
