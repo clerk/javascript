@@ -161,7 +161,6 @@ export const BaseRouter = ({
   // eslint-disable-next-line custom-rules/no-navigate-useClerk
   const { navigate: clerkNavigate } = useClerk();
 
-  // Normalize basePath to always have a leading slash and no double slashes
   const normalizedBasePath = withLeadingSlash(basePath);
 
   const [routeParts, setRouteParts] = React.useState({
