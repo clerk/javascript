@@ -1,5 +1,15 @@
 # @clerk/nuxt
 
+## 1.13.26
+
+### Patch Changes
+
+- Updated dependencies [[`76a5a1b`](https://github.com/clerk/javascript/commit/76a5a1b851819b4247c944ba0132f2cacd626962), [`7955e9d`](https://github.com/clerk/javascript/commit/7955e9dd90419c02fd51226d4fe335d42e7096a5), [`51bc9a9`](https://github.com/clerk/javascript/commit/51bc9a90554b83f04b33e836931f33b778bfc506)]:
+  - @clerk/backend@2.33.0
+  - @clerk/shared@3.47.2
+  - @clerk/types@4.101.20
+  - @clerk/vue@1.17.18
+
 ## 1.13.25
 
 ### Patch Changes
@@ -57,14 +67,12 @@
   - @clerk/types@4.101.15
   - @clerk/vue@1.17.13
 
-
 ## 1.13.19
 
 ### Patch Changes
 
 - Updated dependencies [[`a726252`](https://github.com/clerk/javascript/commit/a726252610ea0cbef2d971ec3ce8d0d4be3a3468)]:
   - @clerk/backend@2.30.1
-
 
 ## 1.13.18
 
@@ -74,14 +82,12 @@
   - @clerk/backend@2.30.0
   - @clerk/vue@1.17.12
 
-
 ## 1.13.17
 
 ### Patch Changes
 
 - Updated dependencies [[`559cd84`](https://github.com/clerk/javascript/commit/559cd84a320a1d808fb38c404f31437046198123)]:
   - @clerk/backend@2.29.7
-
 
 ## 1.13.16
 
@@ -93,7 +99,6 @@
   - @clerk/types@4.101.14
   - @clerk/vue@1.17.11
 
-
 ## 1.13.15
 
 ### Patch Changes
@@ -103,7 +108,6 @@
   - @clerk/backend@2.29.5
   - @clerk/types@4.101.13
   - @clerk/vue@1.17.10
-
 
 ## 1.13.14
 
@@ -115,7 +119,6 @@
   - @clerk/types@4.101.12
   - @clerk/vue@1.17.9
 
-
 ## 1.13.13
 
 ### Patch Changes
@@ -126,14 +129,12 @@
   - @clerk/types@4.101.11
   - @clerk/vue@1.17.8
 
-
 ## 1.13.12
 
 ### Patch Changes
 
 - Updated dependencies [[`6b26afc`](https://github.com/clerk/javascript/commit/6b26afcc784f6e8344cf6ff0b1ef69c14019fe66)]:
   - @clerk/backend@2.29.2
-
 
 ## 1.13.11
 
@@ -145,7 +146,6 @@
   - @clerk/types@4.101.10
   - @clerk/vue@1.17.7
 
-
 ## 1.13.10
 
 ### Patch Changes
@@ -155,7 +155,6 @@
   - @clerk/shared@3.41.1
   - @clerk/types@4.101.9
   - @clerk/vue@1.17.6
-
 
 ## 1.13.9
 
@@ -167,7 +166,6 @@
   - @clerk/types@4.101.8
   - @clerk/vue@1.17.5
 
-
 ## 1.13.8
 
 ### Patch Changes
@@ -178,14 +176,12 @@
   - @clerk/types@4.101.7
   - @clerk/vue@1.17.4
 
-
 ## 1.13.7
 
 ### Patch Changes
 
 - Updated dependencies [[`e448757`](https://github.com/clerk/javascript/commit/e448757cd3d24a509a3a312e3a376c235fba32a1)]:
   - @clerk/backend@2.27.0
-
 
 ## 1.13.6
 

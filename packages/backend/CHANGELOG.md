@@ -1,5 +1,87 @@
 # Change Log
 
+## 2.33.0
+
+### Minor Changes
+
+- Added support for JWT token format when creating and verifying machine-to-machine (M2M) tokens. This enables fully **networkless verification** when using the public JWT key. ([#7883](https://github.com/clerk/javascript/pull/7883)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  **Creating a JWT-format M2M token**
+
+  ```ts
+  const clerkClient = createClerkClient({
+    machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY,
+  });
+
+  const m2mToken = await clerkClient.m2m.createToken({
+    tokenFormat: 'jwt',
+  });
+
+  console.log('M2M token created:', m2mToken.token);
+  ```
+
+  **Verifying a token**
+
+  ```ts
+  const clerkClient = createClerkClient({
+    machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY,
+  });
+
+  const authHeader = req.headers.get('Authorization');
+  const token = authHeader.slice(7);
+
+  const verified = await clerkClient.m2m.verify(token);
+
+  console.log('Verified M2M token:', verified);
+  ```
+
+  **Networkless verification**
+
+  ```ts
+  const clerkClient = createClerkClient({
+    jwtKey: process.env.CLERK_JWT_KEY,
+  });
+
+  const authHeader = req.headers.get('Authorization');
+  const token = authHeader.slice(7);
+
+  const verified = await clerkClient.m2m.verify(token);
+
+  console.log('Verified M2M token:', verified);
+  ```
+
+- Add `list()` method to M2M tokens API to retrieve a list of machine-to-machine tokens for a given machine. ([#7939](https://github.com/clerk/javascript/pull/7939)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```ts
+  // Retrieve M2M tokens for a specific machine
+  const response = await clerkClient.m2m.list({
+    subject: 'mch_1xxxxxxxxxxxxx',
+  });
+
+  console.log(response.data); // M2MToken[]
+  console.log(response.totalCount); // number
+  ```
+
+  Filter by revoked or expired tokens:
+
+  ```ts
+  const revokedTokens = await clerkClient.m2m.list({
+    subject: 'mch_1xxxxxxxxxxxxx',
+    revoked: true,
+  });
+
+  const expiredTokens = await clerkClient.m2m.list({
+    subject: 'mch_1xxxxxxxxxxxxx',
+    expired: true,
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`7955e9d`](https://github.com/clerk/javascript/commit/7955e9dd90419c02fd51226d4fe335d42e7096a5)]:
+  - @clerk/shared@3.47.2
+  - @clerk/types@4.101.20
+
 ## 2.32.2
 
 ### Patch Changes
@@ -46,7 +128,6 @@
   - @clerk/shared@3.45.1
   - @clerk/types@4.101.16
 
-
 ## 2.31.0
 
 ### Minor Changes
@@ -61,13 +142,11 @@
   - @clerk/shared@3.45.0
   - @clerk/types@4.101.15
 
-
 ## 2.30.1
 
 ### Patch Changes
 
 - Improved token type validation in authentication requests ([#7764](https://github.com/clerk/javascript/pull/7764)) by [@wobsoriano](https://github.com/wobsoriano)
-
 
 ## 2.30.0
 
@@ -81,13 +160,11 @@
 
 - Fixed an issue where JWT OAuth access tokens where not treated as a machine token ([#7756](https://github.com/clerk/javascript/pull/7756)) by [@wobsoriano](https://github.com/wobsoriano)
 
-
 ## 2.29.7
 
 ### Patch Changes
 
 - fix: correct `createInvitationBulk` return type to `Promise<Invitation[]>` ([#7702](https://github.com/clerk/javascript/pull/7702)) by [@jacekradko](https://github.com/jacekradko)
-
 
 ## 2.29.6
 
@@ -97,7 +174,6 @@
   - @clerk/shared@3.44.0
   - @clerk/types@4.101.14
 
-
 ## 2.29.5
 
 ### Patch Changes
@@ -106,7 +182,6 @@
   - @clerk/shared@3.43.2
   - @clerk/types@4.101.13
 
-
 ## 2.29.4
 
 ### Patch Changes
@@ -114,7 +189,6 @@
 - Updated dependencies [[`e995cc3`](https://github.com/clerk/javascript/commit/e995cc3572f85aa47bdee8f7b56130a383488a7f)]:
   - @clerk/shared@3.43.1
   - @clerk/types@4.101.12
-
 
 ## 2.29.3
 
@@ -126,13 +200,11 @@
   - @clerk/shared@3.43.0
   - @clerk/types@4.101.11
 
-
 ## 2.29.2
 
 ### Patch Changes
 
 - Fixed an issue when using multiple `acceptsToken` values in `authenticateRequest`. When `acceptsToken` is an array containing both session and machine token types (e.g., `['session_token', 'api_key']`), the function now correctly routes to the appropriate authentication handler based on the actual token type, instead of always treating them as machine tokens. ([#7556](https://github.com/clerk/javascript/pull/7556)) by [@wobsoriano](https://github.com/wobsoriano)
-
 
 ## 2.29.1
 
@@ -143,7 +215,6 @@
 - Updated dependencies [[`a4e6932`](https://github.com/clerk/javascript/commit/a4e693262f734bfd3ab08ffac019168c874c2bd8)]:
   - @clerk/shared@3.42.0
   - @clerk/types@4.101.10
-
 
 ## 2.29.0
 
@@ -156,7 +227,6 @@
 - Updated dependencies [[`03dd374`](https://github.com/clerk/javascript/commit/03dd37458eedf59198dc3574e12030b217efcb41)]:
   - @clerk/shared@3.41.1
   - @clerk/types@4.101.9
-
 
 ## 2.28.0
 
@@ -172,7 +242,6 @@
   - @clerk/shared@3.41.0
   - @clerk/types@4.101.8
 
-
 ## 2.27.1
 
 ### Patch Changes
@@ -182,7 +251,6 @@
 - Updated dependencies [[`375a32d`](https://github.com/clerk/javascript/commit/375a32d0f44933605ffb513ff28f522ac5e851d6), [`175883b`](https://github.com/clerk/javascript/commit/175883b05228138c9ff55d0871cc1041bd68d7fe), [`f626046`](https://github.com/clerk/javascript/commit/f626046c589956022b1e1ac70382c986822f4733), [`14342d2`](https://github.com/clerk/javascript/commit/14342d2b34fe0882f7676195aefaaa17f034af70)]:
   - @clerk/shared@3.40.0
   - @clerk/types@4.101.7
-
 
 ## 2.27.0
 
@@ -202,7 +270,6 @@
 
   await clerkClient.apiKeys.delete('api_key_id');
   ```
-
 
 ## 2.26.0
 
