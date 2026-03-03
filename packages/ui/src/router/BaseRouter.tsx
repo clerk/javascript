@@ -1,6 +1,7 @@
 import { getQueryParams, stringifyQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
 import { trimTrailingSlash } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
+import { withLeadingSlash } from '@clerk/shared/url';
 import type { NavigateOptions } from '@clerk/shared/types';
 import React from 'react';
 import { flushSync } from 'react-dom';
@@ -161,7 +162,7 @@ export const BaseRouter = ({
   const { navigate: clerkNavigate } = useClerk();
 
   // Normalize basePath to always have a leading slash and no double slashes
-  const normalizedBasePath = '/' + basePath.replace(/^\/+/, '');
+  const normalizedBasePath = withLeadingSlash(basePath);
 
   const [routeParts, setRouteParts] = React.useState({
     path: getPath(),
