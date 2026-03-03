@@ -13,7 +13,7 @@ import { RouteContext } from './RouteContext';
 // Custom events that don't exist on WindowEventMap but are handled
 // by wrapping history.pushState/replaceState in the fallback path.
 type HistoryEvent = 'pushstate' | 'replacestate';
-type RefreshEvent = keyof WindowEventMap | HistoryEvent;
+export type RefreshEvent = keyof WindowEventMap | HistoryEvent;
 type NavigationType = 'push' | 'replace' | 'traverse';
 
 const isWindowRefreshEvent = (event: RefreshEvent): event is keyof WindowEventMap => {
@@ -196,13 +196,17 @@ export const BaseRouter = ({
     const newPath = getPath();
     const newQueryString = getQueryString();
 
+    if (basePath && !newPath.startsWith('/' + basePath)) {
+      return;
+    }
+
     if (newPath !== currentPath || newQueryString !== currentQueryString) {
       setRouteParts({
         path: newPath,
         queryString: newQueryString,
       });
     }
-  }, [currentPath, currentQueryString, getPath, getQueryString]);
+  }, [basePath, currentPath, currentQueryString, getPath, getQueryString]);
 
   // Suppresses the history observer during baseNavigate's internal navigation.
   // Without this, the observer's microtask triggers a render before setActive's
