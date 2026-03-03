@@ -1,5 +1,21 @@
 # Change Log
 
+## 2.9.9
+
+### Patch Changes
+
+- Updated dependencies [[`86d42b9`](https://github.com/clerk/javascript/commit/86d42b95c89c069c71d262c2c3988ea2bbde5569)]:
+  - @clerk/clerk-js@5.125.4
+
+## 2.9.8
+
+### Patch Changes
+
+- Updated dependencies [[`9aceb31`](https://github.com/clerk/javascript/commit/9aceb318f18bc5b5a0312baf22d627e65e25afdd), [`7955e9d`](https://github.com/clerk/javascript/commit/7955e9dd90419c02fd51226d4fe335d42e7096a5)]:
+  - @clerk/clerk-js@5.125.3
+  - @clerk/shared@3.47.2
+  - @clerk/clerk-react@5.61.3
+
 ## 2.9.7
 
 ### Patch Changes
@@ -43,7 +59,6 @@
   - @clerk/clerk-js@5.123.1
   - @clerk/clerk-react@5.60.2
 
-
 ## 2.9.2
 
 ### Patch Changes
@@ -53,14 +68,12 @@
   - @clerk/shared@3.45.0
   - @clerk/clerk-react@5.60.1
 
-
 ## 2.9.1
 
 ### Patch Changes
 
 - Updated dependencies [[`68dc502`](https://github.com/clerk/javascript/commit/68dc50234bd418c44501e1407fbce47d35dbfb1a)]:
   - @clerk/clerk-js@5.122.1
-
 
 ## 2.9.0
 
@@ -75,7 +88,6 @@
   - @clerk/shared@3.44.0
   - @clerk/clerk-react@5.60.0
 
-
 ## 2.8.20
 
 ### Patch Changes
@@ -84,7 +96,6 @@
   - @clerk/clerk-js@5.121.1
   - @clerk/shared@3.43.2
   - @clerk/clerk-react@5.59.6
-
 
 ## 2.8.19
 
@@ -95,7 +106,6 @@
   - @clerk/shared@3.43.1
   - @clerk/clerk-react@5.59.5
 
-
 ## 2.8.18
 
 ### Patch Changes
@@ -105,14 +115,12 @@
   - @clerk/shared@3.43.0
   - @clerk/clerk-react@5.59.4
 
-
 ## 2.8.17
 
 ### Patch Changes
 
 - Updated dependencies [[`68fe8b6`](https://github.com/clerk/javascript/commit/68fe8b65eb47e289d22c6481f1eba7747d40a0b1)]:
   - @clerk/clerk-js@5.119.1
-
 
 ## 2.8.16
 
@@ -122,7 +130,6 @@
   - @clerk/clerk-js@5.119.0
   - @clerk/clerk-react@5.59.3
 
-
 ## 2.8.15
 
 ### Patch Changes
@@ -131,7 +138,6 @@
   - @clerk/clerk-js@5.118.0
   - @clerk/shared@3.42.0
   - @clerk/clerk-react@5.59.3
-
 
 ## 2.8.14
 
@@ -144,7 +150,6 @@
   - @clerk/clerk-react@5.59.2
   - @clerk/shared@3.41.1
 
-
 ## 2.8.13
 
 ### Patch Changes
@@ -153,7 +158,6 @@
   - @clerk/clerk-js@5.116.0
   - @clerk/shared@3.41.0
   - @clerk/clerk-react@5.59.1
-
 
 ## 2.8.12
 
@@ -164,7 +168,6 @@
   - @clerk/shared@3.40.0
   - @clerk/clerk-react@5.59.0
 
-
 ## 2.8.11
 
 ### Patch Changes
@@ -172,7 +175,6 @@
 - Updated dependencies []:
   - @clerk/clerk-js@5.114.1
   - @clerk/clerk-react@5.58.1
-
 
 ## 2.8.10
 

@@ -1,5 +1,13 @@
 # @clerk/vue
 
+## 1.17.18
+
+### Patch Changes
+
+- Updated dependencies [[`7955e9d`](https://github.com/clerk/javascript/commit/7955e9dd90419c02fd51226d4fe335d42e7096a5)]:
+  - @clerk/shared@3.47.2
+  - @clerk/types@4.101.20
+
 ## 1.17.17
 
 ### Patch Changes
@@ -40,13 +48,11 @@
   - @clerk/shared@3.45.0
   - @clerk/types@4.101.15
 
-
 ## 1.17.12
 
 ### Patch Changes
 
 - Fixed an error occurring in the composables where watchers attempted to call unwatch() within their own initialization. ([#7744](https://github.com/clerk/javascript/pull/7744)) by [@wobsoriano](https://github.com/wobsoriano)
-
 
 ## 1.17.11
 
@@ -56,7 +62,6 @@
   - @clerk/shared@3.44.0
   - @clerk/types@4.101.14
 
-
 ## 1.17.10
 
 ### Patch Changes
@@ -64,7 +69,6 @@
 - Updated dependencies [[`b7a4e1e`](https://github.com/clerk/javascript/commit/b7a4e1eabe7aa61e7d2cb7f27cbd22671c49f2b1)]:
   - @clerk/shared@3.43.2
   - @clerk/types@4.101.13
-
 
 ## 1.17.9
 
@@ -74,7 +78,6 @@
   - @clerk/shared@3.43.1
   - @clerk/types@4.101.12
 
-
 ## 1.17.8
 
 ### Patch Changes
@@ -82,7 +85,6 @@
 - Updated dependencies [[`271ddeb`](https://github.com/clerk/javascript/commit/271ddeb0b47357f7da316eef389ae46b180c36da)]:
   - @clerk/shared@3.43.0
   - @clerk/types@4.101.11
-
 
 ## 1.17.7
 
@@ -92,7 +94,6 @@
   - @clerk/shared@3.42.0
   - @clerk/types@4.101.10
 
-
 ## 1.17.6
 
 ### Patch Changes
@@ -100,7 +101,6 @@
 - Updated dependencies [[`03dd374`](https://github.com/clerk/javascript/commit/03dd37458eedf59198dc3574e12030b217efcb41)]:
   - @clerk/shared@3.41.1
   - @clerk/types@4.101.9
-
 
 ## 1.17.5
 
@@ -110,7 +110,6 @@
   - @clerk/shared@3.41.0
   - @clerk/types@4.101.8
 
-
 ## 1.17.4
 
 ### Patch Changes
@@ -118,7 +117,6 @@
 - Updated dependencies [[`375a32d`](https://github.com/clerk/javascript/commit/375a32d0f44933605ffb513ff28f522ac5e851d6), [`175883b`](https://github.com/clerk/javascript/commit/175883b05228138c9ff55d0871cc1041bd68d7fe), [`f626046`](https://github.com/clerk/javascript/commit/f626046c589956022b1e1ac70382c986822f4733), [`14342d2`](https://github.com/clerk/javascript/commit/14342d2b34fe0882f7676195aefaaa17f034af70)]:
   - @clerk/shared@3.40.0
   - @clerk/types@4.101.7
-
 
 ## 1.17.3
 
