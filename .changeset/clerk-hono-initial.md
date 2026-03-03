@@ -1,5 +1,5 @@
 ---
-'@clerk/hono': minor
+'@clerk/hono': patch
 ---
 
 Initial release of `@clerk/hono` - the official Clerk SDK for Hono.
