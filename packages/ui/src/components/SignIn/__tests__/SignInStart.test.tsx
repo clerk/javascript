@@ -606,6 +606,81 @@ describe('SignInStart', () => {
     });
   });
 
+  describe('signUpIfMissing', () => {
+    it('passes signUpIfMissing: true when combined flow and enumeration protection are enabled', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withEnumerationProtection();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when enumeration protection is disabled', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when not in combined flow', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withEnumerationProtection();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when password is present', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+        f.withEnumerationProtection();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { container, userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      const passwordField = container.querySelector('#password-field') as Element;
+      expect(passwordField).not.toBeNull();
+      fireEvent.change(passwordField, { target: { value: 'some-password' } });
+      const form = container.querySelector('form') as Element;
+      fireEvent.submit(form);
+      await waitFor(() => {
+        expect(fixtures.signIn.create).toHaveBeenCalledWith(
+          expect.not.objectContaining({
+            signUpIfMissing: true,
+          }),
+        );
+      });
+    });
+  });
+
   describe('ticket flow', () => {
     it('calls the appropriate resource function upon detecting the ticket', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {

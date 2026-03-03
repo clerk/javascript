@@ -9,11 +9,12 @@ import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCa
 import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { useFetch } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { type LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
+import { handleSignUpIfMissingTransfer } from './handleSignUpIfMissingTransfer';
 
 export type SignInFactorOneCodeCard = Pick<
   VerificationCodeCardProps,
@@ -35,8 +36,10 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const signIn = useCoreSignIn();
   const card = useCardState();
   const { navigate } = useRouter();
-  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
+  const ctx = useSignInContext();
+  const { afterSignInUrl, afterSignUpUrl, navigateOnSetActive, isCombinedFlow } = ctx;
   const { setActive } = useClerk();
+  const { userSettings } = useEnvironment();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
 
@@ -114,6 +117,20 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
         if (isUserLockedError(err)) {
           // @ts-expect-error -- private method for the time being
           return clerk.__internal_navigateWithError('..', err.errors[0]);
+        }
+
+        if (
+          isCombinedFlow &&
+          userSettings.attackProtection.enumeration_protection.enabled &&
+          signIn.firstFactorVerification.status === 'transferable'
+        ) {
+          return handleSignUpIfMissingTransfer({
+            clerk,
+            navigate,
+            afterSignUpUrl,
+            navigateOnSetActive,
+            unsafeMetadata: ctx.unsafeMetadata,
+          });
         }
 
         return reject(err);

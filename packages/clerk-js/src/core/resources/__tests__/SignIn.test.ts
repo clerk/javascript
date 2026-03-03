@@ -697,6 +697,37 @@ describe('SignIn', () => {
           expect.anything(),
         );
       });
+
+      it('polls until firstFactorVerification status is transferable', async () => {
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_123',
+              first_factor_verification: { status: 'unverified' },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_123',
+              first_factor_verification: { status: 'transferable' },
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({ id: 'signin_123' } as any);
+        await signIn.__internal_future.emailLink.waitForVerification();
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'GET',
+            path: '/client/sign_ins/signin_123',
+          }),
+          expect.anything(),
+        );
+      });
     });
 
     describe('sendPhoneCode', () => {

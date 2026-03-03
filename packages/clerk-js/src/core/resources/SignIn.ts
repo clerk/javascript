@@ -284,7 +284,7 @@ export class SignIn extends BaseResource implements SignInResource {
           return this.reload()
             .then(res => {
               const status = res[verificationKey].status;
-              if (status === 'verified' || status === 'expired') {
+              if (status === 'verified' || status === 'expired' || status === 'transferable') {
                 stop();
                 resolve(res);
               }
@@ -940,7 +940,7 @@ class SignInFuture implements SignInFutureResource {
           try {
             const res = await this.#resource.__internal_baseGet();
             const status = res.firstFactorVerification.status;
-            if (status === 'verified' || status === 'expired') {
+            if (status === 'verified' || status === 'expired' || status === 'transferable') {
               stop();
               resolve(res);
             }

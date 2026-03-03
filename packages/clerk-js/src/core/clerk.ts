@@ -2116,6 +2116,14 @@ export class Clerk implements ClerkInterface {
       throw new EmailLinkError(EmailLinkErrorCodeStatus.Expired);
     } else if (verificationStatus === 'client_mismatch') {
       throw new EmailLinkError(EmailLinkErrorCodeStatus.ClientMismatch);
+    } else if (verificationStatus === 'transferable') {
+      // signUpIfMissing flow: the email was verified but the user doesn't exist.
+      // The polling tab handles the actual sign-up transfer, so treat this
+      // the same as verified-on-other-device for the link-click tab.
+      if (typeof params.onVerifiedOnOtherDevice === 'function') {
+        params.onVerifiedOnOtherDevice();
+      }
+      return;
     } else if (verificationStatus !== 'verified') {
       throw new EmailLinkError(EmailLinkErrorCodeStatus.Failed);
     }
