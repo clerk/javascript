@@ -1,12 +1,56 @@
 # Change Log
 
+## 3.37.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.20
+
+## 3.37.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.19
+
+## 3.37.0
+
+### Minor Changes
+
+- Add support for displaying proration and account credits on payment attempts and statements. ([#7885](https://github.com/clerk/javascript/pull/7885)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.18
+
+## 3.36.0
+
+### Minor Changes
+
+- Introduces MFA setup session task for handling require MFA after sign-in and sign-up ([#7851](https://github.com/clerk/javascript/pull/7851)) by [@octoper](https://github.com/octoper)
+
+- Add support for account credits in checkout. ([#7870](https://github.com/clerk/javascript/pull/7870)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.17
+
+## 3.35.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.16
+
 ## 3.35.4
 
 ### Patch Changes
 
 - Updated dependencies []:
   - @clerk/types@4.101.15
-
 
 ## 3.35.3
 
@@ -21,14 +65,12 @@
 - Updated dependencies []:
   - @clerk/types@4.101.14
 
-
 ## 3.35.2
 
 ### Patch Changes
 
 - Updated dependencies []:
   - @clerk/types@4.101.13
-
 
 ## 3.35.1
 
@@ -38,7 +80,6 @@
 
 - Updated dependencies []:
   - @clerk/types@4.101.12
-
 
 ## 3.35.0
 
@@ -51,13 +92,11 @@
 - Updated dependencies []:
   - @clerk/types@4.101.11
 
-
 ## 3.34.0
 
 ### Minor Changes
 
 - Fix "You must belong to an organization" screen showing when user has existing memberships, invitations or suggestions ([#7557](https://github.com/clerk/javascript/pull/7557)) by [@LauraBeatris](https://github.com/LauraBeatris)
-
 
 ## 3.33.0
 
@@ -70,14 +109,12 @@
 - Updated dependencies []:
   - @clerk/types@4.101.10
 
-
 ## 3.32.1
 
 ### Patch Changes
 
 - Updated dependencies []:
   - @clerk/types@4.101.9
-
 
 ## 3.32.0
 
@@ -91,7 +128,6 @@
 
 - Updated dependencies []:
   - @clerk/types@4.101.8
-
 
 ## 3.31.0
 
@@ -112,13 +148,11 @@
 - Updated dependencies []:
   - @clerk/types@4.101.7
 
-
 ## 3.30.1
 
 ### Patch Changes
 
 - Added translations for Polish in UI elements for Organizations ([#7390](https://github.com/clerk/javascript/pull/7390)) by [@kamil-homer](https://github.com/kamil-homer)
-
 
 ## 3.30.0
 

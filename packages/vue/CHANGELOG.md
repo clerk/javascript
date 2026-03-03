@@ -1,5 +1,45 @@
 # @clerk/vue
 
+## 1.17.18
+
+### Patch Changes
+
+- Updated dependencies [[`7955e9d`](https://github.com/clerk/javascript/commit/7955e9dd90419c02fd51226d4fe335d42e7096a5)]:
+  - @clerk/shared@3.47.2
+  - @clerk/types@4.101.20
+
+## 1.17.17
+
+### Patch Changes
+
+- Updated dependencies [[`8a0c404`](https://github.com/clerk/javascript/commit/8a0c404d05a88697fcc3a609fef25bd5ff9f9ef0)]:
+  - @clerk/shared@3.47.1
+  - @clerk/types@4.101.19
+
+## 1.17.16
+
+### Patch Changes
+
+- Updated dependencies [[`c00c524`](https://github.com/clerk/javascript/commit/c00c5246f340cf0339c5725cade90cfcd118727d)]:
+  - @clerk/shared@3.47.0
+  - @clerk/types@4.101.18
+
+## 1.17.15
+
+### Patch Changes
+
+- Updated dependencies [[`71bd53c`](https://github.com/clerk/javascript/commit/71bd53c67a5018bd7aa589c3baced2038123c228), [`935f780`](https://github.com/clerk/javascript/commit/935f780ab5b3871253da2ad46f0e44f9ce7e53e8)]:
+  - @clerk/shared@3.46.0
+  - @clerk/types@4.101.17
+
+## 1.17.14
+
+### Patch Changes
+
+- Updated dependencies [[`b17e4bb`](https://github.com/clerk/javascript/commit/b17e4bbbbad173969523e5494f2d8447d1887b95)]:
+  - @clerk/shared@3.45.1
+  - @clerk/types@4.101.16
+
 ## 1.17.13
 
 ### Patch Changes
@@ -8,13 +48,11 @@
   - @clerk/shared@3.45.0
   - @clerk/types@4.101.15
 
-
 ## 1.17.12
 
 ### Patch Changes
 
 - Fixed an error occurring in the composables where watchers attempted to call unwatch() within their own initialization. ([#7744](https://github.com/clerk/javascript/pull/7744)) by [@wobsoriano](https://github.com/wobsoriano)
-
 
 ## 1.17.11
 
@@ -24,7 +62,6 @@
   - @clerk/shared@3.44.0
   - @clerk/types@4.101.14
 
-
 ## 1.17.10
 
 ### Patch Changes
@@ -32,7 +69,6 @@
 - Updated dependencies [[`b7a4e1e`](https://github.com/clerk/javascript/commit/b7a4e1eabe7aa61e7d2cb7f27cbd22671c49f2b1)]:
   - @clerk/shared@3.43.2
   - @clerk/types@4.101.13
-
 
 ## 1.17.9
 
@@ -42,7 +78,6 @@
   - @clerk/shared@3.43.1
   - @clerk/types@4.101.12
 
-
 ## 1.17.8
 
 ### Patch Changes
@@ -50,7 +85,6 @@
 - Updated dependencies [[`271ddeb`](https://github.com/clerk/javascript/commit/271ddeb0b47357f7da316eef389ae46b180c36da)]:
   - @clerk/shared@3.43.0
   - @clerk/types@4.101.11
-
 
 ## 1.17.7
 
@@ -60,7 +94,6 @@
   - @clerk/shared@3.42.0
   - @clerk/types@4.101.10
 
-
 ## 1.17.6
 
 ### Patch Changes
@@ -68,7 +101,6 @@
 - Updated dependencies [[`03dd374`](https://github.com/clerk/javascript/commit/03dd37458eedf59198dc3574e12030b217efcb41)]:
   - @clerk/shared@3.41.1
   - @clerk/types@4.101.9
-
 
 ## 1.17.5
 
@@ -78,7 +110,6 @@
   - @clerk/shared@3.41.0
   - @clerk/types@4.101.8
 
-
 ## 1.17.4
 
 ### Patch Changes
@@ -86,7 +117,6 @@
 - Updated dependencies [[`375a32d`](https://github.com/clerk/javascript/commit/375a32d0f44933605ffb513ff28f522ac5e851d6), [`175883b`](https://github.com/clerk/javascript/commit/175883b05228138c9ff55d0871cc1041bd68d7fe), [`f626046`](https://github.com/clerk/javascript/commit/f626046c589956022b1e1ac70382c986822f4733), [`14342d2`](https://github.com/clerk/javascript/commit/14342d2b34fe0882f7676195aefaaa17f034af70)]:
   - @clerk/shared@3.40.0
   - @clerk/types@4.101.7
-
 
 ## 1.17.3
 

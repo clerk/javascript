@@ -92,6 +92,7 @@ const LINK_REPLACEMENTS = [
   ['billing-payment-resource', '/docs/reference/javascript/types/billing-payment-resource'],
   ['deleted-object-resource', '/docs/reference/javascript/types/deleted-object-resource'],
   ['checkout-flow-resource', '/docs/reference/hooks/use-checkout#checkout-flow-resource'],
+  ['organization-creation-defaults-resource', '#organization-creation-defaults-resource'],
 ];
 
 /**

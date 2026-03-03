@@ -1,5 +1,116 @@
 # Change Log
 
+## 6.39.0
+
+### Minor Changes
+
+- Added support for JWT token format when creating and verifying machine-to-machine (M2M) tokens. This enables fully **networkless verification** when using the public JWT key. ([#7883](https://github.com/clerk/javascript/pull/7883)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  **Creating a JWT-format M2M token**
+
+  ```ts
+  const clerkClient = createClerkClient({
+    machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY,
+  });
+
+  const m2mToken = await clerkClient.m2m.createToken({
+    tokenFormat: 'jwt',
+  });
+
+  console.log('M2M token created:', m2mToken.token);
+  ```
+
+  **Verifying a token**
+
+  ```ts
+  const clerkClient = createClerkClient({
+    machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY,
+  });
+
+  const authHeader = req.headers.get('Authorization');
+  const token = authHeader.slice(7);
+
+  const verified = await clerkClient.m2m.verify(token);
+
+  console.log('Verified M2M token:', verified);
+  ```
+
+  **Networkless verification**
+
+  ```ts
+  const clerkClient = createClerkClient({
+    jwtKey: process.env.CLERK_JWT_KEY,
+  });
+
+  const authHeader = req.headers.get('Authorization');
+  const token = authHeader.slice(7);
+
+  const verified = await clerkClient.m2m.verify(token);
+
+  console.log('Verified M2M token:', verified);
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`76a5a1b`](https://github.com/clerk/javascript/commit/76a5a1b851819b4247c944ba0132f2cacd626962), [`7955e9d`](https://github.com/clerk/javascript/commit/7955e9dd90419c02fd51226d4fe335d42e7096a5), [`51bc9a9`](https://github.com/clerk/javascript/commit/51bc9a90554b83f04b33e836931f33b778bfc506)]:
+  - @clerk/backend@2.33.0
+  - @clerk/shared@3.47.2
+  - @clerk/clerk-react@5.61.3
+  - @clerk/types@4.101.20
+
+## 6.38.3
+
+### Patch Changes
+
+- Updated dependencies [[`8a0c404`](https://github.com/clerk/javascript/commit/8a0c404d05a88697fcc3a609fef25bd5ff9f9ef0)]:
+  - @clerk/shared@3.47.1
+  - @clerk/backend@2.32.2
+  - @clerk/clerk-react@5.61.2
+  - @clerk/types@4.101.19
+
+## 6.38.2
+
+### Patch Changes
+
+- Updated dependencies [[`c15c8a2`](https://github.com/clerk/javascript/commit/c15c8a2cd263bd777fd94fb4bdeae2cfb4a70aca)]:
+  - @clerk/backend@2.32.1
+
+## 6.38.1
+
+### Patch Changes
+
+- Updated dependencies [[`c00c524`](https://github.com/clerk/javascript/commit/c00c5246f340cf0339c5725cade90cfcd118727d), [`9c935ad`](https://github.com/clerk/javascript/commit/9c935adeda94af60219ed8b7c7f1f9c34fbd410d)]:
+  - @clerk/shared@3.47.0
+  - @clerk/backend@2.32.0
+  - @clerk/clerk-react@5.61.1
+  - @clerk/types@4.101.18
+
+## 6.38.0
+
+### Minor Changes
+
+- Introduces MFA setup session task for handling require MFA after sign-in and sign-up ([#7851](https://github.com/clerk/javascript/pull/7851)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Fix infinite handshake redirect loop when deploying Next.js apps with Clerk development instances to Netlify ([#7876](https://github.com/clerk/javascript/pull/7876)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- Updated dependencies [[`71bd53c`](https://github.com/clerk/javascript/commit/71bd53c67a5018bd7aa589c3baced2038123c228), [`935f780`](https://github.com/clerk/javascript/commit/935f780ab5b3871253da2ad46f0e44f9ce7e53e8), [`2471e31`](https://github.com/clerk/javascript/commit/2471e314b24eab485c78313d84d986ee30c63088)]:
+  - @clerk/clerk-react@5.61.0
+  - @clerk/shared@3.46.0
+  - @clerk/backend@2.31.2
+  - @clerk/types@4.101.17
+
+## 6.37.5
+
+### Patch Changes
+
+- Updated dependencies [[`b17e4bb`](https://github.com/clerk/javascript/commit/b17e4bbbbad173969523e5494f2d8447d1887b95)]:
+  - @clerk/shared@3.45.1
+  - @clerk/backend@2.31.1
+  - @clerk/clerk-react@5.60.2
+  - @clerk/types@4.101.16
+
 ## 6.37.4
 
 ### Patch Changes
@@ -10,14 +121,12 @@
   - @clerk/clerk-react@5.60.1
   - @clerk/types@4.101.15
 
-
 ## 6.37.3
 
 ### Patch Changes
 
 - Updated dependencies [[`a726252`](https://github.com/clerk/javascript/commit/a726252610ea0cbef2d971ec3ce8d0d4be3a3468)]:
   - @clerk/backend@2.30.1
-
 
 ## 6.37.2
 
@@ -28,14 +137,12 @@
 - Updated dependencies [[`7917ff4`](https://github.com/clerk/javascript/commit/7917ff4214fc9e1001e2698c7241bbfa4b68e5af), [`b0d28c1`](https://github.com/clerk/javascript/commit/b0d28c14815a6136c67a719efb1dc5496ffb5c82)]:
   - @clerk/backend@2.30.0
 
-
 ## 6.37.1
 
 ### Patch Changes
 
 - Updated dependencies [[`559cd84`](https://github.com/clerk/javascript/commit/559cd84a320a1d808fb38c404f31437046198123)]:
   - @clerk/backend@2.29.7
-
 
 ## 6.37.0
 
@@ -53,7 +160,6 @@
   - @clerk/backend@2.29.6
   - @clerk/types@4.101.14
 
-
 ## 6.36.10
 
 ### Patch Changes
@@ -64,7 +170,6 @@
   - @clerk/clerk-react@5.59.6
   - @clerk/types@4.101.13
 
-
 ## 6.36.9
 
 ### Patch Changes
@@ -74,7 +179,6 @@
   - @clerk/clerk-react@5.59.5
   - @clerk/backend@2.29.4
   - @clerk/types@4.101.12
-
 
 ## 6.36.8
 
@@ -88,7 +192,6 @@
   - @clerk/clerk-react@5.59.4
   - @clerk/types@4.101.11
 
-
 ## 6.36.7
 
 ### Patch Changes
@@ -96,7 +199,6 @@
 - Updated dependencies [[`6b26afc`](https://github.com/clerk/javascript/commit/6b26afcc784f6e8344cf6ff0b1ef69c14019fe66)]:
   - @clerk/backend@2.29.2
   - @clerk/clerk-react@5.59.3
-
 
 ## 6.36.6
 
@@ -107,7 +209,6 @@
   - @clerk/shared@3.42.0
   - @clerk/clerk-react@5.59.3
   - @clerk/types@4.101.10
-
 
 ## 6.36.5
 
@@ -121,7 +222,6 @@
   - @clerk/shared@3.41.1
   - @clerk/types@4.101.9
 
-
 ## 6.36.4
 
 ### Patch Changes
@@ -131,7 +231,6 @@
   - @clerk/backend@2.28.0
   - @clerk/clerk-react@5.59.1
   - @clerk/types@4.101.8
-
 
 ## 6.36.3
 
@@ -145,7 +244,6 @@
   - @clerk/clerk-react@5.59.0
   - @clerk/types@4.101.7
 
-
 ## 6.36.2
 
 ### Patch Changes
@@ -153,7 +251,6 @@
 - Updated dependencies [[`e448757`](https://github.com/clerk/javascript/commit/e448757cd3d24a509a3a312e3a376c235fba32a1)]:
   - @clerk/backend@2.27.0
   - @clerk/clerk-react@5.58.1
-
 
 ## 6.36.1
 

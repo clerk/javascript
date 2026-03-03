@@ -1,11 +1,42 @@
 # Change Log
 
+## 3.47.2
+
+### Patch Changes
+
+- Remove CHIPS build variant and use `partitioned_cookies` environment flag from the Clerk API to control partitioned cookie behavior at runtime. ([#7946](https://github.com/clerk/javascript/pull/7946)) by [@brkalow](https://github.com/brkalow)
+
+## 3.47.1
+
+### Patch Changes
+
+- Don't display impersonation for agents ([#7934](https://github.com/clerk/javascript/pull/7934)) by [@tmilewski](https://github.com/tmilewski)
+
+## 3.47.0
+
+### Minor Changes
+
+- Add support for displaying proration and account credits on payment attempts and statements. ([#7885](https://github.com/clerk/javascript/pull/7885)) by [@dstaley](https://github.com/dstaley)
+
+## 3.46.0
+
+### Minor Changes
+
+- Introduces MFA setup session task for handling require MFA after sign-in and sign-up ([#7851](https://github.com/clerk/javascript/pull/7851)) by [@octoper](https://github.com/octoper)
+
+- Add support for account credits in checkout. ([#7870](https://github.com/clerk/javascript/pull/7870)) by [@dstaley](https://github.com/dstaley)
+
+## 3.45.1
+
+### Patch Changes
+
+- Set `SameSite=None` on cookies for `.replit.dev` origins and consolidate third-party domain list ([#7864](https://github.com/clerk/javascript/pull/7864)) by [@brkalow](https://github.com/brkalow)
+
 ## 3.45.0
 
 ### Minor Changes
 
 - Add `username` field into `PublicUserData` object. ([#7837](https://github.com/clerk/javascript/pull/7837)) by [@Jibaru](https://github.com/Jibaru)
-
 
 ## 3.44.0
 
@@ -13,13 +44,11 @@
 
 - Export `useOrganizationCreationDefaults` hook to fetch suggested organization name and logo from default naming rules ([#7690](https://github.com/clerk/javascript/pull/7690)) by [@LauraBeatris](https://github.com/LauraBeatris)
 
-
 ## 3.43.2
 
 ### Patch Changes
 
 - Fix `unsafeMetadata` being lost when users are transferred between sign-in and sign-up flows during OAuth/SSO authentication ([#7647](https://github.com/clerk/javascript/pull/7647)) by [@tmilewski](https://github.com/tmilewski)
-
 
 ## 3.43.1
 
@@ -27,13 +56,11 @@
 
 - Fix prototype pollution vulnerability in `fastDeepMergeAndReplace` and `fastDeepMergeAndKeep` utilities by blocking dangerous keys (`__proto__`, `constructor`, `prototype`) during object merging. ([#7625](https://github.com/clerk/javascript/pull/7625)) by [@jacekradko](https://github.com/jacekradko)
 
-
 ## 3.43.0
 
 ### Minor Changes
 
 - Surface organization creation defaults with prefilled form fields and advisory warnings ([#7603](https://github.com/clerk/javascript/pull/7603)) by [@LauraBeatris](https://github.com/LauraBeatris)
-
 
 ## 3.42.0
 
@@ -41,13 +68,11 @@
 
 - Disable role selection in `OrganizationProfile` during role set migration ([#7541](https://github.com/clerk/javascript/pull/7541)) by [@LauraBeatris](https://github.com/LauraBeatris)
 
-
 ## 3.41.1
 
 ### Patch Changes
 
 - Fix React peer dependency version ranges to use `~` instead of `^` for React 19 versions, ensuring non-overlapping version constraints. ([#7513](https://github.com/clerk/javascript/pull/7513)) by [@jacekradko](https://github.com/jacekradko)
-
 
 ## 3.41.0
 
@@ -63,7 +88,6 @@
 
 - Refactor internal Clerk error handling functions ([#7490](https://github.com/clerk/javascript/pull/7490)) by [@kduprey](https://github.com/kduprey)
 
-
 ## 3.40.0
 
 ### Minor Changes
@@ -77,7 +101,6 @@
 - Added temporary email services support error localization key. ([#7436](https://github.com/clerk/javascript/pull/7436)) by [@wobsoriano](https://github.com/wobsoriano)
 
 - Added missing password or identifier incorrect error localization. ([#7437](https://github.com/clerk/javascript/pull/7437)) by [@wobsoriano](https://github.com/wobsoriano)
-
 
 ## 3.39.0
 
