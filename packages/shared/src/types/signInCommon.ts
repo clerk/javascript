@@ -162,13 +162,8 @@ export type SignInCreateParams = (
   | {
       identifier: string;
     }
-  | {
-      transfer?: boolean;
-    }
-) & {
-  transfer?: boolean;
-  signUpIfMissing?: boolean;
-};
+  | { transfer?: boolean }
+) & { transfer?: boolean };
 
 export type ResetPasswordParams = {
   password: string;

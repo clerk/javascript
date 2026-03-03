@@ -1,5 +1,23 @@
 # Change Log
 
+## 5.125.4
+
+### Patch Changes
+
+- Fix a crash in the Turnstile CAPTCHA retry logic where captcha.reset() was called after the widget's DOM container had already been removed, causing an unhandled error ([#7957](https://github.com/clerk/javascript/pull/7957)) by [@tmilewski](https://github.com/tmilewski)
+
+## 5.125.3
+
+### Patch Changes
+
+- Add debug logging to detect session token swaps in multi-session scenarios ([#7945](https://github.com/clerk/javascript/pull/7945)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove CHIPS build variant and use `partitioned_cookies` environment flag from the Clerk API to control partitioned cookie behavior at runtime. ([#7946](https://github.com/clerk/javascript/pull/7946)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`7955e9d`](https://github.com/clerk/javascript/commit/7955e9dd90419c02fd51226d4fe335d42e7096a5)]:
+  - @clerk/shared@3.47.2
+  - @clerk/localizations@3.37.2
+
 ## 5.125.2
 
 ### Patch Changes
@@ -58,7 +76,6 @@
   - @clerk/shared@3.45.1
   - @clerk/localizations@3.35.5
 
-
 ## 5.123.0
 
 ### Minor Changes
@@ -85,13 +102,11 @@
   - @clerk/shared@3.45.0
   - @clerk/localizations@3.35.4
 
-
 ## 5.122.1
 
 ### Patch Changes
 
 - Improve captcha error diagnostics ([#7768](https://github.com/clerk/javascript/pull/7768)) by [@jacekradko](https://github.com/jacekradko)
-
 
 ## 5.122.0
 
@@ -104,7 +119,6 @@
 - Updated dependencies [[`64a35f7`](https://github.com/clerk/javascript/commit/64a35f79e9a49dfc140b4c8a8df517b74d46d6c6), [`71b20f1`](https://github.com/clerk/javascript/commit/71b20f126042a55148a9da146dcedd672a230811), [`aebb8df`](https://github.com/clerk/javascript/commit/aebb8df24f19a932ef4663ee2c7c93a535d314f9), [`71b20f1`](https://github.com/clerk/javascript/commit/71b20f126042a55148a9da146dcedd672a230811)]:
   - @clerk/shared@3.44.0
   - @clerk/localizations@3.35.3
-
 
 ## 5.121.1
 
@@ -120,7 +134,6 @@
   - @clerk/shared@3.43.2
   - @clerk/localizations@3.35.2
 
-
 ## 5.121.0
 
 ### Minor Changes
@@ -134,7 +147,6 @@
 - Updated dependencies [[`c650a04`](https://github.com/clerk/javascript/commit/c650a04e624e7da5b81f2bdc12af0b6940c20f82), [`e995cc3`](https://github.com/clerk/javascript/commit/e995cc3572f85aa47bdee8f7b56130a383488a7f)]:
   - @clerk/localizations@3.35.1
   - @clerk/shared@3.43.1
-
 
 ## 5.120.0
 
@@ -154,13 +166,11 @@
   - @clerk/localizations@3.35.0
   - @clerk/shared@3.43.0
 
-
 ## 5.119.1
 
 ### Patch Changes
 
 - Fix role select being disabled on `OrganizationProfile` invite members page when default role is not in roles list ([#7569](https://github.com/clerk/javascript/pull/7569)) by [@LauraBeatris](https://github.com/LauraBeatris)
-
 
 ## 5.119.0
 
@@ -174,7 +184,6 @@
 
 - Updated dependencies [[`c4dbcf7`](https://github.com/clerk/javascript/commit/c4dbcf70ec9d96b74bf31f138e7da357ba89e5e7)]:
   - @clerk/localizations@3.34.0
-
 
 ## 5.118.0
 
@@ -190,7 +199,6 @@
   - @clerk/localizations@3.33.0
   - @clerk/shared@3.42.0
 
-
 ## 5.117.0
 
 ### Minor Changes
@@ -202,7 +210,6 @@
 - Updated dependencies [[`03dd374`](https://github.com/clerk/javascript/commit/03dd37458eedf59198dc3574e12030b217efcb41)]:
   - @clerk/shared@3.41.1
   - @clerk/localizations@3.32.1
-
 
 ## 5.116.0
 
@@ -222,7 +229,6 @@
   - @clerk/shared@3.41.0
   - @clerk/localizations@3.32.0
 
-
 ## 5.115.0
 
 ### Minor Changes
@@ -239,14 +245,12 @@
   - @clerk/localizations@3.31.0
   - @clerk/shared@3.40.0
 
-
 ## 5.114.1
 
 ### Patch Changes
 
 - Updated dependencies [[`893d3e4`](https://github.com/clerk/javascript/commit/893d3e4c4ca1f4f7c9ee13961319ea9423628de9)]:
   - @clerk/localizations@3.30.1
-
 
 ## 5.114.0
 
