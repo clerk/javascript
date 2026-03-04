@@ -1,7 +1,7 @@
 import type { CaptchaProvider, CaptchaWidgetType } from '@clerk/shared/types';
 
 export type CaptchaOptions = {
-  action?: 'verify' | 'signin' | 'signup' | 'heartbeat';
+  action?: 'verify' | 'signup' | 'heartbeat';
   captchaProvider: CaptchaProvider;
   closeModal?: () => Promise<unknown>;
   invisibleSiteKey: string;

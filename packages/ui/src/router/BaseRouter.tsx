@@ -1,6 +1,7 @@
 import { getQueryParams, stringifyQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
 import { trimTrailingSlash } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
+import { withLeadingSlash } from '@clerk/shared/url';
 import type { NavigateOptions } from '@clerk/shared/types';
 import React from 'react';
 import { flushSync } from 'react-dom';
@@ -13,7 +14,7 @@ import { RouteContext } from './RouteContext';
 // Custom events that don't exist on WindowEventMap but are handled
 // by wrapping history.pushState/replaceState in the fallback path.
 type HistoryEvent = 'pushstate' | 'replacestate';
-type RefreshEvent = keyof WindowEventMap | HistoryEvent;
+export type RefreshEvent = keyof WindowEventMap | HistoryEvent;
 type NavigationType = 'push' | 'replace' | 'traverse';
 
 const isWindowRefreshEvent = (event: RefreshEvent): event is keyof WindowEventMap => {
@@ -160,6 +161,8 @@ export const BaseRouter = ({
   // eslint-disable-next-line custom-rules/no-navigate-useClerk
   const { navigate: clerkNavigate } = useClerk();
 
+  const normalizedBasePath = withLeadingSlash(basePath);
+
   const [routeParts, setRouteParts] = React.useState({
     path: getPath(),
     queryString: getQueryString(),
@@ -196,13 +199,17 @@ export const BaseRouter = ({
     const newPath = getPath();
     const newQueryString = getQueryString();
 
+    if (basePath && !newPath.startsWith(normalizedBasePath)) {
+      return;
+    }
+
     if (newPath !== currentPath || newQueryString !== currentQueryString) {
       setRouteParts({
         path: newPath,
         queryString: newQueryString,
       });
     }
-  }, [currentPath, currentQueryString, getPath, getQueryString]);
+  }, [basePath, normalizedBasePath, currentPath, currentQueryString, getPath, getQueryString]);
 
   // Suppresses the history observer during baseNavigate's internal navigation.
   // Without this, the observer's microtask triggers a render before setActive's
@@ -214,11 +221,11 @@ export const BaseRouter = ({
       return;
     }
     const newPath = getPath();
-    if (basePath && !newPath.startsWith('/' + basePath)) {
+    if (basePath && !newPath.startsWith(normalizedBasePath)) {
       return;
     }
     refresh();
-  }, [basePath, getPath, refresh]);
+  }, [basePath, normalizedBasePath, getPath, refresh]);
 
   useHistoryChangeObserver(refreshEvents, observerRefresh);
 
@@ -229,7 +236,7 @@ export const BaseRouter = ({
     }
 
     const isCrossOrigin = toURL.origin !== window.location.origin;
-    const isOutsideOfUIComponent = !toURL.pathname.startsWith('/' + basePath);
+    const isOutsideOfUIComponent = !toURL.pathname.startsWith(normalizedBasePath);
 
     if (isOutsideOfUIComponent || isCrossOrigin) {
       isNavigatingRef.current = true;
