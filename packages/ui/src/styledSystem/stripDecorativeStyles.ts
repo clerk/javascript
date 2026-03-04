@@ -39,9 +39,25 @@ const STRUCTURAL_PROPERTIES = new Set([
   'borderSpacing',
 ]);
 
-// Content-rendering properties that produce visible icon/image content.
+// Specific properties that produce visible icon/image content.
 // These must survive stripping so icons remain visible in raw mode.
-const CONTENT_RENDERING_PREFIXES = ['background', 'mask', 'WebkitMask'];
+// Uses exact properties instead of prefixes to avoid preserving
+// decorative properties like backgroundColor on non-icon elements.
+const CONTENT_RENDERING_PROPERTIES = new Set([
+  'backgroundColor',
+  'backgroundImage',
+  'backgroundSize',
+  'backgroundPosition',
+  'backgroundRepeat',
+  'maskImage',
+  'maskSize',
+  'maskPosition',
+  'maskRepeat',
+  'WebkitMaskImage',
+  'WebkitMaskSize',
+  'WebkitMaskPosition',
+  'WebkitMaskRepeat',
+]);
 
 const STRUCTURAL_PREFIXES = ['flex', 'inset', 'margin', 'padding', 'overflow', 'min', 'max', 'clip'];
 
@@ -55,7 +71,7 @@ function isStructuralProperty(key: string): boolean {
 }
 
 function isContentRenderingProperty(key: string): boolean {
-  return CONTENT_RENDERING_PREFIXES.some(prefix => key.startsWith(prefix));
+  return CONTENT_RENDERING_PROPERTIES.has(key);
 }
 
 export type StripOptions = {

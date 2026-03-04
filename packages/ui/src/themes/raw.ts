@@ -18,6 +18,10 @@ export const raw = createTheme({
   simpleStyles: true,
   __internal_rawMode: true,
   variables: {
+    // backgroundColor survives stripping (needed for icon mask fills), so
+    // background colors must be explicitly transparent to avoid leaking.
+    colorBackground: 'transparent',
+    colorInput: 'transparent',
     // Icon fill: masked provider icons use --cl-icon-fill which survives stripping
     colorForeground: '#000000',
     colorPrimaryForeground: '#ffffff',
