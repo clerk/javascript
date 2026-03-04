@@ -26,7 +26,7 @@ type CheckAuthorizationSignedOut = CheckAuthorizationWithoutOrgOrUser;
 export type UseAuthReturn =
   | {
       /**
-       * A boolean indicating whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
+       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
        */
       isLoaded: false;
       /**
