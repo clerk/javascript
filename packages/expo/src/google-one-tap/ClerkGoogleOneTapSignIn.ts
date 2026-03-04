@@ -10,14 +10,14 @@ import type {
   SignInParams,
 } from './types';
 
-// Lazy-load the native module to avoid crashes when not available
-let _nativeModule: typeof NativeClerkGoogleSignIn | null = null;
-
-function getNativeModule(): typeof NativeClerkGoogleSignIn {
-  if (!_nativeModule) {
-    _nativeModule = NativeClerkGoogleSignIn;
+function getNativeModule(): NonNullable<typeof NativeClerkGoogleSignIn> {
+  if (!NativeClerkGoogleSignIn) {
+    throw new Error(
+      'ClerkGoogleSignIn native module is not available. ' +
+        'Ensure the @clerk/expo plugin is added to your app.json and you have run a development build.',
+    );
   }
-  return _nativeModule;
+  return NativeClerkGoogleSignIn;
 }
 
 /**

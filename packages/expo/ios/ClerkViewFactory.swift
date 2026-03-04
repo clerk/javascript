@@ -19,6 +19,15 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
 
   private init() {}
 
+  /// Resolves the keychain service name, checking ClerkKeychainService in Info.plist first
+  /// (for extension apps sharing a keychain group), then falling back to the bundle identifier.
+  private static var keychainService: String? {
+    if let custom = Bundle.main.object(forInfoDictionaryKey: "ClerkKeychainService") as? String, !custom.isEmpty {
+      return custom
+    }
+    return Bundle.main.bundleIdentifier
+  }
+
   // Register this factory with the ClerkExpo module
   public static func register() {
     clerkViewFactory = shared
@@ -52,7 +61,7 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
   /// Both expo-secure-store and the native Clerk SDK use the iOS Keychain with the
   /// bundle identifier as the service name, making cross-SDK token sharing possible.
   private static func syncJSTokenToNativeKeychainIfNeeded() {
-    guard let service = Bundle.main.bundleIdentifier, !service.isEmpty else { return }
+    guard let service = keychainService, !service.isEmpty else { return }
 
     let jsTokenKey = "__clerk_client_jwt"
     let nativeTokenKey = "clerkDeviceToken"
@@ -100,7 +109,7 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
   /// Writes the provided bearer token as the native SDK's device token,
   /// but only if the native SDK doesn't already have one.
   private static func writeNativeDeviceTokenIfNeeded(_ token: String) {
-    guard let service = Bundle.main.bundleIdentifier, !service.isEmpty else { return }
+    guard let service = keychainService, !service.isEmpty else { return }
 
     let nativeTokenKey = "clerkDeviceToken"
 
@@ -273,7 +282,7 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
   override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
     if isBeingDismissed {
-      completeOnce(.failure(NSError(domain: "ClerkAuth", code: 3, userInfo: [NSLocalizedDescriptionKey: "Auth modal was dismissed"])))
+      completeOnce(.success(["cancelled": true]))
     }
   }
 
@@ -292,25 +301,16 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
           if let sessionId = signIn.createdSessionId {
             self.completeOnce(.success(["sessionId": sessionId, "type": "signIn"]))
             self.dismiss(animated: true)
-          } else {
-            self.completeOnce(.failure(NSError(domain: "ClerkAuth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Sign-in completed but no session ID was created"])))
-            self.dismiss(animated: true)
           }
         case .signUpCompleted(let signUp):
           if let sessionId = signUp.createdSessionId {
             self.completeOnce(.success(["sessionId": sessionId, "type": "signUp"]))
-            self.dismiss(animated: true)
-          } else {
-            self.completeOnce(.failure(NSError(domain: "ClerkAuth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Sign-up completed but no session ID was created"])))
             self.dismiss(animated: true)
           }
         default:
           break
         }
       }
-      // Stream ended without an auth completion event
-      guard let self = self else { return }
-      self.completeOnce(.failure(NSError(domain: "ClerkAuth", code: 2, userInfo: [NSLocalizedDescriptionKey: "Auth event stream ended unexpectedly"])))
     }
   }
 }
@@ -351,7 +351,7 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
   override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
     if isBeingDismissed {
-      completeOnce(.failure(NSError(domain: "ClerkProfile", code: 3, userInfo: [NSLocalizedDescriptionKey: "Profile modal was dismissed"])))
+      completeOnce(.success(["dismissed": true]))
     }
   }
 
@@ -373,9 +373,6 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
           break
         }
       }
-      // Stream ended without a sign-out event
-      guard let self = self else { return }
-      self.completeOnce(.failure(NSError(domain: "ClerkProfile", code: 2, userInfo: [NSLocalizedDescriptionKey: "Profile event stream ended unexpectedly"])))
     }
   }
 }

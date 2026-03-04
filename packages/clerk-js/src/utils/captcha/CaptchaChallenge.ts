@@ -81,6 +81,9 @@ export class CaptchaChallenge {
    * managed by clerk-js itself.
    */
   public async managedInModal(opts?: Partial<CaptchaOptions>) {
+    if (typeof document === 'undefined') {
+      return { captchaError: 'modal_component_not_ready' };
+    }
     return this.managedOrInvisible({
       modalWrapperQuerySelector: '#cl-modal-captcha-wrapper',
       modalContainerQuerySelector: '#cl-modal-captcha-container',
