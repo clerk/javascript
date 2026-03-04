@@ -107,13 +107,9 @@ export function useUserProfileModal(): UseUserProfileModalReturn {
         }
       }
     } catch (error) {
-      // iOS native module rejects when modal is dismissed — this is expected.
-      // Log unexpected errors for debugging.
-      const isDismissal =
-        error instanceof Error && (error.message.includes('dismissed') || error.message.includes('cancelled'));
-      if (!isDismissal) {
-        console.error('[useUserProfileModal] Unexpected error from presentUserProfile:', error);
-      }
+      // Native module rejects on actual errors (E_NOT_INITIALIZED, E_CREATE_FAILED, etc.)
+      // Dismissal resolves successfully with { dismissed: true }, so this is a real error.
+      console.error('[useUserProfileModal] presentUserProfile failed:', error);
     } finally {
       presentingRef.current = false;
     }
