@@ -517,7 +517,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.locale = data.locale;
     }
 
-    eventBus.emit('resource:update', { resource: this });
+    eventBus.emit('resource:state-change', { resource: this });
     return this;
   }
 
@@ -1112,21 +1112,29 @@ class SignUpFuture implements SignUpFutureResource {
     return this.create({ ...params, ticket: ticket ?? undefined });
   }
 
+  /**
+   * Finalizes a completed sign-up by setting the active session.
+   * Like reset(), this does NOT set fetchStatus to 'fetching' — the sign-up
+   * is already complete, and setActive is a session-level operation.
+   */
   async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: ClerkError | null }> {
     const { navigate } = params || {};
-    return runAsyncResourceTask(this.#resource, async () => {
+
+    try {
       if (!this.#resource.createdSessionId) {
         throw new Error('Cannot finalize sign-up without a created session.');
       }
-
       this.#canBeDiscarded = true;
       await SignUp.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
-    });
+      return { error: null };
+    } catch (err) {
+      return { error: err as ClerkError };
+    }
   }
 
   /**
    * Resets the current sign-up attempt by clearing all local state back to null.
-   * Unlike other methods, this does NOT emit resource:fetch with 'fetching' status,
+   * Unlike other methods, this does NOT set fetchStatus to 'fetching',
    * allowing for smooth UI transitions without loading states.
    */
   reset(): Promise<{ error: ClerkError | null }> {

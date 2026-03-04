@@ -989,9 +989,8 @@ describe('SignUp', () => {
           resetSignUp: vi.fn().mockImplementation(function (this: typeof mockClient) {
             const newSignUp = new SignUp(null);
             this.signUp = newSignUp;
-            // Emit events like the real implementation
-            eventBus.emit('resource:error', { resource: newSignUp, error: null });
-            // Also update signals directly since State isn't set up in tests
+            eventBus.emit('resource:state-change', { resource: newSignUp, error: null, fetchStatus: 'idle' });
+            // Also update signals directly since State isn't set up in these tests
             signUpResourceSignal({ resource: newSignUp });
             signUpErrorSignal({ error: null });
           }),
@@ -1009,7 +1008,7 @@ describe('SignUp', () => {
         signUpErrorSignal({ error: null });
       });
 
-      it('does NOT emit resource:fetch with status fetching', async () => {
+      it('does NOT set fetchStatus to fetching', async () => {
         const emitSpy = vi.spyOn(eventBus, 'emit');
         const mockFetch = vi.fn();
         BaseResource._fetch = mockFetch;
@@ -1017,9 +1016,9 @@ describe('SignUp', () => {
         const signUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
         await signUp.__internal_future.reset();
 
-        // Verify that resource:fetch was NOT called with status: 'fetching'
+        // Verify that no event was emitted with fetchStatus: 'fetching'
         const fetchingCalls = emitSpy.mock.calls.filter(
-          call => call[0] === 'resource:fetch' && call[1]?.status === 'fetching',
+          call => call[0] === 'resource:state-change' && call[1]?.fetchStatus === 'fetching',
         );
         expect(fetchingCalls).toHaveLength(0);
         // Verify no API calls were made

@@ -9,24 +9,22 @@ export const events = {
   UserSignOut: 'user:signOut',
   EnvironmentUpdate: 'environment:update',
   SessionTokenResolved: 'session:tokenResolved',
-  ResourceUpdate: 'resource:update',
-  ResourceError: 'resource:error',
-  ResourceFetch: 'resource:fetch',
+  ResourceStateChange: 'resource:state-change',
 } as const;
 
 type TokenUpdatePayload = { token: TokenResource | null };
-export type ResourceUpdatePayload = { resource: BaseResource };
-export type ResourceErrorPayload = { resource: BaseResource; error: ClerkError | null };
-export type ResourceFetchPayload = { resource: BaseResource; status: 'idle' | 'fetching' };
+export type ResourceStateChangePayload = {
+  resource: BaseResource;
+  error?: ClerkError | null;
+  fetchStatus?: 'idle' | 'fetching';
+};
 
 type InternalEvents = {
   [events.TokenUpdate]: TokenUpdatePayload;
   [events.UserSignOut]: null;
   [events.EnvironmentUpdate]: null;
   [events.SessionTokenResolved]: null;
-  [events.ResourceUpdate]: ResourceUpdatePayload;
-  [events.ResourceError]: ResourceErrorPayload;
-  [events.ResourceFetch]: ResourceFetchPayload;
+  [events.ResourceStateChange]: ResourceStateChangePayload;
 };
 
 export const eventBus = createEventBus<InternalEvents>();
