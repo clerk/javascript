@@ -483,7 +483,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
           padding: 0,
         })}
       >
-        {plan.unitPrices && (plan.hasBaseFee || plan.unitPrices[0].tiers.length > 1) ? (
+        {plan.unitPrices && (plan.hasBaseFee || plan.unitPrices[0].tiers.length > 0) ? (
           <CardFeaturesListSeatCost plan={plan} />
         ) : null}
         {plan.features.slice(0, hasMoreFeatures ? (isCompact ? 3 : 8) : totalFeatures).map(feature => (
