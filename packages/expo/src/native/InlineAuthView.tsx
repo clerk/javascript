@@ -138,11 +138,17 @@ export function InlineAuthView({ mode = 'signInOrUp', isDismissable = false }: I
       return;
     }
 
+    const POLL_INTERVAL_MS = 1500;
+    const MAX_POLLS = 40; // 60s max
+    let pollCount = 0;
+
     const interval = setInterval(async () => {
-      if (authCompletedRef.current) {
+      if (authCompletedRef.current || pollCount >= MAX_POLLS) {
         clearInterval(interval);
         return;
       }
+
+      pollCount++;
 
       try {
         const session = (await ClerkExpoModule.getSession()) as { sessionId?: string } | null;
@@ -153,7 +159,7 @@ export function InlineAuthView({ mode = 'signInOrUp', isDismissable = false }: I
       } catch {
         // ignore polling errors
       }
-    }, 1500);
+    }, POLL_INTERVAL_MS);
 
     return () => clearInterval(interval);
   }, [syncSession]);
