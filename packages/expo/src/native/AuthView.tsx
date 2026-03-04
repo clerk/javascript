@@ -1,9 +1,9 @@
-import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useRef } from 'react';
 import { Platform, Text, View } from 'react-native';
 
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
 import { getClerkInstance } from '../provider/singleton';
+import { tokenCache } from '../token-cache';
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';
 import NativeClerkModule from '../specs/NativeClerkModule';
 import type { AuthViewProps } from './AuthView.types';
@@ -26,9 +26,7 @@ export async function syncNativeSession(sessionId: string): Promise<void> {
   if (ClerkExpo?.getClientToken) {
     const nativeClientToken = await ClerkExpo.getClientToken();
     if (nativeClientToken) {
-      await SecureStore.setItemAsync(CLERK_CLIENT_JWT_KEY, nativeClientToken, {
-        keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
-      });
+      await tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, nativeClientToken);
     }
   }
 

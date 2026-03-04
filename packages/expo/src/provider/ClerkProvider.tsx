@@ -2,12 +2,12 @@ import '../polyfills';
 
 import type { ClerkProviderProps as ReactClerkProviderProps } from '@clerk/react';
 import { InternalClerkProvider as ClerkReactProvider, type Ui } from '@clerk/react/internal';
-import * as SecureStore from 'expo-secure-store';
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 
 import type { TokenCache } from '../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
+import { tokenCache as defaultTokenCache } from '../token-cache';
 import { useNativeAuthEvents } from '../hooks/useNativeAuthEvents';
 import NativeClerkModule from '../specs/NativeClerkModule';
 import { isNative, isWeb } from '../utils/runtime';
@@ -106,11 +106,9 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
             // Read the JS SDK's client JWT to sync with the native SDK
             let bearerToken: string | null = null;
             try {
-              bearerToken = await SecureStore.getItemAsync(CLERK_CLIENT_JWT_KEY, {
-                keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
-              });
+              bearerToken = (await defaultTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
             } catch {
-              // SecureStore may not be available
+              // Token cache may not be available
             }
             await ClerkExpo.configure(pk, bearerToken);
 
