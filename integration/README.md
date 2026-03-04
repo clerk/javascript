@@ -23,10 +23,11 @@ Before you begin writing tests, you should already have:
 
 Integration tests install Clerk packages from a local registry managed by pkglab. Before running tests:
 
-1. Publish packages: `pkglab pub` (builds and publishes to local registry)
-2. Run tests: `pnpm test:integration:base`
+1. Build packages: `pnpm build`
+2. Publish to local registry: `pkglab pub`
+3. Run tests: `pnpm test:integration:base`
 
-After making changes to packages, re-run `pkglab pub` to update the registry.
+After making changes to packages, re-run `pnpm build && pkglab pub` to update the registry.
 
 ## Initial setup
 
