@@ -1,5 +1,11 @@
 # @clerk/expo-passkeys
 
+## 1.0.1
+
+### Patch Changes
+
+- Update README prerequisites to match actual `package.json` engine and peer dependency constraints. ([#7972](https://github.com/clerk/javascript/pull/7972)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 1.0.0
 
 ### Major Changes

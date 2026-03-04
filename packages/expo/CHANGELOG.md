@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.0.1
+
+### Patch Changes
+
+- Update README prerequisites to match actual `package.json` engine and peer dependency constraints. ([#7972](https://github.com/clerk/javascript/pull/7972)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`55ece85`](https://github.com/clerk/javascript/commit/55ece8518b14c1976fb00bfe45a681981060239d)]:
+  - @clerk/react@6.0.1
+  - @clerk/clerk-js@6.0.0
+
 ## 3.0.0
 
 ### Major Changes
