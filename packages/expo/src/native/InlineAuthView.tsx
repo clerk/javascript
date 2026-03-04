@@ -2,6 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useRef } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 
+import { CLERK_CLIENT_JWT_KEY } from '../constants';
 import { getClerkInstance } from '../provider/singleton';
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';
 import NativeClerkModule from '../specs/NativeClerkModule';
@@ -9,9 +10,6 @@ import type { AuthViewMode } from './AuthView.types';
 
 // Check if native module is supported on this platform
 const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
-
-// Token cache key used by the Clerk JS SDK (must match createClerkInstance.ts)
-const CLERK_CLIENT_JWT_KEY = '__clerk_client_jwt';
 
 // Safely get the native module
 let ClerkExpoModule: typeof NativeClerkModule | null = null;

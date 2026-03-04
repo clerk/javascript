@@ -19,6 +19,7 @@ import {
 } from '../../cache';
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { errorThrower } from '../../errorThrower';
+import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { isNative } from '../../utils';
 import type { BuildClerkOptions } from './types';
 
@@ -35,8 +36,6 @@ type FapiRequestInit = RequestInit & {
 type FapiResponse = Response & {
   payload: { errors?: Array<{ code: string }> } | null;
 };
-
-const KEY = '__clerk_client_jwt';
 
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
 
@@ -57,7 +56,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
     if (!__internal_clerk || hasKeyChanged) {
       if (hasKeyChanged) {
-        tokenCache.clearToken?.(KEY);
+        tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
       }
 
       const getToken = tokenCache.getToken;
@@ -173,7 +172,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         // Instructs the backend to parse the api token from the Authorization header.
         requestInit.url?.searchParams.append('_is_native', '1');
 
-        const jwt = await getToken(KEY);
+        const jwt = await getToken(CLERK_CLIENT_JWT_KEY);
         (requestInit.headers as Headers).set('authorization', jwt || '');
 
         // Instructs the backend that the request is from a mobile device.
@@ -189,7 +188,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       __internal_clerk.__internal_onAfterResponse(async (_: FapiRequestInit, response: FapiResponse) => {
         const authHeader = response.headers.get('authorization');
         if (authHeader) {
-          await saveToken(KEY, authHeader);
+          await saveToken(CLERK_CLIENT_JWT_KEY, authHeader);
         }
 
         if (!nativeApiErrorShown && response.payload?.errors?.[0]?.code === 'native_api_disabled') {
