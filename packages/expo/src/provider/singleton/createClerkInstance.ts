@@ -18,8 +18,8 @@ import {
   SessionJWTCache,
 } from '../../cache';
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
-import { errorThrower } from '../../errorThrower';
 import { CLERK_CLIENT_JWT_KEY } from '../../constants';
+import { errorThrower } from '../../errorThrower';
 import { isNative } from '../../utils';
 import type { BuildClerkOptions } from './types';
 

@@ -4,9 +4,9 @@ import { Platform, Text, View } from 'react-native';
 
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
 import { getClerkInstance } from '../provider/singleton';
-import { tokenCache } from '../token-cache';
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';
 import NativeClerkModule from '../specs/NativeClerkModule';
+import { tokenCache } from '../token-cache';
 import type { AuthViewProps } from './AuthView.types';
 
 // Check if native module is supported on this platform

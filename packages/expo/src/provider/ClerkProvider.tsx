@@ -7,9 +7,9 @@ import { Platform } from 'react-native';
 
 import type { TokenCache } from '../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
-import { tokenCache as defaultTokenCache } from '../token-cache';
 import { useNativeAuthEvents } from '../hooks/useNativeAuthEvents';
 import NativeClerkModule from '../specs/NativeClerkModule';
+import { tokenCache as defaultTokenCache } from '../token-cache';
 import { isNative, isWeb } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
