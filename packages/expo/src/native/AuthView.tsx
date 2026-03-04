@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { useCallback, useEffect, useRef } from 'react';
 import { Platform, Text, View } from 'react-native';
 
@@ -32,7 +33,10 @@ export async function syncNativeSession(sessionId: string): Promise<void> {
 
   const clerkInstance = getClerkInstance();
   if (!clerkInstance) {
-    throw new Error('[AuthView] Clerk instance not available');
+    throw new ClerkRuntimeError(
+      'Clerk instance is not available. Ensure <ClerkProvider> is mounted before using <AuthView>.',
+      { code: 'clerk_instance_not_available' },
+    );
   }
 
   // Reload resources using the native client's token

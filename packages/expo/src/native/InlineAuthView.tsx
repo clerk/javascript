@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { useCallback, useEffect, useRef } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 
@@ -89,7 +90,10 @@ export function InlineAuthView({ mode = 'signInOrUp', isDismissable = false }: I
       // because __internal_reloadInitialResources is stripped from IsomorphicClerk
       const clerkInstance = getClerkInstance();
       if (!clerkInstance) {
-        throw new Error('[InlineAuthView] Clerk instance not available');
+        throw new ClerkRuntimeError(
+          'Clerk instance is not available. Ensure <ClerkProvider> is mounted before using <InlineAuthView>.',
+          { code: 'clerk_instance_not_available' },
+        );
       }
 
       const clerkRecord = clerkInstance as unknown as Record<string, unknown>;
