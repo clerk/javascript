@@ -1,5 +1,6 @@
 import { PageMocking, type MockScenario } from '@clerk/msw';
 import * as l from '../../localizations';
+import { dark, neobrutalism, raw, shadcn, shadesOfPurple } from '../../ui/src/themes';
 import type { Clerk as ClerkType } from '../';
 import * as scenarios from './scenarios';
 
@@ -313,6 +314,40 @@ function otherOptions() {
   return { updateOtherOptions };
 }
 
+const themes: Record<string, unknown> = {
+  dark,
+  shadesOfPurple,
+  neobrutalism,
+  shadcn,
+  raw,
+};
+
+function themeSelector() {
+  assertClerkIsLoaded(Clerk);
+
+  const themeSelect = document.getElementById('themeSelect') as HTMLSelectElement;
+
+  const savedTheme = sessionStorage.getItem('baseTheme') ?? 'raw';
+  themeSelect.value = savedTheme;
+
+  const updateTheme = () => {
+    const themeName = themeSelect.value;
+    sessionStorage.setItem('baseTheme', themeName);
+
+    const currentAppearance = Clerk.__internal_getOption('appearance') ?? {};
+    void Clerk.__internal_updateProps({
+      appearance: {
+        ...currentAppearance,
+        theme: themeName ? themes[themeName] : undefined,
+      },
+    });
+  };
+
+  themeSelect.addEventListener('change', updateTheme);
+
+  return { updateTheme };
+}
+
 const urlParams = new URL(window.location.href).searchParams;
 for (const [component, encodedProps] of urlParams.entries()) {
   if (AVAILABLE_COMPONENTS.includes(component as AvailableComponent)) {
@@ -328,6 +363,7 @@ void (async () => {
   assertClerkIsLoaded(Clerk);
   fillLocalizationSelect();
   const { updateVariables } = appearanceVariableOptions();
+  const { updateTheme } = themeSelector();
   const { updateOtherOptions } = otherOptions();
 
   const sidebars = document.querySelectorAll('[data-sidebar]');
@@ -452,14 +488,23 @@ void (async () => {
       await mocking.initialize(route, { scenario });
     }
 
+    const initialThemeName = sessionStorage.getItem('baseTheme') ?? 'raw';
+    const initialTheme = initialThemeName ? themes[initialThemeName] : undefined;
+
     await Clerk.load({
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
       ui: { ClerkUI: window.__internal_ClerkUICtor },
+      appearance: initialTheme ? { theme: initialTheme } : undefined,
     });
     renderCurrentRoute();
-    updateVariables();
+    updateTheme();
+    // Only apply sandbox variable overrides when using the default theme.
+    // Prebuilt themes (raw, dark, etc.) define their own variables.
+    if (!initialTheme) {
+      updateVariables();
+    }
     updateOtherOptions();
   } else {
     console.error(`Unknown route: "${route}".`);

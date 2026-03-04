@@ -10,7 +10,11 @@ type InternalThemeProviderProps = React.PropsWithChildren<{
 }>;
 
 export const InternalThemeProvider = (props: InternalThemeProviderProps) => {
-  const { parsedInternalTheme } = useAppearance();
+  const { parsedInternalTheme, rawMode } = useAppearance();
+  const theme = React.useMemo(
+    () => (rawMode ? { ...parsedInternalTheme, __rawMode: true } : parsedInternalTheme),
+    [parsedInternalTheme, rawMode],
+  );
 
-  return <ThemeProvider theme={parsedInternalTheme}>{props.children}</ThemeProvider>;
+  return <ThemeProvider theme={theme}>{props.children}</ThemeProvider>;
 };
