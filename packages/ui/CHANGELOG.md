@@ -1,5 +1,11 @@
 # @clerk/ui
 
+## 1.0.1
+
+### Patch Changes
+
+- Update `MIN_CLERK_JS_VERSION` to `6.0.0` for Core 3 release ([#7827](https://github.com/clerk/javascript/pull/7827)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 1.0.0
 
 ### Major Changes
