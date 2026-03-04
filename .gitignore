@@ -7,6 +7,9 @@ out-tsc
 out
 **/dist/*
 **/build/*
+!playground/browser-extension-js/build/manifest.json
+!playground/browser-extension-js/build/popup.html
+!playground/browser-extension-js/build/popup.css
 packages/*/dist/**
 **/.pnpm-store/**
 
@@ -62,6 +65,7 @@ lerna-debug.log
 .dev.vars
 .env.local
 playground/*/build
+!playground/browser-extension-js/build
 playground/*/public/build
 playground/*/.cache
 playground/custom

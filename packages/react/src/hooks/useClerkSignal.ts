@@ -73,6 +73,8 @@ function useClerkSignal(
 }
 
 /**
+ * @internal
+ *
  * This hook allows you to access the Signal-based `SignIn` resource.
  *
  * @example
@@ -90,6 +92,8 @@ export function useSignIn() {
 }
 
 /**
+ * @internal
+ *
  * This hook allows you to access the Signal-based `SignUp` resource.
  *
  * @example

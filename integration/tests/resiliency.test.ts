@@ -18,6 +18,20 @@ const make500ClerkResponse = () => ({
   }),
 });
 
+const makeDevBrowserUnauthenticatedResponse = () => ({
+  status: 401,
+  body: JSON.stringify({
+    errors: [
+      {
+        message: '',
+        long_message: '',
+        code: 'dev_browser_unauthenticated',
+      },
+    ],
+    clerk_trace_id: 'some-trace-id',
+  }),
+});
+
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resiliency @generic', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
@@ -81,25 +95,53 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       await u.po.expect.toBeSignedIn();
     });
 
+    test('dev_browser_unauthenticated during runtime polling resets dev browser without infinite requests', async ({
+      page,
+      context,
+    }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+
+      let clientRequestCount = 0;
+      await page.route('**/v1/client?**', route => {
+        clientRequestCount++;
+        return route.continue();
+      });
+
+      // Intercept token requests to simulate a wiped __clerk_db_jwt cookie at runtime
+      await page.route('**/v1/client/sessions/*/tokens**', route => {
+        return route.fulfill(makeDevBrowserUnauthenticatedResponse());
+      });
+
+      const waitForDevBrowserRefresh = page.waitForResponse(
+        response => response.url().includes('/dev_browser') && response.status() === 200,
+        { timeout: 10_000 },
+      );
+
+      // Clear the token cache so the next poller tick makes a fresh network request
+      await page.evaluate(() => window.Clerk?.session?.clearCache());
+
+      await waitForDevBrowserRefresh;
+
+      await page.unrouteAll();
+
+      // Allow a window for any runaway requests to surface
+      await page.waitForTimeout(2_000);
+
+      // Without the fix, handleUnauthenticated would recursively call Client.fetch
+      // hundreds of times. With the fix, /v1/client should only see normal poller activity.
+      expect(clientRequestCount).toBeLessThan(5);
+    });
+
     test('resiliency to not break devBrowser - dummy client and is not created on `/client` 4xx errors', async ({
       page,
       context,
     }) => {
       // Simulate "Needs new dev browser, when dev browser exists but does not match the instance".
-
-      const response = {
-        status: 401,
-        body: JSON.stringify({
-          errors: [
-            {
-              message: '',
-              long_message: '',
-              code: 'dev_browser_unauthenticated',
-            },
-          ],
-          clerk_trace_id: 'some-trace-id',
-        }),
-      };
+      const response = makeDevBrowserUnauthenticatedResponse();
 
       const u = createTestUtils({ app, page, context, useTestingToken: false });
 

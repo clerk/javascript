@@ -31,7 +31,7 @@
 
 ### Prerequisites
 
-- Node.js `>=18.17.0` (or later) or any V8 isolates runtime
+- Node.js `>=20.9.0` (or later) or any V8 isolates runtime
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_backend).
 
 ### Installation

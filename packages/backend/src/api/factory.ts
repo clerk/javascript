@@ -33,7 +33,9 @@ import {
 import { BillingAPI } from './endpoints/BillingApi';
 import { buildRequest } from './request';
 
-export type CreateBackendApiOptions = Parameters<typeof buildRequest>[0];
+export type CreateBackendApiOptions = Parameters<typeof buildRequest>[0] & {
+  jwtKey?: string;
+};
 
 export type ApiClient = ReturnType<typeof createBackendApiClient>;
 
@@ -83,6 +85,11 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
         requireSecretKey: false,
         useMachineSecretKey: true,
       }),
+      {
+        secretKey: options.secretKey,
+        apiUrl: options.apiUrl,
+        jwtKey: options.jwtKey,
+      },
     ),
     oauthApplications: new OAuthApplicationsApi(request),
     organizations: new OrganizationAPI(request),
