@@ -263,9 +263,6 @@ importers:
       pkglab:
         specifier: ^0.15.0
         version: 0.15.0
-      pkglab-linux-x64:
-        specifier: ^0.15.0
-        version: 0.15.0
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -28831,7 +28828,8 @@ snapshots:
   pkglab-linux-arm64@0.15.0:
     optional: true
 
-  pkglab-linux-x64@0.15.0: {}
+  pkglab-linux-x64@0.15.0:
+    optional: true
 
   pkglab@0.15.0:
     optionalDependencies:

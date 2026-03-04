@@ -131,7 +131,6 @@
     "jsonwebtoken": "9.0.2",
     "lint-staged": "^14.0.1",
     "pkglab": "^0.15.0",
-    "pkglab-linux-x64": "^0.15.0",
     "prettier": "^3.6.2",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-packagejson": "^2.5.15",
