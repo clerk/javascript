@@ -107,9 +107,11 @@ export function useUserProfileModal(): UseUserProfileModalReturn {
         }
       }
     } catch (error) {
-      // Native module rejects on actual errors (E_NOT_INITIALIZED, E_CREATE_FAILED, etc.)
-      // Dismissal resolves successfully with { dismissed: true }, so this is a real error.
-      console.error('[useUserProfileModal] presentUserProfile failed:', error);
+      // Dismissal resolves successfully with { dismissed: true }, so reaching
+      // here means a real native error (E_NOT_INITIALIZED, E_CREATE_FAILED, E_NO_ROOT_VC).
+      if (__DEV__) {
+        console.error('[useUserProfileModal] presentUserProfile failed:', error);
+      }
     } finally {
       presentingRef.current = false;
     }
