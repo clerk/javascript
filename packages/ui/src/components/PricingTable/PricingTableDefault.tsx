@@ -27,7 +27,7 @@ import {
   Text,
   useLocalizations,
 } from '../../customizables';
-import { Check, Plus, Users } from '../../icons';
+import { Check, Plus, User, Users } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { SubscriptionBadge } from '../Subscriptions/badge';
 import { getPricingFooterState } from './utils/pricing-footer-state';
@@ -552,7 +552,7 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
   const period = t(localizationKeys('billing.month'));
   const periodAbbreviation = t(localizationKeys('billing.monthAbbreviation'));
 
-  const seatPriceContent = React.useMemo(() => {
+  const seatRows = React.useMemo(() => {
     if (!unitPrices) {
       return null;
     }
@@ -565,39 +565,39 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
 
     const formatTierFee = (tier: BillingPlanUnitPrice['tiers'][number]) =>
       `${tier.feePerBlock.currencySymbol}${normalizeFormatted(tier.feePerBlock.amountFormatted)}`;
+    const getCapacityText = (endsAfterBlock: number | null) =>
+      endsAfterBlock === null
+        ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
+        : localizationKeys('billing.pricingTable.seatCost.upToSeats', { endsAfterBlock });
 
     if (seatUnitPrice.tiers.length === 1) {
       const tier = seatUnitPrice.tiers[0];
-
-      if (tier.feePerBlock.amount === 0 && tier.endsAfterBlock !== null) {
-        return {
-          baseText: localizationKeys(
-            plan.fee.amount === 0
-              ? 'billing.pricingTable.seatCost.freeUpToSeats'
-              : 'billing.pricingTable.seatCost.upToSeats',
-            {
-              endsAfterBlock: tier.endsAfterBlock,
-            },
-          ),
-        };
-      }
+      const rows: Array<{
+        elementId: string;
+        icon: typeof User | typeof Users;
+        text: ReturnType<typeof localizationKeys>;
+        additionalText?: ReturnType<typeof localizationKeys>;
+        additionalTooltipText?: string;
+      }> = [];
 
       if (tier.feePerBlock.amount !== 0) {
-        return {
-          baseText: localizationKeys('billing.pricingTable.seatCost.perSeat', {
+        rows.push({
+          elementId: 'seats',
+          icon: User,
+          text: localizationKeys('billing.pricingTable.seatCost.perSeat', {
             feePerBlockAmount: formatTierFee(tier),
             periodAbbreviation,
           }),
-        };
+        });
       }
 
-      if (tier.feePerBlock.amount === 0 && tier.endsAfterBlock === null) {
-        return {
-          baseText: localizationKeys('billing.pricingTable.seatCost.unlimitedSeats'),
-        };
-      }
+      rows.push({
+        elementId: rows.length ? 'seats-limit' : 'seats',
+        icon: Users,
+        text: getCapacityText(tier.endsAfterBlock),
+      });
 
-      return null;
+      return rows;
     }
 
     if (seatUnitPrice.tiers.length === 2) {
@@ -628,82 +628,91 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
           }),
         );
 
-        return {
-          baseText: localizationKeys(
-            plan.fee.amount === 0
-              ? 'billing.pricingTable.seatCost.freeUpToSeats'
-              : 'billing.pricingTable.seatCost.upToSeats',
-            {
-              endsAfterBlock: includedTier.endsAfterBlock,
-            },
-          ),
-          additionalText: localizationKeys('billing.pricingTable.seatCost.additionalSeats', {
-            additionalTierFeePerBlockAmount,
-            periodAbbreviation,
-          }),
-          additionalTooltipText: `${tooltipPrefixText} ${tooltipAdditionalText}`,
-        };
+        return [
+          {
+            elementId: 'seats',
+            icon: User,
+            text: localizationKeys('billing.pricingTable.seatCost.includedSeats', {
+              includedSeats: includedTier.endsAfterBlock,
+            }),
+            additionalText: localizationKeys('billing.pricingTable.seatCost.additionalSeats', {
+              additionalTierFeePerBlockAmount,
+              periodAbbreviation,
+            }),
+            additionalTooltipText: `${tooltipPrefixText} ${tooltipAdditionalText}`,
+          },
+          {
+            elementId: 'seats-limit',
+            icon: Users,
+            text: getCapacityText(additionalTier.endsAfterBlock),
+          },
+        ];
       }
     }
 
     return null;
   }, [period, periodAbbreviation, plan.fee.amount, t, unitPrices]);
 
-  if (!seatPriceContent) {
+  if (!seatRows?.length) {
     return null;
   }
 
   return (
-    <Box
-      elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
-      elementId={descriptors.pricingTableCardFeaturesListItem.setId('seats')}
-      as='li'
-      sx={t => ({
-        display: 'flex',
-        alignItems: 'baseline',
-        gap: t.space.$2,
-        margin: 0,
-        padding: 0,
-      })}
-    >
-      <Icon
-        icon={Users}
-        colorScheme='neutral'
-        size='sm'
-        aria-hidden
-        sx={t => ({
-          transform: `translateY(${t.space.$0x25})`,
-        })}
-      />
-      <Span elementDescriptor={descriptors.pricingTableCardFeaturesListItemContent}>
-        <Text
-          elementDescriptor={descriptors.pricingTableCardFeaturesListItemTitle}
-          colorScheme='body'
+    <>
+      {seatRows.map(row => (
+        <Box
+          key={row.elementId}
+          elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
+          elementId={descriptors.pricingTableCardFeaturesListItem.setId(row.elementId)}
+          as='li'
           sx={t => ({
-            fontWeight: t.fontWeights.$normal,
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: t.space.$2,
+            margin: 0,
+            padding: 0,
           })}
         >
-          <Span localizationKey={seatPriceContent.baseText} />
-          {seatPriceContent.additionalText ? (
-            <>
-              {' '}
-              {seatPriceContent.additionalTooltipText ? (
-                <Tooltip.Root>
-                  <Tooltip.Trigger>
-                    <Span
-                      localizationKey={seatPriceContent.additionalText}
-                      sx={{ textDecoration: 'underline dotted' }}
-                    />
-                  </Tooltip.Trigger>
-                  <Tooltip.Content text={seatPriceContent.additionalTooltipText} />
-                </Tooltip.Root>
-              ) : (
-                <Span localizationKey={seatPriceContent.additionalText} />
-              )}
-            </>
-          ) : null}
-        </Text>
-      </Span>
-    </Box>
+          <Icon
+            icon={row.icon}
+            colorScheme='neutral'
+            size='sm'
+            aria-hidden
+            sx={t => ({
+              transform: `translateY(${t.space.$0x25})`,
+            })}
+          />
+          <Span elementDescriptor={descriptors.pricingTableCardFeaturesListItemContent}>
+            <Text
+              elementDescriptor={descriptors.pricingTableCardFeaturesListItemTitle}
+              colorScheme='body'
+              sx={t => ({
+                fontWeight: t.fontWeights.$normal,
+              })}
+            >
+              <Span localizationKey={row.text} />
+              {row.additionalText ? (
+                <>
+                  {' '}
+                  {row.additionalTooltipText ? (
+                    <Tooltip.Root>
+                      <Tooltip.Trigger>
+                        <Span
+                          localizationKey={row.additionalText}
+                          sx={{ textDecoration: 'underline dotted' }}
+                        />
+                      </Tooltip.Trigger>
+                      <Tooltip.Content text={row.additionalTooltipText} />
+                    </Tooltip.Root>
+                  ) : (
+                    <Span localizationKey={row.additionalText} />
+                  )}
+                </>
+              ) : null}
+            </Text>
+          </Span>
+        </Box>
+      ))}
+    </>
   );
 };
