@@ -43,7 +43,7 @@ const STRUCTURAL_PROPERTIES = new Set([
 // These must survive stripping so icons remain visible in raw mode.
 const CONTENT_RENDERING_PREFIXES = ['background', 'mask', 'WebkitMask'];
 
-const STRUCTURAL_PREFIXES = ['flex', 'grid', 'inset', 'margin', 'padding', 'overflow', 'min', 'max', 'clip'];
+const STRUCTURAL_PREFIXES = ['flex', 'inset', 'margin', 'padding', 'overflow', 'min', 'max', 'clip'];
 
 function isPlainObject(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
