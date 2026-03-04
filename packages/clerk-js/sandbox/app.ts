@@ -1,6 +1,6 @@
 import { PageMocking, type MockScenario } from '@clerk/msw';
 import * as l from '../../localizations';
-import { dark, neobrutalism, shadcn, shadesOfPurple } from '../../ui/src/themes';
+import { dark, neobrutalism, raw, shadcn, shadesOfPurple } from '../../ui/src/themes';
 import type { Clerk as ClerkType } from '../';
 import * as scenarios from './scenarios';
 
@@ -319,6 +319,7 @@ const themes: Record<string, unknown> = {
   shadesOfPurple,
   neobrutalism,
   shadcn,
+  raw,
 };
 
 function themeSelector() {
@@ -326,7 +327,7 @@ function themeSelector() {
 
   const themeSelect = document.getElementById('themeSelect') as HTMLSelectElement;
 
-  const savedTheme = sessionStorage.getItem('baseTheme') ?? '';
+  const savedTheme = sessionStorage.getItem('baseTheme') ?? 'raw';
   themeSelect.value = savedTheme;
 
   const updateTheme = () => {
@@ -533,7 +534,7 @@ void (async () => {
       await mocking.initialize(route, { scenario });
     }
 
-    const initialThemeName = sessionStorage.getItem('baseTheme') ?? '';
+    const initialThemeName = sessionStorage.getItem('baseTheme') ?? 'raw';
     const initialTheme = initialThemeName ? themes[initialThemeName] : undefined;
     const initialPresetName = sessionStorage.getItem('preset') ?? '';
     const initialPreset = initialPresetName ? presets[initialPresetName] : undefined;

@@ -36,6 +36,7 @@ export type ParsedAppearance = {
   parsedInternalTheme: ParsedInternalTheme;
   parsedOptions: ParsedOptions;
   parsedCaptcha: ParsedCaptcha;
+  rawMode: boolean;
 };
 
 const defaultOptions: ParsedOptions = {
@@ -78,6 +79,8 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
   const parsedOptions = parseOptions(appearanceList);
   const parsedCaptcha = parseCaptcha(appearanceList);
 
+  const rawMode = appearanceList.some(a => !!(a as any).__internal_rawMode);
+
   if (
     !appearanceList.find(a => {
       //@ts-expect-error not public api
@@ -97,7 +100,7 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
       return res;
     }),
   );
-  return { parsedElements, parsedInternalTheme, parsedOptions, parsedCaptcha };
+  return { parsedElements, parsedInternalTheme, parsedOptions, parsedCaptcha, rawMode };
 };
 
 const expand = (theme: Theme | undefined, cascade: any[]) => {

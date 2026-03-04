@@ -1,6 +1,7 @@
 import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 
 import { createInfiniteAccessProxy } from '../utils/createInfiniteAccessProxy';
+import { stripDecorativeStyles } from './stripDecorativeStyles';
 import type { InternalTheme, StyleRule } from './types';
 
 type UnwrapBooleanVariant<T> = T extends 'true' | 'false' ? boolean : T;
@@ -57,6 +58,9 @@ export const createVariants: CreateVariants = configFn => {
       applyVariantRules(computedStyles, variantsToApply, variants);
       applyCompoundVariantRules(computedStyles, variantsToApply, compoundVariants);
       sanitizeCssVariables(computedStyles);
+      if (theme.__rawMode) {
+        return stripDecorativeStyles(computedStyles);
+      }
       return computedStyles;
     };
 
