@@ -18,5 +18,5 @@ And update your package.json:
 
 ```diff
 - "@clerk/clerk-react": "^5.0.0",
-+ "@clerk/react": "^7.0.0",
++ "@clerk/react": "^6.0.0",
 ```
