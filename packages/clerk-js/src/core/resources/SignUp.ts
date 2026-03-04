@@ -557,20 +557,26 @@ export class SignUp extends BaseResource implements SignUpResource {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const captchaOauthBypass = SignUp.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
 
-    // For transfers, inspect the SignIn strategy to determine bypass logic
-    if (params.transfer && SignUp.clerk.client?.signIn?.firstFactorVerification?.status === 'transferable') {
-      const signInStrategy = SignUp.clerk.client.signIn.firstFactorVerification.strategy;
+    // Check for transfer captcha bypass.
+    if (params.transfer) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const signInVerificationStrategy = SignUp.clerk.client!.signIn.firstFactorVerification.strategy;
 
-      // OAuth transfer: Check if strategy is in bypass list
-      if (signInStrategy?.startsWith('oauth_')) {
-        return captchaOauthBypass.some(strategy => strategy === signInStrategy);
+      // OAuth transfers: If we delegate captcha detection to OAuth provider,
+      // do not show another captcha on sign up.
+      if (captchaOauthBypass.some(strategy => strategy === signInVerificationStrategy)) {
+        return true;
       }
 
-      // Non-OAuth transfer (signUpIfMissing): Captcha already validated during SignIn
-      return true;
+      // Sign up if missing transfers: We let sign in handle the captcha,
+      // do not show another captcha on sign up.
+      if (isCaptchaBypassableVerificationStrategy(signInVerificationStrategy)) {
+        return true;
+      }
     }
 
-    // For direct SignUp (not transfer), check OAuth bypass
+    // OAuth sign ups: If we delegate captcha detection to OAuth provider,
+    // do not show another captcha on sign up.
     if (params.strategy && captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
     }
@@ -588,6 +594,22 @@ export class SignUp extends BaseResource implements SignUpResource {
       return enterpriseConnections.map(enterpriseConnection => new SignUpEnterpriseConnection(enterpriseConnection));
     });
   };
+}
+
+/**
+ * Returns true if the given strategy is one where captcha is already handled
+ * by the sign-in attempt with sign up if missing, so a subsequent sign-up should
+ * not show another captcha. Matches email_link, email_code, phone_code, and any
+ * web3 wallet strategy. This should be kept in sync with `validateSignUpIfMissing`
+ * in the backend.
+ */
+export function isCaptchaBypassableVerificationStrategy(strategy: string | null): boolean {
+  if (!strategy) {
+    return false;
+  }
+  return (
+    strategy === 'email_link' || strategy === 'email_code' || strategy === 'phone_code' || strategy.startsWith('web3_')
+  );
 }
 
 type SignUpFutureVerificationsMethods = Pick<
@@ -785,20 +807,26 @@ class SignUpFuture implements SignUpFutureResource {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const captchaOauthBypass = SignUp.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
 
-    // For transfers, inspect the SignIn strategy to determine bypass logic
-    if (params.transfer && SignUp.clerk.client?.signIn?.firstFactorVerification?.status === 'transferable') {
-      const signInStrategy = SignUp.clerk.client.signIn.firstFactorVerification.strategy;
+    // Check for transfer captcha bypass.
+    if (params.transfer) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const signInVerificationStrategy = SignUp.clerk.client!.signIn.firstFactorVerification.strategy;
 
-      // OAuth transfer: Check if strategy is in bypass list
-      if (signInStrategy?.startsWith('oauth_')) {
-        return captchaOauthBypass.some(strategy => strategy === signInStrategy);
+      // OAuth transfers: If we delegate captcha detection to OAuth provider,
+      // do not show another captcha on sign up.
+      if (captchaOauthBypass.some(strategy => strategy === signInVerificationStrategy)) {
+        return true;
       }
 
-      // Non-OAuth transfer (signUpIfMissing): Captcha already validated during SignIn
-      return true;
+      // Sign up if missing transfers: We let sign in handle the captcha,
+      // do not show another captcha on sign up.
+      if (isCaptchaBypassableVerificationStrategy(signInVerificationStrategy)) {
+        return true;
+      }
     }
 
-    // For direct SignUp (not transfer), check OAuth bypass
+    // OAuth sign ups: If we delegate captcha detection to OAuth provider,
+    // do not show another captcha on sign up.
     if (params.strategy && captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
     }

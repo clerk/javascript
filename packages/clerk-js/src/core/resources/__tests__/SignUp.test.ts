@@ -35,6 +35,86 @@ describe('SignUp', () => {
     expect(snapshot).toBeDefined();
   });
 
+  describe('create', () => {
+    beforeEach(() => {
+      SignUp.clerk = {
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+          },
+        },
+      } as any;
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.unstubAllGlobals();
+      SignUp.clerk = {} as any;
+    });
+
+    it.each([
+      { strategy: 'email_code', label: 'email_code' },
+      { strategy: 'email_link', label: 'email_link' },
+      { strategy: 'phone_code', label: 'phone_code' },
+      { strategy: 'web3_metamask_signature', label: 'web3_metamask_signature' },
+      { strategy: 'web3_coinbase_wallet_signature', label: 'web3_coinbase_wallet_signature' },
+    ])('skips captcha challenge for $label transfer (sign_up_if_missing)', async ({ strategy }) => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signup_123', status: 'missing_requirements' },
+      });
+      BaseResource._fetch = mockFetch;
+      SignUp.clerk = {
+        client: {
+          signIn: {
+            firstFactorVerification: {
+              status: 'transferable',
+              strategy,
+            },
+          },
+        },
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: ['oauth_google', 'oauth_apple'],
+          },
+        },
+      } as any;
+
+      const signUp = new SignUp();
+      await signUp.create({ transfer: true });
+
+      expect(CaptchaChallenge).not.toHaveBeenCalled();
+    });
+
+    it('does not skip captcha challenge for enterprise_sso transfer', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signup_123', status: 'missing_requirements' },
+      });
+      BaseResource._fetch = mockFetch;
+      SignUp.clerk = {
+        client: {
+          signIn: {
+            firstFactorVerification: {
+              status: 'transferable',
+              strategy: 'enterprise_sso',
+            },
+          },
+        },
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+          },
+        },
+      } as any;
+
+      const signUp = new SignUp();
+      await signUp.create({ transfer: true });
+
+      expect(CaptchaChallenge).toHaveBeenCalledWith(SignUp.clerk);
+    });
+  });
+
   describe('SignUpFuture', () => {
     it('can be serialized with JSON.stringify', () => {
       const signUp = new SignUp();
@@ -159,7 +239,13 @@ describe('SignUp', () => {
         expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaError', undefined);
       });
 
-      it('skips captcha challenge for non-OAuth transfer (sign_up_if_missing)', async () => {
+      it.each([
+        { strategy: 'email_code', label: 'email_code' },
+        { strategy: 'email_link', label: 'email_link' },
+        { strategy: 'phone_code', label: 'phone_code' },
+        { strategy: 'web3_metamask_signature', label: 'web3_metamask_signature' },
+        { strategy: 'web3_coinbase_wallet_signature', label: 'web3_coinbase_wallet_signature' },
+      ])('skips captcha challenge for $label transfer (sign_up_if_missing)', async ({ strategy }) => {
         const mockFetch = vi.fn().mockResolvedValue({
           client: null,
           response: { id: 'signup_123', status: 'missing_requirements' },
@@ -170,7 +256,7 @@ describe('SignUp', () => {
             signIn: {
               firstFactorVerification: {
                 status: 'transferable',
-                strategy: 'email_code',
+                strategy,
               },
             },
           },
@@ -188,6 +274,34 @@ describe('SignUp', () => {
         expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaToken', undefined);
         expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaWidgetType', undefined);
         expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaError', undefined);
+      });
+
+      it('does not skip captcha challenge for enterprise_sso transfer', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+        SignUp.clerk = {
+          client: {
+            signIn: {
+              firstFactorVerification: {
+                status: 'transferable',
+                strategy: 'enterprise_sso',
+              },
+            },
+          },
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.create({ transfer: true });
+
+        expect(CaptchaChallenge).toHaveBeenCalledWith(SignUp.clerk);
       });
     });
 
