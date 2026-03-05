@@ -39,7 +39,13 @@ const EmailScreen = (props: EmailScreenProps) => {
   );
 };
 
-export const EmailsSection = ({ shouldAllowCreation = true }) => {
+export const EmailsSection = ({
+  shouldAllowCreation = true,
+  shouldAllowDeletion = true,
+}: {
+  shouldAllowCreation?: boolean;
+  shouldAllowDeletion?: boolean;
+}) => {
   const { user } = useUser();
 
   return (
@@ -69,7 +75,10 @@ export const EmailsSection = ({ shouldAllowCreation = true }) => {
                       <Badge localizationKey={localizationKeys('badge__unverified')} />
                     )}
                   </Flex>
-                  <EmailMenu email={email} />
+                  <EmailMenu
+                    email={email}
+                    shouldAllowDeletion={shouldAllowDeletion}
+                  />
                 </ProfileSection.Item>
 
                 <Action.Open value={`remove-${emailId}`}>
@@ -107,7 +116,13 @@ export const EmailsSection = ({ shouldAllowCreation = true }) => {
   );
 };
 
-const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
+const EmailMenu = ({
+  email,
+  shouldAllowDeletion = true,
+}: {
+  email: EmailAddressResource;
+  shouldAllowDeletion?: boolean;
+}) => {
   const card = useCardState();
   const { user } = useUser();
   const { open } = useActionContext();
@@ -140,13 +155,19 @@ const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
             onClick: () => open(`verify-${emailId}`),
           }
         : null,
-      {
-        label: localizationKeys('userProfile.start.emailAddressesSection.destructiveAction'),
-        isDestructive: true,
-        onClick: () => open(`remove-${emailId}`),
-      },
+      shouldAllowDeletion
+        ? {
+            label: localizationKeys('userProfile.start.emailAddressesSection.destructiveAction'),
+            isDestructive: true,
+            onClick: () => open(`remove-${emailId}`),
+          }
+        : null,
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
+
+  if (actions.length === 0) {
+    return null;
+  }
 
   return <ThreeDotsMenu actions={actions} />;
 };
