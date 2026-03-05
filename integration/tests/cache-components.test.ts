@@ -284,6 +284,24 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       await expect(page).toHaveURL(/sign-in/);
     });
 
+    test('dynamic route renders correctly via direct navigation', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.page.goToRelative('/dynamic-route/test-123');
+      await expect(u.page.getByText('Dynamic Route')).toBeVisible();
+      await expect(u.page.getByTestId('route-id')).toContainText('test-123');
+    });
+
+    test('client-side navigation to dynamic route works', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.page.goToRelative('/');
+      await expect(u.page.getByText('Next.js Cache Components Test App')).toBeVisible();
+
+      // Click the dynamic route link (exercises ClerkProvider's navigation hooks)
+      await u.page.getByRole('link', { name: 'Dynamic Route' }).click();
+      await expect(u.page.getByText('Dynamic Route')).toBeVisible();
+      await expect(u.page.getByTestId('route-id')).toContainText('test-123');
+    });
+
     test('protected route accessible when authenticated', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
