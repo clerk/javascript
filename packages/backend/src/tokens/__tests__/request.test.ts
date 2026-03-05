@@ -953,6 +953,36 @@ describe('tokens.authenticateRequest(options)', () => {
     });
   });
 
+  test('cookieToken: triggers handshake when satelliteAutoSync is not set but __clerk_synced=false is present - dev', async () => {
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        {
+          __client_uat: '0',
+          __clerk_db_jwt: mockJwt,
+        },
+        `http://satellite.dev/path?__clerk_synced=false`,
+      ),
+      mockOptions({
+        secretKey: 'sk_test_deadbeef',
+        publishableKey: PK_TEST,
+        signInUrl: 'https://primary.dev/sign-in',
+        isSatellite: true,
+        domain: 'satellite.dev',
+      }),
+    );
+
+    expect(requestState).toMatchHandshake({
+      reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
+      isSatellite: true,
+      domain: 'satellite.dev',
+      signInUrl: 'https://primary.dev/sign-in',
+    });
+    expect(requestState.headers.get('location')).toEqual(
+      `https://primary.dev/sign-in?__clerk_redirect_url=http%3A%2F%2Fexample.com%2Fpath%3F__clerk_synced%3Dfalse`,
+    );
+  });
+
   test('cookieToken: returns handshake when app is not satellite and responds to syncing on dev instances[12y]', async () => {
     const sp = new URLSearchParams();
     sp.set('__clerk_redirect_url', 'http://localhost:3000');
