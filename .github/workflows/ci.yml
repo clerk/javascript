@@ -69,10 +69,10 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        # with:
-        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-        # turbo-team: ${{ vars.TURBO_TEAM }}
-        # turbo-token: ${{ secrets.TURBO_TOKEN }}
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Verify lockfile is deduped
         run: pnpm dedupe --check
@@ -89,6 +89,39 @@ jobs:
           else
             pnpm changeset status --since=origin/main;
           fi
+
+      - name: Validate integration suite turbo config
+        run: |
+          # Every test:integration:* script in package.json must have a
+          # matching turbo.json task with dependsOn so that turbo --affected
+          # can detect SDK package changes. Without dependsOn, the suite
+          # would only react to integration/** file changes.
+          # Scripts that aren't test suites (utilities, disabled, base runner)
+          SKIP_SCRIPTS="test:integration:base test:integration:cleanup test:integration:deployment:nextjs test:integration:expo-web:disabled"
+          MISSING=()
+          SUITES=$(jq -r '.scripts | keys[] | select(startswith("test:integration:"))' package.json)
+          for script in $SUITES; do
+            if echo "$SKIP_SCRIPTS" | grep -qw "$script"; then
+              continue
+            fi
+            TASK_KEY="//#${script}"
+            DEPS=$(jq -r --arg k "$TASK_KEY" '(.tasks[$k].dependsOn // []) | length' turbo.json 2>/dev/null || echo "0")
+            if [ "$DEPS" = "0" ]; then
+              MISSING+=("$script")
+            fi
+          done
+          if [ ${#MISSING[@]} -gt 0 ]; then
+            echo "ERROR: The following integration suites are missing dependsOn in turbo.json:"
+            for s in "${MISSING[@]}"; do
+              echo "  - $s"
+            done
+            echo ""
+            echo "Add dependsOn with the framework SDK build task(s) the suite uses,"
+            echo "e.g.: \"dependsOn\": [\"@clerk/clerk-js#build\", \"@clerk/nextjs#build\"]"
+            echo "See existing entries in turbo.json for examples."
+            exit 1
+          fi
+          echo "All integration suites have dependsOn configured"
 
   build-packages:
     needs: [check-permissions]
@@ -117,11 +150,11 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        # with:
-        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-        # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-        # turbo-team: ${{ vars.TURBO_TEAM }}
-        # turbo-token: ${{ secrets.TURBO_TOKEN }}
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Turbo Build
         run: pnpm turbo build $TURBO_ARGS --only
@@ -136,7 +169,7 @@ jobs:
           retention-days: 5
 
   static-analysis:
-    needs: [check-permissions, build-packages]
+    needs: [check-permissions]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Static analysis
     permissions:
@@ -163,11 +196,11 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        # with:
-        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-        # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-        # turbo-team: ${{ vars.TURBO_TEAM }}
-        # turbo-token: ${{ secrets.TURBO_TOKEN }}
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Check size using bundlewatch
         continue-on-error: true
@@ -199,7 +232,7 @@ jobs:
           retention-days: 5
 
   unit-tests:
-    needs: [check-permissions, build-packages]
+    needs: [check-permissions]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Unit Tests (${{ matrix.filter-label }})
     permissions:
@@ -237,10 +270,10 @@ jobs:
         with:
           # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (20)`.
           node-version: ${{ matrix.node-version }}
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Run tests in packages
         run: |
@@ -272,9 +305,83 @@ jobs:
           path: .turbo/runs
           retention-days: 5
 
-  integration-tests:
-    # needs: [check-permissions, build-packages]
+  compute-affected-integration:
     needs: [check-permissions]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    name: Compute Affected Integration Suites
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    outputs:
+      affected: ${{ steps.compute.outputs.affected }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Build packages
+        run: pnpm turbo build $TURBO_ARGS --only
+
+      - name: Compute affected integration suites
+        id: compute
+        env:
+          E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
+          E2E_PROJECT: "chrome"
+        run: |
+          # Derive suite names from turbo.json (single source of truth)
+          readarray -t TEST_NAMES < <(jq -r '.tasks | keys[] | select(startswith("//#test:integration:")) | sub("^//#test:integration:"; "")' turbo.json)
+
+          AFFECTED_JSON="{"
+          FIRST=true
+          for name in "${TEST_NAMES[@]}"; do
+            TASK_KEY="//#test:integration:${name}"
+            HAS_DEPS=$(jq -r --arg k "$TASK_KEY" '(.tasks[$k].dependsOn // []) | length' turbo.json 2>/dev/null || echo "0")
+
+            if [ "$HAS_DEPS" = "0" ]; then
+              # Safe default: suites without dependsOn always run.
+              # This prevents silent skipping when someone adds a suite
+              # but forgets to add dependsOn in turbo.json.
+              IS_AFFECTED=true
+              echo "  WARNING: $name has no dependsOn in turbo.json, forcing affected"
+            else
+              TASK_COUNT=$(pnpm turbo run "test:integration:${name}" --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
+              [ "$TASK_COUNT" -gt 0 ] && IS_AFFECTED=true || IS_AFFECTED=false
+            fi
+
+            $FIRST || AFFECTED_JSON+=","
+            AFFECTED_JSON+="\"${name}\":${IS_AFFECTED}"
+            if [ "$IS_AFFECTED" = "true" ] && [ "$HAS_DEPS" != "0" ]; then
+              echo "  affected: $name"
+            elif [ "$IS_AFFECTED" != "true" ]; then
+              echo "  skipped:  $name"
+            fi
+            FIRST=false
+          done
+          AFFECTED_JSON+="}"
+
+          echo "affected=${AFFECTED_JSON}" >> $GITHUB_OUTPUT
+          echo "Affected: ${AFFECTED_JSON}"
+
+  integration-tests:
+    needs: [compute-affected-integration]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
     permissions:
@@ -329,7 +436,18 @@ jobs:
             next-version: "16"
 
     steps:
+      - name: Check if affected
+        id: affected
+        run: |
+          AFFECTED_JSON='${{ needs.compute-affected-integration.outputs.affected }}'
+          IS_AFFECTED=$(echo "$AFFECTED_JSON" | jq -r '.["${{ matrix.test-name }}"] // false')
+          echo "skip=$([ "$IS_AFFECTED" = "true" ] && echo "false" || echo "true")" >> $GITHUB_OUTPUT
+          if [ "$IS_AFFECTED" != "true" ]; then
+            echo "Skipping ${{ matrix.test-name }} - not affected by changes"
+          fi
+
       - name: Checkout Repo
+        if: ${{ steps.affected.outputs.skip != 'true' }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
@@ -338,73 +456,40 @@ jobs:
           show-progress: false
 
       - name: Setup
+        if: ${{ steps.affected.outputs.skip != 'true' }}
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true
 
-      - name: Verify jq is installed
-        shell: bash
-        run: |
-          if ! command -v jq &> /dev/null; then
-            echo "jq not found, installing..."
-            sudo apt-get update && sudo apt-get install -y jq
-          fi
-          jq --version
-
-      - name: Task Status
-        id: task-status
-        env:
-          E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
-          E2E_CLERK_JS_VERSION: "latest"
-          E2E_CLERK_UI_VERSION: "latest"
-          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
-          E2E_PROJECT: ${{ matrix.test-project }}
-          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
-        run: |
-          # Use turbo's built-in --affected flag to detect changes
-          # This automatically uses GITHUB_BASE_REF in GitHub Actions
-          TASK_COUNT=$(pnpm turbo run test:integration:${{ matrix.test-name }} --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
-
-          if [ "$TASK_COUNT" -gt 0 ]; then
-            AFFECTED=1
-          else
-            AFFECTED=0
-          fi
-
-          echo "affected=${AFFECTED}"
-          echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
-
       - name: Version packages for snapshot
-        if: ${{ steps.task-status.outputs.affected == '1' }}
+        if: ${{ steps.affected.outputs.skip != 'true' }}
         run: npm run version-packages:snapshot ci
 
       - name: Verdaccio
-        if: ${{ steps.task-status.outputs.affected == '1' }}
+        if: ${{ steps.affected.outputs.skip != 'true' }}
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
             if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag --tag latest; fi
 
       - name: Edit .npmrc [link-workspace-packages=false]
+        if: ${{ steps.affected.outputs.skip != 'true' }}
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 
       - name: Install @clerk/backend in /integration
-        if: ${{ steps.task-status.outputs.affected == '1' }}
+        if: ${{ steps.affected.outputs.skip != 'true' }}
         working-directory: ./integration
         run: |
           pnpm init
           pnpm config set minimum-release-age-exclude @clerk/*
           pnpm add @clerk/backend
 
-      # Install published packages from Verdaccio to test against real npm install scenarios
-      # rather than local monorepo builds. Validates package structure, dependencies, and entry points.
       - name: Install @clerk/clerk-js in os temp
-        if: ${{ steps.task-status.outputs.affected == '1' }}
+        if: ${{ steps.affected.outputs.skip != 'true' }}
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-js && cd clerk-js
@@ -413,7 +498,7 @@ jobs:
           pnpm add @clerk/clerk-js
 
       - name: Install @clerk/ui in os temp
-        if: ${{ steps.task-status.outputs.affected == '1' }}
+        if: ${{ steps.affected.outputs.skip != 'true' }}
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-ui && cd clerk-ui
@@ -422,11 +507,11 @@ jobs:
           pnpm add @clerk/ui
 
       - name: Copy components @clerk/astro
-        if: ${{ matrix.test-name == 'astro' }}
+        if: ${{ steps.affected.outputs.skip != 'true' && matrix.test-name == 'astro' }}
         run: cd packages/astro && pnpm copy:components
 
       - name: Write all ENV certificates to files in integration/certs
-        if: ${{ steps.task-status.outputs.affected == '1' }}
+        if: ${{ steps.affected.outputs.skip != 'true' }}
         uses: actions/github-script@v7
         env:
           INTEGRATION_CERTS: "${{secrets.INTEGRATION_CERTS}}"
@@ -444,12 +529,12 @@ jobs:
             }
 
       - name: LS certs
-        if: ${{ steps.task-status.outputs.affected == '1' }}
+        if: ${{ steps.affected.outputs.skip != 'true' }}
         working-directory: ./integration/certs
         run: ls -la && pwd
 
       - name: Run Integration Tests
-        if: ${{ steps.task-status.outputs.affected == '1' }}
+        if: ${{ steps.affected.outputs.skip != 'true' }}
         id: integration-tests
         timeout-minutes: 25
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
@@ -467,7 +552,7 @@ jobs:
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       - name: Upload test-results
-        if: ${{ cancelled() || failure() }}
+        if: ${{ !steps.affected.outputs.skip && (cancelled() || failure()) }}
         uses: actions/upload-artifact@v4
         with:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
@@ -477,7 +562,7 @@ jobs:
   pkg-pr-new:
     name: Publish with pkg-pr-new
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    needs: [check-permissions, build-packages]
+    needs: [check-permissions]
     runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
@@ -500,10 +585,10 @@ jobs:
         with:
           turbo-enabled: true
           node-version: 22
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Publish with pkg-pr-new
-        run: pnpm run build && pnpx pkg-pr-new@${{ vars.PKG_PR_NEW_VERSION || '0.0.49' }} publish --compact --pnpm './packages/*'
+        run: pnpm turbo build $TURBO_ARGS && pnpx pkg-pr-new@${{ vars.PKG_PR_NEW_VERSION || '0.0.49' }} publish --compact --pnpm './packages/*'
