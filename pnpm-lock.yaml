@@ -832,8 +832,8 @@ importers:
         specifier: workspace:^
         version: link:../shared
       cookie:
-        specifier: 0.7.2
-        version: 0.7.2
+        specifier: 1.0.2
+        version: 1.0.2
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -844,9 +844,6 @@ importers:
         specifier: catalog:repo
         version: 2.8.1
     devDependencies:
-      '@types/cookie':
-        specifier: ^0.6.0
-        version: 0.6.0
       esbuild-plugin-file-path-extensions:
         specifier: ^2.1.4
         version: 2.1.4
