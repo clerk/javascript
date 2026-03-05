@@ -1,5 +1,4 @@
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useTransition } from 'react';
 
 import { removeBasePath } from '../../utils/removeBasePath';
@@ -17,7 +16,6 @@ export const useInternalNavFun = (props: {
   name: string;
 }): NavigationFunction => {
   const { windowNav, routerNav, name } = props;
-  const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
   if (windowNav) {
@@ -81,7 +79,7 @@ export const useInternalNavFun = (props: {
     if (!isPending) {
       flushPromises();
     }
-  }, [pathname, isPending]);
+  }, [isPending]);
 
   return useCallback<NavigationFunction>((to, metadata) => {
     return getClerkNavigationObject(name).fun(to, metadata);
