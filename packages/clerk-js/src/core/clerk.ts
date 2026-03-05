@@ -2064,6 +2064,7 @@ export class Clerk implements ClerkInterface {
       signUp: SignUpResource;
       navigate: (to: string) => Promise<unknown>;
     },
+    searchParams?: URLSearchParams,
   ): Promise<unknown> => {
     if (!this.loaded || !this.environment || !this.client) {
       return;
@@ -2126,7 +2127,7 @@ export class Clerk implements ClerkInterface {
         buildURL({ base: displayConfig.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
     );
 
-    const redirectUrls = new RedirectUrls(this.#options, params);
+    const redirectUrls = new RedirectUrls(this.#options, params, searchParams);
 
     const navigateToContinueSignUp = makeNavigate(
       params.continueSignUpUrl ||
@@ -2334,12 +2335,18 @@ export class Clerk implements ClerkInterface {
 
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
-
-    return this._handleRedirectCallback(params, {
-      signUp,
-      signIn,
-      navigate,
-    });
+    // Pass the current window location search params to preserve and prioritize
+    // a redirect_url from the OAuth flow. Needed by AuthenticateWithRedirectCallback.
+    const searchParams = new URLSearchParams(window.location.search);
+    return this._handleRedirectCallback(
+      params,
+      {
+        signUp,
+        signIn,
+        navigate,
+      },
+      searchParams,
+    );
   };
 
   // TODO: Deprecate this one, and mark it as internal. Is there actual benefit for external developers to use this ? Should they ever reach for it ?
