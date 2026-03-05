@@ -224,10 +224,13 @@ jobs:
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
             try {
-              await github.rest.orgs.checkMembershipForUser({
+              const { data } = await github.rest.orgs.getMembershipForUser({
                 org: 'clerk',
                 username: context.actor
               });
+              if (data.state !== 'active') {
+                core.setFailed(`@${context.actor} is not an active member of the Clerk organization`);
+              }
             } catch (e) {
               core.setFailed(`@${context.actor} is not a member of the Clerk organization`);
             }
