@@ -2,8 +2,11 @@ import type { AuthObject } from '@clerk/backend';
 import { createClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, AuthOptions, GetAuthFnNoRequest } from '@clerk/backend/internal';
 import { getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
+import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath } from '@clerk/backend/proxy';
 import type { MiddlewareHandler } from 'hono';
 import { env } from 'hono/adapter';
+
+import type { FrontendApiProxyOptions } from './types';
 
 type ClerkEnv = {
   CLERK_SECRET_KEY: string;
@@ -12,7 +15,13 @@ type ClerkEnv = {
   CLERK_API_VERSION?: string;
 };
 
-export type ClerkMiddlewareOptions = Omit<AuthenticateRequestOptions, 'acceptsToken'>;
+export type ClerkMiddlewareOptions = Omit<AuthenticateRequestOptions, 'acceptsToken'> & {
+  /**
+   * When set, enables the middleware to proxy Frontend API requests to Clerk.
+   * This is useful when direct communication with Clerk's API is blocked.
+   */
+  frontendApiProxy?: FrontendApiProxyOptions;
+};
 
 /**
  * Clerk middleware for Hono that authenticates requests and attaches
@@ -35,12 +44,14 @@ export type ClerkMiddlewareOptions = Omit<AuthenticateRequestOptions, 'acceptsTo
 export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareHandler => {
   return async (c, next) => {
     const clerkEnv = env<ClerkEnv>(c);
-    const { secretKey, publishableKey, apiUrl, apiVersion, ...rest } = options || {
-      secretKey: clerkEnv.CLERK_SECRET_KEY || '',
-      publishableKey: clerkEnv.CLERK_PUBLISHABLE_KEY || '',
-      apiUrl: clerkEnv.CLERK_API_URL,
-      apiVersion: clerkEnv.CLERK_API_VERSION,
-    };
+    const {
+      secretKey = clerkEnv.CLERK_SECRET_KEY || '',
+      publishableKey = clerkEnv.CLERK_PUBLISHABLE_KEY || '',
+      apiUrl = clerkEnv.CLERK_API_URL,
+      apiVersion = clerkEnv.CLERK_API_VERSION,
+      frontendApiProxy,
+      ...rest
+    } = options || {};
 
     if (!secretKey) {
       throw new Error(
@@ -54,6 +65,22 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareHan
       );
     }
 
+    // Handle Frontend API proxy requests early, before authentication
+    if (frontendApiProxy) {
+      const { enabled, path: proxyPath = DEFAULT_PROXY_PATH } = frontendApiProxy;
+
+      const requestUrl = new URL(c.req.url);
+      const isEnabled = typeof enabled === 'function' ? enabled(requestUrl) : enabled;
+
+      if (isEnabled && matchProxyPath(c.req.raw, { proxyPath })) {
+        return clerkFrontendApiProxy(c.req.raw, {
+          proxyPath,
+          publishableKey,
+          secretKey,
+        });
+      }
+    }
+
     const clerkClient = createClerkClient({
       ...rest,
       apiUrl,
@@ -63,8 +90,21 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareHan
       userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
     });
 
+    // Auto-derive proxyUrl from frontendApiProxy config if not explicitly set
+    let authenticateOptions: typeof rest & { proxyUrl?: string } = rest;
+    if (frontendApiProxy && !rest.proxyUrl) {
+      const { enabled, path: proxyPath = DEFAULT_PROXY_PATH } = frontendApiProxy;
+      const requestUrl = new URL(c.req.url);
+      const isEnabled = typeof enabled === 'function' ? enabled(requestUrl) : enabled;
+
+      if (isEnabled) {
+        const derivedProxyUrl = `${requestUrl.origin}${proxyPath}`;
+        authenticateOptions = { ...rest, proxyUrl: derivedProxyUrl };
+      }
+    }
+
     const requestState = await clerkClient.authenticateRequest(c.req.raw, {
-      ...rest,
+      ...authenticateOptions,
       secretKey,
       publishableKey,
       acceptsToken: 'any',

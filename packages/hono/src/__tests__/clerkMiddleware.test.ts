@@ -1,3 +1,4 @@
+import { clerkFrontendApiProxy } from '@clerk/backend/proxy';
 import { Hono } from 'hono';
 
 import { clerkMiddleware, getAuth } from '../index';
@@ -30,6 +31,16 @@ vi.mock(import('@clerk/backend'), async importOriginal => {
     },
   };
 });
+
+vi.mock(import('@clerk/backend/proxy'), async importOriginal => {
+  const original = await importOriginal();
+  return {
+    ...original,
+    clerkFrontendApiProxy: vi.fn().mockResolvedValue(new Response('proxy-response', { status: 200 })),
+  };
+});
+
+const mockClerkFrontendApiProxy = vi.mocked(clerkFrontendApiProxy);
 
 describe('clerkMiddleware()', () => {
   beforeEach(() => {
@@ -160,6 +171,105 @@ describe('clerkMiddleware()', () => {
     const response = await app.request(new Request('http://localhost/'));
 
     expect(response.status).toEqual(500);
+  });
+
+  describe('frontendApiProxy', () => {
+    beforeEach(() => {
+      mockClerkFrontendApiProxy.mockReset();
+      mockClerkFrontendApiProxy.mockResolvedValue(new Response('proxy-response', { status: 200 }));
+    });
+
+    test('proxies requests to the default proxy path when enabled', async () => {
+      const app = new Hono();
+      app.use('*', clerkMiddleware({ frontendApiProxy: { enabled: true } }));
+      app.get('/', c => c.json({ ok: true }));
+
+      const response = await app.request(new Request('http://localhost/__clerk/v1/client'));
+
+      expect(response.status).toEqual(200);
+      expect(await response.text()).toEqual('proxy-response');
+      expect(mockClerkFrontendApiProxy).toHaveBeenCalled();
+      expect(authenticateRequestMock).not.toHaveBeenCalled();
+    });
+
+    test('proxies requests to custom proxy path', async () => {
+      const app = new Hono();
+      app.use('*', clerkMiddleware({ frontendApiProxy: { enabled: true, path: '/custom-proxy' } }));
+      app.get('/', c => c.json({ ok: true }));
+
+      const response = await app.request(new Request('http://localhost/custom-proxy/v1/client'));
+
+      expect(response.status).toEqual(200);
+      expect(mockClerkFrontendApiProxy).toHaveBeenCalled();
+    });
+
+    test('does not proxy when enabled is false', async () => {
+      authenticateRequestMock.mockResolvedValueOnce({
+        headers: new Headers(),
+        toAuth: createMockSessionAuth,
+      });
+      const app = new Hono();
+      app.use('*', clerkMiddleware({ frontendApiProxy: { enabled: false } }));
+      app.get('/__clerk/v1/client', c => c.json({ ok: true }));
+
+      const response = await app.request(new Request('http://localhost/__clerk/v1/client'));
+
+      expect(response.status).toEqual(200);
+      expect(mockClerkFrontendApiProxy).not.toHaveBeenCalled();
+      expect(authenticateRequestMock).toHaveBeenCalled();
+    });
+
+    test('does not proxy non-matching paths', async () => {
+      authenticateRequestMock.mockResolvedValueOnce({
+        headers: new Headers(),
+        toAuth: createMockSessionAuth,
+      });
+      const app = new Hono();
+      app.use('*', clerkMiddleware({ frontendApiProxy: { enabled: true } }));
+      app.get('/api/users', c => c.json({ ok: true }));
+
+      const response = await app.request(new Request('http://localhost/api/users'));
+
+      expect(response.status).toEqual(200);
+      expect(mockClerkFrontendApiProxy).not.toHaveBeenCalled();
+      expect(authenticateRequestMock).toHaveBeenCalled();
+    });
+
+    test('supports enabled as a function', async () => {
+      authenticateRequestMock.mockResolvedValueOnce({
+        headers: new Headers(),
+        toAuth: createMockSessionAuth,
+      });
+      const enabledFn = vi.fn().mockReturnValue(false);
+      const app = new Hono();
+      app.use('*', clerkMiddleware({ frontendApiProxy: { enabled: enabledFn } }));
+      app.get('/__clerk/v1/client', c => c.json({ ok: true }));
+
+      const response = await app.request(new Request('http://localhost/__clerk/v1/client'));
+
+      expect(response.status).toEqual(200);
+      expect(enabledFn).toHaveBeenCalledWith(expect.any(URL));
+      expect(mockClerkFrontendApiProxy).not.toHaveBeenCalled();
+    });
+
+    test('auto-derives proxyUrl for authenticateRequest when frontendApiProxy is enabled', async () => {
+      authenticateRequestMock.mockResolvedValueOnce({
+        headers: new Headers(),
+        toAuth: createMockSessionAuth,
+      });
+      const app = new Hono();
+      app.use('*', clerkMiddleware({ frontendApiProxy: { enabled: true } }));
+      app.get('/api/users', c => c.json({ ok: true }));
+
+      await app.request(new Request('http://localhost/api/users'));
+
+      expect(authenticateRequestMock).toHaveBeenCalledWith(
+        expect.any(Request),
+        expect.objectContaining({
+          proxyUrl: 'http://localhost/__clerk',
+        }),
+      );
+    });
   });
 });
 

@@ -3,8 +3,8 @@ export type { ClerkMiddlewareOptions } from './clerkMiddleware';
 
 export { getAuth } from './getAuth';
 
-import type { ClerkHonoVariables } from './types';
-export type { ClerkHonoVariables };
+import type { ClerkHonoVariables, FrontendApiProxyOptions } from './types';
+export type { ClerkHonoVariables, FrontendApiProxyOptions };
 
 // Augment Hono's ContextVariableMap so users get type inference
 // for c.get('clerk') and c.get('clerkAuth')
