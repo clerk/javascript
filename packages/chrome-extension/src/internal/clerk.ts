@@ -89,7 +89,7 @@ export function createClerkClient({
   }
 
   clerk.__internal_onAfterResponse(responseHandler(jwt, { isProd }));
-  clerk.__internal_onBeforeRequest(requestHandler(jwt, { isProd }));
+  clerk.__internal_onBeforeRequest(requestHandler(jwt, { isProd, frontendApi: key.frontendApi }));
 
   return clerk;
 }
