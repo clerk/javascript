@@ -63,7 +63,7 @@ export default defineConfig(({ watch }) => {
       unbundle: true,
       define: {
         ...common.define,
-        __BUILD_DISABLE_RHC__: JSON.stringify(true),
+        __BUILD_DISABLE_RHC__: 'true',
       },
     },
   ];
