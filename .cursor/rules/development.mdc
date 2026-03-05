@@ -113,7 +113,7 @@ Release Process
 Local Development Tips
 - Use playground applications to test changes quickly
 - Set up multiple test environments for different scenarios
-- Use Verdaccio for local npm registry testing
+- Use pkglab for local npm registry testing (`pkglab pub` to publish, `pkglab add` to install)
 - Leverage hot reloading for faster development cycles
 - Use proper IDE setup with TypeScript support
 
