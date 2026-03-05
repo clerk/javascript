@@ -100,11 +100,10 @@
     "@clerk/backend": "workspace:^",
     "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "cookie": "0.7.2",
+    "cookie": "1.0.2",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@types/cookie": "^0.6.0",
     "esbuild-plugin-file-path-extensions": "^2.1.4",
     "react-router": "7.12.0"
   },
