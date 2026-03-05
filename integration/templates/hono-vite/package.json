@@ -1,0 +1,25 @@
+{
+  "name": "hono-vite",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "dev": "PORT=$PORT tsx src/server/main.ts",
+    "preview": "vite preview --port $PORT --no-open",
+    "start": "PORT=$PORT NODE_ENV=production tsx src/server/main.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.1",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "hono": "^4.7.10",
+    "tsx": "^4.20.3",
+    "vite-express": "^0.21.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.2.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.3"
+  }
+}
