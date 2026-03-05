@@ -1,19 +1,21 @@
 name: Release
-run-name: Release
+run-name: ${{ github.event_name == 'issue_comment' && format('Snapshot release by {0}', github.actor) || format('Release pipelines from {0}', github.ref_name) }}
 
 on:
   push:
     branches:
       - main
+  issue_comment:
+    types: [created]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'issue_comment' && format('issue-{0}-{1}', github.event.issue.number, github.actor) || github.ref }}
   cancel-in-progress: true
 
 jobs:
   release:
     name: Release
-    if: ${{ github.repository == 'clerk/javascript' }}
+    if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
@@ -43,6 +45,7 @@ jobs:
         uses: ./.github/actions/init
         with:
           playwright-enabled: true # Must be present to enable caching on branched workflows
+          registry-url: 'https://registry.npmjs.org'
           # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           # turbo-team: ${{ vars.TURBO_TEAM }}
           # turbo-token: ${{ secrets.TURBO_TOKEN }}
@@ -62,8 +65,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
           HUSKY: "0"
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
@@ -95,7 +96,7 @@ jobs:
                 workflow_id: 'prepare-nextjs-sdk-update.yml',
                 ref: 'main',
                 inputs: { version: nextjsVersion }
-              }) 
+              })
 
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
@@ -122,12 +123,232 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CHANGELOG_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
+  canary-release:
+    name: Canary release
+    if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      TURBO_CACHE: remote:rw
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          fetch-tags: false
+          filter: 'blob:none'
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true # Must be present to enable caching on branched workflows
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Version packages for canary
+        id: version-packages
+        run: pnpm version-packages:canary | tail -1 >> "$GITHUB_OUTPUT"
+
+      - name: Build release
+        if: steps.version-packages.outputs.success == '1'
+        run: pnpm turbo build $TURBO_ARGS
+
+      - name: Canary release
+        id: publish
+        if: steps.version-packages.outputs.success == '1'
+        run: pnpm release:canary
+        env:
+          NPM_CONFIG_PROVENANCE: true
+
+      - name: Trigger workflows on related repos
+        if: steps.publish.outcome == 'success'
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          script: |
+            const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+            const clerkUiVersion = require('./packages/ui/package.json').version;
+            const nextjsVersion = require('./packages/nextjs/package.json').version;
+
+            github.rest.actions.createWorkflowDispatch({
+              owner: 'clerk',
+              repo: 'sdk-infra-workers',
+              workflow_id: 'update-pkg-versions.yml',
+              ref: 'main',
+              inputs: { clerkjsVersion, clerkUiVersion, sourceCommit: context.sha }
+            })
+
+            if (nextjsVersion.includes('canary')) {
+              console.log('clerk/nextjs changed, will notify clerk/accounts');
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerk',
+                repo: 'accounts',
+                workflow_id: 'release-staging.yml',
+                ref: 'main',
+                inputs: { version: nextjsVersion }
+              })
+            }
+
+  snapshot-release:
+    name: Snapshot release
+    if: ${{ github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
+    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Limit action to Clerk members
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          script: |
+            try {
+              await github.rest.orgs.checkMembershipForUser({
+                org: 'clerk',
+                username: context.actor
+              });
+            } catch (e) {
+              core.setFailed(`@${context.actor} is not a member of the Clerk organization`);
+            }
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
+          fetch-depth: 1
+          fetch-tags: false
+          filter: 'blob:none'
+
+      - name: Ensure the PR hasn't changed since initiating the !snapshot command.
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          script: |
+            const commentCreated = new Date(context.payload.comment.created_at);
+
+            const pr = await github.rest.pulls.get({
+              owner: 'clerk',
+              repo: 'javascript',
+              pull_number: context.issue.number,
+            });
+
+            const prLastUpdated = new Date(pr.updated_at);
+
+            if (prLastUpdated > commentCreated) {
+              core.setFailed("The PR has been updated since !snapshot was initiated. Please review the changes and re-run the !snapshot command.");
+            }
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Extract snapshot name
+        id: extract-snapshot-name
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const match = context.payload.comment.body.match(/!snapshot (.*)/)
+            const name = match && match[1] || '';
+            const isKebabCase = name.match(/^[a-z]+(-[a-z]+)*$/)
+            if(name && !isKebabCase) {
+              core.setFailed(`Invalid snapshot name: ${name}`);
+            }
+            core.setOutput('name', name);
+
+      - name: Version packages for snapshot
+        id: version-packages
+        run: npm run version-packages:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
+
+      - name: Build release
+        if: steps.version-packages.outputs.success == '1'
+        run: npx turbo build $TURBO_ARGS
+
+      - name: Snapshot release
+        if: steps.version-packages.outputs.success == '1'
+        run: npm run release:snapshot
+        env:
+          NPM_CONFIG_PROVENANCE: true
+
+      - name: Package info
+        if: steps.version-packages.outputs.success == '1'
+        id: package-info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const files = await (await glob.create("./packages/*/package.json")).glob();
+            const descriptors = files
+              .map((file) => {
+                const { name, version } = JSON.parse(fs.readFileSync(file, "utf8"));
+                return { name, version };
+              })
+              .filter(({ version }) => version.includes("-${{ steps.extract-snapshot-name.outputs.name }}"));
+
+            let table = `| Package | Version |\n| --- | --- |\n`;
+            descriptors.forEach(({ name, version }) => {
+              table += `| ${name} | ${version} |\n`;
+            });
+            const snippets = descriptors
+              .map(
+                ({ name, version }) =>
+                  `\`${name}\`\n\`\`\`sh\nnpm i ${name}@${version} --save-exact\n\`\`\``
+              )
+              .join("\n");
+            core.setOutput("table", table);
+            core.setOutput("snippets", snippets);
+
+      - name: Update Comment
+        if: steps.version-packages.outputs.success == '1'
+        uses: peter-evans/create-or-update-comment@v3.0.0
+        with:
+          token: ${{ secrets.CLERK_COOKIE_PAT }}
+          comment-id: ${{ github.event.comment.id }}
+          reactions: heart
+
+      - name: Create snapshot release comment
+        if: steps.version-packages.outputs.success == '1'
+        uses: peter-evans/create-or-update-comment@v3.0.0
+        with:
+          token: ${{ secrets.CLERK_COOKIE_PAT }}
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Hey @${{ github.event.comment.user.login }} - the snapshot version command generated the following package versions:
+            ${{ steps.package-info.outputs.table }}
+            Tip: Use the snippet copy button below to quickly install the required packages.
+            ${{ steps.package-info.outputs.snippets }}
+
   # We're running the CI workflow (where node v20 modules are cached) in
   # merge_group and not on main, we need to explicitly cache node_modules here so
   # that follow-on branches can use the cached version of node_modules rather
   # than recreating them every time.
   cache-for-alternate-node-versions:
     name: Cache for Alternate Node Versions
+    if: ${{ github.event_name == 'push' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
     continue-on-error: true
