@@ -2845,10 +2845,9 @@ export class Clerk implements ClerkInterface {
       return true;
     }
 
-    // Check if satelliteAutoSync is disabled - if so, skip automatic sync
-    // unless explicitly triggered via __clerk_synced=false
-    if (this.#options.satelliteAutoSync === false) {
-      // Skip automatic sync when satelliteAutoSync is false
+    // Check if satelliteAutoSync is enabled - only auto-sync when explicitly opted in
+    // In Core 3, satelliteAutoSync defaults to false (undefined is treated as false)
+    if (this.#options.satelliteAutoSync !== true) {
       return false;
     }
 
