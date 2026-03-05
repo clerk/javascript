@@ -4,7 +4,6 @@ import clerk from '@clerk/astro';
 import react from '@astrojs/react';
 
 export default defineConfig({
-  output: 'hybrid',
   adapter: node({
     mode: 'standalone',
   }),

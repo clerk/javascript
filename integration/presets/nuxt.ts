@@ -1,7 +1,7 @@
 import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
-import { linkPackage } from './utils';
+import { PKGLAB } from './utils';
 
 const nuxtNode = applicationConfig()
   .setName('nuxt-node')
@@ -12,9 +12,9 @@ const nuxtNode = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/nuxt', constants.E2E_CLERK_JS_VERSION || linkPackage('nuxt'))
-  .addDependency('@clerk/shared', linkPackage('shared'))
-  .addDependency('@clerk/vue', linkPackage('vue'));
+  .addDependency('@clerk/nuxt', PKGLAB)
+  .addDependency('@clerk/shared', PKGLAB)
+  .addDependency('@clerk/vue', PKGLAB);
 
 export const nuxt = {
   node: nuxtNode,

@@ -167,6 +167,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
     const organizationCtx = computed(() => derivedState.value.organization);
 
     app.provide(ClerkInjectionKey, {
+      loaded,
       clerk,
       authCtx,
       clientCtx,
