@@ -4,12 +4,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useInternalNavFun } from '../useInternalNavFun';
 
-let mockedPathname = '/';
-
-vi.mock('next/navigation', () => ({
-  usePathname: () => mockedPathname,
-}));
-
 let currentNavigate: NavigationFunction | undefined;
 
 const windowNav = window.history.pushState.bind(window.history);
@@ -34,7 +28,6 @@ const navigate = (to: string) => {
 
 describe('useInternalNavFun', () => {
   beforeEach(() => {
-    mockedPathname = '/protected';
     currentNavigate = undefined;
     window.__clerk_internal_navigations = {};
     vi.clearAllMocks();
@@ -46,7 +39,7 @@ describe('useInternalNavFun', () => {
 
   it('dedupes duplicate in-flight pushes to the same destination', async () => {
     const routerNav = vi.fn();
-    const view = render(<Harness routerNav={routerNav} />);
+    render(<Harness routerNav={routerNav} />);
 
     let firstPromise!: Promise<void>;
     let secondPromise!: Promise<void>;
@@ -59,10 +52,6 @@ describe('useInternalNavFun', () => {
     await waitFor(() => {
       expect(routerNav).toHaveBeenCalledTimes(1);
     });
-
-    // Simulate route change completion so buffered resolvers flush.
-    mockedPathname = '/sign-in';
-    view.rerender(<Harness routerNav={routerNav} />);
 
     await expect(Promise.all([firstPromise, secondPromise])).resolves.toEqual([undefined, undefined]);
   });
@@ -86,7 +75,7 @@ describe('useInternalNavFun', () => {
 
   it('allows a fresh same-destination push after flush', async () => {
     const routerNav = vi.fn();
-    const view = render(<Harness routerNav={routerNav} />);
+    render(<Harness routerNav={routerNav} />);
 
     let firstPromise!: Promise<void>;
     let secondPromise!: Promise<void>;
@@ -99,9 +88,6 @@ describe('useInternalNavFun', () => {
     await waitFor(() => {
       expect(routerNav).toHaveBeenCalledTimes(1);
     });
-
-    mockedPathname = '/sign-in';
-    view.rerender(<Harness routerNav={routerNav} />);
 
     await expect(Promise.all([firstPromise, secondPromise])).resolves.toEqual([undefined, undefined]);
 
