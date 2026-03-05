@@ -1200,15 +1200,15 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /**
      * Controls whether satellite apps automatically sync with the primary domain on initial page load.
      *
-     * When `false` (default), satellite apps will skip the automatic handshake if no session cookies exist,
-     * and only trigger the handshake after an explicit sign-in action. This provides the best performance
+     * When `true` (default), satellite apps will automatically trigger a handshake redirect to sync authentication
+     * state with the primary domain on first load, even if no session cookies exist. This preserves the
+     * Core 2 behavior where users signed in on the primary domain are automatically recognized on the satellite.
+     *
+     * When explicitly set to `false`, satellite apps will skip the automatic handshake if no session cookies exist,
+     * and only trigger the handshake after an explicit sign-in action. This provides better performance
      * by showing the satellite app immediately without attempting to sync state first.
      *
-     * When `true`, satellite apps will automatically trigger a handshake redirect to sync authentication
-     * state with the primary domain on first load, even if no session cookies exist. Use this if you want
-     * users who are already signed in on the primary domain to be automatically recognized on the satellite.
-     *
-     * @default false
+     * @default true
      */
     satelliteAutoSync?: boolean;
     /**
