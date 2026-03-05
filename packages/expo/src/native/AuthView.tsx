@@ -1,5 +1,5 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { Platform, Text, View } from 'react-native';
 
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
@@ -26,6 +26,12 @@ export async function syncNativeSession(sessionId: string): Promise<void> {
   // Copy the native client's bearer token to the JS SDK's token cache
   if (ClerkExpo?.getClientToken) {
     const nativeClientToken = await ClerkExpo.getClientToken();
+    if (__DEV__) {
+      console.log(
+        '[syncNativeSession] getClientToken:',
+        nativeClientToken ? `${nativeClientToken.slice(0, 20)}...` : 'null',
+      );
+    }
     if (nativeClientToken) {
       await tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, nativeClientToken);
     }
@@ -42,11 +48,23 @@ export async function syncNativeSession(sessionId: string): Promise<void> {
   // Reload resources using the native client's token
   const clerkRecord = clerkInstance as unknown as Record<string, unknown>;
   if (typeof clerkRecord.__internal_reloadInitialResources === 'function') {
+    if (__DEV__) {
+      console.log('[syncNativeSession] reloading initial resources...');
+    }
     await (clerkRecord.__internal_reloadInitialResources as () => Promise<void>)();
+    if (__DEV__) {
+      console.log('[syncNativeSession] reload complete');
+    }
   }
 
   if (typeof clerkInstance.setActive === 'function') {
+    if (__DEV__) {
+      console.log('[syncNativeSession] calling setActive with session:', sessionId);
+    }
     await clerkInstance.setActive({ session: sessionId });
+    if (__DEV__) {
+      console.log('[syncNativeSession] setActive complete');
+    }
   }
 }
 
@@ -86,61 +104,42 @@ export function AuthView({ mode = 'signInOrUp', isDismissable = false }: AuthVie
       return;
     }
 
+    if (__DEV__) {
+      console.log('[AuthView] syncSession called with sessionId:', sessionId);
+    }
+
     try {
       await syncNativeSession(sessionId);
       authCompletedRef.current = true;
+      if (__DEV__) {
+        console.log('[AuthView] syncSession succeeded');
+      }
     } catch (err) {
-      console.error('[AuthView] Failed to sync session:', err);
+      if (__DEV__) {
+        console.error('[AuthView] Failed to sync session:', err);
+      }
     }
   }, []);
 
   const handleAuthEvent = useCallback(
     async (event: { nativeEvent: { type: string; data: string } }) => {
       const { type, data: rawData } = event.nativeEvent;
+      if (__DEV__) {
+        console.log('[AuthView] onAuthEvent:', type, rawData);
+      }
       const data: Record<string, any> = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
 
       if (type === 'signInCompleted' || type === 'signUpCompleted') {
         const sessionId = data?.sessionId;
         if (sessionId) {
           await syncSession(sessionId);
+        } else if (__DEV__) {
+          console.warn('[AuthView] Auth event received but no sessionId in data:', data);
         }
       }
     },
     [syncSession],
   );
-
-  // Fallback: poll native session to detect auth completion
-  useEffect(() => {
-    if (!ClerkExpo?.getSession) {
-      return;
-    }
-
-    const POLL_INTERVAL_MS = 1500;
-    const MAX_POLLS = 40; // 60s max
-    let pollCount = 0;
-
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    const interval = setInterval(async () => {
-      if (authCompletedRef.current || pollCount >= MAX_POLLS) {
-        clearInterval(interval);
-        return;
-      }
-
-      pollCount++;
-
-      try {
-        const session = (await ClerkExpo.getSession()) as { sessionId?: string } | null;
-        if (session?.sessionId) {
-          clearInterval(interval);
-          await syncSession(session.sessionId);
-        }
-      } catch {
-        // ignore polling errors
-      }
-    }, POLL_INTERVAL_MS);
-
-    return () => clearInterval(interval);
-  }, [syncSession]);
 
   if (!isNativeSupported || !NativeClerkAuthView) {
     return (

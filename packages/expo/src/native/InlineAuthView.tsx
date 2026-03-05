@@ -1,5 +1,5 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
@@ -75,10 +75,6 @@ export function InlineAuthView({ mode = 'signInOrUp', isDismissable = false }: I
     }
 
     try {
-      // The native SDK (clerk-ios/clerk-android) and JS SDK (clerk-js) use separate
-      // Clerk API clients. The native session won't appear in the JS client's sessions.
-      // To fix this, we copy the native client's bearer token to the JS SDK's token cache
-      // so both SDKs use the same Clerk API client.
       if (ClerkExpoModule?.getClientToken) {
         const nativeClientToken = await ClerkExpoModule.getClientToken();
         if (nativeClientToken) {
@@ -86,8 +82,6 @@ export function InlineAuthView({ mode = 'signInOrUp', isDismissable = false }: I
         }
       }
 
-      // Get the raw Clerk instance (not IsomorphicClerk from useClerk())
-      // because __internal_reloadInitialResources is stripped from IsomorphicClerk
       const clerkInstance = getClerkInstance();
       if (!clerkInstance) {
         throw new ClerkRuntimeError(
@@ -97,9 +91,6 @@ export function InlineAuthView({ mode = 'signInOrUp', isDismissable = false }: I
       }
 
       const clerkRecord = clerkInstance as unknown as Record<string, unknown>;
-
-      // Reload the client from the API - now using the native client's token,
-      // so the JS SDK will see the same sessions as the native SDK
       if (typeof clerkRecord.__internal_reloadInitialResources === 'function') {
         await (clerkRecord.__internal_reloadInitialResources as () => Promise<void>)();
       }
@@ -108,61 +99,33 @@ export function InlineAuthView({ mode = 'signInOrUp', isDismissable = false }: I
         await clerkInstance.setActive({ session: sessionId });
       }
 
-      // Mark complete only after successful sync to allow retries on transient failures
       authCompletedRef.current = true;
     } catch (err) {
-      console.error('[InlineAuthView] Failed to sync session:', err);
+      if (__DEV__) {
+        console.error('[InlineAuthView] Failed to sync session:', err);
+      }
     }
   }, []);
 
-  // Handle native events from the view bridge
   const handleAuthEvent = useCallback(
     async (event: { nativeEvent: { type: string; data: string } }) => {
       const { type, data: rawData } = event.nativeEvent;
+      if (__DEV__) {
+        console.log('[InlineAuthView] onAuthEvent:', type, rawData);
+      }
       const data: Record<string, any> = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
 
       if (type === 'signInCompleted' || type === 'signUpCompleted') {
         const sessionId = data?.sessionId;
         if (sessionId) {
           await syncSession(sessionId);
+        } else if (__DEV__) {
+          console.warn('[InlineAuthView] Auth event received but no sessionId in data:', data);
         }
       }
     },
     [syncSession],
   );
-
-  // Fallback: poll native session to detect auth completion
-  // This handles cases where the native event bridge doesn't fire
-  useEffect(() => {
-    if (!ClerkExpoModule?.getSession) {
-      return;
-    }
-
-    const POLL_INTERVAL_MS = 1500;
-    const MAX_POLLS = 40; // 60s max
-    let pollCount = 0;
-
-    const interval = setInterval(async () => {
-      if (authCompletedRef.current || pollCount >= MAX_POLLS) {
-        clearInterval(interval);
-        return;
-      }
-
-      pollCount++;
-
-      try {
-        const session = (await ClerkExpoModule.getSession()) as { sessionId?: string } | null;
-        if (session?.sessionId) {
-          clearInterval(interval);
-          await syncSession(session.sessionId);
-        }
-      } catch {
-        // ignore polling errors
-      }
-    }, POLL_INTERVAL_MS);
-
-    return () => clearInterval(interval);
-  }, [syncSession]);
 
   if (!isNativeSupported || !NativeClerkAuthView) {
     return (

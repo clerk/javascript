@@ -292,19 +292,28 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
     completion(result)
   }
 
+  private var initialSessionId: String? = Clerk.shared.session?.id
+
   private func subscribeToAuthEvents() {
     authEventTask = Task { @MainActor [weak self] in
       for await event in Clerk.shared.auth.events {
         guard let self = self, !self.completionCalled else { return }
         switch event {
         case .signInCompleted(let signIn):
-          if let sessionId = signIn.createdSessionId {
+          let sessionId = signIn.createdSessionId ?? Clerk.shared.session?.id
+          if let sessionId, sessionId != self.initialSessionId {
             self.completeOnce(.success(["sessionId": sessionId, "type": "signIn"]))
             self.dismiss(animated: true)
           }
         case .signUpCompleted(let signUp):
-          if let sessionId = signUp.createdSessionId {
+          let sessionId = signUp.createdSessionId ?? Clerk.shared.session?.id
+          if let sessionId, sessionId != self.initialSessionId {
             self.completeOnce(.success(["sessionId": sessionId, "type": "signUp"]))
+            self.dismiss(animated: true)
+          }
+        case .sessionChanged(_, let newSession):
+          if let sessionId = newSession?.id, sessionId != self.initialSessionId {
+            self.completeOnce(.success(["sessionId": sessionId, "type": "signIn"]))
             self.dismiss(animated: true)
           }
         default:
@@ -393,20 +402,33 @@ struct ClerkInlineAuthWrapperView: View {
   let dismissable: Bool
   let onEvent: (String, [String: Any]) -> Void
 
+  // Track initial session to detect new sign-ins (same approach as Android)
+  @State private var initialSessionId: String? = Clerk.shared.session?.id
+  @State private var eventSent = false
+
+  private func sendAuthCompleted(sessionId: String, type: String) {
+    guard !eventSent, sessionId != initialSessionId else { return }
+    eventSent = true
+    onEvent(type, ["sessionId": sessionId, "type": type == "signUpCompleted" ? "signUp" : "signIn"])
+  }
+
   var body: some View {
     AuthView(mode: mode, isDismissable: dismissable)
       .environment(Clerk.shared)
       .task {
         for await event in Clerk.shared.auth.events {
+          guard !eventSent else { continue }
           switch event {
           case .signInCompleted(let signIn):
-            if let sessionId = signIn.createdSessionId {
-              onEvent("signInCompleted", ["sessionId": sessionId, "type": "signIn"])
-            }
+            // Use createdSessionId if available, fall back to current session
+            let sessionId = signIn.createdSessionId ?? Clerk.shared.session?.id
+            if let sessionId { sendAuthCompleted(sessionId: sessionId, type: "signInCompleted") }
           case .signUpCompleted(let signUp):
-            if let sessionId = signUp.createdSessionId {
-              onEvent("signUpCompleted", ["sessionId": sessionId, "type": "signUp"])
-            }
+            let sessionId = signUp.createdSessionId ?? Clerk.shared.session?.id
+            if let sessionId { sendAuthCompleted(sessionId: sessionId, type: "signUpCompleted") }
+          case .sessionChanged(_, let newSession):
+            // Catches auth completion even when signIn/signUp events lack a sessionId
+            if let sessionId = newSession?.id { sendAuthCompleted(sessionId: sessionId, type: "signInCompleted") }
           default:
             break
           }
