@@ -45,10 +45,12 @@ jobs:
         uses: ./.github/actions/init
         with:
           playwright-enabled: true # Must be present to enable caching on branched workflows
-          registry-url: 'https://registry.npmjs.org'
           # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           # turbo-team: ${{ vars.TURBO_TEAM }}
           # turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Configure npm for provenance
+        run: pnpm config set registry https://registry.npmjs.org/
 
       - name: Upgrade npm for trusted publishing
         run: npm install -g npm@latest
@@ -154,7 +156,9 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
-          registry-url: 'https://registry.npmjs.org'
+
+      - name: Configure npm for provenance
+        run: pnpm config set registry https://registry.npmjs.org/
 
       - name: Upgrade npm for trusted publishing
         run: npm install -g npm@latest
@@ -271,7 +275,9 @@ jobs:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-          registry-url: 'https://registry.npmjs.org'
+
+      - name: Configure npm for provenance
+        run: pnpm config set registry https://registry.npmjs.org/
 
       - name: Upgrade npm for trusted publishing
         run: npm install -g npm@latest
