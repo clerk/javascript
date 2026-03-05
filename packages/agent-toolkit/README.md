@@ -66,6 +66,26 @@ Use this SDK to integrate [Clerk](https://clerk.com/?utm_source=github&utm_mediu
 
 This package exposes a subset of Clerk's functionality to agent frameworks, allowing you to build powerful agentic systems capable of managing users, user data, organizations, and more.
 
+## Clerk Skills
+
+[Clerk Skills](https://clerk.com/docs/guides/ai/skills) are installable packages that provide AI coding agents with specialized knowledge about Clerk authentication. They complement this toolkit by providing agents with up-to-date documentation, best practices, and implementation patterns.
+
+Install Clerk Skills for your AI agent:
+
+```shell
+npx skills add clerk/skills
+```
+
+Available skills include:
+- `/clerk-setup` - Add Clerk to any framework
+- `/clerk-custom-ui` - Build custom sign-in/up components
+- `/clerk-nextjs-patterns` - Advanced Next.js patterns and best practices
+- `/clerk-orgs` - Multi-tenant B2B organization management
+- `/clerk-webhooks` - Real-time events and data syncing
+- `/clerk-testing` - End-to-end testing for authentication flows
+
+Clerk Skills work with Claude Code, Cursor, Windsurf, GitHub Copilot, and other supported agents.
+
 ## API Reference
 
 ### Import Paths

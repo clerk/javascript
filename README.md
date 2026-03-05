@@ -63,6 +63,7 @@ Clerk's full documentation is available at [clerk.com/docs](https://clerk.com/do
 - **We recommend starting with the [quickstart guides](https://clerk.com/docs/quickstarts/overview?utm_source=github&utm_medium=clerk_js_repo_readme).** They'll help you quickly add Clerk to your application. If you're starting a new project and aren't sure what to pick, check out our most popular quickstart: [Next.js](https://clerk.com/docs/quickstarts/nextjs?utm_source=github&utm_medium=clerk_js_repo_readme).
 - Clerk offers a comprehensive suite of components designed to seamlessly integrate authentication and multi-tenancy into your application. To learn more about **Clerk's components**, check out [the docs](https://clerk.com/docs/components/overview?utm_source=github&utm_medium=clerk_js_repo_readme).
 - Clerk's **organizations** feature provides powerful multi-tenancy capabilities, allowing you to group users, manage roles and permissions, and control access to resources. Perfect for B2B applications, enterprise software, and any multi-tenant system. Learn more [in the docs](https://clerk.com/docs/organizations/overview?utm_source=github&utm_medium=clerk_js_repo_readme).
+- **Using AI agents?** Check out [Clerk Skills](https://clerk.com/docs/guides/ai/skills) - installable packages that provide AI coding agents with specialized knowledge about Clerk authentication. Install with `npx skills add clerk/skills` to enhance your AI agent's understanding of Clerk.
 
 ## 🚢 Release notes
 
