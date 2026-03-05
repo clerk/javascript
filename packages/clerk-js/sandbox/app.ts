@@ -1,6 +1,7 @@
 import { PageMocking, type MockScenario } from '@clerk/msw';
 import * as l from '../../localizations';
 import { dark, neobrutalism, raw, shadcn, shadesOfPurple } from '../../ui/src/themes';
+import { darkPremium, darkPremiumDefault, modernSaas, terminalDefault, terminalRaw } from './raw-demo-appearances';
 import type { Clerk as ClerkType } from '../';
 import * as scenarios from './scenarios';
 
@@ -348,6 +349,45 @@ function themeSelector() {
   return { updateTheme };
 }
 
+const presets: Record<
+  string,
+  { elements: Record<string, any>; options?: Record<string, any>; variables?: Record<string, any> }
+> = {
+  modernSaas,
+  darkPremium,
+  darkPremiumDefault,
+  terminalRaw,
+  terminalDefault,
+};
+
+function presetSelector() {
+  assertClerkIsLoaded(Clerk);
+
+  const presetSelect = document.getElementById('presetSelect') as HTMLSelectElement;
+  const savedPreset = sessionStorage.getItem('preset') ?? '';
+  presetSelect.value = savedPreset;
+
+  const updatePreset = () => {
+    const presetName = presetSelect.value;
+    sessionStorage.setItem('preset', presetName);
+
+    const currentAppearance = Clerk.__internal_getOption('appearance') ?? {};
+    const preset = presetName ? presets[presetName] : undefined;
+    void Clerk.__internal_updateProps({
+      appearance: {
+        ...currentAppearance,
+        elements: preset?.elements ?? {},
+        ...(preset?.options ? { options: preset.options } : {}),
+        ...(preset?.variables ? { variables: preset.variables } : {}),
+      },
+    });
+  };
+
+  presetSelect.addEventListener('change', updatePreset);
+
+  return { updatePreset };
+}
+
 const urlParams = new URL(window.location.href).searchParams;
 for (const [component, encodedProps] of urlParams.entries()) {
   if (AVAILABLE_COMPONENTS.includes(component as AvailableComponent)) {
@@ -364,6 +404,7 @@ void (async () => {
   fillLocalizationSelect();
   const { updateVariables } = appearanceVariableOptions();
   const { updateTheme } = themeSelector();
+  const { updatePreset } = presetSelector();
   const { updateOtherOptions } = otherOptions();
 
   const sidebars = document.querySelectorAll('[data-sidebar]');
@@ -490,16 +531,24 @@ void (async () => {
 
     const initialThemeName = sessionStorage.getItem('baseTheme') ?? 'raw';
     const initialTheme = initialThemeName ? themes[initialThemeName] : undefined;
+    const initialPresetName = sessionStorage.getItem('preset') ?? '';
+    const initialPreset = initialPresetName ? presets[initialPresetName] : undefined;
 
     await Clerk.load({
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
       ui: { ClerkUI: window.__internal_ClerkUICtor },
-      appearance: initialTheme ? { theme: initialTheme } : undefined,
+      appearance: {
+        ...(initialTheme ? { theme: initialTheme } : {}),
+        ...(initialPreset ? { elements: initialPreset.elements } : {}),
+        ...(initialPreset?.options ? { options: initialPreset.options } : {}),
+        ...(initialPreset?.variables ? { variables: initialPreset.variables } : {}),
+      },
     });
     renderCurrentRoute();
     updateTheme();
+    updatePreset();
     // Only apply sandbox variable overrides when using the default theme.
     // Prebuilt themes (raw, dark, etc.) define their own variables.
     if (!initialTheme) {

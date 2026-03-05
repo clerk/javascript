@@ -23,7 +23,7 @@
           'html[data-no-tailwind] main > div { width: 100% }' +
           'html[data-no-tailwind] fieldset { margin-top: 1rem }' +
           'html[data-no-tailwind] legend { font-size: 14px; font-weight: 500 }' +
-          'html[data-no-tailwind] label { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-top: 1px solid #f3f4f6 }' +
+          'html[data-no-tailwind] [data-sidebar] label { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-top: 1px solid #f3f4f6 }' +
           'html[data-no-tailwind] nav ul { list-style: none; padding: 0 }' +
           'html[data-no-tailwind] nav a { display: block; padding: 0.3rem 0.5rem; text-decoration: none; color: inherit; font-size: 14px }' +
           'html[data-no-tailwind] nav a:hover { background: #f9fafb }' +
@@ -376,6 +376,20 @@
             <option value="neobrutalism">neobrutalism</option>
             <option value="shadcn">shadcn</option>
             <option value="raw">raw</option>
+          </select>
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">preset</span>
+          <select
+            id="presetSelect"
+            class="text-sm"
+          >
+            <option value="">none</option>
+            <option value="modernSaas">modernSaas</option>
+            <option value="darkPremium">darkPremium</option>
+            <option value="darkPremiumDefault">darkPremiumDefault</option>
+            <option value="terminalRaw">terminalRaw</option>
+            <option value="terminalDefault">terminalDefault</option>
           </select>
         </label>
       </fieldset>
