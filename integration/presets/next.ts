@@ -31,6 +31,11 @@ const appRouterQuickstartV6 = appRouter
   .setName('next-app-router-quickstart-v6')
   .useTemplate(templates['next-app-router-quickstart-v6']);
 
+const appRouterAPWithClerkNextV5 = appRouterQuickstartV6
+  .clone()
+  .setName('next-app-router-ap-clerk-next-v5')
+  .addDependency('@clerk/nextjs', '5');
+
 const appRouterAPWithClerkNextV6 = appRouterQuickstartV6
   .clone()
   .setName('next-app-router-ap-clerk-next-v6')
@@ -67,6 +72,7 @@ export const next = {
   appRouterTurbo,
   appRouterQuickstart,
   appRouterAPWithClerkNextLatest,
+  appRouterAPWithClerkNextV5,
   appRouterAPWithClerkNextV6,
   appRouterQuickstartV6,
   appRouterBundledUI,

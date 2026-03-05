@@ -7,7 +7,7 @@
     }
   ],
   "commit": false,
-  "ignore": ["@clerk/hono"],
+  "ignore": [],
   "fixed": [],
   "linked": [],
   "access": "public",

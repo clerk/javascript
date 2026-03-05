@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "2.19.10",
+  "version": "3.0.1",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -139,6 +139,9 @@
     "expo-apple-authentication": {
       "optional": true
     },
+    "expo-auth-session": {
+      "optional": true
+    },
     "expo-constants": {
       "optional": true
     },
@@ -149,6 +152,9 @@
       "optional": true
     },
     "expo-secure-store": {
+      "optional": true
+    },
+    "expo-web-browser": {
       "optional": true
     }
   },

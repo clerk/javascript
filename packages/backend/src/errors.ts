@@ -1,3 +1,5 @@
+import { ClerkError } from '@clerk/shared/error';
+
 export type TokenCarrier = 'header' | 'cookie';
 
 export const TokenVerificationErrorCode = {
@@ -80,11 +82,11 @@ export const MachineTokenVerificationErrorCode = {
 export type MachineTokenVerificationErrorCode =
   (typeof MachineTokenVerificationErrorCode)[keyof typeof MachineTokenVerificationErrorCode];
 
-export class MachineTokenVerificationError extends Error {
-  code: MachineTokenVerificationErrorCode;
-  long_message?: string;
-  status?: number;
-  action?: TokenVerificationErrorAction;
+export class MachineTokenVerificationError extends ClerkError {
+  static kind = 'MachineTokenVerificationError';
+  declare readonly code: MachineTokenVerificationErrorCode;
+  readonly status?: number;
+  readonly action?: TokenVerificationErrorAction;
 
   constructor({
     message,
@@ -97,12 +99,15 @@ export class MachineTokenVerificationError extends Error {
     status?: number;
     action?: TokenVerificationErrorAction;
   }) {
-    super(message);
+    super({ message, code });
     Object.setPrototypeOf(this, MachineTokenVerificationError.prototype);
-
-    this.code = code;
     this.status = status;
     this.action = action;
+  }
+
+  // Keep message unformatted, matching ClerkAPIResponseError's approach
+  protected static override formatMessage(_name: string, msg: string, _code: string, _docsUrl: string | undefined) {
+    return msg;
   }
 
   public getFullMessage() {
