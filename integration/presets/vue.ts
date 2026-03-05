@@ -1,7 +1,6 @@
-import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
-import { linkPackage } from './utils';
+import { PKGLAB } from './utils';
 
 const vite = applicationConfig()
   .setName('vue-vite')
@@ -11,8 +10,8 @@ const vite = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/vue', constants.E2E_CLERK_JS_VERSION || linkPackage('vue'))
-  .addDependency('@clerk/localizations', linkPackage('localizations'));
+  .addDependency('@clerk/vue', PKGLAB)
+  .addDependency('@clerk/localizations', PKGLAB);
 
 export const vue = {
   vite,
