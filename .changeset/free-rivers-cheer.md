@@ -1,5 +1,5 @@
 ---
-"@clerk/localizations": major
+"@clerk/localizations": patch
 ---
 
 Add the missing Dutch translation for `organizationProfile.start.profileSection.primaryButton`.
