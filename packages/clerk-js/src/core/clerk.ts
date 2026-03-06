@@ -1598,9 +1598,7 @@ export class Clerk implements ClerkInterface {
           } catch (e) {
             if (isUnauthenticatedError(e)) {
               void this.handleUnauthenticated();
-            } else if (!is4xxError(e)) {
-              // Swallow 4xx errors like 429 (rate limit) that are not auth failures.
-              // Non-4xx errors (5xx, network) should still propagate.
+            } else {
               throw e;
             }
           }
@@ -3179,6 +3177,8 @@ export class Clerk implements ClerkInterface {
     await session.touch().catch(e => {
       if (isUnauthenticatedError(e)) {
         void this.handleUnauthenticated();
+      } else {
+        throw e;
       }
     });
   };
