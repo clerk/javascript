@@ -456,10 +456,9 @@ export class Session extends BaseResource implements SessionResource {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
       result = cachedToken.getRawString() || null;
+    } else if (!isBrowserOnline()) {
+      throw new ClerkRuntimeError('Browser is offline, skipping token fetch', { code: 'network_error' });
     } else {
-      if (!isBrowserOnline()) {
-        throw new ClerkRuntimeError('Browser is offline, skipping token fetch', { code: 'network_error' });
-      }
       result = await this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
     }
 
@@ -530,8 +529,7 @@ export class Session extends BaseResource implements SessionResource {
     return tokenResolver.then(token => {
       const rawString = token.getRawString();
       if (!rawString) {
-        // Token fetch returned an empty response — this happens when _baseFetch returns null
-        // due to a network error while offline. Throw so retry logic in getToken() can handle it,
+        // Throw so retry logic in getToken() can handle it,
         // rather than silently returning null (which callers interpret as "signed out").
         throw new ClerkRuntimeError('Token fetch returned empty response', { code: 'network_error' });
       }
