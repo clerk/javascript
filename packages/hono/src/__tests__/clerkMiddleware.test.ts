@@ -378,6 +378,21 @@ describe('Frontend API proxy handling', () => {
       }),
     );
   });
+
+  test('falls back to default proxy path when path reduces to empty string', async () => {
+    mockClerkFrontendApiProxy.mockResolvedValueOnce(new Response('proxied', { status: 200 }));
+
+    const app = new Hono();
+    app.use('*', clerkMiddleware({ frontendApiProxy: { enabled: true, path: '/' } }));
+    app.get('/*', c => c.text('OK'));
+
+    // Should intercept /__clerk (the default), not match everything
+    const response = await app.request(new Request('http://localhost/__clerk/v1/client'));
+
+    expect(response.status).toEqual(200);
+    expect(await response.text()).toEqual('proxied');
+    expect(mockClerkFrontendApiProxy).toHaveBeenCalled();
+  });
 });
 
 describe('getAuth()', () => {

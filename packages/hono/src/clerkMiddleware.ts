@@ -64,7 +64,7 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareHan
     // Handle Frontend API proxy requests and auto-derive proxyUrl
     let derivedProxyUrl = rest.proxyUrl;
     if (frontendApiProxy) {
-      const proxyPath = stripTrailingSlashes(frontendApiProxy.path ?? DEFAULT_PROXY_PATH);
+      const proxyPath = stripTrailingSlashes(frontendApiProxy.path ?? DEFAULT_PROXY_PATH) || DEFAULT_PROXY_PATH;
       const requestUrl = new URL(c.req.url);
       const isEnabled =
         typeof frontendApiProxy.enabled === 'function'
