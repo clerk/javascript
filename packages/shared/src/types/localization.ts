@@ -175,7 +175,11 @@ export type __internal_LocalizationResource = {
   membershipRole__guestMember: LocalizationValue;
   billing: {
     month: LocalizationValue;
+    monthAbbreviation: LocalizationValue;
+    monthPerUnit: LocalizationValue<'unitName'>;
     year: LocalizationValue;
+    yearAbbreviation: LocalizationValue;
+    yearPerUnit: LocalizationValue<'unitName'>;
     free: LocalizationValue;
     getStarted: LocalizationValue;
     manage: LocalizationValue;
@@ -257,6 +261,19 @@ export type __internal_LocalizationResource = {
     pricingTable: {
       billingCycle: LocalizationValue;
       included: LocalizationValue;
+      seatCost: {
+        freeUpToSeats: LocalizationValue<'endsAfterBlock'>;
+        upToSeats: LocalizationValue<'endsAfterBlock'>;
+        perSeat: LocalizationValue<'feePerBlockAmount' | 'periodAbbreviation'>;
+        includedSeats: LocalizationValue<'includedSeats'>;
+        additionalSeats: LocalizationValue<'additionalTierFeePerBlockAmount' | 'periodAbbreviation'>;
+        unlimitedSeats: LocalizationValue;
+        tooltip: {
+          freeForUpToSeats: LocalizationValue<'endsAfterBlock'>;
+          additionalSeatsEach: LocalizationValue<'feePerBlockAmount' | 'period'>;
+          firstSeatsIncludedInPlan: LocalizationValue<'endsAfterBlock'>;
+        };
+      };
     };
     checkout: {
       title: LocalizationValue;

@@ -1,5 +1,10 @@
 import { __internal_useOrganizationBase, useClerk, useSession } from '@clerk/shared/react';
-import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/shared/types';
+import type {
+  BillingPlanResource,
+  BillingSubscriptionPlanPeriod,
+  PricingTableProps,
+  BillingPlanUnitPrice,
+} from '@clerk/shared/types';
 import * as React from 'react';
 
 import { Switch } from '@/ui/elements/Switch';
@@ -20,8 +25,9 @@ import {
   SimpleButton,
   Span,
   Text,
+  useLocalizations,
 } from '../../customizables';
-import { Check, Plus } from '../../icons';
+import { Check, Plus, User, Users } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { SubscriptionBadge } from '../Subscriptions/badge';
 import { getPricingFooterState } from './utils/pricing-footer-state';
@@ -296,9 +302,32 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
       : plan.fee;
   }, [planSupportsAnnual, planPeriod, plan.fee, plan.annualMonthlyFee]);
 
+  const singleUnitPriceTierFee = React.useMemo(() => {
+    if (plan.hasBaseFee || !plan.unitPrices || plan.unitPrices.length !== 1) {
+      return null;
+    }
+
+    const [unitPrice] = plan.unitPrices;
+    if (unitPrice.tiers.length !== 1) {
+      return null;
+    }
+
+    return unitPrice.tiers[0].feePerBlock;
+  }, [plan.hasBaseFee, plan.unitPrices]);
+
+  const displayedFee = singleUnitPriceTierFee ?? fee;
+
   const feeFormatted = React.useMemo(() => {
-    return normalizeFormatted(fee.amountFormatted);
-  }, [fee.amountFormatted]);
+    return normalizeFormatted(displayedFee.amountFormatted);
+  }, [displayedFee.amountFormatted]);
+
+  const feePeriodText = React.useMemo(() => {
+    if (!plan.hasBaseFee && plan.unitPrices) {
+      return localizationKeys('billing.monthPerUnit', { unitName: plan.unitPrices[0].name });
+    }
+
+    return localizationKeys('billing.month');
+  }, [plan.unitPrices]);
 
   return (
     <Box
@@ -361,7 +390,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           variant={isCompact ? 'h2' : 'h1'}
           colorScheme='body'
         >
-          {fee.currencySymbol}
+          {displayedFee.currencySymbol}
           {feeFormatted}
         </Text>
         {!plan.isDefault ? (
@@ -376,7 +405,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
                 marginInlineEnd: t.space.$0x25,
               },
             })}
-            localizationKey={localizationKeys('billing.month')}
+            localizationKey={feePeriodText}
           />
         ) : null}
       </Flex>
@@ -454,6 +483,9 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
           padding: 0,
         })}
       >
+        {plan.unitPrices && (plan.hasBaseFee || plan.unitPrices[0].tiers.length > 0) ? (
+          <CardFeaturesListSeatCost plan={plan} />
+        ) : null}
         {plan.features.slice(0, hasMoreFeatures ? (isCompact ? 3 : 8) : totalFeatures).map(feature => (
           <Box
             elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
@@ -513,3 +545,174 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
     </Box>
   );
 });
+
+const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
+  const { t } = useLocalizations();
+  const unitPrices = plan.unitPrices;
+  const period = t(localizationKeys('billing.month'));
+  const periodAbbreviation = t(localizationKeys('billing.monthAbbreviation'));
+
+  const seatRows = React.useMemo(() => {
+    if (!unitPrices) {
+      return null;
+    }
+
+    const seatUnitPrice = unitPrices.find(unitPrice => unitPrice.name.toLowerCase() === 'seats') ?? unitPrices[0];
+
+    if (!seatUnitPrice) {
+      return null;
+    }
+
+    const formatTierFee = (tier: BillingPlanUnitPrice['tiers'][number]) =>
+      `${tier.feePerBlock.currencySymbol}${normalizeFormatted(tier.feePerBlock.amountFormatted)}`;
+    const getCapacityText = (endsAfterBlock: number | null) =>
+      endsAfterBlock === null
+        ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
+        : localizationKeys('billing.pricingTable.seatCost.upToSeats', { endsAfterBlock });
+
+    if (seatUnitPrice.tiers.length === 1) {
+      const tier = seatUnitPrice.tiers[0];
+      const rows: Array<{
+        elementId: string;
+        icon: typeof User | typeof Users;
+        text: ReturnType<typeof localizationKeys>;
+        additionalText?: ReturnType<typeof localizationKeys>;
+        additionalTooltipText?: string;
+      }> = [];
+
+      if (tier.feePerBlock.amount !== 0 && plan.hasBaseFee) {
+        rows.push({
+          elementId: 'seats',
+          icon: User,
+          text: localizationKeys('billing.pricingTable.seatCost.perSeat', {
+            feePerBlockAmount: formatTierFee(tier),
+            periodAbbreviation,
+          }),
+        });
+      }
+
+      rows.push({
+        elementId: rows.length ? 'seats-limit' : 'seats',
+        icon: Users,
+        text: getCapacityText(tier.endsAfterBlock),
+      });
+
+      return rows;
+    }
+
+    if (seatUnitPrice.tiers.length === 2) {
+      const [includedTier, additionalTier] = seatUnitPrice.tiers;
+
+      if (
+        includedTier &&
+        additionalTier &&
+        includedTier.feePerBlock.amount === 0 &&
+        includedTier.endsAfterBlock !== null &&
+        additionalTier.feePerBlock.amount !== 0
+      ) {
+        const additionalTierFeePerBlockAmount = formatTierFee(additionalTier);
+        const tooltipPrefixText = t(
+          localizationKeys(
+            plan.fee.amount === 0
+              ? 'billing.pricingTable.seatCost.tooltip.freeForUpToSeats'
+              : 'billing.pricingTable.seatCost.tooltip.firstSeatsIncludedInPlan',
+            {
+              endsAfterBlock: includedTier.endsAfterBlock,
+            },
+          ),
+        );
+        const tooltipAdditionalText = t(
+          localizationKeys('billing.pricingTable.seatCost.tooltip.additionalSeatsEach', {
+            feePerBlockAmount: additionalTierFeePerBlockAmount,
+            period,
+          }),
+        );
+
+        return [
+          {
+            elementId: 'seats',
+            icon: User,
+            text: localizationKeys('billing.pricingTable.seatCost.includedSeats', {
+              includedSeats: includedTier.endsAfterBlock,
+            }),
+            additionalText: localizationKeys('billing.pricingTable.seatCost.additionalSeats', {
+              additionalTierFeePerBlockAmount,
+              periodAbbreviation,
+            }),
+            additionalTooltipText: `${tooltipPrefixText} ${tooltipAdditionalText}`,
+          },
+          {
+            elementId: 'seats-limit',
+            icon: Users,
+            text: getCapacityText(additionalTier.endsAfterBlock),
+          },
+        ];
+      }
+    }
+
+    return null;
+  }, [period, periodAbbreviation, plan.fee.amount, t, unitPrices]);
+
+  if (!seatRows?.length) {
+    return null;
+  }
+
+  return (
+    <>
+      {seatRows.map(row => (
+        <Box
+          key={row.elementId}
+          elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
+          elementId={descriptors.pricingTableCardFeaturesListItem.setId(row.elementId)}
+          as='li'
+          sx={t => ({
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: t.space.$2,
+            margin: 0,
+            padding: 0,
+          })}
+        >
+          <Icon
+            icon={row.icon}
+            colorScheme='neutral'
+            size='sm'
+            aria-hidden
+            sx={t => ({
+              transform: `translateY(${t.space.$0x25})`,
+            })}
+          />
+          <Span elementDescriptor={descriptors.pricingTableCardFeaturesListItemContent}>
+            <Text
+              elementDescriptor={descriptors.pricingTableCardFeaturesListItemTitle}
+              colorScheme='body'
+              sx={t => ({
+                fontWeight: t.fontWeights.$normal,
+              })}
+            >
+              <Span localizationKey={row.text} />
+              {row.additionalText ? (
+                <>
+                  {' '}
+                  {row.additionalTooltipText ? (
+                    <Tooltip.Root>
+                      <Tooltip.Trigger>
+                        <Span
+                          localizationKey={row.additionalText}
+                          sx={{ textDecoration: 'underline dotted' }}
+                        />
+                      </Tooltip.Trigger>
+                      <Tooltip.Content text={row.additionalTooltipText} />
+                    </Tooltip.Root>
+                  ) : (
+                    <Span localizationKey={row.additionalText} />
+                  )}
+                </>
+              ) : null}
+            </Text>
+          </Span>
+        </Box>
+      ))}
+    </>
+  );
+};
