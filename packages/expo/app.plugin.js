@@ -9,7 +9,13 @@
  * Native modules are registered via react-native.config.js and standard
  * React Native autolinking (RCTViewManager / ReactPackage).
  */
-const { withXcodeProject, withDangerousMod, withInfoPlist, withAppBuildGradle } = require('@expo/config-plugins');
+const {
+  withXcodeProject,
+  withDangerousMod,
+  withInfoPlist,
+  withAppBuildGradle,
+  withEntitlementsPlist,
+} = require('@expo/config-plugins');
 const path = require('path');
 const fs = require('fs');
 
@@ -507,6 +513,26 @@ const withClerkAndroid = config => {
       console.log('✅ Clerk Android packaging exclusions added');
     }
 
+    // --- Kotlin metadata version check skip ---
+    if (!buildGradle.includes('-Xskip-metadata-version-check')) {
+      const kotlinOptionsMatch = buildGradle.match(/kotlinOptions\s*\{/);
+      if (kotlinOptionsMatch) {
+        buildGradle = buildGradle.replace(
+          /kotlinOptions\s*\{/,
+          `kotlinOptions {\n        // Clerk: allow reading metadata from newer Kotlin versions\n        freeCompilerArgs += ['-Xskip-metadata-version-check']`,
+        );
+      } else {
+        const androidMatch = buildGradle.match(/android\s*\{/);
+        if (androidMatch) {
+          buildGradle = buildGradle.replace(
+            /android\s*\{/,
+            `android {\n    kotlinOptions {\n        // Clerk: allow reading metadata from newer Kotlin versions\n        freeCompilerArgs += ['-Xskip-metadata-version-check']\n    }`,
+          );
+        }
+      }
+      console.log('✅ Clerk Android Kotlin metadata version check skip added');
+    }
+
     modConfig.modResults.contents = buildGradle;
     return modConfig;
   });
@@ -572,8 +598,23 @@ const withClerkKeychainService = (config, { keychainService } = {}) => {
   });
 };
 
+/**
+ * Add Sign in with Apple entitlement to the iOS app.
+ * Required for the native Apple Sign In flow via ASAuthorizationController.
+ */
+const withClerkAppleSignIn = config => {
+  return withEntitlementsPlist(config, modConfig => {
+    if (!modConfig.modResults['com.apple.developer.applesignin']) {
+      modConfig.modResults['com.apple.developer.applesignin'] = ['Default'];
+      console.log('✅ Added Sign in with Apple entitlement');
+    }
+    return modConfig;
+  });
+};
+
 const withClerkExpo = (config, props = {}) => {
   config = withClerkIOS(config);
+  config = withClerkAppleSignIn(config);
   config = withClerkGoogleSignIn(config);
   config = withClerkAndroid(config);
   config = withClerkKeychainService(config, props);
