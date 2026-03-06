@@ -11,7 +11,7 @@ import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
 
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment } from '../../contexts';
-import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import { Box, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { mqu } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
@@ -19,6 +19,7 @@ import { MembersActionsRow } from './MembersActions';
 import { MembersSearch } from './MembersSearch';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
+import { Users } from '@/icons';
 
 export const ACTIVE_MEMBERS_PAGE_SIZE = 10;
 
@@ -33,7 +34,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const [query, setQuery] = useState('');
   const [search, setSearch] = useState('');
 
-  const { membershipRequests, memberships, invitations } = useOrganization({
+  const { membershipRequests, memberships, invitations, organization } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
     invitations: canManageMemberships || undefined,
     memberships: canReadMemberships
@@ -43,6 +44,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
         }
       : undefined,
   });
+  organization?.maxAllowedMemberships;
 
   if (canManageMemberships === null) {
     return null;
@@ -57,6 +59,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('organizationMembers')}
         gap={4}
+        sx={theme => ({ paddingBottom: theme.space.$13 })}
       >
         <Action.Root animate={false}>
           <Animated asChild>
@@ -173,6 +176,46 @@ export const OrganizationMembers = withCardStateProvider(() => {
           </Tabs>
         </Action.Root>
       </Col>
+
+      {canReadMemberships && !!memberships?.count && organization?.maxAllowedMemberships && (
+        <Box
+          sx={theme => ({
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: theme.colors.$colorBackground,
+            borderTop: `1px solid ${theme.colors.$borderAlpha100}`,
+            paddingInline: theme.space.$4,
+            height: theme.space.$13,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          })}
+        >
+          <Text
+            sx={t => ({
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: t.space.$2,
+            })}
+          >
+            <Icon
+              icon={Users}
+              size='md'
+              colorScheme='neutral'
+            />
+            <Text
+              as='span'
+              colorScheme='inherit'
+              localizationKey={localizationKeys('organizationProfile.start.membershipSeatUsageLabel', {
+                count: memberships.count + (invitations?.count ?? 0),
+                limit: organization.maxAllowedMemberships,
+              })}
+            />
+          </Text>
+        </Box>
+      )}
     </Col>
   );
 });

@@ -1005,6 +1005,7 @@ export type __internal_LocalizationResource = {
     badge__manualInvitation: LocalizationValue;
     start: {
       headerTitle__members: LocalizationValue;
+      membershipSeatUsageLabel: LocalizationValue<'count' | 'limit'>;
       headerTitle__general: LocalizationValue;
       profileSection: {
         title: LocalizationValue;
