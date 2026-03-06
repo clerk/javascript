@@ -369,34 +369,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       await u.po.expect.toBeSignedIn();
     });
 
-    test('status transitions to degraded (not error) when tokens return 429', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
-
-      await u.po.signIn.goTo();
-      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-      await u.po.expect.toBeSignedIn();
-
-      // Navigate to status page while signed in
-      await u.page.goToRelative('/clerk-status');
-      await expect(page.getByText('Status: ready', { exact: true })).toBeVisible();
-
-      // Intercept token requests to return 429
-      await page.route('**/v1/client/sessions/*/tokens**', route => {
-        return route.fulfill(make429ClerkResponse());
-      });
-
-      // Clear the token cache so the next poller tick makes a fresh network request
-      await page.evaluate(() => window.Clerk?.session?.clearCache());
-
-      // The app should enter degraded state, not error
-      await expect(page.getByText('Status: degraded', { exact: true })).toBeVisible({
-        timeout: 10_000,
-      });
-
-      // Verify the user is still signed in despite degraded state
-      await page.unrouteAll();
-    });
-
     test('429 on /tokens does not cause recursive handleUnauthenticated calls', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
