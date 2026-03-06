@@ -29,9 +29,10 @@ vi.mock('../auth/devBrowser', () => ({
   createDevBrowser: (): DevBrowser => ({
     clear: vi.fn(),
     setup: vi.fn(),
-    getDevBrowserJWT: vi.fn(() => 'deadbeef'),
-    setDevBrowserJWT: vi.fn(),
-    removeDevBrowserJWT: vi.fn(),
+    getDevBrowser: vi.fn(() => 'deadbeef'),
+    setDevBrowser: vi.fn(),
+    removeDevBrowser: vi.fn(),
+    refreshCookies: vi.fn(),
   }),
 }));
 
@@ -2509,7 +2510,7 @@ describe('Clerk singleton', () => {
       expect(url).toBe('foo');
     });
 
-    it('uses the hash to propagate the dev_browser JWT by default on dev', async () => {
+    it('uses the hash to propagate the dev browser by default on dev', async () => {
       const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 
@@ -2517,7 +2518,7 @@ describe('Clerk singleton', () => {
       expect(url).toBe('https://example.com/some-path?__clerk_db_jwt=deadbeef');
     });
 
-    it('uses the query param to propagate the dev_browser JWT if specified by option on dev', async () => {
+    it('uses the query param to propagate the dev browser if specified by option on dev', async () => {
       const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 
@@ -2525,7 +2526,7 @@ describe('Clerk singleton', () => {
       expect(url).toBe('https://example.com/some-path?__clerk_db_jwt=deadbeef');
     });
 
-    it('uses the query param to propagate the dev_browser JWT to Account Portal pages on dev - non-kima', async () => {
+    it('uses the query param to propagate the dev browser to Account Portal pages on dev - non-kima', async () => {
       const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 
@@ -2533,7 +2534,7 @@ describe('Clerk singleton', () => {
       expect(url).toBe('https://accounts.abcef.12345.dev.lclclerk.com/?__clerk_db_jwt=deadbeef');
     });
 
-    it('uses the query param to propagate the dev_browser JWT to Account Portal pages on dev - kima', async () => {
+    it('uses the query param to propagate the dev browser to Account Portal pages on dev - kima', async () => {
       const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 

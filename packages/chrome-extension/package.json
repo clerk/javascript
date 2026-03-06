@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "2.8.10",
+  "version": "3.0.1",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
     "auth",
@@ -22,11 +22,48 @@
   },
   "license": "MIT",
   "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./client": {
+      "import": {
+        "types": "./dist/types/client/index.d.ts",
+        "default": "./dist/esm/client/index.js"
+      },
+      "require": {
+        "types": "./dist/types/client/index.d.ts",
+        "default": "./dist/cjs/client/index.js"
+      }
+    },
+    "./background": {
+      "import": {
+        "types": "./dist/types/background/index.d.ts",
+        "default": "./dist/esm/background/index.js"
+      },
+      "require": {
+        "types": "./dist/types/background/index.d.ts",
+        "default": "./dist/cjs/background/index.js"
+      }
+    },
+    "./types": {
+      "types": "./dist/types/types/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "files": [
     "background",
+    "client",
     "dist",
     "internal",
     "react",
@@ -42,7 +79,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16",
+    "lint:attw": "attw --pack . --profile node16 --ignore-rules unexpected-module-syntax",
     "lint:publint": "publint",
     "test": "vitest run",
     "test:ci": "vitest run --maxWorkers=70%",

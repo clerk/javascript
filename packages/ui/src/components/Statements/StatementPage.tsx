@@ -137,12 +137,24 @@ export const StatementPage = () => {
                             </SimpleButton>
                           }
                         />
-                        {item.subscriptionItem.credit && item.subscriptionItem.credit.amount.amount > 0 ? (
+                        {item.subscriptionItem.credits &&
+                        item.subscriptionItem.credits.proration &&
+                        item.subscriptionItem.credits.proration.amount.amount > 0 ? (
                           <Statement.SectionContentDetailsListItem
                             label={localizationKeys(
                               `${localizationRoot}.billingPage.statementsSection.itemCaption__proratedCredit`,
                             )}
-                            value={`(${item.subscriptionItem.credit.amount.currencySymbol}${item.subscriptionItem.credit.amount.amountFormatted})`}
+                            value={`(${item.subscriptionItem.credits.proration.amount.currencySymbol}${item.subscriptionItem.credits.proration.amount.amountFormatted})`}
+                          />
+                        ) : null}
+                        {item.subscriptionItem.credits &&
+                        item.subscriptionItem.credits.payer &&
+                        item.subscriptionItem.credits.payer.appliedAmount.amount > 0 ? (
+                          <Statement.SectionContentDetailsListItem
+                            label={localizationKeys(
+                              `${localizationRoot}.billingPage.statementsSection.itemCaption__payerCredit`,
+                            )}
+                            value={`(${item.subscriptionItem.credits.payer.appliedAmount.currencySymbol}${item.subscriptionItem.credits.payer.appliedAmount.amountFormatted})`}
                           />
                         ) : null}
                       </Statement.SectionContentDetailsList>

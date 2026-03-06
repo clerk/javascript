@@ -1,9 +1,12 @@
 import { hasUrlInFragment, stripOrigin } from '@clerk/shared/internal/clerk-js/url';
 import React from 'react';
 
+import type { RefreshEvent } from './BaseRouter';
 import { BaseRouter } from './BaseRouter';
 
 export const hashRouterBase = 'CLERK-ROUTER/HASH';
+
+const HASH_REFRESH_EVENTS: RefreshEvent[] = ['pushstate', 'replacestate', 'popstate', 'hashchange'];
 
 interface HashRouterProps {
   preservedParams?: string[];
@@ -44,7 +47,7 @@ export const HashRouter = ({ preservedParams, children }: HashRouterProps): JSX.
       startPath={''}
       getQueryString={getQueryString}
       internalNavigate={internalNavigate}
-      refreshEvents={['popstate', 'hashchange']}
+      refreshEvents={HASH_REFRESH_EVENTS}
       preservedParams={preservedParams}
     >
       {children}

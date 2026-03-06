@@ -12,6 +12,7 @@ export const templates = {
   'react-cra': resolve(__dirname, './react-cra'),
   'react-vite': resolve(__dirname, './react-vite'),
   'express-vite': resolve(__dirname, './express-vite'),
+  'hono-vite': resolve(__dirname, './hono-vite'),
   'elements-next': resolve(__dirname, './elements-next'),
   'astro-node': resolve(__dirname, './astro-node'),
   'astro-hybrid': resolve(__dirname, './astro-hybrid'),

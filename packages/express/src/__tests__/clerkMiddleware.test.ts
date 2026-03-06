@@ -117,15 +117,6 @@ describe('clerkMiddleware', () => {
     expect(response.header).toHaveProperty('location', expect.stringContaining('/v1/client/handshake?redirect_url='));
   });
 
-  it('can disable handshake flow', async () => {
-    const response = await runMiddleware(clerkMiddleware({ enableHandshake: false }), {
-      Cookie: '__client_uat=1711618859;',
-      'Sec-Fetch-Dest': 'document',
-    }).expect(200);
-
-    assertNoDebugHeaders(response);
-  });
-
   describe('Frontend API proxy handling', () => {
     beforeEach(() => {
       mockClerkFrontendApiProxy.mockReset();

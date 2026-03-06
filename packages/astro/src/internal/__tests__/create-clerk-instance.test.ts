@@ -42,7 +42,7 @@ describe('getClerkUIEntryChunk', () => {
     (window as any).Clerk = undefined;
   });
 
-  it('preserves clerkUIUrl from options', async () => {
+  it('preserves __internal_clerkUIUrl from options', async () => {
     mockLoadClerkUIScript.mockImplementation(async () => {
       (window as any).__internal_ClerkUICtor = mockClerkUICtor;
       return null;
@@ -59,18 +59,18 @@ describe('getClerkUIEntryChunk', () => {
     // Dynamically import to get fresh module with mocks
     const { createClerkInstance } = await import('../create-clerk-instance');
 
-    // Call createClerkInstance with clerkUIUrl
+    // Call createClerkInstance with __internal_clerkUIUrl
     await createClerkInstance({
       publishableKey: 'pk_test_xxx',
-      clerkUIUrl: 'https://custom.selfhosted.example.com/ui.js',
+      __internal_clerkUIUrl: 'https://custom.selfhosted.example.com/ui.js',
     });
 
     expect(mockLoadClerkUIScript).toHaveBeenCalled();
     const loadClerkUIScriptCall = mockLoadClerkUIScript.mock.calls[0]?.[0] as Record<string, unknown>;
-    expect(loadClerkUIScriptCall?.clerkUIUrl).toBe('https://custom.selfhosted.example.com/ui.js');
+    expect(loadClerkUIScriptCall?.__internal_clerkUIUrl).toBe('https://custom.selfhosted.example.com/ui.js');
   });
 
-  it('does not set clerkUIUrl when not provided', async () => {
+  it('does not set __internal_clerkUIUrl when not provided', async () => {
     mockLoadClerkUIScript.mockImplementation(async () => {
       (window as any).__internal_ClerkUICtor = mockClerkUICtor;
       return null;
@@ -92,6 +92,6 @@ describe('getClerkUIEntryChunk', () => {
 
     expect(mockLoadClerkUIScript).toHaveBeenCalled();
     const loadClerkUIScriptCall = mockLoadClerkUIScript.mock.calls[0]?.[0] as Record<string, unknown>;
-    expect(loadClerkUIScriptCall?.clerkUIUrl).toBeUndefined();
+    expect(loadClerkUIScriptCall?.__internal_clerkUIUrl).toBeUndefined();
   });
 });

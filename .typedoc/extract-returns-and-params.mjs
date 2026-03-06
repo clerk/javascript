@@ -141,10 +141,10 @@ function getAllMdxFiles(dir) {
 }
 
 /**
- * Main function to process all clerk-react files
+ * Main function to process all files from the react package
  */
 function main() {
-  const packages = ['clerk-react'];
+  const packages = ['react'];
   const dirs = packages.map(folder => path.join(__dirname, 'temp-docs', folder));
 
   for (const dir of dirs) {

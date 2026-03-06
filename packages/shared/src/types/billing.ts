@@ -693,6 +693,7 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
      */
     amount: BillingMoneyAmount;
   };
+  credits?: BillingCredits;
   /**
    * Seat entitlement details for this subscription item. Only set for organization subscription items with
    * seat-based billing.
@@ -1142,8 +1143,7 @@ interface CheckoutFlowMethods {
 }
 
 /**
- * Public API type for checkout flow. Properties are null when status is 'needs_initialization'
- * and present when status is 'needs_confirmation' or 'completed'.
+ * @interface
  */
 export type CheckoutFlowResource = CheckoutPropertiesPerStatus & CheckoutFlowMethods;
 
