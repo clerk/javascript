@@ -472,9 +472,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
       if (!clerk.loaded) {
         this.beforeLoad(clerk);
-        // Only load UI scripts in standard browser environments (not native/headless)
-        const shouldLoadUi = !this.options.Clerk && this.options.standardBrowser !== false;
-        const ClerkUI = shouldLoadUi ? await this.getClerkUIEntryChunk() : this.options.ui?.ClerkUI;
+        // Load UI in standard browser environments, or when a bundled ClerkUI is provided via the ui prop
+        const shouldLoadUi =
+          this.options.standardBrowser !== false && (!this.options.Clerk || this.options.ui?.ClerkUI);
+        const ClerkUI = shouldLoadUi ? await this.getClerkUIEntryChunk() : undefined;
         await clerk.load({ ...this.options, ui: { ...this.options.ui, ClerkUI } });
       }
       if (clerk.loaded) {
