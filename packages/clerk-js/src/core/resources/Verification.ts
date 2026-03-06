@@ -107,6 +107,7 @@ export class SignUpVerifications implements SignUpVerificationsResource {
   phoneNumber: SignUpVerificationResource;
   web3Wallet: SignUpVerificationResource;
   externalAccount: VerificationResource;
+  protectCheck: { url: string } | null;
 
   constructor(data: SignUpVerificationsJSON | SignUpVerificationsJSONSnapshot | null) {
     if (data) {
@@ -114,11 +115,13 @@ export class SignUpVerifications implements SignUpVerificationsResource {
       this.phoneNumber = new SignUpVerification(data.phone_number);
       this.web3Wallet = new SignUpVerification(data.web3_wallet);
       this.externalAccount = new Verification(data.external_account);
+      this.protectCheck = data.protect_check ?? null;
     } else {
       this.emailAddress = new SignUpVerification(null);
       this.phoneNumber = new SignUpVerification(null);
       this.web3Wallet = new SignUpVerification(null);
       this.externalAccount = new Verification(null);
+      this.protectCheck = null;
     }
   }
 
@@ -128,6 +131,7 @@ export class SignUpVerifications implements SignUpVerificationsResource {
       phone_number: this.phoneNumber.__internal_toSnapshot(),
       web3_wallet: this.web3Wallet.__internal_toSnapshot(),
       external_account: this.externalAccount.__internal_toSnapshot(),
+      protect_check: this.protectCheck,
     };
   }
 }

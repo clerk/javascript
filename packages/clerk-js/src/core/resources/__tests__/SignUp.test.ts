@@ -28,6 +28,12 @@ vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
   })),
 }));
 
+// Mock the protectCheck module
+const mockExecuteProtectCheck = vi.fn();
+vi.mock('../../../utils/protectCheck', () => ({
+  executeProtectCheck: (...args: any[]) => mockExecuteProtectCheck(...args),
+}));
+
 describe('SignUp', () => {
   it('can be serialized with JSON.stringify', () => {
     const signUp = new SignUp();
@@ -1093,6 +1099,424 @@ describe('SignUp', () => {
         expect(mockClient.signUp.status).toBeNull();
         expect(mockClient.signUp.emailAddress).toBeNull();
         expect(mockClient.signUp.firstName).toBeNull();
+      });
+    });
+  });
+
+  describe('protect check', () => {
+    describe('fromJSON and toSnapshot', () => {
+      it('deserializes protect_check from verifications JSON', () => {
+        const signUp = new SignUp({
+          id: 'signup_123',
+          status: 'missing_requirements',
+          verifications: {
+            protect_check: { url: 'https://cdn.example.com/check.mjs' },
+          },
+        } as any);
+
+        expect(signUp.verifications.protectCheck).toEqual({ url: 'https://cdn.example.com/check.mjs' });
+      });
+
+      it('deserializes protect_check as null when not present', () => {
+        const signUp = new SignUp({
+          id: 'signup_123',
+          status: 'missing_requirements',
+        } as any);
+
+        expect(signUp.verifications.protectCheck).toBeNull();
+      });
+
+      it('deserializes protect_check as null when explicitly null', () => {
+        const signUp = new SignUp({
+          id: 'signup_123',
+          status: 'missing_requirements',
+          verifications: {
+            protect_check: null,
+          },
+        } as any);
+
+        expect(signUp.verifications.protectCheck).toBeNull();
+      });
+
+      it('serializes protect_check in toSnapshot', () => {
+        const signUp = new SignUp({
+          id: 'signup_123',
+          status: 'missing_requirements',
+          verifications: {
+            protect_check: { url: 'https://cdn.example.com/check.mjs' },
+          },
+        } as any);
+
+        const snapshot = signUp.__internal_toSnapshot();
+        expect(snapshot.verifications.protect_check).toEqual({ url: 'https://cdn.example.com/check.mjs' });
+      });
+
+      it('serializes protect_check as null in toSnapshot when not set', () => {
+        const signUp = new SignUp({
+          id: 'signup_123',
+          status: 'missing_requirements',
+        } as any);
+
+        const snapshot = signUp.__internal_toSnapshot();
+        expect(snapshot.verifications.protect_check).toBeNull();
+      });
+    });
+
+    describe('SignUpFuture.verifications.protectCheck getter', () => {
+      it('exposes protectCheck from the underlying resource verifications', () => {
+        const signUp = new SignUp({
+          id: 'signup_123',
+          verifications: {
+            protect_check: { url: 'https://cdn.example.com/check.mjs' },
+          },
+        } as any);
+
+        expect(signUp.__internal_future.verifications.protectCheck).toEqual({
+          url: 'https://cdn.example.com/check.mjs',
+        });
+      });
+
+      it('returns null when no protect check', () => {
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        expect(signUp.__internal_future.verifications.protectCheck).toBeNull();
+      });
+    });
+
+    describe('SignUp.runProtectCheck', () => {
+      beforeEach(() => {
+        SignUp.clerk = {
+          __internal_environment: {
+            displayConfig: { captchaOauthBypass: [] },
+          },
+          client: { captchaBypass: true },
+        } as any;
+        mockExecuteProtectCheck.mockReset();
+      });
+
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.unstubAllGlobals();
+        SignUp.clerk = {} as any;
+      });
+
+      it('calls prepare_protect_check, executes script, and calls attempt_protect_check', async () => {
+        mockExecuteProtectCheck.mockResolvedValue({ token: 'solved_abc' });
+
+        const mockFetch = vi
+          .fn()
+          // prepare_protect_check response
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              status: 'missing_requirements',
+              missing_fields: ['protect_check'],
+              verifications: { protect_check: { url: 'https://cdn.example.com/check.mjs' } },
+            },
+          })
+          // attempt_protect_check response
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              status: 'missing_requirements',
+              missing_fields: [],
+              verifications: { protect_check: null },
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({
+          id: 'signup_123',
+          status: 'missing_requirements',
+          missing_fields: ['protect_check'],
+        } as any);
+        await signUp.runProtectCheck();
+
+        // executeProtectCheck was called with the URL, the signUp resource, and a container div
+        expect(mockExecuteProtectCheck).toHaveBeenCalledTimes(1);
+        expect(mockExecuteProtectCheck).toHaveBeenCalledWith(
+          'https://cdn.example.com/check.mjs',
+          signUp,
+          expect.any(HTMLDivElement),
+        );
+
+        // First call: prepare_protect_check
+        expect(mockFetch).toHaveBeenCalledTimes(2);
+        expect(mockFetch.mock.calls[0][0]).toEqual(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups/signup_123/prepare_protect_check',
+          }),
+        );
+
+        // Second call: attempt_protect_check with result
+        expect(mockFetch.mock.calls[1][0]).toEqual(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups/signup_123/attempt_protect_check',
+            body: { token: 'solved_abc' },
+          }),
+        );
+      });
+
+      it('cleans up the protect check container after execution', async () => {
+        mockExecuteProtectCheck.mockResolvedValue({ token: 'solved' });
+
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              status: 'missing_requirements',
+              verifications: { protect_check: { url: 'https://cdn.example.com/check.mjs' } },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: { id: 'signup_123', status: 'missing_requirements', verifications: { protect_check: null } },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.runProtectCheck();
+
+        const container = mockExecuteProtectCheck.mock.calls[0][2] as HTMLDivElement;
+        expect(container.innerHTML).toBe('');
+      });
+
+      it('cleans up container even when executeProtectCheck throws', async () => {
+        mockExecuteProtectCheck.mockRejectedValue(new Error('script failed'));
+
+        const mockFetch = vi.fn().mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signup_123',
+            status: 'missing_requirements',
+            verifications: { protect_check: { url: 'https://cdn.example.com/check.mjs' } },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await expect(signUp.runProtectCheck()).rejects.toThrow('script failed');
+
+        const container = mockExecuteProtectCheck.mock.calls[0][2] as HTMLDivElement;
+        expect(container.innerHTML).toBe('');
+      });
+
+      it('throws when prepare returns no protect_check URL', async () => {
+        const mockFetch = vi.fn().mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signup_123',
+            status: 'missing_requirements',
+            verifications: { protect_check: null },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await expect(signUp.runProtectCheck()).rejects.toThrow('No protect check script URL returned');
+
+        expect(mockExecuteProtectCheck).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('SignUp.create does not auto-execute protect check', () => {
+      beforeEach(() => {
+        SignUp.clerk = {
+          __internal_environment: {
+            displayConfig: { captchaOauthBypass: [] },
+          },
+          client: { captchaBypass: true },
+        } as any;
+        mockExecuteProtectCheck.mockReset();
+      });
+
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.unstubAllGlobals();
+        SignUp.clerk = {} as any;
+      });
+
+      it('does not auto-execute protect check even when protect_check is in response', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_123',
+            status: 'missing_requirements',
+            missing_fields: ['protect_check'],
+            verifications: { protect_check: { url: 'https://cdn.example.com/check.mjs' } },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.create({ emailAddress: 'user@example.com' });
+
+        expect(mockExecuteProtectCheck).not.toHaveBeenCalled();
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('SignUpFuture.verifications.runProtectCheck', () => {
+      beforeEach(() => {
+        SignUp.clerk = {
+          client: { captchaBypass: true },
+        } as any;
+        mockExecuteProtectCheck.mockReset();
+      });
+
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.unstubAllGlobals();
+        SignUp.clerk = {} as any;
+      });
+
+      it('runs prepare → execute → attempt flow', async () => {
+        mockExecuteProtectCheck.mockResolvedValue({ token: 'solved_xyz' });
+
+        const mockFetch = vi
+          .fn()
+          // prepare_protect_check response
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              status: 'missing_requirements',
+              verifications: { protect_check: { url: 'https://cdn.example.com/check.mjs' } },
+            },
+          })
+          // attempt_protect_check response
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              status: 'missing_requirements',
+              verifications: { protect_check: null },
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({
+          id: 'signup_123',
+          status: 'missing_requirements',
+          missing_fields: ['protect_check'],
+        } as any);
+        const result = await signUp.__internal_future.verifications.runProtectCheck();
+
+        expect(result).toHaveProperty('error', null);
+        expect(mockExecuteProtectCheck).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledTimes(2);
+
+        // First call: prepare_protect_check
+        expect(mockFetch.mock.calls[0][0]).toEqual(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups/signup_123/prepare_protect_check',
+          }),
+        );
+
+        // Second call: attempt_protect_check with result
+        expect(mockFetch.mock.calls[1][0]).toEqual(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups/signup_123/attempt_protect_check',
+            body: { token: 'solved_xyz' },
+          }),
+        );
+      });
+
+      it('returns error when prepare returns no URL', async () => {
+        const mockFetch = vi.fn().mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signup_123',
+            status: 'missing_requirements',
+            verifications: { protect_check: null },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        const result = await signUp.__internal_future.verifications.runProtectCheck();
+
+        expect(result.error).toBeTruthy();
+        expect(mockExecuteProtectCheck).not.toHaveBeenCalled();
+      });
+
+      it('does not auto-execute protect check from create', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_123',
+            status: 'missing_requirements',
+            missing_fields: ['protect_check'],
+            verifications: { protect_check: { url: 'https://cdn.example.com/check.mjs' } },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.create({ emailAddress: 'user@example.com' });
+
+        expect(mockExecuteProtectCheck).not.toHaveBeenCalled();
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+      });
+
+      it('does not auto-execute protect check from password', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_123',
+            status: 'missing_requirements',
+            missing_fields: ['protect_check'],
+            verifications: { protect_check: { url: 'https://cdn.example.com/check.mjs' } },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.password({
+          password: 'secure-password',
+          emailAddress: 'user@example.com',
+        });
+
+        expect(mockExecuteProtectCheck).not.toHaveBeenCalled();
+      });
+
+      it('does not auto-execute protect check from sso', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+        SignUp.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://example.com/sso-callback'),
+          __internal_environment: {
+            displayConfig: { captchaOauthBypass: [] },
+          },
+          client: { captchaBypass: true },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_123',
+            verifications: {
+              externalAccount: { status: 'complete' },
+              protect_check: { url: 'https://cdn.example.com/check.mjs' },
+            },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/complete',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        expect(mockExecuteProtectCheck).not.toHaveBeenCalled();
       });
     });
   });
