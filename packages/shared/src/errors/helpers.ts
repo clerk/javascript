@@ -50,16 +50,21 @@ export function is429Error(e: any): boolean {
  * Checks if the provided error indicates the user's session is no longer valid
  * and should trigger the unauthenticated flow (e.g. sign-out / redirect to sign-in).
  *
- * This is a 4xx client error that is NOT a rate limit (429). Rate-limited requests
- * are transient — the session may still be valid, so they should be retried rather
- * than treated as authentication failures.
+ * Only matches explicit authentication failure status codes:
+ * - 401: session is invalid or expired
+ * - 422: invalid session state (e.g. missing_expired_token)
  *
- * Use this instead of `is4xxError` when deciding whether to call `handleUnauthenticated`.
+ * 404 is intentionally excluded despite being returned for "session not found",
+ * because it's also returned for unrelated resources (org not found, JWT template
+ * not found) and shares the same `resource_not_found` error code, making it
+ * impossible to distinguish. Session-not-found 401s are already handled directly
+ * by Base._fetch.
  *
  * @internal
  */
 export function isUnauthenticatedError(e: any): boolean {
-  return is4xxError(e) && !is429Error(e);
+  const status = e?.status;
+  return status === 401 || status === 422;
 }
 
 /**

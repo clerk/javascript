@@ -103,15 +103,15 @@ describe('is429Error', () => {
 });
 
 describe('isUnauthenticatedError', () => {
-  it('returns true for auth-related 4xx errors', () => {
-    expect(isUnauthenticatedError({ status: 400 })).toBe(true);
+  it('returns true for authentication failure status codes', () => {
     expect(isUnauthenticatedError({ status: 401 })).toBe(true);
-    expect(isUnauthenticatedError({ status: 403 })).toBe(true);
-    expect(isUnauthenticatedError({ status: 404 })).toBe(true);
     expect(isUnauthenticatedError({ status: 422 })).toBe(true);
   });
 
-  it('returns false for 429 (rate limit)', () => {
+  it('returns false for other 4xx status codes', () => {
+    expect(isUnauthenticatedError({ status: 400 })).toBe(false);
+    expect(isUnauthenticatedError({ status: 403 })).toBe(false);
+    expect(isUnauthenticatedError({ status: 404 })).toBe(false);
     expect(isUnauthenticatedError({ status: 429 })).toBe(false);
   });
 
