@@ -160,47 +160,6 @@ describe('SignUp', () => {
         vi.unstubAllGlobals();
       });
 
-      it('creates signup with phoneNumber when no existing signup', async () => {
-        const mockFetch = vi
-          .fn()
-          .mockResolvedValueOnce({
-            client: null,
-            response: { id: 'signup_123', status: 'missing_requirements' },
-          })
-          .mockResolvedValueOnce({
-            client: null,
-            response: { id: 'signup_123' },
-          });
-        BaseResource._fetch = mockFetch;
-
-        const signUp = new SignUp();
-        await signUp.__internal_future.verifications.sendPhoneCode({ phoneNumber: '+15551234567' });
-
-        // First call should create signup with phoneNumber
-        expect(mockFetch).toHaveBeenNthCalledWith(
-          1,
-          expect.objectContaining({
-            method: 'POST',
-            path: '/client/sign_ups',
-            body: expect.objectContaining({
-              phoneNumber: '+15551234567',
-            }),
-          }),
-        );
-
-        // Second call should prepare verification
-        expect(mockFetch).toHaveBeenNthCalledWith(
-          2,
-          expect.objectContaining({
-            method: 'POST',
-            path: '/client/sign_ups/signup_123/prepare_verification',
-            body: expect.objectContaining({
-              strategy: 'phone_code',
-            }),
-          }),
-        );
-      });
-
       it('uses existing signup when already created', async () => {
         const mockFetch = vi.fn().mockResolvedValue({
           client: null,

@@ -152,6 +152,7 @@ const TaskResetPasswordInternal = () => {
                         }
                         return confirmField.props.onChange(e);
                       }}
+                      autoComplete='new-password'
                     />
                   </Form.ControlRow>
                   <Form.ControlRow elementId={sessionsField.id}>

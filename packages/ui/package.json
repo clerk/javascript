@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "Internal package that contains the UI components for the Clerk frontend SDKs",
   "repository": {
     "type": "git",
@@ -24,6 +24,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./no-rhc": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/no-rhc/index.js",
+      "default": "./dist/no-rhc/index.js"
     },
     "./entry": {
       "types": "./dist/entry.d.ts",
@@ -64,13 +69,14 @@
     "register"
   ],
   "scripts": {
-    "build": "pnpm build:umd && pnpm build:esm",
+    "build": "pnpm build:umd && pnpm build:esm && pnpm check:no-rhc",
     "build:analyze": "rspack build --config rspack.config.js --env production --env analyze --analyze",
     "build:esm": "tsdown",
     "build:rsdoctor": "RSDOCTOR=true rspack build --config rspack.config.js --env production",
     "build:umd": "rspack build --config rspack.config.js --env production",
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
+    "check:no-rhc": "node ../../scripts/search-for-rhc.mjs directory dist/no-rhc",
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4011}",

@@ -7,6 +7,9 @@ out-tsc
 out
 **/dist/*
 **/build/*
+!playground/browser-extension-js/build/manifest.json
+!playground/browser-extension-js/build/popup.html
+!playground/browser-extension-js/build/popup.css
 packages/*/dist/**
 **/.pnpm-store/**
 
@@ -61,9 +64,8 @@ lerna-debug.log
 .next
 .dev.vars
 .env.local
-.yalc
-yalc.lock
 playground/*/build
+!playground/browser-extension-js/build
 playground/*/public/build
 playground/*/.cache
 playground/custom
@@ -86,7 +88,7 @@ test-results
 sessions-key.pem
 sessions.pem
 
-# Verdaccio
+# pkglab / Verdaccio local registry
 .verdaccio
 
 # Release preflight
@@ -110,3 +112,6 @@ CLAUDE.local.md
 
 # Claude Code local settings (user-specific permissions)
 .claude/settings.local.json
+
+# Git worktrees
+.worktrees

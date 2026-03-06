@@ -47,7 +47,13 @@ export const application = (
       const nodeModulesExist = await fs.pathExists(path.resolve(appDirPath, 'node_modules'));
       if (force || !nodeModulesExist) {
         const log = logger.child({ prefix: 'setup' }).info;
-        await run(scripts.setup, { cwd: appDirPath, log });
+        // Use pkglab add to install packages from the local registry
+        const pkglabDeps = config.pkglabDependencies;
+        if (pkglabDeps.length > 0) {
+          await run(`pkglab add ${pkglabDeps.join(' ')}`, { cwd: appDirPath, log });
+        } else {
+          await run(scripts.setup, { cwd: appDirPath, log });
+        }
         state.completedSetup = true;
         // Print all Clerk package versions (direct and transitive)
         const clerkPackagesLog = logger.child({ prefix: 'clerk-packages' }).info;

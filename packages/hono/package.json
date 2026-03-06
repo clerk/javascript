@@ -1,6 +1,6 @@
 {
   "name": "@clerk/hono",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Clerk SDK for Hono",
   "keywords": [
     "auth",
@@ -51,11 +51,10 @@
       "require": {
         "types": "./dist/types.d.ts"
       }
-    }
+    },
+    "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -63,12 +62,12 @@
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
+    "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
-    "publish:local": "pnpm yalc push --replace --sig",
     "test": "vitest run",
     "test:watch": "vitest watch"
   },
@@ -83,7 +82,7 @@
     "hono": ">=4"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

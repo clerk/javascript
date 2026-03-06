@@ -82,8 +82,6 @@ function useClerkSignal(
  *   const { signIn, errors, fetchStatus } = useSignInSignal();
  *   //
  * }
- *
- * @experimental This experimental API is subject to change.
  */
 export function useSignIn() {
   return useClerkSignal('signIn');
@@ -99,8 +97,6 @@ export function useSignIn() {
  *   const { signUp, errors, fetchStatus } = useSignUpSignal();
  *   //
  * }
- *
- * @experimental This experimental API is subject to change.
  */
 export function useSignUp() {
   return useClerkSignal('signUp');
@@ -116,8 +112,6 @@ export function useSignUp() {
  *   const { waitlist, errors, fetchStatus } = useWaitlist();
  *   //
  * }
- *
- * @experimental This experimental API is subject to change.
  */
 export function useWaitlist() {
   return useClerkSignal('waitlist');
