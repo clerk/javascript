@@ -55,5 +55,16 @@ export default defineConfig(({ watch }) => {
         }
       },
     },
+    {
+      ...common,
+      dts: false,
+      entry: ['./src/index.ts'],
+      outDir: './dist/no-rhc',
+      unbundle: true,
+      define: {
+        ...common.define,
+        __BUILD_DISABLE_RHC__: 'true',
+      },
+    },
   ];
 });

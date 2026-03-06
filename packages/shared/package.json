@@ -112,6 +112,13 @@
     },
     "./package.json": "./package.json"
   },
+  "typesVersions": {
+    "*": {
+      "types": [
+        "dist/types/index.d.ts"
+      ]
+    }
+  },
   "files": [
     "dist",
     "scripts"
