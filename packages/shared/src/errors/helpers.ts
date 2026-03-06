@@ -38,6 +38,15 @@ export function is4xxError(e: any): boolean {
 }
 
 /**
+ * Checks if the provided error is a 429 (Too Many Requests) error.
+ *
+ * @internal
+ */
+export function is429Error(e: any): boolean {
+  return e?.status === 429;
+}
+
+/**
  * Checks if the provided error is a network error.
  *
  * @internal

@@ -3,7 +3,13 @@ import type { createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { clerkEvents } from '@clerk/shared/clerkEventBus';
 import type { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserInURL } from '@clerk/shared/devBrowser';
-import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
+import {
+  is429Error,
+  is4xxError,
+  isClerkAPIResponseError,
+  isClerkRuntimeError,
+  isNetworkError,
+} from '@clerk/shared/error';
 import type { Clerk, InstanceType } from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
 
@@ -215,8 +221,9 @@ export class AuthCookieService {
       return;
     }
 
-    //sign user out if a 4XX error
-    if (is4xxError(e)) {
+    // 429 (rate limited) is not an auth failure — the session may still be valid.
+    // Treat it the same as a transient error and degrade gracefully.
+    if (is4xxError(e) && !is429Error(e)) {
       void this.clerk.handleUnauthenticated().catch(noop);
       return;
     }

@@ -5,6 +5,7 @@ import {
   ClerkRuntimeError,
   EmailLinkError,
   EmailLinkErrorCodeStatus,
+  is429Error,
   is4xxError,
   isClerkAPIResponseError,
   isClerkRuntimeError,
@@ -1595,9 +1596,9 @@ export class Clerk implements ClerkInterface {
               this.updateClient(updatedClient, { __internal_dangerouslySkipEmit: true });
             }
           } catch (e) {
-            if (is4xxError(e)) {
+            if (is4xxError(e) && !is429Error(e)) {
               void this.handleUnauthenticated();
-            } else {
+            } else if (!is429Error(e)) {
               throw e;
             }
           }
@@ -3174,7 +3175,7 @@ export class Clerk implements ClerkInterface {
     }
 
     await session.touch().catch(e => {
-      if (is4xxError(e)) {
+      if (is4xxError(e) && !is429Error(e)) {
         void this.handleUnauthenticated();
       }
     });

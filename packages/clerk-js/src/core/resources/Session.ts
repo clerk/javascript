@@ -1,6 +1,12 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { isValidBrowserOnline } from '@clerk/shared/browser';
-import { ClerkOfflineError, ClerkWebAuthnError, is4xxError, MissingExpiredTokenError } from '@clerk/shared/error';
+import {
+  ClerkOfflineError,
+  ClerkWebAuthnError,
+  is429Error,
+  is4xxError,
+  MissingExpiredTokenError,
+} from '@clerk/shared/error';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -156,7 +162,8 @@ export class Session extends BaseResource implements SessionResource {
         maxDelayBetweenRetries: 50 * 1_000,
         jitter: false,
         shouldRetry: (error, iterationsCount) => {
-          if (is4xxError(error)) {
+          // 429 is a rate limit, not an auth error — retry with backoff
+          if (is4xxError(error) && !is429Error(error)) {
             return false;
           }
 
