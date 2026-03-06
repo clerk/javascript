@@ -5,8 +5,8 @@ import {
   buildErrorThrower,
   ClerkOfflineError,
   ClerkRuntimeError,
-  is429Error,
   is4xxError,
+  is429Error,
   isClerkRuntimeError,
   isUnauthenticatedError,
 } from '../error';
