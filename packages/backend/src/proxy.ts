@@ -112,6 +112,22 @@ function createErrorResponse(code: ProxyErrorCode, message: string, status: numb
 }
 
 /**
+ * Derives the public-facing origin from forwarded headers, falling back to the raw request URL.
+ * Behind a reverse proxy, request.url is typically localhost, but the Clerk-Proxy-Url header
+ * and Location rewrites must use the origin visible to the browser.
+ */
+function derivePublicOrigin(request: Request, requestUrl: URL): string {
+  const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim();
+  const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
+
+  if (forwardedProto && forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+
+  return requestUrl.origin;
+}
+
+/**
  * Gets the client IP address from various headers
  */
 function getClientIp(request: Request): string | undefined {
@@ -208,7 +224,10 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
   });
 
   // Set required Clerk proxy headers
-  const proxyUrl = `${requestUrl.protocol}//${requestUrl.host}${proxyPath}`;
+  // Use the public origin (from forwarded headers) so the Clerk-Proxy-Url
+  // points to the browser-visible host, not localhost behind a reverse proxy.
+  const publicOrigin = derivePublicOrigin(request, requestUrl);
+  const proxyUrl = `${publicOrigin}${proxyPath}`;
   headers.set('Clerk-Proxy-Url', proxyUrl);
   headers.set('Clerk-Secret-Key', secretKey);
 
