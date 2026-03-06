@@ -1,36 +1,104 @@
 import { NextRequest } from 'next/server';
 
+const CLERK_USE_CACHE_MARKER = Symbol.for('clerk_use_cache_error');
+
+/**
+ * Custom error class for "use cache" errors with a symbol marker to prevent double-wrapping.
+ */
+export class ClerkUseCacheError extends Error {
+  readonly [CLERK_USE_CACHE_MARKER] = true;
+
+  constructor(
+    message: string,
+    public readonly originalError?: Error,
+  ) {
+    super(message);
+    this.name = 'ClerkUseCacheError';
+  }
+}
+
+export const isClerkUseCacheError = (e: unknown): e is ClerkUseCacheError => {
+  return e instanceof Error && CLERK_USE_CACHE_MARKER in e;
+};
+
+// Patterns for Next.js "use cache" errors - tightened to reduce false positives
+// Matches both "use cache" (double quotes) and 'use cache' (single quotes)
+const USE_CACHE_WITH_DYNAMIC_API_PATTERN =
+  /inside\s+["']use cache["']|["']use cache["'].*(?:headers|cookies)|(?:headers|cookies).*["']use cache["']/i;
+const CACHE_SCOPE_PATTERN = /cache scope/i;
+const DYNAMIC_DATA_SOURCE_PATTERN = /dynamic data source/i;
+// https://github.com/vercel/next.js/pull/61332
+const ROUTE_BAILOUT_PATTERN = /Route .*? needs to bail out of prerendering at this point because it used .*?./;
+
 export const isPrerenderingBailout = (e: unknown) => {
   if (!(e instanceof Error) || !('message' in e)) {
     return false;
   }
 
   const { message } = e;
-
   const lowerCaseInput = message.toLowerCase();
-  const dynamicServerUsage = lowerCaseInput.includes('dynamic server usage');
-  const bailOutPrerendering = lowerCaseInput.includes('this page needs to bail out of prerendering');
 
-  // note: new error message syntax introduced in next@14.1.1-canary.21
-  // but we still want to support older versions.
-  // https://github.com/vercel/next.js/pull/61332 (dynamic-rendering.ts:153)
-  const routeRegex = /Route .*? needs to bail out of prerendering at this point because it used .*?./;
-
-  return routeRegex.test(message) || dynamicServerUsage || bailOutPrerendering;
+  return (
+    ROUTE_BAILOUT_PATTERN.test(message) ||
+    lowerCaseInput.includes('dynamic server usage') ||
+    lowerCaseInput.includes('this page needs to bail out of prerendering') ||
+    lowerCaseInput.includes('during prerendering')
+  );
 };
+
+/**
+ * Detects Next.js errors from using dynamic APIs (headers/cookies) inside "use cache".
+ */
+export const isNextjsUseCacheError = (e: unknown): boolean => {
+  if (!(e instanceof Error)) {
+    return false;
+  }
+
+  const { message } = e;
+
+  // "use cache" with dynamic API context (e.g., 'used `headers()` inside "use cache"')
+  if (USE_CACHE_WITH_DYNAMIC_API_PATTERN.test(message)) {
+    return true;
+  }
+
+  // "cache scope" with dynamic data source (e.g., 'Dynamic data sources inside a cache scope')
+  if (CACHE_SCOPE_PATTERN.test(message) && DYNAMIC_DATA_SOURCE_PATTERN.test(message)) {
+    return true;
+  }
+
+  return false;
+};
+
+export const USE_CACHE_ERROR_MESSAGE =
+  `Clerk: auth() and currentUser() cannot be called inside a "use cache" function. ` +
+  `These functions access \`headers()\` internally, which is a dynamic API not allowed in cached contexts.\n\n` +
+  `To fix this, call auth() outside the cached function and pass the values you need as arguments:\n\n` +
+  `  import { auth, clerkClient } from '@clerk/nextjs/server';\n\n` +
+  `  async function getCachedUser(userId: string) {\n` +
+  `    "use cache";\n` +
+  `    const client = await clerkClient();\n` +
+  `    return client.users.getUser(userId);\n` +
+  `  }\n\n` +
+  `  // In your component/page:\n` +
+  `  const { userId } = await auth();\n` +
+  `  if (userId) {\n` +
+  `    const user = await getCachedUser(userId);\n` +
+  `  }`;
 
 export async function buildRequestLike(): Promise<NextRequest> {
   try {
-    // Dynamically import next/headers, otherwise Next12 apps will break
-    // @ts-expect-error: Cannot find module 'next/headers' or its corresponding type declarations.ts(2307)
+    // @ts-expect-error - Dynamically import to avoid breaking Next 12 apps
     const { headers } = await import('next/headers');
     const resolvedHeaders = await headers();
     return new NextRequest('https://placeholder.com', { headers: resolvedHeaders });
   } catch (e: any) {
-    // rethrow the error when react throws a prerendering bailout
     // https://nextjs.org/docs/messages/ppr-caught-error
     if (e && isPrerenderingBailout(e)) {
       throw e;
+    }
+
+    if (e && isNextjsUseCacheError(e)) {
+      throw new ClerkUseCacheError(`${USE_CACHE_ERROR_MESSAGE}\n\nOriginal error: ${e.message}`, e);
     }
 
     throw new Error(

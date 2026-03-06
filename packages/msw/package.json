@@ -1,6 +1,6 @@
 {
   "name": "@clerk/msw",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -9,6 +9,9 @@
       "types": "./index.ts",
       "default": "./index.ts"
     }
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",

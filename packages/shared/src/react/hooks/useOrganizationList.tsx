@@ -10,9 +10,10 @@ import type {
   SetActive,
   UserOrganizationInvitationResource,
 } from '../../types';
-import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
+import { useUserBase } from './base/useUserBase';
 import { createCacheKeys } from './createCacheKeys';
 import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
@@ -278,7 +279,7 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
   });
 
   const clerk = useClerkInstanceContext();
-  const user = useUserContext();
+  const user = useUserBase();
 
   clerk.telemetry?.record(eventMethodCalled('useOrganizationList'));
 

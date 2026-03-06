@@ -368,6 +368,12 @@ export const ruRU: LocalizationResource = {
         tableHeader__role: 'Роль',
         tableHeader__user: 'Пользователь',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Мы обновляем доступные роли. Как только это будет сделано, вы сможете снова обновлять роли.',
+          title: 'Роли временно заблокированы',
+        },
+      },
       detailsTitle__emptyRow: 'Нет участников для отображения',
       invitationsTab: {
         autoInvitations: {
@@ -398,12 +404,6 @@ export const ruRU: LocalizationResource = {
         headerTitle__invitations: 'Приглашения',
         headerTitle__members: 'Участники',
         headerTitle__requests: 'Заявки',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Роли временно заблокированы',
-          subtitle: 'Мы обновляем доступные роли. Как только это будет сделано, вы сможете снова обновлять роли.',
-        },
       },
     },
     navbar: {
@@ -870,6 +870,10 @@ export const ruRU: LocalizationResource = {
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Организация уже существует для обнаруженного названия компании ({{organizationName}}) и {{organizationDomain}}. Присоединяйтесь по приглашению.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Создать новую организацию',
       action__invitationAccept: 'Присоединиться',
@@ -890,16 +894,12 @@ export const ruRU: LocalizationResource = {
       title: 'Настройте вашу организацию',
     },
     organizationCreationDisabled: {
-      title: 'Вы должны принадлежать к организации',
       subtitle: 'Свяжитесь с администратором вашей организации для получения приглашения.',
+      title: 'Вы должны принадлежать к организации',
     },
     signOut: {
       actionLink: 'Выйти',
       actionText: 'Вошли как {{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'Организация уже существует для обнаруженного названия компании ({{organizationName}}) и {{organizationDomain}}. Присоединяйтесь по приглашению.',
     },
   },
   taskResetPassword: {
@@ -910,6 +910,69 @@ export const ruRU: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} уже является членом организации.',
@@ -940,11 +1003,12 @@ export const ruRU: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect:
-      'Пароль или адрес электронной почты неверен. Попробуйте снова или используйте другой метод.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Ваш пароль недостаточно надежный.',
+    form_password_or_identifier_incorrect:
+      'Пароль или адрес электронной почты неверен. Попробуйте снова или используйте другой метод.',
     form_password_pwned: 'Этот пароль был взломан и не может быть использован, попробуйте другой пароль.',
     form_password_pwned__sign_in:
       'Этот пароль был найден в утечке данных и не может быть использован. Пожалуйста, сбросьте пароль.',

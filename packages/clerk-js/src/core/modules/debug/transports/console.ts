@@ -1,35 +1,8 @@
 import type { DebugLogEntry, DebugTransport } from '../types';
 
 /**
- * ANSI color codes for console output
- */
-const COLORS = {
-  blue: '\x1b[34m',
-  bright: '\x1b[1m',
-  cyan: '\x1b[36m',
-  dim: '\x1b[2m',
-  gray: '\x1b[90m',
-  green: '\x1b[32m',
-  magenta: '\x1b[35m',
-  red: '\x1b[31m',
-  reset: '\x1b[0m',
-  white: '\x1b[37m',
-  yellow: '\x1b[33m',
-} as const;
-
-/**
- * Color mapping for different log levels
- */
-const LEVEL_COLORS = {
-  debug: COLORS.green,
-  error: COLORS.red,
-  info: COLORS.blue,
-  warn: COLORS.yellow,
-} as const;
-
-/**
  * A transport that writes debug logs to the host environment's console
- * (e.g. browser devtools or Node.js stdout) with ANSI color accents.
+ * (e.g. browser devtools or Node.js stdout).
  *
  * @public
  */
@@ -46,16 +19,7 @@ export class ConsoleTransport implements DebugTransport {
     const source = entry.source ? `[${entry.source}]` : '';
     const context = entry.context ? ` ${JSON.stringify(entry.context)}` : '';
 
-    const levelColor = LEVEL_COLORS[entry.level] || COLORS.white;
-
-    const prefix = `${COLORS.bright}${COLORS.cyan}[Clerk Debug]${COLORS.reset}`;
-    const timestampColored = `${COLORS.dim}${timestamp}${COLORS.reset}`;
-    const levelColored = `${levelColor}${level}${COLORS.reset}`;
-    const sourceColored = source ? `${COLORS.gray}${source}${COLORS.reset}` : '';
-    const messageColored = `${COLORS.white}${entry.message}${COLORS.reset}`;
-    const contextColored = context ? `${COLORS.dim}${context}${COLORS.reset}` : '';
-
-    const message = `${prefix} ${timestampColored} ${levelColored}${sourceColored}: ${messageColored}${contextColored}`;
+    const message = `[Clerk Debug] ${timestamp} ${level}${source}: ${entry.message}${context}`;
 
     switch (entry.level) {
       case 'error':

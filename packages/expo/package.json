@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "2.19.10",
+  "version": "3.0.1",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -48,6 +48,14 @@
       "types": "./dist/token-cache/index.d.ts",
       "default": "./dist/token-cache/index.js"
     },
+    "./google": {
+      "types": "./dist/google/index.d.ts",
+      "default": "./dist/google/index.js"
+    },
+    "./apple": {
+      "types": "./dist/apple/index.d.ts",
+      "default": "./dist/apple/index.js"
+    },
     "./resource-cache": {
       "types": "./dist/resource-cache/index.d.ts",
       "default": "./dist/resource-cache/index.js"
@@ -70,6 +78,8 @@
     "dist",
     "android",
     "ios",
+    "google",
+    "apple",
     "expo-module.config.json",
     "app.plugin.js"
   ],
@@ -78,11 +88,10 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "pnpm dev -- --env.publish",
+    "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "publish:local": "pnpm yalc push --replace  --sig",
     "test": "vitest run",
     "test:watch": "vitest watch"
   },
@@ -130,6 +139,9 @@
     "expo-apple-authentication": {
       "optional": true
     },
+    "expo-auth-session": {
+      "optional": true
+    },
     "expo-constants": {
       "optional": true
     },
@@ -140,6 +152,9 @@
       "optional": true
     },
     "expo-secure-store": {
+      "optional": true
+    },
+    "expo-web-browser": {
       "optional": true
     }
   },

@@ -8,6 +8,7 @@ import type { ProfileSectionActionMenuItemProps } from '@/ui/elements/Section';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
+import { defaultFirst, getSecondFactors, getSecondFactorsAvailableToAdd } from '@/ui/utils/mfa';
 
 import { useEnvironment } from '../../contexts';
 import { Badge, Flex, Icon, localizationKeys, Text } from '../../customizables';
@@ -16,11 +17,10 @@ import { useActionContext } from '../../elements/Action/ActionRoot';
 import { AuthApp, DotCircle, Mobile } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { MfaBackupCodeCreateScreen, MfaScreen, RemoveMfaPhoneCodeScreen, RemoveMfaTOTPScreen } from './MfaScreens';
-import { defaultFirst, getSecondFactors, getSecondFactorsAvailableToAdd } from './utils';
 
 export const MfaSection = () => {
   const {
-    userSettings: { attributes },
+    userSettings: { attributes, signUp },
   } = useEnvironment();
   const { user } = useUser();
   const [actionValue, setActionValue] = useState<string | null>(null);
@@ -34,11 +34,15 @@ export const MfaSection = () => {
 
   const showTOTP = secondFactors.includes('totp') && user.totpEnabled;
   const showBackupCode = secondFactors.includes('backup_code') && user.backupCodeEnabled;
+  const showPhoneCode = secondFactors.includes('phone_code');
 
   const mfaPhones = user.phoneNumbers
     .filter(ph => ph.verification.status === 'verified')
     .filter(ph => ph.reservedForSecondFactor)
     .sort(defaultFirst);
+
+  const hideTOTPDeleteAction = Boolean(signUp.mfa?.required && mfaPhones.length === 0);
+  const hidePhoneCodeDeleteAction = Boolean(signUp.mfa?.required && !showTOTP && mfaPhones.length === 1);
 
   return (
     <ProfileSection.Root
@@ -68,7 +72,7 @@ export const MfaSection = () => {
                   <Badge localizationKey={localizationKeys('badge__default')} />
                 </Flex>
 
-                <MfaTOTPMenu />
+                {!hideTOTPDeleteAction && <MfaTOTPMenu />}
               </ProfileSection.Item>
 
               <Action.Open value='remove-totp'>
@@ -79,7 +83,7 @@ export const MfaSection = () => {
             </>
           )}
 
-          {secondFactors.includes('phone_code') &&
+          {showPhoneCode &&
             mfaPhones.map(phone => {
               const isDefault = !showTOTP && phone.defaultSecondFactor;
               const phoneId = phone.id;
@@ -102,7 +106,8 @@ export const MfaSection = () => {
 
                     <MfaPhoneCodeMenu
                       phone={phone}
-                      showTOTP={showTOTP}
+                      isDefault={isDefault}
+                      hidePhoneCodeDeleteAction={hidePhoneCodeDeleteAction}
                     />
                   </ProfileSection.Item>
 
@@ -153,29 +158,36 @@ export const MfaSection = () => {
 
 type MfaPhoneCodeMenuProps = {
   phone: PhoneNumberResource;
-  showTOTP: boolean;
+  isDefault: boolean;
+  hidePhoneCodeDeleteAction: boolean;
 };
 
-const MfaPhoneCodeMenu = ({ phone, showTOTP }: MfaPhoneCodeMenuProps) => {
+const MfaPhoneCodeMenu = ({ phone, isDefault, hidePhoneCodeDeleteAction }: MfaPhoneCodeMenuProps) => {
   const { open } = useActionContext();
   const card = useCardState();
   const phoneId = phone.id;
 
   const actions = (
     [
-      !showTOTP && !phone.defaultSecondFactor
+      !isDefault
         ? {
             label: localizationKeys('userProfile.start.mfaSection.phoneCode.actionLabel__setDefault'),
             onClick: () => phone.makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError)),
           }
         : null,
-      {
-        label: localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionLabel'),
-        isDestructive: true,
-        onClick: () => open(`remove-${phoneId}`),
-      },
+      !hidePhoneCodeDeleteAction
+        ? {
+            label: localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionLabel'),
+            isDestructive: true,
+            onClick: () => open(`remove-${phoneId}`),
+          }
+        : null,
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
+
+  if (actions.length === 0) {
+    return null;
+  }
 
   return <ThreeDotsMenu actions={actions} />;
 };
@@ -216,6 +228,24 @@ type MfaAddMenuProps = ProfileSectionActionMenuItemProps & {
   onClick?: () => void;
 };
 
+const strategiesMap = {
+  phone_code: {
+    icon: Mobile,
+    text: 'SMS code',
+    key: 'phone_code',
+  },
+  totp: {
+    icon: AuthApp,
+    text: 'Authenticator application',
+    key: 'totp',
+  },
+  backup_code: {
+    icon: DotCircle,
+    text: 'Backup code',
+    key: 'backup_code',
+  },
+} as const;
+
 const MfaAddMenu = (props: MfaAddMenuProps) => {
   const { open } = useActionContext();
   const { secondFactorsAvailableToAdd, onClick } = props;
@@ -225,27 +255,7 @@ const MfaAddMenu = (props: MfaAddMenuProps) => {
     () =>
       secondFactorsAvailableToAdd
         .map(key => {
-          if (key === 'phone_code') {
-            return {
-              icon: Mobile,
-              text: 'SMS code',
-              key: 'phone_code',
-            } as const;
-          } else if (key === 'totp') {
-            return {
-              icon: AuthApp,
-              text: 'Authenticator application',
-              key: 'totp',
-            } as const;
-          } else if (key === 'backup_code') {
-            return {
-              icon: DotCircle,
-              text: 'Backup code',
-              key: 'backup_code',
-            } as const;
-          }
-
-          return null;
+          return strategiesMap[key as keyof typeof strategiesMap] || null;
         })
         .filter(element => element !== null),
     [secondFactorsAvailableToAdd],
@@ -260,21 +270,18 @@ const MfaAddMenu = (props: MfaAddMenuProps) => {
             triggerLocalizationKey={localizationKeys('userProfile.start.mfaSection.primaryButton')}
             onClick={onClick}
           >
-            {strategies.map(
-              method =>
-                method && (
-                  <ProfileSection.ActionMenuItem
-                    key={method.key}
-                    id={method.key}
-                    localizationKey={method.text}
-                    leftIcon={method.icon}
-                    onClick={() => {
-                      setSelectedStrategy(method.key);
-                      open('multi-factor');
-                    }}
-                  />
-                ),
-            )}
+            {strategies.map(method => (
+              <ProfileSection.ActionMenuItem
+                key={method.key}
+                id={method.key}
+                localizationKey={method.text}
+                leftIcon={method.icon}
+                onClick={() => {
+                  setSelectedStrategy(method.key);
+                  open('multi-factor');
+                }}
+              />
+            ))}
           </ProfileSection.ActionMenu>
         </Action.Closed>
       )}

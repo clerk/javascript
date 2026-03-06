@@ -1,4 +1,4 @@
-import { useClerk, useOrganizationContext } from '@clerk/shared/react';
+import { __internal_useOrganizationBase, useClerk } from '@clerk/shared/react';
 import type { BillingPaymentMethodResource } from '@clerk/shared/types';
 import { Fragment, useMemo, useRef } from 'react';
 
@@ -65,7 +65,7 @@ const RemoveScreen = ({
     `${paymentMethod.paymentType === 'card' ? paymentMethod.cardType : paymentMethod.paymentType} ${paymentMethod.paymentType === 'card' ? `⋯ ${paymentMethod.last4}` : '-'}`,
   );
   // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
-  const organizationCtx = useOrganizationContext();
+  const organization = __internal_useOrganizationBase();
 
   if (!ref.current) {
     return null;
@@ -73,7 +73,7 @@ const RemoveScreen = ({
 
   const removePaymentMethod = async () => {
     await paymentMethod
-      .remove({ orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined })
+      .remove({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
       .then(revalidate)
       .catch((error: any) => {
         handleError(error, [], card.setError);
@@ -200,7 +200,7 @@ const PaymentMethodMenu = ({
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
-  const organizationCtx = useOrganizationContext();
+  const organization = __internal_useOrganizationBase();
 
   const actions = [
     {
@@ -217,7 +217,7 @@ const PaymentMethodMenu = ({
       isDestructive: false,
       onClick: () => {
         paymentMethod
-          .makeDefault({ orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined })
+          .makeDefault({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
           .then(revalidate)
           .catch((error: Error) => {
             handleError(error, [], card.setError);

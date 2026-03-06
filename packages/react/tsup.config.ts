@@ -13,7 +13,7 @@ import { parseRangeToBounds, type VersionBounds } from './build-utils/parseVersi
  * If it's a catalog reference (catalog:XXX), looks it up in pnpm-workspace.yaml.
  * Otherwise, parses the range string directly.
  */
-function getClerkUiSupportedReactBounds(): VersionBounds[] {
+function getClerkUISupportedReactBounds(): VersionBounds[] {
   const reactPeerDep = peerDependencies.react;
 
   let rangeStr: string;
@@ -55,7 +55,7 @@ function getClerkUiSupportedReactBounds(): VersionBounds[] {
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
   const shouldPublish = !!overrideOptions.env?.publish;
-  const clerkUiSupportedReactBounds = getClerkUiSupportedReactBounds();
+  const clerkUISupportedReactBounds = getClerkUISupportedReactBounds();
 
   return {
     entry: {
@@ -67,7 +67,7 @@ export default defineConfig(overrideOptions => {
       types: 'src/types/index.ts',
     },
     dts: true,
-    onSuccess: shouldPublish ? 'pnpm publish:local' : undefined,
+    onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     format: ['cjs', 'esm'],
     bundle: true,
     clean: true,
@@ -83,7 +83,7 @@ export default defineConfig(overrideOptions => {
       PACKAGE_VERSION: `"${version}"`,
       JS_PACKAGE_VERSION: `"${clerkJsVersion}"`,
       __DEV__: `${isWatch}`,
-      __CLERK_UI_SUPPORTED_REACT_BOUNDS__: JSON.stringify(clerkUiSupportedReactBounds),
+      __CLERK_UI_SUPPORTED_REACT_BOUNDS__: JSON.stringify(clerkUISupportedReactBounds),
     },
   };
 });

@@ -363,6 +363,12 @@ export const kkKZ: LocalizationResource = {
         tableHeader__role: 'Рөл',
         tableHeader__user: 'Пайдаланушы',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Қолжетімді рөлдерді жаңартып жатырмыз. Бұл аяқталғаннан кейін рөлдерді қайта жаңарта аласыз.',
+          title: 'Рөлдер уақытша құлыпталған',
+        },
+      },
       detailsTitle__emptyRow: 'Көрсету үшін мүшелер жоқ',
       invitationsTab: {
         autoInvitations: {
@@ -391,12 +397,6 @@ export const kkKZ: LocalizationResource = {
         headerTitle__invitations: 'Шақырулар',
         headerTitle__members: 'Мүшелер',
         headerTitle__requests: 'Сұраулар',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Рөлдер уақытша құлыпталған',
-          subtitle: 'Қолжетімді рөлдерді жаңартып жатырмыз. Бұл аяқталғаннан кейін рөлдерді қайта жаңарта аласыз.',
-        },
       },
     },
     navbar: {
@@ -850,6 +850,10 @@ export const kkKZ: LocalizationResource = {
   socialButtonsBlockButton: '{{provider|titleize}} арқылы жалғастыру',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Анықталған компания атауы ({{organizationName}}) және {{organizationDomain}} үшін ұйым бұрыннан бар. Шақыру арқылы қосылыңыз.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Жаңа ұйым құру',
       action__invitationAccept: 'Қосылу',
@@ -870,16 +874,12 @@ export const kkKZ: LocalizationResource = {
       title: 'Ұйымыңызды баптаңыз',
     },
     organizationCreationDisabled: {
-      title: 'Сіз ұйымға тиесілі болуыңыз керек',
       subtitle: 'Шақыру алу үшін ұйымыңыздың әкімшісіне хабарласыңыз.',
+      title: 'Сіз ұйымға тиесілі болуыңыз керек',
     },
     signOut: {
       actionLink: 'Шығу',
       actionText: '{{identifier}} ретінде кірді',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'Анықталған компания атауы ({{organizationName}}) және {{organizationDomain}} үшін ұйым бұрыннан бар. Шақыру арқылы қосылыңыз.',
     },
   },
   taskResetPassword: {
@@ -890,6 +890,69 @@ export const kkKZ: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ұйымға қазірдің өзінде қосылған.',
@@ -916,11 +979,12 @@ export const kkKZ: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Енгізілген мән жарамсыз.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Құпия сөз қате.',
-    form_password_or_identifier_incorrect:
-      'Құпия сөз немесе электрондық пошта мекенжайы дұрыс емес. Қайталап көріңіз немесе басқа әдісті пайдаланыңыз.',
     form_password_length_too_short: 'Құпия сөз тым қысқа. Кемінде 8 таңба болуы керек.',
     form_password_not_strong_enough: 'Құпия сөз әлсіз.',
+    form_password_or_identifier_incorrect:
+      'Құпия сөз немесе электрондық пошта мекенжайы дұрыс емес. Қайталап көріңіз немесе басқа әдісті пайдаланыңыз.',
     form_password_pwned: 'Бұл құпия сөз қауіпсіздік бұзылуынан табылды. Басқа құпия сөзді қолданыңыз.',
     form_password_pwned__sign_in: 'Бұл құпия сөз қауіпсіз емес. Құпия сөзді өзгертуге болады.',
     form_password_size_in_bytes_exceeded:

@@ -81,6 +81,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
               width: '100vw',
               height: ['100vh', '-webkit-fill-available'],
               position: 'fixed',
+              // eslint-disable-next-line custom-rules/no-physical-css-properties -- Full-viewport centering (used with right: 0)
               left: 0,
               top: 0,
             }),

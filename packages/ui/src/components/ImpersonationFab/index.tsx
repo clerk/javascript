@@ -77,8 +77,8 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
     <Col
       sx={t => ({
         width: '100%',
-        paddingLeft: t.sizes.$4,
-        paddingRight: t.sizes.$6,
+        paddingInlineStart: t.sizes.$4,
+        paddingInlineEnd: t.sizes.$6,
         whiteSpace: 'nowrap',
       })}
     >
@@ -116,7 +116,8 @@ const ImpersonationFabInternal = () => {
   const { parsedInternalTheme } = useAppearance();
   const containerRef = useRef<HTMLDivElement>(null);
   const actor = session?.actor;
-  const isImpersonating = !!actor;
+  const agent = session?.agent;
+  const isImpersonating = !!actor && !agent;
 
   //essentials for calcs
   const eyeWidth = parsedInternalTheme.sizes.$16;
@@ -199,6 +200,7 @@ const ImpersonationFabInternal = () => {
           position: 'fixed',
           overflow: 'hidden',
           top: `var(${topProperty}, ${defaultTop}px)`,
+          // eslint-disable-next-line custom-rules/no-physical-css-properties -- Complex JS-based positioning via CSS custom properties
           right: `var(${rightProperty}, ${defaultRight}px)`,
           zIndex: t.zIndices.$fab,
           boxShadow: t.shadows.$fabShadow,

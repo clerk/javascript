@@ -21,11 +21,19 @@ describe('loadConfig', () => {
     expect(config.alreadyUpgraded).toBe(true);
   });
 
-  it('returns config with needsUpgrade: true for react v6', async () => {
-    const config = await loadConfig('react', 6);
+  it('returns config with needsUpgrade: true for react v5', async () => {
+    const config = await loadConfig('react', 5);
 
     expect(config).not.toBeNull();
     expect(config.needsUpgrade).toBe(true);
+  });
+
+  it('returns config with alreadyUpgraded: true for react v6', async () => {
+    const config = await loadConfig('react', 6);
+
+    expect(config).not.toBeNull();
+    expect(config.needsUpgrade).toBe(false);
+    expect(config.alreadyUpgraded).toBe(true);
   });
 
   it('returns config with needsUpgrade: true for expo v2', async () => {

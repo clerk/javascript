@@ -87,6 +87,14 @@ const withEmailCodesQuickstart = withEmailCodes
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '');
 
 // Uses staging instance which runs Core 3
+const withAPCore3ClerkV5 = environmentConfig()
+  .setId('withAPCore3ClerkV5')
+  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
+  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk);
+
+// Uses staging instance which runs Core 3
 const withAPCore3ClerkV6 = environmentConfig()
   .setId('withAPCore3ClerkV6')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
@@ -158,6 +166,13 @@ const withSessionTasksResetPassword = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-session-tasks-reset-password').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks-reset-password').pk);
 
+const withSessionTasksSetupMfa = base
+  .clone()
+  .setId('withSessionTasksSetupMfa')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-session-tasks-setup-mfa').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks-setup-mfa').pk)
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
+
 const withBillingJwtV2 = base
   .clone()
   .setId('withBillingJwtV2')
@@ -199,6 +214,7 @@ export const envs = {
   sessionsProd1,
   withAPIKeys,
   withAPCore3ClerkLatest,
+  withAPCore3ClerkV5,
   withAPCore3ClerkV6,
   withBilling,
   withBillingJwtV2,
@@ -216,6 +232,7 @@ export const envs = {
   withSessionTasks,
   withSessionTasksResetPassword,
   withSharedUIVariant,
+  withSessionTasksSetupMfa,
   withSignInOrUpEmailLinksFlow,
   withSignInOrUpFlow,
   withSignInOrUpwithRestrictedModeFlow,

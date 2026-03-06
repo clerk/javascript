@@ -3,6 +3,7 @@ import type { PendingSessionOptions } from '@clerk/shared/types';
 
 import { clerkClient } from '../../server/clerkClient';
 import { auth } from './auth';
+import { ClerkUseCacheError, isClerkUseCacheError, isNextjsUseCacheError, USE_CACHE_ERROR_MESSAGE } from './utils';
 
 type CurrentUserOptions = PendingSessionOptions;
 
@@ -31,10 +32,20 @@ export async function currentUser(opts?: CurrentUserOptions): Promise<User | nul
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
 
-  const { userId } = await auth({ treatPendingAsSignedOut: opts?.treatPendingAsSignedOut });
-  if (!userId) {
-    return null;
-  }
+  try {
+    const { userId } = await auth({ treatPendingAsSignedOut: opts?.treatPendingAsSignedOut });
+    if (!userId) {
+      return null;
+    }
 
-  return (await clerkClient()).users.getUser(userId);
+    return (await clerkClient()).users.getUser(userId);
+  } catch (e: any) {
+    if (isClerkUseCacheError(e)) {
+      throw e;
+    }
+    if (isNextjsUseCacheError(e)) {
+      throw new ClerkUseCacheError(`${USE_CACHE_ERROR_MESSAGE}\n\nOriginal error: ${e.message}`, e);
+    }
+    throw e;
+  }
 }

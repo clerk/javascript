@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`module exports > default export (index.ts) > should have the expected shape 1`] = `
+[
+  "ClerkUI",
+  "__brand",
+  "version",
+]
+`;
+
+exports[`module exports > server export (server.ts) > should have the expected shape 1`] = `
+[
+  "ClerkUI",
+  "__brand",
+  "version",
+]
+`;

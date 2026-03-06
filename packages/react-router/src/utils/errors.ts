@@ -94,38 +94,3 @@ Example:
 
 <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
 `);
-
-const middlewareMigrationExample = `To use the new middleware system, you need to:
-
-1. Enable the 'v8_middleware' future flag in your config:
-
-// react-router.config.ts
-export default {
-  future: {
-    v8_middleware: true,
-  },
-} satisfies Config;
-
-2. Install the clerkMiddleware:
-
-import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/server'
-import { ClerkProvider } from '@clerk/react-router'
-
-export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
-
-export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args)
-
-export default function App({ loaderData }: Route.ComponentProps) {
-  return (
-    <ClerkProvider loaderData={loaderData}>
-      <Outlet />
-    </ClerkProvider>
-  )
-}
-`;
-
-export const middlewareMigrationWarning = createErrorMessage(`
-'"clerkMiddleware()" not detected.
-
-${middlewareMigrationExample}
-`);

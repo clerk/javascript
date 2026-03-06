@@ -53,22 +53,23 @@ type UseOrganization = () => ToComputedRefs<UseOrganizationReturn>;
  * </template>
  */
 export const useOrganization: UseOrganization = () => {
-  const { clerk, organizationCtx } = useClerkContext('useOrganization');
+  const { loaded, clerk, organizationCtx } = useClerkContext('useOrganization');
   const { session } = useSession();
 
-  const unwatch = watch(
-    clerk,
+  watch(
+    loaded,
     value => {
       if (value) {
         // Optional chaining is important for `@clerk/vue` usage with older clerk-js versions that don't have the method
-        value.__internal_attemptToEnableEnvironmentSetting?.({
+        clerk.value?.__internal_attemptToEnableEnvironmentSetting?.({
           for: 'organizations',
           caller: 'useOrganization',
         });
-        unwatch();
       }
     },
-    { immediate: true },
+    {
+      once: true,
+    },
   );
 
   const result = computed<UseOrganizationReturn>(() => {
@@ -81,7 +82,7 @@ export const useOrganization: UseOrganization = () => {
     }
 
     /** In SSR context we include only the organization object when loadOrg is set to true. */
-    if (!clerk.value?.loaded) {
+    if (!loaded.value) {
       return {
         isLoaded: true,
         organization: organizationCtx.value,
@@ -90,7 +91,7 @@ export const useOrganization: UseOrganization = () => {
     }
 
     return {
-      isLoaded: clerk.value.loaded,
+      isLoaded: loaded.value,
       organization: organizationCtx.value,
       membership: getCurrentOrganizationMembership(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

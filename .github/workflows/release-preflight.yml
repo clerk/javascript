@@ -1,0 +1,95 @@
+name: Release Preflight
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release-preflight-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rehearse:
+    name: Release Preflight
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+          fetch-tags: false
+          filter: 'blob:none'
+          show-progress: false
+
+      - name: Fetch main branch for changeset comparison
+        run: git fetch origin main:refs/remotes/origin/main --depth=100
+
+      - name: Setup
+        uses: ./.github/actions/init
+        with:
+          turbo-team: ''
+          turbo-token: ''
+
+      # 1) Validate changesets against base branch
+      - name: Changeset status
+        run: |
+          mkdir -p .release-artifacts
+          pnpm changeset status --output .release-artifacts/changeset-status.json
+
+      # 2) Build (same path as production releases)
+      - name: Build
+        run: pnpm build
+
+      # 3) Version packages (uses existing script: changeset version + lockfile update)
+      - name: Version packages (preflight)
+        run: pnpm version-packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      # 4) Fail on unexpected file changes after versioning
+      - name: Post-version diff guard
+        run: |
+          UNEXPECTED=$(git diff --name-only | grep -Ev '^(\.changeset/|package\.json$|pnpm-lock\.yaml$|packages/.*/package\.json$|packages/.*/CHANGELOG\.md$)' || true)
+          if [ -n "$UNEXPECTED" ]; then
+            echo "::error::Unexpected files changed after versioning:"
+            echo "$UNEXPECTED"
+            exit 1
+          fi
+
+      # 5) Simulate publish by packing all public packages
+      - name: Pack public packages
+        run: |
+          node -e '
+            const fs = require("fs");
+            const path = require("path");
+            const { execSync } = require("child_process");
+            const dirs = fs.readdirSync("packages", { withFileTypes: true })
+              .filter(d => d.isDirectory())
+              .map(d => path.join("packages", d.name));
+            const results = [];
+            for (const dir of dirs) {
+              const pkgPath = path.join(dir, "package.json");
+              if (!fs.existsSync(pkgPath)) continue;
+              const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+              if (pkg.private) {
+                console.log("Skipping private package:", pkg.name);
+                continue;
+              }
+              const out = execSync("npm pack --json", { cwd: dir, encoding: "utf8" });
+              results.push(...JSON.parse(out));
+            }
+            fs.writeFileSync(".release-artifacts/pack-output.json", JSON.stringify(results, null, 2));
+            console.log("Packed", results.length, "packages");
+          '
+
+      - name: Upload preflight artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-preflight-artifacts
+          path: .release-artifacts/

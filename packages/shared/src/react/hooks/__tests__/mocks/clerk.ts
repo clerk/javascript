@@ -32,6 +32,13 @@ export function createMockClerk(overrides: any = {}) {
     telemetry: { record: vi.fn() },
     on: vi.fn(),
     off: vi.fn(),
+    addListener: vi.fn(() => vi.fn()), // Returns unsubscribe function
+    __internal_lastEmittedResources: {
+      user: null,
+      session: null,
+      organization: null,
+      client: null,
+    },
     __internal_environment: {
       commerceSettings: {
         billing: {

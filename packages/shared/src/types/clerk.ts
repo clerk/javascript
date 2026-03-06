@@ -1,6 +1,6 @@
 import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 
-import type { ClerkUiConstructor } from '../ui/types';
+import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   BillingCheckoutResource,
@@ -93,7 +93,7 @@ export type CheckoutErrors = {
 };
 
 /**
- * The value returned by the `useCheckout` hook.
+ * @interface
  */
 export interface CheckoutSignalValue {
   /**
@@ -721,6 +721,23 @@ export interface Clerk {
   unmountTaskResetPassword: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts a TaskSetupMFA component at the target element.
+   * This component allows users to set up multi-factor authentication.
+   *
+   * @param targetNode - Target node to mount the TaskSetupMFA component.
+   * @param props - configuration parameters.
+   */
+  mountTaskSetupMFA: (targetNode: HTMLDivElement, props?: TaskSetupMFAProps) => void;
+
+  /**
+   * Unmount a TaskSetupMFA component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode - Target node to unmount the TaskSetupMFA component from.
+   */
+  unmountTaskSetupMFA: (targetNode: HTMLDivElement) => void;
+
+  /**
    * @internal
    * Loads Stripe libraries for commerce functionality
    */
@@ -1136,9 +1153,10 @@ export type ClerkOptions = ClerkOptionsNavigation &
   AfterMultiSessionSingleSignOutUrl &
   ClerkUnsafeOptions & {
     /**
-     * Clerk UI entrypoint.
+     * Clerk UI module. Pass the `ui` export from `@clerk/ui` to bundle the UI
+     * with your application instead of loading it from the CDN.
      */
-    clerkUICtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
+    ui?: { ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor> };
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
@@ -2360,6 +2378,14 @@ export type TaskResetPasswordProps = {
   appearance?: ClerkAppearanceTheme;
 };
 
+export type TaskSetupMFAProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   */
+  redirectUrlComplete: string;
+  appearance?: ClerkAppearanceTheme;
+};
+
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;
   role: OrganizationCustomRoleKey;
@@ -2467,24 +2493,39 @@ export type ClerkProp =
   | undefined
   | null;
 
+/**
+ * Internal props used by framework SDKs to configure script URLs and versions.
+ * These are omitted from consumer-facing types like ClerkProviderProps.
+ */
+export type InternalClerkScriptProps = {
+  __internal_clerkJSUrl?: string;
+  __internal_clerkJSVersion?: string;
+  __internal_clerkUIUrl?: string;
+  __internal_clerkUIVersion?: string;
+};
+
 export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
   /**
    * The URL that `@clerk/clerk-js` should be hot-loaded from.
+   * @internal
    */
-  clerkJSUrl?: string;
+  __internal_clerkJSUrl?: string;
   /**
    * The npm version for `@clerk/clerk-js`.
+   * @internal
    */
-  clerkJSVersion?: string;
+  __internal_clerkJSVersion?: string;
   /**
    * The URL that `@clerk/ui` should be hot-loaded from.
+   * @internal
    */
-  clerkUIUrl?: string;
+  __internal_clerkUIUrl?: string;
   /**
    * The npm version for `@clerk/ui`.
+   * @internal
    */
-  clerkUIVersion?: string;
+  __internal_clerkUIVersion?: string;
   /**
    * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
    */

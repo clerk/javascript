@@ -17,6 +17,7 @@ export const getPublicEnvVariables = (context: AppLoadContext | undefined) => {
     clerkJsUrl: getValue('CLERK_JS_URL'),
     clerkJsVersion: getValue('CLERK_JS_VERSION'),
     clerkUIUrl: getValue('CLERK_UI_URL'),
+    clerkUIVersion: getValue('CLERK_UI_VERSION'),
     prefetchUI: getValue('CLERK_PREFETCH_UI') === 'false' ? false : undefined,
     telemetryDisabled: isTruthy(getValue('CLERK_TELEMETRY_DISABLED')),
     telemetryDebug: isTruthy(getValue('CLERK_TELEMETRY_DEBUG')),

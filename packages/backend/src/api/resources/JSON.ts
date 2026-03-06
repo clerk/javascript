@@ -19,6 +19,7 @@ import type {
 export const ObjectType = {
   AccountlessApplication: 'accountless_application',
   ActorToken: 'actor_token',
+  AgentTask: 'agent_task',
   AllowlistIdentifier: 'allowlist_identifier',
   ApiKey: 'api_key',
   BlocklistIdentifier: 'blocklist_identifier',
@@ -512,6 +513,13 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
+export interface AgentTaskJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.AgentTask;
+  agent_id: string;
+  task_id: string;
+  url: string;
+}
+
 export interface SignUpJSON extends ClerkResourceJSON {
   object: typeof ObjectType.SignUpAttempt;
   id: string;
@@ -907,7 +915,7 @@ export interface BillingSubscriptionItemWebhookEventJSON extends ClerkResourceJS
   proration_date: string;
   plan_period: 'month' | 'annual';
   period_start: number;
-  period_end?: number;
+  period_end: number | null;
   canceled_at?: number;
   past_due_at?: number;
   lifetime_paid: number;

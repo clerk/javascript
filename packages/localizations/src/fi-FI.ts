@@ -372,6 +372,12 @@ export const fiFI: LocalizationResource = {
         tableHeader__role: 'Rooli',
         tableHeader__user: 'Käyttäjä',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Päivitämme käytettävissä olevia rooleja. Kun se on tehty, voit päivittää rooleja uudelleen.',
+          title: 'Roolit on tilapäisesti lukittu',
+        },
+      },
       detailsTitle__emptyRow: 'Ei jäseniä näytettäväksi',
       invitationsTab: {
         autoInvitations: {
@@ -402,12 +408,6 @@ export const fiFI: LocalizationResource = {
         headerTitle__invitations: 'Kutsut',
         headerTitle__members: 'Jäsenet',
         headerTitle__requests: 'Pyyntöjä',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Roolit on tilapäisesti lukittu',
-          subtitle: 'Päivitämme käytettävissä olevia rooleja. Kun se on tehty, voit päivittää rooleja uudelleen.',
-        },
       },
     },
     navbar: {
@@ -870,6 +870,10 @@ export const fiFI: LocalizationResource = {
   socialButtonsBlockButton: 'Jatka palvelun {{provider|titleize}} avulla',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Organisaatio on jo olemassa havaitulle yrityksen nimelle ({{organizationName}}) ja {{organizationDomain}}. Liity kutsulla.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Luo uusi organisaatio',
       action__invitationAccept: 'Liity',
@@ -889,13 +893,13 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Syötä organisaation tiedot jatkaaksesi',
       title: 'Määritä organisaatiosi',
     },
+    organizationCreationDisabled: {
+      subtitle: undefined,
+      title: undefined,
+    },
     signOut: {
       actionLink: 'Kirjaudu ulos',
       actionText: 'Kirjautuneena käyttäjänä {{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'Organisaatio on jo olemassa havaitulle yrityksen nimelle ({{organizationName}}) ja {{organizationDomain}}. Liity kutsulla.',
     },
   },
   taskResetPassword: {
@@ -906,6 +910,69 @@ export const fiFI: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} on jo tämän organisaation jäsen.',
@@ -934,11 +1001,12 @@ export const fiFI: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect:
-      'Salasana tai sähköpostiosoite on väärä. Yritä uudelleen tai käytä toista menetelmää.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Salasana ei ole riittävän vahva.',
+    form_password_or_identifier_incorrect:
+      'Salasana tai sähköpostiosoite on väärä. Yritä uudelleen tai käytä toista menetelmää.',
     form_password_pwned: 'Salasana on ollut mukana julkisissa tietovuodoissa. Valitse toinen salasana.',
     form_password_pwned__sign_in: 'Salasana on ollut mukana julkisissa tietovuodoissa. Vaihdathan salasanasi.',
     form_password_size_in_bytes_exceeded:

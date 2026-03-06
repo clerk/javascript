@@ -14,8 +14,8 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <ClerkProvider
         publishableKey={PUBLISHABLE_KEY}
-        clerkJSUrl={CLERK_JS_URL}
-        clerkUIUrl={CLERK_UI_URL}
+        __internal_clerkJSUrl={CLERK_JS_URL}
+        __internal_clerkUIUrl={CLERK_UI_URL}
         appearance={{
           options: {
             showOptionalFields: true,

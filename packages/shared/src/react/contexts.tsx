@@ -3,29 +3,20 @@
 import type { PropsWithChildren } from 'react';
 import React, { useState } from 'react';
 
-import type {
-  BillingSubscriptionPlanPeriod,
-  ClerkOptions,
-  ForPayerType,
-  InitialState,
-  LoadedClerk,
-  OrganizationResource,
-} from '../types';
-import { useOrganizationBase } from './hooks/base/useOrganizationBase';
+import type { BillingSubscriptionPlanPeriod, ClerkOptions, ForPayerType, InitialState, LoadedClerk } from '../types';
 import { createContextAndHook } from './hooks/createContextAndHook';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
-export { useUserBase as useUserContext } from './hooks/base/useUserBase';
-export { useClientBase as useClientContext } from './hooks/base/useClientBase';
-export { useSessionBase as useSessionContext } from './hooks/base/useSessionBase';
 
-const [InitialStateContext, _useInitialStateContext] = createContextAndHook<InitialState | undefined>(
-  'InitialStateContext',
-);
+const [InitialStateContext, _useInitialStateContext] = createContextAndHook<
+  InitialState | Promise<InitialState> | undefined
+>('InitialStateContext');
 
 /**
  * Provides initial Clerk state (session, user, organization data) from server-side rendering
  * to child components via React context.
+ *
+ * Passing in a promise is only supported for React >= 19.
  *
  * The initialState is snapshotted on mount and cannot change during the component lifecycle.
  *
@@ -37,7 +28,7 @@ export function InitialStateProvider({
   initialState,
 }: {
   children: React.ReactNode;
-  initialState: InitialState | undefined;
+  initialState: InitialState | Promise<InitialState> | undefined;
 }) {
   // The initialState is not allowed to change, we snapshot it to turn that expectation into a guarantee.
   // Note that despite this, it could still be different for different parts of the React tree which is fine,
@@ -51,9 +42,13 @@ export function InitialStateProvider({
 export function useInitialStateContext(): InitialState | undefined {
   const initialState = _useInitialStateContext();
 
-  // If we want to support passing initialState as a promise, this is where we would handle that.
-  // Note that we can not use(promise) as long as we support React 18, so we'll need to have some extra handling
-  // and throw the promise instead.
+  if (initialState instanceof Promise) {
+    if ('use' in React && typeof React.use === 'function') {
+      return React.use(initialState);
+    } else {
+      throw new Error('initialState cannot be a promise if React version is less than 19');
+    }
+  }
 
   return initialState;
 }
@@ -97,11 +92,6 @@ function useOptionsContext(): ClerkOptions {
   return context;
 }
 
-function useOrganizationContext(): { organization: OrganizationResource | null | undefined } {
-  const organization = useOrganizationBase();
-  return React.useMemo(() => ({ organization }), [organization]);
-}
-
 /**
  * @internal
  */
@@ -134,5 +124,4 @@ export {
   useCheckoutContext,
   useClerkInstanceContext,
   useOptionsContext,
-  useOrganizationContext,
 };

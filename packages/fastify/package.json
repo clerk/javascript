@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "2.6.8",
+  "version": "3.0.1",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -63,12 +63,12 @@
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
+    "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
-    "publish:local": "pnpm yalc push --replace  --sig",
     "test": "vitest run",
     "test:watch": "vitest watch"
   },
@@ -79,13 +79,13 @@
     "fastify-plugin": "^5.0.1"
   },
   "devDependencies": {
-    "fastify": "^5.6.1"
+    "fastify": "^5.7.2"
   },
   "peerDependencies": {
     "fastify": ">=5"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

@@ -36,7 +36,7 @@ The current monorepo setup is based on:
 - [Turborepo](https://turbo.build/repo/docs), used for task running and task output caching.
 - [Changesets](https://github.com/changesets/changesets), used for package versioning, publishing and changelog generation.
 - [GitHub Actions](https://docs.github.com/en/actions), used for quality checks and automated release orchestration.
-- [Yalc](https://github.com/wclr/yalc), used for to publish packages locally and test them in other local projects.
+- [pkglab](https://github.com/pkglab/pkglab), used for publishing packages locally and testing them in other local projects.
 - [Jest](https://jestjs.io/) or [Vitest](https://vitest.dev/), used for running unit tests.
 - [Playwright](https://playwright.dev/), used for running the [integration](../integration/) test suite.
 

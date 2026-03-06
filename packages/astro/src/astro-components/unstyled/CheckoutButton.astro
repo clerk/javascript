@@ -1,22 +1,16 @@
 ---
-import type { HTMLTag, Polymorphic } from 'astro/types';
 import type { __experimental_CheckoutButtonProps } from '@clerk/shared/types';
 import type { ButtonProps } from '../../types';
-import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils';
+import { addUnstyledAttributeToFirstTag } from './utils';
 
-type Props<Tag extends HTMLTag = 'button'> = Polymorphic<ButtonProps<Tag>> &
+type Props = ButtonProps &
   Omit<__experimental_CheckoutButtonProps, 'onSubscriptionComplete'> & { clickIdentifier?: string };
 
 import { generateSafeId } from '@clerk/astro/internal';
 
 const safeId = generateSafeId();
 
-if ('as' in Astro.props) {
-  logAsPropUsageDeprecation();
-}
-
 const {
-  as: Tag = 'button',
   asChild,
   planId,
   planPeriod,
@@ -48,12 +42,12 @@ if (asChild) {
   asChild ? (
     <Fragment set:html={htmlElement} />
   ) : (
-    <Tag
+    <button
       {...props}
       data-clerk-unstyled-id={safeId}
     >
       <slot>Checkout</slot>
-    </Tag>
+    </button>
   )
 }
 

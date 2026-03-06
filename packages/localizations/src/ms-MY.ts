@@ -366,6 +366,13 @@ export const msMY: LocalizationResource = {
         tableHeader__role: 'Peranan',
         tableHeader__user: 'Pengguna',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Kami sedang mengemas kini peranan yang tersedia. Setelah selesai, anda akan dapat mengemas kini peranan semula.',
+          title: 'Peranan dikunci buat sementara waktu',
+        },
+      },
       detailsTitle__emptyRow: 'Tiada ahli untuk dipaparkan',
       invitationsTab: {
         autoInvitations: {
@@ -396,13 +403,6 @@ export const msMY: LocalizationResource = {
         headerTitle__invitations: 'Jemputan',
         headerTitle__members: 'Ahli',
         headerTitle__requests: 'Permintaan',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Peranan dikunci buat sementara waktu',
-          subtitle:
-            'Kami sedang mengemas kini peranan yang tersedia. Setelah selesai, anda akan dapat mengemas kini peranan semula.',
-        },
       },
     },
     navbar: {
@@ -867,6 +867,10 @@ export const msMY: LocalizationResource = {
   socialButtonsBlockButton: 'Teruskan dengan {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Organisasi sudah wujud untuk nama syarikat yang dikesan ({{organizationName}}) dan {{organizationDomain}}. Sertai melalui jemputan.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Cipta organisasi baharu',
       action__invitationAccept: 'Sertai',
@@ -887,16 +891,12 @@ export const msMY: LocalizationResource = {
       title: 'Sediakan organisasi anda',
     },
     organizationCreationDisabled: {
-      title: 'Anda mesti menjadi ahli organisasi',
       subtitle: 'Hubungi pentadbir organisasi anda untuk jemputan.',
+      title: 'Anda mesti menjadi ahli organisasi',
     },
     signOut: {
       actionLink: 'Daftar keluar',
       actionText: 'Log masuk sebagai {{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'Organisasi sudah wujud untuk nama syarikat yang dikesan ({{organizationName}}) dan {{organizationDomain}}. Sertai melalui jemputan.',
     },
   },
   taskResetPassword: {
@@ -907,6 +907,69 @@ export const msMY: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi ahli organisasi.',
@@ -936,11 +999,12 @@ export const msMY: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Nilai yang dimasukkan tidak sah. Sila betulkannya.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Kata laluan yang anda masukkan tidak betul. Sila cuba lagi.',
-    form_password_or_identifier_incorrect:
-      'Kata laluan atau alamat e-mel tidak betul. Cuba lagi atau gunakan kaedah lain.',
     form_password_length_too_short: 'Kata laluan anda terlalu pendek. Ia mesti sekurang-kurangnya 8 aksara panjang.',
     form_password_not_strong_enough: 'Kata laluan anda tidak cukup kuat.',
+    form_password_or_identifier_incorrect:
+      'Kata laluan atau alamat e-mel tidak betul. Cuba lagi atau gunakan kaedah lain.',
     form_password_pwned:
       'Kata laluan ini telah dijumpai sebagai sebahagian daripada pelanggaran dan tidak boleh digunakan, sila cuba kata laluan lain.',
     form_password_pwned__sign_in:

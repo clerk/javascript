@@ -12,13 +12,12 @@ const __DEV__: boolean;
  */
 const __BUILD_DISABLE_RHC__: string;
 const __BUILD_VARIANT_CHANNEL__: boolean;
-const __BUILD_VARIANT_CHIPS__: boolean;
 
 interface Window {
   __internal_onBeforeSetActive: (intent?: 'sign-out') => Promise<void> | void;
   __internal_onAfterSetActive: () => Promise<void> | void;
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  __internal_ClerkUICtor?: import('@clerk/shared/types').ClerkUiConstructor;
+  __internal_ClerkUICtor?: import('@clerk/shared/ui').ClerkUIConstructor;
   /**
    * Promise used for coordination between standalone getToken() from @clerk/shared and clerk-js.
    * When getToken() is called before Clerk loads, it creates this promise with __resolve/__reject callbacks.

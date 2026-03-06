@@ -1,0 +1,45 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout>
+  <main>
+    <pricing-table></pricing-table>
+  </main>
+</Layout>
+
+<script>
+  import { $billingStore } from '@clerk/astro/client';
+
+  class PricingTable extends HTMLElement {
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      $billingStore.subscribe(this.render.bind(this));
+    }
+
+    async render(billing) {
+      if (billing) {
+        const { data: plans } = await billing.getPlans();
+        this.innerHTML = `
+          <div>
+            ${plans
+              .map(
+                p => `
+                <div>
+                  <h4>${p.name}</h4>
+                  <p>$${p.fee.amountFormatted}</p>
+                </div>
+              `,
+              )
+              .join('')}
+          </div>
+        `;
+      }
+    }
+  }
+
+  customElements.define('pricing-table', PricingTable);
+</script>

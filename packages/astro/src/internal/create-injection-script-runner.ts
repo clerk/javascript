@@ -22,7 +22,9 @@ function createInjectionScriptRunner(creator: CreateClerkInstanceInternalFn) {
       clientSafeVars = JSON.parse(clientSafeVarsContainer.textContent || '{}');
     }
 
-    await creator(mergeEnvVarsWithParams({ ...astroClerkOptions, ...clientSafeVars }));
+    await creator({
+      ...mergeEnvVarsWithParams({ ...astroClerkOptions, ...clientSafeVars }),
+    });
   }
 
   return runner;

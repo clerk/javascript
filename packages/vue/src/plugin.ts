@@ -6,12 +6,13 @@ import type {
   ClerkOptions,
   ClientResource,
   InitialState,
+  InternalClerkScriptProps,
   IsomorphicClerkOptions,
   MultiDomainAndOrProxy,
   Resources,
   Without,
 } from '@clerk/shared/types';
-import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { Appearance, Ui } from '@clerk/ui/internal';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
@@ -19,14 +20,23 @@ import { computed, ref, shallowRef, triggerRef } from 'vue';
 import { ClerkInjectionKey } from './keys';
 declare global {
   interface Window {
-    __internal_ClerkUICtor?: ClerkUiConstructor;
+    __internal_ClerkUICtor?: ClerkUIConstructor;
   }
 }
 
-export type PluginOptions<TUi extends Ui = Ui> = Without<IsomorphicClerkOptions, 'domain' | 'proxyUrl' | 'appearance'> &
+export type PluginOptions<TUi extends Ui = Ui> = Without<
+  IsomorphicClerkOptions,
+  'domain' | 'proxyUrl' | 'appearance' | keyof InternalClerkScriptProps
+> &
   MultiDomainAndOrProxy & {
     initialState?: InitialState;
     appearance?: Appearance<TUi>;
+    /**
+     * Optional object to use the bundled Clerk UI instead of loading from CDN.
+     * Import `ui` from `@clerk/ui` and pass it here to bundle the UI with your application.
+     * When omitted, UI is loaded from Clerk's CDN.
+     */
+    ui?: TUi;
   };
 
 const SDK_METADATA = {
@@ -78,10 +88,11 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
       void (async () => {
         try {
           const clerkPromise = loadClerkJSScript(options);
-          // Honor explicit clerkUICtor even when prefetchUI={false}
-          const clerkUICtorPromise = pluginOptions.clerkUICtor
-            ? Promise.resolve(pluginOptions.clerkUICtor)
-            : pluginOptions.prefetchUI === false
+          // Support bundled UI via ui.ClerkUI prop
+          const uiProp = pluginOptions.ui;
+          const clerkUICtorPromise = uiProp?.ClerkUI
+            ? Promise.resolve(uiProp.ClerkUI)
+            : uiProp || pluginOptions.prefetchUI === false
               ? Promise.resolve(undefined)
               : (async () => {
                   await loadClerkUIScript(options);
@@ -98,7 +109,10 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           }
 
           clerk.value = window.Clerk;
-          const loadOptions = { ...options, clerkUICtor: clerkUICtorPromise } as unknown as ClerkOptions;
+          const loadOptions = {
+            ...options,
+            ui: { ...pluginOptions.ui, ClerkUI: clerkUICtorPromise },
+          } as unknown as ClerkOptions;
           await window.Clerk.load(loadOptions);
           loaded.value = true;
 
@@ -153,6 +167,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
     const organizationCtx = computed(() => derivedState.value.organization);
 
     app.provide(ClerkInjectionKey, {
+      loaded,
       clerk,
       authCtx,
       clientCtx,

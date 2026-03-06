@@ -364,6 +364,12 @@ export const svSE: LocalizationResource = {
         tableHeader__role: 'Roll',
         tableHeader__user: 'Användare',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Vi uppdaterar tillgängliga roller. När det är klart kommer du att kunna uppdatera roller igen.',
+          title: 'Roller är tillfälligt låsta',
+        },
+      },
       detailsTitle__emptyRow: 'Inga medlemmar att visa',
       invitationsTab: {
         autoInvitations: {
@@ -394,12 +400,6 @@ export const svSE: LocalizationResource = {
         headerTitle__invitations: 'Inbjudningar',
         headerTitle__members: 'Medlemmar',
         headerTitle__requests: 'Förfrågningar',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Roller är tillfälligt låsta',
-          subtitle: 'Vi uppdaterar tillgängliga roller. När det är klart kommer du att kunna uppdatera roller igen.',
-        },
       },
     },
     navbar: {
@@ -861,6 +861,10 @@ export const svSE: LocalizationResource = {
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'En organisation finns redan för det upptäckta företagsnamnet ({{organizationName}}) och {{organizationDomain}}. Gå med via inbjudan.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Skapa ny organisation',
       action__invitationAccept: 'Gå med',
@@ -881,16 +885,12 @@ export const svSE: LocalizationResource = {
       title: 'Konfigurera din organisation',
     },
     organizationCreationDisabled: {
-      title: 'Du måste tillhöra en organisation',
       subtitle: 'Kontakta din organisationsadministratör för en inbjudan.',
+      title: 'Du måste tillhöra en organisation',
     },
     signOut: {
       actionLink: 'Logga ut',
       actionText: 'Inloggad som {{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'En organisation finns redan för det upptäckta företagsnamnet ({{organizationName}}) och {{organizationDomain}}. Gå med via inbjudan.',
     },
   },
   taskResetPassword: {
@@ -901,6 +901,69 @@ export const svSE: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} är redan medlem i organisationen.',
@@ -929,11 +992,12 @@ export const svSE: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Lösenordet är felaktigt.',
-    form_password_or_identifier_incorrect:
-      'Lösenordet eller e-postadressen är felaktig. Försök igen eller använd en annan metod.',
     form_password_length_too_short: 'Lösenordet är för kort.',
     form_password_not_strong_enough: 'Ditt lösenord är inte tillräckligt starkt.',
+    form_password_or_identifier_incorrect:
+      'Lösenordet eller e-postadressen är felaktig. Försök igen eller använd en annan metod.',
     form_password_pwned: 'Lösenordet har läckt i tidigare dataintrång.',
     form_password_pwned__sign_in: 'Lösenordet har läckt, vänligen logga in för att ändra det.',
     form_password_size_in_bytes_exceeded:

@@ -6,7 +6,7 @@ import { TextDecoder, TextEncoder } from 'node:util';
 import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from 'vitest';
 
-configure({});
+configure({ asyncUtilTimeout: 5000 });
 
 // Track all timers created during tests to clean them up
 const activeTimers = new Set<ReturnType<typeof setTimeout>>();
@@ -261,6 +261,13 @@ if (typeof window !== 'undefined') {
   };
   window.getComputedStyle = patchedGetComputedStyle;
 }
+
+// Mock @formkit/auto-animate to prevent timers leaking after test teardown.
+// The __mocks__ directory in src/elements/ is not detected by Vitest for
+// node_module mocks, so we need an explicit vi.mock here.
+vi.mock('@formkit/auto-animate/react', () => ({
+  useAutoAnimate: () => [null],
+}));
 
 // Mock browser-tabs-lock to prevent window access errors in tests
 vi.mock('browser-tabs-lock', () => {

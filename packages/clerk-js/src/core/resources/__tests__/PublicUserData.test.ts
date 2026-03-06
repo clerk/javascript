@@ -13,6 +13,7 @@ describe('PublicUserData', () => {
       has_image: true,
       identifier: 'john-doe',
       user_id: '123',
+      username: 'johndoe',
     });
 
     expect(pud).toMatchObject({
@@ -22,6 +23,7 @@ describe('PublicUserData', () => {
       hasImage: true,
       identifier: 'john-doe',
       userId: '123',
+      username: 'johndoe',
     });
   });
 });

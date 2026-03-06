@@ -55,6 +55,7 @@ export type { VerifyTokenOptions } from './tokens/verify';
  */
 export type {
   ActorTokenJSON,
+  AgentTaskJSON,
   AccountlessApplicationJSON,
   ClerkResourceJSON,
   TokenJSON,
@@ -110,6 +111,7 @@ export type {
  * Resources
  */
 export type {
+  AgentTask,
   APIKey,
   ActorToken,
   AccountlessApplication,

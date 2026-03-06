@@ -11,14 +11,11 @@ import type {
   OrganizationMembershipResource,
   OrganizationResource,
 } from '../../types';
-import {
-  useAssertWrappedByClerkProvider,
-  useClerkInstanceContext,
-  useOrganizationContext,
-  useSessionContext,
-} from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
+import { useOrganizationBase } from './base/useOrganizationBase';
+import { useSessionBase } from './base/useSessionBase';
 import { createCacheKeys } from './createCacheKeys';
 import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
@@ -283,8 +280,8 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
   useAssertWrappedByClerkProvider('useOrganization');
   useAttemptToEnableOrganizations('useOrganization');
 
-  const { organization } = useOrganizationContext();
-  const session = useSessionContext();
+  const organization = useOrganizationBase();
+  const session = useSessionBase();
 
   const domainSafeValues = useWithSafeValues(domainListParams, {
     initialPage: 1,

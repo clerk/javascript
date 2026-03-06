@@ -371,6 +371,13 @@ export const faIR: LocalizationResource = {
         tableHeader__role: 'نقش',
         tableHeader__user: 'کاربر',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'ما در حال به‌روزرسانی نقش‌های موجود هستیم. پس از اتمام، می‌توانید دوباره نقش‌ها را به‌روزرسانی کنید.',
+          title: 'نقش‌ها موقتاً قفل شده‌اند',
+        },
+      },
       detailsTitle__emptyRow: 'هیچ عضوی برای نمایش وجود ندارد',
       invitationsTab: {
         autoInvitations: {
@@ -401,13 +408,6 @@ export const faIR: LocalizationResource = {
         headerTitle__invitations: 'دعوت نامه ها',
         headerTitle__members: 'اعضا',
         headerTitle__requests: 'درخواست‌ها',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'نقش‌ها موقتاً قفل شده‌اند',
-          subtitle:
-            'ما در حال به‌روزرسانی نقش‌های موجود هستیم. پس از اتمام، می‌توانید دوباره نقش‌ها را به‌روزرسانی کنید.',
-        },
       },
     },
     navbar: {
@@ -870,6 +870,10 @@ export const faIR: LocalizationResource = {
   socialButtonsBlockButton: 'ادامه با {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'سازمانی برای نام شرکت شناسایی شده ({{organizationName}}) و {{organizationDomain}} از قبل وجود دارد. از طریق دعوتنامه بپیوندید.',
+    },
     chooseOrganization: {
       action__createOrganization: 'ایجاد سازمان',
       action__invitationAccept: 'بپیوندید',
@@ -890,16 +894,12 @@ export const faIR: LocalizationResource = {
       title: 'ایجاد سازمان جدید',
     },
     organizationCreationDisabled: {
-      title: 'شما باید عضو یک سازمان باشید',
       subtitle: 'برای دریافت دعوتنامه با مدیر سازمان خود تماس بگیرید.',
+      title: 'شما باید عضو یک سازمان باشید',
     },
     signOut: {
       actionLink: 'خروج از همه حساب‌ها',
       actionText: 'می‌خواهید خارج شوید؟',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'سازمانی برای نام شرکت شناسایی شده ({{organizationName}}) و {{organizationDomain}} از قبل وجود دارد. از طریق دعوتنامه بپیوندید.',
     },
   },
   taskResetPassword: {
@@ -910,6 +910,69 @@ export const faIR: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} از قبل عضو سازمان است.',
@@ -937,11 +1000,12 @@ export const faIR: LocalizationResource = {
     form_param_type_invalid__email_address: 'آدرس ایمیل باید یک رشته معتبر باشد.',
     form_param_type_invalid__phone_number: 'شماره تلفن باید یک رشته معتبر باشد.',
     form_param_value_invalid: 'مقدار پارامتر نامعتبر است.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'رمز عبور نادرست است.',
-    form_password_or_identifier_incorrect:
-      'رمز عبور یا آدرس ایمیل نادرست است. دوباره تلاش کنید یا از روش دیگری استفاده کنید.',
     form_password_length_too_short: 'رمز عبور شما خیلی کوتاه است. باید حداقل ۸ کاراکتر داشته باشد.',
     form_password_not_strong_enough: 'رمز عبور شما به اندازه کافی قوی نیست.',
+    form_password_or_identifier_incorrect:
+      'رمز عبور یا آدرس ایمیل نادرست است. دوباره تلاش کنید یا از روش دیگری استفاده کنید.',
     form_password_pwned:
       'این رمز عبور به عنوان بخشی از یک نقض امنیتی یافت شده و قابل استفاده نیست، لطفاً رمز عبور دیگری را امتحان کنید.',
     form_password_pwned__sign_in:

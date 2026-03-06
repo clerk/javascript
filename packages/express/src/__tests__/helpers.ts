@@ -15,6 +15,18 @@ export function runMiddleware(middleware: RequestHandler | RequestHandler[], hea
   return supertest(app).get('/').set(headers);
 }
 
+export function runMiddlewareOnPath(
+  middleware: RequestHandler | RequestHandler[],
+  path: string,
+  headers: Record<string, string> = {},
+) {
+  const app: Application = express();
+  app.use(middleware);
+  app.use((_req, res, _next) => res.end('Hello world!'));
+
+  return supertest(app).get(path).set(headers);
+}
+
 export function mockResponse(): ExpressResponse {
   return {
     status: vi.fn().mockReturnThis(),

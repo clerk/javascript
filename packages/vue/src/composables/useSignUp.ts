@@ -32,12 +32,15 @@ type UseSignUp = () => ToComputedRefs<UseSignUpReturn>;
 export const useSignUp: UseSignUp = () => {
   const { clerk, clientCtx } = useClerkContext('useSignUp');
 
-  const unwatch = watch(clerk, value => {
-    if (value) {
-      value.telemetry?.record(eventMethodCalled('useSignUp'));
-      unwatch();
-    }
-  });
+  watch(
+    clerk,
+    value => {
+      if (value) {
+        value.telemetry?.record(eventMethodCalled('useSignUp'));
+      }
+    },
+    { once: true },
+  );
 
   const result = computed<UseSignUpReturn>(() => {
     if (!clerk.value || !clientCtx.value) {

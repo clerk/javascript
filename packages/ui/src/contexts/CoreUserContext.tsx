@@ -1,9 +1,9 @@
-import { useUserContext } from '@clerk/shared/react';
+import { __internal_useUserBase } from '@clerk/shared/react';
 import React from 'react';
 
 export function withCoreUserGuard<P>(Component: React.ComponentType<P>): React.ComponentType<P> {
   const Hoc = (props: P) => {
-    const user = useUserContext();
+    const user = __internal_useUserBase();
 
     if (!user) {
       return null;

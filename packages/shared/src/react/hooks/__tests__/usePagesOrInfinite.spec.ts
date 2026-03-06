@@ -62,10 +62,17 @@ vi.mock('../../contexts', () => {
   return {
     useAssertWrappedByClerkProvider: () => {},
     useClerkInstanceContext: () => mockClerk,
-    useUserContext: () => ({ id: 'user_123' }),
-    useOrganizationContext: () => ({ organization: { id: 'org_123' } }),
+    useInitialStateContext: () => undefined,
   };
 });
+
+vi.mock('../base/useUserBase', () => ({
+  useUserBase: () => ({ id: 'user_123' }),
+}));
+
+vi.mock('../base/useOrganizationBase', () => ({
+  useOrganizationBase: () => ({ id: 'org_123' }),
+}));
 
 beforeEach(() => {
   vi.clearAllMocks();

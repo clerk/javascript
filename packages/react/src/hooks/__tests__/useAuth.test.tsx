@@ -78,6 +78,31 @@ describe('useAuth', () => {
   });
 });
 
+describe('useAuth.getToken', () => {
+  test('throws an error if getToken is called in a non-browser environment', async () => {
+    const originalWindow = global.window;
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => (
+        <ClerkInstanceContext.Provider value={{ value: { addListener: vi.fn() } as unknown as LoadedClerk }}>
+          <InitialStateProvider initialState={{} as any}>{children}</InitialStateProvider>
+        </ClerkInstanceContext.Provider>
+      ),
+    });
+
+    // Set window to undefined to simulate non-browser environment
+    global.window = undefined as any;
+
+    try {
+      await expect(result.current.getToken()).rejects.toThrow(
+        'useAuth().getToken() can only be used in browser environments',
+      );
+    } finally {
+      global.window = originalWindow;
+    }
+  });
+});
+
 describe('useDerivedAuth', () => {
   beforeEach(() => {
     vi.clearAllMocks();

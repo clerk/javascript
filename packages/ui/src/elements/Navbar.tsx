@@ -156,7 +156,7 @@ const NavbarContainer = (
         maxWidth: t.space.$57,
         background: common.mutedBackground(t),
         padding: `${t.space.$6} ${t.space.$5} ${t.space.$4} ${t.space.$3}`,
-        marginRight: `calc(${t.space.$2} * -1)`,
+        marginInlineEnd: `calc(${t.space.$2} * -1)`,
         color: t.colors.$colorForeground,
         justifyContent: 'space-between',
       })}
@@ -239,13 +239,13 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
             bottom: 0,
             width: t.space.$60,
             backgroundColor: colors.makeSolid(t.colors.$colorBackground),
-            borderTopRightRadius: t.radii.$lg,
-            borderBottomRightRadius: t.radii.$lg,
+            borderStartEndRadius: t.radii.$lg,
+            borderEndEndRadius: t.radii.$lg,
             padding: `${t.space.$10} ${t.space.$6}`,
             animation: `${animations.navbarSlideIn} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
-            borderRightWidth: t.borderWidths.$normal,
-            borderRightStyle: t.borderStyles.$solid,
-            borderRightColor: t.colors.$borderAlpha150,
+            borderInlineEndWidth: t.borderWidths.$normal,
+            borderInlineEndStyle: t.borderStyles.$solid,
+            borderInlineEndColor: t.colors.$borderAlpha150,
             boxShadow: t.shadows.$cardContentShadow,
           })}
         >

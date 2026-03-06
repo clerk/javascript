@@ -6,7 +6,6 @@
 .tsup
 .turbo
 .vscode
-.yalc
 /**/scripts/info.js
 *.map
 *.min.js

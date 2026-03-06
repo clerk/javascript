@@ -180,19 +180,39 @@ const centeredFlex = (display: 'flex' | 'inline-flex' = 'flex') => ({
   alignItems: 'center',
 });
 
-const unstyledScrollbar = (t: InternalTheme) => ({
-  '::-webkit-scrollbar': {
-    background: 'transparent',
-    width: '8px',
-    height: '8px',
-  },
-  '::-webkit-scrollbar-thumb': {
-    background: t.colors.$neutralAlpha500,
-  },
-  '::-webkit-scrollbar-track': {
-    background: 'transparent',
-  },
-});
+const unstyledScrollbar = (t: InternalTheme) => {
+  // Chrome 121+ prioritizes standardized properties over webkit when both are present
+  // So we only apply standardized properties for Firefox (which doesn't support webkit)
+  // Chrome/Safari/Edge will use the webkit properties below
+  const baseStyles: any = {
+    // Webkit (Chrome, Safari, Edge) - full styling support
+    '::-webkit-scrollbar': {
+      background: t.colors.$neutralAlpha50,
+      width: '6px',
+      height: '6px',
+    },
+    '::-webkit-scrollbar-thumb': {
+      background: t.colors.$neutralAlpha600,
+      borderRadius: t.radii.$sm,
+      transition: `background-color ${t.transitionDuration.$fast} ${t.transitionTiming.$common}`,
+    },
+    '::-webkit-scrollbar-thumb:hover': {
+      background: t.colors.$neutralAlpha700,
+    },
+    '::-webkit-scrollbar-track': {
+      background: t.colors.$neutralAlpha50,
+    },
+  };
+
+  // Firefox support - wrapped in @supports so Chrome doesn't use it
+  // Emotion supports @supports queries in sx objects
+  baseStyles['@supports not selector(::-webkit-scrollbar)'] = {
+    scrollbarColor: `${t.colors.$neutralAlpha600} ${t.colors.$neutralAlpha50}`,
+    scrollbarWidth: 'thin',
+  };
+
+  return baseStyles;
+};
 
 const maxHeightScroller = (t: InternalTheme) =>
   ({

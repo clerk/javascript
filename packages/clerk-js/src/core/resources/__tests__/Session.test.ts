@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkOfflineError } from '@clerk/shared/error';
 import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
@@ -260,13 +260,13 @@ describe('Session', () => {
     });
 
     describe('with offline browser and network failure', () => {
-      let warnSpy;
       beforeEach(() => {
+        // Use real timers for offline tests to avoid unhandled rejection issues with retry logic
+        vi.useRealTimers();
         Object.defineProperty(window.navigator, 'onLine', {
           writable: true,
           value: false,
         });
-        warnSpy = vi.spyOn(console, 'warn').mockReturnValue();
       });
 
       afterEach(() => {
@@ -274,10 +274,10 @@ describe('Session', () => {
           writable: true,
           value: true,
         });
-        warnSpy.mockRestore();
+        vi.useFakeTimers();
       });
 
-      it('returns null', async () => {
+      it('throws ClerkOfflineError when offline', async () => {
         const session = new Session({
           status: 'active',
           id: 'session_1',
@@ -292,11 +292,33 @@ describe('Session', () => {
         mockNetworkFailedFetch();
         BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
 
-        const token = await session.getToken();
+        try {
+          await session.getToken({ skipCache: true });
+          expect.fail('Expected ClerkOfflineError to be thrown');
+        } catch (error) {
+          expect(ClerkOfflineError.is(error)).toBe(true);
+        }
+      });
 
+      it('throws ClerkOfflineError after fetch fails while offline', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: 'activeOrganization',
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        mockNetworkFailedFetch();
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        await expect(session.getToken({ skipCache: true })).rejects.toThrow(ClerkOfflineError);
+
+        // Fetch should have been called at least once
         expect(global.fetch).toHaveBeenCalled();
-        expect(dispatchSpy).toHaveBeenCalledTimes(1);
-        expect(token).toEqual(null);
       });
     });
 
@@ -633,6 +655,110 @@ describe('Session', () => {
       expect(dispatchSpy).toHaveBeenCalledWith('token:update', {
         token: session.lastActiveToken,
       });
+    });
+  });
+
+  describe('__internal_touch()', () => {
+    const mockSessionData = {
+      status: 'active',
+      id: 'session_1',
+      object: 'session',
+      user: createUser({}),
+      last_active_organization_id: 'org_123',
+      actor: null,
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+      last_active_token: { object: 'token', jwt: mockJwt },
+    } as SessionJSON;
+
+    const mockClientData = {
+      object: 'client',
+      id: 'client_1',
+      sessions: [mockSessionData],
+      sign_up: null,
+      sign_in: null,
+      last_active_session_id: 'session_1',
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    };
+
+    beforeEach(() => {
+      BaseResource.clerk = clerkMock();
+    });
+
+    afterEach(() => {
+      BaseResource.clerk = null as any;
+    });
+
+    it('does not dispatch token:update event', async () => {
+      const dispatchSpy = vi.spyOn(eventBus, 'emit');
+      const session = new Session(mockSessionData);
+
+      (BaseResource.clerk.getFapiClient().request as Mock).mockResolvedValue({
+        payload: { response: mockSessionData, client: mockClientData },
+      });
+
+      await session.__internal_touch();
+
+      expect(dispatchSpy).not.toHaveBeenCalledWith('token:update', expect.anything());
+      dispatchSpy.mockRestore();
+    });
+
+    it('does not call clerk.updateClient', async () => {
+      const session = new Session(mockSessionData);
+      const updateClientSpy = vi.fn();
+      BaseResource.clerk = clerkMock({ updateClient: updateClientSpy } as any);
+
+      (BaseResource.clerk.getFapiClient().request as Mock).mockResolvedValue({
+        payload: { response: mockSessionData, client: mockClientData },
+        status: 200,
+      });
+
+      await session.__internal_touch();
+
+      expect(updateClientSpy).not.toHaveBeenCalled();
+    });
+
+    it('returns piggybacked client when present in response', async () => {
+      const session = new Session(mockSessionData);
+
+      (BaseResource.clerk.getFapiClient().request as Mock).mockResolvedValue({
+        payload: { response: mockSessionData, client: mockClientData },
+        status: 200,
+      });
+
+      const result = await session.__internal_touch();
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe('client_1');
+      expect(result?.sessions).toHaveLength(1);
+    });
+
+    it('returns undefined when response has no piggybacked client', async () => {
+      const session = new Session(mockSessionData);
+
+      (BaseResource.clerk.getFapiClient().request as Mock).mockResolvedValue({
+        payload: { response: mockSessionData },
+        status: 200,
+      });
+
+      const result = await session.__internal_touch();
+
+      expect(result).toBeUndefined();
+    });
+
+    it('updates session in-place from response', async () => {
+      const session = new Session(mockSessionData);
+      const updatedSessionData = { ...mockSessionData, last_active_organization_id: 'org_456' };
+
+      (BaseResource.clerk.getFapiClient().request as Mock).mockResolvedValue({
+        payload: { response: updatedSessionData },
+        status: 200,
+      });
+
+      await session.__internal_touch();
+
+      expect(session.lastActiveOrganizationId).toBe('org_456');
     });
   });
 
@@ -1398,6 +1524,59 @@ describe('Session', () => {
       });
 
       expect(fetchSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('agent', () => {
+    it('sets agent to null when actor is null', () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      expect(session.actor).toBeNull();
+      expect(session.agent).toBeNull();
+    });
+
+    it('sets agent to null when actor has no type (impersonation)', () => {
+      const actor = { sub: 'user_2' };
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      expect(session.actor).toEqual(actor);
+      expect(session.agent).toBeNull();
+    });
+
+    it('sets agent to the actor when actor has type "agent"', () => {
+      const actor = { sub: 'user_2', type: 'agent' as const };
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      expect(session.actor).toEqual(actor);
+      expect(session.agent).toEqual(actor);
+      expect(session.agent?.type).toBe('agent');
     });
   });
 });

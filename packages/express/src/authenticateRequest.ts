@@ -1,15 +1,16 @@
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
-import { deprecated } from '@clerk/shared/deprecated';
+import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, stripTrailingSlashes } from '@clerk/backend/proxy';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type { RequestHandler, Response } from 'express';
+import { Readable } from 'stream';
 
 import { clerkClient as defaultClerkClient } from './clerkClient';
 import { satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from './errors';
 import type { AuthenticateRequestParams, ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
-import { incomingMessageToRequest, loadApiEnv, loadClientEnv } from './utils';
+import { incomingMessageToRequest, loadApiEnv, loadClientEnv, requestToProxyRequest } from './utils';
 
 /**
  * @internal
@@ -99,7 +100,10 @@ const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): strin
 
 export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
   const clerkClient = options.clerkClient || defaultClerkClient;
-  const enableHandshake = options.enableHandshake ?? true;
+
+  // Extract proxy configuration
+  const frontendApiProxy = options.frontendApiProxy;
+  const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH);
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const middleware: RequestHandler = async (request, response, next) => {
@@ -107,39 +111,98 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
       return next();
     }
 
+    const env = { ...loadApiEnv(), ...loadClientEnv() };
+    const publishableKey = options.publishableKey || env.publishableKey;
+    const secretKey = options.secretKey || env.secretKey;
+
+    // Handle Frontend API proxy requests early, before authentication
+    if (frontendApiProxy) {
+      const requestUrl = new URL(request.originalUrl || request.url, `http://${request.headers.host}`);
+      const isEnabled =
+        typeof frontendApiProxy.enabled === 'function'
+          ? frontendApiProxy.enabled(requestUrl)
+          : frontendApiProxy.enabled;
+
+      if (isEnabled && (requestUrl.pathname === proxyPath || requestUrl.pathname.startsWith(proxyPath + '/'))) {
+        // Convert Express request to Fetch API Request
+        const proxyRequest = requestToProxyRequest(request);
+
+        // Call the core proxy function
+        const proxyResponse = await clerkFrontendApiProxy(proxyRequest, {
+          proxyPath,
+          publishableKey,
+          secretKey,
+        });
+
+        // Send the proxy response back to the client
+        response.status(proxyResponse.status);
+        proxyResponse.headers.forEach((value, key) => {
+          response.setHeader(key, value);
+        });
+
+        if (proxyResponse.body) {
+          const reader = proxyResponse.body.getReader();
+          const stream = new Readable({
+            async read() {
+              try {
+                const { done, value } = await reader.read();
+                if (done) {
+                  this.push(null);
+                } else {
+                  this.push(Buffer.from(value));
+                }
+              } catch (error) {
+                this.destroy(error instanceof Error ? error : new Error(String(error)));
+              }
+            },
+          });
+          stream.pipe(response);
+        } else {
+          response.end();
+        }
+        return;
+      }
+    }
+
+    // Auto-derive proxyUrl from frontendApiProxy config if not explicitly set
+    let resolvedOptions = options;
+    if (frontendApiProxy && !options.proxyUrl) {
+      const requestUrl = new URL(request.originalUrl || request.url, `http://${request.headers.host}`);
+      const isProxyEnabled =
+        typeof frontendApiProxy.enabled === 'function'
+          ? frontendApiProxy.enabled(requestUrl)
+          : frontendApiProxy.enabled;
+      if (isProxyEnabled) {
+        const forwardedProto = request.headers['x-forwarded-proto'];
+        const protoHeader = Array.isArray(forwardedProto) ? forwardedProto[0] : forwardedProto;
+        const proto = (protoHeader || '').split(',')[0].trim();
+        const protocol = request.secure || proto === 'https' ? 'https' : 'http';
+
+        const forwardedHost = request.headers['x-forwarded-host'];
+        const hostHeader = Array.isArray(forwardedHost) ? forwardedHost[0] : forwardedHost;
+        const host = (hostHeader || '').split(',')[0].trim() || request.headers.host || 'localhost';
+
+        const derivedProxyUrl = `${protocol}://${host}${proxyPath}`;
+        resolvedOptions = { ...options, proxyUrl: derivedProxyUrl };
+      }
+    }
+
     try {
       const requestState = await authenticateRequest({
         clerkClient,
         request,
-        options,
+        options: resolvedOptions,
       });
 
-      if (enableHandshake) {
-        const err = setResponseHeaders(requestState, response);
-        if (err) {
-          return next(err);
-        }
-        if (response.writableEnded) {
-          return;
-        }
+      const err = setResponseHeaders(requestState, response);
+      if (err) {
+        return next(err);
+      }
+      if (response.writableEnded) {
+        return;
       }
 
-      // TODO: For developers coming from the clerk-sdk-node package, we gave them examples
-      // to use `req.auth` without calling it as a function. We need to keep this for backwards compatibility.
-      const authHandler = (opts: Parameters<typeof requestState.toAuth>[0]) => requestState.toAuth(opts);
-      const authObject = requestState.toAuth();
-
-      const auth = new Proxy(authHandler, {
-        get(target, prop, receiver) {
-          deprecated('req.auth', 'Use `req.auth()` as a function instead.');
-          // If the property exists on the function, return it
-          if (prop in target) {
-            return Reflect.get(target, prop, receiver);
-          }
-          // Otherwise, get it from the authObject
-          return authObject?.[prop as keyof typeof authObject];
-        },
-      });
+      const auth = (opts: Parameters<typeof requestState.toAuth>[0]) => requestState.toAuth(opts);
 
       Object.assign(request, { auth });
 

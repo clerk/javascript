@@ -16,7 +16,7 @@ type ClerkContextProps = {
   clerk: ClerkProviderValue;
   clerkStatus?: ClerkStatus;
   children: React.ReactNode;
-  initialState?: InitialState;
+  initialState?: InitialState | Promise<InitialState>;
 };
 
 export function ClerkContextProvider(props: ClerkContextProps): JSX.Element | null {
@@ -27,6 +27,11 @@ export function ClerkContextProvider(props: ClerkContextProps): JSX.Element | nu
   const clerk = props.clerk as LoadedClerk;
 
   assertClerkSingletonExists(clerk);
+
+  // The initialState hook has the same check, but it's better to fail early
+  if (props.initialState instanceof Promise && !('use' in React && typeof React.use === 'function')) {
+    throw new Error('initialState cannot be a promise if React version is less than 19');
+  }
 
   const clerkCtx = React.useMemo(
     () => ({ value: clerk }),

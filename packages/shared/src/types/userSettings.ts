@@ -30,6 +30,7 @@ export type OAuthProviderSettings = {
 export type AttributeDataJSON = {
   enabled: boolean;
   required: boolean;
+  immutable?: boolean;
   verifications: VerificationStrategy[];
   used_for_first_factor: boolean;
   first_factors: VerificationStrategy[];
@@ -58,6 +59,9 @@ export type SignUpData = {
   captcha_enabled: boolean;
   mode: SignUpModes;
   legal_consent_enabled: boolean;
+  mfa?: {
+    required: boolean;
+  };
 };
 
 export type PasswordSettingsData = {

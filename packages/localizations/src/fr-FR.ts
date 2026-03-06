@@ -375,6 +375,13 @@ export const frFR: LocalizationResource = {
         tableHeader__role: 'Rôle',
         tableHeader__user: 'Utilisateur',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Nous mettons à jour les rôles disponibles. Une fois terminé, vous pourrez de nouveau modifier les rôles.',
+          title: 'Les rôles sont temporairement verrouillés',
+        },
+      },
       detailsTitle__emptyRow: 'Aucun membre',
       invitationsTab: {
         autoInvitations: {
@@ -405,13 +412,6 @@ export const frFR: LocalizationResource = {
         headerTitle__invitations: 'Invitations',
         headerTitle__members: 'Membres',
         headerTitle__requests: 'Demandes',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Les rôles sont temporairement verrouillés',
-          subtitle:
-            'Nous mettons à jour les rôles disponibles. Une fois terminé, vous pourrez de nouveau modifier les rôles.',
-        },
       },
     },
     navbar: {
@@ -875,6 +875,9 @@ export const frFR: LocalizationResource = {
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists: undefined,
+    },
     chooseOrganization: {
       action__createOrganization: 'Créer une nouvelle organisation',
       action__invitationAccept: 'Rejoindre',
@@ -895,8 +898,8 @@ export const frFR: LocalizationResource = {
       title: 'Configurer votre organisation',
     },
     organizationCreationDisabled: {
-      title: 'Vous devez appartenir à une organisation',
       subtitle: "Contactez l'administrateur de votre organisation pour obtenir une invitation.",
+      title: 'Vous devez appartenir à une organisation',
     },
     signOut: {
       actionLink: 'Se déconnecter',
@@ -911,6 +914,69 @@ export const frFR: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: 'Vous êtes déjà membre de cette organisation.',
@@ -941,11 +1007,12 @@ export const frFR: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'La valeur fournie est invalide.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Mot de passe incorrect',
-    form_password_or_identifier_incorrect:
-      "Le mot de passe ou l'adresse e-mail est incorrect. Réessayez ou utilisez une autre méthode.",
     form_password_length_too_short: 'Votre mot de passe est trop court.',
     form_password_not_strong_enough: "Votre mot de passe n'est pas assez fort.",
+    form_password_or_identifier_incorrect:
+      "Le mot de passe ou l'adresse e-mail est incorrect. Réessayez ou utilisez une autre méthode.",
     form_password_pwned:
       'Ce mot de passe a été compromis et ne peut pas être utilisé. Veuillez essayer un autre mot de passe à la place.',
     form_password_pwned__sign_in: 'Mot de passe compromis. Veuillez le réinitialiser.',

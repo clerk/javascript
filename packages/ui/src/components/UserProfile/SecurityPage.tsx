@@ -3,6 +3,7 @@ import { useUser } from '@clerk/shared/react';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
+import { getSecondFactors } from '@/ui/utils/mfa';
 
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
@@ -11,7 +12,6 @@ import { DeleteSection } from './DeleteSection';
 import { MfaSection } from './MfaSection';
 import { PasskeySection } from './PasskeySection';
 import { PasswordSection } from './PasswordSection';
-import { getSecondFactors } from './utils';
 
 export const SecurityPage = withCardStateProvider(() => {
   const { attributes, instanceIsPasswordBased } = useEnvironment().userSettings;
