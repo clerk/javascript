@@ -47,6 +47,22 @@ export function is429Error(e: any): boolean {
 }
 
 /**
+ * Checks if the provided error indicates the user's session is no longer valid
+ * and should trigger the unauthenticated flow (e.g. sign-out / redirect to sign-in).
+ *
+ * This is a 4xx client error that is NOT a rate limit (429). Rate-limited requests
+ * are transient — the session may still be valid, so they should be retried rather
+ * than treated as authentication failures.
+ *
+ * Use this instead of `is4xxError` when deciding whether to call `handleUnauthenticated`.
+ *
+ * @internal
+ */
+export function isUnauthenticatedError(e: any): boolean {
+  return is4xxError(e) && !is429Error(e);
+}
+
+/**
  * Checks if the provided error is a network error.
  *
  * @internal

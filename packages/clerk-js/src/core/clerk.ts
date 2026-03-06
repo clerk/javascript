@@ -5,10 +5,10 @@ import {
   ClerkRuntimeError,
   EmailLinkError,
   EmailLinkErrorCodeStatus,
-  is429Error,
   is4xxError,
   isClerkAPIResponseError,
   isClerkRuntimeError,
+  isUnauthenticatedError,
 } from '@clerk/shared/error';
 import {
   disabledAllAPIKeysFeatures,
@@ -1596,9 +1596,11 @@ export class Clerk implements ClerkInterface {
               this.updateClient(updatedClient, { __internal_dangerouslySkipEmit: true });
             }
           } catch (e) {
-            if (is4xxError(e) && !is429Error(e)) {
+            if (isUnauthenticatedError(e)) {
               void this.handleUnauthenticated();
-            } else if (!is429Error(e)) {
+            } else if (!is4xxError(e)) {
+              // Swallow 4xx errors like 429 (rate limit) that are not auth failures.
+              // Non-4xx errors (5xx, network) should still propagate.
               throw e;
             }
           }
@@ -3175,7 +3177,7 @@ export class Clerk implements ClerkInterface {
     }
 
     await session.touch().catch(e => {
-      if (is4xxError(e) && !is429Error(e)) {
+      if (isUnauthenticatedError(e)) {
         void this.handleUnauthenticated();
       }
     });

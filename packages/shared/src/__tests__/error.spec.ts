@@ -8,6 +8,7 @@ import {
   is429Error,
   is4xxError,
   isClerkRuntimeError,
+  isUnauthenticatedError,
 } from '../error';
 
 describe('ErrorThrower', () => {
@@ -98,6 +99,27 @@ describe('is429Error', () => {
     expect(is429Error({})).toBe(false);
     expect(is429Error(null)).toBe(false);
     expect(is429Error(undefined)).toBe(false);
+  });
+});
+
+describe('isUnauthenticatedError', () => {
+  it('returns true for auth-related 4xx errors', () => {
+    expect(isUnauthenticatedError({ status: 400 })).toBe(true);
+    expect(isUnauthenticatedError({ status: 401 })).toBe(true);
+    expect(isUnauthenticatedError({ status: 403 })).toBe(true);
+    expect(isUnauthenticatedError({ status: 404 })).toBe(true);
+    expect(isUnauthenticatedError({ status: 422 })).toBe(true);
+  });
+
+  it('returns false for 429 (rate limit)', () => {
+    expect(isUnauthenticatedError({ status: 429 })).toBe(false);
+  });
+
+  it('returns false for non-4xx errors', () => {
+    expect(isUnauthenticatedError({ status: 200 })).toBe(false);
+    expect(isUnauthenticatedError({ status: 500 })).toBe(false);
+    expect(isUnauthenticatedError({})).toBe(false);
+    expect(isUnauthenticatedError(null)).toBe(false);
   });
 });
 

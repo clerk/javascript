@@ -3,8 +3,7 @@ import { isValidBrowserOnline } from '@clerk/shared/browser';
 import {
   ClerkOfflineError,
   ClerkWebAuthnError,
-  is429Error,
-  is4xxError,
+  isUnauthenticatedError,
   MissingExpiredTokenError,
 } from '@clerk/shared/error';
 import {
@@ -162,8 +161,7 @@ export class Session extends BaseResource implements SessionResource {
         maxDelayBetweenRetries: 50 * 1_000,
         jitter: false,
         shouldRetry: (error, iterationsCount) => {
-          // 429 is a rate limit, not an auth error — retry with backoff
-          if (is4xxError(error) && !is429Error(error)) {
+          if (isUnauthenticatedError(error)) {
             return false;
           }
 

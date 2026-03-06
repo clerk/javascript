@@ -27,6 +27,7 @@ export {
   isPasswordPwnedError,
   isPasswordCompromisedError,
   isReverificationCancelledError,
+  isUnauthenticatedError,
   isUnauthorizedError,
   isUserLockedError,
 } from './errors/helpers';
