@@ -3,8 +3,8 @@ import { isValidBrowserOnline } from '@clerk/shared/browser';
 import {
   ClerkOfflineError,
   ClerkWebAuthnError,
-  is429Error,
   is4xxError,
+  is429Error,
   MissingExpiredTokenError,
 } from '@clerk/shared/error';
 import {
