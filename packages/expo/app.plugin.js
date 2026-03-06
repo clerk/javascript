@@ -483,29 +483,55 @@ const withClerkAndroid = config => {
   return withAppBuildGradle(config, modConfig => {
     let buildGradle = modConfig.modResults.contents;
 
-    // Check if exclusion already exists
-    if (buildGradle.includes('META-INF/versions/9/OSGI-INF/MANIFEST.MF')) {
-      console.log('✅ Clerk Android packaging exclusions already configured');
-      return modConfig;
-    }
-
-    // Find the existing packagingOptions block and add resources.excludes
-    const packagingOptionsMatch = buildGradle.match(/packagingOptions\s*\{/);
-    if (packagingOptionsMatch) {
-      // Add resources block inside packagingOptions
-      const resourcesExclude = `packagingOptions {
+    // --- META-INF exclusion ---
+    if (!buildGradle.includes('META-INF/versions/9/OSGI-INF/MANIFEST.MF')) {
+      // AGP 8+ uses `packaging` DSL, older versions use `packagingOptions`
+      const packagingMatch = buildGradle.match(/packaging\s*\{/) || buildGradle.match(/packagingOptions\s*\{/);
+      if (packagingMatch) {
+        const blockName = packagingMatch[0].trim().replace(/\s*\{$/, '');
+        const resourcesExclude = `${blockName} {
         // Clerk Android SDK: exclude duplicate META-INF files
         resources {
             excludes += ['META-INF/versions/9/OSGI-INF/MANIFEST.MF']
         }`;
 
-      buildGradle = buildGradle.replace(/packagingOptions\s*\{/, resourcesExclude);
-      modConfig.modResults.contents = buildGradle;
+        buildGradle = buildGradle.replace(new RegExp(`${blockName}\\s*\\{`), resourcesExclude);
+      } else {
+        // No packaging block found; append one at the end of the android block
+        const androidBlockEnd = buildGradle.lastIndexOf('}');
+        if (androidBlockEnd !== -1) {
+          const packagingBlock = `\n    packaging {\n        resources {\n            excludes += ['META-INF/versions/9/OSGI-INF/MANIFEST.MF']\n        }\n    }\n`;
+          buildGradle = buildGradle.slice(0, androidBlockEnd) + packagingBlock + buildGradle.slice(androidBlockEnd);
+        }
+      }
       console.log('✅ Clerk Android packaging exclusions added');
-    } else {
-      console.warn('⚠️ Could not find packagingOptions block in build.gradle');
     }
 
+    // --- Kotlin metadata version check skip ---
+    // clerk-android is compiled with a newer Kotlin than Expo/RN ships.
+    // Without this flag, the app module fails to compile with:
+    //   "Module was compiled with an incompatible version of Kotlin"
+    if (!buildGradle.includes('-Xskip-metadata-version-check')) {
+      const kotlinOptionsMatch = buildGradle.match(/kotlinOptions\s*\{/);
+      if (kotlinOptionsMatch) {
+        buildGradle = buildGradle.replace(
+          /kotlinOptions\s*\{/,
+          `kotlinOptions {\n        // Clerk: allow reading metadata from newer Kotlin versions\n        freeCompilerArgs += ['-Xskip-metadata-version-check']`,
+        );
+      } else {
+        // No kotlinOptions block; add one inside the android block
+        const androidMatch = buildGradle.match(/android\s*\{/);
+        if (androidMatch) {
+          buildGradle = buildGradle.replace(
+            /android\s*\{/,
+            `android {\n    kotlinOptions {\n        // Clerk: allow reading metadata from newer Kotlin versions\n        freeCompilerArgs += ['-Xskip-metadata-version-check']\n    }`,
+          );
+        }
+      }
+      console.log('✅ Clerk Android Kotlin metadata version check skip added');
+    }
+
+    modConfig.modResults.contents = buildGradle;
     return modConfig;
   });
 };
