@@ -33,7 +33,7 @@ const billingPerUnitTotalsFromJSON = (data: BillingPerUnitTotalJSON[]): BillingP
   }));
 };
 
-const billingCreditsFromJSON = (data: BillingCreditsJSON): BillingCredits => {
+export const billingCreditsFromJSON = (data: BillingCreditsJSON): BillingCredits => {
   return {
     proration: data.proration
       ? {

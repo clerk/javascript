@@ -9,8 +9,8 @@ root.render(
   <React.StrictMode>
     <ClerkProvider
       publishableKey={process.env.REACT_APP_CLERK_PUBLISHABLE_KEY as string}
-      clerkJSUrl={process.env.REACT_APP_CLERK_JS as string}
-      clerkUIUrl={process.env.REACT_APP_CLERK_UI as string}
+      __internal_clerkJSUrl={process.env.REACT_APP_CLERK_JS as string}
+      __internal_clerkUIUrl={process.env.REACT_APP_CLERK_UI as string}
       appearance={{
         options: {
           showOptionalFields: true,

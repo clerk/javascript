@@ -1,5 +1,486 @@
 # Change Log
 
+## 3.0.1
+
+### Patch Changes
+
+- Update README prerequisites to match actual `package.json` engine and peer dependency constraints. ([#7972](https://github.com/clerk/javascript/pull/7972)) by [@jacekradko](https://github.com/jacekradko)
+
+## 3.0.0
+
+### Major Changes
+
+- Remove deprecated verify methods in favor of `verify()`. ([#7927](https://github.com/clerk/javascript/pull/7927)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  **`apiKeys.verifySecret()` removed**
+
+  ```ts
+  // Before
+  await clerkClient.apiKeys.verifySecret(secret);
+
+  // After
+  await clerkClient.apiKeys.verify(secret);
+  ```
+
+  **`idpOAuthAccessToken.verifyAccessToken()` removed**
+
+  ```ts
+  // Before
+  await clerkClient.idpOAuthAccessToken.verifyAccessToken(accessToken);
+
+  // After
+  await clerkClient.idpOAuthAccessToken.verify(accessToken);
+  ```
+
+  **`m2m.verifyToken()` removed**
+
+  ```ts
+  // Before
+  await clerkClient.m2m.verifyToken(params);
+
+  // After
+  await clerkClient.m2m.verify(params);
+  ```
+
+- Update engines config to require node@20 or higher ([#6931](https://github.com/clerk/javascript/pull/6931)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove deprecated `samlAccount` in favor of `enterpriseAccount` ([#7258](https://github.com/clerk/javascript/pull/7258)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Minor Changes
+
+- Add support for Agent Tasks API endpoint which allows developers to create agent tasks that can be used to act on behalf of users through automated flows. ([#7783](https://github.com/clerk/javascript/pull/7783)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add Frontend API proxy support via `frontendApiProxy` option in `clerkMiddleware` ([#7602](https://github.com/clerk/javascript/pull/7602)) by [@brkalow](https://github.com/brkalow)
+
+- Add `satelliteAutoSync` option to optimize satellite app handshake behavior ([#7597](https://github.com/clerk/javascript/pull/7597)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Satellite apps currently trigger a handshake redirect on every first page load, even when no cookies exist. This creates unnecessary redirects to the primary domain for apps where most users aren't authenticated.
+
+  **New option: `satelliteAutoSync`** (default: `false`)
+  - When `false` (default): Skip automatic handshake if no session cookies exist, only trigger after explicit sign-in action
+  - When `true`: Satellite apps automatically trigger handshake on first load (previous behavior)
+
+  **New query parameter: `__clerk_sync`**
+  - `__clerk_sync=1` (NeedsSync): Triggers handshake after returning from primary sign-in
+  - `__clerk_sync=2` (Completed): Prevents re-sync loop after handshake completes
+
+  Backwards compatible: Still reads legacy `__clerk_synced=true` parameter.
+
+  **SSR redirect fix**: Server-side redirects (e.g., `redirectToSignIn()` from middleware) now correctly add `__clerk_sync=1` to the return URL for satellite apps. This ensures the handshake is triggered when the user returns from sign-in on the primary domain.
+
+  **CSR redirect fix**: Client-side redirects now add `__clerk_sync=1` to all redirect URL variants (`forceRedirectUrl`, `fallbackRedirectUrl`) for satellite apps, not just the default `redirectUrl`.
+
+  ## Usage
+
+  ### SSR (Next.js Middleware)
+
+  ```typescript
+  import { clerkMiddleware } from '@clerk/nextjs/server';
+
+  export default clerkMiddleware({
+    isSatellite: true,
+    domain: 'satellite.example.com',
+    signInUrl: 'https://primary.example.com/sign-in',
+    // Set to true to automatically sync auth state on first load
+    satelliteAutoSync: true,
+  });
+  ```
+
+  ### SSR (TanStack Start)
+
+  ```typescript
+  import { clerkMiddleware } from '@clerk/tanstack-react-start/server';
+
+  export default clerkMiddleware({
+    isSatellite: true,
+    domain: 'satellite.example.com',
+    signInUrl: 'https://primary.example.com/sign-in',
+    // Set to true to automatically sync auth state on first load
+    satelliteAutoSync: true,
+  });
+  ```
+
+  ### CSR (ClerkProvider)
+
+  ```tsx
+  <ClerkProvider
+    publishableKey='pk_...'
+    isSatellite={true}
+    domain='satellite.example.com'
+    signInUrl='https://primary.example.com/sign-in'
+    // Set to true to automatically sync auth state on first load
+    satelliteAutoSync={true}
+  >
+    {children}
+  </ClerkProvider>
+  ```
+
+  ### SSR (TanStack Start with callback)
+
+  ```typescript
+  import { clerkMiddleware } from '@clerk/tanstack-react-start/server';
+
+  // Options callback - receives context object, returns options
+  export default clerkMiddleware(({ url }) => ({
+    isSatellite: true,
+    domain: 'satellite.example.com',
+    signInUrl: 'https://primary.example.com/sign-in',
+    satelliteAutoSync: url.pathname.startsWith('/dashboard'),
+  }));
+  ```
+
+  ## Migration Guide
+
+  ### Behavior change: `satelliteAutoSync` defaults to `false`
+
+  Previously, satellite apps would automatically trigger a handshake redirect on every first page load to sync authentication state with the primary domain—even when no session cookies existed. This caused unnecessary redirects to the primary domain for users who weren't authenticated.
+
+  The new default (`satelliteAutoSync: false`) provides a better experience for end users. Performance-wise, the satellite app can be shown immediately without attempting to sync state first, which is the right behavior for most use cases.
+
+  **To preserve the previous behavior** where visiting a satellite while already signed in on the primary domain automatically syncs your session, set `satelliteAutoSync: true`:
+
+  ```typescript
+  export default clerkMiddleware({
+    isSatellite: true,
+    domain: 'satellite.example.com',
+    signInUrl: 'https://primary.example.com/sign-in',
+    satelliteAutoSync: true, // Opt-in to automatic sync on first load
+  });
+  ```
+
+  ### TanStack Start: Function props to options callback
+
+  The `clerkMiddleware` function no longer accepts individual props as functions. If you were using the function form for props like `domain`, `proxyUrl`, or `isSatellite`, migrate to the options callback pattern.
+
+  **Before (prop function form - no longer supported):**
+
+  ```typescript
+  import { clerkMiddleware } from '@clerk/tanstack-react-start/server';
+
+  export default clerkMiddleware({
+    isSatellite: true,
+    // ❌ Function form for individual props no longer works
+    domain: url => url.hostname,
+  });
+  ```
+
+  **After (options callback form):**
+
+  ```typescript
+  import { clerkMiddleware } from '@clerk/tanstack-react-start/server';
+
+  // ✅ Wrap entire options in a callback function
+  export default clerkMiddleware(({ url }) => ({
+    isSatellite: true,
+    domain: url.hostname,
+  }));
+  ```
+
+  The callback receives a context object with the `url` property (a `URL` instance) and can return options synchronously or as a Promise for async configuration.
+
+### Patch Changes
+
+- Warn when a cookie-based session token is missing the `azp` claim instead of rejecting the token. This prepares consumers for a future version where the `azp` claim will be required. ([#7929](https://github.com/clerk/javascript/pull/7929)) by [@jacekradko](https://github.com/jacekradko)
+
+- Dropping the `__experimental_` prefix from `setPasswordCompromised` and `unsetPasswordCompromised` and marking them as stable ([#7504](https://github.com/clerk/javascript/pull/7504)) by [@octoper](https://github.com/octoper)
+
+- Added date filter parameters to user list endpoint ([#7793](https://github.com/clerk/javascript/pull/7793)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fixes an issue with host header parsing that would cause Clerk to throw an exception when receiving malformed host values. ([#7370](https://github.com/clerk/javascript/pull/7370)) by [@brkalow](https://github.com/brkalow)
+
+- Improve token type validation in authentication requests ([#7765](https://github.com/clerk/javascript/pull/7765)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Allow `null` for `period_end` in `BillingSubscriptionItemWebhookEventJSON` ([#7699](https://github.com/clerk/javascript/pull/7699)) by [@jacekradko](https://github.com/jacekradko)
+
+- fix: Update getAuthData to use isMachineToken ([#7755](https://github.com/clerk/javascript/pull/7755)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+- Allow usage of machine secret key when listing M2M tokens: ([#7968](https://github.com/clerk/javascript/pull/7968)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```ts
+  const clerkClient = createClerkClient();
+
+  const m2mToken = await clerkClient.m2m.list({
+    machineSecretKey: 'ak_xxxxx',
+    subject: machineId,
+  });
+  ```
+
+- Add missing fields to CommercePlan type. ([#7707](https://github.com/clerk/javascript/pull/7707)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`0a9cce3`](https://github.com/clerk/javascript/commit/0a9cce375046a7ff5944a7f2a140e787fe66996c), [`e35960f`](https://github.com/clerk/javascript/commit/e35960f5e44ab758d0ab0545691f44dbafd5e7cb), [`c9f0d77`](https://github.com/clerk/javascript/commit/c9f0d777f59673bfe614e1a8502cefe5445ce06f), [`1bd1747`](https://github.com/clerk/javascript/commit/1bd174781b83d3712a07e7dfe1acf73742497349), [`6a2ff9e`](https://github.com/clerk/javascript/commit/6a2ff9e957145124bc3d00bf10f566b613c7c60f), [`d2cee35`](https://github.com/clerk/javascript/commit/d2cee35d73d69130ad8c94650286d3b43dda55e6), [`0a9cce3`](https://github.com/clerk/javascript/commit/0a9cce375046a7ff5944a7f2a140e787fe66996c), [`a374c18`](https://github.com/clerk/javascript/commit/a374c18e31793b0872fe193ab7808747749bc56b), [`466d642`](https://github.com/clerk/javascript/commit/466d642ce332d191e2c03d9cb9ca76b0d3776cc6), [`5ef4a77`](https://github.com/clerk/javascript/commit/5ef4a7791cf2820bb12b038cf3b751252362f6e4), [`af85739`](https://github.com/clerk/javascript/commit/af85739195f5f4b353ba4395a547bbc8a8b26483), [`10b5bea`](https://github.com/clerk/javascript/commit/10b5bea85c3bb588c59f13628f32a82934f5de5a), [`a05d130`](https://github.com/clerk/javascript/commit/a05d130451226d2c512c9ea1e9a9f1e4cb2e3ba2), [`b193f79`](https://github.com/clerk/javascript/commit/b193f79ee86eb8ce788db4b747d1c64a1c7c6ac5), [`e9d2f2f`](https://github.com/clerk/javascript/commit/e9d2f2fd1ea027f7936353dfcdc905bcb01c3ad7), [`43fc7b7`](https://github.com/clerk/javascript/commit/43fc7b7b40cf7c42cfb0aa8b2e2058243a3f38f5), [`0f1011a`](https://github.com/clerk/javascript/commit/0f1011a062c3705fc1a69593672b96ad03936de1), [`cbc5618`](https://github.com/clerk/javascript/commit/cbc56181fb28e35c1974cf4de8256a939c3ff029), [`38def4f`](https://github.com/clerk/javascript/commit/38def4fedc99b6be03c88a3737b8bd5940e5bff3), [`7772f45`](https://github.com/clerk/javascript/commit/7772f45ee601787373cf3c9a24eddf3f76c26bee), [`a3e689f`](https://github.com/clerk/javascript/commit/a3e689f3b7f2f3799a263da4b7bb14c0e49e42b7), [`583f7a9`](https://github.com/clerk/javascript/commit/583f7a9a689310f4bdd2c66f5258261f08e47109), [`965e7f1`](https://github.com/clerk/javascript/commit/965e7f1b635cf25ebfe129ec338e05137d1aba9e), [`2b76081`](https://github.com/clerk/javascript/commit/2b7608145611c10443a999cae4373a1acfd7cab7), [`f284c3d`](https://github.com/clerk/javascript/commit/f284c3d1d122b725594d0a287d0fb838f6d191f5), [`ac34168`](https://github.com/clerk/javascript/commit/ac3416849954780bd873ed3fe20a173a8aee89aa), [`cf0d0dc`](https://github.com/clerk/javascript/commit/cf0d0dc7f6380d6e0c4e552090345b7943c22b35), [`690280e`](https://github.com/clerk/javascript/commit/690280e91b0809d8e0fd1e161dd753dc62801244), [`b971d0b`](https://github.com/clerk/javascript/commit/b971d0bb3eed3a6d3d187b4a296bc6e56271014e), [`22d1689`](https://github.com/clerk/javascript/commit/22d1689cb4b789fe48134b08a4e3dc5921ac0e1b), [`e9a1d4d`](https://github.com/clerk/javascript/commit/e9a1d4dcac8a61595739f83a5b9b2bc18a35f59d), [`c088dde`](https://github.com/clerk/javascript/commit/c088dde13004dc16dd37c17572a52efda69843c9), [`8902e21`](https://github.com/clerk/javascript/commit/8902e216bab83fe85a491bdbc2ac8129e83e5a73), [`972f6a0`](https://github.com/clerk/javascript/commit/972f6a015d720c4867aa24b4503db3968187e523), [`a1aaff3`](https://github.com/clerk/javascript/commit/a1aaff33700ed81f31a9f340cf6cb3a82efeef85), [`d85646a`](https://github.com/clerk/javascript/commit/d85646a0b9efc893e2548dc55dbf08954117e8c2), [`ab3dd16`](https://github.com/clerk/javascript/commit/ab3dd160608318363b42f5f46730ed32ee12335b), [`4a8cb10`](https://github.com/clerk/javascript/commit/4a8cb10117bc9b2c9f5efe4f3d243b79dc815251), [`fd195c1`](https://github.com/clerk/javascript/commit/fd195c14086cba7087c74af472d2558d04fe3afd), [`8887fac`](https://github.com/clerk/javascript/commit/8887fac93fccffac7d1612cf5fb773ae614ceb22), [`dc886a9`](https://github.com/clerk/javascript/commit/dc886a9575a0c7366c57cba59ecde260baeb6dad), [`428629b`](https://github.com/clerk/javascript/commit/428629b46a249f432ab6406a92ff628ab5850773), [`8b95393`](https://github.com/clerk/javascript/commit/8b953930536b12bd8ade6ba5c2092f40770ea8df), [`c438fa5`](https://github.com/clerk/javascript/commit/c438fa529cd410eb237c734c04b583d225e66a07), [`c438fa5`](https://github.com/clerk/javascript/commit/c438fa529cd410eb237c734c04b583d225e66a07), [`fd195c1`](https://github.com/clerk/javascript/commit/fd195c14086cba7087c74af472d2558d04fe3afd), [`fd69edb`](https://github.com/clerk/javascript/commit/fd69edbcfe2dfca71d1e6d41af9647701dba2823), [`8d91225`](https://github.com/clerk/javascript/commit/8d91225acc67349fd0d35f982dedb0618f3179e9), [`1fc95e2`](https://github.com/clerk/javascript/commit/1fc95e2a0a5a99314b1bb4d59d3f3e3f03accb3d), [`3dac245`](https://github.com/clerk/javascript/commit/3dac245456dae1522ee2546fc9cc29454f1f345f), [`a4c3b47`](https://github.com/clerk/javascript/commit/a4c3b477dad70dd55fe58f433415b7cc9618a225), [`7c3c002`](https://github.com/clerk/javascript/commit/7c3c002d6d81305124f934f41025799f4f03103e), [`d8bbc66`](https://github.com/clerk/javascript/commit/d8bbc66d47b476b3405c03e1b0632144afdd716b), [`3983cf8`](https://github.com/clerk/javascript/commit/3983cf85d657c247d46f94403cb121f13f6f01e4), [`f1f1d09`](https://github.com/clerk/javascript/commit/f1f1d09e675cf9005348d2380df0da3f293047a6), [`736314f`](https://github.com/clerk/javascript/commit/736314f8641be005ddeacfccae9135a1b153d6f6), [`2cc7dbb`](https://github.com/clerk/javascript/commit/2cc7dbbb212f92e2889460086b50eb644b8ba69d), [`86d2199`](https://github.com/clerk/javascript/commit/86d219970cdc21d5160f0c8adf2c30fc34f1c7b9), [`da415c8`](https://github.com/clerk/javascript/commit/da415c813332998dafd4ec4690a6731a98ded65f), [`97c9ab3`](https://github.com/clerk/javascript/commit/97c9ab3c2130dbe4500c3feb83232d1ccbbd910e), [`cc63aab`](https://github.com/clerk/javascript/commit/cc63aab479853f0e15947837eff5a4f46c71c9f2), [`a7a38ab`](https://github.com/clerk/javascript/commit/a7a38ab76c66d3f147b8b1169c1ce86ceb0d9384), [`cfa70ce`](https://github.com/clerk/javascript/commit/cfa70ce766b687b781ba984ee3d72ac1081b0c97), [`25d37b0`](https://github.com/clerk/javascript/commit/25d37b03605365395d5d7a667ce657ab243a0a68), [`26254f0`](https://github.com/clerk/javascript/commit/26254f0463312115eca4bc0a396c5acd0703187b), [`c97e6af`](https://github.com/clerk/javascript/commit/c97e6af1d6974270843ce91ce17b0c36ee828aa0), [`d98727e`](https://github.com/clerk/javascript/commit/d98727e30b191087abb817acfc29cfccdb3a7047), [`79e2622`](https://github.com/clerk/javascript/commit/79e2622c18917709a351a122846def44c7e22f0c), [`12b3070`](https://github.com/clerk/javascript/commit/12b3070f3f102256f19e6af6acffb05b66d42e0b)]:
+  - @clerk/shared@4.0.0
+
+## 2.33.0
+
+### Minor Changes
+
+- Added support for JWT token format when creating and verifying machine-to-machine (M2M) tokens. This enables fully **networkless verification** when using the public JWT key. ([#7883](https://github.com/clerk/javascript/pull/7883)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  **Creating a JWT-format M2M token**
+
+  ```ts
+  const clerkClient = createClerkClient({
+    machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY,
+  });
+
+  const m2mToken = await clerkClient.m2m.createToken({
+    tokenFormat: 'jwt',
+  });
+
+  console.log('M2M token created:', m2mToken.token);
+  ```
+
+  **Verifying a token**
+
+  ```ts
+  const clerkClient = createClerkClient({
+    machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY,
+  });
+
+  const authHeader = req.headers.get('Authorization');
+  const token = authHeader.slice(7);
+
+  const verified = await clerkClient.m2m.verify(token);
+
+  console.log('Verified M2M token:', verified);
+  ```
+
+  **Networkless verification**
+
+  ```ts
+  const clerkClient = createClerkClient({
+    jwtKey: process.env.CLERK_JWT_KEY,
+  });
+
+  const authHeader = req.headers.get('Authorization');
+  const token = authHeader.slice(7);
+
+  const verified = await clerkClient.m2m.verify(token);
+
+  console.log('Verified M2M token:', verified);
+  ```
+
+- Add `list()` method to M2M tokens API to retrieve a list of machine-to-machine tokens for a given machine. ([#7939](https://github.com/clerk/javascript/pull/7939)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```ts
+  // Retrieve M2M tokens for a specific machine
+  const response = await clerkClient.m2m.list({
+    subject: 'mch_1xxxxxxxxxxxxx',
+  });
+
+  console.log(response.data); // M2MToken[]
+  console.log(response.totalCount); // number
+  ```
+
+  Filter by revoked or expired tokens:
+
+  ```ts
+  const revokedTokens = await clerkClient.m2m.list({
+    subject: 'mch_1xxxxxxxxxxxxx',
+    revoked: true,
+  });
+
+  const expiredTokens = await clerkClient.m2m.list({
+    subject: 'mch_1xxxxxxxxxxxxx',
+    expired: true,
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`7955e9d`](https://github.com/clerk/javascript/commit/7955e9dd90419c02fd51226d4fe335d42e7096a5)]:
+  - @clerk/shared@3.47.2
+  - @clerk/types@4.101.20
+
+## 2.32.2
+
+### Patch Changes
+
+- Updated dependencies [[`8a0c404`](https://github.com/clerk/javascript/commit/8a0c404d05a88697fcc3a609fef25bd5ff9f9ef0)]:
+  - @clerk/shared@3.47.1
+  - @clerk/types@4.101.19
+
+## 2.32.1
+
+### Patch Changes
+
+- Updates `OrganizationInvitationStatus` to include `expired` to match the API updates. ([#7909](https://github.com/clerk/javascript/pull/7909)) by [@austincalvelage](https://github.com/austincalvelage)
+
+## 2.32.0
+
+### Minor Changes
+
+- Add support for Agent Tasks API endpoint which allows developers to create agent tasks that can be used to act on behalf of users through automated flows. ([#7897](https://github.com/clerk/javascript/pull/7897)) by [@tmilewski](https://github.com/tmilewski)
+
+  Export `createAgentTestingTask` helper for creating agent tasks via the Clerk Backend API from both `@clerk/testing/playwright` and `@clerk/testing/cypress` subpaths.
+
+### Patch Changes
+
+- Updated dependencies [[`c00c524`](https://github.com/clerk/javascript/commit/c00c5246f340cf0339c5725cade90cfcd118727d)]:
+  - @clerk/shared@3.47.0
+  - @clerk/types@4.101.18
+
+## 2.31.2
+
+### Patch Changes
+
+- fix(backend): type JwtTemplatesApi.list as PaginatedResourceResponse ([#7868](https://github.com/clerk/javascript/pull/7868)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+- Updated dependencies [[`71bd53c`](https://github.com/clerk/javascript/commit/71bd53c67a5018bd7aa589c3baced2038123c228), [`935f780`](https://github.com/clerk/javascript/commit/935f780ab5b3871253da2ad46f0e44f9ce7e53e8)]:
+  - @clerk/shared@3.46.0
+  - @clerk/types@4.101.17
+
+## 2.31.1
+
+### Patch Changes
+
+- Updated dependencies [[`b17e4bb`](https://github.com/clerk/javascript/commit/b17e4bbbbad173969523e5494f2d8447d1887b95)]:
+  - @clerk/shared@3.45.1
+  - @clerk/types@4.101.16
+
+## 2.31.0
+
+### Minor Changes
+
+- Add `providerUserId` field to `ExternalAccount` resource as the preferred way to access the unique user ID from the OAuth provider. The existing `externalId` field is now deprecated in favor of `providerUserId` for better clarity and consistency across the API. ([#7778](https://github.com/clerk/javascript/pull/7778)) by [@Jibaru](https://github.com/Jibaru)
+
+- Add `createBulk()` method to `WaitlistEntryAPI` for bulk creating waitlist entries ([#7762](https://github.com/clerk/javascript/pull/7762)) by [@Jibaru](https://github.com/Jibaru)
+
+### Patch Changes
+
+- Updated dependencies [[`35bcbd1`](https://github.com/clerk/javascript/commit/35bcbd11f5753ee396cd090d3dd1848f3f2727e0)]:
+  - @clerk/shared@3.45.0
+  - @clerk/types@4.101.15
+
+## 2.30.1
+
+### Patch Changes
+
+- Improved token type validation in authentication requests ([#7764](https://github.com/clerk/javascript/pull/7764)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 2.30.0
+
+### Minor Changes
+
+- Add `lastSignInAtAfter` and `lastSignInAtBefore` filters to the Users API list and count endpoints. ([#7721](https://github.com/clerk/javascript/pull/7721)) by [@Jibaru](https://github.com/Jibaru)
+
+  These parameters are supported by `users.getUserList()` and are forwarded to `/v1/users` and `/v1/users/count` to filter users by last sign-in timestamp.
+
+### Patch Changes
+
+- Fixed an issue where JWT OAuth access tokens where not treated as a machine token ([#7756](https://github.com/clerk/javascript/pull/7756)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 2.29.7
+
+### Patch Changes
+
+- fix: correct `createInvitationBulk` return type to `Promise<Invitation[]>` ([#7702](https://github.com/clerk/javascript/pull/7702)) by [@jacekradko](https://github.com/jacekradko)
+
+## 2.29.6
+
+### Patch Changes
+
+- Updated dependencies [[`64a35f7`](https://github.com/clerk/javascript/commit/64a35f79e9a49dfc140b4c8a8df517b74d46d6c6)]:
+  - @clerk/shared@3.44.0
+  - @clerk/types@4.101.14
+
+## 2.29.5
+
+### Patch Changes
+
+- Updated dependencies [[`b7a4e1e`](https://github.com/clerk/javascript/commit/b7a4e1eabe7aa61e7d2cb7f27cbd22671c49f2b1)]:
+  - @clerk/shared@3.43.2
+  - @clerk/types@4.101.13
+
+## 2.29.4
+
+### Patch Changes
+
+- Updated dependencies [[`e995cc3`](https://github.com/clerk/javascript/commit/e995cc3572f85aa47bdee8f7b56130a383488a7f)]:
+  - @clerk/shared@3.43.1
+  - @clerk/types@4.101.12
+
+## 2.29.3
+
+### Patch Changes
+
+- Add optional `idToken` member to `OauthAccessToken` returned by `getUserOauthAccessToken`. The ID token is retrieved from OIDC providers and is only present for OIDC-compliant OAuth 2.0 providers when available. ([#7599](https://github.com/clerk/javascript/pull/7599)) by [@jfoshee](https://github.com/jfoshee)
+
+- Updated dependencies [[`271ddeb`](https://github.com/clerk/javascript/commit/271ddeb0b47357f7da316eef389ae46b180c36da)]:
+  - @clerk/shared@3.43.0
+  - @clerk/types@4.101.11
+
+## 2.29.2
+
+### Patch Changes
+
+- Fixed an issue when using multiple `acceptsToken` values in `authenticateRequest`. When `acceptsToken` is an array containing both session and machine token types (e.g., `['session_token', 'api_key']`), the function now correctly routes to the appropriate authentication handler based on the actual token type, instead of always treating them as machine tokens. ([#7556](https://github.com/clerk/javascript/pull/7556)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 2.29.1
+
+### Patch Changes
+
+- Move cookie to devDependencies and bundle it within @clerk/backend to fix module compatibility problems in TanStack Start apps. ([#7545](https://github.com/clerk/javascript/pull/7545)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`a4e6932`](https://github.com/clerk/javascript/commit/a4e693262f734bfd3ab08ffac019168c874c2bd8)]:
+  - @clerk/shared@3.42.0
+  - @clerk/types@4.101.10
+
+## 2.29.0
+
+### Minor Changes
+
+- Improves resilience by keeping users logged in when Clerk's origin is temporarily unavailable using edge-based token generation ([#7516](https://github.com/clerk/javascript/pull/7516)) by [@bratsos](https://github.com/bratsos)
+
+### Patch Changes
+
+- Updated dependencies [[`03dd374`](https://github.com/clerk/javascript/commit/03dd37458eedf59198dc3574e12030b217efcb41)]:
+  - @clerk/shared@3.41.1
+  - @clerk/types@4.101.9
+
+## 2.28.0
+
+### Minor Changes
+
+- Dropping the `__experimental_` prefix from `setPasswordCompromised` and `unsetPasswordCompromised` and marking them as stable ([#7503](https://github.com/clerk/javascript/pull/7503)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Renaming `__experimental_passwordCompromised` to `__experimental_setPasswordCompromised` and introducing `__experimental_unsetPasswordCompromised` ([#7477](https://github.com/clerk/javascript/pull/7477)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`79eb5af`](https://github.com/clerk/javascript/commit/79eb5afd91d7b002faafd2980850d944acb37917), [`b3b02b4`](https://github.com/clerk/javascript/commit/b3b02b46dfa6d194ed12d2e6b9e332796ee73c4a), [`7b3024a`](https://github.com/clerk/javascript/commit/7b3024a71e6e45e926d83f1a9e887216e7c14424), [`2cd4da9`](https://github.com/clerk/javascript/commit/2cd4da9c72bc7385c0c7c71e2a7ca856d79ce630)]:
+  - @clerk/shared@3.41.0
+  - @clerk/types@4.101.8
+
+## 2.27.1
+
+### Patch Changes
+
+- Fixed an issue where TanStack React Start middleware fails to properly handle requests. ([#7431](https://github.com/clerk/javascript/pull/7431)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`375a32d`](https://github.com/clerk/javascript/commit/375a32d0f44933605ffb513ff28f522ac5e851d6), [`175883b`](https://github.com/clerk/javascript/commit/175883b05228138c9ff55d0871cc1041bd68d7fe), [`f626046`](https://github.com/clerk/javascript/commit/f626046c589956022b1e1ac70382c986822f4733), [`14342d2`](https://github.com/clerk/javascript/commit/14342d2b34fe0882f7676195aefaaa17f034af70)]:
+  - @clerk/shared@3.40.0
+  - @clerk/types@4.101.7
+
+## 2.27.0
+
+### Minor Changes
+
+- Added API keys `get`, `delete` and `update` methods. ([#7400](https://github.com/clerk/javascript/pull/7400)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  await clerkClient.apiKeys.get('api_key_id');
+
+  await clerkClient.apiKeys.update({
+    apiKeyId: 'api_key_id',
+    scopes: ['scope1', 'scope2'],
+  });
+
+  await clerkClient.apiKeys.delete('api_key_id');
+  ```
+
 ## 2.26.0
 
 ### Minor Changes
