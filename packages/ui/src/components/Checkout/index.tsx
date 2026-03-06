@@ -10,6 +10,7 @@ import * as CheckoutPage from './CheckoutPage';
 import { AddEmailForm, GenericError, InvalidPlanScreen } from './parts';
 
 export const Checkout = (props: __internal_CheckoutProps) => {
+  console.log({ props });
   return (
     <Flow.Root flow='checkout'>
       <Flow.Part>
