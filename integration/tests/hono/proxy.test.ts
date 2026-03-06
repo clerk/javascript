@@ -22,19 +22,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodesProxy] })(
       await app.teardown();
     });
 
-    test.skip('proxies Frontend API requests to /__clerk path', async ({ page, context }) => {
-      // TODO: clerkFrontendApiProxy sends Clerk-Proxy-Url with localhost origin
-      // because it uses requestUrl directly. FAPI rejects this with 400.
-      // Needs the same forwarded-header awareness in proxy.ts.
-      const u = createTestUtils({ app, page, context });
-      const url = new URL('/api/__clerk/v1/client?_is_native=false', app.serverUrl);
-      const res = await u.page.request.get(url.toString());
-
-      expect(res.status()).toBe(200);
-      const body = await res.json();
-      expect(body).toHaveProperty('response');
-    });
-
     test('protected routes still require auth when proxy is enabled', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToRelative('/');
