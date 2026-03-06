@@ -580,7 +580,7 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
         additionalTooltipText?: string;
       }> = [];
 
-      if (tier.feePerBlock.amount !== 0) {
+      if (tier.feePerBlock.amount !== 0 && plan.hasBaseFee) {
         rows.push({
           elementId: 'seats',
           icon: User,
