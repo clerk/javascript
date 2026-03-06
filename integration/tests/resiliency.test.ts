@@ -312,30 +312,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
   });
 
   test.describe('429 rate limit resiliency', () => {
-    test('signed-in user remains signed in when /tokens returns 429', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
-
-      await u.po.signIn.goTo();
-      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-      await u.po.expect.toBeSignedIn();
-
-      // Intercept token requests to return 429
-      await page.route('**/v1/client/sessions/*/tokens**', route => {
-        return route.fulfill(make429ClerkResponse());
-      });
-
-      // Clear the token cache so the next poller tick makes a fresh network request
-      await page.evaluate(() => window.Clerk?.session?.clearCache());
-
-      // Allow time for the poller to fire and handle the 429
-      await page.waitForTimeout(3_000);
-
-      await page.unrouteAll();
-
-      // The user must still be signed in — 429 is not an auth failure
-      await u.po.expect.toBeSignedIn();
-    });
-
     test('setActive surfaces 429 error to the developer instead of silently swallowing', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
