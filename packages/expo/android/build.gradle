@@ -19,7 +19,7 @@ ext {
   googleIdVersion = "1.1.1"
   kotlinxCoroutinesVersion = "1.7.3"
   clerkAndroidApiVersion = "1.0.6"
-  clerkAndroidUiVersion = "1.0.8"
+  clerkAndroidUiVersion = "1.0.9"
   composeVersion = "1.7.0"
   activityComposeVersion = "1.9.0"
   lifecycleVersion = "2.8.0"
