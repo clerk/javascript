@@ -1,7 +1,7 @@
 import { clerkCoreErrorNoClerkSingleton } from '../internal/clerk-js/errors';
-import type { Clerk } from '../types';
+import type { LoadedClerk } from '../types';
 
-export function assertClerkSingletonExists(clerk: Clerk | undefined): asserts clerk is Clerk {
+export function assertClerkSingletonExists(clerk: LoadedClerk | undefined): asserts clerk is LoadedClerk {
   if (!clerk) {
     clerkCoreErrorNoClerkSingleton();
   }
