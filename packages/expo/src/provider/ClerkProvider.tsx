@@ -282,6 +282,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
         ...experimental,
         // force the rethrowOfflineNetworkErrors flag to true if the asyncStorage is provided
         rethrowOfflineNetworkErrors: !!__experimental_resourceCache || experimental?.rethrowOfflineNetworkErrors,
+        ...(isNative() && { runtimeEnvironment: 'headless' as const }),
       }}
     >
       {children}

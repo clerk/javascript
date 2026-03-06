@@ -279,12 +279,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.#eventBus.emit(clerkEvents.Status, 'loading');
     this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status));
 
-    // Only load entry chunks in standard browser environments (not React Native/headless)
-    if (this.#publishableKey && this.options.standardBrowser !== false) {
-      void this.getEntryChunks();
-    } else if (this.#publishableKey && this.options.Clerk) {
-      // For React Native/headless: initialize with the provided Clerk instance
+    // TODO: Please check into refactoring the type logic here, the experimental type interface is using type Autocomplete<U extends T, T = string> = U | (T & Record<never, never>);
+    //       so we are casting options.experimental.runtimeEnvironment to avoid changing Autocomplete to use an intersection (&) instead of a union (|), as this could cause problems in other parts of the codebase if not also refactored.
+
+    if (
+      this.#publishableKey &&
+      (this.options.experimental as { runtimeEnvironment?: string } | undefined)?.runtimeEnvironment === 'headless' &&
+      this.options.Clerk
+    ) {
       void this.loadHeadlessClerk();
+    } else if (this.#publishableKey) {
+      void this.getEntryChunks();
     }
   }
 
