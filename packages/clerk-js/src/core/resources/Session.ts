@@ -3,7 +3,8 @@ import { isValidBrowserOnline } from '@clerk/shared/browser';
 import {
   ClerkOfflineError,
   ClerkWebAuthnError,
-  isUnauthenticatedError,
+  is429Error,
+  is4xxError,
   MissingExpiredTokenError,
 } from '@clerk/shared/error';
 import {
@@ -151,9 +152,10 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
-    // This will retry the getToken call if it fails with a non-4xx error
-    // For offline state, we use shorter retries (~15s total) before throwing ClerkOfflineError
-    // For other errors, we retry up to 8 times over ~3 minutes
+    // Retry on transient failures (5xx, network errors, 429 rate limits).
+    // Do not retry on deterministic client errors (4xx) — they won't resolve on their own.
+    // For offline state, we use shorter retries (~15s total) before throwing ClerkOfflineError.
+    // For other errors, we retry up to 8 times over ~3 minutes.
     try {
       const result = await retry(() => this._getToken(options), {
         factor: 1.55,
@@ -161,7 +163,7 @@ export class Session extends BaseResource implements SessionResource {
         maxDelayBetweenRetries: 50 * 1_000,
         jitter: false,
         shouldRetry: (error, iterationsCount) => {
-          if (isUnauthenticatedError(error)) {
+          if (is4xxError(error) && !is429Error(error)) {
             return false;
           }
 
