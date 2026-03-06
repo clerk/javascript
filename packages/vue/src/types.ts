@@ -17,6 +17,7 @@ import type {
 import type { Component, ComputedRef, ShallowRef, Slot, VNode } from 'vue';
 
 export interface VueClerkInjectionKeyType {
+  loaded: ShallowRef<boolean>;
   clerk: ShallowRef<Clerk | null>;
   authCtx: ComputedRef<{
     userId: string | null | undefined;

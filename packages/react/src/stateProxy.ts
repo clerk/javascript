@@ -142,7 +142,9 @@ export class StateProxy implements State {
       signIn: {
         status: 'needs_identifier' as const,
         availableStrategies: [],
-        isTransferable: false,
+        get isTransferable() {
+          return gateProperty(target, 'isTransferable', false);
+        },
         get id() {
           return gateProperty(target, 'id', undefined);
         },

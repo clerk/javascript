@@ -18,10 +18,14 @@ const UsernameScreen = () => {
   );
 };
 
-export const UsernameSection = () => {
+export const UsernameSection = ({ isImmutable }: { isImmutable?: boolean }) => {
   const { user } = useUser();
 
   if (!user) {
+    return null;
+  }
+
+  if (isImmutable && !user.username) {
     return null;
   }
 
@@ -48,16 +52,18 @@ export const UsernameSection = () => {
               </Text>
             )}
 
-            <Action.Trigger value='edit'>
-              <ProfileSection.Button
-                id='username'
-                localizationKey={
-                  user.username
-                    ? localizationKeys('userProfile.start.usernameSection.primaryButton__updateUsername')
-                    : localizationKeys('userProfile.start.usernameSection.primaryButton__setUsername')
-                }
-              />
-            </Action.Trigger>
+            {!isImmutable && (
+              <Action.Trigger value='edit'>
+                <ProfileSection.Button
+                  id='username'
+                  localizationKey={
+                    user.username
+                      ? localizationKeys('userProfile.start.usernameSection.primaryButton__updateUsername')
+                      : localizationKeys('userProfile.start.usernameSection.primaryButton__setUsername')
+                  }
+                />
+              </Action.Trigger>
+            )}
           </ProfileSection.Item>
         </Action.Closed>
 

@@ -1,5 +1,5 @@
 import { constants, debugRequestState } from '@clerk/backend/internal';
-import cookie from 'cookie';
+import { parse as parseCookie } from 'cookie';
 import type { AppLoadContext, UNSAFE_DataWithResponseInit } from 'react-router';
 
 import { getPublicEnvVariables } from '../utils/env';
@@ -32,7 +32,7 @@ export function isRedirect(res: Response): boolean {
 }
 
 export const parseCookies = (req: Request) => {
-  return cookie.parse(req.headers.get('cookie') || '');
+  return parseCookie(req.headers.get('cookie') || '');
 };
 
 export function assertValidHandlerResult(val: any, error?: string): asserts val is Record<string, unknown> | null {

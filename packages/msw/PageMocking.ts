@@ -56,7 +56,7 @@ export class PageMocking {
         const clerkSessionStorageKeys = Object.keys(sessionStorage).filter(key => key.startsWith('__clerk'));
         clerkSessionStorageKeys.forEach(key => sessionStorage.removeItem(key));
 
-        document.cookie = `__clerk_db_jwt=mock_dev_browser_jwt_${Date.now()}; path=/; max-age=31536000; Secure; SameSite=None`;
+        document.cookie = `__clerk_db_jwt=mock_dev_browser_${Date.now()}; path=/; max-age=31536000; Secure; SameSite=None`;
       }
 
       const scenario = config.scenario();

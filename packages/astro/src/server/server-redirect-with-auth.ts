@@ -1,7 +1,7 @@
 // Middleware runs on the server side, before clerk-js is loaded, that's why we need Cookies.
 import type { AuthenticateRequestOptions, ClerkRequest } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
-import { DEV_BROWSER_JWT_KEY, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
+import { DEV_BROWSER_KEY, setDevBrowserInURL } from '@clerk/shared/devBrowser';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 
 import { getSafeEnv } from './get-safe-env';
@@ -9,7 +9,7 @@ import type { AstroMiddlewareContextParam } from './types';
 
 // TODO-SHARED: This exists in @clerk/nextjs
 /**
- * Grabs the dev browser JWT from cookies and appends it to the redirect URL when redirecting to cross-origin.
+ * Grabs the dev browser from cookies and appends it to the redirect URL when redirecting to cross-origin.
  */
 export const serverRedirectWithAuth = (
   context: AstroMiddlewareContextParam,
@@ -27,9 +27,9 @@ export const serverRedirectWithAuth = (
     isDevelopmentFromSecretKey(opts.secretKey || getSafeEnv(context).sk!) &&
     clerkRequest.clerkUrl.isCrossOrigin(location)
   ) {
-    const dbJwt = clerkRequest.cookies.get(DEV_BROWSER_JWT_KEY) || '';
+    const devBrowser = clerkRequest.cookies.get(DEV_BROWSER_KEY) || '';
     const url = new URL(location);
-    const urlWithDevBrowser = setDevBrowserJWTInURL(url, dbJwt);
+    const urlWithDevBrowser = setDevBrowserInURL(url, devBrowser);
     return context.redirect(urlWithDevBrowser.href, 307);
   }
   return res;
