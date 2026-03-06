@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import type { AccountlessApplication } from '@clerk/backend';
 
 import { constants } from '../constants';
+import { PKGLAB } from '../presets/utils';
 import { createLogger, fs } from '../scripts';
 import { application } from './application';
 import type { EnvironmentConfig } from './environment';
@@ -21,8 +22,6 @@ export const applicationConfig = () => {
   const envFormatters = { public: (key: string) => key, private: (key: string) => key };
   const logger = createLogger({ prefix: 'appConfig', color: 'yellow' });
   const dependencies = new Map<string, string>();
-  const resolutions = new Map<string, string>();
-
   const self = {
     clone: () => {
       const clone = applicationConfig();
@@ -33,7 +32,6 @@ export const applicationConfig = () => {
         clone.useTemplate(template);
       }
       dependencies.forEach((v, k) => clone.addDependency(k, v));
-      resolutions.forEach((v, k) => clone.addResolution(k, v));
       Object.entries(scripts).forEach(([k, v]) => clone.addScript(k as keyof typeof scripts, v));
       files.forEach((v, k) => clone.addFile(k, () => v));
       return clone;
@@ -78,10 +76,6 @@ export const applicationConfig = () => {
       }
       return self;
     },
-    addResolution: (name: string, version: string) => {
-      resolutions.set(name, version);
-      return self;
-    },
     /**
      * Creates a new application directory and copies the template files (and any overrides) to it.
      * The application directory is created in the `constants.TMP_DIR` directory.
@@ -122,21 +116,13 @@ export const applicationConfig = () => {
           }),
       );
 
-      // Adjust package.json dependencies
-      if (dependencies.size > 0) {
+      // Adjust package.json dependencies (skip pkglab deps, those are handled by pkglab add)
+      const npmDeps = [...dependencies.entries()].filter(([, version]) => version !== PKGLAB);
+      if (npmDeps.length > 0) {
         const packageJsonPath = path.resolve(appDirPath, 'package.json');
         logger.info(`Modifying dependencies in "${packageJsonPath}"`);
         const contents = await fs.readJSON(packageJsonPath);
-        contents.dependencies = { ...contents.dependencies, ...Object.fromEntries(dependencies) };
-        await fs.writeJSON(packageJsonPath, contents, { spaces: 2 });
-      }
-
-      // Adjust package.json resolutions
-      if (resolutions.size > 0) {
-        const packageJsonPath = path.resolve(appDirPath, 'package.json');
-        logger.info(`Modifying resolutions in "${packageJsonPath}"`);
-        const contents = await fs.readJSON(packageJsonPath);
-        contents.resolutions = { ...contents.resolutions, ...Object.fromEntries(resolutions) };
+        contents.dependencies = { ...contents.dependencies, ...Object.fromEntries(npmDeps) };
         await fs.writeJSON(packageJsonPath, contents, { spaces: 2 });
       }
 
@@ -150,6 +136,9 @@ export const applicationConfig = () => {
     },
     get scripts() {
       return scripts;
+    },
+    get pkglabDependencies() {
+      return [...dependencies.entries()].filter(([, version]) => version === PKGLAB).map(([name]) => name);
     },
     get copyKeylessToEnv() {
       const writer = async (appDir: string) => {

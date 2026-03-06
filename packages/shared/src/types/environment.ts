@@ -23,6 +23,7 @@ export interface EnvironmentResource extends ClerkResource {
   onWindowLocationHost: () => boolean;
   maintenanceMode: boolean;
   clientDebugMode: boolean;
+  partitionedCookies: boolean;
   __internal_toSnapshot: () => EnvironmentJSONSnapshot;
   __internal_enableEnvironmentSetting: (params: EnableEnvironmentSettingParams) => Promise<void>;
 }
