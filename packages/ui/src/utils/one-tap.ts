@@ -39,6 +39,9 @@ declare global {
 }
 
 async function loadGIS() {
+  if (__BUILD_DISABLE_RHC__) {
+    return undefined as unknown as Google;
+  }
   if (!window.google) {
     try {
       await loadScript('https://accounts.google.com/gsi/client', { defer: true });
