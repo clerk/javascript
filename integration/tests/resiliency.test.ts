@@ -327,7 +327,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       // setActive should surface the 429 error so the developer can handle it
       const error = await page.evaluate(async () => {
         const session = window.Clerk?.session;
-        if (!session) return null;
+        if (!session) {
+          return null;
+        }
         try {
           await window.Clerk?.setActive({ session });
           return null;
