@@ -3,13 +3,10 @@ import { type ConfigPlugin, createRunOncePlugin, withAppBuildGradle, withInfoPli
 import pkg from '../../package.json';
 
 /**
- * Add packaging exclusions and Kotlin compatibility flags to Android app build.gradle.
- *
- * - Resolves duplicate META-INF file conflicts from clerk-android dependencies
- * - Adds -Xskip-metadata-version-check to kotlinOptions so the app module can
- *   consume clerk-android (compiled with a newer Kotlin version than Expo/RN ships)
+ * Add packaging exclusions to Android app build.gradle to resolve
+ * duplicate META-INF file conflicts from clerk-android dependencies.
  */
-const withClerkAndroidConfig: ConfigPlugin = config => {
+const withClerkAndroidPackaging: ConfigPlugin = config => {
   return withAppBuildGradle(config, modConfig => {
     let buildGradle = modConfig.modResults.contents;
 
@@ -32,29 +29,6 @@ const withClerkAndroidConfig: ConfigPlugin = config => {
         if (androidBlockEnd !== -1) {
           const packagingBlock = `\n    packaging {\n        resources {\n            excludes += ['META-INF/versions/9/OSGI-INF/MANIFEST.MF']\n        }\n    }\n`;
           buildGradle = buildGradle.slice(0, androidBlockEnd) + packagingBlock + buildGradle.slice(androidBlockEnd);
-        }
-      }
-    }
-
-    // --- Kotlin metadata version check skip ---
-    // clerk-android is compiled with a newer Kotlin than Expo/RN ships.
-    // Without this flag, the app module fails to compile with:
-    //   "Module was compiled with an incompatible version of Kotlin"
-    if (!buildGradle.includes('-Xskip-metadata-version-check')) {
-      const kotlinOptionsMatch = buildGradle.match(/kotlinOptions\s*\{/);
-      if (kotlinOptionsMatch) {
-        buildGradle = buildGradle.replace(
-          /kotlinOptions\s*\{/,
-          `kotlinOptions {\n        // Clerk: allow reading metadata from newer Kotlin versions\n        freeCompilerArgs += ['-Xskip-metadata-version-check']`,
-        );
-      } else {
-        // No kotlinOptions block; add one inside the android block
-        const androidMatch = buildGradle.match(/android\s*\{/);
-        if (androidMatch) {
-          buildGradle = buildGradle.replace(
-            /android\s*\{/,
-            `android {\n    kotlinOptions {\n        // Clerk: allow reading metadata from newer Kotlin versions\n        freeCompilerArgs += ['-Xskip-metadata-version-check']\n    }`,
-          );
         }
       }
     }
@@ -107,14 +81,13 @@ const withClerkGoogleSignIn: ConfigPlugin = config => {
  * When this plugin is used, it:
  * 1. Configures iOS URL scheme for Google Sign-In (if env var is set)
  * 2. Adds Android packaging exclusions to resolve dependency conflicts
- * 3. Adds Kotlin metadata version compatibility flag for clerk-android
  *
  * Native modules are registered via react-native.config.js and standard
  * React Native autolinking (RCTViewManager / ReactPackage).
  */
 const withClerkExpo: ConfigPlugin = config => {
   config = withClerkGoogleSignIn(config);
-  config = withClerkAndroidConfig(config);
+  config = withClerkAndroidPackaging(config);
   return config;
 };
 

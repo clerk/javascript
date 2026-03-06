@@ -19,7 +19,7 @@ ext {
   googleIdVersion = "1.1.1"
   kotlinxCoroutinesVersion = "1.7.3"
   clerkAndroidApiVersion = "1.0.6"
-  clerkAndroidUiVersion = "1.0.6"
+  clerkAndroidUiVersion = "1.0.8"
   composeVersion = "1.7.0"
   activityComposeVersion = "1.9.0"
   lifecycleVersion = "2.8.0"
@@ -54,9 +54,6 @@ android {
 
   kotlinOptions {
     jvmTarget = "17"
-    // clerk-android is compiled with Kotlin 2.3.x, but Expo uses Kotlin 2.1.20.
-    // This flag allows the compiler to read metadata from a newer Kotlin version.
-    freeCompilerArgs += ['-Xskip-metadata-version-check']
   }
 
   buildFeatures {

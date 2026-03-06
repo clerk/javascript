@@ -507,30 +507,6 @@ const withClerkAndroid = config => {
       console.log('✅ Clerk Android packaging exclusions added');
     }
 
-    // --- Kotlin metadata version check skip ---
-    // clerk-android is compiled with a newer Kotlin than Expo/RN ships.
-    // Without this flag, the app module fails to compile with:
-    //   "Module was compiled with an incompatible version of Kotlin"
-    if (!buildGradle.includes('-Xskip-metadata-version-check')) {
-      const kotlinOptionsMatch = buildGradle.match(/kotlinOptions\s*\{/);
-      if (kotlinOptionsMatch) {
-        buildGradle = buildGradle.replace(
-          /kotlinOptions\s*\{/,
-          `kotlinOptions {\n        // Clerk: allow reading metadata from newer Kotlin versions\n        freeCompilerArgs += ['-Xskip-metadata-version-check']`,
-        );
-      } else {
-        // No kotlinOptions block; add one inside the android block
-        const androidMatch = buildGradle.match(/android\s*\{/);
-        if (androidMatch) {
-          buildGradle = buildGradle.replace(
-            /android\s*\{/,
-            `android {\n    kotlinOptions {\n        // Clerk: allow reading metadata from newer Kotlin versions\n        freeCompilerArgs += ['-Xskip-metadata-version-check']\n    }`,
-          );
-        }
-      }
-      console.log('✅ Clerk Android Kotlin metadata version check skip added');
-    }
-
     modConfig.modResults.contents = buildGradle;
     return modConfig;
   });
