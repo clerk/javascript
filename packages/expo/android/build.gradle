@@ -54,6 +54,8 @@ android {
 
   kotlinOptions {
     jvmTarget = "17"
+    // clerk-android transitive deps (e.g. telemetry-api) still ship Kotlin 2.3.x metadata
+    freeCompilerArgs += ['-Xskip-metadata-version-check']
   }
 
   buildFeatures {
