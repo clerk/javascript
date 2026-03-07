@@ -116,7 +116,7 @@ export class AuthCookieService {
     if (!this.clerk.loaded) {
       return this.clientUat.get() <= 0;
     }
-    return !!this.clerk.user;
+    return !this.clerk.user;
   }
 
   public async handleUnauthenticatedDevBrowser() {
