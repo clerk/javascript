@@ -1,5 +1,19 @@
 # Change Log
 
+## 3.1.0
+
+### Minor Changes
+
+- Remove remotely hosted code from new @clerk/ui package ([#7983](https://github.com/clerk/javascript/pull/7983)) by [@royanger](https://github.com/royanger)
+
+### Patch Changes
+
+- Updated dependencies [[`776ee1b`](https://github.com/clerk/javascript/commit/776ee1b3f3a576976b43352a93b6988340e83353), [`e13fc29`](https://github.com/clerk/javascript/commit/e13fc294ff5ee7a32f87b0d2784c82f56a0215de), [`7fb870d`](https://github.com/clerk/javascript/commit/7fb870d37a8c153e9b0e6313b1d38ff53bc2f49b), [`398b7f9`](https://github.com/clerk/javascript/commit/398b7f906956e4b1f3fb1d8fb02c787e18309b53), [`09cb6d4`](https://github.com/clerk/javascript/commit/09cb6d4d45286cf4e657b880696bf0ff81a8a3e8)]:
+  - @clerk/clerk-js@6.1.0
+  - @clerk/shared@4.1.0
+  - @clerk/ui@1.1.0
+  - @clerk/react@6.0.2
+
 ## 3.0.1
 
 ### Patch Changes
