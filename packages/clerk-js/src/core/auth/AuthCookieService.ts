@@ -3,7 +3,12 @@ import type { createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { clerkEvents } from '@clerk/shared/clerkEventBus';
 import type { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserInURL } from '@clerk/shared/devBrowser';
-import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
+import {
+  isClerkAPIResponseError,
+  isClerkRuntimeError,
+  isNetworkError,
+  isUnauthenticatedError,
+} from '@clerk/shared/error';
 import type { Clerk, InstanceType } from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
 
@@ -215,8 +220,7 @@ export class AuthCookieService {
       return;
     }
 
-    //sign user out if a 4XX error
-    if (is4xxError(e)) {
+    if (isUnauthenticatedError(e)) {
       void this.clerk.handleUnauthenticated().catch(noop);
       return;
     }
