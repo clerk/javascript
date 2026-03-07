@@ -178,13 +178,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   #publishableKey: string;
   #eventBus = createClerkEventBus();
   #stateProxy: StateProxy;
+  #initialized = false;
 
   get publishableKey(): string {
     return this.#publishableKey;
   }
 
   get loaded(): boolean {
-    return this.clerkjs?.loaded || false;
+    // Consider loaded if either clerk is loaded OR we've initialized headlessly
+    return this.clerkjs?.loaded || this.#initialized;
   }
 
   get status(): ClerkStatus {
@@ -277,8 +279,76 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.#eventBus.emit(clerkEvents.Status, 'loading');
     this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status));
 
-    if (this.#publishableKey) {
+    // TODO: Please check into refactoring the type logic here, the experimental type interface is using type Autocomplete<U extends T, T = string> = U | (T & Record<never, never>);
+    //       so we are casting options.experimental.runtimeEnvironment to avoid changing Autocomplete to use an intersection (&) instead of a union (|), as this could cause problems in other parts of the codebase if not also refactored.
+
+    if (
+      this.#publishableKey &&
+      (this.options.experimental as { runtimeEnvironment?: string } | undefined)?.runtimeEnvironment === 'headless' &&
+      this.options.Clerk
+    ) {
+      void this.loadHeadlessClerk();
+    } else if (this.#publishableKey) {
       void this.getEntryChunks();
+    }
+  }
+
+  /**
+   * Initialize Clerk for headless/React Native environments where a Clerk instance is provided directly.
+   */
+  private loadHeadlessClerk(): void {
+    const clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk)
+      ? new this.options.Clerk(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain })
+      : this.options.Clerk;
+
+    if (!clerk) {
+      this.#eventBus.emit(clerkEvents.Status, 'error');
+      return;
+    }
+
+    // Helper to finish initialization - marks as ready and triggers re-renders
+    const finishInit = () => {
+      this.#initialized = true;
+      this.clerkjs = clerk;
+      this.premountMethodCalls.forEach(cb => cb());
+      this.premountAddListenerCalls.forEach((listenerExtras, listener) => {
+        const unsubscribe = clerk.addListener(listener, listenerExtras.options);
+        listenerExtras.handlers.nativeUnsubscribe = unsubscribe;
+      });
+
+      // Emit current state to all listeners so React context gets updated with actual values
+      // Use null instead of undefined for missing values to signal "loaded but empty"
+      const currentState = {
+        client: clerk.client ?? null,
+        session: clerk.session ?? null,
+        user: clerk.user ?? null,
+        organization: clerk.organization ?? null,
+      };
+      if (currentState.client) {
+        this.premountAddListenerCalls.forEach((_, listener) => {
+          listener(currentState as Resources);
+        });
+      }
+
+      // Emit status through eventBus
+      this.#eventBus.emit(clerkEvents.Status, 'ready');
+      this.emitLoaded();
+    };
+
+    // Try to load, but finish initialization regardless
+    if (!clerk.loaded) {
+      clerk
+        .load(this.options)
+        .then(() => finishInit())
+        .catch(err => {
+          if (__DEV__) {
+            console.error('Clerk: Failed to load:', err);
+          }
+          this.#eventBus.emit(clerkEvents.Status, 'error');
+          this.emitLoaded();
+        });
+    } else {
+      finishInit();
     }
   }
 
