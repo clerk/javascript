@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.1.0
+
+### Minor Changes
+
+- Adds support for Expo SDK 55 ([#8008](https://github.com/clerk/javascript/pull/8008)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`776ee1b`](https://github.com/clerk/javascript/commit/776ee1b3f3a576976b43352a93b6988340e83353), [`7fb870d`](https://github.com/clerk/javascript/commit/7fb870d37a8c153e9b0e6313b1d38ff53bc2f49b), [`398b7f9`](https://github.com/clerk/javascript/commit/398b7f906956e4b1f3fb1d8fb02c787e18309b53), [`09cb6d4`](https://github.com/clerk/javascript/commit/09cb6d4d45286cf4e657b880696bf0ff81a8a3e8)]:
+  - @clerk/clerk-js@6.1.0
+  - @clerk/shared@4.1.0
+  - @clerk/react@6.0.2
+
 ## 3.0.1
 
 ### Patch Changes

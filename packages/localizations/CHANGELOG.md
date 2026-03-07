@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.1.0
+
+### Minor Changes
+
+- Added en-XA locale to highlight unlocalized strings. ([#7979](https://github.com/clerk/javascript/pull/7979)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`776ee1b`](https://github.com/clerk/javascript/commit/776ee1b3f3a576976b43352a93b6988340e83353), [`7fb870d`](https://github.com/clerk/javascript/commit/7fb870d37a8c153e9b0e6313b1d38ff53bc2f49b), [`09cb6d4`](https://github.com/clerk/javascript/commit/09cb6d4d45286cf4e657b880696bf0ff81a8a3e8)]:
+  - @clerk/shared@4.1.0
+
 ## 4.0.0
 
 ### Major Changes
