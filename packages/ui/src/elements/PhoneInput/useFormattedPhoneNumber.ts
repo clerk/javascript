@@ -3,7 +3,7 @@ import React from 'react';
 import { extractDigits, formatPhoneNumber, parsePhoneString } from '@/ui/utils/phoneUtils';
 
 import type { CountryIso } from './countryCodeData';
-import { IsoToCountryMap } from './countryCodeData';
+import { getIsoToCountryMap } from './countryCodeDataLoader';
 
 type UseFormattedPhoneNumberProps = { initPhoneWithCode: string; locationBasedCountryIso?: CountryIso };
 
@@ -11,7 +11,7 @@ const format = (str: string, iso: CountryIso) => {
   if (!str) {
     return '';
   }
-  const country = IsoToCountryMap.get(iso);
+  const country = getIsoToCountryMap()?.get(iso);
   return formatPhoneNumber(str, country?.pattern, country?.code);
 };
 
@@ -35,7 +35,7 @@ export const useFormattedPhoneNumber = (props: UseFormattedPhoneNumberProps) => 
     if (!number) {
       return '';
     }
-    const dialCode = IsoToCountryMap.get(iso)?.code || '1';
+    const dialCode = getIsoToCountryMap()?.get(iso)?.code || '1';
     return '+' + extractDigits(`${dialCode}${number}`);
   }, [iso, number]);
 

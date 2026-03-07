@@ -1,14 +1,19 @@
 import { ClerkAPIResponseError, parseError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { act, mockWebAuthn, render, screen } from '@/test/utils';
+import { loadCountryCodeData } from '@/ui/elements/PhoneInput/countryCodeDataLoader';
 
 import { SignInFactorOne } from '../SignInFactorOne';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
+
+beforeAll(async () => {
+  await loadCountryCodeData();
+});
 
 describe('SignInFactorOne', () => {
   it('renders the component', async () => {

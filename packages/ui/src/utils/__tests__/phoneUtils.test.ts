@@ -1,6 +1,7 @@
 import type { PhoneCodeChannel } from '@clerk/shared/types';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
+import { loadCountryCodeData } from '../../elements/PhoneInput/countryCodeDataLoader';
 import {
   extractDigits,
   formatPhoneNumber,
@@ -9,6 +10,10 @@ import {
   getFlagEmojiFromCountryIso,
   getPreferredPhoneCodeChannelByCountry,
 } from '../phoneUtils';
+
+beforeAll(async () => {
+  await loadCountryCodeData();
+});
 
 describe('phoneUtils', () => {
   describe('countryIsoToFlagEmoji(iso)', () => {
