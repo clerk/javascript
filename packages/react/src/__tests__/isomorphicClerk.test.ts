@@ -200,4 +200,57 @@ describe('isomorphicClerk', () => {
       expect(result).toBe(mockClerkUI);
     });
   });
+
+  describe('ui.ClerkUI with pre-created Clerk instance', () => {
+    it('passes ui.ClerkUI to clerk.load when Clerk instance is provided', async () => {
+      const mockClerkUI = vi.fn();
+      const mockLoad = vi.fn().mockResolvedValue(undefined);
+      const mockClerkInstance = {
+        load: mockLoad,
+        loaded: false,
+      };
+
+      // Simulate the chrome-extension flow: pre-created Clerk instance + ui prop
+      const clerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        Clerk: mockClerkInstance as any,
+        ui: { ClerkUI: mockClerkUI } as any,
+      });
+
+      // Set the global Clerk so getClerkJsEntryChunk resolves
+      (global as any).Clerk = mockClerkInstance;
+
+      await (clerk as any).getEntryChunks();
+
+      // clerk.load should have been called with ui.ClerkUI preserved
+      expect(mockLoad).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ui: expect.objectContaining({
+            ClerkUI: mockClerkUI,
+          }),
+        }),
+      );
+    });
+
+    it('does not load UI scripts from CDN when Clerk instance is provided', async () => {
+      const mockClerkUI = vi.fn();
+      const mockClerkInstance = {
+        load: vi.fn().mockResolvedValue(undefined),
+        loaded: false,
+      };
+
+      const clerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        Clerk: mockClerkInstance as any,
+        ui: { ClerkUI: mockClerkUI } as any,
+      });
+
+      (global as any).Clerk = mockClerkInstance;
+
+      await (clerk as any).getEntryChunks();
+
+      // Should not attempt to load UI from CDN
+      expect(loadClerkUIScript).not.toHaveBeenCalled();
+    });
+  });
 });
