@@ -17,6 +17,7 @@ export { ClerkRuntimeError, isClerkRuntimeError } from './errors/clerkRuntimeErr
 export { ClerkWebAuthnError } from './errors/webAuthNError';
 
 export {
+  is429Error,
   is4xxError,
   isCaptchaError,
   isEmailLinkError,
@@ -26,6 +27,7 @@ export {
   isPasswordPwnedError,
   isPasswordCompromisedError,
   isReverificationCancelledError,
+  isUnauthenticatedError,
   isUnauthorizedError,
   isUserLockedError,
 } from './errors/helpers';

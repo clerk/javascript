@@ -4,6 +4,7 @@ import { astro } from './astro';
 import { envs } from './envs';
 import { expo } from './expo';
 import { express } from './express';
+import { hono } from './hono';
 import { next } from './next';
 import { nuxt } from './nuxt';
 import { react } from './react';
@@ -80,6 +81,11 @@ export const createLongRunningApps = () => {
     { id: 'nuxt.node', config: nuxt.node, env: envs.withCustomRoles },
     { id: 'react-router.node', config: reactRouter.reactRouterNode, env: envs.withEmailCodes },
     { id: 'express.vite.withEmailCodes', config: express.vite, env: envs.withEmailCodes },
+
+    /**
+     * Hono apps
+     */
+    { id: 'hono.vite.withEmailCodes', config: hono.vite, env: envs.withEmailCodes },
   ] as const;
 
   const apps = configs.map(longRunningApplication);

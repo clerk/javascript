@@ -202,6 +202,83 @@ describe('PhoneSection', () => {
     });
   });
 
+  describe('Immutable phone numbers', () => {
+    const withImmutablePhones = createFixtures.config(f => {
+      f.withPhoneNumber({ immutable: true });
+      f.withUser({
+        phone_numbers: ['+30 691 1111111', '+30 692 2222222'],
+      });
+    });
+
+    it('hides the "Add phone number" button when phone is immutable', async () => {
+      const { wrapper } = await createFixtures(withImmutablePhones);
+
+      const { queryByRole } = render(
+        <CardStateProvider>
+          <PhoneSection shouldAllowCreation={false} />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      expect(queryByRole('button', { name: /add phone number/i })).not.toBeInTheDocument();
+    });
+
+    it('hides the "Remove" menu action when phone is immutable', async () => {
+      const { wrapper } = await createFixtures(withImmutablePhones);
+
+      const { getByText, userEvent, queryByRole } = render(
+        <CardStateProvider>
+          <PhoneSection
+            shouldAllowCreation={false}
+            shouldAllowDeletion={false}
+          />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const item = getByText('+30 691 1111111');
+      const menuButton = getMenuItemFromText(item);
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      expect(queryByRole('menuitem', { name: /remove phone number/i })).not.toBeInTheDocument();
+    });
+
+    it('still shows verify and set-as-primary actions when phone is immutable', async () => {
+      const { wrapper } = await createFixtures(
+        createFixtures.config(f => {
+          f.withPhoneNumber({ immutable: true });
+          f.withUser({
+            phone_numbers: [
+              { phone_number: '+30 691 1111111', id: 'phone_primary', verification: { status: 'verified' } },
+              { phone_number: '+30 692 2222222', id: 'phone_secondary', verification: { status: 'verified' } },
+            ],
+            primary_phone_number_id: 'phone_primary',
+          });
+        }),
+      );
+
+      const { getByText, userEvent, getByRole } = render(
+        <CardStateProvider>
+          <PhoneSection
+            shouldAllowCreation={false}
+            shouldAllowDeletion={false}
+          />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const item = getByText('+30 692 2222222');
+      const menuButton = getMenuItemFromText(item);
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      getByRole('menuitem', { name: /set as primary/i });
+    });
+  });
+
   describe('Handles opening/closing actions', () => {
     it('closes add phone number form when remove an phone number action is clicked', async () => {
       const { wrapper, fixtures } = await createFixtures(withNumberCofig);

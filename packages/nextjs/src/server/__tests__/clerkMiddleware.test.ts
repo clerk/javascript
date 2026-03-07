@@ -681,7 +681,7 @@ describe('clerkMiddleware(params)', () => {
       const req = mockRequest({
         url: '/api/protected',
         headers: new Headers({
-          [constants.Headers.Authorization]: 'Bearer m2m_123',
+          [constants.Headers.Authorization]: 'Bearer mt_123',
         }),
       });
 
