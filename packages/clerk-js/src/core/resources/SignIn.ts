@@ -572,7 +572,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.clientTrustState = data.client_trust_state ?? undefined;
     }
 
-    eventBus.emit('resource:update', { resource: this });
+    eventBus.emit('resource:state-change', { resource: this });
     return this;
   }
 
@@ -1285,6 +1285,11 @@ class SignInFuture implements SignInFutureResource {
     return this.create({ ticket: ticket ?? undefined });
   }
 
+  /**
+   * Finalizes a completed sign-in by setting the active session.
+   * Like reset(), this does NOT set fetchStatus to 'fetching' — the sign-in
+   * is already complete, and setActive is a session-level operation.
+   */
   async finalize(params?: SignInFutureFinalizeParams): Promise<{ error: ClerkError | null }> {
     const { navigate } = params || {};
 
@@ -1292,7 +1297,7 @@ class SignInFuture implements SignInFutureResource {
       throw new Error('Cannot finalize sign-in without a created session.');
     }
 
-    return runAsyncResourceTask(this.#resource, async () => {
+    try {
       // Reload the client if the created session is not in the client's sessions. This can happen during modal SSO
       // flows where the in-memory client does not have the created session.
       if (SignIn.clerk.client && !SignIn.clerk.client.sessions.some(s => s.id === this.#resource.createdSessionId)) {
@@ -1301,12 +1306,15 @@ class SignInFuture implements SignInFutureResource {
 
       this.#canBeDiscarded = true;
       await SignIn.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
-    });
+      return { error: null };
+    } catch (err) {
+      return { error: err as ClerkError };
+    }
   }
 
   /**
    * Resets the current sign-in attempt by clearing all local state back to null.
-   * Unlike other methods, this does NOT emit resource:fetch with 'fetching' status,
+   * Unlike other methods, this does NOT set fetchStatus to 'fetching',
    * allowing for smooth UI transitions without loading states.
    */
   reset(): Promise<{ error: ClerkError | null }> {
