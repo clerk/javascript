@@ -103,7 +103,7 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
 
   // Extract proxy configuration
   const frontendApiProxy = options.frontendApiProxy;
-  const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH);
+  const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH) || DEFAULT_PROXY_PATH;
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const middleware: RequestHandler = async (request, response, next) => {
