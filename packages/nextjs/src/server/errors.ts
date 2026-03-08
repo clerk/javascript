@@ -27,6 +27,7 @@ export const authAuthHeaderMissing = (helperName = 'auth', prefixSteps?: string[
 - ${prefixSteps ? [...prefixSteps, ''].join('\n- ') : ' '}clerkMiddleware() is used in your Next.js ${fileReference} file.
 - Your ${fileReference} matcher is configured to match this route or page.
 - If you are using the src directory, make sure the ${fileReference} file is inside of it.
+- If your ${fileReference} file and matcher are configured correctly, this error can also occur if the ${fileReference} failed to run on this request (e.g. due to an edge runtime error or platform outage).
 
 For more details, see https://clerk.com/err/auth-middleware
 `;
