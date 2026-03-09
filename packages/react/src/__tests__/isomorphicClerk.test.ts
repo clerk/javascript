@@ -201,28 +201,59 @@ describe('isomorphicClerk', () => {
     });
   });
 
-  describe('ui.ClerkUI with pre-created Clerk instance', () => {
-    it('passes ui.ClerkUI to clerk.load when Clerk instance is provided', async () => {
-      const mockClerkUI = vi.fn();
+  describe('shouldLoadUi across SDK scenarios', () => {
+    // Helper to run getEntryChunks and return what clerk.load was called with
+    async function runGetEntryChunks(options: Record<string, any>) {
       const mockLoad = vi.fn().mockResolvedValue(undefined);
-      const mockClerkInstance = {
+      const mockClerkInstance = options.Clerk || {
         load: mockLoad,
         loaded: false,
       };
+      if (options.Clerk) {
+        options.Clerk.load = mockLoad;
+        options.Clerk.loaded = false;
+      }
 
-      // Simulate the chrome-extension flow: pre-created Clerk instance + ui prop
+      (global as any).Clerk = mockClerkInstance;
+
       const clerk = new IsomorphicClerk({
         publishableKey: 'pk_test_XXX',
-        Clerk: mockClerkInstance as any,
-        ui: { ClerkUI: mockClerkUI } as any,
+        ...options,
       });
-
-      // Set the global Clerk so getClerkJsEntryChunk resolves
-      (global as any).Clerk = mockClerkInstance;
 
       await (clerk as any).getEntryChunks();
 
-      // clerk.load should have been called with ui.ClerkUI preserved
+      return { mockLoad };
+    }
+
+    // ─── @clerk/react, @clerk/nextjs, @clerk/react-router, @clerk/tanstack-react-start ───
+    // These SDKs: no Clerk prop, no ui prop, standardBrowser omitted (undefined)
+    // shouldLoadUi = (undefined !== false && !undefined) || !!undefined = (true && true) || false = true
+    // → loads UI from CDN
+    it('loads UI from CDN when no Clerk, no ui, standardBrowser omitted (nextjs/react-router/tanstack)', async () => {
+      const { mockLoad } = await runGetEntryChunks({});
+
+      expect(loadClerkUIScript).toHaveBeenCalled();
+      expect(mockLoad).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ui: expect.objectContaining({
+            ClerkUI: (global as any).__internal_ClerkUICtor,
+          }),
+        }),
+      );
+    });
+
+    // ─── @clerk/react with bundled ui prop (e.g. user passes ui={ui} from @clerk/ui) ───
+    // These SDKs: no Clerk prop, ui with ClerkUI, standardBrowser omitted
+    // shouldLoadUi = (true && true) || true = true
+    // → getClerkUIEntryChunk returns the bundled ClerkUI (no CDN)
+    it('uses bundled ClerkUI when ui prop is passed without Clerk instance (react with ui prop)', async () => {
+      const mockClerkUI = vi.fn();
+      const { mockLoad } = await runGetEntryChunks({
+        ui: { ClerkUI: mockClerkUI },
+      });
+
+      expect(loadClerkUIScript).not.toHaveBeenCalled();
       expect(mockLoad).toHaveBeenCalledWith(
         expect.objectContaining({
           ui: expect.objectContaining({
@@ -232,48 +263,61 @@ describe('isomorphicClerk', () => {
       );
     });
 
-    it('does not load UI scripts from CDN when Clerk instance is provided', async () => {
-      const mockClerkUI = vi.fn();
-      const mockClerkInstance = {
-        load: vi.fn().mockResolvedValue(undefined),
-        loaded: false,
-      };
-
-      const clerk = new IsomorphicClerk({
-        publishableKey: 'pk_test_XXX',
-        Clerk: mockClerkInstance as any,
-        ui: { ClerkUI: mockClerkUI } as any,
-      });
-
-      (global as any).Clerk = mockClerkInstance;
-
-      await (clerk as any).getEntryChunks();
-
-      // Should not attempt to load UI from CDN
-      expect(loadClerkUIScript).not.toHaveBeenCalled();
-    });
-
-    it('passes ui.ClerkUI to clerk.load even when standardBrowser is false', async () => {
-      const mockClerkUI = vi.fn();
-      const mockLoad = vi.fn().mockResolvedValue(undefined);
-      const mockClerkInstance = {
-        load: mockLoad,
-        loaded: false,
-      };
-
-      // Simulate chrome-extension with syncHost: Clerk instance + ui prop + standardBrowser: false
-      const clerk = new IsomorphicClerk({
-        publishableKey: 'pk_test_XXX',
-        Clerk: mockClerkInstance as any,
-        ui: { ClerkUI: mockClerkUI } as any,
+    // ─── @clerk/expo (native mode) ───
+    // Expo native: Clerk instance, no ui prop, standardBrowser: false
+    // shouldLoadUi = (false !== false && ...) || !!undefined = false || false = false
+    // → no UI loaded (correct: native apps don't render prebuilt UI)
+    it('does not load UI for Expo native (Clerk instance, no ui, standardBrowser: false)', async () => {
+      const mockClerkInstance = {} as any;
+      const { mockLoad } = await runGetEntryChunks({
+        Clerk: mockClerkInstance,
         standardBrowser: false,
       });
 
-      (global as any).Clerk = mockClerkInstance;
+      expect(loadClerkUIScript).not.toHaveBeenCalled();
+      expect(mockLoad).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ui: expect.objectContaining({
+            ClerkUI: undefined,
+          }),
+        }),
+      );
+    });
 
-      await (clerk as any).getEntryChunks();
+    // ─── @clerk/expo (web mode) ───
+    // Expo web: Clerk is null, no ui prop, standardBrowser: true
+    // shouldLoadUi = (true !== false && !null) || false = (true && true) || false = true
+    // → loads UI from CDN (correct: web mode uses normal browser flow)
+    it('loads UI from CDN for Expo web (Clerk: null, standardBrowser: true)', async () => {
+      const { mockLoad } = await runGetEntryChunks({
+        Clerk: null,
+        standardBrowser: true,
+      });
 
-      // clerk.load should have been called with ui.ClerkUI preserved
+      expect(loadClerkUIScript).toHaveBeenCalled();
+      expect(mockLoad).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ui: expect.objectContaining({
+            ClerkUI: (global as any).__internal_ClerkUICtor,
+          }),
+        }),
+      );
+    });
+
+    // ─── @clerk/chrome-extension (without syncHost) ───
+    // No syncHost: Clerk instance, ui with ClerkUI, standardBrowser: true
+    // shouldLoadUi = (true && !instance) || true = false || true = true
+    // → uses bundled ClerkUI (no CDN)
+    it('uses bundled ClerkUI for chrome-extension without syncHost (standardBrowser: true)', async () => {
+      const mockClerkUI = vi.fn();
+      const mockClerkInstance = {} as any;
+      const { mockLoad } = await runGetEntryChunks({
+        Clerk: mockClerkInstance,
+        ui: { ClerkUI: mockClerkUI },
+        standardBrowser: true,
+      });
+
+      expect(loadClerkUIScript).not.toHaveBeenCalled();
       expect(mockLoad).toHaveBeenCalledWith(
         expect.objectContaining({
           ui: expect.objectContaining({
@@ -281,8 +325,68 @@ describe('isomorphicClerk', () => {
           }),
         }),
       );
-      // Should not attempt to load UI from CDN
+    });
+
+    // ─── @clerk/chrome-extension (with syncHost) ───
+    // With syncHost: Clerk instance, ui with ClerkUI, standardBrowser: false
+    // shouldLoadUi = (false !== false && ...) || !!ClerkUI = false || true = true
+    // → uses bundled ClerkUI (no CDN)
+    it('uses bundled ClerkUI for chrome-extension with syncHost (standardBrowser: false)', async () => {
+      const mockClerkUI = vi.fn();
+      const mockClerkInstance = {} as any;
+      const { mockLoad } = await runGetEntryChunks({
+        Clerk: mockClerkInstance,
+        ui: { ClerkUI: mockClerkUI },
+        standardBrowser: false,
+      });
+
       expect(loadClerkUIScript).not.toHaveBeenCalled();
+      expect(mockLoad).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ui: expect.objectContaining({
+            ClerkUI: mockClerkUI,
+          }),
+        }),
+      );
+    });
+
+    // ─── Clerk instance provided, no ui prop, standardBrowser: true ───
+    // shouldLoadUi = (true && !instance) || false = false || false = false
+    // → no UI loaded (correct: Clerk instance without bundled UI, no CDN attempt)
+    it('does not load UI when Clerk instance provided without ui prop (standardBrowser: true)', async () => {
+      const mockClerkInstance = {} as any;
+      const { mockLoad } = await runGetEntryChunks({
+        Clerk: mockClerkInstance,
+        standardBrowser: true,
+      });
+
+      expect(loadClerkUIScript).not.toHaveBeenCalled();
+      expect(mockLoad).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ui: expect.objectContaining({
+            ClerkUI: undefined,
+          }),
+        }),
+      );
+    });
+
+    // ─── ui prop passed as server marker (no ClerkUI), no Clerk instance ───
+    // RSC react-server export may provide ui without ClerkUI initially
+    // shouldLoadUi = (true && true) || false = true
+    // → getClerkUIEntryChunk is called, but uiProp exists without ClerkUI → returns undefined (skips CDN)
+    it('skips CDN when ui prop exists without ClerkUI (server marker object)', async () => {
+      const { mockLoad } = await runGetEntryChunks({
+        ui: { __brand: '__clerkUI', version: '1.0.0' },
+      });
+
+      expect(loadClerkUIScript).not.toHaveBeenCalled();
+      expect(mockLoad).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ui: expect.objectContaining({
+            ClerkUI: undefined,
+          }),
+        }),
+      );
     });
   });
 });
