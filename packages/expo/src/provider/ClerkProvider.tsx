@@ -183,7 +183,9 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
                 try {
                   await clerkInstance.setActive({ session: pendingSession });
                 } catch (err) {
-                  console.error(`[ClerkProvider] Failed to sync native session:`, err);
+                  if (__DEV__) {
+                    console.error(`[ClerkProvider] Failed to sync native session:`, err);
+                  }
                 }
               }
             }
@@ -200,7 +202,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
                   `To enable native features, add "@clerk/expo" to your app.json plugins array.`,
               );
             }
-          } else {
+          } else if (__DEV__) {
             console.error(`[ClerkProvider] Failed to configure Clerk ${Platform.OS}:`, error);
           }
         }
@@ -249,7 +251,9 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
           await clerkInstance.signOut();
         }
       } catch (error) {
-        console.error(`[ClerkProvider] Failed to sync native auth state:`, error);
+        if (__DEV__) {
+          console.error(`[ClerkProvider] Failed to sync native auth state:`, error);
+        }
       }
     };
 

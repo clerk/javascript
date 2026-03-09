@@ -78,7 +78,9 @@ export function InlineUserProfileView({ isDismissable = false, style }: InlineUs
           try {
             await clerk.signOut();
           } catch (err) {
-            console.warn('[InlineUserProfileView] JS SDK sign out error:', err);
+            if (__DEV__) {
+              console.warn('[InlineUserProfileView] JS SDK sign out error:', err);
+            }
           }
         }
       }

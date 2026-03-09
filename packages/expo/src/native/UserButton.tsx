@@ -104,7 +104,9 @@ export function UserButton(_props: UserButtonProps) {
           setNativeUser(null);
         }
       } catch (err) {
-        console.error('[UserButton] Error fetching user:', err);
+        if (__DEV__) {
+          console.error('[UserButton] Error fetching user:', err);
+        }
       }
     };
 

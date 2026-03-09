@@ -71,31 +71,28 @@ export function useNativeAuthEvents(): UseNativeAuthEventsReturn {
   const [nativeAuthState, setNativeAuthState] = useState<NativeAuthStateEvent | null>(null);
 
   useEffect(() => {
-    console.log(`[useNativeAuthEvents] INIT: isNativeSupported=${isNativeSupported}, ClerkExpo=${!!ClerkExpo}`);
-
     if (!isNativeSupported || !ClerkExpo) {
-      console.log(`[useNativeAuthEvents] SKIP: Native not supported or ClerkExpo not available`);
       return;
     }
 
     let subscription: { remove: () => void } | null = null;
 
     try {
-      console.log(`[useNativeAuthEvents] SETUP: Creating NativeEventEmitter for ClerkExpo`);
       const eventEmitter = new NativeEventEmitter(ClerkExpo as any);
 
-      console.log(`[useNativeAuthEvents] LISTEN: Adding listener for 'onAuthStateChange' events`);
       subscription = eventEmitter.addListener('onAuthStateChange', (event: NativeAuthStateEvent) => {
-        console.log('[useNativeAuthEvents] EVENT_RECEIVED:', JSON.stringify(event));
+        if (__DEV__) {
+          console.log('[useNativeAuthEvents] onAuthStateChange:', JSON.stringify(event));
+        }
         setNativeAuthState(event);
       });
-      console.log(`[useNativeAuthEvents] LISTEN: Listener added successfully`);
     } catch (error) {
-      console.log('[useNativeAuthEvents] ERROR: Could not set up event listener:', error);
+      if (__DEV__) {
+        console.error('[useNativeAuthEvents] Failed to set up event listener:', error);
+      }
     }
 
     return () => {
-      console.log(`[useNativeAuthEvents] CLEANUP: Removing event listener`);
       subscription?.remove();
     };
   }, []);

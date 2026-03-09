@@ -90,7 +90,9 @@ export function UserProfileView({ isDismissable = false, style }: UserProfileVie
           try {
             await clerk.signOut();
           } catch (err) {
-            console.warn('[UserProfileView] JS SDK sign out error:', err);
+            if (__DEV__) {
+              console.warn('[UserProfileView] JS SDK sign out error:', err);
+            }
           }
         }
       }

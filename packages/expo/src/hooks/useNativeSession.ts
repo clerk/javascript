@@ -117,7 +117,9 @@ export function useNativeSession(): UseNativeSessionReturn {
       setSessionId(id);
       setUser(result?.user ?? null);
     } catch (error) {
-      console.log('[useNativeSession] Error fetching native session:', error);
+      if (__DEV__) {
+        console.error('[useNativeSession] Error fetching native session:', error);
+      }
       setSessionId(null);
       setUser(null);
     } finally {
