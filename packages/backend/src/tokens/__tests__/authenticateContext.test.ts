@@ -214,6 +214,50 @@ describe('AuthenticateContext', () => {
     });
   });
 
+  describe('relative proxyUrl resolution', () => {
+    it('resolves relative proxyUrl against forwarded origin', async () => {
+      const headers = new Headers({
+        'x-forwarded-proto': 'https',
+        'x-forwarded-host': 'myapp.example.com',
+      });
+      const clerkRequest = createClerkRequest(new Request('http://localhost:3000/path', { headers }));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkLive,
+        proxyUrl: '/__clerk',
+      });
+
+      // initPublishableKeyValues resolves it for parsePublishableKey (strips protocol)
+      expect(context.frontendApi).toBe('https://myapp.example.com/__clerk');
+      // post-Object.assign resolves this.proxyUrl
+      expect(context.proxyUrl).toBe('https://myapp.example.com/__clerk');
+    });
+
+    it('does not modify absolute proxyUrl', async () => {
+      const headers = new Headers({
+        'x-forwarded-proto': 'https',
+        'x-forwarded-host': 'myapp.example.com',
+      });
+      const clerkRequest = createClerkRequest(new Request('http://localhost:3000/path', { headers }));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkLive,
+        proxyUrl: 'https://custom.proxy.com/__clerk',
+      });
+
+      expect(context.frontendApi).toBe('https://custom.proxy.com/__clerk');
+      expect(context.proxyUrl).toBe('https://custom.proxy.com/__clerk');
+    });
+
+    it('resolves relative proxyUrl without forwarded headers using request origin', async () => {
+      const clerkRequest = createClerkRequest(new Request('http://localhost:3000/path'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkLive,
+        proxyUrl: '/__clerk',
+      });
+
+      expect(context.proxyUrl).toBe('http://localhost:3000/__clerk');
+    });
+  });
+
   // Added these tests to verify that the generated sha-1 is the same as the one used in cookie assignment
   // Tests copied from packages/shared/src/__tests__/keys.test.ts
   describe('getCookieSuffix(publishableKey, subtle)', () => {
