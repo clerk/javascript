@@ -36,6 +36,11 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
   } = props;
   const inputRef = useRef<HTMLInputElement>(null);
   const [timeoutState, setTimeoutState] = useState<ReturnType<typeof setTimeout> | null>(null);
+  // Tracks whether the last client-side validation result was "success".
+  // Used to prevent focus/blur from overriding a server-side error when the
+  // password value hasn't changed (i.e. the user just clicks into the field
+  // after a failed submission).
+  const lastClientValidationWasSuccessRef = useRef(false);
 
   const {
     userSettings: { passwordSettings },
@@ -46,10 +51,20 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
   const { validatePassword } = usePassword(
     { ...passwordSettings, validatePassword: validatePasswordProp },
     {
-      onValidationSuccess: () => setSuccess(t(localizationKeys('unstable__errors.zxcvbn.goodPassword'))),
-      onValidationError: message => setError(message),
-      onValidationWarning: message => setWarning(message),
+      onValidationSuccess: () => {
+        lastClientValidationWasSuccessRef.current = true;
+        setSuccess(t(localizationKeys('unstable__errors.zxcvbn.goodPassword')));
+      },
+      onValidationError: message => {
+        lastClientValidationWasSuccessRef.current = false;
+        setError(message);
+      },
+      onValidationWarning: message => {
+        lastClientValidationWasSuccessRef.current = false;
+        setWarning(message);
+      },
       onValidationInfo: message => {
+        lastClientValidationWasSuccessRef.current = false;
         // ref will be null when onFocus is triggered due to `autoFocus=true`
         if (!inputRef.current) {
           return;
@@ -67,6 +82,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
   );
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    lastClientValidationWasSuccessRef.current = false;
     if (timeoutState) {
       clearTimeout(timeoutState);
     }
@@ -92,10 +108,16 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         onBlur={e => {
           rest.onBlur?.(e);
           // Call validate password because to calculate the new feedbackType as the element is now blurred
-          validatePassword(e.target.value);
+          if (!lastClientValidationWasSuccessRef.current) {
+            validatePassword(e.target.value);
+          }
         }}
         onFocus={e => {
           rest.onFocus?.(e);
+          // Call validate password because to calculate the new feedbackType as the element is now focused
+          if (!lastClientValidationWasSuccessRef.current) {
+            validatePassword(e.target.value);
+          }
         }}
         //@ts-expect-error Type mismatch between ForwardRef and RefObject due to null
         ref={mergeRefs(ref, inputRef)}
