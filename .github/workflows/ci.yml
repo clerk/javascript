@@ -305,6 +305,7 @@ jobs:
             "nuxt",
             "react-router",
             "custom",
+            "hono",
           ]
         test-project: ["chrome"]
         include:

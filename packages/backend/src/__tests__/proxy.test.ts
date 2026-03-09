@@ -380,6 +380,67 @@ describe('proxy', () => {
       expect(options.headers.get('X-Forwarded-Proto')).toBe('https');
     });
 
+    it('derives Clerk-Proxy-Url from forwarded headers instead of localhost', async () => {
+      const mockResponse = new Response(JSON.stringify({}), { status: 200 });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      // Behind a reverse proxy, request.url is localhost but forwarded headers carry the public origin
+      const request = new Request('http://localhost:3000/__clerk/v1/client', {
+        headers: {
+          'X-Forwarded-Host': 'myapp.example.com',
+          'X-Forwarded-Proto': 'https',
+        },
+      });
+
+      await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      const [, options] = mockFetch.mock.calls[0];
+      expect(options.headers.get('Clerk-Proxy-Url')).toBe('https://myapp.example.com/__clerk');
+    });
+
+    it('falls back to request URL for Clerk-Proxy-Url when no forwarded headers', async () => {
+      const mockResponse = new Response(JSON.stringify({}), { status: 200 });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/client');
+
+      await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      const [, options] = mockFetch.mock.calls[0];
+      expect(options.headers.get('Clerk-Proxy-Url')).toBe('https://example.com/__clerk');
+    });
+
+    it('rewrites Location header using forwarded origin, not localhost', async () => {
+      const mockResponse = new Response(null, {
+        status: 302,
+        headers: {
+          Location: 'https://frontend-api.clerk.dev/v1/oauth/callback?code=123',
+        },
+      });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('http://localhost:3000/__clerk/v1/oauth/authorize', {
+        headers: {
+          'X-Forwarded-Host': 'myapp.example.com',
+          'X-Forwarded-Proto': 'https',
+        },
+      });
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      expect(response.status).toBe(302);
+      expect(response.headers.get('Location')).toBe('https://myapp.example.com/__clerk/v1/oauth/callback?code=123');
+    });
+
     it('rewrites Location header for redirects pointing to FAPI', async () => {
       const mockResponse = new Response(null, {
         status: 302,
