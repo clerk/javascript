@@ -1,4 +1,5 @@
 ---
+'@clerk/backend': minor
 '@clerk/localizations': minor
 '@clerk/clerk-js': minor
 '@clerk/shared': minor
