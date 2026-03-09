@@ -252,5 +252,37 @@ describe('isomorphicClerk', () => {
       // Should not attempt to load UI from CDN
       expect(loadClerkUIScript).not.toHaveBeenCalled();
     });
+
+    it('passes ui.ClerkUI to clerk.load even when standardBrowser is false', async () => {
+      const mockClerkUI = vi.fn();
+      const mockLoad = vi.fn().mockResolvedValue(undefined);
+      const mockClerkInstance = {
+        load: mockLoad,
+        loaded: false,
+      };
+
+      // Simulate chrome-extension with syncHost: Clerk instance + ui prop + standardBrowser: false
+      const clerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        Clerk: mockClerkInstance as any,
+        ui: { ClerkUI: mockClerkUI } as any,
+        standardBrowser: false,
+      });
+
+      (global as any).Clerk = mockClerkInstance;
+
+      await (clerk as any).getEntryChunks();
+
+      // clerk.load should have been called with ui.ClerkUI preserved
+      expect(mockLoad).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ui: expect.objectContaining({
+            ClerkUI: mockClerkUI,
+          }),
+        }),
+      );
+      // Should not attempt to load UI from CDN
+      expect(loadClerkUIScript).not.toHaveBeenCalled();
+    });
   });
 });
