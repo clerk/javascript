@@ -178,15 +178,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   #publishableKey: string;
   #eventBus = createClerkEventBus();
   #stateProxy: StateProxy;
-  #initialized = false;
-
   get publishableKey(): string {
     return this.#publishableKey;
   }
 
   get loaded(): boolean {
-    // Consider loaded if either clerk is loaded OR we've initialized headlessly
-    return this.clerkjs?.loaded || this.#initialized;
+    return this.clerkjs?.loaded || false;
   }
 
   get status(): ClerkStatus {
@@ -295,6 +292,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   /**
    * Initialize Clerk for headless/React Native environments where a Clerk instance is provided directly.
+   * Only handles Clerk construction and loading — post-load wiring is shared via replayInterceptedInvocations.
    */
   private loadHeadlessClerk(): void {
     const clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk)
@@ -306,40 +304,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return;
     }
 
-    // Helper to finish initialization - marks as ready and triggers re-renders
-    const finishInit = () => {
-      this.#initialized = true;
-      this.clerkjs = clerk;
-      this.premountMethodCalls.forEach(cb => cb());
-      this.premountAddListenerCalls.forEach((listenerExtras, listener) => {
-        const unsubscribe = clerk.addListener(listener, listenerExtras.options);
-        listenerExtras.handlers.nativeUnsubscribe = unsubscribe;
-      });
-
-      // Emit current state to all listeners so React context gets updated with actual values
-      // Use null instead of undefined for missing values to signal "loaded but empty"
-      const currentState = {
-        client: clerk.client ?? null,
-        session: clerk.session ?? null,
-        user: clerk.user ?? null,
-        organization: clerk.organization ?? null,
-      };
-      if (currentState.client) {
-        this.premountAddListenerCalls.forEach((_, listener) => {
-          listener(currentState as Resources);
-        });
-      }
-
-      // Emit status through eventBus
-      this.#eventBus.emit(clerkEvents.Status, 'ready');
-      this.emitLoaded();
+    const onLoaded = () => {
+      this.replayInterceptedInvocations(clerk);
     };
 
-    // Try to load, but finish initialization regardless
     if (!clerk.loaded) {
       clerk
         .load(this.options)
-        .then(() => finishInit())
+        .then(() => onLoaded())
         .catch(err => {
           if (__DEV__) {
             console.error('Clerk: Failed to load:', err);
@@ -348,7 +320,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
           this.emitLoaded();
         });
     } else {
-      finishInit();
+      onLoaded();
     }
   }
 
