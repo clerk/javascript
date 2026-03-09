@@ -14,8 +14,13 @@ export class AgentTask {
     readonly agentId: string,
     /**
      * A unique identifier for this agent task.
+     * @deprecated Use agentTaskId instead.
      */
     readonly taskId: string,
+    /**
+     * A unique identifier for this agent task.
+     */
+    readonly agentTaskId: string,
     /**
      * The FAPI URL that, when visited, creates a session for the user.
      */
@@ -29,6 +34,6 @@ export class AgentTask {
    * @returns A new AgentTask instance
    */
   static fromJSON(data: AgentTaskJSON): AgentTask {
-    return new AgentTask(data.agent_id, data.task_id, data.url);
+    return new AgentTask(data.agent_id, data.agent_task_id, data.agent_task_id, data.url);
   }
 }

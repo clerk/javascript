@@ -516,7 +516,7 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
 export interface AgentTaskJSON extends ClerkResourceJSON {
   object: typeof ObjectType.AgentTask;
   agent_id: string;
-  task_id: string;
+  agent_task_id: string;
   url: string;
 }
 
