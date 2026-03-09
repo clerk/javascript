@@ -365,7 +365,21 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
         >
           {feeFormatted}
         </Text>
-        {!plan.isDefault ? <PlanPeriod plan={plan} /> : null}
+        {!plan.isDefault ? (
+          <Text
+            elementDescriptor={descriptors.pricingTableCardFeePeriod}
+            variant='caption'
+            colorScheme='secondary'
+            sx={t => ({
+              textTransform: 'lowercase',
+              ':before': {
+                content: '"/"',
+                marginInlineEnd: t.space.$0x25,
+              },
+            })}
+            localizationKey={plan.fee ? localizationKeys('billing.month') : localizationKeys('billing.year')}
+          />
+        ) : null}
       </Flex>
 
       <PeriodToggle
@@ -376,42 +390,6 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
     </Box>
   );
 });
-
-const PlanPeriod = ({ plan }: { plan: BillingPlanResource }) => {
-  if (plan.fee) {
-    return (
-      <Text
-        elementDescriptor={descriptors.pricingTableCardFeePeriod}
-        variant='caption'
-        colorScheme='secondary'
-        sx={t => ({
-          textTransform: 'lowercase',
-          ':before': {
-            content: '"/"',
-            marginInlineEnd: t.space.$0x25,
-          },
-        })}
-        localizationKey={localizationKeys('billing.month')}
-      />
-    );
-  }
-
-  return (
-    <Text
-      elementDescriptor={descriptors.pricingTableCardFeePeriod}
-      variant='caption'
-      colorScheme='secondary'
-      sx={t => ({
-        textTransform: 'lowercase',
-        ':before': {
-          content: '"/"',
-          marginInlineEnd: t.space.$0x25,
-        },
-      })}
-      localizationKey={localizationKeys('billing.year')}
-    />
-  );
-};
 
 const PeriodToggle = ({
   plan,
