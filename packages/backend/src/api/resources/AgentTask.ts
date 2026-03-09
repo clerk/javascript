@@ -34,6 +34,7 @@ export class AgentTask {
    * @returns A new AgentTask instance
    */
   static fromJSON(data: AgentTaskJSON): AgentTask {
-    return new AgentTask(data.agent_id, data.agent_task_id, data.agent_task_id, data.url);
+    const agentTaskId = data.agent_task_id ?? data.task_id ?? '';
+    return new AgentTask(data.agent_id, agentTaskId, agentTaskId, data.url);
   }
 }
