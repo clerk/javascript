@@ -1,11 +1,8 @@
 import { useClerk, useUser } from '@clerk/react';
 import { useEffect, useRef, useState } from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import NativeClerkModule from '../specs/NativeClerkModule';
-
-// Check if native module is supported on this platform
-const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
+import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 
 // Raw result from native module (may vary by platform)
 interface NativeSessionResult {
@@ -14,14 +11,13 @@ interface NativeSessionResult {
   user?: { id: string; firstName?: string; lastName?: string; imageUrl?: string; primaryEmailAddress?: string };
 }
 
-// Safely get the native module
-let ClerkExpo: typeof NativeClerkModule | null = null;
-if (isNativeSupported) {
-  try {
-    ClerkExpo = NativeClerkModule;
-  } catch {
-    ClerkExpo = null;
+function getInitials(user: { firstName?: string; lastName?: string } | null): string {
+  if (user?.firstName) {
+    const first = user.firstName.charAt(0).toUpperCase();
+    const last = user.lastName?.charAt(0).toUpperCase() || '';
+    return first + last;
   }
+  return 'U';
 }
 
 interface NativeUser {
@@ -153,22 +149,29 @@ export function UserButton(_props: UserButtonProps) {
         // Clear native session explicitly (may already be cleared, but ensure it)
         try {
           await ClerkExpo.signOut?.();
-        } catch {
-          // May already be signed out
+        } catch (e) {
+          if (__DEV__) {
+            console.warn('[UserButton] Native signOut error (may already be signed out):', e);
+          }
         }
 
         // Sign out from JS SDK to update isSignedIn state
         if (clerk?.signOut) {
           try {
             await clerk.signOut();
-          } catch {
+          } catch (e) {
+            if (__DEV__) {
+              console.warn('[UserButton] JS SDK signOut error, attempting reload:', e);
+            }
             // Even if signOut throws, try to force reload to clear stale state
             const clerkRecord = clerk as unknown as Record<string, unknown>;
             if (typeof clerkRecord.__internal_reloadInitialResources === 'function') {
               try {
                 await (clerkRecord.__internal_reloadInitialResources as () => Promise<void>)();
-              } catch {
-                // Best effort
+              } catch (reloadErr) {
+                if (__DEV__) {
+                  console.warn('[UserButton] Best-effort reload failed:', reloadErr);
+                }
               }
             }
           }
@@ -183,16 +186,6 @@ export function UserButton(_props: UserButtonProps) {
     } finally {
       presentingRef.current = false;
     }
-  };
-
-  // Get initials from user name
-  const getInitials = () => {
-    if (user?.firstName) {
-      const first = user.firstName.charAt(0).toUpperCase();
-      const last = user.lastName?.charAt(0).toUpperCase() || '';
-      return first + last;
-    }
-    return 'U';
   };
 
   // Show fallback when native modules aren't available
@@ -216,7 +209,7 @@ export function UserButton(_props: UserButtonProps) {
         />
       ) : (
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{getInitials()}</Text>
+          <Text style={styles.avatarText}>{getInitials(user)}</Text>
         </View>
       )}
     </TouchableOpacity>

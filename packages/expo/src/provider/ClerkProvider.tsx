@@ -104,8 +104,10 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
             let bearerToken: string | null = null;
             try {
               bearerToken = (await defaultTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
-            } catch {
-              // Token cache may not be available
+            } catch (e) {
+              if (__DEV__) {
+                console.warn('[ClerkProvider] Token cache read failed:', e);
+              }
             }
             await ClerkExpo.configure(pk, bearerToken);
 
@@ -267,8 +269,10 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const WebBrowser = require('expo-web-browser');
       WebBrowser.maybeCompleteAuthSession();
-    } catch {
-      // expo-web-browser not installed — SSO/OAuth on web won't work
+    } catch (e) {
+      if (__DEV__) {
+        console.warn('[ClerkProvider] expo-web-browser not available, OAuth/SSO on web will not work:', e);
+      }
     }
   }
 

@@ -1,27 +1,13 @@
 import { useClerk } from '@clerk/react';
 import { useCallback, useRef } from 'react';
-import { Platform } from 'react-native';
 
-import NativeClerkModule from '../specs/NativeClerkModule';
-
-// Check if native module is supported on this platform
-const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
+import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 
 // Raw result from the native module (may vary by platform)
 type NativeSessionResult = {
   sessionId?: string;
   session?: { id: string };
 };
-
-// Safely get the native module
-let ClerkExpo: typeof NativeClerkModule | null = null;
-if (isNativeSupported) {
-  try {
-    ClerkExpo = NativeClerkModule;
-  } catch {
-    ClerkExpo = null;
-  }
-}
 
 export interface UseUserProfileModalReturn {
   /**
@@ -93,16 +79,20 @@ export function useUserProfileModal(): UseUserProfileModalReturn {
         // Clear native session explicitly (may already be cleared, but ensure it)
         try {
           await ClerkExpo.signOut?.();
-        } catch {
-          // May already be signed out
+        } catch (e) {
+          if (__DEV__) {
+            console.warn('[useUserProfileModal] Native signOut error (may already be signed out):', e);
+          }
         }
 
         // Sign out from JS SDK to update isSignedIn state
         if (clerk?.signOut) {
           try {
             await clerk.signOut();
-          } catch {
-            // Best effort
+          } catch (e) {
+            if (__DEV__) {
+              console.warn('[useUserProfileModal] Best-effort JS SDK signOut failed:', e);
+            }
           }
         }
       }

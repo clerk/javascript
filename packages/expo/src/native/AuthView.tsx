@@ -1,26 +1,13 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { useCallback, useRef } from 'react';
-import { Platform, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
 import { getClerkInstance } from '../provider/singleton';
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';
-import NativeClerkModule from '../specs/NativeClerkModule';
 import { tokenCache } from '../token-cache';
+import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 import type { AuthViewProps } from './AuthView.types';
-
-// Check if native module is supported on this platform
-const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
-
-// Safely get the native module
-let ClerkExpo: typeof NativeClerkModule | null = null;
-if (isNativeSupported) {
-  try {
-    ClerkExpo = NativeClerkModule;
-  } catch {
-    ClerkExpo = null;
-  }
-}
 
 export async function syncNativeSession(sessionId: string): Promise<void> {
   // Copy the native client's bearer token to the JS SDK's token cache
@@ -41,7 +28,7 @@ export async function syncNativeSession(sessionId: string): Promise<void> {
   if (!clerkInstance) {
     throw new ClerkRuntimeError(
       'Clerk instance is not available. Ensure <ClerkProvider> is mounted before using <AuthView>.',
-      { code: 'clerk_instance_not_available' },
+      { code: 'expo_auth_view_clerk_instance_not_available' },
     );
   }
 

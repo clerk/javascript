@@ -1,26 +1,13 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { useCallback, useRef } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
 import { getClerkInstance } from '../provider/singleton';
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';
-import NativeClerkModule from '../specs/NativeClerkModule';
 import { tokenCache } from '../token-cache';
+import { ClerkExpoModule, isNativeSupported } from '../utils/native-module';
 import type { AuthViewMode } from './AuthView.types';
-
-// Check if native module is supported on this platform
-const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
-
-// Safely get the native module
-let ClerkExpoModule: typeof NativeClerkModule | null = null;
-if (isNativeSupported) {
-  try {
-    ClerkExpoModule = NativeClerkModule;
-  } catch {
-    ClerkExpoModule = null;
-  }
-}
 
 export interface InlineAuthViewProps {
   /**
@@ -86,7 +73,7 @@ export function InlineAuthView({ mode = 'signInOrUp', isDismissable = false }: I
       if (!clerkInstance) {
         throw new ClerkRuntimeError(
           'Clerk instance is not available. Ensure <ClerkProvider> is mounted before using <InlineAuthView>.',
-          { code: 'clerk_instance_not_available' },
+          { code: 'expo_inline_auth_view_clerk_instance_not_available' },
         );
       }
 

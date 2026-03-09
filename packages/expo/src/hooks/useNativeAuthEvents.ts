@@ -1,22 +1,7 @@
 import { useEffect, useState } from 'react';
-import { NativeEventEmitter, Platform } from 'react-native';
+import { NativeEventEmitter } from 'react-native';
 
-import NativeClerkModule from '../specs/NativeClerkModule';
-
-// Check if native module is supported on this platform
-const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
-
-// Get the native module for event listening
-let ClerkExpo: typeof NativeClerkModule | null = null;
-
-if (isNativeSupported) {
-  try {
-    ClerkExpo = NativeClerkModule;
-  } catch {
-    // Native module not available - plugin not configured
-    ClerkExpo = null;
-  }
-}
+import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 
 /**
  * Auth state change event from native SDK

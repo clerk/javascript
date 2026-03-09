@@ -1,23 +1,10 @@
 import { useClerk } from '@clerk/react';
 import { useCallback, useRef } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-import NativeClerkModule from '../specs/NativeClerkModule';
 import NativeClerkUserProfileView from '../specs/NativeClerkUserProfileView';
-
-// Check if native module is supported on this platform
-const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
-
-// Safely get the native module
-let ClerkExpo: typeof NativeClerkModule | null = null;
-if (isNativeSupported) {
-  try {
-    ClerkExpo = NativeClerkModule;
-  } catch {
-    ClerkExpo = null;
-  }
-}
+import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 
 /**
  * Props for the UserProfileView component.
@@ -82,8 +69,10 @@ export function UserProfileView({ isDismissable = false, style }: UserProfileVie
 
         try {
           await ClerkExpo?.signOut();
-        } catch {
-          // May already be signed out
+        } catch (e) {
+          if (__DEV__) {
+            console.warn('[UserProfileView] Native signOut error (may already be signed out):', e);
+          }
         }
 
         if (clerk?.signOut) {

@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Platform } from 'react-native';
 
-import NativeClerkModule from '../specs/NativeClerkModule';
-
-// Check if native module is supported on this platform
-const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
+import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 
 // Native session data structure (normalized)
 interface NativeSessionData {
@@ -23,17 +19,6 @@ interface NativeSessionRawResult {
   sessionId?: string;
   session?: { id: string };
   user?: NativeSessionData['user'];
-}
-
-// Safely get the native module
-let ClerkExpo: typeof NativeClerkModule | null = null;
-
-if (isNativeSupported) {
-  try {
-    ClerkExpo = NativeClerkModule;
-  } catch {
-    // Native module not available - this is expected when expo plugin is not installed
-  }
 }
 
 export interface UseNativeSessionReturn {
