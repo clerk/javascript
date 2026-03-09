@@ -96,8 +96,6 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         }}
         onFocus={e => {
           rest.onFocus?.(e);
-          // Call validate password because to calculate the new feedbackType as the element is now focused
-          validatePassword(e.target.value);
         }}
         //@ts-expect-error Type mismatch between ForwardRef and RefObject due to null
         ref={mergeRefs(ref, inputRef)}
