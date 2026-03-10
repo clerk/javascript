@@ -121,7 +121,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       createAuthenticateRequestOptions(clerkRequest, keylessOptions, context),
     );
 
-    handleNetlifyCacheHeaders(requestState);
+    await handleNetlifyCacheHeaders(requestState);
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {

@@ -1,5 +1,5 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
-import { isDevelopmentFromPublishableKey } from './keys';
+import { getCookieSuffix, isDevelopmentFromPublishableKey } from './keys';
 
 /**
  * Cache busting parameter for Netlify to prevent cached responses
@@ -32,23 +32,33 @@ function isNetlifyRuntime(): boolean {
  * Applies Netlify-specific cache headers to the request state.
  *
  * When running on Netlify, this function:
- * 1. Sets `Netlify-Vary: cookie=__client_uat,cookie=__session` to instruct Netlify's CDN
- *    to create separate cache entries based on auth cookie values, preventing cached auth
- *    state from bleeding across users/sessions.
+ * 1. Sets `Netlify-Vary` with both unsuffixed and suffixed Clerk cookie names to instruct
+ *    Netlify's CDN to create separate cache entries based on auth cookie values, preventing
+ *    cached auth state from bleeding across users/sessions.
  * 2. For development instances with a redirect (Location header), adds a cache-bust query
  *    parameter to prevent Netlify from serving cached responses during the handshake flow.
  *
  * @internal
  */
-export function handleNetlifyCacheHeaders(requestState: { headers: Headers; publishableKey: string }): void {
+export async function handleNetlifyCacheHeaders(requestState: {
+  headers: Headers;
+  publishableKey: string;
+}): Promise<void> {
   if (!isNetlifyRuntime()) {
     return;
   }
 
   const { headers, publishableKey } = requestState;
 
-  // Tell Netlify CDN to vary cache by auth cookie values (all instances, dev + prod)
-  headers.set('Netlify-Vary', 'cookie=__client_uat,cookie=__session');
+  // Tell Netlify CDN to vary cache by auth cookie values (all instances, dev + prod).
+  // Include both unsuffixed and suffixed cookie names since Clerk uses suffixed cookies
+  // by default for newer instances (e.g. __client_uat_AbC12345).
+  const cookieNames = ['__client_uat', '__session'];
+  if (publishableKey) {
+    const suffix = await getCookieSuffix(publishableKey);
+    cookieNames.push(`__client_uat_${suffix}`, `__session_${suffix}`);
+  }
+  headers.set('Netlify-Vary', cookieNames.map(name => `cookie=${name}`).join(','));
 
   // Add cache-bust param to redirect URL for dev instances to prevent cached redirects
   const locationHeader = headers.get('Location');
@@ -66,7 +76,7 @@ export function handleNetlifyCacheHeaders(requestState: { headers: Headers; publ
  * @deprecated Use `handleNetlifyCacheHeaders` instead.
  * @internal
  */
-export function handleNetlifyCacheInDevInstance({
+export async function handleNetlifyCacheInDevInstance({
   locationHeader: _locationHeader,
   requestStateHeaders,
   publishableKey,
@@ -75,5 +85,5 @@ export function handleNetlifyCacheInDevInstance({
   requestStateHeaders: Headers;
   publishableKey: string;
 }) {
-  handleNetlifyCacheHeaders({ headers: requestStateHeaders, publishableKey });
+  await handleNetlifyCacheHeaders({ headers: requestStateHeaders, publishableKey });
 }

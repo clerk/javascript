@@ -221,7 +221,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         reason: requestState.reason,
       }));
 
-      handleNetlifyCacheHeaders(requestState);
+      await handleNetlifyCacheHeaders(requestState);
 
       const locationHeader = requestState.headers.get(constants.Headers.Location);
       if (locationHeader) {

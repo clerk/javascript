@@ -88,7 +88,7 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       __keylessApiKeysUrl,
     });
 
-    handleNetlifyCacheHeaders(requestState);
+    await handleNetlifyCacheHeaders(requestState);
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
