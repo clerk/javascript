@@ -570,7 +570,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
       // Sign up if missing transfers: We let sign in handle the captcha,
       // do not show another captcha on sign up.
-      if (isCaptchaBypassableVerificationStrategy(signInVerificationStrategy)) {
+      if (isSignUpIfMissingCaptchaBypassStrategy(signInVerificationStrategy)) {
         return true;
       }
     }
@@ -603,13 +603,13 @@ export class SignUp extends BaseResource implements SignUpResource {
  * web3 wallet strategy. This should be kept in sync with `validateSignUpIfMissing`
  * in the backend.
  */
-export function isCaptchaBypassableVerificationStrategy(strategy: string | null): boolean {
+const SIGN_UP_IF_MISSING_CAPTCHA_BYPASS_STRATEGIES = new Set(['email_link', 'email_code', 'phone_code']);
+
+export function isSignUpIfMissingCaptchaBypassStrategy(strategy: string | null): boolean {
   if (!strategy) {
     return false;
   }
-  return (
-    strategy === 'email_link' || strategy === 'email_code' || strategy === 'phone_code' || strategy.startsWith('web3_')
-  );
+  return SIGN_UP_IF_MISSING_CAPTCHA_BYPASS_STRATEGIES.has(strategy) || strategy.startsWith('web3_');
 }
 
 type SignUpFutureVerificationsMethods = Pick<
@@ -820,7 +820,7 @@ class SignUpFuture implements SignUpFutureResource {
 
       // Sign up if missing transfers: We let sign in handle the captcha,
       // do not show another captcha on sign up.
-      if (isCaptchaBypassableVerificationStrategy(signInVerificationStrategy)) {
+      if (isSignUpIfMissingCaptchaBypassStrategy(signInVerificationStrategy)) {
         return true;
       }
     }
