@@ -244,7 +244,6 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
         </Header.Root>
         <SuccessPage
           contents={<InvitationsSentMessage />}
-          sx={t => ({ minHeight: t.sizes.$60 })}
           onFinish={completeFlow}
         />
       </Col>
