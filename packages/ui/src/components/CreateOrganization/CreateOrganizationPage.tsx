@@ -19,7 +19,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
     <Card.Root sx={t => ({ width: t.sizes.$108 })}>
       <Card.Content
         sx={t => ({
-          padding: `${t.space.$4} ${t.space.$5} ${showDevModeNotice ? t.space.$12 : t.space.$6}`,
+          padding: `${t.space.$4} ${t.space.$5}`,
         })}
       >
         <Card.Alert>{card.error}</Card.Alert>
