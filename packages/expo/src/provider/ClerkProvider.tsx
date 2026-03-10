@@ -63,9 +63,17 @@ const SDK_METADATA = {
  *
  * Must be rendered inside `ClerkReactProvider` so `useAuth()` has access to context.
  */
-function NativeSessionSync({ publishableKey }: { publishableKey: string }) {
+function NativeSessionSync({
+  publishableKey,
+  tokenCache,
+}: {
+  publishableKey: string;
+  tokenCache: TokenCache | undefined;
+}) {
   const { isSignedIn } = useAuth();
   const hasSyncedRef = useRef(false);
+  // Use the provided tokenCache, falling back to the default SecureStore cache
+  const effectiveTokenCache = tokenCache ?? defaultTokenCache;
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -98,7 +106,7 @@ function NativeSessionSync({ publishableKey }: { publishableKey: string }) {
         }
 
         // Read the JS SDK's client JWT and push it to the native SDK
-        const bearerToken = (await defaultTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
+        const bearerToken = (await effectiveTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
         if (bearerToken) {
           await ClerkExpo.configure(publishableKey, bearerToken);
         }
@@ -110,7 +118,7 @@ function NativeSessionSync({ publishableKey }: { publishableKey: string }) {
     };
 
     void syncToNative();
-  }, [isSignedIn, publishableKey]);
+  }, [isSignedIn, publishableKey, effectiveTokenCache]);
 
   return null;
 }
@@ -163,10 +171,12 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
           const ClerkExpo = NativeClerkModule;
 
           if (ClerkExpo?.configure) {
-            // Read the JS SDK's client JWT to sync with the native SDK
+            // Read the JS SDK's client JWT to sync with the native SDK.
+            // Use the user-provided tokenCache so custom caches are honored.
+            const effectiveTokenCache = tokenCache ?? defaultTokenCache;
             let bearerToken: string | null = null;
             try {
-              bearerToken = (await defaultTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
+              bearerToken = (await effectiveTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
             } catch (e) {
               if (__DEV__) {
                 console.warn('[ClerkProvider] Token cache read failed:', e);
@@ -364,7 +374,12 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
         ...(isNative() && { runtimeEnvironment: 'headless' as const }),
       }}
     >
-      {isNative() && <NativeSessionSync publishableKey={pk} />}
+      {isNative() && (
+        <NativeSessionSync
+          publishableKey={pk}
+          tokenCache={tokenCache}
+        />
+      )}
       {children}
     </ClerkReactProvider>
   );
