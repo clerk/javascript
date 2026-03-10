@@ -224,7 +224,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
         headerTitle={localizationKeys('organizationProfile.invitePage.title')}
         headerTitleTextVariant={headerTitleTextVariant}
         headerSubtitleTextVariant={headerSubtitleTextVariant}
-        sx={t => ({ minHeight: t.sizes.$60, textAlign: 'start' })}
+        sx={() => ({ textAlign: 'start' })}
       >
         {organization && (
           <InviteMembersForm
