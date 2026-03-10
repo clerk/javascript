@@ -275,7 +275,7 @@ jobs:
   integration-tests:
     needs: [check-permissions, build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
+    name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }}${{ matrix.shard && format(', shard {0}', matrix.shard) || '' }})
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
@@ -315,9 +315,33 @@ jobs:
           - test-name: "nextjs"
             test-project: "chrome"
             next-version: "15"
+            shard: "1/3"
+            shard-label: "1-of-3"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "15"
+            shard: "2/3"
+            shard-label: "2-of-3"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "15"
+            shard: "3/3"
+            shard-label: "3-of-3"
           - test-name: "nextjs"
             test-project: "chrome"
             next-version: "16"
+            shard: "1/3"
+            shard-label: "1-of-3"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "16"
+            shard: "2/3"
+            shard-label: "2-of-3"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "16"
+            shard: "3/3"
+            shard-label: "3-of-3"
           - test-name: "quickstart"
             test-project: "chrome"
             next-version: "15"
@@ -365,6 +389,7 @@ jobs:
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          PLAYWRIGHT_SHARD: ${{ matrix.shard || '' }}
         run: |
           # Use turbo's built-in --affected flag to detect changes
           # This automatically uses GITHUB_BASE_REF in GitHub Actions
@@ -449,13 +474,14 @@ jobs:
           E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
+          PLAYWRIGHT_SHARD: ${{ matrix.shard || '' }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}${{ matrix.shard-label && format('-shard-%s', matrix.shard-label) || '' }}
           path: integration/test-results
           retention-days: 1
 

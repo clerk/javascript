@@ -222,7 +222,7 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:nextjs": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "PLAYWRIGHT_SHARD"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
