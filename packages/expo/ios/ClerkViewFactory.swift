@@ -16,6 +16,7 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
 
   private static let clerkLoadMaxAttempts = 30
   private static let clerkLoadIntervalNs: UInt64 = 100_000_000
+  private static var clerkConfigured = false
 
   private init() {}
 
@@ -39,11 +40,30 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     // This handles the case where the user signed in via JS SDK but the native SDK
     // has no device token (e.g., after app reinstall or first launch).
     if let token = bearerToken, !token.isEmpty {
-      Self.writeNativeDeviceTokenIfNeeded(token)
+      let existingToken = Self.readNativeDeviceToken()
+      Self.writeNativeDeviceToken(token)
+
+      // If the device token changed (or didn't exist), clear stale cached client/environment.
+      // A previous launch may have cached an anonymous client (no device token), and the
+      // SDK would send both the new device token AND the stale client ID in API requests,
+      // causing a 400 error. Clearing the cache forces a fresh client fetch using only
+      // the device token.
+      if existingToken != token {
+        Self.clearCachedClerkData()
+      }
     } else {
       Self.syncJSTokenToNativeKeychainIfNeeded()
     }
 
+    // If already configured with a new bearer token, refresh the client
+    // to pick up the session associated with the device token we just wrote.
+    // Clerk.configure() is a no-op on subsequent calls, so we use refreshClient().
+    if Self.clerkConfigured, let token = bearerToken, !token.isEmpty {
+      _ = try? await Clerk.shared.refreshClient()
+      return
+    }
+
+    Self.clerkConfigured = true
     Clerk.configure(publishableKey: publishableKey)
 
     // Wait for Clerk to finish loading (cached data + API refresh).
@@ -106,14 +126,48 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     SecItemAdd(writeQuery as CFDictionary, nil)
   }
 
-  /// Writes the provided bearer token as the native SDK's device token,
-  /// but only if the native SDK doesn't already have one.
-  private static func writeNativeDeviceTokenIfNeeded(_ token: String) {
+  /// Reads the native device token from keychain, if present.
+  private static func readNativeDeviceToken() -> String? {
+    guard let service = keychainService, !service.isEmpty else { return nil }
+
+    var result: CFTypeRef?
+    let query: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: "clerkDeviceToken",
+      kSecReturnData as String: true,
+      kSecMatchLimit as String: kSecMatchLimitOne,
+    ]
+    guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess,
+          let data = result as? Data else { return nil }
+    return String(data: data, encoding: .utf8)
+  }
+
+  /// Clears stale cached client and environment data from keychain.
+  /// This prevents the native SDK from loading a stale anonymous client
+  /// during initialization, which would conflict with a newly-synced device token.
+  private static func clearCachedClerkData() {
+    guard let service = keychainService, !service.isEmpty else { return }
+
+    for key in ["cachedClient", "cachedEnvironment"] {
+      let query: [String: Any] = [
+        kSecClass as String: kSecClassGenericPassword,
+        kSecAttrService as String: service,
+        kSecAttrAccount as String: key,
+      ]
+      SecItemDelete(query as CFDictionary)
+    }
+  }
+
+  /// Writes the provided bearer token as the native SDK's device token.
+  /// If the native SDK already has a device token, it is updated with the new value.
+  private static func writeNativeDeviceToken(_ token: String) {
     guard let service = keychainService, !service.isEmpty else { return }
 
     let nativeTokenKey = "clerkDeviceToken"
+    guard let tokenData = token.data(using: .utf8) else { return }
 
-    // Check if native SDK already has a device token — don't overwrite
+    // Check if native SDK already has a device token
     let checkQuery: [String: Any] = [
       kSecClass as String: kSecClassGenericPassword,
       kSecAttrService as String: service,
@@ -121,20 +175,29 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
       kSecReturnData as String: false,
       kSecMatchLimit as String: kSecMatchLimitOne,
     ]
-    if SecItemCopyMatching(checkQuery as CFDictionary, nil) == errSecSuccess {
-      return
-    }
 
-    // Write the provided token as native device token
-    guard let tokenData = token.data(using: .utf8) else { return }
-    let writeQuery: [String: Any] = [
-      kSecClass as String: kSecClassGenericPassword,
-      kSecAttrService as String: service,
-      kSecAttrAccount as String: nativeTokenKey,
-      kSecValueData as String: tokenData,
-      kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
-    ]
-    SecItemAdd(writeQuery as CFDictionary, nil)
+    if SecItemCopyMatching(checkQuery as CFDictionary, nil) == errSecSuccess {
+      // Update the existing token
+      let updateQuery: [String: Any] = [
+        kSecClass as String: kSecClassGenericPassword,
+        kSecAttrService as String: service,
+        kSecAttrAccount as String: nativeTokenKey,
+      ]
+      let updateAttributes: [String: Any] = [
+        kSecValueData as String: tokenData,
+      ]
+      SecItemUpdate(updateQuery as CFDictionary, updateAttributes as CFDictionary)
+    } else {
+      // Write a new token
+      let writeQuery: [String: Any] = [
+        kSecClass as String: kSecClassGenericPassword,
+        kSecAttrService as String: service,
+        kSecAttrAccount as String: nativeTokenKey,
+        kSecValueData as String: tokenData,
+        kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+      ]
+      SecItemAdd(writeQuery as CFDictionary, nil)
+    }
   }
 
   public func createAuthViewController(

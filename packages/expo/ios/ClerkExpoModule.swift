@@ -170,37 +170,6 @@ class ClerkExpoModule: RCTEventEmitter {
     }
   }
 
-  // MARK: - getClientToken
-
-  @objc func getClientToken(_ resolve: @escaping RCTPromiseResolveBlock,
-                              reject: @escaping RCTPromiseRejectBlock) {
-    // Use a custom keychain service if configured in Info.plist (for extension apps
-    // sharing a keychain group). Falls back to the main bundle identifier.
-    let keychainService: String = {
-      if let custom = Bundle.main.object(forInfoDictionaryKey: "ClerkKeychainService") as? String, !custom.isEmpty {
-        return custom
-      }
-      return Bundle.main.bundleIdentifier ?? ""
-    }()
-
-    let query: [String: Any] = [
-      kSecClass as String: kSecClassGenericPassword,
-      kSecAttrService as String: keychainService,
-      kSecAttrAccount as String: "clerkDeviceToken",
-      kSecReturnData as String: true,
-      kSecMatchLimit as String: kSecMatchLimitOne
-    ]
-
-    var result: AnyObject?
-    let status = SecItemCopyMatching(query as CFDictionary, &result)
-
-    if status == errSecSuccess, let data = result as? Data {
-      resolve(String(data: data, encoding: .utf8))
-    } else {
-      resolve(nil)
-    }
-  }
-
   // MARK: - signOut
 
   @objc func signOut(_ resolve: @escaping RCTPromiseResolveBlock,

@@ -1,6 +1,7 @@
 import '../polyfills';
 
 import type { ClerkProviderProps as ReactClerkProviderProps } from '@clerk/react';
+import { useAuth } from '@clerk/react';
 import { InternalClerkProvider as ClerkReactProvider, type Ui } from '@clerk/react/internal';
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
@@ -51,6 +52,68 @@ const SDK_METADATA = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
 };
+
+/**
+ * Syncs JS SDK auth state to the native Clerk SDK.
+ *
+ * When a user authenticates via the JS SDK (custom sign-in forms, useSignIn, etc.)
+ * rather than through native `<AuthView />`, the native SDK doesn't know about the
+ * session. This component watches for JS auth state changes and pushes the bearer
+ * token to the native SDK so native components (UserButton, UserProfileView) work.
+ *
+ * Must be rendered inside `ClerkReactProvider` so `useAuth()` has access to context.
+ */
+function NativeSessionSync({ publishableKey }: { publishableKey: string }) {
+  const { isSignedIn } = useAuth();
+  const hasSyncedRef = useRef(false);
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      hasSyncedRef.current = false;
+      return;
+    }
+
+    if (hasSyncedRef.current) {
+      return;
+    }
+
+    hasSyncedRef.current = true;
+
+    const syncToNative = async () => {
+      try {
+        const ClerkExpo = NativeClerkModule;
+        if (!ClerkExpo?.configure || !ClerkExpo?.getSession) {
+          return;
+        }
+
+        // Check if native already has a session (e.g. auth via AuthView or initial load)
+        const nativeSession = (await ClerkExpo.getSession()) as {
+          sessionId?: string;
+          session?: { id: string };
+        } | null;
+        const hasNativeSession = !!(nativeSession?.sessionId || nativeSession?.session?.id);
+
+        if (hasNativeSession) {
+          return;
+        }
+
+        // Read the JS SDK's client JWT and push it to the native SDK
+        const bearerToken = (await defaultTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
+        if (bearerToken) {
+          await ClerkExpo.configure(publishableKey, bearerToken);
+        }
+      } catch (error) {
+        if (__DEV__) {
+          console.warn('[NativeSessionSync] Failed to sync JS session to native:', error);
+        }
+      }
+    };
+
+    void syncToNative();
+  }, [isSignedIn, publishableKey]);
+
+  return null;
+}
 
 export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi>): JSX.Element {
   const {
@@ -109,6 +172,14 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
                 console.warn('[ClerkProvider] Token cache read failed:', e);
               }
             }
+
+            // Only configure native SDK if we have a bearer token.
+            // Configuring without a token creates an anonymous native client,
+            // which conflicts when we later try to inject the JS SDK's token.
+            if (!bearerToken) {
+              return;
+            }
+
             await ClerkExpo.configure(pk, bearerToken);
 
             if (!isMountedRef.current) {
@@ -293,6 +364,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
         ...(isNative() && { runtimeEnvironment: 'headless' as const }),
       }}
     >
+      {isNative() && <NativeSessionSync publishableKey={pk} />}
       {children}
     </ClerkReactProvider>
   );

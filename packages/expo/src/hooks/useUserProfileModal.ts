@@ -1,6 +1,8 @@
-import { useClerk } from '@clerk/react';
+import { useClerk, useUser } from '@clerk/react';
 import { useCallback, useRef } from 'react';
 
+import { CLERK_CLIENT_JWT_KEY } from '../constants';
+import { tokenCache } from '../token-cache';
 import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 
 // Raw result from the native module (may vary by platform)
@@ -53,6 +55,7 @@ export interface UseUserProfileModalReturn {
  */
 export function useUserProfileModal(): UseUserProfileModalReturn {
   const clerk = useClerk();
+  const { user } = useUser();
   const presentingRef = useRef(false);
 
   const presentUserProfile = useCallback(async () => {
@@ -66,6 +69,20 @@ export function useUserProfileModal(): UseUserProfileModalReturn {
 
     presentingRef.current = true;
     try {
+      // If native doesn't have a session but JS does (e.g. user signed in via custom form),
+      // sync the JS SDK's bearer token to native and wait for it before presenting.
+      if (user && ClerkExpo?.getSession && ClerkExpo?.configure) {
+        const preCheck = (await ClerkExpo.getSession()) as NativeSessionResult | null;
+        const hasSession = !!(preCheck?.sessionId || preCheck?.session?.id);
+
+        if (!hasSession) {
+          const bearerToken = (await tokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
+          if (bearerToken) {
+            await ClerkExpo.configure(clerk.publishableKey, bearerToken);
+          }
+        }
+      }
+
       await ClerkExpo.presentUserProfile({
         dismissable: true,
       });
@@ -97,15 +114,13 @@ export function useUserProfileModal(): UseUserProfileModalReturn {
         }
       }
     } catch (error) {
-      // Dismissal resolves successfully with { dismissed: true }, so reaching
-      // here means a real native error (E_NOT_INITIALIZED, E_CREATE_FAILED, E_NO_ROOT_VC).
       if (__DEV__) {
         console.error('[useUserProfileModal] presentUserProfile failed:', error);
       }
     } finally {
       presentingRef.current = false;
     }
-  }, [clerk]);
+  }, [clerk, user]);
 
   return {
     presentUserProfile,

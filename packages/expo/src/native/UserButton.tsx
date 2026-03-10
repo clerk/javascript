@@ -2,6 +2,8 @@ import { useClerk, useUser } from '@clerk/react';
 import { useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import { CLERK_CLIENT_JWT_KEY } from '../constants';
+import { tokenCache } from '../token-cache';
 import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 
 // Raw result from native module (may vary by platform)
@@ -133,6 +135,20 @@ export function UserButton(_props: UserButtonProps) {
 
     presentingRef.current = true;
     try {
+      // If native doesn't have a session but JS does (e.g. user signed in via custom form),
+      // sync the JS SDK's bearer token to native and wait for it before presenting.
+      if (clerkUser && ClerkExpo?.getSession && ClerkExpo?.configure) {
+        const preCheck = (await ClerkExpo.getSession()) as NativeSessionResult | null;
+        const hasSession = !!(preCheck?.sessionId || preCheck?.session?.id);
+
+        if (!hasSession) {
+          const bearerToken = (await tokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
+          if (bearerToken) {
+            await ClerkExpo.configure(clerk.publishableKey, bearerToken);
+          }
+        }
+      }
+
       await ClerkExpo.presentUserProfile({
         dismissable: true,
       });
@@ -161,25 +177,12 @@ export function UserButton(_props: UserButtonProps) {
             await clerk.signOut();
           } catch (e) {
             if (__DEV__) {
-              console.warn('[UserButton] JS SDK signOut error, attempting reload:', e);
-            }
-            // Even if signOut throws, try to force reload to clear stale state
-            const clerkRecord = clerk as unknown as Record<string, unknown>;
-            if (typeof clerkRecord.__internal_reloadInitialResources === 'function') {
-              try {
-                await (clerkRecord.__internal_reloadInitialResources as () => Promise<void>)();
-              } catch (reloadErr) {
-                if (__DEV__) {
-                  console.warn('[UserButton] Best-effort reload failed:', reloadErr);
-                }
-              }
+              console.warn('[UserButton] JS SDK signOut error:', e);
             }
           }
         }
       }
     } catch (error) {
-      // Dismissal resolves successfully with { dismissed: true }, so reaching
-      // here means a real native error (E_NOT_INITIALIZED, E_CREATE_FAILED, E_NO_ROOT_VC).
       if (__DEV__) {
         console.error('[UserButton] presentUserProfile failed:', error);
       }
