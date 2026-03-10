@@ -136,10 +136,13 @@ export abstract class BaseResource {
       const message = errors?.[0]?.long_message;
       const code = errors?.[0]?.code;
 
-      // if the status is 401, we need to handle unauthenticated as we did before
-      // otherwise, we are going to ignore the requires_captcha error
-      // as we're going to handle it by triggering the captcha challenge
-      if (status === 401 && code !== 'requires_captcha') {
+      // Handle 401 errors based on the specific error code:
+      // - dev_browser_unauthenticated: reset the dev browser token
+      // - requires_captcha: ignored here, handled by the captcha challenge flow
+      // - all other 401s: refresh client/session via handleUnauthenticated
+      if (status === 401 && code === 'dev_browser_unauthenticated') {
+        await BaseResource.clerk.__internal_handleUnauthenticatedDevBrowser();
+      } else if (status === 401 && code !== 'requires_captcha') {
         await BaseResource.clerk.handleUnauthenticated();
       }
 

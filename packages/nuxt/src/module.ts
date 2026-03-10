@@ -1,4 +1,4 @@
-import type { Without } from '@clerk/shared/types';
+import type { InternalClerkScriptProps, Without } from '@clerk/shared/types';
 import type { PluginOptions } from '@clerk/vue';
 import {
   addComponent,
@@ -12,30 +12,28 @@ import {
   updateRuntimeConfig,
 } from '@nuxt/kit';
 
-export type ModuleOptions = Without<
-  PluginOptions,
-  'routerPush' | 'routerReplace' | 'publishableKey' | 'initialState'
-> & {
-  publishableKey?: string;
-  /**
-   * Skip the automatic server middleware registration. When enabled, you'll need to
-   * register the middleware manually in your application.
-   *
-   * @default false
-   *
-   * @example
-   *
-   * ```ts
-   * // server/middleware/clerk.ts
-   * import { clerkMiddleware } from '@clerk/nuxt/server'
-   *
-   * export default clerkMiddleware((event) => {
-   *   console.log('auth', event.context.auth())
-   * })
-   * ```
-   */
-  skipServerMiddleware?: boolean;
-};
+export type ModuleOptions = Without<PluginOptions, 'routerPush' | 'routerReplace' | 'publishableKey' | 'initialState'> &
+  InternalClerkScriptProps & {
+    publishableKey?: string;
+    /**
+     * Skip the automatic server middleware registration. When enabled, you'll need to
+     * register the middleware manually in your application.
+     *
+     * @default false
+     *
+     * @example
+     *
+     * ```ts
+     * // server/middleware/clerk.ts
+     * import { clerkMiddleware } from '@clerk/nuxt/server'
+     *
+     * export default clerkMiddleware((event) => {
+     *   console.log('auth', event.context.auth())
+     * })
+     * ```
+     */
+    skipServerMiddleware?: boolean;
+  };
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -64,12 +62,12 @@ export default defineNuxtModule<ModuleOptions>({
           signUpForceRedirectUrl: options.signUpForceRedirectUrl,
           signUpUrl: options.signUpUrl,
           domain: options.domain,
-          // Using jsUrl/uiUrl instead of clerkJSUrl/clerkUIUrl to support
+          // Using jsUrl/uiUrl instead of __internal_clerkJSUrl/__internal_clerkUIUrl to support
           // NUXT_PUBLIC_CLERK_JS_URL and NUXT_PUBLIC_CLERK_UI_URL env vars.
-          jsUrl: options.clerkJSUrl,
-          uiUrl: options.clerkUIUrl,
-          clerkJSVersion: options.clerkJSVersion,
-          clerkUIVersion: options.clerkUIVersion,
+          jsUrl: options.__internal_clerkJSUrl,
+          uiUrl: options.__internal_clerkUIUrl,
+          clerkJSVersion: options.__internal_clerkJSVersion,
+          clerkUIVersion: options.__internal_clerkUIVersion,
           // prefetchUI config: can be false or undefined
           prefetchUI: options.prefetchUI,
           isSatellite: options.isSatellite,

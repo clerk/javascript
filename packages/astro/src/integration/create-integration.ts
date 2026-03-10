@@ -20,9 +20,10 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
     const { proxyUrl, isSatellite, domain, signInUrl, signUpUrl, enableEnvSchema = true } = params || {};
 
     // These are not provided when the "bundled" integration is used
-    const clerkJSUrl = (params as any)?.clerkJSUrl as string | undefined;
-    const clerkJSVersion = (params as any)?.clerkJSVersion as string | undefined;
-    const clerkUIVersion = (params as any)?.clerkUIVersion as string | undefined;
+    const clerkJSUrl = (params as any)?.__internal_clerkJSUrl as string | undefined;
+    const clerkJSVersion = (params as any)?.__internal_clerkJSVersion as string | undefined;
+    const clerkUIUrl = (params as any)?.__internal_clerkUIUrl as string | undefined;
+    const clerkUIVersion = (params as any)?.__internal_clerkUIVersion as string | undefined;
     const prefetchUI = (params as any)?.prefetchUI as boolean | undefined;
     const hasUI = !!(params as any)?.ui;
 
@@ -60,6 +61,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 ...buildEnvVarFromOption(domain, 'PUBLIC_CLERK_DOMAIN'),
                 ...buildEnvVarFromOption(clerkJSUrl, 'PUBLIC_CLERK_JS_URL'),
                 ...buildEnvVarFromOption(clerkJSVersion, 'PUBLIC_CLERK_JS_VERSION'),
+                ...buildEnvVarFromOption(clerkUIUrl, 'PUBLIC_CLERK_UI_URL'),
                 ...buildEnvVarFromOption(clerkUIVersion, 'PUBLIC_CLERK_UI_VERSION'),
                 ...buildEnvVarFromOption(
                   prefetchUI === false || hasUI ? 'false' : undefined,

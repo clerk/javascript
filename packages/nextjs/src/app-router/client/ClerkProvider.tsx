@@ -1,6 +1,5 @@
 'use client';
-import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
-import type { Ui } from '@clerk/react/internal';
+import { InternalClerkProvider as ReactClerkProvider, type Ui } from '@clerk/react/internal';
 import { InitialStateProvider } from '@clerk/shared/react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';

@@ -33,7 +33,7 @@
 ### Prerequisites
 
 - Hono 4+
-- Node.js 20+
+- Node.js `>=20.9.0` or later
 
 ### Installation
 

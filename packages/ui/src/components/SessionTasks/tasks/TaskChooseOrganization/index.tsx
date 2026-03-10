@@ -25,7 +25,11 @@ const TaskChooseOrganizationInternal = () => {
     userSuggestions?.isLoading ||
     organizationCreationDefaults?.isLoading;
   const hasExistingResources = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
-  const isOrganizationCreationDisabled = !isLoading && !user?.createOrganizationEnabled && !hasExistingResources;
+  const isOrganizationCreationDisabled =
+    !isLoading &&
+    !user?.createOrganizationEnabled &&
+    user?.organizationMemberships?.length === 0 &&
+    !hasExistingResources;
 
   if (isOrganizationCreationDisabled) {
     return <OrganizationCreationDisabledScreen />;

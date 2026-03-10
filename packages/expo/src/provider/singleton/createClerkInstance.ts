@@ -1,6 +1,6 @@
-import { type Clerk, isClerkRuntimeError } from '@clerk/clerk-js';
+import { type Clerk } from '@clerk/clerk-js';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/react';
-import { is4xxError } from '@clerk/shared/error';
+import { is4xxError, isClerkRuntimeError } from '@clerk/shared/error';
 import type {
   ClientJSONSnapshot,
   EnvironmentJSONSnapshot,
@@ -18,6 +18,7 @@ import {
   SessionJWTCache,
 } from '../../cache';
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
+import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { errorThrower } from '../../errorThrower';
 import { isNative } from '../../utils';
 import type { BuildClerkOptions } from './types';
@@ -35,8 +36,6 @@ type FapiRequestInit = RequestInit & {
 type FapiResponse = Response & {
   payload: { errors?: Array<{ code: string }> } | null;
 };
-
-const KEY = '__clerk_client_jwt';
 
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
 
@@ -57,12 +56,12 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
     if (!__internal_clerk || hasKeyChanged) {
       if (hasKeyChanged) {
-        tokenCache.clearToken?.(KEY);
+        tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
       }
 
       const getToken = tokenCache.getToken;
       const saveToken = tokenCache.saveToken;
-      __internal_clerk = new ClerkClass(publishableKey);
+      __internal_clerk = new ClerkClass(publishableKey) as unknown as BrowserClerk;
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API
@@ -103,12 +102,13 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           return Promise.resolve(true);
         };
 
+        const isClerkNetworkError = (err: unknown): boolean => isClerkRuntimeError(err) && err.code === 'network_error';
+
         if (createResourceCache) {
           const retryInitilizeResourcesFromFAPI = async () => {
-            const isClerkNetworkError = (err: unknown) => isClerkRuntimeError(err) && err.code === 'network_error';
             try {
               await __internal_clerk?.__internal_reloadInitialResources();
-            } catch (err) {
+            } catch (err: unknown) {
               // Retry after 3 seconds if the error is a network error or a 5xx error
               if (isClerkNetworkError(err) || !is4xxError(err)) {
                 // Retry after 2 seconds if the error is a network error
@@ -168,7 +168,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         // Instructs the backend to parse the api token from the Authorization header.
         requestInit.url?.searchParams.append('_is_native', '1');
 
-        const jwt = await getToken(KEY);
+        const jwt = await getToken(CLERK_CLIENT_JWT_KEY);
         (requestInit.headers as Headers).set('authorization', jwt || '');
 
         // Instructs the backend that the request is from a mobile device.
@@ -184,10 +184,10 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       __internal_clerk.__internal_onAfterResponse(async (_: FapiRequestInit, response: FapiResponse) => {
         const authHeader = response.headers.get('authorization');
         if (authHeader) {
-          await saveToken(KEY, authHeader);
+          await saveToken(CLERK_CLIENT_JWT_KEY, authHeader);
         }
 
-        if (!nativeApiErrorShown && response.payload?.errors?.[0]?.code === 'native_api_disabled') {
+        if (__DEV__ && !nativeApiErrorShown && response.payload?.errors?.[0]?.code === 'native_api_disabled') {
           console.error(
             'The Native API is disabled for this instance.\nGo to Clerk Dashboard > Configure > Native applications to enable it.\nOr, navigate here: https://dashboard.clerk.com/last-active?path=native-applications',
           );
@@ -195,6 +195,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         }
       });
     }
+    // At this point __internal_clerk is guaranteed to be defined
     return __internal_clerk;
   };
 }

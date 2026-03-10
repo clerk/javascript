@@ -1,5 +1,4 @@
-import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
-import type { Ui } from '@clerk/react/internal';
+import { InternalClerkProvider as ReactClerkProvider, type Ui } from '@clerk/react/internal';
 import React from 'react';
 
 import {
@@ -93,10 +92,10 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
     signUpForceRedirectUrl: __signUpForceRedirectUrl,
     signInFallbackRedirectUrl: __signInFallbackRedirectUrl,
     signUpFallbackRedirectUrl: __signUpFallbackRedirectUrl,
-    clerkJSUrl: __clerkJSUrl,
-    clerkJSVersion: __clerkJSVersion,
-    clerkUIUrl: __clerkUIUrl,
-    clerkUIVersion: __clerkUIVersion,
+    __internal_clerkJSUrl: __clerkJSUrl,
+    __internal_clerkJSVersion: __clerkJSVersion,
+    __internal_clerkUIUrl: __clerkUIUrl,
+    __internal_clerkUIVersion: __clerkUIVersion,
     prefetchUI: __prefetchUI,
     telemetry: {
       disabled: __telemetryDisabled,

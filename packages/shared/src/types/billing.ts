@@ -159,7 +159,7 @@ export interface BillingPlanResource extends ClerkResource {
   /**
    * The monthly price of the Plan.
    */
-  fee: BillingMoneyAmount;
+  fee: BillingMoneyAmount | null;
   /**
    * The annual price of the Plan or `null` if the Plan is not annual.
    */
@@ -1034,8 +1034,7 @@ interface CheckoutFlowMethods {
 }
 
 /**
- * Public API type for checkout flow. Properties are null when status is 'needs_initialization'
- * and present when status is 'needs_confirmation' or 'completed'.
+ * @interface
  */
 export type CheckoutFlowResource = CheckoutPropertiesPerStatus & CheckoutFlowMethods;
 

@@ -3,9 +3,10 @@ import React from 'react';
 
 type ClerkScriptTagsProps = {
   publishableKey: string;
-  clerkJSUrl?: string;
-  clerkJSVersion?: string;
-  clerkUIUrl?: string;
+  __internal_clerkJSUrl?: string;
+  __internal_clerkJSVersion?: string;
+  __internal_clerkUIUrl?: string;
+  __internal_clerkUIVersion?: string;
   nonce?: string;
   domain?: string;
   proxyUrl?: string;
@@ -18,13 +19,24 @@ type ClerkScriptTagsProps = {
  * No hooks or client-only imports — safe for both server and client components.
  */
 export function ClerkScriptTags(props: ClerkScriptTagsProps) {
-  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkUIUrl, nonce, domain, proxyUrl, prefetchUI } = props;
+  const {
+    publishableKey,
+    __internal_clerkJSUrl,
+    __internal_clerkJSVersion,
+    __internal_clerkUIUrl,
+    __internal_clerkUIVersion,
+    nonce,
+    domain,
+    proxyUrl,
+    prefetchUI,
+  } = props;
 
   const opts = {
     publishableKey,
-    clerkJSUrl,
-    clerkJSVersion,
-    clerkUIUrl,
+    __internal_clerkJSUrl,
+    __internal_clerkJSVersion,
+    __internal_clerkUIUrl,
+    __internal_clerkUIVersion,
     nonce,
     domain,
     proxyUrl,

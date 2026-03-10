@@ -32,37 +32,25 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true
 
-      - name: Version packages for snapshot
-        run: npm run version-packages:snapshot ci
+      - name: Build packages
+        run: pnpm turbo build $TURBO_ARGS --only
 
-      - name: Verdaccio
-        uses: ./.github/actions/verdaccio
-        with:
-          publish-cmd: |
-            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag --tag latest; fi
-
-      - name: Install @clerk/backend in /integration
-        working-directory: ./integration
-        run: |
-          pnpm init
-          pnpm config set minimum-release-age-exclude @clerk/*
-          pnpm add @clerk/backend
+      - name: Publish to local registry
+        run: pkglab pub --force
 
       - name: Install @clerk/clerk-js in os temp
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-js && cd clerk-js
           pnpm init
-          pnpm config set minimum-release-age-exclude @clerk/*
-          pnpm add @clerk/clerk-js
+          pkglab add @clerk/clerk-js
 
       - name: Install @clerk/ui in os temp
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-ui && cd clerk-ui
           pnpm init
-          pnpm config set minimum-release-age-exclude @clerk/*
-          pnpm add @clerk/ui
+          pkglab add @clerk/ui
 
       - name: Run Integration Tests
         id: integration_tests
@@ -81,9 +69,7 @@ jobs:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
           # Don't set E2E_CLERK_JS_VERSION - let it use '*' (via linkPackage)
-          # which matches any version including snapshots from verdaccio.
-          # Using "latest" would fail since snapshot packages don't have
-          # the "latest" dist-tag, causing fallback to npm's stable version.
+          # which resolves via pkglab add in the integration test setup
           E2E_NEXTJS_VERSION: "canary"
           E2E_NPM_FORCE: "true"
           E2E_REACT_DOM_VERSION: "19.2.3"

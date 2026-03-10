@@ -75,7 +75,7 @@ Environment Configuration
 
 - Supports multiple Clerk environment variables (CLERK*\*, NEXT_PUBLIC_CLERK*\*, etc.)
 - Development, staging, and production configurations
-- Verdaccio for local npm registry testing
+- pkglab for local npm registry testing
 - Docker support for integration testing
 - CI/CD with GitHub Actions
 

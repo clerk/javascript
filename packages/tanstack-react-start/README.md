@@ -33,10 +33,10 @@
 
 ### Prerequisites
 
-- Tanstack Start `^1.49.1` or later
-- Tanstack Router `^1.49.1` or later
+- TanStack Start `^1.157.0` or later
+- TanStack Router `^1.157.0` or later
 - React 18 or later
-- Node.js `>=18.17.0` or later
+- Node.js `>=20.9.0` or later
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_tanstack_react_start).
 
 ### Installation

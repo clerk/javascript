@@ -89,6 +89,7 @@ export interface EnvironmentJSON extends ClerkResourceJSON {
   display_config: DisplayConfigJSON;
   maintenance_mode: boolean;
   organization_settings: OrganizationSettingsJSON;
+  partitioned_cookies?: boolean;
   user_settings: UserSettingsJSON;
   protect_config: ProtectConfigJSON;
 }
@@ -605,7 +606,7 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   object: 'commerce_plan';
   id: string;
   name: string;
-  fee: BillingMoneyAmountJSON;
+  fee: BillingMoneyAmountJSON | null;
   annual_fee: BillingMoneyAmountJSON | null;
   annual_monthly_fee: BillingMoneyAmountJSON | null;
   description: string | null;

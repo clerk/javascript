@@ -87,6 +87,14 @@ const withEmailCodesQuickstart = withEmailCodes
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '');
 
 // Uses staging instance which runs Core 3
+const withAPCore3ClerkV5 = environmentConfig()
+  .setId('withAPCore3ClerkV5')
+  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
+  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk);
+
+// Uses staging instance which runs Core 3
 const withAPCore3ClerkV6 = environmentConfig()
   .setId('withAPCore3ClerkV6')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
@@ -127,6 +135,11 @@ const withWaitlistMode = withEmailCodes
   .setId('withWaitlistMode')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-waitlist-mode').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-waitlist-mode').pk);
+
+const withEmailCodesProxy = withEmailCodes
+  .clone()
+  .setId('withEmailCodesProxy')
+  .setEnvVariable('private', 'CLERK_PROXY_ENABLED', 'true');
 
 const withSignInOrUpFlow = withEmailCodes
   .clone()
@@ -206,6 +219,7 @@ export const envs = {
   sessionsProd1,
   withAPIKeys,
   withAPCore3ClerkLatest,
+  withAPCore3ClerkV5,
   withAPCore3ClerkV6,
   withBilling,
   withBillingJwtV2,
@@ -213,6 +227,7 @@ export const envs = {
   withDynamicKeys,
   withEmailCodes,
   withEmailCodes_destroy_client,
+  withEmailCodesProxy,
   withEmailCodesQuickstart,
   withEmailLinks,
   withKeyless,
