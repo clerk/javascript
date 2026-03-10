@@ -193,6 +193,7 @@ export type __internal_LocalizationResource = {
     switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
     billedAnnually: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
+    billedAnnuallyOnly: LocalizationValue;
     cancelFreeTrial: LocalizationValue<'plan'>;
     cancelFreeTrialTitle: LocalizationValue<'plan'>;
     cancelFreeTrialAccessUntil: LocalizationValue<'plan' | 'date'>;

@@ -159,7 +159,7 @@ export interface BillingPlanResource extends ClerkResource {
   /**
    * The monthly price of the Plan.
    */
-  fee: BillingMoneyAmount;
+  fee: BillingMoneyAmount | null;
   /**
    * The annual price of the Plan or `null` if the Plan is not annual.
    */
