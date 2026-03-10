@@ -273,8 +273,7 @@ jobs:
           retention-days: 5
 
   integration-tests:
-    # needs: [check-permissions, build-packages]
-    needs: [check-permissions]
+    needs: [check-permissions, build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
     permissions:
