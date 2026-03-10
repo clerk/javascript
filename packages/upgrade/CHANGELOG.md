@@ -1,5 +1,11 @@
 # @clerk/upgrade
 
+## 2.0.2
+
+### Patch Changes
+
+- fix(upgrade): Correct Core 3 upgrade guide docs URL ([#8014](https://github.com/clerk/javascript/pull/8014)) by [@manovotny](https://github.com/manovotny)
+
 ## 2.0.1
 
 ### Patch Changes
