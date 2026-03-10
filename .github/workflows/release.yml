@@ -73,6 +73,7 @@ jobs:
           NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
+        id: trigger
         if: steps.changesets.outputs.published == 'true'
         uses: actions/github-script@v7
         with:
@@ -113,6 +114,80 @@ jobs:
             } else{
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
             }
+
+      # Recovery: if the changesets action published to npm but then failed
+      # (e.g. git push --follow-tags error), the `published` output is never
+      # set and downstream repos are not notified. This step detects that
+      # scenario by checking npm for the local package version and dispatches
+      # if the packages are already live.
+      - name: Recover downstream notifications
+        if: always() && steps.changesets.conclusion == 'failure'
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          script: |
+            const { execSync } = require('child_process');
+
+            const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+
+            // Only recover stable releases
+            if (clerkjsVersion.includes('-')) {
+              console.log(`Skipping recovery: ${clerkjsVersion} is a pre-release`);
+              return;
+            }
+
+            // Check if this version was actually published to npm
+            let npmVersion;
+            try {
+              npmVersion = execSync(`npm view @clerk/clerk-js@${clerkjsVersion} version`, { encoding: 'utf8' }).trim();
+            } catch {
+              console.log(`Version ${clerkjsVersion} not found on npm, no recovery needed`);
+              return;
+            }
+
+            if (npmVersion !== clerkjsVersion) {
+              console.log(`Version mismatch: local=${clerkjsVersion}, npm=${npmVersion}`);
+              return;
+            }
+
+            core.warning(`Recovery: @clerk/clerk-js@${clerkjsVersion} was published to npm but downstream repos were not notified. Dispatching now.`);
+
+            const preMode = require("fs").existsSync("./.changeset/pre.json");
+            if (preMode) {
+              core.warning("Changeset in pre-mode, skipping recovery dispatch");
+              return;
+            }
+
+            const clerkUiVersion = require('./packages/ui/package.json').version;
+            const nextjsVersion = require('./packages/nextjs/package.json').version;
+
+            const dispatches = [
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerk',
+                repo: 'sdk-infra-workers',
+                workflow_id: 'update-pkg-versions.yml',
+                ref: 'main',
+                inputs: { clerkjsVersion, clerkUiVersion }
+              }),
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerk',
+                repo: 'dashboard',
+                workflow_id: 'prepare-nextjs-sdk-update.yml',
+                ref: 'main',
+                inputs: { version: nextjsVersion }
+              }),
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerk',
+                repo: 'clerk-docs',
+                workflow_id: 'typedoc.yml',
+                ref: 'main',
+              }),
+            ];
+            await Promise.all(dispatches);
+            core.notice('Recovery dispatch completed successfully');
 
       - name: Generate notification payload
         id: notification
