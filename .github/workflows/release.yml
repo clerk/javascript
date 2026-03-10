@@ -140,26 +140,28 @@ jobs:
               return;
             }
 
-            // Check if these versions were actually published to npm
-            const packagesToCheck = [
-              { name: '@clerk/clerk-js', version: clerkjsVersion },
-              { name: '@clerk/ui', version: clerkUiVersion },
-            ];
-
-            for (const { name, version } of packagesToCheck) {
+            // Check if either version was actually published to npm
+            function isPublished(name, version) {
               try {
-                const npmVersion = execSync(`npm view ${name}@${version} version`, { encoding: 'utf8' }).trim();
-                if (npmVersion !== version) {
-                  console.log(`${name}@${version} not published to npm, no recovery needed`);
-                  return;
-                }
+                return execSync(`npm view ${name}@${version} version`, { encoding: 'utf8' }).trim() === version;
               } catch {
-                console.log(`${name}@${version} not found on npm, no recovery needed`);
-                return;
+                return false;
               }
             }
 
-            core.warning(`Recovery: @clerk/clerk-js@${clerkjsVersion} and @clerk/ui@${clerkUiVersion} were published to npm but downstream repos were not notified. Dispatching now.`);
+            const clerkjsPublished = isPublished('@clerk/clerk-js', clerkjsVersion);
+            const clerkUiPublished = isPublished('@clerk/ui', clerkUiVersion);
+
+            if (!clerkjsPublished && !clerkUiPublished) {
+              console.log('Neither @clerk/clerk-js nor @clerk/ui were published to npm, no recovery needed');
+              return;
+            }
+
+            const published = [
+              clerkjsPublished && `@clerk/clerk-js@${clerkjsVersion}`,
+              clerkUiPublished && `@clerk/ui@${clerkUiVersion}`,
+            ].filter(Boolean).join(', ');
+            core.warning(`Recovery: ${published} published to npm but downstream repos were not notified. Dispatching now.`);
 
             const preMode = require("fs").existsSync("./.changeset/pre.json");
             if (preMode) {
