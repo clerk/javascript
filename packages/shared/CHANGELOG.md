@@ -1,5 +1,23 @@
 # Change Log
 
+## 3.47.2
+
+### Patch Changes
+
+- Remove CHIPS build variant and use `partitioned_cookies` environment flag from the Clerk API to control partitioned cookie behavior at runtime. ([#7946](https://github.com/clerk/javascript/pull/7946)) by [@brkalow](https://github.com/brkalow)
+
+## 3.47.1
+
+### Patch Changes
+
+- Don't display impersonation for agents ([#7934](https://github.com/clerk/javascript/pull/7934)) by [@tmilewski](https://github.com/tmilewski)
+
+## 3.47.0
+
+### Minor Changes
+
+- Add support for displaying proration and account credits on payment attempts and statements. ([#7885](https://github.com/clerk/javascript/pull/7885)) by [@dstaley](https://github.com/dstaley)
+
 ## 3.46.0
 
 ### Minor Changes

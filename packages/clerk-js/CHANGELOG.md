@@ -1,5 +1,51 @@
 # Change Log
 
+## 5.125.4
+
+### Patch Changes
+
+- Fix a crash in the Turnstile CAPTCHA retry logic where captcha.reset() was called after the widget's DOM container had already been removed, causing an unhandled error ([#7957](https://github.com/clerk/javascript/pull/7957)) by [@tmilewski](https://github.com/tmilewski)
+
+## 5.125.3
+
+### Patch Changes
+
+- Add debug logging to detect session token swaps in multi-session scenarios ([#7945](https://github.com/clerk/javascript/pull/7945)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove CHIPS build variant and use `partitioned_cookies` environment flag from the Clerk API to control partitioned cookie behavior at runtime. ([#7946](https://github.com/clerk/javascript/pull/7946)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`7955e9d`](https://github.com/clerk/javascript/commit/7955e9dd90419c02fd51226d4fe335d42e7096a5)]:
+  - @clerk/shared@3.47.2
+  - @clerk/localizations@3.37.2
+
+## 5.125.2
+
+### Patch Changes
+
+- Don't display impersonation for agents ([#7934](https://github.com/clerk/javascript/pull/7934)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`8a0c404`](https://github.com/clerk/javascript/commit/8a0c404d05a88697fcc3a609fef25bd5ff9f9ef0)]:
+  - @clerk/shared@3.47.1
+  - @clerk/localizations@3.37.1
+
+## 5.125.1
+
+### Patch Changes
+
+- Fix "You must belong to an organization" screen showing after accepting an organization invitation ([#7921](https://github.com/clerk/javascript/pull/7921)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 5.125.0
+
+### Minor Changes
+
+- Add support for displaying proration and account credits on payment attempts and statements. ([#7885](https://github.com/clerk/javascript/pull/7885)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`c00c524`](https://github.com/clerk/javascript/commit/c00c5246f340cf0339c5725cade90cfcd118727d)]:
+  - @clerk/localizations@3.37.0
+  - @clerk/shared@3.47.0
+
 ## 5.124.0
 
 ### Minor Changes

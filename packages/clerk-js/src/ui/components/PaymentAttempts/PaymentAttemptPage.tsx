@@ -233,14 +233,26 @@ function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: BillingSub
             text={`${subscriptionItem.amount?.currencySymbol}${subscriptionItem.amount?.amountFormatted}`}
           />
         </LineItems.Group>
-        {subscriptionItem.credit && subscriptionItem.credit.amount.amount > 0 && (
-          <LineItems.Group variant='tertiary'>
-            <LineItems.Title title={localizationKeys('billing.credit')} />
-            <LineItems.Description
-              text={`- ${subscriptionItem.credit.amount.currencySymbol}${subscriptionItem.credit.amount.amountFormatted}`}
-            />
-          </LineItems.Group>
-        )}
+        {subscriptionItem.credits &&
+          subscriptionItem.credits.proration &&
+          subscriptionItem.credits.proration.amount.amount > 0 && (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title title={localizationKeys('billing.prorationCredit')} />
+              <LineItems.Description
+                text={`- ${subscriptionItem.credits.proration.amount.currencySymbol}${subscriptionItem.credits.proration.amount.amountFormatted}`}
+              />
+            </LineItems.Group>
+          )}
+        {subscriptionItem.credits &&
+          subscriptionItem.credits.payer &&
+          subscriptionItem.credits.payer.appliedAmount.amount > 0 && (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title title={localizationKeys('billing.accountCredit')} />
+              <LineItems.Description
+                text={`- ${subscriptionItem.credits.payer.appliedAmount.currencySymbol}${subscriptionItem.credits.payer.appliedAmount.amountFormatted}`}
+              />
+            </LineItems.Group>
+          )}
       </LineItems.Root>
     </Box>
   );

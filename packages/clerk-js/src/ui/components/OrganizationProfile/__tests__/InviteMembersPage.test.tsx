@@ -155,7 +155,7 @@ describe('InviteMembersPage', () => {
         { wrapper },
       );
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
-      await userEvent.click(getByRole('button', { name: /mydefaultrole/i }));
+      await waitFor(() => expect(getByRole('button', { name: /mydefaultrole/i })).toBeInTheDocument());
     });
 
     it("initializes if there's only one role available", async () => {

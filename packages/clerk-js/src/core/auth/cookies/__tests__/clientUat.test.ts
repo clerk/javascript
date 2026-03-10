@@ -19,6 +19,7 @@ describe('createClientUatCookie', () => {
   const mockCookieSuffix = 'test-suffix';
   const mockExpires = new Date('2024-12-31');
   const mockDomain = 'test.domain';
+  const defaultOptions = { usePartitionedCookies: () => false };
   const mockSet = vi.fn();
   const mockRemove = vi.fn();
   const mockGet = vi.fn();
@@ -39,14 +40,14 @@ describe('createClientUatCookie', () => {
   });
 
   it('should create both suffixed and non-suffixed cookie handlers', () => {
-    createClientUatCookie(mockCookieSuffix);
+    createClientUatCookie(mockCookieSuffix, defaultOptions);
     expect(createCookieHandler).toHaveBeenCalledTimes(2);
     expect(createCookieHandler).toHaveBeenCalledWith('__client_uat');
     expect(createCookieHandler).toHaveBeenCalledWith('__client_uat_test-suffix');
   });
 
   it('should set cookies with correct parameters in non-cross-origin context', () => {
-    const cookieHandler = createClientUatCookie(mockCookieSuffix);
+    const cookieHandler = createClientUatCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set({
       id: 'test-client',
       updatedAt: new Date('2024-01-01'),
@@ -65,7 +66,7 @@ describe('createClientUatCookie', () => {
 
   it('should set cookies with None sameSite in cross-origin context', () => {
     (inCrossOriginIframe as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    const cookieHandler = createClientUatCookie(mockCookieSuffix);
+    const cookieHandler = createClientUatCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set({
       id: 'test-client',
       updatedAt: new Date('2024-01-01'),
@@ -82,7 +83,7 @@ describe('createClientUatCookie', () => {
   });
 
   it('should set value to 0 when client is undefined', () => {
-    const cookieHandler = createClientUatCookie(mockCookieSuffix);
+    const cookieHandler = createClientUatCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set(undefined);
 
     expect(mockSet).toHaveBeenCalledWith('0', {
@@ -95,7 +96,7 @@ describe('createClientUatCookie', () => {
   });
 
   it('should set value to 0 when client has no signed in sessions', () => {
-    const cookieHandler = createClientUatCookie(mockCookieSuffix);
+    const cookieHandler = createClientUatCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set({
       id: 'test-client',
       updatedAt: new Date('2024-01-01'),
@@ -114,7 +115,7 @@ describe('createClientUatCookie', () => {
   it('should get cookie value from suffixed cookie first, then fallback to non-suffixed', () => {
     mockGet.mockImplementationOnce(() => '1234567890').mockImplementationOnce(() => '9876543210');
 
-    const cookieHandler = createClientUatCookie(mockCookieSuffix);
+    const cookieHandler = createClientUatCookie(mockCookieSuffix, defaultOptions);
     const result = cookieHandler.get();
 
     expect(result).toBe(1234567890);
@@ -123,7 +124,7 @@ describe('createClientUatCookie', () => {
   it('should return 0 when no cookie value is present', () => {
     mockGet.mockImplementationOnce(() => undefined).mockImplementationOnce(() => undefined);
 
-    const cookieHandler = createClientUatCookie(mockCookieSuffix);
+    const cookieHandler = createClientUatCookie(mockCookieSuffix, defaultOptions);
     const result = cookieHandler.get();
 
     expect(result).toBe(0);
@@ -131,7 +132,7 @@ describe('createClientUatCookie', () => {
 
   it('should set cookies with SameSite=None when the host requires it', () => {
     (requiresSameSiteNone as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    const cookieHandler = createClientUatCookie(mockCookieSuffix);
+    const cookieHandler = createClientUatCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set({
       id: 'test-client',
       updatedAt: new Date('2024-01-01'),
@@ -144,6 +145,23 @@ describe('createClientUatCookie', () => {
       sameSite: 'None',
       secure: true,
       partitioned: false,
+    });
+  });
+
+  it('should set partitioned cookies when usePartitionedCookies returns true', () => {
+    const cookieHandler = createClientUatCookie(mockCookieSuffix, { usePartitionedCookies: () => true });
+    cookieHandler.set({
+      id: 'test-client',
+      updatedAt: new Date('2024-01-01'),
+      signedInSessions: ['session1'],
+    });
+
+    expect(mockSet).toHaveBeenCalledWith('1704067200', {
+      domain: mockDomain,
+      expires: mockExpires,
+      sameSite: 'None',
+      secure: true,
+      partitioned: true,
     });
   });
 });

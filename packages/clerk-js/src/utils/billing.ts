@@ -18,7 +18,7 @@ export const billingMoneyAmountFromJSON = (data: BillingMoneyAmountJSON): Billin
   };
 };
 
-const billingCreditsFromJSON = (data: BillingCreditsJSON): BillingCredits => {
+export const billingCreditsFromJSON = (data: BillingCreditsJSON): BillingCredits => {
   return {
     proration: data.proration
       ? {
