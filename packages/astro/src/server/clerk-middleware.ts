@@ -16,7 +16,7 @@ import {
   TokenType,
 } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
-import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { handleNetlifyCacheHeaders } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import { handleValueOrFn } from '@clerk/shared/utils';
@@ -121,14 +121,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       createAuthenticateRequestOptions(clerkRequest, keylessOptions, context),
     );
 
+    handleNetlifyCacheHeaders(requestState);
+
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
-      handleNetlifyCacheInDevInstance({
-        locationHeader,
-        requestStateHeaders: requestState.headers,
-        publishableKey: requestState.publishableKey,
-      });
-
       const res = new Response(null, { status: 307, headers: requestState.headers });
       return decorateResponseWithObservabilityHeaders(res, requestState);
     } else if (requestState.status === AuthStatus.Handshake) {

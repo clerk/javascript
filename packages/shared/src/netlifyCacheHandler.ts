@@ -29,19 +29,45 @@ function isNetlifyRuntime(): boolean {
 }
 
 /**
- * Prevents infinite redirects in Netlify's functions by adding a cache bust parameter
- * to the original redirect URL. This ensures that Netlify doesn't serve a cached response
- * during the handshake flow.
+ * Applies Netlify-specific cache headers to the request state.
  *
- * The issue happens only on Clerk development instances running on Netlify. This is
- * a workaround until we find a better solution.
- *
- * See https://answers.netlify.com/t/cache-handling-recommendation-for-authentication-handshake-redirects/143969/1.
+ * When running on Netlify, this function:
+ * 1. Sets `Netlify-Vary: cookie=__client_uat,cookie=__session` to instruct Netlify's CDN
+ *    to create separate cache entries based on auth cookie values, preventing cached auth
+ *    state from bleeding across users/sessions.
+ * 2. For development instances with a redirect (Location header), adds a cache-bust query
+ *    parameter to prevent Netlify from serving cached responses during the handshake flow.
  *
  * @internal
  */
+export function handleNetlifyCacheHeaders(requestState: { headers: Headers; publishableKey: string }): void {
+  if (!isNetlifyRuntime()) {
+    return;
+  }
+
+  const { headers, publishableKey } = requestState;
+
+  // Tell Netlify CDN to vary cache by auth cookie values (all instances, dev + prod)
+  headers.set('Netlify-Vary', 'cookie=__client_uat,cookie=__session');
+
+  // Add cache-bust param to redirect URL for dev instances to prevent cached redirects
+  const locationHeader = headers.get('Location');
+  if (locationHeader && isDevelopmentFromPublishableKey(publishableKey)) {
+    const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
+    if (!hasHandshakeQueryParam) {
+      const url = new URL(locationHeader);
+      url.searchParams.append(CLERK_NETLIFY_CACHE_BUST_PARAM, Date.now().toString());
+      headers.set('Location', url.toString());
+    }
+  }
+}
+
+/**
+ * @deprecated Use `handleNetlifyCacheHeaders` instead.
+ * @internal
+ */
 export function handleNetlifyCacheInDevInstance({
-  locationHeader,
+  locationHeader: _locationHeader,
   requestStateHeaders,
   publishableKey,
 }: {
@@ -49,17 +75,5 @@ export function handleNetlifyCacheInDevInstance({
   requestStateHeaders: Headers;
   publishableKey: string;
 }) {
-  const isOnNetlify = isNetlifyRuntime();
-  const isDevelopmentInstance = isDevelopmentFromPublishableKey(publishableKey);
-
-  if (isOnNetlify && isDevelopmentInstance) {
-    const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
-    // If location header is the original URL before the handshake flow, add cache bust param
-    // The param should be removed in clerk-js
-    if (!hasHandshakeQueryParam) {
-      const url = new URL(locationHeader);
-      url.searchParams.append(CLERK_NETLIFY_CACHE_BUST_PARAM, Date.now().toString());
-      requestStateHeaders.set('Location', url.toString());
-    }
-  }
+  handleNetlifyCacheHeaders({ headers: requestStateHeaders, publishableKey });
 }

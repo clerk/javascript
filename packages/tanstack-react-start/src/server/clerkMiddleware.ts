@@ -1,6 +1,6 @@
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
-import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { handleNetlifyCacheHeaders } from '@clerk/shared/netlifyCacheHandler';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { AnyRequestMiddleware } from '@tanstack/react-start';
 import { createMiddleware } from '@tanstack/react-start';
@@ -48,13 +48,10 @@ export const clerkMiddleware = (
       acceptsToken: 'any',
     });
 
+    handleNetlifyCacheHeaders(requestState);
+
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
-      handleNetlifyCacheInDevInstance({
-        locationHeader,
-        requestStateHeaders: requestState.headers,
-        publishableKey: requestState.publishableKey,
-      });
       // Trigger a handshake redirect
       // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw new Response(null, { status: 307, headers: requestState.headers });

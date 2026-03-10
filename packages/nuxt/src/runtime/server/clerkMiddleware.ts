@@ -1,6 +1,6 @@
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { AuthStatus, constants, getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
-import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { handleNetlifyCacheHeaders } from '@clerk/shared/netlifyCacheHandler';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { EventHandler } from 'h3';
 import { createError, eventHandler, setResponseHeader } from 'h3';
@@ -87,13 +87,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       acceptsToken: 'any',
     });
 
+    handleNetlifyCacheHeaders(requestState);
+
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
-      handleNetlifyCacheInDevInstance({
-        locationHeader,
-        requestStateHeaders: requestState.headers,
-        publishableKey: requestState.publishableKey,
-      });
       // Trigger a handshake redirect
       return new Response(null, { status: 307, headers: requestState.headers });
     }

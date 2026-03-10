@@ -1,7 +1,7 @@
 import type { AuthObject } from '@clerk/backend';
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
-import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { handleNetlifyCacheHeaders } from '@clerk/shared/netlifyCacheHandler';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { MiddlewareFunction } from 'react-router';
 import { createContext } from 'react-router';
@@ -88,13 +88,10 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       __keylessApiKeysUrl,
     });
 
+    handleNetlifyCacheHeaders(requestState);
+
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
-      handleNetlifyCacheInDevInstance({
-        locationHeader,
-        requestStateHeaders: requestState.headers,
-        publishableKey: requestState.publishableKey,
-      });
       // Trigger a handshake redirect
       return new Response(null, { status: 307, headers: requestState.headers });
     }
