@@ -46,6 +46,15 @@ export function testAgainstRunningApps(runningAppsParams: RunningAppsParams) {
     test.describe(title, () => {
       runningApps(runningAppsParams).forEach(app => {
         test.describe(`${app.name}`, () => {
+          test.beforeAll(async () => {
+            // Workers may block waiting for another worker to finish initializing
+            // an app, so allow up to 5 minutes for the lock + init sequence.
+            test.setTimeout(300_000);
+            // Lazy init: starts the app if it's not already running.
+            // Uses file-based locking so only one worker initializes each app.
+            await app.init();
+          });
+
           cb({ app });
         });
       });
