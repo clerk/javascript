@@ -253,12 +253,11 @@ jobs:
           script: |
             const commentCreated = new Date(context.payload.comment.created_at);
 
-            const pr = await github.rest.pulls.get({
+            const { data: pr } = await github.rest.pulls.get({
               owner: 'clerk',
               repo: 'javascript',
               pull_number: context.issue.number,
             });
-
             const prLastUpdated = new Date(pr.updated_at);
 
             if (prLastUpdated > commentCreated) {
