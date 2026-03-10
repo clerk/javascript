@@ -145,48 +145,21 @@ export function UserButton(_props: UserButtonProps) {
         const preCheck = (await ClerkExpo.getSession()) as NativeSessionResult | null;
         hadNativeSessionBefore = !!(preCheck?.sessionId || preCheck?.session?.id);
 
-        if (__DEV__) {
-          console.log('[UserButton] handlePress - preCheck:', JSON.stringify(preCheck));
-          console.log('[UserButton] handlePress - hadNativeSessionBefore:', hadNativeSessionBefore);
-        }
-
         if (!hadNativeSessionBefore) {
           const bearerToken = (await tokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
-          if (__DEV__) {
-            console.log(
-              '[UserButton] handlePress - bearerToken:',
-              bearerToken ? `present(${bearerToken.length} chars)` : 'null',
-            );
-          }
           if (bearerToken) {
-            if (__DEV__) {
-              console.log('[UserButton] handlePress - calling configure()...');
-            }
             await ClerkExpo.configure(clerk.publishableKey, bearerToken);
-            if (__DEV__) {
-              console.log('[UserButton] handlePress - configure() done');
-            }
 
             // Re-check if configure produced a session
             const postConfigure = (await ClerkExpo.getSession()) as NativeSessionResult | null;
             hadNativeSessionBefore = !!(postConfigure?.sessionId || postConfigure?.session?.id);
-            if (__DEV__) {
-              console.log('[UserButton] handlePress - post-configure session:', JSON.stringify(postConfigure));
-              console.log('[UserButton] handlePress - hadNativeSessionBefore (updated):', hadNativeSessionBefore);
-            }
           }
         }
       }
 
-      if (__DEV__) {
-        console.log('[UserButton] handlePress - calling presentUserProfile()...');
-      }
       await ClerkExpo.presentUserProfile({
         dismissable: true,
       });
-      if (__DEV__) {
-        console.log('[UserButton] handlePress - presentUserProfile() returned');
-      }
 
       // Check if native session still exists after modal closes.
       // Only sign out the JS SDK if the native SDK HAD a session before the modal
@@ -194,20 +167,8 @@ export function UserButton(_props: UserButtonProps) {
       // If native never had a session (e.g. force refresh didn't work), don't sign out JS.
       const sessionCheck = (await ClerkExpo.getSession?.()) as NativeSessionResult | null;
       const hasNativeSession = !!(sessionCheck?.sessionId || sessionCheck?.session?.id);
-      if (__DEV__) {
-        console.log('[UserButton] handlePress - post-modal sessionCheck:', JSON.stringify(sessionCheck));
-        console.log(
-          '[UserButton] handlePress - hasNativeSession:',
-          hasNativeSession,
-          'hadBefore:',
-          hadNativeSessionBefore,
-        );
-      }
 
       if (!hasNativeSession && hadNativeSessionBefore) {
-        if (__DEV__) {
-          console.log('[UserButton] handlePress - native session LOST during modal, signing out JS SDK');
-        }
         // Clear local state immediately for instant UI feedback
         setNativeUser(null);
 
@@ -229,14 +190,6 @@ export function UserButton(_props: UserButtonProps) {
               console.warn('[UserButton] JS SDK signOut error:', e);
             }
           }
-        }
-      } else if (!hasNativeSession) {
-        if (__DEV__) {
-          console.log('[UserButton] handlePress - native never had session, NOT signing out JS SDK');
-        }
-      } else {
-        if (__DEV__) {
-          console.log('[UserButton] handlePress - native session still exists, keeping JS SDK signed in');
         }
       }
     } catch (error) {

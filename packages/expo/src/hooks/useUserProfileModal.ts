@@ -77,65 +77,28 @@ export function useUserProfileModal(): UseUserProfileModalReturn {
         const preCheck = (await ClerkExpo.getSession()) as NativeSessionResult | null;
         hadNativeSessionBefore = !!(preCheck?.sessionId || preCheck?.session?.id);
 
-        if (__DEV__) {
-          console.log('[useUserProfileModal] preCheck:', JSON.stringify(preCheck));
-          console.log('[useUserProfileModal] hadNativeSessionBefore:', hadNativeSessionBefore);
-        }
-
         if (!hadNativeSessionBefore) {
           const bearerToken = (await tokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
-          if (__DEV__) {
-            console.log(
-              '[useUserProfileModal] bearerToken:',
-              bearerToken ? `present(${bearerToken.length} chars)` : 'null',
-            );
-          }
           if (bearerToken) {
-            if (__DEV__) {
-              console.log('[useUserProfileModal] calling configure()...');
-            }
             await ClerkExpo.configure(clerk.publishableKey, bearerToken);
-            if (__DEV__) {
-              console.log('[useUserProfileModal] configure() done');
-            }
 
             // Re-check if configure produced a session
             const postConfigure = (await ClerkExpo.getSession()) as NativeSessionResult | null;
             hadNativeSessionBefore = !!(postConfigure?.sessionId || postConfigure?.session?.id);
-            if (__DEV__) {
-              console.log('[useUserProfileModal] post-configure session:', JSON.stringify(postConfigure));
-            }
           }
         }
       }
 
-      if (__DEV__) {
-        console.log('[useUserProfileModal] calling presentUserProfile()...');
-      }
       await ClerkExpo.presentUserProfile({
         dismissable: true,
       });
-      if (__DEV__) {
-        console.log('[useUserProfileModal] presentUserProfile() returned');
-      }
 
       // Only sign out the JS SDK if native HAD a session before the modal
       // and now it's gone (user signed out from within native UI).
       const sessionCheck = (await ClerkExpo.getSession?.()) as NativeSessionResult | null;
       const hasNativeSession = !!(sessionCheck?.sessionId || sessionCheck?.session?.id);
-      if (__DEV__) {
-        console.log(
-          '[useUserProfileModal] post-modal:',
-          JSON.stringify(sessionCheck),
-          'hadBefore:',
-          hadNativeSessionBefore,
-        );
-      }
 
       if (!hasNativeSession && hadNativeSessionBefore) {
-        if (__DEV__) {
-          console.log('[useUserProfileModal] native session LOST during modal, signing out');
-        }
         try {
           await ClerkExpo.signOut?.();
         } catch (e) {
@@ -153,8 +116,6 @@ export function useUserProfileModal(): UseUserProfileModalReturn {
             }
           }
         }
-      } else if (__DEV__ && !hasNativeSession) {
-        console.log('[useUserProfileModal] native never had session, NOT signing out JS SDK');
       }
     } catch (error) {
       if (__DEV__) {
