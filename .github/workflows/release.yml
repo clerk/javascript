@@ -84,28 +84,29 @@ jobs:
               const clerkUiVersion = require('./packages/ui/package.json').version;
               const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerk',
-                repo: 'sdk-infra-workers',
-                workflow_id: 'update-pkg-versions.yml',
-                ref: 'main',
-                inputs: { clerkjsVersion, clerkUiVersion }
-              })
-
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerk',
-                repo: 'dashboard',
-                workflow_id: 'prepare-nextjs-sdk-update.yml',
-                ref: 'main',
-                inputs: { version: nextjsVersion }
-              })
-
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerk',
-                repo: 'clerk-docs',
-                workflow_id: 'typedoc.yml',
-                ref: 'main',
-              })
+              const dispatches = [
+                github.rest.actions.createWorkflowDispatch({
+                  owner: 'clerk',
+                  repo: 'sdk-infra-workers',
+                  workflow_id: 'update-pkg-versions.yml',
+                  ref: 'main',
+                  inputs: { clerkjsVersion, clerkUiVersion }
+                }),
+                github.rest.actions.createWorkflowDispatch({
+                  owner: 'clerk',
+                  repo: 'dashboard',
+                  workflow_id: 'prepare-nextjs-sdk-update.yml',
+                  ref: 'main',
+                  inputs: { version: nextjsVersion }
+                }),
+                github.rest.actions.createWorkflowDispatch({
+                  owner: 'clerk',
+                  repo: 'clerk-docs',
+                  workflow_id: 'typedoc.yml',
+                  ref: 'main',
+                }),
+              ];
+              await Promise.all(dispatches);
             } else{
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
             }
@@ -185,24 +186,30 @@ jobs:
             const clerkUiVersion = require('./packages/ui/package.json').version;
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-            github.rest.actions.createWorkflowDispatch({
-              owner: 'clerk',
-              repo: 'sdk-infra-workers',
-              workflow_id: 'update-pkg-versions.yml',
-              ref: 'main',
-              inputs: { clerkjsVersion, clerkUiVersion, sourceCommit: context.sha }
-            })
+            const dispatches = [
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerk',
+                repo: 'sdk-infra-workers',
+                workflow_id: 'update-pkg-versions.yml',
+                ref: 'main',
+                inputs: { clerkjsVersion, clerkUiVersion, sourceCommit: context.sha }
+              }),
+            ];
 
             if (nextjsVersion.includes('canary')) {
               console.log('clerk/nextjs changed, will notify clerk/accounts');
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerk',
-                repo: 'accounts',
-                workflow_id: 'release-staging.yml',
-                ref: 'main',
-                inputs: { version: nextjsVersion }
-              })
+              dispatches.push(
+                github.rest.actions.createWorkflowDispatch({
+                  owner: 'clerk',
+                  repo: 'accounts',
+                  workflow_id: 'release-staging.yml',
+                  ref: 'main',
+                  inputs: { version: nextjsVersion }
+                }),
+              );
             }
+
+            await Promise.all(dispatches);
 
   snapshot-release:
     name: Snapshot release
