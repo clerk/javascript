@@ -1,5 +1,17 @@
 # @clerk/ui
 
+## 1.2.0
+
+### Minor Changes
+
+- Add support for annual-only Billing plans. ([#8012](https://github.com/clerk/javascript/pull/8012)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`3e63793`](https://github.com/clerk/javascript/commit/3e637932b1b7af669955f0e4f86233106f7d18ef)]:
+  - @clerk/localizations@4.2.0
+  - @clerk/shared@4.2.0
+
 ## 1.1.0
 
 ### Minor Changes
