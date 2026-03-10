@@ -27,6 +27,7 @@ export const ObjectType = {
   Cookies: 'cookies',
   Domain: 'domain',
   Email: 'email',
+  EnterpriseConnection: 'enterprise_connection',
   EmailAddress: 'email_address',
   ExternalAccount: 'external_account',
   FacebookAccount: 'facebook_account',
@@ -668,6 +669,19 @@ export interface UserDeletedJSON extends DeletedObjectJSON {
 export interface PaginatedResponseJSON {
   data: object[];
   total_count?: number;
+}
+
+export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.EnterpriseConnection;
+  name: string;
+  domains: string[];
+  organization_id: string | null;
+  active: boolean;
+  sync_user_attributes: boolean;
+  allow_subdomains: boolean;
+  disable_additional_identifications: boolean;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface SamlConnectionJSON extends ClerkResourceJSON {
