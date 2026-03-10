@@ -215,7 +215,7 @@ export const usePlansContext = () => {
       const subscription =
         sub ?? (plan ? activeOrUpcomingSubscriptionWithPlanPeriod(plan, selectedPlanPeriod) : undefined);
       let _selectedPlanPeriod = selectedPlanPeriod;
-      const isEligibleForSwitchToAnnual = Boolean(plan?.annualMonthlyFee);
+      const isEligibleForSwitchToAnnual = Boolean(plan?.annualMonthlyFee && !plan.isDefault);
 
       if (_selectedPlanPeriod === 'annual' && !isEligibleForSwitchToAnnual) {
         _selectedPlanPeriod = 'month';

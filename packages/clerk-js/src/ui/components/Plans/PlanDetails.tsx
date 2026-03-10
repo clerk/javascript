@@ -325,7 +325,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         </>
       </Flex>
 
-      {plan.annualMonthlyFee ? (
+      {plan.annualMonthlyFee && !plan.isDefault ? (
         <Box
           elementDescriptor={descriptors.planDetailPeriodToggle}
           sx={t => ({
