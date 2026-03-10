@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.125.5
+
+### Patch Changes
+
+- Fix issue where free plans had a monthly/annual toggle. ([#8031](https://github.com/clerk/javascript/pull/8031)) by [@dstaley](https://github.com/dstaley)
+
 ## 5.125.4
 
 ### Patch Changes
