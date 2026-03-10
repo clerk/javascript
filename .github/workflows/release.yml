@@ -125,6 +125,26 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CHANGELOG_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
+      - name: Notify Slack on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*:red_circle: Stable release failed*\n*Repo:* `${{ github.repository }}`\n*Workflow:* `${{ github.workflow }}`\n*Commit:* `${{ github.sha }}`\n*Triggered by:* `${{ github.actor }}`\n*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View logs>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SDK_SLACKER_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
   canary-release:
     name: Canary release
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
@@ -203,6 +223,26 @@ jobs:
                 inputs: { version: nextjsVersion }
               })
             }
+
+      - name: Notify Slack on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*:red_circle: Canary release failed*\n*Repo:* `${{ github.repository }}`\n*Workflow:* `${{ github.workflow }}`\n*Commit:* `${{ github.sha }}`\n*Triggered by:* `${{ github.actor }}`\n*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View logs>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SDK_SLACKER_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
   snapshot-release:
     name: Snapshot release
