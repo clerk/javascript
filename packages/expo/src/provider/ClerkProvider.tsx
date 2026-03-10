@@ -83,7 +83,14 @@ function NativeSessionSync({ publishableKey }: { publishableKey: string }) {
       try {
         const ClerkExpo = NativeClerkModule;
         if (!ClerkExpo?.configure || !ClerkExpo?.getSession) {
+          if (__DEV__) {
+            console.log('[NativeSessionSync] syncToNative - native module not available');
+          }
           return;
+        }
+
+        if (__DEV__) {
+          console.log('[NativeSessionSync] syncToNative - checking native session...');
         }
 
         // Check if native already has a session (e.g. auth via AuthView or initial load)
@@ -93,14 +100,34 @@ function NativeSessionSync({ publishableKey }: { publishableKey: string }) {
         } | null;
         const hasNativeSession = !!(nativeSession?.sessionId || nativeSession?.session?.id);
 
+        if (__DEV__) {
+          console.log('[NativeSessionSync] syncToNative - nativeSession:', JSON.stringify(nativeSession));
+          console.log('[NativeSessionSync] syncToNative - hasNativeSession:', hasNativeSession);
+        }
+
         if (hasNativeSession) {
+          if (__DEV__) {
+            console.log('[NativeSessionSync] syncToNative - native already has session, skipping');
+          }
           return;
         }
 
         // Read the JS SDK's client JWT and push it to the native SDK
         const bearerToken = (await defaultTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
+        if (__DEV__) {
+          console.log(
+            '[NativeSessionSync] syncToNative - bearerToken:',
+            bearerToken ? `present(${bearerToken.length} chars)` : 'null',
+          );
+        }
         if (bearerToken) {
+          if (__DEV__) {
+            console.log('[NativeSessionSync] syncToNative - calling configure()...');
+          }
           await ClerkExpo.configure(publishableKey, bearerToken);
+          if (__DEV__) {
+            console.log('[NativeSessionSync] syncToNative - configure() done');
+          }
         }
       } catch (error) {
         if (__DEV__) {
