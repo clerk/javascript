@@ -5,7 +5,6 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 
 import { useCreateOrganizationContext } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { useDevMode } from '../../hooks/useDevMode';
 import { CreateOrganizationForm } from './CreateOrganizationForm';
 
 export const CreateOrganizationPage = withCardStateProvider(() => {
@@ -13,7 +12,6 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
 
   const { mode, navigateAfterCreateOrganization, skipInvitationScreen } = useCreateOrganizationContext();
   const card = useCardState();
-  const { showDevModeNotice } = useDevMode();
 
   return (
     <Card.Root sx={t => ({ width: t.sizes.$108 })}>
