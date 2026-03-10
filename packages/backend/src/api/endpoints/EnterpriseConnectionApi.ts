@@ -68,6 +68,9 @@ export class EnterpriseConnectionAPI extends AbstractAPI {
       method: 'POST',
       path: basePath,
       bodyParams: params,
+      options: {
+        deepSnakecaseBodyParamKeys: true,
+      },
     });
   }
 
@@ -77,6 +80,9 @@ export class EnterpriseConnectionAPI extends AbstractAPI {
       method: 'PATCH',
       path: joinPaths(basePath, enterpriseConnectionId),
       bodyParams: params,
+      options: {
+        deepSnakecaseBodyParamKeys: true,
+      },
     });
   }
 
