@@ -400,6 +400,22 @@ const PeriodToggle = ({
   planPeriod: BillingSubscriptionPlanPeriod;
   setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
 }) => {
+  if (plan.isDefault) {
+    return (
+      <Text
+        elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
+        variant='caption'
+        colorScheme='secondary'
+        localizationKey={localizationKeys('billing.alwaysFree')}
+        sx={t => ({
+          justifySelf: 'flex-start',
+          alignSelf: 'center',
+          marginTop: t.space.$1,
+        })}
+      />
+    );
+  }
+
   if (plan.fee && plan.annualMonthlyFee) {
     return (
       <Box
@@ -423,9 +439,7 @@ const PeriodToggle = ({
         elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
         variant='caption'
         colorScheme='secondary'
-        localizationKey={
-          plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedAnnuallyOnly')
-        }
+        localizationKey={localizationKeys('billing.billedAnnuallyOnly')}
         sx={t => ({
           justifySelf: 'flex-start',
           alignSelf: 'center',
@@ -440,9 +454,7 @@ const PeriodToggle = ({
       elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
       variant='caption'
       colorScheme='secondary'
-      localizationKey={
-        plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedMonthlyOnly')
-      }
+      localizationKey={localizationKeys('billing.billedMonthlyOnly')}
       sx={t => ({
         justifySelf: 'flex-start',
         alignSelf: 'center',
