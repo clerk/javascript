@@ -1,5 +1,31 @@
 # @clerk/ui
 
+## 1.2.0
+
+### Minor Changes
+
+- Add support for annual-only Billing plans. ([#8012](https://github.com/clerk/javascript/pull/8012)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`3e63793`](https://github.com/clerk/javascript/commit/3e637932b1b7af669955f0e4f86233106f7d18ef)]:
+  - @clerk/localizations@4.2.0
+  - @clerk/shared@4.2.0
+
+## 1.1.0
+
+### Minor Changes
+
+- Prevent modification of immutable attributes in UserProfile ([#7931](https://github.com/clerk/javascript/pull/7931)) by [@dmoerner](https://github.com/dmoerner)
+
+- Remove remotely hosted code from new @clerk/ui package ([#7983](https://github.com/clerk/javascript/pull/7983)) by [@royanger](https://github.com/royanger)
+
+### Patch Changes
+
+- Updated dependencies [[`776ee1b`](https://github.com/clerk/javascript/commit/776ee1b3f3a576976b43352a93b6988340e83353), [`7fb870d`](https://github.com/clerk/javascript/commit/7fb870d37a8c153e9b0e6313b1d38ff53bc2f49b), [`e7a25e8`](https://github.com/clerk/javascript/commit/e7a25e8e5135346f62e4bccfb25ce1870597ad58), [`de089c5`](https://github.com/clerk/javascript/commit/de089c57efba7a1e4c4d8da416370c8ba4084ff6), [`09cb6d4`](https://github.com/clerk/javascript/commit/09cb6d4d45286cf4e657b880696bf0ff81a8a3e8)]:
+  - @clerk/shared@4.1.0
+  - @clerk/localizations@4.1.0
+
 ## 1.0.1
 
 ### Patch Changes

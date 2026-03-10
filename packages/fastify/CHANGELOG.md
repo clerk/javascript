@@ -1,5 +1,25 @@
 # Change Log
 
+## 3.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`3e63793`](https://github.com/clerk/javascript/commit/3e637932b1b7af669955f0e4f86233106f7d18ef)]:
+  - @clerk/backend@3.1.0
+  - @clerk/shared@4.2.0
+
+## 3.1.0
+
+### Minor Changes
+
+- Add Frontend API proxy support to `@clerk/fastify` via the `frontendApiProxy` option on `clerkPlugin`. When enabled, requests matching the proxy path (default `/__clerk`) are forwarded to Clerk's Frontend API, allowing Clerk to work in environments where direct API access is blocked by ad blockers or firewalls. The `proxyUrl` for auth handshake is automatically derived from the request when `frontendApiProxy` is configured. ([#7994](https://github.com/clerk/javascript/pull/7994)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+### Patch Changes
+
+- Updated dependencies [[`a8c64cc`](https://github.com/clerk/javascript/commit/a8c64cce3735483230d785fbd916859cb630f752), [`776ee1b`](https://github.com/clerk/javascript/commit/776ee1b3f3a576976b43352a93b6988340e83353), [`7fb870d`](https://github.com/clerk/javascript/commit/7fb870d37a8c153e9b0e6313b1d38ff53bc2f49b), [`09cb6d4`](https://github.com/clerk/javascript/commit/09cb6d4d45286cf4e657b880696bf0ff81a8a3e8), [`09088ed`](https://github.com/clerk/javascript/commit/09088edeba8eaa299130f52e6aa26f2b2771e7e3)]:
+  - @clerk/backend@3.0.2
+  - @clerk/shared@4.1.0
+
 ## 3.0.1
 
 ### Patch Changes
