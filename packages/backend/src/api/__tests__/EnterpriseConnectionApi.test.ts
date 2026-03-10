@@ -14,13 +14,14 @@ describe('EnterpriseConnectionAPI', () => {
     object: 'enterprise_connection',
     id: 'entconn_123',
     name: 'Clerk',
-    provider: 'saml_custom',
     domains: ['clerk.dev'],
     organization_id: null,
     created_at: 1672531200000,
     updated_at: 1672531200000,
     active: true,
     sync_user_attributes: false,
+    allow_subdomains: false,
+    disable_additional_identifications: false,
   };
 
   describe('createEnterpriseConnection', () => {
@@ -118,6 +119,81 @@ describe('EnterpriseConnectionAPI', () => {
           idpMetadataUrl: 'https://updated.example.com/metadata',
         },
       });
+    });
+  });
+
+  describe('getEnterpriseConnectionList', () => {
+    it('successfully fetches enterprise connections with query params in snake_case', async () => {
+      const mockListResponse = {
+        data: [mockEnterpriseConnectionResponse],
+        total_count: 1,
+      };
+
+      let capturedRequestUrl: string | null = null;
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/enterprise_connections',
+          validateHeaders(({ request }) => {
+            capturedRequestUrl = request.url;
+            return HttpResponse.json(mockListResponse);
+          }),
+        ),
+      );
+
+      const response = await apiClient.enterpriseConnections.getEnterpriseConnectionList({
+        organizationId: 'org_123',
+        active: true,
+        limit: 10,
+        offset: 5,
+      });
+
+      expect(capturedRequestUrl).toBeTruthy();
+      const url = new URL(capturedRequestUrl!);
+      expect(url.searchParams.get('organization_id')).toBe('org_123');
+      expect(url.searchParams.get('active')).toBe('true');
+      expect(url.searchParams.get('limit')).toBe('10');
+      expect(url.searchParams.get('offset')).toBe('5');
+
+      expect(response.data).toHaveLength(1);
+      expect(response.data[0].id).toBe('entconn_123');
+      expect(response.data[0].name).toBe('Clerk');
+      expect(response.data[0].domains).toEqual(['clerk.dev']);
+      expect(response.totalCount).toBe(1);
+    });
+  });
+
+  describe('getEnterpriseConnection', () => {
+    it('successfully fetches a single enterprise connection', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/enterprise_connections/entconn_123',
+          validateHeaders(() => HttpResponse.json(mockEnterpriseConnectionResponse)),
+        ),
+      );
+
+      const response = await apiClient.enterpriseConnections.getEnterpriseConnection('entconn_123');
+
+      expect(response.id).toBe('entconn_123');
+      expect(response.name).toBe('Clerk');
+      expect(response.domains).toEqual(['clerk.dev']);
+      expect(response.active).toBe(true);
+      expect(response.organizationId).toBeNull();
+    });
+  });
+
+  describe('deleteEnterpriseConnection', () => {
+    it('successfully deletes an enterprise connection', async () => {
+      server.use(
+        http.delete(
+          'https://api.clerk.test/v1/enterprise_connections/entconn_123',
+          validateHeaders(() => HttpResponse.json(mockEnterpriseConnectionResponse)),
+        ),
+      );
+
+      const response = await apiClient.enterpriseConnections.deleteEnterpriseConnection('entconn_123');
+
+      expect(response.id).toBe('entconn_123');
+      expect(response.name).toBe('Clerk');
     });
   });
 });
