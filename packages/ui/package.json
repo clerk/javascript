@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Internal package that contains the UI components for the Clerk frontend SDKs",
   "repository": {
     "type": "git",
