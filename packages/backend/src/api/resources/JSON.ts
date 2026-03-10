@@ -682,6 +682,31 @@ export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
   disable_additional_identifications: boolean;
   created_at: number;
   updated_at: number;
+  saml_connection?: Pick<
+    SamlConnectionJSON,
+    | 'id'
+    | 'name'
+    | 'idp_entity_id'
+    | 'idp_sso_url'
+    | 'idp_certificate'
+    | 'idp_metadata_url'
+    | 'idp_metadata'
+    | 'acs_url'
+    | 'sp_entity_id'
+    | 'sp_metadata_url'
+    | 'sync_user_attributes'
+    | 'allow_subdomains'
+    | 'allow_idp_initiated'
+  >;
+  oauth_config?: {
+    id: string;
+    name: string;
+    client_id: string;
+    discovery_url: string;
+    logo_public_url: string;
+    created_at: number;
+    updated_at: number;
+  };
 }
 
 export interface SamlConnectionJSON extends ClerkResourceJSON {
