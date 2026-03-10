@@ -1,5 +1,20 @@
 # Change Log
 
+## 6.1.0
+
+### Minor Changes
+
+- Prevent modification of immutable attributes in UserProfile ([#7931](https://github.com/clerk/javascript/pull/7931)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Narrow the error conditions that trigger the unauthenticated flow (sign-out) to only high-confidence authentication failures (401, 422). Previously, all 4xx errors — including 429 rate limits — were treated as auth failures, which could sign users out during transient rate limiting. Non-auth errors from `setActive` now propagate to the caller instead of being silently swallowed. ([#8004](https://github.com/clerk/javascript/pull/8004)) by [@brkalow](https://github.com/brkalow)
+
+- Fix random sign-outs when the browser temporarily loses network connectivity. ([#7912](https://github.com/clerk/javascript/pull/7912)) by [@bratsos](https://github.com/bratsos)
+
+- Updated dependencies [[`776ee1b`](https://github.com/clerk/javascript/commit/776ee1b3f3a576976b43352a93b6988340e83353), [`7fb870d`](https://github.com/clerk/javascript/commit/7fb870d37a8c153e9b0e6313b1d38ff53bc2f49b), [`09cb6d4`](https://github.com/clerk/javascript/commit/09cb6d4d45286cf4e657b880696bf0ff81a8a3e8)]:
+  - @clerk/shared@4.1.0
+
 ## 6.0.0
 
 ### Major Changes

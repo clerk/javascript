@@ -99,4 +99,99 @@ describe('useInternalNavFun', () => {
       expect(routerNav).toHaveBeenCalledTimes(2);
     });
   });
+
+  it('resolves a single navigation promise without usePathname', async () => {
+    const routerNav = vi.fn();
+    render(<Harness routerNav={routerNav} />);
+
+    let promise!: Promise<void>;
+    act(() => {
+      promise = navigate('/dashboard');
+    });
+
+    await waitFor(() => {
+      expect(routerNav).toHaveBeenCalledWith('/dashboard');
+    });
+
+    // Promise resolves via isPending cycling alone — no usePathname needed
+    await expect(promise).resolves.toBeUndefined();
+  });
+
+  it('flushes pre-existing window buffer on mount', async () => {
+    const routerNav = vi.fn();
+
+    // Simulate promises left in the window buffer from a previous component instance
+    // (e.g., ClerkProvider unmounted during navigation — the core scenario from #2899)
+    let resolved1 = false;
+    let resolved2 = false;
+    window.__clerk_internal_navigations = {
+      push: {
+        promisesBuffer: [
+          () => {
+            resolved1 = true;
+          },
+          () => {
+            resolved2 = true;
+          },
+        ],
+      },
+    } as unknown as typeof window.__clerk_internal_navigations;
+
+    render(<Harness routerNav={routerNav} />);
+
+    // The mount effect should flush the pre-existing buffer
+    await waitFor(() => {
+      expect(resolved1).toBe(true);
+      expect(resolved2).toBe(true);
+    });
+  });
+
+  it('flushes pending promises on unmount', async () => {
+    const routerNav = vi.fn();
+    const { unmount } = render(<Harness routerNav={routerNav} />);
+
+    // Manually add resolvers to the buffer to simulate pending navigations
+    let resolved = false;
+    const nav = window.__clerk_internal_navigations.push;
+    nav.promisesBuffer = [
+      () => {
+        resolved = true;
+      },
+    ];
+
+    unmount();
+
+    // The useEffect cleanup should have flushed the promise buffer
+    expect(resolved).toBe(true);
+  });
+
+  it('uses history pushState for internal navigations', async () => {
+    const routerNav = vi.fn();
+    const mockWindowNav = vi.fn();
+
+    let internalNavigate: NavigationFunction | undefined;
+    const InternalHarness = () => {
+      internalNavigate = useInternalNavFun({
+        windowNav: mockWindowNav as typeof window.history.pushState,
+        routerNav: routerNav as any,
+        name: 'push',
+      });
+      return null;
+    };
+
+    render(<InternalHarness />);
+
+    act(() => {
+      internalNavigate!('/shallow-path', {
+        __internal_metadata: { navigationType: 'internal' },
+        windowNavigate: vi.fn(),
+      });
+    });
+
+    await waitFor(() => {
+      expect(mockWindowNav).toHaveBeenCalledWith(null, '', '/shallow-path');
+    });
+
+    expect(routerNav).not.toHaveBeenCalled();
+  });
 });

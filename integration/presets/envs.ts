@@ -136,6 +136,11 @@ const withWaitlistMode = withEmailCodes
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-waitlist-mode').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-waitlist-mode').pk);
 
+const withEmailCodesProxy = withEmailCodes
+  .clone()
+  .setId('withEmailCodesProxy')
+  .setEnvVariable('private', 'CLERK_PROXY_ENABLED', 'true');
+
 const withSignInOrUpFlow = withEmailCodes
   .clone()
   .setId('withSignInOrUpFlow')
@@ -222,6 +227,7 @@ export const envs = {
   withDynamicKeys,
   withEmailCodes,
   withEmailCodes_destroy_client,
+  withEmailCodesProxy,
   withEmailCodesQuickstart,
   withEmailLinks,
   withKeyless,

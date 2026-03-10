@@ -281,24 +281,26 @@ interface CardHeaderProps {
 
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref) => {
   const { plan, isCompact, planPeriod, setPlanPeriod, badge } = props;
-  const { name, annualMonthlyFee } = plan;
-
-  const planSupportsAnnual = Boolean(annualMonthlyFee);
+  const { name } = plan;
 
   const fee = React.useMemo(() => {
-    if (!planSupportsAnnual) {
+    if (!plan.annualMonthlyFee) {
       return plan.fee;
     }
 
-    return planPeriod === 'annual'
-      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        plan.annualMonthlyFee!
-      : plan.fee;
-  }, [planSupportsAnnual, planPeriod, plan.fee, plan.annualMonthlyFee]);
+    if (!plan.fee) {
+      return plan.annualFee;
+    }
+
+    return planPeriod === 'annual' ? plan.annualMonthlyFee : plan.fee;
+  }, [plan, planPeriod]);
 
   const feeFormatted = React.useMemo(() => {
-    return normalizeFormatted(fee.amountFormatted);
-  }, [fee.amountFormatted]);
+    if (!fee) {
+      return '';
+    }
+    return `${fee.currencySymbol}${normalizeFormatted(fee.amountFormatted)}`;
+  }, [fee]);
 
   return (
     <Box
@@ -361,7 +363,6 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           variant={isCompact ? 'h2' : 'h1'}
           colorScheme='body'
         >
-          {fee.currencySymbol}
           {feeFormatted}
         </Text>
         {!plan.isDefault ? (
@@ -376,42 +377,80 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
                 marginInlineEnd: t.space.$0x25,
               },
             })}
-            localizationKey={localizationKeys('billing.month')}
+            localizationKey={plan.fee ? localizationKeys('billing.month') : localizationKeys('billing.year')}
           />
         ) : null}
       </Flex>
 
-      {planSupportsAnnual && setPlanPeriod ? (
-        <Box
-          elementDescriptor={descriptors.pricingTableCardPeriodToggle}
-          sx={t => ({
-            marginTop: t.space.$1,
-          })}
-        >
-          <Switch
-            isChecked={planPeriod === 'annual'}
-            onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
-            label={localizationKeys('billing.billedAnnually')}
-          />
-        </Box>
-      ) : (
-        <Text
-          elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
-          variant='caption'
-          colorScheme='secondary'
-          localizationKey={
-            plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedMonthlyOnly')
-          }
-          sx={t => ({
-            justifySelf: 'flex-start',
-            alignSelf: 'center',
-            marginTop: t.space.$1,
-          })}
-        />
-      )}
+      <PeriodToggle
+        plan={plan}
+        planPeriod={planPeriod}
+        setPlanPeriod={setPlanPeriod}
+      />
     </Box>
   );
 });
+
+const PeriodToggle = ({
+  plan,
+  planPeriod,
+  setPlanPeriod,
+}: {
+  plan: BillingPlanResource;
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
+}) => {
+  if (plan.fee && plan.annualMonthlyFee) {
+    return (
+      <Box
+        elementDescriptor={descriptors.pricingTableCardPeriodToggle}
+        sx={t => ({
+          marginTop: t.space.$1,
+        })}
+      >
+        <Switch
+          isChecked={planPeriod === 'annual'}
+          onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
+          label={localizationKeys('billing.billedAnnually')}
+        />
+      </Box>
+    );
+  }
+
+  if (plan.annualMonthlyFee) {
+    return (
+      <Text
+        elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
+        variant='caption'
+        colorScheme='secondary'
+        localizationKey={
+          plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedAnnuallyOnly')
+        }
+        sx={t => ({
+          justifySelf: 'flex-start',
+          alignSelf: 'center',
+          marginTop: t.space.$1,
+        })}
+      />
+    );
+  }
+
+  return (
+    <Text
+      elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
+      variant='caption'
+      colorScheme='secondary'
+      localizationKey={
+        plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedMonthlyOnly')
+      }
+      sx={t => ({
+        justifySelf: 'flex-start',
+        alignSelf: 'center',
+        marginTop: t.space.$1,
+      })}
+    />
+  );
+};
 
 /* -------------------------------------------------------------------------------------------------
  * CardFeaturesList

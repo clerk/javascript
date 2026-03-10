@@ -45,7 +45,7 @@ export class BillingPlan {
     /**
      * The monthly fee of the Plan.
      */
-    readonly fee: BillingMoneyAmount,
+    readonly fee: BillingMoneyAmount | null,
     /**
      * The annual fee of the Plan.
      */

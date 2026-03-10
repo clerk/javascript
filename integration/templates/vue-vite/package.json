@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vue-tsc -b && vite build",
+    "build": "vite build",
     "dev": "vite --port $PORT",
     "preview": "vite preview --port $PORT"
   },

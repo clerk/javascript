@@ -323,5 +323,61 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       const userId = await userIdElement.textContent();
       expect(userId).toMatch(/^user_/);
     });
+
+    test('sign out completes and navigation promise resolves', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      // Sign in
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({
+        email: fakeUser.email,
+        password: fakeUser.password,
+      });
+      await u.po.expect.toBeSignedIn();
+
+      // Navigate to a non-root page to ensure post-sign-out navigation is a real route change
+      await u.page.goToRelative('/auth-server-component');
+      await expect(u.page.getByText('auth() in Server Component')).toBeVisible();
+
+      // Sign out by explicitly awaiting the full signOut() promise.
+      // Internally, signOut() calls: onBeforeSetActive (cache invalidation) →
+      // session removal → navigate(redirectUrl) via routerPush → useInternalNavFun →
+      // startTransition(() => router.push(to)).
+      // The navigate() call awaits the promise from useInternalNavFun.
+      // If isPending doesn't cycle (the concern from removing usePathname in #7989),
+      // the navigation promise hangs and this evaluate call times out.
+      await page.evaluate(async () => {
+        await window.Clerk.signOut();
+      });
+
+      await u.po.expect.toBeSignedOut();
+    });
+
+    test('protected route redirects to sign-in after sign out', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      // Sign in and access protected route
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({
+        email: fakeUser.email,
+        password: fakeUser.password,
+      });
+      await u.po.expect.toBeSignedIn();
+
+      await u.page.goToRelative('/protected');
+      await expect(u.page.getByText('Protected Route')).toBeVisible();
+
+      // Sign out
+      await page.evaluate(async () => {
+        await window.Clerk.signOut();
+      });
+
+      await u.po.expect.toBeSignedOut();
+
+      // Try to access protected route again — should redirect to sign-in
+      // This verifies cache invalidation worked correctly alongside navigation
+      await u.page.goToRelative('/protected');
+      await expect(page).toHaveURL(/sign-in/);
+    });
   },
 );
