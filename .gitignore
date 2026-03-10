@@ -91,6 +91,10 @@ sessions.pem
 # pkglab / Verdaccio local registry
 .verdaccio
 
+# yalc
+.yalc/
+yalc.lock
+
 # Release preflight
 .release-artifacts/
 

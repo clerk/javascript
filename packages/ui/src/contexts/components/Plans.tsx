@@ -328,7 +328,7 @@ export const usePlansContext = () => {
       clerk.__internal_openCheckout({
         planId: plan.id,
         // if the plan doesn't support annual, use monthly
-        planPeriod: planPeriod === 'annual' && !plan.annualMonthlyFee ? 'month' : planPeriod,
+        planPeriod: determinePlanPeriod(plan, planPeriod),
         for: subscriberType,
         onSubscriptionComplete: () => {
           revalidateAll();
@@ -364,3 +364,19 @@ export const usePlansContext = () => {
     revalidateAll,
   };
 };
+
+function determinePlanPeriod(plan: BillingPlanResource, period: BillingSubscriptionPlanPeriod) {
+  if ((period === 'month' && plan.fee) || (period === 'annual' && plan.annualMonthlyFee)) {
+    return period;
+  }
+
+  if (period === 'month' && !plan.fee) {
+    return 'annual';
+  }
+
+  if (period === 'annual' && !plan.annualMonthlyFee) {
+    return 'month';
+  }
+
+  return period;
+}
