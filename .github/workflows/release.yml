@@ -45,9 +45,12 @@ jobs:
         uses: ./.github/actions/init
         with:
           playwright-enabled: true # Must be present to enable caching on branched workflows
+          turbo-enabled: false # Release uses --force, so turbo cache is not needed
           # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           # turbo-team: ${{ vars.TURBO_TEAM }}
           # turbo-token: ${{ secrets.TURBO_TOKEN }}
+          turbo-team: ""
+          turbo-token: ""
 
       - name: Upgrade npm for trusted publishing
         run: npm install -g npm@latest
@@ -412,5 +415,6 @@ jobs:
         uses: ./.github/actions/init
         with:
           node-version: ${{ matrix.version }}
+          turbo-enabled: false
           turbo-team: ""
           turbo-token: ""
