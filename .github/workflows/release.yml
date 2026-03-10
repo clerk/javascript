@@ -132,6 +132,7 @@ jobs:
             const { execSync } = require('child_process');
 
             const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+            const clerkUiVersion = require('./packages/ui/package.json').version;
 
             // Only recover stable releases
             if (clerkjsVersion.includes('-')) {
@@ -139,21 +140,26 @@ jobs:
               return;
             }
 
-            // Check if this version was actually published to npm
-            let npmVersion;
-            try {
-              npmVersion = execSync(`npm view @clerk/clerk-js@${clerkjsVersion} version`, { encoding: 'utf8' }).trim();
-            } catch {
-              console.log(`Version ${clerkjsVersion} not found on npm, no recovery needed`);
-              return;
+            // Check if these versions were actually published to npm
+            const packagesToCheck = [
+              { name: '@clerk/clerk-js', version: clerkjsVersion },
+              { name: '@clerk/ui', version: clerkUiVersion },
+            ];
+
+            for (const { name, version } of packagesToCheck) {
+              try {
+                const npmVersion = execSync(`npm view ${name}@${version} version`, { encoding: 'utf8' }).trim();
+                if (npmVersion !== version) {
+                  console.log(`${name}@${version} not published to npm, no recovery needed`);
+                  return;
+                }
+              } catch {
+                console.log(`${name}@${version} not found on npm, no recovery needed`);
+                return;
+              }
             }
 
-            if (npmVersion !== clerkjsVersion) {
-              console.log(`Version mismatch: local=${clerkjsVersion}, npm=${npmVersion}`);
-              return;
-            }
-
-            core.warning(`Recovery: @clerk/clerk-js@${clerkjsVersion} was published to npm but downstream repos were not notified. Dispatching now.`);
+            core.warning(`Recovery: @clerk/clerk-js@${clerkjsVersion} and @clerk/ui@${clerkUiVersion} were published to npm but downstream repos were not notified. Dispatching now.`);
 
             const preMode = require("fs").existsSync("./.changeset/pre.json");
             if (preMode) {
@@ -161,7 +167,6 @@ jobs:
               return;
             }
 
-            const clerkUiVersion = require('./packages/ui/package.json').version;
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
             const dispatches = [
