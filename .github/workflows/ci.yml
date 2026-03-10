@@ -481,7 +481,7 @@ jobs:
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}${{ matrix.shard-label && format('-shard-%s', matrix.shard-label) || '' }}
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}${{ matrix.shard-label && format('-shard-{0}', matrix.shard-label) || '' }}
           path: integration/test-results
           retention-days: 1
 

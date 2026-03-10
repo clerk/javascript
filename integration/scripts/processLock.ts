@@ -1,4 +1,3 @@
-// integration/scripts/processLock.ts
 import * as path from 'node:path';
 
 import { constants } from '../constants';
