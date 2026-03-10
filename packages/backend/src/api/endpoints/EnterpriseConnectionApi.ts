@@ -12,9 +12,6 @@ type EnterpriseConnectionListParams = ClerkPaginationRequest<{
   active?: boolean;
 }>;
 
-/**
- * OIDC configuration for an enterprise connection.
- */
 export interface EnterpriseConnectionOidcParams {
   authUrl?: string;
   clientId?: string;
@@ -25,9 +22,6 @@ export interface EnterpriseConnectionOidcParams {
   userInfoUrl?: string;
 }
 
-/**
- * Attribute mapping for SAML attributes
- */
 export interface EnterpriseConnectionSamlAttributeMappingParams {
   userId?: string | null;
   emailAddress?: string | null;
@@ -35,9 +29,6 @@ export interface EnterpriseConnectionSamlAttributeMappingParams {
   lastName?: string | null;
 }
 
-/**
- * SAML configuration for an enterprise connection.
- */
 export interface EnterpriseConnectionSamlParams {
   allowIdpInitiated?: boolean;
   allowSubdomains?: boolean;
@@ -101,6 +92,14 @@ export class EnterpriseConnectionAPI extends AbstractAPI {
     this.requireId(enterpriseConnectionId);
     return this.request<EnterpriseConnection>({
       method: 'GET',
+      path: joinPaths(basePath, enterpriseConnectionId),
+    });
+  }
+
+  public async deleteEnterpriseConnection(enterpriseConnectionId: string) {
+    this.requireId(enterpriseConnectionId);
+    return this.request<EnterpriseConnection>({
+      method: 'DELETE',
       path: joinPaths(basePath, enterpriseConnectionId),
     });
   }
