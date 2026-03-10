@@ -1,5 +1,21 @@
 # Change Log
 
+## 6.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`3e63793`](https://github.com/clerk/javascript/commit/3e637932b1b7af669955f0e4f86233106f7d18ef)]:
+  - @clerk/shared@4.2.0
+
+## 6.0.2
+
+### Patch Changes
+
+- Remove experimental tags on signal hooks ([#7999](https://github.com/clerk/javascript/pull/7999)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`776ee1b`](https://github.com/clerk/javascript/commit/776ee1b3f3a576976b43352a93b6988340e83353), [`7fb870d`](https://github.com/clerk/javascript/commit/7fb870d37a8c153e9b0e6313b1d38ff53bc2f49b), [`09cb6d4`](https://github.com/clerk/javascript/commit/09cb6d4d45286cf4e657b880696bf0ff81a8a3e8)]:
+  - @clerk/shared@4.1.0
+
 ## 6.0.1
 
 ### Patch Changes

@@ -1,5 +1,23 @@
 # Change Log
 
+## 4.2.0
+
+### Minor Changes
+
+- Add support for annual-only Billing plans. ([#8012](https://github.com/clerk/javascript/pull/8012)) by [@dstaley](https://github.com/dstaley)
+
+## 4.1.0
+
+### Minor Changes
+
+- Prevent modification of immutable attributes in UserProfile ([#7931](https://github.com/clerk/javascript/pull/7931)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Narrow the error conditions that trigger the unauthenticated flow (sign-out) to only high-confidence authentication failures (401, 422). Previously, all 4xx errors — including 429 rate limits — were treated as auth failures, which could sign users out during transient rate limiting. Non-auth errors from `setActive` now propagate to the caller instead of being silently swallowed. ([#8004](https://github.com/clerk/javascript/pull/8004)) by [@brkalow](https://github.com/brkalow)
+
+- Add `typesVersions` fallback so that `@clerk/shared/types` resolves correctly under `moduleResolution: "node"` in TypeScript. ([#7998](https://github.com/clerk/javascript/pull/7998)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 4.0.0
 
 ### Major Changes

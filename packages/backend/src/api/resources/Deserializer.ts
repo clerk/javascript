@@ -10,6 +10,7 @@ import {
   Domain,
   Email,
   EmailAddress,
+  EnterpriseConnection,
   IdPOAuthAccessToken,
   Instance,
   InstanceRestrictions,
@@ -193,6 +194,8 @@ function jsonToObject(item: any): any {
       return ProxyCheck.fromJSON(item);
     case ObjectType.RedirectUrl:
       return RedirectUrl.fromJSON(item);
+    case ObjectType.EnterpriseConnection:
+      return EnterpriseConnection.fromJSON(item);
     case ObjectType.SamlConnection:
       return SamlConnection.fromJSON(item);
     case ObjectType.SignInToken:
