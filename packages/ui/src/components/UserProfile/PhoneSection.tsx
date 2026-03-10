@@ -40,7 +40,13 @@ const PhoneScreen = (props: PhoneScreenProps) => {
   );
 };
 
-export const PhoneSection = ({ shouldAllowCreation = true }: { shouldAllowCreation?: boolean }) => {
+export const PhoneSection = ({
+  shouldAllowCreation = true,
+  shouldAllowDeletion = true,
+}: {
+  shouldAllowCreation?: boolean;
+  shouldAllowDeletion?: boolean;
+}) => {
   const { user } = useUser();
   const hasPhoneNumbers = Boolean(user?.phoneNumbers?.length);
 
@@ -78,7 +84,10 @@ export const PhoneSection = ({ shouldAllowCreation = true }: { shouldAllowCreati
                     </Flex>
                   </Box>
 
-                  <PhoneMenu phone={phone} />
+                  <PhoneMenu
+                    phone={phone}
+                    shouldAllowDeletion={shouldAllowDeletion}
+                  />
                 </ProfileSection.Item>
 
                 <Action.Open value={`remove-${phoneId}`}>
@@ -116,7 +125,13 @@ export const PhoneSection = ({ shouldAllowCreation = true }: { shouldAllowCreati
   );
 };
 
-const PhoneMenu = ({ phone }: { phone: PhoneNumberResource }) => {
+const PhoneMenu = ({
+  phone,
+  shouldAllowDeletion = true,
+}: {
+  phone: PhoneNumberResource;
+  shouldAllowDeletion?: boolean;
+}) => {
   const card = useCardState();
   const { open } = useActionContext();
   const { user } = useUser();
@@ -152,13 +167,19 @@ const PhoneMenu = ({ phone }: { phone: PhoneNumberResource }) => {
             onClick: () => open(`verify-${phoneId}`),
           }
         : null,
-      {
-        label: localizationKeys('userProfile.start.phoneNumbersSection.destructiveAction'),
-        isDestructive: true,
-        onClick: () => open(`remove-${phoneId}`),
-      },
+      shouldAllowDeletion
+        ? {
+            label: localizationKeys('userProfile.start.phoneNumbersSection.destructiveAction'),
+            isDestructive: true,
+            onClick: () => open(`remove-${phoneId}`),
+          }
+        : null,
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
+
+  if (actions.length === 0) {
+    return null;
+  }
 
   return <ThreeDotsMenu actions={actions} />;
 };

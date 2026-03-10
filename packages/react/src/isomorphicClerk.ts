@@ -178,7 +178,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   #publishableKey: string;
   #eventBus = createClerkEventBus();
   #stateProxy: StateProxy;
-
   get publishableKey(): string {
     return this.#publishableKey;
   }
@@ -277,8 +276,51 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.#eventBus.emit(clerkEvents.Status, 'loading');
     this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status));
 
-    if (this.#publishableKey) {
+    // TODO: Please check into refactoring the type logic here, the experimental type interface is using type Autocomplete<U extends T, T = string> = U | (T & Record<never, never>);
+    //       so we are casting options.experimental.runtimeEnvironment to avoid changing Autocomplete to use an intersection (&) instead of a union (|), as this could cause problems in other parts of the codebase if not also refactored.
+
+    if (
+      this.#publishableKey &&
+      (this.options.experimental as { runtimeEnvironment?: string } | undefined)?.runtimeEnvironment === 'headless' &&
+      this.options.Clerk
+    ) {
+      void this.loadHeadlessClerk();
+    } else if (this.#publishableKey) {
       void this.getEntryChunks();
+    }
+  }
+
+  /**
+   * Initialize Clerk for headless/React Native environments where a Clerk instance is provided directly.
+   * Only handles Clerk construction and loading — post-load wiring is shared via replayInterceptedInvocations.
+   */
+  private loadHeadlessClerk(): void {
+    const clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk)
+      ? new this.options.Clerk(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain })
+      : this.options.Clerk;
+
+    if (!clerk) {
+      this.#eventBus.emit(clerkEvents.Status, 'error');
+      return;
+    }
+
+    const onLoaded = () => {
+      this.replayInterceptedInvocations(clerk);
+    };
+
+    if (!clerk.loaded) {
+      clerk
+        .load(this.options)
+        .then(() => onLoaded())
+        .catch(err => {
+          if (__DEV__) {
+            console.error('Clerk: Failed to load:', err);
+          }
+          this.#eventBus.emit(clerkEvents.Status, 'error');
+          this.emitLoaded();
+        });
+    } else {
+      onLoaded();
     }
   }
 
@@ -472,8 +514,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
       if (!clerk.loaded) {
         this.beforeLoad(clerk);
-        // Only load UI scripts in standard browser environments (not native/headless)
-        const shouldLoadUi = !this.options.Clerk && this.options.standardBrowser !== false;
+        // Load UI when:
+        // - standard browser and no pre-created Clerk instance (normal CDN path), OR
+        // - a bundled ClerkUI was provided via the ui prop (e.g. chrome-extension, even with standardBrowser: false)
+        const shouldLoadUi =
+          (this.options.standardBrowser !== false && !this.options.Clerk) || !!this.options.ui?.ClerkUI;
         const ClerkUI = shouldLoadUi ? await this.getClerkUIEntryChunk() : undefined;
         await clerk.load({ ...this.options, ui: { ...this.options.ui, ClerkUI } });
       }

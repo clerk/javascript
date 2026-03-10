@@ -1,6 +1,13 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { isValidBrowserOnline } from '@clerk/shared/browser';
-import { ClerkOfflineError, ClerkWebAuthnError, is4xxError, MissingExpiredTokenError } from '@clerk/shared/error';
+import { isBrowserOnline, isValidBrowserOnline } from '@clerk/shared/browser';
+import {
+  ClerkOfflineError,
+  ClerkRuntimeError,
+  ClerkWebAuthnError,
+  is4xxError,
+  is429Error,
+  MissingExpiredTokenError,
+} from '@clerk/shared/error';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -146,9 +153,10 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
-    // This will retry the getToken call if it fails with a non-4xx error
-    // For offline state, we use shorter retries (~15s total) before throwing ClerkOfflineError
-    // For other errors, we retry up to 8 times over ~3 minutes
+    // Retry on transient failures (5xx, network errors, 429 rate limits).
+    // Do not retry on deterministic client errors (4xx) — they won't resolve on their own.
+    // For offline state, we use shorter retries (~15s total) before throwing ClerkOfflineError.
+    // For other errors, we retry up to 8 times over ~3 minutes.
     try {
       const result = await retry(() => this._getToken(options), {
         factor: 1.55,
@@ -156,7 +164,7 @@ export class Session extends BaseResource implements SessionResource {
         maxDelayBetweenRetries: 50 * 1_000,
         jitter: false,
         shouldRetry: (error, iterationsCount) => {
-          if (is4xxError(error)) {
+          if (is4xxError(error) && !is429Error(error)) {
             return false;
           }
 
@@ -438,18 +446,31 @@ export class Session extends BaseResource implements SessionResource {
     // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
+    let result: string | null;
+
     if (cacheResult) {
       // Proactive refresh is handled by timers scheduled in the cache
       // Prefer synchronous read to avoid microtask overhead when token is already resolved
       const cachedToken = cacheResult.entry.resolvedToken ?? (await cacheResult.entry.tokenResolver);
-      if (shouldDispatchTokenUpdate) {
+      // Only emit token updates when we have an actual token — emitting with an empty
+      // token causes AuthCookieService to remove the __session cookie (looks like sign-out).
+      if (shouldDispatchTokenUpdate && cachedToken.getRawString()) {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
-      // Return null when raw string is empty to indicate signed-out state
-      return cachedToken.getRawString() || null;
+      result = cachedToken.getRawString() || null;
+    } else if (!isBrowserOnline()) {
+      throw new ClerkRuntimeError('Browser is offline, skipping token fetch', { code: 'network_error' });
+    } else {
+      result = await this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
     }
 
-    return this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
+    // Throw when offline and no token so retry() in getToken() can fire.
+    // Without this, _getToken returns null (success) and retry() never calls shouldRetry.
+    if (result === null && !isValidBrowserOnline()) {
+      throw new ClerkRuntimeError('Network request failed while offline', { code: 'network_error' });
+    }
+
+    return result;
   }
 
   #createTokenResolver(
@@ -474,6 +495,12 @@ export class Session extends BaseResource implements SessionResource {
 
   #dispatchTokenEvents(token: TokenResource, shouldDispatch: boolean): void {
     if (!shouldDispatch) {
+      return;
+    }
+
+    // Never dispatch empty tokens — this would cause AuthCookieService to remove
+    // the __session cookie even though the user is still authenticated.
+    if (!token.getRawString()) {
       return;
     }
 
@@ -502,9 +529,14 @@ export class Session extends BaseResource implements SessionResource {
     });
 
     return tokenResolver.then(token => {
+      const rawString = token.getRawString();
+      if (!rawString) {
+        // Throw so retry logic in getToken() can handle it,
+        // rather than silently returning null (which callers interpret as "signed out").
+        throw new ClerkRuntimeError('Token fetch returned empty response', { code: 'network_error' });
+      }
       this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
-      // Return null when raw string is empty to indicate signed-out state
-      return token.getRawString() || null;
+      return rawString;
     });
   }
 
@@ -534,6 +566,12 @@ export class Session extends BaseResource implements SessionResource {
     // This allows concurrent calls to continue using the stale token
     tokenResolver
       .then(token => {
+        // Never cache or dispatch empty tokens — preserve the stale-but-valid
+        // token in cache instead of replacing it with an empty one.
+        if (!token.getRawString()) {
+          return;
+        }
+
         // Cache the resolved token for future calls
         // Re-register onRefresh to handle the next refresh cycle when this token approaches expiration
         SessionTokenCache.set({

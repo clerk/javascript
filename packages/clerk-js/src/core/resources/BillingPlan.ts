@@ -12,7 +12,7 @@ import { BaseResource, Feature } from './internal';
 export class BillingPlan extends BaseResource implements BillingPlanResource {
   id!: string;
   name!: string;
-  fee!: BillingMoneyAmount;
+  fee: BillingMoneyAmount | null = null;
   annualFee: BillingMoneyAmount | null = null;
   annualMonthlyFee: BillingMoneyAmount | null = null;
   description: string | null = null;
@@ -39,7 +39,7 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
 
     this.id = data.id;
     this.name = data.name;
-    this.fee = billingMoneyAmountFromJSON(data.fee);
+    this.fee = data.fee ? billingMoneyAmountFromJSON(data.fee) : null;
     this.annualFee = data.annual_fee ? billingMoneyAmountFromJSON(data.annual_fee) : null;
     this.annualMonthlyFee = data.annual_monthly_fee ? billingMoneyAmountFromJSON(data.annual_monthly_fee) : null;
     this.description = data.description;

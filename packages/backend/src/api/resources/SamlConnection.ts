@@ -2,6 +2,7 @@ import type { AttributeMappingJSON, SamlConnectionJSON } from './JSON';
 
 /**
  * The Backend `SamlConnection` object holds information about a SAML connection for an organization.
+ * @deprecated Use `EnterpriseConnection` instead.
  */
 export class SamlConnection {
   constructor(

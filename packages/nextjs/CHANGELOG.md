@@ -1,5 +1,339 @@
 # Change Log
 
+## 7.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`3e63793`](https://github.com/clerk/javascript/commit/3e637932b1b7af669955f0e4f86233106f7d18ef)]:
+  - @clerk/backend@3.1.0
+  - @clerk/shared@4.2.0
+  - @clerk/react@6.0.3
+
+## 7.0.2
+
+### Patch Changes
+
+- Fix build failures when using `cacheComponents: true` with dynamic routes (e.g. `[id]`) ([#7989](https://github.com/clerk/javascript/pull/7989)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`a8c64cc`](https://github.com/clerk/javascript/commit/a8c64cce3735483230d785fbd916859cb630f752), [`776ee1b`](https://github.com/clerk/javascript/commit/776ee1b3f3a576976b43352a93b6988340e83353), [`7fb870d`](https://github.com/clerk/javascript/commit/7fb870d37a8c153e9b0e6313b1d38ff53bc2f49b), [`398b7f9`](https://github.com/clerk/javascript/commit/398b7f906956e4b1f3fb1d8fb02c787e18309b53), [`09cb6d4`](https://github.com/clerk/javascript/commit/09cb6d4d45286cf4e657b880696bf0ff81a8a3e8), [`09088ed`](https://github.com/clerk/javascript/commit/09088edeba8eaa299130f52e6aa26f2b2771e7e3)]:
+  - @clerk/backend@3.0.2
+  - @clerk/shared@4.1.0
+  - @clerk/react@6.0.2
+
+## 7.0.1
+
+### Patch Changes
+
+- Update README prerequisites to match actual `package.json` engine and peer dependency constraints. ([#7972](https://github.com/clerk/javascript/pull/7972)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`55ece85`](https://github.com/clerk/javascript/commit/55ece8518b14c1976fb00bfe45a681981060239d)]:
+  - @clerk/backend@3.0.1
+  - @clerk/react@6.0.1
+
+## 7.0.0
+
+### Major Changes
+
+- Align experimental/unstable prefixes to use consistent naming: ([#7361](https://github.com/clerk/javascript/pull/7361)) by [@brkalow](https://github.com/brkalow)
+  - Renamed all `__unstable_*` methods to `__internal_*` (for internal APIs)
+  - Renamed all `experimental__*` and `experimental_*` methods to `__experimental_*` (for beta features)
+  - Removed deprecated billing-related props (`__unstable_manageBillingUrl`, `__unstable_manageBillingLabel`, `__unstable_manageBillingMembersLimit`) and `experimental__forceOauthFirst`
+
+- Renamed `__unstable_invokeMiddlewareOnAuthStateChange` to `__internal_invokeMiddlewareOnAuthStateChange`. ([#7925](https://github.com/clerk/javascript/pull/7925)) by [@jacekradko](https://github.com/jacekradko)
+
+- `useAuth().getToken` is no longer `undefined` during server-side rendering, it is a function and calling it will throw. ([#7730](https://github.com/clerk/javascript/pull/7730)) by [@Ephem](https://github.com/Ephem)
+  - If you are only using `getToken` in `useEffect`, event handlers or with non-suspenseful data fetching libraries, no change is necessary as these only trigger on the client.
+  - If you are using suspenseful data fetching libraries that do trigger during SSR, you likely have strategies in place to avoid calling `getToken` already, since this has never been possible.
+  - If you are using `getToken === undefined` checks to avoid calling it, know that it will now throw instead and you should catch and handle the error.
+
+  ```tsx
+  async function doThingWithToken(getToken: GetToken) {
+    try {
+      const token = await getToken();
+
+      // Use token
+    } catch (error) {
+      if (isClerkRuntimeError(error) && error.code === 'clerk_runtime_not_browser') {
+        // Handle error
+      }
+    }
+  }
+  ```
+
+  To access auth data server-side, see the [`Auth` object reference doc](https://clerk.com/docs/reference/backend/types/auth-object).
+
+- Refactor React SDK hooks to subscribe to auth state via `useSyncExternalStore`. This is a mostly internal refactor to unlock future improvements, but includes a few breaking changes and fixes. ([#7411](https://github.com/clerk/javascript/pull/7411)) by [@Ephem](https://github.com/Ephem)
+
+  Breaking changes:
+  - Removes ability to pass in `initialAuthState` to `useAuth`
+    - This was added for internal use and is no longer needed
+    - Instead pass in `initialState` to the `<ClerkProvider>`, or `dynamic` if using the Next package
+    - See your specific SDK documentation for more information on Server Rendering
+
+  Fixes:
+  - A bug where `useAuth` would sometimes briefly return the `initialState` rather than `undefined`
+    - This could in certain situations incorrectly lead to a brief `user: null` on the first page after signing in, indicating a signed out state
+  - Hydration mismatches in certain rare scenarios where subtrees would suspend and hydrate only after `clerk-js` had loaded fully
+
+- Updating minimum version of Node to v20.9.0 ([#6936](https://github.com/clerk/javascript/pull/6936)) by [@jacekradko](https://github.com/jacekradko)
+
+- Throw an error when an encryption key is missing when passing a secret key at runtime `clerkMiddleware()`. To migrate, ensure your application specifies a `CLERK_ENCRYPTION_KEY` environment variable when passing `secretKey` as a runtime option. ([#7360](https://github.com/clerk/javascript/pull/7360)) by [@brkalow](https://github.com/brkalow)
+
+- Return 401 instead of 404 for unauthenticated server action requests in `auth.protect()` ([#7820](https://github.com/clerk/javascript/pull/7820)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove `clerkJSUrl`, `clerkJSVersion`, `clerkUIUrl`, and `clerkUIVersion` props from all SDKs. To pin a specific version of `@clerk/clerk-js`, import the `Clerk` constructor from `@clerk/clerk-js` and pass it to `ClerkProvider` via the `Clerk` prop. To pin a specific version of `@clerk/ui`, import `ui` from `@clerk/ui` and pass it via the `ui` prop. This bundles the modules directly with your application instead of loading them from the CDN. ([#7879](https://github.com/clerk/javascript/pull/7879)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove all previously deprecated UI props across the Next.js, React and clerk-js SDKs. The legacy `afterSign(In|Up)Url`/`redirectUrl` props, `UserButton` sign-out overrides, organization `hideSlug` flags, `OrganizationSwitcher`'s `afterSwitchOrganizationUrl`, `Client.activeSessions`, `setActive({ beforeEmit })`, and the `ClerkMiddlewareAuthObject` type alias are no longer exported. Components now rely solely on the new redirect options and server-side configuration. ([#7243](https://github.com/clerk/javascript/pull/7243)) by [@jacekradko](https://github.com/jacekradko)
+
+- Introduce `<Show when={...}>` as the cross-framework authorization control component and remove `<Protect>`, `<SignedIn>`, and `<SignedOut>` in favor of `<Show>`. ([#7373](https://github.com/clerk/javascript/pull/7373)) by [@jacekradko](https://github.com/jacekradko)
+
+- `getToken()` now throws `ClerkOfflineError` instead of returning `null` when the client is offline. ([#7598](https://github.com/clerk/javascript/pull/7598)) by [@bratsos](https://github.com/bratsos)
+
+  This makes it explicit that a token fetch failure was due to network conditions, not authentication state. Previously, returning `null` could be misinterpreted as "user is signed out," potentially causing the cached token to be cleared.
+
+  To handle this change, catch `ClerkOfflineError` from `getToken()` calls:
+
+  ```typescript
+  import { ClerkOfflineError } from '@clerk/react/errors';
+
+  try {
+    const token = await session.getToken();
+  } catch (error) {
+    if (ClerkOfflineError.is(error)) {
+      // Handle offline scenario - show offline UI, retry later, etc.
+    }
+    throw error;
+  }
+  ```
+
+- Drop support for `next@13` and `next@14` since they have reached [EOL](https://nextjs.org/support-policy#unsupported-versions). Now `>= next@15.2.3` is required. ([#7197](https://github.com/clerk/javascript/pull/7197)) by [@panteliselef](https://github.com/panteliselef)
+
+### Minor Changes
+
+- Add `unsafe_disableDevelopmentModeConsoleWarning` option to disable the development mode warning that's emitted to the console when Clerk is first loaded. ([#7505](https://github.com/clerk/javascript/pull/7505)) by [@dstaley](https://github.com/dstaley)
+
+- Add Frontend API proxy support via `frontendApiProxy` option in `clerkMiddleware` ([#7602](https://github.com/clerk/javascript/pull/7602)) by [@brkalow](https://github.com/brkalow)
+
+- Introducing `setup_mfa` session task ([#7626](https://github.com/clerk/javascript/pull/7626)) by [@octoper](https://github.com/octoper)
+
+- Remove `clerkJSVariant` option and headless bundle. Use `prefetchUI={false}` instead. ([#7629](https://github.com/clerk/javascript/pull/7629)) by [@jacekradko](https://github.com/jacekradko)
+
+- Add `ui` prop to `ClerkProvider` for passing `@clerk/ui` ([#7664](https://github.com/clerk/javascript/pull/7664)) by [@jacekradko](https://github.com/jacekradko)
+
+- Add standalone `getToken()` function for retrieving session tokens outside of framework component trees. ([#7325](https://github.com/clerk/javascript/pull/7325)) by [@bratsos](https://github.com/bratsos)
+
+  This function is safe to call from anywhere in the browser, such as API interceptors, data fetching layers (e.g., React Query, SWR), or vanilla JavaScript code. It automatically waits for Clerk to initialize before returning the token.
+
+  import { getToken } from '@clerk/nextjs'; // or any framework package
+
+  // Example: Axios interceptor
+  axios.interceptors.request.use(async (config) => {
+  const token = await getToken();
+  if (token) {
+  config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+  });
+
+- Export `useOrganizationCreationDefaults` hook to fetch suggested organization name and logo from default naming rules ([#7694](https://github.com/clerk/javascript/pull/7694)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add `/types` subpath export to re-export types from `@clerk/shared/types` along with SDK-specific types. This allows importing Clerk types directly from the SDK package (e.g., `import type { UserResource } from '@clerk/react/types'`) without needing to install `@clerk/types` as a separate dependency. ([#7644](https://github.com/clerk/javascript/pull/7644)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add `HandleSSOCallback` component which handles the SSO callback during custom flows, including support for sign-in-or-up. ([#7678](https://github.com/clerk/javascript/pull/7678)) by [@dstaley](https://github.com/dstaley)
+
+- Introduce `<UNSAFE_PortalProvider>` component which allows you to specify a custom container for Clerk floating UI elements (popovers, modals, tooltips, etc.) that use portals. Only Clerk components within the provider will be affected, components outside the provider will continue to use the default document.body for portals. ([#7310](https://github.com/clerk/javascript/pull/7310)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  This is particularly useful when using Clerk components inside external UI libraries like [Radix Dialog](https://www.radix-ui.com/primitives/docs/components/dialog) or [React Aria Components](https://react-spectrum.adobe.com/react-aria/components.html), where portaled elements need to render within the dialog's container to remain interact-able.
+
+  ```tsx
+  'use client';
+
+  import { useRef } from 'react';
+  import * as Dialog from '@radix-ui/react-dialog';
+  import { UNSAFE_PortalProvider, UserButton } from '@clerk/nextjs';
+
+  export function UserDialog() {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    return (
+      <Dialog.Root>
+        <Dialog.Trigger>Open Dialog</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Overlay />
+          <Dialog.Content ref={containerRef}>
+            <UNSAFE_PortalProvider getContainer={() => containerRef.current}>
+              <UserButton />
+            </UNSAFE_PortalProvider>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    );
+  }
+  ```
+
+### Patch Changes
+
+- Fix an App Router navigation edge case where duplicate in-flight redirects to the same destination could leave Clerk's awaitable navigation pending indefinitely. ([#7865](https://github.com/clerk/javascript/pull/7865)) by [@bratsos](https://github.com/bratsos)
+
+- Rename dev browser APIs to remove JWT terminology. The dev browser identifier is now a generic ID, so internal naming has been updated to reflect this. No runtime behavior changes. ([#7930](https://github.com/clerk/javascript/pull/7930)) by [@brkalow](https://github.com/brkalow)
+
+- Wire `clerkUIVersion` option through all framework packages ([#7740](https://github.com/clerk/javascript/pull/7740)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fixed an issue where the CSP nonce generated by `clerkMiddleware({ contentSecurityPolicy: { strict: true } })` was not forwarded as a request header. Server components can now access the nonce via `headers()`, allowing `ClerkProvider` and Next.js to apply it to `<script>` tags. ([#7828](https://github.com/clerk/javascript/pull/7828)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix Turbopack compatibility for `ui` prop by adding `turbopackIgnore` magic comment alongside `webpackIgnore` on the dynamic `@clerk/ui/entry` import. This prevents both bundlers from statically resolving the optional dependency at build time. ([#7805](https://github.com/clerk/javascript/pull/7805)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix `@clerk/ui/entry` bare specifier failing in browser when using `ui` prop with RSC ([#7809](https://github.com/clerk/javascript/pull/7809)) by [@jacekradko](https://github.com/jacekradko)
+
+- Add exports for `useWaitlist` hook. ([#7609](https://github.com/clerk/javascript/pull/7609)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updating peerDependency for CVE-2025-55182 ([#7423](https://github.com/clerk/javascript/pull/7423)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Fix race condition that could cause `__clerkSharedModules is not defined` error when using the shared React UI variant. ([#7685](https://github.com/clerk/javascript/pull/7685)) by [@bratsos](https://github.com/bratsos)
+
+- Add support for Next.js 16 cache components by improving error detection and providing helpful error messages when `auth()` or `currentUser()` are called inside a `"use cache"` function. ([#7595](https://github.com/clerk/javascript/pull/7595)) by [@jacekradko](https://github.com/jacekradko)
+
+- Add image CDNs to the `connect-src` Content Security Policy directive ([#7610](https://github.com/clerk/javascript/pull/7610)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- fix: Update getAuthData to use isMachineToken ([#7755](https://github.com/clerk/javascript/pull/7755)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+- Add `satelliteAutoSync` option to optimize satellite app handshake behavior ([#7597](https://github.com/clerk/javascript/pull/7597)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Satellite apps currently trigger a handshake redirect on every first page load, even when no cookies exist. This creates unnecessary redirects to the primary domain for apps where most users aren't authenticated.
+
+  **New option: `satelliteAutoSync`** (default: `false`)
+  - When `false` (default): Skip automatic handshake if no session cookies exist, only trigger after explicit sign-in action
+  - When `true`: Satellite apps automatically trigger handshake on first load (previous behavior)
+
+  **New query parameter: `__clerk_sync`**
+  - `__clerk_sync=1` (NeedsSync): Triggers handshake after returning from primary sign-in
+  - `__clerk_sync=2` (Completed): Prevents re-sync loop after handshake completes
+
+  Backwards compatible: Still reads legacy `__clerk_synced=true` parameter.
+
+  **SSR redirect fix**: Server-side redirects (e.g., `redirectToSignIn()` from middleware) now correctly add `__clerk_sync=1` to the return URL for satellite apps. This ensures the handshake is triggered when the user returns from sign-in on the primary domain.
+
+  **CSR redirect fix**: Client-side redirects now add `__clerk_sync=1` to all redirect URL variants (`forceRedirectUrl`, `fallbackRedirectUrl`) for satellite apps, not just the default `redirectUrl`.
+
+  ## Usage
+
+  ### SSR (Next.js Middleware)
+
+  ```typescript
+  import { clerkMiddleware } from '@clerk/nextjs/server';
+
+  export default clerkMiddleware({
+    isSatellite: true,
+    domain: 'satellite.example.com',
+    signInUrl: 'https://primary.example.com/sign-in',
+    // Set to true to automatically sync auth state on first load
+    satelliteAutoSync: true,
+  });
+  ```
+
+  ### SSR (TanStack Start)
+
+  ```typescript
+  import { clerkMiddleware } from '@clerk/tanstack-react-start/server';
+
+  export default clerkMiddleware({
+    isSatellite: true,
+    domain: 'satellite.example.com',
+    signInUrl: 'https://primary.example.com/sign-in',
+    // Set to true to automatically sync auth state on first load
+    satelliteAutoSync: true,
+  });
+  ```
+
+  ### CSR (ClerkProvider)
+
+  ```tsx
+  <ClerkProvider
+    publishableKey='pk_...'
+    isSatellite={true}
+    domain='satellite.example.com'
+    signInUrl='https://primary.example.com/sign-in'
+    // Set to true to automatically sync auth state on first load
+    satelliteAutoSync={true}
+  >
+    {children}
+  </ClerkProvider>
+  ```
+
+  ### SSR (TanStack Start with callback)
+
+  ```typescript
+  import { clerkMiddleware } from '@clerk/tanstack-react-start/server';
+
+  // Options callback - receives context object, returns options
+  export default clerkMiddleware(({ url }) => ({
+    isSatellite: true,
+    domain: 'satellite.example.com',
+    signInUrl: 'https://primary.example.com/sign-in',
+    satelliteAutoSync: url.pathname.startsWith('/dashboard'),
+  }));
+  ```
+
+  ## Migration Guide
+
+  ### Behavior change: `satelliteAutoSync` defaults to `false`
+
+  Previously, satellite apps would automatically trigger a handshake redirect on every first page load to sync authentication state with the primary domain—even when no session cookies existed. This caused unnecessary redirects to the primary domain for users who weren't authenticated.
+
+  The new default (`satelliteAutoSync: false`) provides a better experience for end users. Performance-wise, the satellite app can be shown immediately without attempting to sync state first, which is the right behavior for most use cases.
+
+  **To preserve the previous behavior** where visiting a satellite while already signed in on the primary domain automatically syncs your session, set `satelliteAutoSync: true`:
+
+  ```typescript
+  export default clerkMiddleware({
+    isSatellite: true,
+    domain: 'satellite.example.com',
+    signInUrl: 'https://primary.example.com/sign-in',
+    satelliteAutoSync: true, // Opt-in to automatic sync on first load
+  });
+  ```
+
+  ### TanStack Start: Function props to options callback
+
+  The `clerkMiddleware` function no longer accepts individual props as functions. If you were using the function form for props like `domain`, `proxyUrl`, or `isSatellite`, migrate to the options callback pattern.
+
+  **Before (prop function form - no longer supported):**
+
+  ```typescript
+  import { clerkMiddleware } from '@clerk/tanstack-react-start/server';
+
+  export default clerkMiddleware({
+    isSatellite: true,
+    // ❌ Function form for individual props no longer works
+    domain: url => url.hostname,
+  });
+  ```
+
+  **After (options callback form):**
+
+  ```typescript
+  import { clerkMiddleware } from '@clerk/tanstack-react-start/server';
+
+  // ✅ Wrap entire options in a callback function
+  export default clerkMiddleware(({ url }) => ({
+    isSatellite: true,
+    domain: url.hostname,
+  }));
+  ```
+
+  The callback receives a context object with the `url` property (a `URL` instance) and can return options synchronously or as a Promise for async configuration.
+
+- ([#7759](https://github.com/clerk/javascript/pull/7759)) by [@Ephem](https://github.com/Ephem)
+
+- Use new `@clerk/react` package. ([#6911](https://github.com/clerk/javascript/pull/6911)) by [@dstaley](https://github.com/dstaley)
+
+- Isolate nonce fetch in Suspense boundary for improved PPR support ([#7773](https://github.com/clerk/javascript/pull/7773)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`0a9cce3`](https://github.com/clerk/javascript/commit/0a9cce375046a7ff5944a7f2a140e787fe66996c), [`e35960f`](https://github.com/clerk/javascript/commit/e35960f5e44ab758d0ab0545691f44dbafd5e7cb), [`c9f0d77`](https://github.com/clerk/javascript/commit/c9f0d777f59673bfe614e1a8502cefe5445ce06f), [`1bd1747`](https://github.com/clerk/javascript/commit/1bd174781b83d3712a07e7dfe1acf73742497349), [`6a2ff9e`](https://github.com/clerk/javascript/commit/6a2ff9e957145124bc3d00bf10f566b613c7c60f), [`d2cee35`](https://github.com/clerk/javascript/commit/d2cee35d73d69130ad8c94650286d3b43dda55e6), [`44d0e5c`](https://github.com/clerk/javascript/commit/44d0e5c94a366e4a35049955c89b9cb3c430a0e9), [`6ec5f08`](https://github.com/clerk/javascript/commit/6ec5f08ae6c0aa4034dcb17c4a148a6baa95a47b), [`0a9cce3`](https://github.com/clerk/javascript/commit/0a9cce375046a7ff5944a7f2a140e787fe66996c), [`8c47111`](https://github.com/clerk/javascript/commit/8c4711153552d50c67611fea668f82f7c8fb7f9c), [`00882e8`](https://github.com/clerk/javascript/commit/00882e8993d9aa49feb1106bfe68164b72ba29d9), [`a374c18`](https://github.com/clerk/javascript/commit/a374c18e31793b0872fe193ab7808747749bc56b), [`466d642`](https://github.com/clerk/javascript/commit/466d642ce332d191e2c03d9cb9ca76b0d3776cc6), [`5ef4a77`](https://github.com/clerk/javascript/commit/5ef4a7791cf2820bb12b038cf3b751252362f6e4), [`3abe9ed`](https://github.com/clerk/javascript/commit/3abe9ed4c44166cb95f61e92f7742abb0c6df82a), [`af85739`](https://github.com/clerk/javascript/commit/af85739195f5f4b353ba4395a547bbc8a8b26483), [`10b5bea`](https://github.com/clerk/javascript/commit/10b5bea85c3bb588c59f13628f32a82934f5de5a), [`a05d130`](https://github.com/clerk/javascript/commit/a05d130451226d2c512c9ea1e9a9f1e4cb2e3ba2), [`b193f79`](https://github.com/clerk/javascript/commit/b193f79ee86eb8ce788db4b747d1c64a1c7c6ac5), [`e9d2f2f`](https://github.com/clerk/javascript/commit/e9d2f2fd1ea027f7936353dfcdc905bcb01c3ad7), [`6e90b7f`](https://github.com/clerk/javascript/commit/6e90b7f8033dabac68e594894b30a49596a32625), [`43fc7b7`](https://github.com/clerk/javascript/commit/43fc7b7b40cf7c42cfb0aa8b2e2058243a3f38f5), [`0f1011a`](https://github.com/clerk/javascript/commit/0f1011a062c3705fc1a69593672b96ad03936de1), [`cbc5618`](https://github.com/clerk/javascript/commit/cbc56181fb28e35c1974cf4de8256a939c3ff029), [`38def4f`](https://github.com/clerk/javascript/commit/38def4fedc99b6be03c88a3737b8bd5940e5bff3), [`7772f45`](https://github.com/clerk/javascript/commit/7772f45ee601787373cf3c9a24eddf3f76c26bee), [`a3e689f`](https://github.com/clerk/javascript/commit/a3e689f3b7f2f3799a263da4b7bb14c0e49e42b7), [`583f7a9`](https://github.com/clerk/javascript/commit/583f7a9a689310f4bdd2c66f5258261f08e47109), [`965e7f1`](https://github.com/clerk/javascript/commit/965e7f1b635cf25ebfe129ec338e05137d1aba9e), [`84483c2`](https://github.com/clerk/javascript/commit/84483c2a710cef9165f9cd016ebccff13b004c78), [`2b76081`](https://github.com/clerk/javascript/commit/2b7608145611c10443a999cae4373a1acfd7cab7), [`f284c3d`](https://github.com/clerk/javascript/commit/f284c3d1d122b725594d0a287d0fb838f6d191f5), [`ac34168`](https://github.com/clerk/javascript/commit/ac3416849954780bd873ed3fe20a173a8aee89aa), [`cf0d0dc`](https://github.com/clerk/javascript/commit/cf0d0dc7f6380d6e0c4e552090345b7943c22b35), [`0aff70e`](https://github.com/clerk/javascript/commit/0aff70eab5353a8a6ea171e6b69d3b600acdd45e), [`ab9efa2`](https://github.com/clerk/javascript/commit/ab9efa2a7161c97a2bd6ab038e0fb36d4944b895), [`690280e`](https://github.com/clerk/javascript/commit/690280e91b0809d8e0fd1e161dd753dc62801244), [`b971d0b`](https://github.com/clerk/javascript/commit/b971d0bb3eed3a6d3d187b4a296bc6e56271014e), [`22d1689`](https://github.com/clerk/javascript/commit/22d1689cb4b789fe48134b08a4e3dc5921ac0e1b), [`e9a1d4d`](https://github.com/clerk/javascript/commit/e9a1d4dcac8a61595739f83a5b9b2bc18a35f59d), [`c088dde`](https://github.com/clerk/javascript/commit/c088dde13004dc16dd37c17572a52efda69843c9), [`1a7cac1`](https://github.com/clerk/javascript/commit/1a7cac1eb48e643c0fd1a5d567ab0490609b252d), [`8902e21`](https://github.com/clerk/javascript/commit/8902e216bab83fe85a491bdbc2ac8129e83e5a73), [`64af60c`](https://github.com/clerk/javascript/commit/64af60cb2980afc01c5fd60fdc488feb867ac170), [`972f6a0`](https://github.com/clerk/javascript/commit/972f6a015d720c4867aa24b4503db3968187e523), [`a1aaff3`](https://github.com/clerk/javascript/commit/a1aaff33700ed81f31a9f340cf6cb3a82efeef85), [`d85646a`](https://github.com/clerk/javascript/commit/d85646a0b9efc893e2548dc55dbf08954117e8c2), [`ab3dd16`](https://github.com/clerk/javascript/commit/ab3dd160608318363b42f5f46730ed32ee12335b), [`4a8cb10`](https://github.com/clerk/javascript/commit/4a8cb10117bc9b2c9f5efe4f3d243b79dc815251), [`fd195c1`](https://github.com/clerk/javascript/commit/fd195c14086cba7087c74af472d2558d04fe3afd), [`8887fac`](https://github.com/clerk/javascript/commit/8887fac93fccffac7d1612cf5fb773ae614ceb22), [`0b4b481`](https://github.com/clerk/javascript/commit/0b4b4811c99f3261deea9e7bd2215e51ad32d4bf), [`5f88dbb`](https://github.com/clerk/javascript/commit/5f88dbb84620e15d9bdaa5f2e78dc3e975104204), [`2e46acc`](https://github.com/clerk/javascript/commit/2e46accfa72f7ad41f5eebe8da1b220fcd878cab), [`dc886a9`](https://github.com/clerk/javascript/commit/dc886a9575a0c7366c57cba59ecde260baeb6dad), [`428629b`](https://github.com/clerk/javascript/commit/428629b46a249f432ab6406a92ff628ab5850773), [`8b95393`](https://github.com/clerk/javascript/commit/8b953930536b12bd8ade6ba5c2092f40770ea8df), [`c438fa5`](https://github.com/clerk/javascript/commit/c438fa529cd410eb237c734c04b583d225e66a07), [`c438fa5`](https://github.com/clerk/javascript/commit/c438fa529cd410eb237c734c04b583d225e66a07), [`fd195c1`](https://github.com/clerk/javascript/commit/fd195c14086cba7087c74af472d2558d04fe3afd), [`fd69edb`](https://github.com/clerk/javascript/commit/fd69edbcfe2dfca71d1e6d41af9647701dba2823), [`8d91225`](https://github.com/clerk/javascript/commit/8d91225acc67349fd0d35f982dedb0618f3179e9), [`1fc95e2`](https://github.com/clerk/javascript/commit/1fc95e2a0a5a99314b1bb4d59d3f3e3f03accb3d), [`3dac245`](https://github.com/clerk/javascript/commit/3dac245456dae1522ee2546fc9cc29454f1f345f), [`a4c3b47`](https://github.com/clerk/javascript/commit/a4c3b477dad70dd55fe58f433415b7cc9618a225), [`7c3c002`](https://github.com/clerk/javascript/commit/7c3c002d6d81305124f934f41025799f4f03103e), [`d8bbc66`](https://github.com/clerk/javascript/commit/d8bbc66d47b476b3405c03e1b0632144afdd716b), [`3983cf8`](https://github.com/clerk/javascript/commit/3983cf85d657c247d46f94403cb121f13f6f01e4), [`f1f1d09`](https://github.com/clerk/javascript/commit/f1f1d09e675cf9005348d2380df0da3f293047a6), [`736314f`](https://github.com/clerk/javascript/commit/736314f8641be005ddeacfccae9135a1b153d6f6), [`2cc7dbb`](https://github.com/clerk/javascript/commit/2cc7dbbb212f92e2889460086b50eb644b8ba69d), [`0af2e6f`](https://github.com/clerk/javascript/commit/0af2e6fc0a1e59af30799faf75cd998ec6072ebf), [`86d2199`](https://github.com/clerk/javascript/commit/86d219970cdc21d5160f0c8adf2c30fc34f1c7b9), [`da415c8`](https://github.com/clerk/javascript/commit/da415c813332998dafd4ec4690a6731a98ded65f), [`97c9ab3`](https://github.com/clerk/javascript/commit/97c9ab3c2130dbe4500c3feb83232d1ccbbd910e), [`df16d8d`](https://github.com/clerk/javascript/commit/df16d8d57f4df7ba024910022f8cd3a777502816), [`cc63aab`](https://github.com/clerk/javascript/commit/cc63aab479853f0e15947837eff5a4f46c71c9f2), [`a7a38ab`](https://github.com/clerk/javascript/commit/a7a38ab76c66d3f147b8b1169c1ce86ceb0d9384), [`cfa70ce`](https://github.com/clerk/javascript/commit/cfa70ce766b687b781ba984ee3d72ac1081b0c97), [`25d37b0`](https://github.com/clerk/javascript/commit/25d37b03605365395d5d7a667ce657ab243a0a68), [`26254f0`](https://github.com/clerk/javascript/commit/26254f0463312115eca4bc0a396c5acd0703187b), [`7bd782b`](https://github.com/clerk/javascript/commit/7bd782b274cd8f7eb6a6dba4bc5684d3954994e6), [`c97e6af`](https://github.com/clerk/javascript/commit/c97e6af1d6974270843ce91ce17b0c36ee828aa0), [`c92ccf8`](https://github.com/clerk/javascript/commit/c92ccf831359d251223d0bfb0ef72f33ad7509ed), [`677a9b5`](https://github.com/clerk/javascript/commit/677a9b5d0cd9291d48e1a6b7e3f0e923211a5c4f), [`5b24266`](https://github.com/clerk/javascript/commit/5b24266bab99b8d4873050d72a59da4884f5619e), [`d98727e`](https://github.com/clerk/javascript/commit/d98727e30b191087abb817acfc29cfccdb3a7047), [`c77ca7e`](https://github.com/clerk/javascript/commit/c77ca7e8abdd64fe62eaeaacb647188588079f32), [`79e2622`](https://github.com/clerk/javascript/commit/79e2622c18917709a351a122846def44c7e22f0c), [`12b3070`](https://github.com/clerk/javascript/commit/12b3070f3f102256f19e6af6acffb05b66d42e0b), [`d2317f5`](https://github.com/clerk/javascript/commit/d2317f58bfdbe531c2cffe8553e2e5a3e728a415)]:
+  - @clerk/shared@4.0.0
+  - @clerk/react@6.0.0
+  - @clerk/backend@3.0.0
+
 ## 6.39.0
 
 ### Minor Changes

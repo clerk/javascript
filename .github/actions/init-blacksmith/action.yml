@@ -88,6 +88,12 @@ runs:
           )
 
           if (ENABLED === 'true') {
+            if (!TEAM) {
+              throw new Error('turbo-team input is required and must not be empty')
+            }
+            if (!TOKEN) {
+              throw new Error('turbo-token input is required and must not be empty')
+            }
             core.exportVariable('TURBO_CACHE', CACHE)
             core.exportVariable('TURBO_TEAM', TEAM)
             core.exportVariable('TURBO_TOKEN', TOKEN)
@@ -117,6 +123,10 @@ runs:
       env:
         CYPRESS_INSTALL_BINARY: 0
       run: pnpm install
+      shell: bash
+
+    - name: Add node_modules/.bin to PATH
+      run: echo "${{ github.workspace }}/node_modules/.bin" >> $GITHUB_PATH
       shell: bash
 
     - name: Get Playwright Version

@@ -162,7 +162,7 @@ describe('isValidBrowserOnline', () => {
     expect(isValidBrowserOnline()).toBe(false);
   });
 
-  it('returns FALSE if connection is NOT online, navigator is online, has disabled the webdriver flag, and is not a bot', () => {
+  it('returns TRUE if connection reports zero values but navigator is online (headless browser)', () => {
     userAgentGetter.mockReturnValue(
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0',
     );
@@ -170,7 +170,7 @@ describe('isValidBrowserOnline', () => {
     onLineGetter.mockReturnValue(true);
     connectionGetter.mockReturnValue({ downlink: 0, rtt: 0 });
 
-    expect(isValidBrowserOnline()).toBe(false);
+    expect(isValidBrowserOnline()).toBe(true);
   });
 
   it('returns FALSE if connection is online, navigator is NOT online, has disabled the webdriver flag, and is not a bot', () => {

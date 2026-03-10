@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "vite build",
     "dev": "vite --port $PORT --no-open",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview --port $PORT --no-open"
