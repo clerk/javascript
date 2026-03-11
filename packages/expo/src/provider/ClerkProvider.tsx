@@ -183,13 +183,9 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
               }
             }
 
-            // Only configure native SDK if we have a bearer token.
-            // Configuring without a token creates an anonymous native client,
-            // which conflicts when we later try to inject the JS SDK's token.
-            if (!bearerToken) {
-              return;
-            }
-
+            // Always configure the native SDK on launch, even without a token.
+            // The iOS SDK requires Clerk.configure() before Clerk.shared can be accessed.
+            // If we have a bearer token, pass it so the native SDK picks up the JS session.
             await ClerkExpo.configure(pk, bearerToken);
 
             if (!isMountedRef.current) {
