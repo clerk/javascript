@@ -381,7 +381,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
         ) : null}
       </Flex>
 
-      {planSupportsAnnual && setPlanPeriod ? (
+      {planSupportsAnnual && !plan.isDefault && setPlanPeriod ? (
         <Box
           elementDescriptor={descriptors.pricingTableCardPeriodToggle}
           sx={t => ({
