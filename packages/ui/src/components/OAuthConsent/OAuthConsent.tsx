@@ -1,6 +1,7 @@
-import { useUser } from '@clerk/shared/react';
+import { useClerk, useUser } from '@clerk/shared/react';
+import type { __internal_OAuthConsentProps } from '@clerk/shared/types';
 import type { ComponentProps } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext } from '@/ui/contexts';
 import { Box, Button, Flex, Flow, Grid, Icon, Text } from '@/ui/customizables';
@@ -11,7 +12,7 @@ import { Header } from '@/ui/elements/Header';
 import { Modal } from '@/ui/elements/Modal';
 import { Tooltip } from '@/ui/elements/Tooltip';
 import { LockDottedCircle } from '@/ui/icons';
-import { Alert, Textarea } from '@/ui/primitives';
+import { Alert, Spinner, Textarea } from '@/ui/primitives';
 import type { ThemableCssProp } from '@/ui/styledSystem';
 import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
@@ -19,11 +20,47 @@ import { colors } from '@/ui/utils/colors';
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
 export function OAuthConsentInternal() {
-  const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, oAuthApplicationUrl, redirectUrl, onDeny, onAllow } =
-    useOAuthConsentContext();
+  const ctx = useOAuthConsentContext();
+  const clerk = useClerk();
   const { user } = useUser();
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
+  const [fetchedData, setFetchedData] = useState<__internal_OAuthConsentProps | null>(null);
+  const [isLoading, setIsLoading] = useState(!!ctx.clientId);
+
+  useEffect(() => {
+    if (!ctx.clientId) {
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoading(true);
+
+    clerk
+      .__internal_fetchOAuthConsent(ctx.clientId, { scope: ctx.scope })
+      .then(data => {
+        if (!cancelled) {
+          setFetchedData(data);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ctx.clientId, ctx.scope, clerk]);
+
+  const scopes = fetchedData?.scopes ?? ctx.scopes;
+  const oAuthApplicationName = fetchedData?.oAuthApplicationName ?? ctx.oAuthApplicationName ?? '';
+  const oAuthApplicationLogoUrl = fetchedData?.oAuthApplicationLogoUrl ?? ctx.oAuthApplicationLogoUrl;
+  const oAuthApplicationUrl = fetchedData?.oAuthApplicationUrl ?? ctx.oAuthApplicationUrl;
+  const redirectUrl = fetchedData?.redirectUrl ?? ctx.redirectUrl ?? '';
+  const onAllow = ctx.onAllow ?? (() => {});
+  const onDeny = ctx.onDeny ?? (() => {});
 
   const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
 
@@ -38,6 +75,24 @@ export function OAuthConsentInternal() {
     } catch {
       return '';
     }
+  }
+
+  if (isLoading) {
+    return (
+      <Flow.Root flow='oauthConsent'>
+        <Card.Root>
+          <Card.Content>
+            <Flex
+              justify='center'
+              align='center'
+              sx={t => ({ padding: t.space.$10 })}
+            >
+              <Spinner />
+            </Flex>
+          </Card.Content>
+        </Card.Root>
+      </Flow.Root>
+    );
   }
 
   return (
