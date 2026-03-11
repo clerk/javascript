@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.2.0
+
+### Minor Changes
+
+- Add `EnterpriseConnection` resource, allowing to create both OIDC and SAML connections ([#8017](https://github.com/clerk/javascript/pull/8017)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Fix casing of enterprise connection API params when sending `saml` or `oidc` configuration ([#8022](https://github.com/clerk/javascript/pull/8022)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`de1386f`](https://github.com/clerk/javascript/commit/de1386fc90a3e8c2bab515b693c84a1b383525d3)]:
+  - @clerk/shared@4.3.0
+
 ## 3.1.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # Change Log
 
+## 6.3.0
+
+### Minor Changes
+
+- Support `sign_up_if_missing` on SignIn.create, including captcha ([#8030](https://github.com/clerk/javascript/pull/8030)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Updated dependencies [[`de1386f`](https://github.com/clerk/javascript/commit/de1386fc90a3e8c2bab515b693c84a1b383525d3)]:
+  - @clerk/shared@4.3.0
+
 ## 6.2.0
 
 ### Minor Changes
