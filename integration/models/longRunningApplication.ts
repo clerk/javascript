@@ -179,16 +179,23 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
       pid = serveResult.pid;
       appDir = app.appDir;
       log(`Serve complete: port=${port}, serverUrl=${serverUrl}, pid=${pid}`);
-      stateFile.addLongRunningApp({
-        port,
-        serverUrl,
-        pid,
-        id,
-        appDir,
-        env: params.env.toJson(),
-        clerkFapi: process.env.CLERK_FAPI,
-        clerkTestingToken: process.env.CLERK_TESTING_TOKEN,
-      });
+      // Serialize state file writes across all apps to prevent concurrent
+      // read-modify-write from clobbering entries written by other workers.
+      const releaseStateFileLock = await acquireProcessLock('__state-file__');
+      try {
+        stateFile.addLongRunningApp({
+          port,
+          serverUrl,
+          pid,
+          id,
+          appDir,
+          env: params.env.toJson(),
+          clerkFapi: process.env.CLERK_FAPI,
+          clerkTestingToken: process.env.CLERK_TESTING_TOKEN,
+        });
+      } finally {
+        releaseStateFileLock();
+      }
     } catch (error) {
       console.error('Error during app serve:', error);
       throw error;
@@ -236,11 +243,19 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
       // will be called by global.teardown.ts
       destroy: async () => {
         readFromStateFile();
+        if (!pid && !appDir) {
+          console.log(`Skipping destroy for ${name}: no pid or appDir`);
+          return;
+        }
         console.log(`Destroying ${serverUrl}`);
-        await awaitableTreekill(pid, 'SIGKILL');
-        // TODO: Test whether this is necessary now that we have awaitableTreekill
-        await new Promise(res => setTimeout(res, 2000));
-        await fs.rm(appDir, { recursive: true, force: true });
+        if (pid) {
+          await awaitableTreekill(pid, 'SIGKILL');
+          // TODO: Test whether this is necessary now that we have awaitableTreekill
+          await new Promise(res => setTimeout(res, 2000));
+        }
+        if (appDir) {
+          await fs.rm(appDir, { recursive: true, force: true });
+        }
       },
       // read the persisted state and behave like an app
       commit: () => {
