@@ -12,22 +12,24 @@
         document.write('<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"><\/script>');
       } else {
         document.documentElement.setAttribute('data-no-tailwind', '');
-        document.write('<style>' +
-          'html[data-no-tailwind] { height: 100% }' +
-          'html[data-no-tailwind] body { display: flex; min-height: 100%; margin: 0; font-family: system-ui, sans-serif; background: #f9fafb }' +
-          'html[data-no-tailwind] [data-sidebar] { position: fixed; top: 0; bottom: 0; width: 18rem; overflow-y: auto; background: #fff; border: 1px solid #eee; padding: 0.5rem; font-size: 13px }' +
-          'html[data-no-tailwind] body > [data-sidebar]:nth-child(1) { left: 0 }' +
-          'html[data-no-tailwind] body > [data-sidebar]:nth-child(2) { right: 0 }' +
-          'html[data-no-tailwind] body:has([data-sidebar]:not(.hidden)) { padding: 0 18rem }' +
-          'html[data-no-tailwind] main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 3rem }' +
-          'html[data-no-tailwind] main > div { width: 100% }' +
-          'html[data-no-tailwind] fieldset { margin-top: 1rem }' +
-          'html[data-no-tailwind] legend { font-size: 14px; font-weight: 500 }' +
-          'html[data-no-tailwind] [data-sidebar] label { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-top: 1px solid #f3f4f6 }' +
-          'html[data-no-tailwind] nav ul { list-style: none; padding: 0 }' +
-          'html[data-no-tailwind] nav a { display: block; padding: 0.3rem 0.5rem; text-decoration: none; color: inherit; font-size: 14px }' +
-          'html[data-no-tailwind] nav a:hover { background: #f9fafb }' +
-          '<\/style>');
+        document.write(
+          '<style>' +
+            'html[data-no-tailwind] { height: 100% }' +
+            'html[data-no-tailwind] body { display: flex; min-height: 100%; margin: 0; font-family: system-ui, sans-serif; background: #f9fafb }' +
+            'html[data-no-tailwind] [data-sidebar] { position: fixed; top: 0; bottom: 0; width: 18rem; overflow-y: auto; background: #fff; border: 1px solid #eee; padding: 0.5rem; font-size: 13px }' +
+            'html[data-no-tailwind] body > [data-sidebar]:nth-child(1) { left: 0 }' +
+            'html[data-no-tailwind] body > [data-sidebar]:nth-child(2) { right: 0 }' +
+            'html[data-no-tailwind] body:has([data-sidebar]:not(.hidden)) { padding: 0 18rem }' +
+            'html[data-no-tailwind] main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 3rem }' +
+            'html[data-no-tailwind] main > div { width: 100% }' +
+            'html[data-no-tailwind] fieldset { margin-top: 1rem }' +
+            'html[data-no-tailwind] legend { font-size: 14px; font-weight: 500 }' +
+            'html[data-no-tailwind] [data-sidebar] label { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-top: 1px solid #f3f4f6 }' +
+            'html[data-no-tailwind] nav ul { list-style: none; padding: 0 }' +
+            'html[data-no-tailwind] nav a { display: block; padding: 0.3rem 0.5rem; text-decoration: none; color: inherit; font-size: 14px }' +
+            'html[data-no-tailwind] nav a:hover { background: #f9fafb }' +
+            '<\/style>',
+        );
       }
     </script>
   </head>
@@ -391,15 +393,21 @@
         <div class="mb-2 mt-4 flex items-center justify-between">
           <legend class="block text-sm">Page</legend>
         </div>
-        <label class="flex items-center justify-between border-t border-gray-100 py-2" style="font-size:12px;font-family:monospace">
+        <label
+          class="flex items-center justify-between border-t border-gray-100 py-2"
+          style="font-size: 12px; font-family: monospace"
+        >
           <span>Tailwind CSS</span>
-          <input type="checkbox" id="tailwindToggle" />
+          <input
+            type="checkbox"
+            id="tailwindToggle"
+          />
         </label>
         <script>
-          (function() {
+          (function () {
             var cb = document.getElementById('tailwindToggle');
             cb.checked = localStorage.getItem('clerk-js-sandbox-tailwind') !== 'off';
-            cb.addEventListener('change', function() {
+            cb.addEventListener('change', function () {
               localStorage.setItem('clerk-js-sandbox-tailwind', cb.checked ? 'on' : 'off');
               location.reload();
             });
