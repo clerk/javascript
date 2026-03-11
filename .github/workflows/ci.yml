@@ -58,13 +58,13 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 100 # Enough for changeset status comparison, much faster than full history
+          fetch-depth: 0 # Full clone needed so changeset status finds correct merge-base with main
           fetch-tags: false
           filter: "blob:none"
           show-progress: false
 
       - name: Fetch main branch for changeset comparison
-        run: git fetch origin main:refs/remotes/origin/main --depth=100
+        run: git fetch origin main:refs/remotes/origin/main
 
       - name: Setup
         id: config
