@@ -85,8 +85,6 @@ function NativeSessionSync({
       return;
     }
 
-    hasSyncedRef.current = true;
-
     const syncToNative = async () => {
       try {
         const ClerkExpo = NativeClerkModule;
@@ -102,6 +100,7 @@ function NativeSessionSync({
         const hasNativeSession = !!(nativeSession?.sessionId || nativeSession?.session?.id);
 
         if (hasNativeSession) {
+          hasSyncedRef.current = true;
           return;
         }
 
@@ -109,6 +108,7 @@ function NativeSessionSync({
         const bearerToken = (await effectiveTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
         if (bearerToken) {
           await ClerkExpo.configure(publishableKey, bearerToken);
+          hasSyncedRef.current = true;
         }
       } catch (error) {
         if (__DEV__) {
