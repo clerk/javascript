@@ -27,6 +27,7 @@ export const ObjectType = {
   Cookies: 'cookies',
   Domain: 'domain',
   Email: 'email',
+  EnterpriseConnection: 'enterprise_connection',
   EmailAddress: 'email_address',
   ExternalAccount: 'external_account',
   FacebookAccount: 'facebook_account',
@@ -670,6 +671,44 @@ export interface PaginatedResponseJSON {
   total_count?: number;
 }
 
+export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.EnterpriseConnection;
+  name: string;
+  domains: string[];
+  organization_id: string | null;
+  active: boolean;
+  sync_user_attributes: boolean;
+  allow_subdomains: boolean;
+  disable_additional_identifications: boolean;
+  created_at: number;
+  updated_at: number;
+  saml_connection?: Pick<
+    SamlConnectionJSON,
+    | 'id'
+    | 'name'
+    | 'idp_entity_id'
+    | 'idp_sso_url'
+    | 'idp_certificate'
+    | 'idp_metadata_url'
+    | 'idp_metadata'
+    | 'acs_url'
+    | 'sp_entity_id'
+    | 'sp_metadata_url'
+    | 'sync_user_attributes'
+    | 'allow_subdomains'
+    | 'allow_idp_initiated'
+  >;
+  oauth_config?: {
+    id: string;
+    name: string;
+    client_id: string;
+    discovery_url: string;
+    logo_public_url: string;
+    created_at: number;
+    updated_at: number;
+  };
+}
+
 export interface SamlConnectionJSON extends ClerkResourceJSON {
   object: typeof ObjectType.SamlConnection;
   name: string;
@@ -854,7 +893,7 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   is_recurring: boolean;
   has_base_fee: boolean;
   publicly_visible: boolean;
-  fee: BillingMoneyAmountJSON;
+  fee: BillingMoneyAmountJSON | null;
   annual_fee: BillingMoneyAmountJSON | null;
   annual_monthly_fee: BillingMoneyAmountJSON | null;
   for_payer_type: 'org' | 'user';

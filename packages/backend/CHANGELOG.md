@@ -1,5 +1,27 @@
 # Change Log
 
+## 3.1.0
+
+### Minor Changes
+
+- Add support for annual-only Billing plans. ([#8012](https://github.com/clerk/javascript/pull/8012)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`3e63793`](https://github.com/clerk/javascript/commit/3e637932b1b7af669955f0e4f86233106f7d18ef)]:
+  - @clerk/shared@4.2.0
+
+## 3.0.2
+
+### Patch Changes
+
+- Fix `clerkFrontendApiProxy` to derive the `Clerk-Proxy-Url` header and Location rewrites from `x-forwarded-proto`/`x-forwarded-host` headers instead of the raw `request.url`. Behind a reverse proxy, `request.url` resolves to localhost, causing FAPI to receive an incorrect proxy URL. The fix uses the same forwarded-header resolution pattern as `ClerkRequest`. ([#7994](https://github.com/clerk/javascript/pull/7994)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Remove experimental comment from Agent Tasks API ([#7978](https://github.com/clerk/javascript/pull/7978)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`776ee1b`](https://github.com/clerk/javascript/commit/776ee1b3f3a576976b43352a93b6988340e83353), [`7fb870d`](https://github.com/clerk/javascript/commit/7fb870d37a8c153e9b0e6313b1d38ff53bc2f49b), [`09cb6d4`](https://github.com/clerk/javascript/commit/09cb6d4d45286cf4e657b880696bf0ff81a8a3e8)]:
+  - @clerk/shared@4.1.0
+
 ## 3.0.1
 
 ### Patch Changes
