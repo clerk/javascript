@@ -1,6 +1,7 @@
 import React from 'react';
 
-import type { ThemableCssProp } from '../styledSystem';
+import type { InternalTheme, ThemableCssProp } from '../styledSystem';
+import { stripDecorativeStyles, type StripOptions } from '../styledSystem/stripDecorativeStyles';
 import { useAppearance } from './AppearanceContext';
 import { appendEmojiSeparator, generateClassName } from './classGeneration';
 import type { ElementDescriptor, ElementId } from './elementDescriptors';
@@ -44,6 +45,17 @@ type MakeCustomizableOptions = {
   defaultDescriptor?: ElementDescriptor;
 };
 
+function wrapWithStripper(style: ThemableCssProp | undefined, options?: StripOptions): ThemableCssProp | undefined {
+  if (!style) return style;
+  if (Array.isArray(style)) {
+    return style.map(s => wrapWithStripper(s as ThemableCssProp, options)) as ThemableCssProp;
+  }
+  if (typeof style === 'function') {
+    return (theme: InternalTheme) => stripDecorativeStyles(style(theme) as Record<string, any>, options);
+  }
+  return stripDecorativeStyles(style as Record<string, any>, options);
+}
+
 export const makeCustomizable = <P,>(
   Component: React.FunctionComponent<P>,
   options?: MakeCustomizableOptions,
@@ -52,7 +64,7 @@ export const makeCustomizable = <P,>(
 
   const customizableComponent = React.forwardRef((props: Customizable<any>, ref) => {
     const { elementDescriptor, elementId, sx, className, ...restProps } = props;
-    const { parsedElements } = useAppearance();
+    const { parsedElements, rawMode } = useAppearance();
     const descriptors = [
       defaultDescriptor,
       ...(Array.isArray(elementDescriptor) ? elementDescriptor : [elementDescriptor]),
@@ -71,7 +83,13 @@ export const makeCustomizable = <P,>(
 
     const generatedStyles = generateClassName(parsedElements, descriptors, elementId, props);
     const generatedClassname = appendEmojiSeparator(generatedStyles.className, className);
-    generatedStyles.css.unshift(defaultStyles, sx);
+    // In rawMode, strip decorative styles from both defaultStyles and sx.
+    // sx is filtered with preserveContentRendering so icon images
+    // (backgroundImage/maskImage) survive while borders/colors are removed.
+    generatedStyles.css.unshift(
+      rawMode ? wrapWithStripper(defaultStyles) : defaultStyles,
+      rawMode ? wrapWithStripper(sx, { preserveContentRendering: true }) : sx,
+    );
 
     return (
       <Component
