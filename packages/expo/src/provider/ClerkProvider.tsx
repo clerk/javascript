@@ -78,6 +78,18 @@ function NativeSessionSync({
   useEffect(() => {
     if (!isSignedIn) {
       hasSyncedRef.current = false;
+
+      // Clear the native session so native components (UserButton, etc.)
+      // don't continue showing a signed-in state after JS-side sign out.
+      const ClerkExpo = NativeClerkModule;
+      if (ClerkExpo?.signOut) {
+        void ClerkExpo.signOut().catch((error: unknown) => {
+          if (__DEV__) {
+            console.warn('[NativeSessionSync] Failed to clear native session:', error);
+          }
+        });
+      }
+
       return;
     }
 
