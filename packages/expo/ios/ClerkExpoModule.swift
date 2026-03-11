@@ -22,6 +22,7 @@ public protocol ClerkViewFactoryProtocol {
   // SDK operations
   func configure(publishableKey: String, bearerToken: String?) async throws
   func getSession() async -> [String: Any]?
+  func getClientToken() -> String?
   func signOut() async throws
 }
 
@@ -168,6 +169,18 @@ class ClerkExpoModule: RCTEventEmitter {
       let session = await factory.getSession()
       resolve(session)
     }
+  }
+
+  // MARK: - getClientToken
+
+  @objc func getClientToken(_ resolve: @escaping RCTPromiseResolveBlock,
+                              reject: @escaping RCTPromiseRejectBlock) {
+    guard let factory = clerkViewFactory else {
+      resolve(nil)
+      return
+    }
+
+    resolve(factory.getClientToken())
   }
 
   // MARK: - signOut

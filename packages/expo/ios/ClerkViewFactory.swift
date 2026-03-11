@@ -64,7 +64,12 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     }
 
     Self.clerkConfigured = true
-    Clerk.configure(publishableKey: publishableKey)
+    let options: Clerk.Options = if let service = Self.keychainService {
+      .init(keychainConfig: .init(service: service))
+    } else {
+      .init()
+    }
+    Clerk.configure(publishableKey: publishableKey, options: options)
 
     // Wait for Clerk to finish loading (cached data + API refresh).
     // The static configure() fires off async refreshes; poll until loaded.
@@ -198,6 +203,10 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
       ]
       SecItemAdd(writeQuery as CFDictionary, nil)
     }
+  }
+
+  public func getClientToken() -> String? {
+    return Self.readNativeDeviceToken()
   }
 
   public func createAuthViewController(
