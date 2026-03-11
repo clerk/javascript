@@ -173,7 +173,7 @@ describe('Frontend API proxy handling', () => {
     expect(authenticateRequestMock).toHaveBeenCalledWith(
       expect.any(Request),
       expect.objectContaining({
-        proxyUrl: expect.stringContaining('/__clerk'),
+        proxyUrl: '/__clerk',
       }),
     );
   });

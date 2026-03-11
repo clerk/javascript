@@ -28,7 +28,7 @@ export function createClerkClient(opts: CreateClerkClientOptions): Clerk | Promi
 
   const originalLoad = clerk.load.bind(clerk);
   clerk.load = async (loadOpts?: Parameters<typeof clerk.load>[0]) => {
-    const { ui } = await import('@clerk/ui');
+    const { ui } = await import('@clerk/ui/no-rhc');
     return originalLoad({ ...loadOpts, ui });
   };
 

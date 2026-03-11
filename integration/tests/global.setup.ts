@@ -5,7 +5,7 @@ import { appConfigs } from '../presets';
 import { fs, parseEnvOptions, startClerkJsHttpServer, startClerkUiHttpServer } from '../scripts';
 
 setup('start long running apps', async () => {
-  setup.setTimeout(90_000);
+  setup.setTimeout(300_000);
 
   await fs.ensureDir(constants.TMP_DIR);
 

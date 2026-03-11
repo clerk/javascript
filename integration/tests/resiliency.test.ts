@@ -4,6 +4,21 @@ import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
+const make429ClerkResponse = () => ({
+  status: 429,
+  headers: { 'retry-after': '1' },
+  body: JSON.stringify({
+    errors: [
+      {
+        message: 'Too many requests',
+        long_message: 'Too many requests. Please retry later.',
+        code: 'rate_limit_exceeded',
+      },
+    ],
+    clerk_trace_id: 'some-trace-id',
+  }),
+});
+
 const make500ClerkResponse = () => ({
   status: 500,
   body: JSON.stringify({
@@ -293,6 +308,73 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
         // Verify loading component is no longer visible
         await expect(page.getByText('Clerk is loading', { exact: true })).toBeHidden();
       });
+    });
+  });
+
+  test.describe('429 rate limit resiliency', () => {
+    test('setActive surfaces 429 error to the developer instead of silently swallowing', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+
+      // Intercept touch requests to return 429
+      await page.route('**/v1/client/sessions/*/touch**', route => {
+        return route.fulfill(make429ClerkResponse());
+      });
+
+      // setActive should surface the 429 error so the developer can handle it
+      const error = await page.evaluate(async () => {
+        const session = window.Clerk?.session;
+        if (!session) {
+          return null;
+        }
+        try {
+          await window.Clerk?.setActive({ session });
+          return null;
+        } catch (e: any) {
+          return { status: e.status, message: e.message };
+        }
+      });
+
+      expect(error).not.toBeNull();
+      expect(error!.status).toBe(429);
+
+      await page.unrouteAll();
+
+      // The user must still be signed in — 429 should not trigger handleUnauthenticated
+      await u.po.expect.toBeSignedIn();
+    });
+
+    test('429 on /tokens does not cause recursive handleUnauthenticated calls', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+
+      let clientRequestCount = 0;
+      await page.route('**/v1/client?**', route => {
+        clientRequestCount++;
+        return route.continue();
+      });
+
+      // Intercept token requests to return 429
+      await page.route('**/v1/client/sessions/*/tokens**', route => {
+        return route.fulfill(make429ClerkResponse());
+      });
+
+      // Clear the token cache so the next poller tick makes a fresh network request
+      await page.evaluate(() => window.Clerk?.session?.clearCache());
+
+      await page.waitForTimeout(3_000);
+
+      await page.unrouteAll();
+
+      // Without the fix, 429 on /tokens would trigger handleUnauthenticated → Client.fetch loop.
+      // With the fix, /v1/client should only see normal poller activity (not hundreds of requests).
+      expect(clientRequestCount).toBeLessThan(5);
     });
   });
 

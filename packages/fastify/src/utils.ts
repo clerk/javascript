@@ -29,7 +29,7 @@ export const fastifyRequestToRequest = (req: FastifyRequest): Request => {
 };
 
 /**
- * Converts a Fastify request to a Fetch API Request with a real URL and body streaming,
+ * Converts a Fastify request to a Fetch API Request with full headers and body streaming,
  * suitable for proxy forwarding.
  */
 export const requestToProxyRequest = (req: FastifyRequest): Request => {

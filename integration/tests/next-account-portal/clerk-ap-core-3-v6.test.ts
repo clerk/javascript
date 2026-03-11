@@ -4,7 +4,7 @@ import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
 import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
-import { testHandshakeRecovery, testSignIn, testSignOut, testSignUp, testSSR } from './common';
+import { testAPClerkJsVersion, testHandshakeRecovery, testSignIn, testSignOut, testSignUp, testSSR } from './common';
 
 test.describe('Next with ClerkJS V6 <-> Account Portal Core 3 @ap-flows', () => {
   test.describe.configure({ mode: 'serial' });
@@ -25,6 +25,10 @@ test.describe('Next with ClerkJS V6 <-> Account Portal Core 3 @ap-flows', () => 
   test.afterAll(async () => {
     await fakeUser.deleteIfExists();
     await app.teardown();
+  });
+
+  test('AP serves clerk-js v6', async ({ page, context }) => {
+    await testAPClerkJsVersion({ app, page, context, fakeUser }, '6');
   });
 
   test('sign in', async ({ page, context }) => {

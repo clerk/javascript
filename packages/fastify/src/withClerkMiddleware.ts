@@ -10,7 +10,7 @@ import { fastifyRequestToRequest, requestToProxyRequest } from './utils';
 
 export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
   const frontendApiProxy = options.frontendApiProxy;
-  const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH);
+  const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH) || DEFAULT_PROXY_PATH;
 
   return async (fastifyRequest: FastifyRequest, reply: FastifyReply) => {
     const publishableKey = options.publishableKey || constants.PUBLISHABLE_KEY;
@@ -64,16 +64,10 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
           return reply.send();
         }
 
+        // Pass just the path - the backend resolves it against the request's
+        // public origin (from x-forwarded-* headers).
         if (!resolvedProxyUrl) {
-          const forwardedProto = fastifyRequest.headers['x-forwarded-proto'];
-          const protoHeader = Array.isArray(forwardedProto) ? forwardedProto[0] : forwardedProto;
-          const protocol = (protoHeader || '').split(',')[0].trim() || 'https';
-
-          const forwardedHost = fastifyRequest.headers['x-forwarded-host'];
-          const hostHeader = Array.isArray(forwardedHost) ? forwardedHost[0] : forwardedHost;
-          const host = (hostHeader || '').split(',')[0].trim() || fastifyRequest.hostname || 'localhost';
-
-          resolvedProxyUrl = `${protocol}://${host}${proxyPath}`;
+          resolvedProxyUrl = proxyPath;
         }
       }
     }

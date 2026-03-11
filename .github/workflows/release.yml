@@ -45,10 +45,15 @@ jobs:
         uses: ./.github/actions/init
         with:
           playwright-enabled: true # Must be present to enable caching on branched workflows
-          registry-url: 'https://registry.npmjs.org'
+          turbo-enabled: false # Release uses --force, so turbo cache is not needed
           # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           # turbo-team: ${{ vars.TURBO_TEAM }}
           # turbo-token: ${{ secrets.TURBO_TOKEN }}
+          turbo-team: ""
+          turbo-token: ""
+
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@latest
 
       - name: Build release
         run: pnpm turbo build $TURBO_ARGS --force
@@ -82,28 +87,29 @@ jobs:
               const clerkUiVersion = require('./packages/ui/package.json').version;
               const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerk',
-                repo: 'sdk-infra-workers',
-                workflow_id: 'update-pkg-versions.yml',
-                ref: 'main',
-                inputs: { clerkjsVersion, clerkUiVersion }
-              })
-
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerk',
-                repo: 'dashboard',
-                workflow_id: 'prepare-nextjs-sdk-update.yml',
-                ref: 'main',
-                inputs: { version: nextjsVersion }
-              })
-
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerk',
-                repo: 'clerk-docs',
-                workflow_id: 'typedoc.yml',
-                ref: 'main',
-              })
+              const dispatches = [
+                github.rest.actions.createWorkflowDispatch({
+                  owner: 'clerk',
+                  repo: 'sdk-infra-workers',
+                  workflow_id: 'update-pkg-versions.yml',
+                  ref: 'main',
+                  inputs: { clerkjsVersion, clerkUiVersion }
+                }),
+                github.rest.actions.createWorkflowDispatch({
+                  owner: 'clerk',
+                  repo: 'dashboard',
+                  workflow_id: 'prepare-nextjs-sdk-update.yml',
+                  ref: 'main',
+                  inputs: { version: nextjsVersion }
+                }),
+                github.rest.actions.createWorkflowDispatch({
+                  owner: 'clerk',
+                  repo: 'clerk-docs',
+                  workflow_id: 'typedoc.yml',
+                  ref: 'main',
+                }),
+              ];
+              await Promise.all(dispatches);
             } else{
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
             }
@@ -151,7 +157,9 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
-          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@latest
 
       - name: Version packages for canary
         id: version-packages
@@ -181,24 +189,30 @@ jobs:
             const clerkUiVersion = require('./packages/ui/package.json').version;
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-            github.rest.actions.createWorkflowDispatch({
-              owner: 'clerk',
-              repo: 'sdk-infra-workers',
-              workflow_id: 'update-pkg-versions.yml',
-              ref: 'main',
-              inputs: { clerkjsVersion, clerkUiVersion, sourceCommit: context.sha }
-            })
+            const dispatches = [
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerk',
+                repo: 'sdk-infra-workers',
+                workflow_id: 'update-pkg-versions.yml',
+                ref: 'main',
+                inputs: { clerkjsVersion, clerkUiVersion, sourceCommit: context.sha }
+              }),
+            ];
 
             if (nextjsVersion.includes('canary')) {
               console.log('clerk/nextjs changed, will notify clerk/accounts');
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerk',
-                repo: 'accounts',
-                workflow_id: 'release-staging.yml',
-                ref: 'main',
-                inputs: { version: nextjsVersion }
-              })
+              dispatches.push(
+                github.rest.actions.createWorkflowDispatch({
+                  owner: 'clerk',
+                  repo: 'accounts',
+                  workflow_id: 'release-staging.yml',
+                  ref: 'main',
+                  inputs: { version: nextjsVersion }
+                }),
+              );
             }
+
+            await Promise.all(dispatches);
 
   snapshot-release:
     name: Snapshot release
@@ -209,6 +223,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      pull-requests: write
 
     steps:
       - name: Limit action to Clerk members
@@ -220,10 +235,13 @@ jobs:
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
             try {
-              await github.rest.orgs.checkMembershipForUser({
+              const { data } = await github.rest.orgs.getMembershipForUser({
                 org: 'clerk',
                 username: context.actor
               });
+              if (data.state !== 'active') {
+                core.setFailed(`@${context.actor} is not an active member of the Clerk organization`);
+              }
             } catch (e) {
               core.setFailed(`@${context.actor} is not a member of the Clerk organization`);
             }
@@ -242,16 +260,14 @@ jobs:
           result-encoding: string
           retries: 3
           retry-exempt-status-codes: 400,401
-          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
             const commentCreated = new Date(context.payload.comment.created_at);
 
-            const pr = await github.rest.pulls.get({
+            const { data: pr } = await github.rest.pulls.get({
               owner: 'clerk',
               repo: 'javascript',
               pull_number: context.issue.number,
             });
-
             const prLastUpdated = new Date(pr.updated_at);
 
             if (prLastUpdated > commentCreated) {
@@ -265,7 +281,9 @@ jobs:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@latest
 
       - name: Extract snapshot name
         id: extract-snapshot-name
@@ -282,15 +300,15 @@ jobs:
 
       - name: Version packages for snapshot
         id: version-packages
-        run: npm run version-packages:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
+        run: pnpm version-packages:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
 
       - name: Build release
         if: steps.version-packages.outputs.success == '1'
-        run: npx turbo build $TURBO_ARGS
+        run: pnpm turbo build $TURBO_ARGS
 
       - name: Snapshot release
         if: steps.version-packages.outputs.success == '1'
-        run: npm run release:snapshot
+        run: pnpm release:snapshot
         env:
           NPM_CONFIG_PROVENANCE: true
 
@@ -326,15 +344,42 @@ jobs:
         if: steps.version-packages.outputs.success == '1'
         uses: peter-evans/create-or-update-comment@v3.0.0
         with:
-          token: ${{ secrets.CLERK_COOKIE_PAT }}
           comment-id: ${{ github.event.comment.id }}
           reactions: heart
+
+      - name: Minimize previous snapshot comments
+        if: steps.version-packages.outputs.success == '1'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+
+            const snapshotComments = comments.filter(
+              (comment) =>
+                comment.body?.includes('the snapshot version command generated the following package versions')
+            );
+
+            for (const comment of snapshotComments) {
+              await github.graphql(`
+                mutation MinimizeComment($id: ID!) {
+                  minimizeComment(input: { subjectId: $id, classifier: OUTDATED }) {
+                    minimizedComment {
+                      isMinimized
+                    }
+                  }
+                }
+              `, { id: comment.node_id });
+            }
 
       - name: Create snapshot release comment
         if: steps.version-packages.outputs.success == '1'
         uses: peter-evans/create-or-update-comment@v3.0.0
         with:
-          token: ${{ secrets.CLERK_COOKIE_PAT }}
           issue-number: ${{ github.event.issue.number }}
           body: |
             Hey @${{ github.event.comment.user.login }} - the snapshot version command generated the following package versions:
@@ -370,5 +415,6 @@ jobs:
         uses: ./.github/actions/init
         with:
           node-version: ${{ matrix.version }}
+          turbo-enabled: false
           turbo-team: ""
           turbo-token: ""

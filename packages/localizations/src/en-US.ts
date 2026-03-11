@@ -69,6 +69,7 @@ export const enUS: LocalizationResource = {
     availableFeatures: 'Available features',
     billedAnnually: 'Billed annually',
     billedMonthlyOnly: 'Only billed monthly',
+    billedAnnuallyOnly: 'Only billed annually',
     cancelFreeTrial: 'Cancel free trial',
     cancelFreeTrialAccessUntil:
       "Your trial will stay active until {{ date | longDate('en-US') }}. After that, you'll lose access to trial features. You won't be charged.",
@@ -221,7 +222,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
-  formFieldInputPlaceholder__username: undefined,
+  formFieldInputPlaceholder__username: 'Enter your username',
   formFieldInput__emailAddress_format: 'Example format: name@example.com',
   formFieldLabel__apiKey: 'API key',
   formFieldLabel__apiKeyDescription: 'Description',

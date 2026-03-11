@@ -11,7 +11,7 @@ vi.mock('@clerk/clerk-js/no-rhc', () => {
   return { Clerk };
 });
 
-vi.mock('@clerk/ui', () => ({
+vi.mock('@clerk/ui/no-rhc', () => ({
   ui: mockUi,
 }));
 
