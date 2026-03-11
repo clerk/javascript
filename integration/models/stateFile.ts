@@ -9,6 +9,8 @@ export type AppParams = {
   pid?: number;
   appDir: string;
   env: ReturnType<EnvironmentConfig['toJson']>;
+  clerkFapi?: string;
+  clerkTestingToken?: string;
 };
 
 type StandaloneAppParams = {

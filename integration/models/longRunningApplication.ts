@@ -85,6 +85,14 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
         pid = data.pid;
         appDir = data.appDir;
         env = params.env;
+        // Propagate testing tokens to this worker process so that
+        // setupClerkTestingToken() can bypass bot protection.
+        if (data.clerkFapi) {
+          process.env.CLERK_FAPI = data.clerkFapi;
+        }
+        if (data.clerkTestingToken) {
+          process.env.CLERK_TESTING_TOKEN = data.clerkTestingToken;
+        }
         return true;
       }
       return false;
@@ -171,7 +179,16 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
       pid = serveResult.pid;
       appDir = app.appDir;
       log(`Serve complete: port=${port}, serverUrl=${serverUrl}, pid=${pid}`);
-      stateFile.addLongRunningApp({ port, serverUrl, pid, id, appDir, env: params.env.toJson() });
+      stateFile.addLongRunningApp({
+        port,
+        serverUrl,
+        pid,
+        id,
+        appDir,
+        env: params.env.toJson(),
+        clerkFapi: process.env.CLERK_FAPI,
+        clerkTestingToken: process.env.CLERK_TESTING_TOKEN,
+      });
     } catch (error) {
       console.error('Error during app serve:', error);
       throw error;
