@@ -475,7 +475,9 @@ export const authenticateRequest: AuthenticateRequest = (async (
       }
     }
     const isRequestEligibleForMultiDomainSync =
-      authenticateContext.isSatellite && authenticateContext.secFetchDest === 'document';
+      authenticateContext.isSatellite &&
+      authenticateContext.secFetchDest === 'document' &&
+      authenticateContext.method === 'GET';
 
     /**
      * Begin multi-domain sync flows

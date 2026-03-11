@@ -2095,4 +2095,62 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
   });
+
+  describe('POST requests with sec-fetch-dest: document', () => {
+    const mockPostRequest = (headers = {}, cookies = {}, requestUrl = 'http://clerk.com/path') => {
+      const cookieStr = Object.entries(cookies)
+        .map(([k, v]) => `${k}=${v}`)
+        .join(';');
+
+      return new Request(requestUrl, {
+        method: 'POST',
+        headers: { ...defaultHeaders, 'sec-fetch-dest': 'document', cookie: cookieStr, ...headers },
+      });
+    };
+
+    test('returns signed out instead of handshake when clientUat > 0 and no cookieToken', async () => {
+      const requestState = await authenticateRequest(
+        mockPostRequest({}, { __client_uat: '12345' }),
+        mockOptions({ secretKey: 'deadbeef', publishableKey: PK_LIVE }),
+      );
+
+      expect(requestState).toBeSignedOut({ reason: AuthErrorReason.ClientUATWithoutSessionToken });
+    });
+
+    test('returns signed out instead of handshake for satellite app needing sync', async () => {
+      const requestState = await authenticateRequest(
+        mockPostRequest({}, { __client_uat: '0' }),
+        mockOptions({
+          publishableKey: PK_LIVE,
+          secretKey: 'deadbeef',
+          isSatellite: true,
+          signInUrl: 'https://primary.dev/sign-in',
+          domain: 'satellite.dev',
+        }),
+      );
+
+      expect(requestState).toBeSignedOut({
+        reason: AuthErrorReason.SessionTokenAndUATMissing,
+        isSatellite: true,
+        signInUrl: 'https://primary.dev/sign-in',
+        domain: 'satellite.dev',
+      });
+    });
+
+    test('returns signed out instead of handshake when clientUat > cookieToken.iat', async () => {
+      const requestState = await authenticateRequest(
+        mockPostRequest(
+          {},
+          {
+            __clerk_db_jwt: 'deadbeef',
+            __client_uat: `${mockJwtPayload.iat + 10}`,
+            __session: mockJwt,
+          },
+        ),
+        mockOptions(),
+      );
+
+      expect(requestState).toBeSignedOut({ reason: AuthErrorReason.SessionTokenIATBeforeClientUAT });
+    });
+  });
 });
