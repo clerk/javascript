@@ -21,10 +21,6 @@ inputs:
     description: 'Cache usage settings'
     required: false
     default: 'remote:rw'
-  turbo-cache-dir:
-    description: 'The cache dir to use for Turbo'
-    required: false
-    default: './.turbo-cache'
   turbo-signature:
     description: 'The signature to use for Turbo'
     required: false
@@ -52,7 +48,6 @@ runs:
       env:
         # envs are required to pass inputs to the script
         CACHE: ${{ inputs.turbo-cache }}
-        CACHE_DIR: ${{ inputs.turbo-cache-dir }}
         ENABLED: ${{ inputs.turbo-enabled }}
         SIGNATURE: ${{ inputs.turbo-signature }}
         SUMMARIZE: ${{ inputs.turbo-summarize }}
@@ -67,10 +62,9 @@ runs:
               ? os.availableParallelism()
               : os.cpus().length;
 
-          const { ENABLED, CACHE = 'remote:rw', CACHE_DIR, SIGNATURE, SUMMARIZE, TEAM, TOKEN, VERBOSE } = process.env
+          const { ENABLED, CACHE = 'remote:rw', SIGNATURE, SUMMARIZE, TEAM, TOKEN, VERBOSE } = process.env
 
           const ARGS = [
-            `--cache-dir=${CACHE_DIR}`,
             `--concurrency=${cpus}`,
             `--summarize=${SUMMARIZE}`,
           ]
