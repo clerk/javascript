@@ -349,10 +349,18 @@ function themeSelector() {
   return { updateTheme };
 }
 
-const presets: Record<
-  string,
-  { elements: Record<string, any>; options?: Record<string, any>; variables?: Record<string, any> }
-> = {
+type Preset = { elements: Record<string, any>; options?: Record<string, any>; variables?: Record<string, any> };
+
+function presetToAppearance(preset: Preset | undefined) {
+  if (!preset) return {};
+  return {
+    elements: preset.elements,
+    ...(preset.options ? { options: preset.options } : {}),
+    ...(preset.variables ? { variables: preset.variables } : {}),
+  };
+}
+
+const presets: Record<string, Preset> = {
   modernSaas,
   darkPremium,
   darkPremiumDefault,
@@ -372,13 +380,11 @@ function presetSelector() {
     sessionStorage.setItem('preset', presetName);
 
     const currentAppearance = Clerk.__internal_getOption('appearance') ?? {};
-    const preset = presetName ? presets[presetName] : undefined;
     void Clerk.__internal_updateProps({
       appearance: {
         ...currentAppearance,
-        elements: preset?.elements ?? {},
-        ...(preset?.options ? { options: preset.options } : {}),
-        ...(preset?.variables ? { variables: preset.variables } : {}),
+        elements: {},
+        ...presetToAppearance(presetName ? presets[presetName] : undefined),
       },
     });
   };
@@ -541,9 +547,7 @@ void (async () => {
       ui: { ClerkUI: window.__internal_ClerkUICtor },
       appearance: {
         ...(initialTheme ? { theme: initialTheme } : {}),
-        ...(initialPreset ? { elements: initialPreset.elements } : {}),
-        ...(initialPreset?.options ? { options: initialPreset.options } : {}),
-        ...(initialPreset?.variables ? { variables: initialPreset.variables } : {}),
+        ...presetToAppearance(initialPreset),
       },
     });
     renderCurrentRoute();
