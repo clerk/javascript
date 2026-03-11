@@ -11,12 +11,19 @@ import ClerkExpo  // Import the pod to access ClerkViewFactoryProtocol
 
 // MARK: - View Factory Implementation
 
-public class ClerkViewFactory: ClerkViewFactoryProtocol {
+public final class ClerkViewFactory: ClerkViewFactoryProtocol {
   public static let shared = ClerkViewFactory()
 
   private static let clerkLoadMaxAttempts = 30
   private static let clerkLoadIntervalNs: UInt64 = 100_000_000
   private static var clerkConfigured = false
+
+  private enum KeychainKey {
+    static let jsClientJWT = "__clerk_client_jwt"
+    static let nativeDeviceToken = "clerkDeviceToken"
+    static let cachedClient = "cachedClient"
+    static let cachedEnvironment = "cachedEnvironment"
+  }
 
   private init() {}
 
@@ -29,6 +36,11 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     return Bundle.main.bundleIdentifier
   }
 
+  private static var keychain: ExpoKeychain? {
+    guard let service = keychainService, !service.isEmpty else { return nil }
+    return ExpoKeychain(service: service)
+  }
+
   // Register this factory with the ClerkExpo module
   public static func register() {
     clerkViewFactory = shared
@@ -36,12 +48,29 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
 
   @MainActor
   public func configure(publishableKey: String, bearerToken: String? = nil) async throws {
+    Self.syncTokenState(bearerToken: bearerToken)
+
+    // If already configured with a new bearer token, refresh the client
+    // to pick up the session associated with the device token we just wrote.
+    // Clerk.configure() is a no-op on subsequent calls, so we use refreshClient().
+    if Self.shouldRefreshConfiguredClient(for: bearerToken) {
+      _ = try? await Clerk.shared.refreshClient()
+      return
+    }
+
+    Self.clerkConfigured = true
+    Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
+
+    await Self.waitForLoadedSession()
+  }
+
+  private static func syncTokenState(bearerToken: String?) {
     // Sync JS SDK's client token to native keychain so both SDKs share the same client.
     // This handles the case where the user signed in via JS SDK but the native SDK
     // has no device token (e.g., after app reinstall or first launch).
     if let token = bearerToken, !token.isEmpty {
-      let existingToken = Self.readNativeDeviceToken()
-      Self.writeNativeDeviceToken(token)
+      let existingToken = readNativeDeviceToken()
+      writeNativeDeviceToken(token)
 
       // If the device token changed (or didn't exist), clear stale cached client/environment.
       // A previous launch may have cached an anonymous client (no device token), and the
@@ -49,35 +78,34 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
       // causing a 400 error. Clearing the cache forces a fresh client fetch using only
       // the device token.
       if existingToken != token {
-        Self.clearCachedClerkData()
+        clearCachedClerkData()
       }
-    } else {
-      Self.syncJSTokenToNativeKeychainIfNeeded()
-    }
-
-    // If already configured with a new bearer token, refresh the client
-    // to pick up the session associated with the device token we just wrote.
-    // Clerk.configure() is a no-op on subsequent calls, so we use refreshClient().
-    if Self.clerkConfigured, let token = bearerToken, !token.isEmpty {
-      _ = try? await Clerk.shared.refreshClient()
       return
     }
 
-    Self.clerkConfigured = true
-    let options: Clerk.Options = if let service = Self.keychainService {
-      .init(keychainConfig: .init(service: service))
-    } else {
-      .init()
-    }
-    Clerk.configure(publishableKey: publishableKey, options: options)
+    syncJSTokenToNativeKeychainIfNeeded()
+  }
 
+  private static func shouldRefreshConfiguredClient(for bearerToken: String?) -> Bool {
+    clerkConfigured && !(bearerToken?.isEmpty ?? true)
+  }
+
+  private static func makeClerkOptions() -> Clerk.Options {
+    guard let service = keychainService else {
+      return .init()
+    }
+    return .init(keychainConfig: .init(service: service))
+  }
+
+  @MainActor
+  private static func waitForLoadedSession() async {
     // Wait for Clerk to finish loading (cached data + API refresh).
     // The static configure() fires off async refreshes; poll until loaded.
-    for _ in 0..<Self.clerkLoadMaxAttempts {
+    for _ in 0..<clerkLoadMaxAttempts {
       if Clerk.shared.isLoaded && Clerk.shared.session != nil {
         return
       }
-      try? await Task.sleep(nanoseconds: Self.clerkLoadIntervalNs)
+      try? await Task.sleep(nanoseconds: clerkLoadIntervalNs)
     }
   }
 
@@ -86,127 +114,34 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
   /// Both expo-secure-store and the native Clerk SDK use the iOS Keychain with the
   /// bundle identifier as the service name, making cross-SDK token sharing possible.
   private static func syncJSTokenToNativeKeychainIfNeeded() {
-    guard let service = keychainService, !service.isEmpty else { return }
+    guard let keychain else { return }
+    guard keychain.string(forKey: KeychainKey.nativeDeviceToken) == nil else { return }
+    guard let jsToken = keychain.string(forKey: KeychainKey.jsClientJWT), !jsToken.isEmpty else { return }
 
-    let jsTokenKey = "__clerk_client_jwt"
-    let nativeTokenKey = "clerkDeviceToken"
-
-    // Check if native SDK already has a device token — don't overwrite
-    let checkQuery: [String: Any] = [
-      kSecClass as String: kSecClassGenericPassword,
-      kSecAttrService as String: service,
-      kSecAttrAccount as String: nativeTokenKey,
-      kSecReturnData as String: false,
-      kSecMatchLimit as String: kSecMatchLimitOne,
-    ]
-    if SecItemCopyMatching(checkQuery as CFDictionary, nil) == errSecSuccess {
-      return  // Native token exists, don't overwrite
-    }
-
-    // Read JS SDK's client JWT from keychain (stored by expo-secure-store)
-    var result: CFTypeRef?
-    let readQuery: [String: Any] = [
-      kSecClass as String: kSecClassGenericPassword,
-      kSecAttrService as String: service,
-      kSecAttrAccount as String: jsTokenKey,
-      kSecReturnData as String: true,
-      kSecMatchLimit as String: kSecMatchLimitOne,
-    ]
-    guard SecItemCopyMatching(readQuery as CFDictionary, &result) == errSecSuccess,
-          let data = result as? Data,
-          let jsToken = String(data: data, encoding: .utf8),
-          !jsToken.isEmpty else {
-      return  // No JS token available
-    }
-
-    // Write JS token as native device token
-    guard let tokenData = jsToken.data(using: .utf8) else { return }
-    let writeQuery: [String: Any] = [
-      kSecClass as String: kSecClassGenericPassword,
-      kSecAttrService as String: service,
-      kSecAttrAccount as String: nativeTokenKey,
-      kSecValueData as String: tokenData,
-      kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
-    ]
-    SecItemAdd(writeQuery as CFDictionary, nil)
+    keychain.set(jsToken, forKey: KeychainKey.nativeDeviceToken)
   }
 
   /// Reads the native device token from keychain, if present.
   private static func readNativeDeviceToken() -> String? {
-    guard let service = keychainService, !service.isEmpty else { return nil }
-
-    var result: CFTypeRef?
-    let query: [String: Any] = [
-      kSecClass as String: kSecClassGenericPassword,
-      kSecAttrService as String: service,
-      kSecAttrAccount as String: "clerkDeviceToken",
-      kSecReturnData as String: true,
-      kSecMatchLimit as String: kSecMatchLimitOne,
-    ]
-    guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess,
-          let data = result as? Data else { return nil }
-    return String(data: data, encoding: .utf8)
+    keychain?.string(forKey: KeychainKey.nativeDeviceToken)
   }
 
   /// Clears stale cached client and environment data from keychain.
   /// This prevents the native SDK from loading a stale anonymous client
   /// during initialization, which would conflict with a newly-synced device token.
   private static func clearCachedClerkData() {
-    guard let service = keychainService, !service.isEmpty else { return }
-
-    for key in ["cachedClient", "cachedEnvironment"] {
-      let query: [String: Any] = [
-        kSecClass as String: kSecClassGenericPassword,
-        kSecAttrService as String: service,
-        kSecAttrAccount as String: key,
-      ]
-      SecItemDelete(query as CFDictionary)
-    }
+    keychain?.delete(KeychainKey.cachedClient)
+    keychain?.delete(KeychainKey.cachedEnvironment)
   }
 
   /// Writes the provided bearer token as the native SDK's device token.
   /// If the native SDK already has a device token, it is updated with the new value.
   private static func writeNativeDeviceToken(_ token: String) {
-    guard let service = keychainService, !service.isEmpty else { return }
-
-    let nativeTokenKey = "clerkDeviceToken"
-    guard let tokenData = token.data(using: .utf8) else { return }
-
-    // Check if native SDK already has a device token
-    let checkQuery: [String: Any] = [
-      kSecClass as String: kSecClassGenericPassword,
-      kSecAttrService as String: service,
-      kSecAttrAccount as String: nativeTokenKey,
-      kSecReturnData as String: false,
-      kSecMatchLimit as String: kSecMatchLimitOne,
-    ]
-
-    if SecItemCopyMatching(checkQuery as CFDictionary, nil) == errSecSuccess {
-      // Update the existing token
-      let updateQuery: [String: Any] = [
-        kSecClass as String: kSecClassGenericPassword,
-        kSecAttrService as String: service,
-        kSecAttrAccount as String: nativeTokenKey,
-      ]
-      let updateAttributes: [String: Any] = [
-        kSecValueData as String: tokenData,
-      ]
-      SecItemUpdate(updateQuery as CFDictionary, updateAttributes as CFDictionary)
-    } else {
-      // Write a new token
-      let writeQuery: [String: Any] = [
-        kSecClass as String: kSecClassGenericPassword,
-        kSecAttrService as String: service,
-        kSecAttrAccount as String: nativeTokenKey,
-        kSecValueData as String: tokenData,
-        kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
-      ]
-      SecItemAdd(writeQuery as CFDictionary, nil)
-    }
+    keychain?.set(token, forKey: KeychainKey.nativeDeviceToken)
   }
 
   public func getClientToken() -> String? {
-    return Self.readNativeDeviceToken()
+    Self.readNativeDeviceToken()
   }
 
   public func createAuthViewController(
@@ -214,18 +149,8 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     dismissable: Bool,
     completion: @escaping (Result<[String: Any], Error>) -> Void
   ) -> UIViewController? {
-    let authMode: AuthView.Mode
-    switch mode {
-    case "signIn":
-      authMode = .signIn
-    case "signUp":
-      authMode = .signUp
-    default:
-      authMode = .signInOrUp
-    }
-
     let wrapper = ClerkAuthWrapperViewController(
-      mode: authMode,
+      mode: Self.authMode(from: mode),
       dismissable: dismissable,
       completion: completion
     )
@@ -250,39 +175,25 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     dismissable: Bool,
     onEvent: @escaping (String, [String: Any]) -> Void
   ) -> UIViewController? {
-    let authMode: AuthView.Mode
-    switch mode {
-    case "signIn":
-      authMode = .signIn
-    case "signUp":
-      authMode = .signUp
-    default:
-      authMode = .signInOrUp
-    }
-
-    let hostingController = UIHostingController(
+    makeHostingController(
       rootView: ClerkInlineAuthWrapperView(
-        mode: authMode,
+        mode: Self.authMode(from: mode),
         dismissable: dismissable,
         onEvent: onEvent
       )
     )
-    hostingController.view.backgroundColor = .clear
-    return hostingController
   }
 
   public func createUserProfileView(
     dismissable: Bool,
     onEvent: @escaping (String, [String: Any]) -> Void
   ) -> UIViewController? {
-    let hostingController = UIHostingController(
+    makeHostingController(
       rootView: ClerkInlineProfileWrapperView(
         dismissable: dismissable,
         onEvent: onEvent
       )
     )
-    hostingController.view.backgroundColor = .clear
-    return hostingController
   }
 
   @MainActor
@@ -290,41 +201,119 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     guard let session = Clerk.shared.session else {
       return nil
     }
-
-    var result: [String: Any] = [
-      "sessionId": session.id,
-      "status": String(describing: session.status)
-    ]
-
-    // Include user details if available
-    let user = session.user ?? Clerk.shared.user
-
-    if let user = user {
-      var userDict: [String: Any] = [
-        "id": user.id,
-        "imageUrl": user.imageUrl
-      ]
-      if let firstName = user.firstName {
-        userDict["firstName"] = firstName
-      }
-      if let lastName = user.lastName {
-        userDict["lastName"] = lastName
-      }
-      if let primaryEmail = user.emailAddresses.first(where: { $0.id == user.primaryEmailAddressId }) {
-        userDict["primaryEmailAddress"] = primaryEmail.emailAddress
-      } else if let firstEmail = user.emailAddresses.first {
-        userDict["primaryEmailAddress"] = firstEmail.emailAddress
-      }
-      result["user"] = userDict
-    }
-
-    return result
+    return Self.sessionPayload(from: session, user: session.user ?? Clerk.shared.user)
   }
 
   @MainActor
   public func signOut() async throws {
     guard let sessionId = Clerk.shared.session?.id else { return }
     try await Clerk.shared.auth.signOut(sessionId: sessionId)
+  }
+
+  private static func authMode(from mode: String) -> AuthView.Mode {
+    switch mode {
+    case "signIn":
+      .signIn
+    case "signUp":
+      .signUp
+    default:
+      .signInOrUp
+    }
+  }
+
+  private func makeHostingController<Content: View>(rootView: Content) -> UIViewController {
+    let hostingController = UIHostingController(rootView: rootView)
+    hostingController.view.backgroundColor = .clear
+    return hostingController
+  }
+
+  private static func sessionPayload(from session: Session, user: User?) -> [String: Any] {
+    var payload: [String: Any] = [
+      "sessionId": session.id,
+      "status": String(describing: session.status)
+    ]
+
+    if let user {
+      payload["user"] = userPayload(from: user)
+    }
+
+    return payload
+  }
+
+  private static func userPayload(from user: User) -> [String: Any] {
+    var payload: [String: Any] = [
+      "id": user.id,
+      "imageUrl": user.imageUrl
+    ]
+
+    if let firstName = user.firstName {
+      payload["firstName"] = firstName
+    }
+    if let lastName = user.lastName {
+      payload["lastName"] = lastName
+    }
+    if let primaryEmail = user.emailAddresses.first(where: { $0.id == user.primaryEmailAddressId }) {
+      payload["primaryEmailAddress"] = primaryEmail.emailAddress
+    } else if let firstEmail = user.emailAddresses.first {
+      payload["primaryEmailAddress"] = firstEmail.emailAddress
+    }
+
+    return payload
+  }
+}
+
+private struct ExpoKeychain {
+  private let service: String
+
+  init(service: String) {
+    self.service = service
+  }
+
+  func string(forKey key: String) -> String? {
+    guard let data = data(forKey: key) else { return nil }
+    return String(data: data, encoding: .utf8)
+  }
+
+  func set(_ value: String, forKey key: String) {
+    guard let data = value.data(using: .utf8) else { return }
+
+    var addQuery = baseQuery(for: key)
+    addQuery[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+    addQuery[kSecValueData as String] = data
+
+    let status = SecItemAdd(addQuery as CFDictionary, nil)
+    if status == errSecDuplicateItem {
+      let attributes: [String: Any] = [
+        kSecValueData as String: data,
+        kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+      ]
+      SecItemUpdate(baseQuery(for: key) as CFDictionary, attributes as CFDictionary)
+    }
+  }
+
+  func delete(_ key: String) {
+    SecItemDelete(baseQuery(for: key) as CFDictionary)
+  }
+
+  private func data(forKey key: String) -> Data? {
+    var query = baseQuery(for: key)
+    query[kSecReturnData as String] = true
+    query[kSecMatchLimit as String] = kSecMatchLimitOne
+
+    var result: CFTypeRef?
+    guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess else {
+      return nil
+    }
+
+    return result as? Data
+  }
+
+  private func baseQuery(for key: String) -> [String: Any] {
+    [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: key,
+    ]
   }
 }
 
@@ -530,4 +519,3 @@ struct ClerkInlineProfileWrapperView: View {
       }
   }
 }
-
