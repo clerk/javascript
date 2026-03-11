@@ -652,6 +652,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       // Check for cross-origin requests from satellite domains to primary domain
       const shouldForceHandshakeForCrossDomain =
         !authenticateContext.isSatellite && // We're on primary
+        authenticateContext.method === 'GET' && // Only GET navigations (POST form submissions set sec-fetch-dest: document too)
         authenticateContext.secFetchDest === 'document' && // Document navigation
         authenticateContext.isCrossOriginReferrer() && // Came from different domain
         !authenticateContext.isKnownClerkReferrer() && // Not from Clerk accounts portal or FAPI

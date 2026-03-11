@@ -1815,6 +1815,39 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
+    test('does not trigger handshake for cross-origin POST document request on primary domain', async () => {
+      const cookieStr = Object.entries({
+        __session: mockJwt,
+        __client_uat: '12345',
+      })
+        .map(([k, v]) => `${k}=${v}`)
+        .join(';');
+
+      const request = new Request('https://primary.com/dashboard', {
+        method: 'POST',
+        headers: {
+          ...defaultHeaders,
+          referer: 'https://satellite.com/form',
+          'sec-fetch-dest': 'document',
+          cookie: cookieStr,
+        },
+      });
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
     test('does not trigger handshake for non-document requests', async () => {
       const request = mockRequestWithCookies(
         {
