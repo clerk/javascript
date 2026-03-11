@@ -1,6 +1,7 @@
 import { PageMocking, type MockScenario } from '@clerk/msw';
 import * as l from '../../localizations';
 import { dark, neobrutalism, raw, shadcn, shadesOfPurple } from '../../ui/src/themes';
+import { darkPremium, darkPremiumDefault, modernSaas, terminalDefault, terminalRaw } from './raw-demo-appearances';
 import type { Clerk as ClerkType } from '../';
 import * as scenarios from './scenarios';
 
@@ -359,7 +360,13 @@ function presetToAppearance(preset: Preset | undefined) {
   };
 }
 
-const presets: Record<string, Preset> = {};
+const presets: Record<string, Preset> = {
+  modernSaas,
+  darkPremium,
+  darkPremiumDefault,
+  terminalRaw,
+  terminalDefault,
+};
 
 function presetSelector() {
   assertClerkIsLoaded(Clerk);
