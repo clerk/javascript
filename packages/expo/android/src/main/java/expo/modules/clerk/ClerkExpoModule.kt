@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.clerk.api.Clerk
+import com.clerk.api.network.serialization.ClerkResult
 import com.facebook.react.bridge.ActivityEventListener
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -14,7 +15,6 @@ import com.facebook.react.bridge.WritableNativeMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
@@ -68,19 +68,51 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
             try {
                 publishableKey = pubKey
 
-                // If the JS SDK has a bearer token, write it to the native SDK's
-                // SharedPreferences so both SDKs share the same Clerk API client.
-                if (!bearerToken.isNullOrEmpty()) {
-                    reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
-                        .edit()
-                        .putString("DEVICE_TOKEN", bearerToken)
-                        .apply()
+                if (!Clerk.isInitialized.value) {
+                    // First-time initialization — write the bearer token to SharedPreferences
+                    // before initializing so the SDK boots with the correct client.
+                    if (!bearerToken.isNullOrEmpty()) {
+                        reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
+                            .edit()
+                            .putString("DEVICE_TOKEN", bearerToken)
+                            .apply()
+                    }
+
+                    Clerk.initialize(reactApplicationContext, pubKey)
+
+                    // Wait for initialization to complete with timeout
+                    try {
+                        withTimeout(10_000L) {
+                            Clerk.isInitialized.first { it }
+                        }
+                    } catch (e: TimeoutCancellationException) {
+                        val initError = Clerk.initializationError.value
+                        val message = if (initError != null) {
+                            "Clerk initialization timed out: ${initError.message}"
+                        } else {
+                            "Clerk initialization timed out after 10 seconds"
+                        }
+                        promise.reject("E_TIMEOUT", message)
+                        return@launch
+                    }
+
+                    // Check for initialization errors
+                    val error = Clerk.initializationError.value
+                    if (error != null) {
+                        promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}")
+                    } else {
+                        promise.resolve(null)
+                    }
+                    return@launch
                 }
 
-                if (Clerk.isInitialized.value) {
-                    // Already initialized — force a client refresh so the SDK
-                    // picks up the new device token from SharedPreferences.
-                    forceClientRefresh()
+                // Already initialized — use the public SDK API to update
+                // the device token and trigger a client/environment refresh.
+                if (!bearerToken.isNullOrEmpty()) {
+                    val result = Clerk.updateDeviceToken(bearerToken)
+                    if (result is ClerkResult.Failure) {
+                        debugLog(TAG, "configure - updateDeviceToken failed: ${result.error}")
+                    }
 
                     // Wait for session to appear with the new token (up to 5s)
                     try {
@@ -88,91 +120,14 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
                             Clerk.sessionFlow.first { it != null }
                         }
                     } catch (_: TimeoutCancellationException) {
-                        debugLog(TAG, "configure - session did not appear after force refresh")
+                        debugLog(TAG, "configure - session did not appear after token update")
                     }
-
-                    promise.resolve(null)
-                    return@launch
                 }
 
-                // First-time initialization
-                Clerk.initialize(reactApplicationContext, pubKey)
-
-                // Wait for initialization to complete with timeout
-                try {
-                    withTimeout(10_000L) {
-                        Clerk.isInitialized.first { it }
-                    }
-                } catch (e: TimeoutCancellationException) {
-                    val initError = Clerk.initializationError.value
-                    val message = if (initError != null) {
-                        "Clerk initialization timed out: ${initError.message}"
-                    } else {
-                        "Clerk initialization timed out after 10 seconds"
-                    }
-                    promise.reject("E_TIMEOUT", message)
-                    return@launch
-                }
-
-                // Check for initialization errors
-                val error = Clerk.initializationError.value
-                if (error != null) {
-                    promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}")
-                } else {
-                    promise.resolve(null)
-                }
+                promise.resolve(null)
             } catch (e: Exception) {
                 promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${e.message}", e)
             }
-        }
-    }
-
-    /**
-     * Forces the Clerk SDK to re-fetch client/environment data from the API.
-     *
-     * This is needed when a new device token has been written to SharedPreferences
-     * but the SDK was already initialized (so Clerk.initialize() is a no-op).
-     *
-     * Uses reflection to find the ConfigurationManager instance by type (field name
-     * may vary across SDK versions), then sets _isInitialized to false so
-     * reinitialize() proceeds with a fresh client/environment fetch.
-     */
-    private fun forceClientRefresh() {
-        try {
-            // Find the ConfigurationManager field by type since the name may differ
-            val clerkClass = Clerk::class.java
-            var configManager: Any? = null
-
-            for (field in clerkClass.declaredFields) {
-                field.isAccessible = true
-                val fieldValue = field.get(Clerk)
-                if (fieldValue != null && fieldValue.javaClass.name.contains("ConfigurationManager")) {
-                    configManager = fieldValue
-                    break
-                }
-            }
-
-            if (configManager == null) {
-                debugLog(TAG, "forceClientRefresh - ConfigurationManager not found")
-                return
-            }
-
-            // Find _isInitialized field (MutableStateFlow<Boolean>) in ConfigurationManager
-            // and set it to false so reinitialize() will proceed
-            for (field in configManager.javaClass.declaredFields) {
-                field.isAccessible = true
-                val fieldValue = field.get(configManager)
-                if (fieldValue is MutableStateFlow<*> && fieldValue.value is Boolean && fieldValue.value == true) {
-                    @Suppress("UNCHECKED_CAST")
-                    (fieldValue as MutableStateFlow<Boolean>).value = false
-                    Clerk.reinitialize()
-                    return
-                }
-            }
-
-            debugLog(TAG, "forceClientRefresh - _isInitialized flow not found")
-        } catch (e: Exception) {
-            debugLog(TAG, "forceClientRefresh failed: ${e.message}")
         }
     }
 
