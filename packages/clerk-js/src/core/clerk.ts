@@ -38,7 +38,7 @@ import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
-import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
+import { isHttpOrHttps, isValidProxyUrl, isVercelPreviewDeploy, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
 import {
   eventPrebuiltComponentMounted,
   eventPrebuiltComponentOpened,
@@ -351,7 +351,14 @@ export class Clerk implements ClerkInterface {
       if (!isValidProxyUrl(_unfilteredProxy)) {
         errorThrower.throwInvalidProxyUrl({ url: _unfilteredProxy });
       }
-      return proxyUrlToAbsoluteURL(_unfilteredProxy);
+      const resolved = proxyUrlToAbsoluteURL(_unfilteredProxy);
+      if (resolved) {
+        return resolved;
+      }
+      // Auto-detect for Vercel preview deployments when no explicit proxy or domain is configured
+      if (!this.#domain && isVercelPreviewDeploy(window.location.hostname)) {
+        return `${window.location.origin}/__clerk`;
+      }
     }
     return '';
   }

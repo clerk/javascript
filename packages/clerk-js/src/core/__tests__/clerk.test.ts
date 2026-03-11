@@ -2491,6 +2491,71 @@ describe('Clerk singleton', () => {
         expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://proxy.com/api/__clerk/v1/me');
       });
     });
+
+    describe('auto-detection for .vercel.app', () => {
+      const originalLocation = window.location;
+
+      afterEach(() => {
+        Object.defineProperty(window, 'location', {
+          value: originalLocation,
+          writable: true,
+        });
+      });
+
+      test('auto-derives proxyUrl when hostname is .vercel.app', () => {
+        Object.defineProperty(window, 'location', {
+          value: {
+            ...originalLocation,
+            hostname: 'myapp-abc123.vercel.app',
+            origin: 'https://myapp-abc123.vercel.app',
+            href: 'https://myapp-abc123.vercel.app/dashboard',
+          },
+          writable: true,
+        });
+
+        const sut = new Clerk(developmentPublishableKey);
+        expect(sut.proxyUrl).toBe('https://myapp-abc123.vercel.app/__clerk');
+      });
+
+      test('does NOT auto-derive proxyUrl for non-.vercel.app domains', () => {
+        const sut = new Clerk(developmentPublishableKey);
+        expect(sut.proxyUrl).toBe('');
+      });
+
+      test('explicit proxyUrl takes precedence over auto-detection', () => {
+        Object.defineProperty(window, 'location', {
+          value: {
+            ...originalLocation,
+            hostname: 'myapp-abc123.vercel.app',
+            origin: 'https://myapp-abc123.vercel.app',
+            href: 'https://myapp-abc123.vercel.app/dashboard',
+          },
+          writable: true,
+        });
+
+        const sut = new Clerk(developmentPublishableKey, {
+          proxyUrl: 'https://custom-proxy.example.com/__clerk',
+        });
+        expect(sut.proxyUrl).toBe('https://custom-proxy.example.com/__clerk');
+      });
+
+      test('explicit domain skips auto-detection', () => {
+        Object.defineProperty(window, 'location', {
+          value: {
+            ...originalLocation,
+            hostname: 'myapp-abc123.vercel.app',
+            origin: 'https://myapp-abc123.vercel.app',
+            href: 'https://myapp-abc123.vercel.app/dashboard',
+          },
+          writable: true,
+        });
+
+        const sut = new Clerk(developmentPublishableKey, {
+          domain: 'clerk.myapp.com',
+        });
+        expect(sut.proxyUrl).toBe('');
+      });
+    });
   });
 
   describe('buildUrlWithAuth', () => {

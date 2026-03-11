@@ -258,6 +258,46 @@ describe('AuthenticateContext', () => {
     });
   });
 
+  describe('auto-proxy for .vercel.app', () => {
+    it('auto-derives proxyUrl for .vercel.app hostnames', async () => {
+      const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkTest,
+      });
+
+      expect(context.proxyUrl).toBe('https://myapp-abc123.vercel.app/__clerk');
+    });
+
+    it('does NOT auto-derive proxyUrl for non-.vercel.app domains', async () => {
+      const clerkRequest = createClerkRequest(new Request('https://myapp.com/dashboard'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkTest,
+      });
+
+      expect(context.proxyUrl).toBeUndefined();
+    });
+
+    it('explicit proxyUrl takes precedence over auto-detection', async () => {
+      const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkTest,
+        proxyUrl: 'https://custom-proxy.example.com/__clerk',
+      });
+
+      expect(context.proxyUrl).toBe('https://custom-proxy.example.com/__clerk');
+    });
+
+    it('explicit domain skips auto-detection', async () => {
+      const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkTest,
+        domain: 'clerk.myapp.com',
+      });
+
+      expect(context.proxyUrl).toBeUndefined();
+    });
+  });
+
   // Added these tests to verify that the generated sha-1 is the same as the one used in cookie assignment
   // Tests copied from packages/shared/src/__tests__/keys.test.ts
   describe('getCookieSuffix(publishableKey, subtle)', () => {
