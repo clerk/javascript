@@ -5,7 +5,7 @@ import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
 
-test.describe('Custom JWT templates with skipCache @nextjs', () => {
+test.describe('Custom JWT templates @nextjs', () => {
   test.describe.configure({ mode: 'serial' });
 
   let app: Application;
@@ -37,9 +37,9 @@ import { auth } from '@clerk/nextjs/server';
 export async function GET() {
   const headersList = await headers();
   const templateName = headersList.get('x-jwt-template');
-  const skipCache = headersList.get('x-skip-cache') === 'true';
   const { getToken, userId, sessionId } = await auth();
-  const customToken = await getToken({ template: templateName, skipCache });
+  // Always returns a valid, freshly issued token
+  const customToken = await getToken({ template: '${jwtTemplateName}' });
   return Response.json({
     userId,
     sessionId,
@@ -82,16 +82,9 @@ export async function GET() {
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
 
-    const fetchToken = (skipCache: boolean) =>
-      page.request.get(`${app.serverUrl}/api/custom-jwt`, {
-        headers: {
-          'x-jwt-template': jwtTemplateName,
-          'x-skip-cache': String(skipCache),
-        },
-      });
+    const fetchToken = () => page.request.get(`${app.serverUrl}/api/custom-jwt`);
 
-    // Without skipCache
-    const res1 = await fetchToken(false);
+    const res1 = await fetchToken();
     expect(res1.status()).toBe(200);
     const body1 = await res1.json();
     expect(body1.userId).toBeTruthy();
@@ -101,8 +94,10 @@ export async function GET() {
     const payload1 = JSON.parse(atob(body1.customToken.split('.')[1]));
     expect(payload1.test_claim).toBe('hello_from_e2e');
 
-    // With skipCache — should return a valid, freshly issued token
-    const res2 = await fetchToken(true);
+    // Wait >1s so the next token gets a different `iat` (seconds granularity)
+    await page.waitForTimeout(1500);
+
+    const res2 = await fetchToken();
     expect(res2.status()).toBe(200);
     const body2 = await res2.json();
     expect(body2.userId).toBeTruthy();
@@ -111,6 +106,6 @@ export async function GET() {
 
     const payload2 = JSON.parse(atob(body2.customToken.split('.')[1]));
     expect(payload2.test_claim).toBe('hello_from_e2e');
-    expect(payload2.iat).toBeGreaterThanOrEqual(payload1.iat);
+    expect(payload2.iat).toBeGreaterThan(payload1.iat);
   });
 });
