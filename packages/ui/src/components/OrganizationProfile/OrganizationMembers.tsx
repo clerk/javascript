@@ -2,6 +2,7 @@ import { useOrganization } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useFetchRoles } from '@/hooks/useFetchRoles';
+import { Users } from '@/icons';
 import { Alert } from '@/ui/elements/Alert';
 import { Animated } from '@/ui/elements/Animated';
 import { Card } from '@/ui/elements/Card';
@@ -19,7 +20,6 @@ import { MembersActionsRow } from './MembersActions';
 import { MembersSearch } from './MembersSearch';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
-import { Users } from '@/icons';
 
 export const ACTIVE_MEMBERS_PAGE_SIZE = 10;
 
