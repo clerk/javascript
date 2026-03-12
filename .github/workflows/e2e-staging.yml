@@ -116,11 +116,10 @@ jobs:
           fi
           jq --version
 
-      # --- SDK from ref: build from source and publish to local registry ---
       - name: Build packages
-        if: ${{ steps.inputs.outputs.sdk-source == 'ref' }}
         run: pnpm turbo build $TURBO_ARGS --only
 
+      # --- SDK from ref: publish to local registry ---
       - name: Publish to local registry
         if: ${{ steps.inputs.outputs.sdk-source == 'ref' }}
         run: pkglab pub --force
