@@ -1,10 +1,5 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import type {
-  BillingPaymentMethodResource,
-  ConfirmCheckoutParams,
-  RemoveFunctions,
-  BillingPerUnitTotal,
-} from '@clerk/shared/types';
+import type { BillingPaymentMethodResource, ConfirmCheckoutParams, RemoveFunctions } from '@clerk/shared/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
