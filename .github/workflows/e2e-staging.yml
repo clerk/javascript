@@ -66,6 +66,7 @@ jobs:
           PAYLOAD_COMMIT_SHA: ${{ github.event.client_payload.clerk-go-commit-sha }}
           PAYLOAD_NOTIFY_SLACK: ${{ github.event.client_payload.notify-slack }}
           PAYLOAD_SDK_SOURCE: ${{ github.event.client_payload.sdk-source }}
+          TEST_NAME: ${{ matrix.test-name }}
         run: |
           if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
             echo "ref=${INPUT_REF:-main}" >> $GITHUB_OUTPUT
@@ -78,6 +79,7 @@ jobs:
             echo "notify-slack=${PAYLOAD_NOTIFY_SLACK:-true}" >> $GITHUB_OUTPUT
             echo "sdk-source=${PAYLOAD_SDK_SOURCE:-latest}" >> $GITHUB_OUTPUT
           fi
+          echo "artifact-suffix=${TEST_NAME//:/-}" >> $GITHUB_OUTPUT
 
       - name: Validate ref
         env:
@@ -198,7 +200,7 @@ jobs:
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ replace(matrix.test-name, ':', '-') }}
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.inputs.outputs.artifact-suffix }}
           path: integration/test-results
           retention-days: 1
 
