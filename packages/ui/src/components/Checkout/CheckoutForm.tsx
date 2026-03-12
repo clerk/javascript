@@ -35,7 +35,6 @@ export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
 
   const { plan, totals, isImmediatePlanChange, planPeriod, freeTrialEndsAt } = checkout;
-  console.log({ checkout });
 
   if (!plan) {
     return null;

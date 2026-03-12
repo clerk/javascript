@@ -42,21 +42,13 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
 
   constructor(data: BillingCheckoutJSON | null = null) {
     super();
-    try {
-      this.fromJSON(data);
-    } catch (error) {
-      console.error({ error });
-      throw error;
-    }
+    this.fromJSON(data);
   }
 
   protected fromJSON(data: BillingCheckoutJSON | null): this {
-    console.log({ data });
-
     if (!data) {
       return this;
     }
-    console.log({ checkoutId: data.id });
 
     this.id = data.id;
     this.externalClientSecret = data.external_client_secret;
