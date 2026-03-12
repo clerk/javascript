@@ -766,7 +766,7 @@ test.describe('api keys component @machine', () => {
     await u.po.expect.toBeSignedIn();
 
     // Mock the API keys create endpoint to return 403 for free plan users who exceed free tier limits
-    await page.route('*/**/v1/api_keys', async route => {
+    await page.route('*/**/api_keys', async route => {
       if (route.request().method() === 'POST') {
         await route.fulfill({
           status: 403,
