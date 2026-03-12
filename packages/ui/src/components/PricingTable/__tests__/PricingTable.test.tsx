@@ -637,3 +637,273 @@ describe('PricingTable - plans visibility', () => {
     });
   });
 });
+
+describe('PricingTable - seat tiers rendering', () => {
+  const createSeatPlan = ({
+    id,
+    feeAmount,
+    tiers,
+  }: {
+    id: string;
+    feeAmount: number;
+    tiers: Array<{
+      id: string;
+      startsAtBlock: number;
+      endsAfterBlock: number | null;
+      feePerBlock: {
+        amount: number;
+        amountFormatted: string;
+        currencySymbol: string;
+        currency: string;
+      };
+    }>;
+  }) => {
+    return {
+      id,
+      name: 'Seat Plan',
+      fee: {
+        amount: feeAmount,
+        amountFormatted: feeAmount === 0 ? '0.00' : '20.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: feeAmount === 0 ? 0 : 20000,
+        amountFormatted: feeAmount === 0 ? '0.00' : '200.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: feeAmount === 0 ? 0 : 1667,
+        amountFormatted: feeAmount === 0 ? '0.00' : '16.67',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      description: 'Seat-based pricing plan',
+      hasBaseFee: true,
+      isRecurring: true,
+      isDefault: false,
+      forPayerType: 'user',
+      publiclyVisible: true,
+      slug: `seat-plan-${id}`,
+      avatarUrl: '',
+      unitPrices: [
+        {
+          name: 'seats',
+          blockSize: 1,
+          tiers,
+        },
+      ],
+      features: [] as any[],
+      freeTrialEnabled: false,
+      freeTrialDays: 0,
+      __internal_toSnapshot: vi.fn(),
+      pathRoot: '',
+      reload: vi.fn(),
+    } as const;
+  };
+
+  const setup = async (plan: ReturnType<typeof createSeatPlan>) => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
+    });
+
+    props.setProps({});
+
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [plan as any], total_count: 1 });
+    fixtures.clerk.billing.getSubscription.mockRejectedValue(new Error('Unauthenticated'));
+
+    const renderResult = render(<PricingTable />, { wrapper });
+
+    await waitFor(() => {
+      expect(renderResult.getByRole('heading', { name: 'Seat Plan' })).toBeVisible();
+    });
+
+    return renderResult;
+  };
+
+  it('renders only "Up to N seats" for one free capped tier', async () => {
+    const plan = createSeatPlan({
+      id: 'plan_free_capped',
+      feeAmount: 0,
+      tiers: [
+        {
+          id: 'tier_1',
+          startsAtBlock: 1,
+          endsAfterBlock: 5,
+          feePerBlock: {
+            amount: 0,
+            amountFormatted: '0.00',
+            currencySymbol: '$',
+            currency: 'USD',
+          },
+        },
+      ],
+    });
+
+    const { getByText, queryByText } = await setup(plan);
+
+    expect(getByText('Up to 5 seats')).toBeVisible();
+    expect(queryByText('$5/mo per seat')).not.toBeInTheDocument();
+  });
+
+  it('renders per-seat price plus "Up to N seats" for one paid capped tier', async () => {
+    const plan = createSeatPlan({
+      id: 'plan_paid_capped',
+      feeAmount: 2000,
+      tiers: [
+        {
+          id: 'tier_1',
+          startsAtBlock: 1,
+          endsAfterBlock: 5,
+          feePerBlock: {
+            amount: 500,
+            amountFormatted: '5.00',
+            currencySymbol: '$',
+            currency: 'USD',
+          },
+        },
+      ],
+    });
+
+    const { getByText } = await setup(plan);
+
+    expect(getByText('$5/mo per seat')).toBeVisible();
+    expect(getByText('Up to 5 seats')).toBeVisible();
+  });
+
+  it('renders only "Unlimited seats" for one free uncapped tier', async () => {
+    const plan = createSeatPlan({
+      id: 'plan_free_unlimited',
+      feeAmount: 0,
+      tiers: [
+        {
+          id: 'tier_1',
+          startsAtBlock: 1,
+          endsAfterBlock: null,
+          feePerBlock: {
+            amount: 0,
+            amountFormatted: '0.00',
+            currencySymbol: '$',
+            currency: 'USD',
+          },
+        },
+      ],
+    });
+
+    const { getByText, queryByText } = await setup(plan);
+
+    expect(getByText('Unlimited seats')).toBeVisible();
+    expect(queryByText('$5/mo per seat')).not.toBeInTheDocument();
+  });
+
+  it('renders per-seat price plus "Unlimited seats" for one paid uncapped tier', async () => {
+    const plan = createSeatPlan({
+      id: 'plan_paid_unlimited',
+      feeAmount: 2000,
+      tiers: [
+        {
+          id: 'tier_1',
+          startsAtBlock: 1,
+          endsAfterBlock: null,
+          feePerBlock: {
+            amount: 500,
+            amountFormatted: '5.00',
+            currencySymbol: '$',
+            currency: 'USD',
+          },
+        },
+      ],
+    });
+
+    const { getByText } = await setup(plan);
+
+    expect(getByText('$5/mo per seat')).toBeVisible();
+    expect(getByText('Unlimited seats')).toBeVisible();
+  });
+
+  it('renders included seats with tooltip and unlimited limit for free+additional uncapped tiers', async () => {
+    const plan = createSeatPlan({
+      id: 'plan_two_tier_unlimited',
+      feeAmount: 2000,
+      tiers: [
+        {
+          id: 'tier_included',
+          startsAtBlock: 1,
+          endsAfterBlock: 5,
+          feePerBlock: {
+            amount: 0,
+            amountFormatted: '0.00',
+            currencySymbol: '$',
+            currency: 'USD',
+          },
+        },
+        {
+          id: 'tier_additional',
+          startsAtBlock: 6,
+          endsAfterBlock: null,
+          feePerBlock: {
+            amount: 500,
+            amountFormatted: '5.00',
+            currencySymbol: '$',
+            currency: 'USD',
+          },
+        },
+      ],
+    });
+
+    const { getByText, findByText, userEvent } = await setup(plan);
+
+    expect(getByText('5 seats included')).toBeVisible();
+    expect(getByText('($5/mo for additional)')).toBeVisible();
+    expect(getByText('Unlimited seats')).toBeVisible();
+
+    await userEvent.hover(getByText('($5/mo for additional)'));
+
+    expect(
+      await findByText('First 5 seats are included in the plan. Additional seats are $5/month each.'),
+    ).toBeVisible();
+  });
+
+  it('renders included seats with tooltip and capped limit for free+additional capped tiers', async () => {
+    const plan = createSeatPlan({
+      id: 'plan_two_tier_capped',
+      feeAmount: 0,
+      tiers: [
+        {
+          id: 'tier_included',
+          startsAtBlock: 1,
+          endsAfterBlock: 5,
+          feePerBlock: {
+            amount: 0,
+            amountFormatted: '0.00',
+            currencySymbol: '$',
+            currency: 'USD',
+          },
+        },
+        {
+          id: 'tier_additional',
+          startsAtBlock: 6,
+          endsAfterBlock: 10,
+          feePerBlock: {
+            amount: 500,
+            amountFormatted: '5.00',
+            currencySymbol: '$',
+            currency: 'USD',
+          },
+        },
+      ],
+    });
+
+    const { getByText, findByText, userEvent } = await setup(plan);
+
+    expect(getByText('5 seats included')).toBeVisible();
+    expect(getByText('($5/mo for additional)')).toBeVisible();
+    expect(getByText('Up to 10 seats')).toBeVisible();
+
+    await userEvent.hover(getByText('($5/mo for additional)'));
+
+    expect(await findByText('Free for up to 5 seats. Additional seats are $5/month each.')).toBeVisible();
+  });
+});
