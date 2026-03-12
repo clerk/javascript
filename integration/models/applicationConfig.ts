@@ -116,8 +116,11 @@ export const applicationConfig = () => {
           }),
       );
 
-      // Adjust package.json dependencies (skip pkglab deps, those are handled by pkglab add)
-      const npmDeps = [...dependencies.entries()].filter(([, version]) => version !== PKGLAB);
+      // When E2E_SDK_SOURCE=latest, install pkglab deps from npm instead of local registry
+      const usePkglab = process.env.E2E_SDK_SOURCE !== 'latest';
+      const npmDeps = [...dependencies.entries()]
+        .filter(([, version]) => version !== PKGLAB)
+        .concat(usePkglab ? [] : [...dependencies.entries()].filter(([, version]) => version === PKGLAB).map(([name]) => [name, 'latest']));
       if (npmDeps.length > 0) {
         const packageJsonPath = path.resolve(appDirPath, 'package.json');
         logger.info(`Modifying dependencies in "${packageJsonPath}"`);
