@@ -208,6 +208,11 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
   public func signOut() async throws {
     guard let sessionId = Clerk.shared.session?.id else { return }
     try await Clerk.shared.auth.signOut(sessionId: sessionId)
+
+    // Clear all keychain data (device token, cached client/environment, etc.)
+    // so the native SDK doesn't boot with a stale token on next launch.
+    Clerk.clearAllKeychainItems()
+    Self.clerkConfigured = false
   }
 
   private static func authMode(from mode: String) -> AuthView.Mode {
@@ -476,19 +481,24 @@ struct ClerkInlineAuthWrapperView: View {
   var body: some View {
     AuthView(mode: mode, isDismissable: dismissable)
       .environment(Clerk.shared)
+      // Primary detection: observe Clerk.shared.session directly (matches Android's sessionFlow approach).
+      // This is more reliable than auth.events which may not emit for inline AuthView sign-ins.
+      .onChange(of: Clerk.shared.session?.id) { _, newSessionId in
+        guard let sessionId = newSessionId else { return }
+        sendAuthCompleted(sessionId: sessionId, type: "signInCompleted")
+      }
+      // Fallback: also listen to auth.events for signUp events and edge cases
       .task {
         for await event in Clerk.shared.auth.events {
           guard !eventSent else { continue }
           switch event {
           case .signInCompleted(let signIn):
-            // Use createdSessionId if available, fall back to current session
             let sessionId = signIn.createdSessionId ?? Clerk.shared.session?.id
             if let sessionId { sendAuthCompleted(sessionId: sessionId, type: "signInCompleted") }
           case .signUpCompleted(let signUp):
             let sessionId = signUp.createdSessionId ?? Clerk.shared.session?.id
             if let sessionId { sendAuthCompleted(sessionId: sessionId, type: "signUpCompleted") }
           case .sessionChanged(_, let newSession):
-            // Catches auth completion even when signIn/signUp events lack a sessionId
             if let sessionId = newSession?.id { sendAuthCompleted(sessionId: sessionId, type: "signInCompleted") }
           default:
             break

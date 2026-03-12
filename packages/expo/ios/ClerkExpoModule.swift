@@ -32,9 +32,11 @@ public protocol ClerkViewFactoryProtocol {
 class ClerkExpoModule: RCTEventEmitter {
 
   private static var _hasListeners = false
+  private static weak var sharedInstance: ClerkExpoModule?
 
   override init() {
     super.init()
+    ClerkExpoModule.sharedInstance = self
   }
 
   @objc override static func requiresMainQueueSetup() -> Bool {
@@ -51,6 +53,17 @@ class ClerkExpoModule: RCTEventEmitter {
 
   override func stopObserving() {
     ClerkExpoModule._hasListeners = false
+  }
+
+  /// Emits an onAuthStateChange event to JS from anywhere in the native layer.
+  /// Used by inline views (AuthView, UserProfileView) to notify ClerkProvider
+  /// of auth state changes in addition to the view-level onAuthEvent callback.
+  static func emitAuthStateChange(type: String, sessionId: String?) {
+    guard _hasListeners, let instance = sharedInstance else { return }
+    instance.sendEvent(withName: "onAuthStateChange", body: [
+      "type": type,
+      "sessionId": sessionId as Any,
+    ])
   }
 
   /// Returns the topmost presented view controller, avoiding deprecated `keyWindow`.
@@ -259,6 +272,12 @@ public class ClerkAuthNativeView: UIView {
         let jsonData = (try? JSONSerialization.data(withJSONObject: data)) ?? Data()
         let jsonString = String(data: jsonData, encoding: .utf8) ?? "{}"
         self?.onAuthEvent?(["type": eventName, "data": jsonString])
+
+        // Also emit module-level event so ClerkProvider's useNativeAuthEvents picks it up
+        if eventName == "signInCompleted" || eventName == "signUpCompleted" {
+          let sessionId = data["sessionId"] as? String
+          ClerkExpoModule.emitAuthStateChange(type: "signedIn", sessionId: sessionId)
+        }
       }
     ) else { return }
 
@@ -341,6 +360,12 @@ public class ClerkUserProfileNativeView: UIView {
         let jsonData = (try? JSONSerialization.data(withJSONObject: data)) ?? Data()
         let jsonString = String(data: jsonData, encoding: .utf8) ?? "{}"
         self?.onProfileEvent?(["type": eventName, "data": jsonString])
+
+        // Also emit module-level event for sign-out detection
+        if eventName == "signedOut" {
+          let sessionId = data["sessionId"] as? String
+          ClerkExpoModule.emitAuthStateChange(type: "signedOut", sessionId: sessionId)
+        }
       }
     ) else { return }
 

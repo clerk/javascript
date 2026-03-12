@@ -317,6 +317,17 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     const syncNativeAuthToJs = async () => {
       try {
         if (nativeAuthState.type === 'signedIn' && nativeAuthState.sessionId && clerkInstance.setActive) {
+          // Copy the native client's bearer token to the JS SDK's token cache
+          // so API requests use the native client (which has the session).
+          const ClerkExpo = NativeClerkModule;
+          if (ClerkExpo?.getClientToken) {
+            const nativeClientToken = await ClerkExpo.getClientToken();
+            if (nativeClientToken) {
+              const effectiveTokenCache = tokenCache ?? defaultTokenCache;
+              await effectiveTokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, nativeClientToken);
+            }
+          }
+
           // Ensure the session exists in the client before calling setActive
           const sessionInClient = clerkInstance.client?.sessions?.some(
             (s: { id: string }) => s.id === nativeAuthState.sessionId,
