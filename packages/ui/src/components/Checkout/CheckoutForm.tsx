@@ -43,9 +43,6 @@ export const CheckoutForm = withCardStateProvider(() => {
 
   const showProratedCredit = !!totals.credits?.proration?.amount && totals.credits.proration.amount.amount > 0;
   const showAccountCredits = !!totals.credits?.payer?.appliedAmount && totals.credits.payer.appliedAmount.amount > 0;
-  const showSeats =
-    !!totals.perUnitTotals && totals.perUnitTotals.length > 0 && totals.perUnitTotals.some(put => put.name === 'seats');
-  const seatsPerUnitTotal = totals.perUnitTotals?.find(put => put.name === 'seats');
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
@@ -54,6 +51,25 @@ export const CheckoutForm = withCardStateProvider(() => {
       ? plan.fee
       : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         plan.annualMonthlyFee!;
+
+  const descriptionElements = [];
+  if (planPeriod === 'annual') {
+    descriptionElements.push(localizationKeys('billing.billedAnnually'));
+  }
+  if (plan.unitPrices) {
+    const seatUnitPrice = plan.unitPrices.find(unitPrice => unitPrice.name.toLowerCase() === 'seats');
+    if (seatUnitPrice) {
+      if (seatUnitPrice.tiers.length === 1) {
+        descriptionElements.push(
+          seatUnitPrice.tiers[0].endsAfterBlock
+            ? localizationKeys('billing.pricingTable.seatCost.upToSeats', {
+                endsAfterBlock: seatUnitPrice.tiers[0].endsAfterBlock,
+              })
+            : localizationKeys('billing.pricingTable.seatCost.unlimitedSeats'),
+        );
+      }
+    }
+  }
 
   return (
     <Drawer.Body>
@@ -70,7 +86,7 @@ export const CheckoutForm = withCardStateProvider(() => {
           <LineItems.Group>
             <LineItems.Title
               title={plan.name}
-              description={planPeriod === 'annual' ? localizationKeys('billing.billedAnnually') : undefined}
+              description={descriptionElements}
               badge={
                 plan.freeTrialEnabled && freeTrialEndsAt ? (
                   <SubscriptionBadge subscription={{ status: 'free_trial' }} />
@@ -83,7 +99,6 @@ export const CheckoutForm = withCardStateProvider(() => {
               suffix={localizationKeys('billing.checkout.perMonth')}
             />
           </LineItems.Group>
-          {totals.perUnitTotals && <SeatsLineItems perUnitTotals={totals.perUnitTotals} />}
           <LineItems.Group
             borderTop
             variant='tertiary'
@@ -517,27 +532,3 @@ const ExistingPaymentMethodForm = withCardStateProvider(
     );
   },
 );
-
-const SeatsLineItems = ({ perUnitTotals }: { perUnitTotals: BillingPerUnitTotal[] }) => {
-  const seatsPerUnitTotal = perUnitTotals.find(put => put.name === 'seats');
-  if (!seatsPerUnitTotal) {
-    return null;
-  }
-
-  return (
-    <>
-      {seatsPerUnitTotal.tiers
-        // only render tiers that impact the total
-        .filter(tier => tier.total.amount > 0)
-        .map((tier, i) => (
-          <LineItems.Group key={`${seatsPerUnitTotal.name}-${i}`}>
-            <LineItems.Title title={'Seats'} />
-            <LineItems.Description
-              text={`${tier.quantity} x ${tier.feePerBlock.currencySymbol}${tier.feePerBlock.amountFormatted}`}
-              suffix={localizationKeys('billing.checkout.perMonth')}
-            />
-          </LineItems.Group>
-        ))}
-    </>
-  );
-};
