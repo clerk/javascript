@@ -8,6 +8,7 @@ import {
   is4xxError,
   isClerkAPIResponseError,
   isClerkRuntimeError,
+  isUnauthenticatedError,
 } from '@clerk/shared/error';
 import {
   disabledAllAPIKeysFeatures,
@@ -1595,7 +1596,7 @@ export class Clerk implements ClerkInterface {
               this.updateClient(updatedClient, { __internal_dangerouslySkipEmit: true });
             }
           } catch (e) {
-            if (is4xxError(e)) {
+            if (isUnauthenticatedError(e)) {
               void this.handleUnauthenticated();
             } else {
               throw e;
@@ -3174,8 +3175,10 @@ export class Clerk implements ClerkInterface {
     }
 
     await session.touch().catch(e => {
-      if (is4xxError(e)) {
+      if (isUnauthenticatedError(e)) {
         void this.handleUnauthenticated();
+      } else {
+        throw e;
       }
     });
   };

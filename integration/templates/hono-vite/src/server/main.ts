@@ -8,10 +8,13 @@ import ViteExpress from 'vite-express';
 
 const app = new Hono();
 
+const proxyEnabled = process.env.CLERK_PROXY_ENABLED === 'true';
+
 app.use(
   '*',
   clerkMiddleware({
     publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
+    ...(proxyEnabled ? { frontendApiProxy: { enabled: true } } : {}),
   }),
 );
 

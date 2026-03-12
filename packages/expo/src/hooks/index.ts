@@ -1,3 +1,4 @@
+// Re-export hooks that don't need type overrides
 export {
   useClerk,
   useEmailLink,
@@ -15,3 +16,6 @@ export {
 export * from './useSSO';
 export * from './useOAuth';
 export * from './useAuth';
+export * from './useNativeSession';
+export * from './useNativeAuthEvents';
+export * from './useUserProfileModal';

@@ -226,6 +226,26 @@ export const testSignOut = async ({ app, page, context, fakeUser }: TestParams) 
   expect(apURL).toMatch(/\.accounts(stage\.dev|\.dev|\.stg)/);
 };
 
+export const testAPClerkJsVersion = async ({ app, page, context }: TestParams, expectedMajorVersion: string) => {
+  const u = createTestUtils({ app, page, context, useTestingToken: false });
+
+  await u.page.goToAppHome();
+  await u.page.waitForClerkJsLoaded();
+  await u.po.expect.toBeSignedOut();
+
+  // Navigate to the Account Portal
+  await u.page.getByRole('button', { name: /Sign in/i }).click();
+  await u.po.signIn.waitForMounted();
+
+  const accountPortalURL = page.url();
+  expect(accountPortalURL).toMatch(/\.accounts(stage\.dev|\.dev|\.stg)/);
+
+  // Verify the clerk-js version served by the Account Portal
+  const clerkVersion = await page.evaluate(() => window.Clerk?.version);
+  expect(clerkVersion).toBeDefined();
+  expect(clerkVersion).toMatch(new RegExp(`^${expectedMajorVersion}\\.`));
+};
+
 export const testHandshakeRecovery = async ({ app, page, context, fakeUser }: TestParams) => {
   const u = createTestUtils({ app, page, context, useTestingToken: false });
 
