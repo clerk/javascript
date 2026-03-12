@@ -1,5 +1,5 @@
 export { assertContextExists, createContextAndHook } from './createContextAndHook';
-export { useAPIKeys as __experimental_useAPIKeys } from './useAPIKeys';
+export { useAPIKeys, useAPIKeys as __experimental_useAPIKeys } from './useAPIKeys';
 export { useOrganization } from './useOrganization';
 export { useOrganizationCreationDefaults } from './useOrganizationCreationDefaults';
 export type {

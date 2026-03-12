@@ -18,7 +18,7 @@ export class APIKeys implements APIKeysNamespace {
   /**
    * Returns the base options for the FAPI proxy requests.
    */
-  private async getBaseFapiProxyOptions(): Promise<FapiRequestInit> {
+  async #getBaseFapiProxyOptions(): Promise<FapiRequestInit> {
     const token = await BaseResource.clerk.session?.getToken();
     if (!token) {
       throw new ClerkRuntimeError('No valid session token available', { code: 'no_session_token' });
@@ -39,7 +39,7 @@ export class APIKeys implements APIKeysNamespace {
 
   async getAll(params?: GetAPIKeysParams): Promise<ClerkPaginatedResponse<APIKeyResource>> {
     return BaseResource._fetch({
-      ...(await this.getBaseFapiProxyOptions()),
+      ...(await this.#getBaseFapiProxyOptions()),
       method: 'GET',
       path: '/api_keys',
       search: convertPageToOffsetSearchParams({
@@ -59,7 +59,7 @@ export class APIKeys implements APIKeysNamespace {
 
   async create(params: CreateAPIKeyParams): Promise<APIKeyResource> {
     const json = (await BaseResource._fetch<ApiKeyJSON>({
-      ...(await this.getBaseFapiProxyOptions()),
+      ...(await this.#getBaseFapiProxyOptions()),
       path: '/api_keys',
       method: 'POST',
       body: JSON.stringify({
@@ -76,7 +76,7 @@ export class APIKeys implements APIKeysNamespace {
 
   async revoke(params: RevokeAPIKeyParams): Promise<APIKeyResource> {
     const json = (await BaseResource._fetch<ApiKeyJSON>({
-      ...(await this.getBaseFapiProxyOptions()),
+      ...(await this.#getBaseFapiProxyOptions()),
       method: 'POST',
       path: `/api_keys/${params.apiKeyID}/revoke`,
       body: JSON.stringify({
