@@ -21,6 +21,7 @@ import { withRedirectToAfterSignUp, withRedirectToSignUpTask } from '../../commo
 import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
+import { ProtectCheckElement } from '../../elements/ProtectCheckElement';
 import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import { getPreferredAlternativePhoneChannel } from '../SignIn/utils';
@@ -456,7 +457,12 @@ function SignUpStartInternal(): JSX.Element {
                   />
                 )}
               </SocialButtonsReversibleContainerWithDivider>
-              {!shouldShowForm && <CaptchaElement />}
+              {!shouldShowForm && (
+                <>
+                  <CaptchaElement />
+                  <ProtectCheckElement />
+                </>
+              )}
             </Flex>
           </Card.Content>
 

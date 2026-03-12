@@ -259,6 +259,12 @@ export interface SignUpFutureFinalizeParams {
  */
 export interface SignUpFutureVerifications {
   /**
+   * A protect check challenge returned by the backend, containing the URL of the script to execute.
+   * Null if no protect check is required.
+   */
+  readonly protectCheck: { url: string } | null;
+
+  /**
    * An object holding information about the email address verification.
    */
   readonly emailAddress: SignUpVerificationResource;
@@ -327,6 +333,12 @@ export interface SignUpFutureVerifications {
    * Used to verify a code sent via phone.
    */
   verifyPhoneCode: (params: SignUpFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Runs the protect check flow: prepares the check, executes the script, and attempts verification.
+   * This is called when 'protect_check' appears in the sign-up's missing fields.
+   */
+  runProtectCheck: () => Promise<{ error: ClerkError | null }>;
 }
 
 /**

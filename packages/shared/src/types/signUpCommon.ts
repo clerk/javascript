@@ -24,7 +24,9 @@ import type { VerificationResource } from './verification';
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 
-export type SignUpField = SignUpAttributeField | SignUpIdentificationField;
+export type ProtectCheckField = 'protect_check';
+
+export type SignUpField = SignUpAttributeField | SignUpIdentificationField | ProtectCheckField;
 
 export type PrepareVerificationParams =
   | {
@@ -125,6 +127,7 @@ export interface SignUpVerificationsResource {
   phoneNumber: SignUpVerificationResource;
   externalAccount: VerificationResource;
   web3Wallet: VerificationResource;
+  protectCheck: { url: string } | null;
   __internal_toSnapshot: () => SignUpVerificationsJSONSnapshot;
 }
 
