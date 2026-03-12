@@ -177,7 +177,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
         </Action.Root>
       </Col>
 
-      {canReadMemberships && !!memberships?.count && organization?.maxAllowedMemberships && (
+      {canReadMemberships && !!memberships?.count && organization && organization.maxAllowedMemberships > 0 ? (
         <Box
           sx={theme => ({
             position: 'absolute',
@@ -215,7 +215,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
             />
           </Text>
         </Box>
-      )}
+      ) : null}
     </Col>
   );
 });
