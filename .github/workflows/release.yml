@@ -130,7 +130,7 @@ jobs:
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       - name: Notify Slack on failure
-        if: failure()
+        if: ${{ always() && steps.changesets.outcome == 'failure' }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
           payload: |
@@ -235,7 +235,7 @@ jobs:
             await Promise.all(dispatches);
 
       - name: Notify Slack on failure
-        if: failure()
+        if: ${{ always() && steps.publish.outcome == 'failure' }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
           payload: |
