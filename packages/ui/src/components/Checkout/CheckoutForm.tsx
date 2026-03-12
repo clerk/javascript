@@ -59,7 +59,7 @@ export const CheckoutForm = withCardStateProvider(() => {
   if (plan.unitPrices) {
     const seatUnitPrice = plan.unitPrices.find(unitPrice => unitPrice.name.toLowerCase() === 'seats');
     if (seatUnitPrice) {
-      if (seatUnitPrice.tiers.length === 1) {
+      if (seatUnitPrice.tiers.length === 1 && seatUnitPrice.tiers[0].feePerBlock.amount === 0) {
         descriptionElements.push(
           seatUnitPrice.tiers[0].endsAfterBlock
             ? localizationKeys('billing.pricingTable.seatCost.upToSeats', {
