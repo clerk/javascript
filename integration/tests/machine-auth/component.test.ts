@@ -757,4 +757,43 @@ test.describe('api keys component @machine', () => {
       }
     });
   });
+
+  test('shows error when API key usage is exceeded for free plan', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    // Mock the API keys create endpoint to return 403 for free plan users who exceed free tier limits
+    await page.route('*/**/v1/api_keys', async route => {
+      if (route.request().method() === 'POST') {
+        await route.fulfill({
+          status: 403,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            errors: [{ code: 'token_quota_exceeded', message: 'Token quota exceeded' }],
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await u.po.page.goToRelative('/api-keys');
+    await u.po.apiKeys.waitForMounted();
+
+    await u.po.apiKeys.clickAddButton();
+    await u.po.apiKeys.waitForFormOpened();
+    await u.po.apiKeys.typeName('test-key');
+    await u.po.apiKeys.selectExpiration('1d');
+    await u.po.apiKeys.clickSaveButton();
+
+    // Verify error message is displayed
+    await expect(
+      u.page.getByText('You have reached your usage limit. You can remove the limit by upgrading to a paid plan.'),
+    ).toBeVisible({ timeout: 5000 });
+
+    await u.page.unrouteAll();
+  });
 });
