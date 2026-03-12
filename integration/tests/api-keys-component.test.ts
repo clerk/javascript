@@ -785,7 +785,7 @@ test.describe('api keys component @machine', () => {
 
     await u.po.apiKeys.clickAddButton();
     await u.po.apiKeys.waitForFormOpened();
-    await u.po.apiKeys.typeName('test-key');
+    await u.po.apiKeys.typeName(`${fakeAdmin.firstName}-test-usage-exceeded`);
     await u.po.apiKeys.selectExpiration('1d');
     await u.po.apiKeys.clickSaveButton();
 
