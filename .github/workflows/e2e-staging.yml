@@ -56,18 +56,36 @@ jobs:
     steps:
       - name: Normalize inputs
         id: inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_REF: ${{ github.event.inputs.ref }}
+          INPUT_COMMIT_SHA: ${{ github.event.inputs.clerk-go-commit-sha }}
+          INPUT_NOTIFY_SLACK: ${{ github.event.inputs.notify-slack }}
+          INPUT_SDK_SOURCE: ${{ github.event.inputs.sdk-source }}
+          PAYLOAD_REF: ${{ github.event.client_payload.ref }}
+          PAYLOAD_COMMIT_SHA: ${{ github.event.client_payload.clerk-go-commit-sha }}
+          PAYLOAD_NOTIFY_SLACK: ${{ github.event.client_payload.notify-slack }}
+          PAYLOAD_SDK_SOURCE: ${{ github.event.client_payload.sdk-source }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "ref=${{ github.event.inputs.ref || 'main' }}" >> $GITHUB_OUTPUT
-            echo "clerk-go-commit-sha=${{ github.event.inputs.clerk-go-commit-sha }}" >> $GITHUB_OUTPUT
-            echo "notify-slack=${{ github.event.inputs.notify-slack }}" >> $GITHUB_OUTPUT
-            echo "sdk-source=${{ github.event.inputs.sdk-source || 'latest' }}" >> $GITHUB_OUTPUT
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "ref=${INPUT_REF:-main}" >> $GITHUB_OUTPUT
+            echo "clerk-go-commit-sha=$INPUT_COMMIT_SHA" >> $GITHUB_OUTPUT
+            echo "notify-slack=$INPUT_NOTIFY_SLACK" >> $GITHUB_OUTPUT
+            echo "sdk-source=${INPUT_SDK_SOURCE:-latest}" >> $GITHUB_OUTPUT
           else
-            echo "ref=${{ github.event.client_payload.ref || 'main' }}" >> $GITHUB_OUTPUT
-            echo "clerk-go-commit-sha=${{ github.event.client_payload.clerk-go-commit-sha || '' }}" >> $GITHUB_OUTPUT
-            NOTIFY_SLACK="${{ github.event.client_payload.notify-slack }}"
-            echo "notify-slack=${NOTIFY_SLACK:-true}" >> $GITHUB_OUTPUT
-            echo "sdk-source=${{ github.event.client_payload.sdk-source || 'latest' }}" >> $GITHUB_OUTPUT
+            echo "ref=${PAYLOAD_REF:-main}" >> $GITHUB_OUTPUT
+            echo "clerk-go-commit-sha=${PAYLOAD_COMMIT_SHA:-}" >> $GITHUB_OUTPUT
+            echo "notify-slack=${PAYLOAD_NOTIFY_SLACK:-true}" >> $GITHUB_OUTPUT
+            echo "sdk-source=${PAYLOAD_SDK_SOURCE:-latest}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate ref
+        env:
+          REF: ${{ steps.inputs.outputs.ref }}
+        run: |
+          if [[ ! "$REF" =~ ^(main|release/.*)$ ]]; then
+            echo "::error::Ref '$REF' is not allowed. Only 'main' and 'release/*' branches are permitted."
+            exit 1
           fi
 
       - name: Checkout Repo
@@ -196,18 +214,27 @@ jobs:
     steps:
       - name: Normalize inputs
         id: inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_REF: ${{ github.event.inputs.ref }}
+          INPUT_COMMIT_SHA: ${{ github.event.inputs.clerk-go-commit-sha }}
+          INPUT_NOTIFY_SLACK: ${{ github.event.inputs.notify-slack }}
+          INPUT_SDK_SOURCE: ${{ github.event.inputs.sdk-source }}
+          PAYLOAD_REF: ${{ github.event.client_payload.ref }}
+          PAYLOAD_COMMIT_SHA: ${{ github.event.client_payload.clerk-go-commit-sha }}
+          PAYLOAD_NOTIFY_SLACK: ${{ github.event.client_payload.notify-slack }}
+          PAYLOAD_SDK_SOURCE: ${{ github.event.client_payload.sdk-source }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "ref=${{ github.event.inputs.ref || 'main' }}" >> $GITHUB_OUTPUT
-            echo "clerk-go-commit-sha=${{ github.event.inputs.clerk-go-commit-sha }}" >> $GITHUB_OUTPUT
-            echo "notify-slack=${{ github.event.inputs.notify-slack }}" >> $GITHUB_OUTPUT
-            echo "sdk-source=${{ github.event.inputs.sdk-source || 'latest' }}" >> $GITHUB_OUTPUT
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "ref=${INPUT_REF:-main}" >> $GITHUB_OUTPUT
+            echo "clerk-go-commit-sha=$INPUT_COMMIT_SHA" >> $GITHUB_OUTPUT
+            echo "notify-slack=$INPUT_NOTIFY_SLACK" >> $GITHUB_OUTPUT
+            echo "sdk-source=${INPUT_SDK_SOURCE:-latest}" >> $GITHUB_OUTPUT
           else
-            echo "ref=${{ github.event.client_payload.ref || 'main' }}" >> $GITHUB_OUTPUT
-            echo "clerk-go-commit-sha=${{ github.event.client_payload.clerk-go-commit-sha || '' }}" >> $GITHUB_OUTPUT
-            NOTIFY_SLACK="${{ github.event.client_payload.notify-slack }}"
-            echo "notify-slack=${NOTIFY_SLACK:-true}" >> $GITHUB_OUTPUT
-            echo "sdk-source=${{ github.event.client_payload.sdk-source || 'latest' }}" >> $GITHUB_OUTPUT
+            echo "ref=${PAYLOAD_REF:-main}" >> $GITHUB_OUTPUT
+            echo "clerk-go-commit-sha=${PAYLOAD_COMMIT_SHA:-}" >> $GITHUB_OUTPUT
+            echo "notify-slack=${PAYLOAD_NOTIFY_SLACK:-true}" >> $GITHUB_OUTPUT
+            echo "sdk-source=${PAYLOAD_SDK_SOURCE:-latest}" >> $GITHUB_OUTPUT
           fi
 
       - name: Notify Slack on failure
