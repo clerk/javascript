@@ -56,19 +56,15 @@ export const CheckoutForm = withCardStateProvider(() => {
   if (planPeriod === 'annual') {
     descriptionElements.push(localizationKeys('billing.billedAnnually'));
   }
-  if (plan.unitPrices) {
-    const seatUnitPrice = plan.unitPrices.find(unitPrice => unitPrice.name.toLowerCase() === 'seats');
-    if (seatUnitPrice) {
-      if (seatUnitPrice.tiers.length === 1 && seatUnitPrice.tiers[0].feePerBlock.amount === 0) {
-        descriptionElements.push(
-          seatUnitPrice.tiers[0].endsAfterBlock
-            ? localizationKeys('billing.pricingTable.seatCost.upToSeats', {
-                endsAfterBlock: seatUnitPrice.tiers[0].endsAfterBlock,
-              })
-            : localizationKeys('billing.pricingTable.seatCost.unlimitedSeats'),
-        );
-      }
-    }
+  const seatUnitPrice = plan.unitPrices?.find(unitPrice => unitPrice.name.toLowerCase() === 'seats');
+  if (seatUnitPrice && seatUnitPrice.tiers.length === 1 && seatUnitPrice.tiers[0].feePerBlock.amount === 0) {
+    descriptionElements.push(
+      seatUnitPrice.tiers[0].endsAfterBlock
+        ? localizationKeys('billing.pricingTable.seatCost.upToSeats', {
+            endsAfterBlock: seatUnitPrice.tiers[0].endsAfterBlock,
+          })
+        : localizationKeys('billing.pricingTable.seatCost.unlimitedSeats'),
+    );
   }
 
   return (
