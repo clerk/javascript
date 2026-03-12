@@ -1,5 +1,27 @@
 # Change Log
 
+## 6.3.0
+
+### Minor Changes
+
+- Support `sign_up_if_missing` on SignIn.create, including captcha ([#8030](https://github.com/clerk/javascript/pull/8030)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Updated dependencies [[`de1386f`](https://github.com/clerk/javascript/commit/de1386fc90a3e8c2bab515b693c84a1b383525d3)]:
+  - @clerk/shared@4.3.0
+
+## 6.2.0
+
+### Minor Changes
+
+- Add support for annual-only Billing plans. ([#8012](https://github.com/clerk/javascript/pull/8012)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`3e63793`](https://github.com/clerk/javascript/commit/3e637932b1b7af669955f0e4f86233106f7d18ef)]:
+  - @clerk/shared@4.2.0
+
 ## 6.1.0
 
 ### Minor Changes
