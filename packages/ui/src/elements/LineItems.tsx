@@ -192,7 +192,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
         sx={t => ({
           display: 'inline-flex',
           justifyContent: 'flex-end',
-          alignItems: 'center',
+          alignItems: 'end',
           gap: t.space.$1,
           minWidth: '0',
         })}
