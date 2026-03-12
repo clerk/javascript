@@ -172,20 +172,25 @@ jobs:
             echo "notify-slack=${NOTIFY_SLACK:-true}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Report to Slack
+      - name: Notify Slack on failure
         if: ${{ needs.integration-tests.result == 'failure' && steps.inputs.outputs.notify-slack == 'true' }}
-        uses: ravsamhq/notify-slack-action@v1
+        uses: slackapi/slack-github-action@v1.24.0
         with:
-          status: failure
-          notify_when: "failure"
-          notification_title: "Staging E2E Failure"
-          message_format: |
-            *Staging E2E tests failed*
-            *Ref:* ${{ steps.inputs.outputs.ref }}
-            *clerk_go commit:* ${{ steps.inputs.outputs.clerk-go-commit-sha || 'N/A' }}
-            *Run:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*:red_circle: Staging E2E tests failed*\n*Repo:* `${{ github.repository }}`\n*Ref:* `${{ steps.inputs.outputs.ref }}`\n*clerk_go commit:* `${{ steps.inputs.outputs.clerk-go-commit-sha || 'N/A' }}`\n*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View logs>"
+                  }
+                }
+              ]
+            }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SDK_E2E_ALERTS_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SDK_SLACKER_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       # Uncomment when clerk_go side is ready
       # - name: Post commit status to clerk_go
