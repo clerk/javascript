@@ -152,7 +152,10 @@ jobs:
             const fs = require('fs');
             const path = require('path');
             const rootCa = process.env.INTEGRATION_ROOT_CA;
-            console.log('rootCa', rootCa);
+            if (!rootCa) {
+              core.setFailed('INTEGRATION_ROOT_CA secret is not set');
+              return;
+            }
             fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', 'rootCA.pem'), rootCa);
             const certs = JSON.parse(process.env.INTEGRATION_CERTS);
             for (const [name, cert] of Object.entries(certs)) {
