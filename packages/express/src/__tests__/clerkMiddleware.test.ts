@@ -171,6 +171,35 @@ describe('clerkMiddleware', () => {
       expect(response.header).toHaveProperty('x-clerk-auth-status', 'handshake');
     });
 
+    it('falls back to default proxy path when path reduces to empty string', async () => {
+      mockClerkFrontendApiProxy.mockResolvedValueOnce(new globalThis.Response('proxied', { status: 200 }));
+
+      // path: '/' strips to '' — should fall back to DEFAULT_PROXY_PATH (/__clerk)
+      // and only intercept /__clerk, not every request
+      await runMiddlewareOnPath(
+        clerkMiddleware({ frontendApiProxy: { enabled: true, path: '/' } }),
+        '/__clerk/v1/client',
+        {},
+      ).expect(200);
+
+      expect(mockClerkFrontendApiProxy).toHaveBeenCalled();
+    });
+
+    it('does not intercept non-proxy paths when path reduces to empty string', async () => {
+      // path: '/' strips to '' — without the fallback guard, this would match everything
+      const response = await runMiddlewareOnPath(
+        clerkMiddleware({ frontendApiProxy: { enabled: true, path: '/' } }),
+        '/api/users',
+        {
+          Cookie: '__client_uat=1711618859;',
+          'Sec-Fetch-Dest': 'document',
+        },
+      ).expect(307);
+
+      expect(response.header).toHaveProperty('x-clerk-auth-status', 'handshake');
+      expect(mockClerkFrontendApiProxy).not.toHaveBeenCalled();
+    });
+
     it('still authenticates requests to other paths when proxy is configured', async () => {
       const response = await runMiddlewareOnPath(
         clerkMiddleware({ frontendApiProxy: { enabled: true } }),

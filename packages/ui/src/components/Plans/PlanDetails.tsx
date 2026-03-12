@@ -226,8 +226,11 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   }, [plan, planPeriod]);
 
   const feeFormatted = React.useMemo(() => {
-    return normalizeFormatted(fee.amountFormatted);
-  }, [fee.amountFormatted]);
+    if (!fee) {
+      return '';
+    }
+    return `${fee.currencySymbol}${normalizeFormatted(fee.amountFormatted)}`;
+  }, [fee]);
 
   return (
     <Box
@@ -306,7 +309,6 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
             variant='h1'
             colorScheme='body'
           >
-            {fee.currencySymbol}
             {feeFormatted}
           </Text>
           <Text
@@ -325,35 +327,73 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         </>
       </Flex>
 
-      {plan.annualMonthlyFee ? (
-        <Box
-          elementDescriptor={descriptors.planDetailPeriodToggle}
-          sx={t => ({
-            display: 'flex',
-            marginTop: t.space.$3,
-          })}
-        >
-          <Switch
-            isChecked={planPeriod === 'annual'}
-            onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
-            label={localizationKeys('billing.billedAnnually')}
-          />
-        </Box>
-      ) : (
-        <Text
-          elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
-          variant='caption'
-          colorScheme='secondary'
-          localizationKey={
-            plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedMonthlyOnly')
-          }
-          sx={t => ({
-            justifySelf: 'flex-start',
-            alignSelf: 'center',
-            marginTop: t.space.$3,
-          })}
-        />
-      )}
+      <PeriodToggle
+        plan={plan}
+        planPeriod={planPeriod}
+        setPlanPeriod={setPlanPeriod}
+      />
     </Box>
   );
 });
+
+const PeriodToggle = ({
+  plan,
+  planPeriod,
+  setPlanPeriod,
+}: {
+  plan: BillingPlanResource;
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
+}) => {
+  if (plan.fee && plan.annualMonthlyFee) {
+    return (
+      <Box
+        elementDescriptor={descriptors.planDetailPeriodToggle}
+        sx={t => ({
+          display: 'flex',
+          marginTop: t.space.$3,
+        })}
+      >
+        <Switch
+          isChecked={planPeriod === 'annual'}
+          onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
+          label={localizationKeys('billing.billedAnnually')}
+        />
+      </Box>
+    );
+  }
+
+  if (plan.annualMonthlyFee) {
+    return (
+      <Text
+        elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
+        variant='caption'
+        colorScheme='secondary'
+        localizationKey={
+          plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedAnnuallyOnly')
+        }
+        sx={t => ({
+          justifySelf: 'flex-start',
+          alignSelf: 'center',
+          marginTop: t.space.$3,
+        })}
+      />
+    );
+  }
+
+  return (
+    <Text
+      elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
+      variant='caption'
+      colorScheme='secondary'
+      localizationKey={
+        plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedMonthlyOnly')
+      }
+      sx={t => ({
+        justifySelf: 'flex-start',
+        alignSelf: 'center',
+        marginTop: t.space.$3,
+      })}
+    />
+  );
+};

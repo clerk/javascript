@@ -42,7 +42,7 @@ export const CheckoutForm = withCardStateProvider(() => {
 
   const fee =
     planPeriod === 'month'
-      ? plan.fee
+      ? plan.fee!
       : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         plan.annualMonthlyFee!;
 
