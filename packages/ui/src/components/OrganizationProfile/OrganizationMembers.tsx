@@ -44,7 +44,6 @@ export const OrganizationMembers = withCardStateProvider(() => {
         }
       : undefined,
   });
-  organization?.maxAllowedMemberships;
 
   if (canManageMemberships === null) {
     return null;
