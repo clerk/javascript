@@ -372,14 +372,14 @@ jobs:
           # --affected check only served to silently skip tests when the task was missing
           # from turbo.json, hiding real configuration errors.
           TASK_NAME="test:integration:${{ matrix.test-name }}"
-          TURBO_OUTPUT=$(pnpm turbo run "$TASK_NAME" --dry=json 2>&1)
-          if [ $? -ne 0 ]; then
+          TURBO_STDERR=$(mktemp)
+          if ! TURBO_JSON=$(pnpm turbo run "$TASK_NAME" --dry=json 2>"$TURBO_STDERR"); then
             echo "::error::Turbo task '$TASK_NAME' failed validation"
-            echo "$TURBO_OUTPUT"
+            cat "$TURBO_STDERR"
             exit 1
           fi
 
-          TASK_COUNT=$(echo "$TURBO_OUTPUT" | jq '.tasks | length')
+          TASK_COUNT=$(echo "$TURBO_JSON" | jq '.tasks | length')
           if [ -z "$TASK_COUNT" ] || [ "$TASK_COUNT" -eq 0 ]; then
             echo "::error::Turbo task '$TASK_NAME' returned 0 tasks"
             exit 1
