@@ -13,14 +13,11 @@ document.addEventListener('DOMContentLoaded', async function () {
   if (clerk.isSignedIn) {
     document.getElementById('app')!.innerHTML = `
           <div id="user-button"></div>
-          <div id="org-switcher"></div>
         `;
 
     const userButtonDiv = document.getElementById('user-button');
-    clerk.mountUserButton(userButtonDiv);
 
-    const orgSwitcherDiv = document.getElementById('org-switcher');
-    clerk.mountOrganizationSwitcher(orgSwitcherDiv);
+    clerk.mountUserButton(userButtonDiv);
   } else {
     document.getElementById('app')!.innerHTML = `
           <div id="sign-in"></div>
