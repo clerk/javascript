@@ -415,8 +415,10 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
                     currency: subscription.plan.annualFee!.currencySymbol,
                   })
                 : localizationKeys('billing.switchToMonthlyWithPrice', {
-                    price: normalizeFormatted(subscription.plan.fee.amountFormatted),
-                    currency: subscription.plan.fee.currencySymbol,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    price: normalizeFormatted(subscription.plan.fee!.amountFormatted),
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    currency: subscription.plan.fee!.currencySymbol,
                   }),
             onClick: () => {
               openCheckout({
@@ -508,7 +510,8 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
 
   const fee =
     subscription.planPeriod === 'month'
-      ? subscription.plan.fee
+      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        subscription.plan.fee!
       : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         subscription.plan.annualFee!;
 
