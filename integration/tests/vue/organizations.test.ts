@@ -50,7 +50,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('organiza
 
     await u.page.goToRelative('/create-org');
     await u.page.waitForClerkComponentMounted();
-    await expect(u.page.getByText(/Create organization/i)).toBeVisible();
+    await expect(u.page.getByRole('heading', { name: /Create organization/i })).toBeVisible();
   });
 
   test('<OrganizationSwitcher /> allows switching organizations', async ({ page, context }) => {

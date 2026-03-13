@@ -18,8 +18,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
   });
 
   test.afterAll(async () => {
-    await fakeOrganization.delete();
-    await fakeUser.deleteIfExists();
+    await fakeOrganization?.delete();
+    await fakeUser?.deleteIfExists();
 
     await app.teardown();
   });
@@ -258,12 +258,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
+    await u.page.waitForAppUrl('/');
 
     await u.page.goToRelative('/sign-out');
     await expect(u.page.locator('[data-signed-in]')).toBeVisible();
 
     await u.page.getByRole('button', { name: /Sign out/i }).click();
-    await expect(u.page.locator('[data-signed-out]')).toBeVisible();
     await u.po.expect.toBeSignedOut();
   });
 

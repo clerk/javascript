@@ -23,7 +23,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('Show com
     const bapiMember = await u.services.users.createBapiUser(memberUser);
     await u.services.clerk.organizations.createOrganizationMembership({
       organizationId: fakeOrganization.organization.id,
-      role: 'org:member' as OrganizationMembershipRole,
+      role: 'org:viewer' as OrganizationMembershipRole,
       userId: bapiMember.id,
     });
   });
@@ -47,7 +47,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('Show com
     await u.page.waitForClerkJsLoaded();
 
     await expect(u.page.getByText('show-signed-out-content')).toBeVisible();
-    await expect(u.page.getByText('show-signed-in-content')).not.toBeVisible();
+    await expect(u.page.getByText('show-signed-in-content')).toBeHidden();
   });
 
   test('<Show when="signed-in"> renders when authenticated', async ({ page, context }) => {
@@ -59,7 +59,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('Show com
 
     await u.page.goToRelative('/show-component');
     await expect(u.page.getByText('show-signed-in-content')).toBeVisible();
-    await expect(u.page.getByText('show-signed-out-content')).not.toBeVisible();
+    await expect(u.page.getByText('show-signed-out-content')).toBeHidden();
   });
 
   test('<Show> with permission condition renders for admin with manage permission', async ({ page, context }) => {
@@ -76,7 +76,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('Show com
 
     await u.page.goToRelative('/show-component');
     await expect(u.page.getByText('show-permission-content')).toBeVisible();
-    await expect(u.page.getByText('show-permission-fallback')).not.toBeVisible();
+    await expect(u.page.getByText('show-permission-fallback')).toBeHidden();
   });
 
   test('<Show> with role condition renders fallback for non-admin', async ({ page, context }) => {
@@ -94,6 +94,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('Show com
 
     await u.page.goToRelative('/show-component');
     await expect(u.page.getByText('show-admin-fallback')).toBeVisible();
-    await expect(u.page.getByText('show-admin-content')).not.toBeVisible();
+    await expect(u.page.getByText('show-admin-content')).toBeHidden();
   });
 });
