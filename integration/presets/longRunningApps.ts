@@ -1,7 +1,7 @@
 import type { LongRunningApplication } from '../models/longRunningApplication';
 import { longRunningApplication } from '../models/longRunningApplication';
 import { astro } from './astro';
-import { envs, isStagingUnavailable } from './envs';
+import { envs, isStagingReady } from './envs';
 import { expo } from './expo';
 import { express } from './express';
 import { fastify } from './fastify';
@@ -95,7 +95,7 @@ export const createLongRunningApps = () => {
     { id: 'hono.vite.withEmailCodes', config: hono.vite, env: envs.withEmailCodes },
     { id: 'hono.vite.withEmailCodesProxy', config: hono.vite, env: envs.withEmailCodesProxy },
     { id: 'hono.vite.withCustomRoles', config: hono.vite, env: envs.withCustomRoles },
-  ] as const).filter(c => !isStagingUnavailable(c.env));
+  ] as const).filter(c => isStagingReady(c.env));
 
   const apps = configs.map(longRunningApplication);
 

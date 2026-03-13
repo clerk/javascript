@@ -38,30 +38,33 @@ export const instanceKeys = getInstanceKeys();
 
 const STAGING_API_URL = 'https://api.clerkstage.dev';
 const STAGING_KEY_PREFIX = 'clerkstage-';
-const STAGING_UNAVAILABLE_KEY = '__STAGING_UNAVAILABLE__';
 
 /**
- * Check whether an env config was marked as having no staging key available.
- * Used by longRunningApps to filter out apps that can't run in staging mode.
+ * Check whether an env config is ready for staging tests.
+ * In non-staging mode, always returns true.
+ * In staging mode, returns true only if the config has been swapped to staging keys
+ * (indicated by CLERK_API_URL being set to the staging URL).
  */
-export function isStagingUnavailable(env: EnvironmentConfig): boolean {
-  return env.privateVariables.get(STAGING_UNAVAILABLE_KEY) === 'true';
+export function isStagingReady(env: EnvironmentConfig): boolean {
+  if (process.env.E2E_STAGING !== '1') return true;
+  return env.privateVariables.get('CLERK_API_URL') === STAGING_API_URL;
 }
 
 /**
  * When E2E_STAGING=1 is set, swaps PK/SK to staging keys and adds CLERK_API_URL.
- * If the staging key doesn't exist, marks the config so long-running apps can filter it out.
+ * If the staging key doesn't exist, removes any inherited CLERK_API_URL so the config
+ * falls back to production and is filtered from long-running apps by isStagingReady.
  * In non-staging mode, returns the env config unchanged.
  */
 function withStagingSupport(env: EnvironmentConfig, prodKeyName: string): EnvironmentConfig {
   if (process.env.E2E_STAGING !== '1') return env;
   const stagingKeyName = STAGING_KEY_PREFIX + prodKeyName;
   if (!instanceKeys.has(stagingKeyName)) {
-    env.setEnvVariable('private', STAGING_UNAVAILABLE_KEY, 'true');
+    // Remove staging API URL if inherited from parent clone to prevent
+    // production keys from being used against the staging API
+    env.privateVariables.delete('CLERK_API_URL');
     return env;
   }
-  // Clear marker if inherited from parent clone
-  env.privateVariables.delete(STAGING_UNAVAILABLE_KEY);
   const keys = instanceKeys.get(stagingKeyName)!;
   return env
     .setEnvVariable('private', 'CLERK_SECRET_KEY', keys.sk)
