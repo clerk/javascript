@@ -6,6 +6,9 @@ import type { PaginatedHookConfig, PaginatedResources } from '../types';
 import { createCacheKeys } from './createCacheKeys';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
+/**
+ * @interface
+ */
 export type UseAPIKeysParams = PaginatedHookConfig<
   GetAPIKeysParams & {
     /**
@@ -17,6 +20,9 @@ export type UseAPIKeysParams = PaginatedHookConfig<
   }
 >;
 
+/**
+ * @interface
+ */
 export type UseAPIKeysReturn<T extends UseAPIKeysParams> = PaginatedResources<
   APIKeyResource,
   T extends { infinite: true } ? true : false
