@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.clerk.api.Clerk
+import com.clerk.api.network.serialization.ClerkResult
 import com.facebook.react.bridge.ActivityEventListener
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -67,41 +68,63 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
             try {
                 publishableKey = pubKey
 
-                // If the JS SDK has a bearer token, write it to the native SDK's
-                // SharedPreferences so both SDKs share the same Clerk API client.
-                if (!bearerToken.isNullOrEmpty()) {
-                    reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
-                        .edit()
-                        .putString("DEVICE_TOKEN", bearerToken)
-                        .apply()
-                    debugLog(TAG, "configure - wrote JS bearer token to native SharedPreferences")
-                }
-
-                Clerk.initialize(reactApplicationContext, pubKey)
-
-                // Wait for initialization to complete with timeout
-                try {
-                    withTimeout(10_000L) {
-                        Clerk.isInitialized.first { it }
+                if (!Clerk.isInitialized.value) {
+                    // First-time initialization — write the bearer token to SharedPreferences
+                    // before initializing so the SDK boots with the correct client.
+                    if (!bearerToken.isNullOrEmpty()) {
+                        reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
+                            .edit()
+                            .putString("DEVICE_TOKEN", bearerToken)
+                            .apply()
                     }
-                } catch (e: TimeoutCancellationException) {
-                    val initError = Clerk.initializationError.value
-                    val message = if (initError != null) {
-                        "Clerk initialization timed out: ${initError.message}"
+
+                    Clerk.initialize(reactApplicationContext, pubKey)
+
+                    // Wait for initialization to complete with timeout
+                    try {
+                        withTimeout(10_000L) {
+                            Clerk.isInitialized.first { it }
+                        }
+                    } catch (e: TimeoutCancellationException) {
+                        val initError = Clerk.initializationError.value
+                        val message = if (initError != null) {
+                            "Clerk initialization timed out: ${initError.message}"
+                        } else {
+                            "Clerk initialization timed out after 10 seconds"
+                        }
+                        promise.reject("E_TIMEOUT", message)
+                        return@launch
+                    }
+
+                    // Check for initialization errors
+                    val error = Clerk.initializationError.value
+                    if (error != null) {
+                        promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}")
                     } else {
-                        "Clerk initialization timed out after 10 seconds"
+                        promise.resolve(null)
                     }
-                    promise.reject("E_TIMEOUT", message)
                     return@launch
                 }
 
-                // Check for initialization errors
-                val error = Clerk.initializationError.value
-                if (error != null) {
-                    promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}")
-                } else {
-                    promise.resolve(null)
+                // Already initialized — use the public SDK API to update
+                // the device token and trigger a client/environment refresh.
+                if (!bearerToken.isNullOrEmpty()) {
+                    val result = Clerk.updateDeviceToken(bearerToken)
+                    if (result is ClerkResult.Failure) {
+                        debugLog(TAG, "configure - updateDeviceToken failed: ${result.error}")
+                    }
+
+                    // Wait for session to appear with the new token (up to 5s)
+                    try {
+                        withTimeout(5_000L) {
+                            Clerk.sessionFlow.first { it != null }
+                        }
+                    } catch (_: TimeoutCancellationException) {
+                        debugLog(TAG, "configure - session did not appear after token update")
+                    }
                 }
+
+                promise.resolve(null)
             } catch (e: Exception) {
                 promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${e.message}", e)
             }
@@ -174,14 +197,14 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     override fun getSession(promise: Promise) {
         if (!Clerk.isInitialized.value) {
-            promise.reject("E_NOT_INITIALIZED", "Clerk SDK is not initialized. Call configure() first.")
+            // Return null when not initialized (matches iOS behavior)
+            // so callers can proceed to call configure() with a bearer token.
+            promise.resolve(null)
             return
         }
 
         val session = Clerk.session
         val user = Clerk.user
-
-        debugLog(TAG, "getSession - hasSession: ${session != null}, hasUser: ${user != null}")
 
         val result = WritableNativeMap()
 
@@ -217,7 +240,6 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
         try {
             val prefs = reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
             val deviceToken = prefs.getString("DEVICE_TOKEN", null)
-            debugLog(TAG, "getClientToken - deviceToken: ${if (deviceToken != null) "found" else "null"}")
             promise.resolve(deviceToken)
         } catch (e: Exception) {
             debugLog(TAG, "getClientToken failed: ${e.message}")
@@ -230,7 +252,8 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     override fun signOut(promise: Promise) {
         if (!Clerk.isInitialized.value) {
-            promise.reject("E_NOT_INITIALIZED", "Clerk SDK is not initialized. Call configure() first.")
+            // Resolve gracefully when not initialized (matches iOS behavior)
+            promise.resolve(null)
             return
         }
 
@@ -258,16 +281,12 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     }
 
     private fun handleAuthResult(resultCode: Int, data: Intent?) {
-        debugLog(TAG, "handleAuthResult - resultCode: $resultCode")
-
         val promise = pendingAuthPromise ?: return
         pendingAuthPromise = null
 
         if (resultCode == Activity.RESULT_OK) {
             val session = Clerk.session
             val user = Clerk.user
-
-            debugLog(TAG, "handleAuthResult - hasSession: ${session != null}, hasUser: ${user != null}")
 
             val result = WritableNativeMap()
 
@@ -296,7 +315,6 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
 
             promise.resolve(result)
         } else {
-            debugLog(TAG, "handleAuthResult - user cancelled")
             val result = WritableNativeMap()
             result.putBoolean("cancelled", true)
             promise.resolve(result)
