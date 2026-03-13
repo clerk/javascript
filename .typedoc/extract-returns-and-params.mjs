@@ -124,7 +124,7 @@ function extractParametersSection(filePath) {
 }
 
 /**
- * Renames legacy hook docs to use a -legacy suffix (without the -1).
+ * Moves legacy hook docs into a legacy/ folder and removes the -1 suffix
  * @param {string} filePath
  */
 function moveLegacyHookDoc(filePath) {
