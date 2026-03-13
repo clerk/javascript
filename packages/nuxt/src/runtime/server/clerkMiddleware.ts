@@ -5,7 +5,9 @@ import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { EventHandler } from 'h3';
 import { createError, eventHandler, setResponseHeader } from 'h3';
 
+import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
+import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import type { AuthFn, AuthOptions } from './types';
 import { createInitialState, toWebRequest } from './utils';
 
@@ -82,6 +84,38 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   return eventHandler(async event => {
     const clerkRequest = toWebRequest(event);
 
+    // Resolve keyless in development if keys are missing
+    let keylessClaimUrl: string | undefined;
+    let keylessApiKeysUrl: string | undefined;
+
+    if (canUseKeyless) {
+      try {
+        // Get runtime config to access configured keys
+        // @ts-expect-error: Nitro import. Handled by Nuxt.
+        const { useRuntimeConfig } = await import('#imports');
+        const runtimeConfig = useRuntimeConfig(event);
+
+        const { publishableKey, secretKey, claimUrl, apiKeysUrl } = await resolveKeysWithKeylessFallback(
+          runtimeConfig.public.clerk.publishableKey,
+          runtimeConfig.clerk.secretKey,
+          event,
+        );
+
+        keylessClaimUrl = claimUrl;
+        keylessApiKeysUrl = apiKeysUrl;
+
+        // Override runtime config with keyless values if returned
+        if (publishableKey) {
+          runtimeConfig.public.clerk.publishableKey = publishableKey;
+        }
+        if (secretKey) {
+          runtimeConfig.clerk.secretKey = secretKey;
+        }
+      } catch {
+        // Silently fail - continue without keyless
+      }
+    }
+
     const requestState = await clerkClient(event).authenticateRequest(clerkRequest, {
       ...options,
       acceptsToken: 'any',
@@ -116,6 +150,14 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     event.context.auth = authHandler;
     // Internal serializable state that will be passed to the client
     event.context.__clerk_initial_state = createInitialState(authObjectFn());
+
+    // Store keyless mode URLs in separate context property
+    if (canUseKeyless && keylessClaimUrl) {
+      event.context.__clerk_keyless = {
+        claimUrl: keylessClaimUrl,
+        apiKeysUrl: keylessApiKeysUrl,
+      };
+    }
 
     await handler?.(event);
   });
