@@ -1,8 +1,6 @@
-import { useClerk, useUser } from '@clerk/react';
+import { useClerk } from '@clerk/react';
 import { useCallback, useRef } from 'react';
 
-import { CLERK_CLIENT_JWT_KEY } from '../constants';
-import { tokenCache } from '../token-cache';
 import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 
 // Raw result from the native module (may vary by platform)
@@ -55,7 +53,6 @@ export interface UseUserProfileModalReturn {
  */
 export function useUserProfileModal(): UseUserProfileModalReturn {
   const clerk = useClerk();
-  const { user } = useUser();
   const presentingRef = useRef(false);
 
   const presentUserProfile = useCallback(async () => {
@@ -69,36 +66,17 @@ export function useUserProfileModal(): UseUserProfileModalReturn {
 
     presentingRef.current = true;
     try {
-      let hadNativeSessionBefore = false;
-
-      // If native doesn't have a session but JS does (e.g. user signed in via custom form),
-      // sync the JS SDK's bearer token to native and wait for it before presenting.
-      if (user && ClerkExpo?.getSession && ClerkExpo?.configure) {
-        const preCheck = (await ClerkExpo.getSession()) as NativeSessionResult | null;
-        hadNativeSessionBefore = !!(preCheck?.sessionId || preCheck?.session?.id);
-
-        if (!hadNativeSessionBefore) {
-          const bearerToken = (await tokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
-          if (bearerToken) {
-            await ClerkExpo.configure(clerk.publishableKey, bearerToken);
-
-            // Re-check if configure produced a session
-            const postConfigure = (await ClerkExpo.getSession()) as NativeSessionResult | null;
-            hadNativeSessionBefore = !!(postConfigure?.sessionId || postConfigure?.session?.id);
-          }
-        }
-      }
-
       await ClerkExpo.presentUserProfile({
         dismissable: true,
       });
 
-      // Only sign out the JS SDK if native HAD a session before the modal
-      // and now it's gone (user signed out from within native UI).
+      // Check if native session still exists after modal closes
+      // If session is null, user signed out from the native UI
       const sessionCheck = (await ClerkExpo.getSession?.()) as NativeSessionResult | null;
       const hasNativeSession = !!(sessionCheck?.sessionId || sessionCheck?.session?.id);
 
-      if (!hasNativeSession && hadNativeSessionBefore) {
+      if (!hasNativeSession) {
+        // Clear native session explicitly (may already be cleared, but ensure it)
         try {
           await ClerkExpo.signOut?.();
         } catch (e) {
@@ -107,6 +85,7 @@ export function useUserProfileModal(): UseUserProfileModalReturn {
           }
         }
 
+        // Sign out from JS SDK to update isSignedIn state
         if (clerk?.signOut) {
           try {
             await clerk.signOut();
@@ -118,13 +97,15 @@ export function useUserProfileModal(): UseUserProfileModalReturn {
         }
       }
     } catch (error) {
+      // Dismissal resolves successfully with { dismissed: true }, so reaching
+      // here means a real native error (E_NOT_INITIALIZED, E_CREATE_FAILED, E_NO_ROOT_VC).
       if (__DEV__) {
         console.error('[useUserProfileModal] presentUserProfile failed:', error);
       }
     } finally {
       presentingRef.current = false;
     }
-  }, [clerk, user]);
+  }, [clerk]);
 
   return {
     presentUserProfile,
