@@ -10,7 +10,6 @@ export {
   useUser,
   useSession,
   useReverification,
-  useAPIKeys,
   __experimental_useCheckout,
   __experimental_CheckoutProvider,
   __experimental_usePaymentElement,
