@@ -82,6 +82,8 @@ export const createLongRunningApps = () => {
     { id: 'nuxt.node', config: nuxt.node, env: envs.withCustomRoles },
     { id: 'react-router.node', config: reactRouter.reactRouterNode, env: envs.withEmailCodes },
     { id: 'express.vite.withEmailCodes', config: express.vite, env: envs.withEmailCodes },
+    { id: 'express.vite.withEmailCodesProxy', config: express.vite, env: envs.withEmailCodesProxy },
+    { id: 'express.vite.withCustomRoles', config: express.vite, env: envs.withCustomRoles },
 
     /**
      * Fastify apps
