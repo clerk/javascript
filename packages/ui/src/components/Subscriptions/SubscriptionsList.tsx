@@ -1,5 +1,5 @@
 import type { BillingPlanResource, BillingSubscriptionItemResource } from '@clerk/shared/types';
-import { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
 import { ProfileSection } from '@/ui/elements/Section';
@@ -14,7 +14,7 @@ import {
 } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, Flex, Icon, localizationKeys, Span, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
-import { ArrowsUpDown, CogFilled, Plans, Plus } from '../../icons';
+import { ArrowsUpDown, CogFilled, Plans, Plus, Users } from '../../icons';
 import { useRouter } from '../../router';
 import { SubscriptionBadge } from './badge';
 
@@ -50,7 +50,7 @@ export function SubscriptionsList({
 
   const isManageButtonVisible = canManageBilling && !hasActiveFreePlan && subscriptionItems.length > 0;
 
-  const sortedSubscriptions = useMemo(
+  const sortedSubscriptionItems = useMemo(
     () =>
       subscriptionItems.sort((a, b) => {
         // always put active subscriptions first
@@ -94,11 +94,11 @@ export function SubscriptionsList({
             </Tr>
           </Thead>
           <Tbody>
-            {sortedSubscriptions.map(subscription => (
-              <SubscriptionRow
-                key={subscription.id}
-                subscription={subscription}
-                length={sortedSubscriptions.length}
+            {sortedSubscriptionItems.map(subscriptionItem => (
+              <SubscriptionItemRow
+                key={subscriptionItem.id}
+                subscriptionItem={subscriptionItem}
+                length={sortedSubscriptionItems.length}
               />
             ))}
           </Tbody>
@@ -152,78 +152,132 @@ export function SubscriptionsList({
   );
 }
 
-function SubscriptionRow({ subscription, length }: { subscription: BillingSubscriptionItemResource; length: number }) {
+function SubscriptionItemRow({
+  subscriptionItem,
+  length,
+}: {
+  subscriptionItem: BillingSubscriptionItemResource;
+  length: number;
+}) {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const fee = subscription.planPeriod === 'annual' ? subscription.plan.annualFee! : subscription.plan.fee;
+  const fee = subscriptionItem.planPeriod === 'annual' ? subscriptionItem.plan.annualFee! : subscriptionItem.plan.fee!;
   const { captionForSubscription } = usePlansContext();
 
   const feeFormatted = useMemo(() => {
     return normalizeFormatted(fee.amountFormatted);
   }, [fee.amountFormatted]);
+
+  const endsAfterBlock = subscriptionItem.seats?.quantity;
+
   return (
-    <Tr key={subscription.id}>
-      <Td>
-        <Col gap={1}>
-          <Flex
-            align='center'
-            gap={1}
+    <Fragment key={subscriptionItem.id}>
+      <Tr>
+        <Td>
+          <Col gap={1}>
+            <Flex
+              align='center'
+              gap={1}
+            >
+              <Icon
+                icon={Plans}
+                sx={t => ({
+                  width: t.sizes.$4,
+                  height: t.sizes.$4,
+                  opacity: t.opacity.$inactive,
+                })}
+              />
+              <Text
+                variant='subtitle'
+                sx={t => ({ marginInlineEnd: t.sizes.$1 })}
+              >
+                {subscriptionItem.plan.name}
+              </Text>
+              {subscriptionItem.isFreeTrial || length > 1 || !!subscriptionItem.canceledAt ? (
+                <SubscriptionBadge
+                  subscription={subscriptionItem.isFreeTrial ? { status: 'free_trial' } : subscriptionItem}
+                />
+              ) : null}
+            </Flex>
+
+            {(!subscriptionItem.plan.isDefault || subscriptionItem.status === 'upcoming') && (
+              // here
+              <Text
+                variant='caption'
+                colorScheme='secondary'
+                localizationKey={captionForSubscription(subscriptionItem)}
+              />
+            )}
+          </Col>
+        </Td>
+        <Td
+          sx={_ => ({
+            textAlign: 'end',
+          })}
+        >
+          <Text variant='subtitle'>
+            {fee.currencySymbol}
+            {feeFormatted}
+            {fee.amount > 0 && (
+              <Span
+                sx={t => ({
+                  color: t.colors.$colorMutedForeground,
+                  textTransform: 'lowercase',
+                  ':before': {
+                    content: '"/"',
+                    marginInline: t.space.$1,
+                  },
+                })}
+                localizationKey={
+                  subscriptionItem.planPeriod === 'annual'
+                    ? localizationKeys('billing.year')
+                    : localizationKeys('billing.month')
+                }
+              />
+            )}
+          </Text>
+        </Td>
+      </Tr>
+      {typeof endsAfterBlock !== 'undefined' ? (
+        <Tr>
+          <Td>
+            <Col gap={1}>
+              <Flex
+                align='center'
+                gap={1}
+              >
+                <Icon
+                  icon={Users}
+                  sx={t => ({
+                    width: t.sizes.$4,
+                    height: t.sizes.$4,
+                    opacity: t.opacity.$inactive,
+                  })}
+                />
+                <Text
+                  variant='subtitle'
+                  sx={t => ({ marginInlineEnd: t.sizes.$1 })}
+                >
+                  Seats
+                </Text>
+              </Flex>
+            </Col>
+          </Td>
+          <Td
+            sx={_ => ({
+              textAlign: 'end',
+            })}
           >
-            <Icon
-              icon={Plans}
-              sx={t => ({
-                width: t.sizes.$4,
-                height: t.sizes.$4,
-                opacity: t.opacity.$inactive,
-              })}
-            />
             <Text
               variant='subtitle'
-              sx={t => ({ marginInlineEnd: t.sizes.$1 })}
-            >
-              {subscription.plan.name}
-            </Text>
-            {subscription.isFreeTrial || length > 1 || !!subscription.canceledAt ? (
-              <SubscriptionBadge subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription} />
-            ) : null}
-          </Flex>
-
-          {(!subscription.plan.isDefault || subscription.status === 'upcoming') && (
-            // here
-            <Text
-              variant='caption'
-              colorScheme='secondary'
-              localizationKey={captionForSubscription(subscription)}
-            />
-          )}
-        </Col>
-      </Td>
-      <Td
-        sx={_ => ({
-          textAlign: 'end',
-        })}
-      >
-        <Text variant='subtitle'>
-          {fee.currencySymbol}
-          {feeFormatted}
-          {fee.amount > 0 && (
-            <Span
-              sx={t => ({
-                color: t.colors.$colorMutedForeground,
-                textTransform: 'lowercase',
-                ':before': {
-                  content: '"/"',
-                  marginInline: t.space.$1,
-                },
-              })}
               localizationKey={
-                subscription.planPeriod === 'annual'
-                  ? localizationKeys('billing.year')
-                  : localizationKeys('billing.month')
+                endsAfterBlock === null
+                  ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
+                  : localizationKeys('billing.pricingTable.seatCost.upToSeats', { endsAfterBlock })
               }
             />
-          )}
-        </Text>
-      </Td>
-    </Tr>
+          </Td>
+        </Tr>
+      ) : null}
+    </Fragment>
   );
 }
