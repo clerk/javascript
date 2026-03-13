@@ -292,6 +292,7 @@ jobs:
           [
             "generic",
             "express",
+            "fastify",
             "ap-flows",
             "localhost",
             "sessions",
