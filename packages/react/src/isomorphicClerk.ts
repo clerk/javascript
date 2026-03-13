@@ -1291,6 +1291,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  __internal_fetchOAuthConsent = async (
+    clientId: string,
+    params?: { scope?: string },
+  ): Promise<__internal_OAuthConsentProps> => {
+    const clerkjs = await this.#waitForClerkJS();
+    return clerkjs.__internal_fetchOAuthConsent(clientId, params);
+  };
+
   mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps): void => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.mountTaskChooseOrganization(node, props);

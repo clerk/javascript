@@ -389,6 +389,8 @@ void (async () => {
     },
     '/oauth-consent': () => {
       const searchParams = new URLSearchParams(window.location.search);
+      const clientId = searchParams.get('client_id');
+      const scope = searchParams.get('scope');
       const scopes = (searchParams.get('scopes')?.split(',') ?? []).map(scope => ({
         scope,
         description: scope === 'offline_access' ? null : `Grants access to your ${scope}`,
@@ -397,6 +399,7 @@ void (async () => {
       Clerk.__internal_mountOAuthConsent(
         app,
         componentControls.oauthConsent.getProps() ?? {
+          ...(clientId ? { clientId, scope: scope ?? undefined } : {}),
           scopes,
           oAuthApplicationName: searchParams.get('oauth-application-name'),
           redirectUrl: searchParams.get('redirect_uri'),

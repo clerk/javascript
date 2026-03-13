@@ -1331,6 +1331,28 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
+  public __internal_fetchOAuthConsent = async (
+    clientId: string,
+    params?: { scope?: string },
+  ): Promise<__internal_OAuthConsentProps> => {
+    const search: Record<string, string> = {};
+    if (params?.scope) {
+      search.scope = params.scope;
+    }
+
+    const response = await this.#fapiClient.request<__internal_OAuthConsentProps>({
+      method: 'GET',
+      path: `/me/oauth/consent/${encodeURIComponent(clientId)}`,
+      search,
+    });
+
+    if (!response.payload?.response) {
+      throw new Error('Failed to fetch OAuth consent details');
+    }
+
+    return response.payload.response;
+  };
+
   /**
    * @experimental This API is in early access and may change in future releases.
    *

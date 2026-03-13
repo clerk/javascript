@@ -683,6 +683,18 @@ export interface Clerk {
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Fetches OAuth consent details from the FAPI for the given client_id.
+   *
+   * @param clientId - The OAuth application client_id.
+   * @param params - Optional query parameters for the request.
+   * @param params.scope - Space-delimited list of OAuth scopes.
+   */
+  __internal_fetchOAuthConsent: (
+    clientId: string,
+    params?: { scope?: string },
+  ) => Promise<__internal_OAuthConsentProps>;
+
+  /**
    * Mounts a TaskChooseOrganization component at the target element.
    *
    * @param targetNode - Target node to mount the TaskChooseOrganization component.
@@ -2272,9 +2284,20 @@ export type __experimental_SubscriptionDetailsButtonProps = {
 export type __internal_OAuthConsentProps = {
   appearance?: ClerkAppearanceTheme;
   /**
+   * The OAuth application's client_id. When provided, the component will
+   * fetch consent details from the FAPI endpoint
+   * `/v1/me/oauth/consent/{clientId}`.
+   */
+  clientId?: string;
+  /**
+   * Space-delimited list of OAuth scopes requested by the client.
+   * Sent as the `scope` query parameter when fetching consent details.
+   */
+  scope?: string;
+  /**
    * Name of the OAuth application.
    */
-  oAuthApplicationName: string;
+  oAuthApplicationName?: string;
   /**
    * Logo URL of the OAuth application.
    */
@@ -2286,7 +2309,7 @@ export type __internal_OAuthConsentProps = {
   /**
    * Scopes requested by the OAuth application.
    */
-  scopes: {
+  scopes?: {
     scope: string;
     description: string | null;
     requires_consent: boolean;
@@ -2294,15 +2317,15 @@ export type __internal_OAuthConsentProps = {
   /**
    * Full URL or path to navigate to after the user allows access.
    */
-  redirectUrl: string;
+  redirectUrl?: string;
   /**
    * Called when user allows access.
    */
-  onAllow: () => void;
+  onAllow?: () => void;
   /**
    * Called when user denies access.
    */
-  onDeny: () => void;
+  onDeny?: () => void;
 };
 
 export interface HandleEmailLinkVerificationParams {
