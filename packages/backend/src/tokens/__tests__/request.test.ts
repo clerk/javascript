@@ -1815,6 +1815,39 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
+    test('does not trigger handshake for cross-origin POST document request on primary domain', async () => {
+      const cookieStr = Object.entries({
+        __session: mockJwt,
+        __client_uat: '12345',
+      })
+        .map(([k, v]) => `${k}=${v}`)
+        .join(';');
+
+      const request = new Request('https://primary.com/dashboard', {
+        method: 'POST',
+        headers: {
+          ...defaultHeaders,
+          referer: 'https://satellite.com/form',
+          'sec-fetch-dest': 'document',
+          cookie: cookieStr,
+        },
+      });
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
     test('does not trigger handshake for non-document requests', async () => {
       const request = mockRequestWithCookies(
         {
@@ -2093,6 +2126,64 @@ describe('tokens.authenticateRequest(options)', () => {
         isSatellite: false,
         signInUrl: 'https://primary.com/sign-in',
       });
+    });
+  });
+
+  describe('POST requests with sec-fetch-dest: document', () => {
+    const mockPostRequest = (headers = {}, cookies = {}, requestUrl = 'http://clerk.com/path') => {
+      const cookieStr = Object.entries(cookies)
+        .map(([k, v]) => `${k}=${v}`)
+        .join(';');
+
+      return new Request(requestUrl, {
+        method: 'POST',
+        headers: { ...defaultHeaders, 'sec-fetch-dest': 'document', cookie: cookieStr, ...headers },
+      });
+    };
+
+    test('returns signed out instead of handshake when clientUat > 0 and no cookieToken', async () => {
+      const requestState = await authenticateRequest(
+        mockPostRequest({}, { __client_uat: '12345' }),
+        mockOptions({ secretKey: 'deadbeef', publishableKey: PK_LIVE }),
+      );
+
+      expect(requestState).toBeSignedOut({ reason: AuthErrorReason.ClientUATWithoutSessionToken });
+    });
+
+    test('returns signed out instead of handshake for satellite app needing sync', async () => {
+      const requestState = await authenticateRequest(
+        mockPostRequest({}, { __client_uat: '0' }),
+        mockOptions({
+          publishableKey: PK_LIVE,
+          secretKey: 'deadbeef',
+          isSatellite: true,
+          signInUrl: 'https://primary.dev/sign-in',
+          domain: 'satellite.dev',
+        }),
+      );
+
+      expect(requestState).toBeSignedOut({
+        reason: AuthErrorReason.SessionTokenAndUATMissing,
+        isSatellite: true,
+        signInUrl: 'https://primary.dev/sign-in',
+        domain: 'satellite.dev',
+      });
+    });
+
+    test('returns signed out instead of handshake when clientUat > cookieToken.iat', async () => {
+      const requestState = await authenticateRequest(
+        mockPostRequest(
+          {},
+          {
+            __clerk_db_jwt: 'deadbeef',
+            __client_uat: `${mockJwtPayload.iat + 10}`,
+            __session: mockJwt,
+          },
+        ),
+        mockOptions(),
+      );
+
+      expect(requestState).toBeSignedOut({ reason: AuthErrorReason.SessionTokenIATBeforeClientUAT });
     });
   });
 });
