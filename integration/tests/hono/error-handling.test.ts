@@ -23,12 +23,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('error han
       },
     });
 
-    // Should not crash the server — returns either 401 or unauthenticated state
-    expect([200, 401]).toContain(res.status);
-    if (res.status === 200) {
-      const json = await res.json();
-      expect(json.userId).toBeNull();
-    }
+    // Clerk middleware treats an invalid bearer token as unauthenticated (not a crash)
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.userId).toBeNull();
   });
 
   test('request with malformed cookie is handled gracefully', async () => {
@@ -39,8 +37,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('error han
       },
     });
 
-    // Should not crash — server handles gracefully
-    expect(res.status).toBeLessThan(500);
+    // Clerk middleware handles malformed cookies gracefully, treating the request as unauthenticated
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.userId).toBeNull();
   });
 
   test('non-existent API route returns 404', async () => {

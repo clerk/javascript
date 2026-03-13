@@ -45,6 +45,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
 
     test('auth object contains null userId when signed out', async () => {
       const url = new URL('/api/me', app.serverUrl);
+      // Raw fetch has no browser cookies, simulating an unauthenticated request.
       const res = await fetch(url.toString());
 
       expect(res.status).toBe(200);
