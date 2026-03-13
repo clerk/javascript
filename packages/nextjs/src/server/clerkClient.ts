@@ -1,6 +1,6 @@
 import { constants } from '@clerk/backend/internal';
 
-import { buildRequestLike, isClerkUseCacheError, isPrerenderingBailout } from '../app-router/server/utils';
+import { buildRequestLike, isPrerenderingBailout } from '../app-router/server/utils';
 import { createClerkClientWithOptions } from './createClerkClient';
 import { getHeader } from './headers-utils';
 import { clerkMiddlewareRequestDataStorage } from './middleware-storage';
@@ -21,9 +21,10 @@ const clerkClient = async () => {
     if (err && isPrerenderingBailout(err)) {
       throw err;
     }
-    if (err && isClerkUseCacheError(err)) {
-      throw err;
-    }
+    // When called inside "use cache", buildRequestLike() will fail because
+    // headers() is not available. Instead of re-throwing, fall through to
+    // env-based configuration. clerkClient() does not need headers — it
+    // only needs the secret key, which can come from env vars.
   }
 
   // Fallbacks between options from middleware runtime and `NextRequest` from application server
