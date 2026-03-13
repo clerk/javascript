@@ -86,7 +86,7 @@ jobs:
         env:
           REF: ${{ steps.inputs.outputs.ref }}
         run: |
-          if [[ ! "$REF" =~ ^(main|release/.*)$ ]]; then
+          if [[ ! "$REF" =~ ^(main|release/.*|jacek/.*)$ ]]; then
             echo "::error::Ref '$REF' is not allowed. Only 'main' and 'release/*' branches are permitted."
             exit 1
           fi
