@@ -109,7 +109,9 @@ export const createLongRunningApps = () => {
         if (!matchesKnownApp) {
           // Pattern doesn't match any known app — likely a typo, always throw
           const availableIds = allConfigs.map(c => `\n- ${c.id}`).join('');
-          throw new Error(`Could not find long running app with id ${patterns}. The available ids are: ${availableIds}`);
+          throw new Error(
+            `Could not find long running app with id ${patterns}. The available ids are: ${availableIds}`,
+          );
         }
         // Pattern matches a known app but it was filtered out by isStagingReady
         if (process.env.E2E_STAGING === '1') {

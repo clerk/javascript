@@ -72,17 +72,13 @@ describe('createLongRunningApps', () => {
 
     it('throws for an invalid pattern (typo) in normal mode', () => {
       const apps = createLongRunningApps();
-      expect(() => apps.getByPattern(['react.vite.withEmailCodez'])).toThrow(
-        /Could not find long running app with id/,
-      );
+      expect(() => apps.getByPattern(['react.vite.withEmailCodez'])).toThrow(/Could not find long running app with id/);
     });
 
     it('throws for an invalid pattern (typo) even when E2E_STAGING=1', () => {
       process.env.E2E_STAGING = '1';
       const apps = createLongRunningApps();
-      expect(() => apps.getByPattern(['react.vite.withEmailCodez'])).toThrow(
-        /Could not find long running app with id/,
-      );
+      expect(() => apps.getByPattern(['react.vite.withEmailCodez'])).toThrow(/Could not find long running app with id/);
     });
 
     it('returns [] for a known app filtered by isStagingReady when E2E_STAGING=1', () => {
@@ -98,9 +94,7 @@ describe('createLongRunningApps', () => {
       // Filter out all apps
       mockIsStagingReady.mockImplementation(() => false);
       const apps = createLongRunningApps();
-      expect(() => apps.getByPattern(['react.vite.withEmailCodes'])).toThrow(
-        /Could not find long running app with id/,
-      );
+      expect(() => apps.getByPattern(['react.vite.withEmailCodes'])).toThrow(/Could not find long running app with id/);
     });
   });
 });
