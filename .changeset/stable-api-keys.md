@@ -5,7 +5,7 @@
 "@clerk/ui": minor
 ---
 
-API keys now generally available.
+API keys is now generally available.
 
 ### `<APIKeys />` component
 
