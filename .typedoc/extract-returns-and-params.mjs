@@ -6,6 +6,25 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const LEGACY_HOOK_NAMES = new Set(['use-sign-in-1', 'use-sign-up-1']);
+
+/**
+ * Returns legacy hook output info or null if not a legacy hook.
+ * @param {string} filePath
+ * @returns {{ outputDir: string; baseName: string } | null}
+ */
+function getLegacyHookTarget(filePath) {
+  const fileName = path.basename(filePath, '.mdx');
+  if (!LEGACY_HOOK_NAMES.has(fileName)) {
+    return null;
+  }
+  const dirName = path.dirname(filePath);
+  return {
+    outputDir: path.join(dirName, 'legacy'),
+    baseName: fileName.replace(/-1$/, ''),
+  };
+}
+
 /**
  * Extracts the "## Returns" section from a markdown file and writes it to a separate file.
  * @param {string} filePath - The path to the markdown file
@@ -13,6 +32,7 @@ const __dirname = path.dirname(__filename);
  */
 function extractReturnsSection(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
+  const legacyTarget = getLegacyHookTarget(filePath);
 
   // Find the "## Returns" section
   const returnsStart = content.indexOf('## Returns');
@@ -34,13 +54,12 @@ function extractReturnsSection(filePath) {
 
   // Generate the new filename: use-auth.mdx -> use-auth-return.mdx
   const fileName = path.basename(filePath, '.mdx');
-  const dirName = path.dirname(filePath);
   let outputBaseName = `${fileName}-return`;
-  let outputDir = dirName;
+  let outputDir = path.dirname(filePath);
   // Legacy hooks: move into legacy/ and drop the -1
-  if (fileName === 'use-sign-in-1' || fileName === 'use-sign-up-1') {
-    outputBaseName = `${fileName.replace(/-1$/, '')}-return`;
-    outputDir = path.join(dirName, 'legacy');
+  if (legacyTarget) {
+    outputBaseName = `${legacyTarget.baseName}-return`;
+    outputDir = legacyTarget.outputDir;
     fs.mkdirSync(outputDir, { recursive: true });
   }
   const newFilePath = path.join(outputDir, `${outputBaseName}.mdx`);
@@ -75,12 +94,13 @@ function extractParametersSection(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const fileName = path.basename(filePath, '.mdx');
   const dirName = path.dirname(filePath);
+  const legacyTarget = getLegacyHookTarget(filePath);
   let outputDir = dirName;
   let outputBaseName = fileName;
 
-  if (fileName === 'use-sign-in-1' || fileName === 'use-sign-up-1') {
-    outputDir = path.join(dirName, 'legacy');
-    outputBaseName = fileName.replace(/-1$/, '');
+  if (legacyTarget) {
+    outputDir = legacyTarget.outputDir;
+    outputBaseName = legacyTarget.baseName;
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
@@ -128,17 +148,14 @@ function extractParametersSection(filePath) {
  * @param {string} filePath
  */
 function moveLegacyHookDoc(filePath) {
-  const fileName = path.basename(filePath, '.mdx');
-  if (fileName !== 'use-sign-in-1' && fileName !== 'use-sign-up-1') {
+  const legacyTarget = getLegacyHookTarget(filePath);
+  if (!legacyTarget) {
     return;
   }
 
-  const dirName = path.dirname(filePath);
-  const legacyDir = path.join(dirName, 'legacy');
+  const legacyDir = legacyTarget.outputDir;
   fs.mkdirSync(legacyDir, { recursive: true });
-
-  const legacyName = fileName.replace(/-1$/, '');
-  const legacyPath = path.join(legacyDir, `${legacyName}.mdx`);
+  const legacyPath = path.join(legacyDir, `${legacyTarget.baseName}.mdx`);
 
   if (fs.existsSync(legacyPath)) {
     fs.unlinkSync(legacyPath);
