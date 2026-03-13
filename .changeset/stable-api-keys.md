@@ -10,7 +10,7 @@ API keys is now generally available.
 ### `<APIKeys />` component
 
 ```tsx
-import { APIKeys } from '@clerk/clerk-react';
+import { APIKeys } from '@clerk/react';
 
 export default function Page() {
   return <APIKeys />;
@@ -20,7 +20,7 @@ export default function Page() {
 ### `useAPIKeys()` hook
 
 ```tsx
-import { useAPIKeys } from '@clerk/clerk-react';
+import { useAPIKeys } from '@clerk/react';
 
 export default function CustomAPIKeys() {
   const { data, isLoading, page, pageCount, fetchNext, fetchPrevious } = useAPIKeys({
