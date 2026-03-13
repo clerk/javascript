@@ -1,5 +1,16 @@
 # Change Log
 
+## 6.1.0
+
+### Minor Changes
+
+- The `ui` prop is now respected if a Clerk instance is passed via the `Clerk` prop to `IsomorphicClerk`. This fixes the 'Clerk was not loaded with Ui components' error in the Chrome Extension SDK. ([#7997](https://github.com/clerk/javascript/pull/7997)) by [@royanger](https://github.com/royanger)
+
+### Patch Changes
+
+- Updated dependencies [[`de1386f`](https://github.com/clerk/javascript/commit/de1386fc90a3e8c2bab515b693c84a1b383525d3)]:
+  - @clerk/shared@4.3.0
+
 ## 6.0.3
 
 ### Patch Changes

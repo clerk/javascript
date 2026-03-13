@@ -400,7 +400,7 @@ const PeriodToggle = ({
   planPeriod: BillingSubscriptionPlanPeriod;
   setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
 }) => {
-  if (plan.fee && plan.annualMonthlyFee) {
+  if (!plan.isDefault && plan.fee && plan.annualMonthlyFee) {
     return (
       <Box
         elementDescriptor={descriptors.pricingTableCardPeriodToggle}

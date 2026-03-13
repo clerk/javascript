@@ -1,5 +1,13 @@
 # @clerk/ui
 
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`de1386f`](https://github.com/clerk/javascript/commit/de1386fc90a3e8c2bab515b693c84a1b383525d3)]:
+  - @clerk/shared@4.3.0
+  - @clerk/localizations@4.2.1
+
 ## 1.2.0
 
 ### Minor Changes
