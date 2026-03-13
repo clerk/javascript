@@ -51,6 +51,7 @@
     "test:integration:express": "E2E_APP_ID=express.* pnpm test:integration:base --grep @express",
     "test:integration:express:staging": "E2E_STAGING=1 pnpm test:integration:express",
     "test:integration:fastify": "E2E_APP_ID=fastify.* pnpm test:integration:base --grep @fastify",
+    "test:integration:fastify:staging": "E2E_STAGING=1 pnpm test:integration:fastify",
     "test:integration:generic": "E2E_APP_ID=react.vite.*,next.appRouter.withEmailCodes* pnpm test:integration:base --grep @generic",
     "test:integration:generic:staging": "E2E_STAGING=1 pnpm test:integration:generic",
     "test:integration:handshake": "DISABLE_WEB_SECURITY=true E2E_APP_1_ENV_KEY=sessions-prod-1 E2E_SESSIONS_APP_1_HOST=multiple-apps-e2e.clerk.app pnpm test:integration:base --grep @handshake",
