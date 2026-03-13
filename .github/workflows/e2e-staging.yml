@@ -6,24 +6,24 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: "Branch to test against"
+        description: 'Branch to test against'
         required: false
-        default: "main"
+        default: 'main'
         type: string
       clerk-go-commit-sha:
-        description: "clerk_go commit SHA for status reporting"
+        description: 'clerk_go commit SHA for status reporting'
         required: false
         type: string
       sdk-source:
         description: "SDK source: 'latest' uses published @latest from npm, 'ref' builds from the checked-out branch"
         required: false
-        default: "latest"
+        default: 'latest'
         type: choice
         options:
           - latest
           - ref
       notify-slack:
-        description: "Send Slack notification on failure"
+        description: 'Send Slack notification on failure'
         required: false
         default: true
         type: boolean
@@ -39,7 +39,7 @@ concurrency:
 jobs:
   integration-tests:
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }})
-    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
         shell: bash
@@ -49,16 +49,16 @@ jobs:
       fail-fast: false
       matrix:
         test-name:
-          - "sessions:staging"
-          - "handshake:staging"
-          - "generic:staging"
-          - "cache-components:staging"
-          - "express:staging"
-          - "hono:staging"
-          - "quickstart:staging"
-          - "react-router:staging"
-          - "tanstack-react-start:staging"
-        test-project: ["chrome"]
+          - 'sessions:staging'
+          - 'handshake:staging'
+          - 'generic'
+          - 'cache-components'
+          - 'express'
+          - 'hono'
+          - 'quickstart'
+          - 'react-router'
+          - 'tanstack-react-start'
+        test-project: ['chrome']
 
     steps:
       - name: Normalize inputs
@@ -103,7 +103,7 @@ jobs:
           ref: ${{ steps.inputs.outputs.ref }}
           fetch-depth: 1
           fetch-tags: false
-          filter: "blob:none"
+          filter: 'blob:none'
           show-progress: false
 
       - name: Setup
@@ -171,8 +171,8 @@ jobs:
       - name: Write all ENV certificates to files in integration/certs
         uses: actions/github-script@v7
         env:
-          INTEGRATION_CERTS: "${{ secrets.INTEGRATION_CERTS }}"
-          INTEGRATION_ROOT_CA: "${{ secrets.INTEGRATION_ROOT_CA }}"
+          INTEGRATION_CERTS: '${{ secrets.INTEGRATION_CERTS }}'
+          INTEGRATION_ROOT_CA: '${{ secrets.INTEGRATION_ROOT_CA }}'
         with:
           script: |
             const fs = require('fs');
@@ -193,12 +193,13 @@ jobs:
         timeout-minutes: 25
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
-          E2E_DEBUG: "1"
+          E2E_DEBUG: '1'
+          E2E_STAGING: '1'
           E2E_SDK_SOURCE: ${{ steps.inputs.outputs.sdk-source }}
           E2E_APP_CLERK_JS_DIR: ${{ runner.temp }}
           E2E_APP_CLERK_UI_DIR: ${{ runner.temp }}
-          E2E_CLERK_JS_VERSION: "latest"
-          E2E_CLERK_UI_VERSION: "latest"
+          E2E_CLERK_JS_VERSION: 'latest'
+          E2E_CLERK_UI_VERSION: 'latest'
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
@@ -216,7 +217,7 @@ jobs:
     name: Report Results
     needs: [integration-tests]
     if: always()
-    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
         shell: bash
