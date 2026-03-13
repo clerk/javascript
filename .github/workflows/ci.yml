@@ -379,8 +379,13 @@ jobs:
             exit 1
           fi
 
-          TASK_COUNT=$(echo "$TURBO_JSON" | jq '.tasks | length')
-          if [ -z "$TASK_COUNT" ] || [ "$TASK_COUNT" -eq 0 ]; then
+          if ! TASK_COUNT=$(jq -er '.tasks | length' <<< "$TURBO_JSON"); then
+            echo "::error::Turbo task '$TASK_NAME' returned invalid JSON or missing .tasks"
+            printf '%s\n' "$TURBO_JSON"
+            exit 1
+          fi
+
+          if [ "$TASK_COUNT" -eq 0 ]; then
             echo "::error::Turbo task '$TASK_NAME' returned 0 tasks"
             exit 1
           fi
