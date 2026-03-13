@@ -12,6 +12,7 @@ import { EnterpriseAccountsSection } from './EnterpriseAccountsSection';
 import { PhoneSection } from './PhoneSection';
 import { UsernameSection } from './UsernameSection';
 import { UserProfileSection } from './UserProfileSection';
+import { isAttributeAvailable } from './utils';
 import { Web3Section } from './Web3Section';
 
 export const AccountPage = withCardStateProvider(() => {
@@ -20,9 +21,9 @@ export const AccountPage = withCardStateProvider(() => {
   const { user } = useUser();
   const { shouldAllowIdentificationCreation, immutableAttributes } = useUserProfileContext();
 
-  const showUsername = attributes.username?.enabled;
-  const showEmail = attributes.email_address?.enabled;
-  const showPhone = attributes.phone_number?.enabled;
+  const showUsername = isAttributeAvailable(attributes.username);
+  const showEmail = isAttributeAvailable(attributes.email_address);
+  const showPhone = isAttributeAvailable(attributes.phone_number);
   const showConnectedAccounts = social && Object.values(social).filter(p => p.enabled).length > 0;
   const showEnterpriseAccounts = user && enterpriseSSO.enabled;
   const showWeb3 = attributes.web3_wallet?.enabled;
