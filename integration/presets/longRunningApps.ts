@@ -4,6 +4,7 @@ import { astro } from './astro';
 import { envs } from './envs';
 import { expo } from './expo';
 import { express } from './express';
+import { fastify } from './fastify';
 import { hono } from './hono';
 import { next } from './next';
 import { nuxt } from './nuxt';
@@ -83,10 +84,17 @@ export const createLongRunningApps = () => {
     { id: 'express.vite.withEmailCodes', config: express.vite, env: envs.withEmailCodes },
 
     /**
+     * Fastify apps
+     */
+    { id: 'fastify.vite.withEmailCodes', config: fastify.vite, env: envs.withEmailCodes },
+    { id: 'fastify.vite.withEmailCodesProxy', config: fastify.vite, env: envs.withEmailCodesProxy },
+
+    /**
      * Hono apps
      */
     { id: 'hono.vite.withEmailCodes', config: hono.vite, env: envs.withEmailCodes },
     { id: 'hono.vite.withEmailCodesProxy', config: hono.vite, env: envs.withEmailCodesProxy },
+    { id: 'hono.vite.withCustomRoles', config: hono.vite, env: envs.withCustomRoles },
   ] as const;
 
   const apps = configs.map(longRunningApplication);

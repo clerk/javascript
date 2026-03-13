@@ -199,7 +199,7 @@ export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCust
  *
  * The `Session` object includes methods for recording session activity and ending the session client-side. For security reasons, sessions can also expire server-side.
  *
- * As soon as a [`User`](https://clerk.com/docs/reference/javascript/user) signs in, Clerk creates a `Session` for the current [`Client`](https://clerk.com/docs/reference/javascript/client). Clients can have more than one sessions at any point in time, but only one of those sessions will be **active**.
+ * As soon as a [`User`](https://clerk.com/docs/reference/objects/user) signs in, Clerk creates a `Session` for the current [`Client`](https://clerk.com/docs/reference/objects/client). Clients can have more than one sessions at any point in time, but only one of those sessions will be **active**.
  *
  * In certain scenarios, a session might be replaced by another one. This is often the case with [multi-session applications](https://clerk.com/docs/guides/secure/session-options#multi-session-applications).
  *
