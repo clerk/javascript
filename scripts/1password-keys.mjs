@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { writeFile } from 'node:fs/promises';
+import { rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { $ } from 'zx';
@@ -63,5 +63,6 @@ if (stagingKeysItem) {
   await writeFile(join(process.cwd(), 'integration', '.keys.staging.json'), stagingKeysItem);
   console.log('Keys and env written to .keys.json, .keys.staging.json, and .env.local');
 } else {
+  await rm(join(process.cwd(), 'integration', '.keys.staging.json'), { force: true });
   console.log('Keys and env written to .keys.json and .env.local (staging keys not found, skipping)');
 }

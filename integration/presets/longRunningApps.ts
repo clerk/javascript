@@ -18,9 +18,9 @@ import { vue } from './vue';
  * These are applications that are started once and then used for all tests,
  * making the tests run faster as the app doesn't need to be started for each test.
  */
-// prettier-ignore
 export const createLongRunningApps = () => {
-  const configs = ([
+  // prettier-ignore
+  const allConfigs = [
     /**
      * NextJS apps - basic flows
      */
@@ -95,19 +95,27 @@ export const createLongRunningApps = () => {
     { id: 'hono.vite.withEmailCodes', config: hono.vite, env: envs.withEmailCodes },
     { id: 'hono.vite.withEmailCodesProxy', config: hono.vite, env: envs.withEmailCodesProxy },
     { id: 'hono.vite.withCustomRoles', config: hono.vite, env: envs.withCustomRoles },
-  ] as const).filter(c => isStagingReady(c.env));
+  ] as const;
 
-  const apps = configs.map(longRunningApplication);
+  const stagingReadyConfigs = allConfigs.filter(c => isStagingReady(c.env));
+  const apps = stagingReadyConfigs.map(longRunningApplication);
 
   return {
-    getByPattern: (patterns: Array<string | (typeof configs)[number]['id']>) => {
+    getByPattern: (patterns: Array<string | (typeof allConfigs)[number]['id']>) => {
       const res = new Set(patterns.map(pattern => apps.filter(app => idMatchesPattern(app.id, pattern))).flat());
       if (!res.size) {
-        // In staging mode, missing apps are expected (not all staging keys may exist yet)
+        // Check whether the pattern matches any known app (before staging filtering)
+        const matchesKnownApp = patterns.some(pattern => allConfigs.some(c => idMatchesPattern(c.id, pattern)));
+        if (!matchesKnownApp) {
+          // Pattern doesn't match any known app — likely a typo, always throw
+          const availableIds = allConfigs.map(c => `\n- ${c.id}`).join('');
+          throw new Error(`Could not find long running app with id ${patterns}. The available ids are: ${availableIds}`);
+        }
+        // Pattern matches a known app but it was filtered out by isStagingReady
         if (process.env.E2E_STAGING === '1') {
           return [] as any as LongRunningApplication[];
         }
-        const availableIds = configs.map(c => `\n- ${c.id}`).join('');
+        const availableIds = stagingReadyConfigs.map(c => `\n- ${c.id}`).join('');
         throw new Error(`Could not find long running app with id ${patterns}. The available ids are: ${availableIds}`);
       }
       return [...res] as any as LongRunningApplication[];
