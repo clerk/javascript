@@ -32,6 +32,7 @@ const componentImportPaths = {
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
   EnableOrganizationsPrompt: () =>
     import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/devPrompts/EnableOrganizationsPrompt'),
+  Inspector: () => import(/* webpackChunkName: "inspector" */ '../components/devPrompts/Inspector'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -149,6 +150,8 @@ export const OAuthConsent = lazy(() =>
 export const SessionTasks = lazy(() =>
   componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTasks })),
 );
+
+export const Inspector = lazy(() => componentImportPaths.Inspector().then(module => ({ default: module.Inspector })));
 
 export const preloadComponent = async (component: unknown) => {
   return componentImportPaths[component as keyof typeof componentImportPaths]?.();
