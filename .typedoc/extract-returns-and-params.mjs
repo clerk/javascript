@@ -35,7 +35,15 @@ function extractReturnsSection(filePath) {
   // Generate the new filename: use-auth.mdx -> use-auth-return.mdx
   const fileName = path.basename(filePath, '.mdx');
   const dirName = path.dirname(filePath);
-  const newFilePath = path.join(dirName, `${fileName}-return.mdx`);
+  let outputBaseName = `${fileName}-return`;
+  let outputDir = dirName;
+  // Legacy hooks: move into legacy/ and drop the -1
+  if (fileName === 'use-sign-in-1' || fileName === 'use-sign-up-1') {
+    outputBaseName = `${fileName.replace(/-1$/, '')}-return`;
+    outputDir = path.join(dirName, 'legacy');
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+  const newFilePath = path.join(outputDir, `${outputBaseName}.mdx`);
 
   // Write the extracted Returns section to the new file
   fs.writeFileSync(newFilePath, returnsContent, 'utf-8');
@@ -67,10 +75,18 @@ function extractParametersSection(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const fileName = path.basename(filePath, '.mdx');
   const dirName = path.dirname(filePath);
+  let outputDir = dirName;
+  let outputBaseName = fileName;
+
+  if (fileName === 'use-sign-in-1' || fileName === 'use-sign-up-1') {
+    outputDir = path.join(dirName, 'legacy');
+    outputBaseName = fileName.replace(/-1$/, '');
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
 
   // Always use -params suffix
   const suffix = '-params';
-  const targetFileName = `${fileName}${suffix}.mdx`;
+  const targetFileName = `${outputBaseName}${suffix}.mdx`;
   const propsFileName = `${fileName}-props.mdx`;
 
   // Delete any existing -props file (TypeDoc-generated)
@@ -100,11 +116,38 @@ function extractParametersSection(filePath) {
   const processedParams = replaceGenericTypesInParamsTable(paramsContent);
 
   // Write to new file
-  const newFilePath = path.join(dirName, targetFileName);
+  const newFilePath = path.join(outputDir, targetFileName);
   fs.writeFileSync(newFilePath, processedParams, 'utf-8');
 
   console.log(`[extract-returns] Created ${path.relative(process.cwd(), newFilePath)}`);
   return true;
+}
+
+/**
+ * Renames legacy hook docs to use a -legacy suffix (without the -1).
+ * @param {string} filePath
+ */
+function moveLegacyHookDoc(filePath) {
+  const fileName = path.basename(filePath, '.mdx');
+  if (fileName !== 'use-sign-in-1' && fileName !== 'use-sign-up-1') {
+    return;
+  }
+
+  const dirName = path.dirname(filePath);
+  const legacyDir = path.join(dirName, 'legacy');
+  fs.mkdirSync(legacyDir, { recursive: true });
+
+  const legacyName = fileName.replace(/-1$/, '');
+  const legacyPath = path.join(legacyDir, `${legacyName}.mdx`);
+
+  if (fs.existsSync(legacyPath)) {
+    fs.unlinkSync(legacyPath);
+  }
+
+  fs.renameSync(filePath, legacyPath);
+  console.log(
+    `[extract-returns] Moved ${path.relative(process.cwd(), filePath)} -> ${path.relative(process.cwd(), legacyPath)}`,
+  );
 }
 
 /**
@@ -169,6 +212,9 @@ function main() {
       if (extractParametersSection(filePath)) {
         paramsCount++;
       }
+
+      // Move legacy hook docs after extraction
+      moveLegacyHookDoc(filePath);
     }
 
     console.log(`[extract-returns] Extracted ${returnsCount} Returns sections`);
