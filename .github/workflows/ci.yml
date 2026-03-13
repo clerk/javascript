@@ -356,8 +356,7 @@ jobs:
           fi
           jq --version
 
-      - name: Task Status
-        id: task-status
+      - name: Validate turbo task
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
@@ -391,21 +390,17 @@ jobs:
           fi
 
           echo "Task '$TASK_NAME' validated ($TASK_COUNT tasks in graph)"
-          echo "affected=1" >> $GITHUB_OUTPUT
 
       - name: Build packages
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         run: pnpm turbo build $TURBO_ARGS --only
 
       - name: Publish to local registry
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         run: pkglab pub --force
 
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 
       - name: Install @clerk/clerk-js in os temp
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-js && cd clerk-js
@@ -413,7 +408,6 @@ jobs:
           pkglab add @clerk/clerk-js
 
       - name: Install @clerk/ui in os temp
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-ui && cd clerk-ui
@@ -425,7 +419,6 @@ jobs:
         run: cd packages/astro && pnpm copy:components
 
       - name: Write all ENV certificates to files in integration/certs
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: actions/github-script@v7
         env:
           INTEGRATION_CERTS: "${{secrets.INTEGRATION_CERTS}}"
@@ -443,12 +436,10 @@ jobs:
             }
 
       - name: LS certs
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration/certs
         run: ls -la && pwd
 
       - name: Run Integration Tests
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
         timeout-minutes: 25
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
