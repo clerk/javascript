@@ -52,6 +52,12 @@ jobs:
           - "sessions:staging"
           - "handshake:staging"
           - "generic:staging"
+          - "cache-components:staging"
+          - "express:staging"
+          - "hono:staging"
+          - "quickstart:staging"
+          - "react-router:staging"
+          - "tanstack-react-start:staging"
         test-project: ["chrome"]
 
     steps:
