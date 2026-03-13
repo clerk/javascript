@@ -20,7 +20,7 @@ import { vue } from './vue';
  */
 // prettier-ignore
 export const createLongRunningApps = () => {
-  const configs = [
+  const configs = ([
     /**
      * NextJS apps - basic flows
      */
@@ -95,7 +95,7 @@ export const createLongRunningApps = () => {
     { id: 'hono.vite.withEmailCodes', config: hono.vite, env: envs.withEmailCodes },
     { id: 'hono.vite.withEmailCodesProxy', config: hono.vite, env: envs.withEmailCodesProxy },
     { id: 'hono.vite.withCustomRoles', config: hono.vite, env: envs.withCustomRoles },
-  ] as const;
+  ] as { id: string; config: any; env: any }[]).filter(c => c.env != null);
 
   const apps = configs.map(longRunningApplication);
 
