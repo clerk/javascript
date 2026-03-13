@@ -367,18 +367,26 @@ jobs:
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
         run: |
-          # Use turbo's built-in --affected flag to detect changes
-          # This automatically uses GITHUB_BASE_REF in GitHub Actions
-          TASK_COUNT=$(pnpm turbo run test:integration:${{ matrix.test-name }} --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
-
-          if [ "$TASK_COUNT" -gt 0 ]; then
-            AFFECTED=1
-          else
-            AFFECTED=0
+          # Validate the turbo task exists. Turbo's --affected flag is a no-op for
+          # root-level tasks (//#) — they are always returned as affected. The previous
+          # --affected check only served to silently skip tests when the task was missing
+          # from turbo.json, hiding real configuration errors.
+          TASK_NAME="test:integration:${{ matrix.test-name }}"
+          TURBO_OUTPUT=$(pnpm turbo run "$TASK_NAME" --dry=json 2>&1)
+          if [ $? -ne 0 ]; then
+            echo "::error::Turbo task '$TASK_NAME' failed validation"
+            echo "$TURBO_OUTPUT"
+            exit 1
           fi
 
-          echo "affected=${AFFECTED}"
-          echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
+          TASK_COUNT=$(echo "$TURBO_OUTPUT" | jq '.tasks | length')
+          if [ -z "$TASK_COUNT" ] || [ "$TASK_COUNT" -eq 0 ]; then
+            echo "::error::Turbo task '$TASK_NAME' returned 0 tasks"
+            exit 1
+          fi
+
+          echo "Task '$TASK_NAME' validated ($TASK_COUNT tasks in graph)"
+          echo "affected=1" >> $GITHUB_OUTPUT
 
       - name: Build packages
         if: ${{ steps.task-status.outputs.affected == '1' }}
