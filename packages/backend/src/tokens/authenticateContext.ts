@@ -1,4 +1,5 @@
 import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
+import { shouldAutoProxy } from '@clerk/shared/proxy';
 import type { Jwt } from '@clerk/shared/types';
 import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
 
@@ -69,6 +70,14 @@ class AuthenticateContext implements AuthenticateContext {
     private clerkRequest: ClerkRequest,
     options: AuthenticateRequestOptions,
   ) {
+    // Auto-detect proxy for supported platform deployments
+    if (!options.proxyUrl && !options.domain) {
+      const hostname = clerkRequest.clerkUrl.hostname;
+      if (shouldAutoProxy(hostname)) {
+        options = { ...options, proxyUrl: `${clerkRequest.clerkUrl.origin}/__clerk` };
+      }
+    }
+
     if (options.acceptsToken === TokenType.M2MToken || options.acceptsToken === TokenType.ApiKey) {
       // For non-session tokens, we only want to set the header values.
       this.initHeaderValues();

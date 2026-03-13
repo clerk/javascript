@@ -1191,6 +1191,21 @@ describe('frontendApiProxy multi-domain support', () => {
   });
 });
 
+describe('auto-proxy for eligible hosts', () => {
+  it('auto-intercepts /__clerk/* requests on eligible hostnames', async () => {
+    const req = new NextRequest(new URL('/__clerk/v1/client', 'https://myapp-abc123.vercel.app').toString(), {
+      method: 'GET',
+      headers: new Headers(),
+    });
+
+    const resp = await clerkMiddleware()(req, {} as NextFetchEvent);
+
+    // Proxy should intercept the request — authenticateRequest should NOT be called
+    expect((await clerkClient()).authenticateRequest).not.toBeCalled();
+    expect(resp?.status).toBeDefined();
+  });
+});
+
 describe('contentSecurityPolicy option', () => {
   it('forwards CSP headers as request headers when strict mode is enabled', async () => {
     const resp = await clerkMiddleware({
