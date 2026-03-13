@@ -15,6 +15,8 @@ import { convertPageToOffsetSearchParams } from '@/utils/convertPageToOffsetSear
 import { APIKey, BaseResource } from '../../resources/internal';
 
 export class APIKeys implements APIKeysNamespace {
+  static readonly #pathRoot = '/api_keys';
+
   /**
    * Returns the base options for the FAPI proxy requests.
    */
@@ -27,7 +29,7 @@ export class APIKeys implements APIKeysNamespace {
     return {
       // Set to an empty string because FAPI Proxy does not include the version in the path.
       pathPrefix: '',
-      // Set the session token as a Bearer token in the Authorization header for authentication.
+      // FAPI Proxy looks for the session token in the Authorization header.
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -41,7 +43,7 @@ export class APIKeys implements APIKeysNamespace {
     return BaseResource._fetch({
       ...(await this.#getBaseFapiProxyOptions()),
       method: 'GET',
-      path: '/api_keys',
+      path: APIKeys.#pathRoot,
       search: convertPageToOffsetSearchParams({
         ...params,
         subject: params?.subject ?? BaseResource.clerk.organization?.id ?? BaseResource.clerk.user?.id ?? '',
@@ -60,7 +62,7 @@ export class APIKeys implements APIKeysNamespace {
   async create(params: CreateAPIKeyParams): Promise<APIKeyResource> {
     const json = (await BaseResource._fetch<ApiKeyJSON>({
       ...(await this.#getBaseFapiProxyOptions()),
-      path: '/api_keys',
+      path: APIKeys.#pathRoot,
       method: 'POST',
       body: JSON.stringify({
         type: 'api_key',
@@ -78,7 +80,7 @@ export class APIKeys implements APIKeysNamespace {
     const json = (await BaseResource._fetch<ApiKeyJSON>({
       ...(await this.#getBaseFapiProxyOptions()),
       method: 'POST',
-      path: `/api_keys/${params.apiKeyID}/revoke`,
+      path: `${APIKeys.#pathRoot}/${params.apiKeyID}/revoke`,
       body: JSON.stringify({
         revocation_reason: params.revocationReason,
       }),
