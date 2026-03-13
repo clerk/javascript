@@ -1,5 +1,5 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
-import { isDevelopmentFromPublishableKey } from './keys';
+import { getCookieSuffix, isDevelopmentFromPublishableKey } from './keys';
 
 /**
  * Cache busting parameter for Netlify to prevent cached responses
@@ -29,19 +29,55 @@ function isNetlifyRuntime(): boolean {
 }
 
 /**
- * Prevents infinite redirects in Netlify's functions by adding a cache bust parameter
- * to the original redirect URL. This ensures that Netlify doesn't serve a cached response
- * during the handshake flow.
+ * Applies Netlify-specific cache headers to the request state.
  *
- * The issue happens only on Clerk development instances running on Netlify. This is
- * a workaround until we find a better solution.
- *
- * See https://answers.netlify.com/t/cache-handling-recommendation-for-authentication-handshake-redirects/143969/1.
+ * When running on Netlify, this function:
+ * 1. Sets `Netlify-Vary` with both unsuffixed and suffixed Clerk cookie names to instruct
+ *    Netlify's CDN to create separate cache entries based on auth cookie values, preventing
+ *    cached auth state from bleeding across users/sessions.
+ * 2. For development instances with a redirect (Location header), adds a cache-bust query
+ *    parameter to prevent Netlify from serving cached responses during the handshake flow.
  *
  * @internal
  */
-export function handleNetlifyCacheInDevInstance({
-  locationHeader,
+export async function handleNetlifyCacheHeaders(requestState: {
+  headers: Headers;
+  publishableKey: string;
+}): Promise<void> {
+  if (!isNetlifyRuntime()) {
+    return;
+  }
+
+  const { headers, publishableKey } = requestState;
+
+  // Tell Netlify CDN to vary cache by auth cookie values (all instances, dev + prod).
+  // Include both unsuffixed and suffixed cookie names since Clerk uses suffixed cookies
+  // by default for newer instances (e.g. __client_uat_AbC12345).
+  const cookieNames = ['__client_uat', '__session'];
+  if (publishableKey) {
+    const suffix = await getCookieSuffix(publishableKey);
+    cookieNames.push(`__client_uat_${suffix}`, `__session_${suffix}`);
+  }
+  headers.set('Netlify-Vary', cookieNames.map(name => `cookie=${name}`).join(','));
+
+  // Add cache-bust param to redirect URL for dev instances to prevent cached redirects
+  const locationHeader = headers.get('Location');
+  if (locationHeader && isDevelopmentFromPublishableKey(publishableKey)) {
+    const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
+    if (!hasHandshakeQueryParam) {
+      const url = new URL(locationHeader);
+      url.searchParams.append(CLERK_NETLIFY_CACHE_BUST_PARAM, Date.now().toString());
+      headers.set('Location', url.toString());
+    }
+  }
+}
+
+/**
+ * @deprecated Use `handleNetlifyCacheHeaders` instead.
+ * @internal
+ */
+export async function handleNetlifyCacheInDevInstance({
+  locationHeader: _locationHeader,
   requestStateHeaders,
   publishableKey,
 }: {
@@ -49,17 +85,5 @@ export function handleNetlifyCacheInDevInstance({
   requestStateHeaders: Headers;
   publishableKey: string;
 }) {
-  const isOnNetlify = isNetlifyRuntime();
-  const isDevelopmentInstance = isDevelopmentFromPublishableKey(publishableKey);
-
-  if (isOnNetlify && isDevelopmentInstance) {
-    const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
-    // If location header is the original URL before the handshake flow, add cache bust param
-    // The param should be removed in clerk-js
-    if (!hasHandshakeQueryParam) {
-      const url = new URL(locationHeader);
-      url.searchParams.append(CLERK_NETLIFY_CACHE_BUST_PARAM, Date.now().toString());
-      requestStateHeaders.set('Location', url.toString());
-    }
-  }
+  await handleNetlifyCacheHeaders({ headers: requestStateHeaders, publishableKey });
 }
