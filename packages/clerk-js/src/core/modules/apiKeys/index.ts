@@ -39,6 +39,14 @@ export class APIKeys implements APIKeysNamespace {
     };
   }
 
+  /**
+   * Retrieves a paginated list of API keys.
+   *
+   * The subject (owner) is resolved in the following order:
+   * 1. Explicit `subject` param (user or organization ID)
+   * 2. Active organization ID
+   * 3. Current user ID
+   */
   async getAll(params?: GetAPIKeysParams): Promise<ClerkPaginatedResponse<APIKeyResource>> {
     return BaseResource._fetch({
       ...(await this.#getBaseFapiProxyOptions()),
