@@ -5,9 +5,7 @@
 "@clerk/ui": minor
 ---
 
-Promote API Keys from experimental to stable.
-
-The `<APIKeys />` component and `useAPIKeys()` hook are now generally available.
+API keys now generally available.
 
 ### `<APIKeys />` component
 
