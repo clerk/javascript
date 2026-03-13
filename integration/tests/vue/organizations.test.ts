@@ -41,7 +41,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('organiza
     await expect(u.page.getByText(fakeOrganization.name)).toBeVisible();
   });
 
-  test('<CreateOrganization /> renders and can create an org', async ({ page, context }) => {
+  test('<CreateOrganization /> renders', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();

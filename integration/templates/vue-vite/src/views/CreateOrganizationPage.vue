@@ -3,8 +3,5 @@ import { CreateOrganization } from '@clerk/vue';
 </script>
 
 <template>
-  <div>
-    <h1>Create Organization</h1>
-    <CreateOrganization />
-  </div>
+  <CreateOrganization />
 </template>

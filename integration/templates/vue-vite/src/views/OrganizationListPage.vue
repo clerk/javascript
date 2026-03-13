@@ -3,8 +3,5 @@ import { OrganizationList } from '@clerk/vue';
 </script>
 
 <template>
-  <div>
-    <h1>Organization List</h1>
-    <OrganizationList />
-  </div>
+  <OrganizationList />
 </template>
