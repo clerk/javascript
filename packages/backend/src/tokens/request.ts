@@ -605,8 +605,30 @@ export const authenticateRequest: AuthenticateRequest = (async (
       });
     }
 
-    // This can eagerly run handshake since client_uat is SameSite=Strict in dev
+    // This can eagerly run handshake since client_uat is SameSite=Strict in dev.
+    // However, Safari's ITP can block the client_uat cookie during cross-site redirects,
+    // causing infinite redirect loops. If we detect a redirect loop and have a valid
+    // session token, authenticate the user instead of triggering another handshake.
     if (!hasActiveClient && hasSessionToken) {
+      if (authenticateContext.handshakeRedirectLoopCounter > 0) {
+        const sessionToken = authenticateContext.sessionTokenInCookie;
+        if (sessionToken) {
+          try {
+            const { data } = await verifyToken(sessionToken, authenticateContext);
+            if (data) {
+              return signedIn({
+                tokenType: TokenType.SessionToken,
+                authenticateContext,
+                sessionClaims: data,
+                headers: new Headers(),
+                token: sessionToken,
+              });
+            }
+          } catch {
+            // Token verification failed, proceed with normal handshake flow
+          }
+        }
+      }
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenWithoutClientUAT, '');
     }
 
