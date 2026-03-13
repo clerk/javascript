@@ -126,19 +126,24 @@ export type SignUpErrors = Errors<SignUpFields>;
 export type WaitlistErrors = Errors<WaitlistFields>;
 
 /**
+ * @inline
+ *
  * The value returned by the `useSignInSignal` hook.
  */
 export interface SignInSignalValue {
   /**
-   * Represents the errors that occurred during the last fetch of the parent resource.
+   * The errors that occurred during the last fetch of the underlying `SignInFuture` resource.
    */
   errors: SignInErrors;
   /**
-   * The fetch status of the underlying `SignIn` resource.
+   * The fetch status of the underlying `SignInFuture` resource.
    */
   fetchStatus: 'idle' | 'fetching';
   /**
-   * An instance representing the currently active `SignIn`, with new APIs designed specifically for custom flows.
+   * An instance representing the currently active `SignInFuture`, with new APIs designed specifically for custom flows.
+   *
+   * > [!IMPORTANT]
+   * > The `SignInFuture` instance referenced by `signIn` does not have a stable identity, and will change as the sign-in flow progresses. Make sure you provide it in dependency arrays when using hooks such as `useEffect`, `useCallback`, or `useMemo`.
    */
   signIn: SignInFutureResource;
 }
@@ -149,17 +154,25 @@ export interface SignInSignal {
   (): NullableSignInSignal;
 }
 
+/**
+ * @inline
+ *
+ * The value returned by the `useSignUpSignal` hook.
+ */
 export interface SignUpSignalValue {
   /**
-   * The errors that occurred during the last fetch of the underlying `SignUp` resource.
+   * The errors that occurred during the last fetch of the underlying `SignUpFuture` resource.
    */
   errors: SignUpErrors;
   /**
-   * The fetch status of the underlying `SignUp` resource.
+   * The fetch status of the underlying `SignUpFuture` resource.
    */
   fetchStatus: 'idle' | 'fetching';
   /**
-   * The underlying `SignUp` resource.
+   * The underlying `SignUpFuture` resource
+   *
+   * > [!IMPORTANT]
+   * > The `SignUpFuture` instance referenced by `signUp` does not have a stable identity, and will change as the sign-up flow progresses. Make sure you provide it in dependency arrays when using hooks such as `useEffect`, `useCallback`, or `useMemo`.
    */
   signUp: SignUpFutureResource;
 }

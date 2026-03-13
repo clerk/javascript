@@ -52,7 +52,11 @@ const LINK_REPLACEMENTS = [
   ['session-resource', '/docs/reference/objects/session'],
   ['signed-in-session-resource', '/docs/reference/objects/session'],
   ['sign-in-resource', '/docs/reference/objects/sign-in'],
+  ['sign-in-future-resource', '/docs/reference/objects/sign-in-future'],
+  ['sign-in-errors', '/docs/reference/javascript/types/errors'],
   ['sign-up-resource', '/docs/reference/objects/sign-up'],
+  ['sign-up-future-resource', '/docs/reference/objects/sign-up-future'],
+  ['sign-up-errors', '/docs/reference/javascript/types/errors'],
   ['user-resource', '/docs/reference/objects/user'],
   ['session-status-claim', '/docs/reference/types/session-status'],
   ['user-organization-invitation-resource', '/docs/reference/types/user-organization-invitation'],
@@ -158,12 +162,25 @@ function getCatchAllReplacements() {
       replace: '[`SignInResource`](/docs/reference/objects/sign-in)',
     },
     {
+      pattern: /(?<![\[\w`])`?((?:SignIn|SignUp)Errors)`?(?![\]\w`])/g,
+      replace: (/** @type {string} */ _match, /** @type {string} */ type) =>
+        `[${type}](/docs/reference/javascript/types/errors)`,
+    },
+    {
+      pattern: /(?<![\[\w`])`?SignInFutureResource`?(?![\]\w`])/g,
+      replace: '[`SignInFutureResource`](/docs/reference/objects/sign-in-future)',
+    },
+    {
       pattern: /(?<![\[\w`])`?SignedInSessionResource`?(?![\]\w`])/g,
       replace: '[`SignedInSessionResource`](/docs/reference/objects/session)',
     },
     {
       pattern: /(?<![\[\w`])`?SignUpResource`?(?![\]\w`])/g,
       replace: '[`SignUpResource`](/docs/reference/objects/sign-up)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?SignUpFutureResource`?(?![\]\w`])/g,
+      replace: '[`SignUpFutureResource`](/docs/reference/objects/sign-up-future)',
     },
     {
       pattern: /(?<![\[\w`])`?OrganizationResource`?(?![\]\w`])/g,
