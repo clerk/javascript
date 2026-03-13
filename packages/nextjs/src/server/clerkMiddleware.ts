@@ -23,7 +23,7 @@ import {
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath } from '@clerk/backend/proxy';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
-import { isVercelPreviewDeploy } from '@clerk/shared/proxy';
+import { shouldAutoProxy } from '@clerk/shared/proxy';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -583,7 +583,7 @@ const handleControlFlowErrors = (
 };
 
 function getAutoDetectedProxyConfig(requestUrl: URL): FrontendApiProxyOptions | undefined {
-  if (isVercelPreviewDeploy(requestUrl.hostname)) {
+  if (shouldAutoProxy(requestUrl.hostname)) {
     return { enabled: true };
   }
   return undefined;

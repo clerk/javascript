@@ -1191,8 +1191,8 @@ describe('frontendApiProxy multi-domain support', () => {
   });
 });
 
-describe('auto-proxy for .vercel.app', () => {
-  it('auto-intercepts /__clerk/* requests on .vercel.app hostnames', async () => {
+describe('auto-proxy for eligible hosts', () => {
+  it('auto-intercepts /__clerk/* requests on eligible hostnames', async () => {
     const req = new NextRequest(new URL('/__clerk/v1/client', 'https://myapp-abc123.vercel.app').toString(), {
       method: 'GET',
       headers: new Headers(),

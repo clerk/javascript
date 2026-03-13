@@ -2492,7 +2492,7 @@ describe('Clerk singleton', () => {
       });
     });
 
-    describe('auto-detection for .vercel.app', () => {
+    describe('auto-detection for eligible hosts', () => {
       const originalLocation = window.location;
 
       afterEach(() => {
@@ -2502,7 +2502,7 @@ describe('Clerk singleton', () => {
         });
       });
 
-      test('auto-derives proxyUrl when hostname is .vercel.app', () => {
+      test('auto-derives proxyUrl when hostname is eligible', () => {
         Object.defineProperty(window, 'location', {
           value: {
             ...originalLocation,
@@ -2517,7 +2517,7 @@ describe('Clerk singleton', () => {
         expect(sut.proxyUrl).toBe('https://myapp-abc123.vercel.app/__clerk');
       });
 
-      test('does NOT auto-derive proxyUrl for non-.vercel.app domains', () => {
+      test('does NOT auto-derive proxyUrl for ineligible domains', () => {
         const sut = new Clerk(developmentPublishableKey);
         expect(sut.proxyUrl).toBe('');
       });

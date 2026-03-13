@@ -33,8 +33,10 @@ export function proxyUrlToAbsoluteURL(url: string | undefined): string {
   return isProxyUrlRelative(url) ? new URL(url, window.location.origin).toString() : url;
 }
 
-export function isVercelPreviewDeploy(hostname: string): boolean {
-  return hostname.endsWith('.vercel.app');
+const AUTO_PROXY_HOST_SUFFIXES = ['.vercel.app'];
+
+export function shouldAutoProxy(hostname: string): boolean {
+  return AUTO_PROXY_HOST_SUFFIXES.some(hostSuffix => hostname.endsWith(hostSuffix));
 }
 
 /**

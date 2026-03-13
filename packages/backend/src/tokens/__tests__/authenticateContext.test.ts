@@ -258,8 +258,8 @@ describe('AuthenticateContext', () => {
     });
   });
 
-  describe('auto-proxy for .vercel.app', () => {
-    it('auto-derives proxyUrl for .vercel.app hostnames', async () => {
+  describe('auto-proxy for eligible hosts', () => {
+    it('auto-derives proxyUrl for eligible hostnames', async () => {
       const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
       const context = await createAuthenticateContext(clerkRequest, {
         publishableKey: pkTest,
@@ -268,7 +268,7 @@ describe('AuthenticateContext', () => {
       expect(context.proxyUrl).toBe('https://myapp-abc123.vercel.app/__clerk');
     });
 
-    it('does NOT auto-derive proxyUrl for non-.vercel.app domains', async () => {
+    it('does NOT auto-derive proxyUrl for ineligible domains', async () => {
       const clerkRequest = createClerkRequest(new Request('https://myapp.com/dashboard'));
       const context = await createAuthenticateContext(clerkRequest, {
         publishableKey: pkTest,

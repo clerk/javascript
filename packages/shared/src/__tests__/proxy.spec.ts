@@ -1,12 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import {
-  isHttpOrHttps,
-  isProxyUrlRelative,
-  isValidProxyUrl,
-  isVercelPreviewDeploy,
-  proxyUrlToAbsoluteURL,
-} from '../proxy';
+import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl, proxyUrlToAbsoluteURL, shouldAutoProxy } from '../proxy';
 
 describe('isValidProxyUrl(key)', () => {
   it('returns true if the proxyUrl is valid', () => {
@@ -44,25 +38,25 @@ describe('isHttpOrHttps(key)', () => {
   });
 });
 
-describe('isVercelPreviewDeploy(hostname)', () => {
+describe('shouldAutoProxy(hostname)', () => {
   it('returns true for a .vercel.app subdomain', () => {
-    expect(isVercelPreviewDeploy('myapp.vercel.app')).toBe(true);
+    expect(shouldAutoProxy('myapp.vercel.app')).toBe(true);
   });
 
   it('returns true for a git branch preview subdomain', () => {
-    expect(isVercelPreviewDeploy('myapp-git-branch.vercel.app')).toBe(true);
+    expect(shouldAutoProxy('myapp-git-branch.vercel.app')).toBe(true);
   });
 
   it('returns false for the bare vercel.app domain', () => {
-    expect(isVercelPreviewDeploy('vercel.app')).toBe(false);
+    expect(shouldAutoProxy('vercel.app')).toBe(false);
   });
 
   it('returns false for a custom domain', () => {
-    expect(isVercelPreviewDeploy('myapp.com')).toBe(false);
+    expect(shouldAutoProxy('myapp.com')).toBe(false);
   });
 
   it('returns false for a domain that contains vercel.app but is not a subdomain', () => {
-    expect(isVercelPreviewDeploy('vercel.app.evil.com')).toBe(false);
+    expect(shouldAutoProxy('vercel.app.evil.com')).toBe(false);
   });
 });
 
