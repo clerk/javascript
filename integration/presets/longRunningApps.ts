@@ -103,6 +103,10 @@ export const createLongRunningApps = () => {
     getByPattern: (patterns: Array<string | (typeof configs)[number]['id']>) => {
       const res = new Set(patterns.map(pattern => apps.filter(app => idMatchesPattern(app.id, pattern))).flat());
       if (!res.size) {
+        // In staging mode, missing apps are expected (not all staging keys may exist yet)
+        if (process.env.E2E_STAGING === '1') {
+          return [] as any as LongRunningApplication[];
+        }
         const availableIds = configs.map(c => `\n- ${c.id}`).join('');
         throw new Error(`Could not find long running app with id ${patterns}. The available ids are: ${availableIds}`);
       }
