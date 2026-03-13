@@ -1346,6 +1346,108 @@ test.describe('Client handshake with organization activation @nextjs', () => {
       },
     },
     {
+      name: 'Expired session, org A active in session, but org B is requested by ID => attempts to activate org B',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
+        },
+        appRequestPath: '/organizations-by-id/org_b',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_b',
+      },
+    },
+    {
+      name: 'Expired session, no active org in session, but org B is requested by slug => attempts to activate org B',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([]),
+        orgSyncOptions: {
+          organizationPatterns: [
+            '/organizations-by-id/:id',
+            '/organizations-by-id/:id/(.*)',
+            '/organizations-by-slug/:slug',
+            '/organizations-by-slug/:id/(.*)',
+          ],
+        },
+        appRequestPath: '/organizations-by-slug/bcorp',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'bcorp',
+      },
+    },
+    {
+      name: 'Expired session, org A in session, but *an org B* is requested by slug => attempts to activate org B',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: [
+            '/organizations-by-slug/:slug',
+            '/organizations-by-slug/:id/(.*)',
+            '/organizations-by-id/:id',
+            '/organizations-by-id/:id/(.*)',
+          ],
+        },
+        appRequestPath: '/organizations-by-slug/bcorp/settings',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'bcorp',
+      },
+    },
+    {
+      name: 'Expired session, org A in session, but *the personal account* is requested => attempts to activate personal account',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: [
+            '/organizations-by-id/:id',
+            '/organizations-by-id/:id/(.*)',
+            '/organizations-by-slug/:slug',
+            '/organizations-by-slug/:id/(.*)',
+          ],
+          personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+        },
+        appRequestPath: '/personal-account',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: '', // <-- Empty string indicates personal account
+      },
+    },
+    {
+      name: 'Expired session, org A in session, and org A is requested => still handshakes to refresh session',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
+          personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_a', // Same org, but still handshakes to refresh the expired token
+      },
+    },
+    {
       // NOTE(izaak): Would we prefer 500ing in this case?
       name: 'No config => nothing to activate, return 200',
       when: {
