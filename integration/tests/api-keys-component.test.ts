@@ -758,6 +758,41 @@ test.describe('api keys component @machine', () => {
     });
   });
 
+  test('shows error when creating API key with duplicate name', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.page.goToRelative('/api-keys');
+    await u.po.apiKeys.waitForMounted();
+
+    const duplicateName = `${fakeAdmin.firstName}-duplicate-${Date.now()}`;
+
+    // Create the first API key
+    await u.po.apiKeys.clickAddButton();
+    await u.po.apiKeys.waitForFormOpened();
+    await u.po.apiKeys.typeName(duplicateName);
+    await u.po.apiKeys.selectExpiration('1d');
+    await u.po.apiKeys.clickSaveButton();
+
+    await u.po.apiKeys.waitForCopyModalOpened();
+    await u.po.apiKeys.clickCopyAndCloseButton();
+    await u.po.apiKeys.waitForCopyModalClosed();
+    await u.po.apiKeys.waitForFormClosed();
+
+    // Try to create another API key with the same name
+    await u.po.apiKeys.clickAddButton();
+    await u.po.apiKeys.waitForFormOpened();
+    await u.po.apiKeys.typeName(duplicateName);
+    await u.po.apiKeys.selectExpiration('1d');
+    await u.po.apiKeys.clickSaveButton();
+
+    // Verify error message is displayed
+    await expect(u.page.getByText('API Key name already exists.')).toBeVisible({ timeout: 5000 });
+  });
+
   test('shows error when API key usage is exceeded for free plan', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
