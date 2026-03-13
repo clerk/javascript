@@ -94,6 +94,7 @@ export const createLongRunningApps = () => {
      */
     { id: 'hono.vite.withEmailCodes', config: hono.vite, env: envs.withEmailCodes },
     { id: 'hono.vite.withEmailCodesProxy', config: hono.vite, env: envs.withEmailCodesProxy },
+    { id: 'hono.vite.withCustomRoles', config: hono.vite, env: envs.withCustomRoles },
   ] as const;
 
   const apps = configs.map(longRunningApplication);
