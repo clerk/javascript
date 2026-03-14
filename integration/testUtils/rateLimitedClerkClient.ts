@@ -6,6 +6,8 @@ const BASE_DELAY_MS = 1000;
 const JITTER_MAX_MS = 500;
 const MAX_RETRY_DELAY_MS = 30_000;
 
+const retryStats = { totalRetries: 0, callsRetried: new Set<string>() };
+
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -17,6 +19,22 @@ function getRetryDelay(error: unknown, attempt: number): number {
   return BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
 }
 
+function recordRetry(path: string): void {
+  retryStats.totalRetries++;
+  retryStats.callsRetried.add(path);
+}
+
+export function printRateLimitSummary(): void {
+  if (retryStats.totalRetries === 0) {
+    console.log('[Rate Limit] No rate-limit retries occurred during this run.');
+    return;
+  }
+  const methods = [...retryStats.callsRetried].join(', ');
+  console.warn(
+    `[Rate Limit] Summary: ${retryStats.totalRetries} retries across ${retryStats.callsRetried.size} API calls (${methods})`,
+  );
+}
+
 async function retryOnRateLimit<T>(firstAttempt: Promise<T>, fn: () => Promise<T>, path: string): Promise<T> {
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
@@ -26,6 +44,7 @@ async function retryOnRateLimit<T>(firstAttempt: Promise<T>, fn: () => Promise<T
       if (!isRateLimited || attempt === MAX_RETRIES) {
         throw error;
       }
+      recordRetry(path);
       const delayMs = getRetryDelay(error, attempt);
       console.warn(`[Rate Limit] Retry ${attempt + 1}/${MAX_RETRIES} for ${path}, waiting ${Math.round(delayMs)}ms`);
       await sleep(delayMs);
