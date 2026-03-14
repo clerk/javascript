@@ -529,7 +529,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('signed out satellite with sec-fetch-dest=document - prod', async () => {
+  test('signed out satellite with sec-fetch-dest=document skips handshake by default (satelliteAutoSync unset) - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -543,13 +543,8 @@ test.describe('Client handshake @generic', () => {
       }),
       redirect: 'manual',
     });
-    expect(res.status).toBe(307);
-    const locationUrl = new URL(res.headers.get('location'));
-    expect(locationUrl.origin + locationUrl.pathname).toBe('https://clerk.example.com/v1/client/handshake');
-    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
-    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe('satellite-needs-syncing');
-    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
-    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
+    // In Core 3, satelliteAutoSync defaults to false, so no handshake redirect
+    expect(res.status).toBe(200);
   });
 
   test('signed out satellite - dev', async () => {
@@ -628,7 +623,28 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('signed out satellite with satelliteAutoSync=true (default) triggers handshake - prod', async () => {
+  test('signed out satellite with satelliteAutoSync unset triggers handshake when __clerk_synced=false - prod', async () => {
+    const config = generateConfig({
+      mode: 'live',
+    });
+    const res = await fetch(app.serverUrl + '/?__clerk_synced=false', {
+      headers: new Headers({
+        'X-Publishable-Key': config.pk,
+        'X-Secret-Key': config.sk,
+        'X-Satellite': 'true',
+        'X-Domain': 'example.com',
+        'Sec-Fetch-Dest': 'document',
+      }),
+      redirect: 'manual',
+    });
+    // Even without satelliteAutoSync, __clerk_synced=false (post sign-in) should trigger handshake
+    expect(res.status).toBe(307);
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe('https://clerk.example.com/v1/client/handshake');
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe('satellite-needs-syncing');
+  });
+
+  test('signed out satellite with satelliteAutoSync=true (explicit opt-in) triggers handshake - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -643,7 +659,7 @@ test.describe('Client handshake @generic', () => {
       }),
       redirect: 'manual',
     });
-    // Should redirect to handshake with default/true satelliteAutoSync
+    // Should redirect to handshake when satelliteAutoSync is explicitly true
     expect(res.status).toBe(307);
     const locationUrl = new URL(res.headers.get('location'));
     expect(locationUrl.origin + locationUrl.pathname).toBe('https://clerk.example.com/v1/client/handshake');

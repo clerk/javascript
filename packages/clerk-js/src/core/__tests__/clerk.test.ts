@@ -2386,6 +2386,7 @@ describe('Clerk singleton', () => {
   describe('Clerk().isSatellite and Clerk().domain getters', () => {
     beforeEach(() => {
       mockClientFetch.mockReset();
+      mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [] }));
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
