@@ -1,5 +1,16 @@
 # @clerk/ui
 
+## 1.2.2
+
+### Patch Changes
+
+- Improve spacing for `CreateOrganization` and `OrganizationList` ([#8034](https://github.com/clerk/javascript/pull/8034)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix issue where monthly/annual toggle appeared on default free plans. ([#8052](https://github.com/clerk/javascript/pull/8052)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`296f52e`](https://github.com/clerk/javascript/commit/296f52e0180969b7a6153a904e298242d3528e35)]:
+  - @clerk/localizations@4.2.2
+
 ## 1.2.1
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @clerk/tanstack-react-start
 
+## 1.0.5
+
+### Patch Changes
+
+- Removed beta warning in README ([#8062](https://github.com/clerk/javascript/pull/8062)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/react@6.1.0
+
 ## 1.0.4
 
 ### Patch Changes
