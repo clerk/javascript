@@ -306,6 +306,7 @@ jobs:
             "react-router",
             "custom",
             "hono",
+            "chrome-extension",
           ]
         test-project: ["chrome"]
         include:
