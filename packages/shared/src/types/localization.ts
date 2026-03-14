@@ -119,6 +119,7 @@ export type __internal_LocalizationResource = {
   formFieldInputPlaceholder__username: LocalizationValue;
   formFieldInputPlaceholder__emailAddress_username: LocalizationValue;
   formFieldInputPlaceholder__password: LocalizationValue;
+  formFieldInputPlaceholder__signUpPassword: LocalizationValue;
   formFieldInputPlaceholder__firstName: LocalizationValue;
   formFieldInputPlaceholder__lastName: LocalizationValue;
   formFieldInputPlaceholder__backupCode: LocalizationValue;
