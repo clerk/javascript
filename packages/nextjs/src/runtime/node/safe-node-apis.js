@@ -1,10 +1,6 @@
-/**
- * This file is used for conditional imports to mitigate bundling issues with Next.js server actions on version prior to 14.1.0.
- */
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { existsSync, writeFileSync, readFileSync, appendFileSync, mkdirSync, rmSync } = require('node:fs');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const path = require('node:path');
+import { appendFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import * as path from 'node:path';
+
 const fs = {
   existsSync,
   writeFileSync,
@@ -16,4 +12,4 @@ const fs = {
 
 const cwd = () => process.cwd();
 
-module.exports = { fs, path, cwd };
+export default { fs, path, cwd };
