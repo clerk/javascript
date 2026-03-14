@@ -20,17 +20,15 @@ describe('runAsyncTask', () => {
     expect(result).toBe('ok');
     expect(error).toBeNull();
 
-    expect(emitSpy).toHaveBeenNthCalledWith(1, 'resource:error', {
+    expect(emitSpy).toHaveBeenNthCalledWith(1, 'resource:state-change', {
       resource,
       error: null,
+      fetchStatus: 'fetching',
     });
-    expect(emitSpy).toHaveBeenNthCalledWith(2, 'resource:fetch', {
+    expect(emitSpy).toHaveBeenNthCalledWith(2, 'resource:state-change', {
       resource,
-      status: 'fetching',
-    });
-    expect(emitSpy).toHaveBeenNthCalledWith(3, 'resource:fetch', {
-      resource,
-      status: 'idle',
+      error: null,
+      fetchStatus: 'idle',
     });
   });
 
@@ -45,21 +43,15 @@ describe('runAsyncTask', () => {
     expect(result).toBeUndefined();
     expect(error).toBe(thrown);
 
-    expect(emitSpy).toHaveBeenNthCalledWith(1, 'resource:error', {
+    expect(emitSpy).toHaveBeenNthCalledWith(1, 'resource:state-change', {
       resource,
       error: null,
+      fetchStatus: 'fetching',
     });
-    expect(emitSpy).toHaveBeenNthCalledWith(2, 'resource:fetch', {
-      resource,
-      status: 'fetching',
-    });
-    expect(emitSpy).toHaveBeenNthCalledWith(3, 'resource:error', {
+    expect(emitSpy).toHaveBeenNthCalledWith(2, 'resource:state-change', {
       resource,
       error: thrown,
-    });
-    expect(emitSpy).toHaveBeenNthCalledWith(4, 'resource:fetch', {
-      resource,
-      status: 'idle',
+      fetchStatus: 'idle',
     });
   });
 });
