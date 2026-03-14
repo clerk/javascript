@@ -221,6 +221,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationName: 'Organization name',
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'Enter your password',
+  formFieldInputPlaceholder__signUpPassword: 'Create a password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldInputPlaceholder__username: 'Enter your username',
   formFieldInput__emailAddress_format: 'Example format: name@example.com',
