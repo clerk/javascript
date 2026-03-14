@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.2.2
+
+### Patch Changes
+
+- Fix en-GB username field placeholder (was showing literal "undefined" instead of "Enter your username") ([#8040](https://github.com/clerk/javascript/pull/8040)) by [@petiteoh](https://github.com/petiteoh)
+
 ## 4.2.1
 
 ### Patch Changes

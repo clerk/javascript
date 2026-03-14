@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.1.3
+
+### Patch Changes
+
+- Revert two-way JS/native session sync (#8032) ([#8065](https://github.com/clerk/javascript/pull/8065)) by [@chriscanin](https://github.com/chriscanin)
+
+- Updated dependencies []:
+  - @clerk/react@6.1.0
+
 ## 3.1.2
 
 ### Patch Changes
