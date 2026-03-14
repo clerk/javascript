@@ -16,10 +16,10 @@ function getRetryDelay(error: unknown, attempt: number): number {
   return BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
 }
 
-async function withRetry<T>(fn: () => Promise<T>, path: string): Promise<T> {
+async function retryOnRateLimit<T>(firstAttempt: Promise<T>, fn: () => Promise<T>, path: string): Promise<T> {
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
-      return await fn();
+      return attempt === 0 ? await firstAttempt : await fn();
     } catch (error) {
       const isRateLimited = isClerkAPIResponseError(error) && error.status === 429;
       if (!isRateLimited || attempt === MAX_RETRIES) {
@@ -51,7 +51,7 @@ function createProxy(target: unknown, path: string[] = []): unknown {
           // Only wrap promises (async API calls), pass through sync returns
           if (result && typeof result === 'object' && typeof result.then === 'function') {
             const fullPath = [...path, prop].join('.');
-            return withRetry(() => value.apply(obj, args), fullPath);
+            return retryOnRateLimit(result, () => value.apply(obj, args), fullPath);
           }
           return result;
         };
