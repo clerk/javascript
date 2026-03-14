@@ -306,7 +306,14 @@
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
+    "//#test:integration:cache-components": {
+      "dependsOn": ["@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
     "//#test:integration:chrome-extension": {
+      "dependsOn": ["@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
