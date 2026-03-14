@@ -988,6 +988,43 @@ describe('tokens.authenticateRequest(options)', () => {
     expect(requestState.toAuth()).toBeNull();
   });
 
+  test('cookieToken: returns signed in for non-document request when no clientUat but valid session token (production)', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies({ ...defaultHeaders, 'sec-fetch-dest': 'empty' }, { __session: mockJwt }),
+      mockOptions({ publishableKey: PK_LIVE }),
+    );
+
+    expect(requestState).toBeSignedIn();
+    expect(requestState.toAuth()).toBeSignedInToAuth();
+  });
+
+  test('cookieToken: returns signed in for non-document request when no clientUat but valid session token (development)', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'empty' },
+        { __clerk_db_jwt: 'deadbeef', __session: mockJwt },
+      ),
+      mockOptions({
+        secretKey: 'test_deadbeef',
+      }),
+    );
+
+    expect(requestState).toBeSignedIn();
+    expect(requestState.toAuth()).toBeSignedInToAuth();
+  });
+
   test('cookieToken: returns handshake when no cookies in development [5y]', async () => {
     const requestState = await authenticateRequest(
       mockRequestWithCookies({}),
