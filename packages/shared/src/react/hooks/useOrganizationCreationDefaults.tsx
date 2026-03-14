@@ -1,3 +1,5 @@
+import { useClearQueriesOnSignOut } from '@/react/hooks/useClearQueriesOnSignOut';
+
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { EnvironmentResource } from '../../types/environment';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
@@ -51,7 +53,13 @@ export function useOrganizationCreationDefaults(
 
   clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
-  const { queryKey } = useOrganizationCreationDefaultsCacheKeys({ userId: user?.id ?? null });
+  const { queryKey, authenticated, stableKey } = useOrganizationCreationDefaultsCacheKeys({ userId: user?.id ?? null });
+
+  useClearQueriesOnSignOut({
+    isSignedOut: user === null, // works with the transitive state
+    authenticated,
+    stableKeys: stableKey,
+  });
 
   const queryEnabled = Boolean(user) && enabled && featureEnabled && clerk.loaded;
 

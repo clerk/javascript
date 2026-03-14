@@ -8,9 +8,9 @@ export function useOrganizationCreationDefaultsCacheKeys(params: { userId: strin
   return useMemo(() => {
     return createCacheKeys({
       stablePrefix: STABLE_KEYS.ORGANIZATION_CREATION_DEFAULTS_KEY,
-      authenticated: Boolean(userId),
+      authenticated: true,
       tracked: {
-        userId: userId ?? null,
+        userId,
       },
       untracked: {
         args: {},
