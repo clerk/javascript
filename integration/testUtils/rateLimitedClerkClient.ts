@@ -4,14 +4,15 @@ import { isClerkAPIResponseError } from '@clerk/shared/error';
 const MAX_RETRIES = 5;
 const BASE_DELAY_MS = 1000;
 const JITTER_MAX_MS = 500;
+const MAX_RETRY_DELAY_MS = 30_000;
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function getRetryDelay(error: unknown, attempt: number): number {
-  if (isClerkAPIResponseError(error) && error.retryAfter) {
-    return error.retryAfter * 1000;
+  if (isClerkAPIResponseError(error) && typeof error.retryAfter === 'number') {
+    return Math.min(error.retryAfter * 1000, MAX_RETRY_DELAY_MS);
   }
   return BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
 }
