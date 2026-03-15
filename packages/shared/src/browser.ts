@@ -73,6 +73,16 @@ export function isBrowserOnline(): boolean {
     return false;
   }
 
+  // React Native / Expo defines a Navigator object but does not implement
+  // the browser-only navigator.onLine API.
+  if (navigator.product === 'ReactNative') {
+    return true;
+  }
+
+  if (typeof navigator.onLine !== 'boolean') {
+    return true;
+  }
+
   // navigator.onLine is the standard API and is reliable for detecting
   // complete disconnection (airplane mode, WiFi off, etc.).
   // The experimental navigator.connection API (rtt/downlink) was previously
