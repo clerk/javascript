@@ -77,10 +77,6 @@ export const application = (
         const pkglabDeps = config.pkglabDependencies;
         if (pkglabDeps.length > 0 && process.env.E2E_SDK_SOURCE !== 'latest') {
           await run(`pkglab add ${pkglabDeps.join(' ')}`, { cwd: appDirPath, log });
-          // pkglab uses `npm install --ignore-scripts` internally, which can leave
-          // the dependency tree in a state where transitive deps are missing.
-          // Run the normal install (pnpm) afterwards to fix the tree structure.
-          await run(scripts.setup, { cwd: appDirPath, log });
         } else {
           await run(scripts.setup, { cwd: appDirPath, log });
         }
