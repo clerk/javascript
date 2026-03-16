@@ -38,12 +38,15 @@ type FapiResponse = Response & {
 };
 
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
+let __internal_clerkOptions: Pick<BuildClerkOptions, 'publishableKey' | 'proxyUrl' | 'domain'> | undefined;
 
 export function createClerkInstance(ClerkClass: typeof Clerk) {
   return (options?: BuildClerkOptions): HeadlessBrowserClerk | BrowserClerk => {
     const {
       publishableKey = '',
       tokenCache = MemoryTokenCache,
+      proxyUrl,
+      domain,
       __experimental_resourceCache: createResourceCache,
     } = options || {};
 
@@ -52,16 +55,21 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
     }
 
     // Support "hot-swapping" the Clerk instance at runtime. See JS-598 for additional details.
-    const hasKeyChanged = __internal_clerk && !!publishableKey && publishableKey !== __internal_clerk.publishableKey;
+    const hasKeyChanged =
+      !!__internal_clerkOptions && !!publishableKey && publishableKey !== __internal_clerkOptions.publishableKey;
+    const hasProxyChanged = !!__internal_clerkOptions && proxyUrl !== __internal_clerkOptions.proxyUrl;
+    const hasDomainChanged = !!__internal_clerkOptions && domain !== __internal_clerkOptions.domain;
+    const hasConfigChanged = hasKeyChanged || hasProxyChanged || hasDomainChanged;
 
-    if (!__internal_clerk || hasKeyChanged) {
-      if (hasKeyChanged) {
+    if (!__internal_clerk || hasConfigChanged) {
+      if (hasConfigChanged) {
         tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
       }
 
       const getToken = tokenCache.getToken;
       const saveToken = tokenCache.saveToken;
-      __internal_clerk = new ClerkClass(publishableKey) as unknown as BrowserClerk;
+      __internal_clerkOptions = { publishableKey, proxyUrl, domain };
+      __internal_clerk = new ClerkClass(publishableKey, { proxyUrl, domain }) as unknown as BrowserClerk;
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API
