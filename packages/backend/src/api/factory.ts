@@ -1,6 +1,7 @@
 import {
   AccountlessApplicationAPI,
   ActorTokenAPI,
+  AgentTaskAPI,
   AllowlistIdentifierAPI,
   APIKeysAPI,
   BetaFeaturesAPI,
@@ -8,6 +9,7 @@ import {
   ClientAPI,
   DomainAPI,
   EmailAddressAPI,
+  EnterpriseConnectionAPI,
   IdPOAuthAccessTokenApi,
   InstanceAPI,
   InvitationAPI,
@@ -32,7 +34,9 @@ import {
 import { BillingAPI } from './endpoints/BillingApi';
 import { buildRequest } from './request';
 
-export type CreateBackendApiOptions = Parameters<typeof buildRequest>[0];
+export type CreateBackendApiOptions = Parameters<typeof buildRequest>[0] & {
+  jwtKey?: string;
+};
 
 export type ApiClient = ReturnType<typeof createBackendApiClient>;
 
@@ -44,6 +48,10 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
       buildRequest({ ...options, requireSecretKey: false }),
     ),
     actorTokens: new ActorTokenAPI(request),
+    /**
+     * @experimental This is an experimental API for the Agent Tasks feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+     */
+    agentTasks: new AgentTaskAPI(request),
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
     apiKeys: new APIKeysAPI(
       buildRequest({
@@ -60,6 +68,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     clients: new ClientAPI(request),
     domains: new DomainAPI(request),
     emailAddresses: new EmailAddressAPI(request),
+    enterpriseConnections: new EnterpriseConnectionAPI(request),
     idPOAuthAccessToken: new IdPOAuthAccessTokenApi(
       buildRequest({
         ...options,
@@ -78,13 +87,17 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
         requireSecretKey: false,
         useMachineSecretKey: true,
       }),
+      {
+        secretKey: options.secretKey,
+        apiUrl: options.apiUrl,
+        jwtKey: options.jwtKey,
+      },
     ),
     oauthApplications: new OAuthApplicationsApi(request),
     organizations: new OrganizationAPI(request),
     phoneNumbers: new PhoneNumberAPI(request),
     proxyChecks: new ProxyCheckAPI(request),
     redirectUrls: new RedirectUrlAPI(request),
-    samlConnections: new SamlConnectionAPI(request),
     sessions: new SessionAPI(request),
     signInTokens: new SignInTokenAPI(request),
     signUps: new SignUpAPI(request),
@@ -92,5 +105,10 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     users: new UserAPI(request),
     waitlistEntries: new WaitlistEntryAPI(request),
     webhooks: new WebhookAPI(request),
+
+    /**
+     * @deprecated Use `enterpriseConnections` instead.
+     */
+    samlConnections: new SamlConnectionAPI(request),
   };
 }

@@ -179,12 +179,6 @@ export type SignUpFuturePasswordParams = SignUpFutureAdditionalParams & {
 
 export interface SignUpFuturePhoneCodeSendParams {
   /**
-   * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if
-   * [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled.
-   * Keep in mind that the phone number requires an extra verification process.
-   */
-  phoneNumber?: string;
-  /**
    * The mechanism to use to send the code to the provided phone number. Defaults to `'sms'`.
    */
   channel?: PhoneCodeChannel;
@@ -327,7 +321,7 @@ export interface SignUpFutureVerifications {
   /**
    * Used to send a phone code to verify a phone number.
    */
-  sendPhoneCode: (params: SignUpFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
+  sendPhoneCode: (params?: SignUpFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to verify a code sent via phone.

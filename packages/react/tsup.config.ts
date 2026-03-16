@@ -67,7 +67,7 @@ export default defineConfig(overrideOptions => {
       types: 'src/types/index.ts',
     },
     dts: true,
-    onSuccess: shouldPublish ? 'pnpm publish:local' : undefined,
+    onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     format: ['cjs', 'esm'],
     bundle: true,
     clean: true,

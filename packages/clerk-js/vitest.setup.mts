@@ -262,6 +262,19 @@ if (typeof window !== 'undefined') {
   window.getComputedStyle = patchedGetComputedStyle;
 }
 
+// Mock @formkit/auto-animate to prevent timers leaking after test teardown.
+// The __mocks__ directory in src/elements/ is not detected by Vitest for
+// node_module mocks, so we need an explicit vi.mock here.
+vi.mock('@formkit/auto-animate/react', () => ({
+  useAutoAnimate: () => [null],
+}));
+
+// Also mock the base module to prevent its side effects (setInterval/setTimeout
+// that call requestAnimationFrame) from firing after jsdom environment teardown.
+vi.mock('@formkit/auto-animate', () => ({
+  default: () => ({ enable: () => {}, disable: () => {}, destroy: () => {} }),
+}));
+
 // Mock browser-tabs-lock to prevent window access errors in tests
 vi.mock('browser-tabs-lock', () => {
   return {

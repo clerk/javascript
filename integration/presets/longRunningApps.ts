@@ -4,6 +4,8 @@ import { astro } from './astro';
 import { envs } from './envs';
 import { expo } from './expo';
 import { express } from './express';
+import { fastify } from './fastify';
+import { hono } from './hono';
 import { next } from './next';
 import { nuxt } from './nuxt';
 import { react } from './react';
@@ -63,12 +65,15 @@ export const createLongRunningApps = () => {
     { id: 'react.vite.withEmailCodes', config: react.vite, env: envs.withEmailCodes },
     { id: 'react.vite.withEmailCodes_persist_client', config: react.vite, env: envs.withEmailCodes_destroy_client },
     { id: 'react.vite.withEmailLinks', config: react.vite, env: envs.withEmailLinks },
+    { id: 'react.vite.withLegalConsent', config: react.vite, env: envs.withLegalConsent },
     { id: 'vue.vite', config: vue.vite, env: envs.withCustomRoles },
 
     /**
      * Tanstack apps - basic flows
      */
     { id: 'tanstack.react-start', config: tanstack.reactStart, env: envs.withEmailCodes },
+    { id: 'tanstack.react-start.withCustomRoles', config: tanstack.reactStart, env: envs.withCustomRoles },
+    { id: 'tanstack.react-start.withEmailCodesProxy', config: tanstack.reactStart, env: envs.withEmailCodesProxy },
 
     /**
      * Various apps - basic flows
@@ -79,6 +84,21 @@ export const createLongRunningApps = () => {
     { id: 'nuxt.node', config: nuxt.node, env: envs.withCustomRoles },
     { id: 'react-router.node', config: reactRouter.reactRouterNode, env: envs.withEmailCodes },
     { id: 'express.vite.withEmailCodes', config: express.vite, env: envs.withEmailCodes },
+    { id: 'express.vite.withEmailCodesProxy', config: express.vite, env: envs.withEmailCodesProxy },
+    { id: 'express.vite.withCustomRoles', config: express.vite, env: envs.withCustomRoles },
+
+    /**
+     * Fastify apps
+     */
+    { id: 'fastify.vite.withEmailCodes', config: fastify.vite, env: envs.withEmailCodes },
+    { id: 'fastify.vite.withEmailCodesProxy', config: fastify.vite, env: envs.withEmailCodesProxy },
+
+    /**
+     * Hono apps
+     */
+    { id: 'hono.vite.withEmailCodes', config: hono.vite, env: envs.withEmailCodes },
+    { id: 'hono.vite.withEmailCodesProxy', config: hono.vite, env: envs.withEmailCodesProxy },
+    { id: 'hono.vite.withCustomRoles', config: hono.vite, env: envs.withCustomRoles },
   ] as const;
 
   const apps = configs.map(longRunningApplication);

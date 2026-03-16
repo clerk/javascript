@@ -27,7 +27,6 @@ const GLOBBY_IGNORE = [
   '**/yarn.lock',
   'pnpm-lock.yaml',
   '**/pnpm-lock.yaml',
-  'yalc.lock',
   '**/*.{ico,png,webp,svg,gif,jpg,jpeg}',
   '**/*.{mp4,mkv,wmv,m4v,mov,avi,flv,webm,flac,mka,m4a,aac,ogg}',
   '**/*.{css,scss,sass,less,styl}',
@@ -56,6 +55,7 @@ export async function runCodemod(transform = 'transform-async-request', patterns
     ...options,
     dry: true,
     silent: true,
+    verbose: 0,
   });
 
   let result = {};
@@ -65,6 +65,7 @@ export async function runCodemod(transform = 'transform-async-request', patterns
       ...options,
       dry: false,
       silent: true,
+      verbose: 0,
     });
   }
 

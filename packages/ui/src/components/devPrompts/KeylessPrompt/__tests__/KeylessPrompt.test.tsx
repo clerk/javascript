@@ -1,10 +1,18 @@
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
 
 import { getCurrentState, getResolvedContent, KeylessPrompt } from '../index';
+import {
+  calculateVelocity,
+  getCornerStyles,
+  getNearestCorner,
+  project,
+  saveCornerPreference,
+  STORAGE_KEY,
+} from '../use-drag-to-corner';
 
 const { createFixtures } = bindCreateFixtures('KeylessPrompt' as any);
 
@@ -331,5 +339,120 @@ describe('KeylessPrompt component', () => {
 
     expect(getByText(/Temporary API keys are enabled/i)).toBeInTheDocument();
     expect(getByText(/Add SSO connections/i)).toBeInTheDocument();
+  });
+});
+
+describe('useDragToCorner utilities', () => {
+  describe('getNearestCorner', () => {
+    const corners = {
+      'top-left': { x: -500, y: -500 },
+      'top-right': { x: 500, y: -500 },
+      'bottom-left': { x: -500, y: 500 },
+      'bottom-right': { x: 0, y: 0 },
+    } as const;
+
+    it('returns the nearest corner to a given translation', () => {
+      expect(getNearestCorner({ x: -400, y: -400 }, corners)).toBe('top-left');
+      expect(getNearestCorner({ x: 400, y: -400 }, corners)).toBe('top-right');
+      expect(getNearestCorner({ x: -400, y: 400 }, corners)).toBe('bottom-left');
+      expect(getNearestCorner({ x: 10, y: 10 }, corners)).toBe('bottom-right');
+    });
+
+    it('returns the exact corner when translation matches', () => {
+      expect(getNearestCorner({ x: 0, y: 0 }, corners)).toBe('bottom-right');
+      expect(getNearestCorner({ x: -500, y: -500 }, corners)).toBe('top-left');
+    });
+
+    it('handles equidistant case by returning the first found', () => {
+      // When equidistant from multiple corners, the iteration order determines the result
+      const result = getNearestCorner({ x: 0, y: -500 }, corners);
+      expect(['top-left', 'top-right']).toContain(result);
+    });
+  });
+
+  describe('getCornerStyles', () => {
+    it('returns correct CSS for top-left', () => {
+      expect(getCornerStyles('top-left')).toEqual({ top: '1.25rem', left: '1.25rem' });
+    });
+
+    it('returns correct CSS for top-right', () => {
+      expect(getCornerStyles('top-right')).toEqual({ top: '1.25rem', right: '1.25rem' });
+    });
+
+    it('returns correct CSS for bottom-left', () => {
+      expect(getCornerStyles('bottom-left')).toEqual({ bottom: '1.25rem', left: '1.25rem' });
+    });
+
+    it('returns correct CSS for bottom-right', () => {
+      expect(getCornerStyles('bottom-right')).toEqual({ bottom: '1.25rem', right: '1.25rem' });
+    });
+  });
+
+  describe('saveCornerPreference', () => {
+    afterEach(() => {
+      localStorage.removeItem(STORAGE_KEY);
+    });
+
+    it('saves corner to localStorage', () => {
+      saveCornerPreference('top-left');
+      expect(localStorage.getItem(STORAGE_KEY)).toBe('top-left');
+    });
+
+    it('overwrites previous value', () => {
+      saveCornerPreference('top-left');
+      saveCornerPreference('bottom-right');
+      expect(localStorage.getItem(STORAGE_KEY)).toBe('bottom-right');
+    });
+  });
+
+  describe('project', () => {
+    it('returns 0 for zero velocity', () => {
+      expect(project(0)).toBe(0);
+    });
+
+    it('returns positive value for positive velocity', () => {
+      expect(project(1000)).toBeGreaterThan(0);
+    });
+
+    it('returns negative value for negative velocity', () => {
+      expect(project(-1000)).toBeLessThan(0);
+    });
+
+    it('scales proportionally with velocity', () => {
+      const single = project(500);
+      const double = project(1000);
+      expect(double).toBeCloseTo(single * 2);
+    });
+  });
+
+  describe('calculateVelocity', () => {
+    it('returns zero for empty history', () => {
+      expect(calculateVelocity([])).toEqual({ x: 0, y: 0 });
+    });
+
+    it('returns zero for single entry', () => {
+      expect(calculateVelocity([{ position: { x: 10, y: 20 }, timestamp: 100 }])).toEqual({ x: 0, y: 0 });
+    });
+
+    it('returns zero when time delta is zero', () => {
+      const history = [
+        { position: { x: 0, y: 0 }, timestamp: 100 },
+        { position: { x: 50, y: 50 }, timestamp: 100 },
+      ];
+      expect(calculateVelocity(history)).toEqual({ x: 0, y: 0 });
+    });
+
+    it('calculates velocity correctly using first and last entries', () => {
+      const history = [
+        { position: { x: 0, y: 0 }, timestamp: 0 },
+        { position: { x: 50, y: 50 }, timestamp: 50 },
+        { position: { x: 100, y: 200 }, timestamp: 100 },
+      ];
+      const velocity = calculateVelocity(history);
+      // (100 - 0) / 100 * 1000 = 1000
+      expect(velocity.x).toBe(1000);
+      // (200 - 0) / 100 * 1000 = 2000
+      expect(velocity.y).toBe(2000);
+    });
   });
 });

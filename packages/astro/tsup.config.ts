@@ -3,7 +3,9 @@ import { defineConfig } from 'tsup';
 // @ts-ignore
 import { name, version } from './package.json';
 
-export default defineConfig(() => {
+export default defineConfig(overrideOptions => {
+  const shouldPublish = !!overrideOptions.env?.publish;
+
   return {
     clean: true,
     entry: [
@@ -19,6 +21,7 @@ export default defineConfig(() => {
     ],
     dts: true,
     minify: false,
+    onSuccess: shouldPublish ? 'pnpm build:dts && pkglab pub --ping' : 'pnpm build:dts',
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,

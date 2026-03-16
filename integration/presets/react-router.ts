@@ -1,7 +1,6 @@
-import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
-import { linkPackage } from './utils';
+import { PKGLAB } from './utils';
 
 const reactRouterNode = applicationConfig()
   .setName('react-router-node')
@@ -11,7 +10,7 @@ const reactRouterNode = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/react-router', constants.E2E_CLERK_JS_VERSION || linkPackage('react-router'));
+  .addDependency('@clerk/react-router', PKGLAB);
 
 const reactRouterLibrary = applicationConfig()
   .setName('react-router-library')
@@ -21,7 +20,7 @@ const reactRouterLibrary = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/react-router', constants.E2E_CLERK_JS_VERSION || linkPackage('react-router'));
+  .addDependency('@clerk/react-router', PKGLAB);
 
 export const reactRouter = {
   reactRouterNode,

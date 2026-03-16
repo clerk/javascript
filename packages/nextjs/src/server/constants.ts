@@ -3,8 +3,8 @@ import { isTruthy } from '@clerk/shared/underscore';
 
 export const CLERK_JS_VERSION = process.env.NEXT_PUBLIC_CLERK_JS_VERSION || '';
 export const CLERK_JS_URL = process.env.NEXT_PUBLIC_CLERK_JS_URL || '';
-export const CLERK_UI_VERSION = process.env.NEXT_PUBLIC_CLERK_UI_VERSION || '';
 export const CLERK_UI_URL = process.env.NEXT_PUBLIC_CLERK_UI_URL || '';
+export const CLERK_UI_VERSION = process.env.NEXT_PUBLIC_CLERK_UI_VERSION || '';
 export const API_VERSION = process.env.CLERK_API_VERSION || 'v1';
 export const SECRET_KEY = process.env.CLERK_SECRET_KEY || '';
 export const MACHINE_SECRET_KEY = process.env.CLERK_MACHINE_SECRET_KEY || '';

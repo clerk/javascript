@@ -24,6 +24,8 @@ const GLOBBY_IGNORE = [
   '**/yarn.lock',
   'pnpm-lock.yaml',
   '**/pnpm-lock.yaml',
+  '**/*.md',
+  '**/*.tsbuildinfo',
   '**/*.{png,webp,svg,gif,jpg,jpeg}',
   '**/*.{mp4,mkv,wmv,m4v,mov,avi,flv,webm,flac,mka,m4a,aac,ogg}',
 ];
@@ -49,7 +51,11 @@ export async function runCodemods(config, sdk, options) {
 
     try {
       const result = await runCodemod(transform, patterns, options);
-      spinner.success(`Codemod applied: ${chalk.dim(transform)}`);
+      if (result.error > 0) {
+        spinner.error(`Codemod applied with errors: ${chalk.dim(transform)}`);
+      } else {
+        spinner.success(`Codemod applied: ${chalk.dim(transform)}`);
+      }
       renderCodemodResults(transform, result);
 
       const codemodConfig = getCodemodConfig(transform);
@@ -64,10 +70,25 @@ export async function runCodemods(config, sdk, options) {
 }
 
 export async function runScans(config, sdk, options) {
-  const matchers = loadMatchers(config, sdk);
+  const changes = loadMatchers(config, sdk);
 
-  if (matchers.length === 0) {
+  if (changes.length === 0) {
     return [];
+  }
+
+  const changesWithMatchers = changes.filter(change => change.matcher);
+  const changesWithoutMatchers = changes.filter(change => !change.matcher);
+
+  const results = {};
+
+  // Always include changes without matchers
+  for (const change of changesWithoutMatchers) {
+    results[change.title] = { instances: [], ...change };
+  }
+
+  // Handle scans with matchers
+  if (changesWithMatchers.length === 0) {
+    return Object.values(results);
   }
 
   const spinner = createSpinner('Scanning files for breaking changes...');
@@ -80,15 +101,13 @@ export async function runScans(config, sdk, options) {
       ignore: [...GLOBBY_IGNORE, ...(options.ignore || [])],
     });
 
-    const results = {};
-
     for (let idx = 0; idx < files.length; idx++) {
       const file = files[idx];
       spinner.update(`Scanning ${path.basename(file)} (${idx + 1}/${files.length})`);
 
       const content = await fs.readFile(file, 'utf8');
 
-      for (const matcher of matchers) {
+      for (const matcher of changesWithMatchers) {
         const matches = findMatches(content, matcher.matcher);
 
         if (matches.length === 0) {
@@ -132,10 +151,6 @@ function loadMatchers(config, sdk) {
   }
 
   return config.changes.filter(change => {
-    if (!change.matcher) {
-      return false;
-    }
-
     const packages = change.packages || ['*'];
     return packages.includes('*') || packages.includes(sdk);
   });

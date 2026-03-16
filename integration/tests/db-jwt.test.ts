@@ -5,7 +5,7 @@ import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
 
-test.describe('Dev Browser JWT test', () => {
+test.describe('Dev browser test', () => {
   const configs = [];
 
   configs.forEach(config => {
@@ -50,7 +50,7 @@ test.describe('Dev Browser JWT test', () => {
         await u.po.expect.toBeSignedIn();
       });
 
-      test('Dev Browser JWT that gets appended to the URL when redirecting to Accounts Portal, overrides any existing Dev Browser JWT in AP', async () => {
+      test('Dev browser ID that gets appended to the URL when redirecting to Accounts Portal, overrides any existing dev browser in AP', async () => {
         // TODO: Implement this test
       });
 
@@ -65,7 +65,7 @@ test.describe('Dev Browser JWT test', () => {
         - Sign in with email and password
         - Should be redirected back to localhost and are signed in
        */
-      test('Deleting localhost Dev Browser JWT should clear the signed in state in Accounts Portal when redirected', async () => {
+      test('Deleting localhost dev browser should clear the signed in state in Accounts Portal when redirected', async () => {
         // TODO: Implement this test
       });
 

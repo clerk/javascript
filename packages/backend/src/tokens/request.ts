@@ -14,7 +14,7 @@ import { AuthErrorReason, handshake, signedIn, signedOut, signedOutInvalidToken 
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
-import { getMachineTokenType, isMachineToken, isOAuthJwt, isTokenTypeAccepted } from './machine';
+import { getMachineTokenType, isMachineJwt, isMachineToken, isTokenTypeAccepted } from './machine';
 import { OrganizationMatcher } from './organizationMatcher';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
@@ -411,11 +411,11 @@ export const authenticateRequest: AuthenticateRequest = (async (
   async function authenticateRequestWithTokenInHeader() {
     const { tokenInHeader } = authenticateContext;
 
-    // Reject OAuth JWTs that may appear in headers when expecting session tokens.
-    // OAuth JWTs are valid Clerk-signed JWTs and will pass verifyToken() verification,
+    // Reject machine JWTs (OAuth or M2M) that may appear in headers when expecting session tokens.
+    // These are valid Clerk-signed JWTs and will pass verify() verification,
     // but should not be accepted as session tokens.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (isOAuthJwt(tokenInHeader!)) {
+    if (isMachineJwt(tokenInHeader!)) {
       return signedOut({
         tokenType: TokenType.SessionToken,
         authenticateContext,
@@ -630,6 +630,12 @@ export const authenticateRequest: AuthenticateRequest = (async (
       const { data, errors } = await verifyToken(authenticateContext.sessionTokenInCookie!, authenticateContext);
       if (errors) {
         throw errors[0];
+      }
+
+      if (!data.azp) {
+        console.warn(
+          'Clerk: Session token from cookie is missing the azp claim. In a future version of Clerk, this token will be considered invalid. Please contact Clerk support if you see this warning.',
+        );
       }
 
       const signedInRequestState = signedIn({

@@ -46,7 +46,7 @@ export type UseOrganizationParams = {
    * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    * <ul>
-   *  <li>`role`: An array of [`OrganizationCustomRoleKey`](https://clerk.com/docs/reference/javascript/types/organization-custom-role-key).</li>
+   *  <li>`role`: An array of [`OrganizationCustomRoleKey`](https://clerk.com/docs/reference/types/organization-custom-role-key).</li>
    *  <li>`query`: A string that filters the memberships by the provided string.</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
    * </ul>
