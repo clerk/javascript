@@ -331,12 +331,7 @@ If you need to run a test suite inside a different environment (e.g. a different
 1. Inside `presets/envs.ts`, create a new environment config wrapped with `withInstanceKeys`:
 
    ```ts
-   const yourConciseName = withInstanceKeys(
-     'your-concise-name',
-     base
-       .clone()
-       .setId('yourConciseName'),
-   );
+   const yourConciseName = withInstanceKeys('your-concise-name', base.clone().setId('yourConciseName'));
    ```
 
    The `withInstanceKeys` wrapper sets PK/SK from the instance keys map and automatically swaps to staging keys when `E2E_STAGING=1` is set. The first argument is the production key name — the staging key is looked up as `clerkstage-your-concise-name`. See [Running tests against staging](#running-tests-against-staging) for more details.
