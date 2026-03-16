@@ -1,5 +1,5 @@
 import { createClerkClient as backendCreateClerkClient } from '@clerk/backend';
-import { withRateLimitRetry } from './rateLimitedClerkClient';
+import { withRetry } from './retryableClerkClient';
 import { createAppPageObject, createPageObjects, type EnhancedPage } from '@clerk/testing/playwright/unstable';
 import type { Browser, BrowserContext, Page } from '@playwright/test';
 
@@ -35,7 +35,7 @@ export const createTestUtils = <
 ): Params extends Partial<CreateAppPageObjectArgs> ? FullReturn : OnlyAppReturn => {
   const { app, context, browser, useTestingToken = true } = params || {};
 
-  const clerkClient = withRateLimitRetry(createClerkClient(app));
+  const clerkClient = withRetry(createClerkClient(app));
   const services = {
     clerk: clerkClient,
     email: createEmailService(),

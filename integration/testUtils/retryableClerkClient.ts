@@ -5,6 +5,7 @@ const MAX_RETRIES = 5;
 const BASE_DELAY_MS = 1000;
 const JITTER_MAX_MS = 500;
 const MAX_RETRY_DELAY_MS = 30_000;
+const RETRYABLE_STATUS_CODES = new Set([429, 502, 503, 504]);
 
 const retryStats = { totalRetries: 0, callsRetried: new Set<string>() };
 
@@ -24,29 +25,29 @@ function recordRetry(path: string): void {
   retryStats.callsRetried.add(path);
 }
 
-export function printRateLimitSummary(): void {
+export function printRetrySummary(): void {
   if (retryStats.totalRetries === 0) {
-    console.log('[Rate Limit] No rate-limit retries occurred during this run.');
+    console.log('[Retry] No retries occurred during this run.');
     return;
   }
   const methods = [...retryStats.callsRetried].join(', ');
   console.warn(
-    `[Rate Limit] Summary: ${retryStats.totalRetries} retries across ${retryStats.callsRetried.size} API calls (${methods})`,
+    `[Retry] Summary: ${retryStats.totalRetries} retries across ${retryStats.callsRetried.size} API calls (${methods})`,
   );
 }
 
-async function retryOnRateLimit<T>(firstAttempt: Promise<T>, fn: () => Promise<T>, path: string): Promise<T> {
+async function retryOnFailure<T>(firstAttempt: Promise<T>, fn: () => Promise<T>, path: string): Promise<T> {
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
       return attempt === 0 ? await firstAttempt : await fn();
     } catch (error) {
-      const isRateLimited = isClerkAPIResponseError(error) && error.status === 429;
-      if (!isRateLimited || attempt === MAX_RETRIES) {
+      const isRetryable = isClerkAPIResponseError(error) && RETRYABLE_STATUS_CODES.has(error.status);
+      if (!isRetryable || attempt === MAX_RETRIES) {
         throw error;
       }
       recordRetry(path);
       const delayMs = getRetryDelay(error, attempt);
-      console.warn(`[Rate Limit] Retry ${attempt + 1}/${MAX_RETRIES} for ${path}, waiting ${Math.round(delayMs)}ms`);
+      console.warn(`[Retry] ${error.status} for ${path}, attempt ${attempt + 1}/${MAX_RETRIES}, waiting ${Math.round(delayMs)}ms`);
       await sleep(delayMs);
     }
   }
@@ -71,7 +72,7 @@ function createProxy(target: unknown, path: string[] = []): unknown {
           // Only wrap promises (async API calls), pass through sync returns
           if (result && typeof result === 'object' && typeof result.then === 'function') {
             const fullPath = [...path, prop].join('.');
-            return retryOnRateLimit(result, () => value.apply(obj, args), fullPath);
+            return retryOnFailure(result, () => value.apply(obj, args), fullPath);
           }
           return result;
         };
@@ -84,6 +85,6 @@ function createProxy(target: unknown, path: string[] = []): unknown {
   });
 }
 
-export function withRateLimitRetry(client: ClerkClient): ClerkClient {
+export function withRetry(client: ClerkClient): ClerkClient {
   return createProxy(client) as ClerkClient;
 }
