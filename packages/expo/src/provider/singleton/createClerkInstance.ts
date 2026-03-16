@@ -112,6 +112,26 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       __internal_clerkOptions = { publishableKey, proxyUrl, domain };
       __internal_clerk = new ClerkClass(publishableKey, { proxyUrl, domain }) as unknown as BrowserClerk;
 
+      // The clerk-js native bundle uses rspack code-splitting for the internal QueryClient.
+      // On React Native, rspack's chunk loading doesn't work (Metro bundles into a single file),
+      // so the dynamic import never resolves and __internal_queryClient stays undefined.
+      // This breaks hooks that depend on the query client (useOrganizationList, etc.).
+      // Override the getter to synchronously create a QueryClient on first access.
+      {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+        const { QueryClient } = require('@tanstack/query-core');
+        let queryClient: InstanceType<typeof QueryClient> | undefined;
+        Object.defineProperty(__internal_clerk, '__internal_queryClient', {
+          get() {
+            if (!queryClient) {
+              queryClient = new QueryClient();
+            }
+            return { __tag: 'clerk-rq-client', client: queryClient };
+          },
+          configurable: true,
+        });
+      }
+
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API
         __internal_clerk.__internal_createPublicCredentials = (
