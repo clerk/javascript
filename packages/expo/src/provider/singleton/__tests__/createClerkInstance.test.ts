@@ -94,6 +94,20 @@ describe('createClerkInstance', () => {
     expect(mocks.constructorSpy).toHaveBeenCalledTimes(1);
   });
 
+  test('reuses the singleton when called without options after initialization', async () => {
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+
+    const first = getClerkInstance({
+      publishableKey: 'pk_test_123',
+      proxyUrl: 'https://proxy.example.com/api/__clerk',
+    });
+    const second = getClerkInstance();
+
+    expect(first).toBe(second);
+    expect(mocks.constructorSpy).toHaveBeenCalledTimes(1);
+  });
+
   test('recreates the singleton when proxyUrl changes', async () => {
     const createClerkInstance = await loadCreateClerkInstance();
     const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
@@ -110,6 +124,43 @@ describe('createClerkInstance', () => {
     expect(first).not.toBe(second);
     expect(mocks.constructorSpy).toHaveBeenNthCalledWith(2, 'pk_test_123', {
       proxyUrl: 'https://proxy-b.example.com/api/__clerk',
+      domain: undefined,
+    });
+  });
+
+  test('preserves the existing publishable key when only proxyUrl changes', async () => {
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+
+    getClerkInstance({
+      publishableKey: 'pk_test_123',
+      proxyUrl: 'https://proxy-a.example.com/api/__clerk',
+    });
+    getClerkInstance({
+      proxyUrl: 'https://proxy-b.example.com/api/__clerk',
+    });
+
+    expect(mocks.constructorSpy).toHaveBeenNthCalledWith(2, 'pk_test_123', {
+      proxyUrl: 'https://proxy-b.example.com/api/__clerk',
+      domain: undefined,
+    });
+  });
+
+  test('does not carry proxy config across publishable key changes', async () => {
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+
+    getClerkInstance({
+      publishableKey: 'pk_test_old',
+      proxyUrl: 'https://proxy.example.com/api/__clerk',
+      domain: 'satellite.example.com',
+    });
+    getClerkInstance({
+      publishableKey: 'pk_test_new',
+    });
+
+    expect(mocks.constructorSpy).toHaveBeenNthCalledWith(2, 'pk_test_new', {
+      proxyUrl: undefined,
       domain: undefined,
     });
   });

@@ -42,24 +42,28 @@ let __internal_clerkOptions: Pick<BuildClerkOptions, 'publishableKey' | 'proxyUr
 
 export function createClerkInstance(ClerkClass: typeof Clerk) {
   return (options?: BuildClerkOptions): HeadlessBrowserClerk | BrowserClerk => {
-    const {
-      publishableKey = '',
-      tokenCache = MemoryTokenCache,
-      proxyUrl,
-      domain,
-      __experimental_resourceCache: createResourceCache,
-    } = options || {};
+    const nextPublishableKey = options?.publishableKey;
+    const nextProxyUrl = options?.proxyUrl;
+    const nextDomain = options?.domain;
+    const { tokenCache = MemoryTokenCache, __experimental_resourceCache: createResourceCache } = options || {};
+    const hasKeyChanged =
+      !!__internal_clerkOptions &&
+      typeof nextPublishableKey !== 'undefined' &&
+      nextPublishableKey !== __internal_clerkOptions.publishableKey;
+    const hasProxyChanged =
+      !!__internal_clerkOptions &&
+      typeof nextProxyUrl !== 'undefined' &&
+      nextProxyUrl !== __internal_clerkOptions.proxyUrl;
+    const hasDomainChanged =
+      !!__internal_clerkOptions && typeof nextDomain !== 'undefined' && nextDomain !== __internal_clerkOptions.domain;
+    const hasConfigChanged = hasKeyChanged || hasProxyChanged || hasDomainChanged;
+    const publishableKey = nextPublishableKey ?? __internal_clerkOptions?.publishableKey ?? '';
+    const proxyUrl = hasKeyChanged ? nextProxyUrl : (nextProxyUrl ?? __internal_clerkOptions?.proxyUrl);
+    const domain = hasKeyChanged ? nextDomain : (nextDomain ?? __internal_clerkOptions?.domain);
 
     if (!__internal_clerk && !publishableKey) {
       errorThrower.throwMissingPublishableKeyError();
     }
-
-    // Support "hot-swapping" the Clerk instance at runtime. See JS-598 for additional details.
-    const hasKeyChanged =
-      !!__internal_clerkOptions && !!publishableKey && publishableKey !== __internal_clerkOptions.publishableKey;
-    const hasProxyChanged = !!__internal_clerkOptions && proxyUrl !== __internal_clerkOptions.proxyUrl;
-    const hasDomainChanged = !!__internal_clerkOptions && domain !== __internal_clerkOptions.domain;
-    const hasConfigChanged = hasKeyChanged || hasProxyChanged || hasDomainChanged;
 
     if (!__internal_clerk || hasConfigChanged) {
       if (hasConfigChanged) {
