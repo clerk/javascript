@@ -1188,6 +1188,15 @@ export const enUS: LocalizationResource = {
       successMessage: 'The provider has been added to your account',
       title: 'Add connected account',
     },
+    enterpriseAccountPage: {
+      removeResource: {
+        messageLine1: '{{identifier}} will be removed from this account.',
+        messageLine2:
+          'You will no longer be able to use this enterprise account and any dependent features will no longer work.',
+        successMessage: '{{enterpriseAccount}} has been removed from your account.',
+        title: 'Remove enterprise account',
+      },
+    },
     deletePage: {
       actionDescription: 'Type "Delete account" below to continue.',
       confirm: 'Delete account',
@@ -1360,6 +1369,8 @@ export const enUS: LocalizationResource = {
         title: 'Email addresses',
       },
       enterpriseAccountsSection: {
+        destructiveActionTitle: 'Remove',
+        primaryButton: 'Connect account',
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Profile details',

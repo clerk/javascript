@@ -61,6 +61,8 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
     return this;
   }
 
+  destroy = (): Promise<void> => this._baseDelete();
+
   public __internal_toSnapshot(): EnterpriseAccountJSONSnapshot {
     return {
       object: 'enterprise_account',
@@ -93,6 +95,7 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
   protocol!: EnterpriseAccountResource['protocol'];
   provider!: EnterpriseAccountResource['provider'];
   syncUserAttributes!: boolean;
+  allowAccountLinking!: boolean;
   createdAt!: Date;
   updatedAt!: Date;
   enterpriseConnectionId: string | null = '';
@@ -114,6 +117,7 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
       this.allowSubdomains = data.allow_subdomains;
       this.allowIdpInitiated = data.allow_idp_initiated;
       this.disableAdditionalIdentifications = data.disable_additional_identifications;
+      this.allowAccountLinking = data.allow_account_linking;
       this.createdAt = unixEpochToDate(data.created_at);
       this.updatedAt = unixEpochToDate(data.updated_at);
       this.enterpriseConnectionId = data.enterprise_connection_id;
@@ -136,6 +140,7 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
       allow_subdomains: this.allowSubdomains,
       allow_idp_initiated: this.allowIdpInitiated,
       disable_additional_identifications: this.disableAdditionalIdentifications,
+      allow_account_linking: this.allowAccountLinking,
       enterprise_connection_id: this.enterpriseConnectionId,
       created_at: this.createdAt.getTime(),
       updated_at: this.updatedAt.getTime(),

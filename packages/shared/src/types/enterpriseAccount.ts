@@ -21,6 +21,7 @@ export interface EnterpriseAccountResource extends ClerkResource {
   publicMetadata: Record<string, unknown> | null;
   verification: VerificationResource | null;
   lastAuthenticatedAt: Date | null;
+  destroy: () => Promise<void>;
   __internal_toSnapshot: () => EnterpriseAccountJSONSnapshot;
 }
 
@@ -35,6 +36,7 @@ export interface EnterpriseAccountConnectionResource extends ClerkResource {
   protocol: EnterpriseProtocol;
   provider: EnterpriseProvider;
   syncUserAttributes: boolean;
+  allowAccountLinking: boolean;
   enterpriseConnectionId: string | null;
   __internal_toSnapshot: () => EnterpriseAccountConnectionJSONSnapshot;
 }

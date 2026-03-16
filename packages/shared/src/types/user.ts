@@ -2,7 +2,7 @@ import type { BackupCodeResource } from './backupCode';
 import type { BillingPayerMethods } from './billing';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
-import type { EnterpriseAccountResource } from './enterpriseAccount';
+import type { EnterpriseAccountConnectionResource, EnterpriseAccountResource } from './enterpriseAccount';
 import type { ExternalAccountResource } from './externalAccount';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
@@ -118,6 +118,7 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   ) => Promise<ClerkPaginatedResponse<OrganizationSuggestionResource>>;
   getOrganizationCreationDefaults: () => Promise<OrganizationCreationDefaultsResource>;
   leaveOrganization: (organizationId: string) => Promise<DeletedObjectResource>;
+  getEnterpriseConnections: () => Promise<EnterpriseAccountConnectionResource[]>;
   createTOTP: () => Promise<TOTPResource>;
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
@@ -141,7 +142,8 @@ export type CreatePhoneNumberParams = { phoneNumber: string };
 export type CreateWeb3WalletParams = { web3Wallet: string };
 export type SetProfileImageParams = { file: Blob | File | string | null };
 export type CreateExternalAccountParams = {
-  strategy: OAuthStrategy;
+  strategy?: OAuthStrategy;
+  enterpriseConnectionId?: string;
   redirectUrl?: string;
   additionalScopes?: OAuthScope[];
   oidcPrompt?: string;

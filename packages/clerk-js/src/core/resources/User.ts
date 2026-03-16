@@ -9,6 +9,8 @@ import type {
   DeletedObjectJSON,
   DeletedObjectResource,
   EmailAddressResource,
+  EnterpriseAccountConnectionJSON,
+  EnterpriseAccountConnectionResource,
   EnterpriseAccountResource,
   ExternalAccountJSON,
   ExternalAccountResource,
@@ -42,6 +44,7 @@ import {
   DeletedObject,
   EmailAddress,
   EnterpriseAccount,
+  EnterpriseAccountConnection,
   ExternalAccount,
   Image,
   OrganizationMembership,
@@ -156,7 +159,7 @@ export class User extends BaseResource implements UserResource {
   };
 
   createExternalAccount = async (params: CreateExternalAccountParams): Promise<ExternalAccountResource> => {
-    const { strategy, redirectUrl, additionalScopes } = params || {};
+    const { strategy, redirectUrl, additionalScopes, enterpriseConnectionId } = params || {};
 
     const json = (
       await BaseResource._fetch<ExternalAccountJSON>({
@@ -166,6 +169,7 @@ export class User extends BaseResource implements UserResource {
           strategy,
           redirect_url: redirectUrl,
           additional_scope: additionalScopes,
+          enterprise_connection_id: enterpriseConnectionId,
         } as any,
       })
     )?.response as unknown as ExternalAccountJSON;
@@ -287,6 +291,17 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as DeletedObjectJSON;
 
     return new DeletedObject(json);
+  };
+
+  getEnterpriseConnections = async (): Promise<EnterpriseAccountConnectionResource[]> => {
+    const json = (
+      await BaseResource._fetch({
+        path: '/me/enterprise_connections',
+        method: 'GET',
+      })
+    )?.response as unknown as EnterpriseAccountConnectionJSON[];
+
+    return (json || []).map(connection => new EnterpriseAccountConnection(connection));
   };
 
   initializePaymentMethod: typeof initializePaymentMethod = params => {

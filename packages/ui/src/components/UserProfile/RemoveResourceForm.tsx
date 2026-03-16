@@ -220,3 +220,34 @@ export const RemovePasskeyForm = (props: RemovePasskeyFormProps) => {
     />
   );
 };
+
+type RemoveEnterpriseAccountFormProps = FormProps & {
+  accountId: string;
+};
+
+export const RemoveEnterpriseAccountForm = (props: RemoveEnterpriseAccountFormProps) => {
+  const { accountId: id, onSuccess, onReset } = props;
+  const { user } = useUser();
+  const resource = user?.enterpriseAccounts.find(e => e.id === id);
+  const ref = React.useRef(resource?.enterpriseConnection?.name || resource?.emailAddress);
+
+  if (!ref.current) {
+    return null;
+  }
+
+  return (
+    <RemoveResourceForm
+      title={localizationKeys('userProfile.enterpriseAccountPage.removeResource.title')}
+      messageLine1={localizationKeys('userProfile.enterpriseAccountPage.removeResource.messageLine1', {
+        identifier: ref.current,
+      })}
+      messageLine2={localizationKeys('userProfile.enterpriseAccountPage.removeResource.messageLine2')}
+      successMessage={localizationKeys('userProfile.enterpriseAccountPage.removeResource.successMessage', {
+        enterpriseAccount: ref.current,
+      })}
+      deleteResource={() => Promise.resolve(resource?.destroy())}
+      onSuccess={onSuccess}
+      onReset={onReset}
+    />
+  );
+};

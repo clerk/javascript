@@ -42,6 +42,88 @@ describe('User', () => {
     });
   });
 
+  it('creates an external account with enterprise connection id', async () => {
+    const externalAccountJSON = {
+      object: 'external_account',
+      provider: 'saml_okta',
+      verification: {
+        external_verification_redirect_url: 'https://www.example.com',
+      },
+    };
+
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: externalAccountJSON }));
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    await user.createExternalAccount({
+      enterpriseConnectionId: 'ec_123',
+      redirectUrl: 'https://www.example.com',
+    });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/me/external_accounts',
+      body: {
+        strategy: undefined,
+        redirect_url: 'https://www.example.com',
+        additional_scope: undefined,
+        enterprise_connection_id: 'ec_123',
+      },
+    });
+  });
+
+  it('fetches enterprise connections', async () => {
+    const enterpriseConnectionsJSON = [
+      {
+        id: 'ec_123',
+        object: 'enterprise_account_connection',
+        name: 'Acme Corp SSO',
+        active: true,
+        allow_account_linking: true,
+        domain: 'acme.com',
+        protocol: 'saml',
+        provider: 'saml_okta',
+        logo_public_url: null,
+        sync_user_attributes: true,
+        allow_subdomains: false,
+        allow_idp_initiated: false,
+        disable_additional_identifications: false,
+        enterprise_connection_id: 'ec_123',
+        created_at: 1234567890,
+        updated_at: 1234567890,
+      },
+    ];
+
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: enterpriseConnectionsJSON }));
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    const connections = await user.getEnterpriseConnections();
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'GET',
+      path: '/me/enterprise_connections',
+    });
+
+    expect(connections).toHaveLength(1);
+    expect(connections[0].name).toBe('Acme Corp SSO');
+    expect(connections[0].allowAccountLinking).toBe(true);
+  });
+
   it('creates a web3 wallet', async () => {
     const targetWeb3Wallet = '0x0000000000000000000000000000000000000000';
     const web3WalletJSON = {
