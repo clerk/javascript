@@ -42,6 +42,13 @@ type ResolvedClerkRuntimeOptions = Omit<ClerkRuntimeOptions, 'publishableKey'> &
   publishableKey: string;
 };
 
+function hasOwnOption<Key extends keyof ClerkRuntimeOptions>(
+  options: ClerkRuntimeOptions | undefined,
+  key: Key,
+): options is ClerkRuntimeOptions & Required<Pick<ClerkRuntimeOptions, Key>> {
+  return !!options && Object.prototype.hasOwnProperty.call(options, key);
+}
+
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
 let __internal_clerkOptions: ClerkRuntimeOptions | undefined;
 
@@ -57,23 +64,25 @@ function getUpdatedClerkOptions(
   hasConfigChanged: boolean;
   options: ResolvedClerkRuntimeOptions;
 } {
+  const hasNextProxyUrl = hasOwnOption(nextOptions, 'proxyUrl');
+  const hasNextDomain = hasOwnOption(nextOptions, 'domain');
   const hasKeyChanged =
     !!currentOptions &&
     typeof nextOptions?.publishableKey !== 'undefined' &&
     nextOptions.publishableKey !== currentOptions.publishableKey;
-  const hasProxyChanged =
-    !!currentOptions &&
-    typeof nextOptions?.proxyUrl !== 'undefined' &&
-    nextOptions.proxyUrl !== currentOptions.proxyUrl;
-  const hasDomainChanged =
-    !!currentOptions && typeof nextOptions?.domain !== 'undefined' && nextOptions.domain !== currentOptions.domain;
+  const hasProxyChanged = !!currentOptions && hasNextProxyUrl && nextOptions.proxyUrl !== currentOptions.proxyUrl;
+  const hasDomainChanged = !!currentOptions && hasNextDomain && nextOptions.domain !== currentOptions.domain;
 
   return {
     hasConfigChanged: hasKeyChanged || hasProxyChanged || hasDomainChanged,
     options: {
       publishableKey: nextOptions?.publishableKey ?? currentOptions?.publishableKey ?? '',
-      proxyUrl: hasKeyChanged ? nextOptions?.proxyUrl : (nextOptions?.proxyUrl ?? currentOptions?.proxyUrl),
-      domain: hasKeyChanged ? nextOptions?.domain : (nextOptions?.domain ?? currentOptions?.domain),
+      proxyUrl: hasKeyChanged
+        ? nextOptions?.proxyUrl
+        : hasNextProxyUrl
+          ? nextOptions.proxyUrl
+          : currentOptions?.proxyUrl,
+      domain: hasKeyChanged ? nextOptions?.domain : hasNextDomain ? nextOptions.domain : currentOptions?.domain,
     },
   };
 }
