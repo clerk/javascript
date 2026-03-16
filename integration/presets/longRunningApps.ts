@@ -99,7 +99,14 @@ export const createLongRunningApps = () => {
     { id: 'hono.vite.withCustomRoles', config: hono.vite, env: envs.withCustomRoles },
   ] as const;
 
+  const stagingSkippedConfigs = allConfigs.filter(c => !isStagingReady(c.env));
   const stagingReadyConfigs = allConfigs.filter(c => isStagingReady(c.env));
+
+  if (process.env.E2E_STAGING === '1' && stagingSkippedConfigs.length > 0) {
+    const skippedIds = stagingSkippedConfigs.map(c => `\n  - ${c.id}`).join('');
+    console.log(`[staging] Skipping ${stagingSkippedConfigs.length} long running app(s) without staging keys:${skippedIds}`);
+  }
+
   const apps = stagingReadyConfigs.map(longRunningApplication);
 
   return {
@@ -117,6 +124,12 @@ export const createLongRunningApps = () => {
         }
         // Pattern matches a known app but it was filtered out by isStagingReady
         if (process.env.E2E_STAGING === '1') {
+          const skippedIds = patterns
+            .flatMap(pattern => stagingSkippedConfigs.filter(c => idMatchesPattern(c.id, pattern)))
+            .map(c => c.id);
+          if (skippedIds.length > 0) {
+            console.log(`[staging] Skipping test suite(s) due to missing staging keys: ${skippedIds.join(', ')}`);
+          }
           return [] as any as LongRunningApplication[];
         }
         const availableIds = stagingReadyConfigs.map(c => `\n- ${c.id}`).join('');

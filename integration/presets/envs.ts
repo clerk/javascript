@@ -51,24 +51,31 @@ export function isStagingReady(env: EnvironmentConfig): boolean {
 }
 
 /**
- * When E2E_STAGING=1 is set, swaps PK/SK to staging keys and adds CLERK_API_URL.
- * If the staging key doesn't exist, removes any inherited CLERK_API_URL so the config
- * falls back to production and is filtered from long-running apps by isStagingReady.
- * In non-staging mode, returns the env config unchanged.
+ * Sets PK/SK from the instance keys map and handles staging environment swapping.
+ * When E2E_STAGING=1 is set, swaps PK/SK to staging keys (looked up as `clerkstage-<keyName>`)
+ * and adds CLERK_API_URL. If the staging key doesn't exist, removes any inherited CLERK_API_URL
+ * so the config falls back to production and is filtered from long-running apps by isStagingReady.
+ * In non-staging mode, sets the production PK/SK and returns.
  */
-function withStagingSupport(env: EnvironmentConfig, prodKeyName: string): EnvironmentConfig {
+function withInstanceKeys(keyName: string, env: EnvironmentConfig): EnvironmentConfig {
+  const keys = instanceKeys.get(keyName)!;
+  env
+    .setEnvVariable('private', 'CLERK_SECRET_KEY', keys.sk)
+    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', keys.pk);
+
   if (process.env.E2E_STAGING !== '1') return env;
-  const stagingKeyName = STAGING_KEY_PREFIX + prodKeyName;
+
+  const stagingKeyName = STAGING_KEY_PREFIX + keyName;
   if (!instanceKeys.has(stagingKeyName)) {
     // Remove staging API URL if inherited from parent clone to prevent
     // production keys from being used against the staging API
     env.privateVariables.delete('CLERK_API_URL');
     return env;
   }
-  const keys = instanceKeys.get(stagingKeyName)!;
+  const stagingKeys = instanceKeys.get(stagingKeyName)!;
   return env
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', keys.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', keys.pk)
+    .setEnvVariable('private', 'CLERK_SECRET_KEY', stagingKeys.sk)
+    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', stagingKeys.pk)
     .setEnvVariable('private', 'CLERK_API_URL', STAGING_API_URL);
 }
 
@@ -86,25 +93,19 @@ const withKeyless = base
   .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
   .setEnvVariable('public', 'CLERK_KEYLESS_DISABLED', false);
 
-const withEmailCodes = withStagingSupport(
+const withEmailCodes = withInstanceKeys('with-email-codes',
   base
     .clone()
     .setId('withEmailCodes')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes')!.pk)
     .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key'),
-  'with-email-codes',
 );
 
-const sessionsProd1 = withStagingSupport(
+const sessionsProd1 = withInstanceKeys('sessions-prod-1',
   base
     .clone()
     .setId('sessionsProd1')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('sessions-prod-1')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('sessions-prod-1')!.pk)
     .setEnvVariable('public', 'CLERK_JS_URL', '')
     .setEnvVariable('public', 'CLERK_UI_URL', ''),
-  'sessions-prod-1',
 );
 
 const withEmailCodes_destroy_client = withEmailCodes
@@ -116,34 +117,25 @@ const withSharedUIVariant = withEmailCodes
   .setId('withSharedUIVariant')
   .setEnvVariable('public', 'CLERK_UI_VARIANT', 'shared');
 
-const withEmailLinks = withStagingSupport(
+const withEmailLinks = withInstanceKeys('with-email-links',
   base
     .clone()
-    .setId('withEmailLinks')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-links')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-links')!.pk),
-  'with-email-links',
+    .setId('withEmailLinks'),
 );
 
-const withCustomRoles = withStagingSupport(
+const withCustomRoles = withInstanceKeys('with-custom-roles',
   base
     .clone()
     .setId('withCustomRoles')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-custom-roles')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-custom-roles')!.pk)
     .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
     .setEnvVariable('public', 'CLERK_UI_URL', constants.E2E_APP_CLERK_UI || 'http://localhost:18212/ui.browser.js'),
-  'with-custom-roles',
 );
 
-const withReverification = withStagingSupport(
+const withReverification = withInstanceKeys('with-reverification',
   base
     .clone()
     .setId('withReverification')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-reverification')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-reverification')!.pk)
     .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key'),
-  'with-reverification',
 );
 
 const withEmailCodesQuickstart = withEmailCodes
@@ -184,31 +176,22 @@ const withDynamicKeys = withEmailCodes
   .setEnvVariable('private', 'CLERK_SECRET_KEY', '')
   .setEnvVariable('private', 'CLERK_DYNAMIC_SECRET_KEY', withEmailCodes.privateVariables.get('CLERK_SECRET_KEY'));
 
-const withRestrictedMode = withStagingSupport(
+const withRestrictedMode = withInstanceKeys('with-restricted-mode',
   withEmailCodes
     .clone()
-    .setId('withRestrictedMode')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-restricted-mode')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-restricted-mode')!.pk),
-  'with-restricted-mode',
+    .setId('withRestrictedMode'),
 );
 
-const withLegalConsent = withStagingSupport(
+const withLegalConsent = withInstanceKeys('with-legal-consent',
   base
     .clone()
-    .setId('withLegalConsent')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-legal-consent')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-legal-consent')!.pk),
-  'with-legal-consent',
+    .setId('withLegalConsent'),
 );
 
-const withWaitlistMode = withStagingSupport(
+const withWaitlistMode = withInstanceKeys('with-waitlist-mode',
   withEmailCodes
     .clone()
-    .setId('withWaitlistMode')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-waitlist-mode')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-waitlist-mode')!.pk),
-  'with-waitlist-mode',
+    .setId('withWaitlistMode'),
 );
 
 const withEmailCodesProxy = withEmailCodes
@@ -226,97 +209,67 @@ const withSignInOrUpEmailLinksFlow = withEmailLinks
   .setId('withSignInOrUpEmailLinksFlow')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined);
 
-const withSignInOrUpwithRestrictedModeFlow = withStagingSupport(
+const withSignInOrUpwithRestrictedModeFlow = withInstanceKeys('with-restricted-mode',
   withEmailCodes
     .clone()
     .setId('withSignInOrUpwithRestrictedModeFlow')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-restricted-mode')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-restricted-mode')!.pk)
     .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined),
-  'with-restricted-mode',
 );
 
-const withSessionTasks = withStagingSupport(
+const withSessionTasks = withInstanceKeys('with-session-tasks',
   base
     .clone()
     .setId('withSessionTasks')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-session-tasks')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks')!.pk)
     .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key'),
-  'with-session-tasks',
 );
 
-const withSessionTasksResetPassword = withStagingSupport(
+const withSessionTasksResetPassword = withInstanceKeys('with-session-tasks-reset-password',
   base
     .clone()
-    .setId('withSessionTasksResetPassword')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-session-tasks-reset-password')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks-reset-password')!.pk),
-  'with-session-tasks-reset-password',
+    .setId('withSessionTasksResetPassword'),
 );
 
-const withSessionTasksSetupMfa = withStagingSupport(
+const withSessionTasksSetupMfa = withInstanceKeys('with-session-tasks-setup-mfa',
   base
     .clone()
     .setId('withSessionTasksSetupMfa')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-session-tasks-setup-mfa')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks-setup-mfa')!.pk)
     .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key'),
-  'with-session-tasks-setup-mfa',
 );
 
-const withBillingJwtV2 = withStagingSupport(
+const withBillingJwtV2 = withInstanceKeys('with-billing',
   base
     .clone()
-    .setId('withBillingJwtV2')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing')!.pk),
-  'with-billing',
+    .setId('withBillingJwtV2'),
 );
 
-const withBilling = withStagingSupport(
+const withBilling = withInstanceKeys('with-billing',
   base
     .clone()
-    .setId('withBilling')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing')!.pk),
-  'with-billing',
+    .setId('withBilling'),
 );
 
-const withWhatsappPhoneCode = withStagingSupport(
+const withWhatsappPhoneCode = withInstanceKeys('with-whatsapp-phone-code',
   base
     .clone()
-    .setId('withWhatsappPhoneCode')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-whatsapp-phone-code')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-whatsapp-phone-code')!.pk),
-  'with-whatsapp-phone-code',
+    .setId('withWhatsappPhoneCode'),
 );
 
-const withAPIKeys = withStagingSupport(
+const withAPIKeys = withInstanceKeys('with-api-keys',
   base
     .clone()
-    .setId('withAPIKeys')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-api-keys')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-api-keys')!.pk),
-  'with-api-keys',
+    .setId('withAPIKeys'),
 );
 
-const withProtectService = withStagingSupport(
+const withProtectService = withInstanceKeys('with-protect-service',
   base
     .clone()
-    .setId('withProtectService')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-protect-service')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-protect-service')!.pk),
-  'with-protect-service',
+    .setId('withProtectService'),
 );
 
-const withNeedsClientTrust = withStagingSupport(
+const withNeedsClientTrust = withInstanceKeys('with-needs-client-trust',
   base
     .clone()
-    .setId('withNeedsClientTrust')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-needs-client-trust')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-needs-client-trust')!.pk),
-  'with-needs-client-trust',
+    .setId('withNeedsClientTrust'),
 );
 
 export const envs = {
