@@ -37,29 +37,54 @@ type FapiResponse = Response & {
   payload: { errors?: Array<{ code: string }> } | null;
 };
 
+type ClerkRuntimeOptions = Pick<BuildClerkOptions, 'publishableKey' | 'proxyUrl' | 'domain'>;
+type ResolvedClerkRuntimeOptions = Omit<ClerkRuntimeOptions, 'publishableKey'> & {
+  publishableKey: string;
+};
+
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
-let __internal_clerkOptions: Pick<BuildClerkOptions, 'publishableKey' | 'proxyUrl' | 'domain'> | undefined;
+let __internal_clerkOptions: ClerkRuntimeOptions | undefined;
+
+/**
+ * Resolves the next native singleton config while preserving existing values for omitted options.
+ * A publishable key change starts from a clean proxy/domain config unless those values are
+ * explicitly provided alongside the new key.
+ */
+function getUpdatedClerkOptions(
+  currentOptions: ClerkRuntimeOptions | undefined,
+  nextOptions: ClerkRuntimeOptions | undefined,
+): {
+  hasConfigChanged: boolean;
+  options: ResolvedClerkRuntimeOptions;
+} {
+  const hasKeyChanged =
+    !!currentOptions &&
+    typeof nextOptions?.publishableKey !== 'undefined' &&
+    nextOptions.publishableKey !== currentOptions.publishableKey;
+  const hasProxyChanged =
+    !!currentOptions &&
+    typeof nextOptions?.proxyUrl !== 'undefined' &&
+    nextOptions.proxyUrl !== currentOptions.proxyUrl;
+  const hasDomainChanged =
+    !!currentOptions && typeof nextOptions?.domain !== 'undefined' && nextOptions.domain !== currentOptions.domain;
+
+  return {
+    hasConfigChanged: hasKeyChanged || hasProxyChanged || hasDomainChanged,
+    options: {
+      publishableKey: nextOptions?.publishableKey ?? currentOptions?.publishableKey ?? '',
+      proxyUrl: hasKeyChanged ? nextOptions?.proxyUrl : (nextOptions?.proxyUrl ?? currentOptions?.proxyUrl),
+      domain: hasKeyChanged ? nextOptions?.domain : (nextOptions?.domain ?? currentOptions?.domain),
+    },
+  };
+}
 
 export function createClerkInstance(ClerkClass: typeof Clerk) {
   return (options?: BuildClerkOptions): HeadlessBrowserClerk | BrowserClerk => {
-    const nextPublishableKey = options?.publishableKey;
-    const nextProxyUrl = options?.proxyUrl;
-    const nextDomain = options?.domain;
     const { tokenCache = MemoryTokenCache, __experimental_resourceCache: createResourceCache } = options || {};
-    const hasKeyChanged =
-      !!__internal_clerkOptions &&
-      typeof nextPublishableKey !== 'undefined' &&
-      nextPublishableKey !== __internal_clerkOptions.publishableKey;
-    const hasProxyChanged =
-      !!__internal_clerkOptions &&
-      typeof nextProxyUrl !== 'undefined' &&
-      nextProxyUrl !== __internal_clerkOptions.proxyUrl;
-    const hasDomainChanged =
-      !!__internal_clerkOptions && typeof nextDomain !== 'undefined' && nextDomain !== __internal_clerkOptions.domain;
-    const hasConfigChanged = hasKeyChanged || hasProxyChanged || hasDomainChanged;
-    const publishableKey = nextPublishableKey ?? __internal_clerkOptions?.publishableKey ?? '';
-    const proxyUrl = hasKeyChanged ? nextProxyUrl : (nextProxyUrl ?? __internal_clerkOptions?.proxyUrl);
-    const domain = hasKeyChanged ? nextDomain : (nextDomain ?? __internal_clerkOptions?.domain);
+    const {
+      hasConfigChanged,
+      options: { publishableKey, proxyUrl, domain },
+    } = getUpdatedClerkOptions(__internal_clerkOptions, options);
 
     if (!__internal_clerk && !publishableKey) {
       errorThrower.throwMissingPublishableKeyError();
