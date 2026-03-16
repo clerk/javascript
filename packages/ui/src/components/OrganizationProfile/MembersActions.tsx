@@ -1,4 +1,7 @@
+import { useMemo } from 'react';
+import { useOrganization } from '@clerk/shared/react';
 import { Animated } from '@/ui/elements/Animated';
+import { Tooltip } from '@/ui/elements/Tooltip';
 
 import { useProtect } from '../../common';
 import { Button, descriptors, Flex, localizationKeys } from '../../customizables';
@@ -11,6 +14,47 @@ type MembersActionsRowProps = {
 
 export const MembersActionsRow = ({ actionSlot }: MembersActionsRowProps) => {
   const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
+  const { organization } = useOrganization();
+
+  const isBelowLimit = useMemo(() => {
+    if (!organization) {
+      return false;
+    }
+
+    if (organization.maxAllowedMemberships === 0) {
+      return true;
+    }
+
+    return organization.membersCount + organization.pendingInvitationsCount < organization.maxAllowedMemberships;
+  }, [organization]);
+
+  const inviteButton = (
+    <Button
+      elementDescriptor={descriptors.membersPageInviteButton}
+      aria-label='Invite'
+      localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
+      isDisabled={!isBelowLimit}
+    />
+  );
+
+  let wrappedInviteButton;
+  if (isBelowLimit) {
+    wrappedInviteButton = (
+      <Action.Trigger
+        value='invite'
+        hideOnActive={!actionSlot}
+      >
+        {inviteButton}
+      </Action.Trigger>
+    );
+  } else {
+    wrappedInviteButton = (
+      <Tooltip.Root>
+        <Tooltip.Trigger>{inviteButton}</Tooltip.Trigger>
+        <Tooltip.Content text={localizationKeys('unstable__errors.organization_membership_quota_exceeded')} />
+      </Tooltip.Root>
+    );
+  }
 
   return (
     <Action.Root animate={false}>
@@ -25,18 +69,7 @@ export const MembersActionsRow = ({ actionSlot }: MembersActionsRowProps) => {
           gap={actionSlot ? 2 : undefined}
         >
           {actionSlot}
-          {canManageMemberships && (
-            <Action.Trigger
-              value='invite'
-              hideOnActive={!actionSlot}
-            >
-              <Button
-                elementDescriptor={descriptors.membersPageInviteButton}
-                aria-label='Invite'
-                localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
-              />
-            </Action.Trigger>
-          )}
+          {canManageMemberships && wrappedInviteButton}
         </Flex>
       </Animated>
       {canManageMemberships && (

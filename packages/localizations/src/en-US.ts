@@ -1037,7 +1037,8 @@ export const enUS: LocalizationResource = {
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
-    organization_membership_quota_exceeded: undefined,
+    organization_membership_quota_exceeded:
+      'You have reached your limit of organisation memberships, including outstanding invitations.',
     organization_minimum_permissions_needed: undefined,
     organization_not_found_or_unauthorized:
       'You are no longer a member of this organization. Please choose or create another one.',
