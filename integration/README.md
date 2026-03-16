@@ -332,18 +332,14 @@ If you need to run a test suite inside a different environment (e.g. a different
 
    ```ts
    const yourConciseName = withInstanceKeys(
+     'your-concise-name',
      base
        .clone()
-       .setId('yourConciseName')
-       .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('your-concise-name')!.sk)
-       .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('your-concise-name')!.pk)
-       .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
-       .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up'),
-     'your-concise-name',
+       .setId('yourConciseName'),
    );
    ```
 
-   The `withInstanceKeys` wrapper enables the environment config to automatically swap to staging keys when `E2E_STAGING=1` is set. The second argument is the production key name — the staging key is looked up as `clerkstage-your-concise-name`. See [Running tests against staging](#running-tests-against-staging) for more details.
+   The `withInstanceKeys` wrapper sets PK/SK from the instance keys map and automatically swaps to staging keys when `E2E_STAGING=1` is set. The first argument is the production key name — the staging key is looked up as `clerkstage-your-concise-name`. See [Running tests against staging](#running-tests-against-staging) for more details.
 
 1. Export `yourConciseName` from the file:
 
@@ -572,14 +568,12 @@ Inside [`presets/envs.ts`](../integration/presets/envs.ts) you can also create a
 
 ```ts
 const withCustomRoles = withInstanceKeys(
+  'with-custom-roles',
   base
     .clone()
     .setId('withCustomRoles')
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-custom-roles')!.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-custom-roles')!.pk)
     .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
     .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up'),
-  'with-custom-roles',
 );
 ```
 
