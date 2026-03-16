@@ -57,7 +57,10 @@ export function userAgentIsRobot(userAgent: string): boolean {
 export function isValidBrowser(): boolean {
   const navigator = inBrowser() ? window?.navigator : null;
   if (!navigator) {
-    return false;
+    // Not in a browser environment (e.g. React Native, SSR).
+    // Return true so non-browser runtimes are not incorrectly
+    // treated as bots or automated browsers.
+    return true;
   }
   return !userAgentIsRobot(navigator?.userAgent) && !navigator?.webdriver;
 }
@@ -70,7 +73,10 @@ export function isValidBrowser(): boolean {
 export function isBrowserOnline(): boolean {
   const navigator = inBrowser() ? window?.navigator : null;
   if (!navigator) {
-    return false;
+    // Not in a browser environment (e.g. React Native, SSR).
+    // Assume online — RN has its own networking layer and the
+    // absence of browser APIs does not indicate offline status.
+    return true;
   }
 
   // navigator.onLine is the standard API and is reliable for detecting

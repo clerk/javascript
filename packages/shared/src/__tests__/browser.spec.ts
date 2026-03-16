@@ -38,12 +38,12 @@ describe('isValidBrowser', () => {
     vi.restoreAllMocks();
   });
 
-  it('returns false if not in browser', () => {
+  it('returns true if not in browser (assumes valid in non-browser environments like React Native)', () => {
     const windowSpy = vi.spyOn(global, 'window', 'get');
     // @ts-ignore - Test
     windowSpy.mockReturnValue(undefined);
 
-    expect(isValidBrowser()).toBe(false);
+    expect(isValidBrowser()).toBe(true);
   });
 
   it('returns true if in browser, navigator is not a bot, and webdriver is not enabled', () => {
