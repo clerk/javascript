@@ -104,7 +104,9 @@ export const createLongRunningApps = () => {
 
   if (process.env.E2E_STAGING === '1' && stagingSkippedConfigs.length > 0) {
     const skippedIds = stagingSkippedConfigs.map(c => `\n  - ${c.id}`).join('');
-    console.log(`[staging] Skipping ${stagingSkippedConfigs.length} long running app(s) without staging keys:${skippedIds}`);
+    console.log(
+      `[staging] Skipping ${stagingSkippedConfigs.length} long running app(s) without staging keys:${skippedIds}`,
+    );
   }
 
   const apps = stagingReadyConfigs.map(longRunningApplication);

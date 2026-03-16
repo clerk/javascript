@@ -59,9 +59,7 @@ export function isStagingReady(env: EnvironmentConfig): boolean {
  */
 function withInstanceKeys(keyName: string, env: EnvironmentConfig): EnvironmentConfig {
   const keys = instanceKeys.get(keyName)!;
-  env
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', keys.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', keys.pk);
+  env.setEnvVariable('private', 'CLERK_SECRET_KEY', keys.sk).setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', keys.pk);
 
   if (process.env.E2E_STAGING !== '1') return env;
 
@@ -93,14 +91,16 @@ const withKeyless = base
   .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
   .setEnvVariable('public', 'CLERK_KEYLESS_DISABLED', false);
 
-const withEmailCodes = withInstanceKeys('with-email-codes',
+const withEmailCodes = withInstanceKeys(
+  'with-email-codes',
   base
     .clone()
     .setId('withEmailCodes')
     .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key'),
 );
 
-const sessionsProd1 = withInstanceKeys('sessions-prod-1',
+const sessionsProd1 = withInstanceKeys(
+  'sessions-prod-1',
   base
     .clone()
     .setId('sessionsProd1')
@@ -117,13 +117,10 @@ const withSharedUIVariant = withEmailCodes
   .setId('withSharedUIVariant')
   .setEnvVariable('public', 'CLERK_UI_VARIANT', 'shared');
 
-const withEmailLinks = withInstanceKeys('with-email-links',
-  base
-    .clone()
-    .setId('withEmailLinks'),
-);
+const withEmailLinks = withInstanceKeys('with-email-links', base.clone().setId('withEmailLinks'));
 
-const withCustomRoles = withInstanceKeys('with-custom-roles',
+const withCustomRoles = withInstanceKeys(
+  'with-custom-roles',
   base
     .clone()
     .setId('withCustomRoles')
@@ -131,7 +128,8 @@ const withCustomRoles = withInstanceKeys('with-custom-roles',
     .setEnvVariable('public', 'CLERK_UI_URL', constants.E2E_APP_CLERK_UI || 'http://localhost:18212/ui.browser.js'),
 );
 
-const withReverification = withInstanceKeys('with-reverification',
+const withReverification = withInstanceKeys(
+  'with-reverification',
   base
     .clone()
     .setId('withReverification')
@@ -176,23 +174,11 @@ const withDynamicKeys = withEmailCodes
   .setEnvVariable('private', 'CLERK_SECRET_KEY', '')
   .setEnvVariable('private', 'CLERK_DYNAMIC_SECRET_KEY', withEmailCodes.privateVariables.get('CLERK_SECRET_KEY'));
 
-const withRestrictedMode = withInstanceKeys('with-restricted-mode',
-  withEmailCodes
-    .clone()
-    .setId('withRestrictedMode'),
-);
+const withRestrictedMode = withInstanceKeys('with-restricted-mode', withEmailCodes.clone().setId('withRestrictedMode'));
 
-const withLegalConsent = withInstanceKeys('with-legal-consent',
-  base
-    .clone()
-    .setId('withLegalConsent'),
-);
+const withLegalConsent = withInstanceKeys('with-legal-consent', base.clone().setId('withLegalConsent'));
 
-const withWaitlistMode = withInstanceKeys('with-waitlist-mode',
-  withEmailCodes
-    .clone()
-    .setId('withWaitlistMode'),
-);
+const withWaitlistMode = withInstanceKeys('with-waitlist-mode', withEmailCodes.clone().setId('withWaitlistMode'));
 
 const withEmailCodesProxy = withEmailCodes
   .clone()
@@ -209,68 +195,46 @@ const withSignInOrUpEmailLinksFlow = withEmailLinks
   .setId('withSignInOrUpEmailLinksFlow')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined);
 
-const withSignInOrUpwithRestrictedModeFlow = withInstanceKeys('with-restricted-mode',
+const withSignInOrUpwithRestrictedModeFlow = withInstanceKeys(
+  'with-restricted-mode',
   withEmailCodes
     .clone()
     .setId('withSignInOrUpwithRestrictedModeFlow')
     .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined),
 );
 
-const withSessionTasks = withInstanceKeys('with-session-tasks',
+const withSessionTasks = withInstanceKeys(
+  'with-session-tasks',
   base
     .clone()
     .setId('withSessionTasks')
     .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key'),
 );
 
-const withSessionTasksResetPassword = withInstanceKeys('with-session-tasks-reset-password',
-  base
-    .clone()
-    .setId('withSessionTasksResetPassword'),
+const withSessionTasksResetPassword = withInstanceKeys(
+  'with-session-tasks-reset-password',
+  base.clone().setId('withSessionTasksResetPassword'),
 );
 
-const withSessionTasksSetupMfa = withInstanceKeys('with-session-tasks-setup-mfa',
+const withSessionTasksSetupMfa = withInstanceKeys(
+  'with-session-tasks-setup-mfa',
   base
     .clone()
     .setId('withSessionTasksSetupMfa')
     .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key'),
 );
 
-const withBillingJwtV2 = withInstanceKeys('with-billing',
-  base
-    .clone()
-    .setId('withBillingJwtV2'),
-);
+const withBillingJwtV2 = withInstanceKeys('with-billing', base.clone().setId('withBillingJwtV2'));
 
-const withBilling = withInstanceKeys('with-billing',
-  base
-    .clone()
-    .setId('withBilling'),
-);
+const withBilling = withInstanceKeys('with-billing', base.clone().setId('withBilling'));
 
-const withWhatsappPhoneCode = withInstanceKeys('with-whatsapp-phone-code',
-  base
-    .clone()
-    .setId('withWhatsappPhoneCode'),
-);
+const withWhatsappPhoneCode = withInstanceKeys('with-whatsapp-phone-code', base.clone().setId('withWhatsappPhoneCode'));
 
-const withAPIKeys = withInstanceKeys('with-api-keys',
-  base
-    .clone()
-    .setId('withAPIKeys'),
-);
+const withAPIKeys = withInstanceKeys('with-api-keys', base.clone().setId('withAPIKeys'));
 
-const withProtectService = withInstanceKeys('with-protect-service',
-  base
-    .clone()
-    .setId('withProtectService'),
-);
+const withProtectService = withInstanceKeys('with-protect-service', base.clone().setId('withProtectService'));
 
-const withNeedsClientTrust = withInstanceKeys('with-needs-client-trust',
-  base
-    .clone()
-    .setId('withNeedsClientTrust'),
-);
+const withNeedsClientTrust = withInstanceKeys('with-needs-client-trust', base.clone().setId('withNeedsClientTrust'));
 
 export const envs = {
   base,
