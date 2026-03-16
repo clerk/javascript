@@ -87,7 +87,7 @@ export class SamlConnection {
      */
     readonly updatedAt: number,
     /**
-     * Defines the attribute name mapping between the Identity Provider (IdP) and Clerk's [`User`](https://clerk.com/docs/reference/javascript/user) properties.
+     * Defines the attribute name mapping between the Identity Provider (IdP) and Clerk's [`User`](https://clerk.com/docs/reference/objects/user) properties.
      */
     readonly attributeMapping: AttributeMapping,
   ) {}
