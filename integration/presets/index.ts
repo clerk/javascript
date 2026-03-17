@@ -3,6 +3,7 @@ import { customFlows } from './custom-flows';
 import { envs, instanceKeys } from './envs';
 import { expo } from './expo';
 import { express } from './express';
+import { fastify } from './fastify';
 import { hono } from './hono';
 import { createLongRunningApps } from './longRunningApps';
 import { next } from './next';
@@ -16,6 +17,7 @@ export const appConfigs = {
   customFlows,
   envs,
   express,
+  fastify,
   hono,
   longRunningApps: createLongRunningApps(),
   next,
