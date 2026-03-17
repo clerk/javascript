@@ -14,7 +14,7 @@ export async function resolveKeysWithKeylessFallback(
   configuredSecretKey: string | undefined,
   event: H3Event,
 ) {
-  const keylessService = await keyless(event);
+  const keylessService = keyless(event);
   return sharedResolveKeysWithKeylessFallback(
     configuredPublishableKey,
     configuredSecretKey,
