@@ -342,7 +342,13 @@ export class Clerk implements ClerkInterface {
       }
       return strippedDomainString;
     }
-    return '';
+
+    if (typeof this.#domain === 'function') {
+      logger.warnOnce(warnings.domainAsFunctionNotSupported);
+      return '';
+    }
+
+    return this.#domain || '';
   }
 
   get proxyUrl(): string {
@@ -353,7 +359,13 @@ export class Clerk implements ClerkInterface {
       }
       return proxyUrlToAbsoluteURL(_unfilteredProxy);
     }
-    return '';
+
+    if (typeof this.#proxyUrl === 'function') {
+      logger.warnOnce(warnings.proxyUrlAsFunctionNotSupported);
+      return '';
+    }
+
+    return this.#proxyUrl || '';
   }
 
   get frontendApi(): string {
