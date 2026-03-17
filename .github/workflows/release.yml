@@ -135,8 +135,12 @@ jobs:
             const clerkUiVersion = require('./packages/ui/package.json').version;
 
             // Only recover stable releases
-            if (clerkjsVersion.includes('-')) {
-              console.log(`Skipping recovery: ${clerkjsVersion} is a pre-release`);
+            const preReleases = [
+              clerkjsVersion.includes('-') && `@clerk/clerk-js@${clerkjsVersion}`,
+              clerkUiVersion.includes('-') && `@clerk/ui@${clerkUiVersion}`,
+            ].filter(Boolean);
+            if (preReleases.length > 0) {
+              console.log(`Skipping recovery: ${preReleases.join(', ')} is a pre-release`);
               return;
             }
 
