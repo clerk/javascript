@@ -17,6 +17,9 @@ test.describe('Client handshake @generic', () => {
     const sk = req.headers.authorization?.replace('Bearer ', '');
     if (!sk) {
       console.log('No SK to', req.url, req.headers);
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Missing authorization header' }));
+      return;
     }
 
     res.setHeader('Content-Type', 'application/json');
@@ -1057,6 +1060,9 @@ test.describe('Client handshake with organization activation @nextjs', () => {
     const sk = req.headers.authorization?.replace('Bearer ', '');
     if (!sk) {
       console.log('No SK to', req.url, req.headers);
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Missing authorization header' }));
+      return;
     }
 
     res.setHeader('Content-Type', 'application/json');
@@ -1440,6 +1446,9 @@ test.describe('Client handshake with an organization activation avoids infinite 
     const sk = req.headers.authorization?.replace('Bearer ', '');
     if (!sk) {
       console.log('No SK to', req.url, req.headers);
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Missing authorization header' }));
+      return;
     }
 
     res.setHeader('Content-Type', 'application/json');

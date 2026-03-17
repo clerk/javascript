@@ -2477,6 +2477,19 @@ describe('Clerk singleton', () => {
 
         expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://clerk.satellite.com/v1/me');
       });
+
+      mockNativeRuntime(() => {
+        test('fapiClient should use Clerk.domain as its baseUrl in non-browser runtimes', async () => {
+          const sut = new Clerk(productionPublishableKey, {
+            domain: 'satellite.com',
+          });
+          await sut.load({
+            isSatellite: true,
+          });
+
+          expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://satellite.com/v1/me');
+        });
+      });
     });
   });
 
@@ -2489,6 +2502,17 @@ describe('Clerk singleton', () => {
         await sut.load({});
 
         expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://proxy.com/api/__clerk/v1/me');
+      });
+
+      mockNativeRuntime(() => {
+        test('fapiClient should use Clerk.proxyUrl as its baseUrl in non-browser runtimes', async () => {
+          const sut = new Clerk(productionPublishableKey, {
+            proxyUrl: 'https://proxy.com/api/__clerk',
+          });
+          await sut.load({});
+
+          expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://proxy.com/api/__clerk/v1/me');
+        });
       });
     });
   });
