@@ -21,15 +21,11 @@ const STAGING_KEY_PREFIX = 'clerkstage-';
  * production and staging environments.
  */
 const IGNORED_PATHS = [
-  // Resource IDs are always different per instance
   /\.id$/,
   /^auth_config\.id$/,
-  // Logo/image URLs use different CDN domains (img.clerk.com vs img.clerkstage.dev)
   /\.logo_url$/,
-  // Captcha settings may intentionally differ between environments
   /\.captcha_enabled$/,
   /\.captcha_widget_type$/,
-  // HIBP (breach detection) enforcement may differ
   /\.enforce_hibp_on_sign_in$/,
   /\.disable_hibp$/,
 ];
@@ -54,11 +50,9 @@ function loadKeys(envVar, filePath) {
 // ── PK parsing ───────────────────────────────────────────────────────────────
 
 function parseFapiDomain(pk) {
-  // pk_test_<base64>$ or pk_live_<base64>$
   const parts = pk.split('_');
   const encoded = parts.slice(2).join('_');
   const decoded = Buffer.from(encoded, 'base64').toString('utf-8');
-  // Remove trailing '$'
   return decoded.replace(/\$$/, '');
 }
 
@@ -75,18 +69,11 @@ async function fetchEnvironment(fapiDomain) {
 
 // ── Comparison ───────────────────────────────────────────────────────────────
 
-const COMPARED_SECTIONS = ['user_settings', 'organization_settings', 'auth_config'];
-
-const COMPARED_USER_SETTINGS_FIELDS = [
-  'attributes',
-  'social',
-  'sign_in',
-  'sign_up',
-  'password_settings',
-];
+const COMPARED_USER_SETTINGS_FIELDS = ['attributes', 'social', 'sign_in', 'sign_up', 'password_settings'];
 
 /**
  * Recursively compare two values and collect paths where they differ.
+ * For arrays of primitives (like strategy lists), stores structured diff info.
  */
 function diffObjects(a, b, path = '') {
   const mismatches = [];
@@ -103,10 +90,21 @@ function diffObjects(a, b, path = '') {
     return mismatches;
   }
   if (Array.isArray(a) && Array.isArray(b)) {
-    const sortedA = [...a].sort();
-    const sortedB = [...b].sort();
-    if (JSON.stringify(sortedA) !== JSON.stringify(sortedB)) {
-      mismatches.push({ path, prod: a, staging: b });
+    const sortedA = JSON.stringify([...a].sort());
+    const sortedB = JSON.stringify([...b].sort());
+    if (sortedA !== sortedB) {
+      // For arrays of primitives, compute added/removed
+      const flatA = a.flat(Infinity);
+      const flatB = b.flat(Infinity);
+      if (flatA.every(v => typeof v !== 'object') && flatB.every(v => typeof v !== 'object')) {
+        const setA = new Set(flatA);
+        const setB = new Set(flatB);
+        const missingOnStaging = [...new Set(flatA.filter(v => !setB.has(v)))];
+        const extraOnStaging = [...new Set(flatB.filter(v => !setA.has(v)))];
+        mismatches.push({ path, prod: a, staging: b, missingOnStaging, extraOnStaging });
+      } else {
+        mismatches.push({ path, prod: a, staging: b });
+      }
     }
     return mismatches;
   }
@@ -140,7 +138,6 @@ function compareEnvironments(prodEnv, stagingEnv) {
   // user_settings — selected fields only
   for (const field of COMPARED_USER_SETTINGS_FIELDS) {
     if (field === 'social') {
-      // Only compare social providers that are enabled in at least one environment
       const prodSocial = prodEnv.user_settings?.social ?? {};
       const stagingSocial = stagingEnv.user_settings?.social ?? {};
       const allProviders = new Set([...Object.keys(prodSocial), ...Object.keys(stagingSocial)]);
@@ -148,9 +145,7 @@ function compareEnvironments(prodEnv, stagingEnv) {
         const prodProvider = prodSocial[provider];
         const stagingProvider = stagingSocial[provider];
         if (!prodProvider?.enabled && !stagingProvider?.enabled) continue;
-        mismatches.push(
-          ...diffObjects(prodProvider, stagingProvider, `user_settings.social.${provider}`),
-        );
+        mismatches.push(...diffObjects(prodProvider, stagingProvider, `user_settings.social.${provider}`));
       }
     } else {
       mismatches.push(
@@ -164,11 +159,128 @@ function compareEnvironments(prodEnv, stagingEnv) {
 
 // ── Output formatting ────────────────────────────────────────────────────────
 
-function formatValue(val) {
+/**
+ * Section display names and the path prefixes they cover.
+ */
+const SECTIONS = [
+  { label: 'Auth Config', prefix: 'auth_config.' },
+  { label: 'Organization Settings', prefix: 'organization_settings.' },
+  { label: 'Attributes', prefix: 'user_settings.attributes.' },
+  { label: 'Social Providers', prefix: 'user_settings.social.' },
+  { label: 'Sign In', prefix: 'user_settings.sign_in.' },
+  { label: 'Sign Up', prefix: 'user_settings.sign_up.' },
+  { label: 'Password Settings', prefix: 'user_settings.password_settings.' },
+];
+
+const COL_FIELD = 40;
+const COL_VAL = 14;
+
+function pad(str, len) {
+  return str.length >= len ? str : str + ' '.repeat(len - str.length);
+}
+
+function formatScalar(val) {
   if (val === undefined) return 'undefined';
   if (val === null) return 'null';
   if (typeof val === 'object') return JSON.stringify(val);
   return String(val);
+}
+
+/**
+ * Collapse attribute mismatches: if <attr>.enabled differs, skip the child
+ * fields (first_factors, second_factors, verifications, etc.) since the root
+ * cause is the enabled flag.
+ */
+function collapseAttributeMismatches(mismatches) {
+  const disabledAttrs = new Set();
+  for (const m of mismatches) {
+    if (m.path.startsWith('user_settings.attributes.') && m.path.endsWith('.enabled')) {
+      disabledAttrs.add(m.path.replace('.enabled', ''));
+    }
+  }
+  return mismatches.filter(m => {
+    if (!m.path.startsWith('user_settings.attributes.')) return true;
+    // Keep the .enabled entry itself
+    if (m.path.endsWith('.enabled')) return true;
+    // Drop children of disabled attributes
+    const parentAttr = m.path.replace(/\.[^.]+$/, '');
+    return !disabledAttrs.has(parentAttr);
+  });
+}
+
+/**
+ * For social providers that are entirely present/missing, collapse to one line.
+ */
+function collapseSocialMismatches(mismatches) {
+  const wholeMissing = new Set();
+  for (const m of mismatches) {
+    if (m.path.startsWith('user_settings.social.') && !m.path.includes('.', 'user_settings.social.x'.length)) {
+      if ((m.prod && !m.staging) || (!m.prod && m.staging)) {
+        wholeMissing.add(m.path);
+      }
+    }
+  }
+  return mismatches.filter(m => {
+    if (!m.path.startsWith('user_settings.social.')) return true;
+    // Keep the top-level entry
+    const parts = m.path.split('.');
+    if (parts.length <= 3) return true;
+    // Drop children of wholly missing providers
+    const parentPath = parts.slice(0, 3).join('.');
+    return !wholeMissing.has(parentPath);
+  });
+}
+
+function formatMismatch(m, prefix) {
+  const field = m.path.slice(prefix.length);
+
+  // Array diff with missing/extra items
+  if (m.missingOnStaging || m.extraOnStaging) {
+    const parts = [];
+    if (m.missingOnStaging?.length) {
+      parts.push(`missing on staging: ${m.missingOnStaging.join(', ')}`);
+    }
+    if (m.extraOnStaging?.length) {
+      parts.push(`extra on staging: ${m.extraOnStaging.join(', ')}`);
+    }
+    return `    ${pad(field, COL_FIELD)} ${parts.join('; ')}`;
+  }
+
+  // Social provider entirely present/missing
+  if (prefix === 'user_settings.social.' && !field.includes('.')) {
+    if (m.prod && !m.staging) {
+      return `    ${pad(field, COL_FIELD)} ${pad('present', COL_VAL)} missing`;
+    }
+    if (!m.prod && m.staging) {
+      return `    ${pad(field, COL_FIELD)} ${pad('missing', COL_VAL)} present`;
+    }
+  }
+
+  const prodVal = formatScalar(m.prod);
+  const stagingVal = formatScalar(m.staging);
+  return `    ${pad(field, COL_FIELD)} ${pad(prodVal, COL_VAL)} ${stagingVal}`;
+}
+
+function printReport(name, mismatches) {
+  if (mismatches.length === 0) {
+    console.log(`✅ ${name}: matched\n`);
+    return;
+  }
+
+  console.log(`❌ ${name} (${mismatches.length} mismatch${mismatches.length === 1 ? '' : 'es'})\n`);
+
+  for (const section of SECTIONS) {
+    const sectionMismatches = mismatches.filter(m => m.path.startsWith(section.prefix));
+    if (sectionMismatches.length === 0) continue;
+
+    console.log(`  ${section.label}`);
+    console.log(`    ${pad('', COL_FIELD)} ${pad('prod', COL_VAL)} staging`);
+
+    for (const m of sectionMismatches) {
+      console.log(formatMismatch(m, section.prefix));
+    }
+    console.log();
+  }
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -186,7 +298,6 @@ async function main() {
     process.exit(0);
   }
 
-  // Find pairs
   const pairs = [];
   for (const [name, keys] of Object.entries(prodKeys)) {
     const stagingName = STAGING_KEY_PREFIX + name;
@@ -217,25 +328,14 @@ async function main() {
       continue;
     }
 
-    const mismatches = compareEnvironments(prodEnv, stagingEnv).filter(m => !isIgnored(m.path));
+    let mismatches = compareEnvironments(prodEnv, stagingEnv).filter(m => !isIgnored(m.path));
+    mismatches = collapseAttributeMismatches(mismatches);
+    mismatches = collapseSocialMismatches(mismatches);
 
-    if (mismatches.length === 0) {
-      console.log(`✅ ${pair.name}: matched`);
-    } else {
-      mismatchCount++;
-      console.log(`❌ ${pair.name} (${mismatches.length} mismatch${mismatches.length === 1 ? '' : 'es'}):`);
-      for (const m of mismatches) {
-        const prodVal = formatValue(m.prod);
-        const stagingVal = formatValue(m.staging);
-        console.log(`   ${m.path}`);
-        console.log(`     prod:    ${prodVal}`);
-        console.log(`     staging: ${stagingVal}`);
-      }
-    }
-    console.log();
+    if (mismatches.length > 0) mismatchCount++;
+    printReport(pair.name, mismatches);
   }
 
-  // Summary
   if (mismatchCount > 0) {
     console.log(`Summary: ${mismatchCount} of ${pairs.length} instance pair(s) have mismatches`);
   } else {
@@ -245,5 +345,5 @@ async function main() {
 
 main().catch(err => {
   console.error('Unexpected error:', err);
-  process.exit(0); // Don't fail the CI run
+  process.exit(0);
 });
