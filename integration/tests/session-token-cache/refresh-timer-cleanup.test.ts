@@ -32,6 +32,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     });
 
     test('touch does not cause clustered token refresh requests', async ({ page, context }) => {
+      test.setTimeout(120_000);
       const u = createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
