@@ -88,33 +88,20 @@ jobs:
               const clerkUiVersion = require('./packages/ui/package.json').version;
               const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-              const dispatches = [
-                github.rest.actions.createWorkflowDispatch({
-                  owner: 'clerk',
-                  repo: 'sdk-infra-workers',
-                  workflow_id: 'update-pkg-versions.yml',
-                  ref: 'main',
-                  inputs: { clerkjsVersion, clerkUiVersion }
-                }),
-                github.rest.actions.createWorkflowDispatch({
-                  owner: 'clerk',
-                  repo: 'dashboard',
-                  workflow_id: 'prepare-nextjs-sdk-update.yml',
-                  ref: 'main',
-                  inputs: { version: nextjsVersion }
-                }),
-                github.rest.actions.createWorkflowDispatch({
-                  owner: 'clerk',
-                  repo: 'clerk-docs',
-                  workflow_id: 'typedoc.yml',
-                  ref: 'main',
-                }),
+              const targets = [
+                { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
+                { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
+                { repo: 'clerk-docs', workflow_id: 'typedoc.yml' },
               ];
-              const results = await Promise.allSettled(dispatches);
-              const failed = results.filter(r => r.status === 'rejected');
-              if (failed.length) {
-                failed.forEach(r => core.error(`Dispatch failed: ${r.reason?.message ?? r.reason}`));
-                core.setFailed(`${failed.length} downstream dispatch(es) failed`);
+              const results = await Promise.allSettled(
+                targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
+              );
+              const failures = results
+                .map((r, i) => r.status === 'rejected' ? { target: targets[i], reason: r.reason } : null)
+                .filter(Boolean);
+              if (failures.length) {
+                failures.forEach(f => core.error(`Dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`));
+                core.setFailed(`${failures.length} downstream dispatch(es) failed`);
               }
             } else{
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
@@ -216,34 +203,26 @@ jobs:
             const clerkUiVersion = require('./packages/ui/package.json').version;
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-            const dispatches = [
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerk',
-                repo: 'sdk-infra-workers',
-                workflow_id: 'update-pkg-versions.yml',
-                ref: 'main',
-                inputs: { clerkjsVersion, clerkUiVersion, sourceCommit: context.sha }
-              }),
+            const targets = [
+              { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion, sourceCommit: context.sha } },
             ];
 
             if (nextjsVersion.includes('canary')) {
               console.log('clerk/nextjs changed, will notify clerk/accounts');
-              dispatches.push(
-                github.rest.actions.createWorkflowDispatch({
-                  owner: 'clerk',
-                  repo: 'accounts',
-                  workflow_id: 'release-staging.yml',
-                  ref: 'main',
-                  inputs: { version: nextjsVersion }
-                }),
+              targets.push(
+                { repo: 'accounts', workflow_id: 'release-staging.yml', inputs: { version: nextjsVersion } },
               );
             }
 
-            const results = await Promise.allSettled(dispatches);
-            const failed = results.filter(r => r.status === 'rejected');
-            if (failed.length) {
-              failed.forEach(r => core.error(`Dispatch failed: ${r.reason?.message ?? r.reason}`));
-              core.setFailed(`${failed.length} downstream dispatch(es) failed`);
+            const results = await Promise.allSettled(
+              targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
+            );
+            const failures = results
+              .map((r, i) => r.status === 'rejected' ? { target: targets[i], reason: r.reason } : null)
+              .filter(Boolean);
+            if (failures.length) {
+              failures.forEach(f => core.error(`Dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`));
+              core.setFailed(`${failures.length} downstream dispatch(es) failed`);
             }
 
       - name: Notify Slack on failure
