@@ -109,7 +109,11 @@ jobs:
                   ref: 'main',
                 }),
               ];
-              await Promise.all(dispatches);
+              const results = await Promise.allSettled(dispatches);
+              const failed = results.filter(r => r.status === 'rejected');
+              if (failed.length) {
+                failed.forEach(r => core.warning(`Dispatch failed: ${r.reason?.message ?? r.reason}`));
+              }
             } else{
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
             }
@@ -232,7 +236,11 @@ jobs:
               );
             }
 
-            await Promise.all(dispatches);
+            const results = await Promise.allSettled(dispatches);
+            const failed = results.filter(r => r.status === 'rejected');
+            if (failed.length) {
+              failed.forEach(r => core.warning(`Dispatch failed: ${r.reason?.message ?? r.reason}`));
+            }
 
       - name: Notify Slack on failure
         if: ${{ always() && steps.publish.outcome == 'failure' }}
