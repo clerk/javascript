@@ -164,7 +164,7 @@ function getCatchAllReplacements() {
     {
       pattern: /(?<![\[\w`])`?((?:SignIn|SignUp)Errors)`?(?![\]\w`])/g,
       replace: (/** @type {string} */ _match, /** @type {string} */ type) =>
-        `[${type}](/docs/reference/javascript/types/errors)`,
+        `[\`${type}\`](/docs/reference/javascript/types/errors)`,
     },
     {
       pattern: /(?<![\[\w`])`?SignInFutureResource`?(?![\]\w`])/g,
