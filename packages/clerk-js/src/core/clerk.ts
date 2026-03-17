@@ -348,7 +348,7 @@ export class Clerk implements ClerkInterface {
       return '';
     }
 
-    return this.#domain || '';
+    return stripScheme(this.#domain || '');
   }
 
   get proxyUrl(): string {
