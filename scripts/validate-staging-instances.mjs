@@ -13,6 +13,7 @@
 
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const STAGING_KEY_PREFIX = 'clerkstage-';
 
@@ -377,7 +378,22 @@ async function main() {
   console.log(`Summary: ${parts.join(', ')} (${pairs.length} total)`);
 }
 
-main().catch(err => {
-  console.error('Unexpected error:', err);
-  process.exit(0);
-});
+// Allow importing functions for testing while still being executable
+const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
+if (isDirectRun) {
+  main().catch(err => {
+    console.error('Unexpected error:', err);
+    process.exit(0);
+  });
+}
+
+export {
+  loadKeys,
+  parseFapiDomain,
+  fetchEnvironment,
+  diffObjects,
+  collapseAttributeMismatches,
+  collapseSocialMismatches,
+  compareEnvironments,
+  main,
+};
