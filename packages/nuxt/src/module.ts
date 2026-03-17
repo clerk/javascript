@@ -114,7 +114,6 @@ export default defineNuxtModule<ModuleOptions>({
       {
         filename: 'types/clerk.d.ts',
         getContents: () => `import type { AuthFn } from '@clerk/nuxt/server';
-          import type { InitialState } from '@clerk/shared/types';
 
           declare module 'h3' {
             interface H3EventContext {

@@ -5,6 +5,9 @@ import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { EventHandler } from 'h3';
 import { createError, eventHandler, setResponseHeader } from 'h3';
 
+// @ts-expect-error: Nitro import. Handled by Nuxt.
+import { useRuntimeConfig } from '#imports';
+
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { resolveKeysWithKeylessFallback } from './keyless/utils';
@@ -90,9 +93,6 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
     if (canUseKeyless) {
       try {
-        // Get runtime config to access configured keys
-        // @ts-expect-error: Nitro import. Handled by Nuxt.
-        const { useRuntimeConfig } = await import('#imports');
         const runtimeConfig = useRuntimeConfig(event);
 
         const { publishableKey, secretKey, claimUrl, apiKeysUrl } = await resolveKeysWithKeylessFallback(
