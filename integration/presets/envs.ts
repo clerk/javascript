@@ -88,11 +88,7 @@ const base = environmentConfig()
 const withKeyless = base
   .clone()
   // Creates keyless applications in our staging database.
-  // Set as both private and public so it works across frameworks:
-  // - Next.js reads from process.env.CLERK_API_URL (private)
-  // - Nuxt reads from NUXT_PUBLIC_CLERK_API_URL via runtime config (public)
   .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
-  .setEnvVariable('public', 'CLERK_API_URL', 'https://api.clerkstage.dev')
   .setEnvVariable('public', 'CLERK_KEYLESS_DISABLED', false);
 
 const withEmailCodes = withInstanceKeys(
