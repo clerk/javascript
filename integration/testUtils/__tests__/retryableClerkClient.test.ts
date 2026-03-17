@@ -194,9 +194,7 @@ describe('withRetry', () => {
       // a summary. Either way it produces a [Retry] message.
       printRetrySummary();
 
-      const logCalled = (console.log as any).mock.calls.some((args: string[]) =>
-        args[0]?.includes('[Retry]'),
-      );
+      const logCalled = (console.log as any).mock.calls.some((args: string[]) => args[0]?.includes('[Retry]'));
       const warnCalled = (console.warn as any).mock.calls.some((args: string[]) =>
         args[0]?.includes('[Retry] Summary'),
       );
