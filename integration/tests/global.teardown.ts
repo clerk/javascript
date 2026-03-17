@@ -4,6 +4,7 @@ import { constants } from '../constants';
 import { stateFile } from '../models/stateFile';
 import { appConfigs } from '../presets';
 import { killClerkJsHttpServer, killClerkUiHttpServer, parseEnvOptions } from '../scripts';
+import { printRetrySummary } from '../testUtils/retryableClerkClient';
 
 setup('teardown long running apps', async () => {
   setup.setTimeout(90_000);
@@ -27,4 +28,5 @@ setup('teardown long running apps', async () => {
   }
   stateFile.remove();
   console.log('Long running apps destroyed');
+  printRetrySummary();
 });
