@@ -179,7 +179,7 @@ function SubscriptionItemRow({
     return normalizeFormatted(fee.amountFormatted);
   }, [fee.amountFormatted]);
 
-  const endsAfterBlock = subscriptionItem.seats?.quantity;
+  const subItemSeatsQty = subscriptionItem.seats?.quantity;
 
   return (
     <Fragment key={subscriptionItem.id}>
@@ -260,7 +260,7 @@ function SubscriptionItemRow({
           </Text>
         </Td>
       </Tr>
-      {typeof endsAfterBlock !== 'undefined' ? (
+      {typeof subItemSeatsQty !== 'undefined' ? (
         <Tr
           sx={t => {
             if (subscriptionItem.status === 'upcoming') {
@@ -303,9 +303,9 @@ function SubscriptionItemRow({
             <Text
               variant='subtitle'
               localizationKey={
-                endsAfterBlock === null
+                subItemSeatsQty === null
                   ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
-                  : localizationKeys('billing.pricingTable.seatCost.upToSeats', { endsAfterBlock })
+                  : localizationKeys('billing.pricingTable.seatCost.upToSeats', { endsAfterBlock: subItemSeatsQty })
               }
             />
           </Td>
