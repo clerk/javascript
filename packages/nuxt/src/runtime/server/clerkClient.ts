@@ -10,8 +10,8 @@ export function clerkClient(event: H3Event) {
 
   return createClerkClient({
     publishableKey: runtimeConfig.public.clerk.publishableKey,
-    apiUrl: runtimeConfig.public.clerk.apiUrl,
-    apiVersion: runtimeConfig.public.clerk.apiVersion,
+    apiUrl: runtimeConfig.clerk.apiUrl,
+    apiVersion: runtimeConfig.clerk.apiVersion,
     proxyUrl: runtimeConfig.public.clerk.proxyUrl,
     domain: runtimeConfig.public.clerk.domain,
     isSatellite: runtimeConfig.public.clerk.isSatellite,
