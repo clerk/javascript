@@ -28,12 +28,11 @@ function getLegacyHookTarget(filePath) {
 /**
  * Extracts the "## Returns" section from a markdown file and writes it to a separate file.
  * @param {string} filePath - The path to the markdown file
+ * @param {string} content - The file content
+ * @param {{ outputDir: string; baseName: string } | null} legacyTarget
  * @returns {boolean} True if a file was created
  */
-function extractReturnsSection(filePath) {
-  const content = fs.readFileSync(filePath, 'utf-8');
-  const legacyTarget = getLegacyHookTarget(filePath);
-
+function extractReturnsSection(filePath, content, legacyTarget) {
   // Find the "## Returns" section
   const returnsStart = content.indexOf('## Returns');
 
@@ -88,13 +87,13 @@ function replaceGenericTypesInParamsTable(content) {
 /**
  * Extracts the "## Parameters" section from a markdown file and writes it to a separate file.
  * @param {string} filePath - The path to the markdown file
+ * @param {string} content - The file content
+ * @param {{ outputDir: string; baseName: string } | null} legacyTarget
  * @returns {boolean} True if a file was created
  */
-function extractParametersSection(filePath) {
-  const content = fs.readFileSync(filePath, 'utf-8');
+function extractParametersSection(filePath, content, legacyTarget) {
   const fileName = path.basename(filePath, '.mdx');
   const dirName = path.dirname(filePath);
-  const legacyTarget = getLegacyHookTarget(filePath);
   let outputDir = dirName;
   let outputBaseName = fileName;
 
@@ -146,9 +145,9 @@ function extractParametersSection(filePath) {
 /**
  * Moves legacy hook docs into a legacy/ folder and removes the -1 suffix
  * @param {string} filePath
+ * @param {{ outputDir: string; baseName: string } | null} legacyTarget
  */
-function moveLegacyHookDoc(filePath) {
-  const legacyTarget = getLegacyHookTarget(filePath);
+function moveLegacyHookDoc(filePath, legacyTarget) {
   if (!legacyTarget) {
     return;
   }
@@ -220,18 +219,21 @@ function main() {
     let paramsCount = 0;
 
     for (const filePath of mdxFiles) {
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const legacyTarget = getLegacyHookTarget(filePath);
+
       // Extract Returns sections
-      if (extractReturnsSection(filePath)) {
+      if (extractReturnsSection(filePath, content, legacyTarget)) {
         returnsCount++;
       }
 
       // Extract Parameters sections
-      if (extractParametersSection(filePath)) {
+      if (extractParametersSection(filePath, content, legacyTarget)) {
         paramsCount++;
       }
 
       // Move legacy hook docs after extraction
-      moveLegacyHookDoc(filePath);
+      moveLegacyHookDoc(filePath, legacyTarget);
     }
 
     console.log(`[extract-returns] Extracted ${returnsCount} Returns sections`);
