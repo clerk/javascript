@@ -73,7 +73,6 @@ jobs:
           NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
-        id: trigger
         if: steps.changesets.outputs.published == 'true'
         uses: actions/github-script@v7
         with:
@@ -144,6 +143,12 @@ jobs:
               return;
             }
 
+            const preMode = require("fs").existsSync("./.changeset/pre.json");
+            if (preMode) {
+              core.warning("Changeset in pre-mode, skipping recovery dispatch");
+              return;
+            }
+
             // Check if either version was actually published to npm
             function isPublished(name, version) {
               try {
@@ -166,12 +171,6 @@ jobs:
               clerkUiPublished && `@clerk/ui@${clerkUiVersion}`,
             ].filter(Boolean).join(', ');
             core.warning(`Recovery: ${published} published to npm but downstream repos were not notified. Dispatching now.`);
-
-            const preMode = require("fs").existsSync("./.changeset/pre.json");
-            if (preMode) {
-              core.warning("Changeset in pre-mode, skipping recovery dispatch");
-              return;
-            }
 
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
