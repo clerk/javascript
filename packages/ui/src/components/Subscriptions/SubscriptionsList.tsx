@@ -3,6 +3,7 @@ import { Fragment, useMemo } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
 import { ProfileSection } from '@/ui/elements/Section';
+import { common } from '@/ui/styledSystem';
 
 import {
   normalizeFormatted,
@@ -78,7 +79,18 @@ export function SubscriptionsList({
       })}
     >
       {subscriptionItems.length > 0 && (
-        <Table tableHeadVisuallyHidden>
+        <Table
+          sx={t => ({
+            overflow: 'hidden',
+            'tr > td': {
+              paddingTop: t.space.$3,
+              paddingBottom: t.space.$3,
+              paddingInlineStart: t.space.$3,
+              paddingInlineEnd: t.space.$3,
+            },
+          })}
+          tableHeadVisuallyHidden
+        >
           <Thead>
             <Tr>
               <Th
@@ -171,7 +183,17 @@ function SubscriptionItemRow({
 
   return (
     <Fragment key={subscriptionItem.id}>
-      <Tr>
+      <Tr
+        sx={t => {
+          if (subscriptionItem.status === 'upcoming') {
+            return {
+              background: common.mutedBackground(t),
+            };
+          }
+
+          return {};
+        }}
+      >
         <Td>
           <Col gap={1}>
             <Flex
@@ -184,6 +206,7 @@ function SubscriptionItemRow({
                   width: t.sizes.$4,
                   height: t.sizes.$4,
                   opacity: t.opacity.$inactive,
+                  color: t.colors.$colorMutedForeground,
                 })}
               />
               <Text
@@ -238,7 +261,17 @@ function SubscriptionItemRow({
         </Td>
       </Tr>
       {typeof endsAfterBlock !== 'undefined' ? (
-        <Tr>
+        <Tr
+          sx={t => {
+            if (subscriptionItem.status === 'upcoming') {
+              return {
+                background: common.mutedBackground(t),
+              };
+            }
+
+            return {};
+          }}
+        >
           <Td>
             <Col gap={1}>
               <Flex
@@ -251,14 +284,14 @@ function SubscriptionItemRow({
                     width: t.sizes.$4,
                     height: t.sizes.$4,
                     opacity: t.opacity.$inactive,
+                    color: t.colors.$colorMutedForeground,
                   })}
                 />
                 <Text
                   variant='subtitle'
                   sx={t => ({ marginInlineEnd: t.sizes.$1 })}
-                >
-                  Seats
-                </Text>
+                  localizationKey={localizationKeys('billing.seats')}
+                />
               </Flex>
             </Col>
           </Td>
