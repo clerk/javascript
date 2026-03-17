@@ -84,6 +84,7 @@ export default defineNuxtModule<ModuleOptions>({
         machineSecretKey: undefined,
         jwtKey: undefined,
         webhookSigningSecret: undefined,
+        apiUrl: undefined,
       },
     });
 
