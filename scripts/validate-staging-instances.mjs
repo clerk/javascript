@@ -60,7 +60,7 @@ function parseFapiDomain(pk) {
 
 async function fetchEnvironment(fapiDomain) {
   const url = `https://${fapiDomain}/v1/environment`;
-  const res = await fetch(url);
+  const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
   if (!res.ok) {
     throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
   }
@@ -314,6 +314,7 @@ async function main() {
   console.log(`Validating ${pairs.length} staging instance pair(s)...\n`);
 
   let mismatchCount = 0;
+  let fetchFailCount = 0;
 
   for (const pair of pairs) {
     const prodDomain = parseFapiDomain(pair.prod.pk);
@@ -323,6 +324,7 @@ async function main() {
     try {
       [prodEnv, stagingEnv] = await Promise.all([fetchEnvironment(prodDomain), fetchEnvironment(stagingDomain)]);
     } catch (err) {
+      fetchFailCount++;
       console.log(`⚠️  ${pair.name}: failed to fetch environment`);
       console.log(`   ${err.message}\n`);
       continue;
@@ -336,11 +338,12 @@ async function main() {
     printReport(pair.name, mismatches);
   }
 
-  if (mismatchCount > 0) {
-    console.log(`Summary: ${mismatchCount} of ${pairs.length} instance pair(s) have mismatches`);
-  } else {
-    console.log(`Summary: all ${pairs.length} instance pair(s) matched`);
-  }
+  const parts = [];
+  if (mismatchCount > 0) parts.push(`${mismatchCount} mismatched`);
+  if (fetchFailCount > 0) parts.push(`${fetchFailCount} failed to fetch`);
+  const matchedCount = pairs.length - mismatchCount - fetchFailCount;
+  if (matchedCount > 0) parts.push(`${matchedCount} matched`);
+  console.log(`Summary: ${parts.join(', ')} (${pairs.length} total)`);
 }
 
 main().catch(err => {
