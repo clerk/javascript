@@ -161,6 +161,7 @@ export const enUS: LocalizationResource = {
       },
     },
     reSubscribe: 'Resubscribe',
+    seats: 'Seats',
     seeAllFeatures: 'See all features',
     startFreeTrial: 'Start free trial',
     startFreeTrial__days: 'Start {{days}}-day free trial',
