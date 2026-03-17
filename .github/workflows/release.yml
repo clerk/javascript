@@ -74,6 +74,7 @@ jobs:
 
       - name: Trigger workflows on related repos
         if: steps.changesets.outputs.published == 'true'
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           result-encoding: string
@@ -112,7 +113,8 @@ jobs:
               const results = await Promise.allSettled(dispatches);
               const failed = results.filter(r => r.status === 'rejected');
               if (failed.length) {
-                failed.forEach(r => core.warning(`Dispatch failed: ${r.reason?.message ?? r.reason}`));
+                failed.forEach(r => core.error(`Dispatch failed: ${r.reason?.message ?? r.reason}`));
+                core.setFailed(`${failed.length} downstream dispatch(es) failed`);
               }
             } else{
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
@@ -202,6 +204,7 @@ jobs:
 
       - name: Trigger workflows on related repos
         if: steps.publish.outcome == 'success'
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           result-encoding: string
@@ -239,7 +242,8 @@ jobs:
             const results = await Promise.allSettled(dispatches);
             const failed = results.filter(r => r.status === 'rejected');
             if (failed.length) {
-              failed.forEach(r => core.warning(`Dispatch failed: ${r.reason?.message ?? r.reason}`));
+              failed.forEach(r => core.error(`Dispatch failed: ${r.reason?.message ?? r.reason}`));
+              core.setFailed(`${failed.length} downstream dispatch(es) failed`);
             }
 
       - name: Notify Slack on failure
