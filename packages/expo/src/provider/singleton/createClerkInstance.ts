@@ -37,31 +37,77 @@ type FapiResponse = Response & {
   payload: { errors?: Array<{ code: string }> } | null;
 };
 
+type ClerkRuntimeOptions = Pick<BuildClerkOptions, 'publishableKey' | 'proxyUrl' | 'domain'>;
+type ResolvedClerkRuntimeOptions = Omit<ClerkRuntimeOptions, 'publishableKey'> & {
+  publishableKey: string;
+};
+
+function hasOwnOption<Key extends keyof ClerkRuntimeOptions>(
+  options: ClerkRuntimeOptions | undefined,
+  key: Key,
+): options is ClerkRuntimeOptions & Required<Pick<ClerkRuntimeOptions, Key>> {
+  return !!options && Object.prototype.hasOwnProperty.call(options, key);
+}
+
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
+let __internal_clerkOptions: ClerkRuntimeOptions | undefined;
+
+/**
+ * Resolves the next native singleton config while preserving existing values for omitted options.
+ * A publishable key change starts from a clean proxy/domain config unless those values are
+ * explicitly provided alongside the new key.
+ */
+function getUpdatedClerkOptions(
+  currentOptions: ClerkRuntimeOptions | undefined,
+  nextOptions: ClerkRuntimeOptions | undefined,
+): {
+  hasConfigChanged: boolean;
+  options: ResolvedClerkRuntimeOptions;
+} {
+  const hasNextProxyUrl = hasOwnOption(nextOptions, 'proxyUrl');
+  const hasNextDomain = hasOwnOption(nextOptions, 'domain');
+  const hasKeyChanged =
+    !!currentOptions &&
+    typeof nextOptions?.publishableKey !== 'undefined' &&
+    nextOptions.publishableKey !== currentOptions.publishableKey;
+  const hasProxyChanged = !!currentOptions && hasNextProxyUrl && nextOptions.proxyUrl !== currentOptions.proxyUrl;
+  const hasDomainChanged = !!currentOptions && hasNextDomain && nextOptions.domain !== currentOptions.domain;
+
+  return {
+    hasConfigChanged: hasKeyChanged || hasProxyChanged || hasDomainChanged,
+    options: {
+      publishableKey: nextOptions?.publishableKey ?? currentOptions?.publishableKey ?? '',
+      proxyUrl: hasKeyChanged
+        ? nextOptions?.proxyUrl
+        : hasNextProxyUrl
+          ? nextOptions.proxyUrl
+          : currentOptions?.proxyUrl,
+      domain: hasKeyChanged ? nextOptions?.domain : hasNextDomain ? nextOptions.domain : currentOptions?.domain,
+    },
+  };
+}
 
 export function createClerkInstance(ClerkClass: typeof Clerk) {
   return (options?: BuildClerkOptions): HeadlessBrowserClerk | BrowserClerk => {
+    const { tokenCache = MemoryTokenCache, __experimental_resourceCache: createResourceCache } = options || {};
     const {
-      publishableKey = '',
-      tokenCache = MemoryTokenCache,
-      __experimental_resourceCache: createResourceCache,
-    } = options || {};
+      hasConfigChanged,
+      options: { publishableKey, proxyUrl, domain },
+    } = getUpdatedClerkOptions(__internal_clerkOptions, options);
 
     if (!__internal_clerk && !publishableKey) {
       errorThrower.throwMissingPublishableKeyError();
     }
 
-    // Support "hot-swapping" the Clerk instance at runtime. See JS-598 for additional details.
-    const hasKeyChanged = __internal_clerk && !!publishableKey && publishableKey !== __internal_clerk.publishableKey;
-
-    if (!__internal_clerk || hasKeyChanged) {
-      if (hasKeyChanged) {
+    if (!__internal_clerk || hasConfigChanged) {
+      if (hasConfigChanged) {
         tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
       }
 
       const getToken = tokenCache.getToken;
       const saveToken = tokenCache.saveToken;
-      __internal_clerk = new ClerkClass(publishableKey) as unknown as BrowserClerk;
+      __internal_clerkOptions = { publishableKey, proxyUrl, domain };
+      __internal_clerk = new ClerkClass(publishableKey, { proxyUrl, domain }) as unknown as BrowserClerk;
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API
