@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { useOrganization } from '@clerk/shared/react';
 import { Animated } from '@/ui/elements/Animated';
 import { Tooltip } from '@/ui/elements/Tooltip';
@@ -21,6 +21,7 @@ export const MembersActionsRow = ({ actionSlot }: MembersActionsRowProps) => {
       return false;
     }
 
+    // A value of 0 means unlimited memberships, thus the organization is always below the limit
     if (organization.maxAllowedMemberships === 0) {
       return true;
     }
@@ -37,7 +38,7 @@ export const MembersActionsRow = ({ actionSlot }: MembersActionsRowProps) => {
     />
   );
 
-  let wrappedInviteButton;
+  let wrappedInviteButton: ReactNode;
   if (isBelowLimit) {
     wrappedInviteButton = (
       <Action.Trigger
