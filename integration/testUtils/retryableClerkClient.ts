@@ -47,7 +47,9 @@ async function retryOnFailure<T>(firstAttempt: Promise<T>, fn: () => Promise<T>,
       }
       recordRetry(path);
       const delayMs = getRetryDelay(error, attempt);
-      console.warn(`[Retry] ${error.status} for ${path}, attempt ${attempt + 1}/${MAX_RETRIES}, waiting ${Math.round(delayMs)}ms`);
+      console.warn(
+        `[Retry] ${error.status} for ${path}, attempt ${attempt + 1}/${MAX_RETRIES}, waiting ${Math.round(delayMs)}ms`,
+      );
       await sleep(delayMs);
     }
   }
