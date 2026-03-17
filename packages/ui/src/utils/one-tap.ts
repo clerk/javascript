@@ -1,5 +1,6 @@
 import { clerkFailedToLoadThirdPartyScript } from '@clerk/shared/internal/clerk-js/errors';
 import { loadScript } from '@clerk/shared/loadScript';
+import type { GoogleOneTapMomentNotification } from '@clerk/shared/types';
 
 interface GISCredentialResponse {
   credential: string;
@@ -14,9 +15,7 @@ interface InitializeProps {
   use_fedcm_for_prompt?: boolean;
 }
 
-interface PromptMomentNotification {
-  getMomentType: () => 'display' | 'skipped' | 'dismissed';
-}
+type PromptMomentNotification = GoogleOneTapMomentNotification;
 
 interface OneTapMethods {
   initialize: (params: InitializeProps) => void;
@@ -54,4 +53,4 @@ async function loadGIS() {
 }
 
 export { loadGIS };
-export type { GISCredentialResponse };
+export type { GISCredentialResponse, PromptMomentNotification };

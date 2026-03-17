@@ -18,6 +18,8 @@ function OneTapStartInternal(): JSX.Element | null {
   const { navigate } = useRouter();
 
   const ctx = useGoogleOneTapContext();
+  const onMomentRef = useRef(ctx.onMoment);
+  onMomentRef.current = ctx.onMoment;
 
   async function oneTapCallback(response: GISCredentialResponse) {
     isPromptedRef.current = false;
@@ -66,6 +68,12 @@ function OneTapStartInternal(): JSX.Element | null {
   useEffect(() => {
     if (initializedGoogle && !user?.id && !isPromptedRef.current) {
       initializedGoogle.accounts.id.prompt(notification => {
+        try {
+          onMomentRef.current?.(notification);
+        } catch (e) {
+          console.error(e);
+        }
+
         // Close the modal, when the user clicks outside the prompt or cancels
         if (notification.getMomentType() === 'skipped') {
           // Unmounts the component will cause the useEffect cleanup function from below to be called

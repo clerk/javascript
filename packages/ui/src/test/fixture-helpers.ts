@@ -331,7 +331,16 @@ const createDisplayConfigFixtureHelpers = (environment: EnvironmentJSON) => {
     dc.terms_url = opts.termsOfService || '';
     dc.privacy_policy_url = opts.privacyPolicy || '';
   };
-  return { withSupportEmail, withoutClerkBranding, withPreferredSignInStrategy, withTermsPrivacyPolicyUrls };
+  const withGoogleOneTap = (opts?: { clientId?: string }) => {
+    dc.google_one_tap_client_id = opts?.clientId || 'test-google-client-id';
+  };
+  return {
+    withSupportEmail,
+    withoutClerkBranding,
+    withPreferredSignInStrategy,
+    withTermsPrivacyPolicyUrls,
+    withGoogleOneTap,
+  };
 };
 
 const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) => {

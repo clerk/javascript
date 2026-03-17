@@ -1606,6 +1606,26 @@ export type __internal_AttemptToEnableEnvironmentSettingResult = {
   isEnabled: boolean;
 };
 
+export interface GoogleOneTapMomentNotification {
+  getMomentType: () => 'display' | 'skipped' | 'dismissed';
+  getDismissedReason: () => 'credential_returned' | 'cancel_called' | 'flow_restarted';
+  getNotDisplayedReason: () =>
+    | 'browser_not_supported'
+    | 'invalid_client'
+    | 'missing_client_id'
+    | 'opt_out_or_no_session'
+    | 'secure_http_required'
+    | 'suppressed_by_user'
+    | 'too_many_dismissals'
+    | 'unknown_reason';
+  getSkippedReason: () => 'auto_cancel' | 'user_cancel' | 'tap_outside' | 'issuing_failed';
+  isDisplayMoment: () => boolean;
+  isDismissedMoment: () => boolean;
+  isSkippedMoment: () => boolean;
+  isDisplayed: () => boolean;
+  isNotDisplayed: () => boolean;
+}
+
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
 export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
@@ -1631,6 +1651,14 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
    */
   fedCmSupport?: boolean;
   appearance?: ClerkAppearanceTheme;
+  /**
+   * A callback that fires when the Google One Tap prompt moment changes.
+   * Receives a notification object with methods to query the moment type,
+   * display status, and reasons for dismissal or skipping.
+   *
+   * Useful for analytics (e.g., tracking display rate, dismissal rate, conversion funnel).
+   */
+  onMoment?: (notification: GoogleOneTapMomentNotification) => void;
 };
 
 export type SignUpProps = RoutingOptions & {
