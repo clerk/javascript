@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.3.1
+
+### Patch Changes
+
+- Ensure clerk-js accepts `proxyUrl` and `domain` in non-browser environments. ([#8095](https://github.com/clerk/javascript/pull/8095)) by [@brkalow](https://github.com/brkalow)
+
 ## 4.3.0
 
 ### Minor Changes
