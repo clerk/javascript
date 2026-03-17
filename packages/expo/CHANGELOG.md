@@ -1,5 +1,22 @@
 # Change Log
 
+## 3.1.3
+
+### Patch Changes
+
+- Fix `@clerk/expo` crashing in web environments by adding web-safe variants for native module imports and polyfills ([#8066](https://github.com/clerk/javascript/pull/8066)) by [@chriscanin](https://github.com/chriscanin)
+
+- Ensure clerk-js accepts `proxyUrl` and `domain` in non-browser environments. ([#8095](https://github.com/clerk/javascript/pull/8095)) by [@brkalow](https://github.com/brkalow)
+
+- Revert two-way JS/native session sync (#8032) ([#8065](https://github.com/clerk/javascript/pull/8065)) by [@chriscanin](https://github.com/chriscanin)
+
+- Pass `proxyUrl` and `domain` through Expo's native Clerk singleton. ([#8085](https://github.com/clerk/javascript/pull/8085)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`b9cb6e5`](https://github.com/clerk/javascript/commit/b9cb6e576bf6af5662fcc624cf2de76120a14565)]:
+  - @clerk/clerk-js@6.3.1
+  - @clerk/shared@4.3.1
+  - @clerk/react@6.1.1
+
 ## 3.1.2
 
 ### Patch Changes
