@@ -480,10 +480,19 @@ export class Session extends BaseResource implements SessionResource {
   ): Promise<TokenResource> {
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     // TODO: update template endpoint to accept organizationId
-    const params: Record<string, string | null> = template ? {} : { organizationId: organizationId ?? null };
+    const params: Record<string, string | null> = template
+      ? {}
+      : {
+          organizationId: organizationId ?? null,
+          ...(this.lastActiveToken ? { token: this.lastActiveToken.getRawString() } : {}),
+        };
     const lastActiveToken = this.lastActiveToken?.getRawString();
 
-    const tokenResolver = Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+    const tokenResolver = Token.create(
+      path,
+      params,
+      skipCache ? { debug: 'skip_cache', force_origin: 'true' } : undefined,
+    ).catch(e => {
       if (MissingExpiredTokenError.is(e) && lastActiveToken) {
         return Token.create(path, { ...params }, { expired_token: lastActiveToken });
       }
