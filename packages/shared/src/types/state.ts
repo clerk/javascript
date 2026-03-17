@@ -141,9 +141,6 @@ export interface SignInSignalValue {
   fetchStatus: 'idle' | 'fetching';
   /**
    * An instance representing the currently active `SignInFuture`, with new APIs designed specifically for custom flows.
-   *
-   * > [!IMPORTANT]
-   * > The `SignInFuture` instance referenced by `signIn` does not have a stable identity, and will change as the sign-in flow progresses. Make sure you provide it in dependency arrays when using hooks such as `useEffect`, `useCallback`, or `useMemo`.
    */
   signIn: SignInFutureResource;
 }
@@ -170,9 +167,6 @@ export interface SignUpSignalValue {
   fetchStatus: 'idle' | 'fetching';
   /**
    * The underlying `SignUpFuture` resource
-   *
-   * > [!IMPORTANT]
-   * > The `SignUpFuture` instance referenced by `signUp` does not have a stable identity, and will change as the sign-up flow progresses. Make sure you provide it in dependency arrays when using hooks such as `useEffect`, `useCallback`, or `useMemo`.
    */
   signUp: SignUpFutureResource;
 }
