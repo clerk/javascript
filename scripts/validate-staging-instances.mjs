@@ -37,14 +37,37 @@ function isIgnored(path) {
 // ── Key loading ──────────────────────────────────────────────────────────────
 
 function loadKeys(envVar, filePath) {
+  let raw;
+  const errors = [];
+
   if (process.env[envVar]) {
-    return JSON.parse(process.env[envVar]);
+    try {
+      raw = JSON.parse(process.env[envVar]);
+    } catch (err) {
+      return { keys: null, errors: [`Failed to parse ${envVar}: ${err.message}`] };
+    }
+  } else {
+    try {
+      raw = JSON.parse(readFileSync(resolve(filePath), 'utf-8'));
+    } catch {
+      return { keys: null, errors: [] };
+    }
   }
-  try {
-    return JSON.parse(readFileSync(resolve(filePath), 'utf-8'));
-  } catch {
-    return null;
+
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return { keys: null, errors: [`Expected a JSON object from ${envVar || filePath}`] };
   }
+
+  const keys = {};
+  for (const [name, entry] of Object.entries(raw)) {
+    if (entry && typeof entry === 'object' && typeof entry.pk === 'string') {
+      keys[name] = entry;
+    } else {
+      errors.push(`"${name}": missing or invalid pk`);
+    }
+  }
+
+  return { keys: Object.keys(keys).length > 0 ? keys : null, errors };
 }
 
 // ── PK parsing ───────────────────────────────────────────────────────────────
@@ -286,17 +309,24 @@ function printReport(name, mismatches) {
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-  const prodKeys = loadKeys('INTEGRATION_INSTANCE_KEYS', 'integration/.keys.json');
+  const { keys: prodKeys, errors: prodErrors } = loadKeys('INTEGRATION_INSTANCE_KEYS', 'integration/.keys.json');
+  for (const err of prodErrors) console.error(`⚠️  Production keys: ${err}`);
   if (!prodKeys) {
     console.error('No production instance keys found.');
     process.exit(0);
   }
 
-  const stagingKeys = loadKeys('INTEGRATION_STAGING_INSTANCE_KEYS', 'integration/.keys.staging.json');
+  const { keys: stagingKeys, errors: stagingErrors } = loadKeys(
+    'INTEGRATION_STAGING_INSTANCE_KEYS',
+    'integration/.keys.staging.json',
+  );
+  for (const err of stagingErrors) console.error(`⚠️  Staging keys: ${err}`);
   if (!stagingKeys) {
     console.error('No staging instance keys found. Skipping validation.');
     process.exit(0);
   }
+
+  const loadErrorCount = prodErrors.length + stagingErrors.length;
 
   const pairs = [];
   for (const [name, keys] of Object.entries(prodKeys)) {
@@ -341,6 +371,7 @@ async function main() {
   const parts = [];
   if (mismatchCount > 0) parts.push(`${mismatchCount} mismatched`);
   if (fetchFailCount > 0) parts.push(`${fetchFailCount} failed to fetch`);
+  if (loadErrorCount > 0) parts.push(`${loadErrorCount} key load errors`);
   const matchedCount = pairs.length - mismatchCount - fetchFailCount;
   if (matchedCount > 0) parts.push(`${matchedCount} matched`);
   console.log(`Summary: ${parts.join(', ')} (${pairs.length} total)`);
