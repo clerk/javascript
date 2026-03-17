@@ -5,6 +5,7 @@ import { TokenId } from '@/utils/tokenId';
 
 import { POLLER_INTERVAL_IN_MS } from './auth/SessionCookiePoller';
 import { Token } from './resources/internal';
+import { shouldRejectToken } from './tokenFreshness';
 
 /**
  * Identifies a cached token entry by tokenId and optional audience.
@@ -288,11 +289,10 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       const result = get({ tokenId: data.tokenId });
       if (result) {
         const existingToken = await result.entry.tokenResolver;
-        const existingIat = existingToken.jwt?.claims?.iat;
-        if (existingIat && existingIat >= iat) {
+        if (shouldRejectToken(existingToken, token)) {
           debugLogger.debug(
-            'Ignoring older token broadcast',
-            { existingIat, incomingIat: iat, tabId, tokenId: data.tokenId, traceId: data.traceId },
+            'Ignoring staler token broadcast',
+            { tokenId: data.tokenId, traceId: data.traceId },
             'tokenCache',
           );
           return;
@@ -369,6 +369,15 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     entry.tokenResolver
       .then(newToken => {
+        // Compare-and-swap: if another concurrent resolve already committed
+        // a fresher token for this key, don't overwrite it.
+        const currentValue = cache.get(key);
+        if (currentValue?.entry?.resolvedToken && newToken) {
+          if (shouldRejectToken(currentValue.entry.resolvedToken, newToken)) {
+            return;
+          }
+        }
+
         // Store resolved token for synchronous reads
         entry.resolvedToken = newToken;
 
