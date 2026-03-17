@@ -36,7 +36,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await app.teardown();
     });
 
-    test('token refresh rate remains stable after session.touch() triggers _updateClient', async ({ page, context }) => {
+    test('token refresh rate remains stable after session.touch() triggers _updateClient', async ({
+      page,
+      context,
+    }) => {
       const u = createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
