@@ -1177,6 +1177,43 @@ describe('SessionTokenCache', () => {
       expect(onRefresh2).toHaveBeenCalledTimes(1);
     });
 
+    it('does not install timers when a pending tokenResolver resolves after being overwritten', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'stale-pending', jwt, object: 'token' });
+
+      const onRefreshStale = vi.fn();
+      const onRefreshFresh = vi.fn();
+      const key = { tokenId: 'stale-pending' };
+
+      // First set() with a slow-resolving promise
+      let resolveSlowPromise: (t: TokenResource) => void;
+      const slowPromise = new Promise<TokenResource>(resolve => {
+        resolveSlowPromise = resolve;
+      });
+
+      SessionTokenCache.set({ ...key, tokenResolver: slowPromise, onRefresh: onRefreshStale });
+
+      // Second set() overwrites the key before the slow promise resolves
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(token),
+        onRefresh: onRefreshFresh,
+      });
+      await Promise.resolve();
+
+      // Now the slow promise resolves — but its entry is stale
+      resolveSlowPromise!(token);
+      await Promise.resolve();
+
+      // Advance past refresh fire time
+      vi.advanceTimersByTime(44 * 1000);
+
+      // Only the fresh callback should fire; the stale one should be ignored
+      expect(onRefreshStale).not.toHaveBeenCalled();
+      expect(onRefreshFresh).toHaveBeenCalledTimes(1);
+    });
+
     it('overwriting with a token that has no onRefresh cancels the old refresh timer', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const jwt = createJwtWithTtl(nowSeconds, 60);

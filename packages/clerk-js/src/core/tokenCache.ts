@@ -382,6 +382,12 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     entry.tokenResolver
       .then(newToken => {
+        // If this entry was overwritten by a newer set() call while our promise
+        // was pending, bail out to avoid installing orphaned timers.
+        if (cache.get(key) !== value) {
+          return;
+        }
+
         // Store resolved token for synchronous reads
         entry.resolvedToken = newToken;
 
