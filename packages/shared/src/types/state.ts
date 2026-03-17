@@ -166,7 +166,7 @@ export interface SignUpSignalValue {
    */
   fetchStatus: 'idle' | 'fetching';
   /**
-   * The underlying `SignUpFuture` resource
+   * The underlying `SignUpFuture` resource.
    */
   signUp: SignUpFutureResource;
 }
