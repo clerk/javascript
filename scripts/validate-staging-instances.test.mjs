@@ -158,6 +158,13 @@ describe('diffObjects', () => {
     expect(result).toEqual([{ path: 'a', prod: 1, staging: undefined }]);
   });
 
+  it('treats undefined and false as equivalent', () => {
+    expect(diffObjects({ a: undefined }, { a: false })).toEqual([]);
+    expect(diffObjects({ a: false }, { a: undefined })).toEqual([]);
+    expect(diffObjects({ a: null }, { a: false })).toEqual([]);
+    expect(diffObjects({ a: 0 }, { a: false })).toEqual([]);
+  });
+
   it('detects nested mismatches with correct paths', () => {
     const result = diffObjects({ a: { b: { c: 1 } } }, { a: { b: { c: 2 } } });
     expect(result).toEqual([{ path: 'a.b.c', prod: 1, staging: 2 }]);
