@@ -73,12 +73,8 @@ export function isBrowserOnline(): boolean {
     return false;
   }
 
-  // React Native / Expo defines a Navigator object but does not implement
-  // the browser-only navigator.onLine API.
-  if (navigator.product === 'ReactNative') {
-    return true;
-  }
-
+  // Some environments (e.g. React Native) define a Navigator object but do not
+  // implement navigator.onLine as a boolean. Default to online in those cases.
   if (typeof navigator.onLine !== 'boolean') {
     return true;
   }
