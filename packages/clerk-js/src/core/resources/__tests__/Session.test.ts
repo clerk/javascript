@@ -1522,6 +1522,126 @@ describe('Session', () => {
     });
   });
 
+  describe('sends previous token in /tokens request body', () => {
+    let dispatchSpy: ReturnType<typeof vi.spyOn>;
+    let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      dispatchSpy = vi.spyOn(eventBus, 'emit');
+      fetchSpy = vi.spyOn(BaseResource, '_fetch' as any);
+      BaseResource.clerk = clerkMock() as any;
+    });
+
+    afterEach(() => {
+      dispatchSpy?.mockRestore();
+      fetchSpy?.mockRestore();
+      BaseResource.clerk = null as any;
+    });
+
+    it('includes token in request body when lastActiveToken exists', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken();
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(fetchSpy.mock.calls[0][0]).toMatchObject({
+        path: '/client/sessions/session_1/tokens',
+        method: 'POST',
+        body: { organizationId: null, token: mockJwt },
+      });
+    });
+
+    it('does not include token key in request body when lastActiveToken is null (first mint)', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as unknown as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken();
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(fetchSpy.mock.calls[0][0]).toMatchObject({
+        path: '/client/sessions/session_1/tokens',
+        method: 'POST',
+        body: { organizationId: null },
+      });
+      expect(fetchSpy.mock.calls[0][0].body).not.toHaveProperty('token');
+    });
+
+    it('does not include token in request body for template token requests', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken({ template: 'my-template' });
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(fetchSpy.mock.calls[0][0]).toMatchObject({
+        path: '/client/sessions/session_1/tokens/my-template',
+        method: 'POST',
+      });
+      expect(fetchSpy.mock.calls[0][0].body).toEqual({});
+    });
+
+    it('token value matches lastActiveToken.getRawString() exactly', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken();
+
+      expect(fetchSpy.mock.calls[0][0].body.token).toBe(mockJwt);
+    });
+  });
+
   describe('origin outage mode fallback', () => {
     let dispatchSpy: ReturnType<typeof vi.spyOn>;
     let fetchSpy: ReturnType<typeof vi.spyOn>;

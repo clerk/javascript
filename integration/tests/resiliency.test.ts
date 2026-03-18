@@ -518,4 +518,45 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       await u.po.clerk.toBeLoaded();
     });
   });
+
+  test.describe('token refresh with previous token in body', () => {
+    test('token refresh includes previous token in POST body and succeeds', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      // Sign in
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+
+      // Track token request bodies
+      const tokenRequestBodies: string[] = [];
+      await context.route('**/v1/client/sessions/*/tokens*', async route => {
+        const postData = route.request().postData();
+        if (postData) {
+          tokenRequestBodies.push(postData);
+        }
+        await route.continue();
+      });
+
+      // Force a fresh token fetch (cache miss -> hits /tokens endpoint)
+      const token = await page.evaluate(async () => {
+        const clerk = (window as any).Clerk;
+        await clerk.session?.clearCache();
+        return await clerk.session?.getToken({ skipCache: true });
+      });
+
+      // Token refresh should succeed (backend ignores the param for now)
+      expect(token).toBeTruthy();
+
+      // Verify token param is present in the POST body (form-urlencoded)
+      // fapiClient serializes body as form-urlencoded via qs.stringify(camelToSnake(body))
+      // so "token" stays "token" (no case change) and the body looks like "organization_id=&token=<jwt>"
+      expect(tokenRequestBodies.length).toBeGreaterThanOrEqual(1);
+      const lastBody = tokenRequestBodies[tokenRequestBodies.length - 1];
+      expect(lastBody).toContain('token=');
+
+      // User should still be signed in after refresh
+      await u.po.expect.toBeSignedIn();
+    });
+  });
 });
