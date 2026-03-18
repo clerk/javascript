@@ -37,6 +37,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validate-instances:
+    name: Validate Staging Instances
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.event.client_payload.ref || 'main' }}
+          sparse-checkout: scripts/validate-staging-instances.mjs
+          fetch-depth: 1
+
+      - name: Validate staging instance settings
+        run: node scripts/validate-staging-instances.mjs
+        env:
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
+
   integration-tests:
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }})
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
@@ -265,7 +282,7 @@ jobs:
               ]
             }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SDK_SLACKER_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.STAGING_E2E_SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       # Uncomment when clerk_go side is ready
