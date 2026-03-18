@@ -13,7 +13,9 @@ import type { Clerk, InstanceType } from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
 
 import { debugLogger } from '@/utils/debug';
+import { decode } from '@/utils/jwt';
 
+import { claimFreshness } from '../tokenFreshness';
 import { clerkMissingDevBrowser } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
@@ -192,6 +194,29 @@ export class AuthCookieService {
     // Only allow background tabs to update if both session and organization match
     if (!document.hasFocus() && !this.isCurrentContextActive()) {
       return;
+    }
+
+    // Monotonic freshness guard: don't regress the cookie within the same session
+    if (token) {
+      const currentRaw = this.sessionCookie.get();
+      if (currentRaw) {
+        try {
+          const current = decode(currentRaw);
+          const incoming = decode(token);
+          const currentSid = current.claims.sid;
+          const incomingSid = incoming.claims.sid;
+          // Only apply within the same session. Different sessions always allowed.
+          if (currentSid && incomingSid && currentSid === incomingSid) {
+            const currentFresh = claimFreshness(current);
+            const incomingFresh = claimFreshness(incoming);
+            if (currentFresh != null && incomingFresh != null && currentFresh > incomingFresh) {
+              return;
+            }
+          }
+        } catch {
+          // If decode fails, allow the write (don't block on malformed tokens)
+        }
+      }
     }
 
     if (!token && !isValidBrowserOnline()) {

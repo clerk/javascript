@@ -98,7 +98,9 @@ describe('Session', () => {
       expect(BaseResource.clerk.getFapiClient().request).not.toHaveBeenCalled();
 
       expect(token).toEqual(mockJwt);
-      expect(dispatchSpy).toHaveBeenCalledTimes(2);
+      // Cache hits with the same token as lastActiveToken suppress re-emission
+      // to avoid unnecessary cookie writes (monotonic freshness guard).
+      expect(dispatchSpy).toHaveBeenCalledTimes(0);
     });
 
     it('returns same token without API call when Session is reconstructed', async () => {
