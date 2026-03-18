@@ -616,7 +616,7 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
                 size='md'
                 colorScheme='neutral'
               />
-              <Text localizationKey={localizationKeys('billing.subscriptionDetails.pastDueAt')} />
+              <Text localizationKey={localizationKeys('billing.seats')} />
             </Text>
           }
           value={
