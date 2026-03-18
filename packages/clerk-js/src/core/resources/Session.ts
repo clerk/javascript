@@ -29,7 +29,6 @@ import type {
   SessionResource,
   SessionStatus,
   SessionTask,
-  SessionTouchParams,
   SessionVerificationJSON,
   SessionVerificationResource,
   SessionVerifyAttemptFirstFactorParams,
@@ -104,16 +103,14 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   private _touchPost = async (
-    { intent, skipUpdateClient }: { intent?: SessionTouchParams['intent']; skipUpdateClient: boolean } = {
-      skipUpdateClient: false,
-    },
+    { skipUpdateClient }: { skipUpdateClient: boolean } = { skipUpdateClient: false },
   ): Promise<FapiResponseJSON<SessionJSON> | null> => {
     const json = await BaseResource._fetch<SessionJSON>(
       {
         method: 'POST',
         path: this.path('touch'),
         // any is how we type the body in the BaseMutateParams as well
-        body: { active_organization_id: this.lastActiveOrganizationId, intent } as any,
+        body: { active_organization_id: this.lastActiveOrganizationId } as any,
       },
       { skipUpdateClient },
     );
@@ -124,8 +121,8 @@ export class Session extends BaseResource implements SessionResource {
     return json;
   };
 
-  touch = async ({ intent }: SessionTouchParams = {}): Promise<SessionResource> => {
-    await this._touchPost({ intent, skipUpdateClient: false });
+  touch = async (): Promise<SessionResource> => {
+    await this._touchPost();
 
     // _touchPost() will have updated `this` in-place
     // The post has potentially changed the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
@@ -146,8 +143,8 @@ export class Session extends BaseResource implements SessionResource {
    *
    * @internal
    */
-  __internal_touch = async ({ intent }: SessionTouchParams = {}): Promise<ClientResource | undefined> => {
-    const json = await this._touchPost({ intent, skipUpdateClient: true });
+  __internal_touch = async (): Promise<ClientResource | undefined> => {
+    const json = await this._touchPost({ skipUpdateClient: true });
     return getClientResourceFromPayload(json);
   };
 

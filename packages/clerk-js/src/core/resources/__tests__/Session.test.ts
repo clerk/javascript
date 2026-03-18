@@ -798,37 +798,6 @@ describe('Session', () => {
         token: session.lastActiveToken,
       });
     });
-
-    it('passes touch intent in the request body', async () => {
-      const sessionData = {
-        status: 'active',
-        id: 'session_1',
-        object: 'session',
-        user: createUser({}),
-        last_active_organization_id: 'org_123',
-        actor: null,
-        created_at: new Date().getTime(),
-        updated_at: new Date().getTime(),
-      } as SessionJSON;
-      const session = new Session(sessionData);
-
-      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
-      requestSpy.mockResolvedValue({
-        payload: { response: sessionData },
-        status: 200,
-      });
-
-      await session.touch({ intent: 'focus' });
-
-      expect(requestSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          body: { active_organization_id: 'org_123', intent: 'focus' },
-          method: 'POST',
-          path: '/client/sessions/session_1/touch',
-        }),
-        expect.anything(),
-      );
-    });
   });
 
   describe('__internal_touch()', () => {
@@ -932,27 +901,6 @@ describe('Session', () => {
       await session.__internal_touch();
 
       expect(session.lastActiveOrganizationId).toBe('org_456');
-    });
-
-    it('passes touch intent in the request body', async () => {
-      const session = new Session(mockSessionData);
-      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
-
-      requestSpy.mockResolvedValue({
-        payload: { response: mockSessionData },
-        status: 200,
-      });
-
-      await session.__internal_touch({ intent: 'select_session' });
-
-      expect(requestSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          body: { active_organization_id: 'org_123', intent: 'select_session' },
-          method: 'POST',
-          path: '/client/sessions/session_1/touch',
-        }),
-        expect.anything(),
-      );
     });
   });
 

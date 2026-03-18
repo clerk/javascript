@@ -101,7 +101,6 @@ import type {
   Resources,
   SDKMetadata,
   SessionResource,
-  SessionTouchParams,
   SetActiveParams,
   SignedInSessionResource,
   SignInProps,
@@ -1580,7 +1579,6 @@ export class Clerk implements ClerkInterface {
         newSession?.currentTask &&
         this.#options.taskUrls?.[newSession?.currentTask.key];
       const shouldNavigate = !!(redirectUrl || taskUrl || setActiveNavigate);
-      const touchIntent: SessionTouchParams['intent'] = shouldSwitchOrganization ? 'select_org' : 'select_session';
 
       //1. setLastActiveSession to passed user session (add a param).
       //   Note that this will also update the session's active organization
@@ -1601,7 +1599,7 @@ export class Clerk implements ClerkInterface {
         if (shouldNavigate && newSession) {
           try {
             // __internal_touch does not call updateClient automatically
-            updatedClient = await newSession.__internal_touch({ intent: touchIntent });
+            updatedClient = await newSession.__internal_touch();
             if (updatedClient) {
               // We call updateClient manually, but without letting it emit
               // It's important that the setTransitiveState call happens somewhat
@@ -1617,7 +1615,7 @@ export class Clerk implements ClerkInterface {
             }
           }
         } else {
-          await this.#touchCurrentSession(newSession, touchIntent);
+          await this.#touchCurrentSession(newSession);
         }
         // If we do have the updatedClient, read from that, otherwise getSessionFromClient
         // will fallback to this.client. This makes no difference now, but will if we
@@ -3152,7 +3150,7 @@ export class Clerk implements ClerkInterface {
       this.#touchThrottledUntil = Date.now() + 5_000;
 
       if (this.#options.touchSession) {
-        void this.#touchCurrentSession(this.session, 'focus');
+        void this.#touchCurrentSession(this.session);
       }
     });
 
@@ -3183,15 +3181,12 @@ export class Clerk implements ClerkInterface {
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
-  #touchCurrentSession = async (
-    session?: SignedInSessionResource | null,
-    intent: SessionTouchParams['intent'] = 'focus',
-  ): Promise<void> => {
+  #touchCurrentSession = async (session?: SignedInSessionResource | null): Promise<void> => {
     if (!session) {
       return Promise.resolve();
     }
 
-    await session.touch({ intent }).catch(e => {
+    await session.touch().catch(e => {
       if (isUnauthenticatedError(e)) {
         void this.handleUnauthenticated();
       } else {
