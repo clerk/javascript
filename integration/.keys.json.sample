@@ -62,5 +62,9 @@
   "with-protect-service": {
     "pk": "",
     "sk": ""
+  },
+  "with-enterprise-sso": {
+    "pk": "",
+    "sk": ""
   }
 }
