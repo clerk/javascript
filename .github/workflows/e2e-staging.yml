@@ -282,7 +282,7 @@ jobs:
               ]
             }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SDK_SLACKER_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.STAGING_E2E_SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       # Uncomment when clerk_go side is ready
