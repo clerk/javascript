@@ -1,13 +1,6 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { isBrowserOnline, isValidBrowserOnline } from '@clerk/shared/browser';
-import {
-  ClerkOfflineError,
-  ClerkRuntimeError,
-  ClerkWebAuthnError,
-  is4xxError,
-  is429Error,
-  MissingExpiredTokenError,
-} from '@clerk/shared/error';
+import { ClerkOfflineError, ClerkRuntimeError, ClerkWebAuthnError, is4xxError, is429Error } from '@clerk/shared/error';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -481,16 +474,8 @@ export class Session extends BaseResource implements SessionResource {
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     // TODO: update template endpoint to accept organizationId
     const params: Record<string, string | null> = template ? {} : { organizationId: organizationId ?? null };
-    const lastActiveToken = this.lastActiveToken?.getRawString();
 
-    const tokenResolver = Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
-      if (MissingExpiredTokenError.is(e) && lastActiveToken) {
-        return Token.create(path, { ...params }, { expired_token: lastActiveToken });
-      }
-      throw e;
-    });
-
-    return tokenResolver;
+    return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined);
   }
 
   #dispatchTokenEvents(token: TokenResource, shouldDispatch: boolean): void {
