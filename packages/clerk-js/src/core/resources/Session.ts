@@ -492,7 +492,11 @@ export class Session extends BaseResource implements SessionResource {
         };
     const lastActiveToken = this.lastActiveToken?.getRawString();
 
-    const tokenResolver = Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+    const tokenResolver = Token.create(
+      path,
+      params,
+      skipCache ? { debug: 'skip_cache', force_origin: 'true' } : undefined,
+    ).catch(e => {
       if (MissingExpiredTokenError.is(e) && lastActiveToken) {
         return Token.create(path, { ...params }, { expired_token: lastActiveToken });
       }
