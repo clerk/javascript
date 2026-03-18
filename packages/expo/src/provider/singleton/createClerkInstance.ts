@@ -118,7 +118,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       // This breaks hooks that depend on the query client (useOrganizationList, etc.).
       // Override the getter to synchronously create a QueryClient on first access.
       {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { QueryClient } = require('@tanstack/query-core');
         let queryClient: InstanceType<typeof QueryClient> | undefined;
         Object.defineProperty(__internal_clerk, '__internal_queryClient', {
