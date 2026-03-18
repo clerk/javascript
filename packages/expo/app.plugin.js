@@ -613,8 +613,11 @@ const withClerkAppleSignIn = config => {
 };
 
 const withClerkExpo = (config, props = {}) => {
+  const { appleSignIn = true } = props;
   config = withClerkIOS(config);
-  config = withClerkAppleSignIn(config);
+  if (appleSignIn !== false) {
+    config = withClerkAppleSignIn(config);
+  }
   config = withClerkGoogleSignIn(config);
   config = withClerkAndroid(config);
   config = withClerkKeychainService(config, props);
