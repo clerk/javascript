@@ -56,11 +56,13 @@ export async function createFakeMachineNetwork(clerkClient: ClerkClient): Promis
     scopedSenderToken,
     unscopedSenderToken,
     cleanup: async () => {
-      await clerkClient.m2m.revokeToken({ m2mTokenId: scopedSenderToken.id });
-      await clerkClient.m2m.revokeToken({ m2mTokenId: unscopedSenderToken.id });
-      await clerkClient.machines.delete(scopedSender.id);
-      await clerkClient.machines.delete(unscopedSender.id);
-      await clerkClient.machines.delete(primaryServer.id);
+      await Promise.all([
+        await clerkClient.m2m.revokeToken({ m2mTokenId: scopedSenderToken.id }),
+        await clerkClient.m2m.revokeToken({ m2mTokenId: unscopedSenderToken.id }),
+        await clerkClient.machines.delete(scopedSender.id),
+        await clerkClient.machines.delete(unscopedSender.id),
+        await clerkClient.machines.delete(primaryServer.id),
+      ]);
     },
   };
 }
@@ -144,7 +146,7 @@ export async function obtainOAuthAccessToken({
   // Sign in on Account Portal
   await signIn.waitForMounted();
   await signIn.signInWithEmailAndInstantPassword({
-    email: fakeUser.email!,
+    email: fakeUser.email,
     password: fakeUser.password,
   });
 
@@ -164,10 +166,10 @@ export async function obtainOAuthAccessToken({
   const tokenResponse = await page.request.post(oAuthApp.tokenFetchUrl, {
     data: new URLSearchParams({
       grant_type: 'authorization_code',
-      code: authCode!,
+      code: authCode,
       redirect_uri: redirectUri,
       client_id: oAuthApp.clientId,
-      client_secret: oAuthApp.clientSecret!,
+      client_secret: oAuthApp.clientSecret,
     }).toString(),
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -178,5 +180,5 @@ export async function obtainOAuthAccessToken({
   const tokenData = (await tokenResponse.json()) as { access_token?: string };
   expect(tokenData.access_token).toBeTruthy();
 
-  return tokenData.access_token!;
+  return tokenData.access_token;
 }
