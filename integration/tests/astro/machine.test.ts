@@ -119,7 +119,7 @@ test.describe('Astro machine authentication @machine', () => {
       app = await appConfigs.astro.node
         .clone()
         .addFile(
-          'src/pages/api/protected.ts',
+          'src/pages/api/m2m.ts',
           () => `
           import type { APIRoute } from 'astro';
 
@@ -151,17 +151,17 @@ test.describe('Astro machine authentication @machine', () => {
     });
 
     test('rejects requests with invalid M2M tokens', async ({ request }) => {
-      const res = await request.get(app.serverUrl + '/api/protected');
+      const res = await request.get(app.serverUrl + '/api/m2m');
       expect(res.status()).toBe(401);
 
-      const res2 = await request.get(app.serverUrl + '/api/protected', {
+      const res2 = await request.get(app.serverUrl + '/api/m2m', {
         headers: { Authorization: 'Bearer mt_xxx' },
       });
       expect(res2.status()).toBe(401);
     });
 
     test('rejects M2M requests when sender machine lacks access to receiver machine', async ({ request }) => {
-      const res = await request.get(app.serverUrl + '/api/protected', {
+      const res = await request.get(app.serverUrl + '/api/m2m', {
         headers: { Authorization: `Bearer ${network.unscopedSenderToken.token}` },
       });
       expect(res.status()).toBe(401);
@@ -170,7 +170,7 @@ test.describe('Astro machine authentication @machine', () => {
     test('authorizes M2M requests when sender machine has proper access', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
-      const res = await u.page.request.get(app.serverUrl + '/api/protected', {
+      const res = await u.page.request.get(app.serverUrl + '/api/m2m', {
         headers: { Authorization: `Bearer ${network.scopedSenderToken.token}` },
       });
       expect(res.status()).toBe(200);
@@ -185,7 +185,7 @@ test.describe('Astro machine authentication @machine', () => {
       });
       const jwtToken = await createJwtM2MToken(client, network.scopedSender.secretKey);
 
-      const res = await request.get(app.serverUrl + '/api/protected', {
+      const res = await request.get(app.serverUrl + '/api/m2m', {
         headers: { Authorization: `Bearer ${jwtToken.token}` },
       });
       expect(res.status()).toBe(200);
@@ -199,7 +199,7 @@ test.describe('Astro machine authentication @machine', () => {
       ['OAuth', 'oat_test_mismatch'],
     ] as const) {
       test(`rejects ${tokenType} token on M2M route (token type mismatch)`, async ({ request }) => {
-        const res = await request.get(app.serverUrl + '/api/protected', {
+        const res = await request.get(app.serverUrl + '/api/m2m', {
           headers: { Authorization: `Bearer ${token}` },
         });
         expect(res.status()).toBe(401);
@@ -219,7 +219,7 @@ test.describe('Astro machine authentication @machine', () => {
       app = await appConfigs.astro.node
         .clone()
         .addFile(
-          'src/pages/api/protected.ts',
+          'src/pages/api/oauth-verify.ts',
           () => `
           import type { APIRoute } from 'astro';
 
@@ -279,7 +279,7 @@ test.describe('Astro machine authentication @machine', () => {
         signIn: u.po.signIn,
       });
 
-      const res = await u.page.request.get(new URL('/api/protected', app.serverUrl).toString(), {
+      const res = await u.page.request.get(new URL('/api/oauth-verify', app.serverUrl).toString(), {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       expect(res.status()).toBe(200);
@@ -289,13 +289,13 @@ test.describe('Astro machine authentication @machine', () => {
     });
 
     test('rejects request without OAuth token', async ({ request }) => {
-      const url = new URL('/api/protected', app.serverUrl);
+      const url = new URL('/api/oauth-verify', app.serverUrl);
       const res = await request.get(url.toString());
       expect(res.status()).toBe(401);
     });
 
     test('rejects request with invalid OAuth token', async ({ request }) => {
-      const url = new URL('/api/protected', app.serverUrl);
+      const url = new URL('/api/oauth-verify', app.serverUrl);
       const res = await request.get(url.toString(), {
         headers: { Authorization: 'Bearer invalid_oauth_token' },
       });
@@ -307,7 +307,7 @@ test.describe('Astro machine authentication @machine', () => {
       ['M2M', 'mt_test_mismatch'],
     ] as const) {
       test(`rejects ${tokenType} token on OAuth route (token type mismatch)`, async ({ request }) => {
-        const url = new URL('/api/protected', app.serverUrl);
+        const url = new URL('/api/oauth-verify', app.serverUrl);
         const res = await request.get(url.toString(), {
           headers: { Authorization: `Bearer ${token}` },
         });
