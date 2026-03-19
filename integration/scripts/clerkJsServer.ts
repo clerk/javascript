@@ -5,7 +5,7 @@ import path from 'node:path';
 
 import { constants } from '../constants';
 import { stateFile } from '../models/stateFile';
-import { awaitableTreekill, createCiDiagnosticLogger, fs, startDetachedProcessLogMirror, waitForServer } from '.';
+import { awaitableTreekill, fs, waitForServer } from '.';
 import { run } from './run';
 
 export const startClerkJsHttpServer = async () => {
@@ -37,45 +37,23 @@ const copyClerkJsToTempDir = async () => {
 };
 
 const serveFromTempDir = async () => {
-  const log = createCiDiagnosticLogger('clerkJsHttpServer');
-  log('Serving clerkJs from temp dir');
+  console.log('Serving clerkJs from temp dir');
   const port = 18211;
   const serverUrl = `http://localhost:${port}`;
   const now = Date.now();
   const stdoutFilePath = path.resolve(constants.TMP_DIR, `clerkJsHttpServer.${now}.log`);
   const stderrFilePath = path.resolve(constants.TMP_DIR, `clerkJsHttpServer.${now}.err.log`);
   const clerkJsTempDir = getClerkJsTempDir();
-  log(`Running "node_modules/.bin/http-server ${clerkJsTempDir} -d --gzip --cors -a localhost" in ${process.cwd()}`);
-  log(`Detached process logs will be written to ${stdoutFilePath} and ${stderrFilePath}`);
   const proc = run(`node_modules/.bin/http-server ${clerkJsTempDir} -d --gzip --cors -a localhost`, {
     cwd: process.cwd(),
     env: { PORT: port.toString() },
     detached: true,
     stdout: fs.openSync(stdoutFilePath, 'a'),
     stderr: fs.openSync(stderrFilePath, 'a'),
-    log,
-  });
-  void proc.on('error', error => {
-    log(`Process error: ${error.message}`);
-  });
-  void proc.on('exit', (code, signal) => {
-    log(`Process exited with code ${String(code)}${signal ? ` and signal ${signal}` : ''}`);
-  });
-  const detachedLogMirror = startDetachedProcessLogMirror({
-    stdoutFilePath,
-    stderrFilePath,
-    log,
   });
   stateFile.setClerkJsHttpServerPid(proc.pid);
-  try {
-    await waitForServer(serverUrl, { log, maxAttempts: Infinity });
-    log(`clerk.browser.js is being served from ${serverUrl}`);
-  } catch (error) {
-    log(`clerk.browser.js failed to start from ${serverUrl}`);
-    throw error;
-  } finally {
-    await detachedLogMirror.stop();
-  }
+  await waitForServer(serverUrl, { log: console.log, maxAttempts: Infinity });
+  console.log('clerk.browser.js is being served from', serverUrl);
 };
 
 // The location where the clerk.browser.js is served from

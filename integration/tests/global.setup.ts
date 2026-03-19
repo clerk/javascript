@@ -12,10 +12,8 @@ setup('start long running apps', async () => {
   await startClerkJsHttpServer();
 
   const { appIds } = parseEnvOptions();
-  console.log(`Preparing long running apps for E2E_APP_ID=${appIds.join(',') || '<none>'}`);
   if (appIds.length) {
     const apps = appConfigs.longRunningApps.getByPattern(appIds);
-    console.log(`Matched long running apps: ${apps.map(app => app.id).join(', ')}`);
     // state cannot be shared using playwright,
     // so we save the state in a file using a strategy similar to `storageState`
     await Promise.all(apps.map(app => app.init()));

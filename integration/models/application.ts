@@ -1,16 +1,6 @@
 import * as path from 'node:path';
 
-import {
-  awaitableTreekill,
-  createCiDiagnosticLogger,
-  createLogger,
-  fs,
-  getPort,
-  run,
-  startDetachedProcessLogMirror,
-  waitForIdleProcess,
-  waitForServer,
-} from '../scripts';
+import { awaitableTreekill, createLogger, fs, getPort, run, waitForIdleProcess, waitForServer } from '../scripts';
 import type { ApplicationConfig } from './applicationConfig.js';
 import type { EnvironmentConfig } from './environment.js';
 
@@ -31,9 +21,6 @@ export const application = (
   const stderrFilePath = path.resolve(appDirPath, `e2e.${now}.err.log`);
   let buildOutput = '';
   let serveOutput = '';
-  const createPhaseLogger = (phase: string) => {
-    return createCiDiagnosticLogger(`${appDirName} :: ${phase}`, logger.child({ prefix: phase }).info);
-  };
 
   const self = {
     name,
@@ -55,18 +42,14 @@ export const application = (
     setup: async (opts?: { strategy?: 'ci' | 'i' | 'copy'; force?: boolean }) => {
       const { force } = opts || {};
       const nodeModulesExist = await fs.pathExists(path.resolve(appDirPath, 'node_modules'));
-      const log = createPhaseLogger('setup');
       if (force || !nodeModulesExist) {
-        log(`Running "${scripts.setup}" in ${appDirPath}`);
+        const log = logger.child({ prefix: 'setup' }).info;
         await run(scripts.setup, { cwd: appDirPath, log });
         state.completedSetup = true;
-        log(`Completed "${scripts.setup}"`);
-        return;
       }
-      log(`Skipping "${scripts.setup}" because node_modules already exists in ${appDirPath}`);
     },
     dev: async (opts: { port?: number; manualStart?: boolean; detached?: boolean; serverUrl?: string } = {}) => {
-      const log = createPhaseLogger('dev');
+      const log = logger.child({ prefix: 'dev' }).info;
       const port = opts.port || (await getPort());
       const getServerUrl = () => {
         if (opts.serverUrl) {
@@ -85,45 +68,21 @@ export const application = (
         return { port, serverUrl: runtimeServerUrl };
       }
 
-      log(`Running "${scripts.dev}" in ${appDirPath}`);
-      if (opts.detached) {
-        log(`Detached process logs will be written to ${stdoutFilePath} and ${stderrFilePath}`);
-      }
       const proc = run(scripts.dev, {
         cwd: appDirPath,
         env: { PORT: port.toString() },
         detached: opts.detached,
         stdout: opts.detached ? fs.openSync(stdoutFilePath, 'a') : undefined,
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
-        log,
+        log: opts.detached ? undefined : log,
       });
-      void proc.on('error', error => {
-        log(`Process error: ${error.message}`);
-      });
-      void proc.on('exit', (code, signal) => {
-        log(`Process exited with code ${String(code)}${signal ? ` and signal ${signal}` : ''}`);
-      });
-      const detachedLogMirror = opts.detached
-        ? startDetachedProcessLogMirror({
-            stdoutFilePath,
-            stderrFilePath,
-            log,
-          })
-        : undefined;
 
       const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
-      try {
-        await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
-        log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
-        cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
-        state.serverUrl = runtimeServerUrl;
-        return { port, serverUrl: runtimeServerUrl, pid: proc.pid };
-      } catch (error) {
-        log(`Server failed to start at ${runtimeServerUrl}`);
-        throw error;
-      } finally {
-        await detachedLogMirror?.stop();
-      }
+      await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
+      log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
+      cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
+      state.serverUrl = runtimeServerUrl;
+      return { port, serverUrl: runtimeServerUrl, pid: proc.pid };
     },
     build: async () => {
       const log = logger.child({ prefix: 'build' }).info;
