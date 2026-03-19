@@ -8,6 +8,7 @@ import type {
 import * as React from 'react';
 import { useCallback, useContext, useState } from 'react';
 
+import { Users } from '@/icons';
 import { useProtect } from '@/ui/common/Gate';
 import {
   SubscriptionDetailsContext,
@@ -36,12 +37,14 @@ import {
   Flex,
   Flow,
   Heading,
+  Icon,
   localizationKeys,
   Spinner,
   Text,
   useLocalizations,
 } from '../../customizables';
 import { SubscriptionBadge } from '../Subscriptions/badge';
+import { common } from '@/styledSystem';
 
 const isFreePlan = (plan: BillingPlanResource) => !plan.hasBaseFee;
 
@@ -518,6 +521,7 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
       sx={t => ({
         borderRadius: t.radii.$md,
         boxShadow: t.shadows.$tableBodyShadow,
+        overflow: 'hidden',
       })}
     >
       <Col
@@ -525,12 +529,14 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
         gap={3}
         sx={t => ({
           padding: t.space.$3,
+          background: common.mutedBackground(t),
         })}
       >
         {/* Header with name and badge */}
         <Flex
           elementDescriptor={descriptors.subscriptionDetailsCardHeader}
-          align='center'
+          // align='center'
+          justify='between'
           gap={2}
         >
           {subscription.plan.avatarUrl ? (
@@ -543,43 +549,85 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
             />
           ) : null}
 
-          <Text
-            elementDescriptor={descriptors.subscriptionDetailsCardTitle}
-            variant='h2'
-            sx={t => ({
-              fontSize: t.fontSizes.$lg,
-              fontWeight: t.fontWeights.$semibold,
-              color: t.colors.$colorForeground,
-              marginInlineEnd: 'auto',
-            })}
+          {/* Pricing details */}
+          <Flex
+            direction='col'
+            justify='between'
           >
-            {subscription.plan.name}
-          </Text>
-          <SubscriptionBadge
-            subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription}
-            elementDescriptor={descriptors.subscriptionDetailsCardBadge}
-          />
-        </Flex>
-
-        {/* Pricing details */}
-        <Flex
-          justify='between'
-          align='center'
-        >
-          <Text
-            variant='body'
-            colorScheme='secondary'
-            sx={t => ({
-              fontWeight: t.fontWeights.$medium,
-              textTransform: 'lowercase',
-            })}
-          >
-            {fee.currencySymbol}
-            {fee.amountFormatted} /{' '}
-            {t(localizationKeys(`billing.${subscription.planPeriod === 'month' ? 'month' : 'year'}`))}
-          </Text>
+            <Text
+              elementDescriptor={descriptors.subscriptionDetailsCardTitle}
+              variant='h2'
+              sx={t => ({
+                fontSize: t.fontSizes.$lg,
+                fontWeight: t.fontWeights.$semibold,
+                color: t.colors.$colorForeground,
+              })}
+            >
+              {subscription.plan.name}
+            </Text>
+            <Flex>
+              <Text
+                variant='body'
+                as='span'
+                sx={t => ({
+                  fontWeight: t.fontWeights.$medium,
+                  textTransform: 'lowercase',
+                })}
+              >
+                {fee.currencySymbol}
+                {fee.amountFormatted}
+              </Text>
+              <Text
+                variant='body'
+                as='span'
+                colorScheme='secondary'
+                sx={t => ({
+                  fontWeight: t.fontWeights.$medium,
+                  textTransform: 'lowercase',
+                  whiteSpace: 'pre',
+                })}
+              >
+                {` / ${t(localizationKeys(`billing.${subscription.planPeriod === 'month' ? 'month' : 'year'}`))}`}
+              </Text>
+            </Flex>
+          </Flex>
+          <Flex align='start'>
+            <SubscriptionBadge
+              subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription}
+              elementDescriptor={descriptors.subscriptionDetailsCardBadge}
+            />
+          </Flex>
         </Flex>
       </Col>
+
+      {subscription.seats ? (
+        <DetailRow
+          variant='header'
+          labelNode={
+            <Text
+              sx={t => ({
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: t.space.$1,
+              })}
+            >
+              <Icon
+                icon={Users}
+                size='md'
+                colorScheme='neutral'
+              />
+              <Text localizationKey={localizationKeys('billing.seats')} />
+            </Text>
+          }
+          value={
+            subscription.seats.quantity === null
+              ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
+              : localizationKeys('billing.pricingTable.seatCost.upToSeats', {
+                  endsAfterBlock: subscription.seats.quantity,
+                })
+          }
+        />
+      ) : null}
 
       {subscription.pastDueAt ? (
         <DetailRow
@@ -627,7 +675,17 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
 };
 
 // Helper component for detail rows
-const DetailRow = ({ label, value }: { label: LocalizationKey; value: string }) => (
+const DetailRow = ({
+  label,
+  labelNode,
+  value,
+  variant,
+}: {
+  label?: LocalizationKey;
+  labelNode?: React.ReactNode;
+  value: string | LocalizationKey;
+  variant?: 'header';
+}) => (
   <Flex
     elementDescriptor={descriptors.subscriptionDetailsDetailRow}
     justify='between'
@@ -638,17 +696,33 @@ const DetailRow = ({ label, value }: { label: LocalizationKey; value: string }) 
       borderBlockStartWidth: t.borderWidths.$normal,
       borderBlockStartStyle: t.borderStyles.$solid,
       borderBlockStartColor: t.colors.$borderAlpha100,
+      ...(variant === 'header'
+        ? {
+            background: common.mutedBackground(t),
+          }
+        : {}),
     })}
   >
-    <Text
-      elementDescriptor={descriptors.subscriptionDetailsDetailRowLabel}
-      localizationKey={label}
-    />
-    <Text
-      elementDescriptor={descriptors.subscriptionDetailsDetailRowValue}
-      colorScheme='secondary'
-    >
-      {value}
-    </Text>
+    {label ? (
+      <Text
+        elementDescriptor={descriptors.subscriptionDetailsDetailRowLabel}
+        localizationKey={label}
+      />
+    ) : null}
+    {labelNode ? labelNode : null}
+    {typeof value === 'string' ? (
+      <Text
+        elementDescriptor={descriptors.subscriptionDetailsDetailRowValue}
+        colorScheme='secondary'
+      >
+        {value}
+      </Text>
+    ) : (
+      <Text
+        localizationKey={value}
+        elementDescriptor={descriptors.subscriptionDetailsDetailRowValue}
+        colorScheme='secondary'
+      />
+    )}
   </Flex>
 );
