@@ -24,7 +24,6 @@ const PricingTableRoot = (props: PricingTableProps) => {
         : []
       : plans;
   }, [clerk.isSignedIn, plans, subscription]);
-  console.log('plansToRender', { plansToRender, plans, subscription });
 
   const defaultPlanPeriod = useMemo(() => {
     if (isCompact) {
