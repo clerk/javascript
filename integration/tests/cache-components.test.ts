@@ -42,61 +42,91 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     test('auth() in server component works when signed in', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
+      // Collect console errors and network failures
+      const consoleErrors: string[] = [];
+      const networkErrors: string[] = [];
+      page.on('console', msg => {
+        if (msg.type() === 'error') consoleErrors.push(msg.text());
+      });
+      page.on('requestfailed', req => {
+        networkErrors.push(`${req.method()} ${req.url()} - ${req.failure()?.errorText}`);
+      });
+
       // Sign in first
       await u.po.signIn.goTo();
-
-      // Diagnostic: check for duplicate DOM elements (Activity component issue)
-      const identifierInputs = await page.locator('input[name=identifier]').count();
-      console.log(`[DIAG] identifier inputs in DOM: ${identifierInputs}`);
       console.log(`[DIAG] URL after goTo sign-in: ${page.url()}`);
 
-      await u.po.signIn.signInWithEmailAndInstantPassword({
-        email: fakeUser.email,
-        password: fakeUser.password,
-        waitForSession: false,
+      // Check form state before interaction
+      const identifierInput = page.locator('input[name=identifier]');
+      const isIdentifierVisible = await identifierInput.isVisible();
+      const isIdentifierEnabled = await identifierInput.isEnabled();
+      console.log(`[DIAG] identifier visible: ${isIdentifierVisible}, enabled: ${isIdentifierEnabled}`);
+
+      // Fill identifier and check if password field appears
+      await identifierInput.fill(fakeUser.email);
+      const passwordInput = page.locator('input[name=password]');
+      try {
+        await passwordInput.waitFor({ state: 'visible', timeout: 5000 });
+        console.log('[DIAG] password field appeared after filling identifier');
+      } catch {
+        console.log('[DIAG] password field did NOT appear after 5s');
+        // Capture what the form looks like
+        const formHTML = await page.locator('.cl-signIn-root').innerHTML();
+        console.log('[DIAG] sign-in form HTML:', formHTML.substring(0, 3000));
+      }
+
+      // Fill password and check Continue button
+      const isPasswordVisible = await passwordInput.isVisible();
+      console.log(`[DIAG] password visible: ${isPasswordVisible}`);
+      if (isPasswordVisible) {
+        await passwordInput.fill(fakeUser.password, { force: true });
+      }
+
+      const continueBtn = page.getByRole('button', { name: 'Continue', exact: true });
+      const isContinueVisible = await continueBtn.isVisible();
+      const isContinueEnabled = await continueBtn.isEnabled();
+      console.log(`[DIAG] continue button visible: ${isContinueVisible}, enabled: ${isContinueEnabled}`);
+
+      // Track API calls during sign-in
+      const apiCalls: string[] = [];
+      page.on('response', res => {
+        if (res.url().includes('clerk') || res.url().includes('sign_in')) {
+          apiCalls.push(`${res.status()} ${res.url().split('?')[0]}`);
+        }
       });
 
-      // Diagnostic: capture state after clicking Continue but before waiting for session
-      const diagAfterSubmit = await page.evaluate(() => {
+      // Click continue
+      await continueBtn.click();
+
+      // Wait a few seconds for the sign-in to process
+      await page.waitForTimeout(5000);
+
+      const diagAfterWait = await page.evaluate(() => {
         return {
           url: window.location.href,
-          clerkDefined: typeof window.Clerk !== 'undefined',
           clerkLoaded: !!(window as any).Clerk?.loaded,
-          clerkVersion: (window as any).Clerk?.version,
           hasSession: !!(window as any).Clerk?.session,
           hasUser: !!(window as any).Clerk?.user,
-          sessionId: (window as any).Clerk?.session?.id ?? null,
           cookies: document.cookie,
-          identifierInputCount: document.querySelectorAll('input[name=identifier]').length,
-          signInRootCount: document.querySelectorAll('.cl-signIn-root').length,
-          activityElements: document.querySelectorAll('[data-activity]').length,
-          hiddenElements: document.querySelectorAll('[hidden]').length,
+          signInCardClass: document.querySelector('.cl-cardBox')?.className ?? 'NOT_FOUND',
         };
       });
-      console.log('[DIAG] State after submit:', JSON.stringify(diagAfterSubmit, null, 2));
+      console.log('[DIAG] State 5s after click:', JSON.stringify(diagAfterWait, null, 2));
+      console.log('[DIAG] API calls:', JSON.stringify(apiCalls));
+      console.log('[DIAG] Console errors:', JSON.stringify(consoleErrors));
+      console.log('[DIAG] Network errors:', JSON.stringify(networkErrors));
 
-      // Now wait for session with extended timeout and more diagnostics
+      // Now wait for session
       try {
-        await page.waitForFunction(
-          () => !!window.Clerk?.session,
-          { timeout: 15_000 },
-        );
+        await page.waitForFunction(() => !!window.Clerk?.session, { timeout: 10_000 });
       } catch {
-        // Capture state at timeout for debugging
-        const diagAtTimeout = await page.evaluate(() => {
-          return {
-            url: window.location.href,
-            clerkDefined: typeof window.Clerk !== 'undefined',
-            clerkLoaded: !!(window as any).Clerk?.loaded,
-            hasSession: !!(window as any).Clerk?.session,
-            hasUser: !!(window as any).Clerk?.user,
-            clerkStatus: (window as any).Clerk?.status,
-            cookies: document.cookie,
-            bodyHTML: document.body.innerHTML.substring(0, 2000),
-          };
-        });
-        console.log('[DIAG] State at TIMEOUT:', JSON.stringify(diagAtTimeout, null, 2));
-        throw new Error(`waitForSession timed out. Diagnostics logged above.`);
+        const finalState = await page.evaluate(() => ({
+          url: window.location.href,
+          hasSession: !!(window as any).Clerk?.session,
+          cookies: document.cookie,
+        }));
+        console.log('[DIAG] FINAL state at timeout:', JSON.stringify(finalState));
+        throw new Error('waitForSession timed out');
       }
 
       await u.po.expect.toBeSignedIn();
