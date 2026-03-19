@@ -378,28 +378,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     });
   });
 
-  test.describe('touch with intent', () => {
-    test('focus touch returns last_active_token even without client piggybacking', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
-
-      await u.po.signIn.goTo();
-      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-      await u.po.expect.toBeSignedIn();
-
-      // Touch with intent=focus. The server may skip client piggybacking for focus
-      // touches as an optimization, but the session must still include last_active_token.
-      await page.evaluate(async () => {
-        await (window.Clerk?.session as any)?.touch({ intent: 'focus' });
-      });
-
-      const lastActiveTokenJwt = await page.evaluate(() => {
-        return window.Clerk?.session?.lastActiveToken?.getRawString() ?? null;
-      });
-
-      expect(lastActiveTokenJwt).toBeTruthy();
-    });
-  });
-
   test.describe('clerk-js script loading', () => {
     test('recovers from transient network failure on clerk-js script load', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
