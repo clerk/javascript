@@ -6,10 +6,12 @@ export const getPort = _getPort;
 export const chalk = _chalk;
 export const fs = _fs;
 export { createLogger } from './logger';
+export { createCiDiagnosticLogger, shouldLogCiDiagnostics } from './ciDiagnostics';
 
 export { waitForIdleProcess } from './waitForIdleProcess';
 export { range } from './range';
 export { chunkLogger, run } from './run';
+export { startDetachedProcessLogMirror } from './detachedProcessLogMirror';
 
 export * from './setup';
 export * from './waitForServer';
