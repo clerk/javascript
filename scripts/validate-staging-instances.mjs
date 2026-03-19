@@ -348,7 +348,7 @@ async function main() {
   const validPairs = [];
   for (const pair of pairs) {
     const stagingDomain = parseFapiDomain(pair.staging.pk);
-    if (!stagingDomain.includes('accountsstage.dev')) {
+    if (!stagingDomain.endsWith('.accountsstage.dev')) {
       console.error(
         `⚠️  ${STAGING_KEY_PREFIX}${pair.name}: PK points to "${stagingDomain}" which is not a staging domain (expected accountsstage.dev). Skipping.`,
       );
