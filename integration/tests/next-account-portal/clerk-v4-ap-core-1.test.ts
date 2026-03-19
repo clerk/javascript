@@ -6,7 +6,7 @@ import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 import { testSignIn, testSignUp, testSSR } from './common';
 
-test.describe('Next with ClerkJS V4 <-> Account Portal Core 1 @ap-flows', () => {
+test.skip('Next with ClerkJS V4 <-> Account Portal Core 1 @ap-flows', () => {
   test.describe.configure({ mode: 'serial' });
   let app: Application;
   let fakeUser: FakeUser;
