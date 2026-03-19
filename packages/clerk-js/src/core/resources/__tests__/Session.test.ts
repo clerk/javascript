@@ -1529,7 +1529,11 @@ describe('Session', () => {
     beforeEach(() => {
       dispatchSpy = vi.spyOn(eventBus, 'emit');
       fetchSpy = vi.spyOn(BaseResource, '_fetch' as any);
-      BaseResource.clerk = clerkMock() as any;
+      BaseResource.clerk = clerkMock({
+        __internal_environment: {
+          authConfig: { sessionMinter: true },
+        },
+      }) as any;
     });
 
     afterEach(() => {
