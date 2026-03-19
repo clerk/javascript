@@ -15,7 +15,7 @@ import {
   obtainOAuthAccessToken,
 } from '../../testUtils';
 
-test.describe('Astro machine authentication @astro @machine', () => {
+test.describe('Astro machine authentication @machine', () => {
   test.describe('API key auth', () => {
     test.describe.configure({ mode: 'parallel' });
     let app: Application;

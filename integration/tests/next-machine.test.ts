@@ -15,7 +15,7 @@ import {
   obtainOAuthAccessToken,
 } from '../testUtils';
 
-test.describe('Next.js machine authentication @nextjs @machine', () => {
+test.describe('Next.js machine authentication @machine', () => {
   test.describe('API key auth', () => {
     test.describe.configure({ mode: 'parallel' });
     let app: Application;
