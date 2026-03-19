@@ -57,11 +57,11 @@ export async function createFakeMachineNetwork(clerkClient: ClerkClient): Promis
     unscopedSenderToken,
     cleanup: async () => {
       await Promise.all([
-        await clerkClient.m2m.revokeToken({ m2mTokenId: scopedSenderToken.id }),
-        await clerkClient.m2m.revokeToken({ m2mTokenId: unscopedSenderToken.id }),
-        await clerkClient.machines.delete(scopedSender.id),
-        await clerkClient.machines.delete(unscopedSender.id),
-        await clerkClient.machines.delete(primaryServer.id),
+        clerkClient.m2m.revokeToken({ m2mTokenId: scopedSenderToken.id }),
+        clerkClient.m2m.revokeToken({ m2mTokenId: unscopedSenderToken.id }),
+        clerkClient.machines.delete(scopedSender.id),
+        clerkClient.machines.delete(unscopedSender.id),
+        clerkClient.machines.delete(primaryServer.id),
       ]);
     },
   };
