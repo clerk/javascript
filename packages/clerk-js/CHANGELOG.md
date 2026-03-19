@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.125.6
+
+### Patch Changes
+
+- Fix issue where "Manage Subscription" button appeared on default free plans. ([#8116](https://github.com/clerk/javascript/pull/8116)) by [@dstaley](https://github.com/dstaley)
+
 ## 5.125.5
 
 ### Patch Changes
