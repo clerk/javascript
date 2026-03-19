@@ -63,6 +63,11 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
         // Once `setActive` performs the navigation, `__internal_onAfterSetActive` will kick in and perform a router.refresh ensuring shared layouts will also update with the correct authentication context.
         if ((nextVersion.startsWith('15') || nextVersion.startsWith('16')) && intent === 'sign-out') {
           resolve(); // noop
+        } else if (nextVersion.startsWith('16')) {
+          // On Next.js 16 with cacheComponents, calling invalidateCacheAction (a server action that
+          // calls cookies()) hangs indefinitely, blocking setActive from completing. The router.refresh()
+          // in onAfterSetActive is sufficient to invalidate the cache on Next.js 16+.
+          resolve();
         } else {
           void invalidateCacheAction().then(() => resolve());
         }
