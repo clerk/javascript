@@ -220,4 +220,23 @@ describe('createClerkInstance', () => {
       domain: undefined,
     });
   });
+
+  test('throws when proxyUrl is not absolute', async () => {
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+
+    expect(() =>
+      getClerkInstance({
+        publishableKey: 'pk_test_123',
+        proxyUrl: '/api/__clerk',
+      }),
+    ).toThrow(/`proxyUrl` must be an absolute URL/);
+
+    expect(() =>
+      getClerkInstance({
+        publishableKey: 'pk_test_123',
+        proxyUrl: () => '/api/__clerk',
+      }),
+    ).toThrow(/`proxyUrl` must be a string/);
+  });
 });
