@@ -3,19 +3,19 @@ import { createClerkClient } from '@clerk/backend';
 import { TokenType } from '@clerk/backend/internal';
 import { expect, test } from '@playwright/test';
 
-import type { Application } from '../../models/application';
-import { appConfigs } from '../../presets';
-import { instanceKeys } from '../../presets/envs';
-import type { FakeAPIKey, FakeMachineNetwork, FakeOAuthApp, FakeUser } from '../../testUtils';
+import type { Application } from '../models/application';
+import { appConfigs } from '../presets';
+import { instanceKeys } from '../presets/envs';
+import type { FakeAPIKey, FakeMachineNetwork, FakeOAuthApp, FakeUser } from '../testUtils';
 import {
   createFakeMachineNetwork,
   createFakeOAuthApp,
   createJwtM2MToken,
   createTestUtils,
   obtainOAuthAccessToken,
-} from '../../testUtils';
+} from '../testUtils';
 
-test.describe('Astro machine authentication @astro @machine', () => {
+test.describe('Next.js machine authentication @nextjs @machine', () => {
   test.describe('API key auth', () => {
     test.describe.configure({ mode: 'parallel' });
     let app: Application;
@@ -26,22 +26,32 @@ test.describe('Astro machine authentication @astro @machine', () => {
     test.beforeAll(async () => {
       test.setTimeout(120_000);
 
-      app = await appConfigs.astro.node
+      app = await appConfigs.next.appRouter
         .clone()
         .addFile(
-          'src/pages/api/me.ts',
+          'src/app/api/me/route.ts',
           () => `
-          import type { APIRoute } from 'astro';
+          import { auth } from '@clerk/nextjs/server';
 
-          export const GET: APIRoute = ({ locals }) => {
-            const { userId, tokenType } = locals.auth({ acceptsToken: 'api_key' });
+          export async function GET() {
+            const { userId, tokenType } = await auth({ acceptsToken: 'api_key' });
 
             if (!userId) {
-              return new Response('Unauthorized', { status: 401 });
+              return Response.json({ error: 'Unauthorized' }, { status: 401 });
             }
 
             return Response.json({ userId, tokenType });
-          };
+          }
+
+          export async function POST() {
+            const authObject = await auth({ acceptsToken: ['api_key', 'session_token'] });
+
+            if (!authObject.isAuthenticated) {
+              return Response.json({ error: 'Unauthorized' }, { status: 401 });
+            }
+
+            return Response.json({ userId: authObject.userId, tokenType: authObject.tokenType });
+          }
           `,
         )
         .commit();
@@ -101,6 +111,40 @@ test.describe('Astro machine authentication @astro @machine', () => {
         expect(res.status()).toBe(401);
       });
     }
+
+    test('should handle multiple token types', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      const url = new URL('/api/me', app.serverUrl);
+
+      // Sign in to get a session token
+      await u.po.signIn.goTo();
+      await u.po.signIn.waitForMounted();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+
+      // GET endpoint (only accepts api_key) - session token should fail
+      const getRes = await u.page.request.get(url.toString());
+      expect(getRes.status()).toBe(401);
+
+      // POST endpoint (accepts both api_key and session_token)
+      // Test with session token
+      const postWithSessionRes = await u.page.request.post(url.toString());
+      const sessionData = await postWithSessionRes.json();
+      expect(postWithSessionRes.status()).toBe(200);
+      expect(sessionData.userId).toBe(fakeBapiUser.id);
+      expect(sessionData.tokenType).toBe(TokenType.SessionToken);
+
+      // Test with API key
+      const postWithApiKeyRes = await u.page.request.post(url.toString(), {
+        headers: {
+          Authorization: `Bearer ${fakeAPIKey.secret}`,
+        },
+      });
+      const apiKeyData = await postWithApiKeyRes.json();
+      expect(postWithApiKeyRes.status()).toBe(200);
+      expect(apiKeyData.userId).toBe(fakeBapiUser.id);
+      expect(apiKeyData.tokenType).toBe(TokenType.ApiKey);
+    });
   });
 
   test.describe('M2M auth', () => {
@@ -116,22 +160,22 @@ test.describe('Astro machine authentication @astro @machine', () => {
       });
       network = await createFakeMachineNetwork(client);
 
-      app = await appConfigs.astro.node
+      app = await appConfigs.next.appRouter
         .clone()
         .addFile(
-          'src/pages/api/protected.ts',
+          'src/app/api/protected/route.ts',
           () => `
-          import type { APIRoute } from 'astro';
+          import { auth } from '@clerk/nextjs/server';
 
-          export const GET: APIRoute = ({ locals }) => {
-            const { subject, tokenType, isAuthenticated } = locals.auth({ acceptsToken: 'm2m_token' });
+          export async function GET() {
+            const { subject, tokenType, isAuthenticated } = await auth({ acceptsToken: 'm2m_token' });
 
             if (!isAuthenticated) {
-              return new Response('Unauthorized', { status: 401 });
+              return Response.json({ error: 'Unauthorized' }, { status: 401 });
             }
 
             return Response.json({ subject, tokenType });
-          };
+          }
           `,
         )
         .commit();
@@ -179,6 +223,25 @@ test.describe('Astro machine authentication @astro @machine', () => {
       expect(body.tokenType).toBe(TokenType.M2MToken);
     });
 
+    test('authorizes after dynamically granting scope', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.services.clerk.machines.createScope(network.unscopedSender.id, network.primaryServer.id);
+      const m2mToken = await u.services.clerk.m2m.createToken({
+        machineSecretKey: network.unscopedSender.secretKey,
+        secondsUntilExpiration: 60 * 30,
+      });
+
+      const res = await u.page.request.get(app.serverUrl + '/api/protected', {
+        headers: { Authorization: `Bearer ${m2mToken.token}` },
+      });
+      expect(res.status()).toBe(200);
+      const body = await res.json();
+      expect(body.subject).toBe(network.unscopedSender.id);
+      expect(body.tokenType).toBe(TokenType.M2MToken);
+      await u.services.clerk.m2m.revokeToken({ m2mTokenId: m2mToken.id });
+    });
+
     test('verifies JWT format M2M token via local verification', async ({ request }) => {
       const client = createClerkClient({
         secretKey: instanceKeys.get('with-api-keys').sk,
@@ -216,32 +279,32 @@ test.describe('Astro machine authentication @astro @machine', () => {
     test.beforeAll(async () => {
       test.setTimeout(120_000);
 
-      app = await appConfigs.astro.node
+      app = await appConfigs.next.appRouter
         .clone()
         .addFile(
-          'src/pages/api/protected.ts',
+          'src/app/api/protected/route.ts',
           () => `
-          import type { APIRoute } from 'astro';
+          import { auth } from '@clerk/nextjs/server';
 
-          export const GET: APIRoute = ({ locals }) => {
-            const { userId, tokenType } = locals.auth({ acceptsToken: 'oauth_token' });
+          export async function GET() {
+            const { userId, tokenType } = await auth({ acceptsToken: 'oauth_token' });
 
             if (!userId) {
-              return new Response('Unauthorized', { status: 401 });
+              return Response.json({ error: 'Unauthorized' }, { status: 401 });
             }
 
             return Response.json({ userId, tokenType });
-          };
+          }
           `,
         )
         .addFile(
-          'src/pages/api/oauth/callback.ts',
+          'src/app/oauth/callback/route.ts',
           () => `
-          import type { APIRoute } from 'astro';
+          import { NextResponse } from 'next/server';
 
-          export const GET: APIRoute = () => {
-            return Response.json({ message: 'OAuth callback received' });
-          };
+          export async function GET() {
+            return NextResponse.json({ message: 'OAuth callback received' });
+          }
           `,
         )
         .commit();
@@ -259,7 +322,7 @@ test.describe('Astro machine authentication @astro @machine', () => {
         publishableKey: app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
       });
 
-      fakeOAuth = await createFakeOAuthApp(clerkClient, `${app.serverUrl}/api/oauth/callback`);
+      fakeOAuth = await createFakeOAuthApp(clerkClient, `${app.serverUrl}/oauth/callback`);
     });
 
     test.afterAll(async () => {
@@ -274,7 +337,7 @@ test.describe('Astro machine authentication @astro @machine', () => {
       const accessToken = await obtainOAuthAccessToken({
         page: u.page,
         oAuthApp: fakeOAuth.oAuthApp,
-        redirectUri: `${app.serverUrl}/api/oauth/callback`,
+        redirectUri: `${app.serverUrl}/oauth/callback`,
         fakeUser,
         signIn: u.po.signIn,
       });
