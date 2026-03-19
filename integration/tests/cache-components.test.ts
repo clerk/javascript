@@ -44,10 +44,61 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
 
       // Sign in first
       await u.po.signIn.goTo();
+
+      // Diagnostic: check for duplicate DOM elements (Activity component issue)
+      const identifierInputs = await page.locator('input[name=identifier]').count();
+      console.log(`[DIAG] identifier inputs in DOM: ${identifierInputs}`);
+      console.log(`[DIAG] URL after goTo sign-in: ${page.url()}`);
+
       await u.po.signIn.signInWithEmailAndInstantPassword({
         email: fakeUser.email,
         password: fakeUser.password,
+        waitForSession: false,
       });
+
+      // Diagnostic: capture state after clicking Continue but before waiting for session
+      const diagAfterSubmit = await page.evaluate(() => {
+        return {
+          url: window.location.href,
+          clerkDefined: typeof window.Clerk !== 'undefined',
+          clerkLoaded: !!(window as any).Clerk?.loaded,
+          clerkVersion: (window as any).Clerk?.version,
+          hasSession: !!(window as any).Clerk?.session,
+          hasUser: !!(window as any).Clerk?.user,
+          sessionId: (window as any).Clerk?.session?.id ?? null,
+          cookies: document.cookie,
+          identifierInputCount: document.querySelectorAll('input[name=identifier]').length,
+          signInRootCount: document.querySelectorAll('.cl-signIn-root').length,
+          activityElements: document.querySelectorAll('[data-activity]').length,
+          hiddenElements: document.querySelectorAll('[hidden]').length,
+        };
+      });
+      console.log('[DIAG] State after submit:', JSON.stringify(diagAfterSubmit, null, 2));
+
+      // Now wait for session with extended timeout and more diagnostics
+      try {
+        await page.waitForFunction(
+          () => !!window.Clerk?.session,
+          { timeout: 15_000 },
+        );
+      } catch {
+        // Capture state at timeout for debugging
+        const diagAtTimeout = await page.evaluate(() => {
+          return {
+            url: window.location.href,
+            clerkDefined: typeof window.Clerk !== 'undefined',
+            clerkLoaded: !!(window as any).Clerk?.loaded,
+            hasSession: !!(window as any).Clerk?.session,
+            hasUser: !!(window as any).Clerk?.user,
+            clerkStatus: (window as any).Clerk?.status,
+            cookies: document.cookie,
+            bodyHTML: document.body.innerHTML.substring(0, 2000),
+          };
+        });
+        console.log('[DIAG] State at TIMEOUT:', JSON.stringify(diagAtTimeout, null, 2));
+        throw new Error(`waitForSession timed out. Diagnostics logged above.`);
+      }
+
       await u.po.expect.toBeSignedIn();
 
       // Navigate to server component page
