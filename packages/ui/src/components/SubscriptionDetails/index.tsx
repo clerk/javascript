@@ -378,8 +378,9 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
 
   const isSwitchable =
     ((subscription.planPeriod === 'month' && Boolean(subscription.plan.annualMonthlyFee)) ||
-      subscription.planPeriod === 'annual') &&
-    subscription.status !== 'past_due';
+      (subscription.planPeriod === 'annual' && Boolean(subscription.plan.fee))) &&
+    subscription.status !== 'past_due' &&
+    !subscription.plan.isDefault;
   const isFree = isFreePlan(subscription.plan);
   const isCancellable = subscription.canceledAt === null && !isFree;
   const isReSubscribable = subscription.canceledAt !== null && !isFree;
