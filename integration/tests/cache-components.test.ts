@@ -70,45 +70,102 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
         console.log('[DIAG] password field appeared after filling identifier');
       } catch {
         console.log('[DIAG] password field did NOT appear after 5s');
-        // Capture what the form looks like
         const formHTML = await page.locator('.cl-signIn-root').innerHTML();
         console.log('[DIAG] sign-in form HTML:', formHTML.substring(0, 3000));
       }
 
-      // Fill password and check Continue button
+      // Install event listeners on password input BEFORE filling
+      await page.evaluate(() => {
+        const pwInput = document.querySelector('input[name=password]') as HTMLInputElement;
+        if (pwInput) {
+          (window as any).__pwEvents = [];
+          ['input', 'change', 'focus', 'blur', 'keydown', 'keyup'].forEach(evt => {
+            pwInput.addEventListener(evt, (e: Event) => {
+              (window as any).__pwEvents.push({
+                type: e.type,
+                value: (e.target as HTMLInputElement).value.length,
+                isTrusted: e.isTrusted,
+              });
+            });
+          });
+          // Also track React's synthetic event by monkey-patching the value setter
+          const origDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+          (window as any).__valueSetCount = 0;
+          if (origDescriptor?.set) {
+            Object.defineProperty(pwInput, 'value', {
+              set(val: string) {
+                (window as any).__valueSetCount++;
+                origDescriptor.set!.call(this, val);
+              },
+              get() {
+                return origDescriptor.get!.call(this);
+              },
+            });
+          }
+        }
+      });
+
+      // Fill password
       const isPasswordVisible = await passwordInput.isVisible();
       console.log(`[DIAG] password visible: ${isPasswordVisible}`);
       if (isPasswordVisible) {
         await passwordInput.fill(fakeUser.password, { force: true });
       }
 
+      // Check what events fired and the password field state
+      const pwDiag = await page.evaluate(() => {
+        const pwInput = document.querySelector('input[name=password]') as HTMLInputElement;
+        return {
+          domValue: pwInput?.value ?? 'NOT_FOUND',
+          domValueLength: pwInput?.value?.length ?? 0,
+          events: (window as any).__pwEvents ?? [],
+          valueSetCount: (window as any).__valueSetCount ?? 0,
+          // Check password field's computed styles (Activity hiding?)
+          computedDisplay: pwInput ? getComputedStyle(pwInput).display : 'N/A',
+          computedOpacity: pwInput ? getComputedStyle(pwInput).opacity : 'N/A',
+          computedPointerEvents: pwInput ? getComputedStyle(pwInput).pointerEvents : 'N/A',
+          // Check parent container styles
+          parentOpacity: pwInput?.closest('[class*="instant"]')
+            ? getComputedStyle(pwInput.closest('[class*="instant"]')!).opacity
+            : pwInput?.parentElement
+              ? getComputedStyle(pwInput.parentElement).opacity
+              : 'N/A',
+        };
+      });
+      console.log('[DIAG] Password field after fill:', JSON.stringify(pwDiag, null, 2));
+
       const continueBtn = page.getByRole('button', { name: 'Continue', exact: true });
       const isContinueVisible = await continueBtn.isVisible();
       const isContinueEnabled = await continueBtn.isEnabled();
       console.log(`[DIAG] continue button visible: ${isContinueVisible}, enabled: ${isContinueEnabled}`);
 
-      // Track API calls during sign-in
+      // Track API calls with response bodies for sign-in calls
       const apiCalls: string[] = [];
-      page.on('response', res => {
-        if (res.url().includes('clerk') || res.url().includes('sign_in')) {
-          apiCalls.push(`${res.status()} ${res.url().split('?')[0]}`);
+      page.on('response', async res => {
+        const url = res.url();
+        if (url.includes('sign_in')) {
+          try {
+            const body = await res.json();
+            const status = body?.response?.status || body?.status || 'unknown';
+            apiCalls.push(`${res.status()} ${url.split('?')[0].split('/').slice(-2).join('/')} signInStatus=${status}`);
+          } catch {
+            apiCalls.push(`${res.status()} ${url.split('?')[0].split('/').slice(-2).join('/')}`);
+          }
         }
       });
 
       // Click continue
       await continueBtn.click();
 
-      // Wait a few seconds for the sign-in to process
+      // Wait for the sign-in to process
       await page.waitForTimeout(5000);
 
       const diagAfterWait = await page.evaluate(() => {
         return {
           url: window.location.href,
-          clerkLoaded: !!(window as any).Clerk?.loaded,
           hasSession: !!(window as any).Clerk?.session,
-          hasUser: !!(window as any).Clerk?.user,
-          cookies: document.cookie,
           signInCardClass: document.querySelector('.cl-cardBox')?.className ?? 'NOT_FOUND',
+          signInStatus: (window as any).Clerk?.client?.signIn?.status ?? 'N/A',
         };
       });
       console.log('[DIAG] State 5s after click:', JSON.stringify(diagAfterWait, null, 2));
