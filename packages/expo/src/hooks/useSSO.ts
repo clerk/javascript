@@ -86,11 +86,20 @@ export function useSSO() {
       return errorThrower.throw('Missing external verification redirect URL for SSO flow');
     }
 
-    const authSessionResult = await WebBrowserModule.openAuthSessionAsync(
-      externalVerificationRedirectURL.toString(),
-      redirectUrl,
-      authSessionOptions,
-    );
+    let authSessionResult: WebBrowser.WebBrowserAuthSessionResult;
+    try {
+      authSessionResult = await WebBrowserModule.openAuthSessionAsync(
+        externalVerificationRedirectURL.toString(),
+        redirectUrl,
+        authSessionOptions,
+      );
+    } finally {
+      // Ensure the browser is always dismissed after the auth session completes or fails.
+      // Without this, the browser can remain open in the background on some platforms,
+      // causing subsequent SSO attempts to fail or the browser to appear frozen.
+      WebBrowserModule.dismissBrowser();
+    }
+
     if (authSessionResult.type !== 'success' || !authSessionResult.url) {
       return {
         createdSessionId: null,
