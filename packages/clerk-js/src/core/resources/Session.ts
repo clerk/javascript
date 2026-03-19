@@ -480,7 +480,7 @@ export class Session extends BaseResource implements SessionResource {
   ): Promise<TokenResource> {
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     // TODO: update template endpoint to accept organizationId
-    const sessionMinterEnabled = Session.clerk?.__internal_environment?.sessionMinter;
+    const sessionMinterEnabled = Session.clerk?.__internal_environment?.authConfig?.sessionMinter;
     const params: Record<string, string | null> = template
       ? {}
       : {
