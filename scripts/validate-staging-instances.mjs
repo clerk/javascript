@@ -103,6 +103,8 @@ function diffObjects(a, b, path = '') {
   const mismatches = [];
 
   if (a === b) return mismatches;
+  // Treat falsy values as equivalent (e.g. undefined vs false)
+  if (!a && !b) return mismatches;
   if (a == null || b == null || typeof a !== typeof b) {
     mismatches.push({ path, prod: a, staging: b });
     return mismatches;
