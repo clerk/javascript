@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.3.2
+
+### Patch Changes
+
+- Fix false offline detection in React Native by checking `navigator.product` and `typeof navigator.onLine` before treating the environment as disconnected ([#8084](https://github.com/clerk/javascript/pull/8084)) by [@eliotgevers](https://github.com/eliotgevers)
+
+- Add optional `intent` parameter to `session.touch()` to indicate why the touch was triggered (focus, session switch, or org switch). This enables the backend to skip expensive client piggybacking for focus-only touches. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.3.1
 
 ### Patch Changes
