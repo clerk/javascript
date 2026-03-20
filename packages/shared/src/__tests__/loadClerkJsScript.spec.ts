@@ -169,6 +169,11 @@ describe('clerkJsScriptUrl()', () => {
     const result = clerkJsScriptUrl({ publishableKey: mockDevPublishableKey, __internal_clerkJSVersion: '6' });
     expect(result).toContain('/npm/@clerk/clerk-js@6/');
   });
+
+  test('constructs a relative proxied URL when proxyUrl is relative', () => {
+    const result = clerkJsScriptUrl({ publishableKey: mockDevPublishableKey, proxyUrl: '/__clerk' });
+    expect(result).toBe(`/__clerk/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`);
+  });
 });
 
 describe('buildScriptHost()', () => {
@@ -444,6 +449,11 @@ describe('clerkUIScriptUrl()', () => {
     // This test ensures we don't accidentally use JS version for UI
     expect(uiResult).not.toContain('@clerk/clerk-js');
     expect(jsResult).not.toContain('@clerk/ui');
+  });
+
+  test('constructs a relative proxied URL when proxyUrl is relative', () => {
+    const result = clerkUIScriptUrl({ publishableKey: mockDevPublishableKey, proxyUrl: '/__clerk' });
+    expect(result).toBe(`/__clerk/npm/@clerk/ui@${uiPackageMajorVersion}/dist/ui.browser.js`);
   });
 });
 

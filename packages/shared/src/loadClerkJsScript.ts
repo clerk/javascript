@@ -230,8 +230,13 @@ export const clerkJSScriptUrl = (opts: LoadClerkJSScriptOptions) => {
     return __internal_clerkJSUrl;
   }
 
-  const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
   const version = versionSelector(__internal_clerkJSVersion);
+
+  if (proxyUrl && isProxyUrlRelative(proxyUrl)) {
+    return buildRelativeProxyScriptUrl(proxyUrl, 'clerk-js', version, 'clerk.browser.js');
+  }
+
+  const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
   return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.browser.js`;
 };
 
@@ -242,8 +247,13 @@ export const clerkUIScriptUrl = (opts: LoadClerkUIScriptOptions) => {
     return __internal_clerkUIUrl;
   }
 
-  const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
   const version = versionSelector(__internal_clerkUIVersion, UI_PACKAGE_VERSION);
+
+  if (proxyUrl && isProxyUrlRelative(proxyUrl)) {
+    return buildRelativeProxyScriptUrl(proxyUrl, 'ui', version, 'ui.browser.js');
+  }
+
+  const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
   return `https://${scriptHost}/npm/@clerk/ui@${version}/dist/ui.browser.js`;
 };
 
@@ -278,6 +288,18 @@ const applyAttributesToScript = (attributes: Record<string, string>) => (script:
   for (const attribute in attributes) {
     script.setAttribute(attribute, attributes[attribute]);
   }
+};
+
+const stripTrailingSlashes = (value: string) => {
+  while (value.endsWith('/')) {
+    value = value.slice(0, -1);
+  }
+
+  return value;
+};
+
+const buildRelativeProxyScriptUrl = (proxyUrl: string, packageName: string, version: string, fileName: string) => {
+  return `${stripTrailingSlashes(proxyUrl)}/npm/@clerk/${packageName}@${version}/dist/${fileName}`;
 };
 
 export const buildScriptHost = (opts: { publishableKey: string; proxyUrl?: string; domain?: string }) => {
