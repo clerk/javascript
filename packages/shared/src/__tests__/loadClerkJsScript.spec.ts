@@ -228,6 +228,26 @@ describe('buildScriptHost()', () => {
       writable: true,
     });
   });
+
+  test('falls back to frontendApi for relative proxyUrl when window is unavailable', () => {
+    const currentWindow = global.window;
+
+    try {
+      Object.defineProperty(global, 'window', {
+        value: undefined,
+        configurable: true,
+      });
+
+      const result = buildScriptHost({ publishableKey: mockDevPublishableKey, proxyUrl: '/__clerk' });
+      expect(result).toBe('foo-bar-13.clerk.accounts.dev');
+    } finally {
+      Object.defineProperty(global, 'window', {
+        value: currentWindow,
+        writable: true,
+        configurable: true,
+      });
+    }
+  });
 });
 
 describe('buildClerkJsScriptAttributes()', () => {

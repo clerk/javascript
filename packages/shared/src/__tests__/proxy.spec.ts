@@ -167,6 +167,24 @@ describe('proxyUrlToAbsoluteURL(url)', () => {
   it('returns the same value as the parameter given as it already an absolute URL', () => {
     expect(proxyUrlToAbsoluteURL('https://clerk.com/api/__clerk')).toBe('https://clerk.com/api/__clerk');
   });
+
+  it('returns the relative URL unchanged when window is unavailable', () => {
+    const currentWindow = global.window;
+
+    Object.defineProperty(global, 'window', {
+      value: undefined,
+      configurable: true,
+    });
+
+    expect(proxyUrlToAbsoluteURL('/api/__clerk')).toBe('/api/__clerk');
+
+    Object.defineProperty(global, 'window', {
+      value: currentWindow,
+      writable: true,
+      configurable: true,
+    });
+  });
+
   it('returns empty string if parameter is undefined', () => {
     expect(proxyUrlToAbsoluteURL(undefined)).toBe('');
   });

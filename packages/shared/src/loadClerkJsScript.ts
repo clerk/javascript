@@ -1,7 +1,7 @@
 import { buildErrorThrower, ClerkRuntimeError } from './error';
 import { createDevOrStagingUrlCache, parsePublishableKey } from './keys';
 import { loadScript } from './loadScript';
-import { isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
+import { isProxyUrlRelative, isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
 import type { SDKMetadata } from './types';
 import { addClerkPrefix } from './url';
 import { versionSelector } from './versionSelector';
@@ -284,7 +284,13 @@ export const buildScriptHost = (opts: { publishableKey: string; proxyUrl?: strin
   const { proxyUrl, domain, publishableKey } = opts;
 
   if (!!proxyUrl && isValidProxyUrl(proxyUrl)) {
-    return proxyUrlToAbsoluteURL(proxyUrl).replace(/http(s)?:\/\//, '');
+    const resolvedProxyUrl = proxyUrlToAbsoluteURL(proxyUrl);
+
+    if (isProxyUrlRelative(resolvedProxyUrl)) {
+      return parsePublishableKey(publishableKey)?.frontendApi || '';
+    }
+
+    return resolvedProxyUrl.replace(/http(s)?:\/\//, '');
   } else if (domain && !isDevOrStagingUrl(parsePublishableKey(publishableKey)?.frontendApi || '')) {
     return addClerkPrefix(domain);
   } else {

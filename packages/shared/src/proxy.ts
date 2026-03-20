@@ -32,7 +32,16 @@ export function proxyUrlToAbsoluteURL(url: string | undefined): string {
   if (!url) {
     return '';
   }
-  return isProxyUrlRelative(url) ? new URL(url, window.location.origin).toString() : url;
+
+  if (!isProxyUrlRelative(url)) {
+    return url;
+  }
+
+  if (typeof window === 'undefined' || !window.location?.origin) {
+    return url;
+  }
+
+  return new URL(url, window.location.origin).toString();
 }
 
 const AUTO_PROXY_HOST_SUFFIXES = ['.vercel.app'];
