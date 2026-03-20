@@ -46,7 +46,7 @@ jobs:
         with:
           script: |
             const org = context.repo.owner;
-            const username = context.actor;
+            const username = process.env.GITHUB_TRIGGERING_ACTOR || context.actor;
 
             try {
               const { status } = await github.rest.orgs.checkMembershipForUser({
@@ -58,7 +58,13 @@ jobs:
                 core.setFailed(`User '${username}' is not a member of the '${org}' organization.`);
               }
             } catch (error) {
-              core.setFailed(`User '${username}' is not a member of the '${org}' organization.`);
+              if (error?.status === 404) {
+                core.setFailed(`User '${username}' is not a member of the '${org}' organization.`);
+              } else {
+                core.setFailed(
+                  `Org membership check failed for '${username}' in '${org}' (status: ${error?.status ?? 'unknown'}): ${error?.message ?? 'unknown error'}`
+                );
+              }
             }
 
   validate-instances:
