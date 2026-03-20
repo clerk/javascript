@@ -64,6 +64,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 3
       matrix:
         test-name:
           - 'sessions:staging'
@@ -212,6 +213,7 @@ jobs:
         env:
           E2E_DEBUG: '1'
           E2E_STAGING: '1'
+          E2E_WORKERS: '2'
           E2E_SDK_SOURCE: ${{ steps.inputs.outputs.sdk-source }}
           E2E_APP_CLERK_JS_DIR: ${{ runner.temp }}
           E2E_APP_CLERK_UI_DIR: ${{ runner.temp }}
@@ -227,7 +229,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.inputs.outputs.artifact-suffix }}
-          path: integration/test-results
+          path: test-results
           retention-days: 1
 
   report:
