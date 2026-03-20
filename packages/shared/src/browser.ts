@@ -73,6 +73,12 @@ export function isBrowserOnline(): boolean {
     return false;
   }
 
+  // Some environments (e.g. React Native) define a Navigator object but do not
+  // implement navigator.onLine as a boolean. Default to online in those cases.
+  if (typeof navigator.onLine !== 'boolean') {
+    return true;
+  }
+
   // navigator.onLine is the standard API and is reliable for detecting
   // complete disconnection (airplane mode, WiFi off, etc.).
   // The experimental navigator.connection API (rtt/downlink) was previously

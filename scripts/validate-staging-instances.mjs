@@ -103,6 +103,8 @@ function diffObjects(a, b, path = '') {
   const mismatches = [];
 
   if (a === b) return mismatches;
+  // Treat falsy values as equivalent (e.g. undefined vs false)
+  if (!a && !b) return mismatches;
   if (a == null || b == null || typeof a !== typeof b) {
     mismatches.push({ path, prod: a, staging: b });
     return mismatches;
@@ -327,7 +329,7 @@ async function main() {
     process.exit(0);
   }
 
-  const loadErrorCount = prodErrors.length + stagingErrors.length;
+  let loadErrorCount = prodErrors.length + stagingErrors.length;
 
   const pairs = [];
   for (const [name, keys] of Object.entries(prodKeys)) {
@@ -342,12 +344,31 @@ async function main() {
     process.exit(0);
   }
 
-  console.log(`Validating ${pairs.length} staging instance pair(s)...\n`);
+  // Validate that staging PKs actually point to staging domains
+  const validPairs = [];
+  for (const pair of pairs) {
+    const stagingDomain = parseFapiDomain(pair.staging.pk);
+    if (!stagingDomain.endsWith('.accountsstage.dev')) {
+      console.error(
+        `⚠️  ${STAGING_KEY_PREFIX}${pair.name}: PK points to "${stagingDomain}" which is not a staging domain (expected accountsstage.dev). Skipping.`,
+      );
+      loadErrorCount++;
+      continue;
+    }
+    validPairs.push(pair);
+  }
+
+  if (validPairs.length === 0) {
+    console.log('No valid production/staging key pairs found. Skipping validation.');
+    process.exit(0);
+  }
+
+  console.log(`Validating ${validPairs.length} staging instance pair(s)...\n`);
 
   let mismatchCount = 0;
   let fetchFailCount = 0;
 
-  for (const pair of pairs) {
+  for (const pair of validPairs) {
     const prodDomain = parseFapiDomain(pair.prod.pk);
     const stagingDomain = parseFapiDomain(pair.staging.pk);
 
@@ -373,9 +394,9 @@ async function main() {
   if (mismatchCount > 0) parts.push(`${mismatchCount} mismatched`);
   if (fetchFailCount > 0) parts.push(`${fetchFailCount} failed to fetch`);
   if (loadErrorCount > 0) parts.push(`${loadErrorCount} key load errors`);
-  const matchedCount = pairs.length - mismatchCount - fetchFailCount;
+  const matchedCount = validPairs.length - mismatchCount - fetchFailCount;
   if (matchedCount > 0) parts.push(`${matchedCount} matched`);
-  console.log(`Summary: ${parts.join(', ')} (${pairs.length} total)`);
+  console.log(`Summary: ${parts.join(', ')} (${validPairs.length} total)`);
 }
 
 // Allow importing functions for testing while still being executable
