@@ -110,7 +110,7 @@ jobs:
           path: |
             ${{runner.temp}}/test-output.log
             /tmp/.temp_integration/
-            integration/test-results/
+            test-results/
           retention-days: 7
 
       - name: Report Status
