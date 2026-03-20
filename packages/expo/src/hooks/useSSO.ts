@@ -67,20 +67,25 @@ export function useSSO() {
 
     // Create the sign-in attempt. If a stale session exists (e.g. JWT persisted
     // in SecureStore after an incomplete sign-out), clear the token and retry.
-    let createResult = await signIn.create(createParams);
-    if (createResult.error) {
-      const isSessionExists =
-        isClerkAPIResponseError(createResult.error) && createResult.error.errors.some(e => e.code === 'session_exists');
-      const isAlreadySignedIn = createResult.error.message?.includes('already signed in');
+    // The error can surface as either a thrown exception (client-side "already signed in"
+    // guard) or a returned { error } (FAPI "session_exists" response).
+    try {
+      const createResult = await signIn.create(createParams);
+      if (createResult.error) {
+        throw createResult.error;
+      }
+    } catch (err) {
+      const isSessionExists = isClerkAPIResponseError(err) && err.errors.some(e => e.code === 'session_exists');
+      const isAlreadySignedIn = err instanceof Error && err.message?.includes('already signed in');
 
       if (isSessionExists || isAlreadySignedIn) {
         await SecureStore.deleteItemAsync(CLERK_CLIENT_JWT_KEY);
-        createResult = await signIn.create(createParams);
-        if (createResult.error) {
-          throw createResult.error;
+        const retryResult = await signIn.create(createParams);
+        if (retryResult.error) {
+          throw retryResult.error;
         }
       } else {
-        throw createResult.error;
+        throw err;
       }
     }
 
