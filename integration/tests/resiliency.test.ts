@@ -548,12 +548,15 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       // Token refresh should succeed (backend ignores the param for now)
       expect(token).toBeTruthy();
 
-      // Verify token param is present in the POST body (form-urlencoded)
+      // Verify token param is present in the POST body when sessionMinter is enabled.
       // fapiClient serializes body as form-urlencoded via qs.stringify(camelToSnake(body))
       // so "token" stays "token" (no case change) and the body looks like "organization_id=&token=<jwt>"
+      const sessionMinterEnabled = await page.evaluate(() => {
+        return !!(window as any).Clerk?.__internal_environment?.authConfig?.sessionMinter;
+      });
       expect(tokenRequestBodies.length).toBeGreaterThanOrEqual(1);
-      const lastBody = tokenRequestBodies[tokenRequestBodies.length - 1];
-      expect(lastBody).toContain('token=');
+      const lastBody = new URLSearchParams(tokenRequestBodies[tokenRequestBodies.length - 1]);
+      expect(lastBody.has('token')).toBe(sessionMinterEnabled);
 
       // User should still be signed in after refresh
       await u.po.expect.toBeSignedIn();
