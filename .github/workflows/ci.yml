@@ -458,7 +458,7 @@ jobs:
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       - name: Upload test-results
-        if: always() # TODO: revert to `cancelled() || failure()` after validating trace upload path
+        if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}

@@ -19,7 +19,7 @@ export const common: PlaywrightTestConfig = {
     actionTimeout: 10_000,
     navigationTimeout: 30_000,
     ignoreHTTPSErrors: true,
-    trace: 'on', // TODO: revert to 'retain-on-failure' after validating trace upload path
+    trace: 'retain-on-failure',
     bypassCSP: true, // We probably need to limit this to specific tests
   },
 } as const;
