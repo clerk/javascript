@@ -15,6 +15,7 @@ import type {
   SessionResource,
   SessionStatus,
   SessionTask,
+  SessionTouchParams,
   SessionVerificationJSON,
   SessionVerificationResource,
   SessionVerifyAttemptFirstFactorParams,
@@ -86,10 +87,10 @@ export class Session extends BaseResource implements SessionResource {
     });
   };
 
-  touch = (): Promise<SessionResource> => {
+  touch = ({ intent }: SessionTouchParams = {}): Promise<SessionResource> => {
     return this._basePost({
       action: 'touch',
-      body: { active_organization_id: this.lastActiveOrganizationId },
+      body: { active_organization_id: this.lastActiveOrganizationId, intent },
     }).then(res => {
       // touch() will potentially change the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
       if (res.lastActiveToken) {

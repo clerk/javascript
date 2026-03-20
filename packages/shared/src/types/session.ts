@@ -239,7 +239,7 @@ export interface SessionResource extends ClerkResource {
    */
   end: () => Promise<SessionResource>;
   remove: () => Promise<SessionResource>;
-  touch: () => Promise<SessionResource>;
+  touch: (params?: SessionTouchParams) => Promise<SessionResource>;
   getToken: GetToken;
   checkAuthorization: CheckAuthorization;
   clearCache: () => void;
@@ -319,6 +319,12 @@ export type SessionStatus =
   | 'replaced'
   | 'revoked'
   | 'pending';
+
+export type SessionTouchIntent = 'focus' | 'select_session' | 'select_org';
+
+export type SessionTouchParams = {
+  intent?: SessionTouchIntent;
+};
 
 export interface PublicUserData {
   firstName: string | null;

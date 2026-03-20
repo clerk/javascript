@@ -467,6 +467,93 @@ describe('Session', () => {
         token: session.lastActiveToken,
       });
     });
+
+    it('passes touch intent in the request body', async () => {
+      const sessionData = {
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: 'org_123',
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON;
+      const session = new Session(sessionData);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+      requestSpy.mockResolvedValue({
+        payload: session,
+      });
+
+      await session.touch({ intent: 'focus' });
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { active_organization_id: 'org_123', intent: 'focus' },
+          method: 'POST',
+        }),
+        expect.anything(),
+      );
+    });
+
+    it('passes select_session intent in the request body', async () => {
+      const sessionData = {
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: 'org_123',
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON;
+      const session = new Session(sessionData);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+      requestSpy.mockResolvedValue({
+        payload: session,
+      });
+
+      await session.touch({ intent: 'select_session' });
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { active_organization_id: 'org_123', intent: 'select_session' },
+          method: 'POST',
+        }),
+        expect.anything(),
+      );
+    });
+
+    it('passes select_org intent in the request body', async () => {
+      const sessionData = {
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: 'org_123',
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON;
+      const session = new Session(sessionData);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+      requestSpy.mockResolvedValue({
+        payload: session,
+      });
+
+      await session.touch({ intent: 'select_org' });
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { active_organization_id: 'org_123', intent: 'select_org' },
+          method: 'POST',
+        }),
+        expect.anything(),
+      );
+    });
   });
 
   describe('isAuthorized()', () => {
