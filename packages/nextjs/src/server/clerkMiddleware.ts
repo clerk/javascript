@@ -160,7 +160,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       );
 
       // Handle Frontend API proxy requests early, before authentication
-      const requestUrl = new URL(request.url);
+      const requestUrl = new URL(request.nextUrl.href);
       const frontendApiProxyConfig =
         resolvedParams.frontendApiProxy ??
         (resolvedParams.proxyUrl || PROXY_URL || resolvedParams.domain || DOMAIN

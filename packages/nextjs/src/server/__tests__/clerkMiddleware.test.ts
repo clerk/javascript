@@ -1204,6 +1204,23 @@ describe('auto-proxy for eligible hosts', () => {
     expect((await clerkClient()).authenticateRequest).not.toBeCalled();
     expect(resp?.status).toBeDefined();
   });
+
+  it('uses request.nextUrl for auto-detection', async () => {
+    const req = new NextRequest('http://127.0.0.1:3000/__clerk/v1/client', {
+      method: 'GET',
+      headers: new Headers(),
+    });
+
+    Object.defineProperty(req, 'nextUrl', {
+      value: new URL('https://myapp-abc123.vercel.app/__clerk/v1/client'),
+      configurable: true,
+    });
+
+    const resp = await clerkMiddleware()(req, {} as NextFetchEvent);
+
+    expect((await clerkClient()).authenticateRequest).not.toBeCalled();
+    expect(resp?.status).toBeDefined();
+  });
 });
 
 describe('contentSecurityPolicy option', () => {
