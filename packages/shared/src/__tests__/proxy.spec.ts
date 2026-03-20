@@ -1,6 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl, proxyUrlToAbsoluteURL, shouldAutoProxy } from '../proxy';
+import {
+  getAutoProxyUrlFromEnvironment,
+  isHttpOrHttps,
+  isProxyUrlRelative,
+  isValidProxyUrl,
+  proxyUrlToAbsoluteURL,
+  shouldAutoProxy,
+} from '../proxy';
 
 describe('isValidProxyUrl(key)', () => {
   it('returns true if the proxyUrl is valid', () => {
@@ -57,6 +64,78 @@ describe('shouldAutoProxy(hostname)', () => {
 
   it('returns false for a domain that contains vercel.app but is not a subdomain', () => {
     expect(shouldAutoProxy('vercel.app.evil.com')).toBe(false);
+  });
+});
+
+describe('getAutoProxyUrlFromEnvironment(options)', () => {
+  it('returns a relative proxy path for Vercel production deployments with production keys', () => {
+    expect(
+      getAutoProxyUrlFromEnvironment({
+        publishableKey: 'pk_live_Zm9vLmNsZXJrLmNvbSQ=',
+        environment: {
+          VERCEL_PROJECT_PRODUCTION_URL: 'myapp.vercel.app',
+          VERCEL_TARGET_ENV: 'production',
+        },
+      }),
+    ).toBe('/__clerk');
+  });
+
+  it('returns empty string for non-production Clerk keys', () => {
+    expect(
+      getAutoProxyUrlFromEnvironment({
+        publishableKey: 'pk_test_Zm9vLmNsZXJrLmFjY291bnRzLmRldiQ=',
+        environment: {
+          VERCEL_PROJECT_PRODUCTION_URL: 'myapp.vercel.app',
+          VERCEL_TARGET_ENV: 'production',
+        },
+      }),
+    ).toBe('');
+  });
+
+  it('returns empty string when an explicit domain or proxyUrl is configured', () => {
+    expect(
+      getAutoProxyUrlFromEnvironment({
+        hasDomain: true,
+        publishableKey: 'pk_live_Zm9vLmNsZXJrLmNvbSQ=',
+        environment: {
+          VERCEL_PROJECT_PRODUCTION_URL: 'myapp.vercel.app',
+          VERCEL_TARGET_ENV: 'production',
+        },
+      }),
+    ).toBe('');
+
+    expect(
+      getAutoProxyUrlFromEnvironment({
+        hasProxyUrl: true,
+        publishableKey: 'pk_live_Zm9vLmNsZXJrLmNvbSQ=',
+        environment: {
+          VERCEL_PROJECT_PRODUCTION_URL: 'myapp.vercel.app',
+          VERCEL_TARGET_ENV: 'production',
+        },
+      }),
+    ).toBe('');
+  });
+
+  it('returns empty string for ineligible or non-production Vercel environments', () => {
+    expect(
+      getAutoProxyUrlFromEnvironment({
+        publishableKey: 'pk_live_Zm9vLmNsZXJrLmNvbSQ=',
+        environment: {
+          VERCEL_PROJECT_PRODUCTION_URL: 'myapp.com',
+          VERCEL_TARGET_ENV: 'production',
+        },
+      }),
+    ).toBe('');
+
+    expect(
+      getAutoProxyUrlFromEnvironment({
+        publishableKey: 'pk_live_Zm9vLmNsZXJrLmNvbSQ=',
+        environment: {
+          VERCEL_PROJECT_PRODUCTION_URL: 'myapp.vercel.app',
+          VERCEL_TARGET_ENV: 'preview',
+        },
+      }),
+    ).toBe('');
   });
 });
 

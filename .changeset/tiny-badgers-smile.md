@@ -5,4 +5,4 @@
 '@clerk/shared': patch
 ---
 
-Add auto-proxy detection for eligible hosts and generalize the internal helper naming for future providers.
+Add auto-proxy detection for eligible hosts, including Vercel production static-generation builds that can infer a relative proxy URL from platform env vars.

@@ -1,3 +1,5 @@
+import { isProductionFromPublishableKey } from './keys';
+
 /**
  *
  */
@@ -34,9 +36,48 @@ export function proxyUrlToAbsoluteURL(url: string | undefined): string {
 }
 
 const AUTO_PROXY_HOST_SUFFIXES = ['.vercel.app'];
+const AUTO_PROXY_PATH = '/__clerk';
 
 export function shouldAutoProxy(hostname: string): boolean {
   return AUTO_PROXY_HOST_SUFFIXES.some(hostSuffix => hostname.endsWith(hostSuffix));
+}
+
+function normalizeHostname(hostnameOrUrl: string): string {
+  if (hostnameOrUrl.startsWith('http://') || hostnameOrUrl.startsWith('https://')) {
+    return new URL(hostnameOrUrl).hostname;
+  }
+
+  return hostnameOrUrl.split('/')[0] || '';
+}
+
+type GetAutoProxyUrlFromEnvironmentOptions = {
+  publishableKey: string;
+  hasDomain?: boolean;
+  hasProxyUrl?: boolean;
+  environment?: NodeJS.ProcessEnv;
+};
+
+export function getAutoProxyUrlFromEnvironment({
+  publishableKey,
+  hasDomain = false,
+  hasProxyUrl = false,
+  environment = process.env,
+}: GetAutoProxyUrlFromEnvironmentOptions): string {
+  if (hasProxyUrl || hasDomain || !isProductionFromPublishableKey(publishableKey)) {
+    return '';
+  }
+
+  if (environment.VERCEL_TARGET_ENV !== 'production') {
+    return '';
+  }
+
+  const vercelProductionHostname = environment.VERCEL_PROJECT_PRODUCTION_URL;
+
+  if (!vercelProductionHostname || !shouldAutoProxy(normalizeHostname(vercelProductionHostname))) {
+    return '';
+  }
+
+  return AUTO_PROXY_PATH;
 }
 
 /**
