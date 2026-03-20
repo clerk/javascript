@@ -54,6 +54,13 @@ const HOP_BY_HOP_HEADERS = [
   'upgrade',
 ];
 
+// Headers to strip from proxied responses. fetch() auto-decompresses
+// response bodies, so Content-Encoding no longer describes the body
+// and Content-Length reflects the compressed size. We request identity
+// encoding upstream to avoid the double compression pass, but strip
+// these defensively since servers may ignore Accept-Encoding: identity.
+const RESPONSE_HEADERS_TO_STRIP = ['content-encoding', 'content-length'];
+
 /**
  * Derives the Frontend API URL from a publishable key.
  * @param publishableKey - The Clerk publishable key
@@ -235,6 +242,12 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
   const fapiHost = new URL(fapiBaseUrl).host;
   headers.set('Host', fapiHost);
 
+  // Request uncompressed responses to avoid a double compression pass.
+  // fetch() auto-decompresses, so without this FAPI compresses → fetch
+  // decompresses → the serving layer re-compresses for the browser.
+  // With identity the only compression happens at the edge, closer to the client.
+  headers.set('Accept-Encoding', 'identity');
+
   // Set X-Forwarded-* headers for proxy awareness
   // Only set these if not already present (preserve values from upstream proxies)
   if (!headers.has('X-Forwarded-Host')) {
@@ -271,10 +284,11 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
 
     const response = await fetch(targetUrl.toString(), fetchOptions);
 
-    // Build response headers, excluding hop-by-hop headers
+    // Build response headers, excluding hop-by-hop and encoding headers
     const responseHeaders = new Headers();
     response.headers.forEach((value, key) => {
-      if (!HOP_BY_HOP_HEADERS.includes(key.toLowerCase())) {
+      const lower = key.toLowerCase();
+      if (!HOP_BY_HOP_HEADERS.includes(lower) && !RESPONSE_HEADERS_TO_STRIP.includes(lower)) {
         responseHeaders.set(key, value);
       }
     });
