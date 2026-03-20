@@ -204,7 +204,7 @@ describe('Clerk singleton', () => {
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-        expect(mockSession.touch).toHaveBeenCalled();
+        expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
       });
 
       describe('with `touchSession` set to false', () => {
@@ -215,7 +215,7 @@ describe('Clerk singleton', () => {
           const sut = new Clerk(productionPublishableKey);
           await sut.load({ touchSession: false });
           await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-          expect(mockSession.touch).toHaveBeenCalled();
+          expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
         });
       });
 
@@ -230,7 +230,7 @@ describe('Clerk singleton', () => {
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-        expect(mockSession.touch).toHaveBeenCalled();
+        expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
       });
 
       it('sets __session and __client_uat cookie before calling __unstable__onBeforeSetActive', async () => {
@@ -299,7 +299,7 @@ describe('Clerk singleton', () => {
 
         await waitFor(() => {
           expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
-          expect(mockSession2.touch).toHaveBeenCalled();
+          expect(mockSession2.touch).toHaveBeenCalledWith({ intent: 'select_session' });
           expect(mockSession2.getToken).toHaveBeenCalled();
           expect(beforeEmitMock).toHaveBeenCalledWith(mockSession2);
           expect(sut.session).toMatchObject(mockSession2);
@@ -332,7 +332,7 @@ describe('Clerk singleton', () => {
 
         await waitFor(() => {
           expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
-          expect(mockSession.touch).toHaveBeenCalled();
+          expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_org' });
           expect(mockSession.getToken).toHaveBeenCalled();
           expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
           expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);

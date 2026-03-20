@@ -73,6 +73,7 @@ import type {
   Resources,
   SDKMetadata,
   SessionResource,
+  SessionTouchParams,
   SetActiveParams,
   SignedInSessionResource,
   SignInProps,
@@ -1555,11 +1556,13 @@ export class Clerk implements ClerkInterface {
         await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
       }
 
+      const touchIntent: SessionTouchParams['intent'] = shouldSwitchOrganization ? 'select_org' : 'select_session';
+
       //1. setLastActiveSession to passed user session (add a param).
       //   Note that this will also update the session's active organization
       //   id.
       if (inActiveBrowserTab() || !this.#options.standardBrowser) {
-        await this.#touchCurrentSession(newSession);
+        await this.#touchCurrentSession(newSession, touchIntent);
         // reload session from updated client
         newSession = this.#getSessionFromClient(newSession?.id);
       }
@@ -3016,7 +3019,7 @@ export class Clerk implements ClerkInterface {
       this.#touchThrottledUntil = Date.now() + 5_000;
 
       if (this.#options.touchSession) {
-        void this.#touchCurrentSession(this.session);
+        void this.#touchCurrentSession(this.session, 'focus');
       }
     });
 
@@ -3047,12 +3050,15 @@ export class Clerk implements ClerkInterface {
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
-  #touchCurrentSession = async (session?: SignedInSessionResource | null): Promise<void> => {
+  #touchCurrentSession = async (
+    session?: SignedInSessionResource | null,
+    intent: SessionTouchParams['intent'] = 'focus',
+  ): Promise<void> => {
     if (!session) {
       return Promise.resolve();
     }
 
-    await session.touch().catch(e => {
+    await session.touch({ intent }).catch(e => {
       if (is4xxError(e)) {
         void this.handleUnauthenticated();
       }
