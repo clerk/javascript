@@ -77,13 +77,22 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
 
-    const authSessionResult = await WebBrowserModule.openAuthSessionAsync(
-      // @ts-ignore
-      externalVerificationRedirectURL.toString(),
-      oauthRedirectUrl,
-    );
+    let authSessionResult: WebBrowser.WebBrowserAuthSessionResult;
+    try {
+      authSessionResult = await WebBrowserModule.openAuthSessionAsync(
+        // @ts-ignore
+        externalVerificationRedirectURL.toString(),
+        oauthRedirectUrl,
+      );
+    } finally {
+      try {
+        await WebBrowserModule.dismissBrowser();
+      } catch {
+        // Already dismissed
+      }
+    }
 
-    // @ts-expect-error
+    // @ts-expect-error - url exists on success result type
     const { type, url } = authSessionResult || {};
 
     // TODO: Check all the possible AuthSession results
