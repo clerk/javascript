@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.47.3
+
+### Patch Changes
+
+- Add optional `intent` parameter to `session.touch()` to indicate why the touch was triggered (focus, session switch, or org switch). This enables the backend to skip expensive client piggybacking for focus-only touches. ([#8135](https://github.com/clerk/javascript/pull/8135)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 3.47.2
 
 ### Patch Changes
