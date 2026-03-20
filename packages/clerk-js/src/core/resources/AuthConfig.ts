@@ -8,6 +8,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
   reverification: boolean = false;
   singleSessionMode: boolean = false;
   preferredChannels: Record<string, PhoneCodeChannel> | null = null;
+  sessionMinter: boolean = false;
 
   public constructor(data: Partial<AuthConfigJSON> | null = null) {
     super();
@@ -23,6 +24,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
     this.reverification = this.withDefault(data.reverification, this.reverification);
     this.singleSessionMode = this.withDefault(data.single_session_mode, this.singleSessionMode);
     this.preferredChannels = this.withDefault(data.preferred_channels, this.preferredChannels);
+    this.sessionMinter = this.withDefault(data.session_minter, this.sessionMinter);
     return this;
   }
 
@@ -33,6 +35,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
       object: 'auth_config',
       reverification: this.reverification,
       single_session_mode: this.singleSessionMode,
+      session_minter: this.sessionMinter,
     };
   }
 }
