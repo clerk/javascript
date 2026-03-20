@@ -5,6 +5,7 @@ import { chromium } from '@playwright/test';
 import type { BrowserContext } from '@playwright/test';
 
 import type { EnvironmentConfig } from '../../models/environment';
+import { withRetry } from '../../testUtils/retryableClerkClient';
 import { createUserService } from '../../testUtils/usersService';
 import type { FakeUser } from '../../testUtils/usersService';
 
@@ -79,11 +80,13 @@ export async function getExtensionId(context: BrowserContext) {
  * Create a fake user from an env config and register it via the Backend API.
  */
 export async function createTestUser(env: EnvironmentConfig): Promise<FakeUser> {
-  const clerkClient = backendCreateClerkClient({
-    apiUrl: env.privateVariables.get('CLERK_API_URL'),
-    secretKey: env.privateVariables.get('CLERK_SECRET_KEY'),
-    publishableKey: env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
-  });
+  const clerkClient = withRetry(
+    backendCreateClerkClient({
+      apiUrl: env.privateVariables.get('CLERK_API_URL'),
+      secretKey: env.privateVariables.get('CLERK_SECRET_KEY'),
+      publishableKey: env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
+    }),
+  );
   const users = createUserService(clerkClient);
   const fakeUser = users.createFakeUser();
   await users.createBapiUser(fakeUser);
