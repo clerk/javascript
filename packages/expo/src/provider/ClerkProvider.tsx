@@ -140,6 +140,8 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     children,
     tokenCache,
     publishableKey,
+    proxyUrl,
+    domain,
     __experimental_passkeys,
     experimental,
     __experimental_resourceCache,
@@ -163,6 +165,8 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     ? getClerkInstance({
         publishableKey: pk,
         tokenCache,
+        proxyUrl,
+        domain,
         __experimental_passkeys,
         __experimental_resourceCache,
       })
@@ -383,6 +387,8 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       key={pk}
       {...rest}
       publishableKey={pk}
+      proxyUrl={proxyUrl}
+      domain={domain}
       sdkMetadata={SDK_METADATA}
       Clerk={clerkInstance}
       standardBrowser={!isNative()}

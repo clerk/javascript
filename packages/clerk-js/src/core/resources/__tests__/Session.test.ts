@@ -798,6 +798,37 @@ describe('Session', () => {
         token: session.lastActiveToken,
       });
     });
+
+    it('passes touch intent in the request body', async () => {
+      const sessionData = {
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: 'org_123',
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON;
+      const session = new Session(sessionData);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+      requestSpy.mockResolvedValue({
+        payload: { response: sessionData },
+        status: 200,
+      });
+
+      await session.touch({ intent: 'focus' });
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { active_organization_id: 'org_123', intent: 'focus' },
+          method: 'POST',
+          path: '/client/sessions/session_1/touch',
+        }),
+        expect.anything(),
+      );
+    });
   });
 
   describe('__internal_touch()', () => {
@@ -901,6 +932,27 @@ describe('Session', () => {
       await session.__internal_touch();
 
       expect(session.lastActiveOrganizationId).toBe('org_456');
+    });
+
+    it('passes touch intent in the request body', async () => {
+      const session = new Session(mockSessionData);
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+
+      requestSpy.mockResolvedValue({
+        payload: { response: mockSessionData },
+        status: 200,
+      });
+
+      await session.__internal_touch({ intent: 'select_session' });
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { active_organization_id: 'org_123', intent: 'select_session' },
+          method: 'POST',
+          path: '/client/sessions/session_1/touch',
+        }),
+        expect.anything(),
+      );
     });
   });
 
@@ -1519,6 +1571,130 @@ describe('Session', () => {
       });
 
       expect(isAuthorized).toBe(true);
+    });
+  });
+
+  describe('sends previous token in /tokens request body', () => {
+    let dispatchSpy: ReturnType<typeof vi.spyOn>;
+    let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      dispatchSpy = vi.spyOn(eventBus, 'emit');
+      fetchSpy = vi.spyOn(BaseResource, '_fetch' as any);
+      BaseResource.clerk = clerkMock({
+        __internal_environment: {
+          authConfig: { sessionMinter: true },
+        },
+      }) as any;
+    });
+
+    afterEach(() => {
+      dispatchSpy?.mockRestore();
+      fetchSpy?.mockRestore();
+      BaseResource.clerk = null as any;
+    });
+
+    it('includes token in request body when lastActiveToken exists', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken();
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(fetchSpy.mock.calls[0][0]).toMatchObject({
+        path: '/client/sessions/session_1/tokens',
+        method: 'POST',
+        body: { organizationId: null, token: mockJwt },
+      });
+    });
+
+    it('does not include token key in request body when lastActiveToken is null (first mint)', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as unknown as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken();
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(fetchSpy.mock.calls[0][0]).toMatchObject({
+        path: '/client/sessions/session_1/tokens',
+        method: 'POST',
+        body: { organizationId: null },
+      });
+      expect(fetchSpy.mock.calls[0][0].body).not.toHaveProperty('token');
+    });
+
+    it('does not include token in request body for template token requests', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken({ template: 'my-template' });
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(fetchSpy.mock.calls[0][0]).toMatchObject({
+        path: '/client/sessions/session_1/tokens/my-template',
+        method: 'POST',
+      });
+      expect(fetchSpy.mock.calls[0][0].body).toEqual({});
+    });
+
+    it('token value matches lastActiveToken.getRawString() exactly', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken();
+
+      expect(fetchSpy.mock.calls[0][0].body.token).toBe(mockJwt);
     });
   });
 
