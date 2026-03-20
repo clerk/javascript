@@ -39,6 +39,7 @@ test.describe('Keyless mode @react-router', () => {
   });
 
   test('Toggle collapse popover and claim.', async ({ page, context }) => {
+    test.skip(process.env.E2E_STAGING === '1', 'Staging dashboard is behind Vercel SSO');
     await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl, framework: 'react-router' });
   });
 
@@ -46,6 +47,7 @@ test.describe('Keyless mode @react-router', () => {
     page,
     context,
   }) => {
+    test.skip(process.env.E2E_STAGING === '1', 'Staging dashboard is behind Vercel SSO');
     await testClaimedAppWithMissingKeys({ page, context, app, dashboardUrl });
   });
 

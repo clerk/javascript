@@ -56,6 +56,7 @@ test.describe('Keyless mode @quickstart', () => {
   });
 
   test('Toggle collapse popover and claim.', async ({ page, context }) => {
+    test.skip(process.env.E2E_STAGING === '1', 'Staging dashboard is behind Vercel SSO');
     await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl, framework: 'nextjs' });
   });
 
@@ -63,6 +64,7 @@ test.describe('Keyless mode @quickstart', () => {
     page,
     context,
   }) => {
+    test.skip(process.env.E2E_STAGING === '1', 'Staging dashboard is behind Vercel SSO');
     await mockClaimedInstanceEnvironmentCall(page);
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
