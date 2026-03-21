@@ -21,10 +21,7 @@ export const SignOutButton = withClerk(
     const { redirectUrl = '/', sessionId, signOutOptions, getContainer, component, ...rest } = props;
 
     if (signOutOptions) {
-      deprecated(
-        'SignOutButton `signOutOptions`',
-        'Use the `redirectUrl` and `sessionId` props directly instead.',
-      );
+      deprecated('SignOutButton `signOutOptions`', 'Use the `redirectUrl` and `sessionId` props directly instead.');
     }
 
     children = normalizeWithDefaultValue(children, 'Sign out');
