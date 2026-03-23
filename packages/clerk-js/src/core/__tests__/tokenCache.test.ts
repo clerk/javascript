@@ -674,6 +674,236 @@ describe('SessionTokenCache', () => {
     });
   });
 
+  describe('varying TTL across consecutive tokens', () => {
+    it('adapts refresh timer when a 60s token is replaced by a 200s token', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const key = { tokenId: 'varying-ttl-token' };
+
+      const onRefreshB = vi.fn();
+
+      // When Token A's refresh fires, simulate what Session.#refreshTokenInBackground does:
+      // fetch a new token with a different TTL and cache it
+      const onRefreshA = vi.fn(() => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const jwtB = createJwtWithTtl(currentTime, 200);
+        const tokenB = new Token({ id: 'varying-ttl-token', jwt: jwtB, object: 'token' });
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(tokenB),
+          onRefresh: onRefreshB,
+        });
+      });
+
+      // Token A: 60s TTL, refresh fires at 43s (60 - 15 - 2)
+      const jwtA = createJwtWithTtl(nowSeconds, 60);
+      const tokenA = new Token({ id: 'varying-ttl-token', jwt: jwtA, object: 'token' });
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(tokenA),
+        onRefresh: onRefreshA,
+      });
+      await Promise.resolve();
+
+      // Advance to just before Token A's refresh
+      vi.advanceTimersByTime(42 * 1000);
+      expect(onRefreshA).not.toHaveBeenCalled();
+
+      // Token A's refresh fires at 43s, which caches Token B (200s TTL)
+      vi.advanceTimersByTime(1 * 1000);
+      expect(onRefreshA).toHaveBeenCalledTimes(1);
+
+      // Let Token B's promise resolve so its timers get scheduled
+      await Promise.resolve();
+
+      // Token B's refresh should fire at 183s (200 - 15 - 2) from when it was cached (t=43s)
+      // So absolute time: 43s + 183s = 226s from start
+      vi.advanceTimersByTime(182 * 1000);
+      expect(onRefreshB).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(1 * 1000);
+      expect(onRefreshB).toHaveBeenCalledTimes(1);
+    });
+
+    it('adapts refresh timer when a 200s token is replaced by a 60s token', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const key = { tokenId: 'long-to-short-token' };
+
+      const onRefreshB = vi.fn();
+
+      const onRefreshA = vi.fn(() => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const jwtB = createJwtWithTtl(currentTime, 60);
+        const tokenB = new Token({ id: 'long-to-short-token', jwt: jwtB, object: 'token' });
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(tokenB),
+          onRefresh: onRefreshB,
+        });
+      });
+
+      // Token A: 200s TTL, refresh fires at 183s (200 - 15 - 2)
+      const jwtA = createJwtWithTtl(nowSeconds, 200);
+      const tokenA = new Token({ id: 'long-to-short-token', jwt: jwtA, object: 'token' });
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(tokenA),
+        onRefresh: onRefreshA,
+      });
+      await Promise.resolve();
+
+      // Token A's refresh fires at 183s
+      vi.advanceTimersByTime(183 * 1000);
+      expect(onRefreshA).toHaveBeenCalledTimes(1);
+      await Promise.resolve();
+
+      // Token B (60s TTL) refresh fires at 43s from when cached (t=183s)
+      // Absolute: 183s + 43s = 226s
+      vi.advanceTimersByTime(42 * 1000);
+      expect(onRefreshB).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(1 * 1000);
+      expect(onRefreshB).toHaveBeenCalledTimes(1);
+    });
+
+    it('handles full chain: 60s -> 200s -> 60s with correct refresh timing at each step', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const key = { tokenId: 'chain-token' };
+
+      const onRefreshC = vi.fn();
+
+      const onRefreshB = vi.fn(() => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const jwtC = createJwtWithTtl(currentTime, 60);
+        const tokenC = new Token({ id: 'chain-token', jwt: jwtC, object: 'token' });
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(tokenC),
+          onRefresh: onRefreshC,
+        });
+      });
+
+      const onRefreshA = vi.fn(() => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const jwtB = createJwtWithTtl(currentTime, 200);
+        const tokenB = new Token({ id: 'chain-token', jwt: jwtB, object: 'token' });
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(tokenB),
+          onRefresh: onRefreshB,
+        });
+      });
+
+      // Token A: 60s TTL
+      const jwtA = createJwtWithTtl(nowSeconds, 60);
+      const tokenA = new Token({ id: 'chain-token', jwt: jwtA, object: 'token' });
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(tokenA),
+        onRefresh: onRefreshA,
+      });
+      await Promise.resolve();
+
+      // Step 1: Token A (60s) refresh fires at 43s
+      vi.advanceTimersByTime(43 * 1000);
+      expect(onRefreshA).toHaveBeenCalledTimes(1);
+      await Promise.resolve();
+
+      // Step 2: Token B (200s) refresh fires at 183s from t=43s -> absolute t=226s
+      vi.advanceTimersByTime(183 * 1000);
+      expect(onRefreshB).toHaveBeenCalledTimes(1);
+      await Promise.resolve();
+
+      // Step 3: Token C (60s) refresh fires at 43s from t=226s -> absolute t=269s
+      vi.advanceTimersByTime(43 * 1000);
+      expect(onRefreshC).toHaveBeenCalledTimes(1);
+    });
+
+    it('old deletion timer does not remove replacement token with longer TTL', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const key = { tokenId: 'no-interference-token' };
+
+      // Token A: 60s TTL
+      const jwtA = createJwtWithTtl(nowSeconds, 60);
+      const tokenA = new Token({ id: 'no-interference-token', jwt: jwtA, object: 'token' });
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(tokenA),
+      });
+      await Promise.resolve();
+
+      // Replace with Token B (200s TTL) at t=30s
+      vi.advanceTimersByTime(30 * 1000);
+
+      const currentTime = Math.floor(Date.now() / 1000);
+      const jwtB = createJwtWithTtl(currentTime, 200);
+      const tokenB = new Token({ id: 'no-interference-token', jwt: jwtB, object: 'token' });
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(tokenB),
+      });
+      await Promise.resolve();
+
+      // Token A's deletion timer fires at t=60s (30s from now)
+      vi.advanceTimersByTime(30 * 1000);
+
+      // Token B should still be in cache (identity check in deleteKey prevents stale removal)
+      const result = SessionTokenCache.get(key);
+      expect(result).toBeDefined();
+      expect(result?.entry.tokenId).toBe('no-interference-token');
+
+      // Token B should survive well past Token A's original expiry
+      vi.advanceTimersByTime(100 * 1000);
+      const stillValid = SessionTokenCache.get(key);
+      expect(stillValid).toBeDefined();
+    });
+
+    it('token remains readable between refresh and expiry during TTL transitions', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const key = { tokenId: 'readable-during-transition' };
+
+      const onRefresh = vi.fn(() => {
+        // Simulate refresh that creates a token with a much longer TTL
+        const currentTime = Math.floor(Date.now() / 1000);
+        const jwtB = createJwtWithTtl(currentTime, 300);
+        const tokenB = new Token({ id: 'readable-during-transition', jwt: jwtB, object: 'token' });
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(tokenB),
+        });
+      });
+
+      // Token A: 60s TTL
+      const jwtA = createJwtWithTtl(nowSeconds, 60);
+      const tokenA = new Token({ id: 'readable-during-transition', jwt: jwtA, object: 'token' });
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(tokenA),
+        onRefresh,
+      });
+      await Promise.resolve();
+
+      // After refresh fires at 43s, token should still be readable
+      vi.advanceTimersByTime(43 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+      await Promise.resolve();
+
+      // Token B (300s) is now cached, should be readable
+      const result = SessionTokenCache.get(key);
+      expect(result).toBeDefined();
+
+      // Should still be readable far into Token B's lifetime
+      vi.advanceTimersByTime(250 * 1000);
+      const laterResult = SessionTokenCache.get(key);
+      expect(laterResult).toBeDefined();
+    });
+  });
+
   describe('hard cutoff behavior', () => {
     it('returns token when TTL is above poller interval', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
