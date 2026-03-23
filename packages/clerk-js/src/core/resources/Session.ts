@@ -496,6 +496,7 @@ export class Session extends BaseResource implements SessionResource {
       return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined);
     }
 
+    // TODO: Remove this expired_token retry flow when the sessionMinter flag is removed
     const lastActiveToken = this.lastActiveToken?.getRawString();
     return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
       if (MissingExpiredTokenError.is(e) && lastActiveToken) {
