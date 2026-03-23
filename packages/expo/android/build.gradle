@@ -54,7 +54,9 @@ android {
 
   kotlinOptions {
     jvmTarget = "17"
-    // clerk-android transitive deps (e.g. telemetry-api) still ship Kotlin 2.3.x metadata
+    // TODO: Remove once clerk-android pins its transitive deps to a Kotlin version compatible with Expo.
+    // clerk-android transitive deps (e.g. kotlinx-serialization-core:1.10.0) ship Kotlin 2.3.x metadata,
+    // but Expo SDK 54/55 uses Kotlin 2.1.x. This flag lets the 2.1.x compiler read 2.3.x metadata safely.
     freeCompilerArgs += ['-Xskip-metadata-version-check']
   }
 
