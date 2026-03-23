@@ -33,6 +33,30 @@ describe('UsernameScreen', () => {
     screen.getByRole('heading', { name: /Update username/i });
   });
 
+  describe('Immutable username', () => {
+    it('displays username as read-only when immutable and user has a username', async () => {
+      const { wrapper } = await createFixtures(initConfig);
+
+      const { queryByRole } = render(<UsernameSection isImmutable />, { wrapper });
+
+      screen.getByText('georgeclerk');
+      expect(queryByRole('button', { name: /update username/i })).not.toBeInTheDocument();
+      expect(queryByRole('button', { name: /set username/i })).not.toBeInTheDocument();
+    });
+
+    it('hides the section when immutable and user has no username', async () => {
+      const { wrapper } = await createFixtures(
+        createFixtures.config(f => {
+          f.withUser({ username: '' });
+        }),
+      );
+
+      const { container } = render(<UsernameSection isImmutable />, { wrapper });
+
+      expect(container.innerHTML).toBe('');
+    });
+  });
+
   describe('Actions', () => {
     it('calls the appropriate function upon pressing save', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);

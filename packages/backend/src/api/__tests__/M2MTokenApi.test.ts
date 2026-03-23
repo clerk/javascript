@@ -626,6 +626,35 @@ describe('M2MToken', () => {
       expect(response.totalCount).toBe(2);
     });
 
+    it('lists m2m tokens using machine secret key option', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+      });
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/m2m_tokens',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+            const url = new URL(request.url);
+            expect(url.searchParams.get('subject')).toBe(machineId);
+            expect(url.searchParams.has('machineSecretKey')).toBe(false);
+            return HttpResponse.json(mockM2MTokenList);
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2m.list({
+        machineSecretKey: 'ak_xxxxx',
+        subject: machineId,
+      });
+
+      expect(response.data).toHaveLength(2);
+      expect(response.data[0].id).toBe('mt_1xxxxxxxxxxxxx');
+      expect(response.data[1].id).toBe('mt_2xxxxxxxxxxxxx');
+      expect(response.totalCount).toBe(2);
+    });
+
     it('requires a machine secret or instance secret to list m2m tokens', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',

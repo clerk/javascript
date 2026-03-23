@@ -332,6 +332,7 @@ export interface AuthConfigJSON extends ClerkResourceJSON {
   claimed_at: number | null;
   reverification: boolean;
   preferred_channels?: Record<string, PhoneCodeChannel>;
+  session_minter?: boolean;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -605,7 +606,7 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   object: 'commerce_plan';
   id: string;
   name: string;
-  fee: BillingMoneyAmountJSON;
+  fee: BillingMoneyAmountJSON | null;
   annual_fee: BillingMoneyAmountJSON | null;
   annual_monthly_fee: BillingMoneyAmountJSON | null;
   description: string | null;

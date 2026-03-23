@@ -22,6 +22,10 @@ export type M2MTokenFormat = 'opaque' | 'jwt';
 
 type GetM2MTokenListParams = ClerkPaginationRequest<{
   /**
+   * Custom machine secret key for authentication.
+   */
+  machineSecretKey?: string;
+  /**
    * The machine ID to query machine-to-machine tokens by
    */
   subject: string;
@@ -108,11 +112,18 @@ export class M2MTokenApi extends AbstractAPI {
   }
 
   async list(queryParams: GetM2MTokenListParams) {
-    return this.request<PaginatedResourceResponse<M2MToken[]>>({
-      method: 'GET',
-      path: basePath,
-      queryParams,
-    });
+    const { machineSecretKey, ...params } = queryParams;
+
+    const requestOptions = this.#createRequestOptions(
+      {
+        method: 'GET',
+        path: basePath,
+        queryParams: params,
+      },
+      machineSecretKey,
+    );
+
+    return this.request<PaginatedResourceResponse<M2MToken[]>>(requestOptions);
   }
 
   async createToken(params?: CreateM2MTokenParams) {

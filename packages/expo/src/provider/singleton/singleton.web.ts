@@ -2,6 +2,13 @@ import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/react';
 
 import type { BuildClerkOptions } from './types';
 
+// Augment the global Window type to include Clerk
+declare global {
+  interface Window {
+    Clerk?: HeadlessBrowserClerk | BrowserClerk;
+  }
+}
+
 /**
  * Access the existing Clerk instance from `window.Clerk` on the web.
  * Unlike the native implementation, this does not create a new instance—it only returns the existing one set by ClerkProvider.
