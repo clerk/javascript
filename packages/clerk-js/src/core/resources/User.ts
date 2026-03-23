@@ -35,8 +35,6 @@ import type {
   Web3WalletResource,
 } from '@clerk/shared/types';
 
-import { convertPageToOffsetSearchParams } from '@/utils/convertPageToOffsetSearchParams';
-
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
@@ -299,11 +297,19 @@ export class User extends BaseResource implements UserResource {
   getEnterpriseConnections = async (
     params?: GetEnterpriseConnectionsParams,
   ): Promise<EnterpriseAccountConnectionResource[]> => {
+    const { withOrganizationAccountLinking } = params || {};
+
     const json = (
       await BaseResource._fetch({
         path: '/me/enterprise_connections',
         method: 'GET',
-        search: convertPageToOffsetSearchParams(params),
+        ...(withOrganizationAccountLinking !== undefined
+          ? {
+              search: {
+                with_organization_account_linking: String(withOrganizationAccountLinking),
+              },
+            }
+          : {}),
       })
     )?.response as unknown as EnterpriseAccountConnectionJSON[];
 

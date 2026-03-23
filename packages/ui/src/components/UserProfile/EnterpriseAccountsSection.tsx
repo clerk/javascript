@@ -11,7 +11,6 @@ import { Fragment, useState } from 'react';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
-import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 import { sleep } from '@/utils/sleep';
 
@@ -19,9 +18,6 @@ import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { Badge, Box, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
-import { useActionContext } from '../../elements/Action/ActionRoot';
-import type { PropsOfComponent } from '../../styledSystem';
-import { RemoveEnterpriseAccountForm } from './RemoveResourceForm';
 
 const EnterpriseConnectMenuButton = (props: { connection: EnterpriseAccountConnectionResource }) => {
   const { connection } = props;
@@ -122,18 +118,6 @@ const AddEnterpriseAccount = ({
   );
 };
 
-type RemoveEnterpriseAccountScreenProps = { accountId: string };
-const RemoveEnterpriseAccountScreen = (props: RemoveEnterpriseAccountScreenProps) => {
-  const { close } = useActionContext();
-  return (
-    <RemoveEnterpriseAccountForm
-      onSuccess={close}
-      onReset={close}
-      {...props}
-    />
-  );
-};
-
 export const EnterpriseAccountsSection = withCardStateProvider(() => {
   const { user } = useUser();
   const card = useCardState();
@@ -173,6 +157,7 @@ export const EnterpriseAccountsSection = withCardStateProvider(() => {
             />
           ))}
         </ProfileSection.ItemList>
+
         {linkableEnterpriseConnections.length > 0 && (
           <AddEnterpriseAccount
             enterpriseConnections={linkableEnterpriseConnections}
@@ -192,13 +177,7 @@ const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) 
 
   return (
     <Fragment key={accountId}>
-      <ProfileSection.Item
-        id='enterpriseAccounts'
-        sx={t => ({
-          gap: t.space.$2,
-          justifyContent: 'start',
-        })}
-      >
+      <ProfileSection.Item id='enterpriseAccounts'>
         <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
           <EnterpriseAccountProviderIcon account={account} />
           <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
@@ -228,34 +207,9 @@ const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) 
             </Flex>
           </Box>
         </Flex>
-
-        <EnterpriseAccountMenu account={account} />
       </ProfileSection.Item>
-
-      <Action.Open value={`remove-${accountId}`}>
-        <Action.Card variant='destructive'>
-          <RemoveEnterpriseAccountScreen accountId={accountId} />
-        </Action.Card>
-      </Action.Open>
     </Fragment>
   );
-};
-
-const EnterpriseAccountMenu = ({ account }: { account: EnterpriseAccountResource }) => {
-  const { open } = useActionContext();
-  const accountId = account.id;
-
-  const actions = (
-    [
-      {
-        label: localizationKeys('userProfile.start.enterpriseAccountsSection.destructiveActionTitle'),
-        isDestructive: true,
-        onClick: () => open(`remove-${accountId}`),
-      },
-    ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
-  ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
-
-  return <ThreeDotsMenu actions={actions} />;
 };
 
 const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccountResource }) => {

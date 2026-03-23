@@ -684,7 +684,6 @@ export type __internal_LocalizationResource = {
       enterpriseAccountsSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
-        destructiveActionTitle: LocalizationValue;
       };
       passwordSection: {
         title: LocalizationValue;
@@ -819,14 +818,6 @@ export type __internal_LocalizationResource = {
         messageLine1: LocalizationValue<'identifier'>;
         messageLine2: LocalizationValue;
         successMessage: LocalizationValue<'connectedAccount'>;
-      };
-    };
-    enterpriseAccountPage: {
-      removeResource: {
-        title: LocalizationValue;
-        messageLine1: LocalizationValue<'identifier'>;
-        messageLine2: LocalizationValue;
-        successMessage: LocalizationValue<'enterpriseAccount'>;
       };
     };
     web3WalletPage: {
