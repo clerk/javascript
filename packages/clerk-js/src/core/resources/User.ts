@@ -14,6 +14,7 @@ import type {
   EnterpriseAccountResource,
   ExternalAccountJSON,
   ExternalAccountResource,
+  GetEnterpriseConnectionsParams,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -33,6 +34,8 @@ import type {
   VerifyTOTPParams,
   Web3WalletResource,
 } from '@clerk/shared/types';
+
+import { convertPageToOffsetSearchParams } from '@/utils/convertPageToOffsetSearchParams';
 
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
@@ -293,11 +296,14 @@ export class User extends BaseResource implements UserResource {
     return new DeletedObject(json);
   };
 
-  getEnterpriseConnections = async (): Promise<EnterpriseAccountConnectionResource[]> => {
+  getEnterpriseConnections = async (
+    params?: GetEnterpriseConnectionsParams,
+  ): Promise<EnterpriseAccountConnectionResource[]> => {
     const json = (
       await BaseResource._fetch({
         path: '/me/enterprise_connections',
         method: 'GET',
+        search: convertPageToOffsetSearchParams(params),
       })
     )?.response as unknown as EnterpriseAccountConnectionJSON[];
 

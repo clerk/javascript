@@ -46,7 +46,7 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
     card.setLoading(strategy);
     return createExternalAccount()
       .then(res => {
-        if (res?.verification?.externalVerificationRedirectURL) {
+        if (res && res.verification?.externalVerificationRedirectURL) {
           void sleep(2000).then(() => card.setIdle(strategy));
           void navigate(res.verification.externalVerificationRedirectURL.href);
         }

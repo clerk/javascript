@@ -1,18 +1,19 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
-import { useReverification, useUser } from '@clerk/shared/react';
+import { __internal_useUserEnterpriseConnections, useReverification, useUser } from '@clerk/shared/react';
 import type {
   EnterpriseAccountConnectionResource,
   EnterpriseAccountResource,
   OAuthProvider,
 } from '@clerk/shared/types';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
+import { sleep } from '@/utils/sleep';
 
 import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
@@ -49,9 +50,8 @@ const EnterpriseConnectMenuButton = (props: { connection: EnterpriseAccountConne
     return createExternalAccount()
       .then(res => {
         if (res?.verification?.externalVerificationRedirectURL) {
+          void sleep(2000).then(() => card.setIdle(loadingKey));
           windowNavigate(res.verification.externalVerificationRedirectURL);
-        } else {
-          card.setIdle(loadingKey);
         }
       })
       .catch(err => {
@@ -137,23 +137,18 @@ const RemoveEnterpriseAccountScreen = (props: RemoveEnterpriseAccountScreenProps
 export const EnterpriseAccountsSection = withCardStateProvider(() => {
   const { user } = useUser();
   const card = useCardState();
-  const [enterpriseConnections, setEnterpriseConnections] = useState<EnterpriseAccountConnectionResource[]>([]);
   const [actionValue, setActionValue] = useState<string | null>(null);
-
-  useEffect(() => {
-    user?.getEnterpriseConnections?.().then(connections => {
-      setEnterpriseConnections(connections.filter(c => c.allowOrganizationAccountLinking));
-    });
-  }, [user]);
 
   const activeEnterpriseAccounts = user?.enterpriseAccounts.filter(
     ({ enterpriseConnection }) => enterpriseConnection?.active,
   );
 
-  const hasActiveAccounts = Boolean(activeEnterpriseAccounts?.length);
-  const hasAvailableConnections = enterpriseConnections.length > 0;
+  const { data: userEnterpriseConnections = [] } = __internal_useUserEnterpriseConnections({
+    withOrganizationAccountLinking: true,
+  });
+  const linkableEnterpriseConnections = userEnterpriseConnections.filter(c => c.allowOrganizationAccountLinking);
 
-  if (!hasActiveAccounts && !hasAvailableConnections) {
+  if (!activeEnterpriseAccounts?.length && !linkableEnterpriseConnections.length) {
     return null;
   }
 
@@ -177,7 +172,7 @@ export const EnterpriseAccountsSection = withCardStateProvider(() => {
           ))}
         </ProfileSection.ItemList>
         <AddEnterpriseAccount
-          enterpriseConnections={enterpriseConnections}
+          enterpriseConnections={linkableEnterpriseConnections}
           onClick={() => setActionValue(null)}
         />
       </Action.Root>
@@ -189,7 +184,7 @@ const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) 
   const label = account.emailAddress;
   const connectionName = account?.enterpriseConnection?.name;
   const error = account.verification?.error?.longMessage;
-  const accountId = account.id;
+  const accountId = account.id ?? '';
 
   return (
     <Fragment key={accountId}>

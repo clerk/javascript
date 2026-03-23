@@ -118,7 +118,7 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   ) => Promise<ClerkPaginatedResponse<OrganizationSuggestionResource>>;
   getOrganizationCreationDefaults: () => Promise<OrganizationCreationDefaultsResource>;
   leaveOrganization: (organizationId: string) => Promise<DeletedObjectResource>;
-  getEnterpriseConnections: () => Promise<EnterpriseAccountConnectionResource[]>;
+  getEnterpriseConnections: (params?: GetEnterpriseConnectionsParams) => Promise<EnterpriseAccountConnectionResource[]>;
   createTOTP: () => Promise<TOTPResource>;
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
@@ -185,3 +185,7 @@ export type GetUserOrganizationMembershipParams = ClerkPaginationParams;
 export type GetOrganizationMemberships = (
   params?: GetUserOrganizationMembershipParams,
 ) => Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>;
+
+export type GetEnterpriseConnectionsParams = {
+  withOrganizationAccountLinking?: boolean;
+};
