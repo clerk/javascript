@@ -146,7 +146,9 @@ export const EnterpriseAccountsSection = withCardStateProvider(() => {
   const { data: userEnterpriseConnections = [] } = __internal_useUserEnterpriseConnections({
     withOrganizationAccountLinking: true,
   });
-  const linkableEnterpriseConnections = userEnterpriseConnections.filter(c => c.allowOrganizationAccountLinking);
+  const linkableEnterpriseConnections = userEnterpriseConnections.filter(
+    c => c.allowOrganizationAccountLinking && !activeEnterpriseAccounts?.some(a => a.enterpriseConnectionId === c.id),
+  );
 
   if (!activeEnterpriseAccounts?.length && !linkableEnterpriseConnections.length) {
     return null;
