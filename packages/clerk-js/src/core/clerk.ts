@@ -3028,7 +3028,7 @@ export class Clerk implements ClerkInterface {
       };
 
       const initComponents = () => {
-        void this.#clerkUi?.then(ui => ui.ensureMounted());
+        void this.#clerkUI?.then(ui => ui.ensureMounted());
       };
 
       const [envResult, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
