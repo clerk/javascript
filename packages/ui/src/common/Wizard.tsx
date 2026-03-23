@@ -4,6 +4,7 @@ import { Animated } from '../elements/Animated';
 
 type WizardProps = React.PropsWithChildren<{
   step: number;
+  animate?: boolean;
 }>;
 
 type UseWizardProps = {
@@ -26,7 +27,11 @@ export const useWizard = (params: UseWizardProps = {}) => {
 };
 
 export const Wizard = (props: WizardProps) => {
-  const { step, children } = props;
+  const { step, children, animate = true } = props;
+
+  if (!animate) {
+    return React.Children.toArray(children)[step];
+  }
 
   return <Animated>{React.Children.toArray(children)[step]}</Animated>;
 };

@@ -1,5 +1,4 @@
-import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
-import type { Ui } from '@clerk/react/internal';
+import { InternalClerkProvider as ReactClerkProvider, type Ui } from '@clerk/react/internal';
 import { ScriptOnce } from '@tanstack/react-router';
 import { getGlobalStartContext } from '@tanstack/react-start';
 import { useEffect } from 'react';
@@ -8,7 +7,7 @@ import { isClient } from '../utils';
 import { ClerkOptionsProvider } from './OptionsContext';
 import type { TanstackStartClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
-import { mergeWithPublicEnvs, pickFromClerkInitState } from './utils';
+import { mergeWithPublicEnvs, parseUrlForNavigation, pickFromClerkInitState } from './utils';
 
 export * from '@clerk/react';
 
@@ -57,18 +56,24 @@ export function ClerkProvider<TUi extends Ui = Ui>({
         <ReactClerkProvider
           initialState={clerkSsrState}
           sdkMetadata={SDK_METADATA}
-          routerPush={(to: string) =>
-            awaitableNavigateRef.current?.({
-              to,
+          routerPush={(to: string) => {
+            const { search, hash, ...rest } = parseUrlForNavigation(to, window.location.origin);
+            return awaitableNavigateRef.current?.({
+              ...rest,
+              search: search as any,
+              hash,
               replace: false,
-            })
-          }
-          routerReplace={(to: string) =>
-            awaitableNavigateRef.current?.({
-              to,
+            });
+          }}
+          routerReplace={(to: string) => {
+            const { search, hash, ...rest } = parseUrlForNavigation(to, window.location.origin);
+            return awaitableNavigateRef.current?.({
+              ...rest,
+              search: search as any,
+              hash,
               replace: true,
-            })
-          }
+            });
+          }}
           {...mergedProps}
           {...keylessProps}
         >

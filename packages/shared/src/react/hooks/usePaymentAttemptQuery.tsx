@@ -1,7 +1,9 @@
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
-import { useClerkInstanceContext, useOrganizationContext, useUserContext } from '../contexts';
-import { useBillingHookEnabled } from './useBillingHookEnabled';
+import { useClerkInstanceContext } from '../contexts';
+import { useOrganizationBase } from './base/useOrganizationBase';
+import { useUserBase } from './base/useUserBase';
+import { useBillingIsEnabled } from './useBillingIsEnabled';
 import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
 import { usePaymentAttemptQueryCacheKeys } from './usePaymentAttemptQuery.shared';
 import type { PaymentAttemptQueryResult, UsePaymentAttemptQueryParams } from './usePaymentAttemptQuery.types';
@@ -12,8 +14,8 @@ import type { PaymentAttemptQueryResult, UsePaymentAttemptQueryParams } from './
 function usePaymentAttemptQuery(params: UsePaymentAttemptQueryParams): PaymentAttemptQueryResult {
   const { paymentAttemptId, keepPreviousData = false, for: forType = 'user' } = params;
   const clerk = useClerkInstanceContext();
-  const user = useUserContext();
-  const { organization } = useOrganizationContext();
+  const user = useUserBase();
+  const organization = useOrganizationBase();
 
   const organizationId = forType === 'organization' ? (organization?.id ?? null) : null;
   const userId = user?.id ?? null;
@@ -25,7 +27,7 @@ function usePaymentAttemptQuery(params: UsePaymentAttemptQueryParams): PaymentAt
     for: forType,
   });
 
-  const billingEnabled = useBillingHookEnabled(params);
+  const billingEnabled = useBillingIsEnabled(params);
 
   const queryEnabled = Boolean(paymentAttemptId) && billingEnabled;
 

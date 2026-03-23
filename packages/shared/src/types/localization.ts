@@ -193,6 +193,7 @@ export type __internal_LocalizationResource = {
     switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
     billedAnnually: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
+    billedAnnuallyOnly: LocalizationValue;
     cancelFreeTrial: LocalizationValue<'plan'>;
     cancelFreeTrialTitle: LocalizationValue<'plan'>;
     cancelFreeTrialAccessUntil: LocalizationValue<'plan' | 'date'>;
@@ -206,7 +207,10 @@ export type __internal_LocalizationResource = {
     availableFeatures: LocalizationValue;
     subtotal: LocalizationValue;
     credit: LocalizationValue;
+    prorationCredit: LocalizationValue;
+    accountCredit: LocalizationValue;
     creditRemainder: LocalizationValue;
+    payerCreditRemainder: LocalizationValue;
     totalDue: LocalizationValue;
     totalDueToday: LocalizationValue;
     pastDue: LocalizationValue;
@@ -909,6 +913,7 @@ export type __internal_LocalizationResource = {
         empty: LocalizationValue;
         itemCaption__paidForPlan: LocalizationValue;
         itemCaption__proratedCredit: LocalizationValue;
+        itemCaption__payerCredit: LocalizationValue;
         itemCaption__subscribedAndPaidForPlan: LocalizationValue;
         notFound: LocalizationValue;
         tableHeader__date: LocalizationValue;
@@ -1147,6 +1152,7 @@ export type __internal_LocalizationResource = {
         empty: LocalizationValue;
         itemCaption__paidForPlan: LocalizationValue<'plan' | 'period'>;
         itemCaption__proratedCredit: LocalizationValue;
+        itemCaption__payerCredit: LocalizationValue;
         itemCaption__subscribedAndPaidForPlan: LocalizationValue<'plan' | 'period'>;
         notFound: LocalizationValue;
         tableHeader__date: LocalizationValue;
@@ -1326,6 +1332,69 @@ export type __internal_LocalizationResource = {
       actionText: LocalizationValue<'identifier'>;
     };
     formButtonPrimary: LocalizationValue;
+  };
+  taskSetupMfa: {
+    badge: LocalizationValue;
+    start: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      methodSelection: {
+        totp: LocalizationValue;
+        phoneCode: LocalizationValue;
+      };
+    };
+    smsCode: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      addPhoneNumber: LocalizationValue;
+      cancel: LocalizationValue;
+      verifyPhone: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        formTitle: LocalizationValue;
+        resendButton: LocalizationValue;
+        formButtonPrimary: LocalizationValue;
+      };
+      addPhone: {
+        infoText: LocalizationValue;
+        formButtonPrimary: LocalizationValue;
+      };
+      success: {
+        title: LocalizationValue;
+        message1: LocalizationValue;
+        message2: LocalizationValue;
+        finishButton: LocalizationValue;
+      };
+    };
+    totpCode: {
+      title: LocalizationValue;
+      addAuthenticatorApp: {
+        infoText__ableToScan: LocalizationValue;
+        infoText__unableToScan: LocalizationValue;
+        inputLabel__unableToScan1: LocalizationValue;
+        buttonUnableToScan__nonPrimary: LocalizationValue;
+        buttonAbleToScan__nonPrimary: LocalizationValue;
+        formButtonPrimary: LocalizationValue;
+        formButtonReset: LocalizationValue;
+      };
+      verifyTotp: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        formTitle: LocalizationValue;
+        formButtonPrimary: LocalizationValue;
+        formButtonReset: LocalizationValue;
+      };
+      success: {
+        title: LocalizationValue;
+        message1: LocalizationValue;
+        message2: LocalizationValue;
+        finishButton: LocalizationValue;
+      };
+    };
+    signOut: {
+      actionText: LocalizationValue<'identifier'>;
+      actionLink: LocalizationValue;
+    };
   };
   web3SolanaWalletButtons: {
     connect: LocalizationValue<'walletName'>;

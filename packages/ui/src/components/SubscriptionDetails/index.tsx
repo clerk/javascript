@@ -1,4 +1,4 @@
-import { useClerk, useOrganizationContext } from '@clerk/shared/react';
+import { __internal_useOrganizationBase, useClerk } from '@clerk/shared/react';
 import type {
   __internal_CheckoutProps,
   __internal_SubscriptionDetailsProps,
@@ -182,7 +182,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
   const { setIsOpen } = useDrawerContext();
   const { onSubscriptionCancel } = useSubscriptionDetailsContext();
   // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
-  const organizationCtx = useOrganizationContext();
+  const organization = __internal_useOrganizationBase();
 
   const onOpenChange = useCallback((open: boolean) => setConfirmationOpen(open), [setConfirmationOpen]);
 
@@ -195,7 +195,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
     setLoading();
 
     await selectedSubscription
-      .cancel({ orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined })
+      .cancel({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
       .then(() => {
         onSubscriptionCancel?.();
         if (setIsOpen) {
@@ -213,7 +213,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
     setError,
     setLoading,
     subscriberType,
-    organizationCtx?.organization?.id,
+    organization?.id,
     onSubscriptionCancel,
     setIsOpen,
     setIdle,
@@ -375,8 +375,9 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
 
   const isSwitchable =
     ((subscription.planPeriod === 'month' && Boolean(subscription.plan.annualMonthlyFee)) ||
-      subscription.planPeriod === 'annual') &&
-    subscription.status !== 'past_due';
+      (subscription.planPeriod === 'annual' && Boolean(subscription.plan.fee))) &&
+    subscription.status !== 'past_due' &&
+    !subscription.plan.isDefault;
   const isFree = isFreePlan(subscription.plan);
   const isCancellable = subscription.canceledAt === null && !isFree;
   const isReSubscribable = subscription.canceledAt !== null && !isFree;

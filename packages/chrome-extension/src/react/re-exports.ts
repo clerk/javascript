@@ -6,6 +6,7 @@ export {
   ClerkLoaded,
   ClerkLoading,
   CreateOrganization,
+  HandleSSOCallback,
   OrganizationList,
   OrganizationProfile,
   OrganizationSwitcher,

@@ -2,8 +2,8 @@ import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { isOrganizationId } from '@clerk/shared/internal/clerk-js/organization';
 import {
   __experimental_useAPIKeys as useAPIKeys,
+  __internal_useOrganizationBase,
   useClerk,
-  useOrganizationContext,
   useUser,
 } from '@clerk/shared/react';
 import type { APIKeyResource } from '@clerk/shared/types';
@@ -240,9 +240,9 @@ const _APIKeys = () => {
   const ctx = useAPIKeysContext();
   const { user } = useUser();
   // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
-  const organizationCtx = useOrganizationContext();
+  const organization = __internal_useOrganizationBase();
 
-  const subject = organizationCtx?.organization?.id ?? user?.id ?? '';
+  const subject = organization?.id ?? user?.id ?? '';
 
   return (
     <Flow.Root

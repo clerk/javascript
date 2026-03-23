@@ -1,15 +1,12 @@
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { ClerkPaginatedResponse, ClerkResource, ForPayerType } from '../../types';
-import {
-  useAssertWrappedByClerkProvider,
-  useClerkInstanceContext,
-  useOrganizationContext,
-  useUserContext,
-} from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import type { ResourceCacheStableKey } from '../stable-keys';
 import type { PagesOrInfiniteOptions, PaginatedHookConfig, PaginatedResources } from '../types';
+import { useOrganizationBase } from './base/useOrganizationBase';
+import { useUserBase } from './base/useUserBase';
 import { createCacheKeys } from './createCacheKeys';
-import { useBillingHookEnabled } from './useBillingHookEnabled';
+import { useBillingIsEnabled } from './useBillingIsEnabled';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -99,14 +96,14 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
 
     const clerk = useClerkInstanceContext();
 
-    const user = useUserContext();
-    const { organization } = useOrganizationContext();
+    const user = useUserBase();
+    const organization = useOrganizationBase();
 
     clerk.telemetry?.record(eventMethodCalled(hookName));
 
     const isForOrganization = safeFor === 'organization';
 
-    const billingEnabled = useBillingHookEnabled({
+    const billingEnabled = useBillingIsEnabled({
       for: safeFor,
       enabled: externalEnabled,
       authenticated: !options?.unauthenticated,

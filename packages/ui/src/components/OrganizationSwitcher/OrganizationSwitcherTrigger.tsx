@@ -82,7 +82,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
         <Icon
           elementDescriptor={descriptors.organizationSwitcherTriggerIcon}
           icon={ChevronDown}
-          sx={t => ({ marginLeft: `${t.space.$2}` })}
+          sx={t => ({ marginInlineStart: `${t.space.$2}` })}
         />
       </Button>
     );
@@ -115,7 +115,7 @@ const NotificationCountBadgeSwitcherTrigger = () => {
       containerSx={t => ({
         position: 'absolute',
         top: `calc(${t.space.$2} * -1)`,
-        right: `calc(${t.space.$2} * -1)`,
+        insetInlineEnd: `calc(${t.space.$2} * -1)`,
       })}
       notificationCount={notificationCount}
     />

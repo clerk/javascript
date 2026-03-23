@@ -1,23 +1,35 @@
 import { logger } from '@clerk/shared/logger';
 import type { ClerkOptions } from '@clerk/shared/types';
 
+import type { Appearance } from '../internal/appearance';
 import { CLERK_CLASS_RE, HAS_RE, POSITIONAL_PSEUDO_RE } from './cssPatterns';
 import { detectStructuralClerkCss } from './detectClerkStylesheetUsage';
 
-function formatStructuralCssWarning(patterns: string[]): string {
-  const patternsDisplay = patterns.length > 0 ? patterns.slice(0, 3).join(', ') : 'structural CSS';
-  const truncated = patterns.length > 3 ? ` (+${patterns.length - 3} more)` : '';
+// Regex patterns for hasAdjacencyWithOtherSelector
+const OTHER_SELECTOR_RE = /[.#\w\[:]/;
+const CLERK_CLASS_GLOBAL_RE = /\.cl-[A-Za-z0-9_-]+/g;
+const COMBINATOR_RE = /[>+~\s]/;
 
-  return (
-    `🔒 Clerk:\n` +
-    `[CLERK_W001] Structural CSS detected\n\n` +
-    `Found: ${patternsDisplay}${truncated}\n\n` +
-    `May break on updates. Pin your version:\n` +
-    `  npm install @clerk/ui && import { ui } from '@clerk/ui'\n` +
-    `  <ClerkProvider ui={ui} />\n\n` +
-    `https://clerk.com/docs/customization/versioning\n` +
-    `(This notice only appears in development)`
-  );
+function formatStructuralCssWarning(patterns: string[]): string {
+  const displayPatterns = patterns.slice(0, 5);
+  const patternsList = displayPatterns.map(p => `  - ${p}`).join('\n');
+  const truncated = patterns.length > 5 ? `\n  (+${patterns.length - 5} more)` : '';
+
+  return [
+    `Clerk: Structural CSS detected that may break on updates.`,
+    ``,
+    `Found:`,
+    patternsList + truncated,
+    ``,
+    `These selectors depend on the internal DOM structure of Clerk's components, which may change when Clerk deploys component updates.`,
+    `To prevent breaking changes, install @clerk/ui and pass it to ClerkProvider:`,
+    ``,
+    `  import { ui } from '@clerk/ui'`,
+    `  <ClerkProvider ui={ui}>`,
+    ``,
+    `Learn more: https://clerk.com/docs/reference/components/versioning`,
+    `(code=structural_css_pin_clerk_ui)`,
+  ].join('\n');
 }
 
 /**
@@ -33,11 +45,11 @@ function hasAdjacencyWithOtherSelector(selector: string): boolean {
   const hasClerkClass = CLERK_CLASS_RE.test(rest);
 
   // Check if there's another selector (class, tag, id, attribute)
-  const hasOtherSelector = /[.#\w\[:]/.test(rest.replace(/\.cl-[A-Za-z0-9_-]+/g, ''));
+  const hasOtherSelector = OTHER_SELECTOR_RE.test(rest.replace(CLERK_CLASS_GLOBAL_RE, ''));
 
   // Only structural if both a .cl- class and another selector exist
   // OR if it references a .cl- class (assumes internal structure)
-  return hasClerkClass || (hasOtherSelector && /[>+~\s]/.test(selector));
+  return hasClerkClass || (hasOtherSelector && COMBINATOR_RE.test(selector));
 }
 
 /**
@@ -119,6 +131,37 @@ function collectElementPatterns(elements: Record<string, unknown>): string[] {
 }
 
 /**
+ * Checks component-level appearance.elements for structural CSS patterns
+ * and warns if found (when version is not pinned).
+ *
+ * This is called when individual components mount with their own appearance,
+ * to catch structural CSS that wasn't passed through ClerkProvider.
+ *
+ * Note: The caller should check clerk.instanceType === 'development' before calling.
+ * This function assumes it's only called in development mode.
+ *
+ * @param appearance - The component-level appearance to check
+ * @param uiPinned - Whether the user has pinned their @clerk/ui version via options.ui
+ */
+export function warnAboutComponentAppearance(appearance: Appearance | undefined, uiPinned: boolean): void {
+  // If ui is explicitly provided, the user has pinned their version
+  if (uiPinned) {
+    return;
+  }
+
+  // No appearance to check
+  if (!appearance?.elements || Object.keys(appearance.elements).length === 0) {
+    return;
+  }
+
+  const patterns = collectElementPatterns(appearance.elements as Record<string, unknown>);
+
+  if (patterns.length > 0) {
+    logger.warnOnce(formatStructuralCssWarning(patterns));
+  }
+}
+
+/**
  * Warns users when they are using customization
  * (structural appearance.elements or structural CSS targeting .cl- classes)
  * without pinning their @clerk/ui version.
@@ -129,12 +172,14 @@ function collectElementPatterns(elements: Record<string, unknown>): string[] {
  * If the user has explicitly imported @clerk/ui and passed it via the `ui` option,
  * they have "pinned" their version and no warning is shown.
  *
- * Note: We check `options.ui` (not `options.clerkUICtor`) because clerkUICtor is
- * always set when loading from CDN via window.__internal_ClerkUICtor.
+ * Note: We check for `options.ui.__brand` (not just `options.ui`) because
+ * ui.ClerkUI is always set by SDKs for both CDN and bundled paths.
+ * The `__brand` marker is only present when the user explicitly imports @clerk/ui.
  */
 export function warnAboutCustomizationWithoutPinning(options?: ClerkOptions): void {
-  // If ui is explicitly provided, the user has pinned their version
-  if (options?.ui) {
+  // If the user explicitly imported @clerk/ui, they have pinned their version.
+  // The __brand marker distinguishes user-provided ui from SDK-internal ui.
+  if ((options?.ui as Record<string, unknown>)?.__brand) {
     return;
   }
 

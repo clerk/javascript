@@ -1,4 +1,5 @@
 import { createClerkClient as backendCreateClerkClient } from '@clerk/backend';
+import { withRetry } from './retryableClerkClient';
 import { createAppPageObject, createPageObjects, type EnhancedPage } from '@clerk/testing/playwright/unstable';
 import type { Browser, BrowserContext, Page } from '@playwright/test';
 
@@ -11,6 +12,13 @@ import { createUserService } from './usersService';
 import { createWaitlistService } from './waitlistService';
 
 export type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail };
+export type { FakeMachineNetwork, FakeOAuthApp } from './machineAuthService';
+export {
+  createFakeMachineNetwork,
+  createFakeOAuthApp,
+  createJwtM2MToken,
+  obtainOAuthAccessToken,
+} from './machineAuthService';
 
 const createClerkClient = (app: Application) => {
   return backendCreateClerkClient({
@@ -34,7 +42,7 @@ export const createTestUtils = <
 ): Params extends Partial<CreateAppPageObjectArgs> ? FullReturn : OnlyAppReturn => {
   const { app, context, browser, useTestingToken = true } = params || {};
 
-  const clerkClient = createClerkClient(app);
+  const clerkClient = withRetry(createClerkClient(app));
   const services = {
     clerk: clerkClient,
     email: createEmailService(),

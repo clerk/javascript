@@ -361,6 +361,12 @@ export const zhCN: LocalizationResource = {
         tableHeader__role: '角色',
         tableHeader__user: '用户',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: '我们正在更新可用角色。完成后，您将能够再次更新角色。',
+          title: '角色暂时被锁定',
+        },
+      },
       detailsTitle__emptyRow: '没有可显示的成员',
       invitationsTab: {
         autoInvitations: {
@@ -390,12 +396,6 @@ export const zhCN: LocalizationResource = {
         headerTitle__invitations: '邀请',
         headerTitle__members: '成员',
         headerTitle__requests: '请求',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: '角色暂时被锁定',
-          subtitle: '我们正在更新可用角色。完成后，您将能够再次更新角色。',
-        },
       },
     },
     navbar: {
@@ -845,6 +845,10 @@ export const zhCN: LocalizationResource = {
   socialButtonsBlockButton: '使用 {{provider|titleize}} 登录',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        '检测到的公司名称 ({{organizationName}}) 和 {{organizationDomain}} 已存在一个组织。请通过邀请加入。',
+    },
     chooseOrganization: {
       action__createOrganization: '创建新组织',
       action__invitationAccept: '加入',
@@ -865,16 +869,12 @@ export const zhCN: LocalizationResource = {
       title: '设置您的组织',
     },
     organizationCreationDisabled: {
-      title: '您必须属于一个组织',
       subtitle: '请联系您的组织管理员获取邀请。',
+      title: '您必须属于一个组织',
     },
     signOut: {
       actionLink: '退出',
       actionText: '已登录为 {{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        '检测到的公司名称 ({{organizationName}}) 和 {{organizationDomain}} 已存在一个组织。请通过邀请加入。',
     },
   },
   taskResetPassword: {
@@ -885,6 +885,69 @@ export const zhCN: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
@@ -910,10 +973,11 @@ export const zhCN: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect: '密码或电子邮件地址不正确。请重试或使用其他方法。',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: '您的密码强度不够。',
+    form_password_or_identifier_incorrect: '密码或电子邮件地址不正确。请重试或使用其他方法。',
     form_password_pwned: '这个密码在数据泄露中被发现，不能使用，请换一个密码试试。',
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded: '您的密码超过了允许的最大字节数，请缩短它或去掉一些特殊字符。',

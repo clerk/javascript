@@ -208,7 +208,7 @@ const AddMfa = (props: AddMfaProps) => {
           icon={
             <Icon
               icon={Plus}
-              sx={t => ({ marginRight: t.space.$2 })}
+              sx={t => ({ marginInlineEnd: t.space.$2 })}
             />
           }
           localizationKey={localizationKeys('userProfile.mfaPhoneCodePage.primaryButton__addPhoneNumber')}

@@ -1,6 +1,7 @@
 import { createContextAndHook, useDeepEqualMemo } from '@clerk/shared/react';
 import React from 'react';
 
+import { useWarnAboutCustomizationWithoutPinning } from '../hooks/useWarnAboutCustomizationWithoutPinning';
 import type { AppearanceCascade, ParsedAppearance } from './parseAppearance';
 import { parseAppearance } from './parseAppearance';
 
@@ -15,6 +16,9 @@ const AppearanceProvider = (props: AppearanceProviderProps) => {
     const value = parseAppearance(props);
     return { value };
   }, [props.appearance, props.globalAppearance, props.appearanceKey]);
+
+  // Check component-level appearance for structural CSS patterns
+  useWarnAboutCustomizationWithoutPinning(props.appearance);
 
   return <AppearanceContext.Provider value={ctxValue}>{props.children}</AppearanceContext.Provider>;
 };

@@ -1,4 +1,5 @@
 import type {
+  BillingCredits,
   BillingMoneyAmount,
   BillingSubscriptionItemJSON,
   BillingSubscriptionItemResource,
@@ -12,7 +13,7 @@ import type {
 
 import { unixEpochToDate } from '@/utils/date';
 
-import { billingMoneyAmountFromJSON } from '../../utils';
+import { billingCreditsFromJSON, billingMoneyAmountFromJSON } from '../../utils';
 import { Billing } from '../modules/billing/namespace';
 import { BaseResource, BillingPlan, DeletedObject } from './internal';
 
@@ -75,6 +76,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
   credit?: {
     amount: BillingMoneyAmount;
   };
+  credits?: BillingCredits;
   isFreeTrial!: boolean;
 
   constructor(data: BillingSubscriptionItemJSON) {
@@ -102,6 +104,8 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
     this.amount = data.amount ? billingMoneyAmountFromJSON(data.amount) : undefined;
     this.credit =
       data.credit && data.credit.amount ? { amount: billingMoneyAmountFromJSON(data.credit.amount) } : undefined;
+
+    this.credits = data.credits ? billingCreditsFromJSON(data.credits) : undefined;
 
     this.isFreeTrial = this.withDefault(data.is_free_trial, false);
     return this;

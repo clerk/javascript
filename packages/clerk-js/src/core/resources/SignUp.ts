@@ -1,3 +1,4 @@
+import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
@@ -24,6 +25,7 @@ import type {
   SignUpField,
   SignUpFutureCreateParams,
   SignUpFutureEmailCodeVerifyParams,
+  SignUpFutureEmailLinkSendParams,
   SignUpFutureFinalizeParams,
   SignUpFuturePasswordParams,
   SignUpFuturePhoneCodeSendParams,
@@ -169,13 +171,6 @@ export class SignUp extends BaseResource implements SignUpResource {
         throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
       }
       finalParams = { ...finalParams, ...captchaParams };
-    }
-
-    if (finalParams.transfer && this.shouldBypassCaptchaForAttempt(finalParams)) {
-      const strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
-      if (strategy) {
-        finalParams = { ...finalParams, strategy: strategy as SignUpCreateParams['strategy'] };
-      }
     }
 
     return this._basePost({
@@ -519,6 +514,10 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this;
   }
 
+  public __internal_updateFromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {
+    return this.fromJSON(data);
+  }
+
   public __internal_toSnapshot(): SignUpJSONSnapshot {
     return {
       object: 'sign_up',
@@ -555,22 +554,30 @@ export class SignUp extends BaseResource implements SignUpResource {
    * We delegate bot detection to the following providers, instead of relying on turnstile exclusively
    */
   protected shouldBypassCaptchaForAttempt(params: SignUpCreateParams) {
-    if (!params.strategy) {
-      return false;
-    }
-
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const captchaOauthBypass = SignUp.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
 
-    if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
-      return true;
+    // Check for transfer captcha bypass.
+    if (params.transfer) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const signInVerificationStrategy = SignUp.clerk.client!.signIn.firstFactorVerification.strategy;
+
+      // OAuth transfers: If we delegate captcha detection to OAuth provider,
+      // do not show another captcha on sign up.
+      if (captchaOauthBypass.some(strategy => strategy === signInVerificationStrategy)) {
+        return true;
+      }
+
+      // Sign up if missing transfers: We let sign in handle the captcha,
+      // do not show another captcha on sign up.
+      if (isSignUpIfMissingCaptchaBypassStrategy(signInVerificationStrategy)) {
+        return true;
+      }
     }
 
-    if (
-      params.transfer &&
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      captchaOauthBypass.some(strategy => strategy === SignUp.clerk.client!.signIn.firstFactorVerification.strategy)
-    ) {
+    // OAuth sign ups: If we delegate captcha detection to OAuth provider,
+    // do not show another captcha on sign up.
+    if (params.strategy && captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
     }
 
@@ -589,9 +596,30 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 }
 
+/**
+ * Returns true if the given strategy is one where captcha is already handled
+ * by the sign-in attempt with sign up if missing, so a subsequent sign-up should
+ * not show another captcha. Matches email_link, email_code, phone_code, and any
+ * web3 wallet strategy. This should be kept in sync with `validateSignUpIfMissing`
+ * in the backend.
+ */
+const SIGN_UP_IF_MISSING_CAPTCHA_BYPASS_STRATEGIES = new Set(['email_link', 'email_code', 'phone_code']);
+
+export function isSignUpIfMissingCaptchaBypassStrategy(strategy: string | null): boolean {
+  if (!strategy) {
+    return false;
+  }
+  return SIGN_UP_IF_MISSING_CAPTCHA_BYPASS_STRATEGIES.has(strategy) || strategy.startsWith('web3_');
+}
+
 type SignUpFutureVerificationsMethods = Pick<
   SignUpFutureVerifications,
-  'sendEmailCode' | 'verifyEmailCode' | 'sendPhoneCode' | 'verifyPhoneCode'
+  | 'sendEmailCode'
+  | 'verifyEmailCode'
+  | 'sendEmailLink'
+  | 'waitForEmailLinkVerification'
+  | 'sendPhoneCode'
+  | 'verifyPhoneCode'
 >;
 
 class SignUpFutureVerifications implements SignUpFutureVerificationsType {
@@ -599,6 +627,8 @@ class SignUpFutureVerifications implements SignUpFutureVerificationsType {
 
   sendEmailCode: SignUpFutureVerificationsType['sendEmailCode'];
   verifyEmailCode: SignUpFutureVerificationsType['verifyEmailCode'];
+  sendEmailLink: SignUpFutureVerificationsType['sendEmailLink'];
+  waitForEmailLinkVerification: SignUpFutureVerificationsType['waitForEmailLinkVerification'];
   sendPhoneCode: SignUpFutureVerificationsType['sendPhoneCode'];
   verifyPhoneCode: SignUpFutureVerificationsType['verifyPhoneCode'];
 
@@ -606,6 +636,8 @@ class SignUpFutureVerifications implements SignUpFutureVerificationsType {
     this.#resource = resource;
     this.sendEmailCode = methods.sendEmailCode;
     this.verifyEmailCode = methods.verifyEmailCode;
+    this.sendEmailLink = methods.sendEmailLink;
+    this.waitForEmailLinkVerification = methods.waitForEmailLinkVerification;
     this.sendPhoneCode = methods.sendPhoneCode;
     this.verifyPhoneCode = methods.verifyPhoneCode;
   }
@@ -625,6 +657,30 @@ class SignUpFutureVerifications implements SignUpFutureVerificationsType {
   get externalAccount() {
     return this.#resource.verifications.externalAccount;
   }
+
+  get emailLinkVerification() {
+    if (!inBrowser()) {
+      return null;
+    }
+
+    const status = getClerkQueryParam('__clerk_status') as 'verified' | 'expired' | 'failed' | 'client_mismatch';
+    const createdSessionId = getClerkQueryParam('__clerk_created_session');
+
+    if (!status || !createdSessionId) {
+      return null;
+    }
+
+    const verifiedFromTheSameClient =
+      status === 'verified' &&
+      typeof SignUp.clerk.client !== 'undefined' &&
+      SignUp.clerk.client.sessions.some(s => s.id === createdSessionId);
+
+    return {
+      status,
+      createdSessionId,
+      verifiedFromTheSameClient,
+    };
+  }
 }
 
 class SignUpFuture implements SignUpFutureResource {
@@ -638,6 +694,8 @@ class SignUpFuture implements SignUpFutureResource {
     this.verifications = new SignUpFutureVerifications(this.#resource, {
       sendEmailCode: this.sendEmailCode.bind(this),
       verifyEmailCode: this.verifyEmailCode.bind(this),
+      sendEmailLink: this.sendEmailLink.bind(this),
+      waitForEmailLinkVerification: this.waitForEmailLinkVerification.bind(this),
       sendPhoneCode: this.sendPhoneCode.bind(this),
       verifyPhoneCode: this.verifyPhoneCode.bind(this),
     });
@@ -745,11 +803,50 @@ class SignUpFuture implements SignUpFutureResource {
     return this.#canBeDiscarded;
   }
 
-  private async getCaptchaToken(): Promise<{
+  private shouldBypassCaptchaForAttempt(params: { strategy?: string; transfer?: boolean }) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const captchaOauthBypass = SignUp.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
+
+    // Check for transfer captcha bypass.
+    if (params.transfer) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const signInVerificationStrategy = SignUp.clerk.client!.signIn.firstFactorVerification.strategy;
+
+      // OAuth transfers: If we delegate captcha detection to OAuth provider,
+      // do not show another captcha on sign up.
+      if (captchaOauthBypass.some(strategy => strategy === signInVerificationStrategy)) {
+        return true;
+      }
+
+      // Sign up if missing transfers: We let sign in handle the captcha,
+      // do not show another captcha on sign up.
+      if (isSignUpIfMissingCaptchaBypassStrategy(signInVerificationStrategy)) {
+        return true;
+      }
+    }
+
+    // OAuth sign ups: If we delegate captcha detection to OAuth provider,
+    // do not show another captcha on sign up.
+    if (params.strategy && captchaOauthBypass.some(strategy => strategy === params.strategy)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private async getCaptchaToken(params: { strategy?: string; transfer?: boolean } = {}): Promise<{
     captchaToken?: string;
     captchaWidgetType?: CaptchaWidgetType;
     captchaError?: unknown;
   }> {
+    if (__BUILD_DISABLE_RHC__ || SignUp.clerk.client?.captchaBypass || this.shouldBypassCaptchaForAttempt(params)) {
+      return {
+        captchaToken: undefined,
+        captchaWidgetType: undefined,
+        captchaError: undefined,
+      };
+    }
+
     const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
     const response = await captchaChallenge.managedOrInvisible({ action: 'signup' });
     if (!response) {
@@ -761,7 +858,7 @@ class SignUpFuture implements SignUpFutureResource {
   }
 
   private async _create(params: SignUpFutureCreateParams): Promise<void> {
-    const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+    const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken(params);
 
     const body: Record<string, unknown> = {
       transfer: params.transfer,
@@ -833,17 +930,9 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async sendPhoneCode(params: SignUpFuturePhoneCodeSendParams): Promise<{ error: ClerkError | null }> {
-    const { phoneNumber, channel = 'sms' } = params;
+  async sendPhoneCode(params?: SignUpFuturePhoneCodeSendParams): Promise<{ error: ClerkError | null }> {
+    const { channel = 'sms' } = params || {};
     return runAsyncResourceTask(this.#resource, async () => {
-      if (!this.#resource.id) {
-        const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
-        await this.#resource.__internal_basePost({
-          path: this.#resource.pathRoot,
-          body: { phoneNumber, captchaToken, captchaWidgetType, captchaError },
-        });
-      }
-
       await this.#resource.__internal_basePost({
         body: { strategy: 'phone_code', channel },
         action: 'prepare_verification',
@@ -861,6 +950,46 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
+  async sendEmailLink(params: SignUpFutureEmailLinkSendParams): Promise<{ error: ClerkError | null }> {
+    const { verificationUrl } = params;
+    return runAsyncResourceTask(this.#resource, async () => {
+      let absoluteVerificationUrl = verificationUrl;
+      try {
+        new URL(verificationUrl);
+      } catch {
+        absoluteVerificationUrl = window.location.origin + verificationUrl;
+      }
+
+      await this.#resource.__internal_basePost({
+        body: { strategy: 'email_link', redirectUrl: absoluteVerificationUrl },
+        action: 'prepare_verification',
+      });
+    });
+  }
+
+  async waitForEmailLinkVerification(): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
+      const { run, stop } = Poller();
+      await new Promise((resolve, reject) => {
+        void run(() => {
+          return this.#resource
+            .reload()
+            .then(res => {
+              const status = res.verifications.emailAddress.status;
+              if (status === 'verified' || status === 'expired') {
+                stop();
+                resolve(res);
+              }
+            })
+            .catch(err => {
+              stop();
+              reject(err);
+            });
+        });
+      });
+    });
+  }
+
   async sso(params: SignUpFutureSSOParams): Promise<{ error: ClerkError | null }> {
     const {
       strategy,
@@ -874,7 +1003,7 @@ class SignUpFuture implements SignUpFutureResource {
       popup,
     } = params;
     return runAsyncResourceTask(this.#resource, async () => {
-      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken({ strategy });
 
       let redirectUrlComplete = redirectUrl;
       try {

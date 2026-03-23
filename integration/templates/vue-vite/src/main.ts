@@ -7,9 +7,9 @@ import router from './router';
 const app = createApp(App);
 app.use(clerkPlugin, {
   publishableKey: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
-  clerkJSUrl: import.meta.env.VITE_CLERK_JS_URL,
-  clerkUIUrl: import.meta.env.VITE_CLERK_UI_URL,
-  clerkJSVersion: import.meta.env.VITE_CLERK_JS_VERSION,
+  __internal_clerkJSUrl: import.meta.env.VITE_CLERK_JS_URL,
+  __internal_clerkUIUrl: import.meta.env.VITE_CLERK_UI_URL,
+  __internal_clerkJSVersion: import.meta.env.VITE_CLERK_JS_VERSION,
   appearance: {
     options: {
       showOptionalFields: true,

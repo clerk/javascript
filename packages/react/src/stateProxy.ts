@@ -142,7 +142,9 @@ export class StateProxy implements State {
       signIn: {
         status: 'needs_identifier' as const,
         availableStrategies: [],
-        isTransferable: false,
+        get isTransferable() {
+          return gateProperty(target, 'isTransferable', false);
+        },
         get id() {
           return gateProperty(target, 'id', undefined);
         },
@@ -221,6 +223,11 @@ export class StateProxy implements State {
           { verification: null },
         ),
         resetPasswordEmailCode: this.wrapMethods(() => target().resetPasswordEmailCode, [
+          'sendCode',
+          'verifyCode',
+          'submitPassword',
+        ] as const),
+        resetPasswordPhoneCode: this.wrapMethods(() => target().resetPasswordPhoneCode, [
           'sendCode',
           'verifyCode',
           'submitPassword',
@@ -325,13 +332,21 @@ export class StateProxy implements State {
 
         verifications: this.wrapStruct(
           () => target().verifications,
-          ['sendEmailCode', 'verifyEmailCode', 'sendPhoneCode', 'verifyPhoneCode'] as const,
-          ['emailAddress', 'phoneNumber', 'web3Wallet', 'externalAccount'] as const,
+          [
+            'sendEmailCode',
+            'verifyEmailCode',
+            'sendEmailLink',
+            'waitForEmailLinkVerification',
+            'sendPhoneCode',
+            'verifyPhoneCode',
+          ] as const,
+          ['emailAddress', 'phoneNumber', 'web3Wallet', 'externalAccount', 'emailLinkVerification'] as const,
           {
             emailAddress: defaultSignUpVerificationResource(),
             phoneNumber: defaultSignUpVerificationResource(),
             web3Wallet: defaultSignUpVerificationResource(),
             externalAccount: defaultSignUpVerificationResource(),
+            emailLinkVerification: null,
           },
         ),
       },

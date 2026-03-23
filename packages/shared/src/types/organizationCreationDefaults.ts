@@ -19,6 +19,9 @@ export interface OrganizationCreationDefaultsJSON extends ClerkResourceJSON {
   };
 }
 
+/**
+ * @interface
+ */
 export interface OrganizationCreationDefaultsResource extends ClerkResource {
   advisory: {
     code: OrganizationCreationAdvisoryType;

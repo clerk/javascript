@@ -32,6 +32,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'disclosureContentInner',
   'disclosureContent',
 
+  'collapsible',
+  'collapsibleInner',
+
   'lineItemsRoot',
   'lineItemsDivider',
   'lineItemsGroup',
@@ -218,6 +221,12 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'taskChooseOrganizationPreviewItems',
   'taskChooseOrganizationCreateOrganizationActionButton',
   'taskChooseOrganizationPreviewButton',
+
+  'taskSetupMfaMethodSelectionItem',
+  'taskSetupMfaMethodSelectionItems',
+  'taskSetupMfaPhoneSelectionItems',
+  'taskSetupMfaPhoneSelectionItem',
+  'taskSetupMfaPhoneSelectionAddPhoneAction',
 
   'userAvatarBox',
   'userAvatarImage',

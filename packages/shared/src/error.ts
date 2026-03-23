@@ -4,6 +4,7 @@ export { ClerkAPIError, isClerkAPIError } from './errors/clerkApiError';
 export { ClerkAPIResponseError, isClerkAPIResponseError } from './errors/clerkApiResponseError';
 export { ClerkError, isClerkError } from './errors/clerkError';
 export { MissingExpiredTokenError } from './errors/missingExpiredTokenError';
+export { ClerkOfflineError } from './errors/clerkOfflineError';
 
 export { buildErrorThrower, type ErrorThrower, type ErrorThrowerOptions } from './errors/errorThrower';
 
@@ -16,6 +17,7 @@ export { ClerkRuntimeError, isClerkRuntimeError } from './errors/clerkRuntimeErr
 export { ClerkWebAuthnError } from './errors/webAuthNError';
 
 export {
+  is429Error,
   is4xxError,
   isCaptchaError,
   isEmailLinkError,
@@ -25,6 +27,7 @@ export {
   isPasswordPwnedError,
   isPasswordCompromisedError,
   isReverificationCancelledError,
+  isUnauthenticatedError,
   isUnauthorizedError,
   isUserLockedError,
 } from './errors/helpers';

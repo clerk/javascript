@@ -39,10 +39,17 @@ vi.mock('../../contexts', () => {
   return {
     useAssertWrappedByClerkProvider: () => {},
     useClerkInstanceContext: () => mockClerk,
-    useUserContext: () => (mockClerk.loaded ? mockUser : null),
-    useOrganizationContext: () => ({ organization: mockClerk.loaded ? mockOrganization : null }),
+    useInitialStateContext: () => undefined,
   };
 });
+
+vi.mock('../base/useUserBase', () => ({
+  useUserBase: () => (mockClerk.loaded ? mockUser : null),
+}));
+
+vi.mock('../base/useOrganizationBase', () => ({
+  useOrganizationBase: () => (mockClerk.loaded ? mockOrganization : null),
+}));
 
 describe('useSubscription', () => {
   beforeEach(() => {
@@ -57,8 +64,9 @@ describe('useSubscription', () => {
     defaultQueryClient.client.clear();
   });
 
-  it('does not fetch when billing disabled for user', () => {
+  it('does not fetch when billing disabled', () => {
     mockClerk.__internal_environment.commerceSettings.billing.user.enabled = false;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = false;
 
     const { result } = renderHook(() => useSubscription(), { wrapper });
 

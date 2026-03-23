@@ -364,6 +364,12 @@ export const daDK: LocalizationResource = {
         tableHeader__role: 'Rolle',
         tableHeader__user: 'Bruger',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Vi opdaterer de tilgængelige roller. Når det er gjort, vil du kunne opdatere roller igen.',
+          title: 'Roller er midlertidigt låst',
+        },
+      },
       detailsTitle__emptyRow: 'Ingen medlemmer at vise',
       invitationsTab: {
         autoInvitations: {
@@ -394,12 +400,6 @@ export const daDK: LocalizationResource = {
         headerTitle__invitations: 'Invitationer',
         headerTitle__members: 'Medlemmer',
         headerTitle__requests: 'Anmodninger',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Roller er midlertidigt låst',
-          subtitle: 'Vi opdaterer de tilgængelige roller. Når det er gjort, vil du kunne opdatere roller igen.',
-        },
       },
     },
     navbar: {
@@ -856,6 +856,10 @@ export const daDK: LocalizationResource = {
   socialButtonsBlockButton: 'Fortsæt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Der findes allerede en organisation for det registrerede firmanavn ({{organizationName}}) og {{organizationDomain}}. Tilmeld dig via invitation.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Opret ny organisation',
       action__invitationAccept: 'Deltag',
@@ -876,16 +880,12 @@ export const daDK: LocalizationResource = {
       title: 'Opsæt din organisation',
     },
     organizationCreationDisabled: {
-      title: 'Du skal tilhøre en organisation',
       subtitle: 'Kontakt din organisationsadministrator for en invitation.',
+      title: 'Du skal tilhøre en organisation',
     },
     signOut: {
       actionLink: 'Log ud',
       actionText: 'Logget ind som {{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'Der findes allerede en organisation for det registrerede firmanavn ({{organizationName}}) og {{organizationDomain}}. Tilmeld dig via invitation.',
     },
   },
   taskResetPassword: {
@@ -896,6 +896,69 @@ export const daDK: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
@@ -924,11 +987,12 @@ export const daDK: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Adgangskoden er forkert.',
-    form_password_or_identifier_incorrect:
-      'Adgangskoden eller e-mailadressen er forkert. Prøv igen eller brug en anden metode.',
     form_password_length_too_short: 'Adgangskoden er for kort.',
     form_password_not_strong_enough: 'Adgangskoden er ikke stærk nok.',
+    form_password_or_identifier_incorrect:
+      'Adgangskoden eller e-mailadressen er forkert. Prøv igen eller brug en anden metode.',
     form_password_pwned: 'Adgangskoden er blevet kompromitteret.',
     form_password_pwned__sign_in: 'Din adgangskode er blevet kompromitteret, vælg en ny.',
     form_password_size_in_bytes_exceeded:

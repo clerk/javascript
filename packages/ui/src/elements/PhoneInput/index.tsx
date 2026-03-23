@@ -116,9 +116,9 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
           sx={t => ({
             borderWidth: '0',
             borderRadius: t.radii.$md, // needs to be specified as we can't use overflow: hidden on the parent, hides the popover
-            borderBottomRightRadius: '0',
-            borderTopRightRadius: '0',
-            paddingRight: t.space.$2,
+            borderEndEndRadius: '0',
+            borderStartEndRadius: '0',
+            paddingInlineEnd: t.space.$2,
             ':focus': {
               zIndex: 2,
               boxShadow: 'none',
@@ -164,7 +164,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
             display: 'flex',
             alignItems: 'center',
             pointerEvents: 'none',
-            paddingLeft: t.space.$0x5,
+            paddingInlineStart: t.space.$0x5,
             opacity: props.isDisabled ? t.opacity.$disabled : 1,
           })}
         >
@@ -188,9 +188,9 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
               '&[type=tel]': {
                 borderRadius: t.radii.$md,
                 borderWidth: 0,
-                borderTopLeftRadius: 0,
-                borderBottomLeftRadius: 0,
-                paddingLeft: t.space.$1,
+                borderStartStartRadius: 0,
+                borderEndStartRadius: 0,
+                paddingInlineStart: t.space.$1,
                 '&:focus': {
                   borderColor: 'unset',
                   boxShadow: 'unset',
@@ -236,7 +236,7 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
       />
       <Text
         as='div'
-        sx={{ width: '100%', textAlign: 'left' }}
+        sx={{ width: '100%', textAlign: 'start' }}
       >
         {country.name}
       </Text>

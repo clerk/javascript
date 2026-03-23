@@ -11,7 +11,7 @@ import {
   getAuthObjectForAcceptedToken,
   getAuthObjectFromJwt,
   invalidTokenAuthObject,
-  isMachineTokenByPrefix,
+  isMachineToken,
   isTokenTypeAccepted,
   signedOutAuthObject,
   TokenType,
@@ -131,6 +131,13 @@ export const getAuthDataFromRequest = (req: RequestLike, opts: GetAuthDataFromRe
     return machineAuthObject;
   }
 
+  // If a machine token was sent but this endpoint only accepts session tokens,
+  // reject it — don't let it fall through to session auth where its sub claim
+  // would be incorrectly mapped to userId.
+  if (bearerToken && isMachineToken(bearerToken)) {
+    return signedOutAuthObject(options);
+  }
+
   // If a random token is present and acceptsToken is an array that does NOT include session_token,
   // return invalid token auth object.
   if (bearerToken && Array.isArray(acceptsToken) && !acceptsToken.includes(TokenType.SessionToken)) {
@@ -147,7 +154,7 @@ const handleMachineToken = (
   acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
   options: Record<string, any>,
 ): MachineAuthObject<MachineTokenType> | null => {
-  const hasMachineToken = bearerToken && isMachineTokenByPrefix(bearerToken);
+  const hasMachineToken = bearerToken && isMachineToken(bearerToken);
 
   const acceptsOnlySessionToken =
     acceptsToken === TokenType.SessionToken ||

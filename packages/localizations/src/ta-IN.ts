@@ -367,6 +367,13 @@ export const taIN: LocalizationResource = {
         tableHeader__role: 'பங்கு',
         tableHeader__user: 'பயனர்',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'கிடைக்கக்கூடிய பாத்திரங்களை நாங்கள் புதுப்பிக்கிறோம். இது முடிந்ததும், நீங்கள் மீண்டும் பாத்திரங்களை புதுப்பிக்க முடியும்.',
+          title: 'பாத்திரங்கள் தற்காலிகமாக பூட்டப்பட்டுள்ளன',
+        },
+      },
       detailsTitle__emptyRow: 'காட்ட உறுப்பினர்கள் இல்லை',
       invitationsTab: {
         autoInvitations: {
@@ -397,13 +404,6 @@ export const taIN: LocalizationResource = {
         headerTitle__invitations: 'அழைப்புகள்',
         headerTitle__members: 'உறுப்பினர்கள்',
         headerTitle__requests: 'கோரிக்கைகள்',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'பாத்திரங்கள் தற்காலிகமாக பூட்டப்பட்டுள்ளன',
-          subtitle:
-            'கிடைக்கக்கூடிய பாத்திரங்களை நாங்கள் புதுப்பிக்கிறோம். இது முடிந்ததும், நீங்கள் மீண்டும் பாத்திரங்களை புதுப்பிக்க முடியும்.',
-        },
       },
     },
     navbar: {
@@ -866,6 +866,10 @@ export const taIN: LocalizationResource = {
   socialButtonsBlockButton: '{{provider|titleize}} மூலம் தொடரவும்',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'கண்டறியப்பட்ட நிறுவன பெயர் ({{organizationName}}) மற்றும் {{organizationDomain}} க்கு ஒரு அமைப்பு ஏற்கனவே உள்ளது. அழைப்பின் மூலம் சேரவும்.',
+    },
     chooseOrganization: {
       action__createOrganization: 'புதிய அமைப்பை உருவாக்கவும்',
       action__invitationAccept: 'சேரவும்',
@@ -886,16 +890,12 @@ export const taIN: LocalizationResource = {
       title: 'உங்கள் அமைப்பை அமைக்கவும்',
     },
     organizationCreationDisabled: {
-      title: 'நீங்கள் ஒரு அமைப்பில் உறுப்பினராக இருக்க வேண்டும்',
       subtitle: 'அழைப்புக்கு உங்கள் அமைப்பின் நிர்வாகியைத் தொடர்பு கொள்ளவும்.',
+      title: 'நீங்கள் ஒரு அமைப்பில் உறுப்பினராக இருக்க வேண்டும்',
     },
     signOut: {
       actionLink: 'வெளியேறு',
       actionText: '{{identifier}} என உள்நுழைந்துள்ளீர்கள்',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'கண்டறியப்பட்ட நிறுவன பெயர் ({{organizationName}}) மற்றும் {{organizationDomain}} க்கு ஒரு அமைப்பு ஏற்கனவே உள்ளது. அழைப்பின் மூலம் சேரவும்.',
     },
   },
   taskResetPassword: {
@@ -906,6 +906,69 @@ export const taIN: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ஏற்கனவே நிறுவனத்தின் உறுப்பினராக உள்ளார்.',
@@ -934,12 +997,13 @@ export const taIN: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'உள்ளிடப்பட்ட மதிப்பு தவறானது. அதை திருத்தவும்.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'நீங்கள் உள்ளிட்ட கடவுச்சொல் தவறானது. மீண்டும் முயற்சிக்கவும்.',
-    form_password_or_identifier_incorrect:
-      'கடவுச்சொல் அல்லது மின்னஞ்சல் முகவரி தவறானது. மீண்டும் முயற்சிக்கவும் அல்லது வேறு முறையைப் பயன்படுத்தவும்.',
     form_password_length_too_short:
       'உங்கள் கடவுச்சொல் மிகவும் குறுகியது. இது குறைந்தது 8 எழுத்துகள் நீளமாக இருக்க வேண்டும்.',
     form_password_not_strong_enough: 'உங்கள் கடவுச்சொல் போதுமான வலிமை இல்லை.',
+    form_password_or_identifier_incorrect:
+      'கடவுச்சொல் அல்லது மின்னஞ்சல் முகவரி தவறானது. மீண்டும் முயற்சிக்கவும் அல்லது வேறு முறையைப் பயன்படுத்தவும்.',
     form_password_pwned:
       'இந்த கடவுச்சொல் தரவு மீறலின் ஒரு பகுதியாக காணப்பட்டது மற்றும் பயன்படுத்த முடியாது, தயவுசெய்து வேறு கடவுச்சொல்லை முயற்சிக்கவும்.',
     form_password_pwned__sign_in:

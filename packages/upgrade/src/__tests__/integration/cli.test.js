@@ -73,6 +73,7 @@ describe('CLI Integration', () => {
       expect(result.stdout).toContain('--dry-run');
       expect(result.stdout).toContain('--skip-upgrade');
       expect(result.stdout).toContain('--release');
+      expect(result.stdout).toContain('--canary');
       expect(result.exitCode).toBe(0);
     });
   });
@@ -114,6 +115,15 @@ describe('CLI Integration', () => {
       expect(output).toContain('Could not detect Clerk SDK');
       expect(output).toContain('--sdk');
       expect(result.exitCode).toBe(1);
+    });
+
+    it('shows example command in non-interactive SDK detection error', async () => {
+      const dir = getFixturePath('no-clerk');
+      const result = await runCli(['--dir', dir, '--dry-run', '--skip-codemods'], { timeout: 5000 });
+
+      const output = result.stdout + result.stderr;
+      expect(output).toContain('npx @clerk/upgrade');
+      expect(output).toContain('--sdk');
     });
   });
 
@@ -267,6 +277,25 @@ describe('CLI Integration', () => {
     });
   });
 
+  describe('--canary flag', () => {
+    it('shows canary version in dry-run output', async () => {
+      const dir = getFixturePath('nextjs-v6');
+      const result = await runCli(['--dir', dir, '--canary', '--dry-run', '--skip-codemods'], { timeout: 15000 });
+
+      expect(result.stdout).toContain('canary');
+      expect(result.stdout).toContain('[dry run]');
+    });
+
+    it('allows upgrade even when already on target major version', async () => {
+      const dir = getFixturePath('nextjs-v7');
+      const result = await runCli(['--dir', dir, '--canary', '--dry-run', '--skip-codemods'], { timeout: 15000 });
+
+      expect(result.stdout).toContain('canary');
+      expect(result.stdout).toContain('[dry run]');
+      expect(result.stdout).not.toContain('already on the latest');
+    });
+  });
+
   describe('--release flag', () => {
     it('loads specific release configuration', async () => {
       const dir = getFixturePath('nextjs-v7');
@@ -286,6 +315,49 @@ describe('CLI Integration', () => {
       const output = result.stdout + result.stderr;
       expect(output).toContain('No upgrade path found');
       expect(result.exitCode).toBe(1);
+    });
+  });
+
+  describe('Package Replacements', () => {
+    let fixture;
+
+    beforeEach(() => {
+      fixture = createTempFixture('nextjs-v6-with-themes');
+    });
+
+    afterEach(() => {
+      fixture?.cleanup();
+    });
+
+    it('shows replacement message in dry-run mode', async () => {
+      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 15000 });
+
+      expect(result.stdout).toContain('[dry run]');
+      expect(result.stdout).toContain('@clerk/themes');
+      expect(result.stdout).toContain('@clerk/ui');
+    });
+
+    it('skips replacement when --skip-upgrade is used', async () => {
+      const fs = await import('node:fs');
+      const pkgBefore = fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8');
+
+      await runCli(['--dir', fixture.path, '--skip-upgrade', '--skip-codemods'], { timeout: 15000 });
+
+      const pkgAfter = fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8');
+      expect(pkgAfter).toBe(pkgBefore);
+    });
+
+    it('does not show replacement when package is not present', async () => {
+      const noThemesFixture = createTempFixture('nextjs-v6');
+      try {
+        const result = await runCli(['--dir', noThemesFixture.path, '--dry-run', '--skip-codemods'], {
+          timeout: 15000,
+        });
+
+        expect(result.stdout).not.toContain('Would replace');
+      } finally {
+        noThemesFixture.cleanup();
+      }
     });
   });
 });

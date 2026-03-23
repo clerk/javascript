@@ -1,5 +1,6 @@
 import { PageMocking, type MockScenario } from '@clerk/msw';
 import * as l from '../../localizations';
+import { dark, neobrutalism, shadcn, shadesOfPurple } from '../../ui/src/themes';
 import type { Clerk as ClerkType } from '../';
 import * as scenarios from './scenarios';
 
@@ -34,6 +35,7 @@ const AVAILABLE_COMPONENTS = [
   'oauthConsent',
   'taskChooseOrganization',
   'taskResetPassword',
+  'taskSetupMFA',
 ] as const;
 type AvailableComponent = (typeof AVAILABLE_COMPONENTS)[number];
 
@@ -137,6 +139,7 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   oauthConsent: buildComponentControls('oauthConsent'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
   taskResetPassword: buildComponentControls('taskResetPassword'),
+  taskSetupMFA: buildComponentControls('taskSetupMFA'),
 };
 
 declare global {
@@ -311,6 +314,84 @@ function otherOptions() {
   return { updateOtherOptions };
 }
 
+const themes: Record<string, unknown> = {
+  dark,
+  shadesOfPurple,
+  neobrutalism,
+  shadcn,
+};
+
+function themeSelector() {
+  assertClerkIsLoaded(Clerk);
+
+  const themeSelect = document.getElementById('themeSelect') as HTMLSelectElement;
+
+  const savedTheme = sessionStorage.getItem('baseTheme') ?? '';
+  themeSelect.value = savedTheme;
+
+  const updateTheme = () => {
+    const themeName = themeSelect.value;
+    sessionStorage.setItem('baseTheme', themeName);
+
+    const currentAppearance = Clerk.__internal_getOption('appearance') ?? {};
+    void Clerk.__internal_updateProps({
+      appearance: {
+        ...currentAppearance,
+        theme: themeName ? themes[themeName] : undefined,
+      },
+    });
+  };
+
+  themeSelect.addEventListener('change', updateTheme);
+
+  return { updateTheme };
+}
+
+type Preset = { elements: Record<string, any>; options?: Record<string, any>; variables?: Record<string, any> };
+
+function presetToAppearance(preset: Preset | undefined) {
+  if (!preset) return {};
+  return {
+    elements: preset.elements,
+    ...(preset.options ? { options: preset.options } : {}),
+    ...(preset.variables ? { variables: preset.variables } : {}),
+  };
+}
+
+const presets: Record<string, Preset> = {};
+
+function presetSelector() {
+  assertClerkIsLoaded(Clerk);
+
+  const presetSelect = document.getElementById('presetSelect') as HTMLSelectElement;
+
+  // Populate dropdown from presets map
+  for (const name of Object.keys(presets)) {
+    presetSelect.add(new Option(name, name));
+  }
+
+  const savedPreset = sessionStorage.getItem('preset') ?? '';
+  presetSelect.value = savedPreset;
+
+  const updatePreset = () => {
+    const presetName = presetSelect.value;
+    sessionStorage.setItem('preset', presetName);
+
+    const currentAppearance = Clerk.__internal_getOption('appearance') ?? {};
+    void Clerk.__internal_updateProps({
+      appearance: {
+        ...currentAppearance,
+        elements: {},
+        ...presetToAppearance(presetName ? presets[presetName] : undefined),
+      },
+    });
+  };
+
+  presetSelect.addEventListener('change', updatePreset);
+
+  return { updatePreset };
+}
+
 const urlParams = new URL(window.location.href).searchParams;
 for (const [component, encodedProps] of urlParams.entries()) {
   if (AVAILABLE_COMPONENTS.includes(component as AvailableComponent)) {
@@ -326,6 +407,8 @@ void (async () => {
   assertClerkIsLoaded(Clerk);
   fillLocalizationSelect();
   const { updateVariables } = appearanceVariableOptions();
+  const { updateTheme } = themeSelector();
+  const { updatePreset } = presetSelector();
   const { updateOtherOptions } = otherOptions();
 
   const sidebars = document.querySelectorAll('[data-sidebar]');
@@ -419,6 +502,14 @@ void (async () => {
         },
       );
     },
+    '/task-setup-mfa': () => {
+      Clerk.mountTaskSetupMFA(
+        app,
+        componentControls.taskSetupMFA.getProps() ?? {
+          redirectUrlComplete: '/user-profile',
+        },
+      );
+    },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});
     },
@@ -442,14 +533,29 @@ void (async () => {
       await mocking.initialize(route, { scenario });
     }
 
+    const initialThemeName = sessionStorage.getItem('baseTheme') ?? '';
+    const initialTheme = initialThemeName ? themes[initialThemeName] : undefined;
+    const initialPresetName = sessionStorage.getItem('preset') ?? '';
+    const initialPreset = initialPresetName ? presets[initialPresetName] : undefined;
+
     await Clerk.load({
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
-      clerkUICtor: window.__internal_ClerkUICtor,
+      ui: { ClerkUI: window.__internal_ClerkUICtor },
+      appearance: {
+        ...(initialTheme ? { theme: initialTheme } : {}),
+        ...presetToAppearance(initialPreset),
+      },
     });
     renderCurrentRoute();
-    updateVariables();
+    updateTheme();
+    updatePreset();
+    // Only apply sandbox variable overrides when using the default theme.
+    // Prebuilt themes (raw, dark, etc.) define their own variables.
+    if (!initialTheme) {
+      updateVariables();
+    }
     updateOtherOptions();
   } else {
     console.error(`Unknown route: "${route}".`);

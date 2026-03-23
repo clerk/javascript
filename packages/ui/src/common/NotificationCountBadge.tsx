@@ -32,7 +32,7 @@ export const NotificationCountBadge = (props: NotificationCountBadgeProps) => {
       as='span'
       sx={[
         t => ({
-          marginLeft: t.space.$1x5,
+          marginInlineStart: t.space.$1x5,
         }),
         containerSx,
       ]}

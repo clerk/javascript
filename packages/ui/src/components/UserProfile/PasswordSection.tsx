@@ -37,7 +37,7 @@ export const PasswordSection = () => {
           <ProfileSection.Item
             id='password'
             sx={t => ({
-              paddingLeft: !passwordEnabled ? '0' : undefined,
+              paddingInlineStart: !passwordEnabled ? '0' : undefined,
               paddingTop: t.space.$0x25,
               paddingBottom: t.space.$0x25,
             })}

@@ -20,7 +20,7 @@ export const InputWithIcon = React.forwardRef<HTMLInputElement, InputWithIcon>((
           sx={theme => [
             {
               position: 'absolute',
-              left: theme.space.$3x5,
+              insetInlineStart: theme.space.$3x5,
               width: theme.sizes.$3x5,
               height: theme.sizes.$3x5,
               pointerEvents: 'none',
@@ -42,7 +42,7 @@ export const InputWithIcon = React.forwardRef<HTMLInputElement, InputWithIcon>((
         sx={[
           theme => ({
             width: '100%',
-            paddingLeft: theme.space.$10,
+            paddingInlineStart: theme.space.$10,
           }),
           sx,
         ]}

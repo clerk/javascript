@@ -24,9 +24,11 @@ export {
   SignUpButton,
   TaskChooseOrganization,
   TaskResetPassword,
+  TaskSetupMFA,
   UserAvatar,
   UserButton,
   Waitlist,
+  HandleSSOCallback,
 } from '@clerk/react';
 
 // The assignment of UserProfile with BaseUserProfile props is used

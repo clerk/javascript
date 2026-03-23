@@ -1,0 +1,5 @@
+{
+  "main": "../dist/proxy.js",
+  "module": "../dist/proxy.mjs",
+  "types": "../dist/proxy.d.ts"
+}

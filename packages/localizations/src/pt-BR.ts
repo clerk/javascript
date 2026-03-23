@@ -372,6 +372,13 @@ export const ptBR: LocalizationResource = {
         tableHeader__role: 'Função',
         tableHeader__user: 'Usuário',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Estamos atualizando as funções disponíveis. Assim que isso for concluído, você poderá atualizar as funções novamente.',
+          title: 'As funções estão temporariamente bloqueadas',
+        },
+      },
       detailsTitle__emptyRow: 'Nenhum membro para exibir',
       invitationsTab: {
         autoInvitations: {
@@ -402,13 +409,6 @@ export const ptBR: LocalizationResource = {
         headerTitle__invitations: 'Convites',
         headerTitle__members: 'Membros',
         headerTitle__requests: 'Solicitações',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'As funções estão temporariamente bloqueadas',
-          subtitle:
-            'Estamos atualizando as funções disponíveis. Assim que isso for concluído, você poderá atualizar as funções novamente.',
-        },
       },
     },
     navbar: {
@@ -871,6 +871,10 @@ export const ptBR: LocalizationResource = {
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Uma organização já existe para o nome da empresa detectado ({{organizationName}}) e {{organizationDomain}}. Entre por convite.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Criar nova organização',
       action__invitationAccept: 'Participar',
@@ -891,16 +895,12 @@ export const ptBR: LocalizationResource = {
       title: 'Configure sua conta',
     },
     organizationCreationDisabled: {
-      title: 'Você deve pertencer a uma organização',
       subtitle: 'Entre em contato com o administrador da sua organização para obter um convite.',
+      title: 'Você deve pertencer a uma organização',
     },
     signOut: {
       actionLink: 'Sair',
       actionText: 'Conectado como {{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'Uma organização já existe para o nome da empresa detectado ({{organizationName}}) e {{organizationDomain}}. Entre por convite.',
     },
   },
   taskResetPassword: {
@@ -911,6 +911,69 @@ export const ptBR: LocalizationResource = {
     },
     subtitle: 'Sua conta requer uma nova senha antes de continuar',
     title: 'Resetar senha',
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} já é membro da organização.',
@@ -940,11 +1003,12 @@ export const ptBR: LocalizationResource = {
     form_param_type_invalid__email_address: 'Endereço de e-mail inválido.',
     form_param_type_invalid__phone_number: 'Número de telefone inválido.',
     form_param_value_invalid: 'Valor inválido.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Senha incorreta.',
-    form_password_or_identifier_incorrect:
-      'A senha ou o endereço de e-mail está incorreto. Tente novamente ou use outro método.',
     form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',
     form_password_not_strong_enough: 'Sua senha não é forte o suficiente.',
+    form_password_or_identifier_incorrect:
+      'A senha ou o endereço de e-mail está incorreto. Tente novamente ou use outro método.',
     form_password_pwned: 'Esta senha foi comprometida e não pode ser usada, por favor, tente outra senha.',
     form_password_pwned__sign_in: 'Esta senha foi comprometida, por favor redefina sua senha.',
     form_password_size_in_bytes_exceeded:

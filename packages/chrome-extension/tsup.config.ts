@@ -9,7 +9,13 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
-    entry: ['./src/index.ts', './src/background/index.ts', './src/react/index.ts', './src/types/index.ts'],
+    entry: [
+      './src/index.ts',
+      './src/background/index.ts',
+      './src/client/index.ts',
+      './src/react/index.ts',
+      './src/types/index.ts',
+    ],
     bundle: true,
     clean: true,
     minify: false,
@@ -37,5 +43,5 @@ export default defineConfig(overrideOptions => {
     outDir: './dist/cjs',
   };
 
-  return runAfterLast(['pnpm build:declarations', shouldPublish && 'pnpm publish:local'])(esm, cjs);
+  return runAfterLast(['pnpm build:declarations', shouldPublish && 'pkglab pub --ping'])(esm, cjs);
 });

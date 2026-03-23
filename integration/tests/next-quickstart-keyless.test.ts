@@ -1,26 +1,11 @@
-import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import { createTestUtils } from '../testUtils';
+import { mockClaimedInstanceEnvironmentCall, testToggleCollapsePopoverAndClaim } from '../testUtils/keylessHelpers';
 
 const commonSetup = appConfigs.next.appRouterQuickstart.clone();
-
-const mockClaimedInstanceEnvironmentCall = async (page: Page) => {
-  await page.route('*/**/v1/environment*', async route => {
-    const response = await route.fetch();
-    const json = await response.json();
-    const newJson = {
-      ...json,
-      auth_config: {
-        ...json.auth_config,
-        claimed_at: Date.now(),
-      },
-    };
-    await route.fulfill({ response, json: newJson });
-  });
-};
 
 test.describe('Keyless mode @quickstart', () => {
   test.describe.configure({ mode: 'serial' });
@@ -71,39 +56,7 @@ test.describe('Keyless mode @quickstart', () => {
   });
 
   test('Toggle collapse popover and claim.', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.page.goToAppHome();
-    await u.page.waitForClerkJsLoaded();
-    await u.po.expect.toBeSignedOut();
-
-    await u.po.keylessPopover.waitForMounted();
-
-    expect(await u.po.keylessPopover.isExpanded()).toBe(false);
-    await u.po.keylessPopover.toggle();
-    expect(await u.po.keylessPopover.isExpanded()).toBe(true);
-
-    const claim = await u.po.keylessPopover.promptsToClaim();
-
-    const [newPage] = await Promise.all([context.waitForEvent('page'), claim.click()]);
-
-    await newPage.waitForLoadState();
-
-    await newPage.waitForURL(url => {
-      const urlToReturnTo = `${dashboardUrl}apps/claim?token=`;
-
-      const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
-
-      const signUpForceRedirectUrlCheck =
-        signUpForceRedirectUrl?.startsWith(urlToReturnTo) ||
-        (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}prepare-account`) &&
-          signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
-
-      return (
-        url.pathname === '/apps/claim/sign-in' &&
-        url.searchParams.get('sign_in_force_redirect_url')?.startsWith(urlToReturnTo) &&
-        signUpForceRedirectUrlCheck
-      );
-    });
+    await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl, framework: 'nextjs' });
   });
 
   test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({

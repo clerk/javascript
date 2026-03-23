@@ -1,6 +1,5 @@
-import { coerce } from 'semver';
-
 import type { VersionBounds } from '@clerk/shared/versionCheck';
+import { coerce } from 'semver';
 
 export type { VersionBounds } from '@clerk/shared/versionCheck';
 

@@ -1,9 +1,9 @@
-import { useSessionContext } from '@clerk/shared/react';
+import { __internal_useSessionBase } from '@clerk/shared/react';
 import React from 'react';
 
 export function withCoreSessionSwitchGuard<P>(Component: React.ComponentType<P>): React.ComponentType<P> {
   const Hoc = (props: P) => {
-    const session = useSessionContext();
+    const session = __internal_useSessionBase();
 
     /**
      * Avoid simply checking if session is falsy, checking against undefined is preferable as it means that clerk has not loaded yet

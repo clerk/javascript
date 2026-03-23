@@ -3,12 +3,6 @@ import Lock from 'browser-tabs-lock';
 export function SafeLock(key: string) {
   const lock = new Lock();
 
-  // TODO: Figure out how to fix this linting error
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  window.addEventListener('beforeunload', async () => {
-    await lock.releaseLock(key);
-  });
-
   const acquireLockAndRun = async (cb: () => Promise<unknown>) => {
     if ('locks' in navigator && isSecureContext) {
       const controller = new AbortController();

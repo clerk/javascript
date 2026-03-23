@@ -4,6 +4,21 @@ import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
+const make429ClerkResponse = () => ({
+  status: 429,
+  headers: { 'retry-after': '1' },
+  body: JSON.stringify({
+    errors: [
+      {
+        message: 'Too many requests',
+        long_message: 'Too many requests. Please retry later.',
+        code: 'rate_limit_exceeded',
+      },
+    ],
+    clerk_trace_id: 'some-trace-id',
+  }),
+});
+
 const make500ClerkResponse = () => ({
   status: 500,
   body: JSON.stringify({
@@ -12,6 +27,20 @@ const make500ClerkResponse = () => ({
         message: 'Oops, an unexpected error occurred',
         long_message: "There was an internal error on our servers. We've been notified and are working on fixing it.",
         code: 'internal_clerk_error',
+      },
+    ],
+    clerk_trace_id: 'some-trace-id',
+  }),
+});
+
+const makeDevBrowserUnauthenticatedResponse = () => ({
+  status: 401,
+  body: JSON.stringify({
+    errors: [
+      {
+        message: '',
+        long_message: '',
+        code: 'dev_browser_unauthenticated',
       },
     ],
     clerk_trace_id: 'some-trace-id',
@@ -81,25 +110,53 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       await u.po.expect.toBeSignedIn();
     });
 
+    test('dev_browser_unauthenticated during runtime polling resets dev browser without infinite requests', async ({
+      page,
+      context,
+    }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+
+      let clientRequestCount = 0;
+      await page.route('**/v1/client?**', route => {
+        clientRequestCount++;
+        return route.continue();
+      });
+
+      // Intercept token requests to simulate a wiped __clerk_db_jwt cookie at runtime
+      await page.route('**/v1/client/sessions/*/tokens**', route => {
+        return route.fulfill(makeDevBrowserUnauthenticatedResponse());
+      });
+
+      const waitForDevBrowserRefresh = page.waitForResponse(
+        response => response.url().includes('/dev_browser') && response.status() === 200,
+        { timeout: 10_000 },
+      );
+
+      // Clear the token cache so the next poller tick makes a fresh network request
+      await page.evaluate(() => window.Clerk?.session?.clearCache());
+
+      await waitForDevBrowserRefresh;
+
+      await page.unrouteAll();
+
+      // Allow a window for any runaway requests to surface
+      await page.waitForTimeout(2_000);
+
+      // Without the fix, handleUnauthenticated would recursively call Client.fetch
+      // hundreds of times. With the fix, /v1/client should only see normal poller activity.
+      expect(clientRequestCount).toBeLessThan(5);
+    });
+
     test('resiliency to not break devBrowser - dummy client and is not created on `/client` 4xx errors', async ({
       page,
       context,
     }) => {
-      // Simulate "Needs new dev browser, when db jwt exists but does not match the instance".
-
-      const response = {
-        status: 401,
-        body: JSON.stringify({
-          errors: [
-            {
-              message: '',
-              long_message: '',
-              code: 'dev_browser_unauthenticated',
-            },
-          ],
-          clerk_trace_id: 'some-trace-id',
-        }),
-      };
+      // Simulate "Needs new dev browser, when dev browser exists but does not match the instance".
+      const response = makeDevBrowserUnauthenticatedResponse();
 
       const u = createTestUtils({ app, page, context, useTestingToken: false });
 
@@ -254,6 +311,73 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     });
   });
 
+  test.describe('429 rate limit resiliency', () => {
+    test('setActive surfaces 429 error to the developer instead of silently swallowing', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+
+      // Intercept touch requests to return 429
+      await page.route('**/v1/client/sessions/*/touch**', route => {
+        return route.fulfill(make429ClerkResponse());
+      });
+
+      // setActive should surface the 429 error so the developer can handle it
+      const error = await page.evaluate(async () => {
+        const session = window.Clerk?.session;
+        if (!session) {
+          return null;
+        }
+        try {
+          await window.Clerk?.setActive({ session });
+          return null;
+        } catch (e: any) {
+          return { status: e.status, message: e.message };
+        }
+      });
+
+      expect(error).not.toBeNull();
+      expect(error!.status).toBe(429);
+
+      await page.unrouteAll();
+
+      // The user must still be signed in — 429 should not trigger handleUnauthenticated
+      await u.po.expect.toBeSignedIn();
+    });
+
+    test('429 on /tokens does not cause recursive handleUnauthenticated calls', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+
+      let clientRequestCount = 0;
+      await page.route('**/v1/client?**', route => {
+        clientRequestCount++;
+        return route.continue();
+      });
+
+      // Intercept token requests to return 429
+      await page.route('**/v1/client/sessions/*/tokens**', route => {
+        return route.fulfill(make429ClerkResponse());
+      });
+
+      // Clear the token cache so the next poller tick makes a fresh network request
+      await page.evaluate(() => window.Clerk?.session?.clearCache());
+
+      await page.waitForTimeout(3_000);
+
+      await page.unrouteAll();
+
+      // Without the fix, 429 on /tokens would trigger handleUnauthenticated → Client.fetch loop.
+      // With the fix, /v1/client should only see normal poller activity (not hundreds of requests).
+      expect(clientRequestCount).toBeLessThan(5);
+    });
+  });
+
   test.describe('clerk-js script loading', () => {
     test('recovers from transient network failure on clerk-js script load', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
@@ -392,6 +516,50 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       });
 
       await u.po.clerk.toBeLoaded();
+    });
+  });
+
+  test.describe('token refresh with previous token in body', () => {
+    test('token refresh includes previous token in POST body and succeeds', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      // Sign in
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+
+      // Track token request bodies
+      const tokenRequestBodies: string[] = [];
+      await context.route('**/v1/client/sessions/*/tokens*', async route => {
+        const postData = route.request().postData();
+        if (postData) {
+          tokenRequestBodies.push(postData);
+        }
+        await route.continue();
+      });
+
+      // Force a fresh token fetch (cache miss -> hits /tokens endpoint)
+      const token = await page.evaluate(async () => {
+        const clerk = (window as any).Clerk;
+        await clerk.session?.clearCache();
+        return await clerk.session?.getToken({ skipCache: true });
+      });
+
+      // Token refresh should succeed (backend ignores the param for now)
+      expect(token).toBeTruthy();
+
+      // Verify token param is present in the POST body when sessionMinter is enabled.
+      // fapiClient serializes body as form-urlencoded via qs.stringify(camelToSnake(body))
+      // so "token" stays "token" (no case change) and the body looks like "organization_id=&token=<jwt>"
+      const sessionMinterEnabled = await page.evaluate(() => {
+        return !!(window as any).Clerk?.__internal_environment?.authConfig?.sessionMinter;
+      });
+      expect(tokenRequestBodies.length).toBeGreaterThanOrEqual(1);
+      const lastBody = new URLSearchParams(tokenRequestBodies[tokenRequestBodies.length - 1]);
+      expect(lastBody.has('token')).toBe(sessionMinterEnabled);
+
+      // User should still be signed in after refresh
+      await u.po.expect.toBeSignedIn();
     });
   });
 });

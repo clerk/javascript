@@ -59,6 +59,40 @@ describe('api.client', () => {
     expect(totalCount).toBe(2);
   });
 
+  it('executes users.getUserList() with last_sign_in_at filters', async () => {
+    const afterTimestamp = 1640000000;
+    const beforeTimestamp = 1700000000;
+
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('last_sign_in_at_after')).toBe(afterTimestamp.toString());
+          expect(url.searchParams.get('last_sign_in_at_before')).toBe(beforeTimestamp.toString());
+          return HttpResponse.json([userJson]);
+        }),
+      ),
+      http.get(
+        `https://api.clerk.test/v1/users/count`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('last_sign_in_at_after')).toBe(afterTimestamp.toString());
+          expect(url.searchParams.get('last_sign_in_at_before')).toBe(beforeTimestamp.toString());
+          return HttpResponse.json({ object: 'total_count', total_count: 1 });
+        }),
+      ),
+    );
+
+    const { data, totalCount } = await apiClient.users.getUserList({
+      lastSignInAtAfter: afterTimestamp,
+      lastSignInAtBefore: beforeTimestamp,
+    });
+
+    expect(data.length).toBe(1);
+    expect(totalCount).toBe(1);
+  });
+
   it('executes a successful backend API request for a paginated response', async () => {
     server.use(
       http.get(
@@ -429,6 +463,73 @@ describe('api.client', () => {
         token: 'mt_secret_test',
       });
       expect(response.id).toBe('mt_test');
+    });
+  });
+
+  describe('WaitlistEntry', () => {
+    it('executes a successful backend API request to bulk create waitlist entries', async () => {
+      const emailAddresses = ['foo@bar.com', 'bar@foo.com'];
+      const ids = ['wle_123', 'wle_456'];
+      const createdAt = 1700000000;
+      const updatedAt = 1700000100;
+
+      server.use(
+        http.post(
+          `https://api.clerk.test/v1/waitlist_entries/bulk`,
+          validateHeaders(async ({ request }) => {
+            const body = await request.json();
+            expect(body).toEqual([
+              { email_address: emailAddresses[0] },
+              { email_address: emailAddresses[1], notify: true },
+            ]);
+
+            return HttpResponse.json([
+              {
+                object: 'waitlist_entry',
+                id: ids[0],
+                email_address: emailAddresses[0],
+                status: 'pending',
+                is_locked: false,
+                created_at: createdAt,
+                updated_at: updatedAt,
+                invitation: null,
+              },
+              {
+                object: 'waitlist_entry',
+                id: ids[1],
+                email_address: emailAddresses[1],
+                status: 'pending',
+                is_locked: false,
+                created_at: createdAt,
+                updated_at: updatedAt,
+                invitation: null,
+              },
+            ]);
+          }),
+        ),
+      );
+
+      const response = await apiClient.waitlistEntries.createBulk([
+        { emailAddress: emailAddresses[0] },
+        { emailAddress: emailAddresses[1], notify: true },
+      ]);
+
+      expect(response).toHaveLength(2);
+      expect(response[0].id).toBe(ids[0]);
+      expect(response[0].emailAddress).toBe(emailAddresses[0]);
+      expect(response[0].status).toBe('pending');
+      expect(response[0].isLocked).toBe(false);
+      expect(response[0].createdAt).toBe(createdAt);
+      expect(response[0].updatedAt).toBe(updatedAt);
+      expect(response[0].invitation).toBe(null);
+
+      expect(response[1].id).toBe(ids[1]);
+      expect(response[1].emailAddress).toBe(emailAddresses[1]);
+      expect(response[1].status).toBe('pending');
+      expect(response[1].isLocked).toBe(false);
+      expect(response[1].createdAt).toBe(createdAt);
+      expect(response[1].updatedAt).toBe(updatedAt);
+      expect(response[1].invitation).toBe(null);
     });
   });
 });

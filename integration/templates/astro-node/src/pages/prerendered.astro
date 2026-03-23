@@ -1,0 +1,25 @@
+---
+import { Show } from '@clerk/astro/components';
+import Layout from '../layouts/Layout.astro';
+
+// This page is prerendered at build time despite output: 'server' mode
+export const prerender = true;
+---
+
+<Layout title='Prerendered Page Test'>
+  <h1>Prerendered Page with Clerk Components</h1>
+
+  <p>This page is statically generated at build time (prerender = true) in server output mode.</p>
+
+  <Show when='signed-in'>
+    <div id="signed-in-content">
+      <p>✅ You are signed in! (This content should be hidden initially and shown after client-side auth check)</p>
+    </div>
+  </Show>
+
+  <Show when='signed-out'>
+    <div id="signed-out-content">
+      <p>🔒 You are signed out. (This content should be visible initially for signed-out users)</p>
+    </div>
+  </Show>
+</Layout>

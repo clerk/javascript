@@ -1,20 +1,15 @@
 ---
-import type { HTMLTag, Polymorphic } from 'astro/types';
-import type { SignOutOptions, Without } from '@clerk/shared/types';
+import type { SignOutOptions } from '@clerk/shared/types';
 import type { ButtonProps } from '../../types';
-import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils';
+import { addUnstyledAttributeToFirstTag } from './utils';
 
-type Props<Tag extends HTMLTag = 'button'> = Polymorphic<SignOutOptions & ButtonProps<Tag>>;
+type Props = SignOutOptions & ButtonProps;
 
 import { generateSafeId } from '@clerk/astro/internal';
 
 const safeId = generateSafeId();
 
-if ('as' in Astro.props) {
-  logAsPropUsageDeprecation();
-}
-
-const { as: Tag = 'button', asChild, redirectUrl = '/', sessionId, ...elementProps } = Astro.props;
+const { asChild, redirectUrl = '/', sessionId, ...elementProps } = Astro.props;
 
 let htmlElement = '';
 
@@ -28,12 +23,12 @@ if (asChild) {
   asChild ? (
     <Fragment set:html={htmlElement} />
   ) : (
-    <Tag
+    <button
       {...elementProps}
       data-clerk-unstyled-id={safeId}
     >
       <slot>Sign out</slot>
-    </Tag>
+    </button>
   )
 }
 

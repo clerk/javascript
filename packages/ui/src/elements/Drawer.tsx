@@ -535,7 +535,9 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
               willChange: 'transform',
               position: 'absolute',
               bottom: 0,
+              // eslint-disable-next-line custom-rules/no-physical-css-properties -- Full-width overlay positioning
               left: 0,
+              // eslint-disable-next-line custom-rules/no-physical-css-properties -- Full-width overlay positioning
               right: 0,
               background: common.mergedColorsBackground(
                 colors.setAlpha(t.colors.$colorBackground, 1),

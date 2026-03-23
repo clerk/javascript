@@ -1,30 +1,24 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-const csp = `default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' 'nonce-deadbeef';
-  img-src 'self' https://img.clerk.com;
-  worker-src 'self' blob:;
-  style-src 'self' 'unsafe-inline';
-  frame-src 'self' https://challenges.cloudflare.com;
-`;
-
 const isProtectedRoute = createRouteMatcher(['/protected(.*)', '/user(.*)', '/switcher(.*)']);
 const isAdminRoute = createRouteMatcher(['/only-admin(.*)']);
-const isCSPRoute = createRouteMatcher(['/csp']);
 
-export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) {
-    await auth.protect();
-  }
+export default clerkMiddleware(
+  async (auth, req) => {
+    if (isProtectedRoute(req)) {
+      await auth.protect();
+    }
 
-  if (isAdminRoute(req)) {
-    await auth.protect({ role: 'org:admin' });
-  }
-
-  if (isCSPRoute(req)) {
-    req.headers.set('Content-Security-Policy', csp.replace(/\n/g, ''));
-  }
-});
+    if (isAdminRoute(req)) {
+      await auth.protect({ role: 'org:admin' });
+    }
+  },
+  {
+    contentSecurityPolicy: {
+      strict: true,
+    },
+  },
+);
 
 export const config = {
   matcher: [

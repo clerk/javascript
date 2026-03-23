@@ -364,6 +364,12 @@ export const trTR: LocalizationResource = {
         tableHeader__role: 'Rol',
         tableHeader__user: 'Kullanıcı',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Mevcut rolleri güncelliyoruz. Bu tamamlandığında rolleri tekrar güncelleyebileceksiniz.',
+          title: 'Roller geçici olarak kilitlendi',
+        },
+      },
       detailsTitle__emptyRow: 'Görüntülenecek üye yok',
       invitationsTab: {
         autoInvitations: {
@@ -394,12 +400,6 @@ export const trTR: LocalizationResource = {
         headerTitle__invitations: 'Davetler',
         headerTitle__members: 'Üyeler',
         headerTitle__requests: 'İstekler',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Roller geçici olarak kilitlendi',
-          subtitle: 'Mevcut rolleri güncelliyoruz. Bu tamamlandığında rolleri tekrar güncelleyebileceksiniz.',
-        },
       },
     },
     navbar: {
@@ -859,6 +859,10 @@ export const trTR: LocalizationResource = {
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Tespit edilen şirket adı ({{organizationName}}) ve {{organizationDomain}} için bir organizasyon zaten mevcut. Davetiye ile katılın.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Yeni organizasyon oluştur',
       action__invitationAccept: 'Katıl',
@@ -879,16 +883,12 @@ export const trTR: LocalizationResource = {
       title: 'Organizasyonunuzu ayarlayın',
     },
     organizationCreationDisabled: {
-      title: 'Bir organizasyona ait olmalısınız',
       subtitle: 'Davet için organizasyon yöneticinizle iletişime geçin.',
+      title: 'Bir organizasyona ait olmalısınız',
     },
     signOut: {
       actionLink: 'Çıkış yap',
       actionText: '{{identifier}} olarak giriş yapıldı',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'Tespit edilen şirket adı ({{organizationName}}) ve {{organizationDomain}} için bir organizasyon zaten mevcut. Davetiye ile katılın.',
     },
   },
   taskResetPassword: {
@@ -899,6 +899,69 @@ export const trTR: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: 'Bu organizasyonda zaten üyesiniz.',
@@ -928,11 +991,12 @@ export const trTR: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Parametre değeri geçersiz.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Şifre yanlış.',
-    form_password_or_identifier_incorrect:
-      'Şifre veya e-posta adresi yanlış. Tekrar deneyin veya başka bir yöntem kullanın.',
     form_password_length_too_short: 'Şifre çok kısa.',
     form_password_not_strong_enough: 'Şifreniz yeterince güçlü değil.',
+    form_password_or_identifier_incorrect:
+      'Şifre veya e-posta adresi yanlış. Tekrar deneyin veya başka bir yöntem kullanın.',
     form_password_pwned: 'Bu şifre bir veri ihlalinde tespit edildi ve kullanılamaz. Lütfen başka bir şifre deneyin.',
     form_password_pwned__sign_in:
       'Bu şifre bir veri ihlalinde tespit edildi ve oturum açmak için kullanılamaz. Lütfen başka bir şifre seçin.',

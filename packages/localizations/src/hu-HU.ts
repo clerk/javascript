@@ -364,6 +364,12 @@ export const huHU: LocalizationResource = {
         tableHeader__role: 'Beosztás',
         tableHeader__user: 'Felhasználó',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Frissítjük az elérhető szerepköröket. Ha ez befejeződött, újra frissítheti a szerepköröket.',
+          title: 'A szerepkörök ideiglenesen zárolva vannak',
+        },
+      },
       detailsTitle__emptyRow: 'Nincsenek listázható tagok',
       invitationsTab: {
         autoInvitations: {
@@ -394,12 +400,6 @@ export const huHU: LocalizationResource = {
         headerTitle__invitations: 'Meghívók',
         headerTitle__members: 'Tagok',
         headerTitle__requests: 'Kérések',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'A szerepkörök ideiglenesen zárolva vannak',
-          subtitle: 'Frissítjük az elérhető szerepköröket. Ha ez befejeződött, újra frissítheti a szerepköröket.',
-        },
       },
     },
     navbar: {
@@ -857,6 +857,10 @@ export const huHU: LocalizationResource = {
   socialButtonsBlockButton: 'Folytatás {{provider|titleize}} segítségével',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Már létezik szervezet az észlelt cégnévhez ({{organizationName}}) és {{organizationDomain}}. Csatlakozz meghívással.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Szervezet létrehozása',
       action__invitationAccept: 'Csatlakozás',
@@ -877,16 +881,12 @@ export const huHU: LocalizationResource = {
       title: 'Állítsa be szervezetét',
     },
     organizationCreationDisabled: {
-      title: 'Egy szervezethez kell tartoznia',
       subtitle: 'Kérjen meghívót a szervezet adminisztrátorától.',
+      title: 'Egy szervezethez kell tartoznia',
     },
     signOut: {
       actionLink: 'Kijelentkezés',
       actionText: 'Bejelentkezve: {{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'Már létezik szervezet az észlelt cégnévhez ({{organizationName}}) és {{organizationDomain}}. Csatlakozz meghívással.',
     },
   },
   taskResetPassword: {
@@ -897,6 +897,69 @@ export const huHU: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
@@ -925,11 +988,12 @@ export const huHU: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_or_identifier_incorrect:
-      'A jelszó vagy az e-mail cím helytelen. Próbáld újra vagy használj másik módszert.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'A jelszó nem elég erős',
+    form_password_or_identifier_incorrect:
+      'A jelszó vagy az e-mail cím helytelen. Próbáld újra vagy használj másik módszert.',
     form_password_pwned:
       'Úgy látjuk, hogy ez a jelszó kiszivárgott, ezért ezt nem használhatod, kérlek próbálj egy másik jelszót.',
     form_password_pwned__sign_in:

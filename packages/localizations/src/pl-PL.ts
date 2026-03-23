@@ -364,6 +364,12 @@ export const plPL: LocalizationResource = {
         tableHeader__role: 'Rola',
         tableHeader__user: 'Użytkownik',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Aktualizujemy dostępne role. Po zakończeniu będziesz mógł ponownie aktualizować role.',
+          title: 'Role są tymczasowo zablokowane',
+        },
+      },
       detailsTitle__emptyRow: 'Brak użytkowników do wyświetlenia',
       invitationsTab: {
         autoInvitations: {
@@ -394,12 +400,6 @@ export const plPL: LocalizationResource = {
         headerTitle__invitations: 'Zaproszenia',
         headerTitle__members: 'Członkowie',
         headerTitle__requests: 'Prośby',
-      },
-      alerts: {
-        roleSetMigrationInProgress: {
-          title: 'Role są tymczasowo zablokowane',
-          subtitle: 'Aktualizujemy dostępne role. Po zakończeniu będziesz mógł ponownie aktualizować role.',
-        },
       },
     },
     navbar: {
@@ -863,6 +863,10 @@ export const plPL: LocalizationResource = {
   socialButtonsBlockButton: 'Kontynuuj z {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Organizacja już istnieje dla wykrytej nazwy firmy ({{organizationName}}) i {{organizationDomain}}. Dołącz przez zaproszenie.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Utwórz organizację',
       action__invitationAccept: 'Dołącz',
@@ -883,16 +887,12 @@ export const plPL: LocalizationResource = {
       title: 'Utwórz swoją organizację',
     },
     organizationCreationDisabled: {
-      title: 'Musisz należeć do organizacji',
       subtitle: 'Skontaktuj się z administratorem swojej organizacji, aby uzyskać zaproszenie.',
+      title: 'Musisz należeć do organizacji',
     },
     signOut: {
       actionLink: 'Wyloguj',
       actionText: 'Zalogowano jako {{identifier}}',
-    },
-    alerts: {
-      organizationAlreadyExists:
-        'Organizacja już istnieje dla wykrytej nazwy firmy ({{organizationName}}) i {{organizationDomain}}. Dołącz przez zaproszenie.',
     },
   },
   taskResetPassword: {
@@ -903,6 +903,69 @@ export const plPL: LocalizationResource = {
     },
     subtitle: undefined,
     title: 'Zresetuj hasło',
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} jest już członkiem organizacji.',
@@ -931,11 +994,12 @@ export const plPL: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Wprowadzona wartość jest nieprawidłowa. Popraw ją.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Wprowadzone hasło jest nieprawidłowe. Spróbuj ponownie.',
-    form_password_or_identifier_incorrect:
-      'Hasło lub adres e-mail jest nieprawidłowy. Spróbuj ponownie lub użyj innej metody.',
     form_password_length_too_short: 'Twoje hasło jest zbyt krótkie. Musi mieć co najmniej 8 znaków.',
     form_password_not_strong_enough: 'Twoje hasło nie jest wystarczająco silne',
+    form_password_or_identifier_incorrect:
+      'Hasło lub adres e-mail jest nieprawidłowy. Spróbuj ponownie lub użyj innej metody.',
     form_password_pwned:
       'To hasło zostało znalezione w wyniku włamania i nie można go użyć. Zamiast tego spróbuj użyć innego hasła.',
     form_password_pwned__sign_in: 'To hasło zostało znalezione w wyniku włamania i nie można go użyć. Zresetuj hasło.',

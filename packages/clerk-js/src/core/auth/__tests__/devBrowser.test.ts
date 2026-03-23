@@ -50,7 +50,8 @@ describe('Thrown errors', () => {
     const devBrowserHandler = createDevBrowser({
       frontendApi: 'white-koala-42.clerk.accounts.dev',
       fapiClient: mockFapiClient,
-      publishableKey: 'pk_test_d2hpdGUta29hbGEtNDIuY2xlcmsuYWNjb3VudHMuZGV2JA',
+      cookieSuffix: 'test-suffix',
+      cookieOptions: { usePartitionedCookies: () => false },
     });
 
     await expect(devBrowserHandler.setup()).rejects.toThrow(
