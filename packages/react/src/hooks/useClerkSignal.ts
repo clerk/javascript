@@ -79,7 +79,7 @@ function useClerkSignal(
  * import { useSignIn } from "@clerk/react";
  *
  * function SignInForm() {
- *   const { signIn, errors, fetchStatus } = useSignInSignal();
+ *   const { signIn, errors, fetchStatus } = useSignIn();
  *   //
  * }
  */
@@ -94,7 +94,7 @@ export const useSignIn = (): SignInSignalValue => {
  * import { useSignUp } from "@clerk/react";
  *
  * function SignUpForm() {
- *   const { signUp, errors, fetchStatus } = useSignUpSignal();
+ *   const { signUp, errors, fetchStatus } = useSignUp();
  *   //
  * }
  */

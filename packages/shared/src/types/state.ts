@@ -128,7 +128,7 @@ export type WaitlistErrors = Errors<WaitlistFields>;
 /**
  * @inline
  *
- * The value returned by the `useSignInSignal` hook.
+ * The value returned by the `useSignIn` hook.
  */
 export interface SignInSignalValue {
   /**
@@ -154,7 +154,7 @@ export interface SignInSignal {
 /**
  * @inline
  *
- * The value returned by the `useSignUpSignal` hook.
+ * The value returned by the `useSignUp` hook.
  */
 export interface SignUpSignalValue {
   /**
