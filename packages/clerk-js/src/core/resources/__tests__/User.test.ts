@@ -86,7 +86,7 @@ describe('User', () => {
         object: 'enterprise_account_connection',
         name: 'Acme Corp SSO',
         active: true,
-        allow_account_linking: true,
+        allow_organization_account_linking: true,
         domain: 'acme.com',
         protocol: 'saml',
         provider: 'saml_okta',
@@ -121,7 +121,7 @@ describe('User', () => {
 
     expect(connections).toHaveLength(1);
     expect(connections[0].name).toBe('Acme Corp SSO');
-    expect(connections[0].allowAccountLinking).toBe(true);
+    expect(connections[0].allowOrganizationAccountLinking).toBe(true);
   });
 
   it('creates a web3 wallet', async () => {

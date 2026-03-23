@@ -36,7 +36,7 @@ export interface EnterpriseAccountConnectionResource extends ClerkResource {
   protocol: EnterpriseProtocol;
   provider: EnterpriseProvider;
   syncUserAttributes: boolean;
-  allowAccountLinking: boolean;
+  allowOrganizationAccountLinking: boolean;
   enterpriseConnectionId: string | null;
   __internal_toSnapshot: () => EnterpriseAccountConnectionJSONSnapshot;
 }
