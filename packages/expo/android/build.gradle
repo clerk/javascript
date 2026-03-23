@@ -75,7 +75,23 @@ android {
   }
 }
 
-// Note: kotlin-stdlib exclusions are handled in the clerk-android-ui dependency declaration
+// clerk-android is compiled with Kotlin 2.3.x, but Expo/RN projects typically use an older
+// Kotlin version (e.g. 2.1.x). This causes "incompatible version of Kotlin" metadata errors
+// at :app:compileDebugKotlin. Applying -Xskip-metadata-version-check allows the older
+// compiler to read 2.3.x metadata without failing.
+try {
+  rootProject.allprojects {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+      compilerOptions {
+        freeCompilerArgs.add('-Xskip-metadata-version-check')
+      }
+    }
+  }
+} catch (Exception ignored) {
+  // Future Gradle versions with Isolated Projects may block cross-project configuration.
+  // In that case, users should add '@clerk/expo' to their app.json plugins array instead,
+  // which applies the flag via the config plugin's withClerkAndroid.
+}
 
 dependencies {
   // React Native
