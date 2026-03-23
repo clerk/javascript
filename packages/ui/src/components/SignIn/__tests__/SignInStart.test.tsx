@@ -679,6 +679,59 @@ describe('SignInStart', () => {
         );
       });
     });
+
+    it('does not pass signUpIfMissing when sign-up mode is restricted', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withEnumerationProtection();
+        f.withRestrictedMode();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when sign-up mode is waitlist', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withEnumerationProtection();
+        f.withWaitlistMode();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when the identifier is a username', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUsername();
+        f.withEnumerationProtection();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/username/i), 'hello');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
   });
 
   describe('ticket flow', () => {
