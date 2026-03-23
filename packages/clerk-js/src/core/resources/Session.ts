@@ -29,6 +29,7 @@ import type {
   SessionResource,
   SessionStatus,
   SessionTask,
+  SessionTouchParams,
   SessionVerificationJSON,
   SessionVerificationResource,
   SessionVerifyAttemptFirstFactorParams,
@@ -103,14 +104,16 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   private _touchPost = async (
-    { skipUpdateClient }: { skipUpdateClient: boolean } = { skipUpdateClient: false },
+    { intent, skipUpdateClient }: { intent?: SessionTouchParams['intent']; skipUpdateClient: boolean } = {
+      skipUpdateClient: false,
+    },
   ): Promise<FapiResponseJSON<SessionJSON> | null> => {
     const json = await BaseResource._fetch<SessionJSON>(
       {
         method: 'POST',
         path: this.path('touch'),
         // any is how we type the body in the BaseMutateParams as well
-        body: { active_organization_id: this.lastActiveOrganizationId } as any,
+        body: { active_organization_id: this.lastActiveOrganizationId, intent } as any,
       },
       { skipUpdateClient },
     );
@@ -121,8 +124,8 @@ export class Session extends BaseResource implements SessionResource {
     return json;
   };
 
-  touch = async (): Promise<SessionResource> => {
-    await this._touchPost();
+  touch = async ({ intent }: SessionTouchParams = {}): Promise<SessionResource> => {
+    await this._touchPost({ intent, skipUpdateClient: false });
 
     // _touchPost() will have updated `this` in-place
     // The post has potentially changed the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
@@ -143,8 +146,8 @@ export class Session extends BaseResource implements SessionResource {
    *
    * @internal
    */
-  __internal_touch = async (): Promise<ClientResource | undefined> => {
-    const json = await this._touchPost({ skipUpdateClient: true });
+  __internal_touch = async ({ intent }: SessionTouchParams = {}): Promise<ClientResource | undefined> => {
+    const json = await this._touchPost({ intent, skipUpdateClient: true });
     return getClientResourceFromPayload(json);
   };
 
@@ -480,7 +483,13 @@ export class Session extends BaseResource implements SessionResource {
   ): Promise<TokenResource> {
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     // TODO: update template endpoint to accept organizationId
-    const params: Record<string, string | null> = template ? {} : { organizationId: organizationId ?? null };
+    const sessionMinterEnabled = Session.clerk?.__internal_environment?.authConfig?.sessionMinter;
+    const params: Record<string, string | null> = template
+      ? {}
+      : {
+          organizationId: organizationId ?? null,
+          ...(sessionMinterEnabled && this.lastActiveToken ? { token: this.lastActiveToken.getRawString() } : {}),
+        };
     const lastActiveToken = this.lastActiveToken?.getRawString();
 
     const tokenResolver = Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {

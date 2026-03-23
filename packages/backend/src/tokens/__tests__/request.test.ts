@@ -651,7 +651,7 @@ describe('tokens.authenticateRequest(options)', () => {
     expect(requestState).toBeSignedOutToAuth();
   });
 
-  test('cookieToken: returns handshake when clientUat is missing or equals to 0 and is satellite and not is synced [11y]', async () => {
+  test('cookieToken: returns handshake when clientUat is missing or equals to 0 and is satellite with satelliteAutoSync=true and not is synced [11y]', async () => {
     server.use(
       http.get('https://api.clerk.test/v1/jwks', () => {
         return HttpResponse.json(mockJwks);
@@ -671,6 +671,7 @@ describe('tokens.authenticateRequest(options)', () => {
         isSatellite: true,
         signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
+        satelliteAutoSync: true,
       }),
     );
 
@@ -684,7 +685,7 @@ describe('tokens.authenticateRequest(options)', () => {
     expect(requestState.toAuth()).toBeNull();
   });
 
-  test('cookieToken: redirects to signInUrl when is satellite dev and not synced', async () => {
+  test('cookieToken: redirects to signInUrl when is satellite dev with satelliteAutoSync=true and not synced', async () => {
     server.use(
       http.get('https://api.clerk.test/v1/jwks', () => {
         return HttpResponse.json(mockJwks);
@@ -705,6 +706,7 @@ describe('tokens.authenticateRequest(options)', () => {
         isSatellite: true,
         signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
+        satelliteAutoSync: true,
       }),
     );
 
@@ -871,6 +873,114 @@ describe('tokens.authenticateRequest(options)', () => {
       signInUrl: 'https://primary.example/sign-in',
     });
     expect(requestState.toAuth()).toBeSignedOutToAuth();
+  });
+
+  test('cookieToken: returns signed out without handshake when satelliteAutoSync is not set (defaults to false) and no cookies - prod', async () => {
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        { __client_uat: '0' },
+        `http://satellite.example/path`,
+      ),
+      mockOptions({
+        secretKey: 'deadbeef',
+        publishableKey: PK_LIVE,
+        signInUrl: 'https://primary.example/sign-in',
+        isSatellite: true,
+        domain: 'satellite.example',
+      }),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: AuthErrorReason.SessionTokenAndUATMissing,
+      isSatellite: true,
+      domain: 'satellite.example',
+      signInUrl: 'https://primary.example/sign-in',
+    });
+    expect(requestState.toAuth()).toBeSignedOutToAuth();
+    expect(requestState.headers.get('location')).toBeNull();
+  });
+
+  test('cookieToken: returns signed out without handshake when satelliteAutoSync is not set (defaults to false) and no cookies - dev', async () => {
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        {
+          __client_uat: '0',
+          __clerk_db_jwt: mockJwt,
+        },
+      ),
+      mockOptions({
+        secretKey: 'sk_test_deadbeef',
+        publishableKey: PK_TEST,
+        isSatellite: true,
+        signInUrl: 'https://primary.dev/sign-in',
+        domain: 'satellite.dev',
+      }),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: AuthErrorReason.SessionTokenAndUATMissing,
+      isSatellite: true,
+      domain: 'satellite.dev',
+      signInUrl: 'https://primary.dev/sign-in',
+    });
+    expect(requestState.toAuth()).toBeSignedOutToAuth();
+    expect(requestState.headers.get('location')).toBeNull();
+  });
+
+  test('cookieToken: triggers handshake when satelliteAutoSync is not set but __clerk_synced=false is present - prod', async () => {
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        { __client_uat: '0' },
+        `http://satellite.example/path?__clerk_synced=false`,
+      ),
+      mockOptions({
+        secretKey: 'deadbeef',
+        publishableKey: PK_LIVE,
+        signInUrl: 'https://primary.example/sign-in',
+        isSatellite: true,
+        domain: 'satellite.example',
+      }),
+    );
+
+    expect(requestState).toMatchHandshake({
+      reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
+      isSatellite: true,
+      domain: 'satellite.example',
+      signInUrl: 'https://primary.example/sign-in',
+    });
+  });
+
+  test('cookieToken: triggers handshake when satelliteAutoSync is not set but __clerk_synced=false is present - dev', async () => {
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        {
+          __client_uat: '0',
+          __clerk_db_jwt: mockJwt,
+        },
+        `http://satellite.dev/path?__clerk_synced=false`,
+      ),
+      mockOptions({
+        secretKey: 'sk_test_deadbeef',
+        publishableKey: PK_TEST,
+        signInUrl: 'https://primary.dev/sign-in',
+        isSatellite: true,
+        domain: 'satellite.dev',
+      }),
+    );
+
+    expect(requestState).toMatchHandshake({
+      reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
+      isSatellite: true,
+      domain: 'satellite.dev',
+      signInUrl: 'https://primary.dev/sign-in',
+    });
+    expect(requestState.headers.get('location')).toEqual(
+      `https://primary.dev/sign-in?__clerk_redirect_url=http%3A%2F%2Fexample.com%2Fpath%3F__clerk_synced%3Dfalse`,
+    );
   });
 
   test('cookieToken: returns handshake when app is not satellite and responds to syncing on dev instances[12y]', async () => {

@@ -306,6 +306,7 @@ jobs:
             "react-router",
             "custom",
             "hono",
+            "chrome-extension",
           ]
         test-project: ["chrome"]
         include:
@@ -461,7 +462,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
-          path: integration/test-results
+          path: test-results
           retention-days: 1
 
   pkg-pr-new:
