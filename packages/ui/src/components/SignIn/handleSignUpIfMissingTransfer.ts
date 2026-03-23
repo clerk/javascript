@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import type { DecorateUrl, LoadedClerk, SessionResource } from '@clerk/shared/types';
 
 import type { RouteContextValue } from '../../router/RouteContext';
@@ -42,6 +43,8 @@ export async function handleSignUpIfMissingTransfer({
     case 'missing_requirements':
       return navigate(`../create/continue`);
     default:
-      throw new Error(`Unexpected sign-up status after transfer: ${res.status}`);
+      throw new ClerkRuntimeError(`Unexpected sign-up status after transfer: ${res.status}`, {
+        code: 'sign_up_transfer_unexpected_status',
+      });
   }
 }

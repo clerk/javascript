@@ -21,8 +21,10 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
     props.setProps({ withSignUp: true });
 
     fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+    // The SDK updates firstFactorVerification on the resource *before* throwing
+    // the API error. This coupling is intentional — the component reads the
+    // resource status inside the catch block to decide whether to transfer.
     fixtures.signIn.attemptFirstFactor.mockImplementationOnce(() => {
-      // Simulate SDK updating the resource before throwing (backend returns 404 with transferable in meta.client)
       fixtures.signIn.firstFactorVerification = { status: 'transferable' } as any;
       return Promise.reject(
         new ClerkAPIResponseError('Error', {
@@ -125,6 +127,63 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
     await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
     await waitFor(() => {
       expect(fixtures.signUp.create).not.toHaveBeenCalled();
+    });
+  });
+
+  it('proceeds to second factor for existing users (no transfer)', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withEmailAddress();
+      f.withPreferredSignInStrategy({ strategy: 'otp' });
+      f.withEnumerationProtection();
+      f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: false });
+    });
+    props.setProps({ withSignUp: true });
+
+    fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+    fixtures.signIn.attemptFirstFactor.mockResolvedValueOnce({
+      status: 'needs_second_factor',
+      firstFactorVerification: { status: 'verified' },
+    } as any);
+
+    const { userEvent } = render(<SignInFactorOne />, { wrapper });
+
+    await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+    await waitFor(() => {
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-two');
+      expect(fixtures.signUp.create).not.toHaveBeenCalled();
+    });
+  });
+
+  it('surfaces transfer errors instead of leaving the code form loading', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withEmailAddress();
+      f.withPreferredSignInStrategy({ strategy: 'otp' });
+      f.withEnumerationProtection();
+      f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: false });
+    });
+    props.setProps({ withSignUp: true });
+
+    fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+    fixtures.signIn.attemptFirstFactor.mockImplementationOnce(() => {
+      fixtures.signIn.firstFactorVerification = { status: 'transferable' } as any;
+      return Promise.reject(
+        new ClerkAPIResponseError('Error', {
+          data: [{ code: 'form_identifier_not_found', long_message: '', message: '' }],
+          status: 404,
+        }),
+      );
+    });
+    fixtures.signUp.create.mockResolvedValueOnce({ status: 'abandoned' } as any);
+
+    const { userEvent } = render(<SignInFactorOne />, { wrapper });
+    const input = screen.getByLabelText(/Enter verification code/i);
+
+    await userEvent.type(input, '123456');
+
+    await waitFor(() => {
+      expect(fixtures.signUp.create).toHaveBeenCalled();
+      expect(input).toHaveValue('');
+      expect(input).not.toBeDisabled();
     });
   });
 });

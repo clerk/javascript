@@ -130,7 +130,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
             afterSignUpUrl,
             navigateOnSetActive,
             unsafeMetadata: ctx.unsafeMetadata,
-          });
+          }).catch(reject);
         }
 
         return reject(err);
