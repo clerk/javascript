@@ -1769,6 +1769,35 @@ describe('Session', () => {
       expect(fetchSpy).toHaveBeenCalledTimes(1);
       expect(fetchSpy.mock.calls[0][0].body).not.toHaveProperty('forceOrigin');
     });
+
+    it('does not include forceOrigin when sessionMinter is false even with skipCache true', async () => {
+      BaseResource.clerk = clerkMock({
+        __internal_environment: {
+          authConfig: { sessionMinter: false },
+        },
+      }) as any;
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken({ skipCache: true });
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(fetchSpy.mock.calls[0][0].body).not.toHaveProperty('forceOrigin');
+    });
   });
 
   describe('origin outage mode fallback', () => {
