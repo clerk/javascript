@@ -11,4 +11,4 @@ export interface Spec extends TurboModule {
   signOut(): Promise<void>;
 }
 
-export default TurboModuleRegistry?.get<Spec>('ClerkExpo') ?? null;
+export default TurboModuleRegistry.get<Spec>('ClerkExpo');
