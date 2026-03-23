@@ -43,6 +43,7 @@ const Root = () => {
         persistClient: import.meta.env.VITE_EXPERIMENTAL_PERSIST_CLIENT
           ? import.meta.env.VITE_EXPERIMENTAL_PERSIST_CLIENT === 'true'
           : undefined,
+        swr: import.meta.env.VITE_EXPERIMENTAL_SWR ? import.meta.env.VITE_EXPERIMENTAL_SWR === 'true' : undefined,
       }}
     >
       <Outlet />
