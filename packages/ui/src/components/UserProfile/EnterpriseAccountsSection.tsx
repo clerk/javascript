@@ -171,10 +171,12 @@ export const EnterpriseAccountsSection = withCardStateProvider(() => {
             />
           ))}
         </ProfileSection.ItemList>
-        <AddEnterpriseAccount
-          enterpriseConnections={linkableEnterpriseConnections}
-          onClick={() => setActionValue(null)}
-        />
+        {linkableEnterpriseConnections.length > 0 && (
+          <AddEnterpriseAccount
+            enterpriseConnections={linkableEnterpriseConnections}
+            onClick={() => setActionValue(null)}
+          />
+        )}
       </Action.Root>
     </ProfileSection.Root>
   );
