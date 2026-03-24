@@ -309,11 +309,20 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
       }
     }
 
-    return new Response(response.body, {
+    const proxyResponse = new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
       headers: responseHeaders,
     });
+
+    // Some runtimes may re-add Content-Length when constructing the Response.
+    // Delete explicitly since fetch() decoded the body and the original values
+    // no longer reflect the actual content.
+    for (const header of RESPONSE_HEADERS_TO_STRIP) {
+      proxyResponse.headers.delete(header);
+    }
+
+    return proxyResponse;
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return createErrorResponse('proxy_request_failed', `Failed to proxy request to Clerk FAPI: ${message}`, 502);
