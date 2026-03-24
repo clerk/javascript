@@ -26,16 +26,32 @@ async function scanDirectory(type: 'file' | 'directory' = 'file') {
   return arr;
 }
 
+function isTopLevelPath(filePath: string) {
+  return !filePath.includes('/');
+}
+
 describe('Typedoc output', () => {
   it('should only have these top-level folders', async () => {
     const folders = await scanDirectory('directory');
+    const topLevelFolders = folders.filter(isTopLevelPath);
 
-    expect(folders).toMatchInlineSnapshot(`
+    expect(topLevelFolders).toMatchInlineSnapshot(`
       [
         "backend",
         "nextjs",
         "react",
         "shared",
+      ]
+    `);
+  });
+
+  it('should only have these nested folders', async () => {
+    const folders = await scanDirectory('directory');
+    const nestedFolders = folders.filter(folder => !isTopLevelPath(folder));
+
+    expect(nestedFolders).toMatchInlineSnapshot(`
+      [
+        "react/legacy",
       ]
     `);
   });
