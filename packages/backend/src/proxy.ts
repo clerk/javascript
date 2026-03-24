@@ -245,7 +245,6 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
   // Request uncompressed responses to avoid a double compression pass.
   // fetch() auto-decompresses, so without this FAPI compresses → fetch
   // decompresses → the serving layer re-compresses for the browser.
-  // With identity the only compression happens at the edge, closer to the client.
   headers.set('Accept-Encoding', 'identity');
 
   // Set X-Forwarded-* headers for proxy awareness
