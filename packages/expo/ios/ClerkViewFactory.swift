@@ -198,7 +198,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
 
   @MainActor
   public func getSession() async -> [String: Any]? {
-    guard let session = Clerk.shared.session else {
+    guard Self.clerkConfigured, let session = Clerk.shared.session else {
       return nil
     }
     return Self.sessionPayload(from: session, user: session.user ?? Clerk.shared.user)
