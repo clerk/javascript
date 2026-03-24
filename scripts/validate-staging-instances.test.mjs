@@ -229,9 +229,7 @@ describe('collapseAttributeMismatches', () => {
       { path: 'user_settings.attributes.phone_number.verifications', prod: ['phone_code'], staging: [] },
     ];
     const result = collapseAttributeMismatches(mismatches);
-    expect(result).toEqual([
-      { path: 'user_settings.attributes.phone_number.enabled', prod: true, staging: false },
-    ]);
+    expect(result).toEqual([{ path: 'user_settings.attributes.phone_number.enabled', prod: true, staging: false }]);
   });
 
   it('keeps child diffs when .enabled does NOT differ', () => {
@@ -286,9 +284,7 @@ describe('collapseSocialMismatches', () => {
       { path: 'user_settings.social.google.strategy', prod: 'oauth_google', staging: undefined },
     ];
     const result = collapseSocialMismatches(mismatches);
-    expect(result).toEqual([
-      { path: 'user_settings.social.google', prod: { enabled: true }, staging: undefined },
-    ]);
+    expect(result).toEqual([{ path: 'user_settings.social.google', prod: { enabled: true }, staging: undefined }]);
   });
 
   it('collapses child diffs for extra social provider on staging', () => {
@@ -297,9 +293,7 @@ describe('collapseSocialMismatches', () => {
       { path: 'user_settings.social.github.enabled', prod: undefined, staging: true },
     ];
     const result = collapseSocialMismatches(mismatches);
-    expect(result).toEqual([
-      { path: 'user_settings.social.github', prod: undefined, staging: { enabled: true } },
-    ]);
+    expect(result).toEqual([{ path: 'user_settings.social.github', prod: undefined, staging: { enabled: true } }]);
   });
 
   it('keeps child diffs when both prod and staging have the provider', () => {
@@ -313,9 +307,7 @@ describe('collapseSocialMismatches', () => {
   });
 
   it('does not affect non-social mismatches', () => {
-    const mismatches = [
-      { path: 'auth_config.session_token_ttl', prod: 3600, staging: 7200 },
-    ];
+    const mismatches = [{ path: 'auth_config.session_token_ttl', prod: 3600, staging: 7200 }];
     const result = collapseSocialMismatches(mismatches);
     expect(result).toEqual(mismatches);
   });
