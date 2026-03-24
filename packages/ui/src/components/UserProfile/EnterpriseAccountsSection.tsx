@@ -12,7 +12,7 @@ import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { handleError } from '@/ui/utils/errorHandler';
-import { sleep } from '@/utils/sleep';
+import { sleep } from '@/ui/utils/sleep';
 
 import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
@@ -131,7 +131,7 @@ export const EnterpriseAccountsSection = withCardStateProvider(() => {
     withOrganizationAccountLinking: true,
   });
   const linkableEnterpriseConnections = userEnterpriseConnections.filter(
-    c => c.allowOrganizationAccountLinking && !activeEnterpriseAccounts?.some(a => a.enterpriseConnectionId === c.id),
+    c => c.allowOrganizationAccountLinking && !user?.enterpriseAccounts?.some(a => a.enterpriseConnectionId === c.id),
   );
 
   if (!activeEnterpriseAccounts?.length && !linkableEnterpriseConnections.length) {

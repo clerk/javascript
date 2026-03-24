@@ -1373,6 +1373,7 @@ export const jaJP: LocalizationResource = {
         title: 'メールアドレス',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'アカウントを連携する',
         title: 'エンタープライズアカウント',
       },
       headerTitle__account: 'プロフィール詳細',
