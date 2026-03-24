@@ -85,6 +85,13 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
                         withTimeout(10_000L) {
                             Clerk.isInitialized.first { it }
                         }
+                        // If a bearer token was provided, wait for the session to hydrate
+                        // so callers that immediately call getSession() see the session.
+                        if (!bearerToken.isNullOrEmpty()) {
+                            withTimeout(5_000L) {
+                                Clerk.sessionFlow.first { it != null }
+                            }
+                        }
                     } catch (e: TimeoutCancellationException) {
                         val initError = Clerk.initializationError.value
                         val message = if (initError != null) {
