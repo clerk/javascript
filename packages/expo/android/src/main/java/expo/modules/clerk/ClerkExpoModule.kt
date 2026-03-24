@@ -259,7 +259,12 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     override fun signOut(promise: Promise) {
         if (!Clerk.isInitialized.value) {
-            // Resolve gracefully when not initialized (matches iOS behavior)
+            // Clear DEVICE_TOKEN from SharedPreferences even when not initialized,
+            // so the next Clerk.initialize() doesn't boot with a stale client token.
+            reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
+                .edit()
+                .remove("DEVICE_TOKEN")
+                .apply()
             promise.resolve(null)
             return
         }
