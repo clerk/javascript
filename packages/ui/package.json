@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Internal package that contains the UI components for the Clerk frontend SDKs",
   "repository": {
     "type": "git",
@@ -69,7 +69,7 @@
     "register"
   ],
   "scripts": {
-    "build": "pnpm build:umd && pnpm build:esm && pnpm check:no-rhc",
+    "build": "pnpm build:umd && pnpm build:esm && pnpm check:no-rhc && pnpm type-check",
     "build:analyze": "rspack build --config rspack.config.js --env production --env analyze --analyze",
     "build:esm": "tsdown",
     "build:rsdoctor": "RSDOCTOR=true rspack build --config rspack.config.js --env production",
