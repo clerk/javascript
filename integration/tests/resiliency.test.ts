@@ -558,9 +558,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       const lastBody = new URLSearchParams(tokenRequestBodies[tokenRequestBodies.length - 1]);
       expect(lastBody.has('token')).toBe(sessionMinterEnabled);
 
-      // skipCache: true should send force_origin=true in the POST body.
+      // skipCache: true should send force_origin=true in the POST body when sessionMinter is enabled.
       // Session.ts sets forceOrigin: 'true' which fapiClient serializes to force_origin=true
-      expect(lastBody.get('force_origin')).toBe('true');
+      expect(lastBody.has('force_origin')).toBe(sessionMinterEnabled);
 
       // User should still be signed in after refresh
       await u.po.expect.toBeSignedIn();
