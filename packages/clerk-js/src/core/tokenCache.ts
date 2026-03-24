@@ -354,14 +354,8 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     // refresh timers from accumulating across set() calls (e.g., from
     // #hydrateCache during _updateClient AND #refreshTokenInBackground).
     const existing = cache.get(key);
-    if (existing) {
-      if (existing.timeoutId !== undefined) {
-        clearTimeout(existing.timeoutId);
-      }
-      if (existing.refreshTimeoutId !== undefined) {
-        clearTimeout(existing.refreshTimeoutId);
-      }
-    }
+    clearTimeout(existing?.timeoutId);
+    clearTimeout(existing?.refreshTimeoutId);
 
     const nowSeconds = Math.floor(Date.now() / 1000);
     const createdAt = entry.createdAt ?? nowSeconds;
@@ -379,6 +373,8 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
         cache.delete(key);
       }
     };
+
+    cache.set(key, value);
 
     entry.tokenResolver
       .then(newToken => {
@@ -475,8 +471,6 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       .catch(() => {
         deleteKey();
       });
-
-    cache.set(key, value);
   };
 
   const close = () => {
