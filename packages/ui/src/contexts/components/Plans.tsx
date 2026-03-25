@@ -17,8 +17,8 @@ import type {
 import { useCallback, useMemo } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
-import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 import { organizationExceedsPlanSeatLimit } from '@/ui/utils/billingPlanSeats';
+import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import type { Appearance } from '../../internal/appearance';
 import type { LocalizationKey } from '../../localization';
