@@ -1,6 +1,8 @@
 ---
+'@clerk/localizations': minor
 '@clerk/clerk-js': minor
 '@clerk/shared': minor
+'@clerk/ui': minor
 ---
 
-Add support for parsing seat-based billing fields from FAPI.
+Add support for seat-based billing plans in Clerk Billing.
