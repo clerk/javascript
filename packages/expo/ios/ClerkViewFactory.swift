@@ -206,14 +206,12 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
 
   @MainActor
   public func signOut() async throws {
-    if let sessionId = Clerk.shared.session?.id {
-      try await Clerk.shared.auth.signOut(sessionId: sessionId)
+    if Self.clerkConfigured {
+      if let sessionId = Clerk.shared.session?.id {
+        try await Clerk.shared.auth.signOut(sessionId: sessionId)
+      }
+      Clerk.clearAllKeychainItems()
     }
-
-    // Always clear keychain data and reset state, even when there's no active
-    // session. This ensures the native SDK doesn't boot with a stale token
-    // on next launch (e.g. JS signed out before native had a session).
-    Clerk.clearAllKeychainItems()
     Self.clerkConfigured = false
   }
 
