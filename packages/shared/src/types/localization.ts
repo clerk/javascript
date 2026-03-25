@@ -1223,6 +1223,7 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       alerts: {
         noPermissionsToManageBilling: LocalizationValue;
+        planMembershipLimitExceeded: LocalizationValue<'count' | 'limit'>;
       };
     };
     apiKeysPage: {

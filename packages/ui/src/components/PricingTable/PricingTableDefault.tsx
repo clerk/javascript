@@ -1,14 +1,15 @@
 import { __internal_useOrganizationBase, useClerk, useSession } from '@clerk/shared/react';
 import type {
   BillingPlanResource,
+  BillingPlanUnitPrice,
   BillingSubscriptionPlanPeriod,
   PricingTableProps,
-  BillingPlanUnitPrice,
 } from '@clerk/shared/types';
 import * as React from 'react';
 
 import { Switch } from '@/ui/elements/Switch';
 import { Tooltip } from '@/ui/elements/Tooltip';
+import { getPlanSeatLimit, getSeatUnitPrice, organizationExceedsPlanSeatLimit } from '@/ui/utils/billingPlanSeats';
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import { useProtect } from '../../common';
@@ -137,6 +138,22 @@ function Card(props: CardProps) {
     [plan, planPeriod, activeOrUpcomingSubscriptionBasedOnPlanPeriod],
   );
 
+  const footerButtonTooltipText = React.useMemo(() => {
+    if (isSignedIn && !canManageBilling) {
+      return localizationKeys('organizationProfile.plansPage.alerts.noPermissionsToManageBilling');
+    }
+
+    if (organization && subscriberType === 'organization' && organizationExceedsPlanSeatLimit(plan, organization)) {
+      const seatLimit = getPlanSeatLimit(plan);
+      return localizationKeys('organizationProfile.plansPage.alerts.planMembershipLimitExceeded', {
+        count: organization.membersCount + organization.pendingInvitationsCount,
+        limit: seatLimit as number,
+      });
+    }
+
+    return null;
+  }, [isSignedIn, canManageBilling, organization, subscriberType, plan]);
+
   const hasFeatures = plan.features.length > 0;
 
   const { shouldShowFooter, shouldShowFooterNotice } = getPricingFooterState({
@@ -247,17 +264,13 @@ function Card(props: CardProps) {
                     elementDescriptor={descriptors.pricingTableCardFooterButton}
                     block
                     textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                    {...buttonPropsForPlan({ plan, isCompact, selectedPlanPeriod: planPeriod })}
+                    {...buttonPropsForPlan({ plan, organization, isCompact, selectedPlanPeriod: planPeriod })}
                     onClick={event => {
                       onSelect(plan, event);
                     }}
                   />
                 </Tooltip.Trigger>
-                {isSignedIn && !canManageBilling && (
-                  <Tooltip.Content
-                    text={localizationKeys('organizationProfile.plansPage.alerts.noPermissionsToManageBilling')}
-                  />
-                )}
+                {footerButtonTooltipText ? <Tooltip.Content text={footerButtonTooltipText} /> : null}
               </Tooltip.Root>
             )}
           </Box>
@@ -595,7 +608,7 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
       return null;
     }
 
-    const seatUnitPrice = unitPrices.find(unitPrice => unitPrice.name.toLowerCase() === 'seats') ?? unitPrices[0];
+    const seatUnitPrice = getSeatUnitPrice(plan);
 
     if (!seatUnitPrice) {
       return null;

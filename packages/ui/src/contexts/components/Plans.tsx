@@ -12,11 +12,13 @@ import type {
   BillingPlanResource,
   BillingSubscriptionItemResource,
   BillingSubscriptionPlanPeriod,
+  OrganizationResource,
 } from '@clerk/shared/types';
 import { useCallback, useMemo } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
+import { organizationExceedsPlanSeatLimit } from '@/ui/utils/billingPlanSeats';
 
 import type { Appearance } from '../../internal/appearance';
 import type { LocalizationKey } from '../../localization';
@@ -196,12 +198,14 @@ export const usePlansContext = () => {
   const buttonPropsForPlan = useCallback(
     ({
       plan,
+      organization,
       // TODO(@COMMERCE): This needs to be removed.
       subscription: sub,
       isCompact = false,
       selectedPlanPeriod = 'annual',
     }: {
-      plan?: BillingPlanResource;
+      plan: BillingPlanResource;
+      organization?: OrganizationResource | null;
       subscription?: BillingSubscriptionItemResource;
       isCompact?: boolean;
       selectedPlanPeriod?: BillingSubscriptionPlanPeriod;
@@ -214,6 +218,8 @@ export const usePlansContext = () => {
     } => {
       const subscription =
         sub ?? (plan ? activeOrUpcomingSubscriptionWithPlanPeriod(plan, selectedPlanPeriod) : undefined);
+      const exceedsPlanSeatLimit =
+        subscriberType === 'organization' && !!organization && organizationExceedsPlanSeatLimit(plan, organization);
       let _selectedPlanPeriod = selectedPlanPeriod;
       const isEligibleForSwitchToAnnual = Boolean(plan?.annualMonthlyFee);
 
@@ -279,11 +285,17 @@ export const usePlansContext = () => {
         localizationKey: freeTrialOr(getLocalizationKey()),
         variant: isCompact ? 'bordered' : 'solid',
         colorScheme: isCompact ? 'secondary' : 'primary',
-        isDisabled: !canManageBilling,
-        disabled: !canManageBilling,
+        isDisabled: !canManageBilling || exceedsPlanSeatLimit,
+        disabled: !canManageBilling || exceedsPlanSeatLimit,
       };
     },
-    [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, subscriptionItems, topLevelSubscription],
+    [
+      activeOrUpcomingSubscriptionWithPlanPeriod,
+      canManageBilling,
+      subscriberType,
+      subscriptionItems,
+      topLevelSubscription,
+    ],
   );
 
   const captionForSubscription = useCallback((subscription: BillingSubscriptionItemResource) => {

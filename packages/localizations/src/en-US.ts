@@ -433,6 +433,8 @@ export const enUS: LocalizationResource = {
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'You do not have permissions to manage billing for this organization.',
+        planMembershipLimitExceeded:
+          'Your organization has {{count}} members (including pending invitations). This plan only allows {{limit}} members.',
       },
       title: 'Plans',
     },
