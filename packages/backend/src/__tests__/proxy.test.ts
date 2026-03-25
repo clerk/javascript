@@ -148,7 +148,7 @@ describe('proxy', () => {
       expect(body.errors[0].code).toBe('proxy_path_mismatch');
     });
 
-    it('does not SSRF on protocol-relative paths — request stays on FAPI host', async () => {
+    it('does not follow protocol-relative paths', async () => {
       const mockResponse = new Response('{}', { status: 200 });
       mockFetch.mockResolvedValueOnce(mockResponse);
 
