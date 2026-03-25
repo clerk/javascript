@@ -1,5 +1,18 @@
 # @clerk/ui
 
+## 1.2.4
+
+### Patch Changes
+
+- Move `react` and `react-dom` from `dependencies` to `peerDependencies` ([#8160](https://github.com/clerk/javascript/pull/8160)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix minor internal issues with TypeScript types. ([#8076](https://github.com/clerk/javascript/pull/8076)) by [@dstaley](https://github.com/dstaley)
+
+- Fix false positive in structural CSS detection where Clerk's own internal classes (`.cl-internal-*`) were incorrectly triggering the warning on fresh installs. ([#8142](https://github.com/clerk/javascript/pull/8142)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`46093fa`](https://github.com/clerk/javascript/commit/46093fae837a98f830a596062b6f1c9d44fc7c8d)]:
+  - @clerk/localizations@4.2.4
+
 ## 1.2.3
 
 ### Patch Changes
