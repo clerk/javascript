@@ -223,7 +223,6 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
   const targetUrl = new URL(`${fapiBaseUrl}${targetPath}`);
   targetUrl.search = requestUrl.search;
 
-  // Defense-in-depth: reject if the resolved host doesn't match FAPI.
   if (targetUrl.host !== fapiHost) {
     return createErrorResponse('proxy_request_failed', 'Resolved target does not match the expected host', 400);
   }
