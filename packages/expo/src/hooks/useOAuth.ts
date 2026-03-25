@@ -88,11 +88,9 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
       WebBrowserModule.dismissBrowser();
     }
 
-    const { type, url } = authSessionResult || {};
-
     // TODO: Check all the possible AuthSession results
     // https://docs.expo.dev/versions/latest/sdk/auth-session/#returns-7
-    if (type !== 'success') {
+    if (authSessionResult.type !== 'success' || !authSessionResult.url) {
       return {
         authSessionResult,
         createdSessionId: '',
@@ -102,7 +100,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
       };
     }
 
-    const params = new URL(url).searchParams;
+    const params = new URL(authSessionResult.url).searchParams;
 
     const rotatingTokenNonce = params.get('rotating_token_nonce') || '';
     await signIn.reload({ rotatingTokenNonce });
