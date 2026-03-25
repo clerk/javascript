@@ -148,18 +148,20 @@ describe('proxy', () => {
       expect(body.errors[0].code).toBe('proxy_path_mismatch');
     });
 
-    it('rejects requests with protocol-relative path that would SSRF to a different host', async () => {
+    it('does not SSRF on protocol-relative paths — request stays on FAPI host', async () => {
+      const mockResponse = new Response('{}', { status: 200 });
+      mockFetch.mockResolvedValueOnce(mockResponse);
+
       const request = new Request('https://example.com/__clerk//evil.com/steal');
 
-      const response = await clerkFrontendApiProxy(request, {
+      await clerkFrontendApiProxy(request, {
         publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
         secretKey: 'sk_test_xxx',
       });
 
-      expect(response.status).toBe(400);
-      const body = await response.json();
-      expect(body.errors[0].code).toBe('proxy_request_failed');
-      expect(mockFetch).not.toHaveBeenCalled();
+      // String concatenation keeps the host as FAPI, not evil.com
+      const fetchedUrl = new URL(mockFetch.mock.calls[0][0] as string);
+      expect(fetchedUrl.host).toBe('frontend-api.clerk.dev');
     });
 
     it('forwards GET request to FAPI with correct headers', async () => {

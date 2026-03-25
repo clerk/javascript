@@ -214,16 +214,16 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
     );
   }
 
-  // Derive the FAPI URL and construct the target URL
+  // Derive the FAPI URL and construct the target URL.
+  // Use string concatenation instead of `new URL(path, base)` to avoid
+  // protocol-relative resolution (e.g., "//evil.com" resolving to a different host).
   const fapiBaseUrl = fapiUrlFromPublishableKey(publishableKey);
   const fapiHost = new URL(fapiBaseUrl).host;
   const targetPath = requestUrl.pathname.slice(proxyPath.length) || '/';
-  const targetUrl = new URL(targetPath, fapiBaseUrl);
+  const targetUrl = new URL(`${fapiBaseUrl}${targetPath}`);
   targetUrl.search = requestUrl.search;
 
-  // Guard against SSRF: a path like "//evil.com/steal" causes the URL constructor
-  // to treat it as protocol-relative, resolving to a completely different host.
-  // This would leak the Clerk-Secret-Key header to an attacker-controlled server.
+  // Defense-in-depth: reject if the resolved host doesn't match FAPI.
   if (targetUrl.host !== fapiHost) {
     return createErrorResponse('proxy_request_failed', 'Resolved target does not match the expected host', 400);
   }
