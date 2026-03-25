@@ -1,5 +1,11 @@
 # Change Log
 
+## 6.1.3
+
+### Patch Changes
+
+- Deprecate the `signOutOptions` prop on `<SignOutButton />` in favor of top-level `redirectUrl` and `sessionId` props. The `signOutOptions` prop still works but now emits a deprecation warning. ([#8147](https://github.com/clerk/javascript/pull/8147)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 6.1.2
 
 ### Patch Changes
