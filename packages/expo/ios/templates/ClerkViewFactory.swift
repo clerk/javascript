@@ -326,10 +326,10 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
   @MainActor
   public func signOut() async throws {
     if Self.clerkConfigured {
+      defer { Clerk.clearAllKeychainItems() }
       if let sessionId = Clerk.shared.session?.id {
         try await Clerk.shared.auth.signOut(sessionId: sessionId)
       }
-      Clerk.clearAllKeychainItems()
     }
     Self.clerkConfigured = false
   }
