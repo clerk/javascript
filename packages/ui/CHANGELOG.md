@@ -1,5 +1,27 @@
 # @clerk/ui
 
+## 1.2.3
+
+### Patch Changes
+
+- Fix issue where default plans offered the ability to switch to annual. ([#8077](https://github.com/clerk/javascript/pull/8077)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`f0533a2`](https://github.com/clerk/javascript/commit/f0533a26db17066a7dcc7992d9589ba3a60cc5b4), [`e00ec97`](https://github.com/clerk/javascript/commit/e00ec97895640db358af5a9df5d03e83f28f5a27)]:
+  - @clerk/shared@4.3.2
+  - @clerk/localizations@4.2.3
+
+## 1.2.2
+
+### Patch Changes
+
+- Improve spacing for `CreateOrganization` and `OrganizationList` ([#8034](https://github.com/clerk/javascript/pull/8034)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix issue where monthly/annual toggle appeared on default free plans. ([#8052](https://github.com/clerk/javascript/pull/8052)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`296f52e`](https://github.com/clerk/javascript/commit/296f52e0180969b7a6153a904e298242d3528e35), [`b9cb6e5`](https://github.com/clerk/javascript/commit/b9cb6e576bf6af5662fcc624cf2de76120a14565)]:
+  - @clerk/localizations@4.2.2
+  - @clerk/shared@4.3.1
+
 ## 1.2.1
 
 ### Patch Changes

@@ -101,6 +101,7 @@ import type {
   Resources,
   SDKMetadata,
   SessionResource,
+  SessionTouchParams,
   SetActiveParams,
   SignedInSessionResource,
   SignInProps,
@@ -342,7 +343,13 @@ export class Clerk implements ClerkInterface {
       }
       return strippedDomainString;
     }
-    return '';
+
+    if (typeof this.#domain === 'function') {
+      logger.warnOnce(warnings.domainAsFunctionNotSupported);
+      return '';
+    }
+
+    return stripScheme(this.#domain || '');
   }
 
   get proxyUrl(): string {
@@ -353,7 +360,13 @@ export class Clerk implements ClerkInterface {
       }
       return proxyUrlToAbsoluteURL(_unfilteredProxy);
     }
-    return '';
+
+    if (typeof this.#proxyUrl === 'function') {
+      logger.warnOnce(warnings.proxyUrlAsFunctionNotSupported);
+      return '';
+    }
+
+    return this.#proxyUrl || '';
   }
 
   get frontendApi(): string {
@@ -1561,6 +1574,7 @@ export class Clerk implements ClerkInterface {
         newSession?.currentTask &&
         this.#options.taskUrls?.[newSession?.currentTask.key];
       const shouldNavigate = !!(redirectUrl || taskUrl || setActiveNavigate);
+      const touchIntent: SessionTouchParams['intent'] = shouldSwitchOrganization ? 'select_org' : 'select_session';
 
       //1. setLastActiveSession to passed user session (add a param).
       //   Note that this will also update the session's active organization
@@ -1581,7 +1595,7 @@ export class Clerk implements ClerkInterface {
         if (shouldNavigate && newSession) {
           try {
             // __internal_touch does not call updateClient automatically
-            updatedClient = await newSession.__internal_touch();
+            updatedClient = await newSession.__internal_touch({ intent: touchIntent });
             if (updatedClient) {
               // We call updateClient manually, but without letting it emit
               // It's important that the setTransitiveState call happens somewhat
@@ -1597,7 +1611,7 @@ export class Clerk implements ClerkInterface {
             }
           }
         } else {
-          await this.#touchCurrentSession(newSession);
+          await this.#touchCurrentSession(newSession, touchIntent);
         }
         // If we do have the updatedClient, read from that, otherwise getSessionFromClient
         // will fallback to this.client. This makes no difference now, but will if we
@@ -2840,10 +2854,9 @@ export class Clerk implements ClerkInterface {
       return true;
     }
 
-    // Check if satelliteAutoSync is disabled - if so, skip automatic sync
-    // unless explicitly triggered via __clerk_synced=false
-    if (this.#options.satelliteAutoSync === false) {
-      // Skip automatic sync when satelliteAutoSync is false
+    // Check if satelliteAutoSync is enabled - only auto-sync when explicitly opted in
+    // In Core 3, satelliteAutoSync defaults to false (undefined is treated as false)
+    if (this.#options.satelliteAutoSync !== true) {
       return false;
     }
 
@@ -3132,7 +3145,7 @@ export class Clerk implements ClerkInterface {
       this.#touchThrottledUntil = Date.now() + 5_000;
 
       if (this.#options.touchSession) {
-        void this.#touchCurrentSession(this.session);
+        void this.#touchCurrentSession(this.session, 'focus');
       }
     });
 
@@ -3163,12 +3176,15 @@ export class Clerk implements ClerkInterface {
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
-  #touchCurrentSession = async (session?: SignedInSessionResource | null): Promise<void> => {
+  #touchCurrentSession = async (
+    session?: SignedInSessionResource | null,
+    intent: SessionTouchParams['intent'] = 'focus',
+  ): Promise<void> => {
     if (!session) {
       return Promise.resolve();
     }
 
-    await session.touch().catch(e => {
+    await session.touch({ intent }).catch(e => {
       if (isUnauthenticatedError(e)) {
         void this.handleUnauthenticated();
       } else {

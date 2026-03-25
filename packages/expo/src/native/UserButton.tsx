@@ -2,8 +2,6 @@ import { useClerk, useUser } from '@clerk/react';
 import { useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { CLERK_CLIENT_JWT_KEY } from '../constants';
-import { tokenCache } from '../token-cache';
 import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 
 // Raw result from native module (may vary by platform)
@@ -135,40 +133,16 @@ export function UserButton(_props: UserButtonProps) {
 
     presentingRef.current = true;
     try {
-      // Track whether native had a session before the modal, so we can distinguish
-      // "user signed out from within the modal" from "native never had a session".
-      let hadNativeSessionBefore = false;
-
-      // If native doesn't have a session but JS does (e.g. user signed in via custom form),
-      // sync the JS SDK's bearer token to native and wait for it before presenting.
-      if (clerkUser && ClerkExpo?.getSession && ClerkExpo?.configure) {
-        const preCheck = (await ClerkExpo.getSession()) as NativeSessionResult | null;
-        hadNativeSessionBefore = !!(preCheck?.sessionId || preCheck?.session?.id);
-
-        if (!hadNativeSessionBefore) {
-          const bearerToken = (await tokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
-          if (bearerToken) {
-            await ClerkExpo.configure(clerk.publishableKey, bearerToken);
-
-            // Re-check if configure produced a session
-            const postConfigure = (await ClerkExpo.getSession()) as NativeSessionResult | null;
-            hadNativeSessionBefore = !!(postConfigure?.sessionId || postConfigure?.session?.id);
-          }
-        }
-      }
-
       await ClerkExpo.presentUserProfile({
         dismissable: true,
       });
 
-      // Check if native session still exists after modal closes.
-      // Only sign out the JS SDK if the native SDK HAD a session before the modal
-      // and now it's gone (meaning the user signed out from within the native UI).
-      // If native never had a session (e.g. force refresh didn't work), don't sign out JS.
+      // Check if native session still exists after modal closes
+      // If session is null, user signed out from the native UI
       const sessionCheck = (await ClerkExpo.getSession?.()) as NativeSessionResult | null;
       const hasNativeSession = !!(sessionCheck?.sessionId || sessionCheck?.session?.id);
 
-      if (!hasNativeSession && hadNativeSessionBefore) {
+      if (!hasNativeSession) {
         // Clear local state immediately for instant UI feedback
         setNativeUser(null);
 
@@ -187,12 +161,25 @@ export function UserButton(_props: UserButtonProps) {
             await clerk.signOut();
           } catch (e) {
             if (__DEV__) {
-              console.warn('[UserButton] JS SDK signOut error:', e);
+              console.warn('[UserButton] JS SDK signOut error, attempting reload:', e);
+            }
+            // Even if signOut throws, try to force reload to clear stale state
+            const clerkRecord = clerk as unknown as Record<string, unknown>;
+            if (typeof clerkRecord.__internal_reloadInitialResources === 'function') {
+              try {
+                await (clerkRecord.__internal_reloadInitialResources as () => Promise<void>)();
+              } catch (reloadErr) {
+                if (__DEV__) {
+                  console.warn('[UserButton] Best-effort reload failed:', reloadErr);
+                }
+              }
             }
           }
         }
       }
     } catch (error) {
+      // Dismissal resolves successfully with { dismissed: true }, so reaching
+      // here means a real native error (E_NOT_INITIALIZED, E_CREATE_FAILED, E_NO_ROOT_VC).
       if (__DEV__) {
         console.error('[UserButton] presentUserProfile failed:', error);
       }

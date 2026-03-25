@@ -22,7 +22,6 @@ public protocol ClerkViewFactoryProtocol {
   // SDK operations
   func configure(publishableKey: String, bearerToken: String?) async throws
   func getSession() async -> [String: Any]?
-  func getClientToken() -> String?
   func signOut() async throws
 }
 
@@ -32,11 +31,9 @@ public protocol ClerkViewFactoryProtocol {
 class ClerkExpoModule: RCTEventEmitter {
 
   private static var _hasListeners = false
-  private static weak var sharedInstance: ClerkExpoModule?
 
   override init() {
     super.init()
-    ClerkExpoModule.sharedInstance = self
   }
 
   @objc override static func requiresMainQueueSetup() -> Bool {
@@ -53,17 +50,6 @@ class ClerkExpoModule: RCTEventEmitter {
 
   override func stopObserving() {
     ClerkExpoModule._hasListeners = false
-  }
-
-  /// Emits an onAuthStateChange event to JS from anywhere in the native layer.
-  /// Used by inline views (AuthView, UserProfileView) to notify ClerkProvider
-  /// of auth state changes in addition to the view-level onAuthEvent callback.
-  static func emitAuthStateChange(type: String, sessionId: String?) {
-    guard _hasListeners, let instance = sharedInstance else { return }
-    instance.sendEvent(withName: "onAuthStateChange", body: [
-      "type": type,
-      "sessionId": sessionId as Any,
-    ])
   }
 
   /// Returns the topmost presented view controller, avoiding deprecated `keyWindow`.
@@ -188,12 +174,31 @@ class ClerkExpoModule: RCTEventEmitter {
 
   @objc func getClientToken(_ resolve: @escaping RCTPromiseResolveBlock,
                               reject: @escaping RCTPromiseRejectBlock) {
-    guard let factory = clerkViewFactory else {
-      resolve(nil)
-      return
-    }
+    // Use a custom keychain service if configured in Info.plist (for extension apps
+    // sharing a keychain group). Falls back to the main bundle identifier.
+    let keychainService: String = {
+      if let custom = Bundle.main.object(forInfoDictionaryKey: "ClerkKeychainService") as? String, !custom.isEmpty {
+        return custom
+      }
+      return Bundle.main.bundleIdentifier ?? ""
+    }()
 
-    resolve(factory.getClientToken())
+    let query: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: keychainService,
+      kSecAttrAccount as String: "clerkDeviceToken",
+      kSecReturnData as String: true,
+      kSecMatchLimit as String: kSecMatchLimitOne
+    ]
+
+    var result: AnyObject?
+    let status = SecItemCopyMatching(query as CFDictionary, &result)
+
+    if status == errSecSuccess, let data = result as? Data {
+      resolve(String(data: data, encoding: .utf8))
+    } else {
+      resolve(nil)
+    }
   }
 
   // MARK: - signOut
@@ -272,12 +277,6 @@ public class ClerkAuthNativeView: UIView {
         let jsonData = (try? JSONSerialization.data(withJSONObject: data)) ?? Data()
         let jsonString = String(data: jsonData, encoding: .utf8) ?? "{}"
         self?.onAuthEvent?(["type": eventName, "data": jsonString])
-
-        // Also emit module-level event so ClerkProvider's useNativeAuthEvents picks it up
-        if eventName == "signInCompleted" || eventName == "signUpCompleted" {
-          let sessionId = data["sessionId"] as? String
-          ClerkExpoModule.emitAuthStateChange(type: "signedIn", sessionId: sessionId)
-        }
       }
     ) else { return }
 
@@ -360,12 +359,6 @@ public class ClerkUserProfileNativeView: UIView {
         let jsonData = (try? JSONSerialization.data(withJSONObject: data)) ?? Data()
         let jsonString = String(data: jsonData, encoding: .utf8) ?? "{}"
         self?.onProfileEvent?(["type": eventName, "data": jsonString])
-
-        // Also emit module-level event for sign-out detection
-        if eventName == "signedOut" {
-          let sessionId = data["sessionId"] as? String
-          ClerkExpoModule.emitAuthStateChange(type: "signedOut", sessionId: sessionId)
-        }
       }
     ) else { return }
 
