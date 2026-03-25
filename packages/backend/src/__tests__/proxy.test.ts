@@ -481,6 +481,50 @@ describe('proxy', () => {
       expect(response.headers.get('Location')).toBe('https://accounts.google.com/oauth/authorize');
     });
 
+    it('sets Accept-Encoding to identity to avoid double compression', async () => {
+      const mockResponse = new Response(JSON.stringify({ client: {} }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/client', {
+        headers: { 'Accept-Encoding': 'gzip, deflate, br' },
+      });
+
+      await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      const [, options] = mockFetch.mock.calls[0];
+      expect(options.headers.get('Accept-Encoding')).toBe('identity');
+    });
+
+    it('strips Content-Encoding and Content-Length from response even if upstream ignores identity', async () => {
+      // Upstream may ignore Accept-Encoding: identity and compress anyway
+      const mockResponse = new Response('decoded body', {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/javascript',
+          'Content-Encoding': 'gzip',
+          'Content-Length': '500',
+        },
+      });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/client');
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      expect(response.headers.has('Content-Encoding')).toBe(false);
+      expect(response.headers.has('Content-Length')).toBe(false);
+      expect(response.headers.get('Content-Type')).toBe('application/javascript');
+    });
+
     it('preserves relative Location headers', async () => {
       const mockResponse = new Response(null, {
         status: 302,
