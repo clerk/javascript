@@ -110,10 +110,6 @@
     "input-otp": "1.4.2",
     "qrcode.react": "4.2.0"
   },
-  "peerDependencies": {
-    "react": "catalog:peer-react",
-    "react-dom": "catalog:peer-react"
-  },
   "devDependencies": {
     "@floating-ui/react-dom": "^2.1.6",
     "@rsdoctor/rspack-plugin": "^0.4.13",
@@ -128,6 +124,10 @@
     "minimatch": "^10.1.1",
     "tsdown": "catalog:repo",
     "webpack-merge": "^5.10.0"
+  },
+  "peerDependencies": {
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "engines": {
     "node": ">=20.9.0"
