@@ -12,6 +12,13 @@ import { createUserService } from './usersService';
 import { createWaitlistService } from './waitlistService';
 
 export type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail };
+export type { FakeMachineNetwork, FakeOAuthApp } from './machineAuthService';
+export {
+  createFakeMachineNetwork,
+  createFakeOAuthApp,
+  createJwtM2MToken,
+  obtainOAuthAccessToken,
+} from './machineAuthService';
 
 const createClerkClient = (app: Application) => {
   return backendCreateClerkClient({

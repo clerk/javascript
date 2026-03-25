@@ -1,7 +1,5 @@
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
 
-import type { Appearance } from './appearance';
-
 export type { ComponentControls, MountComponentRenderer } from '../Components';
 export type { WithInternalRouting } from './routing';
 
