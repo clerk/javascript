@@ -525,6 +525,33 @@ describe('proxy', () => {
       expect(response.headers.get('Content-Type')).toBe('application/javascript');
     });
 
+    it('preserves multiple Set-Cookie headers from FAPI response', async () => {
+      const headers = new Headers();
+      headers.append('Set-Cookie', '__client=abc123; Path=/; HttpOnly; Secure');
+      headers.append('Set-Cookie', '__client_uat=1234567890; Path=/; Secure');
+      headers.append('Set-Cookie', '__session=xyz789; Path=/; HttpOnly; Secure');
+      headers.append('Content-Type', 'application/json');
+
+      const mockResponse = new Response(JSON.stringify({ client: {} }), {
+        status: 200,
+        headers,
+      });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/client');
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      const setCookies = response.headers.getSetCookie();
+      expect(setCookies).toHaveLength(3);
+      expect(setCookies).toContain('__client=abc123; Path=/; HttpOnly; Secure');
+      expect(setCookies).toContain('__client_uat=1234567890; Path=/; Secure');
+      expect(setCookies).toContain('__session=xyz789; Path=/; HttpOnly; Secure');
+    });
+
     it('preserves relative Location headers', async () => {
       const mockResponse = new Response(null, {
         status: 302,

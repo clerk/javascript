@@ -288,7 +288,11 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
     response.headers.forEach((value, key) => {
       const lower = key.toLowerCase();
       if (!HOP_BY_HOP_HEADERS.includes(lower) && !RESPONSE_HEADERS_TO_STRIP.includes(lower)) {
-        responseHeaders.set(key, value);
+        if (lower === 'set-cookie') {
+          responseHeaders.append(key, value);
+        } else {
+          responseHeaders.set(key, value);
+        }
       }
     });
 
