@@ -216,9 +216,17 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
 
   // Derive the FAPI URL and construct the target URL
   const fapiBaseUrl = fapiUrlFromPublishableKey(publishableKey);
+  const fapiHost = new URL(fapiBaseUrl).host;
   const targetPath = requestUrl.pathname.slice(proxyPath.length) || '/';
   const targetUrl = new URL(targetPath, fapiBaseUrl);
   targetUrl.search = requestUrl.search;
+
+  // Guard against SSRF: a path like "//evil.com/steal" causes the URL constructor
+  // to treat it as protocol-relative, resolving to a completely different host.
+  // This would leak the Clerk-Secret-Key header to an attacker-controlled server.
+  if (targetUrl.host !== fapiHost) {
+    return createErrorResponse('proxy_request_failed', 'Resolved target does not match the expected FAPI host', 400);
+  }
 
   // Build headers for the proxied request
   const headers = new Headers();
@@ -239,7 +247,6 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
   headers.set('Clerk-Secret-Key', secretKey);
 
   // Set the host header to the FAPI host
-  const fapiHost = new URL(fapiBaseUrl).host;
   headers.set('Host', fapiHost);
 
   // Request uncompressed responses to avoid a double compression pass.

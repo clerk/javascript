@@ -148,6 +148,20 @@ describe('proxy', () => {
       expect(body.errors[0].code).toBe('proxy_path_mismatch');
     });
 
+    it('rejects requests with protocol-relative path that would SSRF to a different host', async () => {
+      const request = new Request('https://example.com/__clerk//evil.com/steal');
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      expect(response.status).toBe(400);
+      const body = await response.json();
+      expect(body.errors[0].code).toBe('proxy_request_failed');
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
     it('forwards GET request to FAPI with correct headers', async () => {
       const mockResponse = new Response(JSON.stringify({ client: {} }), {
         status: 200,
