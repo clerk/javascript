@@ -284,9 +284,19 @@ const prodConfig = ({ mode, env, analysis }) => {
     commonForProdChunked(),
     // Disable chunking for the native variant, since it's meant to be used in React Native
     // where dynamic chunk loading is not supported.
+    // `dynamicImportMode: 'eager'` inlines all dynamic import() modules directly into the
+    // bundle and resolves the returned Promise immediately, so rspack's async chunk-loading
+    // runtime (which doesn't work in Metro) is never emitted.
     {
       output: {
         publicPath: '',
+      },
+      module: {
+        parser: {
+          javascript: {
+            dynamicImportMode: 'eager',
+          },
+        },
       },
       optimization: {
         splitChunks: false,
