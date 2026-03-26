@@ -548,14 +548,56 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       // Token refresh should succeed (backend ignores the param for now)
       expect(token).toBeTruthy();
 
-      // Verify token param is present in the POST body (form-urlencoded)
+      // Verify token param is present in the POST body when sessionMinter is enabled.
       // fapiClient serializes body as form-urlencoded via qs.stringify(camelToSnake(body))
       // so "token" stays "token" (no case change) and the body looks like "organization_id=&token=<jwt>"
+      const sessionMinterEnabled = await page.evaluate(() => {
+        return !!(window as any).Clerk?.__internal_environment?.authConfig?.sessionMinter;
+      });
       expect(tokenRequestBodies.length).toBeGreaterThanOrEqual(1);
-      const lastBody = tokenRequestBodies[tokenRequestBodies.length - 1];
-      expect(lastBody).toContain('token=');
+      const lastBody = new URLSearchParams(tokenRequestBodies[tokenRequestBodies.length - 1]);
+      expect(lastBody.has('token')).toBe(sessionMinterEnabled);
+
+      // skipCache: true should send force_origin=true in the POST body when sessionMinter is enabled.
+      // Session.ts sets forceOrigin: 'true' which fapiClient serializes to force_origin=true
+      expect(lastBody.has('force_origin')).toBe(sessionMinterEnabled);
 
       // User should still be signed in after refresh
+      await u.po.expect.toBeSignedIn();
+    });
+
+    test('token refresh without skipCache does not send force_origin', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      // Sign in
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+
+      // Track token request bodies
+      const tokenRequestBodies: string[] = [];
+      await context.route('**/v1/client/sessions/*/tokens*', async route => {
+        const postData = route.request().postData();
+        if (postData) {
+          tokenRequestBodies.push(postData);
+        }
+        await route.continue();
+      });
+
+      // Force a fresh token fetch without skipCache
+      const token = await page.evaluate(async () => {
+        const clerk = (window as any).Clerk;
+        await clerk.session?.clearCache();
+        return await clerk.session?.getToken();
+      });
+
+      expect(token).toBeTruthy();
+
+      // Without skipCache, force_origin should NOT be present in the POST body
+      expect(tokenRequestBodies.length).toBeGreaterThanOrEqual(1);
+      const lastBody = new URLSearchParams(tokenRequestBodies[tokenRequestBodies.length - 1]);
+      expect(lastBody.has('force_origin')).toBe(false);
+
       await u.po.expect.toBeSignedIn();
     });
   });

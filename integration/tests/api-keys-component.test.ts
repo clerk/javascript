@@ -1,10 +1,10 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
-import type { Application } from '../../models/application';
-import { appConfigs } from '../../presets';
-import type { FakeOrganization, FakeUser } from '../../testUtils';
-import { createTestUtils } from '../../testUtils';
+import type { Application } from '../models/application';
+import { appConfigs } from '../presets';
+import type { FakeOrganization, FakeUser } from '../testUtils';
+import { createTestUtils } from '../testUtils';
 
 const mockAPIKeysEnvironmentSettings = async (
   page: Page,
