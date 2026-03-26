@@ -233,11 +233,18 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
     );
   }
 
-  // Derive the FAPI URL and construct the target URL
+  // Derive the FAPI URL and construct the target URL.
+  // Use string concatenation instead of `new URL(path, base)` to avoid
+  // protocol-relative resolution (e.g., "//evil.com" resolving to a different host).
   const fapiBaseUrl = fapiUrlFromPublishableKey(publishableKey);
+  const fapiHost = new URL(fapiBaseUrl).host;
   const targetPath = requestUrl.pathname.slice(proxyPath.length) || '/';
-  const targetUrl = new URL(targetPath, fapiBaseUrl);
+  const targetUrl = new URL(`${fapiBaseUrl}${targetPath}`);
   targetUrl.search = requestUrl.search;
+
+  if (targetUrl.host !== fapiHost) {
+    return createErrorResponse('proxy_request_failed', 'Resolved target does not match the expected host', 400);
+  }
 
   // Build headers for the proxied request
   const headers = new Headers();
@@ -261,7 +268,6 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
   headers.set('Clerk-Secret-Key', secretKey);
 
   // Set the host header to the FAPI host
-  const fapiHost = new URL(fapiBaseUrl).host;
   headers.set('Host', fapiHost);
 
   // Request uncompressed responses to avoid a double compression pass.
@@ -319,7 +325,11 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
         !RESPONSE_HEADERS_TO_STRIP.includes(lower) &&
         !responseDynamicHopByHop.has(lower)
       ) {
-        responseHeaders.set(key, value);
+        if (lower === 'set-cookie') {
+          responseHeaders.append(key, value);
+        } else {
+          responseHeaders.set(key, value);
+        }
       }
     });
 

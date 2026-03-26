@@ -148,6 +148,22 @@ describe('proxy', () => {
       expect(body.errors[0].code).toBe('proxy_path_mismatch');
     });
 
+    it('does not follow protocol-relative paths', async () => {
+      const mockResponse = new Response('{}', { status: 200 });
+      mockFetch.mockResolvedValueOnce(mockResponse);
+
+      const request = new Request('https://example.com/__clerk//evil.com/steal');
+
+      await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      // String concatenation keeps the host as FAPI, not evil.com
+      const fetchedUrl = new URL(mockFetch.mock.calls[0][0] as string);
+      expect(fetchedUrl.host).toBe('frontend-api.clerk.dev');
+    });
+
     it('forwards GET request to FAPI with correct headers', async () => {
       const mockResponse = new Response(JSON.stringify({ client: {} }), {
         status: 200,
@@ -623,6 +639,33 @@ describe('proxy', () => {
       expect(options.headers.has('X-Custom-Hop')).toBe(false);
       // Non-hop-by-hop headers should be preserved
       expect(options.headers.get('User-Agent')).toBe('Test');
+    });
+
+    it('preserves multiple Set-Cookie headers from FAPI response', async () => {
+      const headers = new Headers();
+      headers.append('Set-Cookie', '__client=abc123; Path=/; HttpOnly; Secure');
+      headers.append('Set-Cookie', '__client_uat=1234567890; Path=/; Secure');
+      headers.append('Set-Cookie', '__session=xyz789; Path=/; HttpOnly; Secure');
+      headers.append('Content-Type', 'application/json');
+
+      const mockResponse = new Response(JSON.stringify({ client: {} }), {
+        status: 200,
+        headers,
+      });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/client');
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      const setCookies = response.headers.getSetCookie();
+      expect(setCookies).toHaveLength(3);
+      expect(setCookies).toContain('__client=abc123; Path=/; HttpOnly; Secure');
+      expect(setCookies).toContain('__client_uat=1234567890; Path=/; Secure');
+      expect(setCookies).toContain('__session=xyz789; Path=/; HttpOnly; Secure');
     });
 
     it('preserves relative Location headers', async () => {

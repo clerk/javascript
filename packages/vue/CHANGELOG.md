@@ -1,5 +1,11 @@
 # @clerk/vue
 
+## 2.0.7
+
+### Patch Changes
+
+- Deprecate the `signOutOptions` prop on `<SignOutButton />` in favor of top-level `redirectUrl` and `sessionId` props. The `signOutOptions` prop still works but now emits a deprecation warning. ([#8148](https://github.com/clerk/javascript/pull/8148)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 2.0.6
 
 ### Patch Changes
