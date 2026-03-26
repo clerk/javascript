@@ -1349,6 +1349,7 @@ export const svSE: LocalizationResource = {
         title: 'E-postadresser',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Anslut konto',
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Konto',

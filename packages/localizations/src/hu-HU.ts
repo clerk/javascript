@@ -1350,6 +1350,7 @@ export const huHU: LocalizationResource = {
         title: 'Email címek',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Fiók összekötése',
         title: 'Vállalati fiókok',
       },
       headerTitle__account: 'Profil adatok',

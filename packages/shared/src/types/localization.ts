@@ -683,6 +683,7 @@ export type __internal_LocalizationResource = {
       };
       enterpriseAccountsSection: {
         title: LocalizationValue;
+        primaryButton: LocalizationValue;
       };
       passwordSection: {
         title: LocalizationValue;
