@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "1.2.1",
+  "version": "1.2.4",
   "description": "Internal package that contains the UI components for the Clerk frontend SDKs",
   "repository": {
     "type": "git",
@@ -69,7 +69,7 @@
     "register"
   ],
   "scripts": {
-    "build": "pnpm build:umd && pnpm build:esm && pnpm check:no-rhc",
+    "build": "pnpm build:umd && pnpm build:esm && pnpm check:no-rhc && pnpm type-check",
     "build:analyze": "rspack build --config rspack.config.js --env production --env analyze --analyze",
     "build:esm": "tsdown",
     "build:rsdoctor": "RSDOCTOR=true rspack build --config rspack.config.js --env production",
@@ -108,9 +108,7 @@
     "csstype": "3.1.3",
     "dequal": "2.0.3",
     "input-otp": "1.4.2",
-    "qrcode.react": "4.2.0",
-    "react": "catalog:peer-react",
-    "react-dom": "catalog:peer-react"
+    "qrcode.react": "4.2.0"
   },
   "devDependencies": {
     "@floating-ui/react-dom": "^2.1.6",
@@ -126,6 +124,10 @@
     "minimatch": "^10.1.1",
     "tsdown": "catalog:repo",
     "webpack-merge": "^5.10.0"
+  },
+  "peerDependencies": {
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "engines": {
     "node": ">=20.9.0"

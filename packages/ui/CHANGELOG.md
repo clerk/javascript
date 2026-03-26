@@ -1,5 +1,40 @@
 # @clerk/ui
 
+## 1.2.4
+
+### Patch Changes
+
+- Move `react` and `react-dom` from `dependencies` to `peerDependencies` ([#8160](https://github.com/clerk/javascript/pull/8160)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix minor internal issues with TypeScript types. ([#8076](https://github.com/clerk/javascript/pull/8076)) by [@dstaley](https://github.com/dstaley)
+
+- Fix false positive in structural CSS detection where Clerk's own internal classes (`.cl-internal-*`) were incorrectly triggering the warning on fresh installs. ([#8142](https://github.com/clerk/javascript/pull/8142)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`46093fa`](https://github.com/clerk/javascript/commit/46093fae837a98f830a596062b6f1c9d44fc7c8d)]:
+  - @clerk/localizations@4.2.4
+
+## 1.2.3
+
+### Patch Changes
+
+- Fix issue where default plans offered the ability to switch to annual. ([#8077](https://github.com/clerk/javascript/pull/8077)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`f0533a2`](https://github.com/clerk/javascript/commit/f0533a26db17066a7dcc7992d9589ba3a60cc5b4), [`e00ec97`](https://github.com/clerk/javascript/commit/e00ec97895640db358af5a9df5d03e83f28f5a27)]:
+  - @clerk/shared@4.3.2
+  - @clerk/localizations@4.2.3
+
+## 1.2.2
+
+### Patch Changes
+
+- Improve spacing for `CreateOrganization` and `OrganizationList` ([#8034](https://github.com/clerk/javascript/pull/8034)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix issue where monthly/annual toggle appeared on default free plans. ([#8052](https://github.com/clerk/javascript/pull/8052)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`296f52e`](https://github.com/clerk/javascript/commit/296f52e0180969b7a6153a904e298242d3528e35), [`b9cb6e5`](https://github.com/clerk/javascript/commit/b9cb6e576bf6af5662fcc624cf2de76120a14565)]:
+  - @clerk/localizations@4.2.2
+  - @clerk/shared@4.3.1
+
 ## 1.2.1
 
 ### Patch Changes

@@ -1,5 +1,31 @@
 # @clerk/nuxt
 
+## 2.0.7
+
+### Patch Changes
+
+- Updated dependencies [[`c44f106`](https://github.com/clerk/javascript/commit/c44f1060923d12b9fefd482a88cfd9c5b370b216), [`0288931`](https://github.com/clerk/javascript/commit/028893102b91e3fc8e4e0ca5b993bbb8f23fd1d1), [`3efdd2c`](https://github.com/clerk/javascript/commit/3efdd2cbd36bfe1002e1fbdb0f3a633d46a9287a), [`486545c`](https://github.com/clerk/javascript/commit/486545c17db652e003f56ffdecf6f31dd77a1b02)]:
+  - @clerk/vue@2.0.7
+  - @clerk/backend@3.2.3
+
+## 2.0.6
+
+### Patch Changes
+
+- Updated dependencies [[`f0533a2`](https://github.com/clerk/javascript/commit/f0533a26db17066a7dcc7992d9589ba3a60cc5b4), [`e00ec97`](https://github.com/clerk/javascript/commit/e00ec97895640db358af5a9df5d03e83f28f5a27)]:
+  - @clerk/shared@4.3.2
+  - @clerk/backend@3.2.2
+  - @clerk/vue@2.0.6
+
+## 2.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`b9cb6e5`](https://github.com/clerk/javascript/commit/b9cb6e576bf6af5662fcc624cf2de76120a14565)]:
+  - @clerk/shared@4.3.1
+  - @clerk/vue@2.0.5
+  - @clerk/backend@3.2.1
+
 ## 2.0.4
 
 ### Patch Changes
