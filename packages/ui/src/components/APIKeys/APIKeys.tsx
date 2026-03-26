@@ -114,14 +114,16 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         ...params,
         subject,
       });
-      invalidateAll();
+      void invalidateAll();
       card.setError(undefined);
       setIsCopyModalOpen(true);
       setAPIKey(apiKey);
     } catch (err: any) {
       if (isClerkAPIResponseError(err)) {
-        if (err.status === 409) {
-          card.setError('API Key name already exists');
+        if (err.status === 403) {
+          card.setError(t(localizationKeys('unstable__errors.api_key_usage_exceeded')));
+        } else if (err.status === 409) {
+          card.setError(t(localizationKeys('unstable__errors.api_key_name_already_exists')));
         }
       }
     } finally {
