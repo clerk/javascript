@@ -1,5 +1,22 @@
 # Change Log
 
+## 3.2.3
+
+### Patch Changes
+
+- Fix `ERR_CONTENT_DECODING_FAILED` when loading proxied assets by requesting uncompressed responses from FAPI and stripping `Content-Encoding`/`Content-Length` headers that `fetch()` invalidates through auto-decompression. ([#8159](https://github.com/clerk/javascript/pull/8159)) by [@brkalow](https://github.com/brkalow)
+
+- Fix `satelliteAutoSync` to default to `false` as documented. Previously, not passing the prop resulted in `undefined`, which was treated as `true` due to a strict equality check (`=== false`). This preserved Core 2 auto-sync behavior instead of the intended Core 3 default. The check is now `!== true`, so both `undefined` and `false` skip automatic satellite sync. ([#8001](https://github.com/clerk/javascript/pull/8001)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fix an issue where multiple `set-cookie` headers were being dropped by the frontend API proxy. ([#8162](https://github.com/clerk/javascript/pull/8162)) by [@brkalow](https://github.com/brkalow)
+
+## 3.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`f0533a2`](https://github.com/clerk/javascript/commit/f0533a26db17066a7dcc7992d9589ba3a60cc5b4), [`e00ec97`](https://github.com/clerk/javascript/commit/e00ec97895640db358af5a9df5d03e83f28f5a27)]:
+  - @clerk/shared@4.3.2
+
 ## 3.2.1
 
 ### Patch Changes

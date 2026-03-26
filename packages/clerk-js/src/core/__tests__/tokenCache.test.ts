@@ -1189,6 +1189,237 @@ describe('SessionTokenCache', () => {
     });
   });
 
+  describe('timer cleanup on overwrite', () => {
+    /**
+     * This describe block tests the fix for a bug where calling set() multiple times
+     * for the same cache key would leak orphaned refresh timers. Each set() call creates
+     * a new value object with its own refresh timer, but previously the old value's timers
+     * were never cleared. This caused refresh callbacks to fire N times after N set() calls
+     * instead of just once, making the poller appear erratic.
+     *
+     * The root cause was that both `#hydrateCache` (via Session constructor from _updateClient)
+     * and `#refreshTokenInBackground` call set() for the same key during a single refresh cycle,
+     * doubling the number of active timers each cycle.
+     */
+
+    it('cancels hydrate refresh timer when background refresh calls set() for the same key', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'double-set-token', jwt, object: 'token' });
+
+      const hydrateRefresh = vi.fn();
+      const backgroundRefresh = vi.fn();
+      const key = { tokenId: 'double-set-token' };
+
+      // 1. Simulate #hydrateCache from Session constructor (called by _updateClient)
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(token),
+        onRefresh: hydrateRefresh,
+      });
+      await Promise.resolve();
+
+      // 2. Simulate #refreshTokenInBackground's .then() calling set() with resolved token
+      //    This is what happens during a background refresh cycle — both _updateClient
+      //    and the .then() callback call set() for the same cache key
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(token),
+        onRefresh: backgroundRefresh,
+      });
+      await Promise.resolve();
+
+      // Advance past refresh fire time
+      vi.advanceTimersByTime(44 * 1000);
+
+      // Only the second (background refresh) callback should fire; the hydrate timer was cancelled
+      expect(hydrateRefresh).not.toHaveBeenCalled();
+      expect(backgroundRefresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('cancels old expiration timer when set() is called again for the same key', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt1 = createJwtWithTtl(nowSeconds, 30);
+      const jwt2 = createJwtWithTtl(nowSeconds, 120);
+      const token1 = new Token({ id: 'exp-overwrite', jwt: jwt1, object: 'token' });
+      const token2 = new Token({ id: 'exp-overwrite', jwt: jwt2, object: 'token' });
+
+      const key = { tokenId: 'exp-overwrite' };
+
+      // First set() with 30s TTL
+      SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token1) });
+      await Promise.resolve();
+
+      // Second set() with 120s TTL — old 30s expiration timer should be cancelled
+      SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token2) });
+      await Promise.resolve();
+
+      // After 30s the old timer would have deleted the entry, but it should still exist
+      vi.advanceTimersByTime(31 * 1000);
+      const result = SessionTokenCache.get(key);
+      expect(result).toBeDefined();
+      expect(result?.entry.tokenId).toBe('exp-overwrite');
+    });
+
+    it('simulates multiple refresh cycles without timer accumulation', async () => {
+      const key = { tokenId: 'multi-cycle-token' };
+      const refreshCounts: number[] = [];
+
+      // Simulate 5 consecutive refresh cycles
+      // refreshFireTime = 60 - 15 - 2 = 43s
+      for (let cycle = 0; cycle < 5; cycle++) {
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        const jwt = createJwtWithTtl(nowSeconds, 60);
+        const token = new Token({ id: 'multi-cycle-token', jwt, object: 'token' });
+
+        const onRefresh = vi.fn();
+
+        // Each cycle does TWO set() calls (hydration + background refresh)
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(token),
+          onRefresh,
+        });
+        await Promise.resolve();
+
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(token),
+          onRefresh,
+        });
+        await Promise.resolve();
+
+        // Advance to 42s — just BEFORE the 43s refresh timer fires
+        vi.advanceTimersByTime(42 * 1000);
+        refreshCounts.push(onRefresh.mock.calls.length);
+
+        // Advance 2 more seconds past the 43s fire time
+        vi.advanceTimersByTime(2 * 1000);
+        refreshCounts.push(onRefresh.mock.calls.length);
+      }
+
+      // Each cycle should show: 0 calls before timer, 1 call after timer
+      // If timers were accumulating, later cycles would show more than 1 call
+      for (let i = 0; i < refreshCounts.length; i += 2) {
+        expect(refreshCounts[i]).toBe(0); // before timer (42s)
+        expect(refreshCounts[i + 1]).toBe(1); // after timer (44s)
+      }
+    });
+
+    it('set() with different key does not affect existing timers', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token1 = new Token({ id: 'key-a', jwt, object: 'token' });
+      const token2 = new Token({ id: 'key-b', jwt, object: 'token' });
+
+      const onRefreshA = vi.fn();
+      const onRefreshB = vi.fn();
+
+      SessionTokenCache.set({
+        tokenId: 'key-a',
+        tokenResolver: Promise.resolve<TokenResource>(token1),
+        onRefresh: onRefreshA,
+      });
+      await Promise.resolve();
+
+      SessionTokenCache.set({
+        tokenId: 'key-b',
+        tokenResolver: Promise.resolve<TokenResource>(token2),
+        onRefresh: onRefreshB,
+      });
+      await Promise.resolve();
+
+      vi.advanceTimersByTime(44 * 1000);
+
+      // Both should fire independently — setting key-b should NOT cancel key-a's timer
+      expect(onRefreshA).toHaveBeenCalledTimes(1);
+      expect(onRefreshB).toHaveBeenCalledTimes(1);
+    });
+
+    it('only the latest set() callback fires after interleaved set/clear/set', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'interleaved-token', jwt, object: 'token' });
+
+      const onRefresh1 = vi.fn();
+      const onRefresh2 = vi.fn();
+      const key = { tokenId: 'interleaved-token' };
+
+      // set, clear, set again
+      SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token), onRefresh: onRefresh1 });
+      await Promise.resolve();
+
+      SessionTokenCache.clear();
+
+      SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token), onRefresh: onRefresh2 });
+      await Promise.resolve();
+
+      vi.advanceTimersByTime(44 * 1000);
+
+      expect(onRefresh1).not.toHaveBeenCalled();
+      expect(onRefresh2).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not install timers when a pending tokenResolver resolves after being overwritten', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'stale-pending', jwt, object: 'token' });
+
+      const onRefreshStale = vi.fn();
+      const onRefreshFresh = vi.fn();
+      const key = { tokenId: 'stale-pending' };
+
+      // First set() with a slow-resolving promise
+      let resolveSlowPromise: (t: TokenResource) => void;
+      const slowPromise = new Promise<TokenResource>(resolve => {
+        resolveSlowPromise = resolve;
+      });
+
+      SessionTokenCache.set({ ...key, tokenResolver: slowPromise, onRefresh: onRefreshStale });
+
+      // Second set() overwrites the key before the slow promise resolves
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(token),
+        onRefresh: onRefreshFresh,
+      });
+      await Promise.resolve();
+
+      // Now the slow promise resolves — but its entry is stale
+      resolveSlowPromise!(token);
+      await Promise.resolve();
+
+      // Advance past refresh fire time
+      vi.advanceTimersByTime(44 * 1000);
+
+      // Only the fresh callback should fire; the stale one should be ignored
+      expect(onRefreshStale).not.toHaveBeenCalled();
+      expect(onRefreshFresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('overwriting with a token that has no onRefresh cancels the old refresh timer', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'cancel-refresh', jwt, object: 'token' });
+
+      const onRefresh = vi.fn();
+      const key = { tokenId: 'cancel-refresh' };
+
+      // First set with onRefresh
+      SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token), onRefresh });
+      await Promise.resolve();
+
+      // Second set WITHOUT onRefresh (like a broadcast-received token)
+      SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token) });
+      await Promise.resolve();
+
+      vi.advanceTimersByTime(44 * 1000);
+
+      // The old onRefresh should have been cancelled, and no new one was scheduled
+      expect(onRefresh).not.toHaveBeenCalled();
+    });
+  });
+
   describe('multi-session isolation', () => {
     it('stores tokens from different session IDs separately without interference', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);

@@ -47,7 +47,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       });
 
       // Trigger multiple touch() calls — each causes _updateClient → Session constructor
-      // → #hydrateCache → set(), which previously leaked orphaned refresh timers
+      // → #hydrateCache → set(), which previously leaked orphaned refresh timers.
+      // Note: This works because the test instance is multi-session, so it doesn't
+      // hit the 5s single-session touch throttle.
       for (let i = 0; i < 5; i++) {
         await page.evaluate(async () => {
           await (window as any).Clerk?.session?.touch();
