@@ -33,6 +33,7 @@ function useUserEnterpriseConnections(
 
   const { queryKey, stableKey, authenticated } = useUserEnterpriseConnectionsCacheKeys({
     userId: user?.id ?? null,
+    withOrganizationAccountLinking,
   });
 
   const queryEnabled = enabled && clerk.loaded && Boolean(user);
