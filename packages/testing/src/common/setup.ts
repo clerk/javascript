@@ -24,7 +24,9 @@ async function fetchWithRetry<T>(fn: () => Promise<T>, label: string): Promise<T
         typeof error.retryAfter === 'number'
           ? Math.min(error.retryAfter * 1000, MAX_RETRY_DELAY_MS)
           : Math.min(BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS, MAX_RETRY_DELAY_MS);
-      console.warn(`[Retry] ${error.status} for ${label}, attempt ${attempt + 1}/${MAX_RETRIES}, waiting ${Math.round(delay)}ms`);
+      console.warn(
+        `[Retry] ${error.status} for ${label}, attempt ${attempt + 1}/${MAX_RETRIES}, waiting ${Math.round(delay)}ms`,
+      );
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
