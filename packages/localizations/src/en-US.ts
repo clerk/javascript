@@ -1382,6 +1382,7 @@ export const enUS: LocalizationResource = {
         title: 'Email addresses',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Connect account',
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Profile details',

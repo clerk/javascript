@@ -1359,6 +1359,7 @@ export const itIT: LocalizationResource = {
         title: 'Indirizzi email',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Collega account',
         title: 'Account aziendali',
       },
       headerTitle__account: 'Dettagli profilo',

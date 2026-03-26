@@ -1023,8 +1023,8 @@ export const svSE: LocalizationResource = {
     passkey_registration_cancelled: 'Registrering av passnyckel avbruten.',
     passkey_retrieval_cancelled: 'Hämtning av passnyckel avbruten.',
     passwordComplexity: {
-      maximumLength: 'Maximal längd',
-      minimumLength: 'Minimal längd',
+      maximumLength: 'mindre än {{length}} tecken',
+      minimumLength: '{{length}} eller fler tecken',
       requireLowercase: 'Kräver små bokstäver',
       requireNumbers: 'Kräver siffror',
       requireSpecialCharacter: 'Kräver specialtecken',
@@ -1349,6 +1349,7 @@ export const svSE: LocalizationResource = {
         title: 'E-postadresser',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Anslut konto',
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Konto',

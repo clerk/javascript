@@ -1383,6 +1383,7 @@ export const deDE: LocalizationResource = {
         title: 'E-Mail-Adressen',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Konto verbinden',
         title: 'Unternehmens-Konten',
       },
       headerTitle__account: 'Konto',
