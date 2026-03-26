@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.2.4
+
+### Patch Changes
+
+- Add the missing Dutch translation for `organizationProfile.start.profileSection.primaryButton`. ([#7711](https://github.com/clerk/javascript/pull/7711)) by [@MaartenKoller](https://github.com/MaartenKoller)
+
+  This updates the value from an empty string to `"Profiel bijwerken"` so the primary button label is shown correctly in the organization profile section.
+
+  No consumer code changes are required.
+
 ## 4.2.3
 
 ### Patch Changes

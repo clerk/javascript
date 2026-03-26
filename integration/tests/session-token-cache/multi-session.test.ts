@@ -226,5 +226,106 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       expect(tab1FinalInfo.userId).toBe(user1SessionInfo.userId);
       expect(tab1FinalInfo.activeSessionId).toBe(user1SessionInfo.sessionId);
     });
+
+    /**
+     * Test Flow:
+     * 1. Tab1: Sign in as user1
+     * 2. Tab2: Inherits user1's session, then signs in as user2 (multi-session)
+     * 3. Tab1 has user1's active session; tab2 has user2's active session
+     * 4. Each tab's active session independently hydrates its token cache
+     * 5. Start counting /tokens requests, wait for both refresh timers to fire
+     * 6. Assert exactly 2 /tokens requests (one per session), with each session
+     *    represented exactly once
+     *
+     * Expected Behavior:
+     * - Two different sessions produce two independent refresh requests
+     * - BroadcastChannel does NOT deduplicate across sessions (different tokenIds)
+     * - Each session refreshes exactly once
+     *
+     * Note that this test does not currently assert in which tab the updates happen,
+     * this might be something we want to add in the future, but currently it is not
+     * deterministic.
+     */
+    test('multi-session scheduled refreshes produce one request per session', async ({ context }) => {
+      test.setTimeout(90_000);
+
+      const page1 = await context.newPage();
+      await page1.goto(app.serverUrl);
+      await page1.waitForFunction(() => (window as any).Clerk?.loaded);
+
+      const u1 = createTestUtils({ app, page: page1 });
+      await u1.po.signIn.goTo();
+      await u1.po.signIn.setIdentifier(fakeUser1.email);
+      await u1.po.signIn.continue();
+      await u1.po.signIn.setPassword(fakeUser1.password);
+      await u1.po.signIn.continue();
+      await u1.po.expect.toBeSignedIn();
+
+      const user1SessionId = await page1.evaluate(() => (window as any).Clerk?.session?.id);
+      expect(user1SessionId).toBeDefined();
+
+      const page2 = await context.newPage();
+      await page2.goto(app.serverUrl);
+      await page2.waitForFunction(() => (window as any).Clerk?.loaded);
+
+      // eslint-disable-next-line playwright/no-wait-for-timeout
+      await page2.waitForTimeout(1000);
+
+      const u2 = createTestUtils({ app, page: page2 });
+      await u2.po.expect.toBeSignedIn();
+
+      // Sign in as user2 on tab2, creating a second session
+      const signInResult = await page2.evaluate(
+        async ({ email, password }) => {
+          const clerk = (window as any).Clerk;
+          const signIn = await clerk.client.signIn.create({ identifier: email, password });
+          await clerk.setActive({ session: signIn.createdSessionId });
+          return {
+            sessionCount: clerk?.client?.sessions?.length || 0,
+            sessionId: clerk?.session?.id,
+            success: true,
+          };
+        },
+        { email: fakeUser2.email, password: fakeUser2.password },
+      );
+
+      expect(signInResult.success).toBe(true);
+      expect(signInResult.sessionCount).toBe(2);
+
+      const user2SessionId = signInResult.sessionId;
+      expect(user2SessionId).toBeDefined();
+      expect(user2SessionId).not.toBe(user1SessionId);
+
+      // Tab1 has user1's active session; tab2 has user2's active session.
+      // Start counting /tokens requests.
+      const refreshRequests: Array<{ sessionId: string; url: string }> = [];
+      await context.route('**/v1/client/sessions/*/tokens*', async route => {
+        const url = route.request().url();
+        const match = url.match(/sessions\/([^/]+)\/tokens/);
+        refreshRequests.push({ sessionId: match?.[1] || 'unknown', url });
+        await route.continue();
+      });
+
+      // Wait for proactive refresh timers to fire.
+      // Default token TTL is 60s; onRefresh fires at 60 - 15 - 2 = 43s from iat.
+      // Uses page.evaluate to avoid the global actionTimeout (10s) capping the wait.
+      await page1.evaluate(() => new Promise(resolve => setTimeout(resolve, 50_000)));
+
+      // Two different sessions should each produce exactly one refresh request.
+      // BroadcastChannel deduplication is per-tokenId, so different sessions refresh independently.
+      expect(refreshRequests.length).toBe(2);
+
+      const refreshedSessionIds = new Set(refreshRequests.map(r => r.sessionId));
+      expect(refreshedSessionIds.has(user1SessionId)).toBe(true);
+      expect(refreshedSessionIds.has(user2SessionId)).toBe(true);
+
+      // Both tabs should still have valid tokens after the refresh cycle
+      const page1Token = await page1.evaluate(() => (window as any).Clerk.session?.getToken());
+      const page2Token = await page2.evaluate(() => (window as any).Clerk.session?.getToken());
+
+      expect(page1Token).toBeTruthy();
+      expect(page2Token).toBeTruthy();
+      expect(page1Token).not.toBe(page2Token);
+    });
   },
 );
