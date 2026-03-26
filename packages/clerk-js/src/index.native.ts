@@ -23,22 +23,5 @@ if (originalDescriptor) {
   });
 }
 
-export {
-  ClerkAPIResponseError,
-  ClerkRuntimeError,
-  EmailLinkError,
-  EmailLinkErrorCode,
-  EmailLinkErrorCodeStatus,
-  isClerkAPIResponseError,
-  isClerkRuntimeError,
-  isEmailLinkError,
-  isKnownError,
-  isMetamaskError,
-  isUserLockedError,
-  type MetamaskError,
-} from '@clerk/shared/error';
-export { Clerk };
-
-if (module.hot) {
-  module.hot.accept();
-}
+// Re-export everything from the base entry point to avoid duplicating exports.
+export * from './index';

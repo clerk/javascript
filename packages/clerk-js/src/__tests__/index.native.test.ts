@@ -40,4 +40,14 @@ describe('index.native', () => {
 
     expect(client1?.client).not.toBe(client2?.client);
   });
+
+  it('exports the same public API as the base entry point', async () => {
+    const nativeExports = await import('../index.native');
+    const baseExports = await import('../index');
+
+    const nativeKeys = Object.keys(nativeExports).sort();
+    const baseKeys = Object.keys(baseExports).sort();
+
+    expect(nativeKeys).toEqual(baseKeys);
+  });
 });
