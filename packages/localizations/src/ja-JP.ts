@@ -1038,8 +1038,7 @@ export const jaJP: LocalizationResource = {
     organization_domain_common: 'これは一般的なメールプロバイダーのドメインです。別のものを使用してください。',
     organization_domain_exists_for_enterprise_connection: 'このドメインは組織の SSO で既に使用されています。',
     organization_membership_quota_exceeded: '保留中の招待を含め、組織のメンバー数の上限に達しました。',
-    organization_minimum_permissions_needed:
-      '必要な最小権限を持つ組織メンバーが少なくとも1人必要です。',
+    organization_minimum_permissions_needed: '必要な最小権限を持つ組織メンバーが少なくとも1人必要です。',
     organization_not_found_or_unauthorized:
       'この組織のメンバーではなくなりました。別の組織を選択するか、新しく作成してください。',
     organization_not_found_or_unauthorized_with_create_organization_disabled:
