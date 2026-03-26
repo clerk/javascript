@@ -1367,6 +1367,7 @@ export const msMY: LocalizationResource = {
         title: 'Alamat e-mel',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Sambung akaun',
         title: 'Akaun perusahaan',
       },
       headerTitle__account: 'Butiran profil',

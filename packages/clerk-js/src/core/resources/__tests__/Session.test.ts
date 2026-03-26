@@ -1698,6 +1698,108 @@ describe('Session', () => {
     });
   });
 
+  describe('sends force_origin in /tokens request body when skipCache is true', () => {
+    let dispatchSpy: ReturnType<typeof vi.spyOn>;
+    let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      dispatchSpy = vi.spyOn(eventBus, 'emit');
+      fetchSpy = vi.spyOn(BaseResource, '_fetch' as any);
+      BaseResource.clerk = clerkMock({
+        __internal_environment: {
+          authConfig: { sessionMinter: true },
+        },
+      }) as any;
+    });
+
+    afterEach(() => {
+      dispatchSpy?.mockRestore();
+      fetchSpy?.mockRestore();
+      BaseResource.clerk = null as any;
+    });
+
+    it('includes forceOrigin in body when skipCache is true', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken({ skipCache: true });
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(fetchSpy.mock.calls[0][0]).toMatchObject({
+        path: '/client/sessions/session_1/tokens',
+        method: 'POST',
+        body: expect.objectContaining({ forceOrigin: 'true' }),
+        search: { debug: 'skip_cache' },
+      });
+      expect(fetchSpy.mock.calls[0][0].body).not.toHaveProperty('debug');
+    });
+
+    it('does not include forceOrigin in body when skipCache is false or undefined', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken();
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(fetchSpy.mock.calls[0][0].body).not.toHaveProperty('forceOrigin');
+    });
+
+    it('does not include forceOrigin when sessionMinter is false even with skipCache true', async () => {
+      BaseResource.clerk = clerkMock({
+        __internal_environment: {
+          authConfig: { sessionMinter: false },
+        },
+      }) as any;
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken({ skipCache: true });
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(fetchSpy.mock.calls[0][0].body).not.toHaveProperty('forceOrigin');
+    });
+  });
+
   describe('origin outage mode fallback', () => {
     let dispatchSpy: ReturnType<typeof vi.spyOn>;
     let fetchSpy: ReturnType<typeof vi.spyOn>;

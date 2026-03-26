@@ -1348,6 +1348,7 @@ export const bgBG: LocalizationResource = {
         title: 'Имейл адреси',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Свържи акаунт',
         title: 'Корпоративни акаунти',
       },
       headerTitle__account: 'Профил',

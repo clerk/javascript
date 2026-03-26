@@ -258,41 +258,14 @@ const withClerkIOS = config => {
       const projectName = config.modRequest.projectName;
       const iosProjectPath = path.join(platformProjectRoot, projectName);
 
-      // Find the ClerkViewFactory.swift source file
-      // Check multiple possible locations in order of preference
+      // Find the ClerkViewFactory.swift source file using Node's module resolution,
+      // which handles arbitrary nesting depths in pnpm/yarn/npm workspaces.
       let sourceFile;
-      const possiblePaths = [
-        // Standard node_modules (npm, yarn)
-        path.join(config.modRequest.projectRoot, 'node_modules', '@clerk', 'expo', 'ios', 'ClerkViewFactory.swift'),
-        // pnpm hoisted node_modules
-        path.join(
-          config.modRequest.projectRoot,
-          '..',
-          'node_modules',
-          '@clerk',
-          'expo',
-          'ios',
-          'ClerkViewFactory.swift',
-        ),
-        // Monorepo workspace (pnpm workspace)
-        path.join(
-          config.modRequest.projectRoot,
-          '..',
-          'javascript',
-          'packages',
-          'expo',
-          'ios',
-          'ClerkViewFactory.swift',
-        ),
-        // Alternative monorepo structure
-        path.join(config.modRequest.projectRoot, '..', 'packages', 'expo', 'ios', 'ClerkViewFactory.swift'),
-      ];
-
-      for (const possiblePath of possiblePaths) {
-        if (fs.existsSync(possiblePath)) {
-          sourceFile = possiblePath;
-          break;
-        }
+      try {
+        const packageRoot = path.dirname(require.resolve('@clerk/expo/package.json'));
+        sourceFile = path.join(packageRoot, 'ios', 'ClerkViewFactory.swift');
+      } catch {
+        sourceFile = null;
       }
 
       if (sourceFile && fs.existsSync(sourceFile)) {
@@ -613,8 +586,11 @@ const withClerkAppleSignIn = config => {
 };
 
 const withClerkExpo = (config, props = {}) => {
+  const { appleSignIn = true } = props;
   config = withClerkIOS(config);
-  config = withClerkAppleSignIn(config);
+  if (appleSignIn !== false) {
+    config = withClerkAppleSignIn(config);
+  }
   config = withClerkGoogleSignIn(config);
   config = withClerkAndroid(config);
   config = withClerkKeychainService(config, props);

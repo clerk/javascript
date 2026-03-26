@@ -1354,6 +1354,7 @@ export const caES: LocalizationResource = {
         title: 'Adreces de correu electrònic',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Connecta compte',
         title: "Comptes d'empresa",
       },
       headerTitle__account: 'Detalls del perfil',
