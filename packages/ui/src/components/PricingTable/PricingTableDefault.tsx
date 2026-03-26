@@ -155,6 +155,7 @@ function Card(props: CardProps) {
   }, [isSignedIn, canManageBilling, organization, subscriberType, plan]);
 
   const hasFeatures = plan.features.length > 0;
+  const hasSeatFeatures = !!getSeatUnitPrice(plan);
 
   const { shouldShowFooter, shouldShowFooterNotice } = getPricingFooterState({
     subscription,
@@ -213,8 +214,8 @@ function Card(props: CardProps) {
               flexDirection: 'column',
               flex: '1',
               padding: isCompact ? t.space.$3 : t.space.$4,
-              backgroundColor: hasFeatures ? t.colors.$colorBackground : 'transparent',
-              borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
+              backgroundColor: hasFeatures || hasSeatFeatures ? t.colors.$colorBackground : 'transparent',
+              borderTopWidth: hasFeatures || hasSeatFeatures ? t.borderWidths.$normal : 0,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$borderAlpha150,
             })}
