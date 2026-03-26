@@ -574,9 +574,6 @@ importers:
       '@clerk/shared':
         specifier: workspace:^
         version: link:../shared
-      '@tanstack/query-core':
-        specifier: 5.90.16
-        version: 5.90.16
       base-64:
         specifier: ^1.0.0
         version: 1.0.0
