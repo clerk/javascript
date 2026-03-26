@@ -5,6 +5,7 @@ import type {
   EnterpriseAccountConnectionResource,
   EnterpriseAccountResource,
   OAuthProvider,
+  SamlIdpSlug,
 } from '@clerk/shared/types';
 import { Fragment, useState } from 'react';
 
@@ -56,7 +57,10 @@ const EnterpriseConnectMenuButton = (props: { connection: EnterpriseAccountConne
       });
   };
 
-  const providerWithoutPrefix = connection?.name;
+  const providerWithoutPrefix = connection.provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider;
+  const providerIconElementId = (connection.protocol === 'saml' ? connection.provider : providerWithoutPrefix) as
+    | OAuthProvider
+    | SamlIdpSlug;
 
   return (
     <ProfileSection.ActionMenuItem
@@ -84,7 +88,7 @@ const EnterpriseConnectMenuButton = (props: { connection: EnterpriseAccountConne
           isDisabled={card.isLoading}
           alt={`Connect ${connection.name} account`}
           elementDescriptor={descriptors.providerIcon}
-          elementId={descriptors.providerIcon.setId(providerWithoutPrefix)}
+          elementId={descriptors.providerIcon.setId(providerIconElementId)}
         />
       }
     />
