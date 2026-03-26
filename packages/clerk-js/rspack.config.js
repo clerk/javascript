@@ -22,7 +22,7 @@ const variantToSourceFile = {
   [variants.clerk]: './src/index.ts',
   [variants.clerkNoRHC]: './src/index.ts',
   [variants.clerkBrowser]: './src/index.browser.ts',
-  [variants.clerkNative]: './src/index.ts',
+  [variants.clerkNative]: './src/index.native.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
 };
 
