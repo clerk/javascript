@@ -9,6 +9,7 @@ import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Tooltip } from '@/ui/elements/Tooltip';
+import { getSeatUnitPrice } from '@/ui/utils/billingPlanSeats';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { DevOnly } from '../../common/DevOnly';
@@ -51,7 +52,7 @@ export const CheckoutForm = withCardStateProvider(() => {
   if (planPeriod === 'annual') {
     descriptionElements.push(localizationKeys('billing.billedAnnually'));
   }
-  const seatUnitPrice = plan.unitPrices?.find(unitPrice => unitPrice.name.toLowerCase() === 'seats');
+  const seatUnitPrice = getSeatUnitPrice(plan);
   if (seatUnitPrice && seatUnitPrice.tiers.length === 1 && seatUnitPrice.tiers[0].feePerBlock.amount === 0) {
     descriptionElements.push(
       seatUnitPrice.tiers[0].endsAfterBlock

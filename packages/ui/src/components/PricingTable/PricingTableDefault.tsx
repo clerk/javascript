@@ -329,7 +329,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
   }, [plan.hasBaseFee, plan.unitPrices]);
 
   const feePeriodText = React.useMemo(() => {
-    if (!plan.hasBaseFee && plan.unitPrices) {
+    if (!plan.hasBaseFee && plan.unitPrices && plan.unitPrices.length > 0) {
       return localizationKeys('billing.monthPerUnit', { unitName: plan.unitPrices[0].name });
     }
 
@@ -535,7 +535,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
           padding: 0,
         })}
       >
-        {plan.unitPrices && (plan.hasBaseFee || plan.unitPrices[0].tiers.length > 0) ? (
+        {plan.unitPrices && plan.unitPrices.length > 0 && (plan.hasBaseFee || plan.unitPrices[0].tiers.length > 0) ? (
           <CardFeaturesListSeatCost plan={plan} />
         ) : null}
         {plan.features.slice(0, hasMoreFeatures ? (isCompact ? 3 : 8) : totalFeatures).map(feature => (

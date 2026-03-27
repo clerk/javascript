@@ -3,7 +3,7 @@ import type { BillingPlanResource, BillingPlanUnitPrice, OrganizationResource } 
 /**
  * Given a plan, return the unit price for seats.
  */
-export const getSeatUnitPrice = (plan: BillingPlanResource): BillingPlanUnitPrice | null => {
+export const getSeatUnitPrice = (plan: { unitPrices?: BillingPlanUnitPrice[] }): BillingPlanUnitPrice | null => {
   if (!plan.unitPrices?.length) {
     return null;
   }

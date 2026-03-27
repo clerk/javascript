@@ -107,7 +107,7 @@ export function PricingTableSBB(): MockScenario {
           free_trial_days: null,
           unit_prices: [
             {
-              name: 'seat',
+              name: 'seats',
               block_size: 1,
               tiers: [
                 {
@@ -141,7 +141,7 @@ export function PricingTableSBB(): MockScenario {
           free_trial_days: null,
           unit_prices: [
             {
-              name: 'seat',
+              name: 'seats',
               block_size: 1,
               tiers: [
                 {
@@ -175,7 +175,7 @@ export function PricingTableSBB(): MockScenario {
           free_trial_days: null,
           unit_prices: [
             {
-              name: 'seat',
+              name: 'seats',
               block_size: 1,
               tiers: [
                 {
@@ -209,7 +209,7 @@ export function PricingTableSBB(): MockScenario {
           free_trial_days: null,
           unit_prices: [
             {
-              name: 'seat',
+              name: 'seats',
               block_size: 1,
               tiers: [
                 {
@@ -269,7 +269,7 @@ export function PricingTableSBB(): MockScenario {
           free_trial_days: null,
           unit_prices: [
             {
-              name: 'seat',
+              name: 'seats',
               block_size: 1,
               tiers: [
                 {
@@ -310,7 +310,7 @@ export function PricingTableSBB(): MockScenario {
           free_trial_days: null,
           unit_prices: [
             {
-              name: 'seat',
+              name: 'seats',
               block_size: 1,
               tiers: [
                 {
@@ -344,7 +344,7 @@ export function PricingTableSBB(): MockScenario {
           free_trial_days: null,
           unit_prices: [
             {
-              name: 'seat',
+              name: 'seats',
               block_size: 1,
               tiers: [
                 {
