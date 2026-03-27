@@ -278,6 +278,11 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
     const fetchOptions: RequestInit = {
       method: request.method,
       headers,
+      // Return redirects as-is instead of following them server-side.
+      // Without this, fetch() follows same-origin redirects internally,
+      // which bypasses the browser and breaks flows like OAuth callbacks
+      // where FAPI redirects back to the app origin.
+      redirect: 'manual',
       // @ts-expect-error - duplex is required for streaming bodies but not in all TS definitions
       duplex: hasBody ? 'half' : undefined,
     };
