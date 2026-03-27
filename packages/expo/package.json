@@ -92,6 +92,8 @@
     "token-cache",
     "google",
     "apple",
+    "experimental",
+    "legacy",
     "src/specs",
     "expo-module.config.json",
     "react-native.config.js",
