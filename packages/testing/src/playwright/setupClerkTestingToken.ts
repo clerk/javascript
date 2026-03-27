@@ -69,10 +69,18 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
         const response = await route.fetch({ url: urlString });
         const status = response.status();
 
-        if (RETRYABLE_STATUS_CODES.has(status) && attempt < MAX_ROUTE_RETRIES) {
-          const delay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
-          await new Promise(resolve => setTimeout(resolve, delay));
-          continue;
+        if (RETRYABLE_STATUS_CODES.has(status)) {
+          if (attempt < MAX_ROUTE_RETRIES) {
+            const delay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
+            await new Promise(resolve => setTimeout(resolve, delay));
+            continue;
+          }
+
+          console.warn(
+            `[Clerk Testing] FAPI request failed with status ${status} after ${MAX_ROUTE_RETRIES + 1} attempts: ${route.request().url()}`,
+          );
+          await route.fulfill({ response });
+          return;
         }
 
         const json = await response.json();
