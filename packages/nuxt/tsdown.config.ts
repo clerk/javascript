@@ -1,6 +1,6 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 
-import { name, version } from './package.json';
+import pkgJson from './package.json' with { type: 'json' };
 
 export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
@@ -21,15 +21,15 @@ export default defineConfig(overrideOptions => {
     format: ['esm'],
     // Make sure to not bundle the imports
     // or else the Nuxt module will not be able to resolve them
-    bundle: false,
+    unbundle: true,
     sourcemap: true,
     minify: false,
     dts: true,
     onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     define: {
-      PACKAGE_NAME: `"${name}"`,
-      PACKAGE_VERSION: `"${version}"`,
+      PACKAGE_NAME: `"${pkgJson.name}"`,
+      PACKAGE_VERSION: `"${pkgJson.version}"`,
     },
-    external: ['#imports'],
+    external: ['#imports', 'nuxt/app'],
   };
 });

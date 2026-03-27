@@ -9,7 +9,6 @@
     "noUnusedLocals": true,
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": false,
     "skipLibCheck": true
   },
   "include": ["src"]
