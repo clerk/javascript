@@ -1,6 +1,6 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 
-import { name, version } from './package.json';
+import pkgJson from './package.json' with { type: 'json' };
 
 export default defineConfig(overrideOptions => {
   const isProd = overrideOptions.env?.NODE_ENV === 'production';
@@ -15,13 +15,12 @@ export default defineConfig(overrideOptions => {
     ],
     dts: true,
     clean: true,
-    bundle: true,
     sourcemap: true,
     format: 'esm',
     onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     define: {
-      PACKAGE_NAME: `"${name}"`,
-      PACKAGE_VERSION: `"${version}"`,
+      PACKAGE_NAME: `"${pkgJson.name}"`,
+      PACKAGE_VERSION: `"${pkgJson.version}"`,
       __DEV__: `${!isProd}`,
     },
   };
