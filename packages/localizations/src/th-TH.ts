@@ -1340,6 +1340,7 @@ export const thTH: LocalizationResource = {
         title: 'ที่อยู่อีเมล',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'เชื่อมต่อบัญชี',
         title: 'บัญชีองค์กร',
       },
       headerTitle__account: 'รายละเอียดโปรไฟล์',
