@@ -1,12 +1,12 @@
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { parse as parseYaml } from 'yaml';
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 
-import { version as clerkJsVersion } from '../clerk-js/package.json';
-import { name, version, peerDependencies } from './package.json';
-import { parseRangeToBounds, type VersionBounds } from './build-utils/parseVersionRange';
+import clerkJsPkgJson from '../clerk-js/package.json' with { type: 'json' };
+import pkgJson from './package.json' with { type: 'json' };
+import { parseRangeToBounds, type VersionBounds } from './build-utils/parseVersionRange.ts';
 
 /**
  * Resolves the React peer dependency range from package.json.
@@ -14,7 +14,7 @@ import { parseRangeToBounds, type VersionBounds } from './build-utils/parseVersi
  * Otherwise, parses the range string directly.
  */
 function getClerkUISupportedReactBounds(): VersionBounds[] {
-  const reactPeerDep = peerDependencies.react;
+  const reactPeerDep = pkgJson.peerDependencies.react;
 
   let rangeStr: string;
 
@@ -24,7 +24,7 @@ function getClerkUISupportedReactBounds(): VersionBounds[] {
     const catalogName = catalogMatch[1];
 
     // Read the version range from pnpm-workspace.yaml
-    const workspaceYamlPath = resolve(__dirname, '../../pnpm-workspace.yaml');
+    const workspaceYamlPath = fileURLToPath(new URL('../../pnpm-workspace.yaml', import.meta.url));
     let workspaceYaml: string;
     try {
       workspaceYaml = readFileSync(workspaceYamlPath, 'utf-8');
@@ -69,7 +69,6 @@ export default defineConfig(overrideOptions => {
     dts: true,
     onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     format: ['cjs', 'esm'],
-    bundle: true,
     clean: true,
     minify: false,
     sourcemap: true,
@@ -79,9 +78,9 @@ export default defineConfig(overrideOptions => {
     // to enable @clerk/ui's shared variant to use the host app's React.
     noExternal: ['@clerk/ui/register'],
     define: {
-      PACKAGE_NAME: `"${name}"`,
-      PACKAGE_VERSION: `"${version}"`,
-      JS_PACKAGE_VERSION: `"${clerkJsVersion}"`,
+      PACKAGE_NAME: `"${pkgJson.name}"`,
+      PACKAGE_VERSION: `"${pkgJson.version}"`,
+      JS_PACKAGE_VERSION: `"${clerkJsPkgJson.version}"`,
       __DEV__: `${isWatch}`,
       __CLERK_UI_SUPPORTED_REACT_BOUNDS__: JSON.stringify(clerkUISupportedReactBounds),
     },
