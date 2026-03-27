@@ -42,6 +42,9 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
   }
 
   if (setupContexts.has(browserContext)) {
+    if (process.env.CLERK_TESTING_DEBUG) {
+      console.log('[Clerk Testing] Route handler already registered for this context, skipping duplicate setup');
+    }
     return;
   }
   setupContexts.add(browserContext);
@@ -72,6 +75,11 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
         if (RETRYABLE_STATUS_CODES.has(status)) {
           if (attempt < MAX_ROUTE_RETRIES) {
             const delay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
+            if (process.env.CLERK_TESTING_DEBUG) {
+              console.log(
+                `[Clerk Testing] FAPI returned ${status}, retrying (attempt ${attempt + 1}/${MAX_ROUTE_RETRIES}, delay ${Math.round(delay)}ms): ${route.request().url()}`,
+              );
+            }
             await new Promise(resolve => setTimeout(resolve, delay));
             continue;
           }
@@ -100,6 +108,12 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
       } catch (error) {
         if (attempt < MAX_ROUTE_RETRIES) {
           const delay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
+          if (process.env.CLERK_TESTING_DEBUG) {
+            console.log(
+              `[Clerk Testing] FAPI request error, retrying (attempt ${attempt + 1}/${MAX_ROUTE_RETRIES}, delay ${Math.round(delay)}ms): ${route.request().url()}`,
+              error,
+            );
+          }
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
         }
