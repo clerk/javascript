@@ -10,6 +10,7 @@ import { CLERK_CLIENT_JWT_KEY } from '../constants';
 import { useNativeAuthEvents } from '../hooks/useNativeAuthEvents';
 import NativeClerkModule from '../specs/NativeClerkModule';
 import { tokenCache as defaultTokenCache } from '../token-cache';
+import * as SecureStore from 'expo-secure-store';
 import { isNative, isWeb } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
@@ -254,6 +255,9 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
           if (!isMountedRef.current) {
             return;
           }
+          // Clear the JWT from SecureStore before signing out to prevent
+          // "session_exists" / "already signed in" errors on the next sign-in attempt.
+          await SecureStore.deleteItemAsync(CLERK_CLIENT_JWT_KEY).catch(() => {});
           await clerkInstance.signOut();
         }
       } catch (error) {

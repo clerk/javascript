@@ -1,7 +1,9 @@
 import { useClerk, useUser } from '@clerk/react';
+import * as SecureStore from 'expo-secure-store';
 import { useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import { CLERK_CLIENT_JWT_KEY } from '../constants';
 import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
 
 // Raw result from native module (may vary by platform)
@@ -154,6 +156,9 @@ export function UserButton(_props: UserButtonProps) {
             console.warn('[UserButton] Native signOut error (may already be signed out):', e);
           }
         }
+
+        // Clear stale JWT from SecureStore to prevent "already signed in" errors
+        await SecureStore.deleteItemAsync(CLERK_CLIENT_JWT_KEY).catch(() => {});
 
         // Sign out from JS SDK to update isSignedIn state
         if (clerk?.signOut) {
