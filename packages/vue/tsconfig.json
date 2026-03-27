@@ -8,7 +8,6 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": false,
     "skipLibCheck": true
   },
   "include": ["src"]
