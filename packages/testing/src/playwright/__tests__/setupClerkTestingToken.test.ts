@@ -4,7 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ERROR_MISSING_FRONTEND_API_URL } from '../../common/errors';
 
 // We need to reset the module-level WeakSet between tests
-let setupClerkTestingToken: typeof import('../setupClerkTestingToken').setupClerkTestingToken;
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+let setupClerkTestingToken: (typeof import('../setupClerkTestingToken'))['setupClerkTestingToken'];
 
 function createMockRoute(overrides: { url?: string; fetchStatus?: number; fetchJson?: unknown; fetchError?: Error } = {}) {
   const {
@@ -23,20 +24,21 @@ function createMockRoute(overrides: { url?: string; fetchStatus?: number; fetchJ
       ({
         url: () => url,
       }) as unknown as Request,
-    fetch: vi.fn(async () => {
+    fetch: vi.fn(() => {
       fetchCallCount++;
       if (fetchError) {
-        throw fetchError;
+        return Promise.reject(fetchError);
       }
-      return {
+      return Promise.resolve({
         status: () => fetchStatus,
-        json: async () => JSON.parse(JSON.stringify(fetchJson)),
-      };
+        json: () => Promise.resolve(JSON.parse(JSON.stringify(fetchJson))),
+      });
     }),
-    fulfill: vi.fn(async (opts: any) => {
+    fulfill: vi.fn((opts: any) => {
       fulfilled.push(opts);
+      return Promise.resolve();
     }),
-    continue: vi.fn(async () => {}),
+    continue: vi.fn(() => Promise.resolve()),
   } as unknown as Route;
 
   return { route, fulfilled, continued, getFetchCallCount: () => fetchCallCount };
@@ -46,8 +48,9 @@ function createMockContext() {
   let routeHandler: ((route: Route) => Promise<void>) | undefined;
 
   const context = {
-    route: vi.fn(async (_pattern: RegExp, handler: (route: Route) => Promise<void>) => {
+    route: vi.fn((_pattern: RegExp, handler: (route: Route) => Promise<void>) => {
       routeHandler = handler;
+      return Promise.resolve();
     }),
   } as unknown as BrowserContext;
 
@@ -201,22 +204,21 @@ describe('setupClerkTestingToken', () => {
       let callCount = 0;
       const route = {
         request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
-        fetch: vi.fn(async () => {
+        fetch: vi.fn(() => {
           callCount++;
           if (callCount <= 2) {
-            return { status: () => 429, json: async () => ({}) };
+            return Promise.resolve({ status: () => 429, json: () => Promise.resolve({}) });
           }
-          return {
+          return Promise.resolve({
             status: () => 200,
-            json: async () => ({ response: { captcha_bypass: false } }),
-          };
+            json: () => Promise.resolve({ response: { captcha_bypass: false } }),
+          });
         }),
-        fulfill: vi.fn(),
-        continue: vi.fn(),
+        fulfill: vi.fn(() => Promise.resolve()),
+        continue: vi.fn(() => Promise.resolve()),
       } as unknown as Route;
 
       const handlerPromise = getRouteHandler()!(route);
-      // Advance through retry delays
       await vi.advanceTimersByTimeAsync(60_000);
       await handlerPromise;
 
@@ -231,18 +233,18 @@ describe('setupClerkTestingToken', () => {
       let callCount = 0;
       const route = {
         request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
-        fetch: vi.fn(async () => {
+        fetch: vi.fn(() => {
           callCount++;
           if (callCount === 1) {
-            return { status: () => status, json: async () => ({}) };
+            return Promise.resolve({ status: () => status, json: () => Promise.resolve({}) });
           }
-          return {
+          return Promise.resolve({
             status: () => 200,
-            json: async () => ({ response: { captcha_bypass: false } }),
-          };
+            json: () => Promise.resolve({ response: { captcha_bypass: false } }),
+          });
         }),
-        fulfill: vi.fn(),
-        continue: vi.fn(),
+        fulfill: vi.fn(() => Promise.resolve()),
+        continue: vi.fn(() => Promise.resolve()),
       } as unknown as Route;
 
       const handlerPromise = getRouteHandler()!(route);
@@ -272,12 +274,14 @@ describe('setupClerkTestingToken', () => {
 
       const route = {
         request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
-        fetch: vi.fn(async () => ({
-          status: () => 429,
-          json: async () => ({}),
-        })),
-        fulfill: vi.fn(),
-        continue: vi.fn(),
+        fetch: vi.fn(() =>
+          Promise.resolve({
+            status: () => 429,
+            json: () => Promise.resolve({}),
+          }),
+        ),
+        fulfill: vi.fn(() => Promise.resolve()),
+        continue: vi.fn(() => Promise.resolve()),
       } as unknown as Route;
 
       const handlerPromise = getRouteHandler()!(route);
@@ -302,11 +306,9 @@ describe('setupClerkTestingToken', () => {
       const networkError = new Error('net::ERR_CONNECTION_REFUSED');
       const route = {
         request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
-        fetch: vi.fn(async () => {
-          throw networkError;
-        }),
-        fulfill: vi.fn(async () => {}),
-        continue: vi.fn(async () => {}),
+        fetch: vi.fn(() => Promise.reject(networkError)),
+        fulfill: vi.fn(() => Promise.resolve()),
+        continue: vi.fn(() => Promise.resolve()),
       } as unknown as Route;
 
       const handlerPromise = getRouteHandler()!(route);
@@ -331,18 +333,18 @@ describe('setupClerkTestingToken', () => {
       let callCount = 0;
       const route = {
         request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
-        fetch: vi.fn(async () => {
+        fetch: vi.fn(() => {
           callCount++;
           if (callCount === 1) {
-            throw new Error('network error');
+            return Promise.reject(new Error('network error'));
           }
-          return {
+          return Promise.resolve({
             status: () => 200,
-            json: async () => ({ response: { captcha_bypass: false } }),
-          };
+            json: () => Promise.resolve({ response: { captcha_bypass: false } }),
+          });
         }),
-        fulfill: vi.fn(),
-        continue: vi.fn(),
+        fulfill: vi.fn(() => Promise.resolve()),
+        continue: vi.fn(() => Promise.resolve()),
       } as unknown as Route;
 
       const handlerPromise = getRouteHandler()!(route);
