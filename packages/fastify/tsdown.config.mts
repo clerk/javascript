@@ -1,6 +1,6 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 
-import { name, version } from './package.json';
+import pkgJson from './package.json' with { type: 'json' };
 
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
@@ -13,15 +13,14 @@ export default defineConfig(overrideOptions => {
       types: './src/types/index.ts',
     },
     format: ['cjs', 'esm'],
-    bundle: true,
     clean: true,
     minify: false,
     sourcemap: true,
     dts: true,
     onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     define: {
-      PACKAGE_NAME: `"${name}"`,
-      PACKAGE_VERSION: `"${version}"`,
+      PACKAGE_NAME: `"${pkgJson.name}"`,
+      PACKAGE_VERSION: `"${pkgJson.version}"`,
       __DEV__: `${isWatch}`,
     },
   };
