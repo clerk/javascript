@@ -1,4 +1,4 @@
-import type { EnterpriseAccountConnectionResource } from '../../types/enterpriseAccount';
+import type { EnterpriseConnectionResource } from '../../types/enterpriseConnection';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useClerkInstanceContext } from '../contexts';
@@ -13,7 +13,7 @@ export type UseUserEnterpriseConnectionsParams = {
 };
 
 export type UseUserEnterpriseConnectionsReturn = {
-  data: EnterpriseAccountConnectionResource[] | undefined;
+  data: EnterpriseConnectionResource[] | undefined;
   error: Error | null;
   isLoading: boolean;
   isFetching: boolean;
