@@ -7,9 +7,6 @@ import * as path from 'path';
 
 config({ path: path.resolve(__dirname, '.env.local') });
 
-// Enable debug logging for @clerk/testing route handler
-process.env.CLERK_TESTING_DEBUG = '1';
-
 export const common: PlaywrightTestConfig = {
   testDir: './tests',
   snapshotDir: './tests/snapshots',
@@ -17,7 +14,7 @@ export const common: PlaywrightTestConfig = {
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 5 : 0,
   maxFailures: process.env.CI ? 5 : undefined,
-  workers: process.env.E2E_WORKERS ? Number(process.env.E2E_WORKERS) : process.env.CI ? 4 : '70%',
+  workers: process.env.E2E_WORKERS ? Number(process.env.E2E_WORKERS) : process.env.CI ? '50%' : '70%',
   use: {
     actionTimeout: 10_000,
     navigationTimeout: 30_000,
