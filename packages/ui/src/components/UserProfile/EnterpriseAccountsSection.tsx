@@ -1,12 +1,7 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { __internal_useUserEnterpriseConnections, useReverification, useUser } from '@clerk/shared/react';
-import type {
-  EnterpriseAccountConnectionResource,
-  EnterpriseAccountResource,
-  OAuthProvider,
-  SamlIdpSlug,
-} from '@clerk/shared/types';
+import type { EnterpriseAccountResource, EnterpriseConnectionResource, OAuthProvider } from '@clerk/shared/types';
 import { Fragment, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -20,7 +15,9 @@ import { useUserProfileContext } from '../../contexts';
 import { Badge, Box, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 
-const EnterpriseConnectMenuButton = (props: { connection: EnterpriseAccountConnectionResource }) => {
+const GENERIC_ENTERPRISE_PROVIDER_ICON_ID = 'custom_enterprise' as OAuthProvider;
+
+const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionResource }) => {
   const { connection } = props;
   const card = useCardState();
   const { user } = useUser();
@@ -57,10 +54,7 @@ const EnterpriseConnectMenuButton = (props: { connection: EnterpriseAccountConne
       });
   };
 
-  const providerWithoutPrefix = connection.provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider;
-  const providerIconElementId = (connection.protocol === 'saml' ? connection.provider : providerWithoutPrefix) as
-    | OAuthProvider
-    | SamlIdpSlug;
+  const providerIconUrl = connection.oauthConfig?.logoPublicUrl?.trim() ?? '';
 
   return (
     <ProfileSection.ActionMenuItem
@@ -81,14 +75,15 @@ const EnterpriseConnectMenuButton = (props: { connection: EnterpriseAccountConne
       })}
       leftIcon={
         <ProviderIcon
-          id={providerWithoutPrefix}
-          iconUrl={connection.logoPublicUrl}
+          // TODO - Use `provider` and `logo_public_url` once FAPI `EnterpriseConnection` resource gets updated
+          id={GENERIC_ENTERPRISE_PROVIDER_ICON_ID}
+          iconUrl={providerIconUrl || undefined}
           name={connection.name}
           isLoading={card.loadingMetadata === loadingKey}
           isDisabled={card.isLoading}
           alt={`Connect ${connection.name} account`}
           elementDescriptor={descriptors.providerIcon}
-          elementId={descriptors.providerIcon.setId(providerIconElementId)}
+          elementId={descriptors.providerIcon.setId(GENERIC_ENTERPRISE_PROVIDER_ICON_ID)}
         />
       }
     />
@@ -100,7 +95,7 @@ const AddEnterpriseAccount = ({
   enterpriseConnections,
 }: {
   onClick?: () => void;
-  enterpriseConnections: EnterpriseAccountConnectionResource[];
+  enterpriseConnections: EnterpriseConnectionResource[];
 }) => {
   if (enterpriseConnections.length === 0) {
     return null;
