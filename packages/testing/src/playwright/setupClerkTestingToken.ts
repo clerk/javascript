@@ -47,7 +47,6 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
     }
     return;
   }
-  setupContexts.add(browserContext);
 
   const fapiUrl = options?.frontendApiUrl || process.env.CLERK_FAPI;
   if (!fapiUrl) {
@@ -57,6 +56,7 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
   const escapedFapiUrl = fapiUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const apiUrl = new RegExp(`^https://${escapedFapiUrl}/v1/.*?(\\?.*)?$`);
 
+  setupContexts.add(browserContext);
   await browserContext.route(apiUrl, async route => {
     const originalUrl = new URL(route.request().url());
     const testingToken = process.env.CLERK_TESTING_TOKEN;
