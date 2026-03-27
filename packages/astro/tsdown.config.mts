@@ -1,7 +1,6 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 
-// @ts-ignore
-import { name, version } from './package.json';
+import pkgJson from './package.json' with { type: 'json' };
 
 export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
@@ -23,10 +22,9 @@ export default defineConfig(overrideOptions => {
     minify: false,
     onSuccess: shouldPublish ? 'pnpm build:dts && pkglab pub --ping' : 'pnpm build:dts',
     define: {
-      PACKAGE_NAME: `"${name}"`,
-      PACKAGE_VERSION: `"${version}"`,
+      PACKAGE_NAME: `"${pkgJson.name}"`,
+      PACKAGE_VERSION: `"${pkgJson.version}"`,
     },
-    bundle: true,
     sourcemap: true,
     format: ['esm'],
     external: ['astro', 'react', 'react-dom', 'node:async_hooks', '#async-local-storage', 'astro:transitions/client'],
