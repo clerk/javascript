@@ -9,6 +9,13 @@ type SetupClerkTestingTokenParams = {
   options?: SetupClerkTestingTokenOptions;
 };
 
+const setupContexts = new WeakSet<BrowserContext>();
+
+const RETRYABLE_STATUS_CODES = new Set([429, 502, 503, 504]);
+const MAX_ROUTE_RETRIES = 3;
+const BASE_DELAY_MS = 500;
+const JITTER_MAX_MS = 250;
+
 /**
  * Bypasses bot protection by appending the testing token in the Frontend API requests.
  *
@@ -34,6 +41,11 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
     throw new Error('Either context or page must be provided to setup testing token');
   }
 
+  if (setupContexts.has(browserContext)) {
+    return;
+  }
+  setupContexts.add(browserContext);
+
   const fapiUrl = options?.frontendApiUrl || process.env.CLERK_FAPI;
   if (!fapiUrl) {
     throw new Error(ERROR_MISSING_FRONTEND_API_URL);
@@ -50,33 +62,47 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
       originalUrl.searchParams.set(TESTING_TOKEN_PARAM, testingToken);
     }
 
-    try {
-      const response = await route.fetch({
-        url: originalUrl.toString(),
-      });
+    const urlString = originalUrl.toString();
 
-      const json = await response.json();
+    for (let attempt = 0; attempt <= MAX_ROUTE_RETRIES; attempt++) {
+      try {
+        const response = await route.fetch({ url: urlString });
+        const status = response.status();
 
-      // Override captcha_bypass in /v1/client
-      if (json?.response?.captcha_bypass === false) {
-        json.response.captcha_bypass = true;
+        if (RETRYABLE_STATUS_CODES.has(status) && attempt < MAX_ROUTE_RETRIES) {
+          const delay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+
+        const json = await response.json();
+
+        // Override captcha_bypass in /v1/client
+        if (json?.response?.captcha_bypass === false) {
+          json.response.captcha_bypass = true;
+        }
+
+        // Override captcha_bypass in piggybacking
+        if (json?.client?.captcha_bypass === false) {
+          json.client.captcha_bypass = true;
+        }
+
+        await route.fulfill({ response, json });
+        return;
+      } catch (error) {
+        if (attempt < MAX_ROUTE_RETRIES) {
+          const delay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+
+        console.warn(
+          `[Clerk Testing] FAPI request failed after ${MAX_ROUTE_RETRIES + 1} attempts: ${route.request().url()}`,
+          error,
+        );
+        await route.continue({ url: urlString }).catch(console.error);
+        return;
       }
-
-      // Override captcha_bypass in piggybacking
-      if (json?.client?.captcha_bypass === false) {
-        json.client.captcha_bypass = true;
-      }
-
-      await route.fulfill({
-        response,
-        json,
-      });
-    } catch {
-      await route
-        .continue({
-          url: originalUrl.toString(),
-        })
-        .catch(console.error);
     }
   });
 };
