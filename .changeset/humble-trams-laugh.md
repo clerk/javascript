@@ -5,3 +5,5 @@
 ---
 
 Add `EnterpriseConnection` resource
+
+`User.getEnterpriseConnections()` was wrongly typed as returning `EnterpriseAccountConnectionResource[]`, it now returns `EnterpriseConnectionResource[]`
