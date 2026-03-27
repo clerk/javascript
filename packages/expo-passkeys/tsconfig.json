@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "baseUrl": ".",
     "declaration": true,
     "declarationMap": false,
     "esModuleInterop": true,
@@ -20,7 +19,9 @@
     "skipLibCheck": true,
     "sourceMap": false,
     "strict": true,
-    "target": "ES2019"
+    "target": "ES2019",
+    "types": ["node"],
+    "rootDir": "./src"
   },
   "include": ["src"]
 }
