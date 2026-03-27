@@ -1,3 +1,5 @@
+import { middlewareFileReference } from '../utils/sdk-versions';
+
 export const missingDomainAndProxy = `
 Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl.
 
@@ -18,16 +20,17 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
    NEXT_PUBLIC_CLERK_SIGN_IN_URL='SOME_URL'
    NEXT_PUBLIC_CLERK_IS_SATELLITE='true'`;
 
-export const getAuthAuthHeaderMissing = () => authAuthHeaderMissing('getAuth');
+export const getAuthAuthHeaderMissing = () => authAuthHeaderMissing('getAuth', undefined, middlewareFileReference);
 
-export const authAuthHeaderMissing = (helperName = 'auth', prefixSteps?: string[]) =>
-  `Clerk: ${helperName}() was called but Clerk can't detect usage of clerkMiddleware(). Please ensure the following:
-- ${prefixSteps ? [...prefixSteps, ''].join('\n- ') : ' '}clerkMiddleware() is used in your Next.js Middleware.
-- Your Middleware matcher is configured to match this route or page.
-- If you are using the src directory, make sure the Middleware file is inside of it.
+export const authAuthHeaderMissing = (helperName = 'auth', prefixSteps?: string[], fileReference = 'middleware') => {
+  return `Clerk: ${helperName}() was called but Clerk can't detect usage of clerkMiddleware(). Please ensure the following:
+- ${prefixSteps ? [...prefixSteps, ''].join('\n- ') : ' '}clerkMiddleware() is used in your Next.js ${fileReference} file.
+- Your ${fileReference} matcher is configured to match this route or page.
+- If you are using the src directory, make sure the ${fileReference} file is inside of it.
 
 For more details, see https://clerk.com/err/auth-middleware
 `;
+};
 
 export const authSignatureInvalid = `Clerk: Unable to verify request, this usually means the Clerk middleware did not run. Ensure Clerk's middleware is properly integrated and matches the current route. For more information, see: https://clerk.com/docs/reference/nextjs/clerk-middleware. (code=auth_signature_invalid)`;
 

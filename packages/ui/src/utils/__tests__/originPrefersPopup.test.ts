@@ -15,11 +15,18 @@ describe('originPrefersPopup', () => {
   // Store original location to restore after tests
   const originalLocation = window.location;
 
-  // Helper function to mock window.location.origin
+  // Helper function to mock window.location.hostname
   const mockLocationOrigin = (origin: string) => {
+    let hostname: string;
+    try {
+      hostname = new URL(origin).hostname;
+    } catch {
+      hostname = origin;
+    }
     Object.defineProperty(window, 'location', {
       value: {
         origin,
+        hostname,
       },
       writable: true,
       configurable: true,
@@ -176,12 +183,12 @@ describe('originPrefersPopup', () => {
         expect(originPrefersPopup()).toBe(false);
       });
 
-      it('should be case sensitive', () => {
+      it('should be case insensitive (hostnames are normalized to lowercase)', () => {
         mockLocationOrigin('https://app.LOVABLE.APP');
-        expect(originPrefersPopup()).toBe(false);
+        expect(originPrefersPopup()).toBe(true);
 
         mockLocationOrigin('https://APP.V0.DEV');
-        expect(originPrefersPopup()).toBe(false);
+        expect(originPrefersPopup()).toBe(true);
       });
 
       it('should handle malformed origins gracefully', () => {

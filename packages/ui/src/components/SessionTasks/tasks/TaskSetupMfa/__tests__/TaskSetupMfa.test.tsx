@@ -33,6 +33,8 @@ describe('TaskSetupMFA', () => {
           identifier: 'test@clerk.com',
           tasks: [{ key: 'setup-mfa' }],
         });
+        f.withAuthenticatorApp({ enabled: true });
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
       const { queryByText, queryByRole } = render(<TaskSetupMFA />, { wrapper });
@@ -60,7 +62,7 @@ describe('TaskSetupMFA', () => {
       expect(getByRole('button', { name: /sms code/i })).toBeInTheDocument();
     });
 
-    it('should render SMS code item on the first screen if only SMS code is enabled', async () => {
+    it('should skip selection screen and go directly to SMS code flow when only SMS code is enabled', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['test@clerk.com'],
@@ -70,14 +72,14 @@ describe('TaskSetupMFA', () => {
         f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
-      const { getByRole, queryByRole } = render(<TaskSetupMFA />, { wrapper });
+      const { findByText, queryByText } = render(<TaskSetupMFA />, { wrapper });
 
-      expect(queryByRole('button', { name: /authenticator application/i })).not.toBeInTheDocument();
-      expect(getByRole('button', { name: /sms code/i })).toBeInTheDocument();
+      await findByText(/add phone number/i);
+      expect(queryByText(/set up two-step verification/i)).not.toBeInTheDocument();
     });
 
-    it('should render TOTP item on the first screen if only TOTP is enabled', async () => {
-      const { wrapper } = await createFixtures(f => {
+    it('should skip selection screen and go directly to TOTP flow when only TOTP is enabled', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['test@clerk.com'],
           identifier: 'test@clerk.com',
@@ -86,10 +88,15 @@ describe('TaskSetupMFA', () => {
         f.withAuthenticatorApp({ enabled: true });
       });
 
-      const { getByRole, queryByRole } = render(<TaskSetupMFA />, { wrapper });
+      fixtures.clerk.user?.createTOTP.mockResolvedValue({
+        uri: 'otpauth://totp/Test:test@clerk.com?secret=TESTSECRET&issuer=Test',
+        secret: 'TESTSECRET',
+      } as TOTPResource);
 
-      expect(getByRole('button', { name: /authenticator application/i })).toBeInTheDocument();
-      expect(queryByRole('button', { name: /sms code/i })).not.toBeInTheDocument();
+      const { findByText, queryByText } = render(<TaskSetupMFA />, { wrapper });
+
+      await findByText(/add authenticator application/i);
+      expect(queryByText(/set up two-step verification/i)).not.toBeInTheDocument();
     });
   });
   describe('authenticator application', () => {
@@ -101,6 +108,7 @@ describe('TaskSetupMFA', () => {
           tasks: [{ key: 'setup-mfa' }],
         });
         f.withAuthenticatorApp({ enabled: true });
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
       fixtures.clerk.user?.createTOTP.mockResolvedValue({
@@ -127,6 +135,7 @@ describe('TaskSetupMFA', () => {
           tasks: [{ key: 'setup-mfa' }],
         });
         f.withAuthenticatorApp({ enabled: true });
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
       fixtures.clerk.user?.createTOTP.mockResolvedValue({
@@ -159,6 +168,7 @@ describe('TaskSetupMFA', () => {
           tasks: [{ key: 'setup-mfa' }],
         });
         f.withAuthenticatorApp({ enabled: true });
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
       fixtures.clerk.user?.createTOTP.mockResolvedValue({
@@ -190,6 +200,7 @@ describe('TaskSetupMFA', () => {
           tasks: [{ key: 'setup-mfa' }],
         });
         f.withAuthenticatorApp({ enabled: true });
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
         f.withBackupCode();
       });
 
@@ -234,6 +245,7 @@ describe('TaskSetupMFA', () => {
           tasks: [{ key: 'setup-mfa' }],
         });
         f.withAuthenticatorApp({ enabled: true });
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
       fixtures.clerk.user?.createTOTP.mockResolvedValue({
@@ -275,6 +287,7 @@ describe('TaskSetupMFA', () => {
           tasks: [{ key: 'setup-mfa' }],
         });
         f.withAuthenticatorApp({ enabled: true });
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
       fixtures.clerk.user?.createTOTP.mockResolvedValue({
@@ -351,6 +364,7 @@ describe('TaskSetupMFA', () => {
           tasks: [{ key: 'setup-mfa' }],
         });
         f.withAuthenticatorApp({ enabled: true });
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
       fixtures.clerk.user?.createTOTP.mockRejectedValueOnce(
@@ -384,6 +398,7 @@ describe('TaskSetupMFA', () => {
           tasks: [{ key: 'setup-mfa' }],
         });
         f.withAuthenticatorApp({ enabled: true });
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
       fixtures.clerk.user?.createTOTP.mockResolvedValue({
@@ -438,6 +453,7 @@ describe('TaskSetupMFA', () => {
           phone_numbers: [{ phone_number: '+306911111111', id: 'phone_1' }],
           tasks: [{ key: 'setup-mfa' }],
         });
+        f.withAuthenticatorApp({ enabled: true });
         f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
@@ -460,6 +476,7 @@ describe('TaskSetupMFA', () => {
           identifier: 'test@clerk.com',
           tasks: [{ key: 'setup-mfa' }],
         });
+        f.withAuthenticatorApp({ enabled: true });
         f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
@@ -481,6 +498,7 @@ describe('TaskSetupMFA', () => {
           phone_numbers: [{ phone_number: '+306911111111', id: 'phone_1' }],
           tasks: [{ key: 'setup-mfa' }],
         });
+        f.withAuthenticatorApp({ enabled: true });
         f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
@@ -514,6 +532,7 @@ describe('TaskSetupMFA', () => {
           ],
           tasks: [{ key: 'setup-mfa' }],
         });
+        f.withAuthenticatorApp({ enabled: true });
         f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
         f.withBackupCode();
       });
@@ -556,6 +575,7 @@ describe('TaskSetupMFA', () => {
           ],
           tasks: [{ key: 'setup-mfa' }],
         });
+        f.withAuthenticatorApp({ enabled: true });
         f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
@@ -602,6 +622,7 @@ describe('TaskSetupMFA', () => {
           ],
           tasks: [{ key: 'setup-mfa' }],
         });
+        f.withAuthenticatorApp({ enabled: true });
         f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
@@ -662,6 +683,7 @@ describe('TaskSetupMFA', () => {
           ],
           tasks: [{ key: 'setup-mfa' }],
         });
+        f.withAuthenticatorApp({ enabled: true });
         f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
@@ -705,6 +727,7 @@ describe('TaskSetupMFA', () => {
           identifier: 'test@clerk.com',
           tasks: [{ key: 'setup-mfa' }],
         });
+        f.withAuthenticatorApp({ enabled: true });
         f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
@@ -746,6 +769,7 @@ describe('TaskSetupMFA', () => {
           identifier: 'test@clerk.com',
           tasks: [{ key: 'setup-mfa' }],
         });
+        f.withAuthenticatorApp({ enabled: true });
         f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
@@ -794,6 +818,7 @@ describe('TaskSetupMFA', () => {
           ],
           tasks: [{ key: 'setup-mfa' }],
         });
+        f.withAuthenticatorApp({ enabled: true });
         f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 
@@ -846,6 +871,7 @@ describe('TaskSetupMFA', () => {
           ],
           tasks: [{ key: 'setup-mfa' }],
         });
+        f.withAuthenticatorApp({ enabled: true });
         f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
       });
 

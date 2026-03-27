@@ -14,8 +14,8 @@ createRoot(document.getElementById('root')!).render(
     <div className='bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10'>
       <div className='flex w-full max-w-sm flex-col gap-6'>
         <ClerkProvider
-          clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL as string}
-          clerkUIUrl={import.meta.env.VITE_CLERK_UI_URL as string}
+          __internal_clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL as string}
+          __internal_clerkUIUrl={import.meta.env.VITE_CLERK_UI_URL as string}
           appearance={{
             options: {
               showOptionalFields: true,

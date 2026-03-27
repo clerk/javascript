@@ -1,6 +1,9 @@
 import type { ClerkAPIResponseError } from '../../errors/clerkApiResponseError';
 import type { OrganizationCreationDefaultsResource } from '../../types';
 
+/**
+ * @interface
+ */
 export type UseOrganizationCreationDefaultsParams = {
   /**
    * If true, the previous data will be kept in the cache until new data is fetched.
@@ -16,6 +19,9 @@ export type UseOrganizationCreationDefaultsParams = {
   enabled?: boolean;
 };
 
+/**
+ * @interface
+ */
 export type UseOrganizationCreationDefaultsReturn = {
   /**
    * The organization creation defaults resource, `undefined` before the first fetch, or `null` if not available.

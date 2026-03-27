@@ -172,12 +172,14 @@ export function warnAboutComponentAppearance(appearance: Appearance | undefined,
  * If the user has explicitly imported @clerk/ui and passed it via the `ui` option,
  * they have "pinned" their version and no warning is shown.
  *
- * Note: We check `options.ui` (not `options.clerkUICtor`) because clerkUICtor is
- * always set when loading from CDN via window.__internal_ClerkUICtor.
+ * Note: We check for `options.ui.__brand` (not just `options.ui`) because
+ * ui.ClerkUI is always set by SDKs for both CDN and bundled paths.
+ * The `__brand` marker is only present when the user explicitly imports @clerk/ui.
  */
 export function warnAboutCustomizationWithoutPinning(options?: ClerkOptions): void {
-  // If ui is explicitly provided, the user has pinned their version
-  if (options?.ui) {
+  // If the user explicitly imported @clerk/ui, they have pinned their version.
+  // The __brand marker distinguishes user-provided ui from SDK-internal ui.
+  if ((options?.ui as Record<string, unknown>)?.__brand) {
     return;
   }
 

@@ -11,14 +11,11 @@ import type {
   OrganizationMembershipResource,
   OrganizationResource,
 } from '../../types';
-import {
-  useAssertWrappedByClerkProvider,
-  useClerkInstanceContext,
-  useOrganizationContext,
-  useSessionContext,
-} from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
+import { useOrganizationBase } from './base/useOrganizationBase';
+import { useSessionBase } from './base/useSessionBase';
 import { createCacheKeys } from './createCacheKeys';
 import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
@@ -49,7 +46,7 @@ export type UseOrganizationParams = {
    * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    * <ul>
-   *  <li>`role`: An array of [`OrganizationCustomRoleKey`](https://clerk.com/docs/reference/javascript/types/organization-custom-role-key).</li>
+   *  <li>`role`: An array of [`OrganizationCustomRoleKey`](https://clerk.com/docs/reference/types/organization-custom-role-key).</li>
    *  <li>`query`: A string that filters the memberships by the provided string.</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
    * </ul>
@@ -283,8 +280,8 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
   useAssertWrappedByClerkProvider('useOrganization');
   useAttemptToEnableOrganizations('useOrganization');
 
-  const { organization } = useOrganizationContext();
-  const session = useSessionContext();
+  const organization = useOrganizationBase();
+  const session = useSessionBase();
 
   const domainSafeValues = useWithSafeValues(domainListParams, {
     initialPage: 1,

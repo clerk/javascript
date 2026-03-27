@@ -163,7 +163,7 @@ export const TagInput = (props: TagInputProps) => {
           width: 'initial',
           padding: 0,
           lineHeight: t.space.$5,
-          paddingLeft: t.space.$1,
+          paddingInlineStart: t.space.$1,
           '::placeholder': {
             color: t.colors.$colorMutedForeground,
           },
@@ -198,7 +198,7 @@ const TagPill = (props: TagPillProps) => {
         borderStyle: t.borderStyles.$solid,
         borderColor: t.colors.$borderAlpha100,
         display: 'inline-flex',
-        marginRight: '1px',
+        marginInlineEnd: '1px',
         cursor: 'pointer',
         ':hover': {
           backgroundColor: t.colors.$neutralAlpha100,

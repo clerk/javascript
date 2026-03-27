@@ -1,4 +1,5 @@
 import {
+  BillingService,
   clerkHandlers,
   EnvironmentService,
   SessionService,
@@ -10,11 +11,17 @@ import {
 export function UserButtonSignedIn(): MockScenario {
   const user = UserService.create();
   const session = SessionService.create(user);
+  const plans = BillingService.createDefaultPlans();
+  const subscription = BillingService.createSubscription(plans[1]);
 
   setClerkState({
     environment: EnvironmentService.MULTI_SESSION,
     session,
     user,
+    billing: {
+      plans,
+      subscription,
+    },
   });
 
   return {

@@ -15,3 +15,10 @@ Update your imports:
 ```
 
 The `@clerk/types` package will continue to re-export types from `@clerk/shared/types` for backward compatibility, but new types will only be added to `@clerk/shared/types`.
+
+**Note:** The `Appearance` type should be imported from `@clerk/ui` instead of `@clerk/shared/types`:
+
+```diff
+- import type { Appearance } from '@clerk/types';
++ import type { Appearance } from '@clerk/ui';
+```

@@ -211,7 +211,7 @@ export const nlBE: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Voer een back-upcode in',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Verwijder account',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Account verwijderen',
   formFieldInputPlaceholder__emailAddress: 'jouw@email.com',
   formFieldInputPlaceholder__emailAddress_username: 'gebruikersnaam@email.com',
   formFieldInputPlaceholder__emailAddresses: 'voorbeeld@email.com, voorbeeld2@email.com',
@@ -1348,6 +1348,7 @@ export const nlBE: LocalizationResource = {
         title: 'E-mailadressen',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Verbind een account',
         title: 'Bedrijfsaccounts',
       },
       headerTitle__account: 'Account',

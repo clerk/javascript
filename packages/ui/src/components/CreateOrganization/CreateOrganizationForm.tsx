@@ -139,7 +139,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
         headerSubtitle={props?.startPage?.headerSubtitle}
         headerTitleTextVariant={headerTitleTextVariant}
         headerSubtitleTextVariant={headerSubtitleTextVariant}
-        sx={t => ({ minHeight: t.sizes.$60, gap: t.space.$6, textAlign: 'left' })}
+        sx={t => ({ minHeight: t.sizes.$60, gap: t.space.$6, textAlign: 'start' })}
       >
         <Form.Root
           onSubmit={onSubmit}
@@ -224,7 +224,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
         headerTitle={localizationKeys('organizationProfile.invitePage.title')}
         headerTitleTextVariant={headerTitleTextVariant}
         headerSubtitleTextVariant={headerSubtitleTextVariant}
-        sx={t => ({ minHeight: t.sizes.$60, textAlign: 'left' })}
+        sx={() => ({ textAlign: 'start' })}
       >
         {organization && (
           <InviteMembersForm
@@ -239,12 +239,11 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
         <Header.Root>
           <Header.Title
             localizationKey={localizationKeys('organizationProfile.invitePage.title')}
-            sx={{ textAlign: 'left' }}
+            sx={{ textAlign: 'start' }}
           />
         </Header.Root>
         <SuccessPage
           contents={<InvitationsSentMessage />}
-          sx={t => ({ minHeight: t.sizes.$60 })}
           onFinish={completeFlow}
         />
       </Col>

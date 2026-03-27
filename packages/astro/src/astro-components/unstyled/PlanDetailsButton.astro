@@ -1,20 +1,15 @@
 ---
-import type { HTMLTag, Polymorphic } from 'astro/types';
 import type { __experimental_PlanDetailsButtonProps } from '@clerk/shared/types';
 import type { ButtonProps } from '../../types';
-import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils';
+import { addUnstyledAttributeToFirstTag } from './utils';
 
-type Props<Tag extends HTMLTag = 'button'> = Polymorphic<ButtonProps<Tag>> & __experimental_PlanDetailsButtonProps;
+type Props = ButtonProps & __experimental_PlanDetailsButtonProps;
 
 import { generateSafeId } from '@clerk/astro/internal';
 
 const safeId = generateSafeId();
 
-if ('as' in Astro.props) {
-  logAsPropUsageDeprecation();
-}
-
-const { as: Tag = 'button', asChild, plan, planId, initialPlanPeriod, planDetailsProps, ...props } = Astro.props;
+const { asChild, plan, planId, initialPlanPeriod, planDetailsProps, ...props } = Astro.props;
 
 const planDetailsOptions = {
   plan,
@@ -35,12 +30,12 @@ if (asChild) {
   asChild ? (
     <Fragment set:html={htmlElement} />
   ) : (
-    <Tag
+    <button
       {...props}
       data-clerk-unstyled-id={safeId}
     >
       <slot>Plan details</slot>
-    </Tag>
+    </button>
   )
 }
 

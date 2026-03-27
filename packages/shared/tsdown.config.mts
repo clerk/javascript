@@ -2,10 +2,12 @@ import type { Options } from 'tsdown';
 import { defineConfig } from 'tsdown';
 
 import clerkJsPackage from '../clerk-js/package.json' with { type: 'json' };
-import clerkUiPackage from '../ui/package.json' with { type: 'json' };
+import clerkUIPackage from '../ui/package.json' with { type: 'json' };
 import sharedPackage from './package.json' with { type: 'json' };
 
-export default defineConfig(({ watch }) => {
+export default defineConfig(({ watch, env }) => {
+  const shouldPublish = !!env?.publish;
+
   const common = {
     dts: true,
     sourcemap: true,
@@ -15,11 +17,12 @@ export default defineConfig(({ watch }) => {
     external: ['react', 'react-dom'],
     format: ['cjs', 'esm'],
     minify: false,
+    onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     define: {
       PACKAGE_NAME: `"${sharedPackage.name}"`,
       PACKAGE_VERSION: `"${sharedPackage.version}"`,
       JS_PACKAGE_VERSION: `"${clerkJsPackage.version}"`,
-      UI_PACKAGE_VERSION: `"${clerkUiPackage.version}"`,
+      UI_PACKAGE_VERSION: `"${clerkUIPackage.version}"`,
       __DEV__: `${watch}`,
       __BUILD_DISABLE_RHC__: JSON.stringify(false),
     },

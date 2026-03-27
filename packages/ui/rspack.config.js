@@ -64,7 +64,6 @@ const common = ({ mode, variant }) => {
       new rspack.DefinePlugin({
         __DEV__: isDevelopment(mode),
         PACKAGE_VERSION: JSON.stringify(packageJSON.version),
-        __PKG_VERSION__: JSON.stringify(packageJSON.version),
         PACKAGE_NAME: JSON.stringify(packageJSON.name),
         __BUILD_DISABLE_RHC__: JSON.stringify(false),
       }),

@@ -162,6 +162,9 @@ export type ElementsConfig = {
   disclosureContentInner: WithOptions;
   disclosureContent: WithOptions;
 
+  collapsible: WithOptions;
+  collapsibleInner: WithOptions;
+
   lineItemsRoot: WithOptions;
   lineItemsDivider: WithOptions;
   lineItemsGroup: WithOptions<'primary' | 'secondary' | 'tertiary'>;

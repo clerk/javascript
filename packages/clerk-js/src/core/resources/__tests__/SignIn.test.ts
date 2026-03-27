@@ -17,6 +17,16 @@ vi.mock('../../../utils/authenticateWithPopup', async () => {
 // Import the mocked function after mocking
 import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPopup';
 
+// Mock the CaptchaChallenge module
+vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
+  CaptchaChallenge: vi.fn().mockImplementation(() => ({
+    managedOrInvisible: vi.fn().mockResolvedValue({
+      captchaToken: 'mock_captcha_token',
+      captchaWidgetType: 'invisible',
+    }),
+  })),
+}));
+
 describe('SignIn', () => {
   it('can be serialized with JSON.stringify', () => {
     const signIn = new SignIn();
@@ -40,6 +50,17 @@ describe('SignIn', () => {
       BaseResource._fetch = mockFetch;
 
       const signIn = new SignIn();
+      SignIn.clerk = {
+        client: {
+          captchaBypass: false,
+        },
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+          },
+        },
+      } as any;
+
       await signIn.create({ identifier: 'user@example.com' });
 
       expect(mockFetch).toHaveBeenCalledWith(
@@ -64,6 +85,17 @@ describe('SignIn', () => {
       BaseResource._fetch = mockFetch;
 
       const signIn = new SignIn();
+      SignIn.clerk = {
+        client: {
+          captchaBypass: false,
+        },
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+          },
+        },
+      } as any;
+
       await signIn.create({ identifier: 'user@example.com' });
 
       expect(mockFetch).toHaveBeenCalledWith(
@@ -73,6 +105,98 @@ describe('SignIn', () => {
           body: {
             identifier: 'user@example.com',
           },
+        }),
+      );
+    });
+
+    it('includes captcha params when signUpIfMissing is true', async () => {
+      vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
+
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'needs_first_factor' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      SignIn.clerk = {
+        client: {
+          captchaBypass: false,
+        },
+        isStandardBrowser: true,
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+            captchaPublicKey: 'test-site-key',
+            captchaPublicKeyInvisible: 'test-invisible-key',
+            captchaProvider: 'turnstile',
+            captchaWidgetType: 'invisible',
+          },
+          userSettings: {
+            signUp: {
+              captcha_enabled: true,
+            },
+          },
+        },
+      } as any;
+
+      await signIn.create({ identifier: 'user@example.com', signUpIfMissing: true });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: expect.objectContaining({
+            identifier: 'user@example.com',
+            signUpIfMissing: true,
+            captchaToken: 'mock_captcha_token',
+            captchaWidgetType: 'invisible',
+          }),
+        }),
+      );
+    });
+
+    it('excludes captcha params when signUpIfMissing is false', async () => {
+      vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
+
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'needs_first_factor' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      SignIn.clerk = {
+        client: {
+          captchaBypass: false,
+        },
+        isStandardBrowser: true,
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+            captchaPublicKey: 'test-site-key',
+            captchaPublicKeyInvisible: 'test-invisible-key',
+            captchaProvider: 'turnstile',
+            captchaWidgetType: 'invisible',
+          },
+          userSettings: {
+            signUp: {
+              captcha_enabled: true,
+            },
+          },
+        },
+      } as any;
+
+      await signIn.create({ identifier: 'user@example.com', signUpIfMissing: false });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: expect.not.objectContaining({
+            captchaToken: expect.anything(),
+            captchaWidgetType: expect.anything(),
+          }),
         }),
       );
     });
@@ -245,6 +369,136 @@ describe('SignIn', () => {
         const result = await signIn.__internal_future.create({ identifier: 'user@example.com' });
 
         expect(result).toHaveProperty('error', mockError);
+      });
+
+      it('includes captcha params when signUpIfMissing is true', async () => {
+        vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        SignIn.clerk = {
+          client: {
+            captchaBypass: false,
+          },
+          isStandardBrowser: true,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+              captchaPublicKey: 'test-site-key',
+              captchaPublicKeyInvisible: 'test-invisible-key',
+              captchaProvider: 'turnstile',
+              captchaWidgetType: 'invisible',
+            },
+            userSettings: {
+              signUp: {
+                captcha_enabled: true,
+              },
+            },
+          },
+        } as any;
+
+        await signIn.__internal_future.create({ identifier: 'user@example.com', signUpIfMissing: true });
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: {
+            identifier: 'user@example.com',
+            signUpIfMissing: true,
+            captchaToken: 'mock_captcha_token',
+            captchaWidgetType: 'invisible',
+          },
+        });
+      });
+
+      it('excludes captcha params when signUpIfMissing is false', async () => {
+        vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        SignIn.clerk = {
+          client: {
+            captchaBypass: false,
+          },
+          isStandardBrowser: true,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+              captchaPublicKey: 'test-site-key',
+              captchaPublicKeyInvisible: 'test-invisible-key',
+              captchaProvider: 'turnstile',
+              captchaWidgetType: 'invisible',
+            },
+            userSettings: {
+              signUp: {
+                captcha_enabled: true,
+              },
+            },
+          },
+        } as any;
+
+        await signIn.__internal_future.create({ identifier: 'user@example.com', signUpIfMissing: false });
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: {
+            identifier: 'user@example.com',
+            signUpIfMissing: false,
+          },
+        });
+      });
+
+      it('excludes captcha params when signUpIfMissing is not provided', async () => {
+        vi.stubGlobal('__BUILD_DISABLE_RHC__', false);
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        SignIn.clerk = {
+          client: {
+            captchaBypass: false,
+          },
+          isStandardBrowser: true,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+              captchaPublicKey: 'test-site-key',
+              captchaPublicKeyInvisible: 'test-invisible-key',
+              captchaProvider: 'turnstile',
+              captchaWidgetType: 'invisible',
+            },
+            userSettings: {
+              signUp: {
+                captcha_enabled: true,
+              },
+            },
+          },
+        } as any;
+
+        await signIn.__internal_future.create({ identifier: 'user@example.com' });
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: {
+            identifier: 'user@example.com',
+          },
+        });
       });
     });
 
@@ -890,6 +1144,133 @@ describe('SignIn', () => {
       });
     });
 
+    describe('sendResetPasswordPhoneCode', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+      });
+
+      it('creates signIn with phoneNumber when no existing signIn', async () => {
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_123',
+              identifier: '+15551234567',
+              supported_first_factors: [
+                {
+                  strategy: 'reset_password_phone_code',
+                  phone_number_id: 'phone_123',
+                  safe_identifier: '+15551234567',
+                },
+              ],
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: { id: 'signin_123' },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.resetPasswordPhoneCode.sendCode({ phoneNumber: '+15551234567' });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(1, {
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: { identifier: '+15551234567' },
+        });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(2, {
+          method: 'POST',
+          path: '/client/sign_ins/signin_123/prepare_first_factor',
+          body: {
+            phoneNumberId: 'phone_123',
+            strategy: 'reset_password_phone_code',
+          },
+        });
+      });
+
+      it('prepares first factor with reset password phone code', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({
+          id: 'signin_123',
+          supported_first_factors: [
+            {
+              strategy: 'reset_password_phone_code',
+              phone_number_id: 'phone_123',
+              safe_identifier: '+15551234567',
+            },
+          ],
+        } as any);
+        await signIn.__internal_future.resetPasswordPhoneCode.sendCode();
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins/signin_123/prepare_first_factor',
+          body: {
+            phoneNumberId: 'phone_123',
+            strategy: 'reset_password_phone_code',
+          },
+        });
+      });
+
+      it('throws error when no signIn ID and no phoneNumber', async () => {
+        const signIn = new SignIn();
+
+        await expect(signIn.__internal_future.resetPasswordPhoneCode.sendCode()).rejects.toThrow();
+      });
+
+      it('returns error when reset password phone code factor not found', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signin_123',
+            identifier: '+15551234567',
+            supported_first_factors: [{ strategy: 'password' }],
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        const result = await signIn.__internal_future.resetPasswordPhoneCode.sendCode({ phoneNumber: '+15551234567' });
+
+        expect(result.error).toBeTruthy();
+        expect(result.error?.code).toBe('factor_not_found');
+      });
+    });
+
+    describe('verifyResetPasswordPhoneCode', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+      });
+
+      it('attempts first factor with reset password phone code', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({ id: 'signin_123' } as any);
+        await signIn.__internal_future.resetPasswordPhoneCode.verifyCode({ code: '123456' });
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ins/signin_123/attempt_first_factor',
+          body: {
+            code: '123456',
+            strategy: 'reset_password_phone_code',
+          },
+        });
+      });
+    });
+
     describe('submitResetPassword', () => {
       afterEach(() => {
         vi.clearAllMocks();
@@ -1109,6 +1490,11 @@ describe('SignIn', () => {
           __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
           __internal_isWebAuthnAutofillSupported: mockIsWebAuthnAutofillSupported,
           __internal_getPublicCredentials: mockWebAuthnGetCredential,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi
@@ -1163,6 +1549,11 @@ describe('SignIn', () => {
         SignIn.clerk = {
           __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
           __internal_getPublicCredentials: mockWebAuthnGetCredential,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi
@@ -1236,6 +1627,11 @@ describe('SignIn', () => {
         SignIn.clerk = {
           __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
           __internal_getPublicCredentials: mockWebAuthnGetCredential,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi.fn().mockResolvedValue({
@@ -1323,6 +1719,14 @@ describe('SignIn', () => {
       });
 
       it('authenticates with metamask strategy', async () => {
+        SignIn.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
         const mockFetch = vi
           .fn()
           .mockResolvedValueOnce({
@@ -1659,6 +2063,11 @@ describe('SignIn', () => {
         const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
         SignIn.clerk = {
           buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi
@@ -1707,6 +2116,11 @@ describe('SignIn', () => {
         const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
         SignIn.clerk = {
           buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi.fn().mockResolvedValue({
@@ -1755,6 +2169,11 @@ describe('SignIn', () => {
           buildUrlWithAuth: mockBuildUrlWithAuth,
           buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
           frontendApi: 'clerk.example.com',
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi.fn();
@@ -1829,6 +2248,14 @@ describe('SignIn', () => {
           },
         });
         vi.stubGlobal('URLSearchParams', vi.fn().mockReturnValue(mockSearchParams));
+
+        SignIn.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
 
         const mockFetch = vi.fn().mockResolvedValue({
           client: null,

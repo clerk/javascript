@@ -16,6 +16,7 @@ vi.mock('../../../utils/authenticateWithPopup', async () => {
 
 // Import the mocked function after mocking
 import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPopup';
+import { CaptchaChallenge } from '../../../utils/captcha/CaptchaChallenge';
 
 // Mock the CaptchaChallenge module
 vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
@@ -34,6 +35,114 @@ describe('SignUp', () => {
     expect(snapshot).toBeDefined();
   });
 
+  describe('create', () => {
+    beforeEach(() => {
+      SignUp.clerk = {
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+          },
+        },
+      } as any;
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.unstubAllGlobals();
+      SignUp.clerk = {} as any;
+    });
+
+    it.each([
+      { strategy: 'email_code', label: 'email_code' },
+      { strategy: 'email_link', label: 'email_link' },
+      { strategy: 'phone_code', label: 'phone_code' },
+      { strategy: 'web3_metamask_signature', label: 'web3_metamask_signature' },
+      { strategy: 'web3_coinbase_wallet_signature', label: 'web3_coinbase_wallet_signature' },
+    ])('skips captcha challenge for $label transfer (sign_up_if_missing)', async ({ strategy }) => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signup_123', status: 'missing_requirements' },
+      });
+      BaseResource._fetch = mockFetch;
+      SignUp.clerk = {
+        client: {
+          signIn: {
+            firstFactorVerification: {
+              status: 'transferable',
+              strategy,
+            },
+          },
+        },
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: ['oauth_google', 'oauth_apple'],
+          },
+        },
+      } as any;
+
+      const signUp = new SignUp();
+      await signUp.create({ transfer: true });
+
+      expect(CaptchaChallenge).not.toHaveBeenCalled();
+    });
+
+    it('skips captcha challenge for oauth transfer when strategy is in captchaOauthBypass', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signup_123', status: 'missing_requirements' },
+      });
+      BaseResource._fetch = mockFetch;
+      SignUp.clerk = {
+        client: {
+          signIn: {
+            firstFactorVerification: {
+              status: 'transferable',
+              strategy: 'oauth_google',
+            },
+          },
+        },
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: ['oauth_google', 'oauth_apple'],
+          },
+        },
+      } as any;
+
+      const signUp = new SignUp();
+      await signUp.create({ transfer: true });
+
+      expect(CaptchaChallenge).not.toHaveBeenCalled();
+    });
+
+    it('does not skip captcha challenge for enterprise_sso transfer', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signup_123', status: 'missing_requirements' },
+      });
+      BaseResource._fetch = mockFetch;
+      SignUp.clerk = {
+        client: {
+          signIn: {
+            firstFactorVerification: {
+              status: 'transferable',
+              strategy: 'enterprise_sso',
+            },
+          },
+        },
+        __internal_environment: {
+          displayConfig: {
+            captchaOauthBypass: [],
+          },
+        },
+      } as any;
+
+      const signUp = new SignUp();
+      await signUp.create({ transfer: true });
+
+      expect(CaptchaChallenge).toHaveBeenCalledWith(SignUp.clerk);
+    });
+  });
+
   describe('SignUpFuture', () => {
     it('can be serialized with JSON.stringify', () => {
       const signUp = new SignUp();
@@ -42,9 +151,20 @@ describe('SignUp', () => {
     });
 
     describe('create', () => {
+      beforeEach(() => {
+        SignUp.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+      });
+
       afterEach(() => {
         vi.clearAllMocks();
         vi.unstubAllGlobals();
+        SignUp.clerk = {} as any;
       });
 
       it('includes locale in request when navigator.language is available', async () => {
@@ -106,6 +226,142 @@ describe('SignUp', () => {
 
         expect(result).toHaveProperty('error', null);
       });
+
+      it('runs captcha challenge when bypass is not enabled', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.create({ emailAddress: 'user@example.com' });
+
+        expect(CaptchaChallenge).toHaveBeenCalledWith(SignUp.clerk);
+        const challengeInstance = vi.mocked(CaptchaChallenge).mock.results[0]?.value as {
+          managedOrInvisible: ReturnType<typeof vi.fn>;
+        };
+        expect(challengeInstance.managedOrInvisible).toHaveBeenCalledWith({ action: 'signup' });
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaToken', 'mock_token');
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaWidgetType', 'invisible');
+      });
+
+      it('skips captcha challenge when client captcha bypass is enabled', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+        SignUp.clerk = {
+          client: {
+            captchaBypass: true,
+          },
+        } as any;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.create({ emailAddress: 'user@example.com' });
+
+        expect(CaptchaChallenge).not.toHaveBeenCalled();
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaToken', undefined);
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaWidgetType', undefined);
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaError', undefined);
+      });
+
+      it.each([
+        { strategy: 'email_code', label: 'email_code' },
+        { strategy: 'email_link', label: 'email_link' },
+        { strategy: 'phone_code', label: 'phone_code' },
+        { strategy: 'web3_metamask_signature', label: 'web3_metamask_signature' },
+        { strategy: 'web3_coinbase_wallet_signature', label: 'web3_coinbase_wallet_signature' },
+      ])('skips captcha challenge for $label transfer (sign_up_if_missing)', async ({ strategy }) => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+        SignUp.clerk = {
+          client: {
+            signIn: {
+              firstFactorVerification: {
+                status: 'transferable',
+                strategy,
+              },
+            },
+          },
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: ['oauth_google', 'oauth_apple'],
+            },
+          },
+        } as any;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.create({ transfer: true });
+
+        expect(CaptchaChallenge).not.toHaveBeenCalled();
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaToken', undefined);
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaWidgetType', undefined);
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaError', undefined);
+      });
+
+      it('skips captcha challenge for oauth transfer when strategy is in captchaOauthBypass', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+        SignUp.clerk = {
+          client: {
+            signIn: {
+              firstFactorVerification: {
+                status: 'transferable',
+                strategy: 'oauth_google',
+              },
+            },
+          },
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: ['oauth_google', 'oauth_apple'],
+            },
+          },
+        } as any;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.create({ transfer: true });
+
+        expect(CaptchaChallenge).not.toHaveBeenCalled();
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaToken', undefined);
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaWidgetType', undefined);
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaError', undefined);
+      });
+
+      it('does not skip captcha challenge for enterprise_sso transfer', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+        SignUp.clerk = {
+          client: {
+            signIn: {
+              firstFactorVerification: {
+                status: 'transferable',
+                strategy: 'enterprise_sso',
+              },
+            },
+          },
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.create({ transfer: true });
+
+        expect(CaptchaChallenge).toHaveBeenCalledWith(SignUp.clerk);
+      });
     });
 
     describe('sendPhoneCode', () => {
@@ -114,42 +370,25 @@ describe('SignUp', () => {
         vi.unstubAllGlobals();
       });
 
-      it('creates signup with phoneNumber when no existing signup', async () => {
-        const mockFetch = vi
-          .fn()
-          .mockResolvedValueOnce({
-            client: null,
-            response: { id: 'signup_123', status: 'missing_requirements' },
-          })
-          .mockResolvedValueOnce({
-            client: null,
-            response: { id: 'signup_123' },
-          });
+      it('calls prepare verification directly even with no existing signup', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123' },
+        });
         BaseResource._fetch = mockFetch;
 
         const signUp = new SignUp();
         await signUp.__internal_future.verifications.sendPhoneCode({ phoneNumber: '+15551234567' });
 
-        // First call should create signup with phoneNumber
-        expect(mockFetch).toHaveBeenNthCalledWith(
-          1,
+        // Should call prepare verification directly
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledWith(
           expect.objectContaining({
             method: 'POST',
             path: '/client/sign_ups',
             body: expect.objectContaining({
-              phoneNumber: '+15551234567',
-            }),
-          }),
-        );
-
-        // Second call should prepare verification
-        expect(mockFetch).toHaveBeenNthCalledWith(
-          2,
-          expect.objectContaining({
-            method: 'POST',
-            path: '/client/sign_ups/signup_123/prepare_verification',
-            body: expect.objectContaining({
               strategy: 'phone_code',
+              channel: 'sms',
             }),
           }),
         );
@@ -179,10 +418,161 @@ describe('SignUp', () => {
       });
     });
 
+    describe('sendEmailLink', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.unstubAllGlobals();
+      });
+
+      it('prepares email link verification with absolute redirectUrl', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.verifications.sendEmailLink({ verificationUrl: '/verify' });
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ups/signup_123/prepare_verification',
+          body: {
+            strategy: 'email_link',
+            redirectUrl: 'https://example.com/verify',
+          },
+        });
+      });
+
+      it('keeps absolute verificationUrl unchanged', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.verifications.sendEmailLink({
+          verificationUrl: 'https://other.com/verify',
+        });
+
+        expect(mockFetch).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/client/sign_ups/signup_123/prepare_verification',
+          body: {
+            strategy: 'email_link',
+            redirectUrl: 'https://other.com/verify',
+          },
+        });
+      });
+    });
+
+    describe('waitForEmailLinkVerification', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+      });
+
+      it('polls until email verification status is verified', async () => {
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: { email_address: { status: 'unverified' } },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: { email_address: { status: 'verified' } },
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.verifications.waitForEmailLinkVerification();
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'GET',
+            path: '/client/sign_ups/signup_123',
+          }),
+          expect.anything(),
+        );
+      });
+
+      it('polls until email verification status is expired', async () => {
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: { email_address: { status: 'unverified' } },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: { email_address: { status: 'expired' } },
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.verifications.waitForEmailLinkVerification();
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'GET',
+            path: '/client/sign_ups/signup_123',
+          }),
+          expect.anything(),
+        );
+      });
+    });
+
+    describe('emailLinkVerification', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.unstubAllGlobals();
+        SignUp.clerk = {} as any;
+      });
+
+      it('returns verification data when query params are present', () => {
+        vi.stubGlobal('window', {
+          location: {
+            href: 'https://example.com?__clerk_status=verified&__clerk_created_session=sess_123',
+          },
+        });
+
+        SignUp.clerk = {
+          client: {
+            sessions: [{ id: 'sess_123' }],
+          },
+        } as any;
+
+        const signUp = new SignUp();
+        const verification = signUp.__internal_future.verifications.emailLinkVerification;
+
+        expect(verification).toEqual({
+          status: 'verified',
+          createdSessionId: 'sess_123',
+          verifiedFromTheSameClient: true,
+        });
+      });
+    });
+
     describe('sso', () => {
       afterEach(() => {
         vi.clearAllMocks();
         vi.unstubAllGlobals();
+        SignUp.clerk = {} as any;
       });
 
       it('handles relative redirectUrl by converting to absolute', async () => {
@@ -191,6 +581,11 @@ describe('SignUp', () => {
         const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
         SignUp.clerk = {
           buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi.fn().mockResolvedValue({
@@ -233,6 +628,11 @@ describe('SignUp', () => {
         const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
         SignUp.clerk = {
           buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
         } as any;
 
         const mockFetch = vi.fn().mockResolvedValue({
@@ -286,6 +686,9 @@ describe('SignUp', () => {
           buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
           frontendApi: 'clerk.example.com',
           __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
             reload: vi.fn().mockResolvedValue({}),
           },
         } as any;
@@ -337,11 +740,56 @@ describe('SignUp', () => {
           }),
         );
       });
+
+      it('skips captcha challenge for strategies configured in captcha oauth bypass', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
+        SignUp.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: ['oauth_google'],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_123',
+            verifications: {
+              externalAccount: {
+                status: 'complete',
+              },
+            },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/complete',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        expect(CaptchaChallenge).not.toHaveBeenCalled();
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaToken', undefined);
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaWidgetType', undefined);
+        expect(mockFetch.mock.calls[0]?.[0].body).toHaveProperty('captchaError', undefined);
+      });
     });
 
     describe('web3', () => {
       beforeEach(() => {
-        SignUp.clerk = {} as any;
+        SignUp.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
       });
 
       afterEach(() => {
@@ -597,6 +1045,16 @@ describe('SignUp', () => {
     });
 
     describe('password', () => {
+      beforeEach(() => {
+        SignUp.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+      });
+
       afterEach(() => {
         vi.clearAllMocks();
         vi.unstubAllGlobals();
@@ -662,6 +1120,16 @@ describe('SignUp', () => {
     });
 
     describe('ticket', () => {
+      beforeEach(() => {
+        SignUp.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+      });
+
       afterEach(() => {
         vi.clearAllMocks();
         vi.unstubAllGlobals();

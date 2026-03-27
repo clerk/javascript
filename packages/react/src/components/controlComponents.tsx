@@ -1,9 +1,9 @@
 import { deprecated } from '@clerk/shared/deprecated';
+import { __internal_useSessionBase } from '@clerk/shared/react';
 import type { HandleOAuthCallbackParams, PendingSessionOptions, ShowWhenCondition } from '@clerk/shared/types';
 import React from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
-import { useSessionContext } from '../contexts/SessionContext';
 import { useAuth } from '../hooks';
 import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByClerkProvider';
 import type { RedirectToSignInProps, RedirectToSignUpProps, RedirectToTasksProps, WithClerkProp } from '../types';
@@ -158,7 +158,7 @@ export const RedirectToTasks = withClerk(({ clerk, ...props }: WithClerkProp<Red
 
 /**
  * @function
- * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/reference/javascript/clerk#redirect-to-user-profile) instead.
+ * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/reference/objects/clerk#redirect-to-user-profile) instead.
  */
 export const RedirectToUserProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
@@ -171,7 +171,7 @@ export const RedirectToUserProfile = withClerk(({ clerk }) => {
 
 /**
  * @function
- * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/reference/javascript/clerk#redirect-to-organization-profile) instead.
+ * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/reference/objects/clerk#redirect-to-organization-profile) instead.
  */
 export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
@@ -184,7 +184,7 @@ export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
 
 /**
  * @function
- * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/reference/javascript/clerk#redirect-to-create-organization) instead.
+ * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/reference/objects/clerk#redirect-to-create-organization) instead.
  */
 export const RedirectToCreateOrganization = withClerk(({ clerk }) => {
   React.useEffect(() => {
@@ -209,6 +209,6 @@ export const AuthenticateWithRedirectCallback = withClerk(
 export const MultisessionAppSupport = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('MultisessionAppSupport');
 
-  const session = useSessionContext();
+  const session = __internal_useSessionBase();
   return <React.Fragment key={session ? session.id : 'no-users'}>{children}</React.Fragment>;
 };

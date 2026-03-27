@@ -1363,6 +1363,7 @@ export const fiFI: LocalizationResource = {
         title: 'Sähköpostiosoitteet',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Yhdistä tili',
         title: 'Yritystilit',
       },
       headerTitle__account: 'Tili',

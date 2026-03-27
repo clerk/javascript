@@ -211,7 +211,7 @@ export const nlNL: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Voer een back-upcode in',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Verwijder account',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Account verwijderen',
   formFieldInputPlaceholder__emailAddress: 'jouw@email.com',
   formFieldInputPlaceholder__emailAddress_username: 'gebruikersnaam@email.com',
   formFieldInputPlaceholder__emailAddresses: 'voorbeeld@email.com, voorbeeld2@email.com',
@@ -459,7 +459,7 @@ export const nlNL: LocalizationResource = {
       headerTitle__general: 'Algemeen',
       headerTitle__members: 'Leden',
       profileSection: {
-        primaryButton: '',
+        primaryButton: 'Profiel bijwerken',
         title: 'Organisatieprofiel',
         uploadAction__title: 'Logo',
       },
@@ -1348,6 +1348,7 @@ export const nlNL: LocalizationResource = {
         title: 'E-mailadressen',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Verbind een account',
         title: 'Bedrijfsaccounts',
       },
       headerTitle__account: 'Account',

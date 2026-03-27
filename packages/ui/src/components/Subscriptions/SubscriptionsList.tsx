@@ -154,7 +154,7 @@ export function SubscriptionsList({
 
 function SubscriptionRow({ subscription, length }: { subscription: BillingSubscriptionItemResource; length: number }) {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const fee = subscription.planPeriod === 'annual' ? subscription.plan.annualFee! : subscription.plan.fee;
+  const fee = subscription.planPeriod === 'annual' ? subscription.plan.annualFee! : subscription.plan.fee!;
   const { captionForSubscription } = usePlansContext();
 
   const feeFormatted = useMemo(() => {
@@ -178,7 +178,7 @@ function SubscriptionRow({ subscription, length }: { subscription: BillingSubscr
             />
             <Text
               variant='subtitle'
-              sx={t => ({ marginRight: t.sizes.$1 })}
+              sx={t => ({ marginInlineEnd: t.sizes.$1 })}
             >
               {subscription.plan.name}
             </Text>
@@ -199,7 +199,7 @@ function SubscriptionRow({ subscription, length }: { subscription: BillingSubscr
       </Td>
       <Td
         sx={_ => ({
-          textAlign: 'right',
+          textAlign: 'end',
         })}
       >
         <Text variant='subtitle'>

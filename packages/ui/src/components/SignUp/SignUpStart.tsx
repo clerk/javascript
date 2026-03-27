@@ -224,6 +224,7 @@ function SignUpStartInternal(): JSX.Element {
           case ERROR_CODES.FRAUD_ACTION_BLOCKED:
           case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
           case ERROR_CODES.USER_BANNED:
+          case ERROR_CODES.USER_DEACTIVATED:
             card.setError(error);
             break;
           default:

@@ -1,6 +1,8 @@
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
-import { useClerkInstanceContext, useOrganizationContext, useUserContext } from '../contexts';
+import { useClerkInstanceContext } from '../contexts';
+import { useOrganizationBase } from './base/useOrganizationBase';
+import { useUserBase } from './base/useUserBase';
 import { useBillingIsEnabled } from './useBillingIsEnabled';
 import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
 import { useStatementQueryCacheKeys } from './useStatementQuery.shared';
@@ -12,8 +14,8 @@ import type { StatementQueryResult, UseStatementQueryParams } from './useStateme
 function useStatementQuery(params: UseStatementQueryParams = {}): StatementQueryResult {
   const { statementId = null, keepPreviousData = false, for: forType = 'user' } = params;
   const clerk = useClerkInstanceContext();
-  const user = useUserContext();
-  const { organization } = useOrganizationContext();
+  const user = useUserBase();
+  const organization = useOrganizationBase();
 
   const organizationId = forType === 'organization' ? (organization?.id ?? null) : null;
   const userId = user?.id ?? null;

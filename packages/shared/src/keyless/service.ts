@@ -1,3 +1,4 @@
+import { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMessage } from './devCache';
 import type { AccountlessApplication } from './types';
 
 /**
@@ -76,6 +77,16 @@ export interface KeylessServiceOptions {
 }
 
 /**
+ * Result type for key resolution.
+ */
+export interface KeylessResult {
+  publishableKey: string | undefined;
+  secretKey: string | undefined;
+  claimUrl: string | undefined;
+  apiKeysUrl: string | undefined;
+}
+
+/**
  * The keyless service interface.
  */
 export interface KeylessService {
@@ -104,6 +115,18 @@ export interface KeylessService {
    * Logs a keyless mode message to the console (throttled to once per process).
    */
   logKeylessMessage: (claimUrl: string) => void;
+
+  /**
+   * Resolves Clerk keys, falling back to keyless mode if configured keys are missing.
+   *
+   * @param configuredPublishableKey - The publishable key from options or environment
+   * @param configuredSecretKey - The secret key from options or environment
+   * @returns The resolved keys (either configured or from keyless mode)
+   */
+  resolveKeysWithKeylessFallback: (
+    configuredPublishableKey: string | undefined,
+    configuredSecretKey: string | undefined,
+  ) => Promise<KeylessResult>;
 }
 
 /**
@@ -201,6 +224,64 @@ export function createKeylessService(options: KeylessServiceOptions): KeylessSer
         hasLoggedKeylessMessage = true;
         console.log(`[Clerk]: Running in keyless mode. Claim your keys at: ${claimUrl}`);
       }
+    },
+
+    async resolveKeysWithKeylessFallback(
+      configuredPublishableKey: string | undefined,
+      configuredSecretKey: string | undefined,
+    ): Promise<KeylessResult> {
+      let publishableKey = configuredPublishableKey;
+      let secretKey = configuredSecretKey;
+      let claimUrl: string | undefined;
+      let apiKeysUrl: string | undefined;
+
+      try {
+        const locallyStoredKeys = safeParseConfig();
+
+        // Check if running with claimed keys (configured keys match locally stored keyless keys)
+        const runningWithClaimedKeys =
+          Boolean(configuredPublishableKey) && configuredPublishableKey === locallyStoredKeys?.publishableKey;
+
+        if (runningWithClaimedKeys && locallyStoredKeys) {
+          // Complete onboarding when running with claimed keys
+          try {
+            await clerkDevelopmentCache?.run(() => this.completeOnboarding(), {
+              cacheKey: `${locallyStoredKeys.publishableKey}_complete`,
+              onSuccessStale: 24 * 60 * 60 * 1000, // 24 hours
+            });
+          } catch {
+            // noop
+          }
+
+          clerkDevelopmentCache?.log({
+            cacheKey: `${locallyStoredKeys.publishableKey}_claimed`,
+            msg: createConfirmationMessage(),
+          });
+
+          return { publishableKey, secretKey, claimUrl, apiKeysUrl };
+        }
+
+        // In keyless mode, try to read/create keys from the file system
+        if (!publishableKey && !secretKey) {
+          const keylessApp: AccountlessApplication | null = await this.getOrCreateKeys();
+
+          if (keylessApp) {
+            publishableKey = keylessApp.publishableKey;
+            secretKey = keylessApp.secretKey;
+            claimUrl = keylessApp.claimUrl;
+            apiKeysUrl = keylessApp.apiKeysUrl;
+
+            clerkDevelopmentCache?.log({
+              cacheKey: keylessApp.publishableKey,
+              msg: createKeylessModeMessage(keylessApp),
+            });
+          }
+        }
+      } catch {
+        // noop - fall through to return whatever keys we have
+      }
+
+      return { publishableKey, secretKey, claimUrl, apiKeysUrl };
     },
   };
 }

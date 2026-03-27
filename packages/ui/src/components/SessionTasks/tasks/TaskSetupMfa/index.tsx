@@ -13,6 +13,12 @@ import { SetupMfaStartScreen } from './SetupMfaStartScreen';
 import { SmsCodeFlow } from './SmsCodeFlowScreen';
 import { TOTPCodeFlow } from './TOTPCodeFlowScreen';
 
+const WIZARD_STEPS = {
+  start: 0,
+  phoneCode: 1,
+  totp: 2,
+} as const;
+
 const TaskSetupMFAInternal = () => {
   const clerk = useClerk();
   const { user } = useUser();
@@ -38,7 +44,11 @@ const TaskSetupMFAInternal = () => {
     });
   }, [attributes, user]);
 
-  const wizard = useWizard({ defaultStep: 0 });
+  const defaultStep =
+    secondFactorsAvailableToAdd.indexOf('phone_code') > -1 ? WIZARD_STEPS.phoneCode : WIZARD_STEPS.totp;
+  const wizard = useWizard({
+    defaultStep: secondFactorsAvailableToAdd.length > 1 ? WIZARD_STEPS.start : defaultStep,
+  });
   const { redirectUrlComplete } = useTaskSetupMFAContext();
   const { navigateOnSetActive, redirectOnActiveSession } = useSessionTasksContext();
 

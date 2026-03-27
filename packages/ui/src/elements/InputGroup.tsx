@@ -16,18 +16,18 @@ export const InputGroup = forwardRef<
 
   const inputBorder = groupPrefix
     ? {
-        borderTopLeftRadius: '0',
-        borderBottomLeftRadius: '0',
+        borderStartStartRadius: '0',
+        borderEndStartRadius: '0',
       }
     : {
-        borderTopRightRadius: '0',
-        borderBottomRightRadius: '0',
+        borderStartEndRadius: '0',
+        borderEndEndRadius: '0',
       };
 
   const textProps: ThemableCssProp = t => ({
     paddingInline: t.space.$2,
-    borderTopRightRadius: '0',
-    borderBottomRightRadius: '0',
+    borderStartEndRadius: '0',
+    borderEndEndRadius: '0',
     width: 'fit-content',
     display: 'flex',
     alignItems: 'center',

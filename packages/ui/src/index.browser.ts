@@ -5,10 +5,10 @@ import './utils/setWebpackChunkPublicPath';
 
 // import 'react-dom';
 // import 'scheduler';
-import { ClerkUi } from './ClerkUi';
+import { ClerkUI } from './ClerkUI';
 
 if (!window.__internal_ClerkUICtor) {
-  window.__internal_ClerkUICtor = ClerkUi;
+  window.__internal_ClerkUICtor = ClerkUI;
 }
 
 // Hot module replacement for development

@@ -1,8 +1,9 @@
 import { constants, debugRequestState } from '@clerk/backend/internal';
-import cookie from 'cookie';
+import { parse as parseCookie } from 'cookie';
 import type { AppLoadContext, UNSAFE_DataWithResponseInit } from 'react-router';
 
 import { getPublicEnvVariables } from '../utils/env';
+import { canUseKeyless } from '../utils/feature-flags';
 import type { RequestStateWithRedirectUrls } from './types';
 
 export function isResponse(value: any): value is Response {
@@ -31,7 +32,7 @@ export function isRedirect(res: Response): boolean {
 }
 
 export const parseCookies = (req: Request) => {
-  return cookie.parse(req.headers.get('cookie') || '');
+  return parseCookie(req.headers.get('cookie') || '');
 };
 
 export function assertValidHandlerResult(val: any, error?: string): asserts val is Record<string, unknown> | null {
@@ -62,7 +63,7 @@ export const injectRequestStateIntoResponse = async (
   // set the correct content-type header in case the user returned a `Response` directly
   clone.headers.set(constants.Headers.ContentType, constants.ContentTypes.Json);
 
-  // Only add Clerk headers if requested (for legacy mode)
+  // Only add Clerk headers if requested
   if (includeClerkHeaders) {
     headers.forEach((value, key) => {
       clone.headers.append(key, value);
@@ -78,9 +79,10 @@ export const injectRequestStateIntoResponse = async (
  * @internal
  */
 export function getResponseClerkState(requestState: RequestStateWithRedirectUrls, context: AppLoadContext) {
-  const { reason, message, isSignedIn, ...rest } = requestState;
+  const { reason, message, isSignedIn, __keylessClaimUrl, __keylessApiKeysUrl, ...rest } = requestState;
   const envVars = getPublicEnvVariables(context);
-  const clerkState = wrapWithClerkState({
+
+  const baseState: Record<string, unknown> = {
     __clerk_ssr_state: rest.toAuth(),
     __publishableKey: requestState.publishableKey,
     __proxyUrl: requestState.proxyUrl,
@@ -96,10 +98,18 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __clerkJSUrl: envVars.clerkJsUrl,
     __clerkJSVersion: envVars.clerkJsVersion,
     __clerkUIUrl: envVars.clerkUIUrl,
+    __clerkUIVersion: envVars.clerkUIVersion,
     __prefetchUI: envVars.prefetchUI,
     __telemetryDisabled: envVars.telemetryDisabled,
     __telemetryDebug: envVars.telemetryDebug,
-  });
+  };
+
+  if (canUseKeyless && __keylessClaimUrl) {
+    baseState.__keylessClaimUrl = __keylessClaimUrl;
+    baseState.__keylessApiKeysUrl = __keylessApiKeysUrl;
+  }
+
+  const clerkState = wrapWithClerkState(baseState);
 
   return {
     clerkState,

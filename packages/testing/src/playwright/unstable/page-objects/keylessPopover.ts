@@ -2,20 +2,15 @@ import type { EnhancedPage } from './app';
 
 export const createKeylessPopoverPageObject = (testArgs: { page: EnhancedPage }) => {
   const { page } = testArgs;
-  // TODO: Is this the ID we really want ?
-  const elementId = '#--clerk-keyless-prompt-button';
+  const button = page.getByRole('button', { name: 'Keyless prompt' });
   const self = {
-    waitForMounted: () => page.waitForSelector(elementId, { state: 'attached' }),
-    waitForUnmounted: () => page.waitForSelector(elementId, { state: 'detached' }),
-    isExpanded: () =>
-      page
-        .locator(elementId)
-        .getAttribute('aria-expanded')
-        .then(val => val === 'true'),
-    toggle: () => page.locator(elementId).click(),
+    waitForMounted: () => button.waitFor({ state: 'attached' }),
+    waitForUnmounted: () => button.waitFor({ state: 'detached' }),
+    isExpanded: () => button.getAttribute('aria-expanded').then(val => val === 'true'),
+    toggle: () => button.click(),
 
     promptsToClaim: () => {
-      return page.getByRole('link', { name: /^claim application$/i });
+      return page.getByRole('link', { name: /^configure your application$/i });
     },
     promptToUseClaimedKeys: () => {
       return page.getByRole('link', { name: /^get api keys$/i });

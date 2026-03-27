@@ -29,8 +29,8 @@ export const OrganizationMembersTabRequests = () => {
               width: '100%',
               gap: t.space.$8,
               paddingBottom: t.space.$4,
-              paddingLeft: t.space.$1,
-              paddingRight: t.space.$1,
+              paddingInlineStart: t.space.$1,
+              paddingInlineEnd: t.space.$1,
               borderBottomWidth: t.borderWidths.$normal,
               borderBottomStyle: t.borderStyles.$solid,
               borderBottomColor: t.colors.$borderAlpha100,
@@ -67,10 +67,10 @@ export const OrganizationMembersTabRequests = () => {
                         'organizationProfile.membersPage.requestsTab.autoSuggestions.headerSubtitle',
                       )}
                       sx={t => ({
-                        paddingLeft: t.space.$10,
+                        paddingInlineStart: t.space.$10,
                         color: t.colors.$colorMutedForeground,
                         [mqu.md]: {
-                          paddingLeft: 0,
+                          paddingInlineStart: 0,
                         },
                       })}
                     />

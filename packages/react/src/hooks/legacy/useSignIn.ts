@@ -1,4 +1,4 @@
-import { useClientContext } from '@clerk/shared/react';
+import { __internal_useClientBase } from '@clerk/shared/react';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { UseSignInReturn } from '@clerk/shared/types';
 
@@ -6,7 +6,7 @@ import { useIsomorphicClerkContext } from '../../contexts/IsomorphicClerkContext
 import { useAssertWrappedByClerkProvider } from '../useAssertWrappedByClerkProvider';
 
 /**
- * The `useSignIn()` hook provides access to the [`SignIn`](https://clerk.com/docs/reference/javascript/sign-in) object, which allows you to check the current state of a sign-in attempt and manage the sign-in flow. You can use this to create a [custom sign-in flow](https://clerk.com/docs/guides/development/custom-flows/overview#sign-in-flow).
+ * The `useSignIn()` hook provides access to the [`SignIn`](https://clerk.com/docs/reference/objects/sign-in) object, which allows you to check the current state of a sign-in attempt and manage the sign-in flow. You can use this to create a [custom sign-in flow](https://clerk.com/docs/guides/development/custom-flows/overview).
  *
  * @unionReturnHeadings
  * ["Initialization", "Loaded"]
@@ -14,7 +14,7 @@ import { useAssertWrappedByClerkProvider } from '../useAssertWrappedByClerkProvi
  * @example
  * ### Check the current state of a sign-in
  *
- * The following example uses the `useSignIn()` hook to access the [`SignIn`](https://clerk.com/docs/reference/javascript/sign-in) object, which contains the current sign-in attempt status and methods to create a new sign-in attempt. The `isLoaded` property is used to handle the loading state.
+ * The following example uses the `useSignIn()` hook to access the [`SignIn`](https://clerk.com/docs/reference/objects/sign-in) object, which contains the current sign-in attempt status and methods to create a new sign-in attempt. The `isLoaded` property is used to handle the loading state.
  *
  * <Tabs items='React,Next.js'>
  * <Tab>
@@ -53,7 +53,7 @@ export const useSignIn = (): UseSignInReturn => {
   useAssertWrappedByClerkProvider('useSignIn');
 
   const isomorphicClerk = useIsomorphicClerkContext();
-  const client = useClientContext();
+  const client = __internal_useClientBase();
 
   isomorphicClerk.telemetry?.record(eventMethodCalled('useSignIn'));
 

@@ -193,6 +193,7 @@ export type __internal_LocalizationResource = {
     switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
     billedAnnually: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
+    billedAnnuallyOnly: LocalizationValue;
     cancelFreeTrial: LocalizationValue<'plan'>;
     cancelFreeTrialTitle: LocalizationValue<'plan'>;
     cancelFreeTrialAccessUntil: LocalizationValue<'plan' | 'date'>;
@@ -206,7 +207,10 @@ export type __internal_LocalizationResource = {
     availableFeatures: LocalizationValue;
     subtotal: LocalizationValue;
     credit: LocalizationValue;
+    prorationCredit: LocalizationValue;
+    accountCredit: LocalizationValue;
     creditRemainder: LocalizationValue;
+    payerCreditRemainder: LocalizationValue;
     totalDue: LocalizationValue;
     totalDueToday: LocalizationValue;
     pastDue: LocalizationValue;
@@ -679,6 +683,7 @@ export type __internal_LocalizationResource = {
       };
       enterpriseAccountsSection: {
         title: LocalizationValue;
+        primaryButton: LocalizationValue;
       };
       passwordSection: {
         title: LocalizationValue;
@@ -909,6 +914,7 @@ export type __internal_LocalizationResource = {
         empty: LocalizationValue;
         itemCaption__paidForPlan: LocalizationValue;
         itemCaption__proratedCredit: LocalizationValue;
+        itemCaption__payerCredit: LocalizationValue;
         itemCaption__subscribedAndPaidForPlan: LocalizationValue;
         notFound: LocalizationValue;
         tableHeader__date: LocalizationValue;
@@ -1147,6 +1153,7 @@ export type __internal_LocalizationResource = {
         empty: LocalizationValue;
         itemCaption__paidForPlan: LocalizationValue<'plan' | 'period'>;
         itemCaption__proratedCredit: LocalizationValue;
+        itemCaption__payerCredit: LocalizationValue;
         itemCaption__subscribedAndPaidForPlan: LocalizationValue<'plan' | 'period'>;
         notFound: LocalizationValue;
         tableHeader__date: LocalizationValue;

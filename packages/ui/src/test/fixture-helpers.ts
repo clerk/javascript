@@ -51,6 +51,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
     external_accounts?: Array<OAuthProvider | Partial<ExternalAccountJSON>>;
     organization_memberships?: Array<string | OrgParams>;
     tasks?: SessionJSON['tasks'];
+    actor?: SessionJSON['actor'];
   };
 
   const createPublicUserData = (params: WithUserParams) => {
@@ -81,7 +82,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       id: baseClient.sessions.length.toString(),
       object: 'session',
       last_active_organization_id: activeOrganization,
-      actor: null,
+      actor: params.actor ?? null,
       user: createUser(params),
       public_user_data: createPublicUserData(params),
       created_at: new Date().getTime(),
@@ -305,7 +306,10 @@ const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => {
   const withReverification = () => {
     ac.reverification = true;
   };
-  return { withMultiSessionMode, withReverification };
+  const withClaimedAt = (claimedAt: string | null) => {
+    ac.claimed_at = claimedAt;
+  };
+  return { withMultiSessionMode, withReverification, withClaimedAt };
 };
 
 const createDisplayConfigFixtureHelpers = (environment: EnvironmentJSON) => {
