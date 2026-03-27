@@ -7,7 +7,9 @@ import { ERROR_MISSING_FRONTEND_API_URL } from '../../common/errors';
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 let setupClerkTestingToken: (typeof import('../setupClerkTestingToken'))['setupClerkTestingToken'];
 
-function createMockRoute(overrides: { url?: string; fetchStatus?: number; fetchJson?: unknown; fetchError?: Error } = {}) {
+function createMockRoute(
+  overrides: { url?: string; fetchStatus?: number; fetchJson?: unknown; fetchError?: Error } = {},
+) {
   const {
     url = 'https://clerk.example.com/v1/client',
     fetchStatus = 200,
@@ -317,10 +319,7 @@ describe('setupClerkTestingToken', () => {
 
       expect(route.fetch).toHaveBeenCalledTimes(4);
       expect(route.continue).toHaveBeenCalledTimes(1);
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('failed after 4 attempts'),
-        networkError,
-      );
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('failed after 4 attempts'), networkError);
 
       warnSpy.mockRestore();
       errorSpy.mockRestore();
