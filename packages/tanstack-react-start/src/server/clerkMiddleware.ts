@@ -7,6 +7,7 @@ import { createMiddleware } from '@tanstack/react-start';
 
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
+import { initCloudflareWorkerEnv } from './cloudflareEnv';
 import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import { loadOptions } from './loadOptions';
 import type { ClerkMiddlewareOptions, ClerkMiddlewareOptionsCallback } from './types';
@@ -16,6 +17,9 @@ export const clerkMiddleware = (
   options?: ClerkMiddlewareOptions | ClerkMiddlewareOptionsCallback,
 ): AnyRequestMiddleware => {
   return createMiddleware().server(async ({ request, next }) => {
+    // Initialize Cloudflare Workers env if available (no-op on non-CF runtimes)
+    await initCloudflareWorkerEnv();
+
     const clerkRequest = createClerkRequest(patchRequest(request));
 
     // Resolve options: if function, call it with context object; otherwise use as-is
