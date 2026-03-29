@@ -136,8 +136,8 @@ function SignInStartInternal(): JSX.Element {
       if (mapped) return mapped;
     }
 
-    if (parsedOptions.preferredSignInIdentifier) {
-      const mapped = mapToIdentifierAttribute(parsedOptions.preferredSignInIdentifier);
+    if (parsedOptions.preferredIdentifier) {
+      const mapped = mapToIdentifierAttribute(parsedOptions.preferredIdentifier);
       if (mapped) return mapped;
     }
 

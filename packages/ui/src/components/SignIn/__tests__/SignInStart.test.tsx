@@ -479,13 +479,13 @@ describe('SignInStart', () => {
     });
   });
 
-  describe('preferredSignInIdentifier (appearance option)', () => {
+  describe('preferredIdentifier (appearance option)', () => {
     it('selects phone_number tab when set to phoneNumber', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withEmailAddress();
         f.withPhoneNumber();
       });
-      props.setProps({ appearance: { options: { preferredSignInIdentifier: 'phoneNumber' } } });
+      props.setProps({ appearance: { options: { preferredIdentifier: 'phoneNumber' } } });
 
       render(<SignInStart />, { wrapper });
       screen.getByText(/phone number/i);
@@ -496,7 +496,7 @@ describe('SignInStart', () => {
         f.withEmailAddress();
         f.withPhoneNumber();
       });
-      props.setProps({ appearance: { options: { preferredSignInIdentifier: 'emailAddress' } } });
+      props.setProps({ appearance: { options: { preferredIdentifier: 'emailAddress' } } });
 
       render(<SignInStart />, { wrapper });
       screen.getByText(/email address/i);
@@ -506,7 +506,7 @@ describe('SignInStart', () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withEmailAddress();
       });
-      props.setProps({ appearance: { options: { preferredSignInIdentifier: 'phoneNumber' } } });
+      props.setProps({ appearance: { options: { preferredIdentifier: 'phoneNumber' } } });
 
       render(<SignInStart />, { wrapper });
       screen.getByText(/email address/i);
@@ -519,7 +519,7 @@ describe('SignInStart', () => {
       });
       props.setProps({
         initialValues: { phoneNumber: '+306911111111' },
-        appearance: { options: { preferredSignInIdentifier: 'emailAddress' } },
+        appearance: { options: { preferredIdentifier: 'emailAddress' } },
       });
 
       render(<SignInStart />, { wrapper });
@@ -531,7 +531,7 @@ describe('SignInStart', () => {
         f.withEmailAddress();
         f.withUsername();
       });
-      props.setProps({ appearance: { options: { preferredSignInIdentifier: 'username' } } });
+      props.setProps({ appearance: { options: { preferredIdentifier: 'username' } } });
 
       render(<SignInStart />, { wrapper });
       screen.getByText(/email address or username/i);

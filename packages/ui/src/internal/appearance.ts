@@ -970,7 +970,7 @@ export type Options = {
    *
    * @default undefined
    */
-  preferredSignInIdentifier?: 'emailAddress' | 'phoneNumber' | 'username';
+  preferredIdentifier?: 'emailAddress' | 'phoneNumber' | 'username';
 };
 
 export type CaptchaAppearanceOptions = {
