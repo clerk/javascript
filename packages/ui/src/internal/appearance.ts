@@ -965,7 +965,7 @@ export type Options = {
   unsafe_disableDevelopmentModeWarnings?: boolean;
 
   /**
-   * Controls which identifier type is shown first on the SignIn component
+   * Controls which identifier type is shown first on the SignIn and SignUp components
    * when multiple identifiers are enabled. Does not prefill any value.
    *
    * @default undefined
