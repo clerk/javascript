@@ -37,7 +37,7 @@ function SignUpStartInternal(): JSX.Element {
   const clerk = useClerk();
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
-  const { showOptionalFields } = useAppearance().parsedOptions;
+  const { showOptionalFields, preferredIdentifier } = useAppearance().parsedOptions;
   const { userSettings, authConfig } = useEnvironment();
   const { navigate } = useRouter();
   const { attributes } = userSettings;
@@ -47,16 +47,21 @@ function SignUpStartInternal(): JSX.Element {
   const { afterSignUpUrl, signInUrl, unsafeMetadata, navigateOnSetActive } = ctx;
   const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(() =>
-    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive, {
-      phoneNumber: ctx.initialValues?.phoneNumber === null ? undefined : ctx.initialValues?.phoneNumber,
-      emailAddress: ctx.initialValues?.emailAddress === null ? undefined : ctx.initialValues?.emailAddress,
-      ...(isCombinedFlow
-        ? {
-            emailAddress: signUp.emailAddress,
-            phoneNumber: signUp.phoneNumber,
-          }
-        : {}),
-    }),
+    getInitialActiveIdentifier(
+      attributes,
+      userSettings.signUp.progressive,
+      {
+        phoneNumber: ctx.initialValues?.phoneNumber === null ? undefined : ctx.initialValues?.phoneNumber,
+        emailAddress: ctx.initialValues?.emailAddress === null ? undefined : ctx.initialValues?.emailAddress,
+        ...(isCombinedFlow
+          ? {
+              emailAddress: signUp.emailAddress,
+              phoneNumber: signUp.phoneNumber,
+            }
+          : {}),
+      },
+      preferredIdentifier,
+    ),
   );
   const { t, locale } = useLocalizations();
   const initialValues = ctx.initialValues || {};

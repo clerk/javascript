@@ -107,6 +107,7 @@ export const getInitialActiveIdentifier = (
   attributes: Partial<Attributes>,
   isProgressiveSignUp: boolean,
   initialValues?: { phoneNumber?: string | null; emailAddress?: string | null },
+  preferredIdentifier?: 'emailAddress' | 'phoneNumber' | 'username',
 ): ActiveIdentifier => {
   if (initialValues?.emailAddress) {
     return 'emailAddress';
@@ -115,18 +116,29 @@ export const getInitialActiveIdentifier = (
     return 'phoneNumber';
   }
 
+  const preferred =
+    preferredIdentifier === 'emailAddress' || preferredIdentifier === 'phoneNumber' ? preferredIdentifier : undefined;
+
   if (emailOrPhone(attributes, isProgressiveSignUp)) {
-    // If we are in the case of Email OR Phone, email takes priority
-    return 'emailAddress';
+    return preferred ?? 'emailAddress';
   }
 
   const { email_address, phone_number } = attributes;
 
-  if (email_address?.enabled && isProgressiveSignUp ? email_address.required : email_address?.used_for_first_factor) {
+  const emailMatches =
+    email_address?.enabled && (isProgressiveSignUp ? email_address.required : email_address?.used_for_first_factor);
+  const phoneMatches =
+    phone_number?.enabled && (isProgressiveSignUp ? phone_number.required : phone_number?.used_for_first_factor);
+
+  if (emailMatches && phoneMatches) {
+    return preferred ?? 'emailAddress';
+  }
+
+  if (emailMatches) {
     return 'emailAddress';
   }
 
-  if (phone_number?.enabled && isProgressiveSignUp ? phone_number.required : phone_number?.used_for_first_factor) {
+  if (phoneMatches) {
     return 'phoneNumber';
   }
 
