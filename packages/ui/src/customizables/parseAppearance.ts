@@ -17,7 +17,8 @@ import {
 
 export type ParsedElements = Elements[];
 export type ParsedInternalTheme = InternalTheme;
-export type ParsedOptions = Required<Options>;
+export type ParsedOptions = Required<Omit<Options, 'preferredSignInIdentifier'>> &
+  Pick<Options, 'preferredSignInIdentifier'>;
 export type ParsedCaptcha = Required<CaptchaAppearanceOptions>;
 
 type PublicAppearanceTopLevelKey = Exclude<
@@ -51,6 +52,7 @@ const defaultOptions: ParsedOptions = {
   shimmer: true,
   animations: true,
   unsafe_disableDevelopmentModeWarnings: false,
+  preferredSignInIdentifier: undefined,
 };
 
 const defaultCaptchaOptions: ParsedCaptcha = {

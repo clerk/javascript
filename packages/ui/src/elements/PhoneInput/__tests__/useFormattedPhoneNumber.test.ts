@@ -118,4 +118,62 @@ describe('useFormattedPhoneNumber', () => {
 
     unmount();
   });
+
+  it('defaultCountryIso is used when no phone number and no locationBasedCountryIso', () => {
+    const { result } = renderHook(() =>
+      useFormattedPhoneNumber({
+        initPhoneWithCode: '',
+        defaultCountryIso: 'gr',
+        locationBasedCountryIso: undefined,
+      }),
+    );
+
+    expect(result.current.iso).toBe('gr');
+  });
+
+  it('defaultCountryIso takes precedence over locationBasedCountryIso', () => {
+    const { result } = renderHook(() =>
+      useFormattedPhoneNumber({
+        initPhoneWithCode: '',
+        defaultCountryIso: 'de',
+        locationBasedCountryIso: 'fr',
+      }),
+    );
+
+    expect(result.current.iso).toBe('de');
+  });
+
+  it('parsed phone number takes precedence over defaultCountryIso', () => {
+    const { result } = renderHook(() =>
+      useFormattedPhoneNumber({
+        initPhoneWithCode: '+71111111111',
+        defaultCountryIso: 'gr',
+      }),
+    );
+
+    expect(result.current.iso).toBe('ru');
+  });
+
+  it('invalid defaultCountryIso falls back to locationBasedCountryIso', () => {
+    const { result } = renderHook(() =>
+      useFormattedPhoneNumber({
+        initPhoneWithCode: '',
+        defaultCountryIso: 'xx' as any,
+        locationBasedCountryIso: 'fr',
+      }),
+    );
+
+    expect(result.current.iso).toBe('fr');
+  });
+
+  it('invalid defaultCountryIso with no locationBasedCountryIso falls back to us', () => {
+    const { result } = renderHook(() =>
+      useFormattedPhoneNumber({
+        initPhoneWithCode: '',
+        defaultCountryIso: 'zz' as any,
+      }),
+    );
+
+    expect(result.current.iso).toBe('us');
+  });
 });

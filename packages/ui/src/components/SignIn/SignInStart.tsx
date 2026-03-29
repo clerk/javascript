@@ -10,6 +10,7 @@ import type {
   SignInCreateParams,
   SignInResource,
 } from '@clerk/shared/types';
+import type { CountryIso } from '@/ui/elements/PhoneInput/countryCodeData';
 import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
@@ -33,7 +34,7 @@ import {
   withRedirectToSignInTask,
 } from '../../common';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
-import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
+import { Col, descriptors, Flow, localizationKeys, useAppearance } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -88,6 +89,7 @@ function SignInStartInternal(): JSX.Element {
   const ctx = useSignInContext();
   const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
+  const { parsedOptions } = useAppearance();
   const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
@@ -103,13 +105,46 @@ function SignInStartInternal(): JSX.Element {
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
   const isWebSupported = isWebAuthnSupported();
 
-  const onlyPhoneNumberInitialValueExists =
-    !!ctx.initialValues?.phoneNumber && !(ctx.initialValues.emailAddress || ctx.initialValues.username);
-  const shouldStartWithPhoneNumberIdentifier =
-    onlyPhoneNumberInitialValueExists && identifierAttributes.includes('phone_number');
-  const [identifierAttribute, setIdentifierAttribute] = useState<SignInStartIdentifier>(
-    shouldStartWithPhoneNumberIdentifier ? 'phone_number' : identifierAttributes[0] || '',
-  );
+  const resolveInitialIdentifier = (): SignInStartIdentifier => {
+    const iv = ctx.initialValues;
+
+    const mapToIdentifierAttribute = (key: string): SignInStartIdentifier | undefined => {
+      if (key === 'phoneNumber') {
+        return identifierAttributes.includes('phone_number') ? 'phone_number' : undefined;
+      }
+      if (key === 'emailAddress') {
+        if (identifierAttributes.includes('email_address')) return 'email_address';
+        if (identifierAttributes.includes('email_address_username')) return 'email_address_username';
+        return undefined;
+      }
+      if (key === 'username') {
+        if (identifierAttributes.includes('email_address_username')) return 'email_address_username';
+        if (identifierAttributes.includes('username')) return 'username';
+        return undefined;
+      }
+      return undefined;
+    };
+
+    const filledValues = [
+      iv?.emailAddress && 'emailAddress',
+      iv?.phoneNumber && 'phoneNumber',
+      iv?.username && 'username',
+    ].filter(Boolean) as string[];
+
+    if (filledValues.length === 1) {
+      const mapped = mapToIdentifierAttribute(filledValues[0]);
+      if (mapped) return mapped;
+    }
+
+    if (parsedOptions.preferredSignInIdentifier) {
+      const mapped = mapToIdentifierAttribute(parsedOptions.preferredSignInIdentifier);
+      if (mapped) return mapped;
+    }
+
+    return identifierAttributes[0] || '';
+  };
+
+  const [identifierAttribute, setIdentifierAttribute] = useState<SignInStartIdentifier>(resolveInitialIdentifier);
   const [hasSwitchedByAutofill, setHasSwitchedByAutofill] = useState(false);
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
@@ -596,6 +631,9 @@ function SignInStartInternal(): JSX.Element {
                           actionLabel={nextIdentifier?.action}
                           onActionClicked={switchToNextIdentifier}
                           {...identifierFieldProps}
+                          defaultCountryIso={
+                            ctx.initialValues?.phoneNumberCountryCode?.toLowerCase() as CountryIso | undefined
+                          }
                           autoFocus={shouldAutofocus}
                           autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
                           isLastAuthenticationStrategy={isIdentifierLastAuthenticationStrategy}
@@ -650,6 +688,7 @@ function SignInStartInternal(): JSX.Element {
           phoneNumberFormState={phoneIdentifierField}
           onUseAnotherMethod={onAlternativePhoneCodeUseAnotherMethod}
           phoneCodeProvider={alternativePhoneCodeProvider}
+          defaultCountryIso={ctx.initialValues?.phoneNumberCountryCode?.toLowerCase() as CountryIso | undefined}
         />
       )}
     </Flow.Part>

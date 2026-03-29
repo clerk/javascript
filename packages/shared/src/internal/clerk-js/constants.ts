@@ -50,7 +50,7 @@ export const ERROR_CODES = {
   USER_DEACTIVATED: 'user_deactivated',
 } as const;
 
-export const SIGN_IN_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username'];
+export const SIGN_IN_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username', 'phone_number_country_code'];
 export const SIGN_UP_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username', 'first_name', 'last_name'];
 
 export const DEBOUNCE_MS = 350;

@@ -963,6 +963,14 @@ export type Options = {
    * @default false
    */
   unsafe_disableDevelopmentModeWarnings?: boolean;
+
+  /**
+   * Controls which identifier type is shown first on the SignIn component
+   * when multiple identifiers are enabled. Does not prefill any value.
+   *
+   * @default undefined
+   */
+  preferredSignInIdentifier?: 'emailAddress' | 'phoneNumber' | 'username';
 };
 
 export type CaptchaAppearanceOptions = {
