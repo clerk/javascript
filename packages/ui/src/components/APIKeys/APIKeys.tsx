@@ -27,6 +27,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { InputWithIcon } from '@/ui/elements/InputWithIcon';
 import { Pagination } from '@/ui/elements/Pagination';
 import { useDebounce } from '@/ui/hooks';
+import { handleError } from '@/ui/utils/errorHandler';
 import { MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
 
@@ -119,12 +120,20 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
       setIsCopyModalOpen(true);
       setAPIKey(apiKey);
     } catch (err: any) {
-      if (isClerkAPIResponseError(err)) {
-        if (err.status === 403) {
+      if (!isClerkAPIResponseError(err)) {
+        handleError(err, [], card.setError);
+        return;
+      }
+
+      switch (err.errors?.[0]?.code) {
+        case 'token_quota_exceeded':
           card.setError(t(localizationKeys('unstable__errors.api_key_usage_exceeded')));
-        } else if (err.status === 409) {
+          break;
+        case 'token_creation_conflict':
           card.setError(t(localizationKeys('unstable__errors.api_key_name_already_exists')));
-        }
+          break;
+        default:
+          handleError(err, [], card.setError);
       }
     } finally {
       card.setIdle();
