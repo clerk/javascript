@@ -278,6 +278,7 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
     const fetchOptions: RequestInit = {
       method: request.method,
       headers,
+      redirect: 'manual',
       // @ts-expect-error - duplex is required for streaming bodies but not in all TS definitions
       duplex: hasBody ? 'half' : undefined,
     };
