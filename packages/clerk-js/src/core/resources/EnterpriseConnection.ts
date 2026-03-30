@@ -81,7 +81,7 @@ export class EnterpriseConnection extends BaseResource implements EnterpriseConn
   id!: string;
   name!: string;
   active!: boolean;
-  provider = '';
+  provider!: string;
   logoPublicUrl: string | null = null;
   domains: string[] = [];
   organizationId: string | null = null;
@@ -107,7 +107,7 @@ export class EnterpriseConnection extends BaseResource implements EnterpriseConn
     this.id = data.id;
     this.name = data.name;
     this.active = data.active;
-    this.provider = data.provider ?? '';
+    this.provider = data.provider;
     this.logoPublicUrl = data.logo_public_url ?? null;
     this.domains = data.domains ?? [];
     this.organizationId = data.organization_id ?? null;
