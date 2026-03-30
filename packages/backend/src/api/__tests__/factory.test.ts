@@ -29,6 +29,9 @@ describe('api.client', () => {
     expect(response.emailAddresses[0].emailAddress).toBe('john.doe@clerk.test');
     expect(response.phoneNumbers[0].phoneNumber).toBe('+311-555-2368');
     expect(response.externalAccounts[0].emailAddress).toBe('john.doe@clerk.test');
+    expect(response.enterpriseAccounts[0].emailAddress).toBe('john.doe@clerk.test');
+    expect(response.enterpriseAccounts[0].provider).toBe('saml_okta');
+    expect(response.enterpriseAccounts[0].enterpriseConnection?.name).toBe('Okta SSO');
     expect(response.publicMetadata.zodiac_sign).toBe('leo');
   });
 
