@@ -298,7 +298,6 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
   try {
     // Make the proxied request
     // TODO: Consider adding AbortSignal.timeout(30_000) via AbortSignal.any()
-    // once it's available across all target runtimes.
     const fetchOptions: RequestInit = {
       method: request.method,
       headers,
