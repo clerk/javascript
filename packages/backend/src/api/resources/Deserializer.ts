@@ -10,6 +10,7 @@ import {
   Domain,
   Email,
   EmailAddress,
+  EnterpriseAccount,
   EnterpriseConnection,
   IdPOAuthAccessToken,
   Instance,
@@ -154,6 +155,8 @@ function jsonToObject(item: any): any {
       return Domain.fromJSON(item);
     case ObjectType.EmailAddress:
       return EmailAddress.fromJSON(item);
+    case ObjectType.EnterpriseAccount:
+      return EnterpriseAccount.fromJSON(item);
     case ObjectType.Email:
       return Email.fromJSON(item);
     case ObjectType.IdpOAuthAccessToken:
