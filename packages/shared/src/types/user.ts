@@ -2,7 +2,8 @@ import type { BackupCodeResource } from './backupCode';
 import type { BillingPayerMethods } from './billing';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
-import type { EnterpriseAccountConnectionResource, EnterpriseAccountResource } from './enterpriseAccount';
+import type { EnterpriseAccountResource } from './enterpriseAccount';
+import type { EnterpriseConnectionResource } from './enterpriseConnection';
 import type { ExternalAccountResource } from './externalAccount';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
@@ -118,7 +119,7 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   ) => Promise<ClerkPaginatedResponse<OrganizationSuggestionResource>>;
   getOrganizationCreationDefaults: () => Promise<OrganizationCreationDefaultsResource>;
   leaveOrganization: (organizationId: string) => Promise<DeletedObjectResource>;
-  getEnterpriseConnections: (params?: GetEnterpriseConnectionsParams) => Promise<EnterpriseAccountConnectionResource[]>;
+  getEnterpriseConnections: (params?: GetEnterpriseConnectionsParams) => Promise<EnterpriseConnectionResource[]>;
   createTOTP: () => Promise<TOTPResource>;
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
