@@ -154,7 +154,7 @@ export function SubscriptionsList({
 
 function SubscriptionRow({ subscription, length }: { subscription: BillingSubscriptionItemResource; length: number }) {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const fee = subscription.planPeriod === 'annual' ? subscription.plan.annualFee! : subscription.plan.fee;
+  const fee = subscription.planPeriod === 'annual' ? subscription.plan.annualFee! : subscription.plan.fee!;
   const { captionForSubscription } = usePlansContext();
 
   const feeFormatted = useMemo(() => {

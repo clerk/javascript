@@ -27,6 +27,7 @@ export const ObjectType = {
   Cookies: 'cookies',
   Domain: 'domain',
   Email: 'email',
+  EnterpriseAccount: 'enterprise_account',
   EnterpriseConnection: 'enterprise_connection',
   EmailAddress: 'email_address',
   ExternalAccount: 'external_account',
@@ -192,6 +193,37 @@ export interface EmailAddressJSON extends ClerkResourceJSON {
   email_address: string;
   verification: VerificationJSON | null;
   linked_to: IdentificationLinkJSON[];
+}
+
+export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
+  active: boolean;
+  allow_idp_initiated: boolean;
+  allow_subdomains: boolean;
+  disable_additional_identifications: boolean;
+  domain: string;
+  logo_public_url: string | null;
+  name: string;
+  protocol: string;
+  provider: string;
+  sync_user_attributes: boolean;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface EnterpriseAccountJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.EnterpriseAccount;
+  active: boolean;
+  email_address: string;
+  enterprise_connection: EnterpriseAccountConnectionJSON | null;
+  first_name: string | null;
+  last_name: string | null;
+  protocol: string;
+  provider: string;
+  provider_user_id: string | null;
+  public_metadata: Record<string, unknown>;
+  verification: VerificationJSON | null;
+  last_authenticated_at: number | null;
+  enterprise_connection_id: string | null;
 }
 
 export interface ExternalAccountJSON extends ClerkResourceJSON {
@@ -596,6 +628,7 @@ export interface UserJSON extends ClerkResourceJSON {
   web3_wallets: Web3WalletJSON[];
   organization_memberships: OrganizationMembershipJSON[] | null;
   external_accounts: ExternalAccountJSON[];
+  enterprise_accounts: EnterpriseAccountJSON[];
   password_last_updated_at: number | null;
   public_metadata: UserPublicMetadata;
   private_metadata: UserPrivateMetadata;

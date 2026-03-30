@@ -119,6 +119,14 @@ const withSharedUIVariant = withEmailCodes
 
 const withEmailLinks = withInstanceKeys('with-email-links', base.clone().setId('withEmailLinks'));
 
+const withEnterpriseSso = withInstanceKeys(
+  'with-enterprise-sso',
+  base
+    .clone()
+    .setId('withEnterpriseSso')
+    .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key'),
+);
+
 const withCustomRoles = withInstanceKeys(
   'with-custom-roles',
   base
@@ -252,6 +260,7 @@ export const envs = {
   withEmailCodesProxy,
   withEmailCodesQuickstart,
   withEmailLinks,
+  withEnterpriseSso,
   withKeyless,
   withLegalConsent,
   withNeedsClientTrust,

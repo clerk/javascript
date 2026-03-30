@@ -1312,6 +1312,7 @@ export const zhTW: LocalizationResource = {
         title: '電子郵件地址',
       },
       enterpriseAccountsSection: {
+        primaryButton: '連結帳戶',
         title: '企業帳戶',
       },
       headerTitle__account: '帳戶',

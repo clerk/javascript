@@ -375,8 +375,9 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
 
   const isSwitchable =
     ((subscription.planPeriod === 'month' && Boolean(subscription.plan.annualMonthlyFee)) ||
-      subscription.planPeriod === 'annual') &&
-    subscription.status !== 'past_due';
+      (subscription.planPeriod === 'annual' && Boolean(subscription.plan.fee))) &&
+    subscription.status !== 'past_due' &&
+    !subscription.plan.isDefault;
   const isFree = isFreePlan(subscription.plan);
   const isCancellable = subscription.canceledAt === null && !isFree;
   const isReSubscribable = subscription.canceledAt !== null && !isFree;
@@ -415,8 +416,10 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
                     currency: subscription.plan.annualFee!.currencySymbol,
                   })
                 : localizationKeys('billing.switchToMonthlyWithPrice', {
-                    price: normalizeFormatted(subscription.plan.fee.amountFormatted),
-                    currency: subscription.plan.fee.currencySymbol,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    price: normalizeFormatted(subscription.plan.fee!.amountFormatted),
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    currency: subscription.plan.fee!.currencySymbol,
                   }),
             onClick: () => {
               openCheckout({
@@ -508,7 +511,8 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
 
   const fee =
     subscription.planPeriod === 'month'
-      ? subscription.plan.fee
+      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        subscription.plan.fee!
       : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         subscription.plan.annualFee!;
 
