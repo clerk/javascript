@@ -302,6 +302,7 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
     const fetchOptions: RequestInit = {
       method: request.method,
       headers,
+      redirect: 'manual',
       signal: request.signal,
     };
 

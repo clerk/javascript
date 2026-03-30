@@ -1357,6 +1357,7 @@ export const beBY: LocalizationResource = {
         title: 'Адрасы электроннай пошты',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Падключыць уліковы запіс',
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Уліковы запіс',

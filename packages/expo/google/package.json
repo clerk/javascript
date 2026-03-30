@@ -1,0 +1,4 @@
+{
+  "main": "../dist/google/index.js",
+  "types": "../dist/google/index.d.ts"
+}

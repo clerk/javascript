@@ -1338,6 +1338,7 @@ export const arSA: LocalizationResource = {
         title: 'العنوان الإلكتروني',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'ربط حساب',
         title: 'حساب المؤسسات',
       },
       headerTitle__account: 'الحساب',
