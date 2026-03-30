@@ -1,4 +1,4 @@
-import type { Options } from 'tsup';
+import type { Options } from 'tsdown';
 
 export const runAfterLast =
   (commands: Array<string | false>) =>
