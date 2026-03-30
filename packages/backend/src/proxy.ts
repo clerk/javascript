@@ -307,7 +307,7 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
 
     // Only set duplex when body is present (required for streaming bodies)
     if (hasBody) {
-      // @ts-expect-error - duplex is required for streaming bodies but not in all TS definitions
+      // @ts-expect-error - duplex is required for streaming bodies, but not present on the RequestInit type from undici
       fetchOptions.duplex = 'half';
       fetchOptions.body = request.body;
     }
