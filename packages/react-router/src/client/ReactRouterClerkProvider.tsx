@@ -11,8 +11,6 @@ import { ClerkReactRouterOptionsProvider } from './ReactRouterOptionsContext';
 import type { ClerkState, ReactRouterClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
-export * from '@clerk/react';
-
 const SDK_METADATA = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
