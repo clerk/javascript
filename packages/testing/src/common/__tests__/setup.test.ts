@@ -19,6 +19,7 @@ vi.mock('@clerk/shared/keys', () => ({
 }));
 
 import { createClerkClient } from '@clerk/backend';
+
 import { fetchEnvVars } from '../setup';
 
 function createClerkAPIError(status: number, retryAfter?: number) {
