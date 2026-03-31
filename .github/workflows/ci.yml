@@ -274,7 +274,9 @@ jobs:
 
   integration-tests:
     needs: [check-permissions, build-packages]
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    if: >-
+      ${{ (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
+      && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
     permissions:
       contents: read
@@ -457,11 +459,20 @@ jobs:
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
+      - name: Sanitize artifact name
+        if: ${{ cancelled() || failure() }}
+        id: sanitize
+        run: |
+          SANITIZED="${TEST_NAME//:/-}"
+          echo "artifact-suffix=${SANITIZED}" >> $GITHUB_OUTPUT
+        env:
+          TEST_NAME: ${{ matrix.test-name }}
+
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.sanitize.outputs.artifact-suffix }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
           path: test-results
           retention-days: 1
 

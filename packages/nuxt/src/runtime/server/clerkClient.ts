@@ -1,4 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
+import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { isTruthy } from '@clerk/shared/underscore';
 import type { H3Event } from 'h3';
 
@@ -7,10 +8,12 @@ import { useRuntimeConfig } from '#imports';
 
 export function clerkClient(event: H3Event) {
   const runtimeConfig = useRuntimeConfig(event);
+  const publishableKey = runtimeConfig.public.clerk.publishableKey;
+  const apiUrl = runtimeConfig.public.clerk.apiUrl || apiUrlFromPublishableKey(publishableKey);
 
   return createClerkClient({
-    publishableKey: runtimeConfig.public.clerk.publishableKey,
-    apiUrl: runtimeConfig.public.clerk.apiUrl,
+    publishableKey,
+    apiUrl,
     apiVersion: runtimeConfig.public.clerk.apiVersion,
     proxyUrl: runtimeConfig.public.clerk.proxyUrl,
     domain: runtimeConfig.public.clerk.domain,

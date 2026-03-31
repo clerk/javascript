@@ -9,9 +9,9 @@ import type {
   DeletedObjectJSON,
   DeletedObjectResource,
   EmailAddressResource,
-  EnterpriseAccountConnectionJSON,
-  EnterpriseAccountConnectionResource,
   EnterpriseAccountResource,
+  EnterpriseConnectionJSON,
+  EnterpriseConnectionResource,
   ExternalAccountJSON,
   ExternalAccountResource,
   GetEnterpriseConnectionsParams,
@@ -45,7 +45,7 @@ import {
   DeletedObject,
   EmailAddress,
   EnterpriseAccount,
-  EnterpriseAccountConnection,
+  EnterpriseConnection,
   ExternalAccount,
   Image,
   OrganizationMembership,
@@ -296,7 +296,7 @@ export class User extends BaseResource implements UserResource {
 
   getEnterpriseConnections = async (
     params?: GetEnterpriseConnectionsParams,
-  ): Promise<EnterpriseAccountConnectionResource[]> => {
+  ): Promise<EnterpriseConnectionResource[]> => {
     const { withOrganizationAccountLinking } = params || {};
 
     const json = (
@@ -311,9 +311,9 @@ export class User extends BaseResource implements UserResource {
             }
           : {}),
       })
-    )?.response as unknown as EnterpriseAccountConnectionJSON[];
+    )?.response as unknown as EnterpriseConnectionJSON[];
 
-    return (json || []).map(connection => new EnterpriseAccountConnection(connection));
+    return (json || []).map(connection => new EnterpriseConnection(connection));
   };
 
   initializePaymentMethod: typeof initializePaymentMethod = params => {

@@ -1528,6 +1528,8 @@ type UnstableErrors = WithParamName<{
   organization_domain_common: LocalizationValue;
   organization_domain_blocked: LocalizationValue;
   organization_domain_exists_for_enterprise_connection: LocalizationValue;
+  api_key_name_already_exists: LocalizationValue;
+  api_key_usage_exceeded: LocalizationValue;
   organization_membership_quota_exceeded: LocalizationValue;
   organization_not_found_or_unauthorized: LocalizationValue;
   organization_not_found_or_unauthorized_with_create_organization_disabled: LocalizationValue;
