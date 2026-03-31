@@ -1357,6 +1357,7 @@ export const faIR: LocalizationResource = {
         title: 'آدرس های ایمیل',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'اتصال حساب',
         title: 'حساب های سازمانی',
       },
       headerTitle__account: 'جزئیات نمایه',

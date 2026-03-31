@@ -1,5 +1,47 @@
 # Change Log
 
+## 3.1.5
+
+### Patch Changes
+
+- Add `appleSignIn` option to the Expo config plugin. Setting `appleSignIn: false` prevents the Sign in with Apple entitlement from being added unconditionally, allowing apps that do not use Apple Sign In to opt out. ([#8113](https://github.com/clerk/javascript/pull/8113)) by [@chriscanin](https://github.com/chriscanin)
+
+- fix(expo): use `require.resolve` in config plugin to find `ClerkViewFactory.swift`, resolving failures in pnpm workspaces nested 2+ levels deep ([#8111](https://github.com/clerk/javascript/pull/8111)) by [@chriscanin](https://github.com/chriscanin)
+
+- Add `-Xskip-metadata-version-check` Kotlin compiler flag to resolve metadata version mismatch errors when building Android apps with Expo SDK 54/55. The `clerk-android` dependency is compiled with Kotlin 2.3.x while Expo ships Kotlin 2.1.x, causing `:app:compileDebugKotlin` to fail. ([#8152](https://github.com/clerk/javascript/pull/8152)) by [@chriscanin](https://github.com/chriscanin)
+
+- fix(expo): restore TurboModuleRegistry.get pattern in NativeClerkModule spec to fix Android new architecture codegen error; handle web via NativeClerkModule.web.ts ([#8112](https://github.com/clerk/javascript/pull/8112)) by [@chriscanin](https://github.com/chriscanin)
+
+- Updated dependencies [[`7027e97`](https://github.com/clerk/javascript/commit/7027e9712b17728df5a89691f60e1fff34f06f46), [`9ca9300`](https://github.com/clerk/javascript/commit/9ca9300070b649ccb6f661395e86f23c34e592f4), [`3efdd2c`](https://github.com/clerk/javascript/commit/3efdd2cbd36bfe1002e1fbdb0f3a633d46a9287a), [`857823e`](https://github.com/clerk/javascript/commit/857823e8d3f4285a263131d26b5940ce2030f37b), [`25a73fb`](https://github.com/clerk/javascript/commit/25a73fb6d9a1c262759ec7e6a7b5c1048ea18c7a), [`d976a82`](https://github.com/clerk/javascript/commit/d976a8298a7fc67b9496a896ebbf043449cc6a01)]:
+  - @clerk/react@6.1.3
+  - @clerk/clerk-js@6.3.3
+
+## 3.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`f0533a2`](https://github.com/clerk/javascript/commit/f0533a26db17066a7dcc7992d9589ba3a60cc5b4), [`2837336`](https://github.com/clerk/javascript/commit/28373360e7639e019cc3e71fd6a785f7e075b1f0), [`e00ec97`](https://github.com/clerk/javascript/commit/e00ec97895640db358af5a9df5d03e83f28f5a27)]:
+  - @clerk/shared@4.3.2
+  - @clerk/clerk-js@6.3.2
+  - @clerk/react@6.1.2
+
+## 3.1.3
+
+### Patch Changes
+
+- Fix `@clerk/expo` crashing in web environments by adding web-safe variants for native module imports and polyfills ([#8066](https://github.com/clerk/javascript/pull/8066)) by [@chriscanin](https://github.com/chriscanin)
+
+- Ensure clerk-js accepts `proxyUrl` and `domain` in non-browser environments. ([#8095](https://github.com/clerk/javascript/pull/8095)) by [@brkalow](https://github.com/brkalow)
+
+- Revert two-way JS/native session sync (#8032) ([#8065](https://github.com/clerk/javascript/pull/8065)) by [@chriscanin](https://github.com/chriscanin)
+
+- Pass `proxyUrl` and `domain` through Expo's native Clerk singleton. ([#8085](https://github.com/clerk/javascript/pull/8085)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`b9cb6e5`](https://github.com/clerk/javascript/commit/b9cb6e576bf6af5662fcc624cf2de76120a14565)]:
+  - @clerk/clerk-js@6.3.1
+  - @clerk/shared@4.3.1
+  - @clerk/react@6.1.1
+
 ## 3.1.2
 
 ### Patch Changes

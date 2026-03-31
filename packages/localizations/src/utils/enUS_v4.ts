@@ -311,6 +311,7 @@ export const enUS_v4: any = {
         destructiveActionAccordionSubtitle: 'Remove connected account',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Connect account',
         title: 'Enterprise accounts',
       },
       passwordSection: {

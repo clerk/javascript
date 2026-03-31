@@ -1363,6 +1363,7 @@ export const esES: LocalizationResource = {
         title: 'Correos electrónicos',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Conectar cuenta',
         title: 'Cuentas empresariales',
       },
       headerTitle__account: 'Cuenta',

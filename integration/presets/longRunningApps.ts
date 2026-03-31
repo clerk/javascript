@@ -1,9 +1,10 @@
 import type { LongRunningApplication } from '../models/longRunningApplication';
 import { longRunningApplication } from '../models/longRunningApplication';
 import { astro } from './astro';
-import { envs } from './envs';
+import { envs, isStagingReady } from './envs';
 import { expo } from './expo';
 import { express } from './express';
+import { fastify } from './fastify';
 import { hono } from './hono';
 import { next } from './next';
 import { nuxt } from './nuxt';
@@ -17,9 +18,9 @@ import { vue } from './vue';
  * These are applications that are started once and then used for all tests,
  * making the tests run faster as the app doesn't need to be started for each test.
  */
-// prettier-ignore
 export const createLongRunningApps = () => {
-  const configs = [
+  // prettier-ignore
+  const allConfigs = [
     /**
      * NextJS apps - basic flows
      */
@@ -71,6 +72,9 @@ export const createLongRunningApps = () => {
      * Tanstack apps - basic flows
      */
     { id: 'tanstack.react-start', config: tanstack.reactStart, env: envs.withEmailCodes },
+    { id: 'tanstack.react-start.withCustomRoles', config: tanstack.reactStart, env: envs.withCustomRoles },
+    { id: 'tanstack.react-start.withEmailCodesProxy', config: tanstack.reactStart, env: envs.withEmailCodesProxy },
+    { id: 'tanstack.react-start.withEnterpriseSso', config: tanstack.reactStart, env: envs.withEnterpriseSso },
 
     /**
      * Various apps - basic flows
@@ -81,21 +85,59 @@ export const createLongRunningApps = () => {
     { id: 'nuxt.node', config: nuxt.node, env: envs.withCustomRoles },
     { id: 'react-router.node', config: reactRouter.reactRouterNode, env: envs.withEmailCodes },
     { id: 'express.vite.withEmailCodes', config: express.vite, env: envs.withEmailCodes },
+    { id: 'express.vite.withEmailCodesProxy', config: express.vite, env: envs.withEmailCodesProxy },
+    { id: 'express.vite.withCustomRoles', config: express.vite, env: envs.withCustomRoles },
+
+    /**
+     * Fastify apps
+     */
+    { id: 'fastify.vite.withEmailCodes', config: fastify.vite, env: envs.withEmailCodes },
+    { id: 'fastify.vite.withEmailCodesProxy', config: fastify.vite, env: envs.withEmailCodesProxy },
 
     /**
      * Hono apps
      */
     { id: 'hono.vite.withEmailCodes', config: hono.vite, env: envs.withEmailCodes },
     { id: 'hono.vite.withEmailCodesProxy', config: hono.vite, env: envs.withEmailCodesProxy },
+    { id: 'hono.vite.withCustomRoles', config: hono.vite, env: envs.withCustomRoles },
   ] as const;
 
-  const apps = configs.map(longRunningApplication);
+  const stagingSkippedConfigs = allConfigs.filter(c => !isStagingReady(c.env));
+  const stagingReadyConfigs = allConfigs.filter(c => isStagingReady(c.env));
+
+  if (process.env.E2E_STAGING === '1' && stagingSkippedConfigs.length > 0) {
+    const skippedIds = stagingSkippedConfigs.map(c => `\n  - ${c.id}`).join('');
+    console.log(
+      `[staging] Skipping ${stagingSkippedConfigs.length} long running app(s) without staging keys:${skippedIds}`,
+    );
+  }
+
+  const apps = stagingReadyConfigs.map(longRunningApplication);
 
   return {
-    getByPattern: (patterns: Array<string | (typeof configs)[number]['id']>) => {
+    getByPattern: (patterns: Array<string | (typeof allConfigs)[number]['id']>) => {
       const res = new Set(patterns.map(pattern => apps.filter(app => idMatchesPattern(app.id, pattern))).flat());
       if (!res.size) {
-        const availableIds = configs.map(c => `\n- ${c.id}`).join('');
+        // Check whether the pattern matches any known app (before staging filtering)
+        const matchesKnownApp = patterns.some(pattern => allConfigs.some(c => idMatchesPattern(c.id, pattern)));
+        if (!matchesKnownApp) {
+          // Pattern doesn't match any known app — likely a typo, always throw
+          const availableIds = allConfigs.map(c => `\n- ${c.id}`).join('');
+          throw new Error(
+            `Could not find long running app with id ${patterns}. The available ids are: ${availableIds}`,
+          );
+        }
+        // Pattern matches a known app but it was filtered out by isStagingReady
+        if (process.env.E2E_STAGING === '1') {
+          const skippedIds = patterns
+            .flatMap(pattern => stagingSkippedConfigs.filter(c => idMatchesPattern(c.id, pattern)))
+            .map(c => c.id);
+          if (skippedIds.length > 0) {
+            console.log(`[staging] Skipping test suite(s) due to missing staging keys: ${skippedIds.join(', ')}`);
+          }
+          return [] as any as LongRunningApplication[];
+        }
+        const availableIds = stagingReadyConfigs.map(c => `\n- ${c.id}`).join('');
         throw new Error(`Could not find long running app with id ${patterns}. The available ids are: ${availableIds}`);
       }
       return [...res] as any as LongRunningApplication[];

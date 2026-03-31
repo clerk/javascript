@@ -2,7 +2,7 @@ import type { OrganizationInvitationStatus, OrganizationMembershipRole } from '.
 import type { OrganizationInvitationJSON, PublicOrganizationDataJSON } from './JSON';
 
 /**
- * The Backend `OrganizationInvitation` object is similar to the [`OrganizationInvitation`](https://clerk.com/docs/reference/javascript/types/organization-invitation) object as it's the model around an Organization invitation. However, the Backend `OrganizationInvitation` object is different in that it's used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Organization-Invitations#operation/CreateOrganizationInvitation){{ target: '_blank' }} and is not directly accessible from the Frontend API.
+ * The Backend `OrganizationInvitation` object is similar to the [`OrganizationInvitation`](https://clerk.com/docs/reference/types/organization-invitation) object as it's the model around an Organization invitation. However, the Backend `OrganizationInvitation` object is different in that it's used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Organization-Invitations#operation/CreateOrganizationInvitation){{ target: '_blank' }} and is not directly accessible from the Frontend API.
  */
 export class OrganizationInvitation {
   private _raw: OrganizationInvitationJSON | null = null;
