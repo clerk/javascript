@@ -176,7 +176,11 @@ export type __internal_LocalizationResource = {
   membershipRole__guestMember: LocalizationValue;
   billing: {
     month: LocalizationValue;
+    monthAbbreviation: LocalizationValue;
+    monthPerUnit: LocalizationValue<'unitName'>;
     year: LocalizationValue;
+    yearAbbreviation: LocalizationValue;
+    yearPerUnit: LocalizationValue<'unitName'>;
     free: LocalizationValue;
     getStarted: LocalizationValue;
     manage: LocalizationValue;
@@ -184,6 +188,7 @@ export type __internal_LocalizationResource = {
     cancelSubscription: LocalizationValue;
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
+    seats: LocalizationValue;
     subscribe: LocalizationValue;
     startFreeTrial: LocalizationValue;
     startFreeTrial__days: LocalizationValue<'days'>;
@@ -259,6 +264,19 @@ export type __internal_LocalizationResource = {
     pricingTable: {
       billingCycle: LocalizationValue;
       included: LocalizationValue;
+      seatCost: {
+        freeUpToSeats: LocalizationValue<'endsAfterBlock'>;
+        upToSeats: LocalizationValue<'endsAfterBlock'>;
+        perSeat: LocalizationValue<'feePerBlockAmount' | 'periodAbbreviation'>;
+        includedSeats: LocalizationValue<'includedSeats'>;
+        additionalSeats: LocalizationValue<'additionalTierFeePerBlockAmount' | 'periodAbbreviation'>;
+        unlimitedSeats: LocalizationValue;
+        tooltip: {
+          freeForUpToSeats: LocalizationValue<'endsAfterBlock'>;
+          additionalSeatsEach: LocalizationValue<'feePerBlockAmount' | 'period'>;
+          firstSeatsIncludedInPlan: LocalizationValue<'endsAfterBlock'>;
+        };
+      };
     };
     checkout: {
       title: LocalizationValue;
@@ -684,6 +702,7 @@ export type __internal_LocalizationResource = {
       };
       enterpriseAccountsSection: {
         title: LocalizationValue;
+        primaryButton: LocalizationValue;
       };
       passwordSection: {
         title: LocalizationValue;
@@ -1007,6 +1026,7 @@ export type __internal_LocalizationResource = {
     badge__manualInvitation: LocalizationValue;
     start: {
       headerTitle__members: LocalizationValue;
+      membershipSeatUsageLabel: LocalizationValue<'count' | 'limit'>;
       headerTitle__general: LocalizationValue;
       profileSection: {
         title: LocalizationValue;
@@ -1205,6 +1225,7 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       alerts: {
         noPermissionsToManageBilling: LocalizationValue;
+        planMembershipLimitExceeded: LocalizationValue<'count' | 'limit'>;
       };
     };
     apiKeysPage: {
@@ -1508,6 +1529,8 @@ type UnstableErrors = WithParamName<{
   organization_domain_common: LocalizationValue;
   organization_domain_blocked: LocalizationValue;
   organization_domain_exists_for_enterprise_connection: LocalizationValue;
+  api_key_name_already_exists: LocalizationValue;
+  api_key_usage_exceeded: LocalizationValue;
   organization_membership_quota_exceeded: LocalizationValue;
   organization_not_found_or_unauthorized: LocalizationValue;
   organization_not_found_or_unauthorized_with_create_organization_disabled: LocalizationValue;

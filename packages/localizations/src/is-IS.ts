@@ -1353,6 +1353,7 @@ export const isIS: LocalizationResource = {
         title: 'Netföng',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Tengja reikning',
         title: 'Fyrirtækjareikningar',
       },
       headerTitle__account: 'Prófílupplýsingar',

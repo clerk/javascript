@@ -43,7 +43,7 @@ export interface ProxyError {
 }
 
 // Hop-by-hop headers that should not be forwarded
-const HOP_BY_HOP_HEADERS = [
+const HOP_BY_HOP_HEADERS = new Set([
   'connection',
   'keep-alive',
   'proxy-authenticate',
@@ -52,14 +52,32 @@ const HOP_BY_HOP_HEADERS = [
   'trailer',
   'transfer-encoding',
   'upgrade',
-];
+]);
+
+/**
+ * Parses the Connection header to extract dynamically-nominated hop-by-hop
+ * header names (RFC 7230 Section 6.1). These headers are specific to the
+ * current connection and must not be forwarded by proxies.
+ */
+function getDynamicHopByHopHeaders(headers: Headers): Set<string> {
+  const connectionValue = headers.get('connection');
+  if (!connectionValue) {
+    return new Set();
+  }
+  return new Set(
+    connectionValue
+      .split(',')
+      .map(h => h.trim().toLowerCase())
+      .filter(h => h.length > 0),
+  );
+}
 
 // Headers to strip from proxied responses. fetch() auto-decompresses
 // response bodies, so Content-Encoding no longer describes the body
 // and Content-Length reflects the compressed size. We request identity
 // encoding upstream to avoid the double compression pass, but strip
 // these defensively since servers may ignore Accept-Encoding: identity.
-const RESPONSE_HEADERS_TO_STRIP = ['content-encoding', 'content-length'];
+const RESPONSE_HEADERS_TO_STRIP = new Set(['content-encoding', 'content-length']);
 
 /**
  * Derives the Frontend API URL from a publishable key.
@@ -114,6 +132,7 @@ function createErrorResponse(code: ProxyErrorCode, message: string, status: numb
     status,
     headers: {
       'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
     },
   });
 }
@@ -230,9 +249,12 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
   // Build headers for the proxied request
   const headers = new Headers();
 
-  // Copy original headers, excluding hop-by-hop headers
+  // Copy original headers, excluding hop-by-hop headers and any
+  // dynamically-nominated hop-by-hop headers listed in the Connection header (RFC 7230 Section 6.1).
+  const dynamicHopByHop = getDynamicHopByHopHeaders(request.headers);
   request.headers.forEach((value, key) => {
-    if (!HOP_BY_HOP_HEADERS.includes(key.toLowerCase())) {
+    const lower = key.toLowerCase();
+    if (!HOP_BY_HOP_HEADERS.has(lower) && !dynamicHopByHop.has(lower)) {
       headers.set(key, value);
     }
   });
@@ -270,30 +292,39 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
     headers.set('X-Forwarded-For', clientIp);
   }
 
-  // Determine if request has a body
-  const hasBody = ['POST', 'PUT', 'PATCH'].includes(request.method);
+  // Determine if request has a body (handles DELETE-with-body and any other method)
+  const hasBody = request.body !== null;
 
   try {
     // Make the proxied request
+    // TODO: Consider adding AbortSignal.timeout(30_000) via AbortSignal.any()
     const fetchOptions: RequestInit = {
       method: request.method,
       headers,
-      // @ts-expect-error - duplex is required for streaming bodies but not in all TS definitions
-      duplex: hasBody ? 'half' : undefined,
+      redirect: 'manual',
+      signal: request.signal,
     };
 
-    // Only include body for methods that support it
-    if (hasBody && request.body) {
+    // Only set duplex when body is present (required for streaming bodies)
+    if (hasBody) {
+      // @ts-expect-error - duplex is required for streaming bodies, but not present on the RequestInit type from undici
+      fetchOptions.duplex = 'half';
       fetchOptions.body = request.body;
     }
 
     const response = await fetch(targetUrl.toString(), fetchOptions);
 
-    // Build response headers, excluding hop-by-hop and encoding headers
+    // Build response headers, excluding hop-by-hop and encoding headers.
+    // Also strip dynamically-nominated hop-by-hop headers from the response Connection header.
+    const responseDynamicHopByHop = getDynamicHopByHopHeaders(response.headers);
     const responseHeaders = new Headers();
     response.headers.forEach((value, key) => {
       const lower = key.toLowerCase();
-      if (!HOP_BY_HOP_HEADERS.includes(lower) && !RESPONSE_HEADERS_TO_STRIP.includes(lower)) {
+      if (
+        !HOP_BY_HOP_HEADERS.has(lower) &&
+        !RESPONSE_HEADERS_TO_STRIP.has(lower) &&
+        !responseDynamicHopByHop.has(lower)
+      ) {
         if (lower === 'set-cookie') {
           responseHeaders.append(key, value);
         } else {
