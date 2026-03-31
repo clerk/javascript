@@ -12,8 +12,8 @@ import type { ApplicationConfig } from '../models/applicationConfig';
 import type { EnvironmentConfig } from '../models/environment';
 import { appConfigs } from '../presets';
 import { instanceKeys } from '../presets/envs';
-import { createTestUtils } from './createTestUtils';
 import type { FakeAPIKey, FakeUser } from './usersService';
+import { createTestUtils } from './index';
 
 export type FakeMachineNetwork = {
   primaryServer: Machine;
@@ -24,7 +24,7 @@ export type FakeMachineNetwork = {
   cleanup: () => Promise<void>;
 };
 
-export async function createFakeMachineNetwork(clerkClient: ClerkClient): Promise<FakeMachineNetwork> {
+async function createFakeMachineNetwork(clerkClient: ClerkClient): Promise<FakeMachineNetwork> {
   const fakeCompanyName = faker.company.name();
 
   const primaryServer = await clerkClient.machines.create({
@@ -68,7 +68,7 @@ export async function createFakeMachineNetwork(clerkClient: ClerkClient): Promis
   };
 }
 
-export async function createJwtM2MToken(clerkClient: ClerkClient, senderSecretKey: string): Promise<M2MToken> {
+async function createJwtM2MToken(clerkClient: ClerkClient, senderSecretKey: string): Promise<M2MToken> {
   return clerkClient.m2m.createToken({
     machineSecretKey: senderSecretKey,
     secondsUntilExpiration: 60 * 30,
@@ -81,7 +81,7 @@ export type FakeOAuthApp = {
   cleanup: () => Promise<void>;
 };
 
-export async function createFakeOAuthApp(clerkClient: ClerkClient, callbackUrl: string): Promise<FakeOAuthApp> {
+async function createFakeOAuthApp(clerkClient: ClerkClient, callbackUrl: string): Promise<FakeOAuthApp> {
   const oAuthApp = await clerkClient.oauthApplications.create({
     name: `Integration Test OAuth App - ${Date.now()}`,
     redirectUris: [callbackUrl],
@@ -107,7 +107,7 @@ export type ObtainOAuthAccessTokenParams = {
   };
 };
 
-export async function obtainOAuthAccessToken({
+async function obtainOAuthAccessToken({
   page,
   oAuthApp,
   redirectUri,

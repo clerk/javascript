@@ -1,8 +1,12 @@
 import { test } from '@playwright/test';
 
 import { appConfigs } from '../../presets';
-import type { MachineAuthTestAdapter } from '../../testUtils';
-import { registerApiKeyAuthTests, registerM2MAuthTests, registerOAuthAuthTests } from '../../testUtils';
+import type { MachineAuthTestAdapter } from '../../testUtils/machineAuthHelpers';
+import {
+  registerApiKeyAuthTests,
+  registerM2MAuthTests,
+  registerOAuthAuthTests,
+} from '../../testUtils/machineAuthHelpers';
 
 const adapter: MachineAuthTestAdapter = {
   baseConfig: appConfigs.astro.node,
