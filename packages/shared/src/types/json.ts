@@ -272,6 +272,7 @@ export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
   protocol: EnterpriseProtocol;
   provider: EnterpriseProvider;
   sync_user_attributes: boolean;
+  allow_organization_account_linking: boolean;
   created_at: number;
   updated_at: number;
   enterprise_connection_id: string | null;

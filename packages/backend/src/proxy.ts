@@ -54,6 +54,13 @@ const HOP_BY_HOP_HEADERS = [
   'upgrade',
 ];
 
+// Headers to strip from proxied responses. fetch() auto-decompresses
+// response bodies, so Content-Encoding no longer describes the body
+// and Content-Length reflects the compressed size. We request identity
+// encoding upstream to avoid the double compression pass, but strip
+// these defensively since servers may ignore Accept-Encoding: identity.
+const RESPONSE_HEADERS_TO_STRIP = ['content-encoding', 'content-length'];
+
 /**
  * Derives the Frontend API URL from a publishable key.
  * @param publishableKey - The Clerk publishable key
@@ -207,11 +214,18 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
     );
   }
 
-  // Derive the FAPI URL and construct the target URL
+  // Derive the FAPI URL and construct the target URL.
+  // Use string concatenation instead of `new URL(path, base)` to avoid
+  // protocol-relative resolution (e.g., "//evil.com" resolving to a different host).
   const fapiBaseUrl = fapiUrlFromPublishableKey(publishableKey);
+  const fapiHost = new URL(fapiBaseUrl).host;
   const targetPath = requestUrl.pathname.slice(proxyPath.length) || '/';
-  const targetUrl = new URL(targetPath, fapiBaseUrl);
+  const targetUrl = new URL(`${fapiBaseUrl}${targetPath}`);
   targetUrl.search = requestUrl.search;
+
+  if (targetUrl.host !== fapiHost) {
+    return createErrorResponse('proxy_request_failed', 'Resolved target does not match the expected host', 400);
+  }
 
   // Build headers for the proxied request
   const headers = new Headers();
@@ -232,8 +246,12 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
   headers.set('Clerk-Secret-Key', secretKey);
 
   // Set the host header to the FAPI host
-  const fapiHost = new URL(fapiBaseUrl).host;
   headers.set('Host', fapiHost);
+
+  // Request uncompressed responses to avoid a double compression pass.
+  // fetch() auto-decompresses, so without this FAPI compresses → fetch
+  // decompresses → the serving layer re-compresses for the browser.
+  headers.set('Accept-Encoding', 'identity');
 
   // Set X-Forwarded-* headers for proxy awareness
   // Only set these if not already present (preserve values from upstream proxies)
@@ -260,6 +278,7 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
     const fetchOptions: RequestInit = {
       method: request.method,
       headers,
+      redirect: 'manual',
       // @ts-expect-error - duplex is required for streaming bodies but not in all TS definitions
       duplex: hasBody ? 'half' : undefined,
     };
@@ -271,11 +290,16 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
 
     const response = await fetch(targetUrl.toString(), fetchOptions);
 
-    // Build response headers, excluding hop-by-hop headers
+    // Build response headers, excluding hop-by-hop and encoding headers
     const responseHeaders = new Headers();
     response.headers.forEach((value, key) => {
-      if (!HOP_BY_HOP_HEADERS.includes(key.toLowerCase())) {
-        responseHeaders.set(key, value);
+      const lower = key.toLowerCase();
+      if (!HOP_BY_HOP_HEADERS.includes(lower) && !RESPONSE_HEADERS_TO_STRIP.includes(lower)) {
+        if (lower === 'set-cookie') {
+          responseHeaders.append(key, value);
+        } else {
+          responseHeaders.set(key, value);
+        }
       }
     });
 
@@ -295,11 +319,20 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
       }
     }
 
-    return new Response(response.body, {
+    const proxyResponse = new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
       headers: responseHeaders,
     });
+
+    // Some runtimes may re-add Content-Length when constructing the Response.
+    // Delete explicitly since fetch() decoded the body and the original values
+    // no longer reflect the actual content.
+    for (const header of RESPONSE_HEADERS_TO_STRIP) {
+      proxyResponse.headers.delete(header);
+    }
+
+    return proxyResponse;
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return createErrorResponse('proxy_request_failed', `Failed to proxy request to Clerk FAPI: ${message}`, 502);
