@@ -191,7 +191,7 @@ jobs:
         run: |
           mkdir clerk-js && cd clerk-js
           pnpm init
-          pkglab add @clerk/clerk-js
+          pkglab add @clerk/clerk-js || (sleep 5 && pkglab add @clerk/clerk-js)
 
       - name: Install @clerk/ui from local registry
         if: ${{ steps.inputs.outputs.sdk-source == 'ref' }}
@@ -199,7 +199,7 @@ jobs:
         run: |
           mkdir clerk-ui && cd clerk-ui
           pnpm init
-          pkglab add @clerk/ui
+          pkglab add @clerk/ui || (sleep 5 && pkglab add @clerk/ui)
 
       # --- SDK from npm: install @latest published versions ---
       - name: Install @clerk/clerk-js@latest from npm

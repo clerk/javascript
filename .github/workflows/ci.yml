@@ -408,14 +408,14 @@ jobs:
         run: |
           mkdir clerk-js && cd clerk-js
           pnpm init
-          pkglab add @clerk/clerk-js
+          pkglab add @clerk/clerk-js || (sleep 5 && pkglab add @clerk/clerk-js)
 
       - name: Install @clerk/ui in os temp
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-ui && cd clerk-ui
           pnpm init
-          pkglab add @clerk/ui
+          pkglab add @clerk/ui || (sleep 5 && pkglab add @clerk/ui)
 
       - name: Copy components @clerk/astro
         if: ${{ matrix.test-name == 'astro' }}
