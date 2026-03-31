@@ -9,23 +9,30 @@ const MAX_RETRIES = 5;
 const BASE_DELAY_MS = 1000;
 const JITTER_MAX_MS = 500;
 const MAX_RETRY_DELAY_MS = 30_000;
-const RETRYABLE_STATUS_CODES = new Set([429, 502, 503, 504]);
+const RETRYABLE_STATUS_CODES = new Set([408, 429, 500, 502, 503, 504]);
+const RETRYABLE_NETWORK_ERRORS = new Set(['ECONNREFUSED', 'ECONNRESET', 'ENOTFOUND', 'ETIMEDOUT', 'EAI_AGAIN']);
+
+function isNetworkError(error: unknown): boolean {
+  return error instanceof Error && 'code' in error && RETRYABLE_NETWORK_ERRORS.has((error as NodeJS.ErrnoException).code ?? '');
+}
 
 async function fetchWithRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
       return await fn();
     } catch (error) {
-      const isRetryable = isClerkAPIResponseError(error) && RETRYABLE_STATUS_CODES.has(error.status);
-      if (!isRetryable || attempt === MAX_RETRIES) {
+      const isRetryableApi = isClerkAPIResponseError(error) && RETRYABLE_STATUS_CODES.has(error.status);
+      const isRetryableNetwork = isNetworkError(error);
+      if ((!isRetryableApi && !isRetryableNetwork) || attempt === MAX_RETRIES) {
         throw error;
       }
+      const status = isClerkAPIResponseError(error) ? error.status : (error as NodeJS.ErrnoException).code;
       const delay =
-        typeof error.retryAfter === 'number'
+        isClerkAPIResponseError(error) && typeof error.retryAfter === 'number'
           ? Math.min(error.retryAfter * 1000, MAX_RETRY_DELAY_MS)
           : Math.min(BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS, MAX_RETRY_DELAY_MS);
       console.warn(
-        `[Retry] ${error.status} for ${label}, attempt ${attempt + 1}/${MAX_RETRIES}, waiting ${Math.round(delay)}ms`,
+        `[Retry] ${status} for ${label}, attempt ${attempt + 1}/${MAX_RETRIES}, waiting ${Math.round(delay)}ms`,
       );
       await new Promise(resolve => setTimeout(resolve, delay));
     }
