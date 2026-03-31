@@ -445,6 +445,9 @@ jobs:
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
     continue-on-error: true
 
+    permissions:
+      contents: read
+
     strategy:
       matrix:
         version: [22] # NOTE: 18 is cached in the main release workflow
