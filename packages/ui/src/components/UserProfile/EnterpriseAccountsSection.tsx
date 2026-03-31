@@ -14,9 +14,6 @@ import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { Badge, Box, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
-
-const GENERIC_ENTERPRISE_PROVIDER_ICON_ID = 'custom_enterprise' as OAuthProvider;
-
 const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionResource }) => {
   const { connection } = props;
   const card = useCardState();
