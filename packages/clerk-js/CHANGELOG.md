@@ -1,5 +1,19 @@
 # Change Log
 
+## 6.3.3
+
+### Patch Changes
+
+- Fix dev browser token being read from a stale non-partitioned cookie when `partitionedCookies` is enabled. The token is now kept in memory so FAPI requests always use the authoritative value. ([#8161](https://github.com/clerk/javascript/pull/8161)) by [@brkalow](https://github.com/brkalow)
+
+- Fix `satelliteAutoSync` to default to `false` as documented. Previously, not passing the prop resulted in `undefined`, which was treated as `true` due to a strict equality check (`=== false`). This preserved Core 2 auto-sync behavior instead of the intended Core 3 default. The check is now `!== true`, so both `undefined` and `false` skip automatic satellite sync. ([#8001](https://github.com/clerk/javascript/pull/8001)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fix token cache refresh timer leak that caused accelerating token refresh requests after `session.touch()` or organization switching. ([#8098](https://github.com/clerk/javascript/pull/8098)) by [@jacekradko](https://github.com/jacekradko)
+
+- Skip `expired_token` retry flow when Session Minter is enabled. When `sessionMinter` is on, the token is sent in the POST body, so the retry-with-expired-token fallback is unnecessary. The retry flow is preserved for non-Session Minter mode. ([#8108](https://github.com/clerk/javascript/pull/8108)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Send `force_origin=true` body param on `/tokens` requests when `skipCache` is true, so FAPI Proxy routes to origin instead of Session Minter. ([#8106](https://github.com/clerk/javascript/pull/8106)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 6.3.2
 
 ### Patch Changes
