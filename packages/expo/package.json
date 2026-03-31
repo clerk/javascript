@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "3.1.2",
+  "version": "3.1.5",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -92,6 +92,8 @@
     "token-cache",
     "google",
     "apple",
+    "experimental",
+    "legacy",
     "src/specs",
     "expo-module.config.json",
     "react-native.config.js",

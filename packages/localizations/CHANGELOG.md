@@ -1,5 +1,31 @@
 # Change Log
 
+## 4.2.4
+
+### Patch Changes
+
+- Add the missing Dutch translation for `organizationProfile.start.profileSection.primaryButton`. ([#7711](https://github.com/clerk/javascript/pull/7711)) by [@MaartenKoller](https://github.com/MaartenKoller)
+
+  This updates the value from an empty string to `"Profiel bijwerken"` so the primary button label is shown correctly in the organization profile section.
+
+  No consumer code changes are required.
+
+## 4.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`f0533a2`](https://github.com/clerk/javascript/commit/f0533a26db17066a7dcc7992d9589ba3a60cc5b4), [`e00ec97`](https://github.com/clerk/javascript/commit/e00ec97895640db358af5a9df5d03e83f28f5a27)]:
+  - @clerk/shared@4.3.2
+
+## 4.2.2
+
+### Patch Changes
+
+- Fix en-GB username field placeholder (was showing literal "undefined" instead of "Enter your username") ([#8040](https://github.com/clerk/javascript/pull/8040)) by [@petiteoh](https://github.com/petiteoh)
+
+- Updated dependencies [[`b9cb6e5`](https://github.com/clerk/javascript/commit/b9cb6e576bf6af5662fcc624cf2de76120a14565)]:
+  - @clerk/shared@4.3.1
+
 ## 4.2.1
 
 ### Patch Changes
