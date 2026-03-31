@@ -1368,6 +1368,7 @@ export const ptBR: LocalizationResource = {
         title: 'Endereços de e-mail',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Conectar conta',
         title: 'Contas corporativas',
       },
       headerTitle__account: 'Conta',

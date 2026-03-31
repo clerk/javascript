@@ -17,8 +17,8 @@
   <a href="https://discord.com/invite/b5rXHjAg7A">
     <img alt="Discord" src="https://img.shields.io/discord/856971667393609759?color=7389D8&label&logo=discord&logoColor=ffffff" />
   </a>
-  <a href="https://twitter.com/clerkdev">
-    <img alt="Twitter" src="https://img.shields.io/twitter/url.svg?label=%40clerkdev&style=social&url=https%3A%2F%2Ftwitter.com%2Fclerkdev" />
+  <a href="https://twitter.com/clerk">
+    <img alt="Twitter" src="https://img.shields.io/twitter/url.svg?label=%40clerk&style=social&url=https%3A%2F%2Ftwitter.com%2Fclerk" />
   </a>
   <br />
   <br />
