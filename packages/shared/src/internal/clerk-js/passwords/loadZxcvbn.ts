@@ -1,5 +1,5 @@
-import type { ModuleManager } from '@/moduleManager';
-import type { ZxcvbnResult } from '@/types';
+import type { ModuleManager } from '../../../moduleManager';
+import type { ZxcvbnResult } from '../../../types';
 
 export type zxcvbnFN = (password: string, userInputs?: (string | number)[]) => ZxcvbnResult;
 

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { SignUpField, SignUpResource } from '@/types';
+import type { SignUpField, SignUpResource } from '../../../types';
 
 import { completeSignUpFlow } from '../completeSignUpFlow';
 

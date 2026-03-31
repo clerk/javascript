@@ -1,6 +1,6 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
-import type { ClientResource } from '@/types';
+import type { ClientResource } from '../../../types';
 
 import { useClerkInstanceContext } from '../../contexts';
 

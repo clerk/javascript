@@ -1,6 +1,6 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
-import type { OrganizationResource } from '@/types';
+import type { OrganizationResource } from '../../../types';
 
 import { useClerkInstanceContext, useInitialStateContext } from '../../contexts';
 

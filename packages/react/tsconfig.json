@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "esModuleInterop": true,
     "importHelpers": true,
     "isolatedModules": true,
@@ -16,7 +15,8 @@
     "skipLibCheck": true,
     "sourceMap": false,
     "strict": true,
-    "target": "ES2019"
+    "target": "ES2019",
+    "rootDir": "./src"
   },
   "include": ["src"]
 }
