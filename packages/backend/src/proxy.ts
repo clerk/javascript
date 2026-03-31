@@ -77,7 +77,7 @@ function getDynamicHopByHopHeaders(headers: Headers): Set<string> {
 // and Content-Length reflects the compressed size. We request identity
 // encoding upstream to avoid the double compression pass, but strip
 // these defensively since servers may ignore Accept-Encoding: identity.
-const RESPONSE_HEADERS_TO_STRIP = ['content-encoding', 'content-length'];
+const RESPONSE_HEADERS_TO_STRIP = new Set(['content-encoding', 'content-length']);
 
 /**
  * Derives the Frontend API URL from a publishable key.
@@ -322,7 +322,7 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
       const lower = key.toLowerCase();
       if (
         !HOP_BY_HOP_HEADERS.has(lower) &&
-        !RESPONSE_HEADERS_TO_STRIP.includes(lower) &&
+        !RESPONSE_HEADERS_TO_STRIP.has(lower) &&
         !responseDynamicHopByHop.has(lower)
       ) {
         if (lower === 'set-cookie') {
