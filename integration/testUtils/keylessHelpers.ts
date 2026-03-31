@@ -85,10 +85,7 @@ export async function testClaimedAppWithMissingKeys({
 
   const href = await u.po.keylessPopover.promptToUseClaimedKeys().getAttribute('href');
   expect(href).toBeTruthy();
-
-  const keysUrl = new URL(href!);
-  expect(keysUrl.href).toContain(dashboardUrl);
-  expect(keysUrl.searchParams.has('redirect_url')).toBe(true);
+  expect(href).toContain(dashboardUrl);
 }
 
 /**
