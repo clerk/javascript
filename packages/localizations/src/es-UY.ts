@@ -1362,6 +1362,7 @@ export const esUY: LocalizationResource = {
         title: 'Correos electrónicos',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Conectar cuenta',
         title: 'Cuentas empresariales',
       },
       headerTitle__account: 'Detalles del perfil',

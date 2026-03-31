@@ -1,5 +1,53 @@
 # Change Log
 
+## 3.2.3
+
+### Patch Changes
+
+- Fix `ERR_CONTENT_DECODING_FAILED` when loading proxied assets by requesting uncompressed responses from FAPI and stripping `Content-Encoding`/`Content-Length` headers that `fetch()` invalidates through auto-decompression. ([#8159](https://github.com/clerk/javascript/pull/8159)) by [@brkalow](https://github.com/brkalow)
+
+- Fix `satelliteAutoSync` to default to `false` as documented. Previously, not passing the prop resulted in `undefined`, which was treated as `true` due to a strict equality check (`=== false`). This preserved Core 2 auto-sync behavior instead of the intended Core 3 default. The check is now `!== true`, so both `undefined` and `false` skip automatic satellite sync. ([#8001](https://github.com/clerk/javascript/pull/8001)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fix an issue where multiple `set-cookie` headers were being dropped by the frontend API proxy. ([#8162](https://github.com/clerk/javascript/pull/8162)) by [@brkalow](https://github.com/brkalow)
+
+## 3.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`f0533a2`](https://github.com/clerk/javascript/commit/f0533a26db17066a7dcc7992d9589ba3a60cc5b4), [`e00ec97`](https://github.com/clerk/javascript/commit/e00ec97895640db358af5a9df5d03e83f28f5a27)]:
+  - @clerk/shared@4.3.2
+
+## 3.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`b9cb6e5`](https://github.com/clerk/javascript/commit/b9cb6e576bf6af5662fcc624cf2de76120a14565)]:
+  - @clerk/shared@4.3.1
+
+## 3.2.0
+
+### Minor Changes
+
+- Add `EnterpriseConnection` resource, allowing to create both OIDC and SAML connections ([#8017](https://github.com/clerk/javascript/pull/8017)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Fix casing of enterprise connection API params when sending `saml` or `oidc` configuration ([#8022](https://github.com/clerk/javascript/pull/8022)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`de1386f`](https://github.com/clerk/javascript/commit/de1386fc90a3e8c2bab515b693c84a1b383525d3)]:
+  - @clerk/shared@4.3.0
+
+## 3.1.0
+
+### Minor Changes
+
+- Add support for annual-only Billing plans. ([#8012](https://github.com/clerk/javascript/pull/8012)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`3e63793`](https://github.com/clerk/javascript/commit/3e637932b1b7af669955f0e4f86233106f7d18ef)]:
+  - @clerk/shared@4.2.0
+
 ## 3.0.2
 
 ### Patch Changes

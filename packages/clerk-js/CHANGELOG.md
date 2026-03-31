@@ -1,5 +1,61 @@
 # Change Log
 
+## 6.3.3
+
+### Patch Changes
+
+- Fix dev browser token being read from a stale non-partitioned cookie when `partitionedCookies` is enabled. The token is now kept in memory so FAPI requests always use the authoritative value. ([#8161](https://github.com/clerk/javascript/pull/8161)) by [@brkalow](https://github.com/brkalow)
+
+- Fix `satelliteAutoSync` to default to `false` as documented. Previously, not passing the prop resulted in `undefined`, which was treated as `true` due to a strict equality check (`=== false`). This preserved Core 2 auto-sync behavior instead of the intended Core 3 default. The check is now `!== true`, so both `undefined` and `false` skip automatic satellite sync. ([#8001](https://github.com/clerk/javascript/pull/8001)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fix token cache refresh timer leak that caused accelerating token refresh requests after `session.touch()` or organization switching. ([#8098](https://github.com/clerk/javascript/pull/8098)) by [@jacekradko](https://github.com/jacekradko)
+
+- Skip `expired_token` retry flow when Session Minter is enabled. When `sessionMinter` is on, the token is sent in the POST body, so the retry-with-expired-token fallback is unnecessary. The retry flow is preserved for non-Session Minter mode. ([#8108](https://github.com/clerk/javascript/pull/8108)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Send `force_origin=true` body param on `/tokens` requests when `skipCache` is true, so FAPI Proxy routes to origin instead of Session Minter. ([#8106](https://github.com/clerk/javascript/pull/8106)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 6.3.2
+
+### Patch Changes
+
+- Send previous session token on `/tokens` requests to support Session Minter edge token minting. ([#8105](https://github.com/clerk/javascript/pull/8105)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add optional `intent` parameter to `session.touch()` to indicate why the touch was triggered (focus, session switch, or org switch). This enables the backend to skip expensive client piggybacking for focus-only touches. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`f0533a2`](https://github.com/clerk/javascript/commit/f0533a26db17066a7dcc7992d9589ba3a60cc5b4), [`e00ec97`](https://github.com/clerk/javascript/commit/e00ec97895640db358af5a9df5d03e83f28f5a27)]:
+  - @clerk/shared@4.3.2
+
+## 6.3.1
+
+### Patch Changes
+
+- Ensure clerk-js accepts `proxyUrl` and `domain` in non-browser environments. ([#8095](https://github.com/clerk/javascript/pull/8095)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`b9cb6e5`](https://github.com/clerk/javascript/commit/b9cb6e576bf6af5662fcc624cf2de76120a14565)]:
+  - @clerk/shared@4.3.1
+
+## 6.3.0
+
+### Minor Changes
+
+- Support `sign_up_if_missing` on SignIn.create, including captcha ([#8030](https://github.com/clerk/javascript/pull/8030)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Updated dependencies [[`de1386f`](https://github.com/clerk/javascript/commit/de1386fc90a3e8c2bab515b693c84a1b383525d3)]:
+  - @clerk/shared@4.3.0
+
+## 6.2.0
+
+### Minor Changes
+
+- Add support for annual-only Billing plans. ([#8012](https://github.com/clerk/javascript/pull/8012)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`3e63793`](https://github.com/clerk/javascript/commit/3e637932b1b7af669955f0e4f86233106f7d18ef)]:
+  - @clerk/shared@4.2.0
+
 ## 6.1.0
 
 ### Minor Changes

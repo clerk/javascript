@@ -1347,6 +1347,7 @@ export const nbNO: LocalizationResource = {
         title: 'E-postadresser',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Koble til konto',
         title: 'Bedriftskontoer',
       },
       headerTitle__account: 'Konto',

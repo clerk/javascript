@@ -1202,7 +1202,7 @@ export const bgBG: LocalizationResource = {
         formButton: undefined,
         formSubtitle: undefined,
       },
-      formHint: undefined,
+      formHint: `Ще трябва да потвърдите този имейл адрес преди да бъде добавен към вашия профил.`,
       removeResource: {
         messageLine1: '{{identifier}} ще бъде премахнат от този профил.',
         messageLine2: 'Няма да можете да влезете в профила си, използвайки този имейл адрес.',
@@ -1210,13 +1210,13 @@ export const bgBG: LocalizationResource = {
         title: 'Премахни имейл адрес',
       },
       title: 'Добави имейл адрес',
-      verifyTitle: 'Verify email address',
+      verifyTitle: 'Потвърди имейл адрес',
     },
-    formButtonPrimary__add: 'Add',
+    formButtonPrimary__add: 'Добави',
     formButtonPrimary__continue: 'Продължи',
     formButtonPrimary__finish: 'Завърши',
-    formButtonPrimary__remove: 'Remove',
-    formButtonPrimary__save: 'Save',
+    formButtonPrimary__remove: 'Премахни',
+    formButtonPrimary__save: 'Запази',
     formButtonReset: 'Откажи',
     mfaPage: {
       formHint: 'Изберете метод, който да добавите.',
@@ -1269,11 +1269,11 @@ export const bgBG: LocalizationResource = {
     },
     mobileButton__menu: 'Меню',
     navbar: {
-      account: 'Profile',
+      account: 'Профил',
       apiKeys: undefined,
       billing: undefined,
       description: 'Управлявайте информацията в профила си.',
-      security: 'Security',
+      security: 'Сигурност',
       title: 'Профил',
     },
     passkeyScreen: {
@@ -1348,6 +1348,7 @@ export const bgBG: LocalizationResource = {
         title: 'Имейл адреси',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Свържи акаунт',
         title: 'Корпоративни акаунти',
       },
       headerTitle__account: 'Профил',

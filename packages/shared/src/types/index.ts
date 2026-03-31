@@ -16,6 +16,7 @@ export type * from './displayConfig';
 export type * from './elementIds';
 export type * from './emailAddress';
 export type * from './enterpriseAccount';
+export type * from './enterpriseConnection';
 export type * from './environment';
 export type * from './errors';
 export type * from './externalAccount';
