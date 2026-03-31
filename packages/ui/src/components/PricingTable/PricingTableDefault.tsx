@@ -334,7 +334,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
     }
 
     return plan.fee ? localizationKeys('billing.month') : localizationKeys('billing.year');
-  }, [plan.unitPrices]);
+  }, [plan.hasBaseFee, plan.fee, plan.unitPrices]);
 
   const displayedFee = singleUnitPriceTierFee ?? fee;
   const feeFormatted = React.useMemo(() => {
