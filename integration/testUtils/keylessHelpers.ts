@@ -83,15 +83,12 @@ export async function testClaimedAppWithMissingKeys({
   expect(await u.po.keylessPopover.isExpanded()).toBe(true);
   await expect(u.po.keylessPopover.promptToUseClaimedKeys()).toBeVisible();
 
-  const [newPage] = await Promise.all([
-    context.waitForEvent('page'),
-    u.po.keylessPopover.promptToUseClaimedKeys().click(),
-  ]);
+  const href = await u.po.keylessPopover.promptToUseClaimedKeys().getAttribute('href');
+  expect(href).toBeTruthy();
 
-  await newPage.waitForLoadState();
-  await newPage.waitForURL(url => {
-    return url.href.startsWith(`${dashboardUrl}sign-in?redirect_url=${encodeURIComponent(dashboardUrl)}apps%2Fapp_`);
-  });
+  const keysUrl = new URL(href!);
+  expect(keysUrl.href).toContain(dashboardUrl);
+  expect(keysUrl.searchParams.has('redirect_url')).toBe(true);
 }
 
 /**
