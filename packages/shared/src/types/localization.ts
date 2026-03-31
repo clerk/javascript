@@ -175,7 +175,11 @@ export type __internal_LocalizationResource = {
   membershipRole__guestMember: LocalizationValue;
   billing: {
     month: LocalizationValue;
+    monthAbbreviation: LocalizationValue;
+    monthPerUnit: LocalizationValue<'unitName'>;
     year: LocalizationValue;
+    yearAbbreviation: LocalizationValue;
+    yearPerUnit: LocalizationValue<'unitName'>;
     free: LocalizationValue;
     getStarted: LocalizationValue;
     manage: LocalizationValue;
@@ -183,6 +187,7 @@ export type __internal_LocalizationResource = {
     cancelSubscription: LocalizationValue;
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
+    seats: LocalizationValue;
     subscribe: LocalizationValue;
     startFreeTrial: LocalizationValue;
     startFreeTrial__days: LocalizationValue<'days'>;
@@ -258,6 +263,19 @@ export type __internal_LocalizationResource = {
     pricingTable: {
       billingCycle: LocalizationValue;
       included: LocalizationValue;
+      seatCost: {
+        freeUpToSeats: LocalizationValue<'endsAfterBlock'>;
+        upToSeats: LocalizationValue<'endsAfterBlock'>;
+        perSeat: LocalizationValue<'feePerBlockAmount' | 'periodAbbreviation'>;
+        includedSeats: LocalizationValue<'includedSeats'>;
+        additionalSeats: LocalizationValue<'additionalTierFeePerBlockAmount' | 'periodAbbreviation'>;
+        unlimitedSeats: LocalizationValue;
+        tooltip: {
+          freeForUpToSeats: LocalizationValue<'endsAfterBlock'>;
+          additionalSeatsEach: LocalizationValue<'feePerBlockAmount' | 'period'>;
+          firstSeatsIncludedInPlan: LocalizationValue<'endsAfterBlock'>;
+        };
+      };
     };
     checkout: {
       title: LocalizationValue;
@@ -1007,6 +1025,7 @@ export type __internal_LocalizationResource = {
     badge__manualInvitation: LocalizationValue;
     start: {
       headerTitle__members: LocalizationValue;
+      membershipSeatUsageLabel: LocalizationValue<'count' | 'limit'>;
       headerTitle__general: LocalizationValue;
       profileSection: {
         title: LocalizationValue;
@@ -1205,6 +1224,7 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       alerts: {
         noPermissionsToManageBilling: LocalizationValue;
+        planMembershipLimitExceeded: LocalizationValue<'count' | 'limit'>;
       };
     };
     apiKeysPage: {
