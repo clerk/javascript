@@ -13,7 +13,11 @@ const RETRYABLE_STATUS_CODES = new Set([408, 429, 500, 502, 503, 504]);
 const RETRYABLE_NETWORK_ERRORS = new Set(['ECONNREFUSED', 'ECONNRESET', 'ENOTFOUND', 'ETIMEDOUT', 'EAI_AGAIN']);
 
 function isNetworkError(error: unknown): boolean {
-  return error instanceof Error && 'code' in error && RETRYABLE_NETWORK_ERRORS.has((error as NodeJS.ErrnoException).code ?? '');
+  return (
+    error instanceof Error &&
+    'code' in error &&
+    RETRYABLE_NETWORK_ERRORS.has((error as NodeJS.ErrnoException).code ?? '')
+  );
 }
 
 async function fetchWithRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
