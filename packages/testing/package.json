@@ -73,7 +73,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "test": "vitest run",
+    "test": "vitest",
     "test:ci": "vitest run --maxWorkers=70%"
   },
   "dependencies": {
