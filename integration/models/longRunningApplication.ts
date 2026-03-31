@@ -113,7 +113,11 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
       const publishableKey = params.env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
       const secretKey = params.env.privateVariables.get('CLERK_SECRET_KEY');
       const apiUrl = params.env.privateVariables.get('CLERK_API_URL');
-      const { instanceType, frontendApi: frontendApiUrl } = parsePublishableKey(publishableKey);
+      const parsed = parsePublishableKey(publishableKey);
+      if (!parsed) {
+        throw new Error(`Invalid or missing CLERK_PUBLISHABLE_KEY for ${name}`);
+      }
+      const { instanceType, frontendApi: frontendApiUrl } = parsed;
 
       if (instanceType !== 'development') {
         log('Skipping setup of testing tokens for non-development instance');

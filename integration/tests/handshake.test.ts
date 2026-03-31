@@ -70,7 +70,7 @@ test.describe('Client handshake @generic', () => {
   });
 
   test.afterAll(async () => {
-    await app.teardown();
+    await app?.teardown();
     await new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
