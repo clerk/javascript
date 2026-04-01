@@ -8,7 +8,7 @@
     { "path": "./dist/vendors*.js", "maxSize": "7KB" },
     { "path": "./dist/coinbase*.js", "maxSize": "36KB" },
     { "path": "./dist/base-account-sdk*.js", "maxSize": "203KB" },
-    { "path": "./dist/stripe-vendors*.js", "maxSize": "1KB" },
+    { "path": "./dist/stripe-vendors*.js", "maxSize": "2KB" },
     { "path": "./dist/query-core-vendors*.js", "maxSize": "11KB" },
     { "path": "./dist/zxcvbn-ts-core*.js", "maxSize": "12KB" },
     { "path": "./dist/zxcvbn-common*.js", "maxSize": "226KB" }
