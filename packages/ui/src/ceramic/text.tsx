@@ -1,4 +1,7 @@
-import { style, variants } from './variants';
+import * as React from 'react';
+
+import { Composite, type RenderProp } from './composite';
+import { type StyleRule, type VariantProps, style, variants } from './variants';
 
 export const textStyles = variants({
   base: style(theme => ({
@@ -46,3 +49,30 @@ export const textStyles = variants({
     font: 'sans',
   },
 });
+
+type TextVariantProps = VariantProps<typeof textStyles>;
+
+type TextProps = TextVariantProps & {
+  render?: RenderProp;
+  sx?: StyleRule;
+};
+
+export const Text = React.forwardRef<HTMLElement, Omit<React.HTMLProps<HTMLElement>, 'color'> & TextProps>(
+  function Text(props, forwardedRef) {
+    const { render = <p />, variant, color, font, sx, ...domProps } = props;
+
+    const combinedSx: StyleRule = theme => ({
+      ...(textStyles({ variant, color, font }) as any)(theme),
+      ...(typeof sx === 'function' ? sx(theme) : sx),
+    });
+
+    return (
+      <Composite
+        render={render}
+        sx={combinedSx}
+        ref={forwardedRef}
+        {...domProps}
+      />
+    );
+  },
+);

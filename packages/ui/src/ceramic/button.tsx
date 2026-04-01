@@ -1,9 +1,11 @@
-import { style, variants } from './variants';
+import * as React from 'react';
+
+import { Composite, type RenderProp } from './composite';
+import { type StyleRule, type VariantProps, style, variants } from './variants';
 
 export const buttonStyles = variants({
   base: style(theme => ({
     appearance: 'none',
-    boxSizing: 'border-box',
     position: 'relative',
     display: 'inline-flex',
     alignItems: 'center',
@@ -16,8 +18,6 @@ export const buttonStyles = variants({
     fontFamily: theme.fontFamilies.sans,
     border: 'none',
     outline: 'none',
-    margin: 0,
-    paddingBlock: 0,
     paddingInline: theme.spacing[3],
     cursor: 'pointer',
     textDecoration: 'none',
@@ -55,7 +55,7 @@ export const buttonStyles = variants({
     },
   })),
   variants: {
-    variant: {
+    color: {
       primary: style(theme => ({
         background: theme.colors.purple[700],
         color: theme.colors.white,
@@ -73,7 +73,34 @@ export const buttonStyles = variants({
     },
   },
   defaultVariants: {
-    variant: 'primary',
+    color: 'primary',
     fullWidth: false,
   },
 });
+
+type ButtonVariantProps = VariantProps<typeof buttonStyles>;
+
+type ButtonProps = ButtonVariantProps & {
+  render?: RenderProp;
+  sx?: StyleRule;
+};
+
+export const Button = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement> & ButtonProps>(
+  function Button(props, forwardedRef) {
+    const { render = <button type='button' />, color, fullWidth, sx, ...domProps } = props;
+
+    const combinedSx: StyleRule = theme => ({
+      ...(buttonStyles({ color, fullWidth }) as any)(theme),
+      ...(typeof sx === 'function' ? sx(theme) : sx),
+    });
+
+    return (
+      <Composite
+        render={render}
+        sx={combinedSx}
+        ref={forwardedRef}
+        {...domProps}
+      />
+    );
+  },
+);

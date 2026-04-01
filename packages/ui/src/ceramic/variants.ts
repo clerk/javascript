@@ -4,10 +4,10 @@ import type { Interpolation, Theme } from '@emotion/react';
 
 import { type CeramicTheme } from './theme';
 
-type CSSObject = Record<string, any>;
+export type CSSObject = Record<string, any>;
 // StyleFunction uses CeramicTheme to provide proper typing for theme parameter
-type StyleFunction = (theme: CeramicTheme) => CSSObject;
-type StyleRule = CSSObject | StyleFunction;
+export type StyleFunction = (theme: CeramicTheme) => CSSObject;
+export type StyleRule = CSSObject | StyleFunction;
 
 // Convert string literal "true" | "false" to boolean (CVA's StringToBoolean)
 type StringToBoolean<T> = T extends 'true' | 'false' ? boolean : T;
