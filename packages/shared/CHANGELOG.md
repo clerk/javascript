@@ -1,5 +1,37 @@
 # Change Log
 
+## 4.4.0
+
+### Minor Changes
+
+- Add support for seat-based billing plans in Clerk Billing. ([#8006](https://github.com/clerk/javascript/pull/8006)) by [@dstaley](https://github.com/dstaley)
+
+- Add `EnterpriseConnection` resource ([#8175](https://github.com/clerk/javascript/pull/8175)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  `User.getEnterpriseConnections()` was wrongly typed as returning `EnterpriseAccountConnectionResource[]`, it now returns `EnterpriseConnectionResource[]`
+
+- Allow to link external accounts to enterprise accounts via `UserProfile` ([#8091](https://github.com/clerk/javascript/pull/8091)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+### Patch Changes
+
+- Improved error handling when creating API keys. ([#8056](https://github.com/clerk/javascript/pull/8056)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Use distinct password placeholder for sign-up forms ([#8082](https://github.com/clerk/javascript/pull/8082)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.3.2
+
+### Patch Changes
+
+- Fix false offline detection in React Native by checking `navigator.product` and `typeof navigator.onLine` before treating the environment as disconnected ([#8084](https://github.com/clerk/javascript/pull/8084)) by [@eliotgevers](https://github.com/eliotgevers)
+
+- Add optional `intent` parameter to `session.touch()` to indicate why the touch was triggered (focus, session switch, or org switch). This enables the backend to skip expensive client piggybacking for focus-only touches. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 4.3.1
+
+### Patch Changes
+
+- Ensure clerk-js accepts `proxyUrl` and `domain` in non-browser environments. ([#8095](https://github.com/clerk/javascript/pull/8095)) by [@brkalow](https://github.com/brkalow)
+
 ## 4.3.0
 
 ### Minor Changes

@@ -20,7 +20,7 @@ import {
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { errorThrower } from '../../errorThrower';
-import { isNative } from '../../utils';
+import { assertValidProxyUrl, isNative } from '../../utils';
 import type { BuildClerkOptions } from './types';
 
 /**
@@ -100,12 +100,15 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
     }
 
     if (!__internal_clerk || hasConfigChanged) {
+      assertValidProxyUrl(proxyUrl);
+
       if (hasConfigChanged) {
         tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
       }
 
       const getToken = tokenCache.getToken;
       const saveToken = tokenCache.saveToken;
+
       __internal_clerkOptions = { publishableKey, proxyUrl, domain };
       __internal_clerk = new ClerkClass(publishableKey, { proxyUrl, domain }) as unknown as BrowserClerk;
 

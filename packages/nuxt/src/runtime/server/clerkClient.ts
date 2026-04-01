@@ -1,4 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
+import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { deprecated } from '@clerk/shared/deprecated';
 import { isTruthy } from '@clerk/shared/underscore';
 import type { H3Event } from 'h3';
@@ -14,7 +15,7 @@ function resolveApiUrl(runtimeConfig: ReturnType<typeof useRuntimeConfig>): stri
     deprecated('NUXT_PUBLIC_CLERK_API_URL', 'Use `NUXT_CLERK_API_URL` instead.');
     return runtimeConfig.public.clerk.apiUrl;
   }
-  return 'https://api.clerk.com';
+  return apiUrlFromPublishableKey(runtimeConfig.public.clerk.publishableKey);
 }
 
 function resolveApiVersion(runtimeConfig: ReturnType<typeof useRuntimeConfig>): string {
