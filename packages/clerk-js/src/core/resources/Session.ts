@@ -1,9 +1,24 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { ClerkWebAuthnError, is4xxError } from '@clerk/shared/error';
+import { isBrowserOnline, isValidBrowserOnline } from '@clerk/shared/browser';
+import {
+  ClerkOfflineError,
+  ClerkRuntimeError,
+  ClerkWebAuthnError,
+  is4xxError,
+  is429Error,
+  MissingExpiredTokenError,
+} from '@clerk/shared/error';
+import {
+  convertJSONToPublicKeyRequestOptions,
+  serializePublicKeyCredentialAssertion,
+  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
+} from '@clerk/shared/internal/clerk-js/passkeys';
 import { retry } from '@clerk/shared/retry';
 import type {
   ActClaim,
+  AgentActClaim,
   CheckAuthorization,
+  ClientResource,
   EmailCodeConfig,
   EnterpriseSSOConfig,
   GetToken,
@@ -14,6 +29,7 @@ import type {
   SessionResource,
   SessionStatus,
   SessionTask,
+  SessionTouchParams,
   SessionVerificationJSON,
   SessionVerificationResource,
   SessionVerifyAttemptFirstFactorParams,
@@ -28,21 +44,23 @@ import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/share
 
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
-import {
-  convertJSONToPublicKeyRequestOptions,
-  serializePublicKeyCredentialAssertion,
-  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
-} from '@/utils/passkeys';
 import { TokenId } from '@/utils/tokenId';
 
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
+import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
-import { BaseResource, PublicUserData, Token, User } from './internal';
+import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
+
+  /**
+   * Tracks token IDs with in-flight background refresh requests.
+   * Prevents multiple concurrent background refreshes for the same token.
+   */
+  static #backgroundRefreshInProgress = new Set<string>();
 
   id!: string;
   status!: SessionStatus;
@@ -50,6 +68,7 @@ export class Session extends BaseResource implements SessionResource {
   lastActiveToken!: TokenResource | null;
   lastActiveOrganizationId!: string | null;
   actor!: ActClaim | null;
+  agent!: AgentActClaim | null;
   user!: UserResource | null;
   publicUserData!: PublicUserData;
   factorVerificationAge: [number, number] | null = null;
@@ -84,17 +103,52 @@ export class Session extends BaseResource implements SessionResource {
     });
   };
 
-  touch = (): Promise<SessionResource> => {
-    return this._basePost({
-      action: 'touch',
-      body: { active_organization_id: this.lastActiveOrganizationId },
-    }).then(res => {
-      // touch() will potentially change the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
-      if (res.lastActiveToken) {
-        eventBus.emit(events.TokenUpdate, { token: res.lastActiveToken });
-      }
-      return res;
-    });
+  private _touchPost = async (
+    { intent, skipUpdateClient }: { intent?: SessionTouchParams['intent']; skipUpdateClient: boolean } = {
+      skipUpdateClient: false,
+    },
+  ): Promise<FapiResponseJSON<SessionJSON> | null> => {
+    const json = await BaseResource._fetch<SessionJSON>(
+      {
+        method: 'POST',
+        path: this.path('touch'),
+        // any is how we type the body in the BaseMutateParams as well
+        body: { active_organization_id: this.lastActiveOrganizationId, intent } as any,
+      },
+      { skipUpdateClient },
+    );
+
+    // Update session in-place from response (same as BaseResource._baseMutate)
+    this.fromJSON((json?.response || json) as SessionJSON);
+
+    return json;
+  };
+
+  touch = async ({ intent }: SessionTouchParams = {}): Promise<SessionResource> => {
+    await this._touchPost({ intent, skipUpdateClient: false });
+
+    // _touchPost() will have updated `this` in-place
+    // The post has potentially changed the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
+    if (this.lastActiveToken) {
+      eventBus.emit(events.TokenUpdate, { token: this.lastActiveToken });
+    }
+
+    return this;
+  };
+
+  /**
+   * Internal method to touch the session without updating the client or explicitly emitting the TokenUpdate event.
+   *
+   * Returns the piggybacked client resource if it exists, otherwise undefined.
+   *
+   * The caller is responsible for calling updateClient(result), which internally also emits TokenUpdate.
+   * If updateClient() is not called, the server state and client state will be out of sync.
+   *
+   * @internal
+   */
+  __internal_touch = async ({ intent }: SessionTouchParams = {}): Promise<ClientResource | undefined> => {
+    const json = await this._touchPost({ intent, skipUpdateClient: true });
+    return getClientResourceFromPayload(json);
   };
 
   clearCache = (): void => {
@@ -102,18 +156,43 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
-    // This will retry the getToken call if it fails with a non-4xx error
-    // We're going to trigger 8 retries in the span of ~3 minutes,
-    // Example delays: 3s, 5s, 13s, 19s, 26s, 34s, 43s, 50s, total: ~193s
-    return retry(() => this._getToken(options), {
-      factor: 1.55,
-      initialDelay: 3 * 1000,
-      maxDelayBetweenRetries: 50 * 1_000,
-      jitter: false,
-      shouldRetry: (error, iterationsCount) => {
-        return !is4xxError(error) && iterationsCount <= 8;
-      },
-    });
+    // Retry on transient failures (5xx, network errors, 429 rate limits).
+    // Do not retry on deterministic client errors (4xx) — they won't resolve on their own.
+    // For offline state, we use shorter retries (~15s total) before throwing ClerkOfflineError.
+    // For other errors, we retry up to 8 times over ~3 minutes.
+    try {
+      const result = await retry(() => this._getToken(options), {
+        factor: 1.55,
+        initialDelay: 3 * 1000,
+        maxDelayBetweenRetries: 50 * 1_000,
+        jitter: false,
+        shouldRetry: (error, iterationsCount) => {
+          if (is4xxError(error) && !is429Error(error)) {
+            return false;
+          }
+
+          if (!isValidBrowserOnline()) {
+            return iterationsCount <= 3;
+          }
+          return iterationsCount <= 8;
+        },
+      });
+
+      // If we're offline and got a null/empty result, this is likely due to
+      // BaseResource._baseFetch returning null when offline (silent failure mode).
+      // Throw ClerkOfflineError to make the offline state explicit.
+      if (!result && !isValidBrowserOnline()) {
+        throw new ClerkOfflineError('Network request failed while offline. The browser appears to be disconnected.');
+      }
+
+      return result;
+    } catch (error) {
+      // If the browser is offline after retries, throw ClerkOfflineError
+      if (!isValidBrowserOnline()) {
+        throw new ClerkOfflineError('Network request failed while offline. The browser appears to be disconnected.');
+      }
+      throw error;
+    }
   };
 
   checkAuthorization: CheckAuthorization = params => {
@@ -131,16 +210,15 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   #hydrateCache = (token: TokenResource | null) => {
-    if (!token) {
-      return;
-    }
-
-    const tokenId = this.#getCacheId();
-    const existing = SessionTokenCache.get({ tokenId });
-    if (!existing) {
+    if (token) {
+      const tokenId = this.#getCacheId();
+      // Dispatch tokenUpdate for __session tokens with the session's active organization ID
+      const shouldDispatchTokenUpdate = true;
       SessionTokenCache.set({
         tokenId,
         tokenResolver: Promise.resolve(token),
+        onRefresh: () =>
+          this.#refreshTokenInBackground(undefined, this.lastActiveOrganizationId, tokenId, shouldDispatchTokenUpdate),
       });
     }
   };
@@ -317,6 +395,7 @@ export class Session extends BaseResource implements SessionResource {
     this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.lastActiveOrganizationId = data.last_active_organization_id;
     this.actor = data.actor || null;
+    this.agent = data.actor?.type === 'agent' ? (data.actor as AgentActClaim) : null;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.user = new User(data.user);
@@ -356,74 +435,173 @@ export class Session extends BaseResource implements SessionResource {
       return null;
     }
 
-    const { leewayInSeconds, template, skipCache = false } = options || {};
+    const { skipCache = false, template } = options || {};
 
     // If no organization ID is provided, default to the selected organization in memory
     // Note: this explicitly allows passing `null` or `""`, which should select the personal workspace.
     const organizationId =
       typeof options?.organizationId === 'undefined' ? this.lastActiveOrganizationId : options?.organizationId;
 
-    if (!template && Number(leewayInSeconds) >= 60) {
-      throw new Error('Leeway can not exceed the token lifespan (60 seconds)');
-    }
-
     const tokenId = this.#getCacheId(template, organizationId);
 
-    const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
+    const cacheResult = skipCache ? undefined : SessionTokenCache.get({ tokenId });
 
     // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
-    if (cachedEntry) {
-      debugLogger.debug(
-        'Using cached token (no fetch needed)',
-        {
-          tokenId,
-        },
-        'session',
-      );
-      const cachedToken = await cachedEntry.tokenResolver;
-      if (shouldDispatchTokenUpdate) {
+    let result: string | null;
+
+    if (cacheResult) {
+      // Proactive refresh is handled by timers scheduled in the cache
+      // Prefer synchronous read to avoid microtask overhead when token is already resolved
+      const cachedToken = cacheResult.entry.resolvedToken ?? (await cacheResult.entry.tokenResolver);
+      // Only emit token updates when we have an actual token — emitting with an empty
+      // token causes AuthCookieService to remove the __session cookie (looks like sign-out).
+      if (shouldDispatchTokenUpdate && cachedToken.getRawString()) {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
-      // Return null when raw string is empty to indicate that there it's signed-out
-      return cachedToken.getRawString() || null;
+      result = cachedToken.getRawString() || null;
+    } else if (!isBrowserOnline()) {
+      throw new ClerkRuntimeError('Browser is offline, skipping token fetch', { code: 'network_error' });
+    } else {
+      result = await this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
     }
 
-    debugLogger.info(
-      'Fetching new token from API',
-      {
-        organizationId,
-        template,
-        tokenId,
-      },
-      'session',
-    );
+    // Throw when offline and no token so retry() in getToken() can fire.
+    // Without this, _getToken returns null (success) and retry() never calls shouldRetry.
+    if (result === null && !isValidBrowserOnline()) {
+      throw new ClerkRuntimeError('Network request failed while offline', { code: 'network_error' });
+    }
 
+    return result;
+  }
+
+  #createTokenResolver(
+    template: string | undefined,
+    organizationId: string | undefined | null,
+    skipCache: boolean,
+  ): Promise<TokenResource> {
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
-
     // TODO: update template endpoint to accept organizationId
-    const params: Record<string, string | null> = template ? {} : { organizationId };
+    const sessionMinterEnabled = Session.clerk?.__internal_environment?.authConfig?.sessionMinter;
+    const params: Record<string, string | null> = template
+      ? {}
+      : {
+          organizationId: organizationId ?? null,
+          ...(sessionMinterEnabled && this.lastActiveToken ? { token: this.lastActiveToken.getRawString() } : {}),
+          ...(sessionMinterEnabled && skipCache ? { forceOrigin: 'true' } : {}),
+        };
 
-    const tokenResolver = Token.create(path, params);
+    if (sessionMinterEnabled) {
+      // Session Minter sends the token in the body, no expired_token retry needed
+      return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined);
+    }
 
-    // Cache the promise immediately to prevent concurrent calls from triggering duplicate requests
-    SessionTokenCache.set({ tokenId, tokenResolver });
+    // TODO: Remove this expired_token retry flow when the sessionMinter flag is removed
+    const lastActiveToken = this.lastActiveToken?.getRawString();
+    return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+      if (MissingExpiredTokenError.is(e) && lastActiveToken) {
+        return Token.create(path, { ...params }, { expired_token: lastActiveToken });
+      }
+      throw e;
+    });
+  }
+
+  #dispatchTokenEvents(token: TokenResource, shouldDispatch: boolean): void {
+    if (!shouldDispatch) {
+      return;
+    }
+
+    // Never dispatch empty tokens — this would cause AuthCookieService to remove
+    // the __session cookie even though the user is still authenticated.
+    if (!token.getRawString()) {
+      return;
+    }
+
+    eventBus.emit(events.TokenUpdate, { token });
+
+    if (token.jwt) {
+      this.lastActiveToken = token;
+      eventBus.emit(events.SessionTokenResolved, null);
+    }
+  }
+
+  #fetchToken(
+    template: string | undefined,
+    organizationId: string | undefined | null,
+    tokenId: string,
+    shouldDispatchTokenUpdate: boolean,
+    skipCache: boolean,
+  ): Promise<string | null> {
+    debugLogger.info('Fetching new token from API', { organizationId, template, tokenId }, 'session');
+
+    const tokenResolver = this.#createTokenResolver(template, organizationId, skipCache);
+    SessionTokenCache.set({
+      tokenId,
+      tokenResolver,
+      onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+    });
 
     return tokenResolver.then(token => {
-      if (shouldDispatchTokenUpdate) {
-        eventBus.emit(events.TokenUpdate, { token });
-
-        if (token.jwt) {
-          this.lastActiveToken = token;
-          // Emits the updated session with the new token to the state listeners
-          eventBus.emit(events.SessionTokenResolved, null);
-        }
+      const rawString = token.getRawString();
+      if (!rawString) {
+        // Throw so retry logic in getToken() can handle it,
+        // rather than silently returning null (which callers interpret as "signed out").
+        throw new ClerkRuntimeError('Token fetch returned empty response', { code: 'network_error' });
       }
-
-      // Return null when raw string is empty to indicate that there it's signed-out
-      return token.getRawString() || null;
+      this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
+      return rawString;
     });
+  }
+
+  /**
+   * Triggers a background token refresh without caching the pending promise.
+   * This allows concurrent getToken() calls to continue returning the stale cached token
+   * while the refresh is in progress. The cache is only updated after the refresh succeeds.
+   *
+   * Uses a static Set to prevent multiple concurrent background refreshes for the same token.
+   */
+  #refreshTokenInBackground(
+    template: string | undefined,
+    organizationId: string | undefined | null,
+    tokenId: string,
+    shouldDispatchTokenUpdate: boolean,
+  ): void {
+    // Prevent multiple concurrent background refreshes for the same token
+    if (Session.#backgroundRefreshInProgress.has(tokenId)) {
+      return;
+    }
+
+    Session.#backgroundRefreshInProgress.add(tokenId);
+
+    const tokenResolver = this.#createTokenResolver(template, organizationId, false);
+
+    // Don't cache the promise immediately - only update cache on success
+    // This allows concurrent calls to continue using the stale token
+    tokenResolver
+      .then(token => {
+        // Never cache or dispatch empty tokens — preserve the stale-but-valid
+        // token in cache instead of replacing it with an empty one.
+        if (!token.getRawString()) {
+          return;
+        }
+
+        // Cache the resolved token for future calls
+        // Re-register onRefresh to handle the next refresh cycle when this token approaches expiration
+        SessionTokenCache.set({
+          tokenId,
+          tokenResolver: Promise.resolve(token),
+          onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+        });
+        this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
+      })
+      .catch(error => {
+        // Log but don't propagate - callers already have stale token
+        debugLogger.warn('Background token refresh failed', { error, tokenId }, 'session');
+      })
+      .finally(() => {
+        Session.#backgroundRefreshInProgress.delete(tokenId);
+      });
   }
 
   get currentTask() {

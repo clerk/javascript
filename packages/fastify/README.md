@@ -13,7 +13,7 @@
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_fastify)
-[![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/Clerk?style=social)](https://twitter.com/intent/follow?screen_name=Clerk)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/fastify/CHANGELOG.md)
 ·
@@ -32,7 +32,7 @@
 ### Prerequisites
 
 - Fastify `^5.0.0` or later
-- Node.js `>=20.0.0` or later
+- Node.js `>=20.9.0` or later
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_fastify).
 
 ### Installation

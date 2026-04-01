@@ -3,6 +3,7 @@ import type { CamelToSnake, DeepPartial } from './utils';
 
 /**
  * @internal
+ *
  * @example
  * type PageTitle = LocalizationValue<'name', 'greeting'>;
  *     // ?^
@@ -68,7 +69,8 @@ export type __internal_LocalizationResource = {
   locale: string;
   maintenanceMode: LocalizationValue;
   /**
-   * Add role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
+   * Add Role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
+   *
    * @experimental
    */
   roles: {
@@ -107,6 +109,7 @@ export type __internal_LocalizationResource = {
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
   formFieldLabel__passkeyName: LocalizationValue;
+  formFieldLabel__apiKey: LocalizationValue;
   formFieldLabel__apiKeyName: LocalizationValue;
   formFieldLabel__apiKeyDescription: LocalizationValue;
   formFieldLabel__apiKeyExpiration: LocalizationValue;
@@ -116,6 +119,7 @@ export type __internal_LocalizationResource = {
   formFieldInputPlaceholder__username: LocalizationValue;
   formFieldInputPlaceholder__emailAddress_username: LocalizationValue;
   formFieldInputPlaceholder__password: LocalizationValue;
+  formFieldInputPlaceholder__signUpPassword: LocalizationValue;
   formFieldInputPlaceholder__firstName: LocalizationValue;
   formFieldInputPlaceholder__lastName: LocalizationValue;
   formFieldInputPlaceholder__backupCode: LocalizationValue;
@@ -172,7 +176,11 @@ export type __internal_LocalizationResource = {
   membershipRole__guestMember: LocalizationValue;
   billing: {
     month: LocalizationValue;
+    monthAbbreviation: LocalizationValue;
+    monthPerUnit: LocalizationValue<'unitName'>;
     year: LocalizationValue;
+    yearAbbreviation: LocalizationValue;
+    yearPerUnit: LocalizationValue<'unitName'>;
     free: LocalizationValue;
     getStarted: LocalizationValue;
     manage: LocalizationValue;
@@ -180,6 +188,7 @@ export type __internal_LocalizationResource = {
     cancelSubscription: LocalizationValue;
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
+    seats: LocalizationValue;
     subscribe: LocalizationValue;
     startFreeTrial: LocalizationValue;
     startFreeTrial__days: LocalizationValue<'days'>;
@@ -190,6 +199,7 @@ export type __internal_LocalizationResource = {
     switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
     billedAnnually: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
+    billedAnnuallyOnly: LocalizationValue;
     cancelFreeTrial: LocalizationValue<'plan'>;
     cancelFreeTrialTitle: LocalizationValue<'plan'>;
     cancelFreeTrialAccessUntil: LocalizationValue<'plan' | 'date'>;
@@ -203,7 +213,10 @@ export type __internal_LocalizationResource = {
     availableFeatures: LocalizationValue;
     subtotal: LocalizationValue;
     credit: LocalizationValue;
+    prorationCredit: LocalizationValue;
+    accountCredit: LocalizationValue;
     creditRemainder: LocalizationValue;
+    payerCreditRemainder: LocalizationValue;
     totalDue: LocalizationValue;
     totalDueToday: LocalizationValue;
     pastDue: LocalizationValue;
@@ -251,6 +264,19 @@ export type __internal_LocalizationResource = {
     pricingTable: {
       billingCycle: LocalizationValue;
       included: LocalizationValue;
+      seatCost: {
+        freeUpToSeats: LocalizationValue<'endsAfterBlock'>;
+        upToSeats: LocalizationValue<'endsAfterBlock'>;
+        perSeat: LocalizationValue<'feePerBlockAmount' | 'periodAbbreviation'>;
+        includedSeats: LocalizationValue<'includedSeats'>;
+        additionalSeats: LocalizationValue<'additionalTierFeePerBlockAmount' | 'periodAbbreviation'>;
+        unlimitedSeats: LocalizationValue;
+        tooltip: {
+          freeForUpToSeats: LocalizationValue<'endsAfterBlock'>;
+          additionalSeatsEach: LocalizationValue<'feePerBlockAmount' | 'period'>;
+          firstSeatsIncludedInPlan: LocalizationValue<'endsAfterBlock'>;
+        };
+      };
     };
     checkout: {
       title: LocalizationValue;
@@ -366,6 +392,11 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    web3Solana: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      noAvailableWallets: LocalizationValue;
+    };
   };
   signIn: {
     start: {
@@ -395,6 +426,13 @@ export type __internal_LocalizationResource = {
       actionLink: LocalizationValue;
     };
     passwordPwned: {
+      title: LocalizationValue;
+    };
+    /** @deprecated Use `passwordCompromised` instead */
+    passwordUntrusted: {
+      title: LocalizationValue;
+    };
+    passwordCompromised: {
       title: LocalizationValue;
     };
     passkey: {
@@ -476,6 +514,19 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       title: LocalizationValue<'provider'>;
     };
+    emailCodeMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
+    emailLinkMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formSubtitle: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
+    newDeviceVerificationNotice: LocalizationValue;
     phoneCodeMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -521,6 +572,10 @@ export type __internal_LocalizationResource = {
       action__signOutAll: LocalizationValue;
     };
     enterpriseConnections: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
+    web3Solana: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
@@ -647,6 +702,7 @@ export type __internal_LocalizationResource = {
       };
       enterpriseAccountsSection: {
         title: LocalizationValue;
+        primaryButton: LocalizationValue;
       };
       passwordSection: {
         title: LocalizationValue;
@@ -686,6 +742,10 @@ export type __internal_LocalizationResource = {
         primaryButton: LocalizationValue;
         destructiveAction: LocalizationValue;
         detailsAction__nonPrimary: LocalizationValue;
+        web3SelectSolanaWalletScreen: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
       };
       dangerSection: {
         title: LocalizationValue;
@@ -873,6 +933,7 @@ export type __internal_LocalizationResource = {
         empty: LocalizationValue;
         itemCaption__paidForPlan: LocalizationValue;
         itemCaption__proratedCredit: LocalizationValue;
+        itemCaption__payerCredit: LocalizationValue;
         itemCaption__subscribedAndPaidForPlan: LocalizationValue;
         notFound: LocalizationValue;
         tableHeader__date: LocalizationValue;
@@ -965,6 +1026,7 @@ export type __internal_LocalizationResource = {
     badge__manualInvitation: LocalizationValue;
     start: {
       headerTitle__members: LocalizationValue;
+      membershipSeatUsageLabel: LocalizationValue<'count' | 'limit'>;
       headerTitle__general: LocalizationValue;
       profileSection: {
         title: LocalizationValue;
@@ -1092,6 +1154,12 @@ export type __internal_LocalizationResource = {
           primaryButton: LocalizationValue;
         };
       };
+      alerts: {
+        roleSetMigrationInProgress: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
+      };
     };
     billingPage: {
       title: LocalizationValue;
@@ -1105,6 +1173,7 @@ export type __internal_LocalizationResource = {
         empty: LocalizationValue;
         itemCaption__paidForPlan: LocalizationValue<'plan' | 'period'>;
         itemCaption__proratedCredit: LocalizationValue;
+        itemCaption__payerCredit: LocalizationValue;
         itemCaption__subscribedAndPaidForPlan: LocalizationValue<'plan' | 'period'>;
         notFound: LocalizationValue;
         tableHeader__date: LocalizationValue;
@@ -1156,6 +1225,7 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       alerts: {
         noPermissionsToManageBilling: LocalizationValue;
+        planMembershipLimitExceeded: LocalizationValue<'count' | 'limit'>;
       };
     };
     apiKeysPage: {
@@ -1236,6 +1306,11 @@ export type __internal_LocalizationResource = {
     createdAndExpirationStatus__expiresOn: LocalizationValue<'createdDate' | 'expiresDate'>;
     formFieldCaption__expiration__never: LocalizationValue;
     formFieldCaption__expiration__expiresOn: LocalizationValue<'date'>;
+    copySecret: {
+      formTitle: LocalizationValue<'name'>;
+      formHint: LocalizationValue;
+      formButtonPrimary__copyAndClose: LocalizationValue;
+    };
   };
   taskChooseOrganization: {
     title: LocalizationValue;
@@ -1257,11 +1332,96 @@ export type __internal_LocalizationResource = {
     chooseOrganization: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      subtitle__createOrganizationDisabled: LocalizationValue;
       suggestionsAcceptedLabel: LocalizationValue;
       action__suggestionsAccept: LocalizationValue;
       action__createOrganization: LocalizationValue;
       action__invitationAccept: LocalizationValue;
     };
+    organizationCreationDisabled: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
+    alerts: {
+      organizationAlreadyExists: LocalizationValue<'organizationDomain' | 'organizationName'>;
+    };
+  };
+  taskResetPassword: {
+    title: LocalizationValue;
+    subtitle: LocalizationValue;
+    signOut: {
+      actionLink: LocalizationValue;
+      actionText: LocalizationValue<'identifier'>;
+    };
+    formButtonPrimary: LocalizationValue;
+  };
+  taskSetupMfa: {
+    badge: LocalizationValue;
+    start: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      methodSelection: {
+        totp: LocalizationValue;
+        phoneCode: LocalizationValue;
+      };
+    };
+    smsCode: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      addPhoneNumber: LocalizationValue;
+      cancel: LocalizationValue;
+      verifyPhone: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        formTitle: LocalizationValue;
+        resendButton: LocalizationValue;
+        formButtonPrimary: LocalizationValue;
+      };
+      addPhone: {
+        infoText: LocalizationValue;
+        formButtonPrimary: LocalizationValue;
+      };
+      success: {
+        title: LocalizationValue;
+        message1: LocalizationValue;
+        message2: LocalizationValue;
+        finishButton: LocalizationValue;
+      };
+    };
+    totpCode: {
+      title: LocalizationValue;
+      addAuthenticatorApp: {
+        infoText__ableToScan: LocalizationValue;
+        infoText__unableToScan: LocalizationValue;
+        inputLabel__unableToScan1: LocalizationValue;
+        buttonUnableToScan__nonPrimary: LocalizationValue;
+        buttonAbleToScan__nonPrimary: LocalizationValue;
+        formButtonPrimary: LocalizationValue;
+        formButtonReset: LocalizationValue;
+      };
+      verifyTotp: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        formTitle: LocalizationValue;
+        formButtonPrimary: LocalizationValue;
+        formButtonReset: LocalizationValue;
+      };
+      success: {
+        title: LocalizationValue;
+        message1: LocalizationValue;
+        message2: LocalizationValue;
+        finishButton: LocalizationValue;
+      };
+    };
+    signOut: {
+      actionText: LocalizationValue<'identifier'>;
+      actionLink: LocalizationValue;
+    };
+  };
+  web3SolanaWalletButtons: {
+    connect: LocalizationValue<'walletName'>;
+    continue: LocalizationValue<'walletName'>;
+    noneAvailable: LocalizationValue<'solanaWalletsLink'>;
   };
 };
 
@@ -1269,6 +1429,8 @@ type WithParamName<T> = T &
   Partial<Record<`${keyof T & string}__${CamelToSnake<Exclude<FieldId, 'role'>>}`, LocalizationValue>>;
 
 type UnstableErrors = WithParamName<{
+  avatar_file_type_invalid: LocalizationValue;
+  avatar_file_size_exceeded: LocalizationValue;
   external_account_not_found: LocalizationValue;
   identification_deletion_failed: LocalizationValue;
   phone_number_exists: LocalizationValue;
@@ -1281,19 +1443,28 @@ type UnstableErrors = WithParamName<{
   passkey_registration_cancelled: LocalizationValue;
   passkey_already_exists: LocalizationValue;
   web3_missing_identifier: LocalizationValue;
+  web3_solana_signature_generation_failed: LocalizationValue;
+  web3_signature_request_rejected: LocalizationValue;
   form_password_pwned: LocalizationValue;
   form_password_pwned__sign_in: LocalizationValue;
+  form_new_password_matches_current: LocalizationValue;
+  /** @deprecated Use `form_password_compromised__sign_in` instead */
+  form_password_untrusted__sign_in: LocalizationValue;
+  form_password_compromised__sign_in: LocalizationValue;
   form_username_invalid_length: LocalizationValue<'min_length' | 'max_length'>;
+  form_username_needs_non_number_char: LocalizationValue;
   form_username_invalid_character: LocalizationValue;
   form_param_format_invalid: LocalizationValue;
   form_param_format_invalid__email_address: LocalizationValue;
   form_param_type_invalid: LocalizationValue;
   form_param_type_invalid__phone_number: LocalizationValue;
   form_param_type_invalid__email_address: LocalizationValue;
+  form_email_address_blocked: LocalizationValue;
   form_password_length_too_short: LocalizationValue;
   form_param_nil: LocalizationValue;
   form_code_incorrect: LocalizationValue;
   form_password_incorrect: LocalizationValue;
+  form_password_or_identifier_incorrect: LocalizationValue;
   form_password_validation_failed: LocalizationValue;
   not_allowed_access: LocalizationValue;
   form_identifier_exists: LocalizationValue;
@@ -1358,6 +1529,8 @@ type UnstableErrors = WithParamName<{
   organization_domain_common: LocalizationValue;
   organization_domain_blocked: LocalizationValue;
   organization_domain_exists_for_enterprise_connection: LocalizationValue;
+  api_key_name_already_exists: LocalizationValue;
+  api_key_usage_exceeded: LocalizationValue;
   organization_membership_quota_exceeded: LocalizationValue;
   organization_not_found_or_unauthorized: LocalizationValue;
   organization_not_found_or_unauthorized_with_create_organization_disabled: LocalizationValue;

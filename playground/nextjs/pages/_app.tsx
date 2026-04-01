@@ -4,13 +4,12 @@ import '../styles/globals.css';
 import {
   ClerkProvider,
   OrganizationSwitcher,
-  SignedIn,
-  SignedOut,
+  Show,
   SignInButton,
   SignOutButton,
   UserButton,
 } from '@clerk/nextjs';
-import { dark, experimental__simple, neobrutalism, shadesOfPurple } from '@clerk/themes';
+import { dark, __experimental_simple, neobrutalism, shadesOfPurple } from '@clerk/themes';
 import Link from 'next/link';
 import React, { FunctionComponent, useEffect, useState } from 'react';
 
@@ -63,7 +62,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       {/* @ts-ignore */}
       <ClerkProvider
         appearance={{
-          baseTheme: styleReset ? [experimental__simple, themes[selectedTheme]] : themes[selectedTheme],
+          baseTheme: styleReset ? [__experimental_simple, themes[selectedTheme]] : themes[selectedTheme],
           variables: {
             colorPrimary: primaryColor,
           },
@@ -156,14 +155,14 @@ const AppBar = (props: AppBarProps) => {
       <UserButton />
 
       {/* @ts-ignore */}
-      <SignedIn>
+      <Show when='signed-in'>
         <SignOutButton />
-      </SignedIn>
+      </Show>
 
       {/* @ts-ignore */}
-      <SignedOut>
+      <Show when='signed-out'>
         <SignInButton mode={'modal'} />
-      </SignedOut>
+      </Show>
     </div>
   );
 };

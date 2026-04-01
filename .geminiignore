@@ -1,0 +1,23 @@
+# AI Agent Security - Sensitive Files
+# These files should never be read by AI tools to prevent
+# accidental exposure of secrets to AI service providers.
+#
+# NOTE: Gemini CLI may still read these files if explicitly instructed.
+# See: https://github.com/google-gemini/gemini-cli/issues/13385
+
+# Environment files
+.env
+.env.*
+
+# Secrets directory
+secrets/
+
+# Credentials
+**/credentials.json
+
+# Private keys
+**/*.pem
+**/*.key
+
+# Integration keys
+**/.keys.json

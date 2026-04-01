@@ -1,4 +1,4 @@
-import { SignInButton, SignUpButton } from '@clerk/clerk-react';
+import { SignInButton, SignUpButton } from '@clerk/react';
 
 export default function Home() {
   return (
@@ -9,6 +9,15 @@ export default function Home() {
         signUpForceRedirectUrl='/protected'
       >
         Sign in button (force)
+      </SignInButton>
+
+      <SignInButton
+        mode='modal'
+        oauthFlow='popup'
+        forceRedirectUrl='/protected'
+        signUpForceRedirectUrl='/protected'
+      >
+        Sign in button (force, popup)
       </SignInButton>
 
       <SignInButton

@@ -1,12 +1,12 @@
-import { Protect } from '@clerk/nextjs';
+import { Show } from '@clerk/nextjs';
 
 export default function Page() {
   return (
-    <Protect
-      role='org:admin'
+    <Show
       fallback={<p>User is not admin</p>}
+      when={{ role: 'org:admin' }}
     >
       <p>User has access</p>
-    </Protect>
+    </Show>
   );
 }

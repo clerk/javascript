@@ -4,15 +4,21 @@ import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
+  const shouldPublish = !!overrideOptions.env?.publish;
 
   return {
-    entry: ['./src/index.ts', './src/webhooks.ts'],
+    entry: {
+      index: './src/index.ts',
+      webhooks: './src/webhooks.ts',
+      types: './src/types/index.ts',
+    },
     format: ['cjs', 'esm'],
     bundle: true,
     clean: true,
     minify: false,
     sourcemap: true,
     dts: true,
+    onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,

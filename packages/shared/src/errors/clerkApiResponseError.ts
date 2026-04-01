@@ -47,14 +47,14 @@ export class ClerkAPIResponseError extends ClerkError implements ClerkAPIRespons
 }
 
 /**
- * Type guard to check if an error is a ClerkApiResponseError.
+ * Type guard to check if an error is a ClerkAPIResponseError.
  * Can be called as a standalone function or as a method on an error object.
  *
  * @example
  * // As a standalone function
- * if (isClerkApiResponseError(error)) { ... }
+ * if (isClerkAPIResponseError(error)) { ... }
  *
  * // As a method (when attached to error object)
- * if (error.isClerkApiResponseError()) { ... }
+ * if (error.isClerkAPIResponseError()) { ... }
  */
-export const isClerkApiResponseError = createErrorTypeGuard(ClerkAPIResponseError);
+export const isClerkAPIResponseError = createErrorTypeGuard(ClerkAPIResponseError);

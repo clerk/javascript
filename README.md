@@ -1,9 +1,6 @@
 <p align="center">
   <a href="https://clerk.com?utm_source=github&utm_medium=clerk_javascript" target="_blank" rel="noopener noreferrer">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://images.clerk.com/static/logo-dark-mode-400x400.png">
-      <img src="https://images.clerk.com/static/logo-light-mode-400x400.png" height="64">
-    </picture>
+    <img src="https://images.clerk.com/static/logo-light-mode-400x400.png" height="64">
   </a>
   <br />
 </p>
@@ -20,8 +17,8 @@
   <a href="https://discord.com/invite/b5rXHjAg7A">
     <img alt="Discord" src="https://img.shields.io/discord/856971667393609759?color=7389D8&label&logo=discord&logoColor=ffffff" />
   </a>
-  <a href="https://twitter.com/clerkdev">
-    <img alt="Twitter" src="https://img.shields.io/twitter/url.svg?label=%40clerkdev&style=social&url=https%3A%2F%2Ftwitter.com%2Fclerkdev" />
+  <a href="https://twitter.com/clerk">
+    <img alt="Twitter" src="https://img.shields.io/twitter/url.svg?label=%40clerk&style=social&url=https%3A%2F%2Ftwitter.com%2Fclerk" />
   </a>
   <br />
   <br />

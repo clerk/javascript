@@ -66,7 +66,6 @@ export const mockWebAuthn = (fn: () => void) => {
   });
 };
 
-export * from './create-fixtures';
 // Export everything from @testing-library/react except render, then export our custom render
 export {
   screen,

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 
-import type { Theme } from '@clerk/shared/types';
+import type { Theme } from '@clerk/ui/internal';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import React from 'react';
@@ -46,7 +46,7 @@ describe('SubscriptionDetailsButton', () => {
 
       // Expect the component to throw an error
       expect(() => render(<SubscriptionDetailsButton />)).toThrow(
-        'Ensure that `<SubscriptionDetailsButton />` is rendered inside a `<SignedIn />` component.',
+        'Ensure that `<SubscriptionDetailsButton />` is rendered only when the user is signed in (wrap with `<Show when="signed-in">` or guard with `useAuth()`).',
       );
     });
 

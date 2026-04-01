@@ -1,6 +1,6 @@
 {
   "name": "@clerk/express",
-  "version": "1.7.43",
+  "version": "2.0.8",
   "description": "Clerk server SDK for usage with Express",
   "keywords": [
     "clerk",
@@ -43,6 +43,14 @@
         "default": "./dist/webhooks.js"
       }
     },
+    "./types": {
+      "import": {
+        "types": "./dist/types.d.mts"
+      },
+      "require": {
+        "types": "./dist/types.d.ts"
+      }
+    },
     "./env": "./env.d.ts",
     "./package.json": "./package.json"
   },
@@ -56,20 +64,18 @@
     "build": "pnpm clean && tsup",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "pnpm dev -- --env.publish",
+    "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
-    "publish:local": "pnpm yalc push --replace  --sig",
     "test": "vitest run",
     "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
@@ -82,7 +88,7 @@
     "express": "^4.17.0 || ^5.0.0"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

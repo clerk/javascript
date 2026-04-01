@@ -1,0 +1,770 @@
+import { __internal_useOrganizationBase, useClerk, useSession } from '@clerk/shared/react';
+import type {
+  BillingPlanResource,
+  BillingPlanUnitPrice,
+  BillingSubscriptionPlanPeriod,
+  PricingTableProps,
+} from '@clerk/shared/types';
+import * as React from 'react';
+
+import { Switch } from '@/ui/elements/Switch';
+import { Tooltip } from '@/ui/elements/Tooltip';
+import { getPlanSeatLimit, getSeatUnitPrice, organizationExceedsPlanSeatLimit } from '@/ui/utils/billingPlanSeats';
+import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
+
+import { useProtect } from '../../common';
+import { normalizeFormatted, usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
+import {
+  Box,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Heading,
+  Icon,
+  localizationKeys,
+  SimpleButton,
+  Span,
+  Text,
+  useLocalizations,
+} from '../../customizables';
+import { Check, Plus, User, Users } from '../../icons';
+import { common, InternalThemeProvider } from '../../styledSystem';
+import { SubscriptionBadge } from '../Subscriptions/badge';
+import { getPricingFooterState } from './utils/pricing-footer-state';
+
+interface PricingTableDefaultProps {
+  plans?: BillingPlanResource[] | null;
+  highlightedPlan?: BillingPlanResource['slug'];
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
+  onSelect: (plan: BillingPlanResource) => void;
+  isCompact?: boolean;
+  props: PricingTableProps;
+}
+
+export function PricingTableDefault({
+  plans,
+  planPeriod,
+  setPlanPeriod,
+  onSelect,
+  isCompact,
+  props,
+}: PricingTableDefaultProps) {
+  return (
+    <InternalThemeProvider>
+      <Box
+        elementDescriptor={descriptors.pricingTable}
+        sx={t => ({
+          // Sets the minimum width a column can be before wrapping
+          '--grid-min-size': isCompact ? '11.75rem' : '20rem',
+          // Set a max amount of columns before they start wrapping to new rows.
+          '--grid-max-columns': 'infinity',
+          // Set the default gap, use `--grid-gap-y` to override the row gap
+          '--grid-gap': t.space.$4,
+          // Derived from the maximum column size based on the grid configuration
+          '--max-column-width': '100% / var(--grid-max-columns, infinity) - var(--grid-gap)',
+          // Derived from `--max-column-width` and ensures it respects the minimum size and maximum width constraints
+          '--column-width': 'max(var(--max-column-width), min(var(--grid-min-size, 10rem), 100%))',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(var(--column-width), 1fr))',
+          gridTemplateRows: 'auto 1fr',
+          gap: `var(--grid-gap-y, var(--grid-gap, ${t.space.$4})) var(--grid-gap, ${t.space.$4})`,
+          alignItems: 'stretch',
+          width: '100%',
+          minWidth: '0',
+        })}
+        data-variant={isCompact ? 'compact' : 'default'}
+      >
+        {plans?.map(plan => (
+          <Card
+            key={plan.id}
+            plan={plan}
+            planPeriod={planPeriod}
+            setPlanPeriod={setPlanPeriod}
+            onSelect={onSelect}
+            props={props}
+            isCompact={isCompact}
+          />
+        ))}
+      </Box>
+    </InternalThemeProvider>
+  );
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Card
+ * -----------------------------------------------------------------------------------------------*/
+
+interface CardProps {
+  plan: BillingPlanResource;
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (p: BillingSubscriptionPlanPeriod) => void;
+  onSelect: (plan: BillingPlanResource, event?: React.MouseEvent<HTMLElement>) => void;
+  isCompact?: boolean;
+  props: PricingTableProps;
+}
+
+function Card(props: CardProps) {
+  const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
+  const clerk = useClerk();
+  const { isSignedIn } = useSession();
+  const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
+  const subscriberType = useSubscriberTypeContext();
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organization = __internal_useOrganizationBase();
+
+  const ctaPosition = pricingTableProps.ctaPosition || ctxCtaPosition || 'bottom';
+  const collapseFeatures = pricingTableProps.collapseFeatures || false;
+  const { id, slug } = plan;
+
+  const canManageBilling = useProtect(
+    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
+  );
+  const { buttonPropsForPlan, activeOrUpcomingSubscriptionBasedOnPlanPeriod } = usePlansContext();
+
+  const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
+    const portalRoot = getClosestProfileScrollBox(mode, event);
+
+    clerk.__internal_openPlanDetails({
+      plan,
+      initialPlanPeriod: planPeriod,
+      portalRoot,
+    });
+  };
+
+  const subscription = React.useMemo(
+    () => activeOrUpcomingSubscriptionBasedOnPlanPeriod(plan, planPeriod),
+    [plan, planPeriod, activeOrUpcomingSubscriptionBasedOnPlanPeriod],
+  );
+
+  const footerButtonTooltipText = React.useMemo(() => {
+    if (isSignedIn && !canManageBilling) {
+      return localizationKeys('organizationProfile.plansPage.alerts.noPermissionsToManageBilling');
+    }
+
+    if (organization && subscriberType === 'organization' && organizationExceedsPlanSeatLimit(plan, organization)) {
+      const seatLimit = getPlanSeatLimit(plan);
+      return localizationKeys('organizationProfile.plansPage.alerts.planMembershipLimitExceeded', {
+        count: organization.membersCount + organization.pendingInvitationsCount,
+        limit: seatLimit as number,
+      });
+    }
+
+    return null;
+  }, [isSignedIn, canManageBilling, organization, subscriberType, plan]);
+
+  const hasFeatures = plan.features.length > 0;
+  const hasSeatFeatures = !!getSeatUnitPrice(plan);
+
+  const { shouldShowFooter, shouldShowFooterNotice } = getPricingFooterState({
+    subscription,
+    plan,
+    planPeriod,
+    for: pricingTableProps.for,
+    hasActiveOrganization: !!organization,
+  });
+
+  return (
+    <Box
+      key={id}
+      elementDescriptor={descriptors.pricingTableCard}
+      elementId={descriptors.pricingTableCard.setId(slug)}
+      sx={t => ({
+        display: 'grid',
+        gap: 0,
+        gridTemplateRows: 'subgrid',
+        gridRow: 'span 5',
+        background: common.mutedBackground(t),
+        borderWidth: t.borderWidths.$normal,
+        borderStyle: t.borderStyles.$solid,
+        borderColor: t.colors.$borderAlpha150,
+        borderRadius: t.radii.$xl,
+        overflow: 'hidden',
+        textAlign: 'start',
+      })}
+      data-variant={isCompact ? 'compact' : 'default'}
+    >
+      <CardHeader
+        plan={plan}
+        isCompact={isCompact}
+        planPeriod={planPeriod}
+        setPlanPeriod={setPlanPeriod}
+        badge={
+          subscription ? (
+            <SubscriptionBadge subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription} />
+          ) : undefined
+        }
+      />
+      <Box
+        elementDescriptor={descriptors.pricingTableCardBody}
+        sx={{
+          display: 'grid',
+          gridTemplateRows: 'subgrid',
+          gridRow: 'span 2',
+          gap: 0,
+        }}
+      >
+        {(ctaPosition === 'bottom' && !collapseFeatures) || (ctaPosition === 'top' && hasFeatures) ? (
+          <Box
+            elementDescriptor={descriptors.pricingTableCardFeatures}
+            sx={t => ({
+              // gridRow: shouldShowFooter ? 'auto' : 'span 2',
+              display: 'flex',
+              flexDirection: 'column',
+              flex: '1',
+              padding: isCompact ? t.space.$3 : t.space.$4,
+              backgroundColor: hasFeatures || hasSeatFeatures ? t.colors.$colorBackground : 'transparent',
+              borderTopWidth: hasFeatures || hasSeatFeatures ? t.borderWidths.$normal : 0,
+              borderTopStyle: t.borderStyles.$solid,
+              borderTopColor: t.colors.$borderAlpha150,
+            })}
+            data-variant={isCompact ? 'compact' : 'default'}
+          >
+            <CardFeaturesList
+              plan={plan}
+              isCompact={isCompact}
+              showPlanDetails={showPlanDetails}
+            />
+          </Box>
+        ) : null}
+
+        {shouldShowFooter ? (
+          <Box
+            elementDescriptor={descriptors.pricingTableCardFooter}
+            sx={t => ({
+              marginTop: 'auto',
+              padding: isCompact ? t.space.$3 : t.space.$4,
+              borderTopWidth: t.borderWidths.$normal,
+              borderTopStyle: t.borderStyles.$solid,
+              borderTopColor: t.colors.$borderAlpha150,
+              order: ctaPosition === 'top' ? -1 : undefined,
+            })}
+          >
+            {shouldShowFooterNotice && subscription ? (
+              <Text
+                elementDescriptor={descriptors.pricingTableCardFooterNotice}
+                variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+                localizationKey={
+                  plan.freeTrialEnabled && subscription.isFreeTrial && subscription.periodEnd
+                    ? localizationKeys('badge__trialEndsAt', {
+                        date: subscription.periodEnd,
+                      })
+                    : localizationKeys('badge__startsAt', { date: subscription.periodStart })
+                }
+                colorScheme='secondary'
+                sx={t => ({
+                  paddingBlock: t.space.$1x5,
+                  textAlign: 'center',
+                })}
+              />
+            ) : (
+              <Tooltip.Root>
+                <Tooltip.Trigger sx={{ width: '100%' }}>
+                  <Button
+                    elementDescriptor={descriptors.pricingTableCardFooterButton}
+                    block
+                    textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+                    {...buttonPropsForPlan({ plan, organization, isCompact, selectedPlanPeriod: planPeriod })}
+                    onClick={event => {
+                      onSelect(plan, event);
+                    }}
+                  />
+                </Tooltip.Trigger>
+                {footerButtonTooltipText ? <Tooltip.Content text={footerButtonTooltipText} /> : null}
+              </Tooltip.Root>
+            )}
+          </Box>
+        ) : (
+          <Box
+            sx={t => ({
+              backgroundColor: hasFeatures ? t.colors.$colorBackground : 'transparent',
+            })}
+          />
+        )}
+      </Box>
+    </Box>
+  );
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * CardHeader
+ * -----------------------------------------------------------------------------------------------*/
+
+interface CardHeaderProps {
+  plan: BillingPlanResource;
+  isCompact?: boolean;
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
+  badge?: React.ReactNode;
+}
+
+const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref) => {
+  const { plan, isCompact, planPeriod, setPlanPeriod, badge } = props;
+  const { name } = plan;
+
+  const fee = React.useMemo(() => {
+    if (!plan.annualMonthlyFee) {
+      return plan.fee;
+    }
+
+    if (!plan.fee) {
+      return plan.annualFee;
+    }
+
+    return planPeriod === 'annual' ? plan.annualMonthlyFee : plan.fee;
+  }, [plan, planPeriod]);
+
+  const singleUnitPriceTierFee = React.useMemo(() => {
+    if (plan.hasBaseFee || !plan.unitPrices || plan.unitPrices.length !== 1) {
+      return null;
+    }
+
+    const [unitPrice] = plan.unitPrices;
+    if (unitPrice.tiers.length !== 1) {
+      return null;
+    }
+
+    return unitPrice.tiers[0].feePerBlock;
+  }, [plan.hasBaseFee, plan.unitPrices]);
+
+  const feePeriodText = React.useMemo(() => {
+    if (!plan.hasBaseFee && plan.unitPrices && plan.unitPrices.length > 0) {
+      return localizationKeys('billing.monthPerUnit', { unitName: plan.unitPrices[0].name });
+    }
+
+    return plan.fee ? localizationKeys('billing.month') : localizationKeys('billing.year');
+  }, [plan.hasBaseFee, plan.fee, plan.unitPrices]);
+
+  const displayedFee = singleUnitPriceTierFee ?? fee;
+  const feeFormatted = React.useMemo(() => {
+    if (!displayedFee) {
+      return '';
+    }
+    return `${displayedFee.currencySymbol}${normalizeFormatted(displayedFee.amountFormatted)}`;
+  }, [displayedFee]);
+
+  return (
+    <Box
+      ref={ref}
+      elementDescriptor={descriptors.pricingTableCardHeader}
+      sx={t => ({
+        width: '100%',
+        padding: isCompact ? t.space.$3 : t.space.$4,
+        display: 'grid',
+        gap: t.space.$1,
+        gridRow: 'span 3',
+        gridTemplateRows: 'subgrid',
+      })}
+      data-variant={isCompact ? 'compact' : 'default'}
+    >
+      <Box elementDescriptor={descriptors.pricingTableCardTitleContainer}>
+        <Box
+          sx={t => ({
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: t.space.$0x25,
+          })}
+        >
+          <Heading
+            elementDescriptor={descriptors.pricingTableCardTitle}
+            as='h2'
+            textVariant={isCompact ? 'h3' : 'h2'}
+          >
+            {name}
+          </Heading>
+          {badge && badge}
+        </Box>
+        {!isCompact && plan.description ? (
+          <Text
+            elementDescriptor={descriptors.pricingTableCardDescription}
+            variant='subtitle'
+            colorScheme='secondary'
+            sx={{
+              justifySelf: 'flex-start',
+            }}
+          >
+            {plan.description}
+          </Text>
+        ) : null}
+      </Box>
+
+      <Flex
+        elementDescriptor={descriptors.pricingTableCardFeeContainer}
+        data-variant={isCompact ? 'compact' : 'default'}
+        align='center'
+        wrap='wrap'
+        sx={t => ({
+          columnGap: t.space.$1,
+          marginTop: t.space.$1,
+        })}
+      >
+        <Text
+          elementDescriptor={descriptors.pricingTableCardFee}
+          variant={isCompact ? 'h2' : 'h1'}
+          colorScheme='body'
+        >
+          {feeFormatted}
+        </Text>
+        {!plan.isDefault ? (
+          <Text
+            elementDescriptor={descriptors.pricingTableCardFeePeriod}
+            variant='caption'
+            colorScheme='secondary'
+            sx={t => ({
+              textTransform: 'lowercase',
+              ':before': {
+                content: '"/"',
+                marginInlineEnd: t.space.$0x25,
+              },
+            })}
+            localizationKey={feePeriodText}
+          />
+        ) : null}
+      </Flex>
+
+      <PeriodToggle
+        plan={plan}
+        planPeriod={planPeriod}
+        setPlanPeriod={setPlanPeriod}
+      />
+    </Box>
+  );
+});
+
+const PeriodToggle = ({
+  plan,
+  planPeriod,
+  setPlanPeriod,
+}: {
+  plan: BillingPlanResource;
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
+}) => {
+  if (!plan.isDefault && plan.fee && plan.annualMonthlyFee) {
+    return (
+      <Box
+        elementDescriptor={descriptors.pricingTableCardPeriodToggle}
+        sx={t => ({
+          marginTop: t.space.$1,
+        })}
+      >
+        <Switch
+          isChecked={planPeriod === 'annual'}
+          onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
+          label={localizationKeys('billing.billedAnnually')}
+        />
+      </Box>
+    );
+  }
+
+  if (plan.annualMonthlyFee) {
+    return (
+      <Text
+        elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
+        variant='caption'
+        colorScheme='secondary'
+        localizationKey={
+          plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedAnnuallyOnly')
+        }
+        sx={t => ({
+          justifySelf: 'flex-start',
+          alignSelf: 'center',
+          marginTop: t.space.$1,
+        })}
+      />
+    );
+  }
+
+  return (
+    <Text
+      elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
+      variant='caption'
+      colorScheme='secondary'
+      localizationKey={
+        plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedMonthlyOnly')
+      }
+      sx={t => ({
+        justifySelf: 'flex-start',
+        alignSelf: 'center',
+        marginTop: t.space.$1,
+      })}
+    />
+  );
+};
+
+/* -------------------------------------------------------------------------------------------------
+ * CardFeaturesList
+ * -----------------------------------------------------------------------------------------------*/
+
+interface CardFeaturesListProps {
+  plan: BillingPlanResource;
+  /**
+   * @default false
+   */
+  isCompact?: boolean;
+  showPlanDetails: (event?: React.MouseEvent<HTMLElement>) => void;
+}
+
+const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>((props, ref) => {
+  const { plan, isCompact, showPlanDetails } = props;
+
+  const totalFeatures = plan.features.length;
+  const hasMoreFeatures = isCompact ? totalFeatures > 3 : totalFeatures > 8;
+
+  return (
+    <Box
+      ref={ref}
+      elementDescriptor={descriptors.pricingTableCardFeatures}
+      sx={t => ({
+        display: 'grid',
+        flex: 1,
+        rowGap: isCompact ? t.space.$2 : t.space.$3,
+      })}
+    >
+      <Col
+        elementDescriptor={descriptors.pricingTableCardFeaturesList}
+        data-variant={isCompact ? 'compact' : 'default'}
+        as='ul'
+        role='list'
+        sx={t => ({
+          flex: '1',
+          rowGap: isCompact ? t.space.$2 : t.space.$3,
+          margin: 0,
+          padding: 0,
+        })}
+      >
+        {plan.unitPrices && plan.unitPrices.length > 0 && (plan.hasBaseFee || plan.unitPrices[0].tiers.length > 0) ? (
+          <CardFeaturesListSeatCost plan={plan} />
+        ) : null}
+        {plan.features.slice(0, hasMoreFeatures ? (isCompact ? 3 : 8) : totalFeatures).map(feature => (
+          <Box
+            elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
+            elementId={descriptors.pricingTableCardFeaturesListItem.setId(feature.slug)}
+            key={feature.id}
+            as='li'
+            sx={t => ({
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: t.space.$2,
+              margin: 0,
+              padding: 0,
+            })}
+          >
+            <Icon
+              icon={Check}
+              colorScheme='neutral'
+              size='sm'
+              aria-hidden
+              sx={t => ({
+                transform: `translateY(${t.space.$0x25})`,
+              })}
+            />
+            <Span elementDescriptor={descriptors.pricingTableCardFeaturesListItemContent}>
+              <Text
+                elementDescriptor={descriptors.pricingTableCardFeaturesListItemTitle}
+                colorScheme='body'
+                sx={t => ({
+                  fontWeight: t.fontWeights.$normal,
+                })}
+              >
+                {feature.name}
+              </Text>
+            </Span>
+          </Box>
+        ))}
+      </Col>
+      {hasMoreFeatures && (
+        <SimpleButton
+          onClick={event => showPlanDetails(event)}
+          variant='link'
+          sx={t => ({
+            marginBlockStart: 'auto',
+            paddingBlock: t.space.$1,
+            gap: t.space.$1,
+          })}
+        >
+          <Icon
+            icon={Plus}
+            colorScheme='neutral'
+            size='md'
+            aria-hidden
+          />
+          <Span localizationKey={localizationKeys('billing.seeAllFeatures')} />
+        </SimpleButton>
+      )}
+    </Box>
+  );
+});
+
+const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
+  const { t } = useLocalizations();
+  const unitPrices = plan.unitPrices;
+  const period = t(localizationKeys('billing.month'));
+  const periodAbbreviation = t(localizationKeys('billing.monthAbbreviation'));
+
+  const seatRows = React.useMemo(() => {
+    if (!unitPrices) {
+      return null;
+    }
+
+    const seatUnitPrice = getSeatUnitPrice(plan);
+
+    if (!seatUnitPrice) {
+      return null;
+    }
+
+    const formatTierFee = (tier: BillingPlanUnitPrice['tiers'][number]) =>
+      `${tier.feePerBlock.currencySymbol}${normalizeFormatted(tier.feePerBlock.amountFormatted)}`;
+    const getCapacityText = (endsAfterBlock: number | null) =>
+      endsAfterBlock === null
+        ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
+        : localizationKeys('billing.pricingTable.seatCost.upToSeats', { endsAfterBlock });
+
+    if (seatUnitPrice.tiers.length === 1) {
+      const tier = seatUnitPrice.tiers[0];
+      const rows: Array<{
+        elementId: string;
+        icon: typeof User | typeof Users;
+        text: ReturnType<typeof localizationKeys>;
+        additionalText?: ReturnType<typeof localizationKeys>;
+        additionalTooltipText?: string;
+      }> = [];
+
+      if (tier.feePerBlock.amount !== 0 && plan.hasBaseFee) {
+        rows.push({
+          elementId: 'seats',
+          icon: User,
+          text: localizationKeys('billing.pricingTable.seatCost.perSeat', {
+            feePerBlockAmount: formatTierFee(tier),
+            periodAbbreviation,
+          }),
+        });
+      }
+
+      rows.push({
+        elementId: rows.length ? 'seats-limit' : 'seats',
+        icon: Users,
+        text: getCapacityText(tier.endsAfterBlock),
+      });
+
+      return rows;
+    }
+
+    if (seatUnitPrice.tiers.length === 2) {
+      const [includedTier, additionalTier] = seatUnitPrice.tiers;
+
+      if (
+        includedTier &&
+        additionalTier &&
+        includedTier.feePerBlock.amount === 0 &&
+        includedTier.endsAfterBlock !== null &&
+        additionalTier.feePerBlock.amount !== 0
+      ) {
+        const additionalTierFeePerBlockAmount = formatTierFee(additionalTier);
+        const tooltipPrefixText = t(
+          localizationKeys(
+            plan.isDefault && (plan.fee?.amount === 0 || plan.annualMonthlyFee?.amount === 0)
+              ? 'billing.pricingTable.seatCost.tooltip.freeForUpToSeats'
+              : 'billing.pricingTable.seatCost.tooltip.firstSeatsIncludedInPlan',
+            {
+              endsAfterBlock: includedTier.endsAfterBlock,
+            },
+          ),
+        );
+        const tooltipAdditionalText = t(
+          localizationKeys('billing.pricingTable.seatCost.tooltip.additionalSeatsEach', {
+            feePerBlockAmount: additionalTierFeePerBlockAmount,
+            period,
+          }),
+        );
+
+        return [
+          {
+            elementId: 'seats',
+            icon: User,
+            text: localizationKeys('billing.pricingTable.seatCost.includedSeats', {
+              includedSeats: includedTier.endsAfterBlock,
+            }),
+            additionalText: localizationKeys('billing.pricingTable.seatCost.additionalSeats', {
+              additionalTierFeePerBlockAmount,
+              periodAbbreviation,
+            }),
+            additionalTooltipText: `${tooltipPrefixText} ${tooltipAdditionalText}`,
+          },
+          {
+            elementId: 'seats-limit',
+            icon: Users,
+            text: getCapacityText(additionalTier.endsAfterBlock),
+          },
+        ];
+      }
+    }
+
+    return null;
+  }, [period, periodAbbreviation, plan.fee, plan.annualMonthlyFee, t, unitPrices]);
+
+  if (!seatRows?.length) {
+    return null;
+  }
+
+  return (
+    <>
+      {seatRows.map(row => (
+        <Box
+          key={row.elementId}
+          elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
+          elementId={descriptors.pricingTableCardFeaturesListItem.setId(row.elementId)}
+          as='li'
+          sx={t => ({
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: t.space.$2,
+            margin: 0,
+            padding: 0,
+          })}
+        >
+          <Icon
+            icon={row.icon}
+            colorScheme='neutral'
+            size='sm'
+            aria-hidden
+            sx={t => ({
+              transform: `translateY(${t.space.$0x25})`,
+            })}
+          />
+          <Span elementDescriptor={descriptors.pricingTableCardFeaturesListItemContent}>
+            <Text
+              elementDescriptor={descriptors.pricingTableCardFeaturesListItemTitle}
+              colorScheme='body'
+              sx={t => ({
+                fontWeight: t.fontWeights.$normal,
+              })}
+            >
+              <Span localizationKey={row.text} />
+              {row.additionalText ? (
+                <>
+                  {' '}
+                  {row.additionalTooltipText ? (
+                    <Tooltip.Root>
+                      <Tooltip.Trigger>
+                        <Span
+                          localizationKey={row.additionalText}
+                          sx={{ textDecoration: 'underline dotted' }}
+                        />
+                      </Tooltip.Trigger>
+                      <Tooltip.Content text={row.additionalTooltipText} />
+                    </Tooltip.Root>
+                  ) : (
+                    <Span localizationKey={row.additionalText} />
+                  )}
+                </>
+              ) : null}
+            </Text>
+          </Span>
+        </Box>
+      ))}
+    </>
+  );
+};

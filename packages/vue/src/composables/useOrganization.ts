@@ -1,6 +1,6 @@
 import { getCurrentOrganizationMembership } from '@clerk/shared/organization';
 import type { OrganizationMembershipResource, OrganizationResource } from '@clerk/shared/types';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 
 import type { ToComputedRefs } from '../utils';
 import { toComputedRefs } from '../utils';
@@ -27,7 +27,7 @@ type UseOrganizationReturn =
 type UseOrganization = () => ToComputedRefs<UseOrganizationReturn>;
 
 /**
- * Returns the current [`Organization`](https://clerk.com/docs/reference/javascript/organization/organization) object
+ * Returns the current [`Organization`](https://clerk.com/docs/reference/objects/organization) object
  * along with loading states and membership information.
  *
  * @example
@@ -53,8 +53,24 @@ type UseOrganization = () => ToComputedRefs<UseOrganizationReturn>;
  * </template>
  */
 export const useOrganization: UseOrganization = () => {
-  const { clerk, organizationCtx } = useClerkContext('useOrganization');
+  const { loaded, clerk, organizationCtx } = useClerkContext('useOrganization');
   const { session } = useSession();
+
+  watch(
+    loaded,
+    value => {
+      if (value) {
+        // Optional chaining is important for `@clerk/vue` usage with older clerk-js versions that don't have the method
+        clerk.value?.__internal_attemptToEnableEnvironmentSetting?.({
+          for: 'organizations',
+          caller: 'useOrganization',
+        });
+      }
+    },
+    {
+      once: true,
+    },
+  );
 
   const result = computed<UseOrganizationReturn>(() => {
     if (organizationCtx.value === undefined) {
@@ -66,7 +82,7 @@ export const useOrganization: UseOrganization = () => {
     }
 
     /** In SSR context we include only the organization object when loadOrg is set to true. */
-    if (!clerk.value?.loaded) {
+    if (!loaded.value) {
       return {
         isLoaded: true,
         organization: organizationCtx.value,
@@ -75,7 +91,7 @@ export const useOrganization: UseOrganization = () => {
     }
 
     return {
-      isLoaded: clerk.value.loaded,
+      isLoaded: loaded.value,
       organization: organizationCtx.value,
       membership: getCurrentOrganizationMembership(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

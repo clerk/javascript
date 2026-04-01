@@ -13,7 +13,7 @@
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=expo_passkeys)
-[![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/Clerk?style=social)](https://twitter.com/intent/follow?screen_name=Clerk)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/expo-passkeys/CHANGELOG.md)
 ·
@@ -27,10 +27,10 @@
 
 ### Prerequisites
 
-- Expo 51 or later
-- React 18.0.2 or later
+- Expo 53 or later
+- React 18 or later
 - React Native 0.73 or later
-- Node.js `>=18.17.0` or later
+- Node.js `>=20.9.0` or later
 - An existing Expo application.
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=expo_passkeys).
 - [Passkeys to be enabled ](https://clerk.com/docs/custom-flows/passkeys#enable-passkeys)
@@ -38,8 +38,8 @@
 ## Usage
 
 ```tsx
-import { ClerkProvider } from '@clerk/clerk-expo';
-import { passkeys } from '@clerk/clerk-expo/passkeys';
+import { ClerkProvider } from '@clerk/expo';
+import { passkeys } from '@clerk/expo/passkeys';
 
 <ClerkProvider __experimental_passkeys={passkeys}>{/* Your app here */}</ClerkProvider>;
 ```

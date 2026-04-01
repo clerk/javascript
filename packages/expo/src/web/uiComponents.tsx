@@ -11,11 +11,12 @@ import {
   SignOutButton as BaseSignOutButton,
   SignUp as BaseSignUp,
   SignUpButton as BaseSignUpButton,
+  UNSAFE_PortalProvider as BaseUNSAFE_PortalProvider,
   UserAvatar as BaseUserAvatar,
   UserButton as BaseUserButton,
   UserProfile as BaseUserProfile,
   Waitlist as BaseWaitlist,
-} from '@clerk/clerk-react';
+} from '@clerk/react';
 import { Platform } from 'react-native';
 
 import { errorThrower } from '../utils/errors';
@@ -55,3 +56,5 @@ export const SignInWithMetamaskButton: typeof BaseSignInWithMetamaskButton =
 export const GoogleOneTap: typeof BaseGoogleOneTap = WrapComponent(BaseGoogleOneTap);
 export const Waitlist: typeof BaseWaitlist = WrapComponent(BaseWaitlist);
 export const PricingTable: typeof BasePricingTable = WrapComponent(BasePricingTable);
+
+export const UNSAFE_PortalProvider: typeof BaseUNSAFE_PortalProvider = WrapComponent(BaseUNSAFE_PortalProvider);

@@ -1,5 +1,5 @@
 ---
-import type { OrganizationProfileProps, OrganizationSwitcherProps, Without } from '@clerk/types';
+import type { OrganizationProfileProps, OrganizationSwitcherProps, Without } from '@clerk/shared/types';
 
 type Props = Without<OrganizationSwitcherProps, 'organizationProfileProps'> & {
   organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;

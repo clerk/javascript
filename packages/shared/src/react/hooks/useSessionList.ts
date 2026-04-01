@@ -1,10 +1,11 @@
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { UseSessionListReturn } from '../../types';
-import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
+import { useClientBase } from './base/useClientBase';
 
 const hookName = 'useSessionList';
 /**
- * The `useSessionList()` hook returns an array of [`Session`](https://clerk.com/docs/reference/javascript/session) objects that have been registered on the client device.
+ * The `useSessionList()` hook returns an array of [`Session`](https://clerk.com/docs/reference/objects/session) objects that have been registered on the client device.
  *
  * @unionReturnHeadings
  * ["Initialization", "Loaded"]
@@ -20,7 +21,7 @@ const hookName = 'useSessionList';
  * <Tab>
  *
  * ```tsx {{ filename: 'src/Home.tsx' }}
- * import { useSessionList } from '@clerk/clerk-react'
+ * import { useSessionList } from '@clerk/react'
  *
  * export default function Home() {
  *   const { isLoaded, sessions } = useSessionList()
@@ -50,7 +51,7 @@ export const useSessionList = (): UseSessionListReturn => {
   useAssertWrappedByClerkProvider(hookName);
 
   const isomorphicClerk = useClerkInstanceContext();
-  const client = useClientContext();
+  const client = useClientBase();
   const clerk = useClerkInstanceContext();
 
   clerk.telemetry?.record(eventMethodCalled(hookName));

@@ -3,9 +3,9 @@ import {
   SignIn as BaseSignIn,
   SignUp as BaseSignUp,
   UserProfile as BaseUserProfile,
-} from '@clerk/clerk-react';
-import { useRoutingProps } from '@clerk/clerk-react/internal';
-import type { OrganizationProfileProps, SignInProps, SignUpProps, UserProfileProps } from '@clerk/types';
+} from '@clerk/react';
+import { useRoutingProps } from '@clerk/react/internal';
+import type { OrganizationProfileProps, SignInProps, SignUpProps, UserProfileProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { usePathnameWithoutSplatRouteParams } from './usePathnameWithoutSplatRouteParams';

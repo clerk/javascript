@@ -25,7 +25,7 @@ import type { OrganizationCustomRoleKey, OrganizationPermissionKey } from './org
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
-import type { SamlIdpSlug } from './saml';
+import type { ProtectConfigJSON } from './protectConfig';
 import type { SessionStatus, SessionTask } from './session';
 import type { SessionVerificationLevel, SessionVerificationStatus } from './sessionVerification';
 import type { SignInJSON } from './signIn';
@@ -89,7 +89,9 @@ export interface EnvironmentJSON extends ClerkResourceJSON {
   display_config: DisplayConfigJSON;
   maintenance_mode: boolean;
   organization_settings: OrganizationSettingsJSON;
+  partitioned_cookies?: boolean;
   user_settings: UserSettingsJSON;
+  protect_config: ProtectConfigJSON;
 }
 
 export type LastAuthenticationStrategy =
@@ -101,6 +103,8 @@ export type LastAuthenticationStrategy =
   | UsernameIdentifier
   | OAuthStrategy
   | Web3Strategy;
+
+export type ClientTrustState = 'new' | 'known' | 'pending';
 
 export interface ClientJSON extends ClerkResourceJSON {
   object: 'client';
@@ -268,22 +272,9 @@ export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
   protocol: EnterpriseProtocol;
   provider: EnterpriseProvider;
   sync_user_attributes: boolean;
+  allow_organization_account_linking: boolean;
   created_at: number;
   updated_at: number;
-  enterprise_connection_id: string | null;
-}
-
-export interface SamlAccountJSON extends ClerkResourceJSON {
-  object: 'saml_account';
-  provider: SamlIdpSlug;
-  provider_user_id: string | null;
-  active: boolean;
-  email_address: string;
-  first_name: string;
-  last_name: string;
-  verification?: VerificationJSON;
-  saml_connection?: SamlAccountConnectionJSON;
-  last_authenticated_at: number | null;
   enterprise_connection_id: string | null;
 }
 
@@ -303,11 +294,6 @@ export interface UserJSON extends ClerkResourceJSON {
   external_accounts: ExternalAccountJSON[];
   enterprise_accounts: EnterpriseAccountJSON[];
   passkeys: PasskeyJSON[];
-  /**
-   * @deprecated Use `enterprise_accounts` instead.
-   */
-  saml_accounts: SamlAccountJSON[];
-
   organization_memberships: OrganizationMembershipJSON[];
   password_enabled: boolean;
   profile_image_id: string;
@@ -334,6 +320,7 @@ export interface PublicUserDataJSON {
   has_image: boolean;
   identifier: string;
   user_id?: string;
+  username?: string;
 }
 
 export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
@@ -346,6 +333,7 @@ export interface AuthConfigJSON extends ClerkResourceJSON {
   claimed_at: number | null;
   reverification: boolean;
   preferred_channels?: Record<string, PhoneCodeChannel>;
+  session_minter?: boolean;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -593,20 +581,6 @@ export interface PublicKeyCredentialRequestOptionsJSON {
   userVerification: 'discouraged' | 'preferred' | 'required';
 }
 
-export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
-  id: string;
-  name: string;
-  domain: string;
-  active: boolean;
-  provider: string;
-  sync_user_attributes: boolean;
-  allow_subdomains: boolean;
-  allow_idp_initiated: boolean;
-  disable_additional_identifications: boolean;
-  created_at: number;
-  updated_at: number;
-}
-
 export interface WaitlistJSON extends ClerkResourceJSON {
   object: 'waitlist';
   id: string;
@@ -621,9 +595,71 @@ export interface FeatureJSON extends ClerkResourceJSON {
   object: 'feature';
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   slug: string;
-  avatar_url: string;
+  avatar_url: string | null;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingSubscriptionItemSeatsJSON {
+  /**
+   * The number of seats available. `null` means unlimited.
+   */
+  quantity: number | null;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ *
+ * Represents a single pricing tier for a unit type on a plan.
+ */
+export interface BillingPlanUnitPriceTierJSON extends ClerkResourceJSON {
+  id: string;
+  object: 'commerce_unit_price';
+  starts_at_block: number;
+  /**
+   * `null` means unlimited.
+   */
+  ends_after_block: number | null;
+  fee_per_block: BillingMoneyAmountJSON;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ *
+ * Represents unit pricing for a specific unit type (for example, seats) on a plan.
+ */
+export interface BillingPlanUnitPriceJSON {
+  name: string;
+  block_size: number;
+  tiers: BillingPlanUnitPriceTierJSON[];
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ *
+ * Represents the cost breakdown for a single tier in checkout totals.
+ */
+export interface BillingPerUnitTotalTierJSON {
+  /**
+   * `null` means unlimited.
+   */
+  quantity: number | null;
+  fee_per_block: BillingMoneyAmountJSON;
+  total: BillingMoneyAmountJSON;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ *
+ * Represents the per-unit cost breakdown in checkout totals.
+ */
+export interface BillingPerUnitTotalJSON {
+  name: string;
+  block_size: number;
+  tiers: BillingPerUnitTotalTierJSON[];
 }
 
 /**
@@ -633,28 +669,24 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   object: 'commerce_plan';
   id: string;
   name: string;
-  fee: BillingMoneyAmountJSON;
-  annual_fee: BillingMoneyAmountJSON;
-  annual_monthly_fee: BillingMoneyAmountJSON;
-  amount: number;
-  amount_formatted: string;
-  annual_amount: number;
-  annual_amount_formatted: string;
-  annual_monthly_amount: number;
-  annual_monthly_amount_formatted: string;
-  currency_symbol: string;
-  currency: string;
-  description: string;
+  fee: BillingMoneyAmountJSON | null;
+  annual_fee: BillingMoneyAmountJSON | null;
+  annual_monthly_fee: BillingMoneyAmountJSON | null;
+  description: string | null;
   is_default: boolean;
   is_recurring: boolean;
   has_base_fee: boolean;
   for_payer_type: BillingPayerResourceType;
   publicly_visible: boolean;
   slug: string;
-  avatar_url: string;
-  features: FeatureJSON[];
+  avatar_url: string | null;
+  features?: FeatureJSON[];
   free_trial_days?: number | null;
   free_trial_enabled?: boolean;
+  /**
+   * Per-unit pricing tiers for this plan (for example, seats).
+   */
+  unit_prices?: BillingPlanUnitPriceJSON[];
 }
 
 /**
@@ -663,13 +695,17 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
 export interface BillingPaymentMethodJSON extends ClerkResourceJSON {
   object: 'commerce_payment_method';
   id: string;
-  last4: string;
-  payment_type: 'card' | 'link';
-  card_type: string;
-  is_default: boolean;
-  is_removable: boolean;
+  last4: string | null;
+  payment_type?: 'card';
+  card_type: string | null;
+  is_default?: boolean;
+  is_removable?: boolean;
   status: BillingPaymentMethodStatus;
-  wallet_type: string | null;
+  wallet_type?: string | null;
+  expiry_year?: number | null;
+  expiry_month?: number | null;
+  created_at?: number | null;
+  updated_at?: number | null;
 }
 
 /**
@@ -710,11 +746,10 @@ export interface BillingPaymentJSON extends ClerkResourceJSON {
   object: 'commerce_payment';
   id: string;
   amount: BillingMoneyAmountJSON;
-  paid_at?: number;
-  failed_at?: number;
+  paid_at: number | null;
+  failed_at: number | null;
   updated_at: number;
-  payment_method: BillingPaymentMethodJSON;
-  subscription: BillingSubscriptionItemJSON;
+  payment_method?: BillingPaymentMethodJSON | null;
   subscription_item: BillingSubscriptionItemJSON;
   charge_type: BillingPaymentChargeType;
   status: BillingPaymentStatus;
@@ -730,7 +765,12 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   credit?: {
     amount: BillingMoneyAmountJSON;
   };
-  payment_method_id: string;
+  /**
+   * Seat entitlement details for this subscription item. Only set for organization subscription items with
+   * seat-based billing.
+   */
+  seats?: BillingSubscriptionItemSeatsJSON;
+  credits?: BillingCreditsJSON;
   plan: BillingPlanJSON;
   plan_period: BillingSubscriptionPlanPeriod;
   status: BillingSubscriptionStatus;
@@ -742,8 +782,7 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   period_end: number | null;
   canceled_at: number | null;
   past_due_at: number | null;
-  // TODO(@COMMERCE): Remove optional after GA.
-  is_free_trial?: boolean;
+  is_free_trial: boolean;
 }
 
 /**
@@ -768,7 +807,7 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   updated_at: number | null;
   past_due_at: number | null;
   subscription_items: BillingSubscriptionItemJSON[] | null;
-  eligible_for_free_trial?: boolean;
+  eligible_for_free_trial: boolean;
 }
 
 /**
@@ -782,22 +821,59 @@ export interface BillingMoneyAmountJSON {
 }
 
 /**
+ * Contains proration credit details including billing cycle information.
+ */
+export interface BillingProrationCreditDetailJSON {
+  amount: BillingMoneyAmountJSON;
+  cycle_days_remaining: number;
+  cycle_days_total: number;
+  cycle_remaining_percent: number;
+}
+
+/**
+ * Contains payer credit details including the available balance and the amount applied to this checkout.
+ */
+export interface BillingPayerCreditJSON {
+  remaining_balance: BillingMoneyAmountJSON;
+  applied_amount: BillingMoneyAmountJSON;
+}
+
+/**
+ * Unified credits breakdown for checkout totals. Can be used instead of `credit` field.
+ */
+export interface BillingCreditsJSON {
+  proration: BillingProrationCreditDetailJSON | null;
+  payer: BillingPayerCreditJSON | null;
+  total: BillingMoneyAmountJSON;
+}
+
+/**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingCheckoutTotalsJSON {
   grand_total: BillingMoneyAmountJSON;
   subtotal: BillingMoneyAmountJSON;
   tax_total: BillingMoneyAmountJSON;
+  /**
+   * Per-unit cost breakdown for this checkout (for example, seats).
+   */
+  per_unit_totals?: BillingPerUnitTotalJSON[];
   total_due_now: BillingMoneyAmountJSON;
-  credit: BillingMoneyAmountJSON;
-  past_due: BillingMoneyAmountJSON;
+  credit: BillingMoneyAmountJSON | null;
+  credits: BillingCreditsJSON | null;
+  account_credit: BillingMoneyAmountJSON | null;
+  past_due: BillingMoneyAmountJSON | null;
+  total_due_after_free_trial: BillingMoneyAmountJSON | null;
 }
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface BillingStatementTotalsJSON extends Omit<BillingCheckoutTotalsJSON, 'total_due_now'> {}
+export interface BillingStatementTotalsJSON {
+  grand_total: BillingMoneyAmountJSON;
+  subtotal: BillingMoneyAmountJSON;
+  tax_total: BillingMoneyAmountJSON;
+}
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -814,8 +890,7 @@ export interface BillingCheckoutJSON extends ClerkResourceJSON {
   status: 'needs_confirmation' | 'completed';
   totals: BillingCheckoutTotalsJSON;
   is_immediate_plan_change: boolean;
-  // TODO(@COMMERCE): Remove optional after GA.
-  free_trial_ends_at: number | null;
+  free_trial_ends_at?: number;
   payer: BillingPayerJSON;
   needs_payment_method: boolean;
 }
@@ -826,19 +901,19 @@ export interface BillingCheckoutJSON extends ClerkResourceJSON {
 export interface BillingPayerJSON extends ClerkResourceJSON {
   object: 'commerce_payer';
   id: string;
-  created_at: number;
-  updated_at: number;
-  image_url: string | null;
+  created_at?: number;
+  updated_at?: number;
+  image_url?: string;
 
   // User attributes
-  user_id?: string;
-  email?: string;
-  first_name?: string;
-  last_name?: string;
+  user_id: string | null;
+  email?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
 
   // Organization attributes
-  organization_id?: string;
-  organization_name?: string;
+  organization_id: string | null;
+  organization_name?: string | null;
 }
 
 export interface ApiKeyJSON extends ClerkResourceJSON {
@@ -854,6 +929,10 @@ export interface ApiKeyJSON extends ClerkResourceJSON {
   expiration: number | null;
   created_by: string | null;
   description: string | null;
+  /**
+   * This property is only present in the response from `create()`.
+   */
+  secret?: string;
   last_used_at: number | null;
   created_at: number;
   updated_at: number;

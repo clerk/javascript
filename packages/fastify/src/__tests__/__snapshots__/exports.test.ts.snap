@@ -9,13 +9,3 @@ exports[`/api public exports > should not include a breaking change 1`] = `
   "verifyToken",
 ]
 `;
-
-exports[`/api public exports should not include a breaking change 1`] = `
-[
-  "clerkClient",
-  "clerkPlugin",
-  "createClerkClient",
-  "getAuth",
-  "verifyToken",
-]
-`;

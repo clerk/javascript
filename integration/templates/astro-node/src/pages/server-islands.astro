@@ -1,16 +1,16 @@
 ---
-import { Protect } from '@clerk/astro/components';
+import { Show } from '@clerk/astro/components';
 import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title='Page is only accessible by members'>
   <div class='w-full flex justify-center flex-col'>
-    <Protect
+    <Show
       server:defer
-      role='org:admin'
+      when={{ role: 'org:admin' }}
     >
       <p slot='fallback'>Loading</p>
-      <Fragment slot='protect-fallback'>
+      <Fragment slot='show-fallback'>
         <h1 class='text-2xl text-center'>Not an admin</h1>
         <a
           class='text-sm text-center text-gray-100 transition hover:text-gray-400'
@@ -19,6 +19,6 @@ import Layout from '../layouts/Layout.astro';
         >
       </Fragment>
       <h1 class='text-2xl text-center'>I'm an admin</h1>
-    </Protect>
+    </Show>
   </div>
 </Layout>

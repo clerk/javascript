@@ -11,7 +11,7 @@ export const tools = {
   users,
 
   /**
-   * Tools for interacting with organizations.
+   * Tools for interacting with Organizations.
    * This is a wrapper around the `clerkClient.organizations` API.
    * For more information, see the [Clerk API documentation](https://clerk.com/docs/reference/backend-api/tag/Organizations).
    */

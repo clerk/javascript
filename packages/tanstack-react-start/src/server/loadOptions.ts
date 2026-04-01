@@ -3,10 +3,9 @@ import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
-import { handleValueOrFn } from '@clerk/shared/utils';
 
 import { errorThrower } from '../utils';
-import { getPublicEnvVariables } from '../utils/env';
+import { canUseKeyless } from '../utils/feature-flags';
 import { commonEnvs } from './constants';
 import type { LoaderOptions } from './types';
 
@@ -17,13 +16,12 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
   const publishableKey = overrides.publishableKey || commonEnv.PUBLISHABLE_KEY;
   const jwtKey = overrides.jwtKey || commonEnv.CLERK_JWT_KEY;
   const apiUrl = getEnvVariable('CLERK_API_URL') || apiUrlFromPublishableKey(publishableKey);
-  const domain = handleValueOrFn(overrides.domain, new URL(request.url)) || commonEnv.DOMAIN;
-  const isSatellite = handleValueOrFn(overrides.isSatellite, new URL(request.url)) || commonEnv.IS_SATELLITE;
-  const relativeOrAbsoluteProxyUrl = handleValueOrFn(overrides?.proxyUrl, request.clerkUrl, commonEnv.PROXY_URL);
+  const domain = overrides.domain || commonEnv.DOMAIN;
+  const isSatellite = overrides.isSatellite || commonEnv.IS_SATELLITE;
+  const relativeOrAbsoluteProxyUrl = overrides.proxyUrl || commonEnv.PROXY_URL;
   const signInUrl = overrides.signInUrl || commonEnv.SIGN_IN_URL;
   const signUpUrl = overrides.signUpUrl || commonEnv.SIGN_UP_URL;
-  const afterSignInUrl = overrides.afterSignInUrl || getPublicEnvVariables().afterSignInUrl;
-  const afterSignUpUrl = overrides.afterSignUpUrl || getPublicEnvVariables().afterSignUpUrl;
+  const satelliteAutoSync = overrides.satelliteAutoSync;
 
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {
@@ -32,7 +30,8 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }
 
-  if (!secretKey) {
+  // In keyless mode, don't throw if secretKey is missing - ClerkProvider will handle it
+  if (!secretKey && !canUseKeyless) {
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw errorThrower.throw('Clerk: no secret key provided');
   }
@@ -42,7 +41,7 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
     throw errorThrower.throw('Clerk: satellite mode requires a proxy URL or domain');
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey)) {
+  if (isSatellite && secretKey && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey)) {
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw errorThrower.throw('Clerk: satellite mode requires a sign-in URL in production');
   }
@@ -60,7 +59,6 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
     proxyUrl,
     signInUrl,
     signUpUrl,
-    afterSignInUrl,
-    afterSignUpUrl,
+    satelliteAutoSync,
   };
 };

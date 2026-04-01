@@ -1,5 +1,7 @@
+import type { ClerkGlobalHookError } from '../errors/globalHookError';
 import type { SignInFutureResource } from './signInFuture';
 import type { SignUpFutureResource } from './signUpFuture';
+import type { WaitlistResource } from './waitlist';
 
 /**
  * Represents an error on a specific field.
@@ -20,9 +22,46 @@ export interface FieldError {
 }
 
 /**
- * Represents the collection of possible errors on known fields.
+ * Represents the errors that occurred during the last fetch of the parent resource.
  */
-export interface FieldErrors {
+export interface Errors<T> {
+  /**
+   * Represents the collection of possible errors on known fields.
+   */
+  fields: T;
+  /**
+   * The raw, unparsed errors from the Clerk API.
+   */
+  raw: unknown[] | null;
+  /**
+   * Parsed errors that are not related to any specific field.
+   * Does not include any errors that could be parsed as a field error
+   */
+  global: ClerkGlobalHookError[] | null;
+}
+
+/**
+ * Fields available for SignIn errors.
+ */
+export interface SignInFields {
+  /**
+   * The error for the identifier field.
+   */
+  identifier: FieldError | null;
+  /**
+   * The error for the password field.
+   */
+  password: FieldError | null;
+  /**
+   * The error for the code field.
+   */
+  code: FieldError | null;
+}
+
+/**
+ * Fields available for SignUp errors.
+ */
+export interface SignUpFields {
   /**
    * The error for the first name field.
    */
@@ -35,10 +74,6 @@ export interface FieldErrors {
    * The error for the email address field.
    */
   emailAddress: FieldError | null;
-  /**
-   * The error for the identifier field.
-   */
-  identifier: FieldError | null;
   /**
    * The error for the phone number field.
    */
@@ -66,37 +101,46 @@ export interface FieldErrors {
 }
 
 /**
- * Represents the errors that occurred during the last fetch of the parent resource.
+ * Fields available for Waitlist errors.
  */
-export interface Errors {
+export interface WaitlistFields {
   /**
-   * Represents the collection of possible errors on known fields.
+   * The error for the email address field.
    */
-  fields: FieldErrors;
-  /**
-   * The raw, unparsed errors from the Clerk API.
-   */
-  raw: unknown[] | null;
-  /**
-   * Parsed errors that are not related to any specific field.
-   */
-  global: unknown[] | null; // does not include any errors that could be parsed as a field error
+  emailAddress: FieldError | null;
 }
 
 /**
- * The value returned by the `useSignInSignal` hook.
+ * Errors type for SignIn operations.
+ */
+export type SignInErrors = Errors<SignInFields>;
+
+/**
+ * Errors type for SignUp operations.
+ */
+export type SignUpErrors = Errors<SignUpFields>;
+
+/**
+ * Errors type for Waitlist operations.
+ */
+export type WaitlistErrors = Errors<WaitlistFields>;
+
+/**
+ * @inline
+ *
+ * The value returned by the `useSignIn` hook.
  */
 export interface SignInSignalValue {
   /**
-   * Represents the errors that occurred during the last fetch of the parent resource.
+   * The errors that occurred during the last fetch of the underlying `SignInFuture` resource.
    */
-  errors: Errors;
+  errors: SignInErrors;
   /**
-   * The fetch status of the underlying `SignIn` resource.
+   * The fetch status of the underlying `SignInFuture` resource.
    */
   fetchStatus: 'idle' | 'fetching';
   /**
-   * An instance representing the currently active `SignIn`, with new APIs designed specifically for custom flows.
+   * An instance representing the currently active `SignInFuture`, with new APIs designed specifically for custom flows.
    */
   signIn: SignInFutureResource;
 }
@@ -107,17 +151,22 @@ export interface SignInSignal {
   (): NullableSignInSignal;
 }
 
+/**
+ * @inline
+ *
+ * The value returned by the `useSignUp` hook.
+ */
 export interface SignUpSignalValue {
   /**
-   * The errors that occurred during the last fetch of the underlying `SignUp` resource.
+   * The errors that occurred during the last fetch of the underlying `SignUpFuture` resource.
    */
-  errors: Errors;
+  errors: SignUpErrors;
   /**
-   * The fetch status of the underlying `SignUp` resource.
+   * The fetch status of the underlying `SignUpFuture` resource.
    */
   fetchStatus: 'idle' | 'fetching';
   /**
-   * The underlying `SignUp` resource.
+   * The underlying `SignUpFuture` resource.
    */
   signUp: SignUpFutureResource;
 }
@@ -126,6 +175,27 @@ export type NullableSignUpSignal = Omit<SignUpSignalValue, 'signUp'> & {
 };
 export interface SignUpSignal {
   (): NullableSignUpSignal;
+}
+
+export interface WaitlistSignalValue {
+  /**
+   * The errors that occurred during the last fetch of the underlying `Waitlist` resource.
+   */
+  errors: WaitlistErrors;
+  /**
+   * The fetch status of the underlying `Waitlist` resource.
+   */
+  fetchStatus: 'idle' | 'fetching';
+  /**
+   * The underlying `Waitlist` resource.
+   */
+  waitlist: WaitlistResource;
+}
+export type NullableWaitlistSignal = Omit<WaitlistSignalValue, 'waitlist'> & {
+  waitlist: WaitlistResource | null;
+};
+export interface WaitlistSignal {
+  (): NullableWaitlistSignal;
 }
 
 export interface State {
@@ -140,9 +210,15 @@ export interface State {
   signUpSignal: SignUpSignal;
 
   /**
+   * A Signal that updates when the underlying `Waitlist` resource changes, including errors.
+   */
+  waitlistSignal: WaitlistSignal;
+
+  /**
    * An alias for `effect()` from `alien-signals`, which can be used to subscribe to changes from Signals.
    *
    * @see https://github.com/stackblitz/alien-signals#usage
+   *
    * @experimental This experimental API is subject to change.
    */
   __internal_effect: (callback: () => void) => () => void;
@@ -152,7 +228,12 @@ export interface State {
    * its dependencies change.
    *
    * @see https://github.com/stackblitz/alien-signals#usage
+   *
    * @experimental This experimental API is subject to change.
    */
   __internal_computed: <T>(getter: (previousValue?: T) => T) => () => T;
+  /**
+   * An instance of the Waitlist resource.
+   */
+  __internal_waitlist: WaitlistResource;
 }

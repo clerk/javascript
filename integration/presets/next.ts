@@ -1,7 +1,7 @@
 import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
-import { linkPackage } from './utils';
+import { PKGLAB } from './utils';
 
 const appRouter = applicationConfig()
   .setName('next-app-router')
@@ -14,9 +14,8 @@ const appRouter = applicationConfig()
   .addDependency('next', constants.E2E_NEXTJS_VERSION)
   .addDependency('react', constants.E2E_REACT_VERSION)
   .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
-  .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION || linkPackage('nextjs'))
-  .addDependency('@clerk/shared', linkPackage('shared'))
-  .addDependency('@clerk/types', linkPackage('types'));
+  .addDependency('@clerk/nextjs', PKGLAB)
+  .addDependency('@clerk/shared', PKGLAB);
 
 const appRouterTurbo = appRouter.clone().setName('next-app-router-turbopack').addScript('dev', 'pnpm dev');
 
@@ -27,28 +26,55 @@ const appRouterQuickstart = appRouter
 
 const appRouterAPWithClerkNextLatest = appRouterQuickstart.clone().setName('next-app-router-ap-clerk-next-latest');
 
-const appRouterAPWithClerkNextV4 = appRouterQuickstart
+const appRouterQuickstartV6 = appRouter
   .clone()
-  .setName('next-app-router-ap-clerk-next-v4')
-  .addDependency('@clerk/nextjs', '4')
-  .addFile(
-    'src/middleware.ts',
-    () => `import { authMiddleware } from '@clerk/nextjs';
+  .setName('next-app-router-quickstart-v6')
+  .useTemplate(templates['next-app-router-quickstart-v6']);
 
-    export default authMiddleware({
-      publicRoutes: ['/']
-    });
+const appRouterAPWithClerkNextV5 = appRouterQuickstartV6
+  .clone()
+  .setName('next-app-router-ap-clerk-next-v5')
+  .addDependency('@clerk/nextjs', '5');
 
-    export const config = {
-      matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
-    };
-    `,
-  );
+const appRouterAPWithClerkNextV6 = appRouterQuickstartV6
+  .clone()
+  .setName('next-app-router-ap-clerk-next-v6')
+  .addDependency('@clerk/nextjs', '6');
+
+const appRouterBundledUI = applicationConfig()
+  .setName('next-app-router-bundled-ui')
+  .useTemplate(templates['next-app-router-bundled-ui'])
+  .setEnvFormatter('public', key => `NEXT_PUBLIC_${key}`)
+  .addScript('setup', constants.E2E_NPM_FORCE ? 'pnpm install --force' : 'pnpm install')
+  .addScript('dev', 'pnpm dev')
+  .addScript('build', 'pnpm build')
+  .addScript('serve', 'pnpm start')
+  .addDependency('next', constants.E2E_NEXTJS_VERSION)
+  .addDependency('react', constants.E2E_REACT_VERSION)
+  .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
+  .addDependency('@clerk/nextjs', PKGLAB)
+  .addDependency('@clerk/shared', PKGLAB)
+  .addDependency('@clerk/ui', PKGLAB);
+
+const cacheComponents = applicationConfig()
+  .setName('next-cache-components')
+  .useTemplate(templates['next-cache-components'])
+  .setEnvFormatter('public', key => `NEXT_PUBLIC_${key}`)
+  .addScript('setup', constants.E2E_NPM_FORCE ? 'pnpm install --force' : 'pnpm install')
+  .addScript('dev', 'pnpm dev')
+  .addScript('build', 'pnpm build')
+  .addScript('serve', 'pnpm start')
+  .addDependency('@clerk/nextjs', PKGLAB)
+  .addDependency('@clerk/shared', PKGLAB);
 
 export const next = {
   appRouter,
   appRouterTurbo,
   appRouterQuickstart,
   appRouterAPWithClerkNextLatest,
-  appRouterAPWithClerkNextV4,
+  appRouterAPWithClerkNextV5,
+  appRouterAPWithClerkNextV6,
+  appRouterQuickstartV6,
+  appRouterBundledUI,
+  cacheComponents,
 } as const;

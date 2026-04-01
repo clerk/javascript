@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 
-import type { BillingPayerResourceType, BillingPlanResource, Theme } from '@clerk/shared/types';
+import type { BillingPayerResourceType, BillingPlanResource } from '@clerk/shared/types';
+import type { Theme } from '@clerk/ui/internal';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import React from 'react';

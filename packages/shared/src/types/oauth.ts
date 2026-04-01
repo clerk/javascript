@@ -37,6 +37,7 @@ export type LinearOauthProvider = 'linear';
 export type XOauthProvider = 'x';
 export type EnstallOauthProvider = 'enstall';
 export type HuggingfaceOAuthProvider = 'huggingface';
+export type VercelOauthProvider = 'vercel';
 export type CustomOauthProvider = `custom_${string}`;
 
 export type OAuthProvider =
@@ -68,4 +69,5 @@ export type OAuthProvider =
   | XOauthProvider
   | EnstallOauthProvider
   | HuggingfaceOAuthProvider
+  | VercelOauthProvider
   | CustomOauthProvider;

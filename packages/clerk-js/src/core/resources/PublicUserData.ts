@@ -11,6 +11,7 @@ export class PublicUserData implements IPublicUserData {
   hasImage!: boolean;
   identifier!: string;
   userId?: string;
+  username?: string;
 
   constructor(data: PublicUserDataJSON | PublicUserDataJSONSnapshot) {
     this.fromJSON(data);
@@ -24,6 +25,7 @@ export class PublicUserData implements IPublicUserData {
       this.hasImage = data.has_image || false;
       this.identifier = data.identifier || '';
       this.userId = data.user_id;
+      this.username = data.username;
     }
 
     return this;
@@ -37,6 +39,7 @@ export class PublicUserData implements IPublicUserData {
       has_image: this.hasImage,
       identifier: this.identifier,
       user_id: this.userId,
+      username: this.username,
     };
   }
 }

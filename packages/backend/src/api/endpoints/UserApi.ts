@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest, OAuthProvider, OrganizationInvitationStatus } from '@clerk/types';
+import type { ClerkPaginationRequest, OAuthProvider, OrganizationInvitationStatus } from '@clerk/shared/types';
 
 import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
@@ -40,7 +40,16 @@ type UserListParams = ClerkPaginationRequest<
       | 'last_active_at'
       | 'last_sign_in_at'
     >;
+    /**
+     * @deprecated Use `lastActiveAtAfter` instead. This parameter will be removed in a future version.
+     */
     last_active_at_since?: number;
+    lastActiveAtBefore?: number;
+    lastActiveAtAfter?: number;
+    createdAtBefore?: number;
+    createdAtAfter?: number;
+    lastSignInAtAfter?: number;
+    lastSignInAtBefore?: number;
     organizationId?: string[];
   }
 >;
@@ -157,10 +166,10 @@ type UpdateUserParams = {
   /** If true, the user can delete themselves with the Frontend API. */
   deleteSelfEnabled?: boolean;
 
-  /** If true, the user can create organizations with the Frontend API. */
+  /** If true, the user can create Organizations with the Frontend API. */
   createOrganizationEnabled?: boolean;
 
-  /** The maximum number of organizations the user can create. 0 means unlimited. */
+  /** The maximum number of Organizations the user can create. 0 means unlimited. */
   createOrganizationsLimit?: number;
 } & UserMetadataParams &
   (UserPasswordHashingParams | object);
@@ -197,6 +206,10 @@ type DeleteWeb3WalletParams = {
 type DeleteUserExternalAccountParams = {
   userId: string;
   externalAccountId: string;
+};
+
+type SetPasswordCompromisedParams = {
+  revokeAllSessions?: boolean;
 };
 
 type UserID = {
@@ -445,6 +458,28 @@ export class UserAPI extends AbstractAPI {
     return this.request<UserID>({
       method: 'DELETE',
       path: joinPaths(basePath, userId, 'totp'),
+    });
+  }
+
+  public async setPasswordCompromised(
+    userId: string,
+    params: SetPasswordCompromisedParams = {
+      revokeAllSessions: false,
+    },
+  ) {
+    this.requireId(userId);
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'password', 'set_compromised'),
+      bodyParams: params,
+    });
+  }
+
+  public async unsetPasswordCompromised(userId: string) {
+    this.requireId(userId);
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'password', 'unset_compromised'),
     });
   }
 }

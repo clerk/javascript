@@ -1,12 +1,12 @@
 import { eventMethodCalled } from '../../telemetry/events/method-called';
-import type { ClerkPaginatedResponse, ClerkResource, EnvironmentResource, ForPayerType } from '../../types';
-import {
-  useAssertWrappedByClerkProvider,
-  useClerkInstanceContext,
-  useOrganizationContext,
-  useUserContext,
-} from '../contexts';
+import type { ClerkPaginatedResponse, ClerkResource, ForPayerType } from '../../types';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
+import type { ResourceCacheStableKey } from '../stable-keys';
 import type { PagesOrInfiniteOptions, PaginatedHookConfig, PaginatedResources } from '../types';
+import { useOrganizationBase } from './base/useOrganizationBase';
+import { useUserBase } from './base/useUserBase';
+import { createCacheKeys } from './createCacheKeys';
+import { useBillingIsEnabled } from './useBillingIsEnabled';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -14,7 +14,7 @@ import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
  */
 type BillingHookConfig<TResource extends ClerkResource, TParams extends PagesOrInfiniteOptions> = {
   hookName: string;
-  resourceType: string;
+  resourceType: ResourceCacheStableKey;
   useFetcher: (
     param: ForPayerType,
   ) => ((params: TParams & { orgId?: string }) => Promise<ClerkPaginatedResponse<TResource>>) | undefined;
@@ -24,8 +24,40 @@ type BillingHookConfig<TResource extends ClerkResource, TParams extends PagesOrI
 };
 
 /**
+ * @interface
+ */
+export interface HookParams
+  extends PaginatedHookConfig<
+    PagesOrInfiniteOptions & {
+      /**
+       * If `true`, a request will be triggered when the hook is mounted.
+       *
+       * @default true
+       */
+      enabled?: boolean;
+      /**
+       * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
+       *
+       * @default undefined
+       *
+       * @hidden
+       *
+       * @experimental
+       */
+      __experimental_mode?: 'cache';
+    }
+  > {
+  /**
+   * Specifies whether to fetch for the current user or Organization.
+   *
+   * @default 'user'
+   */
+  for?: ForPayerType;
+}
+
+/**
  * A hook factory that creates paginated data fetching hooks for commerce-related resources.
- * It provides a standardized way to create hooks that can fetch either user or organization resources
+ * It provides a standardized way to create hooks that can fetch either user or Organization resources
  * with built-in pagination support.
  *
  * The generated hooks handle:
@@ -43,14 +75,10 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
   useFetcher,
   options,
 }: BillingHookConfig<TResource, TParams>) {
-  type HookParams = PaginatedHookConfig<PagesOrInfiniteOptions> & {
-    for?: ForPayerType;
-  };
-
   return function useBillingHook<T extends HookParams>(
     params?: T,
   ): PaginatedResources<TResource, T extends { infinite: true } ? true : false> {
-    const { for: _for, ...paginationParams } = params || ({} as Partial<T>);
+    const { for: _for, enabled: externalEnabled, ...paginationParams } = params || ({} as Partial<T>);
 
     const safeFor = _for || 'user';
 
@@ -68,14 +96,18 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
 
     const clerk = useClerkInstanceContext();
 
-    // @ts-expect-error `__unstable__environment` is not typed
-    const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
-    const user = useUserContext();
-    const { organization } = useOrganizationContext();
+    const user = useUserBase();
+    const organization = useOrganizationBase();
 
     clerk.telemetry?.record(eventMethodCalled(hookName));
 
     const isForOrganization = safeFor === 'organization';
+
+    const billingEnabled = useBillingIsEnabled({
+      for: safeFor,
+      enabled: externalEnabled,
+      authenticated: !options?.unauthenticated,
+    });
 
     const hookParams =
       typeof paginationParams === 'undefined'
@@ -86,33 +118,32 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
             ...(options?.unauthenticated ? {} : isForOrganization ? { orgId: organization?.id } : {}),
           } as TParams);
 
-    const billingEnabled = isForOrganization
-      ? environment?.commerceSettings.billing.organization.enabled
-      : environment?.commerceSettings.billing.user.enabled;
-
     const isEnabled = !!hookParams && clerk.loaded && !!billingEnabled;
 
-    const result = usePagesOrInfinite<TParams, ClerkPaginatedResponse<TResource>>(
-      (hookParams || {}) as TParams,
-      fetchFn,
-      {
+    return usePagesOrInfinite({
+      fetcher: fetchFn,
+      config: {
         keepPreviousData: safeValues.keepPreviousData,
         infinite: safeValues.infinite,
         enabled: isEnabled,
-        ...(options?.unauthenticated ? {} : { isSignedIn: Boolean(user) }),
+        ...(options?.unauthenticated ? {} : { isSignedIn: user !== null }),
         __experimental_mode: safeValues.__experimental_mode,
+        initialPage: safeValues.initialPage,
+        pageSize: safeValues.pageSize,
       },
-      {
-        type: resourceType,
-        ...(options?.unauthenticated
-          ? { for: safeFor }
-          : {
+      keys: createCacheKeys({
+        stablePrefix: resourceType,
+        authenticated: !options?.unauthenticated,
+        tracked: options?.unauthenticated
+          ? ({ for: safeFor } as const)
+          : ({
               userId: user?.id,
               ...(isForOrganization ? { orgId: organization?.id } : {}),
-            }),
-      },
-    );
-
-    return result;
+            } as const),
+        untracked: {
+          args: hookParams as TParams,
+        },
+      }),
+    });
   };
 }

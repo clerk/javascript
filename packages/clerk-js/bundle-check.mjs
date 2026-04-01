@@ -5,7 +5,7 @@ import path from 'node:path';
 import { pipeline } from 'node:stream';
 import zlib from 'node:zlib';
 
-import { chromium } from 'playwright';
+import { chromium } from '@playwright/test';
 
 /**
  * This script generates a CLI report detailing the gzipped size of JavaScript resources loaded by `clerk-js` for a
@@ -212,7 +212,7 @@ function report(url, responses) {
 
 /**
  * Loads the given `url` in `browser`, capturing all HTTP requests that occur.
- * @param {import('playwright').Browser} browser
+ * @param {import('@playwright/test').Browser} browser
  * @param {string} url
  */
 async function getResponseSizes(browser, url) {

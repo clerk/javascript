@@ -1,4 +1,4 @@
-import { SignedIn, UserButton, SignOutButton, SignedOut, SignIn } from '@clerk/tanstack-react-start';
+import { OrganizationSwitcher, Show, SignIn, SignOutButton, UserButton } from '@clerk/tanstack-react-start';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/')({
@@ -9,21 +9,24 @@ function Home() {
   return (
     <div>
       <h1>Index Route</h1>
-      <SignedIn>
+      <Show when='signed-in'>
         <p>You are signed in!</p>
         <div>
           <p>View your profile here</p>
           <UserButton />
         </div>
         <div>
+          <OrganizationSwitcher />
+        </div>
+        <div>
           <SignOutButton />
         </div>
-      </SignedIn>
-      <SignedOut>
+      </Show>
+      <Show when='signed-out'>
         <p>You are signed out</p>
 
         <SignIn />
-      </SignedOut>
+      </Show>
     </div>
   );
 }

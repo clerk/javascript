@@ -38,6 +38,7 @@ export interface JWTClaims extends ClerkJWTClaims {
 
 /**
  * Clerk-issued JWT payload
+ *
  * @deprecated Use `JwtPayload` instead.
  */
 export interface ClerkJWTClaims {
@@ -82,17 +83,17 @@ export interface ClerkJWTClaims {
   act?: ActClaim;
 
   /**
-   * Active organization ID.
+   * Active Organization ID.
    */
   org_id?: string;
 
   /**
-   * Active organization slug.
+   * Active Organization Slug.
    */
   org_slug?: string;
 
   /**
-   * Active organization role.
+   * Active Organization Role.
    */
   org_role?: OrganizationCustomRoleKey;
 
@@ -104,7 +105,9 @@ export interface ClerkJWTClaims {
 
 /**
  * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
+ *
  * @inline
+ *
  * @deprecated Use `ActClaim` instead.
  */
 export interface ActJWTClaim {

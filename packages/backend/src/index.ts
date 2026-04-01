@@ -1,6 +1,6 @@
 import type { TelemetryCollectorOptions } from '@clerk/shared/telemetry';
 import { TelemetryCollector } from '@clerk/shared/telemetry';
-import type { SDKMetadata } from '@clerk/types';
+import type { SDKMetadata } from '@clerk/shared/types';
 
 import type { ApiClient, CreateBackendApiOptions } from './api';
 import { createBackendApiClient } from './api';
@@ -55,6 +55,7 @@ export type { VerifyTokenOptions } from './tokens/verify';
  */
 export type {
   ActorTokenJSON,
+  AgentTaskJSON,
   AccountlessApplicationJSON,
   ClerkResourceJSON,
   TokenJSON,
@@ -65,6 +66,7 @@ export type {
   DomainJSON,
   EmailJSON,
   EmailAddressJSON,
+  EnterpriseConnectionJSON,
   ExternalAccountJSON,
   IdentificationLinkJSON,
   InstanceJSON,
@@ -93,6 +95,7 @@ export type {
   SignUpVerificationsJSON,
   SMSMessageJSON,
   UserJSON,
+  UserDeletedJSON,
   VerificationJSON,
   WaitlistEntryJSON,
   Web3WalletJSON,
@@ -109,6 +112,7 @@ export type {
  * Resources
  */
 export type {
+  AgentTask,
   APIKey,
   ActorToken,
   AccountlessApplication,
@@ -118,6 +122,7 @@ export type {
   CnameTarget,
   Domain,
   EmailAddress,
+  EnterpriseConnection,
   ExternalAccount,
   Feature,
   Instance,
@@ -145,6 +150,7 @@ export type {
   Token,
   User,
   TestingToken,
+  WaitlistEntry,
   BillingPlan,
   BillingSubscription,
   BillingSubscriptionItem,

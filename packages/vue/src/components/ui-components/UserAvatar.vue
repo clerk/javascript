@@ -11,7 +11,7 @@ const props = defineProps<UserAvatarProps>();
   <ClerkHostRenderer
     :mount="clerk?.mountUserAvatar"
     :unmount="clerk?.unmountUserAvatar"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal_updateProps"
     :props="props"
   />
 </template>

@@ -2,16 +2,18 @@ import type {
   AuthConfigResource,
   CommerceSettingsResource,
   DisplayConfigResource,
+  EnableEnvironmentSettingParams,
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
   OrganizationSettingsResource,
+  ProtectConfigResource,
   UserSettingsResource,
 } from '@clerk/shared/types';
 
 import { eventBus, events } from '../../core/events';
 import { APIKeySettings } from './APIKeySettings';
-import { AuthConfig, BaseResource, CommerceSettings, DisplayConfig, UserSettings } from './internal';
+import { AuthConfig, BaseResource, CommerceSettings, DisplayConfig, ProtectConfig, UserSettings } from './internal';
 import { OrganizationSettings } from './OrganizationSettings';
 
 export class Environment extends BaseResource implements EnvironmentResource {
@@ -21,11 +23,13 @@ export class Environment extends BaseResource implements EnvironmentResource {
   displayConfig: DisplayConfigResource = new DisplayConfig();
   maintenanceMode: boolean = false;
   clientDebugMode: boolean = false;
+  partitionedCookies: boolean = false;
   pathRoot = '/environment';
   userSettings: UserSettingsResource = new UserSettings();
   organizationSettings: OrganizationSettingsResource = new OrganizationSettings();
   commerceSettings: CommerceSettingsResource = new CommerceSettings();
   apiKeysSettings: APIKeySettings = new APIKeySettings();
+  protectConfig: ProtectConfigResource = new ProtectConfig();
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
@@ -50,10 +54,12 @@ export class Environment extends BaseResource implements EnvironmentResource {
     this.displayConfig = new DisplayConfig(data.display_config);
     this.maintenanceMode = this.withDefault(data.maintenance_mode, this.maintenanceMode);
     this.clientDebugMode = this.withDefault(data.client_debug_mode, this.clientDebugMode);
+    this.partitionedCookies = this.withDefault(data.partitioned_cookies, this.partitionedCookies);
     this.organizationSettings = new OrganizationSettings(data.organization_settings);
     this.userSettings = new UserSettings(data.user_settings);
     this.commerceSettings = new CommerceSettings(data.commerce_settings);
     this.apiKeysSettings = new APIKeySettings(data.api_keys_settings);
+    this.protectConfig = new ProtectConfig(data.protect_config);
 
     return this;
   }
@@ -91,10 +97,19 @@ export class Environment extends BaseResource implements EnvironmentResource {
       id: this.id ?? '',
       maintenance_mode: this.maintenanceMode,
       client_debug_mode: this.clientDebugMode,
+      partitioned_cookies: this.partitionedCookies,
       organization_settings: this.organizationSettings.__internal_toSnapshot(),
       user_settings: this.userSettings.__internal_toSnapshot(),
       commerce_settings: this.commerceSettings.__internal_toSnapshot(),
       api_keys_settings: this.apiKeysSettings.__internal_toSnapshot(),
+      protect_config: this.protectConfig.__internal_toSnapshot(),
     };
+  }
+
+  async __internal_enableEnvironmentSetting(params: EnableEnvironmentSettingParams) {
+    await this._basePatch({
+      path: `/dev_tools/enable_environment_setting`,
+      body: params,
+    });
   }
 }

@@ -13,7 +13,7 @@
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_testing)
-[![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/Clerk?style=social)](https://twitter.com/intent/follow?screen_name=Clerk)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/testing/CHANGELOG.md)
 ·
@@ -36,7 +36,7 @@ It currently supports the following testing frameworks:
 
 ### Prerequisites
 
-- Node.js `>=18.17.0` or later
+- Node.js `>=20.9.0` or later
 - Playwright v1+ or Cypress v13.x or 14.x
 
 ### Installation

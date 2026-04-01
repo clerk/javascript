@@ -181,6 +181,123 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 });
 
+testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
+  'oauth popup with path-based routing @react',
+  ({ app }) => {
+    test.describe.configure({ mode: 'serial' });
+
+    let fakeUser: FakeUser;
+
+    test.beforeAll(async () => {
+      const client = createClerkClient({
+        secretKey: instanceKeys.get('oauth-provider').sk,
+        publishableKey: instanceKeys.get('oauth-provider').pk,
+      });
+      const users = createUserService(client);
+      fakeUser = users.createFakeUser({
+        withUsername: true,
+      });
+      await users.createBapiUser(fakeUser);
+    });
+
+    test.afterAll(async () => {
+      const u = createTestUtils({ app });
+      await fakeUser.deleteIfExists();
+      await u.services.users.deleteIfExists({ email: fakeUser.email });
+      await app.teardown();
+    });
+
+    test('popup OAuth navigates through sso-callback with path-based routing', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.page.goToRelative('/sign-in-popup');
+      await u.page.waitForClerkJsLoaded();
+      await u.po.signIn.waitForMounted();
+
+      const popupPromise = context.waitForEvent('page');
+      await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+      const popup = await popupPromise;
+      const popupUtils = createTestUtils({ app, page: popup, context });
+      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+
+      // Complete OAuth in the popup
+      await popupUtils.po.signIn.setIdentifier(fakeUser.email);
+      await popupUtils.po.signIn.continue();
+      await popupUtils.po.signIn.enterTestOtpCode();
+
+      // Because the user is new to the app and legal consent is required,
+      // the sign-up can't complete in the popup. The popup sends return_url
+      // back to the parent, which navigates to /sso-callback via pushState.
+      await u.page.getByRole('heading', { name: 'Legal consent' }).waitFor();
+      await u.page.getByLabel(/I agree to the/).check();
+      await u.po.signIn.continue();
+
+      await u.page.waitForAppUrl('/protected');
+      await u.po.expect.toBeSignedIn();
+    });
+  },
+);
+
+testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
+  'oauth popup with hash-based routing @react',
+  ({ app }) => {
+    test.describe.configure({ mode: 'serial' });
+
+    let fakeUser: FakeUser;
+
+    test.beforeAll(async () => {
+      const client = createClerkClient({
+        secretKey: instanceKeys.get('oauth-provider').sk,
+        publishableKey: instanceKeys.get('oauth-provider').pk,
+      });
+      const users = createUserService(client);
+      fakeUser = users.createFakeUser({
+        withUsername: true,
+      });
+      await users.createBapiUser(fakeUser);
+    });
+
+    test.afterAll(async () => {
+      const u = createTestUtils({ app });
+      await fakeUser.deleteIfExists();
+      await u.services.users.deleteIfExists({ email: fakeUser.email });
+      await app.teardown();
+    });
+
+    test('popup OAuth navigates through sso-callback with hash-based routing', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.page.goToRelative('/sign-in-hash-popup');
+      await u.page.waitForClerkJsLoaded();
+      await u.po.signIn.waitForMounted();
+
+      const popupPromise = context.waitForEvent('page');
+      await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+      const popup = await popupPromise;
+      const popupUtils = createTestUtils({ app, page: popup, context });
+      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+
+      // Complete OAuth in the popup
+      await popupUtils.po.signIn.setIdentifier(fakeUser.email);
+      await popupUtils.po.signIn.continue();
+      await popupUtils.po.signIn.enterTestOtpCode();
+
+      // Because the user is new to the app and legal consent is required,
+      // the sign-up can't complete in the popup. The popup sends return_url
+      // back to the parent, which navigates to /sso-callback via pushState.
+      // With hash routing, the HashRouter must detect this pushState change
+      // to render the sso-callback route. hashchange does not fire for
+      // pushState, so the router needs pushstate/replacestate listeners.
+      await u.page.getByRole('heading', { name: 'Legal consent' }).waitFor();
+      await u.page.getByLabel(/I agree to the/).check();
+      await u.po.signIn.continue();
+
+      await u.page.getByText('SignedIn').waitFor();
+      await u.po.expect.toBeSignedIn();
+    });
+  },
+);
+
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
   'oauth flows with legal consent @nextjs',
   ({ app }) => {
@@ -255,6 +372,38 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       await u.po.signIn.continue();
 
       await u.page.waitForAppUrl('/protected');
+    });
+
+    test('redirects when attempting OAuth sign in with existing session in another tab', async ({
+      page,
+      context,
+      browser,
+    }) => {
+      const u = createTestUtils({ app, page, context, browser });
+
+      // Open sign-in page in both tabs before signing in
+      await u.po.signIn.goTo();
+
+      let secondTabUtils: any;
+      await u.tabs.runInNewTab(async u2 => {
+        secondTabUtils = u2;
+        await u2.po.signIn.goTo();
+      });
+
+      // Sign in via OAuth on the first tab
+      await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.po.signIn.setIdentifier(fakeUser.email);
+      await u.po.signIn.continue();
+      await u.po.signIn.enterTestOtpCode();
+      await u.page.getByText('SignedIn').waitFor();
+      await u.po.expect.toBeSignedIn();
+
+      // Attempt to sign in via OAuth on the second tab (which already has sign-in mounted)
+      await secondTabUtils.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+
+      // Should redirect and be signed in without error
+      await secondTabUtils.po.expect.toBeSignedIn();
     });
   },
 );

@@ -206,9 +206,9 @@ describe('SessionTokenCache', () => {
       } as MessageEvent<SessionTokenEvent>;
 
       broadcastListener(newerEvent);
-      const cachedEntryAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
-      expect(cachedEntryAfterNewer).toBeDefined();
-      const newerCreatedAt = cachedEntryAfterNewer?.createdAt;
+      const resultAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
+      expect(resultAfterNewer).toBeDefined();
+      const newerCreatedAt = resultAfterNewer?.entry.createdAt;
 
       // mockJwt has iat: 1666648250, so create an older one with iat: 1666648190 (60 seconds earlier)
       const olderJwt =
@@ -226,9 +226,9 @@ describe('SessionTokenCache', () => {
 
       broadcastListener(olderEvent);
 
-      const cachedEntryAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
-      expect(cachedEntryAfterOlder).toBeDefined();
-      expect(cachedEntryAfterOlder?.createdAt).toBe(newerCreatedAt);
+      const resultAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
+      expect(resultAfterOlder).toBeDefined();
+      expect(resultAfterOlder?.entry.createdAt).toBe(newerCreatedAt);
     });
 
     it('successfully updates cache with valid token', () => {
@@ -245,9 +245,9 @@ describe('SessionTokenCache', () => {
 
       broadcastListener(event);
 
-      const cachedEntry = SessionTokenCache.get({ tokenId: 'session_123' });
-      expect(cachedEntry).toBeDefined();
-      expect(cachedEntry?.tokenId).toBe('session_123');
+      const result = SessionTokenCache.get({ tokenId: 'session_123' });
+      expect(result).toBeDefined();
+      expect(result?.entry.tokenId).toBe('session_123');
     });
 
     it('does not re-broadcast when receiving a broadcast message', async () => {
@@ -271,8 +271,8 @@ describe('SessionTokenCache', () => {
       await Promise.resolve();
 
       // Verify cache was updated
-      const cachedEntry = SessionTokenCache.get({ tokenId: 'session_123' });
-      expect(cachedEntry).toBeDefined();
+      const result = SessionTokenCache.get({ tokenId: 'session_123' });
+      expect(result).toBeDefined();
 
       // Critical: postMessage should NOT be called when handling a broadcast
       expect(mockBroadcastChannel.postMessage).not.toHaveBeenCalled();
@@ -331,9 +331,9 @@ describe('SessionTokenCache', () => {
       // Wait for promise to resolve
       await tokenResolver;
 
-      const cachedEntry = SessionTokenCache.get({ tokenId: 'future_token' });
-      expect(cachedEntry).toBeDefined();
-      expect(cachedEntry?.tokenId).toBe('future_token');
+      const result = SessionTokenCache.get({ tokenId: 'future_token' });
+      expect(result).toBeDefined();
+      expect(result?.entry.tokenId).toBe('future_token');
     });
 
     it('removes token when it has already expired based on duration', async () => {
@@ -351,11 +351,11 @@ describe('SessionTokenCache', () => {
 
       await tokenResolver;
 
-      const cachedEntry = SessionTokenCache.get({ tokenId: 'expired_token' });
-      expect(cachedEntry).toBeUndefined();
+      const result = SessionTokenCache.get({ tokenId: 'expired_token' });
+      expect(result).toBeUndefined();
     });
 
-    it('removes token when it expires within the leeway threshold', async () => {
+    it('returns token when remaining TTL is above poller interval', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const iat = nowSeconds;
       const exp = iat + 20;
@@ -366,12 +366,15 @@ describe('SessionTokenCache', () => {
         jwt: { claims: { exp, iat } },
       } as any);
 
-      SessionTokenCache.set({ createdAt: nowSeconds - 13, tokenId: 'soon_expired_token', tokenResolver });
+      // Token has 20s TTL, created 11s ago = 9s remaining (> 5s poller interval)
+      SessionTokenCache.set({ createdAt: nowSeconds - 11, tokenId: 'soon_expired_token', tokenResolver });
 
       await tokenResolver;
 
-      const cachedEntry = SessionTokenCache.get({ tokenId: 'soon_expired_token' });
-      expect(cachedEntry).toBeUndefined();
+      // Token is still valid (9s > 5s poller interval), so it should be returned
+      const result = SessionTokenCache.get({ tokenId: 'soon_expired_token' });
+      expect(result).toBeDefined();
+      expect(result?.entry.tokenId).toBe('soon_expired_token');
     });
 
     it('returns token when expiresAt is undefined (promise not yet resolved)', () => {
@@ -380,9 +383,9 @@ describe('SessionTokenCache', () => {
 
       SessionTokenCache.set({ tokenId: 'pending_token', tokenResolver: pendingTokenResolver });
 
-      const cachedEntry = SessionTokenCache.get({ tokenId: 'pending_token' });
-      expect(cachedEntry).toBeDefined();
-      expect(cachedEntry?.tokenId).toBe('pending_token');
+      const result = SessionTokenCache.get({ tokenId: 'pending_token' });
+      expect(result).toBeDefined();
+      expect(result?.entry.tokenId).toBe('pending_token');
     });
   });
 
@@ -471,7 +474,7 @@ describe('SessionTokenCache', () => {
       SessionTokenCache.set({ ...key, tokenResolver });
       await tokenResolver;
 
-      expect(SessionTokenCache.get(key)).toBeDefined();
+      expect(SessionTokenCache.get(key)?.entry).toBeDefined();
       expect(SessionTokenCache.size()).toBe(1);
 
       SessionTokenCache.clear();
@@ -512,78 +515,447 @@ describe('SessionTokenCache', () => {
 
       SessionTokenCache.set({ ...key, tokenResolver });
 
-      const cachedWhilePending = SessionTokenCache.get(key);
-      expect(cachedWhilePending).toBeDefined();
-      expect(cachedWhilePending?.tokenId).toBe('lifecycle-token');
+      const resultWhilePending = SessionTokenCache.get(key);
+      expect(resultWhilePending).toBeDefined();
+      expect(resultWhilePending?.entry.tokenId).toBe('lifecycle-token');
       expect(isResolved).toBe(false);
 
       vi.advanceTimersByTime(100);
       await tokenResolver;
 
-      const cachedAfterResolved = SessionTokenCache.get(key);
+      const resultAfterResolved = SessionTokenCache.get(key);
       expect(isResolved).toBe(true);
-      expect(cachedAfterResolved).toBeDefined();
-      expect(cachedAfterResolved?.tokenId).toBe('lifecycle-token');
+      expect(resultAfterResolved).toBeDefined();
+      expect(resultAfterResolved?.entry.tokenId).toBe('lifecycle-token');
 
       vi.advanceTimersByTime(60 * 1000);
 
-      const cachedAfterExpiration = SessionTokenCache.get(key);
-      expect(cachedAfterExpiration).toBeUndefined();
+      const resultAfterExpiration = SessionTokenCache.get(key);
+      expect(resultAfterExpiration).toBeUndefined();
     });
   });
 
-  describe('leeway precision', () => {
-    it('includes 5 second sync leeway on top of default 10 second leeway', async () => {
+  describe('proactive refresh timer', () => {
+    it('calls onRefresh callback when refresh timer fires', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const jwt = createJwtWithTtl(nowSeconds, 60);
 
       const token = new Token({
-        id: 'leeway-token',
+        id: 'refresh-timer-token',
         jwt,
         object: 'token',
       });
 
+      const onRefresh = vi.fn();
       const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { audience: 'leeway-test', tokenId: 'leeway-token' };
+      const key = { audience: 'refresh-test', tokenId: 'refresh-timer-token' };
 
-      SessionTokenCache.set({ ...key, tokenResolver });
+      SessionTokenCache.set({ ...key, tokenResolver, onRefresh });
       await tokenResolver;
 
-      expect(SessionTokenCache.get(key)).toMatchObject({ tokenId: 'leeway-token' });
+      // Timer should fire at: 60s - 15s (leeway) - 2s (lead time) = 43s
+      expect(onRefresh).not.toHaveBeenCalled();
 
-      vi.advanceTimersByTime(44 * 1000);
-      expect(SessionTokenCache.get(key)).toBeDefined();
+      // Advance to just before timer should fire
+      vi.advanceTimersByTime(42 * 1000);
+      expect(onRefresh).not.toHaveBeenCalled();
 
-      vi.advanceTimersByTime(1 * 1000);
-      expect(SessionTokenCache.get(key)).toBeDefined();
-
-      vi.advanceTimersByTime(1 * 1000);
-      expect(SessionTokenCache.get(key)).toBeUndefined();
+      // Advance past timer fire time
+      vi.advanceTimersByTime(2 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
     });
 
-    it('enforces minimum 5 second sync leeway even when leeway is set to 0', async () => {
+    it('does not schedule refresh timer when onRefresh is not provided', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const jwt = createJwtWithTtl(nowSeconds, 60);
 
       const token = new Token({
-        id: 'zero-leeway-token',
+        id: 'no-callback-token',
         jwt,
         object: 'token',
       });
 
       const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { audience: 'zero-leeway-test', tokenId: 'zero-leeway-token' };
+      const key = { tokenId: 'no-callback-token' };
+
+      // Set without onRefresh (like broadcast-received tokens)
+      SessionTokenCache.set({ ...key, tokenResolver });
+      await tokenResolver;
+
+      // Token should still be cached and retrievable
+      const result = SessionTokenCache.get(key);
+      expect(result?.entry.tokenId).toBe('no-callback-token');
+
+      // Advance past when timer would fire - nothing should happen
+      vi.advanceTimersByTime(50 * 1000);
+
+      // Token should still be valid (10s remaining)
+      const stillCached = SessionTokenCache.get(key);
+      expect(stillCached?.entry.tokenId).toBe('no-callback-token');
+    });
+
+    it('clears refresh timer when entry is deleted', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'clear-timer-token',
+        jwt,
+        object: 'token',
+      });
+
+      const onRefresh = vi.fn();
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'clear-timer-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver, onRefresh });
+      await tokenResolver;
+
+      // Clear the cache before timer fires
+      vi.advanceTimersByTime(30 * 1000);
+      SessionTokenCache.clear();
+
+      // Advance past when timer would have fired
+      vi.advanceTimersByTime(20 * 1000);
+
+      // onRefresh should not have been called since entry was cleared
+      expect(onRefresh).not.toHaveBeenCalled();
+    });
+
+    it('does not schedule refresh timer for tokens with very short TTL', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      // Token with 10s TTL - refreshFireTime would be 10 - 15 - 2 = -7 (negative)
+      const jwt = createJwtWithTtl(nowSeconds, 10);
+
+      const token = new Token({
+        id: 'short-ttl-token',
+        jwt,
+        object: 'token',
+      });
+
+      const onRefresh = vi.fn();
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'short-ttl-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver, onRefresh });
+      await tokenResolver;
+
+      // Advance past token expiration
+      vi.advanceTimersByTime(15 * 1000);
+
+      // onRefresh should not have been called - no timer was scheduled
+      expect(onRefresh).not.toHaveBeenCalled();
+    });
+
+    it('returns token until expiration even after refresh timer fires', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'still-valid-token',
+        jwt,
+        object: 'token',
+      });
+
+      const onRefresh = vi.fn();
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'still-valid-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver, onRefresh });
+      await tokenResolver;
+
+      // Advance past refresh timer (43s)
+      vi.advanceTimersByTime(50 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+
+      // Token should still be retrievable (10s remaining, > 5s poller interval)
+      const result = SessionTokenCache.get(key);
+      expect(result?.entry.tokenId).toBe('still-valid-token');
+    });
+  });
+
+  describe('varying TTL across consecutive tokens', () => {
+    it('adapts refresh timer when a 60s token is replaced by a 200s token', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const key = { tokenId: 'varying-ttl-token' };
+
+      const onRefreshB = vi.fn();
+
+      // When Token A's refresh fires, simulate what Session.#refreshTokenInBackground does:
+      // fetch a new token with a different TTL and cache it
+      const onRefreshA = vi.fn(() => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const jwtB = createJwtWithTtl(currentTime, 200);
+        const tokenB = new Token({ id: 'varying-ttl-token', jwt: jwtB, object: 'token' });
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(tokenB),
+          onRefresh: onRefreshB,
+        });
+      });
+
+      // Token A: 60s TTL, refresh fires at 43s (60 - 15 - 2)
+      const jwtA = createJwtWithTtl(nowSeconds, 60);
+      const tokenA = new Token({ id: 'varying-ttl-token', jwt: jwtA, object: 'token' });
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(tokenA),
+        onRefresh: onRefreshA,
+      });
+      await Promise.resolve();
+
+      // Advance to just before Token A's refresh
+      vi.advanceTimersByTime(42 * 1000);
+      expect(onRefreshA).not.toHaveBeenCalled();
+
+      // Token A's refresh fires at 43s, which caches Token B (200s TTL)
+      vi.advanceTimersByTime(1 * 1000);
+      expect(onRefreshA).toHaveBeenCalledTimes(1);
+
+      // Let Token B's promise resolve so its timers get scheduled
+      await Promise.resolve();
+
+      // Token B's refresh should fire at 183s (200 - 15 - 2) from when it was cached (t=43s)
+      // So absolute time: 43s + 183s = 226s from start
+      vi.advanceTimersByTime(182 * 1000);
+      expect(onRefreshB).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(1 * 1000);
+      expect(onRefreshB).toHaveBeenCalledTimes(1);
+    });
+
+    it('adapts refresh timer when a 200s token is replaced by a 60s token', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const key = { tokenId: 'long-to-short-token' };
+
+      const onRefreshB = vi.fn();
+
+      const onRefreshA = vi.fn(() => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const jwtB = createJwtWithTtl(currentTime, 60);
+        const tokenB = new Token({ id: 'long-to-short-token', jwt: jwtB, object: 'token' });
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(tokenB),
+          onRefresh: onRefreshB,
+        });
+      });
+
+      // Token A: 200s TTL, refresh fires at 183s (200 - 15 - 2)
+      const jwtA = createJwtWithTtl(nowSeconds, 200);
+      const tokenA = new Token({ id: 'long-to-short-token', jwt: jwtA, object: 'token' });
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(tokenA),
+        onRefresh: onRefreshA,
+      });
+      await Promise.resolve();
+
+      // Token A's refresh fires at 183s
+      vi.advanceTimersByTime(183 * 1000);
+      expect(onRefreshA).toHaveBeenCalledTimes(1);
+      await Promise.resolve();
+
+      // Token B (60s TTL) refresh fires at 43s from when cached (t=183s)
+      // Absolute: 183s + 43s = 226s
+      vi.advanceTimersByTime(42 * 1000);
+      expect(onRefreshB).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(1 * 1000);
+      expect(onRefreshB).toHaveBeenCalledTimes(1);
+    });
+
+    it('handles full chain: 60s -> 200s -> 60s with correct refresh timing at each step', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const key = { tokenId: 'chain-token' };
+
+      const onRefreshC = vi.fn();
+
+      const onRefreshB = vi.fn(() => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const jwtC = createJwtWithTtl(currentTime, 60);
+        const tokenC = new Token({ id: 'chain-token', jwt: jwtC, object: 'token' });
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(tokenC),
+          onRefresh: onRefreshC,
+        });
+      });
+
+      const onRefreshA = vi.fn(() => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const jwtB = createJwtWithTtl(currentTime, 200);
+        const tokenB = new Token({ id: 'chain-token', jwt: jwtB, object: 'token' });
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(tokenB),
+          onRefresh: onRefreshB,
+        });
+      });
+
+      // Token A: 60s TTL
+      const jwtA = createJwtWithTtl(nowSeconds, 60);
+      const tokenA = new Token({ id: 'chain-token', jwt: jwtA, object: 'token' });
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(tokenA),
+        onRefresh: onRefreshA,
+      });
+      await Promise.resolve();
+
+      // Step 1: Token A (60s) refresh fires at 43s
+      vi.advanceTimersByTime(43 * 1000);
+      expect(onRefreshA).toHaveBeenCalledTimes(1);
+      await Promise.resolve();
+
+      // Step 2: Token B (200s) refresh fires at 183s from t=43s -> absolute t=226s
+      vi.advanceTimersByTime(183 * 1000);
+      expect(onRefreshB).toHaveBeenCalledTimes(1);
+      await Promise.resolve();
+
+      // Step 3: Token C (60s) refresh fires at 43s from t=226s -> absolute t=269s
+      vi.advanceTimersByTime(43 * 1000);
+      expect(onRefreshC).toHaveBeenCalledTimes(1);
+    });
+
+    it('old deletion timer does not remove replacement token with longer TTL', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const key = { tokenId: 'no-interference-token' };
+
+      // Token A: 60s TTL
+      const jwtA = createJwtWithTtl(nowSeconds, 60);
+      const tokenA = new Token({ id: 'no-interference-token', jwt: jwtA, object: 'token' });
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(tokenA),
+      });
+      await Promise.resolve();
+
+      // Replace with Token B (200s TTL) at t=30s
+      vi.advanceTimersByTime(30 * 1000);
+
+      const currentTime = Math.floor(Date.now() / 1000);
+      const jwtB = createJwtWithTtl(currentTime, 200);
+      const tokenB = new Token({ id: 'no-interference-token', jwt: jwtB, object: 'token' });
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(tokenB),
+      });
+      await Promise.resolve();
+
+      // Token A's deletion timer fires at t=60s (30s from now)
+      vi.advanceTimersByTime(30 * 1000);
+
+      // Token B should still be in cache (identity check in deleteKey prevents stale removal)
+      const result = SessionTokenCache.get(key);
+      expect(result).toBeDefined();
+      expect(result?.entry.tokenId).toBe('no-interference-token');
+
+      // Token B should survive well past Token A's original expiry
+      vi.advanceTimersByTime(100 * 1000);
+      const stillValid = SessionTokenCache.get(key);
+      expect(stillValid).toBeDefined();
+    });
+
+    it('token remains readable between refresh and expiry during TTL transitions', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const key = { tokenId: 'readable-during-transition' };
+
+      const onRefresh = vi.fn(() => {
+        // Simulate refresh that creates a token with a much longer TTL
+        const currentTime = Math.floor(Date.now() / 1000);
+        const jwtB = createJwtWithTtl(currentTime, 300);
+        const tokenB = new Token({ id: 'readable-during-transition', jwt: jwtB, object: 'token' });
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(tokenB),
+        });
+      });
+
+      // Token A: 60s TTL
+      const jwtA = createJwtWithTtl(nowSeconds, 60);
+      const tokenA = new Token({ id: 'readable-during-transition', jwt: jwtA, object: 'token' });
+
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(tokenA),
+        onRefresh,
+      });
+      await Promise.resolve();
+
+      // After refresh fires at 43s, token should still be readable
+      vi.advanceTimersByTime(43 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+      await Promise.resolve();
+
+      // Token B (300s) is now cached, should be readable
+      const result = SessionTokenCache.get(key);
+      expect(result).toBeDefined();
+
+      // Should still be readable far into Token B's lifetime
+      vi.advanceTimersByTime(250 * 1000);
+      const laterResult = SessionTokenCache.get(key);
+      expect(laterResult).toBeDefined();
+    });
+  });
+
+  describe('hard cutoff behavior', () => {
+    it('returns token when TTL is above poller interval', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'above-cutoff-token',
+        jwt,
+        object: 'token',
+      });
+
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'above-cutoff-token' };
 
       SessionTokenCache.set({ ...key, tokenResolver });
       await tokenResolver;
 
-      expect(SessionTokenCache.get(key, 0)).toMatchObject({ tokenId: 'zero-leeway-token' });
+      // 60s remaining
+      let result = SessionTokenCache.get(key);
+      expect(result?.entry.tokenId).toBe('above-cutoff-token');
 
+      // 10s remaining (above 5s cutoff)
+      vi.advanceTimersByTime(50 * 1000);
+      result = SessionTokenCache.get(key);
+      expect(result?.entry.tokenId).toBe('above-cutoff-token');
+    });
+
+    it('forces synchronous refresh when token has less than poller interval remaining', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'hard-cutoff-token',
+        jwt,
+        object: 'token',
+      });
+
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'hard-cutoff-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver });
+      await tokenResolver;
+
+      // 6s remaining (just above 5s cutoff)
       vi.advanceTimersByTime(54 * 1000);
-      expect(SessionTokenCache.get(key, 0)).toBeDefined();
+      let result = SessionTokenCache.get(key);
+      expect(result?.entry.tokenId).toBe('hard-cutoff-token');
 
+      // 4s remaining (below 5s cutoff) - forces sync refresh
       vi.advanceTimersByTime(2 * 1000);
-      expect(SessionTokenCache.get(key, 0)).toBeUndefined();
+      result = SessionTokenCache.get(key);
+      expect(result).toBeUndefined();
     });
   });
 
@@ -604,7 +976,7 @@ describe('SessionTokenCache', () => {
       SessionTokenCache.set({ ...key, tokenResolver });
       await tokenResolver;
 
-      expect(SessionTokenCache.get(key)).toBeDefined();
+      expect(SessionTokenCache.get(key)?.entry).toBeDefined();
 
       vi.advanceTimersByTime(30 * 1000);
 
@@ -627,10 +999,10 @@ describe('SessionTokenCache', () => {
       SessionTokenCache.set({ ...key, tokenResolver });
       await tokenResolver;
 
-      expect(SessionTokenCache.get(key)).toBeDefined();
+      expect(SessionTokenCache.get(key)?.entry).toBeDefined();
 
       vi.advanceTimersByTime(90 * 1000);
-      expect(SessionTokenCache.get(key)).toBeDefined();
+      expect(SessionTokenCache.get(key)?.entry).toBeDefined();
 
       vi.advanceTimersByTime(30 * 1000);
       expect(SessionTokenCache.get(key)).toBeUndefined();
@@ -656,7 +1028,7 @@ describe('SessionTokenCache', () => {
         SessionTokenCache.set({ tokenId: label, tokenResolver });
         await tokenResolver;
 
-        expect(SessionTokenCache.get({ tokenId: label })).toBeDefined();
+        expect(SessionTokenCache.get({ tokenId: label })?.entry).toBeDefined();
 
         vi.advanceTimersByTime(ttl * 1000);
         expect(SessionTokenCache.get({ tokenId: label })).toBeUndefined();
@@ -684,9 +1056,9 @@ describe('SessionTokenCache', () => {
       SessionTokenCache.set({ ...keyWithAudience, tokenResolver });
       await tokenResolver;
 
-      const cached = SessionTokenCache.get(keyWithAudience);
-      expect(cached).toBeDefined();
-      expect(cached?.audience).toBe('https://api.example.com');
+      const result = SessionTokenCache.get(keyWithAudience);
+      expect(result).toBeDefined();
+      expect(result?.entry.audience).toBe('https://api.example.com');
     });
 
     it('treats tokens with different audiences as separate entries', async () => {
@@ -709,8 +1081,8 @@ describe('SessionTokenCache', () => {
       await Promise.all([resolver1, resolver2]);
 
       expect(SessionTokenCache.size()).toBe(2);
-      expect(SessionTokenCache.get(key1)).toBeDefined();
-      expect(SessionTokenCache.get(key2)).toBeDefined();
+      expect(SessionTokenCache.get(key1)?.entry).toBeDefined();
+      expect(SessionTokenCache.get(key2)?.entry).toBeDefined();
     });
   });
 
@@ -759,6 +1131,292 @@ describe('SessionTokenCache', () => {
       expect(() => {
         broadcastListener(event);
       }).not.toThrow();
+    });
+  });
+
+  describe('resolvedToken', () => {
+    it('is populated after tokenResolver resolves', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'resolved-token-test',
+        jwt,
+        object: 'token',
+      });
+
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'resolved-token-test' };
+
+      SessionTokenCache.set({ ...key, tokenResolver });
+
+      // Before promise resolves, resolvedToken should be undefined
+      let result = SessionTokenCache.get(key);
+      expect(result?.entry.resolvedToken).toBeUndefined();
+
+      // Wait for promise to resolve
+      await tokenResolver;
+
+      // After promise resolves, resolvedToken should be populated
+      result = SessionTokenCache.get(key);
+      expect(result?.entry.resolvedToken).toBeDefined();
+      expect(result?.entry.resolvedToken?.getRawString()).toBeTruthy();
+    });
+
+    it('can be provided when setting a pre-resolved token', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'pre-resolved-token',
+        jwt,
+        object: 'token',
+      });
+
+      const key = { tokenId: 'pre-resolved-token' };
+
+      // Set with both tokenResolver and resolvedToken
+      SessionTokenCache.set({
+        ...key,
+        resolvedToken: token,
+        tokenResolver: Promise.resolve(token),
+      });
+
+      // resolvedToken should be immediately available
+      const result = SessionTokenCache.get(key);
+      expect(result?.entry.resolvedToken).toBeDefined();
+      expect(result?.entry.resolvedToken).toBe(token);
+    });
+  });
+
+  describe('timer cleanup on overwrite', () => {
+    /**
+     * This describe block tests the fix for a bug where calling set() multiple times
+     * for the same cache key would leak orphaned refresh timers. Each set() call creates
+     * a new value object with its own refresh timer, but previously the old value's timers
+     * were never cleared. This caused refresh callbacks to fire N times after N set() calls
+     * instead of just once, making the poller appear erratic.
+     *
+     * The root cause was that both `#hydrateCache` (via Session constructor from _updateClient)
+     * and `#refreshTokenInBackground` call set() for the same key during a single refresh cycle,
+     * doubling the number of active timers each cycle.
+     */
+
+    it('cancels hydrate refresh timer when background refresh calls set() for the same key', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'double-set-token', jwt, object: 'token' });
+
+      const hydrateRefresh = vi.fn();
+      const backgroundRefresh = vi.fn();
+      const key = { tokenId: 'double-set-token' };
+
+      // 1. Simulate #hydrateCache from Session constructor (called by _updateClient)
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(token),
+        onRefresh: hydrateRefresh,
+      });
+      await Promise.resolve();
+
+      // 2. Simulate #refreshTokenInBackground's .then() calling set() with resolved token
+      //    This is what happens during a background refresh cycle — both _updateClient
+      //    and the .then() callback call set() for the same cache key
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(token),
+        onRefresh: backgroundRefresh,
+      });
+      await Promise.resolve();
+
+      // Advance past refresh fire time
+      vi.advanceTimersByTime(44 * 1000);
+
+      // Only the second (background refresh) callback should fire; the hydrate timer was cancelled
+      expect(hydrateRefresh).not.toHaveBeenCalled();
+      expect(backgroundRefresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('cancels old expiration timer when set() is called again for the same key', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt1 = createJwtWithTtl(nowSeconds, 30);
+      const jwt2 = createJwtWithTtl(nowSeconds, 120);
+      const token1 = new Token({ id: 'exp-overwrite', jwt: jwt1, object: 'token' });
+      const token2 = new Token({ id: 'exp-overwrite', jwt: jwt2, object: 'token' });
+
+      const key = { tokenId: 'exp-overwrite' };
+
+      // First set() with 30s TTL
+      SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token1) });
+      await Promise.resolve();
+
+      // Second set() with 120s TTL — old 30s expiration timer should be cancelled
+      SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token2) });
+      await Promise.resolve();
+
+      // After 30s the old timer would have deleted the entry, but it should still exist
+      vi.advanceTimersByTime(31 * 1000);
+      const result = SessionTokenCache.get(key);
+      expect(result).toBeDefined();
+      expect(result?.entry.tokenId).toBe('exp-overwrite');
+    });
+
+    it('simulates multiple refresh cycles without timer accumulation', async () => {
+      const key = { tokenId: 'multi-cycle-token' };
+      const refreshCounts: number[] = [];
+
+      // Simulate 5 consecutive refresh cycles
+      // refreshFireTime = 60 - 15 - 2 = 43s
+      for (let cycle = 0; cycle < 5; cycle++) {
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        const jwt = createJwtWithTtl(nowSeconds, 60);
+        const token = new Token({ id: 'multi-cycle-token', jwt, object: 'token' });
+
+        const onRefresh = vi.fn();
+
+        // Each cycle does TWO set() calls (hydration + background refresh)
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(token),
+          onRefresh,
+        });
+        await Promise.resolve();
+
+        SessionTokenCache.set({
+          ...key,
+          tokenResolver: Promise.resolve<TokenResource>(token),
+          onRefresh,
+        });
+        await Promise.resolve();
+
+        // Advance to 42s — just BEFORE the 43s refresh timer fires
+        vi.advanceTimersByTime(42 * 1000);
+        refreshCounts.push(onRefresh.mock.calls.length);
+
+        // Advance 2 more seconds past the 43s fire time
+        vi.advanceTimersByTime(2 * 1000);
+        refreshCounts.push(onRefresh.mock.calls.length);
+      }
+
+      // Each cycle should show: 0 calls before timer, 1 call after timer
+      // If timers were accumulating, later cycles would show more than 1 call
+      for (let i = 0; i < refreshCounts.length; i += 2) {
+        expect(refreshCounts[i]).toBe(0); // before timer (42s)
+        expect(refreshCounts[i + 1]).toBe(1); // after timer (44s)
+      }
+    });
+
+    it('set() with different key does not affect existing timers', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token1 = new Token({ id: 'key-a', jwt, object: 'token' });
+      const token2 = new Token({ id: 'key-b', jwt, object: 'token' });
+
+      const onRefreshA = vi.fn();
+      const onRefreshB = vi.fn();
+
+      SessionTokenCache.set({
+        tokenId: 'key-a',
+        tokenResolver: Promise.resolve<TokenResource>(token1),
+        onRefresh: onRefreshA,
+      });
+      await Promise.resolve();
+
+      SessionTokenCache.set({
+        tokenId: 'key-b',
+        tokenResolver: Promise.resolve<TokenResource>(token2),
+        onRefresh: onRefreshB,
+      });
+      await Promise.resolve();
+
+      vi.advanceTimersByTime(44 * 1000);
+
+      // Both should fire independently — setting key-b should NOT cancel key-a's timer
+      expect(onRefreshA).toHaveBeenCalledTimes(1);
+      expect(onRefreshB).toHaveBeenCalledTimes(1);
+    });
+
+    it('only the latest set() callback fires after interleaved set/clear/set', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'interleaved-token', jwt, object: 'token' });
+
+      const onRefresh1 = vi.fn();
+      const onRefresh2 = vi.fn();
+      const key = { tokenId: 'interleaved-token' };
+
+      // set, clear, set again
+      SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token), onRefresh: onRefresh1 });
+      await Promise.resolve();
+
+      SessionTokenCache.clear();
+
+      SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token), onRefresh: onRefresh2 });
+      await Promise.resolve();
+
+      vi.advanceTimersByTime(44 * 1000);
+
+      expect(onRefresh1).not.toHaveBeenCalled();
+      expect(onRefresh2).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not install timers when a pending tokenResolver resolves after being overwritten', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'stale-pending', jwt, object: 'token' });
+
+      const onRefreshStale = vi.fn();
+      const onRefreshFresh = vi.fn();
+      const key = { tokenId: 'stale-pending' };
+
+      // First set() with a slow-resolving promise
+      let resolveSlowPromise: (t: TokenResource) => void;
+      const slowPromise = new Promise<TokenResource>(resolve => {
+        resolveSlowPromise = resolve;
+      });
+
+      SessionTokenCache.set({ ...key, tokenResolver: slowPromise, onRefresh: onRefreshStale });
+
+      // Second set() overwrites the key before the slow promise resolves
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(token),
+        onRefresh: onRefreshFresh,
+      });
+      await Promise.resolve();
+
+      // Now the slow promise resolves — but its entry is stale
+      resolveSlowPromise!(token);
+      await Promise.resolve();
+
+      // Advance past refresh fire time
+      vi.advanceTimersByTime(44 * 1000);
+
+      // Only the fresh callback should fire; the stale one should be ignored
+      expect(onRefreshStale).not.toHaveBeenCalled();
+      expect(onRefreshFresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('overwriting with a token that has no onRefresh cancels the old refresh timer', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'cancel-refresh', jwt, object: 'token' });
+
+      const onRefresh = vi.fn();
+      const key = { tokenId: 'cancel-refresh' };
+
+      // First set with onRefresh
+      SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token), onRefresh });
+      await Promise.resolve();
+
+      // Second set WITHOUT onRefresh (like a broadcast-received token)
+      SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token) });
+      await Promise.resolve();
+
+      vi.advanceTimersByTime(44 * 1000);
+
+      // The old onRefresh should have been cancelled, and no new one was scheduled
+      expect(onRefresh).not.toHaveBeenCalled();
     });
   });
 
@@ -813,15 +1471,15 @@ describe('SessionTokenCache', () => {
       // (not session2's token) - tokens are isolated by tokenId
       const retrievedSession1Token = SessionTokenCache.get({ tokenId: session1Id });
       expect(retrievedSession1Token).toBeDefined();
-      const resolvedSession1Token = await retrievedSession1Token!.tokenResolver;
+      const resolvedSession1Token = await retrievedSession1Token!.entry.tokenResolver;
       expect(resolvedSession1Token.jwt?.claims?.iat).toBe(nowSeconds);
-      expect(retrievedSession1Token!.tokenId).toBe(session1Id);
+      expect(retrievedSession1Token!.entry.tokenId).toBe(session1Id);
 
       // Verify session2's token is separate
       const retrievedSession2Token = SessionTokenCache.get({ tokenId: session2Id });
       expect(retrievedSession2Token).toBeDefined();
-      expect(retrievedSession2Token!.tokenId).toBe(session2Id);
-      expect(retrievedSession2Token!.tokenId).not.toBe(session1Id);
+      expect(retrievedSession2Token!.entry.tokenId).toBe(session2Id);
+      expect(retrievedSession2Token!.entry.tokenId).not.toBe(session1Id);
     });
 
     it('accepts broadcast messages from the same session ID', async () => {
@@ -847,7 +1505,7 @@ describe('SessionTokenCache', () => {
 
       const cachedToken = SessionTokenCache.get({ tokenId: sessionId });
       expect(cachedToken).toBeDefined();
-      const resolvedToken = await cachedToken!.tokenResolver;
+      const resolvedToken = await cachedToken!.entry.tokenResolver;
       expect(resolvedToken.jwt?.claims?.iat).toBe(nowSeconds - 10);
 
       const newerJwt = createJwtWithTtl(nowSeconds, 60);
@@ -867,7 +1525,7 @@ describe('SessionTokenCache', () => {
       await vi.waitFor(async () => {
         const updatedCached = SessionTokenCache.get({ tokenId: sessionId });
         expect(updatedCached).toBeDefined();
-        const updatedToken = await updatedCached!.tokenResolver;
+        const updatedToken = await updatedCached!.entry.tokenResolver;
         expect(updatedToken.jwt?.claims?.iat).toBe(nowSeconds);
       });
 

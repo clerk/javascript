@@ -1,9 +1,7 @@
 /**
  * Control Components
  */
-export { default as SignedIn } from './control/SignedIn.astro';
-export { default as SignedOut } from './control/SignedOut.astro';
-export { default as Protect } from './control/Protect.astro';
+export { default as Show } from './control/Show.astro';
 export { default as AuthenticateWithRedirectCallback } from './control/AuthenticateWithRedirectCallback.astro';
 
 /**
@@ -31,3 +29,4 @@ export { default as CreateOrganization } from './interactive/CreateOrganization.
 export { default as GoogleOneTap } from './interactive/GoogleOneTap.astro';
 export { default as Waitlist } from './interactive/Waitlist.astro';
 export { default as PricingTable } from './interactive/PricingTable.astro';
+export { default as APIKeys } from './interactive/APIKeys.astro';

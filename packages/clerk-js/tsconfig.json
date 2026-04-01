@@ -24,5 +24,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "vitest.config.mts", "vitest.setup.mts"]
+  "include": ["src", "vitest.config.mts", "vitest.setup.mts", "../shared/internal/clerk-js/componentGuards.ts"]
 }

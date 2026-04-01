@@ -427,9 +427,43 @@ describe('HandshakeService', () => {
 
       // Verify all required parameters are present
       expect(url.searchParams.get('redirect_url')).toBeDefined();
-      expect(url.searchParams.get('__clerk_api_version')).toBe('2025-04-10');
+      expect(url.searchParams.get('__clerk_api_version')).toBe('2025-11-10');
       expect(url.searchParams.get(constants.QueryParameters.SuffixedCookies)).toMatch(/^(true|false)$/);
       expect(url.searchParams.get(constants.QueryParameters.HandshakeReason)).toBe('test-reason');
+    });
+
+    it('should include session token in handshake URL when session token is present', () => {
+      const contextWithSession = {
+        ...mockAuthenticateContext,
+        sessionToken: 'test_session_token_123',
+      } as AuthenticateContext;
+      const serviceWithSession = new HandshakeService(contextWithSession, mockOptions, mockOrganizationMatcher);
+
+      const headers = serviceWithSession.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.searchParams.get(constants.Cookies.Session)).toBe('test_session_token_123');
+    });
+
+    it('should not include session token in handshake URL when session token is absent', () => {
+      const contextWithoutSession = {
+        ...mockAuthenticateContext,
+        sessionToken: undefined,
+      } as AuthenticateContext;
+      const serviceWithoutSession = new HandshakeService(contextWithoutSession, mockOptions, mockOrganizationMatcher);
+
+      const headers = serviceWithoutSession.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.searchParams.get(constants.Cookies.Session)).toBeNull();
     });
   });
 

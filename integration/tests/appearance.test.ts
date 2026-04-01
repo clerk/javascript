@@ -14,8 +14,8 @@ test.describe('appearance prop', () => {
       .addFile(
         'src/App.tsx',
         ({ tsx }) => tsx`
-            import { SignIn, SignUp } from '@clerk/clerk-react';
-            import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes';
+            import { SignIn, SignUp } from '@clerk/react';
+            import { dark, neobrutalism, shadesOfPurple } from '@clerk/ui/themes';
             const themes = { shadesOfPurple, neobrutalism, dark };
 
             export default function App() {
@@ -26,8 +26,8 @@ test.describe('appearance prop', () => {
                 return (
                   <div key={name}>
                     <h2>{name}</h2>
-                    <SignIn appearance={{ baseTheme: theme }} />
-                    <SignUp appearance={{ baseTheme: theme }} />
+                    <SignIn appearance={{ theme }} />
+                    <SignUp appearance={{ theme }} />
                   </div>
                 );
               });

@@ -1,28 +1,33 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
+
 Clerk JavaScript SDK Monorepo
 
 1. Package Manager
+
 - This project is a monorepo that uses pnpm
 - Turbo is used for build orchestration and caching
 - Node.js is required
 
 2. Repository Overview
+
 - All packages published under @clerk namespace
 - Supports 10+ JavaScript frameworks and platforms
 - Comprehensive testing with unit, integration, and E2E tests
 
 3. Key Directories
-- `packages/` - All publishable packages (@clerk/*)
+
+- `packages/` - All publishable packages (@clerk/\*)
 - `integration/` - Framework integration templates and E2E tests
 - `playground/` - Development and testing applications
 - `scripts/` - Build automation and utilities
 - `.cursor/rules/` - Additional rule files for specific domains
 
 4. Core Commands
+
 - `pnpm dev` - Start development mode for all packages
 - `pnpm build` - Build all packages
 - `pnpm test` - Run unit tests
@@ -31,7 +36,9 @@ Clerk JavaScript SDK Monorepo
 - `pnpm format` - Format code with Prettier
 
 5. Development Workflow
+
 - Make changes in relevant package under packages/
 - Use playground apps for testing changes
 - Follow established testing and documentation requirements
 - Use Changesets for version management and releases
+- If you are provided a commit SHA, always read the commit message and description for extra context.

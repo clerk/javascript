@@ -13,7 +13,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   // console.log(auth());
   return (
-    <ClerkProvider clerkJSUrl={'https://js.lclclerk.com/npm/clerk.browser.js'}>
+    <ClerkProvider __internal_clerkJSUrl={'https://js.lclclerk.com/npm/clerk.browser.js'}>
       <html lang='en'>
         <body className={inter.className}>
           <Links />

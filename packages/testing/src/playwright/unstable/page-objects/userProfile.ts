@@ -17,6 +17,9 @@ export const createUserProfileComponentPageObject = (testArgs: { page: EnhancedP
     switchToBillingTab: async () => {
       await page.getByText(/Billing/i).click();
     },
+    switchToAPIKeysTab: async () => {
+      await page.getByText(/API keys/i).click();
+    },
     waitForMounted: () => {
       return page.waitForSelector('.cl-userProfile-root', { state: 'attached' });
     },

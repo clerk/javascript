@@ -2,11 +2,12 @@ import type { AuthObject } from '@clerk/backend';
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
-import type { PendingSessionOptions } from '@clerk/types';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { MiddlewareFunction } from 'react-router';
 import { createContext } from 'react-router';
 
 import { clerkClient } from './clerkClient';
+import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import { loadOptions } from './loadOptions';
 import type { ClerkMiddlewareOptions } from './types';
 import { patchRequest } from './utils';
@@ -35,43 +36,56 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
     const clerkRequest = createClerkRequest(patchRequest(args.request));
     const loadedOptions = loadOptions(args, options);
 
+    const {
+      publishableKey,
+      secretKey,
+      claimUrl: __keylessClaimUrl,
+      apiKeysUrl: __keylessApiKeysUrl,
+    } = await resolveKeysWithKeylessFallback(loadedOptions.publishableKey, loadedOptions.secretKey, args, options);
+
+    if (publishableKey) {
+      loadedOptions.publishableKey = publishableKey;
+    }
+    if (secretKey) {
+      loadedOptions.secretKey = secretKey;
+    }
+
     // Pick only the properties needed by authenticateRequest.
     // Used when manually providing options to the middleware.
     const {
       apiUrl,
-      secretKey,
       jwtKey,
       proxyUrl,
       isSatellite,
       domain,
-      publishableKey,
       machineSecretKey,
       audience,
       authorizedParties,
       signInUrl,
       signUpUrl,
-      afterSignInUrl,
-      afterSignUpUrl,
       organizationSyncOptions,
     } = loadedOptions;
 
-    const requestState = await clerkClient(args).authenticateRequest(clerkRequest, {
+    const requestState = await clerkClient(args, options).authenticateRequest(clerkRequest, {
       apiUrl,
-      secretKey,
+      secretKey: loadedOptions.secretKey,
       jwtKey,
       proxyUrl,
       isSatellite,
       domain,
-      publishableKey,
+      publishableKey: loadedOptions.publishableKey,
       machineSecretKey,
       audience,
       authorizedParties,
       organizationSyncOptions,
       signInUrl,
       signUpUrl,
-      afterSignInUrl,
-      afterSignUpUrl,
       acceptsToken: 'any',
+    });
+
+    Object.assign(requestState, {
+      __keylessClaimUrl,
+      __keylessApiKeysUrl,
     });
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
@@ -89,7 +103,7 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       throw new Error('Clerk: handshake status without redirect');
     }
 
-    args.context.set(authFnContext, (options?: PendingSessionOptions) => requestState.toAuth(options));
+    args.context.set(authFnContext, (opts?: PendingSessionOptions) => requestState.toAuth(opts));
     args.context.set(requestStateContext, requestState);
 
     const response = await next();

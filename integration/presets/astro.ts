@@ -1,6 +1,6 @@
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
-import { linkPackage } from './utils';
+import { PKGLAB } from './utils';
 
 const astroNode = applicationConfig()
   .setName('astro-node')
@@ -10,9 +10,10 @@ const astroNode = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/astro', linkPackage('astro'))
-  .addDependency('@clerk/types', linkPackage('types'))
-  .addDependency('@clerk/localizations', linkPackage('localizations'));
+  .addDependency('@clerk/astro', PKGLAB)
+  .addDependency('@clerk/backend', PKGLAB)
+  .addDependency('@clerk/shared', PKGLAB)
+  .addDependency('@clerk/localizations', PKGLAB);
 
 const astroStatic = astroNode.clone().setName('astro-hybrid').useTemplate(templates['astro-hybrid']);
 

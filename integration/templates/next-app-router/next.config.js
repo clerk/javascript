@@ -1,9 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  outputFileTracingRoot: '/',
-};
+const nextConfig = {};
 
 module.exports = nextConfig;

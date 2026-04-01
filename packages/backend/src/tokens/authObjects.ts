@@ -9,7 +9,7 @@ import type {
   ServerGetTokenOptions,
   SessionStatusClaim,
   SharedSignedInAuthObjectProperties,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import type { APIKey, CreateBackendApiOptions, IdPOAuthAccessToken, M2MToken } from '../api';
 import { createBackendApiClient } from '../api';
@@ -51,7 +51,7 @@ export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
    */
   getToken: ServerGetToken;
   /**
-   * A function that checks if the user has an organization role or custom permission.
+   * A function that checks if the user has an Organization Role or Custom Permission.
    */
   has: CheckAuthorizationFromSessionClaims;
   /**

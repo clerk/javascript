@@ -1,0 +1,78 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`useRoutingProps() > path prop has priority over path option 1`] = `
+<body>
+  <div>
+    <div
+      data-v-app=""
+    >
+      <!---->
+    </div>
+  </div>
+  <div>
+    <div
+      data-v-app=""
+    >
+      <!---->
+    </div>
+  </div>
+  <div>
+    <div
+      data-v-app=""
+    >
+      <!---->
+    </div>
+  </div>
+  <div>
+    <div
+      path="/path-prop"
+      prop1="1"
+      prop2="2"
+    >
+      {"path":"/path-option","routing":"path"}
+    </div>
+  </div>
+</body>
+`;
+
+exports[`useRoutingProps() > the path option is ignored when "hash" routing prop 1`] = `
+<body>
+  <div>
+    <div
+      data-v-app=""
+    >
+      <!---->
+    </div>
+  </div>
+  <div>
+    <div
+      prop1="1"
+      prop2="2"
+      routing="hash"
+    >
+      {"path":"/path-option","routing":"path"}
+    </div>
+  </div>
+</body>
+`;
+
+exports[`useRoutingProps() > the path option is ignored when "virtual" routing prop 1`] = `
+<body>
+  <div>
+    <div
+      data-v-app=""
+    >
+      <!---->
+    </div>
+  </div>
+  <div>
+    <div
+      prop1="1"
+      prop2="2"
+      routing="virtual"
+    >
+      {"path":"/path-option","routing":"path"}
+    </div>
+  </div>
+</body>
+`;

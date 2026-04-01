@@ -3,11 +3,11 @@ import type { Clerk } from '@clerk/clerk-js';
 import { AUTH_HEADER } from '../constants';
 import type { JWTHandler } from './jwt-handler';
 
-type Handler = Parameters<Clerk['__unstable__onBeforeRequest']>[0];
+type Handler = Parameters<Clerk['__internal_onBeforeRequest']>[0];
 type Req = Parameters<Handler>[0];
 
 /** Append the JWT to the FAPI request */
-export function requestHandler(jwtHandler: JWTHandler, { isProd }: { isProd: boolean }) {
+export function requestHandler(jwtHandler: JWTHandler, { isProd }: { isProd: boolean }): Handler {
   const handler: Handler = async requestInit => {
     requestInit.credentials = 'omit';
 

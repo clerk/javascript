@@ -1,11 +1,6 @@
-import { Clerk } from '@clerk/clerk-js/headless';
+import { Clerk } from '@clerk/clerk-js';
 
 import { createClerkInstance } from './createClerkInstance';
-
-/**
- * @deprecated Use `getClerkInstance()` instead. `Clerk` will be removed in the next major version.
- */
-export { clerk } from './createClerkInstance';
 
 /**
  * Access or create a Clerk instance outside of React. If you are using it in Expo Web then it will only access the existing instance from `window.Clerk`

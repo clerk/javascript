@@ -10,8 +10,18 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone',
   }),
-  integrations: [clerk(), react(), tailwind()],
+  integrations: [
+    clerk({
+      appearance: {
+        options: {
+          showOptionalFields: true,
+        },
+      },
+    }),
+    react(),
+    tailwind(),
+  ],
   server: {
-    port: Number(process.env.PORT),
+    port: process.env.PORT ? Number(process.env.PORT) : undefined,
   },
 });

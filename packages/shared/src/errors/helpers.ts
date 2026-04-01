@@ -1,5 +1,7 @@
 import type { ClerkAPIResponseError } from './clerkApiResponseError';
+import { isClerkAPIResponseError } from './clerkApiResponseError';
 import type { ClerkRuntimeError } from './clerkRuntimeError';
+import { isClerkRuntimeError } from './clerkRuntimeError';
 import type { EmailLinkError } from './emailLinkError';
 import type { MetamaskError } from './metamaskError';
 
@@ -36,6 +38,36 @@ export function is4xxError(e: any): boolean {
 }
 
 /**
+ * Checks if the provided error is a 429 (Too Many Requests) error.
+ *
+ * @internal
+ */
+export function is429Error(e: any): boolean {
+  return e?.status === 429;
+}
+
+/**
+ * Checks if the provided error indicates the user's session is no longer valid
+ * and should trigger the unauthenticated flow (e.g. sign-out / redirect to sign-in).
+ *
+ * Only matches explicit authentication failure status codes:
+ * - 401: session is invalid or expired
+ * - 422: invalid session state (e.g. missing_expired_token)
+ *
+ * 404 is intentionally excluded despite being returned for "session not found",
+ * because it's also returned for unrelated resources (org not found, JWT template
+ * not found) and shares the same `resource_not_found` error code, making it
+ * impossible to distinguish. Session-not-found 401s are already handled directly
+ * by Base._fetch.
+ *
+ * @internal
+ */
+export function isUnauthenticatedError(e: any): boolean {
+  const status = e?.status;
+  return status === 401 || status === 422;
+}
+
+/**
  * Checks if the provided error is a network error.
  *
  * @internal
@@ -53,35 +85,6 @@ export function isNetworkError(e: any): boolean {
  */
 export function isKnownError(error: any): error is ClerkAPIResponseError | ClerkRuntimeError | MetamaskError {
   return isClerkAPIResponseError(error) || isMetamaskError(error) || isClerkRuntimeError(error);
-}
-
-/**
- * Checks if the provided error is a ClerkAPIResponseError.
- *
- * @internal
- */
-export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError {
-  return err && 'clerkError' in err;
-}
-
-/**
- * Checks if the provided error object is an instance of ClerkRuntimeError.
- *
- * @param err - The error object to check.
- * @returns True if the error is a ClerkRuntimeError, false otherwise.
- *
- * @example
- * const error = new ClerkRuntimeError('An error occurred');
- * if (isClerkRuntimeError(error)) {
- *   // Handle ClerkRuntimeError
- *   console.error('ClerkRuntimeError:', error.message);
- * } else {
- *   // Handle other errors
- *   console.error('Other error:', error.message);
- * }
- */
-export function isClerkRuntimeError(err: any): err is ClerkRuntimeError {
-  return 'clerkRuntimeError' in err;
 }
 
 /**
@@ -118,6 +121,15 @@ export function isUserLockedError(err: any) {
  */
 export function isPasswordPwnedError(err: any) {
   return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_password_pwned';
+}
+
+/**
+ * Checks if the provided error is a clerk api response error indicating a password was compromised.
+ *
+ * @internal
+ */
+export function isPasswordCompromisedError(err: any) {
+  return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_password_compromised';
 }
 
 /**

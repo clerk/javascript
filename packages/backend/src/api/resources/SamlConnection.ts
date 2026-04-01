@@ -1,7 +1,8 @@
-import type { AttributeMappingJSON, SamlAccountConnectionJSON, SamlConnectionJSON } from './JSON';
+import type { AttributeMappingJSON, SamlConnectionJSON } from './JSON';
 
 /**
  * The Backend `SamlConnection` object holds information about a SAML connection for an organization.
+ * @deprecated Use `EnterpriseConnection` instead.
  */
 export class SamlConnection {
   constructor(
@@ -14,11 +15,11 @@ export class SamlConnection {
      */
     readonly name: string,
     /**
-     * The domain of your organization. Sign in flows using an email with this domain will use the connection.
+     * The domain of your Organization. Sign in flows using an email with this domain will use the connection.
      */
     readonly domain: string,
     /**
-     * The organization ID of the organization.
+     * The Organization ID of the Organization.
      */
     readonly organizationId: string | null,
     /**
@@ -86,7 +87,7 @@ export class SamlConnection {
      */
     readonly updatedAt: number,
     /**
-     * Defines the attribute name mapping between the Identity Provider (IdP) and Clerk's [`User`](https://clerk.com/docs/reference/javascript/user) properties.
+     * Defines the attribute name mapping between the Identity Provider (IdP) and Clerk's [`User`](https://clerk.com/docs/reference/objects/user) properties.
      */
     readonly attributeMapping: AttributeMapping,
   ) {}
@@ -113,35 +114,6 @@ export class SamlConnection {
       data.created_at,
       data.updated_at,
       data.attribute_mapping && AttributeMapping.fromJSON(data.attribute_mapping),
-    );
-  }
-}
-
-export class SamlAccountConnection {
-  constructor(
-    readonly id: string,
-    readonly name: string,
-    readonly domain: string,
-    readonly active: boolean,
-    readonly provider: string,
-    readonly syncUserAttributes: boolean,
-    readonly allowSubdomains: boolean,
-    readonly allowIdpInitiated: boolean,
-    readonly createdAt: number,
-    readonly updatedAt: number,
-  ) {}
-  static fromJSON(data: SamlAccountConnectionJSON): SamlAccountConnection {
-    return new SamlAccountConnection(
-      data.id,
-      data.name,
-      data.domain,
-      data.active,
-      data.provider,
-      data.sync_user_attributes,
-      data.allow_subdomains,
-      data.allow_idp_initiated,
-      data.created_at,
-      data.updated_at,
     );
   }
 }

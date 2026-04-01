@@ -4,22 +4,22 @@
 
 ```tsx
 // App.tsx
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/chrome-extension';
+import { Show, SignInButton, UserButton } from '@clerk/chrome-extension';
 
 function App() {
   return (
     <>
       <header>
-        <SignedOut>
+        <Show when='signed-out'>
           <SignInButton mode='modal' />
-        </SignedOut>
-        <SignedIn>
+        </Show>
+        <Show when='signed-in'>
           <UserButton />
-        </SignedIn>
+        </Show>
       </header>
       <main>
-        <SignedOut>Please Sign In</SignedOut>
-        <SignedIn>Welcome!</SignedIn>
+        <Show when='signed-out'>Please Sign In</Show>
+        <Show when='signed-in'>Welcome!</Show>
       </main>
     </>
   );
@@ -61,7 +61,7 @@ export default IndexPopup;
 You can hook into the router of your choice to handle navigation. Here's an example using `react-router-dom`:
 
 ```tsx
-import { ClerkProvider } from '@clerk/chrome-extension';
+import { ClerkProvider, Show, SignIn, SignUp } from '@clerk/chrome-extension';
 import { useNavigate, Routes, Route, MemoryRouter } from 'react-router-dom';
 import App from './App';
 
@@ -80,13 +80,13 @@ function AppWithRouting() {
         path='/'
         element={
           <>
-            <SignedIn>Welcome User!</SignedIn>
-            <SignedOut>
+            <Show when='signed-in'>Welcome User!</Show>
+            <Show when='signed-out'>
               <SignIn
                 forceRedirectUrl='/'
                 signUpUrl='/sign-up'
               />
-            </SignedOut>
+            </Show>
           </>
         }
       />

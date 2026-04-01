@@ -8,6 +8,7 @@ import type { MiddlewareFunction } from 'react-router';
 
 import { getPublicEnvVariables } from '../utils/env';
 import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../utils/errors';
+import { canUseKeyless } from '../utils/feature-flags';
 import type { ClerkMiddlewareOptions } from './types';
 import { patchRequest } from './utils';
 
@@ -47,8 +48,6 @@ export const loadOptions = (args: DataFunctionArgs, overrides: ClerkMiddlewareOp
     overrides.signInFallbackRedirectUrl || getPublicEnvVariables(context).signInFallbackRedirectUrl;
   const signUpFallbackRedirectUrl =
     overrides.signUpFallbackRedirectUrl || getPublicEnvVariables(context).signUpFallbackRedirectUrl;
-  const afterSignInUrl = overrides.afterSignInUrl || getPublicEnvVariables(context).afterSignInUrl;
-  const afterSignUpUrl = overrides.afterSignUpUrl || getPublicEnvVariables(context).afterSignUpUrl;
 
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {
@@ -57,13 +56,13 @@ export const loadOptions = (args: DataFunctionArgs, overrides: ClerkMiddlewareOp
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }
 
-  if (!secretKey) {
+  if (!secretKey && !canUseKeyless) {
     throw new Error(noSecretKeyError);
   }
   if (isSatellite && !proxyUrl && !domain) {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey)) {
+  if (isSatellite && secretKey && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey)) {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
@@ -80,8 +79,6 @@ export const loadOptions = (args: DataFunctionArgs, overrides: ClerkMiddlewareOp
     proxyUrl,
     signInUrl,
     signUpUrl,
-    afterSignInUrl,
-    afterSignUpUrl,
     signInForceRedirectUrl,
     signUpForceRedirectUrl,
     signInFallbackRedirectUrl,

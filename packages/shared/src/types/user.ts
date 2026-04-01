@@ -3,10 +3,12 @@ import type { BillingPayerMethods } from './billing';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
 import type { EnterpriseAccountResource } from './enterpriseAccount';
+import type { EnterpriseConnectionResource } from './enterpriseConnection';
 import type { ExternalAccountResource } from './externalAccount';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
 import type { OAuthScope } from './oauth';
+import type { OrganizationCreationDefaultsResource } from './organizationCreationDefaults';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationMembershipResource } from './organizationMembership';
 import type { OrganizationSuggestionResource, OrganizationSuggestionStatus } from './organizationSuggestion';
@@ -14,7 +16,6 @@ import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination
 import type { PasskeyResource } from './passkey';
 import type { PhoneNumberResource } from './phoneNumber';
 import type { ClerkResource } from './resource';
-import type { SamlAccountResource } from './samlAccount';
 import type { SessionWithActivitiesResource } from './session';
 import type { UserJSONSnapshot } from './snapshots';
 import type { OAuthStrategy } from './strategies';
@@ -50,16 +51,12 @@ declare global {
   interface UserUnsafeMetadata {
     [k: string]: unknown;
   }
-
-  interface ikosadfas {
-    [k: string]: unknown;
-  }
 }
 
 /**
  * The `User` object holds all of the information for a single user of your application and provides a set of methods to manage their account.
  *
- * A user can be contacted at their primary email address or primary phone number. They can have more than one registered email address, but only one of them will be their primary email address. This goes for phone numbers as well; a user can have more than one, but only one phone number will be their primary. At the same time, a user can also have one or more external accounts by connecting to [social providers](https://clerk.com/docs/guides/configure/auth-strategies/social-connections/all-providers) such as Google, Apple, Facebook, and many more.
+ * A user can be contacted at their primary email address or primary phone number. They can have more than one registered email address, but only one of them will be their primary email address. This goes for phone numbers as well; a user can have more than one, but only one phone number will be their primary. At the same time, a user can also have one or more external accounts by connecting to [social providers](https://clerk.com/docs/guides/configure/auth-strategies/social-connections/overview) such as Google, Apple, Facebook, and many more.
  *
  * Finally, a `User` object holds profile data like the user's name, profile picture, and a set of [metadata](/docs/guides/users/extending) that can be used internally to store arbitrary information. The metadata are split into `publicMetadata` and `privateMetadata`. Both types are set from the [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}, but public metadata can also be accessed from the [Frontend API](https://clerk.com/docs/reference/frontend-api){{ target: '_blank' }}.
  *
@@ -86,11 +83,6 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   externalAccounts: ExternalAccountResource[];
   enterpriseAccounts: EnterpriseAccountResource[];
   passkeys: PasskeyResource[];
-  /**
-   * @deprecated Use `enterpriseAccounts` instead.
-   */
-  samlAccounts: SamlAccountResource[];
-
   organizationMemberships: OrganizationMembershipResource[];
   passwordEnabled: boolean;
   totpEnabled: boolean;
@@ -125,7 +117,9 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   getOrganizationSuggestions: (
     params?: GetUserOrganizationSuggestionsParams,
   ) => Promise<ClerkPaginatedResponse<OrganizationSuggestionResource>>;
+  getOrganizationCreationDefaults: () => Promise<OrganizationCreationDefaultsResource>;
   leaveOrganization: (organizationId: string) => Promise<DeletedObjectResource>;
+  getEnterpriseConnections: (params?: GetEnterpriseConnectionsParams) => Promise<EnterpriseConnectionResource[]>;
   createTOTP: () => Promise<TOTPResource>;
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
@@ -149,7 +143,8 @@ export type CreatePhoneNumberParams = { phoneNumber: string };
 export type CreateWeb3WalletParams = { web3Wallet: string };
 export type SetProfileImageParams = { file: Blob | File | string | null };
 export type CreateExternalAccountParams = {
-  strategy: OAuthStrategy;
+  strategy?: OAuthStrategy;
+  enterpriseConnectionId?: string;
   redirectUrl?: string;
   additionalScopes?: OAuthScope[];
   oidcPrompt?: string;
@@ -191,3 +186,7 @@ export type GetUserOrganizationMembershipParams = ClerkPaginationParams;
 export type GetOrganizationMemberships = (
   params?: GetUserOrganizationMembershipParams,
 ) => Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>;
+
+export type GetEnterpriseConnectionsParams = {
+  withOrganizationAccountLinking?: boolean;
+};

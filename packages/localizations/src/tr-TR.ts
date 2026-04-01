@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const trTR: LocalizationResource = {
   locale: 'tr-TR',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopyala ve kapat',
+      formHint: 'Güvenlik nedenleriyle, daha sonra tekrar görüntülemenize izin vermeyeceğiz.',
+      formTitle: '"{{name}}" API anahtarınızı şimdi kopyalayın',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const trTR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Telefon numaranızı girin',
   formFieldInputPlaceholder__username: 'Kullanıcı adınızı girin',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API anahtarı',
+  formFieldLabel__apiKeyDescription: 'Açıklama',
+  formFieldLabel__apiKeyExpiration: 'Son kullanma',
+  formFieldLabel__apiKeyName: 'Gizli anahtar adı',
   formFieldLabel__automaticInvitations: 'Bu alan adı için otomatik davetleri etkinleştir',
   formFieldLabel__backupCode: 'Yedekleme kodu',
   formFieldLabel__confirmDeletion: 'Onayla',
@@ -357,6 +363,12 @@ export const trTR: LocalizationResource = {
         tableHeader__joined: 'Katılma tarihi',
         tableHeader__role: 'Rol',
         tableHeader__user: 'Kullanıcı',
+      },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Mevcut rolleri güncelliyoruz. Bu tamamlandığında rolleri tekrar güncelleyebileceksiniz.',
+          title: 'Roller geçici olarak kilitlendi',
+        },
       },
       detailsTitle__emptyRow: 'Görüntülenecek üye yok',
       invitationsTab: {
@@ -606,6 +618,12 @@ export const trTR: LocalizationResource = {
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'E-posta kutunuzu kontrol edin',
     },
+    emailCodeMfa: {
+      formTitle: 'E-posta kutunuzu kontrol edin',
+      resendButton: 'Kod almadınız mı? Tekrar gönderin',
+      subtitle: '{{applicationName}} ile devam etmek için',
+      title: 'E-posta kutunuzu kontrol edin',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -642,6 +660,12 @@ export const trTR: LocalizationResource = {
         titleNewTab: 'Farklı bir sekmede giriş yapıldı',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'E-postanıza gönderilen doğrulama bağlantısını kullanın',
+      resendButton: 'Bağlantıyı almadınız mı? Yeniden gönder',
+      subtitle: '{{applicationName}} uygulamasına devam etmek için',
+      title: 'E-postanızı kontrol edin',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -659,6 +683,8 @@ export const trTR: LocalizationResource = {
       label__alternativeMethods: 'Veya başka bir yöntem kullanın:',
       title: 'Şifremi unuttum',
     },
+    newDeviceVerificationNotice:
+      'Yeni bir cihazdan oturum açıyorsunuz. Hesabınızın güvenliğini sağlamak için doğrulama istiyoruz.',
     noAvailableMethods: {
       message: 'Hesabınızda giriş yapmak için kullanabileceğiniz bir yöntem bulunmuyor.',
       subtitle: 'Bir hata oluştu',
@@ -674,8 +700,14 @@ export const trTR: LocalizationResource = {
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Şifrenizi girin',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Şifre ele geçirildi',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Doğrulama kodu',
@@ -723,6 +755,10 @@ export const trTR: LocalizationResource = {
       formTitle: 'Doğrulama kodu',
       subtitle: 'Devam etmek için lütfen kimlik doğrulayıcı uygulamanız tarafından oluşturulan doğrulama kodunu girin',
       title: 'İki aşamalı doğrulama',
+    },
+    web3Solana: {
+      subtitle: 'Giriş yapmak için aşağıdan bir cüzdan seçin',
+      title: 'Solana ile giriş yap',
     },
   },
   signInEnterPasswordTitle: 'Şifrenizi girin',
@@ -815,44 +851,135 @@ export const trTR: LocalizationResource = {
       title: 'Hesap oluştur',
       titleCombined: 'Hesap oluştur',
     },
+    web3Solana: {
+      subtitle: 'Kaydolmak için aşağıdan bir cüzdan seçin',
+      title: 'Solana ile kaydol',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Tespit edilen şirket adı ({{organizationName}}) ve {{organizationDomain}} için bir organizasyon zaten mevcut. Davetiye ile katılın.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Yeni organizasyon oluştur',
+      action__invitationAccept: 'Katıl',
+      action__suggestionsAccept: 'Katılım iste',
+      subtitle: 'Mevcut bir organizasyona katılın veya yeni bir tane oluşturun',
+      subtitle__createOrganizationDisabled: 'Mevcut bir organizasyona katılın',
+      suggestionsAcceptedLabel: 'Onay bekleniyor',
+      title: 'Bir organizasyon seçin',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'İptal',
+      formButtonSubmit: 'Devam et',
+      formFieldInputPlaceholder__name: 'Organizasyonum',
+      formFieldInputPlaceholder__slug: 'organizasyonum',
+      formFieldLabel__name: 'Ad',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Devam etmek için organizasyon bilgilerinizi girin',
+      title: 'Organizasyonunuzu ayarlayın',
     },
+    organizationCreationDisabled: {
+      subtitle: 'Davet için organizasyon yöneticinizle iletişime geçin.',
+      title: 'Bir organizasyona ait olmalısınız',
+    },
+    signOut: {
+      actionLink: 'Çıkış yap',
+      actionText: '{{identifier}} olarak giriş yapıldı',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
+    title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: 'Bu organizasyonda zaten üyesiniz.',
+    avatar_file_size_exceeded: 'Dosya boyutu maksimum 10 MB sınırını aşıyor. Lütfen daha küçük bir dosya seçin.',
+    avatar_file_type_invalid:
+      'Dosya türü desteklenmiyor. Lütfen JPG, PNG, GIF veya WEBP formatında bir görsel yükleyin.',
     captcha_invalid:
       'Güvenlik doğrulamalarındaki hatalar nedeniyle kayıt yapılamadı. Lütfen tekrar denemek için sayfayı yenileyin veya daha fazla yardım için destek ekibi ile iletişime geçin.',
     captcha_unavailable:
       'Bot doğrulaması başarısız olduğu için kayıt yapılamadı. Lütfen tekrar denemek için sayfayı yenileyin veya daha fazla yardım için destek ekibi ile iletişime geçin.',
     form_code_incorrect: 'Hatalı kod.',
+    form_email_address_blocked:
+      'Geçici e-posta hizmetleri desteklenmemektedir. Lütfen hesap oluşturmak için normal e-posta adresinizi kullanın.',
     form_identifier_exists__email_address: 'Bu e-posta adresi zaten kullanılıyor.',
     form_identifier_exists__phone_number: 'Bu telefon numarası zaten kullanılıyor.',
     form_identifier_exists__username: 'Bu kullanıcı adı zaten kullanılıyor.',
     form_identifier_not_found: 'Bu bilgilere sahip bir hesap bulunamadı.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Parametre formatı geçersiz.',
     form_param_format_invalid__email_address: 'E-posta adresi geçerli olmalıdır.',
     form_param_format_invalid__phone_number: 'Telefon numarası geçerli olmalıdır.',
@@ -864,17 +991,22 @@ export const trTR: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Parametre değeri geçersiz.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Şifre yanlış.',
     form_password_length_too_short: 'Şifre çok kısa.',
     form_password_not_strong_enough: 'Şifreniz yeterince güçlü değil.',
+    form_password_or_identifier_incorrect:
+      'Şifre veya e-posta adresi yanlış. Tekrar deneyin veya başka bir yöntem kullanın.',
     form_password_pwned: 'Bu şifre bir veri ihlalinde tespit edildi ve kullanılamaz. Lütfen başka bir şifre deneyin.',
     form_password_pwned__sign_in:
       'Bu şifre bir veri ihlalinde tespit edildi ve oturum açmak için kullanılamaz. Lütfen başka bir şifre seçin.',
     form_password_size_in_bytes_exceeded:
       'Şifreniz izin verilen maksimum byte sayısını aştı, lütfen kısaltın veya bazı özel karakterleri çıkarın.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Şifre doğrulaması başarısız.',
     form_username_invalid_character: 'Kullanıcı adı geçersiz karakterler içeriyor.',
     form_username_invalid_length: 'Kullanıcı adı 3 ile 50 karakter arasında olmalıdır.',
+    form_username_needs_non_number_char: 'Kullanıcı adınız en az bir sayısal olmayan karakter içermelidir.',
     identification_deletion_failed: 'Son kimliğinizi silemezsiniz.',
     not_allowed_access:
       "E-posta adresiniz veya telefon numaranız kayıt için izin verilmiyor. Bu, e-posta adresinizde '+', '=', '#' veya '.' kullanmanız, geçici e-posta hizmetiyle ilişkilendirilmiş bir alan adı kullanmanız veya açık bir engellemeyle ilgili olabilir.",
@@ -903,6 +1035,9 @@ export const trTR: LocalizationResource = {
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
     session_exists: 'Zaten giriş yapmışsınız.',
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
+    web3_signature_request_rejected: 'İmza isteğini reddettiniz. Devam etmek için lütfen tekrar deneyin.',
+    web3_solana_signature_generation_failed:
+      'İmza oluşturulurken bir hata oluştu. Devam etmek için lütfen tekrar deneyin.',
     zxcvbn: {
       couldBeStronger:
         'Şifreniz kriterleri karşılıyor; fakat birkaç karakter daha ekleyerek daha güçlü bir şifre oluşturabilirsiniz.',
@@ -1216,6 +1351,7 @@ export const trTR: LocalizationResource = {
         title: 'E-posta adresleri',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Hesap bağla',
         title: 'Kurumsal hesaplar',
       },
       headerTitle__account: 'Hesap',
@@ -1272,6 +1408,10 @@ export const trTR: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 cüzdanları',
         title: 'Web3 cüzdanları',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Hesabınıza bağlamak için bir Solana cüzdanı seçin.',
+          title: 'Bir Solana cüzdanı ekle',
+        },
       },
     },
     usernamePage: {
@@ -1306,5 +1446,11 @@ export const trTR: LocalizationResource = {
       subtitle: 'Bekleme listesinde olduğunuz için teşekkür ederiz.',
       title: 'Bekleme Listesine Katıldınız',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} ile bağlan',
+    continue: '{{walletName}} ile devam et',
+    noneAvailable:
+      'Solana Web3 cüzdanı tespit edilmedi. Lütfen Web3 destekli {{ solanaWalletsLink || link("wallet extension") }} kurun.',
   },
 } as const;

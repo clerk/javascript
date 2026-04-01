@@ -1,6 +1,7 @@
 import type { Clerk } from '@clerk/clerk-js/no-rhc';
-import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
-import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
+import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/react';
+import { InternalClerkProvider as ClerkReactProvider } from '@clerk/react/internal';
+import { ui } from '@clerk/ui/no-rhc';
 import React from 'react';
 
 import { createClerkClient } from '../internal/clerk';
@@ -23,11 +24,7 @@ export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Ele
   const [clerkInstance, setClerkInstance] = React.useState<Clerk | null>(null);
 
   React.useEffect(() => {
-    void (async () => {
-      setClerkInstance(
-        await createClerkClient({ publishableKey, storageCache, syncHost, __experimental_syncHostListener }),
-      );
-    })();
+    setClerkInstance(createClerkClient({ publishableKey, storageCache, syncHost, __experimental_syncHostListener }));
   }, [publishableKey, storageCache, syncHost, __experimental_syncHostListener]);
 
   if (!clerkInstance) {
@@ -38,6 +35,7 @@ export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Ele
     <ClerkReactProvider
       {...rest}
       Clerk={clerkInstance}
+      ui={ui}
       standardBrowser={!syncHost}
     >
       {children}

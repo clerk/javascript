@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
   apiKeys: {
     action__add: 'Přidat nový klíč',
     action__search: 'Vyhledat klíče',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopírovat a zavřít',
+      formHint: 'Z bezpečnostních důvodů vám to později nebudeme moci znovu zobrazit.',
+      formTitle: 'Zkopírujte nyní svůj API klíč "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn:
       "Vytvořeno {{ createdDate | shortDate('cs-CZ') }} • Platí do {{ expiresDate | longDate('cs-CZ') }}",
     createdAndExpirationStatus__never: "Vytvořeno {{ createdDate | shortDate('cs-CZ') }} • Nikdy nevyprší",
@@ -225,6 +230,7 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Zadejte své telefonní číslo',
   formFieldInputPlaceholder__username: 'Zadejte své uživatelské jméno',
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API klíč',
   formFieldLabel__apiKeyDescription: 'Popis',
   formFieldLabel__apiKeyExpiration: 'Platnost',
   formFieldLabel__apiKeyName: 'Název tajného klíče',
@@ -363,6 +369,12 @@ export const csCZ: LocalizationResource = {
         tableHeader__joined: 'Připojeno',
         tableHeader__role: 'Role',
         tableHeader__user: 'Uživatel',
+      },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'Aktualizujeme dostupné role. Jakmile to bude hotové, budete moci role opět aktualizovat.',
+          title: 'Role jsou dočasně uzamčeny',
+        },
       },
       detailsTitle__emptyRow: 'Žádní členové k zobrazení',
       invitationsTab: {
@@ -613,6 +625,12 @@ export const csCZ: LocalizationResource = {
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Zkontrolujte svůj e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Zkontrolujte svůj e-mail',
+      resendButton: 'Neobdrželi jste kód? Znovu poslat',
+      subtitle: 'pro pokračování do {{applicationName}}',
+      title: 'Zkontrolujte svůj e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -649,6 +667,12 @@ export const csCZ: LocalizationResource = {
         titleNewTab: 'Přihlášeno na jiné kartě',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Použijte ověřovací odkaz zaslaný na váš e-mail',
+      resendButton: 'Nedostali jste odkaz? Znovu odeslat',
+      subtitle: 'pro pokračování do {{applicationName}}',
+      title: 'Zkontrolujte svůj e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -666,6 +690,8 @@ export const csCZ: LocalizationResource = {
       label__alternativeMethods: 'Nebo se přihlaste jinou metodou',
       title: 'Zapomněli jste heslo?',
     },
+    newDeviceVerificationNotice:
+      'Přihlašujete se z nového zařízení. Žádáme o ověření, abychom udrželi váš účet v bezpečí.',
     noAvailableMethods: {
       message: 'Nelze pokračovat v přihlášení. Není k dispozici žádný autentizační faktor.',
       subtitle: 'Došlo k chybě',
@@ -681,8 +707,14 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Zadejte heslo spojené s vaším účtem',
       title: 'Zadejte své heslo',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Heslo kompromitováno',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Ověřovací kód',
@@ -730,6 +762,10 @@ export const csCZ: LocalizationResource = {
       formTitle: 'Ověřovací kód',
       subtitle: 'Pro pokračování zadejte ověřovací kód vygenerovaný vaší aplikací pro ověřování',
       title: 'Dvoufázové ověření',
+    },
+    web3Solana: {
+      subtitle: 'Vyberte níže peněženku pro přihlášení',
+      title: 'Přihlásit se pomocí Solana',
     },
   },
   signInEnterPasswordTitle: 'Zadejte své heslo',
@@ -825,44 +861,135 @@ export const csCZ: LocalizationResource = {
       title: 'Vytvořte si účet',
       titleCombined: 'Vytvořte si účet',
     },
+    web3Solana: {
+      subtitle: 'Vyberte níže peněženku pro registraci',
+      title: 'Zaregistrovat se pomocí Solana',
+    },
   },
   socialButtonsBlockButton: 'Pokračovat s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Organizace již existuje pro detekovaný název společnosti ({{organizationName}}) a {{organizationDomain}}. Připojte se prostřednictvím pozvánky.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Vytvořit novou organizaci',
+      action__invitationAccept: 'Připojit se',
+      action__suggestionsAccept: 'Požádat o připojení',
+      subtitle: 'Připojte se k existující organizaci nebo vytvořte novou',
+      subtitle__createOrganizationDisabled: 'Připojte se k existující organizaci',
+      suggestionsAcceptedLabel: 'Čeká na schválení',
+      title: 'Vyberte organizaci',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Zrušit',
+      formButtonSubmit: 'Pokračovat',
+      formFieldInputPlaceholder__name: 'Moje organizace',
+      formFieldInputPlaceholder__slug: 'moje-organizace',
+      formFieldLabel__name: 'Název',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Zadejte údaje o vaší organizaci pro pokračování',
+      title: 'Nastavte svou organizaci',
     },
+    organizationCreationDisabled: {
+      subtitle: 'Kontaktujte administrátora vaší organizace pro pozvánku.',
+      title: 'Musíte patřit do organizace',
+    },
+    signOut: {
+      actionLink: 'Odhlásit se',
+      actionText: 'Přihlášen jako {{identifier}}',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
+    title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je již členem organizace.',
+    avatar_file_size_exceeded: 'Velikost souboru přesahuje maximální limit 10 MB. Vyberte prosím menší soubor.',
+    avatar_file_type_invalid:
+      'Typ souboru není podporován. Nahrajte prosím obrázek ve formátu JPG, PNG, GIF nebo WEBP.',
     captcha_invalid:
       'Registrace neúspěšná kvůli neúspěšným bezpečnostním validacím. Prosím, obnovte stránku a zkuste to znovu nebo kontaktujte podporu.',
     captcha_unavailable:
       'Registrace nebyla úspěšná kvůli neúspěšné validaci bota. Prosím obnovte stránku a zkuste to znovu, nebo se obraťte na podporu pro další pomoc.',
     form_code_incorrect: 'Kód je nesprávný.',
+    form_email_address_blocked:
+      'Dočasné e-mailové služby nejsou podporovány. Pro vytvoření účtu použijte prosím svou běžnou e-mailovou adresu.',
     form_identifier_exists__email_address: 'Tato emailová adresa již byla použita.',
     form_identifier_exists__phone_number: 'Toto telefonní číslo již bylo použito.',
     form_identifier_exists__username: 'Toto uživatelské jméno již bylo použito.',
     form_identifier_not_found: 'Nebyl nalezen účet s těmihle detaily.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formát parametru je neplatný.',
     form_param_format_invalid__email_address: 'Emailová adresa musí být platná.',
     form_param_format_invalid__phone_number: 'Telefonní číslo musí být ve validním mezinárodním formátu.',
@@ -874,17 +1001,22 @@ export const csCZ: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Tento parametr má neplatnou hodnotu.',
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Heslo je nesprávné.',
     form_password_length_too_short: 'Heslo je příliš krátké.',
     form_password_not_strong_enough: 'Vaše heslo není dostatečně silné.',
+    form_password_or_identifier_incorrect:
+      'Heslo nebo e-mailová adresa je nesprávná. Zkuste to znovu nebo použijte jinou metodu.',
     form_password_pwned: 'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, zkuste prosím jiné heslo.',
     form_password_pwned__sign_in:
       'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, prosím resetujte si heslo.',
     form_password_size_in_bytes_exceeded:
       'Vaše heslo překročilo maximální povolený počet bajtů, prosím zkrátit ho nebo odstranit některé speciální znaky.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Nesprávné heslo',
     form_username_invalid_character: 'Uživatelské jméno může obsahovat pouze alfanumerické znaky a podtržítka.',
     form_username_invalid_length: 'Vaše uživatelské jméno musí mít mezi {{min_length}} a {{max_length}} znaky.',
+    form_username_needs_non_number_char: 'Uživatelské jméno musí obsahovat alespoň jeden nečíselný znak.',
     identification_deletion_failed: 'Svůj poslední identifikační údaj nelze smazat.',
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
@@ -911,6 +1043,9 @@ export const csCZ: LocalizationResource = {
     phone_number_exists: 'Toto telefonní číslo se používá. Zkuste prosím jiný.',
     session_exists: 'Jste již přihlášen.',
     web3_missing_identifier: 'Rozšíření peněženky Web3 nebylo nalezeno. Pro pokračování prosím nainstalujte jednu.',
+    web3_signature_request_rejected: 'Odmítli jste žádost o podpis. Chcete-li pokračovat, zkuste to prosím znovu.',
+    web3_solana_signature_generation_failed:
+      'Při generování podpisu došlo k chybě. Chcete-li pokračovat, zkuste to prosím znovu.',
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by být silnější. Zkuste přidat více znaků.',
       goodPassword: 'Vaše heslo splňuje všechny potřebné požadavky.',
@@ -1226,6 +1361,7 @@ export const csCZ: LocalizationResource = {
         title: 'E-mailové adresy',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Připojit účet',
         title: 'Podnikové účty',
       },
       headerTitle__account: 'Podrobnosti profilu',
@@ -1282,6 +1418,10 @@ export const csCZ: LocalizationResource = {
         detailsAction__nonPrimary: 'Nastavit jako primární',
         primaryButton: 'Připojit peněženku',
         title: 'Web3 peněženky',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Vyberte Solana peněženku, kterou chcete připojit ke svému účtu.',
+          title: 'Přidat Solana peněženku',
+        },
       },
     },
     usernamePage: {
@@ -1316,5 +1456,11 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Ozveme se vám, až bude vaše místo připraveno',
       title: 'Děkujeme za připojení k čekací listině!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Připojit pomocí {{walletName}}',
+    continue: 'Pokračovat pomocí {{walletName}}',
+    noneAvailable:
+      'Nebyla zjištěna žádná Solana Web3 peněženka. Nainstalujte si prosím {{ solanaWalletsLink || link("wallet extension") }} s podporou Web3.',
   },
 } as const;

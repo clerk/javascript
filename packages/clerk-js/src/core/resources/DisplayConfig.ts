@@ -33,7 +33,6 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   captchaWidgetType: CaptchaWidgetType = null;
   clerkJSVersion?: string;
   createOrganizationUrl: string = '';
-  experimental__forceOauthFirst?: boolean;
   faviconImageUrl: string = '';
   googleOneTapClientId?: string;
   homeUrl: string = '';

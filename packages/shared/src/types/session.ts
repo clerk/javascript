@@ -1,3 +1,4 @@
+import type { ClientResource } from './client';
 import type {
   BackupCodeAttempt,
   EmailCodeAttempt,
@@ -11,7 +12,7 @@ import type {
   PhoneCodeSecondFactorConfig,
   TOTPAttempt,
 } from './factors';
-import type { ActClaim } from './jwtv2';
+import type { ActClaim, AgentActClaim } from './jwtv2';
 import type {
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
@@ -35,6 +36,7 @@ import type { Autocomplete } from './utils';
 export type PendingSessionOptions = {
   /**
    * A boolean that indicates whether pending sessions are considered as signed out or not.
+   *
    * @default true
    */
   treatPendingAsSignedOut?: boolean;
@@ -61,19 +63,19 @@ type WithReverification<T> = T & {
 export type CheckAuthorizationParamsWithCustomPermissions = WithReverification<
   | {
       /**
-       * The [role](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
+       * The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
       role: OrganizationCustomRoleKey;
       /**
-       * The [permission](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
+       * The [Permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
       permission?: never;
       /**
-       * The [feature](https://clerk.com/docs/guides/billing/overview) to check for.
+       * The [Feature](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       feature?: never;
       /**
-       * The [plan](https://clerk.com/docs/guides/billing/overview) to check for.
+       * The [Plan](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       plan?: never;
     }
@@ -103,19 +105,19 @@ export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 type CheckAuthorizationParams = WithReverification<
   | {
       /**
-       * The [role](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
+       * The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
       role: OrganizationCustomRoleKey;
       /**
-       * The [permission](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
+       * The [Permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
       permission?: never;
       /**
-       * The [feature](https://clerk.com/docs/guides/billing/overview) to check for.
+       * The [Feature](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       feature?: never;
       /**
-       * The [plan](https://clerk.com/docs/guides/billing/overview) to check for.
+       * The [Plan](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       plan?: never;
     }
@@ -142,7 +144,7 @@ type CheckAuthorizationParams = WithReverification<
 
 /**
  * Type guard for server-side authorization checks using session claims.
- * System permissions are not allowed since they are not included
+ * System Permissions are not allowed since they are not included
  * in session claims and cannot be verified on the server side.
  */
 export type CheckAuthorizationFromSessionClaims = <P extends OrganizationCustomPermissionKey>(
@@ -155,19 +157,19 @@ export type CheckAuthorizationFromSessionClaims = <P extends OrganizationCustomP
 export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCustomPermissionKey> = WithReverification<
   | {
       /**
-       * The [role](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
+       * The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
       role: OrganizationCustomRoleKey;
       /**
-       * The [permission](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
+       * The [Permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
       permission?: never;
       /**
-       * The [feature](https://clerk.com/docs/guides/billing/overview) to check for.
+       * The [Feature](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       feature?: never;
       /**
-       * The [plan](https://clerk.com/docs/guides/billing/overview) to check for.
+       * The [Plan](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       plan?: never;
     }
@@ -197,7 +199,7 @@ export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCust
  *
  * The `Session` object includes methods for recording session activity and ending the session client-side. For security reasons, sessions can also expire server-side.
  *
- * As soon as a [`User`](https://clerk.com/docs/reference/javascript/user) signs in, Clerk creates a `Session` for the current [`Client`](https://clerk.com/docs/reference/javascript/client). Clients can have more than one sessions at any point in time, but only one of those sessions will be **active**.
+ * As soon as a [`User`](https://clerk.com/docs/reference/objects/user) signs in, Clerk creates a `Session` for the current [`Client`](https://clerk.com/docs/reference/objects/client). Clients can have more than one sessions at any point in time, but only one of those sessions will be **active**.
  *
  * In certain scenarios, a session might be replaced by another one. This is often the case with [multi-session applications](https://clerk.com/docs/guides/secure/session-options#multi-session-applications).
  *
@@ -225,6 +227,7 @@ export interface SessionResource extends ClerkResource {
   lastActiveOrganizationId: string | null;
   lastActiveAt: Date;
   actor: ActClaim | null;
+  agent: AgentActClaim | null;
   tasks: Array<SessionTask> | null;
   currentTask?: SessionTask;
   /**
@@ -237,7 +240,7 @@ export interface SessionResource extends ClerkResource {
    */
   end: () => Promise<SessionResource>;
   remove: () => Promise<SessionResource>;
-  touch: () => Promise<SessionResource>;
+  touch: (params?: SessionTouchParams) => Promise<SessionResource>;
   getToken: GetToken;
   checkAuthorization: CheckAuthorization;
   clearCache: () => void;
@@ -259,6 +262,7 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   verifyWithPasskey: () => Promise<SessionVerificationResource>;
   __internal_toSnapshot: () => SessionJSONSnapshot;
+  __internal_touch: (params?: SessionTouchParams) => Promise<ClientResource | undefined>;
 }
 
 /**
@@ -318,6 +322,12 @@ export type SessionStatus =
   | 'revoked'
   | 'pending';
 
+export type SessionTouchIntent = 'focus' | 'select_session' | 'select_org';
+
+export type SessionTouchParams = {
+  intent?: SessionTouchIntent;
+};
+
 export interface PublicUserData {
   firstName: string | null;
   lastName: string | null;
@@ -325,6 +335,7 @@ export interface PublicUserData {
   hasImage: boolean;
   identifier: string;
   userId?: string;
+  username?: string;
 }
 
 /**
@@ -334,14 +345,13 @@ export interface SessionTask {
   /**
    * A unique identifier for the task
    */
-  key: 'choose-organization';
+  key: 'choose-organization' | 'reset-password' | 'setup-mfa';
 }
 
 export type GetTokenOptions = {
-  template?: string;
   organizationId?: string;
-  leewayInSeconds?: number;
   skipCache?: boolean;
+  template?: string;
 };
 /**
  * @inline

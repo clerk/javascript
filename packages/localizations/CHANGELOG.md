@@ -1,5 +1,399 @@
 # Change Log
 
+## 4.3.0
+
+### Minor Changes
+
+- Add support for seat-based billing plans in Clerk Billing. ([#8006](https://github.com/clerk/javascript/pull/8006)) by [@dstaley](https://github.com/dstaley)
+
+- Allow to link external accounts to enterprise accounts via `UserProfile` ([#8091](https://github.com/clerk/javascript/pull/8091)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+### Patch Changes
+
+- Using length token in minimum and maximum length for swedish translations. ([#8167](https://github.com/clerk/javascript/pull/8167)) by [@DinoSourcesRex](https://github.com/DinoSourcesRex)
+
+- Improved error handling when creating API keys. ([#8056](https://github.com/clerk/javascript/pull/8056)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add and improve Japanese translations ([#8151](https://github.com/clerk/javascript/pull/8151)) by [@kaz](https://github.com/kaz)
+
+- fix(localizations): add missing Hungarian translations for form placeholders and legal consent ([#8080](https://github.com/clerk/javascript/pull/8080)) by [@tornaia](https://github.com/tornaia)
+
+- Use distinct password placeholder for sign-up forms ([#8082](https://github.com/clerk/javascript/pull/8082)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Added missing Bulgarian translations for `UserProfile` component ([#8174](https://github.com/clerk/javascript/pull/8174)) by [@NikolayDikov-work](https://github.com/NikolayDikov-work)
+
+- Updated dependencies [[`9a00a1c`](https://github.com/clerk/javascript/commit/9a00a1cc9753a49ea96e520a8e4918075f3efff4), [`00715a6`](https://github.com/clerk/javascript/commit/00715a6d9ea8cf412c989e870a3eff03973fa505), [`b8c73d3`](https://github.com/clerk/javascript/commit/b8c73d34ee30616e63b6320e7a8724630670eeb3), [`1827b50`](https://github.com/clerk/javascript/commit/1827b50a6ef9ab14c48cddc120796a9bf3c965b6), [`7707a31`](https://github.com/clerk/javascript/commit/7707a31eb1977d0c5f2bb72f7ad0768606a55d16)]:
+  - @clerk/shared@4.4.0
+
+## 4.2.4
+
+### Patch Changes
+
+- Add the missing Dutch translation for `organizationProfile.start.profileSection.primaryButton`. ([#7711](https://github.com/clerk/javascript/pull/7711)) by [@MaartenKoller](https://github.com/MaartenKoller)
+
+  This updates the value from an empty string to `"Profiel bijwerken"` so the primary button label is shown correctly in the organization profile section.
+
+  No consumer code changes are required.
+
+## 4.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`f0533a2`](https://github.com/clerk/javascript/commit/f0533a26db17066a7dcc7992d9589ba3a60cc5b4), [`e00ec97`](https://github.com/clerk/javascript/commit/e00ec97895640db358af5a9df5d03e83f28f5a27)]:
+  - @clerk/shared@4.3.2
+
+## 4.2.2
+
+### Patch Changes
+
+- Fix en-GB username field placeholder (was showing literal "undefined" instead of "Enter your username") ([#8040](https://github.com/clerk/javascript/pull/8040)) by [@petiteoh](https://github.com/petiteoh)
+
+- Updated dependencies [[`b9cb6e5`](https://github.com/clerk/javascript/commit/b9cb6e576bf6af5662fcc624cf2de76120a14565)]:
+  - @clerk/shared@4.3.1
+
+## 4.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`de1386f`](https://github.com/clerk/javascript/commit/de1386fc90a3e8c2bab515b693c84a1b383525d3)]:
+  - @clerk/shared@4.3.0
+
+## 4.2.0
+
+### Minor Changes
+
+- Add support for annual-only Billing plans. ([#8012](https://github.com/clerk/javascript/pull/8012)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`3e63793`](https://github.com/clerk/javascript/commit/3e637932b1b7af669955f0e4f86233106f7d18ef)]:
+  - @clerk/shared@4.2.0
+
+## 4.1.0
+
+### Minor Changes
+
+- Added en-XA locale to highlight unlocalized strings. ([#7979](https://github.com/clerk/javascript/pull/7979)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Add placeholder text "Enter your username" for username field in en-US locale ([#8002](https://github.com/clerk/javascript/pull/8002)) by [@petiteoh](https://github.com/petiteoh)
+
+- Updated dependencies [[`776ee1b`](https://github.com/clerk/javascript/commit/776ee1b3f3a576976b43352a93b6988340e83353), [`7fb870d`](https://github.com/clerk/javascript/commit/7fb870d37a8c153e9b0e6313b1d38ff53bc2f49b), [`09cb6d4`](https://github.com/clerk/javascript/commit/09cb6d4d45286cf4e657b880696bf0ff81a8a3e8)]:
+  - @clerk/shared@4.1.0
+
+## 4.0.0
+
+### Major Changes
+
+- Require Node.js 20.9.0 in all packages ([#7262](https://github.com/clerk/javascript/pull/7262)) by [@jacekradko](https://github.com/jacekradko)
+
+- Removed legacy subpath export mappings in favor of modern package.json `exports` field configuration. Previously, these packages used a workaround to support subpath imports (e.g., `@clerk/shared/react`, `@clerk/expo/web`). All public APIs remain available through the main package entry points. ([#7925](https://github.com/clerk/javascript/pull/7925)) by [@jacekradko](https://github.com/jacekradko)
+
+### Minor Changes
+
+- Surface organization creation defaults with prefilled form fields and advisory warnings ([#7488](https://github.com/clerk/javascript/pull/7488)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Introducing `setup_mfa` session task ([#7626](https://github.com/clerk/javascript/pull/7626)) by [@octoper](https://github.com/octoper)
+
+- Disable role selection in `OrganizationProfile` during role set migration ([#7534](https://github.com/clerk/javascript/pull/7534)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Display message in `TaskChooseOrganization` when user is not allowed to create organizations ([#7486](https://github.com/clerk/javascript/pull/7486)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Update localizations for taskChooseOrganization ([#7468](https://github.com/clerk/javascript/pull/7468)) by [@jigar-clerk](https://github.com/jigar-clerk)
+
+- Match confirmation deletion message for user accounts in Dutch translations. ([#7806](https://github.com/clerk/javascript/pull/7806)) by [@rvan-duy](https://github.com/rvan-duy)
+
+- Add `subtitle__createOrganizationDisabled` localization key shown in the choose organization task when users cannot create organizations ([#7561](https://github.com/clerk/javascript/pull/7561)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`0a9cce3`](https://github.com/clerk/javascript/commit/0a9cce375046a7ff5944a7f2a140e787fe66996c), [`e35960f`](https://github.com/clerk/javascript/commit/e35960f5e44ab758d0ab0545691f44dbafd5e7cb), [`c9f0d77`](https://github.com/clerk/javascript/commit/c9f0d777f59673bfe614e1a8502cefe5445ce06f), [`1bd1747`](https://github.com/clerk/javascript/commit/1bd174781b83d3712a07e7dfe1acf73742497349), [`6a2ff9e`](https://github.com/clerk/javascript/commit/6a2ff9e957145124bc3d00bf10f566b613c7c60f), [`d2cee35`](https://github.com/clerk/javascript/commit/d2cee35d73d69130ad8c94650286d3b43dda55e6), [`0a9cce3`](https://github.com/clerk/javascript/commit/0a9cce375046a7ff5944a7f2a140e787fe66996c), [`a374c18`](https://github.com/clerk/javascript/commit/a374c18e31793b0872fe193ab7808747749bc56b), [`466d642`](https://github.com/clerk/javascript/commit/466d642ce332d191e2c03d9cb9ca76b0d3776cc6), [`5ef4a77`](https://github.com/clerk/javascript/commit/5ef4a7791cf2820bb12b038cf3b751252362f6e4), [`af85739`](https://github.com/clerk/javascript/commit/af85739195f5f4b353ba4395a547bbc8a8b26483), [`10b5bea`](https://github.com/clerk/javascript/commit/10b5bea85c3bb588c59f13628f32a82934f5de5a), [`a05d130`](https://github.com/clerk/javascript/commit/a05d130451226d2c512c9ea1e9a9f1e4cb2e3ba2), [`b193f79`](https://github.com/clerk/javascript/commit/b193f79ee86eb8ce788db4b747d1c64a1c7c6ac5), [`e9d2f2f`](https://github.com/clerk/javascript/commit/e9d2f2fd1ea027f7936353dfcdc905bcb01c3ad7), [`43fc7b7`](https://github.com/clerk/javascript/commit/43fc7b7b40cf7c42cfb0aa8b2e2058243a3f38f5), [`0f1011a`](https://github.com/clerk/javascript/commit/0f1011a062c3705fc1a69593672b96ad03936de1), [`cbc5618`](https://github.com/clerk/javascript/commit/cbc56181fb28e35c1974cf4de8256a939c3ff029), [`38def4f`](https://github.com/clerk/javascript/commit/38def4fedc99b6be03c88a3737b8bd5940e5bff3), [`7772f45`](https://github.com/clerk/javascript/commit/7772f45ee601787373cf3c9a24eddf3f76c26bee), [`a3e689f`](https://github.com/clerk/javascript/commit/a3e689f3b7f2f3799a263da4b7bb14c0e49e42b7), [`583f7a9`](https://github.com/clerk/javascript/commit/583f7a9a689310f4bdd2c66f5258261f08e47109), [`965e7f1`](https://github.com/clerk/javascript/commit/965e7f1b635cf25ebfe129ec338e05137d1aba9e), [`2b76081`](https://github.com/clerk/javascript/commit/2b7608145611c10443a999cae4373a1acfd7cab7), [`f284c3d`](https://github.com/clerk/javascript/commit/f284c3d1d122b725594d0a287d0fb838f6d191f5), [`ac34168`](https://github.com/clerk/javascript/commit/ac3416849954780bd873ed3fe20a173a8aee89aa), [`cf0d0dc`](https://github.com/clerk/javascript/commit/cf0d0dc7f6380d6e0c4e552090345b7943c22b35), [`690280e`](https://github.com/clerk/javascript/commit/690280e91b0809d8e0fd1e161dd753dc62801244), [`b971d0b`](https://github.com/clerk/javascript/commit/b971d0bb3eed3a6d3d187b4a296bc6e56271014e), [`22d1689`](https://github.com/clerk/javascript/commit/22d1689cb4b789fe48134b08a4e3dc5921ac0e1b), [`e9a1d4d`](https://github.com/clerk/javascript/commit/e9a1d4dcac8a61595739f83a5b9b2bc18a35f59d), [`c088dde`](https://github.com/clerk/javascript/commit/c088dde13004dc16dd37c17572a52efda69843c9), [`8902e21`](https://github.com/clerk/javascript/commit/8902e216bab83fe85a491bdbc2ac8129e83e5a73), [`972f6a0`](https://github.com/clerk/javascript/commit/972f6a015d720c4867aa24b4503db3968187e523), [`a1aaff3`](https://github.com/clerk/javascript/commit/a1aaff33700ed81f31a9f340cf6cb3a82efeef85), [`d85646a`](https://github.com/clerk/javascript/commit/d85646a0b9efc893e2548dc55dbf08954117e8c2), [`ab3dd16`](https://github.com/clerk/javascript/commit/ab3dd160608318363b42f5f46730ed32ee12335b), [`4a8cb10`](https://github.com/clerk/javascript/commit/4a8cb10117bc9b2c9f5efe4f3d243b79dc815251), [`fd195c1`](https://github.com/clerk/javascript/commit/fd195c14086cba7087c74af472d2558d04fe3afd), [`8887fac`](https://github.com/clerk/javascript/commit/8887fac93fccffac7d1612cf5fb773ae614ceb22), [`dc886a9`](https://github.com/clerk/javascript/commit/dc886a9575a0c7366c57cba59ecde260baeb6dad), [`428629b`](https://github.com/clerk/javascript/commit/428629b46a249f432ab6406a92ff628ab5850773), [`8b95393`](https://github.com/clerk/javascript/commit/8b953930536b12bd8ade6ba5c2092f40770ea8df), [`c438fa5`](https://github.com/clerk/javascript/commit/c438fa529cd410eb237c734c04b583d225e66a07), [`c438fa5`](https://github.com/clerk/javascript/commit/c438fa529cd410eb237c734c04b583d225e66a07), [`fd195c1`](https://github.com/clerk/javascript/commit/fd195c14086cba7087c74af472d2558d04fe3afd), [`fd69edb`](https://github.com/clerk/javascript/commit/fd69edbcfe2dfca71d1e6d41af9647701dba2823), [`8d91225`](https://github.com/clerk/javascript/commit/8d91225acc67349fd0d35f982dedb0618f3179e9), [`1fc95e2`](https://github.com/clerk/javascript/commit/1fc95e2a0a5a99314b1bb4d59d3f3e3f03accb3d), [`3dac245`](https://github.com/clerk/javascript/commit/3dac245456dae1522ee2546fc9cc29454f1f345f), [`a4c3b47`](https://github.com/clerk/javascript/commit/a4c3b477dad70dd55fe58f433415b7cc9618a225), [`7c3c002`](https://github.com/clerk/javascript/commit/7c3c002d6d81305124f934f41025799f4f03103e), [`d8bbc66`](https://github.com/clerk/javascript/commit/d8bbc66d47b476b3405c03e1b0632144afdd716b), [`3983cf8`](https://github.com/clerk/javascript/commit/3983cf85d657c247d46f94403cb121f13f6f01e4), [`f1f1d09`](https://github.com/clerk/javascript/commit/f1f1d09e675cf9005348d2380df0da3f293047a6), [`736314f`](https://github.com/clerk/javascript/commit/736314f8641be005ddeacfccae9135a1b153d6f6), [`2cc7dbb`](https://github.com/clerk/javascript/commit/2cc7dbbb212f92e2889460086b50eb644b8ba69d), [`86d2199`](https://github.com/clerk/javascript/commit/86d219970cdc21d5160f0c8adf2c30fc34f1c7b9), [`da415c8`](https://github.com/clerk/javascript/commit/da415c813332998dafd4ec4690a6731a98ded65f), [`97c9ab3`](https://github.com/clerk/javascript/commit/97c9ab3c2130dbe4500c3feb83232d1ccbbd910e), [`cc63aab`](https://github.com/clerk/javascript/commit/cc63aab479853f0e15947837eff5a4f46c71c9f2), [`a7a38ab`](https://github.com/clerk/javascript/commit/a7a38ab76c66d3f147b8b1169c1ce86ceb0d9384), [`cfa70ce`](https://github.com/clerk/javascript/commit/cfa70ce766b687b781ba984ee3d72ac1081b0c97), [`25d37b0`](https://github.com/clerk/javascript/commit/25d37b03605365395d5d7a667ce657ab243a0a68), [`26254f0`](https://github.com/clerk/javascript/commit/26254f0463312115eca4bc0a396c5acd0703187b), [`c97e6af`](https://github.com/clerk/javascript/commit/c97e6af1d6974270843ce91ce17b0c36ee828aa0), [`d98727e`](https://github.com/clerk/javascript/commit/d98727e30b191087abb817acfc29cfccdb3a7047), [`79e2622`](https://github.com/clerk/javascript/commit/79e2622c18917709a351a122846def44c7e22f0c), [`12b3070`](https://github.com/clerk/javascript/commit/12b3070f3f102256f19e6af6acffb05b66d42e0b)]:
+  - @clerk/shared@4.0.0
+
+## 3.37.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.20
+
+## 3.37.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.19
+
+## 3.37.0
+
+### Minor Changes
+
+- Add support for displaying proration and account credits on payment attempts and statements. ([#7885](https://github.com/clerk/javascript/pull/7885)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.18
+
+## 3.36.0
+
+### Minor Changes
+
+- Introduces MFA setup session task for handling require MFA after sign-in and sign-up ([#7851](https://github.com/clerk/javascript/pull/7851)) by [@octoper](https://github.com/octoper)
+
+- Add support for account credits in checkout. ([#7870](https://github.com/clerk/javascript/pull/7870)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.17
+
+## 3.35.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.16
+
+## 3.35.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.15
+
+## 3.35.3
+
+### Patch Changes
+
+- Updated Hebrew localization placeholders for user input fields ([#7669](https://github.com/clerk/javascript/pull/7669)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Update translations for locales: Spanish (es-ES) billing page improvements, Portuguese (pt-BR) enterprise connections and password errors, and comprehensive Finnish (fi-FI) updates across authentication, billing, and organization management. ([#7683](https://github.com/clerk/javascript/pull/7683)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated es-ES translations for billing ([#7669](https://github.com/clerk/javascript/pull/7669)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.14
+
+## 3.35.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.13
+
+## 3.35.1
+
+### Patch Changes
+
+- Improved Greek (el-GR), French (fr-FR), and Korean (ko-KR) translations. ([#7619](https://github.com/clerk/javascript/pull/7619)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.12
+
+## 3.35.0
+
+### Minor Changes
+
+- Surface organization creation defaults with prefilled form fields and advisory warnings ([#7603](https://github.com/clerk/javascript/pull/7603)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.11
+
+## 3.34.0
+
+### Minor Changes
+
+- Fix "You must belong to an organization" screen showing when user has existing memberships, invitations or suggestions ([#7557](https://github.com/clerk/javascript/pull/7557)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 3.33.0
+
+### Minor Changes
+
+- Disable role selection in `OrganizationProfile` during role set migration ([#7541](https://github.com/clerk/javascript/pull/7541)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.10
+
+## 3.32.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.9
+
+## 3.32.0
+
+### Minor Changes
+
+- Display message in `TaskChooseOrganization` when user is not allowed to create organizations ([#7502](https://github.com/clerk/javascript/pull/7502)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Added waitlist translations. ([#7483](https://github.com/clerk/javascript/pull/7483)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.8
+
+## 3.31.0
+
+### Minor Changes
+
+- Add Web3 Solana support to `<UserProfile />` ([#7435](https://github.com/clerk/javascript/pull/7435)) by [@kduprey](https://github.com/kduprey)
+
+- Add support for Sign in with Solana. ([#7293](https://github.com/clerk/javascript/pull/7293)) by [@kduprey](https://github.com/kduprey)
+
+### Patch Changes
+
+- Added temporary email services support error localization key. ([#7436](https://github.com/clerk/javascript/pull/7436)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fixed incorrect word in `da-DK` localization ([#7462](https://github.com/clerk/javascript/pull/7462)) by [@jacekradko](https://github.com/jacekradko)
+
+- Added missing password or identifier incorrect error localization. ([#7437](https://github.com/clerk/javascript/pull/7437)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.7
+
+## 3.30.1
+
+### Patch Changes
+
+- Added translations for Polish in UI elements for Organizations ([#7390](https://github.com/clerk/javascript/pull/7390)) by [@kamil-homer](https://github.com/kamil-homer)
+
+## 3.30.0
+
+### Minor Changes
+
+- Add a subtitle on the Reset password session task screen ([#7392](https://github.com/clerk/javascript/pull/7392)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.6
+
+## 3.29.1
+
+### Patch Changes
+
+- Show the correct error message on `form_new_password_matches_current` error code ([#7372](https://github.com/clerk/javascript/pull/7372)) by [@octoper](https://github.com/octoper)
+
+- Deprecating `passwordUntrusted` in favour of `passwordCompromised` and `form_password_untrusted__sign_in` to `form_password_compromised__sign_in` ([#7352](https://github.com/clerk/javascript/pull/7352)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.5
+
+## 3.29.0
+
+### Minor Changes
+
+- Introduce `reset-password` session task ([#7268](https://github.com/clerk/javascript/pull/7268)) by [@octoper](https://github.com/octoper)
+
+- Introduce a new variant for the alternative methods screen to handle untrusted password error on sign-in ([#7331](https://github.com/clerk/javascript/pull/7331)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Add localization key for username form error ([#7320](https://github.com/clerk/javascript/pull/7320)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.4
+
+## 3.28.5
+
+### Patch Changes
+
+- Improve Japanese (ja-JP) translations ([#7216](https://github.com/clerk/javascript/pull/7216)) by [@kaz](https://github.com/kaz)
+
+## 3.28.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.3
+
+## 3.28.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.2
+
+## 3.28.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.1
+
+## 3.28.1
+
+### Patch Changes
+
+- Add Hebrew translations for waitlist component ([#7204](https://github.com/clerk/javascript/pull/7204)) by [@galeshayek](https://github.com/galeshayek)
+  - Translated waitlist start screen (title, subtitle, form button, action links)
+  - Translated waitlist success screen (title, subtitle, message)
+  - corrected userProfile deletePage actionDescription
+
+- Updated dependencies [[`d32d724`](https://github.com/clerk/javascript/commit/d32d724c34a921a176eca159273f270c2af4e787)]:
+  - @clerk/types@4.101.0
+
+## 3.28.0
+
+### Minor Changes
+
+- Support for `email_code` and `email_link` as a second factor when user is signing in on a new device. ([#7116](https://github.com/clerk/javascript/pull/7116)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Improve Korean (ko-KR) localization by translating missing strings ([#7200](https://github.com/clerk/javascript/pull/7200)) by [@HwangSB](https://github.com/HwangSB)
+  - Translated undefined values to Korean
+
+- Updated dependencies [[`b5a7e2f`](https://github.com/clerk/javascript/commit/b5a7e2f8af5514e19e06918632d982be65f4a854)]:
+  - @clerk/types@4.100.0
+
+## 3.27.2
+
+### Patch Changes
+
+- Updated dependencies [[`613cb97`](https://github.com/clerk/javascript/commit/613cb97cb7b3b33c3865cfe008ef9b1ea624cc8d)]:
+  - @clerk/types@4.99.0
+
+## 3.27.1
+
+### Patch Changes
+
+- Updated dependencies [[`296fb0b`](https://github.com/clerk/javascript/commit/296fb0b8f34aca4f527508a5e6a6bbaad89cfdaa)]:
+  - @clerk/types@4.98.0
+
+## 3.27.0
+
+### Minor Changes
+
+- Added localization entry for the API key copy modal component. ([#7107](https://github.com/clerk/javascript/pull/7107)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.97.2
+
+## 3.26.6
+
+### Patch Changes
+
+- Updated dependencies [[`85b5acc`](https://github.com/clerk/javascript/commit/85b5acc5ba192a8247f072fa93d5bc7d42986293)]:
+  - @clerk/types@4.97.1
+
+## 3.26.5
+
+### Patch Changes
+
+- Updated dependencies [[`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8)]:
+  - @clerk/types@4.97.0
+
 ## 3.26.4
 
 ### Patch Changes
@@ -149,7 +543,6 @@
 - Refined German (de-DE) waitlist localization for improved clarity and consistency ([#6631](https://github.com/clerk/javascript/pull/6631)) by [@okikeSolutions](https://github.com/okikeSolutions)
 
   This update improves the waitlist flow by:
-
   - Updating action link text from “Jetzt anmelden” to “Anmelden”
   - Changing action text from “Kein Zugang? Auf die Warteliste setzen!” to “Bereits Zugang?”
   - Adjusting form button label from “Zur Warteliste hinzufügen” to “Warteliste beitreten”
@@ -172,7 +565,6 @@
 - Complete Romanian (ro-RO) localization ([#6629](https://github.com/clerk/javascript/pull/6629)) by [@5ergiu](https://github.com/5ergiu)
 
   This update:
-
   - Translates missing API key management strings.
   - Adds complete commerce and billing translations.
   - Completes organization profile translations.
@@ -185,7 +577,6 @@
 - Improve German (de-DE) localization with all missing translations ([#6538](https://github.com/clerk/javascript/pull/6538)) by [@mwerder](https://github.com/mwerder)
 
   This update improves the German localization by:
-
   - Adding missing German translations
   - Use 'Wiederherstellungscode' instead of 'Backup-Code' in the whole file for consistency
 
@@ -259,7 +650,6 @@
 - Complete Persian (fa-IR) localization with all missing translations ([#6533](https://github.com/clerk/javascript/pull/6533)) by [@hamidrezaghanbari](https://github.com/hamidrezaghanbari)
 
   This update completes the Persian localization by:
-
   - Translating all undefined API key management strings
   - Adding complete commerce/billing translations
   - Completing organization profile translations
@@ -270,7 +660,6 @@
   The Persian localization now provides a complete user experience for Persian-speaking users.
 
 - Add support for trials in `<Checkout/>` ([#6494](https://github.com/clerk/javascript/pull/6494)) by [@panteliselef](https://github.com/panteliselef)
-
   - Added `freeTrialEndsAt` property to `CommerceCheckoutResource` interface.
 
 - Update PricingTable with trial info. ([#6493](https://github.com/clerk/javascript/pull/6493)) by [@panteliselef](https://github.com/panteliselef)
@@ -644,7 +1033,6 @@
   - Adds `SubscriptionDetails` support for plans without a current subscription
 
 - Switch to "Payment method" terminology instead of "Payment source". ([#5721](https://github.com/clerk/javascript/pull/5721)) by [@panteliselef](https://github.com/panteliselef)
-
   - Removes `userProfile.__experimental_billingPage.start.headerTitle__paymentSources`
   - Adds `userProfile.__experimental_billingPage.start.headerTitle__paymentMethods`
 
@@ -849,7 +1237,6 @@
 - Update the translation of `userProfile.start.profileSection.primaryButton` in the `es-ES` locale. ([#5208](https://github.com/clerk/javascript/pull/5208)) by [@Martoxdlol](https://github.com/Martoxdlol)
 
 - Update translations for nl-NL ([#5272](https://github.com/clerk/javascript/pull/5272)) by [@MaartenKoller](https://github.com/MaartenKoller)
-
   - `waitlist.start.actionLink`
   - `waitlist.start.actionText`
 
@@ -883,7 +1270,6 @@
 ### Patch Changes
 
 - Update "profile" translations for en-MX.ts ([#5081](https://github.com/clerk/javascript/pull/5081)) by [@alanmoyano](https://github.com/alanmoyano)
-
   - `userProfile.profilePage.title`
   - `userProfile.start.profileSection.primaryButton`
 
@@ -1205,7 +1591,6 @@
 ### Minor Changes
 
 - New Feature: Introduce the `<Waitlist />` component and the `waitlist` sign up mode. ([#4376](https://github.com/clerk/javascript/pull/4376)) by [@nikospapcom](https://github.com/nikospapcom)
-
   - Allow users to request access with an email address via the new `<Waitlist />` component.
   - Show `Join waitlist` prompt from `<SignIn />` component when mode is `waitlist`.
   - Appropriate the text in the Sign Up component when mode is `waitlist`.
@@ -1670,7 +2055,6 @@
 - af80d7074: Add Thai (th-TH) localization
 - afec17953: Improved error handling for registration and retrieval of passkeys.
   ClerkRuntimeError codes introduced:
-
   - `passkey_not_supported`
   - `passkeys_pa_not_supported`
   - `passkey_invalid_rpID_or_domain`
@@ -1703,7 +2087,6 @@
   The `signIn.resetPassword.requiredMessage` localization was updated to `'For security reasons, it is required to reset your password.'`.
 
 - 2352149f6: Move passkey related apis to stable:
-
   - Register passkey for a user
     Usage: `await clerk.user.createPasskey()`
   - Authenticate with passkey
@@ -1720,7 +2103,6 @@
     }
     ```
   - ClerkRuntimeError codes introduced:
-
     - `passkey_not_supported`
     - `passkeys_pa_not_supported`
     - `passkey_invalid_rpID_or_domain`
@@ -1754,7 +2136,6 @@
 - 2de442b24: Rename beta-v5 to beta
 - 9f5491357: Add missing ru-RU localization keys
 - 840636a14: Adds translation keys to be able to customize error messages when an identifier already exists:
-
   - form_identifier_exists\_\_email_address
   - form_identifier_exists\_\_username
   - form_identifier_exists\_\_phone_number
@@ -1821,7 +2202,6 @@
 ### Minor Changes
 
 - Move passkey related apis to stable: ([#3134](https://github.com/clerk/javascript/pull/3134)) by [@panteliselef](https://github.com/panteliselef)
-
   - Register passkey for a user
     Usage: `await clerk.user.createPasskey()`
   - Authenticate with passkey
@@ -1838,7 +2218,6 @@
     }
     ```
   - ClerkRuntimeError codes introduced:
-
     - `passkey_not_supported`
     - `passkeys_pa_not_supported`
     - `passkey_invalid_rpID_or_domain`
@@ -1879,7 +2258,6 @@
 ### Patch Changes
 
 - Adds translation keys to be able to customize error messages when an identifier already exists: ([#3073](https://github.com/clerk/javascript/pull/3073)) by [@octoper](https://github.com/octoper)
-
   - form_identifier_exists\_\_email_address
   - form_identifier_exists\_\_username
   - form_identifier_exists\_\_phone_number
@@ -1891,7 +2269,6 @@
 - Improved error handling for registration and retrieval of passkeys. ([#3025](https://github.com/clerk/javascript/pull/3025)) by [@panteliselef](https://github.com/panteliselef)
 
   ClerkRuntimeError codes introduced:
-
   - `passkey_not_supported`
   - `passkeys_pa_not_supported`
   - `passkey_invalid_rpID_or_domain`
@@ -1929,7 +2306,6 @@
 ### Minor Changes
 
 - List passkeys under security in UserProfile. ([#2958](https://github.com/clerk/javascript/pull/2958)) by [@panteliselef](https://github.com/panteliselef)
-
   - Supports renaming a passkey.
   - Supports deleting a passkey.
 
@@ -2075,7 +2451,6 @@
 ### Major Changes
 
 - Drop deprecations. Migration steps: ([#2151](https://github.com/clerk/javascript/pull/2151)) by [@dimkl](https://github.com/dimkl)
-
   - drop `formFieldLabel__emailAddress_phoneNumber` from localization keys
   - drop `formFieldLabel__phoneNumber_username` from localization keys
   - drop `formFieldLabel__emailAddress_phoneNumber_username` from localization keys
@@ -2175,7 +2550,6 @@
 ### Minor Changes
 
 - Introduce the new brand-new component OrganizationList ([#1692](https://github.com/clerk/javascript/pull/1692)) by [@panteliselef](https://github.com/panteliselef)
-
   - Lists all the memberships, invitations or suggestions an active user may have
   - Powered by our `useOrganizationList` react hook
 
@@ -2220,23 +2594,19 @@
 ### Patch Changes
 
 - Introduces Membership Requests in <OrganizationProfile /> ([#1576](https://github.com/clerk/javascript/pull/1576)) by [@panteliselef](https://github.com/panteliselef)
-
   - This is a list of users that have requested to join the active organization
 
 - Introduces domains and invitations in <OrganizationProfile /> ([#1560](https://github.com/clerk/javascript/pull/1560)) by [@panteliselef](https://github.com/panteliselef)
-
   - The "Members" page now accommodates Domain and Individual invitations
   - The "Settings" page allows for the addition, edit and removal of a domain
 
 - Add missing account deletion description to Korean translation file ([#1609](https://github.com/clerk/javascript/pull/1609)) by [@JungHoonGhae](https://github.com/JungHoonGhae)
 
 - A OrganizationMembershipRequest can now be rejected ([#1612](https://github.com/clerk/javascript/pull/1612)) by [@panteliselef](https://github.com/panteliselef)
-
   - New `OrganizationMembershipRequest.reject` method alongside `accept`
   - As an organization admin, navigate to `Organization Profile` > `Members` > `Requests`. You can now reject a request from the table.
 
 - Introduces an invitation list within <OrganizationSwitcher/> ([#1554](https://github.com/clerk/javascript/pull/1554)) by [@panteliselef](https://github.com/panteliselef)
-
   - Users can accept the invitation that is sent to them
 
 - When updating enrollment mode of a domain uses can now delete any pending invitations or suggestions. ([#1632](https://github.com/clerk/javascript/pull/1632)) by [@panteliselef](https://github.com/panteliselef)
@@ -2244,7 +2614,6 @@
 - Add translations for deleteOrganization and domainSection objects to Korean ([#1630](https://github.com/clerk/javascript/pull/1630)) by [@JungHoonGhae](https://github.com/JungHoonGhae)
 
 - Introduces list of suggestions within <OrganizationSwitcher/> ([#1577](https://github.com/clerk/javascript/pull/1577)) by [@panteliselef](https://github.com/panteliselef)
-
   - Users can request to join a suggested organization
 
 - Updated dependencies [[`96cc1921c`](https://github.com/clerk/javascript/commit/96cc1921cac20442f19510137ee0100df5f8a0f4), [`8d1e7d76d`](https://github.com/clerk/javascript/commit/8d1e7d76de40c0ecb367c6745094dd0a75f764b3), [`435d2cff5`](https://github.com/clerk/javascript/commit/435d2cff5dfc86c58690d3f0d843f567ac4f3c04), [`8873841fc`](https://github.com/clerk/javascript/commit/8873841fcbb96f31aaeb8a12a0ce1d90512986d4), [`0a5f632f8`](https://github.com/clerk/javascript/commit/0a5f632f83bb4dae4cc82718dc86b7df3a125a56), [`34da40a50`](https://github.com/clerk/javascript/commit/34da40a5035b37eb365c6cb273e25c4d3bcf7161), [`3158752c7`](https://github.com/clerk/javascript/commit/3158752c73b9266775f954d3adaf43c66ba8b2e8), [`8538cd0c1`](https://github.com/clerk/javascript/commit/8538cd0c1e2ee2e38bd11079735a2ffc6738f71b), [`a412a5014`](https://github.com/clerk/javascript/commit/a412a501426f5d7a32284fda47efe48a04b5d38e), [`4ea30e883`](https://github.com/clerk/javascript/commit/4ea30e883a4f5c19cdde3424bf02afa99e2bc86d), [`86de584dd`](https://github.com/clerk/javascript/commit/86de584ddf1c22ec99852b983a92386e5542613c), [`e02a1aff2`](https://github.com/clerk/javascript/commit/e02a1aff2d4b1478601a2e7b598d600ab3902169), [`09bfb793e`](https://github.com/clerk/javascript/commit/09bfb793ee54d50eb54ef4e3a5eb385ea2f2fb54), [`b2296d630`](https://github.com/clerk/javascript/commit/b2296d6304e1ca31a35450e0c67a12555c0142f9), [`52ce79108`](https://github.com/clerk/javascript/commit/52ce79108fb5cb4fc84bf4f2df3e3dc748ee4eb3), [`4764e40c7`](https://github.com/clerk/javascript/commit/4764e40c7e858803fc6379dec20fcf687dcaed64), [`1e117beec`](https://github.com/clerk/javascript/commit/1e117beeca53f27d8e9f58f2a724fbc8a7d54021), [`89bc5de04`](https://github.com/clerk/javascript/commit/89bc5de04aafa9832d4d1b5f816af2340acd14d4)]:
@@ -2257,7 +2626,6 @@
 - Add more translations to fr-FR ([#1529](https://github.com/clerk/javascript/pull/1529)) by [@PierreC1024](https://github.com/PierreC1024)
 
 - New localization keys for max length exceeded validation: ([#1521](https://github.com/clerk/javascript/pull/1521)) by [@nikospapcom](https://github.com/nikospapcom)
-
   - Organization name (form_param_max_length_exceeded\_\_name)
   - First name (form_param_max_length_exceeded\_\_first_name)
   - Last name (form_param_max_length_exceeded\_\_last_name)
@@ -2292,7 +2660,6 @@
 ### Minor Changes
 
 - Add a confirmation input as an additional check when doing destructive actions such as: ([#1454](https://github.com/clerk/javascript/pull/1454)) by [@raptisj](https://github.com/raptisj)
-
   - delete an organization
   - delete a user account
   - leave an organization

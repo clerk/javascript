@@ -10,18 +10,23 @@ import type {
 } from '@clerk/shared/types';
 
 import { Billing } from '@/core/modules/billing';
+import { unixEpochToDate } from '@/utils/date';
 
 import { BaseResource, DeletedObject } from './internal';
 
 export class BillingPaymentMethod extends BaseResource implements BillingPaymentMethodResource {
   id!: string;
-  last4!: string;
-  paymentType!: 'card' | 'link';
-  cardType!: string;
-  isDefault!: boolean;
-  isRemovable!: boolean;
+  last4: string | null = null;
+  paymentType?: 'card';
+  cardType: string | null = null;
+  isDefault?: boolean;
+  isRemovable?: boolean;
   status!: BillingPaymentMethodStatus;
-  walletType: string | undefined;
+  walletType?: string | null;
+  expiryYear?: number | null;
+  expiryMonth?: number | null;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
 
   constructor(data: BillingPaymentMethodJSON) {
     super();
@@ -40,7 +45,11 @@ export class BillingPaymentMethod extends BaseResource implements BillingPayment
     this.isDefault = data.is_default;
     this.isRemovable = data.is_removable;
     this.status = data.status;
-    this.walletType = data.wallet_type ?? undefined;
+    this.walletType = data.wallet_type;
+    this.expiryYear = data.expiry_year;
+    this.expiryMonth = data.expiry_month;
+    this.createdAt = data.created_at == null ? data.created_at : unixEpochToDate(data.created_at);
+    this.updatedAt = data.updated_at == null ? data.updated_at : unixEpochToDate(data.updated_at);
 
     return this;
   }

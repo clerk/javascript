@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest, SamlIdpSlug } from '@clerk/types';
+import type { ClerkPaginationRequest, SamlIdpSlug } from '@clerk/shared/types';
 
 import { joinPaths } from '../../util/path';
 import type { SamlConnection } from '../resources';
@@ -21,9 +21,9 @@ type SamlConnectionListParams = ClerkPaginationRequest<{
   orderBy?: WithSign<'phone_number' | 'email_address' | 'created_at' | 'first_name' | 'last_name' | 'username'>;
 
   /**
-   * Returns SAML connections that have an associated organization ID to the given organizations.
-   * For each organization id, the + and - can be prepended to the id, which denote whether the
-   * respective organization should be included or excluded from the result set. Accepts up to 100 organization ids.
+   * Returns SAML connections that have an associated Organization ID to the given Organizations.
+   * For each Organization ID, the + and - can be prepended to the ID, which denote whether the
+   * respective Organization should be included or excluded from the result set. Accepts up to 100 Organization IDs.
    */
   organizationId?: WithSign<string>[];
 }>;

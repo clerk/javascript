@@ -23,6 +23,11 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
   } = {
     disabled: false,
   };
+  organizationCreationDefaults: {
+    enabled: boolean;
+  } = {
+    enabled: false,
+  };
   enabled: boolean = false;
   maxAllowedMemberships: number = 1;
   forceOrganizationSelection!: boolean;
@@ -49,6 +54,13 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
 
     if (data.slug) {
       this.slug.disabled = this.withDefault(data.slug.disabled, this.slug.disabled);
+    }
+
+    if (data.organization_creation_defaults) {
+      this.organizationCreationDefaults.enabled = this.withDefault(
+        data.organization_creation_defaults.enabled,
+        this.organizationCreationDefaults.enabled,
+      );
     }
 
     this.enabled = this.withDefault(data.enabled, this.enabled);

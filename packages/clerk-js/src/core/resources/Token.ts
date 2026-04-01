@@ -1,18 +1,20 @@
 import type { JWT, TokenJSON, TokenJSONSnapshot, TokenResource } from '@clerk/shared/types';
 
-import { decode } from '../../utils';
-import { BaseResource } from './internal';
+import { decode } from '@/utils';
+
+import { BaseResource } from './Base';
 
 export class Token extends BaseResource implements TokenResource {
   pathRoot = 'tokens';
 
   jwt?: JWT;
 
-  static async create(path: string, body: any = {}): Promise<TokenResource> {
+  static async create(path: string, body: any = {}, search: Record<string, string> = {}): Promise<TokenResource> {
     const json = (await BaseResource._fetch<TokenJSON>({
-      path,
       method: 'POST',
+      path,
       body,
+      search,
     })) as unknown as TokenJSON;
 
     return new Token(json, path);

@@ -5,7 +5,7 @@ import { AbstractAPI } from './AbstractApi';
 const basePath = '/oauth_applications/access_tokens';
 
 export class IdPOAuthAccessTokenApi extends AbstractAPI {
-  async verifyAccessToken(accessToken: string) {
+  async verify(accessToken: string) {
     return this.request<IdPOAuthAccessToken>({
       method: 'POST',
       path: joinPaths(basePath, 'verify'),

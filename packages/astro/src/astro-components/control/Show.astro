@@ -1,0 +1,51 @@
+---
+import ShowCSR from './ShowCSR.astro';
+import ShowSSR from './ShowSSR.astro';
+
+import { isStaticOutput } from 'virtual:@clerk/astro/config';
+import type { ShowProps } from '../../types';
+
+type Props = ShowProps & {
+  isStatic?: boolean;
+  /**
+   * The class name to apply to the outermost element of the component.
+   * This class is only applied to static components.
+   */
+  class?: string;
+};
+
+const { isStatic, when, ...rest } = Astro.props;
+
+if (typeof when === 'undefined') {
+  throw new Error('@clerk/astro: <Show /> requires a `when` prop.');
+}
+
+const props = { ...rest, when };
+
+// If user explicitly sets isStatic prop, honor it
+// Otherwise, detect based on runtime (whether auth function exists)
+const shouldUseCSR = isStatic !== undefined ? isStaticOutput(isStatic) : !Astro.locals?.auth;
+const ShowComponent = shouldUseCSR ? ShowCSR : ShowSSR;
+
+// Note: Astro server islands also use a "fallback" slot for loading states
+// See: https://docs.astro.build/en/guides/server-islands/#server-island-fallback-content
+// We use "show-fallback" as our preferred slot name to avoid conflicts
+const hasShowFallback = Astro.slots.has('show-fallback');
+---
+
+<ShowComponent {...props}>
+  <slot />
+  {
+    hasShowFallback ? (
+      <slot
+        name='show-fallback'
+        slot='show-fallback'
+      />
+    ) : (
+      <slot
+        name='fallback'
+        slot='fallback'
+      />
+    )
+  }
+</ShowComponent>

@@ -1,10 +1,11 @@
 import type {
   CredentialReturn,
+  DomainOrProxyUrl,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import type { TokenCache } from '../../cache/types';
 
@@ -16,6 +17,8 @@ export interface IStorage {
 export type BuildClerkOptions = {
   publishableKey?: string;
   tokenCache?: TokenCache;
+  proxyUrl?: DomainOrProxyUrl['proxyUrl'];
+  domain?: DomainOrProxyUrl['domain'];
   /**
    * Note: Passkey support in Expo is currently in a limited rollout phase.
    * If you're interested in using this feature, please contact us for early access or additional details.

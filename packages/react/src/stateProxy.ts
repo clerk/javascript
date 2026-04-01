@@ -1,15 +1,36 @@
 import { inBrowser } from '@clerk/shared/browser';
-import type { Errors, State } from '@clerk/shared/types';
+import type {
+  BillingSubscriptionPlanPeriod,
+  CheckoutSignalValue,
+  Clerk,
+  ForPayerType,
+  SignInErrors,
+  SignUpErrors,
+  SignUpVerificationResource,
+  State,
+  VerificationResource,
+  WaitlistErrors,
+  WaitlistResource,
+} from '@clerk/shared/types';
 
 import { errorThrower } from './errors/errorThrower';
 import type { IsomorphicClerk } from './isomorphicClerk';
 
-const defaultErrors = (): Errors => ({
+const defaultSignInErrors = (): SignInErrors => ({
+  fields: {
+    identifier: null,
+    password: null,
+    code: null,
+  },
+  raw: null,
+  global: null,
+});
+
+const defaultSignUpErrors = (): SignUpErrors => ({
   fields: {
     firstName: null,
     lastName: null,
     emailAddress: null,
-    identifier: null,
     phoneNumber: null,
     password: null,
     username: null,
@@ -21,11 +42,77 @@ const defaultErrors = (): Errors => ({
   global: null,
 });
 
+const defaultWaitlistErrors = (): WaitlistErrors => ({
+  fields: {
+    emailAddress: null,
+  },
+  raw: null,
+  global: null,
+});
+
+const defaultVerificationResource = (): VerificationResource => ({
+  pathRoot: '',
+
+  attempts: null,
+  error: null,
+  expireAt: null,
+  externalVerificationRedirectURL: null,
+  nonce: null,
+  message: null,
+  status: null,
+  strategy: null,
+  verifiedAtClient: null,
+  verifiedFromTheSameClient() {
+    return false;
+  },
+  reload() {
+    throw new Error('reload() called before Clerk is loaded');
+  },
+  __internal_toSnapshot() {
+    return {
+      object: 'verification',
+      id: '',
+      attempts: null,
+      error: { code: '', message: '' },
+      expire_at: null,
+      externalVerificationRedirectURL: null,
+      nonce: null,
+      message: null,
+      status: null,
+      strategy: null,
+      verified_at_client: null,
+    };
+  },
+});
+
+const defaultSignUpVerificationResource = (): SignUpVerificationResource => ({
+  ...defaultVerificationResource(),
+  supportedStrategies: [],
+  nextAction: '',
+  reload() {
+    throw new Error('reload() called before Clerk is loaded');
+  },
+  __internal_toSnapshot() {
+    return {
+      ...defaultVerificationResource().__internal_toSnapshot(),
+      next_action: this.nextAction,
+      supported_strategies: this.supportedStrategies,
+    };
+  },
+});
+
+type CheckoutSignalProps = {
+  for?: ForPayerType;
+  planPeriod: BillingSubscriptionPlanPeriod;
+  planId: string;
+};
+
 export class StateProxy implements State {
   constructor(private isomorphicClerk: IsomorphicClerk) {}
 
   private readonly signInSignalProxy = this.buildSignInProxy();
   private readonly signUpSignalProxy = this.buildSignUpProxy();
+  private readonly waitlistSignalProxy = this.buildWaitlistProxy();
 
   signInSignal() {
     return this.signInSignalProxy;
@@ -33,18 +120,31 @@ export class StateProxy implements State {
   signUpSignal() {
     return this.signUpSignalProxy;
   }
+  waitlistSignal() {
+    return this.waitlistSignalProxy;
+  }
+
+  get __internal_waitlist() {
+    return this.state.__internal_waitlist;
+  }
+
+  checkoutSignal(params: CheckoutSignalProps) {
+    return this.buildCheckoutProxy(params);
+  }
 
   private buildSignInProxy() {
     const gateProperty = this.gateProperty.bind(this);
     const target = () => this.client.signIn.__internal_future;
 
     return {
-      errors: defaultErrors(),
+      errors: defaultSignInErrors(),
       fetchStatus: 'idle' as const,
       signIn: {
         status: 'needs_identifier' as const,
         availableStrategies: [],
-        isTransferable: false,
+        get isTransferable() {
+          return gateProperty(target, 'isTransferable', false);
+        },
         get id() {
           return gateProperty(target, 'id', undefined);
         },
@@ -105,11 +205,15 @@ export class StateProxy implements State {
             },
           });
         },
+        get canBeDiscarded() {
+          return gateProperty(target, 'canBeDiscarded', false);
+        },
 
         create: this.gateMethod(target, 'create'),
         password: this.gateMethod(target, 'password'),
         sso: this.gateMethod(target, 'sso'),
         finalize: this.gateMethod(target, 'finalize'),
+        reset: this.gateMethod(target, 'reset'),
 
         emailCode: this.wrapMethods(() => target().emailCode, ['sendCode', 'verifyCode'] as const),
         emailLink: this.wrapStruct(
@@ -123,10 +227,17 @@ export class StateProxy implements State {
           'verifyCode',
           'submitPassword',
         ] as const),
+        resetPasswordPhoneCode: this.wrapMethods(() => target().resetPasswordPhoneCode, [
+          'sendCode',
+          'verifyCode',
+          'submitPassword',
+        ] as const),
         phoneCode: this.wrapMethods(() => target().phoneCode, ['sendCode', 'verifyCode'] as const),
         mfa: this.wrapMethods(() => target().mfa, [
           'sendPhoneCode',
           'verifyPhoneCode',
+          'sendEmailCode',
+          'verifyEmailCode',
           'verifyTOTP',
           'verifyBackupCode',
         ] as const),
@@ -140,11 +251,10 @@ export class StateProxy implements State {
   private buildSignUpProxy() {
     const gateProperty = this.gateProperty.bind(this);
     const gateMethod = this.gateMethod.bind(this);
-    const wrapMethods = this.wrapMethods.bind(this);
     const target = () => this.client.signUp.__internal_future;
 
     return {
-      errors: defaultErrors(),
+      errors: defaultSignUpErrors(),
       fetchStatus: 'idle' as const,
       signUp: {
         get id() {
@@ -207,6 +317,9 @@ export class StateProxy implements State {
         get isTransferable() {
           return gateProperty(target, 'isTransferable', false);
         },
+        get canBeDiscarded() {
+          return gateProperty(target, 'canBeDiscarded', false);
+        },
 
         create: gateMethod(target, 'create'),
         update: gateMethod(target, 'update'),
@@ -215,13 +328,111 @@ export class StateProxy implements State {
         ticket: gateMethod(target, 'ticket'),
         web3: gateMethod(target, 'web3'),
         finalize: gateMethod(target, 'finalize'),
+        reset: gateMethod(target, 'reset'),
 
-        verifications: wrapMethods(() => target().verifications, [
-          'sendEmailCode',
-          'verifyEmailCode',
-          'sendPhoneCode',
-          'verifyPhoneCode',
-        ] as const),
+        verifications: this.wrapStruct(
+          () => target().verifications,
+          [
+            'sendEmailCode',
+            'verifyEmailCode',
+            'sendEmailLink',
+            'waitForEmailLinkVerification',
+            'sendPhoneCode',
+            'verifyPhoneCode',
+          ] as const,
+          ['emailAddress', 'phoneNumber', 'web3Wallet', 'externalAccount', 'emailLinkVerification'] as const,
+          {
+            emailAddress: defaultSignUpVerificationResource(),
+            phoneNumber: defaultSignUpVerificationResource(),
+            web3Wallet: defaultSignUpVerificationResource(),
+            externalAccount: defaultSignUpVerificationResource(),
+            emailLinkVerification: null,
+          },
+        ),
+      },
+    };
+  }
+
+  private buildWaitlistProxy() {
+    const gateProperty = this.gateProperty.bind(this);
+    const gateMethod = this.gateMethod.bind(this);
+    const target = (): WaitlistResource => {
+      return this.state.__internal_waitlist;
+    };
+
+    return {
+      errors: defaultWaitlistErrors(),
+      fetchStatus: 'idle' as const,
+      waitlist: {
+        pathRoot: '/waitlist',
+        get id() {
+          return gateProperty(target, 'id', '');
+        },
+        get createdAt() {
+          return gateProperty(target, 'createdAt', null);
+        },
+        get updatedAt() {
+          return gateProperty(target, 'updatedAt', null);
+        },
+
+        join: gateMethod(target, 'join'),
+        reload: gateMethod(target, 'reload'),
+      },
+    };
+  }
+
+  private buildCheckoutProxy(params: CheckoutSignalProps): CheckoutSignalValue {
+    const gateProperty = this.gateProperty.bind(this);
+    const targetCheckout = () => this.checkout(params);
+    const target = () => targetCheckout().checkout;
+
+    return {
+      errors: {
+        raw: null,
+        global: null,
+      },
+      fetchStatus: 'idle' as const,
+      checkout: {
+        get status() {
+          return gateProperty(target, 'status', 'needs_initialization') as 'needs_initialization';
+        },
+        get externalClientSecret() {
+          return gateProperty(target, 'externalClientSecret', null) as null;
+        },
+        get externalGatewayId() {
+          return gateProperty(target, 'externalGatewayId', null) as null;
+        },
+        get paymentMethod() {
+          return gateProperty(target, 'paymentMethod', null) as null;
+        },
+        get plan() {
+          return gateProperty(target, 'plan', null) as null;
+        },
+        get planPeriod() {
+          return gateProperty(target, 'planPeriod', null) as null;
+        },
+        get totals() {
+          return gateProperty(target, 'totals', null) as null;
+        },
+        get isImmediatePlanChange() {
+          return gateProperty(target, 'isImmediatePlanChange', false) as null;
+        },
+        get freeTrialEndsAt() {
+          return gateProperty(target, 'freeTrialEndsAt', null) as null;
+        },
+        get payer() {
+          return gateProperty(target, 'payer', null) as null;
+        },
+        get planPeriodStart() {
+          return gateProperty(target, 'planPeriodStart', null) as null;
+        },
+        get needsPaymentMethod() {
+          return gateProperty(target, 'needsPaymentMethod', null) as null;
+        },
+
+        start: this.gateMethod<ReturnType<typeof target>, 'start'>(target, 'start'),
+        confirm: this.gateMethod<ReturnType<typeof target>, 'confirm'>(target, 'confirm'),
+        finalize: this.gateMethod<ReturnType<typeof target>, 'finalize'>(target, 'finalize'),
       },
     };
   }
@@ -233,10 +444,26 @@ export class StateProxy implements State {
     throw new Error('__internal_computed called before Clerk is loaded');
   }
 
+  private get state() {
+    const s = this.isomorphicClerk.__internal_state;
+    if (!s) {
+      throw new Error('Clerk state not ready');
+    }
+    return s;
+  }
+
   private get client() {
     const c = this.isomorphicClerk.client;
     if (!c) {
       throw new Error('Clerk client not ready');
+    }
+    return c;
+  }
+
+  private get checkout(): Clerk['__experimental_checkout'] {
+    const c = this.isomorphicClerk.__experimental_checkout as Clerk['__experimental_checkout'];
+    if (!c) {
+      throw new Error('Clerk checkout not ready');
     }
     return c;
   }

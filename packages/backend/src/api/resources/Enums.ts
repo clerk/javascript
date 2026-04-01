@@ -1,4 +1,4 @@
-import type { OrganizationCustomRoleKey } from '@clerk/types';
+import type { OrganizationCustomRoleKey } from '@clerk/shared/types';
 
 export type OAuthProvider =
   | 'facebook'
@@ -24,7 +24,7 @@ export type OAuthStrategy = `oauth_${OAuthProvider}`;
 /**
  * @inline
  */
-export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked';
+export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
 
 export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
 

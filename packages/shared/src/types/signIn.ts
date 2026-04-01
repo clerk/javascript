@@ -1,5 +1,6 @@
 import type {
   ClerkResourceJSON,
+  ClientTrustState,
   SignInFirstFactorJSON,
   SignInSecondFactorJSON,
   UserDataJSON,
@@ -15,6 +16,7 @@ import type {
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
   ResetPasswordParams,
+  SignInAuthenticateWithSolanaParams,
   SignInCreateParams,
   SignInFirstFactor,
   SignInIdentifier,
@@ -42,6 +44,7 @@ export interface SignInResource extends ClerkResource {
   supportedIdentifiers: SignInIdentifier[];
   supportedFirstFactors: SignInFirstFactor[] | null;
   supportedSecondFactors: SignInSecondFactor[] | null;
+  clientTrustState?: ClientTrustState;
   firstFactorVerification: VerificationResource;
   secondFactorVerification: VerificationResource;
   identifier: string | null;
@@ -74,6 +77,8 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithBase: () => Promise<SignInResource>;
 
+  authenticateWithSolana: (params: SignInAuthenticateWithSolanaParams) => Promise<SignInResource>;
+
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
 
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
@@ -94,6 +99,7 @@ export interface SignInJSON extends ClerkResourceJSON {
   object: 'sign_in';
   id: string;
   status: SignInStatus;
+  client_trust_state?: ClientTrustState;
   /**
    * @deprecated This attribute will be removed in the next major version.
    */

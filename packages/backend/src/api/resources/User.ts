@@ -1,8 +1,8 @@
 import { EmailAddress } from './EmailAddress';
+import { EnterpriseAccount } from './EnterpriseAccount';
 import { ExternalAccount } from './ExternalAccount';
-import type { ExternalAccountJSON, SamlAccountJSON, UserJSON } from './JSON';
+import type { EnterpriseAccountJSON, ExternalAccountJSON, UserJSON } from './JSON';
 import { PhoneNumber } from './PhoneNumber';
-import { SamlAccount } from './SamlAccount';
 import { Web3Wallet } from './Web3Wallet';
 
 /**
@@ -121,19 +121,19 @@ export class User {
      */
     readonly externalAccounts: ExternalAccount[] = [],
     /**
-     * An array of all the `SamlAccount` objects associated with the user via SAML.
+     * An array of all the `EnterpriseAccount` objects associated with the user via enterprise SSO.
      */
-    readonly samlAccounts: SamlAccount[] = [],
+    readonly enterpriseAccounts: EnterpriseAccount[] = [],
     /**
      * Date when the user was last active.
      */
     readonly lastActiveAt: number | null,
     /**
-     * A boolean indicating whether the organization creation is enabled for the user or not.
+     * A boolean indicating whether the Organization creation is enabled for the user or not.
      */
     readonly createOrganizationEnabled: boolean,
     /**
-     * An integer indicating the number of organizations that can be created by the user. If the value is `0`, then the user can create unlimited organizations. Default is `null`.
+     * An integer indicating the number of Organizations that can be created by the user. If the value is `0`, then the user can create unlimited Organizations. Default is `null`.
      */
     readonly createOrganizationsLimit: number | null = null,
     /**
@@ -179,7 +179,7 @@ export class User {
       (data.phone_numbers || []).map(x => PhoneNumber.fromJSON(x)),
       (data.web3_wallets || []).map(x => Web3Wallet.fromJSON(x)),
       (data.external_accounts || []).map((x: ExternalAccountJSON) => ExternalAccount.fromJSON(x)),
-      (data.saml_accounts || []).map((x: SamlAccountJSON) => SamlAccount.fromJSON(x)),
+      (data.enterprise_accounts || []).map((x: EnterpriseAccountJSON) => EnterpriseAccount.fromJSON(x)),
       data.last_active_at,
       data.create_organization_enabled,
       data.create_organizations_limit,

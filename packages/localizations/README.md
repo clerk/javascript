@@ -13,7 +13,7 @@
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_localizations)
-[![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/Clerk?style=social)](https://twitter.com/intent/follow?screen_name=Clerk)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/localizations/CHANGELOG.md)
 ·
@@ -66,7 +66,6 @@ We're open to all community contributions! If you'd like to contribute in any wa
 1. Open the [`localizations/src/en-US.ts`](https://github.com/clerk/javascript/blob/main/packages/localizations/src/en-US.ts) file and add your new key to the object. `en-US` is the default language. If you feel comfortable adding your message in another language than English, feel free to also edit other files.
 
 1. Use the new localization key inside the component. There are two ways:
-
    - The string is inside a component like `<Text>`:
 
      ```diff

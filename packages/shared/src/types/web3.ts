@@ -10,5 +10,12 @@ export type MetamaskWeb3Provider = 'metamask';
 export type CoinbaseWalletWeb3Provider = 'coinbase_wallet';
 export type OKXWalletWeb3Provider = 'okx_wallet';
 export type BaseWeb3Provider = 'base';
+export type SolanaWeb3Provider = 'solana';
 
-export type Web3Provider = MetamaskWeb3Provider | BaseWeb3Provider | CoinbaseWalletWeb3Provider | OKXWalletWeb3Provider;
+export type Web3Provider = EthereumWeb3Provider | SolanaWeb3Provider;
+
+export type EthereumWeb3Provider =
+  | MetamaskWeb3Provider
+  | BaseWeb3Provider
+  | CoinbaseWalletWeb3Provider
+  | OKXWalletWeb3Provider;

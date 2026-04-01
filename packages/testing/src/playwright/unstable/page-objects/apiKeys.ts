@@ -35,6 +35,15 @@ export const createAPIKeysComponentPageObject = (testArgs: { page: EnhancedPage 
     waitForRevokeModalClosed: () => {
       return page.waitForSelector('.cl-apiKeysRevokeModal', { state: 'detached' });
     },
+    waitForCopyModalOpened: () => {
+      return page.waitForSelector('.cl-apiKeysCopyModal', { state: 'attached' });
+    },
+    waitForCopyModalClosed: () => {
+      return page.waitForSelector('.cl-apiKeysCopyModal', { state: 'detached' });
+    },
+    clickCopyAndCloseButton: () => {
+      return page.locator('.cl-apiKeysCopyModal .cl-apiKeysCopyModalSubmitButton').click();
+    },
     typeName: (value: string) => {
       return page.getByLabel(/Secret key name/i).fill(value);
     },

@@ -14,7 +14,7 @@ import type {
   CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { constants as nextConstants } from '../constants';
 import { isNextFetcher } from './nextFetcher';
@@ -126,12 +126,20 @@ export function createProtect(opts: {
         // TODO: Handle runtime values. What happens if runtime values are set in middleware and in ClerkProvider as well?
         return redirectToSignIn();
       }
+      if (isServerActionRequest(request)) {
+        return unauthorized();
+      }
       return notFound();
     };
 
     const handleUnauthorized = () => {
-      // For machine tokens, return a 401 response
-      if (authObject.tokenType !== TokenType.SessionToken) {
+      // Return 401 for machine token contexts: either the auth object itself is a machine token,
+      // or the endpoint was configured to accept machine tokens but auth failed (e.g. middleware
+      // bypassed, so authObject fell back to a signed-out session object).
+      if (
+        authObject.tokenType !== TokenType.SessionToken ||
+        !isTokenTypeAccepted(TokenType.SessionToken, requestedToken)
+      ) {
         return unauthorized();
       }
 
@@ -246,14 +254,9 @@ const isPagePathAvailable = () => {
     return false;
   }
 
-  const { page, pagePath } = __fetch.__nextGetStaticStore().getStore() || {};
+  const { page } = __fetch.__nextGetStaticStore().getStore() || {};
 
-  return Boolean(
-    // available on next@14
-    pagePath ||
-      // available on next@15
-      page,
-  );
+  return Boolean(page);
 };
 
 const isPagesRouterInternalNavigation = (req: Request) => !!req.headers.get(nextConstants.Headers.NextjsData);

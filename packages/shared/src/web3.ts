@@ -21,4 +21,9 @@ export const WEB3_PROVIDERS: Web3ProviderData[] = [
     strategy: 'web3_okx_wallet_signature',
     name: 'OKX Wallet',
   },
+  {
+    provider: 'solana',
+    strategy: 'web3_solana_signature',
+    name: 'Solana',
+  },
 ];

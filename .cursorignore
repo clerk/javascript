@@ -1,0 +1,20 @@
+# AI Agent Security - Sensitive Files
+# These files should never be read by AI tools to prevent
+# accidental exposure of secrets to AI service providers.
+
+# Environment files
+.env
+.env.*
+
+# Secrets directory
+secrets/
+
+# Credentials
+**/credentials.json
+
+# Private keys
+**/*.pem
+**/*.key
+
+# Integration keys
+**/.keys.json

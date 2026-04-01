@@ -1,4 +1,4 @@
-import type { EnterpriseSSOStrategy, OAuthStrategy, SamlStrategy } from './strategies';
+import type { EnterpriseSSOStrategy, OAuthStrategy } from './strategies';
 
 export type AfterSignOutUrl = {
   /**
@@ -16,24 +16,6 @@ export type AfterMultiSessionSingleSignOutUrl = {
 };
 
 /**
- * @deprecated This will be removed in a future release.
- */
-export type LegacyRedirectProps = {
-  /**
-   * @deprecated Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
-   */
-  afterSignInUrl?: string | null;
-  /**
-   * @deprecated Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
-   */
-  afterSignUpUrl?: string | null;
-  /**
-   * @deprecated Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
-   */
-  redirectUrl?: string | null;
-};
-
-/**
  * Redirect URLs for different actions.
  * Mainly used to be used to type internal Clerk functions.
  */
@@ -41,7 +23,7 @@ export type RedirectOptions = SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
-  LegacyRedirectProps;
+  RedirectUrlProp;
 
 export type AuthenticateWithRedirectParams = {
   /**
@@ -68,9 +50,9 @@ export type AuthenticateWithRedirectParams = {
 
   /**
    * One of the supported OAuth providers you can use to authenticate with, eg 'oauth_google'.
-   * Alternatively `saml` or `enterprise_sso`, to authenticate with Enterprise SSO.
+   * Alternatively `enterprise_sso`, to authenticate with Enterprise SSO.
    */
-  strategy: OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy;
+  strategy: OAuthStrategy | EnterpriseSSOStrategy;
 
   /**
    * Identifier to use for targeting a Enterprise Connection at sign-in
@@ -117,6 +99,7 @@ export type SignUpForceRedirectUrl = {
 export type SignUpFallbackRedirectUrl = {
   /**
    * The fallback URL to redirect to after the user signs up, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   *
    * @default '/'
    */
   signUpFallbackRedirectUrl?: string | null;
@@ -125,6 +108,7 @@ export type SignUpFallbackRedirectUrl = {
 export type SignInFallbackRedirectUrl = {
   /**
    * The fallback URL to redirect to after the user signs in, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   *
    * @default '/'
    */
   signInFallbackRedirectUrl?: string | null;

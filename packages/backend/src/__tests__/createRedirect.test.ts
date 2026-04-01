@@ -1,4 +1,4 @@
-import type { SessionStatusClaim } from '@clerk/types';
+import type { SessionStatusClaim } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createRedirect } from '../createRedirect';
@@ -99,26 +99,44 @@ describe('redirect(redirectAdapter)', () => {
       );
     });
 
-    it('removes __clerk_synced when cross-origin redirect', () => {
-      const returnBackUrl = 'https://current.url:3000/path?__clerk_synced=true&q=1#hash';
-      const encodedUrl = 'https%3A%2F%2Fcurrent.url%3A3000%2Fpath%3Fq%3D1%23hash';
-      const signUpUrl = 'https://lcl.dev/sign-up';
+    it('adds __clerk_synced=false to returnBackUrl for satellite apps on cross-origin redirect', () => {
+      const returnBackUrl = 'https://satellite.example.com/dashboard';
+      const encodedUrl = 'https%3A%2F%2Fsatellite.example.com%2Fdashboard%3F__clerk_synced%3Dfalse';
+      const signInUrl = 'https://primary.example.com/sign-in';
 
       const redirectAdapterSpy = vi.fn().mockImplementation(_url => 'redirectAdapterValue');
-      const { redirectToSignUp } = createRedirect({
-        baseUrl: 'http://www.clerk.com',
-        devBrowserToken: 'deadbeef',
+      const { redirectToSignIn } = createRedirect({
+        baseUrl: 'https://satellite.example.com',
         redirectAdapter: redirectAdapterSpy,
-        publishableKey: 'pk_test_Y2xlcmsubGNsLmRldiQ',
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
         sessionStatus: 'active',
-        signUpUrl,
+        signInUrl,
+        isSatellite: true,
       });
 
-      const result = redirectToSignUp({ returnBackUrl });
+      const result = redirectToSignIn({ returnBackUrl });
       expect(result).toBe('redirectAdapterValue');
-      expect(redirectAdapterSpy).toHaveBeenCalledWith(
-        `${signUpUrl}?redirect_url=${encodedUrl}&__clerk_db_jwt=deadbeef`,
-      );
+      expect(redirectAdapterSpy).toHaveBeenCalledWith(`${signInUrl}?redirect_url=${encodedUrl}`);
+    });
+
+    it('does not add __clerk_synced=false for non-satellite apps', () => {
+      const returnBackUrl = 'https://app.example.com/dashboard';
+      const encodedUrl = 'https%3A%2F%2Fapp.example.com%2Fdashboard';
+      const signInUrl = 'https://accounts.example.com/sign-in';
+
+      const redirectAdapterSpy = vi.fn().mockImplementation(_url => 'redirectAdapterValue');
+      const { redirectToSignIn } = createRedirect({
+        baseUrl: 'https://app.example.com',
+        redirectAdapter: redirectAdapterSpy,
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        sessionStatus: 'active',
+        signInUrl,
+        isSatellite: false,
+      });
+
+      const result = redirectToSignIn({ returnBackUrl });
+      expect(result).toBe('redirectAdapterValue');
+      expect(redirectAdapterSpy).toHaveBeenCalledWith(`${signInUrl}?redirect_url=${encodedUrl}`);
     });
 
     it('returns path based url with development (kima) publishableKey (with staging Clerk) but without signUpUrl to redirectToSignUp', () => {
@@ -340,26 +358,6 @@ describe('redirect(redirectAdapter)', () => {
       expect(result).toBe('redirectAdapterValue');
       expect(redirectAdapterSpy).toHaveBeenCalledWith(
         `https://included.katydid-92.accounts.dev/sign-up/tasks?redirect_url=${encodedUrl}&__clerk_db_jwt=deadbeef`,
-      );
-    });
-
-    it('removes __clerk_synced when cross-origin redirect', () => {
-      const returnBackUrl = 'https://current.url:3000/path?__clerk_synced=true&q=1#hash';
-      const encodedUrl = 'https%3A%2F%2Fcurrent.url%3A3000%2Fpath%3Fq%3D1%23hash';
-
-      const redirectAdapterSpy = vi.fn().mockImplementation(_url => 'redirectAdapterValue');
-      const { redirectToSignUp } = createRedirect({
-        baseUrl: 'http://www.clerk.com',
-        devBrowserToken: 'deadbeef',
-        redirectAdapter: redirectAdapterSpy,
-        publishableKey: 'pk_test_Y2xlcmsubGNsLmRldiQ',
-        sessionStatus: 'pending',
-      });
-
-      const result = redirectToSignUp({ returnBackUrl });
-      expect(result).toBe('redirectAdapterValue');
-      expect(redirectAdapterSpy).toHaveBeenCalledWith(
-        `https://accounts.lcl.dev/sign-up/tasks?redirect_url=${encodedUrl}&__clerk_db_jwt=deadbeef`,
       );
     });
   });

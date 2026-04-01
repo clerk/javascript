@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo-passkeys",
-  "version": "0.4.12",
+  "version": "1.0.7",
   "description": "Passkeys library to be used with Clerk for expo",
   "keywords": [
     "react-native",
@@ -24,23 +24,21 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "pnpm dev -- --env.publish",
+    "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "open:android": "open -a \"Android Studio\" example/android",
-    "open:ios": "xed example/ios",
-    "publish:local": "pnpm yalc push --replace  --sig"
+    "open:ios": "xed example/ios"
   },
   "dependencies": {
-    "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^"
+    "@clerk/shared": "workspace:^"
   },
   "devDependencies": {
     "expo": "~52.0.47"
   },
   "peerDependencies": {
-    "expo": ">=50 <55",
+    "expo": ">=53 <55",
     "react": "catalog:peer-react",
     "react-native": "*"
   }

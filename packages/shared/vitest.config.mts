@@ -1,7 +1,13 @@
+import * as path from 'node:path';
+
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  plugins: [],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   test: {
     watch: false,
     typecheck: {

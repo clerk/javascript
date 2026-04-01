@@ -109,4 +109,29 @@ describe('<SignUpButton/>', () => {
       );
     }).toThrow();
   });
+
+  it('does not pass unsafeMetadata prop to child element', () => {
+    const { container } = render(
+      <SignUpButton unsafeMetadata={{ customField: 'test' }}>
+        <button type='button'>Sign up</button>
+      </SignUpButton>,
+    );
+
+    const button = container.querySelector('button');
+    expect(button?.hasAttribute('unsafeMetadata')).toBe(false);
+  });
+
+  it('does not pass appearance prop to child element', () => {
+    const { container } = render(
+      <SignUpButton
+        mode='modal'
+        appearance={{ elements: { rootBox: 'test' } }}
+      >
+        <button type='button'>Sign up</button>
+      </SignUpButton>,
+    );
+
+    const button = container.querySelector('button');
+    expect(button?.hasAttribute('appearance')).toBe(false);
+  });
 });

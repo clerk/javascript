@@ -12,8 +12,10 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider
+      prefetchUI={process.env.NEXT_PUBLIC_CLERK_PREFETCH_UI === 'false' ? false : undefined}
       appearance={{
-        layout: {
+        options: {
+          showOptionalFields: true,
           // Icon buttons only contain accessible labels when they use an icon; our generated letter icon does not have
           // an accessible label. Using the "blockButton" variant ensures that the button contains a visible label that
           // can be selected by a Playwright selector.

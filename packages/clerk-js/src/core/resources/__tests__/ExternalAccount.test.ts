@@ -9,6 +9,8 @@ describe('External account', () => {
     const externalAccountJSON = {
       object: 'external_account',
       id: targetId,
+      provider_user_id: 'test_provider_user_id',
+      identification_id: 'test_identification_id',
     };
 
     // @ts-ignore
@@ -35,6 +37,8 @@ describe('External account', () => {
       object: 'external_account',
       id: targetId,
       deleted: true,
+      provider_user_id: 'test_provider_user_id',
+      identification_id: 'test_identification_id',
     };
 
     // @ts-ignore

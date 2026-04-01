@@ -1,6 +1,6 @@
 {
   "name": "@clerk/tanstack-react-start",
-  "version": "0.26.5",
+  "version": "1.0.8",
   "description": "Clerk SDK for TanStack React Start",
   "keywords": [
     "clerk",
@@ -43,10 +43,15 @@
       "types": "./dist/webhooks.d.ts",
       "default": "./dist/webhooks.js"
     },
+    "./legacy": {
+      "types": "./dist/legacy.d.ts",
+      "default": "./dist/legacy.js"
+    },
     "./experimental": {
       "types": "./dist/experimental.d.ts",
       "default": "./dist/experimental.js"
     },
+    "./types": "./dist/types/index.d.ts",
     "./package.json": "./package.json"
   },
   "main": "dist/index.js",
@@ -63,36 +68,34 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "pnpm dev -- --env.publish",
+    "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile esm-only",
     "lint:publint": "publint",
-    "publish:local": "pnpm yalc push --replace --sig",
     "test": "vitest run",
     "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
-    "@clerk/clerk-react": "workspace:^",
+    "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@tanstack/react-router": "1.132.0",
-    "@tanstack/react-start": "1.132.0",
+    "@tanstack/react-router": "1.157.16",
+    "@tanstack/react-start": "1.157.16",
     "esbuild-plugin-file-path-extensions": "^2.1.4"
   },
   "peerDependencies": {
-    "@tanstack/react-router": "^1.132.0",
-    "@tanstack/react-start": "^1.132.0",
+    "@tanstack/react-router": "^1.157.0",
+    "@tanstack/react-start": "^1.157.0",
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

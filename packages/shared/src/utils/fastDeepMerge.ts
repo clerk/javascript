@@ -1,3 +1,6 @@
+// Keys that could lead to prototype pollution attacks
+const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
 /**
  * Merges 2 objects without creating new object references
  * The merged props will appear on the `target` object
@@ -12,12 +15,16 @@ export const fastDeepMergeAndReplace = (
   }
 
   for (const key in source) {
+    // Skip dangerous keys to prevent prototype pollution
+    if (DANGEROUS_KEYS.has(key)) {
+      continue;
+    }
     if (Object.prototype.hasOwnProperty.call(source, key) && source[key] !== null && typeof source[key] === `object`) {
       if (target[key] === undefined) {
         target[key] = new (Object.getPrototypeOf(source[key]).constructor)();
       }
       fastDeepMergeAndReplace(source[key], target[key]);
-    } else if (Object.prototype.hasOwnProperty.call(source, key)) {
+    } else if (Object.prototype.hasOwnProperty.call(source, key) && source[key] !== undefined) {
       target[key] = source[key];
     }
   }
@@ -32,6 +39,10 @@ export const fastDeepMergeAndKeep = (
   }
 
   for (const key in source) {
+    // Skip dangerous keys to prevent prototype pollution
+    if (DANGEROUS_KEYS.has(key)) {
+      continue;
+    }
     if (Object.prototype.hasOwnProperty.call(source, key) && source[key] !== null && typeof source[key] === `object`) {
       if (target[key] === undefined) {
         target[key] = new (Object.getPrototypeOf(source[key]).constructor)();

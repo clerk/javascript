@@ -1,12 +1,13 @@
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { UseSessionReturn } from '../../types';
-import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useSessionContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
+import { useSessionBase } from './base/useSessionBase';
 
 type UseSession = () => UseSessionReturn;
 
 const hookName = `useSession`;
 /**
- * The `useSession()` hook provides access to the current user's [`Session`](https://clerk.com/docs/reference/javascript/session) object, as well as helpers for setting the active session.
+ * The `useSession()` hook provides access to the current user's [`Session`](https://clerk.com/docs/reference/objects/session) object, as well as helpers for setting the active session.
  *
  * @unionReturnHeadings
  * ["Initialization", "Signed out", "Signed in"]
@@ -23,7 +24,7 @@ const hookName = `useSession`;
  * <Tab>
  *
  * ```tsx {{ filename: 'src/Home.tsx' }}
- * import { useSession } from '@clerk/clerk-react'
+ * import { useSession } from '@clerk/react'
  *
  * export default function Home() {
  *   const { isLoaded, session, isSignedIn } = useSession()
@@ -56,7 +57,7 @@ const hookName = `useSession`;
 export const useSession: UseSession = () => {
   useAssertWrappedByClerkProvider(hookName);
 
-  const session = useSessionContext();
+  const session = useSessionBase();
   const clerk = useClerkInstanceContext();
 
   clerk.telemetry?.record(eventMethodCalled(hookName));

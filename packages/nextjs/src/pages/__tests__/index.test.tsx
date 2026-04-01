@@ -17,51 +17,24 @@ describe('ClerkProvider', () => {
     });
   });
 
-  describe('Multi domain', () => {
+  describe('prefetchUI', () => {
     const defaultProps = { children: '' };
 
-    it('proxyUrl (primary app)', () => {
-      expectTypeOf({ ...defaultProps, proxyUrl: 'test' }).toMatchTypeOf<ClerkProviderProps>();
+    it('accepts false to disable UI prefetching', () => {
+      expectTypeOf({ ...defaultProps, prefetchUI: false as const }).toMatchTypeOf<ClerkProviderProps>();
     });
 
-    it('proxyUrl + isSatellite (satellite app)', () => {
-      expectTypeOf({ ...defaultProps, proxyUrl: 'test', isSatellite: true }).toMatchTypeOf<ClerkProviderProps>();
-    });
-
-    it('domain + isSatellite (satellite app)', () => {
-      expectTypeOf({ ...defaultProps, domain: 'test', isSatellite: true }).toMatchTypeOf<ClerkProviderProps>();
-    });
-
-    it('only domain is not allowed', () => {
-      expectTypeOf({ ...defaultProps, domain: 'test' }).not.toMatchTypeOf<ClerkProviderProps>();
-    });
-
-    it('only isSatellite is not allowed', () => {
-      expectTypeOf({ ...defaultProps, isSatellite: true }).not.toMatchTypeOf<ClerkProviderProps>();
-    });
-
-    it('proxyUrl + domain is not allowed', () => {
-      expectTypeOf({ ...defaultProps, proxyUrl: 'test', domain: 'test' }).not.toMatchTypeOf<ClerkProviderProps>();
-    });
-
-    it('proxyUrl + domain + isSatellite is not allowed', () => {
-      expectTypeOf({
-        ...defaultProps,
-        proxyUrl: 'test',
-        domain: 'test',
-        isSatellite: true,
-      }).not.toMatchTypeOf<ClerkProviderProps>();
+    it('accepts undefined for default UI prefetching', () => {
+      expectTypeOf({ ...defaultProps, prefetchUI: undefined }).toMatchTypeOf<ClerkProviderProps>();
     });
   });
 
-  describe('clerkJSVariant', () => {
-    const defaultProps = { children: '' };
-
-    it('is either headless or empty', () => {
-      expectTypeOf({ ...defaultProps, clerkJSVariant: 'headless' as const }).toMatchTypeOf<ClerkProviderProps>();
-      expectTypeOf({ ...defaultProps, clerkJSVariant: '' as const }).toMatchTypeOf<ClerkProviderProps>();
-      expectTypeOf({ ...defaultProps, clerkJSVariant: undefined }).toMatchTypeOf<ClerkProviderProps>();
-      expectTypeOf({ ...defaultProps, clerkJSVariant: 'test' }).not.toMatchTypeOf<ClerkProviderProps>();
+  describe('internal script props', () => {
+    it('does not expose internal script props', () => {
+      expectTypeOf<ClerkProviderProps>().not.toHaveProperty('__internal_clerkUIUrl');
+      expectTypeOf<ClerkProviderProps>().not.toHaveProperty('__internal_clerkJSUrl');
+      expectTypeOf<ClerkProviderProps>().not.toHaveProperty('__internal_clerkUIVersion');
+      expectTypeOf<ClerkProviderProps>().not.toHaveProperty('__internal_clerkJSVersion');
     });
   });
 

@@ -1,3 +1,5 @@
+import type { InternalClerkScriptProps } from '@clerk/shared/types';
+
 import { getPublicEnvVariables } from '../utils/env';
 import type { TanstackStartClerkProviderProps } from './types';
 
@@ -5,9 +7,12 @@ type TanStackProviderAndInitialProps = Omit<TanstackStartClerkProviderProps, 'ch
 
 export const pickFromClerkInitState = (
   clerkInitState: any,
-): TanStackProviderAndInitialProps & {
-  clerkSsrState: any;
-} => {
+): TanStackProviderAndInitialProps &
+  InternalClerkScriptProps & {
+    clerkSsrState: any;
+    __keylessClaimUrl?: string;
+    __keylessApiKeysUrl?: string;
+  } => {
   const {
     __clerk_ssr_state,
     __publishableKey,
@@ -16,16 +21,19 @@ export const pickFromClerkInitState = (
     __isSatellite,
     __signInUrl,
     __signUpUrl,
-    __afterSignInUrl,
-    __afterSignUpUrl,
     __clerkJSUrl,
     __clerkJSVersion,
+    __clerkUIUrl,
+    __clerkUIVersion,
     __telemetryDisabled,
     __telemetryDebug,
     __signInForceRedirectUrl,
     __signUpForceRedirectUrl,
     __signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl,
+    __keylessClaimUrl,
+    __keylessApiKeysUrl,
+    __prefetchUI,
   } = clerkInitState || {};
 
   return {
@@ -36,10 +44,11 @@ export const pickFromClerkInitState = (
     isSatellite: !!__isSatellite,
     signInUrl: __signInUrl,
     signUpUrl: __signUpUrl,
-    afterSignInUrl: __afterSignInUrl,
-    afterSignUpUrl: __afterSignUpUrl,
-    clerkJSUrl: __clerkJSUrl,
-    clerkJSVersion: __clerkJSVersion,
+    __internal_clerkJSUrl: __clerkJSUrl,
+    __internal_clerkJSVersion: __clerkJSVersion,
+    __internal_clerkUIUrl: __clerkUIUrl,
+    __internal_clerkUIVersion: __clerkUIVersion,
+    prefetchUI: __prefetchUI,
     telemetry: {
       disabled: __telemetryDisabled,
       debug: __telemetryDebug,
@@ -48,22 +57,46 @@ export const pickFromClerkInitState = (
     signUpForceRedirectUrl: __signUpForceRedirectUrl,
     signInFallbackRedirectUrl: __signInFallbackRedirectUrl,
     signUpFallbackRedirectUrl: __signUpFallbackRedirectUrl,
+    __keylessClaimUrl,
+    __keylessApiKeysUrl,
   };
 };
 
 export const mergeWithPublicEnvs = (restInitState: any) => {
+  const envVars = getPublicEnvVariables();
   return {
     ...restInitState,
-    publishableKey: restInitState.publishableKey || getPublicEnvVariables().publishableKey,
-    domain: restInitState.domain || getPublicEnvVariables().domain,
-    isSatellite: restInitState.isSatellite || getPublicEnvVariables().isSatellite,
-    signInUrl: restInitState.signInUrl || getPublicEnvVariables().signInUrl,
-    signUpUrl: restInitState.signUpUrl || getPublicEnvVariables().signUpUrl,
-    afterSignInUrl: restInitState.afterSignInUrl || getPublicEnvVariables().afterSignInUrl,
-    afterSignUpUrl: restInitState.afterSignUpUrl || getPublicEnvVariables().afterSignUpUrl,
-    clerkJSUrl: restInitState.clerkJSUrl || getPublicEnvVariables().clerkJsUrl,
-    clerkJSVersion: restInitState.clerkJSVersion || getPublicEnvVariables().clerkJsVersion,
+    publishableKey: restInitState.publishableKey || envVars.publishableKey,
+    domain: restInitState.domain || envVars.domain,
+    isSatellite: restInitState.isSatellite || envVars.isSatellite,
+    signInUrl: restInitState.signInUrl || envVars.signInUrl,
+    signUpUrl: restInitState.signUpUrl || envVars.signUpUrl,
+    __internal_clerkJSUrl: restInitState.__internal_clerkJSUrl || envVars.clerkJsUrl,
+    __internal_clerkJSVersion: restInitState.__internal_clerkJSVersion || envVars.clerkJsVersion,
+    __internal_clerkUIUrl: restInitState.__internal_clerkUIUrl || envVars.clerkUIUrl,
+    __internal_clerkUIVersion: restInitState.__internal_clerkUIVersion || envVars.clerkUIVersion,
     signInForceRedirectUrl: restInitState.signInForceRedirectUrl,
-    clerkJSVariant: restInitState.clerkJSVariant || getPublicEnvVariables().clerkJsVariant,
+    prefetchUI: restInitState.prefetchUI ?? envVars.prefetchUI,
   };
 };
+
+export type ParsedNavigationUrl = {
+  to: string;
+  search?: Record<string, string>;
+  hash?: string;
+};
+
+/**
+ * Parses a URL string into TanStack Router navigation options.
+ * TanStack Router doesn't parse query strings from the `to` parameter,
+ * so we need to extract pathname, search params, and hash separately.
+ */
+export function parseUrlForNavigation(to: string, baseUrl: string): ParsedNavigationUrl {
+  const url = new URL(to, baseUrl);
+  const searchParams = Object.fromEntries(url.searchParams);
+  return {
+    to: url.pathname,
+    search: Object.keys(searchParams).length > 0 ? searchParams : undefined,
+    hash: url.hash ? url.hash.slice(1) : undefined,
+  };
+}

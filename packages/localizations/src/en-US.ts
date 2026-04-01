@@ -1,10 +1,15 @@
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copy & Close',
+      formHint: "For security reasons, we won't allow you to view it again later.",
+      formTitle: 'Copy your "{{name}}" API Key now',
+    },
     createdAndExpirationStatus__expiresOn:
       "Created {{ createdDate | shortDate('en-US') }} • Expires {{ expiresDate | longDate('en-US') }}",
     createdAndExpirationStatus__never: "Created {{ createdDate | shortDate('en-US') }} • Never expires",
@@ -64,6 +69,7 @@ export const enUS: LocalizationResource = {
     availableFeatures: 'Available features',
     billedAnnually: 'Billed annually',
     billedMonthlyOnly: 'Only billed monthly',
+    billedAnnuallyOnly: 'Only billed annually',
     cancelFreeTrial: 'Cancel free trial',
     cancelFreeTrialAccessUntil:
       "Your trial will stay active until {{ date | longDate('en-US') }}. After that, you'll lose access to trial features. You won't be charged.",
@@ -104,7 +110,10 @@ export const enUS: LocalizationResource = {
       totalDueAfterTrial: 'Total Due after trial ends in {{days}} days',
     },
     credit: 'Credit',
+    prorationCredit: 'Prorated credit',
+    accountCredit: 'Account credit',
     creditRemainder: 'Credit for the remainder of your current subscription.',
+    payerCreditRemainder: 'Credit from account balance.',
     defaultFreePlanActive: "You're currently on the Free plan",
     free: 'Free',
     getStarted: 'Get started',
@@ -113,6 +122,8 @@ export const enUS: LocalizationResource = {
     manage: 'Manage',
     manageSubscription: 'Manage subscription',
     month: 'Month',
+    monthAbbreviation: 'mo',
+    monthPerUnit: 'Month per {{unitName}}',
     monthly: 'Monthly',
     pastDue: 'Past due',
     pay: 'Pay {{amount}}',
@@ -135,8 +146,22 @@ export const enUS: LocalizationResource = {
     pricingTable: {
       billingCycle: 'Billing cycle',
       included: 'Included',
+      seatCost: {
+        freeUpToSeats: 'Free up to {{endsAfterBlock}} seats',
+        upToSeats: 'Up to {{endsAfterBlock}} seats',
+        perSeat: '{{feePerBlockAmount}}/{{periodAbbreviation}} per seat',
+        includedSeats: '{{includedSeats}} seats included',
+        additionalSeats: '({{additionalTierFeePerBlockAmount}}/{{periodAbbreviation}} for additional)',
+        unlimitedSeats: 'Unlimited seats',
+        tooltip: {
+          freeForUpToSeats: 'Free for up to {{endsAfterBlock}} seats.',
+          additionalSeatsEach: 'Additional seats are {{feePerBlockAmount}}/{{period}} each.',
+          firstSeatsIncludedInPlan: 'First {{endsAfterBlock}} seats are included in the plan.',
+        },
+      },
     },
     reSubscribe: 'Resubscribe',
+    seats: 'Seats',
     seeAllFeatures: 'See all features',
     startFreeTrial: 'Start free trial',
     startFreeTrial__days: 'Start {{days}}-day free trial',
@@ -167,6 +192,8 @@ export const enUS: LocalizationResource = {
     viewFeatures: 'View features',
     viewPayment: 'View payment',
     year: 'Year',
+    yearAbbreviation: 'yr',
+    yearPerUnit: 'Year per {{unitName}}',
   },
   createOrganization: {
     formButtonSubmit: 'Create organization',
@@ -212,9 +239,11 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationName: 'Organization name',
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'Enter your password',
+  formFieldInputPlaceholder__signUpPassword: 'Create a password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
-  formFieldInputPlaceholder__username: undefined,
+  formFieldInputPlaceholder__username: 'Enter your username',
   formFieldInput__emailAddress_format: 'Example format: name@example.com',
+  formFieldLabel__apiKey: 'API key',
   formFieldLabel__apiKeyDescription: 'Description',
   formFieldLabel__apiKeyExpiration: 'Expiration',
   formFieldLabel__apiKeyName: 'Secret key name',
@@ -307,6 +336,7 @@ export const enUS: LocalizationResource = {
         empty: 'No statements to display',
         itemCaption__paidForPlan: 'Paid for {{plan}} {{period}} plan',
         itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
+        itemCaption__payerCredit: 'Credit from account balance',
         itemCaption__subscribedAndPaidForPlan: 'Subscribed and paid for {{plan}} {{period}} plan',
         notFound: 'Statement not found',
         tableHeader__amount: 'Amount',
@@ -355,6 +385,12 @@ export const enUS: LocalizationResource = {
         tableHeader__role: 'Role',
         tableHeader__user: 'User',
       },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle: 'We are updating the available roles. Once that’s done, you’ll be able to update roles again.',
+          title: 'Roles are temporarily locked',
+        },
+      },
       detailsTitle__emptyRow: 'No members to display',
       invitationsTab: {
         autoInvitations: {
@@ -398,6 +434,8 @@ export const enUS: LocalizationResource = {
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'You do not have permissions to manage billing for this organization.',
+        planMembershipLimitExceeded:
+          'Your organization has {{count}} members (including pending invitations). This plan only allows {{limit}} members.',
       },
       title: 'Plans',
     },
@@ -441,6 +479,7 @@ export const enUS: LocalizationResource = {
     start: {
       headerTitle__general: 'General',
       headerTitle__members: 'Members',
+      membershipSeatUsageLabel: '{{count}} of {{limit}} seats used',
       profileSection: {
         primaryButton: 'Update profile',
         title: 'Organization Profile',
@@ -604,6 +643,12 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       title: 'Check your email',
     },
+    emailCodeMfa: {
+      formTitle: 'Check your email',
+      resendButton: "Didn't receive a code? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -640,6 +685,12 @@ export const enUS: LocalizationResource = {
         titleNewTab: 'Signed in on other tab',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Use the verification link sent to your email',
+      resendButton: "Didn't receive a link? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your email',
+    },
     enterpriseConnections: {
       subtitle: 'Select the enterprise account with which you wish to continue.',
       title: 'Choose your enterprise account',
@@ -657,6 +708,8 @@ export const enUS: LocalizationResource = {
       label__alternativeMethods: 'Or, sign in with another method',
       title: 'Forgot Password?',
     },
+    newDeviceVerificationNotice:
+      "You're signing in from a new device. We're asking for verification to keep your account secure.",
     noAvailableMethods: {
       message: "Cannot proceed with sign in. There's no available authentication factor.",
       subtitle: 'An error occurred',
@@ -671,8 +724,14 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter the password associated with your account',
       title: 'Enter your password',
     },
+    passwordCompromised: {
+      title: 'Password compromised',
+    },
     passwordPwned: {
       title: 'Password compromised',
+    },
+    passwordUntrusted: {
+      title: 'Password untrusted',
     },
     phoneCode: {
       formTitle: 'Verification code',
@@ -720,6 +779,10 @@ export const enUS: LocalizationResource = {
       formTitle: 'Verification code',
       subtitle: 'To continue, please enter the verification code generated by your authenticator app',
       title: 'Two-step verification',
+    },
+    web3Solana: {
+      subtitle: 'Select a wallet below to sign in',
+      title: 'Sign in with Solana',
     },
   },
   signInEnterPasswordTitle: 'Enter your password',
@@ -813,15 +876,24 @@ export const enUS: LocalizationResource = {
       title: 'Create your account',
       titleCombined: 'Create your account',
     },
+    web3Solana: {
+      subtitle: 'Select a wallet below to sign up',
+      title: 'Sign up with Solana',
+    },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'An organization already exists for the detected company name ({{organizationName}}) and {{organizationDomain}}. Join by invitation.',
+    },
     chooseOrganization: {
       action__createOrganization: 'Create new organization',
       action__invitationAccept: 'Join',
       action__suggestionsAccept: 'Request to join',
       subtitle: 'Join an existing organization or create a new one',
+      subtitle__createOrganizationDisabled: 'Join an existing organization',
       suggestionsAcceptedLabel: 'Pending approval',
       title: 'Choose an organization',
     },
@@ -835,21 +907,110 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter your organization details to continue',
       title: 'Setup your organization',
     },
+    organizationCreationDisabled: {
+      subtitle: 'Contact your organization admin for an invitation.',
+      title: 'You must belong to an organization',
+    },
     signOut: {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: 'Reset Password',
+    signOut: {
+      actionLink: 'Sign out',
+      actionText: 'Signed in as {{identifier}}',
+    },
+    subtitle: 'Your account requires a new password before you can continue',
+    title: 'Reset your password',
+  },
+  taskSetupMfa: {
+    badge: 'Two-step verification setup',
+    signOut: {
+      actionLink: 'Sign out',
+      actionText: 'Signed in as {{identifier}}',
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: 'Continue',
+        infoText:
+          'A text message containing a verification code will be sent to this phone number. Message and data rates may apply.',
+      },
+      addPhoneNumber: 'Add phone number',
+      cancel: 'Cancel',
+      subtitle: 'Choose phone number you want to use for SMS code two-step verification',
+      success: {
+        finishButton: 'Continue',
+        message1:
+          'Two-step verification is now enabled. When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+        message2:
+          'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+        title: 'SMS code verification enabled',
+      },
+      title: 'Add SMS code verification',
+      verifyPhone: {
+        formButtonPrimary: 'Continue',
+        formTitle: 'Verification code',
+        resendButton: "Didn't receive a code? Resend",
+        subtitle: 'Enter the verification code sent to',
+        title: 'Verify your phone number',
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: 'SMS code',
+        totp: 'Authenticator application',
+      },
+      subtitle: 'Choose which method you prefer to protect your account with an extra layer of security',
+      title: 'Set up two-step verification',
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: 'Scan QR code instead',
+        buttonUnableToScan__nonPrimary: "Can't scan QR code?",
+        formButtonPrimary: 'Continue',
+        formButtonReset: 'Cancel',
+        infoText__ableToScan:
+          'Set up a new sign-in method in your authenticator app and scan the following QR code to link it to your account.',
+        infoText__unableToScan: 'Set up a new sign-in method in your authenticator and enter the Key provided below.',
+        inputLabel__unableToScan1:
+          'Make sure Time-based or One-time passwords is enabled, then finish linking your account.',
+      },
+      success: {
+        finishButton: 'Continue',
+        message1:
+          'Two-step verification is now enabled. When signing in, you will need to enter a verification code from this authenticator as an additional step.',
+        message2:
+          'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+        title: 'Authenticator application verification enabled',
+      },
+      title: 'Add authenticator application',
+      verifyTotp: {
+        formButtonPrimary: 'Continue',
+        formButtonReset: 'Cancel',
+        formTitle: 'Verification code',
+        subtitle: 'Enter verification code generated by your authenticator',
+        title: 'Add authenticator application',
+      },
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
+    api_key_name_already_exists: 'API Key name already exists.',
+    api_key_usage_exceeded: 'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
+    avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+    avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
     captcha_invalid: undefined,
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: undefined,
+    form_new_password_matches_current: 'New password cannot be the same as the current password.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: undefined,
     form_param_format_invalid__phone_number: undefined,
@@ -861,23 +1022,29 @@ export const enUS: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
     form_password_not_strong_enough: 'Your password is not strong enough.',
+    form_password_or_identifier_incorrect: undefined,
     form_password_pwned:
       'This password has been found as part of a breach and can not be used, please try another password instead.',
     form_password_pwned__sign_in:
       'This password has been found as part of a breach and can not be used, please reset your password.',
     form_password_size_in_bytes_exceeded: undefined,
+    form_password_untrusted__sign_in:
+      'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'Your username must be between {{min_length}} and {{max_length}} characters long.',
+    form_username_needs_non_number_char: 'Your username must contain at least one non-numeric character.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
-    organization_membership_quota_exceeded: undefined,
+    organization_membership_quota_exceeded:
+      'You have reached your limit of organization memberships, including outstanding invitations.',
     organization_minimum_permissions_needed: undefined,
     organization_not_found_or_unauthorized:
       'You are no longer a member of this organization. Please choose or create another one.',
@@ -900,6 +1067,9 @@ export const enUS: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
+    web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
+    web3_solana_signature_generation_failed:
+      'An error occurred while generating the signature. Please try again to continue.',
     zxcvbn: {
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',
       goodPassword: 'Your password meets all the necessary requirements.',
@@ -1004,6 +1174,7 @@ export const enUS: LocalizationResource = {
         empty: 'No statements to display',
         itemCaption__paidForPlan: 'Paid for {{plan}} {{period}} plan',
         itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
+        itemCaption__payerCredit: 'Credit from account balance',
         itemCaption__subscribedAndPaidForPlan: 'Subscribed and paid for {{plan}} {{period}} plan',
         notFound: 'Statement not found',
         tableHeader__amount: 'Amount',
@@ -1214,6 +1385,7 @@ export const enUS: LocalizationResource = {
         title: 'Email addresses',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Connect account',
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Profile details',
@@ -1270,6 +1442,10 @@ export const enUS: LocalizationResource = {
         detailsAction__nonPrimary: 'Set as primary',
         primaryButton: 'Connect wallet',
         title: 'Web3 wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Select a Solana wallet to connect to your account.',
+          title: 'Add a Solana wallet',
+        },
       },
     },
     usernamePage: {
@@ -1304,5 +1480,11 @@ export const enUS: LocalizationResource = {
       subtitle: 'We’ll be in touch when your spot is ready',
       title: 'Thanks for joining the waitlist!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Connect with {{walletName}}',
+    continue: 'Continue with {{walletName}}',
+    noneAvailable:
+      'No Solana Web3 wallets detected. Please install a Web3 supported {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

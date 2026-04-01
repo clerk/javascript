@@ -158,6 +158,39 @@ describe('createClerkRequest', () => {
       const req2 = new Request('http://localhost:3000////path');
       expect(createClerkRequest(req2).clerkUrl.toString()).toBe('http://localhost:3000////path');
     });
+
+    it('handles malicious host header with script injection gracefully', () => {
+      const req = new Request('http://localhost:3000/path', {
+        headers: {
+          'x-forwarded-host': 'z2cgvm.xfh"></script><script>alert(document.domain);</script>/',
+          'x-forwarded-proto': 'https',
+        },
+      });
+      expect(() => createClerkRequest(req)).not.toThrow();
+      expect(createClerkRequest(req).clerkUrl.toString()).toBe('http://localhost:3000/path');
+    });
+
+    it('handles malicious host header with invalid characters gracefully', () => {
+      const req = new Request('http://localhost:3000/path?foo=bar', {
+        headers: {
+          'x-forwarded-host': '<invalid>host',
+          'x-forwarded-proto': 'https',
+        },
+      });
+      expect(() => createClerkRequest(req)).not.toThrow();
+      expect(createClerkRequest(req).clerkUrl.toString()).toBe('http://localhost:3000/path?foo=bar');
+    });
+
+    it('handles empty forwarded headers gracefully', () => {
+      const req = new Request('http://localhost:3000/path', {
+        headers: {
+          'x-forwarded-host': '',
+          'x-forwarded-proto': '',
+        },
+      });
+      expect(() => createClerkRequest(req)).not.toThrow();
+      expect(createClerkRequest(req).clerkUrl.toString()).toBe('http://localhost:3000/path');
+    });
   });
 
   describe('toJSON', () => {
@@ -169,6 +202,41 @@ describe('createClerkRequest', () => {
       expect(json.headers).toBe('{}');
       expect(json.clerkUrl).toBe('http://localhost:3000/');
       expect(json.cookies).toBe('{}');
+    });
+  });
+
+  describe('duck typing detection (instanceof workaround)', () => {
+    it('should create a new ClerkRequest from a regular Request', () => {
+      const regularRequest = new Request('http://localhost:3000');
+      const clerkRequest = createClerkRequest(regularRequest);
+
+      expect(clerkRequest).not.toBe(regularRequest);
+      expect(clerkRequest.clerkUrl).toBeDefined();
+      expect(clerkRequest.cookies).toBeDefined();
+    });
+
+    it('should return an existing ClerkRequest instance unchanged', () => {
+      const firstClerkRequest = createClerkRequest(new Request('http://localhost:3000'));
+      const secondClerkRequest = createClerkRequest(firstClerkRequest);
+
+      expect(secondClerkRequest).toBe(firstClerkRequest);
+    });
+
+    it('should work correctly with bundler-scoped Request classes', () => {
+      // Simulate bundler creating a scoped Request class (like Request$1)
+      class RequestScoped extends Request {
+        constructor(input: RequestInfo | URL, init?: RequestInit) {
+          super(input, init);
+        }
+      }
+
+      const scopedRequest = new RequestScoped('http://localhost:3000');
+      const clerkRequest = createClerkRequest(scopedRequest);
+
+      // Should create a new ClerkRequest even though scopedRequest is a different Request class
+      expect(clerkRequest).not.toBe(scopedRequest);
+      expect(clerkRequest.clerkUrl).toBeDefined();
+      expect(clerkRequest.cookies).toBeDefined();
     });
   });
 });

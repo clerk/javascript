@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const idID: LocalizationResource = {
   locale: 'id-ID',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Salin & Tutup',
+      formHint: 'Untuk alasan keamanan, kami tidak akan mengizinkan Anda untuk melihatnya lagi nanti.',
+      formTitle: 'Salin kunci API "{{name}}" Anda sekarang',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const idID: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'Kunci API',
+  formFieldLabel__apiKeyDescription: 'Deskripsi',
+  formFieldLabel__apiKeyExpiration: 'Kedaluwarsa',
+  formFieldLabel__apiKeyName: 'Nama kunci rahasia',
   formFieldLabel__automaticInvitations: 'Aktifkan undangan otomatis untuk domain ini',
   formFieldLabel__backupCode: 'Kode cadangan',
   formFieldLabel__confirmDeletion: 'Konfirmasi',
@@ -358,6 +364,13 @@ export const idID: LocalizationResource = {
         tableHeader__joined: 'Bergabung',
         tableHeader__role: 'Peran',
         tableHeader__user: 'Pengguna',
+      },
+      alerts: {
+        roleSetMigrationInProgress: {
+          subtitle:
+            'Kami sedang memperbarui peran yang tersedia. Setelah selesai, Anda akan dapat memperbarui peran lagi.',
+          title: 'Peran untuk sementara terkunci',
+        },
       },
       detailsTitle__emptyRow: 'Tidak ada anggota untuk ditampilkan',
       invitationsTab: {
@@ -608,6 +621,12 @@ export const idID: LocalizationResource = {
       subtitle: 'untuk melanjutkan ke {{applicationName}}',
       title: 'Periksa email Anda',
     },
+    emailCodeMfa: {
+      formTitle: 'Periksa email Anda',
+      resendButton: 'Tidak menerima kode? Kirim ulang',
+      subtitle: 'untuk melanjutkan ke {{applicationName}}',
+      title: 'Periksa email Anda',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -644,6 +663,12 @@ export const idID: LocalizationResource = {
         titleNewTab: 'Masuk di tab lain',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Gunakan tautan verifikasi yang dikirim ke email Anda',
+      resendButton: 'Tidak menerima tautan? Kirim ulang',
+      subtitle: 'untuk melanjutkan ke {{applicationName}}',
+      title: 'Periksa email Anda',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -661,6 +686,8 @@ export const idID: LocalizationResource = {
       label__alternativeMethods: 'Atau, masuk dengan metode lain',
       title: 'Lupa Kata Sandi?',
     },
+    newDeviceVerificationNotice:
+      'Anda masuk dari perangkat baru. Kami meminta verifikasi untuk menjaga keamanan akun Anda.',
     noAvailableMethods: {
       message: 'Tidak dapat melanjutkan masuk. Tidak ada faktor autentikasi yang tersedia.',
       subtitle: 'Terjadi kesalahan',
@@ -676,8 +703,14 @@ export const idID: LocalizationResource = {
       subtitle: 'Masukkan kata sandi yang terkait dengan akun Anda',
       title: 'Masukkan kata sandi Anda',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Kata sandi terkompromi',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Kode verifikasi',
@@ -725,6 +758,10 @@ export const idID: LocalizationResource = {
       formTitle: 'Kode verifikasi',
       subtitle: 'Untuk melanjutkan, masukkan kode verifikasi yang dihasilkan oleh aplikasi autentikator Anda',
       title: 'Verifikasi dua langkah',
+    },
+    web3Solana: {
+      subtitle: 'Pilih dompet di bawah untuk masuk',
+      title: 'Masuk dengan Solana',
     },
   },
   signInEnterPasswordTitle: 'Masukkan kata sandi Anda',
@@ -820,44 +857,134 @@ export const idID: LocalizationResource = {
       title: 'Buat akun Anda',
       titleCombined: 'Buat akun Anda',
     },
+    web3Solana: {
+      subtitle: 'Pilih dompet di bawah untuk mendaftar',
+      title: 'Daftar dengan Solana',
+    },
   },
   socialButtonsBlockButton: 'Lanjutkan dengan {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
+    alerts: {
+      organizationAlreadyExists:
+        'Organisasi sudah ada untuk nama perusahaan yang terdeteksi ({{organizationName}}) dan {{organizationDomain}}. Bergabung melalui undangan.',
+    },
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Buat organisasi baru',
+      action__invitationAccept: 'Bergabung',
+      action__suggestionsAccept: 'Minta bergabung',
+      subtitle: 'Bergabung dengan organisasi yang ada atau buat yang baru',
+      subtitle__createOrganizationDisabled: 'Bergabung dengan organisasi yang ada',
+      suggestionsAcceptedLabel: 'Menunggu persetujuan',
+      title: 'Pilih organisasi',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Batal',
+      formButtonSubmit: 'Lanjutkan',
+      formFieldInputPlaceholder__name: 'Organisasi Saya',
+      formFieldInputPlaceholder__slug: 'organisasi-saya',
+      formFieldLabel__name: 'Nama',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Masukkan detail organisasi Anda untuk melanjutkan',
+      title: 'Atur organisasi Anda',
     },
+    organizationCreationDisabled: {
+      subtitle: 'Hubungi admin organisasi Anda untuk mendapatkan undangan.',
+      title: 'Anda harus menjadi anggota organisasi',
+    },
+    signOut: {
+      actionLink: 'Keluar',
+      actionText: 'Masuk sebagai {{identifier}}',
+    },
+  },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
+    title: undefined,
+  },
+  taskSetupMfa: {
+    badge: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    smsCode: {
+      addPhone: {
+        formButtonPrimary: undefined,
+        infoText: undefined,
+      },
+      addPhoneNumber: undefined,
+      cancel: undefined,
+      subtitle: undefined,
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyPhone: {
+        formButtonPrimary: undefined,
+        formTitle: undefined,
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
+    start: {
+      methodSelection: {
+        phoneCode: undefined,
+        totp: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpCode: {
+      addAuthenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+      },
+      success: {
+        finishButton: undefined,
+        message1: undefined,
+        message2: undefined,
+        title: undefined,
+      },
+      title: undefined,
+      verifyTotp: {
+        formButtonPrimary: undefined,
+        formButtonReset: undefined,
+        formTitle: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi anggota organisasi.',
+    avatar_file_size_exceeded: 'Ukuran file melebihi batas maksimum 10MB. Silakan pilih file yang lebih kecil.',
+    avatar_file_type_invalid: 'Jenis file tidak didukung. Silakan unggah gambar JPG, PNG, GIF, atau WEBP.',
     captcha_invalid:
       'Pendaftaran gagal karena validasi keamanan gagal. Silakan muat ulang halaman untuk mencoba lagi atau hubungi dukungan untuk bantuan lebih lanjut.',
     captcha_unavailable:
       'Pendaftaran gagal karena validasi bot gagal. Silakan muat ulang halaman untuk mencoba lagi atau hubungi dukungan untuk bantuan lebih lanjut.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Layanan email sementara tidak didukung. Silakan gunakan alamat email reguler Anda untuk membuat akun.',
     form_identifier_exists__email_address: 'Alamat email ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__phone_number: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_not_found: 'Kami tidak dapat menemukan akun dengan detail tersebut.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Alamat email harus berupa alamat email yang valid.',
     form_param_format_invalid__phone_number: 'Nomor telepon harus dalam format internasional yang valid',
@@ -869,18 +996,22 @@ export const idID: LocalizationResource = {
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
+    form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Kata sandi Anda tidak cukup kuat.',
+    form_password_or_identifier_incorrect: 'Kata sandi atau alamat email salah. Coba lagi atau gunakan metode lain.',
     form_password_pwned:
       'Kata sandi ini telah ditemukan sebagai bagian dari kebocoran data dan tidak dapat digunakan, silakan coba kata sandi lain.',
     form_password_pwned__sign_in:
       'Kata sandi ini telah ditemukan sebagai bagian dari kebocoran data dan tidak dapat digunakan, silakan reset kata sandi Anda.',
     form_password_size_in_bytes_exceeded:
       'Kata sandi Anda telah melebihi jumlah byte maksimum yang diizinkan, silakan persingkat atau hapus beberapa karakter khusus.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Kata Sandi Salah',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Nama pengguna Anda harus berisi setidaknya satu karakter non-numerik.',
     identification_deletion_failed: 'Anda tidak dapat menghapus identifikasi terakhir Anda.',
     not_allowed_access:
       "Alamat email atau nomor telepon tidak diizinkan untuk mendaftar. Ini mungkin disebabkan oleh penggunaan '+', '=', '#' atau '.' dalam alamat email Anda, penggunaan domain yang terhubung dengan layanan email sementara, atau pengecualian eksplisit. Jika Anda menganggap ini sebagai kesalahan, silakan hubungi dukungan.",
@@ -910,6 +1041,9 @@ export const idID: LocalizationResource = {
     phone_number_exists: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     session_exists: 'Anda sudah masuk.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Anda menolak permintaan tanda tangan. Silakan coba lagi untuk melanjutkan.',
+    web3_solana_signature_generation_failed:
+      'Terjadi kesalahan saat membuat tanda tangan. Silakan coba lagi untuk melanjutkan.',
     zxcvbn: {
       couldBeStronger: 'Kata sandi Anda berfungsi, tapi bisa lebih kuat. Coba tambahkan lebih banyak karakter.',
       goodPassword: 'Kata sandi Anda memenuhi semua persyaratan yang diperlukan.',
@@ -1214,6 +1348,7 @@ export const idID: LocalizationResource = {
         title: undefined,
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Hubungkan akun',
         title: undefined,
       },
       headerTitle__account: undefined,
@@ -1269,6 +1404,10 @@ export const idID: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: undefined,
         title: undefined,
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Pilih dompet Solana untuk dihubungkan ke akun Anda.',
+          title: 'Tambahkan dompet Solana',
+        },
       },
     },
     usernamePage: {
@@ -1303,5 +1442,11 @@ export const idID: LocalizationResource = {
       subtitle: 'Kami akan menghubungi ketika tempat Anda siap',
       title: 'Terima kasih telah bergabung dengan daftar tunggu!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Hubungkan dengan {{walletName}}',
+    continue: 'Lanjutkan dengan {{walletName}}',
+    noneAvailable:
+      'Tidak ada dompet Solana Web3 yang terdeteksi. Silakan instal {{ solanaWalletsLink || link("wallet extension") }} yang mendukung Web3.',
   },
 } as const;

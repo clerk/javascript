@@ -44,12 +44,7 @@ export { buildClerkProps } from './buildClerkProps';
 export { auth } from '../app-router/server/auth';
 export { currentUser } from '../app-router/server/currentUser';
 export { clerkMiddleware } from './clerkMiddleware';
-export type {
-  ClerkMiddlewareAuth,
-  ClerkMiddlewareSessionAuthObject,
-  ClerkMiddlewareAuthObject,
-  ClerkMiddlewareOptions,
-} from './clerkMiddleware';
+export type { ClerkMiddlewareAuth, ClerkMiddlewareSessionAuthObject, ClerkMiddlewareOptions } from './clerkMiddleware';
 
 /**
  * Re-export resource types from @clerk/backend
@@ -79,3 +74,14 @@ export type {
  * Utilities for reverification
  */
 export { reverificationErrorResponse, reverificationError } from '@clerk/backend/internal';
+
+/**
+ * Frontend API proxy exports
+ */
+export {
+  clerkFrontendApiProxy,
+  createFrontendApiProxyHandlers,
+  type FrontendApiProxyHandlers,
+  type FrontendApiProxyOptions,
+  type NextFrontendApiProxyOptions,
+} from './proxy';

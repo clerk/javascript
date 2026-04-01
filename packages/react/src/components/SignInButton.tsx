@@ -8,6 +8,10 @@ import { withClerk } from './withClerk';
 export const SignInButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<SignInButtonProps>>) => {
     const {
+      // @ts-expect-error - appearance is a valid prop for SignInProps & SignInButtonPropsModal
+      appearance,
+      getContainer,
+      component,
       signUpFallbackRedirectUrl,
       forceRedirectUrl,
       fallbackRedirectUrl,
@@ -33,7 +37,7 @@ export const SignInButton = withClerk(
       };
 
       if (mode === 'modal') {
-        return clerk.openSignIn({ ...opts, appearance: props.appearance });
+        return clerk.openSignIn({ ...opts, appearance, getContainer });
       }
       return clerk.redirectToSignIn({
         ...opts,

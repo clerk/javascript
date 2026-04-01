@@ -1,5 +1,6 @@
 import type { BillingPaymentResource, GetPaymentAttemptsParams } from '../../types';
 import { useClerkInstanceContext } from '../contexts';
+import { STABLE_KEYS } from '../stable-keys';
 import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
 /**
@@ -7,7 +8,7 @@ import { createBillingPaginatedHook } from './createBillingPaginatedHook';
  */
 export const usePaymentAttempts = createBillingPaginatedHook<BillingPaymentResource, GetPaymentAttemptsParams>({
   hookName: 'usePaymentAttempts',
-  resourceType: 'billing-payment-attempts',
+  resourceType: STABLE_KEYS.PAYMENT_ATTEMPTS_KEY,
   useFetcher: () => {
     const clerk = useClerkInstanceContext();
     if (clerk.loaded) {
@@ -16,3 +17,8 @@ export const usePaymentAttempts = createBillingPaginatedHook<BillingPaymentResou
     return undefined;
   },
 });
+
+/**
+ * @interface
+ */
+export type UsePaymentAttemptsReturn = ReturnType<typeof usePaymentAttempts>;

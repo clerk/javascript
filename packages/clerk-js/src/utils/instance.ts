@@ -1,4 +1,4 @@
-import { isDevOrStagingUrl } from './url';
+import { isDevOrStagingUrl } from '@clerk/shared/internal/clerk-js/url';
 
 const FRONTEND_API_DEV_OR_STG_REGEX = /^clerk\.([\w|-]+\.){2,4}(dev|com)$/i;
 

@@ -1,3 +1,6 @@
+/* eslint-disable  */
+// @ts-nocheck
+
 import type {
   AuthConfigJSON,
   ClientJSON,
@@ -9,7 +12,13 @@ import type {
   UserSettingsJSON,
 } from '@clerk/shared/types';
 
-import { containsAllOfType } from '../ui/utils/containsAllOf';
+/**
+ * Enforces that an array contains ALL keys of T
+ */
+const containsAllOfType =
+  <T>() =>
+  <U extends Readonly<T[]>>(array: U & ([T] extends [U[number]] ? unknown : 'Invalid')) =>
+    array;
 
 export const createBaseEnvironmentJSON = (): EnvironmentJSON => {
   return {
@@ -91,6 +100,9 @@ const createBaseOrganizationSettings = (): OrganizationSettingsJSON => {
     },
     slug: {
       disabled: true,
+    },
+    organization_creation_defaults: {
+      enabled: false,
     },
   } as unknown as OrganizationSettingsJSON;
 };

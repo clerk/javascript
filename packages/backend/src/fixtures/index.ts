@@ -33,6 +33,30 @@ export const mockJwtPayload = {
   sub: 'user_2GIpXOEpVyJw51rkZn9Kmnc6Sxr',
 };
 
+export const mockOAuthAccessTokenJwtPayload = {
+  ...mockJwtPayload,
+  iss: 'https://clerk.oauth.example.test',
+  sub: 'user_2vYVtestTESTtestTESTtestTESTtest',
+  client_id: 'client_2VTWUzvGC5UhdJCNx6xG1D98edc',
+  scope: 'read:foo write:bar',
+  jti: 'oat_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE',
+  exp: mockJwtPayload.iat + 300,
+  iat: mockJwtPayload.iat,
+  nbf: mockJwtPayload.iat - 10,
+};
+
+// M2M JWT payload for testing - distinguished by 'sub' claim starting with 'mch_'
+export const mockM2MJwtPayload = {
+  iss: 'https://clerk.m2m.example.test',
+  sub: 'mch_2vYVtestTESTtestTESTtestTESTtest',
+  aud: ['mch_1xxxxx', 'mch_2xxxxx'],
+  exp: mockJwtPayload.iat + 300,
+  iat: mockJwtPayload.iat,
+  nbf: mockJwtPayload.iat - 10,
+  jti: 'mt_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE',
+  scopes: 'mch_1xxxxx mch_2xxxxx',
+};
+
 export const mockRsaJwkKid = 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD';
 
 export const mockRsaJwk = {

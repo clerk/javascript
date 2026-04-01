@@ -6,6 +6,7 @@ import type { DisplayConfigJSON } from './displayConfig';
 import type {
   AuthConfigJSON,
   ClientJSON,
+  ClientTrustState,
   EmailAddressJSON,
   EnterpriseAccountConnectionJSON,
   EnterpriseAccountJSON,
@@ -17,8 +18,6 @@ import type {
   PasskeyJSON,
   PhoneNumberJSON,
   PublicUserDataJSON,
-  SamlAccountConnectionJSON,
-  SamlAccountJSON,
   SessionJSON,
   SignUpJSON,
   SignUpVerificationJSON,
@@ -29,7 +28,9 @@ import type {
   VerificationJSON,
   Web3WalletJSON,
 } from './json';
+import type { OrganizationCreationDefaultsJSON } from './organizationCreationDefaults';
 import type { OrganizationSettingsJSON } from './organizationSettings';
+import type { ProtectConfigJSON } from './protectConfig';
 import type { SignInJSON } from './signIn';
 import type { UserSettingsJSON } from './userSettings';
 import type { Nullable, Override } from './utils';
@@ -40,6 +41,7 @@ export type SignInJSONSnapshot = Override<
     first_factor_verification: VerificationJSONSnapshot;
     second_factor_verification: VerificationJSONSnapshot;
     user_data: UserDataJSONSnapshot;
+    client_trust_state?: ClientTrustState;
   }
 >;
 
@@ -76,7 +78,6 @@ export type UserJSONSnapshot = Override<
     passkeys: PasskeyJSONSnapshot[];
     enterprise_accounts: EnterpriseAccountJSONSnapshot[];
     phone_numbers: PhoneNumberJSONSnapshot[];
-    saml_accounts: SamlAccountJSONSnapshot[];
     web3_wallets: Web3WalletJSONSnapshot[];
   }
 >;
@@ -117,6 +118,8 @@ export type EnvironmentJSONSnapshot = EnvironmentJSON;
 
 export type DisplayConfigJSONSnapshot = DisplayConfigJSON;
 
+export type ProtectConfigJSONSnapshot = ProtectConfigJSON;
+
 export type EmailAddressJSONSnapshot = Override<
   EmailAddressJSON,
   {
@@ -141,6 +144,8 @@ export type OrganizationMembershipJSONSnapshot = OrganizationMembershipJSON;
 
 export type OrganizationSettingsJSONSnapshot = OrganizationSettingsJSON;
 
+export type OrganizationCreationDefaultsJSONSnapshot = OrganizationCreationDefaultsJSON;
+
 export type PasskeyJSONSnapshot = Override<PasskeyJSON, { verification: VerificationJSONSnapshot | null }>;
 
 export type PhoneNumberJSONSnapshot = Override<
@@ -149,15 +154,6 @@ export type PhoneNumberJSONSnapshot = Override<
     verification: VerificationJSONSnapshot;
   }
 >;
-
-export type SamlAccountJSONSnapshot = Override<
-  SamlAccountJSON,
-  {
-    verification: VerificationJSONSnapshot | null;
-  }
->;
-
-export type SamlAccountConnectionJSONSnapshot = SamlAccountConnectionJSON;
 
 export type SignUpVerificationsJSONSnapshot = Override<
   SignUpVerificationsJSON,

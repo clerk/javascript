@@ -1,20 +1,21 @@
 import autoPropsPlugin from '@vue.ts/tsx-auto-props/esbuild';
-import { defineConfig, type Options } from 'tsup';
+import { defineConfig } from 'tsup';
 import vuePlugin from 'unplugin-vue/esbuild';
 
 import { name, version } from './package.json';
 
-type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
+export default defineConfig(overrideOptions => {
+  const shouldPublish = !!overrideOptions.env?.publish;
 
-export default defineConfig(() => {
   return {
     clean: true,
-    entry: ['./src/index.ts', './src/experimental.ts', './src/internal.ts', './src/errors.ts'],
+    entry: ['./src/index.ts', './src/experimental.ts', './src/internal.ts', './src/errors.ts', './src/types/index.ts'],
     format: ['esm'],
     bundle: true,
     sourcemap: true,
     minify: false,
     dts: false,
+    onSuccess: shouldPublish ? 'pnpm build:dts && pkglab pub --ping' : 'pnpm build:dts',
     esbuildPlugins: [
       // Adds .vue files support
       vuePlugin(),

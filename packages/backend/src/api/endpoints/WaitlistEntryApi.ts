@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest } from '@clerk/types';
+import type { ClerkPaginationRequest } from '@clerk/shared/types';
 import { joinPaths } from 'src/util/path';
 
 import type { DeletedObject } from '../resources/DeletedObject';
@@ -24,6 +24,8 @@ type WaitlistEntryCreateParams = {
   notify?: boolean;
 };
 
+type WaitlistEntryBulkCreateParams = Array<WaitlistEntryCreateParams>;
+
 type WaitlistEntryInviteParams = {
   /**
    * When true, do not error if an invitation already exists. Default: false.
@@ -37,7 +39,7 @@ export class WaitlistEntryAPI extends AbstractAPI {
    * @param params Optional parameters (e.g., `query`, `status`, `orderBy`).
    */
   public async list(params: WaitlistEntryListParams = {}) {
-    return this.request<PaginatedResourceResponse<WaitlistEntry>>({
+    return this.request<PaginatedResourceResponse<WaitlistEntry[]>>({
       method: 'GET',
       path: basePath,
       queryParams: params,
@@ -52,6 +54,18 @@ export class WaitlistEntryAPI extends AbstractAPI {
     return this.request<WaitlistEntry>({
       method: 'POST',
       path: basePath,
+      bodyParams: params,
+    });
+  }
+
+  /**
+   * Bulk create waitlist entries.
+   * @param params An array of parameters for creating waitlist entries.
+   */
+  public async createBulk(params: WaitlistEntryBulkCreateParams) {
+    return this.request<WaitlistEntry[]>({
+      method: 'POST',
+      path: joinPaths(basePath, 'bulk'),
       bodyParams: params,
     });
   }

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "vite build",
     "dev": "vite --port $PORT --no-open",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview --port $PORT --no-open"
@@ -28,6 +28,6 @@
     "vite": "^4.3.9"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   }
 }

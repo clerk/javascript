@@ -1,10 +1,5 @@
-import path from 'node:path';
-
-export function linkPackage(pkg: string) {
-  // eslint-disable-next-line turbo/no-undeclared-env-vars
-  if (process.env.CI === 'true') {
-    return '*';
-  }
-
-  return `link:${path.resolve(process.cwd(), `packages/${pkg}`)}`;
-}
+/**
+ * Marker value indicating a dependency should be resolved from the local
+ * pkglab registry rather than npm. Use as the version in addDependency().
+ */
+export const PKGLAB = 'pkglab';

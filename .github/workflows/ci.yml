@@ -6,7 +6,7 @@ on:
     branches:
       - main
       - release/v4
-      - vincent-and-the-doctor
+      - release/core-2
 
 permissions:
   contents: read
@@ -58,8 +58,13 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 100 # Enough for changeset status comparison, much faster than full history
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
+
+      - name: Fetch main branch for changeset comparison
+        run: git fetch origin main:refs/remotes/origin/main --depth=100
 
       - name: Setup
         id: config
@@ -104,7 +109,9 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Setup
@@ -148,7 +155,9 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Setup
@@ -161,14 +170,15 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Check size using bundlewatch
-        run: pnpm turbo bundlewatch $TURBO_ARGS
+        continue-on-error: true
         env:
           BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
-          CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
-          CI_REPO_NAME: ${{ vars.REPO_NAME }}
-          CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
           CI_BRANCH: ${{ github.ref	}}
           CI_BRANCH_BASE: refs/heads/main
+          CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+          CI_REPO_NAME: ${{ vars.REPO_NAME }}
+          CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
+        run: pnpm turbo bundlewatch $TURBO_ARGS
 
       - name: Lint packages using publint
         run: pnpm turbo lint:publint $TURBO_ARGS
@@ -191,7 +201,7 @@ jobs:
   unit-tests:
     needs: [check-permissions, build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    name: Unit Tests
+    name: Unit Tests (${{ matrix.filter-label }})
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
@@ -205,24 +215,27 @@ jobs:
       TURBO_SUMMARIZE: false
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - node-version: 22
             test-filter: "**"
+            filter-label: "**"
 
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
-          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (18)`.
+          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (20)`.
           node-version: ${{ matrix.node-version }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
@@ -232,10 +245,10 @@ jobs:
       - name: Run tests in packages
         run: |
           if [ "${{ matrix.test-filter }}" = "**" ]; then
-            echo "Running full test suite on Node ${{ matrix.node-version }}."
+            echo "Running full test suite on Node ${{ matrix.node-version }}"
             pnpm turbo test $TURBO_ARGS
           else
-            echo "Running LTS subset on Node ${{ matrix.node-version }}."
+            echo "Running tests: ${{ matrix.filter-label }}"
             pnpm turbo test $TURBO_ARGS ${{ matrix.test-filter }}
           fi
         env:
@@ -243,9 +256,9 @@ jobs:
 
       - name: Run Typedoc tests
         run: |
-          # Only run Typedoc tests for one matrix version
-          if [ "${{ matrix.node-version }}" == "22" ]; then
-            pnpm test:typedoc
+          # Only run Typedoc tests for one matrix version and main test run
+          if [ "${{ matrix.node-version }}" == "22" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
+            pnpm turbo run //#test:typedoc
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
@@ -261,8 +274,10 @@ jobs:
 
   integration-tests:
     needs: [check-permissions, build-packages]
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    name: Integration Tests
+    if: >-
+      ${{ (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
+      && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
@@ -275,49 +290,55 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name: [
-            'generic',
-            'express',
-            'ap-flows',
-            'elements',
-            'localhost',
-            'sessions',
-            'sessions:staging',
-            'handshake',
-            'handshake:staging',
-            'astro',
-            'expo-web',
-            'tanstack-react-start',
-            'vue',
-            'nuxt',
-            'react-router',
-            'billing',
-            'machine',
-            'custom',
+        test-name:
+          [
+            "generic",
+            "express",
+            "fastify",
+            "ap-flows",
+            "localhost",
+            "sessions",
+            "sessions:staging",
+            "handshake",
+            "handshake:staging",
+            "astro",
+            "tanstack-react-start",
+            "vue",
+            "nuxt",
+            "react-router",
+            "custom",
+            "hono",
+            "chrome-extension",
           ]
         test-project: ["chrome"]
         include:
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '14'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '15'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '16'
-          - test-name: 'quickstart'
-            test-project: 'chrome'
-            next-version: '15'
-          - test-name: 'quickstart'
-            test-project: 'chrome'
-            next-version: '16'
+          - test-name: "billing"
+            test-project: "chrome"
+          - test-name: "machine"
+            test-project: "chrome"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "15"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "16"
+          - test-name: "quickstart"
+            test-project: "chrome"
+            next-version: "15"
+          - test-name: "quickstart"
+            test-project: "chrome"
+            next-version: "16"
+          - test-name: "cache-components"
+            test-project: "chrome"
+            next-version: "16"
 
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Setup
@@ -338,61 +359,69 @@ jobs:
           fi
           jq --version
 
-      - name: Task Status
-        id: task-status
+      - name: Validate turbo task
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: "latest"
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
         run: |
-          # Use turbo's built-in --affected flag to detect changes
-          # This automatically uses GITHUB_BASE_REF in GitHub Actions
-          TASK_COUNT=$(pnpm turbo run test:integration:${{ matrix.test-name }} --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
-
-          if [ "$TASK_COUNT" -gt 0 ]; then
-            AFFECTED=1
-          else
-            AFFECTED=0
+          # Validate the turbo task exists. Turbo's --affected flag is a no-op for
+          # root-level tasks (//#) — they are always returned as affected. The previous
+          # --affected check only served to silently skip tests when the task was missing
+          # from turbo.json, hiding real configuration errors.
+          TASK_NAME="test:integration:${{ matrix.test-name }}"
+          TURBO_STDERR=$(mktemp)
+          if ! TURBO_JSON=$(pnpm turbo run "$TASK_NAME" --dry=json 2>"$TURBO_STDERR"); then
+            echo "::error::Turbo task '$TASK_NAME' failed validation"
+            cat "$TURBO_STDERR"
+            exit 1
           fi
 
-          echo "affected=${AFFECTED}"
-          echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
+          if ! TASK_COUNT=$(jq -er '.tasks | length' <<< "$TURBO_JSON"); then
+            echo "::error::Turbo task '$TASK_NAME' returned invalid JSON or missing .tasks"
+            printf '%s\n' "$TURBO_JSON"
+            exit 1
+          fi
 
-      - name: Verdaccio
-        if: ${{ steps.task-status.outputs.affected == '1' }}
-        uses: ./.github/actions/verdaccio
-        with:
-          publish-cmd: |
-            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
+          if [ "$TASK_COUNT" -eq 0 ]; then
+            echo "::error::Turbo task '$TASK_NAME' returned 0 tasks"
+            exit 1
+          fi
+
+          echo "Task '$TASK_NAME' validated ($TASK_COUNT tasks in graph)"
+
+      - name: Build packages
+        run: pnpm turbo build $TURBO_ARGS --only
+
+      - name: Publish to local registry
+        run: pkglab pub --force
 
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 
-      - name: Install @clerk/backend in /integration
-        if: ${{ steps.task-status.outputs.affected == '1' }}
-        working-directory: ./integration
-        run: |
-          pnpm init
-          pnpm config set minimum-release-age-exclude @clerk/*
-          pnpm add @clerk/backend
-
       - name: Install @clerk/clerk-js in os temp
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-js && cd clerk-js
           pnpm init
-          pnpm config set minimum-release-age-exclude @clerk/*
-          pnpm add @clerk/clerk-js
+          pkglab add @clerk/clerk-js
+
+      - name: Install @clerk/ui in os temp
+        working-directory: ${{runner.temp}}
+        run: |
+          mkdir clerk-ui && cd clerk-ui
+          pnpm init
+          pkglab add @clerk/ui
 
       - name: Copy components @clerk/astro
         if: ${{ matrix.test-name == 'astro' }}
         run: cd packages/astro && pnpm copy:components
 
       - name: Write all ENV certificates to files in integration/certs
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: actions/github-script@v7
         env:
           INTEGRATION_CERTS: "${{secrets.INTEGRATION_CERTS}}"
@@ -410,31 +439,41 @@ jobs:
             }
 
       - name: LS certs
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration/certs
         run: ls -la && pwd
 
       - name: Run Integration Tests
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
         timeout-minutes: 25
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
+          E2E_DEBUG: "1"
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: "latest"
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
-          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+
+      - name: Sanitize artifact name
+        if: ${{ cancelled() || failure() }}
+        id: sanitize
+        run: |
+          SANITIZED="${TEST_NAME//:/-}"
+          echo "artifact-suffix=${SANITIZED}" >> $GITHUB_OUTPUT
+        env:
+          TEST_NAME: ${{ matrix.test-name }}
 
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
-          path: integration/test-results
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.sanitize.outputs.artifact-suffix }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
+          path: test-results
           retention-days: 1
 
   pkg-pr-new:
@@ -453,7 +492,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Setup Node

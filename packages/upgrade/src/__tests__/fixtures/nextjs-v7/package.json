@@ -1,0 +1,9 @@
+{
+  "name": "test-nextjs-v7",
+  "version": "1.0.0",
+  "dependencies": {
+    "@clerk/nextjs": "^7.0.0",
+    "next": "^14.0.0",
+    "react": "^18.0.0"
+  }
+}

@@ -1,4 +1,7 @@
-import { ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { inBrowser } from '@clerk/shared/browser';
+import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
+import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -14,6 +17,7 @@ import type {
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
   PrepareWeb3WalletVerificationParams,
+  SignUpAuthenticateWithSolanaParams,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpEnterpriseConnectionJSON,
@@ -21,6 +25,7 @@ import type {
   SignUpField,
   SignUpFutureCreateParams,
   SignUpFutureEmailCodeVerifyParams,
+  SignUpFutureEmailLinkSendParams,
   SignUpFutureFinalizeParams,
   SignUpFuturePasswordParams,
   SignUpFuturePhoneCodeSendParams,
@@ -29,6 +34,7 @@ import type {
   SignUpFutureSSOParams,
   SignUpFutureTicketParams,
   SignUpFutureUpdateParams,
+  SignUpFutureVerifications as SignUpFutureVerificationsType,
   SignUpFutureWeb3Params,
   SignUpIdentificationField,
   SignUpJSON,
@@ -42,24 +48,16 @@ import type {
 
 import { debugLogger } from '@/utils/debug';
 
+import { getBrowserLocale, getClerkQueryParam, web3 } from '../../utils';
 import {
-  generateSignatureWithBase,
-  generateSignatureWithCoinbaseWallet,
-  generateSignatureWithMetamask,
-  generateSignatureWithOKXWallet,
-  getBaseIdentifier,
-  getBrowserLocale,
-  getClerkQueryParam,
-  getCoinbaseWalletIdentifier,
-  getMetamaskIdentifier,
-  getOKXWalletIdentifier,
-  windowNavigate,
-} from '../../utils';
-import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
+  _authenticateWithPopup,
+  _futureAuthenticateWithPopup,
+  wrapWithPopupRoutes,
+} from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
-import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
@@ -175,13 +173,6 @@ export class SignUp extends BaseResource implements SignUpResource {
       finalParams = { ...finalParams, ...captchaParams };
     }
 
-    if (finalParams.transfer && this.shouldBypassCaptchaForAttempt(finalParams)) {
-      const strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
-      if (strategy) {
-        finalParams = { ...finalParams, strategy: strategy as SignUpCreateParams['strategy'] };
-      }
-    }
-
     return this._basePost({
       path: this.pathRoot,
       body: normalizeUnsafeMetadata(finalParams),
@@ -274,6 +265,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       unsafeMetadata,
       strategy = 'web3_metamask_signature',
       legalAccepted,
+      walletName,
     } = params || {};
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
@@ -293,7 +285,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     let signature: string;
     try {
-      signature = await generateSignature({ identifier, nonce: message, provider });
+      signature = await generateSignature({ identifier, nonce: message, provider, walletName });
     } catch (err) {
       // There is a chance that as a first time visitor when you try to setup and use the
       // Coinbase Wallet from scratch in order to authenticate, the initial generate
@@ -317,10 +309,10 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    const identifier = await getMetamaskIdentifier();
+    const identifier = await web3().getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithMetamask,
+      generateSignature: web3().generateSignatureWithMetamask,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_metamask_signature',
       legalAccepted: params?.legalAccepted,
@@ -328,47 +320,71 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   public authenticateWithCoinbaseWallet = async (
-    params?: SignUpAuthenticateWithWeb3Params & {
-      legalAccepted?: boolean;
-    },
+    params?: SignUpAuthenticateWithWeb3Params,
   ): Promise<SignUpResource> => {
-    const identifier = await getCoinbaseWalletIdentifier();
+    const identifier = await web3().getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithCoinbaseWallet,
+      generateSignature: web3().generateSignatureWithCoinbaseWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_coinbase_wallet_signature',
       legalAccepted: params?.legalAccepted,
     });
   };
 
-  public authenticateWithBase = async (
-    params?: SignUpAuthenticateWithWeb3Params & {
-      legalAccepted?: boolean;
-    },
-  ): Promise<SignUpResource> => {
-    const identifier = await getBaseIdentifier();
+  public authenticateWithBase = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
+    const identifier = await web3().getBaseIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithBase,
+      generateSignature: web3().generateSignatureWithBase,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_base_signature',
       legalAccepted: params?.legalAccepted,
     });
   };
 
-  public authenticateWithOKXWallet = async (
-    params?: SignUpAuthenticateWithWeb3Params & {
-      legalAccepted?: boolean;
-    },
-  ): Promise<SignUpResource> => {
-    const identifier = await getOKXWalletIdentifier();
+  public authenticateWithOKXWallet = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
+    const identifier = await web3().getOKXWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithOKXWallet,
+      generateSignature: web3().generateSignatureWithOKXWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_okx_wallet_signature',
       legalAccepted: params?.legalAccepted,
+    });
+  };
+
+  /**
+   * Authenticates a user using a Solana Web3 wallet during sign-up.
+   *
+   * @param params - Configuration for Solana authentication
+   * @param params.walletName - The name of the Solana wallet to use (e.g., 'phantom')
+   * @param params.unsafeMetadata - Optional unsafe metadata to attach to the user
+   * @param params.legalAccepted - Optional flag indicating legal terms acceptance
+   * @returns A promise that resolves to the updated SignUp resource
+   * @throws {ClerkRuntimeError} If wallet connection fails
+   *
+   * @example
+   * ```typescript
+   * await signUp.authenticateWithSolana({
+   *   walletName: 'phantom',
+   *   legalAccepted: true
+   * });
+   * ```
+   */
+  public authenticateWithSolana = async ({
+    walletName,
+    unsafeMetadata,
+    legalAccepted,
+  }: SignUpAuthenticateWithSolanaParams): Promise<SignUpResource> => {
+    const identifier = await web3().getSolanaIdentifier(walletName);
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: p => web3().generateSignatureWithSolana({ ...p, walletName }),
+      unsafeMetadata,
+      strategy: 'web3_solana_signature',
+      legalAccepted,
+      walletName,
     });
   };
 
@@ -412,7 +428,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       // If this fails again, we will let the caller handle the error accordingly.
       if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await SignUp.clerk.__unstable__environment!.reload();
+        await SignUp.clerk.__internal_environment!.reload();
         return authenticateFn();
       }
       throw e;
@@ -462,9 +478,9 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
-    if (SignUp.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword({
-        ...SignUp.clerk.__unstable__environment?.userSettings.passwordSettings,
+    if (SignUp.clerk.__internal_environment?.userSettings.passwordSettings) {
+      return createValidatePassword(loadZxcvbn(), {
+        ...SignUp.clerk.__internal_environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
     }
@@ -496,6 +512,10 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     eventBus.emit('resource:update', { resource: this });
     return this;
+  }
+
+  public __internal_updateFromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {
+    return this.fromJSON(data);
   }
 
   public __internal_toSnapshot(): SignUpJSONSnapshot {
@@ -534,22 +554,30 @@ export class SignUp extends BaseResource implements SignUpResource {
    * We delegate bot detection to the following providers, instead of relying on turnstile exclusively
    */
   protected shouldBypassCaptchaForAttempt(params: SignUpCreateParams) {
-    if (!params.strategy) {
-      return false;
-    }
-
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const captchaOauthBypass = SignUp.clerk.__unstable__environment!.displayConfig.captchaOauthBypass;
+    const captchaOauthBypass = SignUp.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
 
-    if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
-      return true;
+    // Check for transfer captcha bypass.
+    if (params.transfer) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const signInVerificationStrategy = SignUp.clerk.client!.signIn.firstFactorVerification.strategy;
+
+      // OAuth transfers: If we delegate captcha detection to OAuth provider,
+      // do not show another captcha on sign up.
+      if (captchaOauthBypass.some(strategy => strategy === signInVerificationStrategy)) {
+        return true;
+      }
+
+      // Sign up if missing transfers: We let sign in handle the captcha,
+      // do not show another captcha on sign up.
+      if (isSignUpIfMissingCaptchaBypassStrategy(signInVerificationStrategy)) {
+        return true;
+      }
     }
 
-    if (
-      params.transfer &&
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      captchaOauthBypass.some(strategy => strategy === SignUp.clerk.client!.signIn.firstFactorVerification.strategy)
-    ) {
+    // OAuth sign ups: If we delegate captcha detection to OAuth provider,
+    // do not show another captcha on sign up.
+    if (params.strategy && captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
     }
 
@@ -568,119 +596,257 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 }
 
-class SignUpFuture implements SignUpFutureResource {
-  verifications = {
-    sendEmailCode: this.sendEmailCode.bind(this),
-    verifyEmailCode: this.verifyEmailCode.bind(this),
-    sendPhoneCode: this.sendPhoneCode.bind(this),
-    verifyPhoneCode: this.verifyPhoneCode.bind(this),
-  };
+/**
+ * Returns true if the given strategy is one where captcha is already handled
+ * by the sign-in attempt with sign up if missing, so a subsequent sign-up should
+ * not show another captcha. Matches email_link, email_code, phone_code, and any
+ * web3 wallet strategy. This should be kept in sync with `validateSignUpIfMissing`
+ * in the backend.
+ */
+const SIGN_UP_IF_MISSING_CAPTCHA_BYPASS_STRATEGIES = new Set(['email_link', 'email_code', 'phone_code']);
 
-  constructor(readonly resource: SignUp) {}
+export function isSignUpIfMissingCaptchaBypassStrategy(strategy: string | null): boolean {
+  if (!strategy) {
+    return false;
+  }
+  return SIGN_UP_IF_MISSING_CAPTCHA_BYPASS_STRATEGIES.has(strategy) || strategy.startsWith('web3_');
+}
+
+type SignUpFutureVerificationsMethods = Pick<
+  SignUpFutureVerifications,
+  | 'sendEmailCode'
+  | 'verifyEmailCode'
+  | 'sendEmailLink'
+  | 'waitForEmailLinkVerification'
+  | 'sendPhoneCode'
+  | 'verifyPhoneCode'
+>;
+
+class SignUpFutureVerifications implements SignUpFutureVerificationsType {
+  #resource: SignUp;
+
+  sendEmailCode: SignUpFutureVerificationsType['sendEmailCode'];
+  verifyEmailCode: SignUpFutureVerificationsType['verifyEmailCode'];
+  sendEmailLink: SignUpFutureVerificationsType['sendEmailLink'];
+  waitForEmailLinkVerification: SignUpFutureVerificationsType['waitForEmailLinkVerification'];
+  sendPhoneCode: SignUpFutureVerificationsType['sendPhoneCode'];
+  verifyPhoneCode: SignUpFutureVerificationsType['verifyPhoneCode'];
+
+  constructor(resource: SignUp, methods: SignUpFutureVerificationsMethods) {
+    this.#resource = resource;
+    this.sendEmailCode = methods.sendEmailCode;
+    this.verifyEmailCode = methods.verifyEmailCode;
+    this.sendEmailLink = methods.sendEmailLink;
+    this.waitForEmailLinkVerification = methods.waitForEmailLinkVerification;
+    this.sendPhoneCode = methods.sendPhoneCode;
+    this.verifyPhoneCode = methods.verifyPhoneCode;
+  }
+
+  get emailAddress() {
+    return this.#resource.verifications.emailAddress;
+  }
+
+  get phoneNumber() {
+    return this.#resource.verifications.phoneNumber;
+  }
+
+  get web3Wallet() {
+    return this.#resource.verifications.web3Wallet;
+  }
+
+  get externalAccount() {
+    return this.#resource.verifications.externalAccount;
+  }
+
+  get emailLinkVerification() {
+    if (!inBrowser()) {
+      return null;
+    }
+
+    const status = getClerkQueryParam('__clerk_status') as 'verified' | 'expired' | 'failed' | 'client_mismatch';
+    const createdSessionId = getClerkQueryParam('__clerk_created_session');
+
+    if (!status || !createdSessionId) {
+      return null;
+    }
+
+    const verifiedFromTheSameClient =
+      status === 'verified' &&
+      typeof SignUp.clerk.client !== 'undefined' &&
+      SignUp.clerk.client.sessions.some(s => s.id === createdSessionId);
+
+    return {
+      status,
+      createdSessionId,
+      verifiedFromTheSameClient,
+    };
+  }
+}
+
+class SignUpFuture implements SignUpFutureResource {
+  verifications: SignUpFutureVerifications;
+
+  #canBeDiscarded = false;
+  readonly #resource: SignUp;
+
+  constructor(resource: SignUp) {
+    this.#resource = resource;
+    this.verifications = new SignUpFutureVerifications(this.#resource, {
+      sendEmailCode: this.sendEmailCode.bind(this),
+      verifyEmailCode: this.verifyEmailCode.bind(this),
+      sendEmailLink: this.sendEmailLink.bind(this),
+      waitForEmailLinkVerification: this.waitForEmailLinkVerification.bind(this),
+      sendPhoneCode: this.sendPhoneCode.bind(this),
+      verifyPhoneCode: this.verifyPhoneCode.bind(this),
+    });
+  }
 
   get id() {
-    return this.resource.id;
+    return this.#resource.id;
   }
 
   get requiredFields() {
-    return this.resource.requiredFields;
+    return this.#resource.requiredFields;
   }
 
   get optionalFields() {
-    return this.resource.optionalFields;
+    return this.#resource.optionalFields;
   }
 
   get missingFields() {
-    return this.resource.missingFields;
+    return this.#resource.missingFields;
   }
 
   get status() {
     // @TODO hooks-revamp: Consolidate this fallback val with stateProxy
-    return this.resource.status || 'missing_requirements';
+    return this.#resource.status || 'missing_requirements';
   }
 
   get username() {
-    return this.resource.username;
+    return this.#resource.username;
   }
 
   get firstName() {
-    return this.resource.firstName;
+    return this.#resource.firstName;
   }
 
   get lastName() {
-    return this.resource.lastName;
+    return this.#resource.lastName;
   }
 
   get emailAddress() {
-    return this.resource.emailAddress;
+    return this.#resource.emailAddress;
   }
 
   get phoneNumber() {
-    return this.resource.phoneNumber;
+    return this.#resource.phoneNumber;
   }
 
   get web3Wallet() {
-    return this.resource.web3wallet;
+    return this.#resource.web3wallet;
   }
 
   get hasPassword() {
-    return this.resource.hasPassword;
+    return this.#resource.hasPassword;
   }
 
   get unsafeMetadata() {
-    return this.resource.unsafeMetadata;
+    return this.#resource.unsafeMetadata;
   }
 
   get createdSessionId() {
-    return this.resource.createdSessionId;
+    return this.#resource.createdSessionId;
   }
 
   get createdUserId() {
-    return this.resource.createdUserId;
+    return this.#resource.createdUserId;
   }
 
   get abandonAt() {
-    return this.resource.abandonAt;
+    return this.#resource.abandonAt;
   }
 
   get legalAcceptedAt() {
-    return this.resource.legalAcceptedAt;
+    return this.#resource.legalAcceptedAt;
   }
 
   get locale() {
-    return this.resource.locale;
+    return this.#resource.locale;
   }
 
   get unverifiedFields() {
-    return this.resource.unverifiedFields;
+    return this.#resource.unverifiedFields;
   }
 
   get isTransferable() {
     // TODO: we can likely remove the error code check as the status should be sufficient
     return (
-      this.resource.verifications.externalAccount.status === 'transferable' &&
-      this.resource.verifications.externalAccount.error?.code === 'external_account_exists'
+      this.#resource.verifications.externalAccount.status === 'transferable' &&
+      this.#resource.verifications.externalAccount.error?.code === 'external_account_exists'
     );
   }
 
   get existingSession() {
     if (
-      (this.resource.verifications.externalAccount.status === 'failed' ||
-        this.resource.verifications.externalAccount.status === 'unverified') &&
-      this.resource.verifications.externalAccount.error?.code === 'identifier_already_signed_in' &&
-      this.resource.verifications.externalAccount.error?.meta?.sessionId
+      (this.#resource.verifications.externalAccount.status === 'failed' ||
+        this.#resource.verifications.externalAccount.status === 'unverified') &&
+      this.#resource.verifications.externalAccount.error?.code === 'identifier_already_signed_in' &&
+      this.#resource.verifications.externalAccount.error?.meta?.sessionId
     ) {
-      return { sessionId: this.resource.verifications.externalAccount.error?.meta?.sessionId };
+      return { sessionId: this.#resource.verifications.externalAccount.error?.meta?.sessionId };
     }
 
     return undefined;
   }
 
-  private async getCaptchaToken(): Promise<{
+  get canBeDiscarded() {
+    return this.#canBeDiscarded;
+  }
+
+  private shouldBypassCaptchaForAttempt(params: { strategy?: string; transfer?: boolean }) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const captchaOauthBypass = SignUp.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
+
+    // Check for transfer captcha bypass.
+    if (params.transfer) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const signInVerificationStrategy = SignUp.clerk.client!.signIn.firstFactorVerification.strategy;
+
+      // OAuth transfers: If we delegate captcha detection to OAuth provider,
+      // do not show another captcha on sign up.
+      if (captchaOauthBypass.some(strategy => strategy === signInVerificationStrategy)) {
+        return true;
+      }
+
+      // Sign up if missing transfers: We let sign in handle the captcha,
+      // do not show another captcha on sign up.
+      if (isSignUpIfMissingCaptchaBypassStrategy(signInVerificationStrategy)) {
+        return true;
+      }
+    }
+
+    // OAuth sign ups: If we delegate captcha detection to OAuth provider,
+    // do not show another captcha on sign up.
+    if (params.strategy && captchaOauthBypass.some(strategy => strategy === params.strategy)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private async getCaptchaToken(params: { strategy?: string; transfer?: boolean } = {}): Promise<{
     captchaToken?: string;
     captchaWidgetType?: CaptchaWidgetType;
     captchaError?: unknown;
   }> {
+    if (__BUILD_DISABLE_RHC__ || SignUp.clerk.client?.captchaBypass || this.shouldBypassCaptchaForAttempt(params)) {
+      return {
+        captchaToken: undefined,
+        captchaWidgetType: undefined,
+        captchaError: undefined,
+      };
+    }
+
     const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
     const response = await captchaChallenge.managedOrInvisible({ action: 'signup' });
     if (!response) {
@@ -692,7 +858,7 @@ class SignUpFuture implements SignUpFutureResource {
   }
 
   private async _create(params: SignUpFutureCreateParams): Promise<void> {
-    const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+    const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken(params);
 
     const body: Record<string, unknown> = {
       transfer: params.transfer,
@@ -704,28 +870,28 @@ class SignUpFuture implements SignUpFutureResource {
       locale: params.locale ?? getBrowserLocale(),
     };
 
-    await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
+    await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
   }
 
-  async create(params: SignUpFutureCreateParams): Promise<{ error: unknown }> {
-    return runAsyncResourceTask(this.resource, async () => {
+  async create(params: SignUpFutureCreateParams): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
       await this._create(params);
     });
   }
 
-  async update(params: SignUpFutureUpdateParams): Promise<{ error: unknown }> {
-    return runAsyncResourceTask(this.resource, async () => {
+  async update(params: SignUpFutureUpdateParams): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
       const body: Record<string, unknown> = {
         ...params,
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
-      await this.resource.__internal_basePatch({ path: this.resource.pathRoot, body });
+      await this.#resource.__internal_basePatch({ path: this.#resource.pathRoot, body });
     });
   }
 
-  async password(params: SignUpFuturePasswordParams): Promise<{ error: unknown }> {
-    return runAsyncResourceTask(this.resource, async () => {
+  async password(params: SignUpFuturePasswordParams): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
 
       const body: Record<string, unknown> = {
@@ -737,61 +903,107 @@ class SignUpFuture implements SignUpFutureResource {
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
-      await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
+      if (this.#resource.id) {
+        await this.#resource.__internal_basePatch({ body });
+      } else {
+        await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
+      }
     });
   }
 
-  async sendEmailCode(): Promise<{ error: unknown }> {
-    return runAsyncResourceTask(this.resource, async () => {
-      await this.resource.__internal_basePost({
+  async sendEmailCode(): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePost({
         body: { strategy: 'email_code' },
         action: 'prepare_verification',
       });
     });
   }
 
-  async verifyEmailCode(params: SignUpFutureEmailCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyEmailCode(params: SignUpFutureEmailCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
-    return runAsyncResourceTask(this.resource, async () => {
-      await this.resource.__internal_basePost({
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePost({
         body: { strategy: 'email_code', code },
         action: 'attempt_verification',
       });
     });
   }
 
-  async sendPhoneCode(params: SignUpFuturePhoneCodeSendParams): Promise<{ error: unknown }> {
-    const { phoneNumber, channel = 'sms' } = params;
-    return runAsyncResourceTask(this.resource, async () => {
-      if (!this.resource.id) {
-        const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
-        await this.resource.__internal_basePost({
-          path: this.resource.pathRoot,
-          body: { phoneNumber, captchaToken, captchaWidgetType, captchaError },
-        });
-      }
-
-      await this.resource.__internal_basePost({
+  async sendPhoneCode(params?: SignUpFuturePhoneCodeSendParams): Promise<{ error: ClerkError | null }> {
+    const { channel = 'sms' } = params || {};
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePost({
         body: { strategy: 'phone_code', channel },
         action: 'prepare_verification',
       });
     });
   }
 
-  async verifyPhoneCode(params: SignUpFuturePhoneCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyPhoneCode(params: SignUpFuturePhoneCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
-    return runAsyncResourceTask(this.resource, async () => {
-      await this.resource.__internal_basePost({
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePost({
         body: { strategy: 'phone_code', code },
         action: 'attempt_verification',
       });
     });
   }
 
-  async sso(params: SignUpFutureSSOParams): Promise<{ error: unknown }> {
-    const { strategy, redirectUrl, redirectCallbackUrl } = params;
-    return runAsyncResourceTask(this.resource, async () => {
-      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+  async sendEmailLink(params: SignUpFutureEmailLinkSendParams): Promise<{ error: ClerkError | null }> {
+    const { verificationUrl } = params;
+    return runAsyncResourceTask(this.#resource, async () => {
+      let absoluteVerificationUrl = verificationUrl;
+      try {
+        new URL(verificationUrl);
+      } catch {
+        absoluteVerificationUrl = window.location.origin + verificationUrl;
+      }
+
+      await this.#resource.__internal_basePost({
+        body: { strategy: 'email_link', redirectUrl: absoluteVerificationUrl },
+        action: 'prepare_verification',
+      });
+    });
+  }
+
+  async waitForEmailLinkVerification(): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
+      const { run, stop } = Poller();
+      await new Promise((resolve, reject) => {
+        void run(() => {
+          return this.#resource
+            .reload()
+            .then(res => {
+              const status = res.verifications.emailAddress.status;
+              if (status === 'verified' || status === 'expired') {
+                stop();
+                resolve(res);
+              }
+            })
+            .catch(err => {
+              stop();
+              reject(err);
+            });
+        });
+      });
+    });
+  }
+
+  async sso(params: SignUpFutureSSOParams): Promise<{ error: ClerkError | null }> {
+    const {
+      strategy,
+      redirectUrl,
+      redirectCallbackUrl,
+      unsafeMetadata,
+      legalAccepted,
+      oidcPrompt,
+      enterpriseConnectionId,
+      emailAddress,
+      popup,
+    } = params;
+    return runAsyncResourceTask(this.#resource, async () => {
+      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken({ strategy });
 
       let redirectUrlComplete = redirectUrl;
       try {
@@ -800,65 +1012,97 @@ class SignUpFuture implements SignUpFutureResource {
         redirectUrlComplete = window.location.origin + redirectUrl;
       }
 
-      await this.resource.__internal_basePost({
-        path: this.resource.pathRoot,
-        body: {
-          strategy,
-          redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
-          redirectUrlComplete,
-          captchaToken,
-          captchaWidgetType,
-          captchaError,
-        },
+      const routes = {
+        redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
+        actionCompleteRedirectUrl: redirectUrlComplete,
+      };
+      if (popup) {
+        const wrappedRoutes = wrapWithPopupRoutes(SignUp.clerk, {
+          redirectCallbackUrl: routes.redirectUrl,
+          redirectUrl: redirectUrlComplete,
+        });
+        routes.redirectUrl = wrappedRoutes.redirectCallbackUrl;
+        routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
+      }
+
+      const authenticateFn = () => {
+        return this.#resource.__internal_basePost({
+          path: this.#resource.pathRoot,
+          body: {
+            strategy,
+            ...routes,
+            unsafeMetadata,
+            legalAccepted,
+            oidcPrompt,
+            enterpriseConnectionId,
+            emailAddress,
+            captchaToken,
+            captchaWidgetType,
+            captchaError,
+          },
+        });
+      };
+
+      await authenticateFn().catch(async e => {
+        if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          await SignUp.clerk.__internal_environment!.reload();
+          return authenticateFn();
+        }
+        throw e;
       });
 
-      const { status, externalVerificationRedirectURL } = this.resource.verifications.externalAccount;
+      const { status, externalVerificationRedirectURL } = this.#resource.verifications.externalAccount;
 
-      if (status === 'unverified' && !!externalVerificationRedirectURL) {
-        windowNavigate(externalVerificationRedirectURL);
-      } else {
-        clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
+      if (status === 'unverified' && externalVerificationRedirectURL) {
+        if (popup) {
+          await _futureAuthenticateWithPopup(SignUp.clerk, { popup, externalVerificationRedirectURL });
+          // Pick up the modified SignUp resource
+          await this.#resource.reload();
+        } else {
+          windowNavigate(externalVerificationRedirectURL);
+        }
       }
     });
   }
 
-  async web3(params: SignUpFutureWeb3Params): Promise<{ error: unknown }> {
+  async web3(params: SignUpFutureWeb3Params): Promise<{ error: ClerkError | null }> {
     const { strategy, unsafeMetadata, legalAccepted } = params;
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
-    return runAsyncResourceTask(this.resource, async () => {
+    return runAsyncResourceTask(this.#resource, async () => {
       let identifier;
       let generateSignature;
       switch (provider) {
         case 'metamask':
-          identifier = await getMetamaskIdentifier();
-          generateSignature = generateSignatureWithMetamask;
+          identifier = await web3().getMetamaskIdentifier();
+          generateSignature = web3().generateSignatureWithMetamask;
           break;
         case 'coinbase_wallet':
-          identifier = await getCoinbaseWalletIdentifier();
-          generateSignature = generateSignatureWithCoinbaseWallet;
+          identifier = await web3().getCoinbaseWalletIdentifier();
+          generateSignature = web3().generateSignatureWithCoinbaseWallet;
           break;
         case 'base':
-          identifier = await getBaseIdentifier();
-          generateSignature = generateSignatureWithBase;
+          identifier = await web3().getBaseIdentifier();
+          generateSignature = web3().generateSignatureWithBase;
           break;
         case 'okx_wallet':
-          identifier = await getOKXWalletIdentifier();
-          generateSignature = generateSignatureWithOKXWallet;
+          identifier = await web3().getOKXWalletIdentifier();
+          generateSignature = web3().generateSignatureWithOKXWallet;
           break;
         default:
           throw new Error(`Unsupported Web3 provider: ${provider}`);
       }
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const web3Wallet = identifier || this.resource.web3wallet!;
+      const web3Wallet = identifier || this.#resource.web3wallet!;
       await this._create({ web3Wallet, unsafeMetadata, legalAccepted });
-      await this.resource.__internal_basePost({
+      await this.#resource.__internal_basePost({
         body: { strategy },
         action: 'prepare_verification',
       });
 
-      const { message } = this.resource.verifications.web3Wallet;
+      const { message } = this.#resource.verifications.web3Wallet;
       if (!message) {
         clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
       }
@@ -881,27 +1125,42 @@ class SignUpFuture implements SignUpFutureResource {
         }
       }
 
-      await this.resource.__internal_basePost({
+      await this.#resource.__internal_basePost({
         body: { signature, strategy },
         action: 'attempt_verification',
       });
     });
   }
 
-  async ticket(params?: SignUpFutureTicketParams): Promise<{ error: unknown }> {
+  async ticket(params?: SignUpFutureTicketParams): Promise<{ error: ClerkError | null }> {
     const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
     return this.create({ ...params, ticket: ticket ?? undefined });
   }
 
-  async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: unknown }> {
+  async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: ClerkError | null }> {
     const { navigate } = params || {};
-    return runAsyncResourceTask(this.resource, async () => {
-      if (!this.resource.createdSessionId) {
+    return runAsyncResourceTask(this.#resource, async () => {
+      if (!this.#resource.createdSessionId) {
         throw new Error('Cannot finalize sign-up without a created session.');
       }
 
-      await SignUp.clerk.setActive({ session: this.resource.createdSessionId, navigate });
+      this.#canBeDiscarded = true;
+      await SignUp.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
+  }
+
+  /**
+   * Resets the current sign-up attempt by clearing all local state back to null.
+   * Unlike other methods, this does NOT emit resource:fetch with 'fetching' status,
+   * allowing for smooth UI transitions without loading states.
+   */
+  reset(): Promise<{ error: ClerkError | null }> {
+    if (!SignUp.clerk.client) {
+      throw new Error('Cannot reset sign-up without a client.');
+    }
+    this.#canBeDiscarded = true;
+    SignUp.clerk.client.resetSignUp();
+    return Promise.resolve({ error: null });
   }
 }
 

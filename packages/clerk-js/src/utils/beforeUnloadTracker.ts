@@ -1,4 +1,4 @@
-import { CLERK_BEFORE_UNLOAD_EVENT } from './windowNavigate';
+import { CLERK_BEFORE_UNLOAD_EVENT } from '@clerk/shared/internal/clerk-js/windowNavigate';
 
 /**
  * Tracks beforeUnload events.

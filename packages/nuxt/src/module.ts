@@ -1,4 +1,4 @@
-import type { Without } from '@clerk/types';
+import type { InternalClerkScriptProps, Without } from '@clerk/shared/types';
 import type { PluginOptions } from '@clerk/vue';
 import {
   addComponent,
@@ -12,30 +12,28 @@ import {
   updateRuntimeConfig,
 } from '@nuxt/kit';
 
-export type ModuleOptions = Without<
-  PluginOptions,
-  'routerPush' | 'routerReplace' | 'publishableKey' | 'initialState'
-> & {
-  publishableKey?: string;
-  /**
-   * Skip the automatic server middleware registration. When enabled, you'll need to
-   * register the middleware manually in your application.
-   *
-   * @default false
-   *
-   * @example
-   *
-   * ```ts
-   * // server/middleware/clerk.ts
-   * import { clerkMiddleware } from '@clerk/nuxt/server'
-   *
-   * export default clerkMiddleware((event) => {
-   *   console.log('auth', event.context.auth())
-   * })
-   * ```
-   */
-  skipServerMiddleware?: boolean;
-};
+export type ModuleOptions = Without<PluginOptions, 'routerPush' | 'routerReplace' | 'publishableKey' | 'initialState'> &
+  InternalClerkScriptProps & {
+    publishableKey?: string;
+    /**
+     * Skip the automatic server middleware registration. When enabled, you'll need to
+     * register the middleware manually in your application.
+     *
+     * @default false
+     *
+     * @example
+     *
+     * ```ts
+     * // server/middleware/clerk.ts
+     * import { clerkMiddleware } from '@clerk/nuxt/server'
+     *
+     * export default clerkMiddleware((event) => {
+     *   console.log('auth', event.context.auth())
+     * })
+     * ```
+     */
+    skipServerMiddleware?: boolean;
+  };
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -64,14 +62,19 @@ export default defineNuxtModule<ModuleOptions>({
           signUpForceRedirectUrl: options.signUpForceRedirectUrl,
           signUpUrl: options.signUpUrl,
           domain: options.domain,
-          clerkJSUrl: options.clerkJSUrl,
-          clerkJSVariant: options.clerkJSVariant,
-          clerkJSVersion: options.clerkJSVersion,
+          // Using jsUrl/uiUrl instead of __internal_clerkJSUrl/__internal_clerkUIUrl to support
+          // NUXT_PUBLIC_CLERK_JS_URL and NUXT_PUBLIC_CLERK_UI_URL env vars.
+          jsUrl: options.__internal_clerkJSUrl,
+          uiUrl: options.__internal_clerkUIUrl,
+          clerkJSVersion: options.__internal_clerkJSVersion,
+          clerkUIVersion: options.__internal_clerkUIVersion,
+          // prefetchUI config: can be false or undefined
+          prefetchUI: options.prefetchUI,
           isSatellite: options.isSatellite,
           // Backend specific variables that are safe to share.
           // We want them to be overridable like the other public keys (e.g NUXT_PUBLIC_CLERK_PROXY_URL)
           proxyUrl: options.proxyUrl,
-          apiUrl: 'https://api.clerk.com',
+          apiUrl: '',
           apiVersion: 'v1',
         },
       },
@@ -110,12 +113,11 @@ export default defineNuxtModule<ModuleOptions>({
     addTypeTemplate(
       {
         filename: 'types/clerk.d.ts',
-        getContents: () => `import type { SessionAuthObject } from '@clerk/backend';
-          import type { AuthFn } from '@clerk/nuxt/server';
+        getContents: () => `import type { AuthFn } from '@clerk/nuxt/server';
 
           declare module 'h3' {
             interface H3EventContext {
-              auth: SessionAuthObject & AuthFn;
+              auth: AuthFn;
             }
           }
         `,
@@ -136,11 +138,28 @@ export default defineNuxtModule<ModuleOptions>({
       },
     ]);
 
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    const components: Array<keyof typeof import('@clerk/vue')> = [
-      // Authentication Components
+    // Components that use path-based routing (wrapped components)
+    const wrappedComponents = [
       'SignIn',
       'SignUp',
+      'UserProfile',
+      'OrganizationProfile',
+      'CreateOrganization',
+      'OrganizationList',
+    ] as const;
+
+    wrappedComponents.forEach(component => {
+      void addComponent({
+        name: component,
+        export: component,
+        filePath: resolver.resolve('./runtime/components'),
+      });
+    });
+
+    // Other components exported directly from @clerk/vue
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    const otherComponents: Array<keyof typeof import('@clerk/vue')> = [
+      // Authentication Components
       'GoogleOneTap',
       // Unstyled Components
       'SignInButton',
@@ -149,28 +168,22 @@ export default defineNuxtModule<ModuleOptions>({
       'SignInWithMetamaskButton',
       // User Components
       'UserButton',
-      'UserProfile',
       // Organization Components
-      'CreateOrganization',
-      'OrganizationProfile',
       'OrganizationSwitcher',
-      'OrganizationList',
       // Billing Components
       'PricingTable',
       // Control Components
       'ClerkLoaded',
       'ClerkLoading',
-      'Protect',
       'RedirectToSignIn',
       'RedirectToSignUp',
       'RedirectToUserProfile',
       'RedirectToOrganizationProfile',
       'RedirectToCreateOrganization',
-      'SignedIn',
-      'SignedOut',
+      'Show',
       'Waitlist',
     ];
-    components.forEach(component => {
+    otherComponents.forEach(component => {
       void addComponent({
         name: component,
         export: component,

@@ -2,14 +2,20 @@ import type {
   Clerk,
   ClerkOptions,
   ClientResource,
+  InternalClerkScriptProps,
   MultiDomainAndOrProxyPrimitives,
-  ProtectProps,
+  ProtectParams,
+  ShowProps,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import type { ClerkUIConstructor } from '@clerk/shared/ui';
+import type { Appearance, Ui } from '@clerk/ui/internal';
 
-type AstroClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
+type AstroClerkUpdateOptions<TUi extends Ui = Ui> = Pick<ClerkOptions, 'localization'> & {
+  appearance?: Appearance<TUi>;
+};
 
-type AstroClerkIntegrationParams = Without<
+type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
   ClerkOptions,
   | 'isSatellite'
   | 'sdkMetadata'
@@ -20,18 +26,57 @@ type AstroClerkIntegrationParams = Without<
   | 'routerPush'
   | 'polling'
   | 'touchSession'
+  | 'appearance'
 > &
-  MultiDomainAndOrProxyPrimitives;
+  MultiDomainAndOrProxyPrimitives & {
+    appearance?: Appearance<TUi>;
+    /**
+     * Controls prefetching of the `@clerk/ui` script.
+     * - `false` - Skip prefetching the UI (for custom UIs using Control Components)
+     * - `undefined` (default) - Prefetch UI normally
+     */
+    prefetchUI?: boolean;
+  };
 
-type AstroClerkCreateInstanceParams = AstroClerkIntegrationParams & { publishableKey: string };
+type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegrationParams<TUi> &
+  InternalClerkScriptProps & {
+    publishableKey: string;
+  };
 
-// Copied from `@clerk/clerk-react`
+/**
+ * @internal
+ * Internal runtime options injected by the server for keyless mode support.
+ */
+export type InternalRuntimeOptions = {
+  /**
+   * Server-injected publishable key from keyless mode or context.locals
+   */
+  publishableKey?: string;
+  /**
+   * Keyless claim URL injected by middleware for the client-side banner
+   */
+  keylessClaimUrl?: string;
+  /**
+   * Keyless API keys URL injected by middleware for the client-side banner
+   */
+  keylessApiKeysUrl?: string;
+  /**
+   * Internal keyless claim URL passed to Clerk.load()
+   */
+  __internal_keylessClaimUrl?: string;
+  /**
+   * Internal keyless API keys URL passed to Clerk.load()
+   */
+  __internal_keylessApiKeysUrl?: string;
+};
+
+// Copied from `@clerk/react`
 export interface HeadlessBrowserClerk extends Clerk {
   load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
   updateClient: (client: ClientResource) => void;
 }
 
-// Copied from `@clerk/clerk-react`
+// Copied from `@clerk/react`
 export interface BrowserClerk extends HeadlessBrowserClerk {
   onComponentsReady: Promise<void>;
   components: any;
@@ -42,21 +87,22 @@ declare global {
     __astro_clerk_component_props: Map<string, Map<string, Record<string, unknown>>>;
     __astro_clerk_function_props: Map<string, Map<string, Record<string, unknown>>>;
     Clerk: BrowserClerk;
+    __internal_ClerkUICtor?: ClerkUIConstructor;
   }
 }
 
-export type { AstroClerkUpdateOptions, AstroClerkIntegrationParams, AstroClerkCreateInstanceParams, ProtectProps };
+export type {
+  AstroClerkUpdateOptions,
+  AstroClerkIntegrationParams,
+  AstroClerkCreateInstanceParams,
+  ProtectParams,
+  ShowProps,
+};
 
-export type ButtonProps<Tag> = {
-  /**
-   * @deprecated The `'as'` prop will be removed in a future version.
-   * Use the default slot with the `'asChild'` prop instead.
-   * @example
-   * <SignInButton asChild>
-   *   <button>Sign in</button>
-   * </SignInButton>
-   */
-  as: Tag;
+// Backward compatibility alias
+export type ProtectProps = ProtectParams;
+
+export type ButtonProps = {
   asChild?: boolean;
 };
 
@@ -72,4 +118,5 @@ export type InternalUIComponentId =
   | 'user-profile'
   | 'google-one-tap'
   | 'waitlist'
-  | 'pricing-table';
+  | 'pricing-table'
+  | 'api-keys';

@@ -17,6 +17,7 @@ import type {
 import type { Component, ComputedRef, ShallowRef, Slot, VNode } from 'vue';
 
 export interface VueClerkInjectionKeyType {
+  loaded: ShallowRef<boolean>;
   clerk: ShallowRef<Clerk | null>;
   authCtx: ComputedRef<{
     userId: string | null | undefined;
@@ -37,13 +38,13 @@ export interface VueClerkInjectionKeyType {
   treatPendingAsSignedOut?: boolean;
 }
 
-// Copied from `@clerk/clerk-react`
+// Copied from `@clerk/react`
 export interface HeadlessBrowserClerk extends Clerk {
   load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
   updateClient: (client: ClientResource) => void;
 }
 
-// Copied from `@clerk/clerk-react`
+// Copied from `@clerk/react`
 export interface BrowserClerk extends HeadlessBrowserClerk {
   onComponentsReady: Promise<void>;
   components: any;
@@ -83,14 +84,14 @@ type PageProps<T extends string> =
       url?: never;
     };
 
-export type UserProfilePageProps = PageProps<'account' | 'security'>;
+export type UserProfilePageProps = PageProps<'account' | 'security' | 'billing' | 'apiKeys'>;
 
 export type UserProfileLinkProps = {
   url: string;
   label: string;
 };
 
-export type OrganizationProfilePageProps = PageProps<'general' | 'members'>;
+export type OrganizationProfilePageProps = PageProps<'general' | 'members' | 'billing' | 'apiKeys'>;
 
 export type OrganizationLinkProps = {
   url: string;

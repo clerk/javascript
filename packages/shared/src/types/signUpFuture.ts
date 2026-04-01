@@ -1,9 +1,11 @@
+import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
-import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUpCommon';
+import type { SignUpField, SignUpIdentificationField, SignUpStatus, SignUpVerificationResource } from './signUpCommon';
 import type { Web3Strategy } from './strategies';
+import type { VerificationResource } from './verification';
 
-interface SignUpFutureAdditionalParams {
+export interface SignUpFutureAdditionalParams {
   /**
    * The user's first name. Only supported if
    * [First and last name](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#user-model)
@@ -81,6 +83,13 @@ export interface SignUpFutureEmailCodeVerifyParams {
    * The code that was sent to the user.
    */
   code: string;
+}
+
+export interface SignUpFutureEmailLinkSendParams {
+  /**
+   * The full URL that the user will be redirected to when they visit the email link.
+   */
+  verificationUrl: string;
 }
 
 export type SignUpFuturePasswordParams = SignUpFutureAdditionalParams & {
@@ -170,12 +179,6 @@ export type SignUpFuturePasswordParams = SignUpFutureAdditionalParams & {
 
 export interface SignUpFuturePhoneCodeSendParams {
   /**
-   * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if
-   * [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled.
-   * Keep in mind that the phone number requires an extra verification process.
-   */
-  phoneNumber?: string;
-  /**
    * The mechanism to use to send the code to the provided phone number. Defaults to `'sms'`.
    */
   channel?: PhoneCodeChannel;
@@ -188,7 +191,7 @@ export interface SignUpFuturePhoneCodeVerifyParams {
   code: string;
 }
 
-export interface SignUpFutureSSOParams {
+export interface SignUpFutureSSOParams extends SignUpFutureAdditionalParams {
   /**
    * The strategy to use for authentication.
    */
@@ -202,6 +205,34 @@ export interface SignUpFutureSSOParams {
    * TODO @revamp-hooks: This should be handled by FAPI instead.
    */
   redirectCallbackUrl: string;
+  /**
+   * If provided, a `Window` to use for the OAuth flow. Useful in instances where you cannot navigate to an
+   * OAuth provider.
+   *
+   * @example
+   * ```ts
+   * const popup = window.open('about:blank', '', 'width=600,height=800');
+   * if (!popup) {
+   *   throw new Error('Failed to open popup');
+   * }
+   * await signIn.sso({ popup, strategy: 'oauth_google', redirectUrl: '/dashboard' });
+   * ```
+   */
+  popup?: Window;
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the
+   * [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.)
+   * in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
+  /**
+   * @experimental
+   */
+  enterpriseConnectionId?: string;
+  /**
+   * Email address to use for targeting an enterprise connection at sign-up.
+   */
+  emailAddress?: string;
 }
 
 export interface SignUpFutureTicketParams extends SignUpFutureAdditionalParams {
@@ -221,6 +252,81 @@ export interface SignUpFutureWeb3Params extends SignUpFutureAdditionalParams {
 
 export interface SignUpFutureFinalizeParams {
   navigate?: SetActiveNavigate;
+}
+
+/**
+ * An object that contains information about all available verification strategies.
+ */
+export interface SignUpFutureVerifications {
+  /**
+   * An object holding information about the email address verification.
+   */
+  readonly emailAddress: SignUpVerificationResource;
+
+  /**
+   * An object holding information about the phone number verification.
+   */
+  readonly phoneNumber: SignUpVerificationResource;
+
+  /**
+   * An object holding information about the Web3 wallet verification.
+   */
+  readonly web3Wallet: VerificationResource;
+
+  /**
+   * An object holding information about the external account verification.
+   */
+  readonly externalAccount: VerificationResource;
+
+  /**
+   * The verification status for email link flows.
+   */
+  readonly emailLinkVerification: {
+    /**
+     * The verification status.
+     */
+    status: 'verified' | 'expired' | 'failed' | 'client_mismatch';
+
+    /**
+     * The created session ID.
+     */
+    createdSessionId: string;
+
+    /**
+     * Whether the verification was from the same client.
+     */
+    verifiedFromTheSameClient: boolean;
+  } | null;
+
+  /**
+   * Used to send an email code to verify an email address.
+   */
+  sendEmailCode: () => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Used to verify a code sent via email.
+   */
+  verifyEmailCode: (params: SignUpFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Used to send an email link to verify an email address.
+   */
+  sendEmailLink: (params: SignUpFutureEmailLinkSendParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Will wait for email link verification to complete or expire.
+   */
+  waitForEmailLinkVerification: () => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Used to send a phone code to verify a phone number.
+   */
+  sendPhoneCode: (params?: SignUpFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Used to verify a code sent via phone.
+   */
+  verifyPhoneCode: (params: SignUpFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 }
 
 /**
@@ -355,6 +461,13 @@ export interface SignUpFutureResource {
   readonly locale: string | null;
 
   /**
+   * Indicates that the sign-up can be discarded (has been finalized or explicitly reset).
+   *
+   * @internal
+   */
+  readonly canBeDiscarded: boolean;
+
+  /**
    * Creates a new `SignUp` instance initialized with the provided parameters. The instance maintains the sign-up
    * lifecycle state through its `status` property, which updates as the authentication flow progresses. Will also
    * deactivate any existing sign-up process the client may already have in progress.
@@ -370,61 +483,51 @@ export interface SignUpFutureResource {
    * > Once the sign-up process is complete, call the `signUp.finalize()` method to set the newly created session as
    * > the active session.
    */
-  create: (params: SignUpFutureCreateParams) => Promise<{ error: unknown }>;
+  create: (params: SignUpFutureCreateParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Updates the current `SignUp`.
    */
-  update: (params: SignUpFutureUpdateParams) => Promise<{ error: unknown }>;
+  update: (params: SignUpFutureUpdateParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   *
+   * An object that contains information about all available verification strategies.
    */
-  verifications: {
-    /**
-     * Used to send an email code to verify an email address.
-     */
-    sendEmailCode: () => Promise<{ error: unknown }>;
-
-    /**
-     * Used to verify a code sent via email.
-     */
-    verifyEmailCode: (params: SignUpFutureEmailCodeVerifyParams) => Promise<{ error: unknown }>;
-
-    /**
-     * Used to send a phone code to verify a phone number.
-     */
-    sendPhoneCode: (params: SignUpFuturePhoneCodeSendParams) => Promise<{ error: unknown }>;
-
-    /**
-     * Used to verify a code sent via phone.
-     */
-    verifyPhoneCode: (params: SignUpFuturePhoneCodeVerifyParams) => Promise<{ error: unknown }>;
-  };
+  verifications: SignUpFutureVerifications;
 
   /**
    * Used to sign up using an email address and password.
    */
-  password: (params: SignUpFuturePasswordParams) => Promise<{ error: unknown }>;
+  password: (params: SignUpFuturePasswordParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to create an account using an OAuth connection.
    */
-  sso: (params: SignUpFutureSSOParams) => Promise<{ error: unknown }>;
+  sso: (params: SignUpFutureSSOParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to perform a ticket-based sign-up.
    */
-  ticket: (params?: SignUpFutureTicketParams) => Promise<{ error: unknown }>;
+  ticket: (params?: SignUpFutureTicketParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to perform a Web3-based sign-up.
    */
-  web3: (params: SignUpFutureWeb3Params) => Promise<{ error: unknown }>;
+  web3: (params: SignUpFutureWeb3Params) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to convert a sign-up with `status === 'complete'` into an active session. Will cause anything observing the
    * session state (such as the `useUser()` hook) to update automatically.
    */
-  finalize: (params?: SignUpFutureFinalizeParams) => Promise<{ error: unknown }>;
+  finalize: (params?: SignUpFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Resets the current sign-up attempt by clearing all local state back to null.
+   * This is useful when you want to allow users to go back to the beginning of
+   * the sign-up flow (e.g., to change their email address during verification).
+   *
+   * Unlike other methods, `reset()` does not trigger the `fetchStatus` to change
+   * to `'fetching'` and does not make any API calls - it only clears local state.
+   */
+  reset: () => Promise<{ error: ClerkError | null }>;
 }

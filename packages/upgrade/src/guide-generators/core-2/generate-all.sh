@@ -11,5 +11,4 @@ node $SCRIPT_DIR/js/index.js
 node $SCRIPT_DIR/nextjs/index.js
 node $SCRIPT_DIR/node/index.js
 node $SCRIPT_DIR/react/index.js
-node $SCRIPT_DIR/remix/index.js
 node $SCRIPT_DIR/retheme/index.js

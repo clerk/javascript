@@ -1,4 +1,4 @@
-import { OrganizationSwitcher, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
+import { OrganizationSwitcher, Show, UserButton } from '@clerk/react';
 import { Link } from 'react-router-dom';
 import React from 'react';
 import { ClientId } from './client-id';
@@ -6,11 +6,11 @@ import { ClientId } from './client-id';
 function App() {
   return (
     <main>
-      <UserButton afterSignOutUrl={'/'} />
+      <UserButton />
       <OrganizationSwitcher fallback={<>Loading organization switcher</>} />
       <ClientId />
-      <SignedOut>SignedOut</SignedOut>
-      <SignedIn>SignedIn</SignedIn>
+      <Show when='signed-out'>SignedOut</Show>
+      <Show when='signed-in'>SignedIn</Show>
       <Link href='/protected'>Protected</Link>
     </main>
   );

@@ -1,4 +1,4 @@
-import type { __experimental_PlanDetailsButtonProps } from '@clerk/types';
+import type { __experimental_PlanDetailsButtonProps } from '@clerk/shared/types';
 import React from 'react';
 
 import type { WithClerkProp } from './utils';

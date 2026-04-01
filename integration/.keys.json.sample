@@ -58,5 +58,13 @@
   "with-api-keys": {
     "pk": "",
     "sk": ""
+  },
+  "with-protect-service": {
+    "pk": "",
+    "sk": ""
+  },
+  "with-enterprise-sso": {
+    "pk": "",
+    "sk": ""
   }
 }

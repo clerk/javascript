@@ -1,4 +1,4 @@
-import { ClerkLoaded, ClerkLoading, ClerkFailed, ClerkDegraded, useClerk } from '@clerk/clerk-react';
+import { ClerkLoaded, ClerkLoading, ClerkFailed, ClerkDegraded, useClerk } from '@clerk/react';
 
 export default function ClerkStatusPage() {
   const { loaded, status } = useClerk();
@@ -27,7 +27,7 @@ export default function ClerkStatusPage() {
       </ClerkFailed>
 
       <ClerkLoading>
-        <p>(comp) Waiting for clerk to fail, ready or regraded.</p>
+        <p>(comp) Waiting for clerk to fail, ready or degraded.</p>
       </ClerkLoading>
     </>
   );
