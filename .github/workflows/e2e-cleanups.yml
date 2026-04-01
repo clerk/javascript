@@ -5,6 +5,9 @@ on:
     # run every 6 hours on every weekday
     - cron: '0 */6 * * 1-5'
 
+permissions:
+  contents: read
+
 jobs:
   integration-tests:
     name: Cleanup e2e instances
