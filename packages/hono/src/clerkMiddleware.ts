@@ -1,5 +1,7 @@
+import type { AuthObject } from '@clerk/backend';
 import { createClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, AuthOptions, GetAuthFnNoRequest } from '@clerk/backend/internal';
+import { getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath, stripTrailingSlashes } from '@clerk/backend/proxy';
 import type { MiddlewareHandler } from 'hono';
 import { env } from 'hono/adapter';
@@ -119,7 +121,11 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareHan
       }
     }
 
-    const authObjectFn = ((authOptions?: AuthOptions) => requestState.toAuth(authOptions)) as GetAuthFnNoRequest;
+    const authObjectFn = ((authOptions?: AuthOptions) =>
+      getAuthObjectForAcceptedToken({
+        authObject: requestState.toAuth(authOptions) as AuthObject,
+        acceptsToken: authOptions?.acceptsToken,
+      })) as GetAuthFnNoRequest;
 
     c.set('clerkAuth', authObjectFn);
     c.set('clerk', clerkClient);
