@@ -885,8 +885,8 @@ describe('clerkMiddleware(params)', () => {
   });
 });
 
-describe('Dev Browser JWT when redirecting to cross origin for page requests', function () {
-  it('does NOT append the Dev Browser JWT when cookie is missing', async () => {
+describe('Dev browser when redirecting to cross origin for page requests', function () {
+  it('does NOT append the dev browser when cookie is missing', async () => {
     const req = mockRequest({
       url: '/protected',
       headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
@@ -911,7 +911,7 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
     expect((await clerkClient()).authenticateRequest).toBeCalled();
   });
 
-  it('appends the Dev Browser JWT to the search when cookie __clerk_db_jwt exists and location is an Account Portal URL', async () => {
+  it('appends the dev browser to the search when cookie __clerk_db_jwt exists and location is an Account Portal URL', async () => {
     const req = mockRequest({
       url: '/protected',
       headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
@@ -936,7 +936,7 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
     expect((await clerkClient()).authenticateRequest).toBeCalled();
   });
 
-  it('does NOT append the Dev Browser JWT if x-clerk-redirect-to header is not set (user-returned redirect)', async () => {
+  it('does NOT append the dev browser if x-clerk-redirect-to header is not set (user-returned redirect)', async () => {
     const req = mockRequest({
       url: '/protected',
       headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),

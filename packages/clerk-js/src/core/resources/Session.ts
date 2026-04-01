@@ -9,6 +9,7 @@ import {
 import { retry } from '@clerk/shared/retry';
 import type {
   ActClaim,
+  AgentActClaim,
   CheckAuthorization,
   ClientResource,
   EmailCodeConfig,
@@ -59,6 +60,7 @@ export class Session extends BaseResource implements SessionResource {
   lastActiveToken!: TokenResource | null;
   lastActiveOrganizationId!: string | null;
   actor!: ActClaim | null;
+  agent!: AgentActClaim | null;
   user!: UserResource | null;
   publicUserData!: PublicUserData;
   factorVerificationAge: [number, number] | null = null;
@@ -382,6 +384,7 @@ export class Session extends BaseResource implements SessionResource {
     this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.lastActiveOrganizationId = data.last_active_organization_id;
     this.actor = data.actor || null;
+    this.agent = data.actor?.type === 'agent' ? (data.actor as AgentActClaim) : null;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.user = new User(data.user);

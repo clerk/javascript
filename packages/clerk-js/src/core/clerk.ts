@@ -691,7 +691,9 @@ export class Clerk implements ClerkInterface {
     }
     this.assertComponentsReady(this.#clerkUI);
     const component = 'SignIn';
-    void this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.openModal('signIn', props || {}));
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls => controls.openModal('signIn', props || {}));
 
     const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
     this.telemetry?.record(eventPrebuiltComponentOpened(component, props, additionalData));
@@ -865,7 +867,9 @@ export class Clerk implements ClerkInterface {
       return;
     }
     this.assertComponentsReady(this.#clerkUI);
-    void this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.openModal('signUp', props || {}));
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: 'SignUp' }))
+      .then(controls => controls.openModal('signUp', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('SignUp', props));
   };
@@ -884,7 +888,9 @@ export class Clerk implements ClerkInterface {
       return;
     }
     this.assertComponentsReady(this.#clerkUI);
-    void this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.openModal('userProfile', props || {}));
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: 'UserProfile' }))
+      .then(controls => controls.openModal('userProfile', props || {}));
 
     const additionalData = (props?.customPages?.length || 0) > 0 ? { customPages: true } : undefined;
     this.telemetry?.record(eventPrebuiltComponentOpened('UserProfile', props, additionalData));
@@ -920,7 +926,7 @@ export class Clerk implements ClerkInterface {
 
     this.assertComponentsReady(this.#clerkUI);
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: 'OrganizationProfile' }))
       .then(controls => controls.openModal('organizationProfile', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('OrganizationProfile', props));
@@ -947,7 +953,7 @@ export class Clerk implements ClerkInterface {
 
     this.assertComponentsReady(this.#clerkUI);
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: 'CreateOrganization' }))
       .then(controls => controls.openModal('createOrganization', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('CreateOrganization', props));
@@ -959,7 +965,9 @@ export class Clerk implements ClerkInterface {
 
   public openWaitlist = (props?: WaitlistProps): void => {
     this.assertComponentsReady(this.#clerkUI);
-    void this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.openModal('waitlist', props || {}));
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: 'Waitlist' }))
+      .then(controls => controls.openModal('waitlist', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('Waitlist', props));
   };
@@ -972,7 +980,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'SignIn';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -994,7 +1002,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'UserAvatar';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1015,7 +1023,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'SignUp';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1044,7 +1052,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'UserProfile';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1090,7 +1098,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OrganizationProfile';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1125,7 +1133,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'CreateOrganization';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1160,7 +1168,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OrganizationSwitcher';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1205,7 +1213,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OrganizationList';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1231,7 +1239,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'UserButton';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1257,7 +1265,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'Waitlist';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1286,7 +1294,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'PricingTable';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1307,7 +1315,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OAuthConsent';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1362,7 +1370,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'APIKeys';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1405,7 +1413,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'TaskChooseOrganization';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1427,7 +1435,7 @@ export class Clerk implements ClerkInterface {
 
     const component = 'TaskResetPassword';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -1449,7 +1457,7 @@ export class Clerk implements ClerkInterface {
 
     const component = 'TaskSetupMFA';
     void this.#clerkUI
-      .then(ui => ui.ensureMounted())
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
       .then(controls =>
         controls.mountComponent({
           name: component,
@@ -2897,8 +2905,8 @@ export class Clerk implements ClerkInterface {
     /**
      * 0. Init auth service and setup dev browser
      * This is not needed for production instances hence the .clear()
-     * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
-     * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
+     * At this point we have already attempted to pre-populate devBrowser, if Step 2 was successful this will not be overwritten.
+     * For multi-domain we want to avoid retrieving a fresh dev browser from FAPI, and we need to get the token as a result of multi-domain session syncing.
      */
     this.#authService = await AuthCookieService.create(
       this,
@@ -2911,7 +2919,7 @@ export class Clerk implements ClerkInterface {
     /**
      * 1. Multi-domain SSO handling
      * If needed the app will attempt to sync with another app hosted in a different domain in order to acquire a session
-     * - for development instances it populates dev browser JWT and `devBrowserHandler.setup()` should not have run.
+     * - for development instances it populates the dev browser and `devBrowserHandler.setup()` should not have run.
      */
     this.#validateMultiDomainOptions();
     if (this.#shouldSyncWithPrimary()) {
@@ -2922,7 +2930,7 @@ export class Clerk implements ClerkInterface {
 
     /**
      * 3. If the app is considered a primary domain and is in the middle of the sync/link flow, interact the loading of Clerk and redirect back to the satellite app
-     * Initially step 2 and 4 were considered one but for step 2 we need devBrowserHandler.setup() to not have run and step 4 requires a valid dev browser JWT
+     * Initially step 2 and 4 were considered one but for step 2 we need devBrowserHandler.setup() to not have run and step 4 requires a valid dev browser
      */
     if (this.#shouldRedirectToSatellite()) {
       await this.#redirectToSatellite();

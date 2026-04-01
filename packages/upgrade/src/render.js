@@ -192,7 +192,15 @@ export function createSpinner(label) {
 }
 
 export function renderCodemodResults(transform, result) {
-  console.log(`  ${result.ok ?? 0} file(s) modified, ${chalk.red(`  ${result.error ?? 0} errors`)}`);
+  const errorCount = result.error ?? 0;
+  const okCount = result.ok ?? 0;
+
+  if (errorCount > 0) {
+    console.log(`  ${okCount} file(s) modified, ${chalk.red(`${errorCount} error(s)`)}`);
+    console.log(chalk.gray('  Error details for failed files are printed above by jscodeshift.'));
+  } else {
+    console.log(`  ${okCount} file(s) modified`);
+  }
   console.log('');
 }
 
