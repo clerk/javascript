@@ -17,7 +17,7 @@ function createMockRoute(
     fetchError,
   } = overrides;
 
-  const fulfilled: { response?: unknown; json?: unknown }[] = [];
+  const fulfilled: { response?: unknown; json: Record<string, any> }[] = [];
   const continued: { url?: string }[] = [];
   let fetchCallCount = 0;
 
@@ -68,13 +68,13 @@ describe('setupClerkTestingToken', () => {
   const TESTING_TOKEN = 'test_token_123';
 
   beforeEach(async () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     vi.stubEnv('CLERK_FAPI', FAPI_URL);
     vi.stubEnv('CLERK_TESTING_TOKEN', TESTING_TOKEN);
 
     // Reset module to clear the WeakSet between tests
     vi.resetModules();
-    const mod = await import('../setupClerkTestingToken');
+    const mod = await import('../setupClerkTestingToken.js');
     setupClerkTestingToken = mod.setupClerkTestingToken;
   });
 
@@ -133,6 +133,19 @@ describe('setupClerkTestingToken', () => {
 
       expect(ctx1.getRouteCallCount()).toBe(1);
       expect(ctx2.getRouteCallCount()).toBe(1);
+    });
+
+    it('allows retry after route registration fails', async () => {
+      const routeFn = vi.fn();
+      routeFn.mockRejectedValueOnce(new Error('context closed'));
+      routeFn.mockResolvedValueOnce(undefined);
+
+      const context = { route: routeFn } as unknown as BrowserContext;
+
+      await expect(setupClerkTestingToken({ context })).rejects.toThrow('context closed');
+      await setupClerkTestingToken({ context });
+
+      expect(routeFn).toHaveBeenCalledTimes(2);
     });
 
     it('resolves context from page when context is not provided', async () => {

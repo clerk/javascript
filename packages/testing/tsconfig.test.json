@@ -2,8 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "sourceMap": true,
-    "emitDeclarationOnly": false,
-    "noImplicitAny": false
+    "emitDeclarationOnly": false
   },
   "include": ["src/**/*"]
 }

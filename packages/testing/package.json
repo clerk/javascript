@@ -73,8 +73,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "test": "vitest",
-    "test:ci": "vitest run --maxWorkers=70%"
+    "test": "vitest"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",

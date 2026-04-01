@@ -24,6 +24,7 @@ const JITTER_MAX_MS = 250;
  * @param params.options.frontendApiUrl - The frontend API URL for your Clerk dev instance, without the protocol.
  * @returns A promise that resolves when the bot protection bypass is set up.
  * @throws An error if the Frontend API URL is not provided.
+ * @remarks Set the `CLERK_TESTING_DEBUG` environment variable to enable verbose logging of retry attempts and route handler registration.
  * @example
  * import { setupClerkTestingToken } from '@clerk/testing/playwright';
  *
@@ -57,27 +58,62 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
   const apiUrl = new RegExp(`^https://${escapedFapiUrl}/v1/.*?(\\?.*)?$`);
 
   setupContexts.add(browserContext);
-  await browserContext.route(apiUrl, async route => {
-    const originalUrl = new URL(route.request().url());
-    const testingToken = process.env.CLERK_TESTING_TOKEN;
+  try {
+    await browserContext.route(apiUrl, async route => {
+      const originalUrl = new URL(route.request().url());
+      const testingToken = process.env.CLERK_TESTING_TOKEN;
 
-    if (testingToken) {
-      originalUrl.searchParams.set(TESTING_TOKEN_PARAM, testingToken);
-    }
+      if (testingToken) {
+        originalUrl.searchParams.set(TESTING_TOKEN_PARAM, testingToken);
+      }
 
-    const urlString = originalUrl.toString();
+      const urlString = originalUrl.toString();
 
-    for (let attempt = 0; attempt <= MAX_ROUTE_RETRIES; attempt++) {
-      try {
-        const response = await route.fetch({ url: urlString });
-        const status = response.status();
+      for (let attempt = 0; attempt <= MAX_ROUTE_RETRIES; attempt++) {
+        try {
+          const response = await route.fetch({ url: urlString });
+          const status = response.status();
 
-        if (RETRYABLE_STATUS_CODES.has(status)) {
+          if (RETRYABLE_STATUS_CODES.has(status)) {
+            if (attempt < MAX_ROUTE_RETRIES) {
+              const delay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
+              if (process.env.CLERK_TESTING_DEBUG) {
+                console.log(
+                  `[Clerk Testing] FAPI returned ${status}, retrying (attempt ${attempt + 1}/${MAX_ROUTE_RETRIES}, delay ${Math.round(delay)}ms): ${route.request().url()}`,
+                );
+              }
+              await new Promise(resolve => setTimeout(resolve, delay));
+              continue;
+            }
+
+            console.warn(
+              `[Clerk Testing] FAPI request failed with status ${status} after ${MAX_ROUTE_RETRIES + 1} attempts: ${route.request().url()}`,
+            );
+            await route.fulfill({ response });
+            return;
+          }
+
+          const json = await response.json();
+
+          // Override captcha_bypass in /v1/client
+          if (json?.response?.captcha_bypass === false) {
+            json.response.captcha_bypass = true;
+          }
+
+          // Override captcha_bypass in piggybacking
+          if (json?.client?.captcha_bypass === false) {
+            json.client.captcha_bypass = true;
+          }
+
+          await route.fulfill({ response, json });
+          return;
+        } catch (error) {
           if (attempt < MAX_ROUTE_RETRIES) {
             const delay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
             if (process.env.CLERK_TESTING_DEBUG) {
               console.log(
-                `[Clerk Testing] FAPI returned ${status}, retrying (attempt ${attempt + 1}/${MAX_ROUTE_RETRIES}, delay ${Math.round(delay)}ms): ${route.request().url()}`,
+                `[Clerk Testing] FAPI request error, retrying (attempt ${attempt + 1}/${MAX_ROUTE_RETRIES}, delay ${Math.round(delay)}ms): ${route.request().url()}`,
+                error,
               );
             }
             await new Promise(resolve => setTimeout(resolve, delay));
@@ -85,46 +121,16 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
           }
 
           console.warn(
-            `[Clerk Testing] FAPI request failed with status ${status} after ${MAX_ROUTE_RETRIES + 1} attempts: ${route.request().url()}`,
+            `[Clerk Testing] FAPI request failed after ${MAX_ROUTE_RETRIES + 1} attempts: ${route.request().url()}`,
+            error,
           );
-          await route.fulfill({ response });
+          await route.continue({ url: urlString }).catch(console.error);
           return;
         }
-
-        const json = await response.json();
-
-        // Override captcha_bypass in /v1/client
-        if (json?.response?.captcha_bypass === false) {
-          json.response.captcha_bypass = true;
-        }
-
-        // Override captcha_bypass in piggybacking
-        if (json?.client?.captcha_bypass === false) {
-          json.client.captcha_bypass = true;
-        }
-
-        await route.fulfill({ response, json });
-        return;
-      } catch (error) {
-        if (attempt < MAX_ROUTE_RETRIES) {
-          const delay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
-          if (process.env.CLERK_TESTING_DEBUG) {
-            console.log(
-              `[Clerk Testing] FAPI request error, retrying (attempt ${attempt + 1}/${MAX_ROUTE_RETRIES}, delay ${Math.round(delay)}ms): ${route.request().url()}`,
-              error,
-            );
-          }
-          await new Promise(resolve => setTimeout(resolve, delay));
-          continue;
-        }
-
-        console.warn(
-          `[Clerk Testing] FAPI request failed after ${MAX_ROUTE_RETRIES + 1} attempts: ${route.request().url()}`,
-          error,
-        );
-        await route.continue({ url: urlString }).catch(console.error);
-        return;
       }
-    }
-  });
+    });
+  } catch (e) {
+    setupContexts.delete(browserContext);
+    throw e;
+  }
 };
