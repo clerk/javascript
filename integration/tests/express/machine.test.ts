@@ -85,9 +85,9 @@ import { Router } from 'express';
 const router = Router();
 
 router.get('/m2m', (req: any, res: any) => {
-  const { subject, tokenType, isAuthenticated } = getAuth(req, { acceptsToken: 'm2m_token' });
+  const { subject, tokenType, machineId } = getAuth(req, { acceptsToken: 'm2m_token' });
 
-  if (!isAuthenticated) {
+  if (!machineId) {
     res.status(401).send('Unauthorized');
     return;
   }
