@@ -51,6 +51,7 @@ describe('SignUpContinue', () => {
     // the email field will be lost
     expect(screen.queryByText(/email address/i)).toBeInTheDocument();
     expect(screen.queryByText(/password/i)).toBeInTheDocument();
+    screen.getByPlaceholderText('Create a password');
   });
 
   it('does not show email field if has been verified', async () => {

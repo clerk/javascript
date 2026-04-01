@@ -1,5 +1,4 @@
 import { createClerkClient as backendCreateClerkClient } from '@clerk/backend';
-import { withRetry } from './retryableClerkClient';
 import { createAppPageObject, createPageObjects, type EnhancedPage } from '@clerk/testing/playwright/unstable';
 import type { Browser, BrowserContext, Page } from '@playwright/test';
 
@@ -7,18 +6,12 @@ import type { Application } from '../models/application';
 import { createEmailService } from './emailService';
 import { createInvitationService } from './invitationsService';
 import { createOrganizationsService } from './organizationsService';
+import { withRetry } from './retryableClerkClient';
 import type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail } from './usersService';
 import { createUserService } from './usersService';
 import { createWaitlistService } from './waitlistService';
 
 export type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail };
-export type { FakeMachineNetwork, FakeOAuthApp } from './machineAuthService';
-export {
-  createFakeMachineNetwork,
-  createFakeOAuthApp,
-  createJwtM2MToken,
-  obtainOAuthAccessToken,
-} from './machineAuthService';
 
 const createClerkClient = (app: Application) => {
   return backendCreateClerkClient({
