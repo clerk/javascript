@@ -691,7 +691,7 @@ export const zhTW: LocalizationResource = {
       title: '輸入您的密碼',
     },
     passwordCompromised: {
-      title: '密碼可能已遭外涯',
+      title: '密碼可能已遭外洩',
     },
     passwordPwned: {
       title: '密碼可能已遭外洩',
