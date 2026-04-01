@@ -122,6 +122,8 @@ export const enUS: LocalizationResource = {
     manage: 'Manage',
     manageSubscription: 'Manage subscription',
     month: 'Month',
+    monthAbbreviation: 'mo',
+    monthPerUnit: 'Month per {{unitName}}',
     monthly: 'Monthly',
     pastDue: 'Past due',
     pay: 'Pay {{amount}}',
@@ -144,8 +146,22 @@ export const enUS: LocalizationResource = {
     pricingTable: {
       billingCycle: 'Billing cycle',
       included: 'Included',
+      seatCost: {
+        freeUpToSeats: 'Free up to {{endsAfterBlock}} seats',
+        upToSeats: 'Up to {{endsAfterBlock}} seats',
+        perSeat: '{{feePerBlockAmount}}/{{periodAbbreviation}} per seat',
+        includedSeats: '{{includedSeats}} seats included',
+        additionalSeats: '({{additionalTierFeePerBlockAmount}}/{{periodAbbreviation}} for additional)',
+        unlimitedSeats: 'Unlimited seats',
+        tooltip: {
+          freeForUpToSeats: 'Free for up to {{endsAfterBlock}} seats.',
+          additionalSeatsEach: 'Additional seats are {{feePerBlockAmount}}/{{period}} each.',
+          firstSeatsIncludedInPlan: 'First {{endsAfterBlock}} seats are included in the plan.',
+        },
+      },
     },
     reSubscribe: 'Resubscribe',
+    seats: 'Seats',
     seeAllFeatures: 'See all features',
     startFreeTrial: 'Start free trial',
     startFreeTrial__days: 'Start {{days}}-day free trial',
@@ -176,6 +192,8 @@ export const enUS: LocalizationResource = {
     viewFeatures: 'View features',
     viewPayment: 'View payment',
     year: 'Year',
+    yearAbbreviation: 'yr',
+    yearPerUnit: 'Year per {{unitName}}',
   },
   createOrganization: {
     formButtonSubmit: 'Create organization',
@@ -221,6 +239,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationName: 'Organization name',
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'Enter your password',
+  formFieldInputPlaceholder__signUpPassword: 'Create a password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldInputPlaceholder__username: 'Enter your username',
   formFieldInput__emailAddress_format: 'Example format: name@example.com',
@@ -415,6 +434,8 @@ export const enUS: LocalizationResource = {
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'You do not have permissions to manage billing for this organization.',
+        planMembershipLimitExceeded:
+          'Your organization has {{count}} members (including pending invitations). This plan only allows {{limit}} members.',
       },
       title: 'Plans',
     },
@@ -458,6 +479,7 @@ export const enUS: LocalizationResource = {
     start: {
       headerTitle__general: 'General',
       headerTitle__members: 'Members',
+      membershipSeatUsageLabel: '{{count}} of {{limit}} seats used',
       profileSection: {
         primaryButton: 'Update profile',
         title: 'Organization Profile',
@@ -1021,7 +1043,8 @@ export const enUS: LocalizationResource = {
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
-    organization_membership_quota_exceeded: undefined,
+    organization_membership_quota_exceeded:
+      'You have reached your limit of organization memberships, including outstanding invitations.',
     organization_minimum_permissions_needed: undefined,
     organization_not_found_or_unauthorized:
       'You are no longer a member of this organization. Please choose or create another one.',
