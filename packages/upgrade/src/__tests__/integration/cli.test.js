@@ -317,4 +317,47 @@ describe('CLI Integration', () => {
       expect(result.exitCode).toBe(1);
     });
   });
+
+  describe('Package Replacements', () => {
+    let fixture;
+
+    beforeEach(() => {
+      fixture = createTempFixture('nextjs-v6-with-themes');
+    });
+
+    afterEach(() => {
+      fixture?.cleanup();
+    });
+
+    it('shows replacement message in dry-run mode', async () => {
+      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 15000 });
+
+      expect(result.stdout).toContain('[dry run]');
+      expect(result.stdout).toContain('@clerk/themes');
+      expect(result.stdout).toContain('@clerk/ui');
+    });
+
+    it('skips replacement when --skip-upgrade is used', async () => {
+      const fs = await import('node:fs');
+      const pkgBefore = fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8');
+
+      await runCli(['--dir', fixture.path, '--skip-upgrade', '--skip-codemods'], { timeout: 15000 });
+
+      const pkgAfter = fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8');
+      expect(pkgAfter).toBe(pkgBefore);
+    });
+
+    it('does not show replacement when package is not present', async () => {
+      const noThemesFixture = createTempFixture('nextjs-v6');
+      try {
+        const result = await runCli(['--dir', noThemesFixture.path, '--dry-run', '--skip-codemods'], {
+          timeout: 15000,
+        });
+
+        expect(result.stdout).not.toContain('Would replace');
+      } finally {
+        noThemesFixture.cleanup();
+      }
+    });
+  });
 });

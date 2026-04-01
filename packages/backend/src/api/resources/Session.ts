@@ -54,7 +54,7 @@ export class SessionActivity {
 }
 
 /**
- * The Backend `Session` object is similar to the [`Session`](https://clerk.com/docs/reference/javascript/session) object as it is an abstraction over an HTTP session and models the period of information exchange between a user and the server. However, the Backend `Session` object is different as it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Sessions#operation/GetSessionList) and is not directly accessible from the Frontend API.
+ * The Backend `Session` object is similar to the [`Session`](https://clerk.com/docs/reference/objects/session) object as it is an abstraction over an HTTP session and models the period of information exchange between a user and the server. However, the Backend `Session` object is different as it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Sessions#operation/GetSessionList) and is not directly accessible from the Frontend API.
  */
 export class Session {
   constructor(

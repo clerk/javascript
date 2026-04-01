@@ -17,6 +17,7 @@ describe('createSessionCookie', () => {
   const mockCookieSuffix = 'test-suffix';
   const mockToken = 'test-token';
   const mockExpires = new Date('2024-12-31');
+  const defaultOptions = { usePartitionedCookies: () => false };
   const mockSet = vi.fn();
   const mockRemove = vi.fn();
   const mockGet = vi.fn();
@@ -36,14 +37,14 @@ describe('createSessionCookie', () => {
   });
 
   it('should create both suffixed and non-suffixed cookie handlers', () => {
-    createSessionCookie(mockCookieSuffix);
+    createSessionCookie(mockCookieSuffix, defaultOptions);
     expect(createCookieHandler).toHaveBeenCalledTimes(2);
     expect(createCookieHandler).toHaveBeenCalledWith('__session');
     expect(createCookieHandler).toHaveBeenCalledWith('__session_test-suffix');
   });
 
   it('should set cookies with correct parameters in non-cross-origin context', () => {
-    const cookieHandler = createSessionCookie(mockCookieSuffix);
+    const cookieHandler = createSessionCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set(mockToken);
 
     expect(mockSet).toHaveBeenCalledTimes(2);
@@ -57,7 +58,7 @@ describe('createSessionCookie', () => {
 
   it('should set cookies with None sameSite in cross-origin context', () => {
     (inCrossOriginIframe as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    const cookieHandler = createSessionCookie(mockCookieSuffix);
+    const cookieHandler = createSessionCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set(mockToken);
 
     expect(mockSet).toHaveBeenCalledWith(mockToken, {
@@ -69,14 +70,14 @@ describe('createSessionCookie', () => {
   });
 
   it('should remove both cookies when remove is called', () => {
-    const cookieHandler = createSessionCookie(mockCookieSuffix);
+    const cookieHandler = createSessionCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.remove();
 
     expect(mockRemove).toHaveBeenCalledTimes(2);
   });
 
   it('should remove cookies with the same attributes as set', () => {
-    const cookieHandler = createSessionCookie(mockCookieSuffix);
+    const cookieHandler = createSessionCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set(mockToken);
     cookieHandler.remove();
 
@@ -102,7 +103,7 @@ describe('createSessionCookie', () => {
   it('should get cookie value from suffixed cookie first, then fallback to non-suffixed', () => {
     mockGet.mockImplementationOnce(() => 'suffixed-value').mockImplementationOnce(() => 'non-suffixed-value');
 
-    const cookieHandler = createSessionCookie(mockCookieSuffix);
+    const cookieHandler = createSessionCookie(mockCookieSuffix, defaultOptions);
     const result = cookieHandler.get();
 
     expect(result).toBe('suffixed-value');
@@ -111,7 +112,7 @@ describe('createSessionCookie', () => {
   it('should fallback to non-suffixed cookie when suffixed cookie is not present', () => {
     mockGet.mockImplementationOnce(() => undefined).mockImplementationOnce(() => 'non-suffixed-value');
 
-    const cookieHandler = createSessionCookie(mockCookieSuffix);
+    const cookieHandler = createSessionCookie(mockCookieSuffix, defaultOptions);
     const result = cookieHandler.get();
 
     expect(result).toBe('non-suffixed-value');
@@ -119,7 +120,7 @@ describe('createSessionCookie', () => {
 
   it('should set cookies with None sameSite on .replit.dev origins', () => {
     (requiresSameSiteNone as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    const cookieHandler = createSessionCookie(mockCookieSuffix);
+    const cookieHandler = createSessionCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set(mockToken);
 
     expect(mockSet).toHaveBeenCalledWith(mockToken, {
@@ -127,6 +128,19 @@ describe('createSessionCookie', () => {
       sameSite: 'None',
       secure: true,
       partitioned: false,
+    });
+  });
+
+  it('should set partitioned cookies when usePartitionedCookies returns true', () => {
+    const cookieHandler = createSessionCookie(mockCookieSuffix, { usePartitionedCookies: () => true });
+    cookieHandler.set(mockToken);
+
+    expect(mockRemove).toHaveBeenCalledTimes(2);
+    expect(mockSet).toHaveBeenCalledWith(mockToken, {
+      expires: mockExpires,
+      sameSite: 'None',
+      secure: true,
+      partitioned: true,
     });
   });
 });

@@ -1,6 +1,6 @@
 export * from '@clerk/backend';
 
-export type { ClerkFastifyOptions } from './types';
+export type { ClerkFastifyOptions, FrontendApiProxyOptions } from './types';
 
 export { clerkPlugin } from './clerkPlugin';
 export { getAuth } from './getAuth';

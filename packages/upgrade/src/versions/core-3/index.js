@@ -1,10 +1,10 @@
 export default {
   id: 'core-3',
   name: 'Core 3',
-  docsUrl: 'https://clerk.com/docs/upgrade-guides/core-3',
+  docsUrl: 'https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3',
   sdkVersions: {
     nextjs: { from: 6, to: 7 },
-    react: { from: 5, to: 7 },
+    react: { from: 5, to: 6 },
     expo: { from: 2, to: 3 },
     'react-router': { from: 2, to: 3 },
     'tanstack-react-start': { from: 0, to: 1 },
@@ -33,4 +33,5 @@ export default {
     { name: 'transform-satellite-auto-sync', packages: ['nextjs', 'react', 'expo', 'astro', 'tanstack-react-start'] },
     'transform-internal-clerk-js-ui-props',
   ],
+  packageReplacements: [{ from: '@clerk/themes', to: '@clerk/ui' }],
 };

@@ -66,16 +66,11 @@ export type UseAuthReturn =
        */
       has: CheckAuthorizationSignedOut;
       /**
-       * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#sign-out).
+       * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/reference/objects/clerk#sign-out).
        */
       signOut: SignOut;
       /**
-       * A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](https://clerk.com/docs/reference/javascript/session#get-token).
-       *
-       * > [!NOTE]
-       * > To access auth data server-side, see the [`Auth` object reference doc](https://clerk.com/docs/reference/backend/types/auth-object).
-       *
-       * @throws {ClerkRuntimeError} When called in a non-browser environment (code: `clerk_runtime_not_browser`)
+       * A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](https://clerk.com/docs/reference/objects/session#get-token).
        */
       getToken: GetToken;
     }
@@ -136,7 +131,7 @@ export type UseSignInReturn =
        */
       signIn: undefined;
       /**
-       * A function that sets the active session. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
+       * A function that sets the active session. See the [reference doc](https://clerk.com/docs/reference/objects/clerk#set-active).
        */
       setActive: undefined;
     }
@@ -160,7 +155,7 @@ export type UseSignUpReturn =
        */
       signUp: undefined;
       /**
-       * A function that sets the active session. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
+       * A function that sets the active session. See the [reference doc](https://clerk.com/docs/reference/objects/clerk#set-active).
        */
       setActive: undefined;
     }
@@ -213,7 +208,7 @@ export type UseSessionListReturn =
        */
       sessions: undefined;
       /**
-       * A function that sets the active session and/or Organization. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
+       * A function that sets the active session and/or Organization. See the [reference doc](https://clerk.com/docs/reference/objects/clerk#set-active).
        */
       setActive: undefined;
     }

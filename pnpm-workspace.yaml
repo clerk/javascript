@@ -35,3 +35,4 @@ minimumReleaseAge: 2880
 minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
+  - 'pkglab-*'

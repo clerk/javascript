@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "canary",
-    "@clerk/themes": "canary",
+    "@clerk/ui": "canary",
     "@clerk/types": "canary",
     "next": "^15",
     "react": "^19.1.1",

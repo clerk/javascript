@@ -72,6 +72,10 @@ types:
   - changed-files:
       - any-glob-to-any-file: packages/types/**
 
+ui:
+  - changed-files:
+      - any-glob-to-any-file: packages/ui/**
+
 vue:
   - changed-files:
       - any-glob-to-any-file: packages/vue/**
@@ -93,8 +97,5 @@ agent-toolkit:
       - any-glob-to-any-file: packages/agent-toolkit/**
 
 # Base branch labels
-core-3:
-  - base-branch: '^main$'
-
 core-2:
   - base-branch: '^release/core-2$'

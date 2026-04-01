@@ -116,7 +116,8 @@ const ImpersonationFabInternal = () => {
   const { parsedInternalTheme } = useAppearance();
   const containerRef = useRef<HTMLDivElement>(null);
   const actor = session?.actor;
-  const isImpersonating = !!actor;
+  const agent = session?.agent;
+  const isImpersonating = !!actor && !agent;
 
   //essentials for calcs
   const eyeWidth = parsedInternalTheme.sizes.$16;

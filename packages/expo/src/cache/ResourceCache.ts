@@ -35,7 +35,9 @@ function createResourceCache<T>(key: string): ResourceCache<T> {
       const value = await storage!.get(itemKey!);
       return value ? JSON.parse(value) : null;
     } catch (error) {
-      console.log(`Clerk: Error loading value on ${key} from storage:`, error);
+      if (__DEV__) {
+        console.error(`Clerk: Error loading value on ${key} from storage:`, error);
+      }
       return null;
     }
   };
@@ -46,7 +48,9 @@ function createResourceCache<T>(key: string): ResourceCache<T> {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return await storage!.set(itemKey!, JSON.stringify(value));
     } catch (error) {
-      console.log(`Clerk: Error saving value on ${key} in storage:`, error);
+      if (__DEV__) {
+        console.error(`Clerk: Error saving value on ${key} in storage:`, error);
+      }
     }
   };
 
@@ -56,7 +60,9 @@ function createResourceCache<T>(key: string): ResourceCache<T> {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return await storage!.set(itemKey!, '');
     } catch (error) {
-      console.log(`Clerk: Error deleting value on ${key} from storage:`, error);
+      if (__DEV__) {
+        console.error(`Clerk: Error deleting value on ${key} from storage:`, error);
+      }
     }
   };
 

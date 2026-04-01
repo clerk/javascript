@@ -32,11 +32,11 @@ describe('getAuth', () => {
   });
 
   it('returns the actual auth object if its tokenType is included in the acceptsToken array', () => {
-    const req = mockRequestWithAuth({ tokenType: 'm2m_token', id: 'm2m_1234' });
+    const req = mockRequestWithAuth({ tokenType: 'm2m_token', id: 'mt_1234' });
     const result = getAuth(req, { acceptsToken: ['m2m_token', 'api_key'] });
     expect(result.tokenType).toBe('m2m_token');
 
-    expect((result as AuthenticatedMachineObject<'m2m_token'>).id).toBe('m2m_1234');
+    expect((result as AuthenticatedMachineObject<'m2m_token'>).id).toBe('mt_1234');
     expect((result as AuthenticatedMachineObject<'m2m_token'>).subject).toBeUndefined();
   });
 
@@ -47,5 +47,13 @@ describe('getAuth', () => {
     // Properties specific to authenticated objects should be null or undefined
     expect(result.userId).toBeNull();
     expect(result.orgId).toBeNull();
+  });
+
+  it('returns an unauthenticated session auth object when m2m_token is present but session_token is expected', () => {
+    const req = mockRequestWithAuth({ tokenType: 'm2m_token', id: 'mt_1234', subject: 'mch_1234' });
+    const result = getAuth(req, { acceptsToken: 'session_token' });
+    expect(result.tokenType).toBe('session_token');
+    expect(result.userId).toBeNull();
+    expect(result.isAuthenticated).toBe(false);
   });
 });

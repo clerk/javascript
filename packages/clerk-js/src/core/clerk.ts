@@ -8,6 +8,7 @@ import {
   is4xxError,
   isClerkAPIResponseError,
   isClerkRuntimeError,
+  isUnauthenticatedError,
 } from '@clerk/shared/error';
 import {
   disabledAllAPIKeysFeatures,
@@ -100,6 +101,7 @@ import type {
   Resources,
   SDKMetadata,
   SessionResource,
+  SessionTouchParams,
   SetActiveParams,
   SignedInSessionResource,
   SignInProps,
@@ -341,7 +343,13 @@ export class Clerk implements ClerkInterface {
       }
       return strippedDomainString;
     }
-    return '';
+
+    if (typeof this.#domain === 'function') {
+      logger.warnOnce(warnings.domainAsFunctionNotSupported);
+      return '';
+    }
+
+    return stripScheme(this.#domain || '');
   }
 
   get proxyUrl(): string {
@@ -352,7 +360,13 @@ export class Clerk implements ClerkInterface {
       }
       return proxyUrlToAbsoluteURL(_unfilteredProxy);
     }
-    return '';
+
+    if (typeof this.#proxyUrl === 'function') {
+      logger.warnOnce(warnings.proxyUrlAsFunctionNotSupported);
+      return '';
+    }
+
+    return this.#proxyUrl || '';
   }
 
   get frontendApi(): string {
@@ -1566,6 +1580,7 @@ export class Clerk implements ClerkInterface {
         newSession?.currentTask &&
         this.#options.taskUrls?.[newSession?.currentTask.key];
       const shouldNavigate = !!(redirectUrl || taskUrl || setActiveNavigate);
+      const touchIntent: SessionTouchParams['intent'] = shouldSwitchOrganization ? 'select_org' : 'select_session';
 
       //1. setLastActiveSession to passed user session (add a param).
       //   Note that this will also update the session's active organization
@@ -1586,7 +1601,7 @@ export class Clerk implements ClerkInterface {
         if (shouldNavigate && newSession) {
           try {
             // __internal_touch does not call updateClient automatically
-            updatedClient = await newSession.__internal_touch();
+            updatedClient = await newSession.__internal_touch({ intent: touchIntent });
             if (updatedClient) {
               // We call updateClient manually, but without letting it emit
               // It's important that the setTransitiveState call happens somewhat
@@ -1595,14 +1610,14 @@ export class Clerk implements ClerkInterface {
               this.updateClient(updatedClient, { __internal_dangerouslySkipEmit: true });
             }
           } catch (e) {
-            if (is4xxError(e)) {
+            if (isUnauthenticatedError(e)) {
               void this.handleUnauthenticated();
             } else {
               throw e;
             }
           }
         } else {
-          await this.#touchCurrentSession(newSession);
+          await this.#touchCurrentSession(newSession, touchIntent);
         }
         // If we do have the updatedClient, read from that, otherwise getSessionFromClient
         // will fallback to this.client. This makes no difference now, but will if we
@@ -2489,6 +2504,12 @@ export class Clerk implements ClerkInterface {
     }
   };
 
+  public __internal_handleUnauthenticatedDevBrowser = async (): Promise<void> => {
+    if (this.#authService) {
+      await this.#authService.handleUnauthenticatedDevBrowser();
+    }
+  };
+
   public authenticateWithGoogleOneTap = async (
     params: AuthenticateWithGoogleOneTapParams,
   ): Promise<SignInResource | SignUpResource> => {
@@ -2839,10 +2860,9 @@ export class Clerk implements ClerkInterface {
       return true;
     }
 
-    // Check if satelliteAutoSync is disabled - if so, skip automatic sync
-    // unless explicitly triggered via __clerk_synced=false
-    if (this.#options.satelliteAutoSync === false) {
-      // Skip automatic sync when satelliteAutoSync is false
+    // Check if satelliteAutoSync is enabled - only auto-sync when explicitly opted in
+    // In Core 3, satelliteAutoSync defaults to false (undefined is treated as false)
+    if (this.#options.satelliteAutoSync !== true) {
       return false;
     }
 
@@ -2905,8 +2925,8 @@ export class Clerk implements ClerkInterface {
     /**
      * 0. Init auth service and setup dev browser
      * This is not needed for production instances hence the .clear()
-     * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
-     * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
+     * At this point we have already attempted to pre-populate devBrowser, if Step 2 was successful this will not be overwritten.
+     * For multi-domain we want to avoid retrieving a fresh dev browser from FAPI, and we need to get the token as a result of multi-domain session syncing.
      */
     this.#authService = await AuthCookieService.create(
       this,
@@ -2919,7 +2939,7 @@ export class Clerk implements ClerkInterface {
     /**
      * 1. Multi-domain SSO handling
      * If needed the app will attempt to sync with another app hosted in a different domain in order to acquire a session
-     * - for development instances it populates dev browser JWT and `devBrowserHandler.setup()` should not have run.
+     * - for development instances it populates the dev browser and `devBrowserHandler.setup()` should not have run.
      */
     this.#validateMultiDomainOptions();
     if (this.#shouldSyncWithPrimary()) {
@@ -2930,7 +2950,7 @@ export class Clerk implements ClerkInterface {
 
     /**
      * 3. If the app is considered a primary domain and is in the middle of the sync/link flow, interact the loading of Clerk and redirect back to the satellite app
-     * Initially step 2 and 4 were considered one but for step 2 we need devBrowserHandler.setup() to not have run and step 4 requires a valid dev browser JWT
+     * Initially step 2 and 4 were considered one but for step 2 we need devBrowserHandler.setup() to not have run and step 4 requires a valid dev browser
      */
     if (this.#shouldRedirectToSatellite()) {
       await this.#redirectToSatellite();
@@ -3131,7 +3151,7 @@ export class Clerk implements ClerkInterface {
       this.#touchThrottledUntil = Date.now() + 5_000;
 
       if (this.#options.touchSession) {
-        void this.#touchCurrentSession(this.session);
+        void this.#touchCurrentSession(this.session, 'focus');
       }
     });
 
@@ -3162,14 +3182,19 @@ export class Clerk implements ClerkInterface {
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
-  #touchCurrentSession = async (session?: SignedInSessionResource | null): Promise<void> => {
+  #touchCurrentSession = async (
+    session?: SignedInSessionResource | null,
+    intent: SessionTouchParams['intent'] = 'focus',
+  ): Promise<void> => {
     if (!session) {
       return Promise.resolve();
     }
 
-    await session.touch().catch(e => {
-      if (is4xxError(e)) {
+    await session.touch({ intent }).catch(e => {
+      if (isUnauthenticatedError(e)) {
         void this.handleUnauthenticated();
+      } else {
+        throw e;
       }
     });
   };

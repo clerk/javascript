@@ -29,9 +29,10 @@ vi.mock('../auth/devBrowser', () => ({
   createDevBrowser: (): DevBrowser => ({
     clear: vi.fn(),
     setup: vi.fn(),
-    getDevBrowserJWT: vi.fn(() => 'deadbeef'),
-    setDevBrowserJWT: vi.fn(),
-    removeDevBrowserJWT: vi.fn(),
+    getDevBrowser: vi.fn(() => 'deadbeef'),
+    setDevBrowser: vi.fn(),
+    removeDevBrowser: vi.fn(),
+    refreshCookies: vi.fn(),
   }),
 }));
 
@@ -206,7 +207,7 @@ describe('Clerk singleton', () => {
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-        expect(mockSession.touch).toHaveBeenCalled();
+        expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
       });
 
       describe('with `touchSession` set to false', () => {
@@ -217,7 +218,7 @@ describe('Clerk singleton', () => {
           const sut = new Clerk(productionPublishableKey);
           await sut.load({ touchSession: false });
           await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-          expect(mockSession.touch).toHaveBeenCalled();
+          expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
         });
       });
 
@@ -232,7 +233,7 @@ describe('Clerk singleton', () => {
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-        expect(mockSession.touch).toHaveBeenCalled();
+        expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
       });
 
       it('sets __session and __client_uat cookie before calling __internal_onBeforeSetActive', async () => {
@@ -279,7 +280,7 @@ describe('Clerk singleton', () => {
         await sut.setActive({ organization: 'some-org-slug' });
 
         await waitFor(() => {
-          expect(mockSession2.touch).toHaveBeenCalled();
+          expect(mockSession2.touch).toHaveBeenCalledWith({ intent: 'select_org' });
           expect(mockSession2.getToken).toHaveBeenCalled();
           expect((mockSession2 as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
           expect(sut.session).toMatchObject(mockSession2);
@@ -362,7 +363,7 @@ describe('Clerk singleton', () => {
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
         await sut.setActive({ session: mockSession as any as PendingSessionResource, navigate });
-        expect(mockSession.__internal_touch).toHaveBeenCalled();
+        expect(mockSession.__internal_touch).toHaveBeenCalledWith({ intent: 'select_session' });
         expect(navigate).toHaveBeenCalled();
       });
 
@@ -2385,6 +2386,7 @@ describe('Clerk singleton', () => {
   describe('Clerk().isSatellite and Clerk().domain getters', () => {
     beforeEach(() => {
       mockClientFetch.mockReset();
+      mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [] }));
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -2476,6 +2478,19 @@ describe('Clerk singleton', () => {
 
         expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://clerk.satellite.com/v1/me');
       });
+
+      mockNativeRuntime(() => {
+        test('fapiClient should use Clerk.domain as its baseUrl in non-browser runtimes', async () => {
+          const sut = new Clerk(productionPublishableKey, {
+            domain: 'satellite.com',
+          });
+          await sut.load({
+            isSatellite: true,
+          });
+
+          expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://satellite.com/v1/me');
+        });
+      });
     });
   });
 
@@ -2488,6 +2503,17 @@ describe('Clerk singleton', () => {
         await sut.load({});
 
         expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://proxy.com/api/__clerk/v1/me');
+      });
+
+      mockNativeRuntime(() => {
+        test('fapiClient should use Clerk.proxyUrl as its baseUrl in non-browser runtimes', async () => {
+          const sut = new Clerk(productionPublishableKey, {
+            proxyUrl: 'https://proxy.com/api/__clerk',
+          });
+          await sut.load({});
+
+          expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://proxy.com/api/__clerk/v1/me');
+        });
       });
     });
   });
@@ -2509,7 +2535,7 @@ describe('Clerk singleton', () => {
       expect(url).toBe('foo');
     });
 
-    it('uses the hash to propagate the dev_browser JWT by default on dev', async () => {
+    it('uses the hash to propagate the dev browser by default on dev', async () => {
       const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 
@@ -2517,7 +2543,7 @@ describe('Clerk singleton', () => {
       expect(url).toBe('https://example.com/some-path?__clerk_db_jwt=deadbeef');
     });
 
-    it('uses the query param to propagate the dev_browser JWT if specified by option on dev', async () => {
+    it('uses the query param to propagate the dev browser if specified by option on dev', async () => {
       const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 
@@ -2525,7 +2551,7 @@ describe('Clerk singleton', () => {
       expect(url).toBe('https://example.com/some-path?__clerk_db_jwt=deadbeef');
     });
 
-    it('uses the query param to propagate the dev_browser JWT to Account Portal pages on dev - non-kima', async () => {
+    it('uses the query param to propagate the dev browser to Account Portal pages on dev - non-kima', async () => {
       const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 
@@ -2533,7 +2559,7 @@ describe('Clerk singleton', () => {
       expect(url).toBe('https://accounts.abcef.12345.dev.lclclerk.com/?__clerk_db_jwt=deadbeef');
     });
 
-    it('uses the query param to propagate the dev_browser JWT to Account Portal pages on dev - kima', async () => {
+    it('uses the query param to propagate the dev browser to Account Portal pages on dev - kima', async () => {
       const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 

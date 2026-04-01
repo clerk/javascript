@@ -2,8 +2,11 @@ import type { AuthObject } from '@clerk/backend';
 import { createClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, AuthOptions, GetAuthFnNoRequest } from '@clerk/backend/internal';
 import { getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
+import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath, stripTrailingSlashes } from '@clerk/backend/proxy';
 import type { MiddlewareHandler } from 'hono';
 import { env } from 'hono/adapter';
+
+import type { FrontendApiProxyOptions } from './types';
 
 type ClerkEnv = {
   CLERK_SECRET_KEY: string;
@@ -12,7 +15,9 @@ type ClerkEnv = {
   CLERK_API_VERSION?: string;
 };
 
-export type ClerkMiddlewareOptions = Omit<AuthenticateRequestOptions, 'acceptsToken'>;
+export type ClerkMiddlewareOptions = Omit<AuthenticateRequestOptions, 'acceptsToken'> & {
+  frontendApiProxy?: FrontendApiProxyOptions;
+};
 
 /**
  * Clerk middleware for Hono that authenticates requests and attaches
@@ -35,12 +40,14 @@ export type ClerkMiddlewareOptions = Omit<AuthenticateRequestOptions, 'acceptsTo
 export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareHandler => {
   return async (c, next) => {
     const clerkEnv = env<ClerkEnv>(c);
-    const { secretKey, publishableKey, apiUrl, apiVersion, ...rest } = options || {
-      secretKey: clerkEnv.CLERK_SECRET_KEY || '',
-      publishableKey: clerkEnv.CLERK_PUBLISHABLE_KEY || '',
-      apiUrl: clerkEnv.CLERK_API_URL,
-      apiVersion: clerkEnv.CLERK_API_VERSION,
-    };
+    const {
+      secretKey = clerkEnv.CLERK_SECRET_KEY || '',
+      publishableKey = clerkEnv.CLERK_PUBLISHABLE_KEY || '',
+      apiUrl = clerkEnv.CLERK_API_URL,
+      apiVersion = clerkEnv.CLERK_API_VERSION,
+      frontendApiProxy,
+      ...rest
+    } = options || {};
 
     if (!secretKey) {
       throw new Error(
@@ -52,6 +59,31 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareHan
       throw new Error(
         'Clerk: Missing Publishable Key. Set CLERK_PUBLISHABLE_KEY in your environment or pass publishableKey to clerkMiddleware().',
       );
+    }
+
+    // Handle Frontend API proxy requests and auto-derive proxyUrl
+    let derivedProxyUrl = rest.proxyUrl;
+    if (frontendApiProxy) {
+      const proxyPath = stripTrailingSlashes(frontendApiProxy.path ?? DEFAULT_PROXY_PATH) || DEFAULT_PROXY_PATH;
+      const requestUrl = new URL(c.req.url);
+      const isEnabled =
+        typeof frontendApiProxy.enabled === 'function'
+          ? frontendApiProxy.enabled(requestUrl)
+          : frontendApiProxy.enabled;
+
+      if (isEnabled) {
+        if (matchProxyPath(c.req.raw, { proxyPath })) {
+          return clerkFrontendApiProxy(c.req.raw, {
+            proxyPath,
+            publishableKey,
+            secretKey,
+          });
+        }
+
+        if (!derivedProxyUrl) {
+          derivedProxyUrl = proxyPath;
+        }
+      }
     }
 
     const clerkClient = createClerkClient({
@@ -67,6 +99,7 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareHan
       ...rest,
       secretKey,
       publishableKey,
+      proxyUrl: derivedProxyUrl,
       acceptsToken: 'any',
     });
 

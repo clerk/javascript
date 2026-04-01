@@ -48,9 +48,6 @@ type CreateAgentTaskParams = {
 const basePath = '/agents/tasks';
 
 export class AgentTaskAPI extends AbstractAPI {
-  /**
-   * @experimental This is an experimental API for the Agent Tokens feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
-   */
   public async create(params: CreateAgentTaskParams) {
     return this.request<AgentTask>({
       method: 'POST',

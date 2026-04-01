@@ -398,7 +398,7 @@ export interface SignInFutureResource {
     /**
      * Used to send an email code to sign-in
      */
-    sendCode: (params: SignInFutureEmailCodeSendParams) => Promise<{ error: ClerkError | null }>;
+    sendCode: (params?: SignInFutureEmailCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to verify a code sent via email to sign-in

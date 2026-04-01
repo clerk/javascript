@@ -43,7 +43,7 @@ export interface ProxyError {
 }
 
 // Hop-by-hop headers that should not be forwarded
-const HOP_BY_HOP_HEADERS = [
+const HOP_BY_HOP_HEADERS = new Set([
   'connection',
   'keep-alive',
   'proxy-authenticate',
@@ -52,7 +52,32 @@ const HOP_BY_HOP_HEADERS = [
   'trailer',
   'transfer-encoding',
   'upgrade',
-];
+]);
+
+/**
+ * Parses the Connection header to extract dynamically-nominated hop-by-hop
+ * header names (RFC 7230 Section 6.1). These headers are specific to the
+ * current connection and must not be forwarded by proxies.
+ */
+function getDynamicHopByHopHeaders(headers: Headers): Set<string> {
+  const connectionValue = headers.get('connection');
+  if (!connectionValue) {
+    return new Set();
+  }
+  return new Set(
+    connectionValue
+      .split(',')
+      .map(h => h.trim().toLowerCase())
+      .filter(h => h.length > 0),
+  );
+}
+
+// Headers to strip from proxied responses. fetch() auto-decompresses
+// response bodies, so Content-Encoding no longer describes the body
+// and Content-Length reflects the compressed size. We request identity
+// encoding upstream to avoid the double compression pass, but strip
+// these defensively since servers may ignore Accept-Encoding: identity.
+const RESPONSE_HEADERS_TO_STRIP = new Set(['content-encoding', 'content-length']);
 
 /**
  * Derives the Frontend API URL from a publishable key.
@@ -107,8 +132,25 @@ function createErrorResponse(code: ProxyErrorCode, message: string, status: numb
     status,
     headers: {
       'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
     },
   });
+}
+
+/**
+ * Derives the public-facing origin from forwarded headers, falling back to the raw request URL.
+ * Behind a reverse proxy, request.url is typically localhost, but the Clerk-Proxy-Url header
+ * and Location rewrites must use the origin visible to the browser.
+ */
+function derivePublicOrigin(request: Request, requestUrl: URL): string {
+  const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim();
+  const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
+
+  if (forwardedProto && forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+
+  return requestUrl.origin;
 }
 
 /**
@@ -191,30 +233,47 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
     );
   }
 
-  // Derive the FAPI URL and construct the target URL
+  // Derive the FAPI URL and construct the target URL.
+  // Use string concatenation instead of `new URL(path, base)` to avoid
+  // protocol-relative resolution (e.g., "//evil.com" resolving to a different host).
   const fapiBaseUrl = fapiUrlFromPublishableKey(publishableKey);
+  const fapiHost = new URL(fapiBaseUrl).host;
   const targetPath = requestUrl.pathname.slice(proxyPath.length) || '/';
-  const targetUrl = new URL(targetPath, fapiBaseUrl);
+  const targetUrl = new URL(`${fapiBaseUrl}${targetPath}`);
   targetUrl.search = requestUrl.search;
+
+  if (targetUrl.host !== fapiHost) {
+    return createErrorResponse('proxy_request_failed', 'Resolved target does not match the expected host', 400);
+  }
 
   // Build headers for the proxied request
   const headers = new Headers();
 
-  // Copy original headers, excluding hop-by-hop headers
+  // Copy original headers, excluding hop-by-hop headers and any
+  // dynamically-nominated hop-by-hop headers listed in the Connection header (RFC 7230 Section 6.1).
+  const dynamicHopByHop = getDynamicHopByHopHeaders(request.headers);
   request.headers.forEach((value, key) => {
-    if (!HOP_BY_HOP_HEADERS.includes(key.toLowerCase())) {
+    const lower = key.toLowerCase();
+    if (!HOP_BY_HOP_HEADERS.has(lower) && !dynamicHopByHop.has(lower)) {
       headers.set(key, value);
     }
   });
 
   // Set required Clerk proxy headers
-  const proxyUrl = `${requestUrl.protocol}//${requestUrl.host}${proxyPath}`;
+  // Use the public origin (from forwarded headers) so the Clerk-Proxy-Url
+  // points to the browser-visible host, not localhost behind a reverse proxy.
+  const publicOrigin = derivePublicOrigin(request, requestUrl);
+  const proxyUrl = `${publicOrigin}${proxyPath}`;
   headers.set('Clerk-Proxy-Url', proxyUrl);
   headers.set('Clerk-Secret-Key', secretKey);
 
   // Set the host header to the FAPI host
-  const fapiHost = new URL(fapiBaseUrl).host;
   headers.set('Host', fapiHost);
+
+  // Request uncompressed responses to avoid a double compression pass.
+  // fetch() auto-decompresses, so without this FAPI compresses → fetch
+  // decompresses → the serving layer re-compresses for the browser.
+  headers.set('Accept-Encoding', 'identity');
 
   // Set X-Forwarded-* headers for proxy awareness
   // Only set these if not already present (preserve values from upstream proxies)
@@ -233,30 +292,44 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
     headers.set('X-Forwarded-For', clientIp);
   }
 
-  // Determine if request has a body
-  const hasBody = ['POST', 'PUT', 'PATCH'].includes(request.method);
+  // Determine if request has a body (handles DELETE-with-body and any other method)
+  const hasBody = request.body !== null;
 
   try {
     // Make the proxied request
+    // TODO: Consider adding AbortSignal.timeout(30_000) via AbortSignal.any()
     const fetchOptions: RequestInit = {
       method: request.method,
       headers,
-      // @ts-expect-error - duplex is required for streaming bodies but not in all TS definitions
-      duplex: hasBody ? 'half' : undefined,
+      redirect: 'manual',
+      signal: request.signal,
     };
 
-    // Only include body for methods that support it
-    if (hasBody && request.body) {
+    // Only set duplex when body is present (required for streaming bodies)
+    if (hasBody) {
+      // @ts-expect-error - duplex is required for streaming bodies, but not present on the RequestInit type from undici
+      fetchOptions.duplex = 'half';
       fetchOptions.body = request.body;
     }
 
     const response = await fetch(targetUrl.toString(), fetchOptions);
 
-    // Build response headers, excluding hop-by-hop headers
+    // Build response headers, excluding hop-by-hop and encoding headers.
+    // Also strip dynamically-nominated hop-by-hop headers from the response Connection header.
+    const responseDynamicHopByHop = getDynamicHopByHopHeaders(response.headers);
     const responseHeaders = new Headers();
     response.headers.forEach((value, key) => {
-      if (!HOP_BY_HOP_HEADERS.includes(key.toLowerCase())) {
-        responseHeaders.set(key, value);
+      const lower = key.toLowerCase();
+      if (
+        !HOP_BY_HOP_HEADERS.has(lower) &&
+        !RESPONSE_HEADERS_TO_STRIP.has(lower) &&
+        !responseDynamicHopByHop.has(lower)
+      ) {
+        if (lower === 'set-cookie') {
+          responseHeaders.append(key, value);
+        } else {
+          responseHeaders.set(key, value);
+        }
       }
     });
 
@@ -276,11 +349,20 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
       }
     }
 
-    return new Response(response.body, {
+    const proxyResponse = new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
       headers: responseHeaders,
     });
+
+    // Some runtimes may re-add Content-Length when constructing the Response.
+    // Delete explicitly since fetch() decoded the body and the original values
+    // no longer reflect the actual content.
+    for (const header of RESPONSE_HEADERS_TO_STRIP) {
+      proxyResponse.headers.delete(header);
+    }
+
+    return proxyResponse;
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return createErrorResponse('proxy_request_failed', `Failed to proxy request to Clerk FAPI: ${message}`, 502);

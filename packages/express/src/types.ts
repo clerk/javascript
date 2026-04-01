@@ -31,14 +31,6 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;
   clerkClient?: ClerkClient;
   /**
-   * @deprecated This option is deprecated as API requests don't trigger handshake flow.
-   * Handshake is only relevant for server-rendered applications with page navigation,
-   * not for API endpoints. This option will be removed in a future version.
-   *
-   * @default true
-   */
-  enableHandshake?: boolean;
-  /**
    * Configure Frontend API proxy handling. When set, requests to the proxy path
    * will skip authentication, and the proxyUrl will be automatically derived
    * for handshake redirects.
