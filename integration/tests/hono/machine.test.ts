@@ -8,7 +8,7 @@ import {
   registerOAuthAuthTests,
 } from '../../testUtils/machineAuthHelpers';
 
-const createAppFile = (routes: string, middlewareOptions = '') => `
+const createAppFile = (routes: string) => `
 import { clerkMiddleware, getAuth } from '@clerk/hono';
 import { Hono } from 'hono';
 
@@ -18,7 +18,6 @@ app.use(
   '*',
   clerkMiddleware({
     publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
-    ${middlewareOptions}
   }),
 );
 
@@ -82,8 +81,7 @@ app.post('/me', c => {
     addRoutes: config =>
       config
         .addFile('src/server/app.ts', () =>
-          createAppFile(
-            `
+          createAppFile(`
 app.get('/m2m', c => {
   const { subject, tokenType, machineId } = getAuth(c, { acceptsToken: 'm2m_token' });
 
@@ -93,9 +91,7 @@ app.get('/m2m', c => {
 
   return c.json({ subject, tokenType });
 });
-`,
-            `machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY || '',`,
-          ),
+`),
         )
         .addFile('src/server/main.ts', () => createMainFile()),
   },

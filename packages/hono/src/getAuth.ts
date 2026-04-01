@@ -1,4 +1,5 @@
 import type { AuthOptions, GetAuthFn } from '@clerk/backend/internal';
+import { getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
 import type { Context } from 'hono';
 
 /**
@@ -33,5 +34,7 @@ export const getAuth: GetAuthFn<Context> = ((c: Context, options?: AuthOptions) 
     );
   }
 
-  return authFn(options);
+  const authObject = authFn(options);
+
+  return getAuthObjectForAcceptedToken({ authObject, acceptsToken: options?.acceptsToken });
 }) as GetAuthFn<Context>;
