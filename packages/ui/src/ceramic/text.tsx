@@ -61,15 +61,10 @@ export const Text = React.forwardRef<HTMLElement, Omit<React.HTMLProps<HTMLEleme
   function Text(props, forwardedRef) {
     const { render = <p />, variant, color, font, sx, ...domProps } = props;
 
-    const combinedSx: StyleRule = theme => ({
-      ...(textStyles({ variant, color, font }) as any)(theme),
-      ...(typeof sx === 'function' ? sx(theme) : sx),
-    });
-
     return (
       <Composite
         render={render}
-        sx={combinedSx}
+        sx={[textStyles({ variant, color, font }), sx]}
         ref={forwardedRef}
         {...domProps}
       />

@@ -1,6 +1,4 @@
 import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
-// eslint-disable-next-line no-restricted-imports
-import type { Interpolation, Theme } from '@emotion/react';
 
 import { type CeramicTheme } from './theme';
 
@@ -143,9 +141,8 @@ function conditionMatches(
 export function variants<T>(config: VariantsConfig<T>) {
   const { base, variants: variantDefinitions = {} as T, defaultVariants = {}, compoundVariants = [] } = config;
 
-  return (props: ConfigVariants<T> = {}): Interpolation<Theme> => {
-    return ((theme: Theme) => {
-      const ceramicTheme = theme as unknown as CeramicTheme;
+  return (props: ConfigVariants<T> = {}): StyleFunction => {
+    return (ceramicTheme: CeramicTheme) => {
       const computedStyles: CSSObject = {};
       const variantDefs = variantDefinitions as Record<string, Record<string, StyleRule>>;
 
@@ -178,6 +175,6 @@ export function variants<T>(config: VariantsConfig<T>) {
       }
 
       return computedStyles;
-    }) as unknown as Interpolation<Theme>;
+    };
   };
 }

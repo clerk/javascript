@@ -14,6 +14,8 @@ const compositeStyles = variants({
 
 export type RenderProp = React.JSX.Element | ((props: React.HTMLAttributes<HTMLElement>) => React.JSX.Element);
 
+type SxArray = (StyleRule | undefined | null | false)[];
+
 function renderJsx(render: RenderProp | undefined, computedProps: React.HTMLAttributes<HTMLElement>) {
   if (typeof render === 'function') {
     return render(computedProps);
@@ -26,19 +28,20 @@ function renderJsx(render: RenderProp | undefined, computedProps: React.HTMLAttr
 
 interface CompositeProps {
   render?: RenderProp;
-  sx?: StyleRule;
+  sx?: StyleRule | SxArray;
 }
 
 export const Composite = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement> & CompositeProps>(
   function Composite(props, forwardedRef) {
     const { render, sx, ...domProps } = props;
     const renderElementProps = render && typeof render !== 'function' ? render.props : {};
+    const sxEntries = Array.isArray(sx) ? sx : [sx];
 
     const computedProps = {
       ...domProps,
       ...renderElementProps,
       ref: forwardedRef,
-      css: [compositeStyles({}), sx as Interpolation<Theme>],
+      css: [compositeStyles({}), ...sxEntries] as Interpolation<Theme>[],
     };
 
     return renderJsx(render, computedProps);

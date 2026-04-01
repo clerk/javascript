@@ -89,15 +89,10 @@ export const Button = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement>
   function Button(props, forwardedRef) {
     const { render = <button type='button' />, color, fullWidth, sx, ...domProps } = props;
 
-    const combinedSx: StyleRule = theme => ({
-      ...(buttonStyles({ color, fullWidth }) as any)(theme),
-      ...(typeof sx === 'function' ? sx(theme) : sx),
-    });
-
     return (
       <Composite
         render={render}
-        sx={combinedSx}
+        sx={[buttonStyles({ color, fullWidth }), sx]}
         ref={forwardedRef}
         {...domProps}
       />
