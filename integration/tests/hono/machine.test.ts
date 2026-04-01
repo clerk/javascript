@@ -8,13 +8,19 @@ import {
   registerOAuthAuthTests,
 } from '../../testUtils/machineAuthHelpers';
 
-const createAppFile = (routes: string) => `
+const createAppFile = (routes: string, middlewareOptions = '') => `
 import { clerkMiddleware, getAuth } from '@clerk/hono';
 import { Hono } from 'hono';
 
 const app = new Hono();
 
-app.use('*', clerkMiddleware());
+app.use(
+  '*',
+  clerkMiddleware({
+    publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
+    ${middlewareOptions}
+  }),
+);
 
 ${routes}
 
@@ -24,11 +30,20 @@ export default app;
 const createMainFile = () => `
 import 'dotenv/config';
 
-import { serve } from '@hono/node-server';
+import { getRequestListener } from '@hono/node-server';
+import express from 'express';
+import ViteExpress from 'vite-express';
 import app from './app';
 
+const expressApp = express();
+const honoRequestListener = getRequestListener(app.fetch);
+
+expressApp.use('/api', async (req: any, res: any) => {
+  await honoRequestListener(req, res);
+});
+
 const port = parseInt(process.env.PORT as string) || 3002;
-serve({ fetch: app.fetch, port }, () => console.log(\`Server is listening on port \${port}...\`));
+ViteExpress.listen(expressApp, port, () => console.log(\`Server is listening on port \${port}...\`));
 `;
 
 const adapter: MachineAuthTestAdapter = {
@@ -39,7 +54,7 @@ const adapter: MachineAuthTestAdapter = {
       config
         .addFile('src/server/app.ts', () =>
           createAppFile(`
-app.get('/api/me', c => {
+app.get('/me', c => {
   const { userId, tokenType } = getAuth(c, { acceptsToken: 'api_key' });
 
   if (!userId) {
@@ -49,7 +64,7 @@ app.get('/api/me', c => {
   return c.json({ userId, tokenType });
 });
 
-app.post('/api/me', c => {
+app.post('/me', c => {
   const authObject = getAuth(c, { acceptsToken: ['api_key', 'session_token'] });
 
   if (!authObject.isAuthenticated) {
@@ -67,17 +82,20 @@ app.post('/api/me', c => {
     addRoutes: config =>
       config
         .addFile('src/server/app.ts', () =>
-          createAppFile(`
-app.get('/api/m2m', c => {
-  const { subject, tokenType, isAuthenticated } = getAuth(c, { acceptsToken: 'm2m_token' });
+          createAppFile(
+            `
+app.get('/m2m', c => {
+  const { subject, tokenType, machineId } = getAuth(c, { acceptsToken: 'm2m_token' });
 
-  if (!isAuthenticated) {
+  if (!machineId) {
     return c.text('Unauthorized', 401);
   }
 
   return c.json({ subject, tokenType });
 });
-`),
+`,
+            `machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY || '',`,
+          ),
         )
         .addFile('src/server/main.ts', () => createMainFile()),
   },
@@ -88,7 +106,7 @@ app.get('/api/m2m', c => {
       config
         .addFile('src/server/app.ts', () =>
           createAppFile(`
-app.get('/api/oauth-verify', c => {
+app.get('/oauth-verify', c => {
   const { userId, tokenType } = getAuth(c, { acceptsToken: 'oauth_token' });
 
   if (!userId) {
@@ -98,7 +116,7 @@ app.get('/api/oauth-verify', c => {
   return c.json({ userId, tokenType });
 });
 
-app.get('/api/oauth/callback', c => {
+app.get('/oauth/callback', c => {
   return c.json({ message: 'OAuth callback received' });
 });
 `),
