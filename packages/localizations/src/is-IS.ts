@@ -95,8 +95,7 @@ export const isIS: LocalizationResource = {
     cancelSubscriptionTitle: 'Hætta {{plan}} áskrift?',
     cannotSubscribeMonthly:
       'Þú getur ekki skráð þig í þessa áskrift með mánaðarlegri greiðslu. Til að skrá þig þarftu að velja árlega greiðslu.',
-    cannotSubscribeUnrecoverable:
-      'Þú getur ekki skráð þig í þessa áskrift. Núverandi áskrift þín er dýrari en þessi.',
+    cannotSubscribeUnrecoverable: 'Þú getur ekki skráð þig í þessa áskrift. Núverandi áskrift þín er dýrari en þessi.',
     checkout: {
       description__paymentSuccessful: 'Greiðsla þín tókst.',
       description__subscriptionSuccessful: 'Nýja áskriftin þín er tilbúin.',
@@ -1065,8 +1064,7 @@ export const isIS: LocalizationResource = {
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
-    organization_membership_quota_exceeded:
-      'Þú hefur náð hámarksfjölda samtakaaðilda, þar á meðal útistandandi boð.',
+    organization_membership_quota_exceeded: 'Þú hefur náð hámarksfjölda samtakaaðilda, þar á meðal útistandandi boð.',
     organization_minimum_permissions_needed: undefined,
     organization_not_found_or_unauthorized:
       'Þú ert ekki lengur meðlimur í þessum samtökum. Vinsamlegast veldu eða stofnaðu önnur samtök.',

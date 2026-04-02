@@ -1011,7 +1011,8 @@ export const fiFI: LocalizationResource = {
   unstable__errors: {
     already_a_member_in_organization: '{{email}} on jo tämän organisaation jäsen.',
     api_key_name_already_exists: 'API-avaimen nimi on jo olemassa.',
-    api_key_usage_exceeded: 'Olet saavuttanut käyttörajasi. Voit poistaa rajoituksen siirtymällä maksulliseen tilaukseen.',
+    api_key_usage_exceeded:
+      'Olet saavuttanut käyttörajasi. Voit poistaa rajoituksen siirtymällä maksulliseen tilaukseen.',
     avatar_file_size_exceeded: 'Tiedostokoko ylittää enimmäisrajan 10 Mt. Valitse pienempi tiedosto.',
     avatar_file_type_invalid: 'Tiedostotyyppiä ei tueta. Lataa JPG-, PNG-, GIF- tai WEBP-kuva.',
     captcha_invalid:

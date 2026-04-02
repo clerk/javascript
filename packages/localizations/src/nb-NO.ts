@@ -289,7 +289,8 @@ export const nbNO: LocalizationResource = {
     title: 'Logget inn som {{identifier}}',
   },
   lastAuthenticationStrategy: 'Sist brukt',
-  maintenanceMode: 'Vi utfører vedlikehold for øyeblikket, men ikke bekymre deg, det bør ikke ta mer enn noen minutter.',
+  maintenanceMode:
+    'Vi utfører vedlikehold for øyeblikket, men ikke bekymre deg, det bør ikke ta mer enn noen minutter.',
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Medlem',
   membershipRole__guestMember: 'Gjest',
@@ -663,8 +664,7 @@ export const nbNO: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle:
-          'For å fortsette, åpne verifiseringslenken på enheten og nettleseren du startet innloggingen fra',
+        subtitle: 'For å fortsette, åpne verifiseringslenken på enheten og nettleseren du startet innloggingen fra',
         title: 'Verifiseringslenken er ugyldig for denne enheten',
       },
       expired: {
@@ -821,8 +821,7 @@ export const nbNO: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle:
-          'For å fortsette, åpne verifiseringslenken på enheten og nettleseren du startet registreringen fra',
+        subtitle: 'For å fortsette, åpne verifiseringslenken på enheten og nettleseren du startet registreringen fra',
         title: 'Verifiseringslenken er ugyldig for denne enheten',
       },
       formSubtitle: 'Bruk verifiseringslenken som er sendt til e-postadressen din',
@@ -871,7 +870,8 @@ export const nbNO: LocalizationResource = {
       blockButton__emailSupport: 'Send e-post til brukerstøtte',
       blockButton__joinWaitlist: 'Bli med på ventelisten',
       subtitle: 'Registrering er for øyeblikket deaktivert. Hvis du mener du bør ha tilgang, kontakt brukerstøtte.',
-      subtitleWaitlist: 'Registrering er for øyeblikket deaktivert. For å være den første som får vite når vi lanserer, bli med på ventelisten.',
+      subtitleWaitlist:
+        'Registrering er for øyeblikket deaktivert. For å være den første som får vite når vi lanserer, bli med på ventelisten.',
       title: 'Begrenset tilgang',
     },
     start: {
@@ -987,7 +987,8 @@ export const nbNO: LocalizationResource = {
         formButtonReset: 'Avbryt',
         infoText__ableToScan:
           'Sett opp en ny innloggingsmetode i autentiseringsappen din og skann følgende QR-kode for å koble den til kontoen din.',
-        infoText__unableToScan: 'Sett opp en ny innloggingsmetode i autentiseringsappen og skriv inn nøkkelen som er oppgitt nedenfor.',
+        infoText__unableToScan:
+          'Sett opp en ny innloggingsmetode i autentiseringsappen og skriv inn nøkkelen som er oppgitt nedenfor.',
         inputLabel__unableToScan1:
           'Sørg for at tidsbaserte eller engangspassord er aktivert, og fullfør deretter koblingen av kontoen din.',
       },

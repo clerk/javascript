@@ -868,8 +868,10 @@ export const hrHR: LocalizationResource = {
       actionText: 'Već imate račun?',
       blockButton__emailSupport: 'Pošalji e-poštu podršci',
       blockButton__joinWaitlist: 'Pridružite se listi čekanja',
-      subtitle: 'Registracije su trenutno onemogućene. Ako smatrate da biste trebali imati pristup, obratite se podršci.',
-      subtitleWaitlist: 'Registracije su trenutno onemogućene. Pridružite se listi čekanja kako biste prvi saznali kad pokrenemo.',
+      subtitle:
+        'Registracije su trenutno onemogućene. Ako smatrate da biste trebali imati pristup, obratite se podršci.',
+      subtitleWaitlist:
+        'Registracije su trenutno onemogućene. Pridružite se listi čekanja kako biste prvi saznali kad pokrenemo.',
       title: 'Pristup ograničen',
     },
     start: {
@@ -1010,7 +1012,8 @@ export const hrHR: LocalizationResource = {
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je već član organizacije.',
     api_key_name_already_exists: 'Naziv API ključa već postoji.',
-    api_key_usage_exceeded: 'Dosegli ste ograničenje korištenja. Možete ukloniti ograničenje nadogradnjom na plaćeni plan.',
+    api_key_usage_exceeded:
+      'Dosegli ste ograničenje korištenja. Možete ukloniti ograničenje nadogradnjom na plaćeni plan.',
     avatar_file_size_exceeded:
       'Veličina datoteke premašuje maksimalno ograničenje od 10 MB. Molimo odaberite manju datoteku.',
     avatar_file_type_invalid: 'Vrsta datoteke nije podržana. Molimo prenesite sliku u formatu JPG, PNG, GIF ili WEBP.',
@@ -1067,8 +1070,7 @@ export const hrHR: LocalizationResource = {
       'Dostigli ste ograničenje članstava u organizacijama, uključujući otvorene pozivnice.',
     organization_minimum_permissions_needed:
       'Mora postojati barem jedan član organizacije s minimalnim potrebnim dozvolama.',
-    organization_not_found_or_unauthorized:
-      'Više niste član ove organizacije. Molimo odaberite ili kreirajte drugu.',
+    organization_not_found_or_unauthorized: 'Više niste član ove organizacije. Molimo odaberite ili kreirajte drugu.',
     organization_not_found_or_unauthorized_with_create_organization_disabled:
       'Više niste član ove organizacije. Molimo odaberite drugu.',
     passkey_already_exists: 'Pristupni ključ je već registriran na ovom uređaju.',

@@ -869,8 +869,10 @@ export const huHU: LocalizationResource = {
       actionText: 'Van már fiókod?',
       blockButton__emailSupport: 'Segítség kérése emailben',
       blockButton__joinWaitlist: 'Csatlakozás a várólistához',
-      subtitle: 'A regisztráció jelenleg nem elérhető. Ha úgy gondolod, hogy hozzáféréssel kellene rendelkezned, kérlek vedd fel a kapcsolatot az ügyfélszolgálattal.',
-      subtitleWaitlist: 'A regisztráció jelenleg nem elérhető. Ha elsőként szeretnél értesülni az indulásról, csatlakozz a várólistához.',
+      subtitle:
+        'A regisztráció jelenleg nem elérhető. Ha úgy gondolod, hogy hozzáféréssel kellene rendelkezned, kérlek vedd fel a kapcsolatot az ügyfélszolgálattal.',
+      subtitleWaitlist:
+        'A regisztráció jelenleg nem elérhető. Ha elsőként szeretnél értesülni az indulásról, csatlakozz a várólistához.',
       title: 'Hozzáférés korlátozva',
     },
     start: {
@@ -986,7 +988,8 @@ export const huHU: LocalizationResource = {
         formButtonReset: 'Mégse',
         infoText__ableToScan:
           'Állíts be egy új belépési módot a hitelesítő alkalmazásodban, és olvasd be a QR kódot, hogy összekösd a fiókoddal.',
-        infoText__unableToScan: 'Állíts be egy új bejelentkezési módot a hitelesítő alkalmazásodban, és írd be az alábbi kulcsot.',
+        infoText__unableToScan:
+          'Állíts be egy új bejelentkezési módot a hitelesítő alkalmazásodban, és írd be az alábbi kulcsot.',
         inputLabel__unableToScan1:
           'Bizonyosodj meg, hogy a Time-based vagy a One-time passwords be van kapcsolva, majd fejezd be a fiók összekötését.',
       },
