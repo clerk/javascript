@@ -1,4 +1,4 @@
-import type { UserJSON } from '@clerk/shared/types';
+import type { EnterpriseConnectionJSON, UserJSON } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { BaseResource } from '../internal';
@@ -80,22 +80,37 @@ describe('User', () => {
   });
 
   it('fetches enterprise connections', async () => {
-    const enterpriseConnectionsJSON = [
+    const enterpriseConnectionsJSON: EnterpriseConnectionJSON[] = [
       {
         id: 'ec_123',
-        object: 'enterprise_account_connection',
+        object: 'enterprise_connection',
         name: 'Acme Corp SSO',
         active: true,
         allow_organization_account_linking: true,
-        domain: 'acme.com',
-        protocol: 'saml',
         provider: 'saml_okta',
         logo_public_url: null,
+        domains: ['acme.com'],
+        organization_id: null,
         sync_user_attributes: true,
-        allow_subdomains: false,
-        allow_idp_initiated: false,
         disable_additional_identifications: false,
-        enterprise_connection_id: 'ec_123',
+        custom_attributes: [],
+        oauth_config: null,
+        saml_connection: {
+          id: 'saml_123',
+          name: 'Acme Corp SSO',
+          active: true,
+          idp_entity_id: 'https://idp.acme.com/entity',
+          idp_sso_url: 'https://idp.acme.com/sso',
+          idp_certificate: 'MIICertificatePlaceholder',
+          idp_metadata_url: 'https://idp.acme.com/metadata',
+          idp_metadata: '',
+          acs_url: 'https://clerk.example.com/v1/saml/acs',
+          sp_entity_id: 'https://clerk.example.com',
+          sp_metadata_url: 'https://clerk.example.com/v1/saml/metadata',
+          allow_subdomains: false,
+          allow_idp_initiated: false,
+          force_authn: false,
+        },
         created_at: 1234567890,
         updated_at: 1234567890,
       },

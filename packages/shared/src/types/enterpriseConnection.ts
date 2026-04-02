@@ -5,6 +5,8 @@ export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
   object: 'enterprise_connection';
   name: string;
   active: boolean;
+  provider: string;
+  logo_public_url?: string | null;
   domains?: string[];
   organization_id?: string | null;
   sync_user_attributes: boolean;
@@ -23,6 +25,8 @@ export interface EnterpriseConnectionResource extends ClerkResource {
   id: string;
   name: string;
   active: boolean;
+  provider: string;
+  logoPublicUrl: string | null;
   domains: string[];
   organizationId: string | null;
   syncUserAttributes: boolean;
