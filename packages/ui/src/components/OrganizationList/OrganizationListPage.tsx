@@ -137,7 +137,7 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
     <>
       <Header.Root
         sx={t => ({
-          paddingTop: `${t.space.$4}`,
+          padding: `${t.space.$4} ${t.space.$4} ${t.space.$none}`,
         })}
         showLogo
       >
