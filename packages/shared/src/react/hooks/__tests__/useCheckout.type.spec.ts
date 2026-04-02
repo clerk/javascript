@@ -1,13 +1,13 @@
 import { describe, expectTypeOf, it } from 'vitest';
 
-import type { ClerkError } from '@/error';
+import type { ClerkError } from '../../../error';
 import type {
   BillingSubscriptionPlanPeriod,
   CheckoutErrors,
   CheckoutFlowFinalizeParams,
   CheckoutFlowResource,
   ConfirmCheckoutParams,
-} from '@/types';
+} from '../../../types';
 
 import type { useCheckout } from '../useCheckout';
 
