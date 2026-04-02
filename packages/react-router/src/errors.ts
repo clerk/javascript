@@ -1,4 +1,5 @@
 export {
+  ClerkAPIResponseError,
   ClerkOfflineError,
   isClerkAPIResponseError,
   isEmailLinkError,
