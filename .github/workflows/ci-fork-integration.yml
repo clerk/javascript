@@ -9,8 +9,6 @@ on:
     types: [labeled, synchronize]
     branches:
       - main
-      # For testing the workflow, remove before merging
-      - fredrik/fork-integration-tests
 
 permissions:
   contents: read
