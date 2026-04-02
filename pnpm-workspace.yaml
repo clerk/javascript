@@ -31,8 +31,11 @@ catalogs:
     '@zxcvbn-ts/language-common': 3.0.4
 
 minimumReleaseAge: 2880
-
 minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
+
+trustPolicy: no-downgrade
+
+blockExoticSubdeps: true
