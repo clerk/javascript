@@ -1,3 +1,7 @@
+# Note: There is a copy of this workflow in ci-fork-integration.yml that is
+# used for triggering integration tests on forked PRs. If you tweak this
+# workflow, see if that also needs to be updated.
+
 name: CI
 
 on:
@@ -289,6 +293,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      # This needs to be kept in sync with ci-fork-integration.yml
       matrix:
         test-name:
           [
