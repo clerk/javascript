@@ -481,6 +481,34 @@ jobs:
           path: test-results
           retention-days: 1
 
+  integration-tests-gate:
+    needs: [integration-tests]
+    if: >-
+      ${{ always()
+      && github.event_name == 'pull_request'
+      && needs.integration-tests.result != 'skipped' }}
+    runs-on: "blacksmith-2vcpu-ubuntu-2204"
+    permissions:
+      statuses: write
+    name: Integration Tests Gate
+    steps:
+      - name: Report integration test status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RESULT: ${{ needs.integration-tests.result }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ "$RESULT" = "success" ]; then
+            STATE="success"
+          else
+            STATE="failure"
+          fi
+          gh api "repos/$REPO/statuses/$SHA" \
+            -f state="$STATE" \
+            -f context="integration-tests" \
+            -f description="Integration tests: $RESULT"
+
   pkg-pr-new:
     name: Publish with pkg-pr-new
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}

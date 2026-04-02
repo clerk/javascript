@@ -24,7 +24,7 @@ jobs:
     if: >-
       ${{ github.event.action == 'synchronize'
       && github.event.pull_request.head.repo.full_name != github.repository }}
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: 'blacksmith-2vcpu-ubuntu-2204'
     permissions:
       # Needed for removing the "safe-to-test" label
       pull-requests: write
@@ -43,7 +43,7 @@ jobs:
       ${{ github.event.action == 'labeled'
       && github.event.label.name == 'safe-to-test'
       && github.event.pull_request.head.repo.full_name != github.repository }}
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: 'blacksmith-2vcpu-ubuntu-2204'
     permissions:
       pull-requests: write
     name: Check Label Sender Permissions
@@ -288,3 +288,28 @@ jobs:
           name: playwright-traces-fork-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.sanitize.outputs.artifact-suffix }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
           path: test-results
           retention-days: 1
+
+  integration-tests-gate:
+    needs: [integration-tests]
+    if: ${{ always() && needs.integration-tests.result != 'skipped' }}
+    runs-on: 'blacksmith-2vcpu-ubuntu-2204'
+    permissions:
+      statuses: write
+    name: Fork Integration Tests Gate
+    steps:
+      - name: Report integration test status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RESULT: ${{ needs.integration-tests.result }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ "$RESULT" = "success" ]; then
+            STATE="success"
+          else
+            STATE="failure"
+          fi
+          gh api "repos/$REPO/statuses/$SHA" \
+            -f state="$STATE" \
+            -f context="integration-tests" \
+            -f description="Fork integration tests: $RESULT"
