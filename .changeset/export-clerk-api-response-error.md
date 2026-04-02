@@ -7,4 +7,4 @@
 '@clerk/nuxt': patch
 ---
 
-Export `ClerkAPIResponseError` class from error subpaths for consistency with the already-exported `isClerkAPIResponseError` type guard.
+Export `ClerkAPIResponseError` and `ClerkRuntimeError` classes from error subpaths for consistency with the already-exported type guards.
