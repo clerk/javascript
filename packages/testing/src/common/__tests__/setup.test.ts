@@ -137,6 +137,26 @@ describe('fetchWithRetry (via fetchEnvVars)', () => {
     expect(warnSpy.mock.calls[0][0]).toContain('waiting 2000ms');
   });
 
+  it('uses exponential backoff as floor when retryAfter is 0', async () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    mockCreateTestingToken
+      .mockRejectedValueOnce(createClerkAPIError(429, 0))
+      .mockResolvedValueOnce({ token: 'test-token' });
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const promise = fetchEnvVars({ dotenv: false });
+
+    // retryAfter=0 should NOT cause a 0ms delay; exponential backoff (1000ms for attempt 0) is used as floor
+    await vi.advanceTimersByTimeAsync(999);
+    expect(mockCreateTestingToken).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(1);
+    const result = await promise;
+
+    expect(result.CLERK_TESTING_TOKEN).toBe('test-token');
+    expect(warnSpy.mock.calls[0][0]).toContain('waiting 1000ms');
+  });
+
   it('caps retryAfter delay at MAX_RETRY_DELAY_MS', async () => {
     mockCreateTestingToken
       .mockRejectedValueOnce(createClerkAPIError(429, 60))
