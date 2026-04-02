@@ -9,6 +9,7 @@ import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Tooltip } from '@/ui/elements/Tooltip';
+import { getSeatUnitPrice } from '@/ui/utils/billingPlanSeats';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { DevOnly } from '../../common/DevOnly';
@@ -47,6 +48,21 @@ export const CheckoutForm = withCardStateProvider(() => {
       : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         plan.annualMonthlyFee!;
 
+  const descriptionElements = [];
+  if (planPeriod === 'annual') {
+    descriptionElements.push(localizationKeys('billing.billedAnnually'));
+  }
+  const seatUnitPrice = getSeatUnitPrice(plan);
+  if (seatUnitPrice && seatUnitPrice.tiers.length === 1 && seatUnitPrice.tiers[0].feePerBlock.amount === 0) {
+    descriptionElements.push(
+      seatUnitPrice.tiers[0].endsAfterBlock
+        ? localizationKeys('billing.pricingTable.seatCost.upToSeats', {
+            endsAfterBlock: seatUnitPrice.tiers[0].endsAfterBlock,
+          })
+        : localizationKeys('billing.pricingTable.seatCost.unlimitedSeats'),
+    );
+  }
+
   return (
     <Drawer.Body>
       <Box
@@ -62,7 +78,7 @@ export const CheckoutForm = withCardStateProvider(() => {
           <LineItems.Group>
             <LineItems.Title
               title={plan.name}
-              description={planPeriod === 'annual' ? localizationKeys('billing.billedAnnually') : undefined}
+              description={descriptionElements}
               badge={
                 plan.freeTrialEnabled && freeTrialEndsAt ? (
                   <SubscriptionBadge subscription={{ status: 'free_trial' }} />

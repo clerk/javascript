@@ -14,9 +14,6 @@ import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { Badge, Box, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
-
-const GENERIC_ENTERPRISE_PROVIDER_ICON_ID = 'custom_enterprise' as OAuthProvider;
-
 const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionResource }) => {
   const { connection } = props;
   const card = useCardState();
@@ -54,7 +51,8 @@ const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionRe
       });
   };
 
-  const providerIconUrl = connection.oauthConfig?.logoPublicUrl?.trim() ?? '';
+  const providerIconId = connection.provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider;
+  const providerIconUrl = connection.logoPublicUrl?.trim() || '';
 
   return (
     <ProfileSection.ActionMenuItem
@@ -75,15 +73,14 @@ const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionRe
       })}
       leftIcon={
         <ProviderIcon
-          // TODO - Use `provider` and `logo_public_url` once FAPI `EnterpriseConnection` resource gets updated
-          id={GENERIC_ENTERPRISE_PROVIDER_ICON_ID}
+          id={providerIconId}
           iconUrl={providerIconUrl || undefined}
           name={connection.name}
           isLoading={card.loadingMetadata === loadingKey}
           isDisabled={card.isLoading}
           alt={`Connect ${connection.name} account`}
           elementDescriptor={descriptors.providerIcon}
-          elementId={descriptors.providerIcon.setId(GENERIC_ENTERPRISE_PROVIDER_ICON_ID)}
+          elementId={descriptors.providerIcon.setId(providerIconId)}
         />
       }
     />
