@@ -53,6 +53,7 @@ export type * from './redirects';
 export type * from './resource';
 export type * from './role';
 export type * from './router';
+export * from './enums';
 /**
  * TODO @revamp-hooks: Drop this in the next major release.
  */
