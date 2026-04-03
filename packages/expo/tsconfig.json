@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "dist",
-    "baseUrl": ".",
-    "lib": ["es6", "dom"],
+    "lib": ["es2019", "dom"],
     "jsx": "react-jsx",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",

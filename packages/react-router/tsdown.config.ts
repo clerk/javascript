@@ -1,8 +1,7 @@
-import { esbuildPluginFilePathExtensions } from 'esbuild-plugin-file-path-extensions';
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 
-import { version as clerkJsVersion } from '../clerk-js/package.json';
-import { name, version } from './package.json';
+import clerkJsPackage from '../clerk-js/package.json' with { type: 'json' };
+import pkgJson from './package.json' with { type: 'json' };
 
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
@@ -19,11 +18,10 @@ export default defineConfig(overrideOptions => {
     sourcemap: true,
     onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     define: {
-      PACKAGE_NAME: `"${name}"`,
-      PACKAGE_VERSION: `"${version}"`,
-      JS_PACKAGE_VERSION: `"${clerkJsVersion}"`,
+      PACKAGE_NAME: `"${pkgJson.name}"`,
+      PACKAGE_VERSION: `"${pkgJson.version}"`,
+      JS_PACKAGE_VERSION: `"${clerkJsPackage.version}"`,
       __DEV__: `${isWatch}`,
     },
-    esbuildPlugins: [esbuildPluginFilePathExtensions({ esmExtension: 'js' })],
   };
 });

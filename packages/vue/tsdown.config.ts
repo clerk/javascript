@@ -1,8 +1,8 @@
-import autoPropsPlugin from '@vue.ts/tsx-auto-props/esbuild';
-import { defineConfig } from 'tsup';
-import vuePlugin from 'unplugin-vue/esbuild';
+import autoPropsPlugin from '@vue.ts/tsx-auto-props/rolldown';
+import { defineConfig } from 'tsdown';
+import vuePlugin from 'unplugin-vue/rolldown';
 
-import { name, version } from './package.json';
+import pkgJson from './package.json' with { type: 'json' };
 
 export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
@@ -11,12 +11,11 @@ export default defineConfig(overrideOptions => {
     clean: true,
     entry: ['./src/index.ts', './src/experimental.ts', './src/internal.ts', './src/errors.ts', './src/types/index.ts'],
     format: ['esm'],
-    bundle: true,
     sourcemap: true,
     minify: false,
     dts: false,
     onSuccess: shouldPublish ? 'pnpm build:dts && pkglab pub --ping' : 'pnpm build:dts',
-    esbuildPlugins: [
+    plugins: [
       // Adds .vue files support
       vuePlugin(),
       // Automatically generates runtime props from TypeScript types/interfaces for all
@@ -27,9 +26,8 @@ export default defineConfig(overrideOptions => {
       }),
     ],
     define: {
-      PACKAGE_NAME: `"${name}"`,
-      PACKAGE_VERSION: `"${version}"`,
+      PACKAGE_NAME: `"${pkgJson.name}"`,
+      PACKAGE_VERSION: `"${pkgJson.version}"`,
     },
-    external: ['vue'],
   };
 });
