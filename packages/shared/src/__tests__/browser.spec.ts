@@ -194,4 +194,17 @@ describe('isValidBrowserOnline', () => {
 
     expect(isValidBrowserOnline()).toBe(true);
   });
+
+  it('returns TRUE in React Native when navigator.onLine is not implemented', () => {
+    userAgentGetter.mockReturnValue(undefined);
+    webdriverGetter.mockReturnValue(undefined);
+    onLineGetter.mockReturnValue(undefined);
+    connectionGetter.mockReturnValue(undefined);
+    Object.defineProperty(window.navigator, 'product', {
+      configurable: true,
+      get: () => 'ReactNative',
+    });
+
+    expect(isValidBrowserOnline()).toBe(true);
+  });
 });

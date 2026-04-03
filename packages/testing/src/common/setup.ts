@@ -1,8 +1,48 @@
 import { createClerkClient } from '@clerk/backend';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import dotenv from 'dotenv';
 
 import type { ClerkSetupOptions, ClerkSetupReturn } from './types';
+
+const MAX_RETRIES = 5;
+const BASE_DELAY_MS = 1000;
+const JITTER_MAX_MS = 500;
+const MAX_RETRY_DELAY_MS = 30_000;
+const RETRYABLE_STATUS_CODES = new Set([408, 429, 500, 502, 503, 504]);
+const RETRYABLE_NETWORK_ERRORS = new Set(['ECONNREFUSED', 'ECONNRESET', 'ENOTFOUND', 'ETIMEDOUT', 'EAI_AGAIN']);
+
+function isNetworkError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    'code' in error &&
+    RETRYABLE_NETWORK_ERRORS.has((error as NodeJS.ErrnoException).code ?? '')
+  );
+}
+
+async function fetchWithRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      const isRetryableApi = isClerkAPIResponseError(error) && RETRYABLE_STATUS_CODES.has(error.status);
+      const isRetryableNetwork = isNetworkError(error);
+      if ((!isRetryableApi && !isRetryableNetwork) || attempt === MAX_RETRIES) {
+        throw error;
+      }
+      const status = isClerkAPIResponseError(error) ? error.status : (error as NodeJS.ErrnoException).code;
+      const delay =
+        isClerkAPIResponseError(error) && typeof error.retryAfter === 'number'
+          ? Math.min(error.retryAfter * 1000, MAX_RETRY_DELAY_MS)
+          : Math.min(BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS, MAX_RETRY_DELAY_MS);
+      console.warn(
+        `[Retry] ${status} for ${label}, attempt ${attempt + 1}/${MAX_RETRIES}, waiting ${Math.round(delay)}ms`,
+      );
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw new Error('Unreachable');
+}
 
 export const fetchEnvVars = async (options?: ClerkSetupOptions): Promise<ClerkSetupReturn> => {
   const { debug = false, dotenv: loadDotEnv = true, ...rest } = options || {};
@@ -44,7 +84,10 @@ export const fetchEnvVars = async (options?: ClerkSetupOptions): Promise<ClerkSe
     try {
       const apiUrl = (rest as any)?.apiUrl || process.env.CLERK_API_URL;
       const clerkClient = createClerkClient({ secretKey, apiUrl });
-      const tokenData = await clerkClient.testingTokens.createTestingToken();
+      const tokenData = await fetchWithRetry(
+        () => clerkClient.testingTokens.createTestingToken(),
+        'testingTokens.createTestingToken',
+      );
       testingToken = tokenData.token;
     } catch (err) {
       console.error('Failed to fetch testing token from Clerk API.');

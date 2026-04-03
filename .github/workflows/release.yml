@@ -1,5 +1,12 @@
 name: Release
-run-name: ${{ github.event_name == 'issue_comment' && format('Snapshot release by {0}', github.actor) || format('Release pipelines from {0}', github.ref_name) }}
+run-name: >-
+  ${{
+    github.event_name == 'issue_comment'
+      && format('[Snapshot] Release by {0}', github.actor)
+    || contains(github.event.head_commit.message, 'Version packages')
+      && format('[Production] Release from {0}', github.ref_name)
+    || format('[Canary] Release from {0}', github.ref_name)
+  }}
 
 on:
   push:
@@ -290,6 +297,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
+          persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
           filter: 'blob:none'
@@ -437,6 +445,9 @@ jobs:
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
     continue-on-error: true
+
+    permissions:
+      contents: read
 
     strategy:
       matrix:

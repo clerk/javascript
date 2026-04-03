@@ -1,5 +1,35 @@
 # Change Log
 
+## 3.2.4
+
+### Patch Changes
+
+- Fix frontend API proxy following redirects server-side instead of passing them to the browser. The proxy's `fetch()` call now uses `redirect: 'manual'` so that 3xx responses from FAPI (e.g. after OAuth callbacks) are returned to the client as-is, matching standard HTTP proxy behavior. ([#8186](https://github.com/clerk/javascript/pull/8186)) by [@brkalow](https://github.com/brkalow)
+
+- Improve the built-in Clerk Frontend API proxy, adding support for abort signals and addressing a number of small edge cases. ([#8163](https://github.com/clerk/javascript/pull/8163)) by [@brkalow](https://github.com/brkalow)
+
+- Add EnterpriseAccount and EnterpriseAccountConnection classes to @clerk/backend, restoring enterprise SSO account data on the User object that was lost when samlAccounts was removed in v3. ([#8181](https://github.com/clerk/javascript/pull/8181)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`9a00a1c`](https://github.com/clerk/javascript/commit/9a00a1cc9753a49ea96e520a8e4918075f3efff4), [`00715a6`](https://github.com/clerk/javascript/commit/00715a6d9ea8cf412c989e870a3eff03973fa505), [`b8c73d3`](https://github.com/clerk/javascript/commit/b8c73d34ee30616e63b6320e7a8724630670eeb3), [`1827b50`](https://github.com/clerk/javascript/commit/1827b50a6ef9ab14c48cddc120796a9bf3c965b6), [`7707a31`](https://github.com/clerk/javascript/commit/7707a31eb1977d0c5f2bb72f7ad0768606a55d16)]:
+  - @clerk/shared@4.4.0
+
+## 3.2.3
+
+### Patch Changes
+
+- Fix `ERR_CONTENT_DECODING_FAILED` when loading proxied assets by requesting uncompressed responses from FAPI and stripping `Content-Encoding`/`Content-Length` headers that `fetch()` invalidates through auto-decompression. ([#8159](https://github.com/clerk/javascript/pull/8159)) by [@brkalow](https://github.com/brkalow)
+
+- Fix `satelliteAutoSync` to default to `false` as documented. Previously, not passing the prop resulted in `undefined`, which was treated as `true` due to a strict equality check (`=== false`). This preserved Core 2 auto-sync behavior instead of the intended Core 3 default. The check is now `!== true`, so both `undefined` and `false` skip automatic satellite sync. ([#8001](https://github.com/clerk/javascript/pull/8001)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fix an issue where multiple `set-cookie` headers were being dropped by the frontend API proxy. ([#8162](https://github.com/clerk/javascript/pull/8162)) by [@brkalow](https://github.com/brkalow)
+
+## 3.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`f0533a2`](https://github.com/clerk/javascript/commit/f0533a26db17066a7dcc7992d9589ba3a60cc5b4), [`e00ec97`](https://github.com/clerk/javascript/commit/e00ec97895640db358af5a9df5d03e83f28f5a27)]:
+  - @clerk/shared@4.3.2
+
 ## 3.2.1
 
 ### Patch Changes

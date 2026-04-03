@@ -148,6 +148,22 @@ describe('proxy', () => {
       expect(body.errors[0].code).toBe('proxy_path_mismatch');
     });
 
+    it('does not follow protocol-relative paths', async () => {
+      const mockResponse = new Response('{}', { status: 200 });
+      mockFetch.mockResolvedValueOnce(mockResponse);
+
+      const request = new Request('https://example.com/__clerk//evil.com/steal');
+
+      await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      // String concatenation keeps the host as FAPI, not evil.com
+      const fetchedUrl = new URL(mockFetch.mock.calls[0][0] as string);
+      expect(fetchedUrl.host).toBe('frontend-api.clerk.dev');
+    });
+
     it('forwards GET request to FAPI with correct headers', async () => {
       const mockResponse = new Response(JSON.stringify({ client: {} }), {
         status: 200,
@@ -479,6 +495,177 @@ describe('proxy', () => {
 
       expect(response.status).toBe(302);
       expect(response.headers.get('Location')).toBe('https://accounts.google.com/oauth/authorize');
+    });
+
+    it('sets Accept-Encoding to identity to avoid double compression', async () => {
+      const mockResponse = new Response(JSON.stringify({ client: {} }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/client', {
+        headers: { 'Accept-Encoding': 'gzip, deflate, br' },
+      });
+
+      await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      const [, options] = mockFetch.mock.calls[0];
+      expect(options.headers.get('Accept-Encoding')).toBe('identity');
+    });
+
+    it('strips Content-Encoding and Content-Length from response even if upstream ignores identity', async () => {
+      // Upstream may ignore Accept-Encoding: identity and compress anyway
+      const mockResponse = new Response('decoded body', {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/javascript',
+          'Content-Encoding': 'gzip',
+          'Content-Length': '500',
+        },
+      });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/client');
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      expect(response.headers.has('Content-Encoding')).toBe(false);
+      expect(response.headers.has('Content-Length')).toBe(false);
+      expect(response.headers.get('Content-Type')).toBe('application/javascript');
+    });
+
+    it('forwards DELETE request with body', async () => {
+      const mockResponse = new Response(JSON.stringify({ deleted: true }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const requestBody = JSON.stringify({ id: '123' });
+      const request = new Request('https://example.com/__clerk/v1/resource', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: requestBody,
+      });
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const [, options] = mockFetch.mock.calls[0];
+
+      expect(options.method).toBe('DELETE');
+      expect(options.body).not.toBeNull();
+      expect(options.duplex).toBe('half');
+
+      expect(response.status).toBe(200);
+    });
+
+    it('propagates abort signal to upstream fetch', async () => {
+      const mockResponse = new Response(JSON.stringify({}), { status: 200 });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const controller = new AbortController();
+      const request = new Request('https://example.com/__clerk/v1/client', {
+        signal: controller.signal,
+      });
+
+      await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      const [, options] = mockFetch.mock.calls[0];
+      expect(options.signal).toBe(request.signal);
+    });
+
+    it('includes Cache-Control: no-store on error responses', async () => {
+      const request = new Request('https://example.com/__clerk/v1/client');
+
+      // Missing publishableKey triggers an error response
+      const response = await clerkFrontendApiProxy(request, {
+        secretKey: 'sk_test_xxx',
+      });
+
+      expect(response.status).toBe(500);
+      expect(response.headers.get('Cache-Control')).toBe('no-store');
+    });
+
+    it('includes Cache-Control: no-store on 502 error responses', async () => {
+      mockFetch.mockRejectedValue(new Error('Network error'));
+
+      const request = new Request('https://example.com/__clerk/v1/client');
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      expect(response.status).toBe(502);
+      expect(response.headers.get('Cache-Control')).toBe('no-store');
+    });
+
+    it('strips dynamic hop-by-hop headers listed in the Connection header from requests', async () => {
+      const mockResponse = new Response(JSON.stringify({}), { status: 200 });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/client', {
+        headers: {
+          Connection: 'keep-alive, X-Custom-Hop',
+          'X-Custom-Hop': 'some-value',
+          'User-Agent': 'Test',
+        },
+      });
+
+      await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      const [, options] = mockFetch.mock.calls[0];
+      // Connection and X-Custom-Hop should both be stripped
+      expect(options.headers.has('Connection')).toBe(false);
+      expect(options.headers.has('X-Custom-Hop')).toBe(false);
+      // Non-hop-by-hop headers should be preserved
+      expect(options.headers.get('User-Agent')).toBe('Test');
+    });
+
+    it('preserves multiple Set-Cookie headers from FAPI response', async () => {
+      const headers = new Headers();
+      headers.append('Set-Cookie', '__client=abc123; Path=/; HttpOnly; Secure');
+      headers.append('Set-Cookie', '__client_uat=1234567890; Path=/; Secure');
+      headers.append('Set-Cookie', '__session=xyz789; Path=/; HttpOnly; Secure');
+      headers.append('Content-Type', 'application/json');
+
+      const mockResponse = new Response(JSON.stringify({ client: {} }), {
+        status: 200,
+        headers,
+      });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/client');
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      const setCookies = response.headers.getSetCookie();
+      expect(setCookies).toHaveLength(3);
+      expect(setCookies).toContain('__client=abc123; Path=/; HttpOnly; Secure');
+      expect(setCookies).toContain('__client_uat=1234567890; Path=/; Secure');
+      expect(setCookies).toContain('__session=xyz789; Path=/; HttpOnly; Secure');
     });
 
     it('preserves relative Location headers', async () => {
