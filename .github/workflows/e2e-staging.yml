@@ -39,6 +39,7 @@ concurrency:
 jobs:
   permissions-check:
     name: Check Permissions
+    if: ${{ github.event_name != 'repository_dispatch' }}
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     steps:
       - name: Check org membership
@@ -70,6 +71,7 @@ jobs:
   validate-instances:
     name: Validate Staging Instances
     needs: [permissions-check]
+    if: ${{ always() && (needs.permissions-check.result == 'success' || needs.permissions-check.result == 'skipped') }}
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     steps:
       - name: Checkout Repo
@@ -88,6 +90,7 @@ jobs:
   integration-tests:
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }})
     needs: [permissions-check]
+    if: ${{ always() && (needs.permissions-check.result == 'success' || needs.permissions-check.result == 'skipped') }}
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
