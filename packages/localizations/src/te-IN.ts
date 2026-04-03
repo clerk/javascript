@@ -1361,6 +1361,7 @@ export const teIN: LocalizationResource = {
         title: 'ఇమెయిల్ చిరునామాలు',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'ఖాతాను కనెక్ట్ చేయండి',
         title: 'ఎంటర్‌ప్రైజ్ ఖాతాలు',
       },
       headerTitle__account: 'ప్రొఫైల్ వివరాలు',

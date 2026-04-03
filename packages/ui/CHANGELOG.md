@@ -1,5 +1,40 @@
 # @clerk/ui
 
+## 1.3.0
+
+### Minor Changes
+
+- Add support for seat-based billing plans in Clerk Billing. ([#8006](https://github.com/clerk/javascript/pull/8006)) by [@dstaley](https://github.com/dstaley)
+
+- Add `EnterpriseConnection` resource ([#8175](https://github.com/clerk/javascript/pull/8175)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  `User.getEnterpriseConnections()` was wrongly typed as returning `EnterpriseAccountConnectionResource[]`, it now returns `EnterpriseConnectionResource[]`
+
+- Allow to link external accounts to enterprise accounts via `UserProfile` ([#8091](https://github.com/clerk/javascript/pull/8091)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+### Patch Changes
+
+- Improved error handling when creating API keys. ([#8056](https://github.com/clerk/javascript/pull/8056)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Use distinct password placeholder for sign-up forms ([#8082](https://github.com/clerk/javascript/pull/8082)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`f26d623`](https://github.com/clerk/javascript/commit/f26d623440740300036e246c6d10e06ca5af9cb5), [`9a00a1c`](https://github.com/clerk/javascript/commit/9a00a1cc9753a49ea96e520a8e4918075f3efff4), [`00715a6`](https://github.com/clerk/javascript/commit/00715a6d9ea8cf412c989e870a3eff03973fa505), [`118999c`](https://github.com/clerk/javascript/commit/118999cb5231a1889e367e337a5936e1d8dc02bf), [`9ec56ab`](https://github.com/clerk/javascript/commit/9ec56ab86749f184d95fd762868bba07b6e195e0), [`b8c73d3`](https://github.com/clerk/javascript/commit/b8c73d34ee30616e63b6320e7a8724630670eeb3), [`1827b50`](https://github.com/clerk/javascript/commit/1827b50a6ef9ab14c48cddc120796a9bf3c965b6), [`7707a31`](https://github.com/clerk/javascript/commit/7707a31eb1977d0c5f2bb72f7ad0768606a55d16), [`23f773b`](https://github.com/clerk/javascript/commit/23f773b472e1f5769452a4c3ae3e72f196359f8d)]:
+  - @clerk/localizations@4.3.0
+  - @clerk/shared@4.4.0
+
+## 1.2.4
+
+### Patch Changes
+
+- Move `react` and `react-dom` from `dependencies` to `peerDependencies` ([#8160](https://github.com/clerk/javascript/pull/8160)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix minor internal issues with TypeScript types. ([#8076](https://github.com/clerk/javascript/pull/8076)) by [@dstaley](https://github.com/dstaley)
+
+- Fix false positive in structural CSS detection where Clerk's own internal classes (`.cl-internal-*`) were incorrectly triggering the warning on fresh installs. ([#8142](https://github.com/clerk/javascript/pull/8142)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`46093fa`](https://github.com/clerk/javascript/commit/46093fae837a98f830a596062b6f1c9d44fc7c8d)]:
+  - @clerk/localizations@4.2.4
+
 ## 1.2.3
 
 ### Patch Changes
