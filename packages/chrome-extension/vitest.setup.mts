@@ -1,9 +1,7 @@
-import { vi } from 'vitest';
-// `jest-chrome` directly references the `jest` global
-(globalThis as any).jest = vi;
+import * as vitestChrome from 'vitest-chrome/lib/index.esm.js';
 
-import { chrome } from 'jest-chrome';
+const { chrome } = vitestChrome;
 
 // @ts-expect-error - required for the browser polyfill
 chrome.runtime.id = 'chrome-extension-test';
-Object.assign(global, { chrome, browser: chrome });
+Object.assign(globalThis, vitestChrome, { browser: chrome });
