@@ -1,4 +1,4 @@
-import * as vitestChrome from 'vitest-chrome/lib/index.esm.js';
+import * as vitestChrome from 'vitest-chrome';
 
 const { chrome } = vitestChrome;
 
