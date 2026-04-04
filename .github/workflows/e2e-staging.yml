@@ -74,10 +74,32 @@ jobs:
     if: ${{ always() && (needs.permissions-check.result == 'success' || needs.permissions-check.result == 'skipped') }}
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     steps:
+      - name: Normalize inputs
+        id: inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_REF: ${{ github.event.inputs.ref }}
+          PAYLOAD_REF: ${{ github.event.client_payload.ref }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "ref=${INPUT_REF:-main}" >> $GITHUB_OUTPUT
+          else
+            echo "ref=${PAYLOAD_REF:-main}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate ref
+        env:
+          REF: ${{ steps.inputs.outputs.ref }}
+        run: |
+          if [[ ! "$REF" =~ ^(main|release/.*)$ ]]; then
+            echo "::error::Ref '$REF' is not allowed. Only 'main' and 'release/*' branches are permitted."
+            exit 1
+          fi
+
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref || github.event.client_payload.ref || 'main' }}
+          ref: ${{ steps.inputs.outputs.ref }}
           sparse-checkout: scripts/validate-staging-instances.mjs
           fetch-depth: 1
 
