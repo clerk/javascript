@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.125.8
+
+### Patch Changes
+
+- Fix dev browser token being read from a stale non-partitioned cookie when `partitionedCookies` is enabled. The token is now kept in memory so FAPI requests always use the authoritative value. ([#8238](https://github.com/clerk/javascript/pull/8238)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 5.125.7
 
 ### Patch Changes
