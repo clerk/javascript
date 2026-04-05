@@ -37,15 +37,22 @@ export function createDevBrowser({
 }: CreateDevBrowserOptions): DevBrowser {
   const devBrowserCookie = createDevBrowserCookie(cookieSuffix, cookieOptions);
 
+  // Hold the dev browser token in memory so it's always available to FAPI
+  // interceptors, even before Environment resolves and cookies can be written
+  // with the correct Partitioned attribute.
+  let devBrowserInMemory: string | undefined;
+
   function getDevBrowserJWT() {
-    return devBrowserCookie.get();
+    return devBrowserInMemory || devBrowserCookie.get();
   }
 
   function setDevBrowserJWT(jwt: string) {
+    devBrowserInMemory = jwt;
     devBrowserCookie.set(jwt);
   }
 
   function removeDevBrowserJWT() {
+    devBrowserInMemory = undefined;
     devBrowserCookie.remove();
   }
 
@@ -81,7 +88,9 @@ export function createDevBrowser({
     }
 
     // 2. If no JWT is found in the first step, check if a JWT is already available in the __clerk_db_jwt JS cookie
-    if (devBrowserCookie.get()) {
+    const existingDevBrowser = devBrowserCookie.get();
+    if (existingDevBrowser) {
+      devBrowserInMemory = existingDevBrowser;
       return;
     }
 
