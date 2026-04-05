@@ -68,7 +68,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       signInUrl.searchParams.set('__clerk_db_jwt', freshToken);
 
       await page.goto(signInUrl.toString());
-      await page.waitForLoadState('networkidle');
+      await page.waitForFunction(() => (window as any).Clerk?.loaded);
 
       // Every FAPI request during initial load must use the URL token,
       // not the stale partitioned cookie.
