@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.2.6
+
+### Patch Changes
+
+- Export `OrganizationInvitationAcceptedWebhookEvent` type. ([#8235](https://github.com/clerk/javascript/pull/8235)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`2c06a5f`](https://github.com/clerk/javascript/commit/2c06a5f1859ce4f1f64111f7c0a61f0093002667)]:
+  - @clerk/shared@4.5.0
+
 ## 3.2.5
 
 ### Patch Changes
