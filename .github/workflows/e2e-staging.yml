@@ -39,6 +39,7 @@ concurrency:
 jobs:
   permissions-check:
     name: Check Permissions
+    if: ${{ github.event_name != 'repository_dispatch' }}
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     steps:
       - name: Check org membership
@@ -70,12 +71,35 @@ jobs:
   validate-instances:
     name: Validate Staging Instances
     needs: [permissions-check]
+    if: ${{ always() && (needs.permissions-check.result == 'success' || needs.permissions-check.result == 'skipped') }}
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     steps:
+      - name: Normalize inputs
+        id: inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_REF: ${{ github.event.inputs.ref }}
+          PAYLOAD_REF: ${{ github.event.client_payload.ref }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "ref=${INPUT_REF:-main}" >> $GITHUB_OUTPUT
+          else
+            echo "ref=${PAYLOAD_REF:-main}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate ref
+        env:
+          REF: ${{ steps.inputs.outputs.ref }}
+        run: |
+          if [[ ! "$REF" =~ ^(main|release/.*)$ ]]; then
+            echo "::error::Ref '$REF' is not allowed. Only 'main' and 'release/*' branches are permitted."
+            exit 1
+          fi
+
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref || github.event.client_payload.ref || 'main' }}
+          ref: ${{ steps.inputs.outputs.ref }}
           sparse-checkout: scripts/validate-staging-instances.mjs
           fetch-depth: 1
 
@@ -88,6 +112,7 @@ jobs:
   integration-tests:
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }})
     needs: [permissions-check]
+    if: ${{ always() && (needs.permissions-check.result == 'success' || needs.permissions-check.result == 'skipped') }}
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
