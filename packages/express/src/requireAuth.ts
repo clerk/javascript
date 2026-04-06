@@ -1,6 +1,5 @@
-import type { RequestHandler } from 'express';
-
 import { deprecated } from '@clerk/shared/deprecated';
+import type { RequestHandler } from 'express';
 
 import { authenticateAndDecorateRequest } from './authenticateRequest';
 import type { ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
