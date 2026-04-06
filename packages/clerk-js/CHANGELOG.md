@@ -1,5 +1,14 @@
 # Change Log
 
+## 6.4.1
+
+### Patch Changes
+
+- Add `provider` and `logoPublicUrl` to `EnterpriseConnection` resource ([#8203](https://github.com/clerk/javascript/pull/8203)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`b289566`](https://github.com/clerk/javascript/commit/b28956617555c21f703a40f8f14fb2ff23d509ae), [`636b496`](https://github.com/clerk/javascript/commit/636b496e42d4afff28187966acf1777be880a5c9), [`aa63796`](https://github.com/clerk/javascript/commit/aa63796b67aa862b100cc04f62d944c19cf03ce9)]:
+  - @clerk/shared@4.4.1
+
 ## 6.4.0
 
 ### Minor Changes

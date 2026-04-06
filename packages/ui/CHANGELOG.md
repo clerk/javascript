@@ -1,5 +1,15 @@
 # @clerk/ui
 
+## 1.3.1
+
+### Patch Changes
+
+- Display enterprise connection icon on account linking dropdown within `UserProfile` ([#8203](https://github.com/clerk/javascript/pull/8203)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`b289566`](https://github.com/clerk/javascript/commit/b28956617555c21f703a40f8f14fb2ff23d509ae), [`0833cb1`](https://github.com/clerk/javascript/commit/0833cb106347049cb9f91a4dd3cca06bbc628a6a), [`636b496`](https://github.com/clerk/javascript/commit/636b496e42d4afff28187966acf1777be880a5c9), [`d93f8ee`](https://github.com/clerk/javascript/commit/d93f8eeabdb93f1392fbf179c00b1f227c452243), [`aa63796`](https://github.com/clerk/javascript/commit/aa63796b67aa862b100cc04f62d944c19cf03ce9)]:
+  - @clerk/shared@4.4.1
+  - @clerk/localizations@4.3.1
+
 ## 1.3.0
 
 ### Minor Changes

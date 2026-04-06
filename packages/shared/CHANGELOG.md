@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.4.1
+
+### Patch Changes
+
+- Add `provider` and `logoPublicUrl` to `EnterpriseConnection` resource ([#8203](https://github.com/clerk/javascript/pull/8203)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add `oiat` (original_issued_at) field to `JwtHeader` type for Session Minter monotonic token freshness checks. ([#8107](https://github.com/clerk/javascript/pull/8107)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add docs URL to `passkey_invalid_rpID_or_domain` error ([#8216](https://github.com/clerk/javascript/pull/8216)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 4.4.0
 
 ### Minor Changes
