@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
 import type { Mock } from 'vitest';
-import { describe, it, beforeEach, expect, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clerkMiddleware } from '../clerkMiddleware';
 import { requireAuth } from '../requireAuth';
