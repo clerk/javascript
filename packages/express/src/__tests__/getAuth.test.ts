@@ -1,4 +1,5 @@
 import type { AuthenticatedMachineObject } from '@clerk/backend/internal';
+import { describe, expect, it } from 'vitest';
 
 import { getAuth } from '../getAuth';
 import { mockRequest, mockRequestWithAuth } from './helpers';

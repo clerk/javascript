@@ -1,5 +1,14 @@
 # Change Log
 
+## 7.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`9a00a1c`](https://github.com/clerk/javascript/commit/9a00a1cc9753a49ea96e520a8e4918075f3efff4), [`00715a6`](https://github.com/clerk/javascript/commit/00715a6d9ea8cf412c989e870a3eff03973fa505), [`39ee042`](https://github.com/clerk/javascript/commit/39ee0425ef4d6a21e9b232e2aa126f45a9cf3cff), [`b8c73d3`](https://github.com/clerk/javascript/commit/b8c73d34ee30616e63b6320e7a8724630670eeb3), [`1827b50`](https://github.com/clerk/javascript/commit/1827b50a6ef9ab14c48cddc120796a9bf3c965b6), [`7707a31`](https://github.com/clerk/javascript/commit/7707a31eb1977d0c5f2bb72f7ad0768606a55d16), [`849f198`](https://github.com/clerk/javascript/commit/849f1980fbfa031f2b62855788ce75eba24c789c), [`7c7d025`](https://github.com/clerk/javascript/commit/7c7d025ceda5fb2dde126ea1143ac3113f6403c7)]:
+  - @clerk/shared@4.4.0
+  - @clerk/backend@3.2.4
+  - @clerk/react@6.1.4
+
 ## 7.0.7
 
 ### Patch Changes

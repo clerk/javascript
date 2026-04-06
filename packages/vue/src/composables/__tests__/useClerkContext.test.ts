@@ -1,5 +1,5 @@
 import { render } from '@testing-library/vue';
-import { vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { defineComponent } from 'vue';
 
 import { clerkPlugin } from '../../plugin';

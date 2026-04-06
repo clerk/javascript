@@ -94,7 +94,10 @@ export function mapNativeErrorToClerkWebAuthnErrorCode(
   }
 
   if (code === '1002') {
-    return new ClerkWebAuthnError(message, { code: 'passkey_invalid_rpID_or_domain' });
+    return new ClerkWebAuthnError(message, {
+      code: 'passkey_invalid_rpID_or_domain',
+      docsUrl: 'https://clerk.com/docs/deployments/overview#authentication-across-subdomains',
+    });
   }
 
   if (code === '1003' || code === 'CreateCredentialInterruptedException') {

@@ -118,6 +118,7 @@ describe('SignInFactorOne', () => {
         });
         render(<SignInFactorOne />, { wrapper });
         await screen.findByText('Password');
+        screen.getByPlaceholderText('Enter your password');
       });
 
       it('should render the other methods component when clicking on "Forgot password"', async () => {

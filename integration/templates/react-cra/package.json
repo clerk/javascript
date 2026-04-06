@@ -5,8 +5,7 @@
   "scripts": {
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "start": "BROWSER=none react-scripts start",
-    "test": "react-scripts test"
+    "start": "BROWSER=none react-scripts start"
   },
   "browserslist": {
     "production": [
@@ -22,8 +21,7 @@
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ]
   },
   "dependencies": {
