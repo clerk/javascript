@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import Fastify from 'fastify';
-import { vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { clerkPlugin, getAuth } from '../index';
 

@@ -1,5 +1,5 @@
 import type { Request, RequestHandler, Response } from 'express';
-import { vi } from 'vitest';
+import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest';
 
 const { mockClerkFrontendApiProxy } = vi.hoisted(() => ({
   mockClerkFrontendApiProxy: vi.fn(),
