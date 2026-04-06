@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 vi.mock('../withClerkMiddleware', () => {
   return {
