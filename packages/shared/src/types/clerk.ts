@@ -644,11 +644,7 @@ export interface Clerk {
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
-   * This API is in early access and may change in future releases.
-   *
-   * Mount a api keys component at the target element.
-   *
-   * @experimental
+   * Mount an API keys component at the target element.
    *
    * @param targetNode - Target to mount the APIKeys component.
    * @param props - Configuration parameters.
@@ -656,14 +652,10 @@ export interface Clerk {
   mountAPIKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
 
   /**
-   * This API is in early access and may change in future releases.
-   *
-   * Unmount a api keys component from the target element.
+   * Unmount an API keys component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @experimental
-   *
-   * @param targetNode - Target node to unmount the ApiKeys component from.
+   * @param targetNode - Target node to unmount the APIKeys component from.
    */
   unmountAPIKeys: (targetNode: HTMLDivElement) => void;
 
@@ -1032,9 +1024,6 @@ export interface Clerk {
 
   /**
    * API Keys Object
-   *
-   * @experimental
-   * This API is in early access and may change in future releases.
    */
   apiKeys: APIKeysNamespace;
 

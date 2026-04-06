@@ -1345,15 +1345,11 @@ export class Clerk implements ClerkInterface {
   };
 
   /**
-   * @experimental This API is in early access and may change in future releases.
-   *
-   * Mount a API keys component at the target element.
+   * Mount an API keys component at the target element.
    * @param targetNode Target to mount the APIKeys component.
    * @param props Configuration parameters.
    */
   public mountAPIKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
-    logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
-
     if (disabledAllAPIKeysFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
@@ -1398,9 +1394,7 @@ export class Clerk implements ClerkInterface {
   };
 
   /**
-   * @experimental This API is in early access and may change in future releases.
-   *
-   * Unmount a API keys component from the target element.
+   * Unmount an API keys component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
    * @param targetNode Target node to unmount the APIKeys component from.
