@@ -4,8 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
 import com.clerk.api.network.serialization.ClerkResult
+import com.clerk.api.ui.ClerkColors
+import com.clerk.api.ui.ClerkDesign
+import com.clerk.api.ui.ClerkTheme
 import com.facebook.react.bridge.ActivityEventListener
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -18,6 +23,7 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import org.json.JSONObject
 
 private const val TAG = "ClerkExpoModule"
 
@@ -78,6 +84,7 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
                             .apply()
                     }
 
+                    loadThemeFromAssets()
                     Clerk.initialize(reactApplicationContext, pubKey)
 
                     // Wait for initialization to complete with timeout
@@ -366,5 +373,78 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
         result.putBoolean("dismissed", resultCode == Activity.RESULT_CANCELED)
 
         promise.resolve(result)
+    }
+
+    // MARK: - Theme Loading
+
+    private fun loadThemeFromAssets() {
+        try {
+            val jsonString = reactApplicationContext.assets
+                .open("clerk_theme.json")
+                .bufferedReader()
+                .use { it.readText() }
+            val json = JSONObject(jsonString)
+            Clerk.customTheme = parseClerkTheme(json)
+        } catch (e: java.io.FileNotFoundException) {
+            // No theme file provided — use defaults
+        } catch (e: Exception) {
+            debugLog(TAG, "Failed to load clerk_theme.json: ${e.message}")
+        }
+    }
+
+    private fun parseClerkTheme(json: JSONObject): ClerkTheme {
+        val colors = json.optJSONObject("colors")?.let { parseColors(it) }
+        val darkColors = json.optJSONObject("darkColors")?.let { parseColors(it) }
+        val design = json.optJSONObject("design")?.let { parseDesign(it) }
+        return ClerkTheme(
+            colors = colors,
+            darkColors = darkColors,
+            design = design
+        )
+    }
+
+    private fun parseColors(json: JSONObject): ClerkColors {
+        return ClerkColors(
+            primary = json.optStringColor("primary"),
+            background = json.optStringColor("background"),
+            input = json.optStringColor("input"),
+            danger = json.optStringColor("danger"),
+            success = json.optStringColor("success"),
+            warning = json.optStringColor("warning"),
+            foreground = json.optStringColor("foreground"),
+            mutedForeground = json.optStringColor("mutedForeground"),
+            primaryForeground = json.optStringColor("primaryForeground"),
+            inputForeground = json.optStringColor("inputForeground"),
+            neutral = json.optStringColor("neutral"),
+            border = json.optStringColor("border"),
+            ring = json.optStringColor("ring"),
+            muted = json.optStringColor("muted"),
+            shadow = json.optStringColor("shadow")
+        )
+    }
+
+    private fun parseDesign(json: JSONObject): ClerkDesign {
+        return ClerkDesign(
+            fontFamily = json.optString("fontFamily", null),
+            borderRadius = if (json.has("borderRadius")) json.getDouble("borderRadius").dp else null
+        )
+    }
+
+    private fun parseHexColor(hex: String): Color? {
+        val cleaned = hex.removePrefix("#")
+        return try {
+            when (cleaned.length) {
+                6 -> Color(android.graphics.Color.parseColor("#FF$cleaned"))
+                8 -> Color(android.graphics.Color.parseColor("#$cleaned"))
+                else -> null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun JSONObject.optStringColor(key: String): Color? {
+        val value = optString(key, null) ?: return null
+        return parseHexColor(value)
     }
 }

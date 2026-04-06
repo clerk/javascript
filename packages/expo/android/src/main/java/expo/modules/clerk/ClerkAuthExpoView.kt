@@ -105,7 +105,7 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
           ) {
             AuthView(
               modifier = Modifier.fillMaxSize(),
-              clerkTheme = null
+              clerkTheme = Clerk.customTheme
             )
           }
         }

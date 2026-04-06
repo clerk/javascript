@@ -18,6 +18,10 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
   private static let clerkLoadIntervalNs: UInt64 = 100_000_000
   private static var clerkConfigured = false
 
+  /// Parsed light and dark themes from Info.plist "ClerkTheme" dictionary.
+  var lightTheme: ClerkTheme?
+  var darkTheme: ClerkTheme?
+
   private enum KeychainKey {
     static let jsClientJWT = "__clerk_client_jwt"
     static let nativeDeviceToken = "clerkDeviceToken"
@@ -43,6 +47,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
 
   // Register this factory with the ClerkExpo module
   public static func register() {
+    shared.loadThemes()
     clerkViewFactory = shared
   }
 
@@ -152,6 +157,8 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     let wrapper = ClerkAuthWrapperViewController(
       mode: Self.authMode(from: mode),
       dismissable: dismissable,
+      lightTheme: lightTheme,
+      darkTheme: darkTheme,
       completion: completion
     )
     return wrapper
@@ -163,6 +170,8 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
   ) -> UIViewController? {
     let wrapper = ClerkProfileWrapperViewController(
       dismissable: dismissable,
+      lightTheme: lightTheme,
+      darkTheme: darkTheme,
       completion: completion
     )
     return wrapper
@@ -179,6 +188,8 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
       rootView: ClerkInlineAuthWrapperView(
         mode: Self.authMode(from: mode),
         dismissable: dismissable,
+        lightTheme: lightTheme,
+        darkTheme: darkTheme,
         onEvent: onEvent
       )
     )
@@ -191,6 +202,8 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     makeHostingController(
       rootView: ClerkInlineProfileWrapperView(
         dismissable: dismissable,
+        lightTheme: lightTheme,
+        darkTheme: darkTheme,
         onEvent: onEvent
       )
     )
@@ -224,6 +237,91 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     default:
       .signInOrUp
     }
+  }
+
+  // MARK: - Theme Parsing
+
+  /// Reads the "ClerkTheme" dictionary from Info.plist and builds light / dark themes.
+  func loadThemes() {
+    guard let themeDictionary = Bundle.main.object(forInfoDictionaryKey: "ClerkTheme") as? [String: Any] else {
+      return
+    }
+
+    // Build light theme from top-level "colors" and "design"
+    let lightColors = (themeDictionary["colors"] as? [String: String]).flatMap { parseColors(from: $0) }
+    let design = (themeDictionary["design"] as? [String: Any]).flatMap { parseDesign(from: $0) }
+    let fonts = (themeDictionary["design"] as? [String: Any]).flatMap { parseFonts(from: $0) }
+
+    if lightColors != nil || design != nil || fonts != nil {
+      lightTheme = ClerkTheme(colors: lightColors, design: design, fonts: fonts)
+    }
+
+    // Build dark theme from "darkColors" (inherits same design/fonts)
+    if let darkColorsDict = themeDictionary["darkColors"] as? [String: String] {
+      let darkColors = parseColors(from: darkColorsDict)
+      if darkColors != nil || design != nil || fonts != nil {
+        darkTheme = ClerkTheme(colors: darkColors, design: design, fonts: fonts)
+      }
+    }
+  }
+
+  private func parseColors(from dict: [String: String]) -> ClerkTheme.Colors? {
+    var hasAny = false
+    var colors = ClerkTheme.Colors()
+
+    if let v = dict["primary"].flatMap({ colorFromHex($0) }) { colors.primary = v; hasAny = true }
+    if let v = dict["background"].flatMap({ colorFromHex($0) }) { colors.background = v; hasAny = true }
+    if let v = dict["input"].flatMap({ colorFromHex($0) }) { colors.input = v; hasAny = true }
+    if let v = dict["danger"].flatMap({ colorFromHex($0) }) { colors.danger = v; hasAny = true }
+    if let v = dict["success"].flatMap({ colorFromHex($0) }) { colors.success = v; hasAny = true }
+    if let v = dict["warning"].flatMap({ colorFromHex($0) }) { colors.warning = v; hasAny = true }
+    if let v = dict["foreground"].flatMap({ colorFromHex($0) }) { colors.foreground = v; hasAny = true }
+    if let v = dict["mutedForeground"].flatMap({ colorFromHex($0) }) { colors.mutedForeground = v; hasAny = true }
+    if let v = dict["primaryForeground"].flatMap({ colorFromHex($0) }) { colors.primaryForeground = v; hasAny = true }
+    if let v = dict["inputForeground"].flatMap({ colorFromHex($0) }) { colors.inputForeground = v; hasAny = true }
+    if let v = dict["neutral"].flatMap({ colorFromHex($0) }) { colors.neutral = v; hasAny = true }
+    if let v = dict["border"].flatMap({ colorFromHex($0) }) { colors.border = v; hasAny = true }
+    if let v = dict["ring"].flatMap({ colorFromHex($0) }) { colors.ring = v; hasAny = true }
+    if let v = dict["muted"].flatMap({ colorFromHex($0) }) { colors.muted = v; hasAny = true }
+    if let v = dict["shadow"].flatMap({ colorFromHex($0) }) { colors.shadow = v; hasAny = true }
+
+    return hasAny ? colors : nil
+  }
+
+  private func colorFromHex(_ hex: String) -> Color? {
+    var cleaned = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+    if cleaned.hasPrefix("#") { cleaned.removeFirst() }
+
+    var rgb: UInt64 = 0
+    guard Scanner(string: cleaned).scanHexInt64(&rgb) else { return nil }
+
+    switch cleaned.count {
+    case 6:
+      return Color(
+        red: Double((rgb >> 16) & 0xFF) / 255.0,
+        green: Double((rgb >> 8) & 0xFF) / 255.0,
+        blue: Double(rgb & 0xFF) / 255.0
+      )
+    case 8:
+      return Color(
+        red: Double((rgb >> 24) & 0xFF) / 255.0,
+        green: Double((rgb >> 16) & 0xFF) / 255.0,
+        blue: Double((rgb >> 8) & 0xFF) / 255.0,
+        opacity: Double(rgb & 0xFF) / 255.0
+      )
+    default:
+      return nil
+    }
+  }
+
+  private func parseFonts(from dict: [String: Any]) -> ClerkTheme.Fonts? {
+    guard let fontFamily = dict["fontFamily"] as? String, !fontFamily.isEmpty else { return nil }
+    return ClerkTheme.Fonts(fontFamily: fontFamily)
+  }
+
+  private func parseDesign(from dict: [String: Any]) -> ClerkTheme.Design? {
+    guard let radius = dict["borderRadius"] as? Double else { return nil }
+    return ClerkTheme.Design(borderRadius: CGFloat(radius))
   }
 
   private func makeHostingController<Content: View>(rootView: Content) -> UIViewController {
@@ -329,9 +427,9 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
   private var authEventTask: Task<Void, Never>?
   private var completionCalled = false
 
-  init(mode: AuthView.Mode, dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) {
+  init(mode: AuthView.Mode, dismissable: Bool, lightTheme: ClerkTheme?, darkTheme: ClerkTheme?, completion: @escaping (Result<[String: Any], Error>) -> Void) {
     self.completion = completion
-    let view = ClerkAuthWrapperView(mode: mode, dismissable: dismissable)
+    let view = ClerkAuthWrapperView(mode: mode, dismissable: dismissable, lightTheme: lightTheme, darkTheme: darkTheme)
     super.init(rootView: view)
     self.modalPresentationStyle = .fullScreen
     subscribeToAuthEvents()
@@ -393,10 +491,20 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
 struct ClerkAuthWrapperView: View {
   let mode: AuthView.Mode
   let dismissable: Bool
+  let lightTheme: ClerkTheme?
+  let darkTheme: ClerkTheme?
+
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
-    AuthView(mode: mode, isDismissable: dismissable)
+    let view = AuthView(mode: mode, isDismissable: dismissable)
       .environment(Clerk.shared)
+    let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
+    if let theme {
+      view.environment(\.clerkTheme, theme)
+    } else {
+      view
+    }
   }
 }
 
@@ -407,9 +515,9 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
   private var authEventTask: Task<Void, Never>?
   private var completionCalled = false
 
-  init(dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) {
+  init(dismissable: Bool, lightTheme: ClerkTheme?, darkTheme: ClerkTheme?, completion: @escaping (Result<[String: Any], Error>) -> Void) {
     self.completion = completion
-    let view = ClerkProfileWrapperView(dismissable: dismissable)
+    let view = ClerkProfileWrapperView(dismissable: dismissable, lightTheme: lightTheme, darkTheme: darkTheme)
     super.init(rootView: view)
     self.modalPresentationStyle = .fullScreen
     subscribeToAuthEvents()
@@ -454,10 +562,20 @@ class ClerkProfileWrapperViewController: UIHostingController<ClerkProfileWrapper
 
 struct ClerkProfileWrapperView: View {
   let dismissable: Bool
+  let lightTheme: ClerkTheme?
+  let darkTheme: ClerkTheme?
+
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
-    UserProfileView(isDismissable: dismissable)
+    let view = UserProfileView(isDismissable: dismissable)
       .environment(Clerk.shared)
+    let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
+    if let theme {
+      view.environment(\.clerkTheme, theme)
+    } else {
+      view
+    }
   }
 }
 
@@ -466,11 +584,15 @@ struct ClerkProfileWrapperView: View {
 struct ClerkInlineAuthWrapperView: View {
   let mode: AuthView.Mode
   let dismissable: Bool
+  let lightTheme: ClerkTheme?
+  let darkTheme: ClerkTheme?
   let onEvent: (String, [String: Any]) -> Void
 
   // Track initial session to detect new sign-ins (same approach as Android)
   @State private var initialSessionId: String? = Clerk.shared.session?.id
   @State private var eventSent = false
+
+  @Environment(\.colorScheme) private var colorScheme
 
   private func sendAuthCompleted(sessionId: String, type: String) {
     guard !eventSent, sessionId != initialSessionId else { return }
@@ -478,9 +600,21 @@ struct ClerkInlineAuthWrapperView: View {
     onEvent(type, ["sessionId": sessionId, "type": type == "signUpCompleted" ? "signUp" : "signIn"])
   }
 
-  var body: some View {
-    AuthView(mode: mode, isDismissable: dismissable)
+  private var themedAuthView: some View {
+    let view = AuthView(mode: mode, isDismissable: dismissable)
       .environment(Clerk.shared)
+    let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
+    return Group {
+      if let theme {
+        view.environment(\.clerkTheme, theme)
+      } else {
+        view
+      }
+    }
+  }
+
+  var body: some View {
+    themedAuthView
       // Primary detection: observe Clerk.shared.session directly (matches Android's sessionFlow approach).
       // This is more reliable than auth.events which may not emit for inline AuthView sign-ins.
       .onChange(of: Clerk.shared.session?.id) { _, newSessionId in
@@ -512,11 +646,24 @@ struct ClerkInlineAuthWrapperView: View {
 
 struct ClerkInlineProfileWrapperView: View {
   let dismissable: Bool
+  let lightTheme: ClerkTheme?
+  let darkTheme: ClerkTheme?
   let onEvent: (String, [String: Any]) -> Void
 
+  @Environment(\.colorScheme) private var colorScheme
+
   var body: some View {
-    UserProfileView(isDismissable: dismissable)
+    let view = UserProfileView(isDismissable: dismissable)
       .environment(Clerk.shared)
+    let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
+    let themedView = Group {
+      if let theme {
+        view.environment(\.clerkTheme, theme)
+      } else {
+        view
+      }
+    }
+    themedView
       .task {
         for await event in Clerk.shared.auth.events {
           switch event {

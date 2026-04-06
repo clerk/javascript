@@ -585,6 +585,120 @@ const withClerkAppleSignIn = config => {
   });
 };
 
+/**
+ * Apply a custom theme to Clerk native components (iOS + Android).
+ *
+ * Accepts a `theme` prop pointing to a JSON file with optional keys:
+ *   - colors: { primary, background, input, danger, success, warning,
+ *               foreground, mutedForeground, primaryForeground, inputForeground,
+ *               neutral, border, ring, muted, shadow }  (hex color strings)
+ *   - darkColors: same keys as colors (for dark mode)
+ *   - design: { fontFamily: string, borderRadius: number }
+ *
+ * iOS: Embeds the parsed JSON into Info.plist under key "ClerkTheme".
+ *       When darkColors is present, removes UIUserInterfaceStyle to allow
+ *       system dark mode.
+ * Android: Copies the JSON file to android/app/src/main/assets/clerk_theme.json.
+ */
+const VALID_COLOR_KEYS = [
+  'primary',
+  'background',
+  'input',
+  'danger',
+  'success',
+  'warning',
+  'foreground',
+  'mutedForeground',
+  'primaryForeground',
+  'inputForeground',
+  'neutral',
+  'border',
+  'ring',
+  'muted',
+  'shadow',
+];
+
+const HEX_COLOR_REGEX = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
+
+function validateThemeJson(theme) {
+  const validateColors = (colors, label) => {
+    if (!colors || typeof colors !== 'object') return;
+    for (const [key, value] of Object.entries(colors)) {
+      if (!VALID_COLOR_KEYS.includes(key)) {
+        console.warn(`⚠️  Clerk theme: unknown color key "${key}" in ${label}, ignoring`);
+        continue;
+      }
+      if (typeof value !== 'string' || !HEX_COLOR_REGEX.test(value)) {
+        throw new Error(`Clerk theme: invalid hex color for ${label}.${key}: "${value}"`);
+      }
+    }
+  };
+
+  if (theme.colors) validateColors(theme.colors, 'colors');
+  if (theme.darkColors) validateColors(theme.darkColors, 'darkColors');
+
+  if (theme.design) {
+    if (theme.design.fontFamily != null && typeof theme.design.fontFamily !== 'string') {
+      throw new Error(`Clerk theme: design.fontFamily must be a string`);
+    }
+    if (theme.design.borderRadius != null && typeof theme.design.borderRadius !== 'number') {
+      throw new Error(`Clerk theme: design.borderRadius must be a number`);
+    }
+  }
+}
+
+const withClerkTheme = (config, props = {}) => {
+  const { theme } = props;
+  if (!theme) return config;
+
+  // Resolve the theme file path relative to the project root
+  const themePath = path.resolve(theme);
+  if (!fs.existsSync(themePath)) {
+    console.warn(`⚠️  Clerk theme file not found: ${themePath}, skipping theme`);
+    return config;
+  }
+
+  let themeJson;
+  try {
+    themeJson = JSON.parse(fs.readFileSync(themePath, 'utf8'));
+    validateThemeJson(themeJson);
+  } catch (e) {
+    throw new Error(`Clerk theme: failed to parse ${themePath}: ${e.message}`);
+  }
+
+  // iOS: Embed theme in Info.plist under "ClerkTheme"
+  config = withInfoPlist(config, modConfig => {
+    modConfig.modResults.ClerkTheme = themeJson;
+    console.log('✅ Embedded Clerk theme in Info.plist');
+
+    // When darkColors is provided, remove UIUserInterfaceStyle to allow
+    // the system to switch between light and dark mode automatically.
+    if (themeJson.darkColors) {
+      delete modConfig.modResults.UIUserInterfaceStyle;
+      console.log('✅ Removed UIUserInterfaceStyle to enable system dark mode');
+    }
+
+    return modConfig;
+  });
+
+  // Android: Copy theme JSON to assets
+  config = withDangerousMod(config, [
+    'android',
+    async config => {
+      const assetsDir = path.join(config.modRequest.platformProjectRoot, 'app', 'src', 'main', 'assets');
+      if (!fs.existsSync(assetsDir)) {
+        fs.mkdirSync(assetsDir, { recursive: true });
+      }
+      const destPath = path.join(assetsDir, 'clerk_theme.json');
+      fs.writeFileSync(destPath, JSON.stringify(themeJson, null, 2) + '\n');
+      console.log('✅ Copied Clerk theme to Android assets');
+      return config;
+    },
+  ]);
+
+  return config;
+};
+
 const withClerkExpo = (config, props = {}) => {
   const { appleSignIn = true } = props;
   config = withClerkIOS(config);
@@ -594,6 +708,7 @@ const withClerkExpo = (config, props = {}) => {
   config = withClerkGoogleSignIn(config);
   config = withClerkAndroid(config);
   config = withClerkKeychainService(config, props);
+  config = withClerkTheme(config, props);
   return config;
 };
 
