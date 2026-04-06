@@ -182,6 +182,8 @@ export default defineNuxtModule<ModuleOptions>({
       'RedirectToCreateOrganization',
       'Show',
       'Waitlist',
+      // API Keys
+      'APIKeys',
     ];
     otherComponents.forEach(component => {
       void addComponent({
