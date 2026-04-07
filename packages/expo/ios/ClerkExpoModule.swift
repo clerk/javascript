@@ -303,31 +303,47 @@ public class ClerkAuthNativeView: UIView {
     ) else { return }
 
     authVC.modalPresentationStyle = .fullScreen
-
-    // Wait for any in-flight modal dismissals (e.g., UserProfileView sign-out)
-    // before presenting. Retry until the top VC has no presented VC.
-    func tryPresent(attempts: Int = 0) {
-      guard attempts < 10 else { return }
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-        guard let self = self, self.presentedAuthVC == nil else { return }
-        guard let rootVC = Self.topViewController() else {
-          tryPresent(attempts: attempts + 1)
-          return
-        }
-        if rootVC.isBeingDismissed || rootVC.isBeingPresented {
-          tryPresent(attempts: attempts + 1)
-          return
-        }
-        rootVC.present(authVC, animated: false)
-        self.presentedAuthVC = authVC
-      }
-    }
-    tryPresent()
+    // Try to present immediately. Only wait if a previous modal is dismissing.
+    presentWhenReady(authVC, attempts: 0)
   }
 
   private func dismissAuthModal() {
     presentedAuthVC?.dismiss(animated: false)
     presentedAuthVC = nil
+  }
+
+  /// Presents the auth view controller as soon as it's safe to do so.
+  /// On initial mount this presents synchronously (no delay, no white flash).
+  /// If a previous modal is still dismissing, waits for its transition coordinator
+  /// to finish — no fixed delays.
+  private func presentWhenReady(_ authVC: UIViewController, attempts: Int) {
+    guard presentedAuthVC == nil, attempts < 30 else { return }
+    guard let rootVC = Self.topViewController() else {
+      DispatchQueue.main.async { [weak self] in
+        self?.presentWhenReady(authVC, attempts: attempts + 1)
+      }
+      return
+    }
+
+    // If a previous modal is animating dismissal, wait for it via the
+    // transition coordinator instead of a fixed delay.
+    if let coordinator = rootVC.transitionCoordinator {
+      coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+        self?.presentWhenReady(authVC, attempts: attempts + 1)
+      }
+      return
+    }
+
+    // If there's still a presented VC (no coordinator yet), wait one frame.
+    if rootVC.presentedViewController != nil {
+      DispatchQueue.main.async { [weak self] in
+        self?.presentWhenReady(authVC, attempts: attempts + 1)
+      }
+      return
+    }
+
+    rootVC.present(authVC, animated: false)
+    presentedAuthVC = authVC
   }
 
   private static func topViewController() -> UIViewController? {
