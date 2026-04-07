@@ -36,6 +36,7 @@ export const enUS: LocalizationResource = {
     menuAction__revoke: 'Revoke key',
     revokeConfirmation: {
       confirmationText: 'Revoke',
+      inputLabel: 'Type the confirmation text below to revoke this key.',
       formButtonPrimary__revoke: 'Revoke key',
       formHint: 'Are you sure you want to delete this Secret key?',
       formTitle: 'Revoke "{{apiKeyName}}" secret key?',
