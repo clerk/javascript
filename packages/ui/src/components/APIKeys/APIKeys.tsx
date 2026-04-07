@@ -1,11 +1,6 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { isOrganizationId } from '@clerk/shared/internal/clerk-js/organization';
-import {
-  __experimental_useAPIKeys as useAPIKeys,
-  __internal_useOrganizationBase,
-  useClerk,
-  useUser,
-} from '@clerk/shared/react';
+import { useAPIKeys, __internal_useOrganizationBase, useClerk, useUser } from '@clerk/shared/react';
 import type { APIKeyResource } from '@clerk/shared/types';
 import { lazy, useState } from 'react';
 
