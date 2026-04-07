@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "3.1.6",
+  "version": "3.1.8",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -124,7 +124,7 @@
     "@clerk/expo-passkeys": "workspace:*",
     "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
-    "esbuild": "^0.19.0",
+    "esbuild": "^0.25.0",
     "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "^5.4.0",
     "expo-constants": "^18.0.0",

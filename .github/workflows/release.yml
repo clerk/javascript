@@ -60,7 +60,7 @@ jobs:
           turbo-token: ""
 
       - name: Upgrade npm for trusted publishing
-        run: npm install -g npm@latest
+        run: npx npm@11 install -g npm@11
 
       - name: Build release
         run: pnpm turbo build $TURBO_ARGS --force
@@ -186,7 +186,7 @@ jobs:
           playwright-enabled: true # Must be present to enable caching on branched workflows
 
       - name: Upgrade npm for trusted publishing
-        run: npm install -g npm@latest
+        run: npx npm@11 install -g npm@11
 
       - name: Version packages for canary
         id: version-packages
@@ -331,7 +331,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Upgrade npm for trusted publishing
-        run: npm install -g npm@latest
+        run: npx npm@11 install -g npm@11
 
       - name: Extract snapshot name
         id: extract-snapshot-name
