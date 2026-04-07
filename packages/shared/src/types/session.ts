@@ -336,6 +336,7 @@ export interface PublicUserData {
   identifier: string;
   userId?: string;
   username?: string;
+  banned: boolean;
 }
 
 /**
