@@ -1287,6 +1287,7 @@ export type __internal_LocalizationResource = {
       formHint: LocalizationValue;
       formButtonPrimary__revoke: LocalizationValue;
       confirmationText: LocalizationValue;
+      inputLabel: LocalizationValue;
     };
     lastUsed__seconds: LocalizationValue<'seconds'>;
     lastUsed__minutes: LocalizationValue<'minutes'>;

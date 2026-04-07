@@ -34,12 +34,13 @@ export const RevokeAPIKeyConfirmationModal = ({
 
   const revokeField = useFormControl('apiKeyRevokeConfirmation', '', {
     type: 'text',
-    label: `Type "Revoke" to confirm`,
-    placeholder: 'Revoke',
+    label: localizationKeys('apiKeys.revokeConfirmation.inputLabel'),
+    placeholder: localizationKeys('apiKeys.revokeConfirmation.confirmationText'),
     isRequired: true,
   });
 
-  const canSubmit = revokeField.value === t(localizationKeys('apiKeys.revokeConfirmation.confirmationText'));
+  const canSubmit =
+    revokeField.value === (t(localizationKeys('apiKeys.revokeConfirmation.confirmationText')) || 'Revoke');
 
   const handleClose = () => {
     onClose();
