@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.2.7
+
+### Patch Changes
+
+- Fix POST requests with `sec-fetch-dest: document` incorrectly triggering handshake redirects, resulting in 405 errors from FAPI. Non-GET requests (e.g. native form submissions) are now excluded from handshake and multi-domain sync eligibility. ([#8045](https://github.com/clerk/javascript/pull/8045)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 3.2.6
 
 ### Patch Changes
