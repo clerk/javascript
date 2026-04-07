@@ -1,5 +1,12 @@
 # @clerk/nuxt
 
+## 2.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`bedad42`](https://github.com/clerk/javascript/commit/bedad42b3a3bce899e23b38ef0b0f8d5b8d1149d)]:
+  - @clerk/backend@3.2.7
+
 ## 2.1.0
 
 ### Minor Changes
