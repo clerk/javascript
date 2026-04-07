@@ -57,6 +57,7 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "__experimental_useCheckout",
   "__experimental_usePaymentElement",
   "getToken",
+  "useAPIKeys",
   "useAuth",
   "useClerk",
   "useEmailLink",

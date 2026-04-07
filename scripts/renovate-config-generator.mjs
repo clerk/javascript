@@ -18,7 +18,6 @@ const rules = new Map();
  * @property {string[]} [matchUpdateTypes]
  * @property {string[]} [matchDepTypes]
  * @property {string[]} [matchPackageNames]
- * @property {string[]} [matchPackagePatterns]
  * @property {boolean} [automerge]
  * @property {boolean} [dependencyDashboardApproval]
  * @property {string} [additionalBranchPrefix]
@@ -37,7 +36,7 @@ const defaultRules = [
   },
   // Don't bump @clerk/ packages since changesets will handle this
   {
-    matchPackagePatterns: ['^@clerk/'],
+    matchPackageNames: ['/^@clerk//'],
     enabled: false,
   },
   {
