@@ -25,7 +25,7 @@
       "inputs": ["sandbox/**"],
       "outputs": ["dist/**"]
     },
-    "dev:sandbox": {
+    "dev:sandbox:serve": {
       "cache": false,
       "dependsOn": ["build"],
       "persistent": true
