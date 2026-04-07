@@ -35,6 +35,8 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
+  # Renovate security update: @modelcontextprotocol/sdk@1.26.0
+  - '@modelcontextprotocol/sdk@1.26.0'
   # Renovate security update: esbuild@0.25.0
   - esbuild@0.25.0
   # Renovate security update: hono@4.12.7
