@@ -1405,8 +1405,8 @@
       enabled: false,
     },
     {
-      matchPackagePatterns: [
-        "^@clerk/",
+      matchPackageNames: [
+        "/^@clerk//",
       ],
       enabled: false,
     },
