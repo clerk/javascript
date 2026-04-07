@@ -321,7 +321,7 @@ export interface PublicUserDataJSON {
   identifier: string;
   user_id?: string;
   username?: string;
-  banned: boolean;
+  banned?: boolean;
 }
 
 export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
