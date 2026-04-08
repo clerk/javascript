@@ -37,7 +37,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const card = useCardState();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { afterSignInUrl, afterSignUpUrl, signUpUrl, isCombinedFlow } = ctx;
+  const { afterSignInUrl, afterSignUpUrl, signUpUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const { setActive } = useClerk();
   const { userSettings } = useEnvironment();
   const supportEmail = useSupportEmail();

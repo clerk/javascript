@@ -47,10 +47,14 @@ export async function handleSignUpIfMissingTransfer({
           }
 
           // Pending task: route to the task within the sign-in component using
-          // an absolute URL built from signUpUrl.
+          // an absolute URL built from signUpUrl. Wrap clerk.navigate to
+          // normalize the return type, since the public LoadedClerk type
+          // declares it as `Promise<unknown> | void`.
           await navigateIfTaskExists(session, {
             baseUrl: signUpUrl,
-            navigate: clerk.navigate,
+            navigate: async to => {
+              await clerk.navigate(to);
+            },
           });
         },
       });
