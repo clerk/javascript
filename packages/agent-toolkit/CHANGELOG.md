@@ -1,5 +1,15 @@
 # @clerk/agent-toolkit
 
+## 0.3.12
+
+### Patch Changes
+
+- Update `@modelcontextprotocol/sdk` to `1.26.0` to pick up an upstream security fix. ([#8256](https://github.com/clerk/javascript/pull/8256)) by [@renovate](https://github.com/apps/renovate)
+
+- Updated dependencies [[`fdac10e`](https://github.com/clerk/javascript/commit/fdac10e96ad60c0176cde4e1e3ddc89e40cd0a15), [`4e3cb0a`](https://github.com/clerk/javascript/commit/4e3cb0abed1f8aa1cba032c15da3a94a49162b0c), [`aa32bbc`](https://github.com/clerk/javascript/commit/aa32bbc94e76ea726056810885208c59269b2d2b)]:
+  - @clerk/shared@4.6.0
+  - @clerk/backend@3.2.8
+
 ## 0.3.11
 
 ### Patch Changes
