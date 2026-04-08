@@ -24,5 +24,4 @@ export const EmailLinkErrorCodeStatus = {
   Expired: 'expired',
   Failed: 'failed',
   ClientMismatch: 'client_mismatch',
-  Transferable: 'transferable',
 } as const;
