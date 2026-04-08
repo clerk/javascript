@@ -1,5 +1,18 @@
 # Change Log
 
+## 4.4.0
+
+### Minor Changes
+
+- Add support for rendering the Banned badge in the organization members list. ([#8261](https://github.com/clerk/javascript/pull/8261)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fixed API keys "Revoke" confirmation modal being stuck disabled when using a localization. ([#8258](https://github.com/clerk/javascript/pull/8258)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`fdac10e`](https://github.com/clerk/javascript/commit/fdac10e96ad60c0176cde4e1e3ddc89e40cd0a15), [`4e3cb0a`](https://github.com/clerk/javascript/commit/4e3cb0abed1f8aa1cba032c15da3a94a49162b0c), [`aa32bbc`](https://github.com/clerk/javascript/commit/aa32bbc94e76ea726056810885208c59269b2d2b)]:
+  - @clerk/shared@4.6.0
+
 ## 4.3.2
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.6.0
+
+### Minor Changes
+
+- Add support for rendering the Banned badge in the organization members list. ([#8261](https://github.com/clerk/javascript/pull/8261)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Improve types for `signIn.create` and `signUp.create` methods. ([#8267](https://github.com/clerk/javascript/pull/8267)) by [@dstaley](https://github.com/dstaley)
+
+- Fixed API keys "Revoke" confirmation modal being stuck disabled when using a localization. ([#8258](https://github.com/clerk/javascript/pull/8258)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 4.5.0
 
 ### Minor Changes
