@@ -163,6 +163,7 @@ export type {
   EmailWebhookEvent,
   OrganizationWebhookEvent,
   OrganizationDomainWebhookEvent,
+  OrganizationInvitationAcceptedWebhookEvent,
   OrganizationInvitationWebhookEvent,
   OrganizationMembershipWebhookEvent,
   RoleWebhookEvent,

@@ -84,10 +84,8 @@
       "dependsOn": ["build"],
       "inputs": [
         "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/jest.*.ts",
         "*.d.ts",
         "bundlewatch.config.json",
-        "jest.*",
         "src/**",
         "tests/**",
         "tsconfig.json",

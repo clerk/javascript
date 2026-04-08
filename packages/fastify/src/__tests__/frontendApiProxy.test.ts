@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import Fastify from 'fastify';
-import { vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockClerkFrontendApiProxy } = vi.hoisted(() => ({
   mockClerkFrontendApiProxy: vi.fn(),

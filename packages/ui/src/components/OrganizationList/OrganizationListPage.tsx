@@ -137,8 +137,9 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
     <>
       <Header.Root
         sx={t => ({
-          padding: `${t.space.$none} ${t.space.$8}`,
+          padding: `${t.space.$4} ${t.space.$4} ${t.space.$none}`,
         })}
+        showLogo
       >
         <Header.Title
           localizationKey={localizationKeys(
