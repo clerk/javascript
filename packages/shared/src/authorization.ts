@@ -342,6 +342,25 @@ const resolveAuthState = ({
     } as const;
   }
 
+  // Session exists but claims aren't available yet (e.g. during client hydration
+  // before a token has been fetched). Treat as loading state.
+  if (!!sessionId && !!userId && !sessionClaims) {
+    return {
+      actor: undefined,
+      getToken,
+      has: () => false,
+      isLoaded: false,
+      isSignedIn: undefined,
+      orgId: undefined,
+      orgRole: undefined,
+      orgSlug: undefined,
+      sessionClaims: undefined,
+      sessionId: undefined,
+      signOut,
+      userId: undefined,
+    } as const;
+  }
+
   if (!!sessionId && !!sessionClaims && !!userId && !!orgId && !!orgRole) {
     return {
       actor: actor || null,
@@ -359,7 +378,7 @@ const resolveAuthState = ({
     } as const;
   }
 
-  if (!!sessionId && !!sessionClaims && !!userId && !orgId) {
+  if (!!sessionId && !!sessionClaims && !!userId) {
     return {
       actor: actor || null,
       getToken,

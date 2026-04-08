@@ -312,6 +312,49 @@ describe('useDerivedAuth', () => {
     expect(errorThrower.throw).toHaveBeenCalledWith(invalidStateError);
   });
 
+  it('returns loading state when sessionId and userId are present but sessionClaims is missing', () => {
+    const authObject = {
+      sessionId: 'session123',
+      userId: 'user123',
+      signOut: vi.fn(),
+      getToken: vi.fn(),
+    };
+
+    const {
+      result: { current },
+    } = renderHook(() => useDerivedAuth(authObject));
+
+    expect(current.isLoaded).toBe(false);
+    expect(current.isSignedIn).toBeUndefined();
+    expect(current.sessionId).toBeUndefined();
+    expect(current.userId).toBeUndefined();
+    expect(current.sessionClaims).toBeUndefined();
+  });
+
+  it('returns signed in without org when orgId is present but orgRole is missing', () => {
+    const authObject = {
+      sessionId: 'session123',
+      sessionClaims: stubSessionClaims({ sessionId: 'session123', userId: 'user123', orgId: 'org123' }),
+      userId: 'user123',
+      orgId: 'org123',
+      orgRole: undefined,
+      signOut: vi.fn(),
+      getToken: vi.fn(),
+    };
+
+    const {
+      result: { current },
+    } = renderHook(() => useDerivedAuth(authObject));
+
+    expect(current.isLoaded).toBe(true);
+    expect(current.isSignedIn).toBe(true);
+    expect(current.sessionId).toBe('session123');
+    expect(current.userId).toBe('user123');
+    expect(current.orgId).toBeNull();
+    expect(current.orgRole).toBeNull();
+    expect(current.orgSlug).toBeNull();
+  });
+
   it('uses provided has function if available', () => {
     const mockHas = vi.fn().mockReturnValue(false);
     const authObject = {
