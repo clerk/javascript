@@ -84,8 +84,10 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
                             .apply()
                     }
 
-                    loadThemeFromAssets()
                     Clerk.initialize(reactApplicationContext, pubKey)
+                    // Must be set AFTER Clerk.initialize() because initialize()
+                    // resets customTheme to its `theme` parameter (default null).
+                    loadThemeFromAssets()
 
                     // Wait for initialization to complete with timeout
                     try {
@@ -424,10 +426,11 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     }
 
     private fun parseDesign(json: JSONObject): ClerkDesign {
-        return ClerkDesign(
-            fontFamily = json.optString("fontFamily", null),
-            borderRadius = if (json.has("borderRadius")) json.getDouble("borderRadius").dp else null
-        )
+        return if (json.has("borderRadius")) {
+            ClerkDesign(borderRadius = json.getDouble("borderRadius").toFloat().dp)
+        } else {
+            ClerkDesign()
+        }
     }
 
     private fun parseHexColor(hex: String): Color? {
