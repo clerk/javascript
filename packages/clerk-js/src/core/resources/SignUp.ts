@@ -1026,21 +1026,22 @@ class SignUpFuture implements SignUpFutureResource {
       }
 
       const authenticateFn = () => {
-        return this.#resource.__internal_basePost({
-          path: this.#resource.pathRoot,
-          body: {
-            strategy,
-            ...routes,
-            unsafeMetadata,
-            legalAccepted,
-            oidcPrompt,
-            enterpriseConnectionId,
-            emailAddress,
-            captchaToken,
-            captchaWidgetType,
-            captchaError,
-          },
-        });
+        const body: Record<string, unknown> = {
+          strategy,
+          ...routes,
+          unsafeMetadata,
+          legalAccepted,
+          oidcPrompt,
+          enterpriseConnectionId,
+          emailAddress,
+          captchaToken,
+          captchaWidgetType,
+          captchaError,
+        };
+        if (this.#resource.id) {
+          return this.#resource.__internal_basePatch({ path: this.#resource.pathRoot, body });
+        }
+        return this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
       };
 
       await authenticateFn().catch(async e => {

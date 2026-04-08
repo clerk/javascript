@@ -1145,11 +1145,13 @@ class SignInFuture implements SignInFutureResource {
         routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
       }
 
-      await this._create({
-        strategy,
-        ...routes,
-        identifier,
-      });
+      if (!this.#resource.id) {
+        await this._create({
+          strategy,
+          ...routes,
+          identifier,
+        });
+      }
 
       if (strategy === 'enterprise_sso') {
         await this.#resource.__internal_basePost({
