@@ -54,6 +54,13 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
   let serverUrl: string = params.serverUrl;
   let appDir: string;
   let env: EnvironmentConfig = params.env;
+  // Captured per-app testing-token state. We deliberately do NOT mirror these
+  // to process.env from this module — see testAgainstRunningApps.ts for the
+  // scoped set/restore around test execution. Polluting process.env globally
+  // here breaks unrelated test files (dynamic-keys, handshake, quickstart,
+  // etc.) that create their own apps and rely on their own clerkSetup().
+  let clerkFapi: string | undefined;
+  let clerkTestingToken: string | undefined;
 
   const readFromStateFile = () => {
     if (!stateFile.getLongRunningApps() || [port, serverUrl, pid, appDir, env].filter(Boolean).length === 0) {
@@ -85,14 +92,10 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
         pid = data.pid;
         appDir = data.appDir;
         env = params.env;
-        // Propagate testing tokens to this worker process so that
-        // setupClerkTestingToken() can bypass bot protection.
-        if (data.clerkFapi) {
-          process.env.CLERK_FAPI = data.clerkFapi;
-        }
-        if (data.clerkTestingToken) {
-          process.env.CLERK_TESTING_TOKEN = data.clerkTestingToken;
-        }
+        // Capture testing-token state on the app so testAgainstRunningApps can
+        // scope it to the long-running-app describes only.
+        clerkFapi = data.clerkFapi;
+        clerkTestingToken = data.clerkTestingToken;
         return true;
       }
       return false;
@@ -123,14 +126,27 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
         log('Skipping setup of testing tokens for non-development instance');
       } else {
         log('Setting up testing tokens...');
-        await clerkSetup({
-          publishableKey,
-          frontendApiUrl,
-          secretKey,
-          // @ts-expect-error apiUrl is not a typed option for clerkSetup, but it is accepted at runtime.
-          apiUrl,
-          dotenv: false,
-        });
+        // clerkSetup mutates process.env.CLERK_FAPI / CLERK_TESTING_TOKEN.
+        // Snapshot the previous values, run setup, capture the new values onto
+        // the app, and restore the previous values so we don't pollute the
+        // worker for unrelated test files in the same process.
+        const prevFapi = process.env.CLERK_FAPI;
+        const prevToken = process.env.CLERK_TESTING_TOKEN;
+        try {
+          await clerkSetup({
+            publishableKey,
+            frontendApiUrl,
+            secretKey,
+            // @ts-expect-error apiUrl is not a typed option for clerkSetup, but it is accepted at runtime.
+            apiUrl,
+            dotenv: false,
+          });
+          clerkFapi = process.env.CLERK_FAPI;
+          clerkTestingToken = process.env.CLERK_TESTING_TOKEN;
+        } finally {
+          process.env.CLERK_FAPI = prevFapi;
+          process.env.CLERK_TESTING_TOKEN = prevToken;
+        }
         log('Testing tokens setup complete');
       }
     } catch (error) {
@@ -194,8 +210,8 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
           id,
           appDir,
           env: params.env.toJson(),
-          clerkFapi: process.env.CLERK_FAPI,
-          clerkTestingToken: process.env.CLERK_TESTING_TOKEN,
+          clerkFapi,
+          clerkTestingToken,
         });
       } finally {
         releaseStateFileLock();
@@ -285,6 +301,12 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
       get serverUrl() {
         readFromStateFile();
         return serverUrl;
+      },
+      get clerkFapi() {
+        return clerkFapi;
+      },
+      get clerkTestingToken() {
+        return clerkTestingToken;
       },
     },
     {

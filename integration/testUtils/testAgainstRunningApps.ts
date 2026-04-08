@@ -46,6 +46,14 @@ export function testAgainstRunningApps(runningAppsParams: RunningAppsParams) {
     test.describe(title, () => {
       runningApps(runningAppsParams).forEach(app => {
         test.describe(`${app.name}`, () => {
+          // Snapshot env vars at the worker process scope so we can restore
+          // them after this describe finishes. Other test files in the same
+          // worker (e.g. dynamic-keys, handshake, quickstart) create their own
+          // apps and rely on their own clerkSetup() to populate these — they
+          // must not see this app's values leak in.
+          let prevClerkFapi: string | undefined;
+          let prevClerkTestingToken: string | undefined;
+
           test.beforeAll(async () => {
             // Workers may block waiting for another worker to finish initializing
             // an app, so allow up to 5 minutes for the lock + init sequence.
@@ -53,6 +61,21 @@ export function testAgainstRunningApps(runningAppsParams: RunningAppsParams) {
             // Lazy init: starts the app if it's not already running.
             // Uses file-based locking so only one worker initializes each app.
             await app.init();
+
+            prevClerkFapi = process.env.CLERK_FAPI;
+            prevClerkTestingToken = process.env.CLERK_TESTING_TOKEN;
+            const lra = app as unknown as { clerkFapi?: string; clerkTestingToken?: string };
+            if (lra.clerkFapi) {
+              process.env.CLERK_FAPI = lra.clerkFapi;
+            }
+            if (lra.clerkTestingToken) {
+              process.env.CLERK_TESTING_TOKEN = lra.clerkTestingToken;
+            }
+          });
+
+          test.afterAll(() => {
+            process.env.CLERK_FAPI = prevClerkFapi;
+            process.env.CLERK_TESTING_TOKEN = prevClerkTestingToken;
           });
 
           cb({ app });
