@@ -27,27 +27,12 @@ describe('OAuthApplication.fetchConsentInfo', () => {
     vi.restoreAllMocks();
   });
 
-  it('throws ClerkRuntimeError when there is no active session', async () => {
-    const fetchSpy = vi.spyOn(BaseResource, '_fetch');
-
-    BaseResource.clerk = {
-      session: undefined,
-    } as any;
-
-    await expect(OAuthApplication.fetchConsentInfo({ oauthClientId: 'cid' })).rejects.toMatchObject({
-      code: 'cannot_fetch_oauth_consent_no_session',
-    });
-    expect(fetchSpy).not.toHaveBeenCalled();
-  });
-
-  it('calls BaseResource._fetch with GET, encoded path, sessionId, optional scope, and skipUpdateClient', async () => {
+  it('calls BaseResource._fetch with GET, encoded path, optional scope, and skipUpdateClient', async () => {
     const fetchSpy = vi.spyOn(BaseResource, '_fetch').mockResolvedValue({
       response: consentPayload,
     } as any);
 
-    BaseResource.clerk = {
-      session: { id: 'sess_test' },
-    } as any;
+    BaseResource.clerk = {} as any;
 
     await OAuthApplication.fetchConsentInfo({ oauthClientId: 'my/client id', scope: 'openid email' });
 
@@ -56,7 +41,6 @@ describe('OAuthApplication.fetchConsentInfo', () => {
         method: 'GET',
         path: '/me/oauth/consent/my%2Fclient%20id',
         search: { scope: 'openid email' },
-        sessionId: 'sess_test',
       },
       { skipUpdateClient: true },
     );
@@ -67,9 +51,7 @@ describe('OAuthApplication.fetchConsentInfo', () => {
       response: consentPayload,
     } as any);
 
-    BaseResource.clerk = {
-      session: { id: 'sess_test' },
-    } as any;
+    BaseResource.clerk = {} as any;
 
     await OAuthApplication.fetchConsentInfo({ oauthClientId: 'cid' });
 
@@ -86,9 +68,7 @@ describe('OAuthApplication.fetchConsentInfo', () => {
       response: consentPayload,
     } as any);
 
-    BaseResource.clerk = {
-      session: { id: 'sess_test' },
-    } as any;
+    BaseResource.clerk = {} as any;
 
     const info = await OAuthApplication.fetchConsentInfo({ oauthClientId: 'client_abc' });
 
@@ -107,9 +87,7 @@ describe('OAuthApplication.fetchConsentInfo', () => {
       response: { ...consentPayload, scopes: undefined },
     } as any);
 
-    BaseResource.clerk = {
-      session: { id: 'sess_test' },
-    } as any;
+    BaseResource.clerk = {} as any;
 
     const info = await OAuthApplication.fetchConsentInfo({ oauthClientId: 'client_abc' });
     expect(info.scopes).toEqual([]);
@@ -121,11 +99,10 @@ describe('OAuthApplication.fetchConsentInfo', () => {
     });
 
     BaseResource.clerk = {
-      session: { id: 'sess_1' },
       getFapiClient: () =>
         createFapiClient({
           frontendApi: 'clerk.example.com',
-          getSessionId: () => 'sess_1',
+          getSessionId: () => undefined,
           instanceType: 'development' as InstanceType,
         }),
       __internal_setCountry: vi.fn(),
@@ -146,9 +123,7 @@ describe('OAuthApplication.fetchConsentInfo', () => {
   it('throws ClerkRuntimeError when _fetch returns null (offline)', async () => {
     vi.spyOn(BaseResource, '_fetch').mockResolvedValue(null);
 
-    BaseResource.clerk = {
-      session: { id: 'sess_test' },
-    } as any;
+    BaseResource.clerk = {} as any;
 
     await expect(OAuthApplication.fetchConsentInfo({ oauthClientId: 'cid' })).rejects.toMatchObject({
       code: 'network_error',
