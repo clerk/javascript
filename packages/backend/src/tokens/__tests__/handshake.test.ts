@@ -94,6 +94,7 @@ describe('HandshakeService', () => {
       clerkUrl: new URL('https://example.com'),
       frontendApi: 'api.clerk.com',
       instanceType: 'production',
+      method: 'GET',
       usesSuffixedCookies: () => true,
       secFetchDest: 'document',
       accept: 'text/html',
@@ -137,6 +138,25 @@ describe('HandshakeService', () => {
     it('should return false for non-eligible requests', () => {
       mockAuthenticateContext.secFetchDest = 'image';
       mockAuthenticateContext.accept = 'image/png';
+      expect(handshakeService.isRequestEligibleForHandshake()).toBe(false);
+    });
+
+    it('should return false for POST requests with document secFetchDest', () => {
+      mockAuthenticateContext.method = 'POST';
+      mockAuthenticateContext.secFetchDest = 'document';
+      expect(handshakeService.isRequestEligibleForHandshake()).toBe(false);
+    });
+
+    it('should return false for PUT requests with document secFetchDest', () => {
+      mockAuthenticateContext.method = 'PUT';
+      mockAuthenticateContext.secFetchDest = 'document';
+      expect(handshakeService.isRequestEligibleForHandshake()).toBe(false);
+    });
+
+    it('should return false for POST requests with text/html accept without secFetchDest', () => {
+      mockAuthenticateContext.method = 'POST';
+      mockAuthenticateContext.secFetchDest = undefined;
+      mockAuthenticateContext.accept = 'text/html';
       expect(handshakeService.isRequestEligibleForHandshake()).toBe(false);
     });
   });

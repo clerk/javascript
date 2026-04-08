@@ -152,6 +152,7 @@ export type __internal_LocalizationResource = {
   badge__unverified: LocalizationValue;
   badge__requiresAction: LocalizationValue;
   badge__you: LocalizationValue;
+  badge__banned: LocalizationValue;
   badge__freeTrial: LocalizationValue;
   badge__currentPlan: LocalizationValue;
   badge__upcomingPlan: LocalizationValue;
@@ -1287,6 +1288,7 @@ export type __internal_LocalizationResource = {
       formHint: LocalizationValue;
       formButtonPrimary__revoke: LocalizationValue;
       confirmationText: LocalizationValue;
+      inputLabel: LocalizationValue;
     };
     lastUsed__seconds: LocalizationValue<'seconds'>;
     lastUsed__minutes: LocalizationValue<'minutes'>;

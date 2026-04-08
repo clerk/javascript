@@ -31,10 +31,11 @@ async function fetchWithRetry<T>(fn: () => Promise<T>, label: string): Promise<T
         throw error;
       }
       const status = isClerkAPIResponseError(error) ? error.status : (error as NodeJS.ErrnoException).code;
+      const exponentialDelay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
       const delay =
         isClerkAPIResponseError(error) && typeof error.retryAfter === 'number'
-          ? Math.min(error.retryAfter * 1000, MAX_RETRY_DELAY_MS)
-          : Math.min(BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS, MAX_RETRY_DELAY_MS);
+          ? Math.min(Math.max(error.retryAfter * 1000, exponentialDelay), MAX_RETRY_DELAY_MS)
+          : Math.min(exponentialDelay, MAX_RETRY_DELAY_MS);
       console.warn(
         `[Retry] ${status} for ${label}, attempt ${attempt + 1}/${MAX_RETRIES}, waiting ${Math.round(delay)}ms`,
       );
