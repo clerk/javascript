@@ -137,7 +137,8 @@ export function OAuthConsentInternal() {
                     display: 'grid',
                     gridTemplateColumns: `${theme.sizes.$5} 1fr ${theme.sizes.$3}`,
                     columnGap: theme.space.$2,
-                    paddingInline: theme.space.$3,
+                    paddingInlineStart: theme.space.$1,
+                    paddingInlineEnd: theme.space.$1x5,
                     paddingBlock: theme.space.$1,
                     alignItems: 'center',
                     borderRadius: theme.radii.$md,
@@ -160,6 +161,7 @@ export function OAuthConsentInternal() {
                     sx={{ flex: 1, textAlign: 'start', minWidth: 0, maxInlineSize: '200px' }}
                     truncate
                     as='span'
+                    variant='subtitle'
                   >
                     {option.label}
                   </Text>
