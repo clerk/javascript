@@ -63,6 +63,7 @@ export const enUS: LocalizationResource = {
   badge__upcomingPlan: 'Upcoming',
   badge__userDevice: 'User device',
   badge__you: 'You',
+  badge__banned: 'Banned',
   billing: {
     addPaymentMethod__label: 'Add payment method',
     alwaysFree: 'Always free',
