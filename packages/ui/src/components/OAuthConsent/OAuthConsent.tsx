@@ -3,14 +3,15 @@ import type { ComponentProps } from 'react';
 import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext } from '@/ui/contexts';
-import { Box, Button, Flex, Flow, Grid, Icon, Text } from '@/ui/customizables';
+import { Box, Button, Flex, Flow, Grid, Icon, Image, Span, Text } from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { Modal } from '@/ui/elements/Modal';
+import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Tooltip } from '@/ui/elements/Tooltip';
-import { LockDottedCircle } from '@/ui/icons';
+import { Check, LockDottedCircle } from '@/ui/icons';
 import { Alert, Textarea } from '@/ui/primitives';
 import type { ThemableCssProp } from '@/ui/styledSystem';
 import { common } from '@/ui/styledSystem';
@@ -24,6 +25,18 @@ export function OAuthConsentInternal() {
   const { user } = useUser();
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
+  const [selectedValue, setSelectedValue] = useState<string | null>('clerk-nation');
+
+  const selectOptions = [
+    { value: 'clerk-nation', label: 'Clerk Nation', logoUrl: 'https://img.clerk.com/static/clerk.png' },
+    {
+      value: 'perky-clerky',
+      label: 'Perky Clerky Clerk Nation Clerk Nation Clerk Nation',
+      logoUrl: 'https://img.clerk.com/static/clerk.png',
+    },
+    { value: 'clerk', label: 'Clerk', logoUrl: 'https://img.clerk.com/static/clerk.png' },
+    { value: 'clerk-of-oz', label: 'The Clerk of Oz', logoUrl: 'https://img.clerk.com/static/clerk.png' },
+  ];
 
   const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
 
@@ -108,6 +121,90 @@ export function OAuthConsentInternal() {
             <Header.Title localizationKey={oAuthApplicationName} />
             <Header.Subtitle localizationKey={`wants to access ${applicationName} on behalf of ${primaryIdentifier}`} />
           </Header.Root>
+
+          <Box>
+            <Select
+              options={selectOptions}
+              value={selectedValue}
+              onChange={option => setSelectedValue(option.value)}
+              renderOption={(option, _index, isSelected) => (
+                <Box
+                  as='span'
+                  sx={theme => ({
+                    width: '100%',
+                    display: 'grid',
+                    gridTemplateColumns: `${theme.sizes.$5} 1fr ${theme.sizes.$3}`,
+                    columnGap: theme.space.$2,
+                    paddingInline: theme.space.$1,
+                    paddingBlock: theme.space.$1,
+                    alignItems: 'center',
+                    borderRadius: theme.radii.$md,
+                    '&:hover, &[data-focused="true"]': {
+                      background: common.mutedBackground(theme),
+                    },
+                  })}
+                >
+                  <Image
+                    src={option.logoUrl}
+                    alt={option.label}
+                    sx={theme => ({
+                      width: theme.sizes.$5,
+                      height: theme.sizes.$5,
+                      objectFit: 'contain',
+                      flexShrink: 0,
+                    })}
+                  />
+                  <Text
+                    sx={{ flex: 1, textAlign: 'start', minWidth: 0, maxInlineSize: '200px' }}
+                    truncate
+                    as='span'
+                  >
+                    {option.label}
+                  </Text>
+                  {isSelected && (
+                    <Icon
+                      icon={Check}
+                      size='sm'
+                      sx={theme => ({ color: theme.colors.$primary500 })}
+                    />
+                  )}
+                </Box>
+              )}
+            >
+              <SelectButton
+                sx={theme => ({
+                  inlineSize: 'min(100%, 16rem)',
+                  paddingInline: theme.space.$3,
+                })}
+              >
+                <Image
+                  src={selectOptions.find(option => option.value === selectedValue)?.logoUrl || ''}
+                  alt={selectOptions.find(option => option.value === selectedValue)?.label || ''}
+                  sx={theme => ({
+                    width: theme.sizes.$5,
+                    height: theme.sizes.$5,
+                    borderRadius: theme.radii.$md,
+                    objectFit: 'contain',
+                    flexShrink: 0,
+                  })}
+                />
+                <Text
+                  colorScheme='body'
+                  as='span'
+                  truncate
+                  sx={{
+                    flex: 1,
+                    minWidth: 0,
+                    textAlign: 'start',
+                  }}
+                >
+                  {selectOptions.find(option => option.value === selectedValue)?.label || 'Select an option'}
+                </Text>
+              </SelectButton>
+              <SelectOptionList />
+            </Select>
+          </Box>
+
           <Box
             sx={t => ({
               textAlign: 'start',
