@@ -12,6 +12,7 @@ export class PublicUserData implements IPublicUserData {
   identifier!: string;
   userId?: string;
   username?: string;
+  banned?: boolean;
 
   constructor(data: PublicUserDataJSON | PublicUserDataJSONSnapshot) {
     this.fromJSON(data);
@@ -26,6 +27,7 @@ export class PublicUserData implements IPublicUserData {
       this.identifier = data.identifier || '';
       this.userId = data.user_id;
       this.username = data.username;
+      this.banned = data.banned ?? undefined;
     }
 
     return this;
@@ -40,6 +42,7 @@ export class PublicUserData implements IPublicUserData {
       identifier: this.identifier,
       user_id: this.userId,
       username: this.username,
+      banned: this.banned,
     };
   }
 }
