@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 import type { ComponentProps } from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext } from '@/ui/contexts';
 import { Box, Button, Flex, Flow, Grid, Icon, Image, Span, Text } from '@/ui/customizables';
@@ -26,6 +26,7 @@ export function OAuthConsentInternal() {
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | null>('clerk-nation');
+  const selectButtonRef = useRef<HTMLButtonElement>(null);
 
   const selectOptions = [
     { value: 'clerk-nation', label: 'Clerk Nation', logoUrl: 'https://img.clerk.com/static/clerk.png' },
@@ -127,6 +128,7 @@ export function OAuthConsentInternal() {
               options={selectOptions}
               value={selectedValue}
               onChange={option => setSelectedValue(option.value)}
+              referenceElement={selectButtonRef}
               renderOption={(option, _index, isSelected) => (
                 <Box
                   as='span'
@@ -135,7 +137,7 @@ export function OAuthConsentInternal() {
                     display: 'grid',
                     gridTemplateColumns: `${theme.sizes.$5} 1fr ${theme.sizes.$3}`,
                     columnGap: theme.space.$2,
-                    paddingInline: theme.space.$1,
+                    paddingInline: theme.space.$3,
                     paddingBlock: theme.space.$1,
                     alignItems: 'center',
                     borderRadius: theme.radii.$md,
@@ -172,6 +174,7 @@ export function OAuthConsentInternal() {
               )}
             >
               <SelectButton
+                ref={selectButtonRef}
                 sx={theme => ({
                   inlineSize: 'min(100%, 16rem)',
                   paddingInline: theme.space.$3,
