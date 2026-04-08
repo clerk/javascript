@@ -2,6 +2,42 @@ import type { OAuthStrategy } from './strategies';
 
 export type OAuthScope = string;
 
+/**
+ * A single OAuth scope returned by the Frontend API for the consent screen.
+ */
+export type OAuthConsentScope = {
+  scope: string;
+  description: string | null;
+  requires_consent: boolean;
+};
+
+/**
+ * OAuth application metadata and requested scopes for the authorization consent step.
+ * Shape matches `GET /v1/me/oauth/consent/{oauth_client_id}`.
+ */
+export type OAuthConsentInfo = {
+  oauth_application_name: string;
+  oauth_application_logo_url?: string;
+  oauth_application_url?: string;
+  client_id: string;
+  state: string;
+  scopes: OAuthConsentScope[];
+};
+
+/**
+ * Parameters for `Clerk.fetchOAuthConsentInfo`.
+ */
+export type FetchOAuthConsentInfoParams = {
+  /**
+   * OAuth 2.0 `client_id` from the authorize request.
+   */
+  oauthClientId: string;
+  /**
+   * Space-delimited OAuth scopes from the authorize request, if any.
+   */
+  scope?: string;
+};
+
 export interface OAuthProviderData {
   provider: OAuthProvider;
   strategy: OAuthStrategy;

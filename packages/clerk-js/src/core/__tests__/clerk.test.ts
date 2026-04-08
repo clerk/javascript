@@ -1,4 +1,9 @@
-import { ClerkOfflineError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import {
+  ClerkAPIResponseError,
+  ClerkOfflineError,
+  ClerkRuntimeError,
+  EmailLinkErrorCodeStatus,
+} from '@clerk/shared/error';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -2581,6 +2586,138 @@ describe('Clerk singleton', () => {
         method: 'GET',
         path: '/organizations/org_id',
       });
+    });
+  });
+
+  describe('fetchOAuthConsentInfo', () => {
+    const mockActiveSession = {
+      id: 'sess_1',
+      status: 'active' as const,
+      user: { id: 'user_1' },
+    };
+
+    const mockClientWithSession = {
+      sessions: [mockActiveSession],
+      signedInSessions: [mockActiveSession],
+      lastActiveSessionId: 'sess_1',
+    };
+
+    it('throws ClerkRuntimeError when Clerk is not loaded', async () => {
+      const sut = new Clerk(developmentPublishableKey);
+
+      await expect(sut.fetchOAuthConsentInfo({ oauthClientId: 'client_abc' })).rejects.toBeInstanceOf(
+        ClerkRuntimeError,
+      );
+      await expect(sut.fetchOAuthConsentInfo({ oauthClientId: 'client_abc' })).rejects.toMatchObject({
+        code: 'clerk_not_loaded',
+      });
+    });
+
+    it('throws when oauthClientId is empty without calling FAPI', async () => {
+      const sut = new Clerk(developmentPublishableKey);
+      vi.spyOn(sut, 'loaded', 'get').mockReturnValue(true);
+      sut.updateClient(mockClientWithSession as any);
+
+      const request = vi.fn();
+      vi.spyOn(sut, 'getFapiClient').mockReturnValue({
+        request,
+        buildUrl: vi.fn(),
+        buildEmailAddress: vi.fn(),
+        onBeforeRequest: vi.fn(),
+        onAfterResponse: vi.fn(),
+      } as any);
+
+      await expect(sut.fetchOAuthConsentInfo({ oauthClientId: '' })).rejects.toMatchObject({
+        code: 'oauth_consent_invalid_client_id',
+      });
+      expect(request).not.toHaveBeenCalled();
+    });
+
+    it('throws when there is no session without calling FAPI', async () => {
+      const sut = new Clerk(developmentPublishableKey);
+      vi.spyOn(sut, 'loaded', 'get').mockReturnValue(true);
+      sut.updateClient({ sessions: [], signedInSessions: [], lastActiveSessionId: null } as any);
+
+      const request = vi.fn();
+      vi.spyOn(sut, 'getFapiClient').mockReturnValue({
+        request,
+        buildUrl: vi.fn(),
+        buildEmailAddress: vi.fn(),
+        onBeforeRequest: vi.fn(),
+        onAfterResponse: vi.fn(),
+      } as any);
+
+      await expect(sut.fetchOAuthConsentInfo({ oauthClientId: 'client_abc' })).rejects.toMatchObject({
+        code: 'oauth_consent_session_required',
+      });
+      expect(request).not.toHaveBeenCalled();
+    });
+
+    it('calls FAPI with encoded path and optional scope', async () => {
+      const sut = new Clerk(developmentPublishableKey);
+      vi.spyOn(sut, 'loaded', 'get').mockReturnValue(true);
+      sut.updateClient(mockClientWithSession as any);
+
+      const consentInfo = {
+        oauth_application_name: 'My App',
+        client_id: 'client/x',
+        state: 'st',
+        scopes: [],
+      };
+
+      const request = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        headers: new Headers(),
+        payload: { response: consentInfo },
+      });
+
+      vi.spyOn(sut, 'getFapiClient').mockReturnValue({
+        request,
+        buildUrl: vi.fn(),
+        buildEmailAddress: vi.fn(),
+        onBeforeRequest: vi.fn(),
+        onAfterResponse: vi.fn(),
+      } as any);
+
+      await expect(sut.fetchOAuthConsentInfo({ oauthClientId: 'client/x', scope: 'openid email' })).resolves.toEqual(
+        consentInfo,
+      );
+
+      expect(request).toHaveBeenCalledWith({
+        method: 'GET',
+        path: '/me/oauth/consent/client%2Fx',
+        search: { scope: 'openid email' },
+      });
+    });
+
+    it('throws ClerkAPIResponseError when FAPI returns an error', async () => {
+      const sut = new Clerk(developmentPublishableKey);
+      vi.spyOn(sut, 'loaded', 'get').mockReturnValue(true);
+      sut.updateClient(mockClientWithSession as any);
+
+      const request = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 400,
+        statusText: 'Bad Request',
+        headers: new Headers(),
+        payload: {
+          errors: [{ code: 'bad_request', long_message: 'Invalid client', message: 'Invalid client' }],
+        },
+      });
+
+      vi.spyOn(sut, 'getFapiClient').mockReturnValue({
+        request,
+        buildUrl: vi.fn(),
+        buildEmailAddress: vi.fn(),
+        onBeforeRequest: vi.fn(),
+        onAfterResponse: vi.fn(),
+      } as any);
+
+      await expect(sut.fetchOAuthConsentInfo({ oauthClientId: 'client_abc' })).rejects.toBeInstanceOf(
+        ClerkAPIResponseError,
+      );
     });
   });
 

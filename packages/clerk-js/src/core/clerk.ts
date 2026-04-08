@@ -1,6 +1,7 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import {
+  ClerkAPIResponseError,
   ClerkOfflineError,
   ClerkRuntimeError,
   EmailLinkError,
@@ -35,7 +36,7 @@ import {
 } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { warnings } from '@clerk/shared/internal/clerk-js/warnings';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
-import { parsePublishableKey } from '@clerk/shared/keys';
+import { isProductionFromPublishableKey, parsePublishableKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
@@ -67,6 +68,7 @@ import type {
   CheckoutSignalValue,
   Clerk as ClerkInterface,
   ClerkAPIError,
+  ClerkAPIErrorJSON,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
   ClientJSONSnapshot,
@@ -78,6 +80,7 @@ import type {
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
+  FetchOAuthConsentInfoParams,
   GenerateSignature,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
@@ -88,6 +91,7 @@ import type {
   ListenerOptions,
   LoadedClerk,
   NavigateOptions,
+  OAuthConsentInfo,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -214,6 +218,30 @@ const defaultOptions: ClerkOptions = {
   signUpForceRedirectUrl: undefined,
   newSubscriptionRedirectUrl: undefined,
 };
+
+function assertOAuthConsentProductionKeysOnDev(
+  clerk: Pick<ClerkInterface, 'publishableKey' | 'frontendApi'>,
+  statusCode: number,
+  payloadErrors?: ClerkAPIErrorJSON[],
+): void {
+  if (!payloadErrors?.[0]) {
+    return;
+  }
+
+  const safeError = payloadErrors[0];
+  const safeErrorMessage = safeError.long_message;
+
+  if (safeError.code === 'origin_invalid' && isProductionFromPublishableKey(clerk.publishableKey)) {
+    const prodDomain = clerk.frontendApi.replace('clerk.', '');
+    throw new ClerkAPIResponseError(
+      `Clerk: Production Keys are only allowed for domain "${prodDomain}". \nAPI Error: ${safeErrorMessage}`,
+      {
+        data: payloadErrors,
+        status: statusCode,
+      },
+    );
+  }
+}
 
 export class Clerk implements ClerkInterface {
   public static version: string = __PKG_VERSION__;
@@ -2697,6 +2725,80 @@ export class Clerk implements ClerkInterface {
 
   public joinWaitlist = async ({ emailAddress }: JoinWaitlistParams): Promise<WaitlistResource> =>
     Waitlist.join({ emailAddress });
+
+  public fetchOAuthConsentInfo = async (params: FetchOAuthConsentInfoParams): Promise<OAuthConsentInfo> => {
+    const { oauthClientId, scope } = params;
+
+    if (!this.loaded) {
+      throw new ClerkRuntimeError('Clerk has not loaded yet. Call `Clerk.load()` before fetching OAuth consent info.', {
+        code: 'clerk_not_loaded',
+      });
+    }
+
+    if (!oauthClientId) {
+      throw new ClerkRuntimeError('Missing OAuth client id (`oauthClientId`).', {
+        code: 'oauth_consent_invalid_client_id',
+      });
+    }
+
+    if (!this.session?.id) {
+      throw new ClerkRuntimeError('Cannot load OAuth consent without an active session.', {
+        code: 'oauth_consent_session_required',
+      });
+    }
+
+    const fapiResponse = await this.getFapiClient().request<OAuthConsentInfo>({
+      method: 'GET',
+      path: `/me/oauth/consent/${encodeURIComponent(oauthClientId)}`,
+      search: scope ? { scope } : undefined,
+    });
+
+    const { payload, status, statusText, headers } = fapiResponse;
+
+    if (status >= 200 && status <= 299) {
+      const data = payload?.response;
+      if (!data) {
+        throw new ClerkRuntimeError('OAuth consent response was empty.', {
+          code: 'oauth_consent_empty_response',
+        });
+      }
+      return data;
+    }
+
+    if (status >= 400) {
+      const errors = payload?.errors as ClerkAPIErrorJSON[] | undefined;
+      const message = errors?.[0]?.long_message;
+      const code = errors?.[0]?.code;
+
+      if (status === 401 && code === 'dev_browser_unauthenticated') {
+        await this.__internal_handleUnauthenticatedDevBrowser();
+      } else if (status === 401 && code !== 'requires_captcha') {
+        await this.handleUnauthenticated();
+      }
+
+      assertOAuthConsentProductionKeysOnDev(this, status, errors);
+
+      const apiResponseOptions: ConstructorParameters<typeof ClerkAPIResponseError>[1] = {
+        data: errors ?? [],
+        status,
+      };
+      if (status === 429 && headers) {
+        const retryAfter = headers.get('retry-after');
+        if (retryAfter) {
+          const value = parseInt(retryAfter, 10);
+          if (!isNaN(value)) {
+            apiResponseOptions.retryAfter = value;
+          }
+        }
+      }
+
+      throw new ClerkAPIResponseError(message || statusText, apiResponseOptions);
+    }
+
+    throw new ClerkRuntimeError('Failed to load OAuth consent data.', {
+      code: 'oauth_consent_request_failed',
+    });
+  };
 
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;

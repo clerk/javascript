@@ -28,6 +28,7 @@ import type {
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
+  FetchOAuthConsentInfoParams,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -35,6 +36,7 @@ import type {
   ListenerCallback,
   ListenerOptions,
   LoadedClerk,
+  OAuthConsentInfo,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -1605,6 +1607,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<WaitlistResource>;
     } else {
       this.premountMethodCalls.set('joinWaitlist', callback);
+    }
+  };
+
+  fetchOAuthConsentInfo = async (params: FetchOAuthConsentInfoParams): Promise<OAuthConsentInfo | void> => {
+    const callback = () => this.clerkjs?.fetchOAuthConsentInfo(params);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<OAuthConsentInfo>;
+    } else {
+      this.premountMethodCalls.set('fetchOAuthConsentInfo', callback);
     }
   };
 

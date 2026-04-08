@@ -18,7 +18,7 @@ import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { DomainOrProxyUrl, MultiDomainAndOrProxy } from './multiDomain';
-import type { OAuthProvider, OAuthScope } from './oauth';
+import type { FetchOAuthConsentInfoParams, OAuthConsentInfo, OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type { ClerkPaginationParams } from './pagination';
@@ -998,6 +998,12 @@ export interface Clerk {
   handleUnauthenticated: () => Promise<unknown>;
 
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
+
+  /**
+   * Loads OAuth consent metadata for the signed-in user from the Frontend API.
+   * Requires an active session and a loaded Clerk instance.
+   */
+  fetchOAuthConsentInfo: (params: FetchOAuthConsentInfoParams) => Promise<OAuthConsentInfo>;
 
   /**
    * This is an optional function.
