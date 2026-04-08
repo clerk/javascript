@@ -16,21 +16,12 @@ export class OAuthApplication extends BaseResource {
   }
 
   static async fetchConsentInfo(params: FetchOAuthConsentInfoParams): Promise<OAuthConsentInfo> {
-    const sessionId = BaseResource.clerk.session?.id;
-    if (!sessionId) {
-      throw new ClerkRuntimeError(
-        'Clerk: `oauthApplication.fetchConsentInfo` requires an active session. Ensure a user is signed in before calling this method.',
-        { code: 'cannot_fetch_oauth_consent_no_session' },
-      );
-    }
-
     const { oauthClientId, scope } = params;
     const json = await BaseResource._fetch<OAuthConsentInfoJSON>(
       {
         method: 'GET',
         path: `/me/oauth/consent/${encodeURIComponent(oauthClientId)}`,
         search: scope !== undefined ? { scope } : undefined,
-        sessionId,
       },
       { skipUpdateClient: true },
     );
