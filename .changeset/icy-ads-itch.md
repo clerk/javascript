@@ -3,7 +3,9 @@
 '@clerk/expo': patch
 ---
 
-Re-exports `useAPIKeys()` hook. Example usage:
+Re-exports `useAPIKeys()` hook.
+
+Usage example:
 
 ```tsx
 'use client';
