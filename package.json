@@ -163,7 +163,8 @@
     "overrides": {
       "react": "catalog:react",
       "react-dom": "catalog:react",
-      "rolldown": "catalog:repo"
+      "rolldown": "catalog:repo",
+      "utf-8-validate": "5.0.10"
     }
   }
 }
