@@ -1,21 +1,22 @@
 import { useUser } from '@clerk/shared/react';
 import type { ComponentProps } from 'react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext } from '@/ui/contexts';
-import { Box, Button, Flex, Flow, Grid, Icon, Image, Span, Text } from '@/ui/customizables';
+import { Box, Button, Flex, Flow, Grid, Icon, Text } from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { Modal } from '@/ui/elements/Modal';
-import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Tooltip } from '@/ui/elements/Tooltip';
-import { Check, LockDottedCircle } from '@/ui/icons';
+import { LockDottedCircle } from '@/ui/icons';
 import { Alert, Textarea } from '@/ui/primitives';
 import type { ThemableCssProp } from '@/ui/styledSystem';
 import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
+
+import { OrgSelect } from './OrgSelect';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
@@ -26,7 +27,6 @@ export function OAuthConsentInternal() {
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | null>('clerk-nation');
-  const selectButtonRef = useRef<HTMLButtonElement>(null);
 
   const selectOptions = [
     { value: 'clerk-nation', label: 'Clerk Nation', logoUrl: 'https://img.clerk.com/static/clerk.png' },
@@ -123,92 +123,15 @@ export function OAuthConsentInternal() {
             <Header.Subtitle localizationKey={`wants to access ${applicationName} on behalf of ${primaryIdentifier}`} />
           </Header.Root>
 
-          <Box>
-            <Select
-              options={selectOptions}
-              value={selectedValue}
-              onChange={option => setSelectedValue(option.value)}
-              referenceElement={selectButtonRef}
-              renderOption={(option, _index, isSelected) => (
-                <Box
-                  as='span'
-                  sx={theme => ({
-                    width: '100%',
-                    display: 'grid',
-                    gridTemplateColumns: `${theme.sizes.$5} 1fr ${theme.sizes.$3}`,
-                    columnGap: theme.space.$2,
-                    paddingInlineStart: theme.space.$1,
-                    paddingInlineEnd: theme.space.$1x5,
-                    paddingBlock: theme.space.$1,
-                    alignItems: 'center',
-                    borderRadius: theme.radii.$md,
-                    '&:hover, &[data-focused="true"]': {
-                      background: common.mutedBackground(theme),
-                    },
-                  })}
-                >
-                  <Image
-                    src={option.logoUrl}
-                    alt={option.label}
-                    sx={theme => ({
-                      width: theme.sizes.$5,
-                      height: theme.sizes.$5,
-                      objectFit: 'contain',
-                      flexShrink: 0,
-                    })}
-                  />
-                  <Text
-                    sx={{ flex: 1, textAlign: 'start', minWidth: 0, maxInlineSize: '200px' }}
-                    truncate
-                    as='span'
-                    variant='subtitle'
-                  >
-                    {option.label}
-                  </Text>
-                  {isSelected && (
-                    <Icon
-                      icon={Check}
-                      size='sm'
-                      sx={theme => ({ color: theme.colors.$primary500 })}
-                    />
-                  )}
-                </Box>
-              )}
-            >
-              <SelectButton
-                ref={selectButtonRef}
-                sx={theme => ({
-                  inlineSize: 'min(100%, 16rem)',
-                  paddingInline: theme.space.$3,
-                })}
-              >
-                <Image
-                  src={selectOptions.find(option => option.value === selectedValue)?.logoUrl || ''}
-                  alt={selectOptions.find(option => option.value === selectedValue)?.label || ''}
-                  sx={theme => ({
-                    width: theme.sizes.$5,
-                    height: theme.sizes.$5,
-                    borderRadius: theme.radii.$md,
-                    objectFit: 'contain',
-                    flexShrink: 0,
-                  })}
-                />
-                <Text
-                  colorScheme='body'
-                  as='span'
-                  truncate
-                  sx={{
-                    flex: 1,
-                    minWidth: 0,
-                    textAlign: 'start',
-                  }}
-                >
-                  {selectOptions.find(option => option.value === selectedValue)?.label || 'Select an option'}
-                </Text>
-              </SelectButton>
-              <SelectOptionList />
-            </Select>
-          </Box>
+          {selectOptions.length > 0 && (
+            <Box>
+              <OrgSelect
+                options={selectOptions}
+                value={selectedValue}
+                onChange={setSelectedValue}
+              />
+            </Box>
+          )}
 
           <Box
             sx={t => ({
