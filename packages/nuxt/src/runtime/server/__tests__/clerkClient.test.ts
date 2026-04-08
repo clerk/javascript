@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // These globals are normally injected at build time by tsup.
 (globalThis as any).PACKAGE_NAME = '@clerk/nuxt';

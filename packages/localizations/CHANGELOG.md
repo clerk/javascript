@@ -1,5 +1,48 @@
 # Change Log
 
+## 4.3.2
+
+### Patch Changes
+
+- Updated dependencies [[`2c06a5f`](https://github.com/clerk/javascript/commit/2c06a5f1859ce4f1f64111f7c0a61f0093002667)]:
+  - @clerk/shared@4.5.0
+
+## 4.3.1
+
+### Patch Changes
+
+- Change the German translation for the Sign Up button from "Anmelden" to "Registrieren". ([#6981](https://github.com/clerk/javascript/pull/6981)) by [@symapp](https://github.com/symapp)
+
+- Add zh-TW translations ([#7937](https://github.com/clerk/javascript/pull/7937)) by [@ridemountainpig](https://github.com/ridemountainpig)
+
+- Updated dependencies [[`b289566`](https://github.com/clerk/javascript/commit/b28956617555c21f703a40f8f14fb2ff23d509ae), [`636b496`](https://github.com/clerk/javascript/commit/636b496e42d4afff28187966acf1777be880a5c9), [`aa63796`](https://github.com/clerk/javascript/commit/aa63796b67aa862b100cc04f62d944c19cf03ce9)]:
+  - @clerk/shared@4.4.1
+
+## 4.3.0
+
+### Minor Changes
+
+- Add support for seat-based billing plans in Clerk Billing. ([#8006](https://github.com/clerk/javascript/pull/8006)) by [@dstaley](https://github.com/dstaley)
+
+- Allow to link external accounts to enterprise accounts via `UserProfile` ([#8091](https://github.com/clerk/javascript/pull/8091)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+### Patch Changes
+
+- Using length token in minimum and maximum length for swedish translations. ([#8167](https://github.com/clerk/javascript/pull/8167)) by [@DinoSourcesRex](https://github.com/DinoSourcesRex)
+
+- Improved error handling when creating API keys. ([#8056](https://github.com/clerk/javascript/pull/8056)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add and improve Japanese translations ([#8151](https://github.com/clerk/javascript/pull/8151)) by [@kaz](https://github.com/kaz)
+
+- fix(localizations): add missing Hungarian translations for form placeholders and legal consent ([#8080](https://github.com/clerk/javascript/pull/8080)) by [@tornaia](https://github.com/tornaia)
+
+- Use distinct password placeholder for sign-up forms ([#8082](https://github.com/clerk/javascript/pull/8082)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Added missing Bulgarian translations for `UserProfile` component ([#8174](https://github.com/clerk/javascript/pull/8174)) by [@NikolayDikov-work](https://github.com/NikolayDikov-work)
+
+- Updated dependencies [[`9a00a1c`](https://github.com/clerk/javascript/commit/9a00a1cc9753a49ea96e520a8e4918075f3efff4), [`00715a6`](https://github.com/clerk/javascript/commit/00715a6d9ea8cf412c989e870a3eff03973fa505), [`b8c73d3`](https://github.com/clerk/javascript/commit/b8c73d34ee30616e63b6320e7a8724630670eeb3), [`1827b50`](https://github.com/clerk/javascript/commit/1827b50a6ef9ab14c48cddc120796a9bf3c965b6), [`7707a31`](https://github.com/clerk/javascript/commit/7707a31eb1977d0c5f2bb72f7ad0768606a55d16)]:
+  - @clerk/shared@4.4.0
+
 ## 4.2.4
 
 ### Patch Changes

@@ -82,7 +82,7 @@ function Group({ children, borderTop = false, variant = 'primary' }: GroupProps)
 
 interface TitleProps {
   title?: string | LocalizationKey;
-  description?: string | LocalizationKey;
+  description?: string | LocalizationKey | (string | LocalizationKey)[];
   icon?: React.ComponentType;
   badge?: React.ReactNode;
 }
@@ -94,6 +94,9 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
   }
   const { variant } = context;
   const textVariant = variant === 'primary' ? 'subtitle' : 'caption';
+
+  const descriptionElements = description ? (Array.isArray(description) ? description : [description]) : [];
+
   return (
     <Dt
       ref={ref}
@@ -124,15 +127,20 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
           {badge}
         </Span>
       ) : null}
-      {description ? (
-        <Span
-          localizationKey={description}
-          elementDescriptor={descriptors.lineItemsTitleDescription}
-          sx={t => ({
-            fontSize: t.fontSizes.$sm,
-            color: t.colors.$colorMutedForeground,
-          })}
-        />
+      {descriptionElements.length > 0 ? (
+        <>
+          {descriptionElements.map((el, i) => (
+            <Span
+              key={i}
+              localizationKey={el}
+              elementDescriptor={descriptors.lineItemsTitleDescription}
+              sx={t => ({
+                fontSize: t.fontSizes.$sm,
+                color: t.colors.$colorMutedForeground,
+              })}
+            />
+          ))}
+        </>
       ) : null}
     </Dt>
   );
@@ -184,7 +192,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
         sx={t => ({
           display: 'inline-flex',
           justifyContent: 'flex-end',
-          alignItems: 'center',
+          alignItems: 'end',
           gap: t.space.$1,
           minWidth: '0',
         })}

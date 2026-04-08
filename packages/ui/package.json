@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "1.2.4",
+  "version": "1.4.0",
   "description": "Internal package that contains the UI components for the Clerk frontend SDKs",
   "repository": {
     "type": "git",
@@ -80,7 +80,8 @@
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4011}",
-    "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4011",
+    "dev:sandbox": "pnpm -w dev:sandbox",
+    "dev:sandbox:serve": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4011",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint:attw": "attw --pack . --exclude-entrypoints themes/shadcn.css --profile esm-only",

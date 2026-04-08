@@ -1,4 +1,6 @@
 /* eslint-disable no-global-assign */
+import { afterEach, describe, expect, it } from 'vitest';
+
 import { isSpaMode } from '../assert';
 
 describe('isSpaMode', () => {

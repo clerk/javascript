@@ -5,4 +5,4 @@
 '@clerk/ui': minor
 ---
 
-Allow to link external accounts to enterprise accounts via `UserProfile`
+Add support for rendering the Banned badge in the organization members list.

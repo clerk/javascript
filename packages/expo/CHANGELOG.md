@@ -1,5 +1,36 @@
 # Change Log
 
+## 3.1.8
+
+### Patch Changes
+
+- Updated dependencies [[`2c06a5f`](https://github.com/clerk/javascript/commit/2c06a5f1859ce4f1f64111f7c0a61f0093002667)]:
+  - @clerk/shared@4.5.0
+  - @clerk/react@6.2.0
+  - @clerk/clerk-js@6.5.0
+
+## 3.1.7
+
+### Patch Changes
+
+- Updated dependencies [[`b289566`](https://github.com/clerk/javascript/commit/b28956617555c21f703a40f8f14fb2ff23d509ae), [`abfd5ef`](https://github.com/clerk/javascript/commit/abfd5efc72739edcac2992dfddd2b23b814f74ba), [`636b496`](https://github.com/clerk/javascript/commit/636b496e42d4afff28187966acf1777be880a5c9), [`aa63796`](https://github.com/clerk/javascript/commit/aa63796b67aa862b100cc04f62d944c19cf03ce9)]:
+  - @clerk/clerk-js@6.4.1
+  - @clerk/shared@4.4.1
+  - @clerk/react@6.1.5
+
+## 3.1.6
+
+### Patch Changes
+
+- Add directory-level `package.json` fallback stubs for all subpath exports so that imports like `@clerk/expo/token-cache` resolve correctly in React Native bundlers that don't support the `exports` field (e.g., Metro without `unstable_enablePackageExports`). ([#8172](https://github.com/clerk/javascript/pull/8172)) by [@jacekradko](https://github.com/jacekradko)
+
+- Re-introduce two-way JS/native session sync for expo native components ([#8088](https://github.com/clerk/javascript/pull/8088)) by [@chriscanin](https://github.com/chriscanin)
+
+- Updated dependencies [[`9a00a1c`](https://github.com/clerk/javascript/commit/9a00a1cc9753a49ea96e520a8e4918075f3efff4), [`00715a6`](https://github.com/clerk/javascript/commit/00715a6d9ea8cf412c989e870a3eff03973fa505), [`b8c73d3`](https://github.com/clerk/javascript/commit/b8c73d34ee30616e63b6320e7a8724630670eeb3), [`1827b50`](https://github.com/clerk/javascript/commit/1827b50a6ef9ab14c48cddc120796a9bf3c965b6), [`7707a31`](https://github.com/clerk/javascript/commit/7707a31eb1977d0c5f2bb72f7ad0768606a55d16)]:
+  - @clerk/clerk-js@6.4.0
+  - @clerk/shared@4.4.0
+  - @clerk/react@6.1.4
+
 ## 3.1.5
 
 ### Patch Changes

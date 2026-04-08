@@ -18,7 +18,6 @@ const rules = new Map();
  * @property {string[]} [matchUpdateTypes]
  * @property {string[]} [matchDepTypes]
  * @property {string[]} [matchPackageNames]
- * @property {string[]} [matchPackagePatterns]
  * @property {boolean} [automerge]
  * @property {boolean} [dependencyDashboardApproval]
  * @property {string} [additionalBranchPrefix]
@@ -37,7 +36,7 @@ const defaultRules = [
   },
   // Don't bump @clerk/ packages since changesets will handle this
   {
-    matchPackagePatterns: ['^@clerk/'],
+    matchPackageNames: ['/^@clerk//'],
     enabled: false,
   },
   {
@@ -75,17 +74,14 @@ const defaultRules = [
     groupName: 'testing',
     matchPackageNames: [
       '@types/chai',
-      '@types/jest',
       '@types/sinon',
       'nock',
       'nyc',
-      'ts-jest',
       'vitest',
       '@testing-library{/,}**',
       '@types/testing-library__{/,}**',
       '@vitest{/,}**',
       'chai{/,}**',
-      'jest{/,}**',
       'qunit{/,}**',
       'should{/,}**',
       'sinon{/,}**',
