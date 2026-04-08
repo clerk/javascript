@@ -15,6 +15,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ComposeView
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.setViewTreeLifecycleOwner
@@ -44,6 +46,16 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
 
   private val activity: ComponentActivity? = findActivity(context)
 
+  // Per-view ViewModelStoreOwner so the AuthView's ViewModels (including its
+  // navigation state) are scoped to THIS view instance, not the activity.
+  // Without this, the AuthView's navigation persists across mount/unmount
+  // cycles within the same activity, leaving the user stuck on whatever screen
+  // (e.g. "Get help") was last navigated to before sign-out.
+  private val viewModelStoreOwner = object : ViewModelStoreOwner {
+    private val store = ViewModelStore()
+    override val viewModelStore: ViewModelStore = store
+  }
+
   private var recomposer: Recomposer? = null
   private var recomposerJob: kotlinx.coroutines.Job? = null
 
@@ -72,11 +84,17 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
   override fun onDetachedFromWindow() {
     recomposer?.cancel()
     recomposerJob?.cancel()
+    // Clear our per-view ViewModelStore so any AuthView ViewModels are GC'd.
+    viewModelStoreOwner.viewModelStore.clear()
     super.onDetachedFromWindow()
   }
 
-  // Track the initial session to detect new sign-ins
+  // Track the initial session to detect new sign-ins. Captured at construction
+  // time, but may capture a stale session if the view is mounted before signOut
+  // has finished clearing local state — so the LaunchedEffect below uses
+  // session id inequality (not null-to-value) to detect new sign-ins.
   private var initialSessionId: String? = Clerk.session?.id
+  private var authCompletedSent: Boolean = false
 
   fun setupView() {
     debugLog(TAG, "setupView - mode: $mode, isDismissable: $isDismissable, activity: $activity")
@@ -84,11 +102,14 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
     composeView.setContent {
       val session by Clerk.sessionFlow.collectAsStateWithLifecycle()
 
-      // Detect auth completion: session appeared when there wasn't one
+      // Detect auth completion: any session that's different from the one we
+      // started with (captures fresh sign-ins, sign-in-after-sign-out, etc.)
       LaunchedEffect(session) {
         val currentSession = session
-        if (currentSession != null && initialSessionId == null) {
-          debugLog(TAG, "Auth completed - session present: true")
+        val currentId = currentSession?.id
+        if (currentSession != null && currentId != initialSessionId && !authCompletedSent) {
+          debugLog(TAG, "Auth completed - new session: $currentId (initial: $initialSessionId)")
+          authCompletedSent = true
           sendEvent("signInCompleted", mapOf(
             "sessionId" to currentSession.id,
             "type" to "signIn"
@@ -113,7 +134,9 @@ class ClerkAuthNativeView(context: Context) : FrameLayout(context) {
 
       if (activity != null) {
         CompositionLocalProvider(
-          LocalViewModelStoreOwner provides activity,
+          // Per-view ViewModelStore so AuthView's navigation state doesn't
+          // leak between mounts within the same MainActivity lifetime.
+          LocalViewModelStoreOwner provides viewModelStoreOwner,
           LocalLifecycleOwner provides activity,
           LocalSavedStateRegistryOwner provides activity,
         ) {
