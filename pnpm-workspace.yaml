@@ -37,8 +37,6 @@ minimumReleaseAgeExclude:
   - 'pkglab-*'
   # Renovate security update: esbuild@0.25.0
   - esbuild@0.25.0
-  # Renovate security update: fastify@5.8.1
-  - fastify@5.8.1
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
