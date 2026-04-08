@@ -2,6 +2,7 @@ import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 
 import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
+import type { OAuthApplicationNamespace } from './oauthApplication';
 import type {
   BillingCheckoutResource,
   BillingNamespace,
@@ -1026,6 +1027,11 @@ export interface Clerk {
    * API Keys Object
    */
   apiKeys: APIKeysNamespace;
+
+  /**
+   * OAuth application helpers (e.g. consent metadata for custom consent UIs).
+   */
+  oauthApplication: OAuthApplicationNamespace;
 
   /**
    * Checkout API
