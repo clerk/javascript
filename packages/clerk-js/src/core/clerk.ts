@@ -110,7 +110,6 @@ import type {
   SignOut,
   SignOutCallback,
   SignOutOptions,
-  SignUpField,
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
@@ -138,7 +137,7 @@ import { ModuleManager } from '@/utils/moduleManager';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
-  completeSignUpFlow,
+  navigateToNextStepSignUp,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
@@ -2270,39 +2269,15 @@ export class Clerk implements ClerkInterface {
 
     const redirectUrls = new RedirectUrls(this.#options, params);
 
-    const navigateToContinueSignUp = makeNavigate(
+    const continueSignUpUrl =
       params.continueSignUpUrl ||
-        buildURL(
-          {
-            base: displayConfig.signUpUrl,
-            hashPath: '/continue',
-          },
-          { stringify: true },
-        ),
-    );
-
-    const navigateToNextStepSignUp = ({ missingFields }: { missingFields: SignUpField[] }) => {
-      if (missingFields.length) {
-        return navigateToContinueSignUp();
-      }
-
-      return completeSignUpFlow({
-        signUp,
-        verifyEmailPath:
-          params.verifyEmailAddressUrl ||
-          buildURL(
-            {
-              base: displayConfig.signUpUrl,
-              hashPath: '/verify-email-address',
-            },
-            { stringify: true },
-          ),
-        verifyPhonePath:
-          params.verifyPhoneNumberUrl ||
-          buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
-        navigate,
-      });
-    };
+      buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true });
+    const verifyEmailAddressUrl =
+      params.verifyEmailAddressUrl ||
+      buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-email-address' }, { stringify: true });
+    const verifyPhoneNumberUrl =
+      params.verifyPhoneNumberUrl ||
+      buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true });
 
     const signInUrl = params.signInUrl || displayConfig.signInUrl;
     const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
@@ -2401,7 +2376,14 @@ export class Clerk implements ClerkInterface {
             },
           });
         case 'missing_requirements':
-          return navigateToNextStepSignUp({ missingFields: res.missingFields });
+          return navigateToNextStepSignUp({
+            signUp,
+            missingFields: res.missingFields,
+            continueSignUpUrl,
+            verifyEmailAddressUrl,
+            verifyPhoneNumberUrl,
+            navigate,
+          });
         default:
           clerkOAuthCallbackDidNotCompleteSignInSignUp('sign in');
       }
@@ -2452,7 +2434,14 @@ export class Clerk implements ClerkInterface {
     }
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
-      return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
+      return navigateToNextStepSignUp({
+        signUp,
+        missingFields: signUp.missingFields,
+        continueSignUpUrl,
+        verifyEmailAddressUrl,
+        verifyPhoneNumberUrl,
+        navigate,
+      });
     }
 
     if (this.session?.currentTask) {

@@ -27,7 +27,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const card = useCardState();
   const signIn = useCoreSignIn();
   const signInContext = useSignInContext();
-  const { signInUrl, afterSignInUrl, afterSignUpUrl, isCombinedFlow, navigateOnSetActive } = signInContext;
+  const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl, isCombinedFlow } = signInContext;
   const { navigate } = useRouter();
   const { setActive } = useClerk();
   const { userSettings } = useEnvironment();
@@ -73,7 +73,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
         clerk,
         navigate,
         afterSignUpUrl,
-        navigateOnSetActive,
+        signUpUrl,
         unsafeMetadata: signInContext.unsafeMetadata,
       });
     } else if (ver.verifiedFromTheSameClient()) {

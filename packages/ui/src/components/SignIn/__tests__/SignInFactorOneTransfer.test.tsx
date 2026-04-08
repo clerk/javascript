@@ -1,7 +1,7 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
@@ -33,6 +33,7 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
         }),
       );
     });
+    fixtures.clerk.client.sessions = [{ id: 'sess_123' }] as any;
     fixtures.signUp.create.mockResolvedValueOnce({ status: 'complete', createdSessionId: 'sess_123' } as any);
 
     const { userEvent } = render(<SignInFactorOne />, { wrapper });
@@ -66,13 +67,17 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
         }),
       );
     });
-    fixtures.signUp.create.mockResolvedValueOnce({ status: 'missing_requirements' } as any);
+    fixtures.signUp.create.mockResolvedValueOnce({
+      status: 'missing_requirements',
+      missingFields: ['first_name'],
+      unverifiedFields: [],
+    } as any);
 
     const { userEvent } = render(<SignInFactorOne />, { wrapper });
 
     await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
     await waitFor(() => {
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('../create/continue');
+      expect(fixtures.router.navigate).toHaveBeenCalledWith(expect.stringContaining('continue'));
     });
   });
 
@@ -151,6 +156,48 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
     await waitFor(() => {
       expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-two');
       expect(fixtures.signUp.create).not.toHaveBeenCalled();
+    });
+  });
+
+  it('triggers sign-up transfer when email link verification becomes transferable', async () => {
+    const email = 'test@clerk.com';
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withEmailAddress();
+      f.withPassword();
+      f.withPreferredSignInStrategy({ strategy: 'password' });
+      f.withEnumerationProtection();
+      f.startSignInWithEmailAddress({ supportEmailLink: true, identifier: email });
+    });
+    props.setProps({ withSignUp: true });
+
+    fixtures.signIn.createEmailLinkFlow.mockReturnValue({
+      startEmailLinkFlow: vi.fn().mockResolvedValue({
+        status: 'needs_first_factor',
+        firstFactorVerification: {
+          status: 'transferable',
+          verifiedFromTheSameClient: () => false,
+        },
+      }),
+      cancelEmailLinkFlow: vi.fn(),
+    } as any);
+    fixtures.signUp.create.mockResolvedValueOnce({
+      status: 'missing_requirements',
+      missingFields: ['first_name'],
+      unverifiedFields: [],
+    } as any);
+
+    const { userEvent } = render(<SignInFactorOne />, { wrapper });
+
+    await userEvent.click(await screen.findByText('Use another method'));
+    await userEvent.click(await screen.findByText(`Email link to ${email}`));
+
+    await waitFor(() => {
+      expect(fixtures.signUp.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          transfer: true,
+        }),
+      );
+      expect(fixtures.router.navigate).toHaveBeenCalledWith(expect.stringContaining('continue'));
     });
   });
 

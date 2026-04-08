@@ -37,7 +37,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const card = useCardState();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { afterSignInUrl, afterSignUpUrl, navigateOnSetActive, isCombinedFlow } = ctx;
+  const { afterSignInUrl, afterSignUpUrl, signUpUrl, isCombinedFlow } = ctx;
   const { setActive } = useClerk();
   const { userSettings } = useEnvironment();
   const supportEmail = useSupportEmail();
@@ -128,7 +128,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
             clerk,
             navigate,
             afterSignUpUrl,
-            navigateOnSetActive,
+            signUpUrl,
             unsafeMetadata: ctx.unsafeMetadata,
           }).catch(reject);
         }
