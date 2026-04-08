@@ -1,5 +1,5 @@
 import { createApp, eventHandler, setResponseHeader, toWebHandler } from 'h3';
-import { vi } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import { clerkMiddleware } from '../clerkMiddleware';
 

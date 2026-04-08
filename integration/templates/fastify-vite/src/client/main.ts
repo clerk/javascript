@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   await clerk.load({
     ui: { ClerkUI },
   });
+  window.Clerk = clerk;
 
   if (clerk.isSignedIn) {
     document.getElementById('app')!.innerHTML = `

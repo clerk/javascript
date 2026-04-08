@@ -2,7 +2,7 @@ import type { AuthObject } from '@clerk/backend';
 import type { Application, Request as ExpressRequest, RequestHandler, Response as ExpressResponse } from 'express';
 import express from 'express';
 import supertest from 'supertest';
-import { vi } from 'vitest';
+import { expect, vi } from 'vitest';
 
 import type { ExpressRequestWithAuth } from '../types';
 
