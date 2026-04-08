@@ -95,6 +95,7 @@ jobs:
               const clerkUiVersion = require('./packages/ui/package.json').version;
               const nextjsVersion = require('./packages/nextjs/package.json').version;
 
+              // NOTE: Keep in sync with the `targets` array in the "Recover downstream notifications" step below.
               const targets = [
                 { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
                 { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
@@ -154,7 +155,8 @@ jobs:
             function isPublished(name, version) {
               try {
                 return execSync(`npm view ${name}@${version} version`, { encoding: 'utf8' }).trim() === version;
-              } catch {
+              } catch (e) {
+                console.log(`npm view ${name}@${version} failed: ${e.message}`);
                 return false;
               }
             }
@@ -175,6 +177,7 @@ jobs:
 
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
+            // NOTE: Keep in sync with the `targets` array in the "Trigger workflows on related repos" step above.
             const targets = [
               { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
               { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
