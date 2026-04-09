@@ -1,10 +1,10 @@
-import { Box } from '@/ui/customizables';
+import { Box, descriptors } from '@/ui/customizables';
 import { Text } from '@/ui/customizables';
 import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
 import type { ComponentProps } from 'react';
 
-export function ListGroup({ children, sx, ...props }: ComponentProps<typeof Box>) {
+export function ListGroup({ children, sx, ...props }: Omit<ComponentProps<typeof Box>, 'elementDescriptor'>) {
   return (
     <Box
       {...props}
@@ -19,13 +19,14 @@ export function ListGroup({ children, sx, ...props }: ComponentProps<typeof Box>
         }),
         sx,
       ]}
+      elementDescriptor={descriptors.listGroup}
     >
       {children}
     </Box>
   );
 }
 
-export function ListGroupHeader({ children, sx, ...props }: ComponentProps<typeof Box>) {
+export function ListGroupHeader({ children, sx, ...props }: Omit<ComponentProps<typeof Box>, 'elementDescriptor'>) {
   return (
     <Box
       {...props}
@@ -39,34 +40,45 @@ export function ListGroupHeader({ children, sx, ...props }: ComponentProps<typeo
         }),
         sx,
       ]}
+      elementDescriptor={descriptors.listGroupHeader}
     >
       {children}
     </Box>
   );
 }
 
-export function ListGroupHeaderTitle(props: ComponentProps<typeof Text>) {
+export function ListGroupHeaderTitle(props: Omit<ComponentProps<typeof Text>, 'elementDescriptor'>) {
   return (
     <Text
       {...props}
       variant='subtitle'
+      elementDescriptor={descriptors.listGroupHeaderTitle}
     />
   );
 }
 
-export function ListGroupContent({ children, sx, ...props }: Omit<ComponentProps<typeof Box>, 'as'>) {
+export function ListGroupContent({
+  children,
+  sx,
+  ...props
+}: Omit<ComponentProps<typeof Box>, 'as' | 'elementDescriptor'>) {
   return (
     <Box
       {...props}
       as='ul'
       sx={[t => ({ margin: t.sizes.$none, padding: t.sizes.$none }), sx]}
+      elementDescriptor={descriptors.listGroupContent}
     >
       {children}
     </Box>
   );
 }
 
-export function ListGroupItem({ children, sx, ...props }: Omit<ComponentProps<typeof Box>, 'as'>) {
+export function ListGroupItem({
+  children,
+  sx,
+  ...props
+}: Omit<ComponentProps<typeof Box>, 'as' | 'elementDescriptor'>) {
   return (
     <Box
       {...props}
@@ -94,17 +106,19 @@ export function ListGroupItem({ children, sx, ...props }: Omit<ComponentProps<ty
         }),
         sx,
       ]}
+      elementDescriptor={descriptors.listGroupItem}
     >
       {children}
     </Box>
   );
 }
 
-export function ListGroupItemLabel(props: ComponentProps<typeof Text>) {
+export function ListGroupItemLabel(props: Omit<ComponentProps<typeof Text>, 'elementDescriptor'>) {
   return (
     <Text
       {...props}
       variant='subtitle'
+      elementDescriptor={descriptors.listGroupItemLabel}
     />
   );
 }
