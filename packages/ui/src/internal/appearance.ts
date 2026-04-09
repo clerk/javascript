@@ -181,6 +181,11 @@ export type ElementsConfig = {
   logoBox: WithOptions;
   logoImage: WithOptions;
 
+  logoGroup: WithOptions;
+  logoGroupItem: WithOptions;
+  logoGroupIcon: WithOptions;
+  logoGroupSeparator: WithOptions;
+
   header: WithOptions;
   headerTitle: WithOptions;
   headerSubtitle: WithOptions;

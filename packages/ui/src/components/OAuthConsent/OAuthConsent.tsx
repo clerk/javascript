@@ -1,21 +1,18 @@
 import { useUser } from '@clerk/shared/react';
-import type { ComponentProps } from 'react';
 import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext } from '@/ui/contexts';
-import { Box, Button, Flex, Flow, Grid, Icon, Text } from '@/ui/customizables';
+import { Box, Button, Flow, Grid, Text } from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { Modal } from '@/ui/elements/Modal';
 import { Tooltip } from '@/ui/elements/Tooltip';
-import { LockDottedCircle } from '@/ui/icons';
 import { Alert, Textarea } from '@/ui/primitives';
-import type { ThemableCssProp } from '@/ui/styledSystem';
 import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
-
+import { LogoGroup, LogoGroupItem, LogoGroupIcon, LogoGroupSeparator } from './LogoGroup';
 import { OrgSelect } from './OrgSelect';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
@@ -61,24 +58,24 @@ export function OAuthConsentInternal() {
           <Header.Root>
             {/* both have avatars */}
             {oAuthApplicationLogoUrl && logoImageUrl && (
-              <ConnectionHeader>
-                <ConnectionItem justify='end'>
+              <LogoGroup>
+                <LogoGroupItem justify='end'>
                   <ApplicationLogo
                     src={oAuthApplicationLogoUrl}
                     alt={oAuthApplicationName}
                     href={oAuthApplicationUrl}
                     isExternal
                   />
-                </ConnectionItem>
-                <ConnectionSeparator />
-                <ConnectionItem justify='start'>
+                </LogoGroupItem>
+                <LogoGroupSeparator />
+                <LogoGroupItem justify='start'>
                   <ApplicationLogo />
-                </ConnectionItem>
-              </ConnectionHeader>
+                </LogoGroupItem>
+              </LogoGroup>
             )}
             {/* only OAuth app has an avatar */}
             {oAuthApplicationLogoUrl && !logoImageUrl && (
-              <ConnectionHeader>
+              <LogoGroup>
                 <Box
                   sx={{
                     position: 'relative',
@@ -90,7 +87,7 @@ export function OAuthConsentInternal() {
                     href={oAuthApplicationUrl}
                     isExternal
                   />
-                  <ConnectionIcon
+                  <LogoGroupIcon
                     size='sm'
                     sx={t => ({
                       position: 'absolute',
@@ -99,25 +96,25 @@ export function OAuthConsentInternal() {
                     })}
                   />
                 </Box>
-              </ConnectionHeader>
+              </LogoGroup>
             )}
             {/* only Clerk application has an avatar */}
             {!oAuthApplicationLogoUrl && logoImageUrl && (
-              <ConnectionHeader>
-                <ConnectionItem justify='end'>
-                  <ConnectionIcon />
-                </ConnectionItem>
-                <ConnectionSeparator />
-                <ConnectionItem justify='start'>
+              <LogoGroup>
+                <LogoGroupItem justify='end'>
+                  <LogoGroupIcon />
+                </LogoGroupItem>
+                <LogoGroupSeparator />
+                <LogoGroupItem justify='start'>
                   <ApplicationLogo />
-                </ConnectionItem>
-              </ConnectionHeader>
+                </LogoGroupItem>
+              </LogoGroup>
             )}
             {/* no avatars */}
             {!oAuthApplicationLogoUrl && !logoImageUrl && (
-              <ConnectionHeader>
-                <ConnectionIcon />
-              </ConnectionHeader>
+              <LogoGroup>
+                <LogoGroupIcon />
+              </LogoGroup>
             )}
             <Header.Title localizationKey={oAuthApplicationName} />
             <Header.Subtitle localizationKey={`wants to access ${applicationName} on behalf of ${primaryIdentifier}`} />
@@ -322,95 +319,6 @@ function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oAuthApplicati
         </Card.Content>
       </Card.Root>
     </Modal>
-  );
-}
-
-function ConnectionHeader({ children }: { children: React.ReactNode }) {
-  return (
-    <Flex
-      justify='center'
-      align='center'
-      gap={4}
-      sx={t => ({
-        marginBlockEnd: t.space.$6,
-      })}
-    >
-      {children}
-    </Flex>
-  );
-}
-
-function ConnectionItem({ children, sx, ...props }: ComponentProps<typeof Flex>) {
-  return (
-    <Flex
-      {...props}
-      sx={[{ flex: 1 }, sx]}
-    >
-      {children}
-    </Flex>
-  );
-}
-
-function ConnectionIcon({ size = 'md', sx }: { size?: 'sm' | 'md'; sx?: ThemableCssProp }) {
-  const scale: ThemableCssProp = t => {
-    const value = size === 'sm' ? t.space.$6 : t.space.$12;
-    return {
-      width: value,
-      height: value,
-    };
-  };
-
-  return (
-    <Box
-      sx={t => [
-        {
-          background: common.mergedColorsBackground(
-            colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$neutralAlpha50,
-          ),
-          borderRadius: t.radii.$circle,
-          borderWidth: t.borderWidths.$normal,
-          borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$borderAlpha100,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-        scale,
-        sx,
-      ]}
-    >
-      <Icon
-        icon={LockDottedCircle}
-        sx={t => ({
-          color: t.colors.$primary500,
-        })}
-      />
-    </Box>
-  );
-}
-
-function ConnectionSeparator() {
-  return (
-    <Box
-      as='svg'
-      // @ts-ignore - valid SVG attribute
-      fill='none'
-      viewBox='0 0 16 2'
-      height={2}
-      aria-hidden
-      sx={t => ({
-        color: t.colors.$colorMutedForeground,
-      })}
-    >
-      <path
-        stroke='currentColor'
-        strokeDasharray='0.1 4'
-        strokeLinecap='round'
-        strokeWidth='2'
-        d='M1 1h14'
-      />
-    </Box>
   );
 }
 
