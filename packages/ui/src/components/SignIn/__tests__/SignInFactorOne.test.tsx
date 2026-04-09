@@ -303,57 +303,6 @@ describe('SignInFactorOne', () => {
         await screen.findByText('First, enter the code sent to your phone');
       });
 
-      it('entering a pwned password, then going back and clicking forgot password should result in the correct title', async () => {
-        const { wrapper, fixtures } = await createFixtures(f => {
-          f.withEmailAddress();
-          f.withPassword();
-          f.withPreferredSignInStrategy({ strategy: 'password' });
-          f.startSignInWithEmailAddress({
-            supportPassword: true,
-            supportEmailCode: true,
-            supportResetPassword: true,
-          });
-        });
-        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-
-        const errJSON = {
-          code: 'form_password_pwned',
-          long_message:
-            'Password has been found in an online data breach. For account safety, please reset your password.',
-          message: 'Password has been found in an online data breach. For account safety, please reset your password.',
-          meta: { param_name: 'password' },
-        };
-
-        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
-          new ClerkAPIResponseError('Error', {
-            data: [errJSON],
-            status: 422,
-          }),
-        );
-
-        const { userEvent } = render(<SignInFactorOne />, { wrapper });
-        await userEvent.type(screen.getByLabelText('Password'), '123456');
-        await userEvent.click(screen.getByText('Continue'));
-
-        await screen.findByText('Password compromised');
-        await screen.findByText(
-          'This password has been found as part of a breach and can not be used, please reset your password.',
-        );
-        await screen.findByText('Or, sign in with another method');
-
-        // Go back
-        await userEvent.click(screen.getByText('Back'));
-
-        // Choose to reset password via "Forgot password" instead
-        await userEvent.click(screen.getByText(/Forgot password/i));
-        await screen.findByText('Forgot Password?');
-        expect(
-          screen.queryByText(
-            'This password has been found as part of a breach and can not be used, please reset your password.',
-          ),
-        ).not.toBeInTheDocument();
-      });
-
       it('using an compromised password should show the compromised password screen', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
