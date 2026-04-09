@@ -78,6 +78,7 @@ export function OrgSelect({ options, value, onChange }: OrgSelectProps) {
         sx={theme => ({
           inlineSize: 'min(100%, 16rem)',
           paddingInline: theme.space.$3,
+          marginInline: 'auto',
         })}
       >
         <Image

@@ -14,6 +14,14 @@ import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
 import { LogoGroup, LogoGroupItem, LogoGroupIcon, LogoGroupSeparator } from './LogoGroup';
 import { OrgSelect } from './OrgSelect';
+import {
+  ListGroup,
+  ListGroupContent,
+  ListGroupHeader,
+  ListGroupHeaderTitle,
+  ListGroupItem,
+  ListGroupItemLabel,
+} from './ListGroup';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
@@ -121,76 +129,26 @@ export function OAuthConsentInternal() {
           </Header.Root>
 
           {selectOptions.length > 0 && (
-            <Box>
-              <OrgSelect
-                options={selectOptions}
-                value={selectedValue}
-                onChange={setSelectedValue}
-              />
-            </Box>
+            <OrgSelect
+              options={selectOptions}
+              value={selectedValue}
+              onChange={setSelectedValue}
+            />
           )}
 
-          <Box
-            sx={t => ({
-              textAlign: 'start',
-              borderWidth: t.borderWidths.$normal,
-              borderStyle: t.borderStyles.$solid,
-              borderColor: t.colors.$borderAlpha100,
-              borderRadius: t.radii.$lg,
-              overflow: 'hidden',
-            })}
-          >
-            <Box
-              sx={t => ({
-                padding: t.space.$3,
-                background: common.mergedColorsBackground(
-                  colors.setAlpha(t.colors.$colorBackground, 1),
-                  t.colors.$neutralAlpha50,
-                ),
-              })}
-            >
-              <Text
-                variant='subtitle'
-                localizationKey={`This will allow ${oAuthApplicationName} access to:`}
-              />
-            </Box>
-            <Box
-              as='ul'
-              sx={t => ({ margin: t.sizes.$none, padding: t.sizes.$none })}
-            >
+          <ListGroup>
+            <ListGroupHeader>
+              <ListGroupHeaderTitle localizationKey={`This will allow ${oAuthApplicationName} access to:`} />
+            </ListGroupHeader>
+            <ListGroupContent>
               {displayedScopes.map(item => (
-                <Box
-                  key={item.scope}
-                  sx={t => ({
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    paddingInline: t.space.$3,
-                    paddingBlock: t.space.$2,
-                    borderTopWidth: t.borderWidths.$normal,
-                    borderTopStyle: t.borderStyles.$solid,
-                    borderTopColor: t.colors.$borderAlpha100,
-                    '&::before': {
-                      content: '""',
-                      display: 'inline-block',
-                      width: t.space.$1,
-                      height: t.space.$1,
-                      background: t.colors.$colorMutedForeground,
-                      borderRadius: t.radii.$circle,
-                      transform: 'translateY(-0.1875rem)',
-                      marginInlineEnd: t.space.$2,
-                      flexShrink: 0,
-                    },
-                  })}
-                  as='li'
-                >
-                  <Text
-                    variant='subtitle'
-                    localizationKey={item.description || item.scope || ''}
-                  />
-                </Box>
+                <ListGroupItem key={item.scope}>
+                  <ListGroupItemLabel>{item.description || item.scope || ''}</ListGroupItemLabel>
+                </ListGroupItem>
               ))}
-            </Box>
-          </Box>
+            </ListGroupContent>
+          </ListGroup>
+
           <Alert colorScheme='warning'>
             <Text
               colorScheme='warning'
