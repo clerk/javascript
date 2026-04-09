@@ -137,7 +137,6 @@ import { ModuleManager } from '@/utils/moduleManager';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
-  navigateToNextStepSignUp,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
@@ -150,6 +149,7 @@ import {
   isError,
   isOrganizationId,
   isRedirectForFAPIInitiatedFlow,
+  navigateToNextStepSignUp,
   removeClerkQueryParam,
   requiresUserInput,
   stripOrigin,
