@@ -4,16 +4,15 @@ import { clerkPlugin } from '@clerk/vue';
 import { setErrorThrowerOptions } from '@clerk/vue/internal';
 import { defineNuxtPlugin, navigateTo, useRuntimeConfig, useState } from 'nuxt/app';
 
+import type { ClerkKeylessContext } from './server/types';
+
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 setClerkJSLoadingErrorPackageName(PACKAGE_NAME);
 
 export default defineNuxtPlugin(nuxtApp => {
   // SSR-friendly shared state
   const initialState = useState<InitialState | undefined>('clerk-initial-state', () => undefined);
-  const keylessContext = useState<{ claimUrl?: string; apiKeysUrl?: string } | undefined>(
-    'clerk-keyless-context',
-    () => undefined,
-  );
+  const keylessContext = useState<ClerkKeylessContext | undefined>('clerk-keyless-context', () => undefined);
 
   if (import.meta.server) {
     // Save the initial state from server and pass it to the plugin
