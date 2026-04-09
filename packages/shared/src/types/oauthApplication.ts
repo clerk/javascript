@@ -1,5 +1,8 @@
 import type { ClerkResourceJSON } from './json';
 
+/**
+ * @internal
+ */
 export type OAuthConsentScopeJSON = {
   scope: string;
   description: string | null;
@@ -20,7 +23,7 @@ export interface OAuthConsentInfoJSON extends ClerkResourceJSON {
 }
 
 /**
- * A single OAuth scope row returned by the Frontend API consent metadata endpoint.
+ * A single OAuth scope with its description and whether it requires consent.
  */
 export type OAuthConsentScope = {
   scope: string;
@@ -30,7 +33,7 @@ export type OAuthConsentScope = {
 
 /**
  * OAuth consent screen metadata from `GET /v1/me/oauth/consent/{oauthClientId}`.
- * Field names match the Frontend API JSON (snake_case).
+ * Includes information needed to populate the consent dialog.
  */
 export type OAuthConsentInfo = {
   oauthApplicationName: string;
@@ -44,7 +47,7 @@ export type OAuthConsentInfo = {
 export type FetchOAuthConsentInfoParams = {
   /** OAuth `client_id` from the authorize request. */
   oauthClientId: string;
-  /** Optional normalized scope string (e.g. space-delimited). */
+  /** Optional space-delimited scope string from the authorize request. */
   scope?: string;
 };
 
@@ -54,7 +57,6 @@ export type FetchOAuthConsentInfoParams = {
 export interface OAuthApplicationNamespace {
   /**
    * Loads consent metadata for the given OAuth client for the signed-in user.
-   * Uses the Frontend API session (cookies, `_clerk_session_id`, dev browser, etc.) like other `/me` requests.
    */
   fetchConsentInfo: (params: FetchOAuthConsentInfoParams) => Promise<OAuthConsentInfo>;
 }
