@@ -63,7 +63,24 @@ describe('OAuthApplication.fetchConsentInfo', () => {
     );
   });
 
-  it('returns OAuthConsentInfo from the FAPI response envelope', async () => {
+  it('returns OAuthConsentInfo from the FAPI response', async () => {
+    vi.spyOn(BaseResource, '_fetch').mockResolvedValue(consentPayload as any);
+
+    BaseResource.clerk = {} as any;
+
+    const info = await OAuthApplication.fetchConsentInfo({ oauthClientId: 'client_abc' });
+
+    expect(info).toEqual({
+      oauthApplicationName: 'My App',
+      oauthApplicationLogoUrl: 'https://img.example/logo.png',
+      oauthApplicationUrl: 'https://app.example',
+      clientId: 'client_abc',
+      state: 'st',
+      scopes: [{ scope: 'openid', description: 'OpenID', requiresConsent: true }],
+    });
+  });
+
+  it('returns OAuthConsentInfo from the FAPI response (enveloped)', async () => {
     vi.spyOn(BaseResource, '_fetch').mockResolvedValue({
       response: consentPayload,
     } as any);

@@ -30,6 +30,7 @@ export class OAuthApplication extends BaseResource {
       throw new ClerkRuntimeError('Network request failed while offline', { code: 'network_error' });
     }
 
+    // Handle in case we start wrapping the response in the future
     const data = json.response ?? json;
     return {
       oauthApplicationName: data.oauth_application_name,
