@@ -73,12 +73,12 @@ describe('OAuthApplication.fetchConsentInfo', () => {
     const info = await OAuthApplication.fetchConsentInfo({ oauthClientId: 'client_abc' });
 
     expect(info).toEqual({
-      oauth_application_name: 'My App',
-      oauth_application_logo_url: 'https://img.example/logo.png',
-      oauth_application_url: 'https://app.example',
-      client_id: 'client_abc',
+      oauthApplicationName: 'My App',
+      oauthApplicationLogoUrl: 'https://img.example/logo.png',
+      oauthApplicationUrl: 'https://app.example',
+      clientId: 'client_abc',
       state: 'st',
-      scopes: [{ scope: 'openid', description: 'OpenID', requires_consent: true }],
+      scopes: [{ scope: 'openid', description: 'OpenID', requiresConsent: true }],
     });
   });
 

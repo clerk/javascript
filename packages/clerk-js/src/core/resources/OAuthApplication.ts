@@ -30,15 +30,19 @@ export class OAuthApplication extends BaseResource {
       throw new ClerkRuntimeError('Network request failed while offline', { code: 'network_error' });
     }
 
-    const envelope = json;
-    const data = envelope.response ?? json;
+    const data = json.response ?? json;
     return {
-      oauth_application_name: data.oauth_application_name,
-      oauth_application_logo_url: data.oauth_application_logo_url,
-      oauth_application_url: data.oauth_application_url,
-      client_id: data.client_id,
+      oauthApplicationName: data.oauth_application_name,
+      oauthApplicationLogoUrl: data.oauth_application_logo_url,
+      oauthApplicationUrl: data.oauth_application_url,
+      clientId: data.client_id,
       state: data.state,
-      scopes: data.scopes ?? [],
+      scopes:
+        data.scopes?.map(scope => ({
+          scope: scope.scope,
+          description: scope.description,
+          requiresConsent: scope.requires_consent,
+        })) ?? [],
     };
   }
 }
