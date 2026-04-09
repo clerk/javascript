@@ -136,6 +136,7 @@ const ResetPasswordInternal = () => {
                   {...passwordField.props}
                   isRequired
                   autoFocus
+                  autoComplete='new-password'
                 />
               </Form.ControlRow>
               <Form.ControlRow elementId={confirmField.id}>
@@ -147,6 +148,7 @@ const ResetPasswordInternal = () => {
                     }
                     return confirmField.props.onChange(e);
                   }}
+                  autoComplete='new-password'
                 />
               </Form.ControlRow>
               {!requiresNewPassword && (

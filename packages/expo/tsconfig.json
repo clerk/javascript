@@ -23,5 +23,5 @@
     "incremental": true,
     "moduleSuffixes": [".web", ".ios", ".android", ".native", ""]
   },
-  "include": ["src"]
+  "include": ["src", "app.plugin.js"]
 }

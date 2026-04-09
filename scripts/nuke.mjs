@@ -37,16 +37,6 @@ try {
   await access(playgroundDir);
   try {
     const playgrounds = await readdir(playgroundDir);
-    for (const dir of playgrounds) {
-      try {
-        await access(join(playgroundDir, dir, '.yalc'), constants.R_OK);
-        $$({
-          cwd: join(playgroundDir, dir),
-        })`rm -rf .yalc`.then(() => console.log('Removed .yalc from', dir));
-      } catch {
-        // Ignore
-      }
-    }
 
     await Promise.allSettled(
       playgrounds.map(

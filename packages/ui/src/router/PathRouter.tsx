@@ -3,7 +3,10 @@ import { useClerk } from '@clerk/shared/react';
 import type { NavigateOptions } from '@clerk/shared/types';
 import React from 'react';
 
+import type { RefreshEvent } from './BaseRouter';
 import { BaseRouter } from './BaseRouter';
+
+const PATH_REFRESH_EVENTS: RefreshEvent[] = ['pushstate', 'replacestate', 'popstate'];
 
 interface PathRouterProps {
   basePath: string;
@@ -59,7 +62,7 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
       getPath={getPath}
       getQueryString={getQueryString}
       internalNavigate={internalNavigate}
-      refreshEvents={['popstate']}
+      refreshEvents={PATH_REFRESH_EVENTS}
       preservedParams={preservedParams}
     >
       {children}

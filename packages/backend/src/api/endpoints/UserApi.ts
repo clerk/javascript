@@ -40,7 +40,14 @@ type UserListParams = ClerkPaginationRequest<
       | 'last_active_at'
       | 'last_sign_in_at'
     >;
+    /**
+     * @deprecated Use `lastActiveAtAfter` instead. This parameter will be removed in a future version.
+     */
     last_active_at_since?: number;
+    lastActiveAtBefore?: number;
+    lastActiveAtAfter?: number;
+    createdAtBefore?: number;
+    createdAtAfter?: number;
     lastSignInAtAfter?: number;
     lastSignInAtBefore?: number;
     organizationId?: string[];

@@ -2,13 +2,16 @@ import type { Ui } from './internal';
 import { UI_BRAND } from './internal';
 import type { Appearance } from './internal/appearance';
 
+import { ClerkUI } from './entry';
+
 declare const PACKAGE_VERSION: string;
 
 /**
- * Server-safe UI marker for React Server Components.
+ * UI object for React Server Components.
  *
- * This export does not include the ClerkUI constructor, making it safe to import
- * in server components. The constructor is resolved via dynamic import when needed.
+ * ClerkUI is imported from a 'use client' module so that RSC serializes it as a
+ * client reference. The bundler includes the actual ClerkUI code only in the
+ * client bundle and resolves the reference automatically on hydration.
  *
  * @example
  * ```tsx
@@ -24,4 +27,5 @@ declare const PACKAGE_VERSION: string;
 export const ui = {
   __brand: UI_BRAND,
   version: PACKAGE_VERSION,
+  ClerkUI,
 } as unknown as Ui<Appearance>;

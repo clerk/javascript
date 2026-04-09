@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
-import { extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from '../devBrowser';
+import { extractDevBrowserFromURL, setDevBrowserInURL } from '../devBrowser';
 
 const DUMMY_URL_BASE = 'http://clerk-dummy';
 
-describe('setDevBrowserJWTInURL(url, jwt)', () => {
+describe('setDevBrowserInURL(url, devBrowser)', () => {
   const testCases: Array<[string, string, string]> = [
     ['', 'deadbeef', '?__clerk_db_jwt=deadbeef'],
     ['foo', 'deadbeef', 'foo?__clerk_db_jwt=deadbeef'],
@@ -22,9 +22,9 @@ describe('setDevBrowserJWTInURL(url, jwt)', () => {
   ];
 
   test.each(testCases)(
-    'sets the dev browser JWT at the end of the provided url. Params: url=(%s), jwt=(%s), expected url=(%s)',
+    'sets the dev browser at the end of the provided url. Params: url=(%s), devBrowser=(%s), expected url=(%s)',
     (input, paramName, expected) => {
-      expect(setDevBrowserJWTInURL(new URL(input, DUMMY_URL_BASE), paramName).href).toEqual(
+      expect(setDevBrowserInURL(new URL(input, DUMMY_URL_BASE), paramName).href).toEqual(
         new URL(expected, DUMMY_URL_BASE).href,
       );
     },
@@ -33,7 +33,7 @@ describe('setDevBrowserJWTInURL(url, jwt)', () => {
 
 const oldHistory = globalThis.history;
 
-describe('getDevBrowserJWTFromURL(url)', () => {
+describe('extractDevBrowserFromURL(url)', () => {
   const replaceStateMock = vi.fn();
 
   beforeEach(() => {
@@ -52,12 +52,12 @@ describe('getDevBrowserJWTFromURL(url)', () => {
   });
 
   it('it calls replaceState and clears the url if it contains any devBrowser related token', () => {
-    expect(extractDevBrowserJWTFromURL(new URL('/foo?__clerk_db_jwt=token', DUMMY_URL_BASE))).toEqual('token');
+    expect(extractDevBrowserFromURL(new URL('/foo?__clerk_db_jwt=token', DUMMY_URL_BASE))).toEqual('token');
     expect(replaceStateMock).toHaveBeenCalled();
   });
 
   it('it does not call replaceState if the clean url is the same as the current url', () => {
-    expect(extractDevBrowserJWTFromURL(new URL('/foo?__otherParam=hello', DUMMY_URL_BASE))).toEqual('');
+    expect(extractDevBrowserFromURL(new URL('/foo?__otherParam=hello', DUMMY_URL_BASE))).toEqual('');
     expect(replaceStateMock).not.toHaveBeenCalled();
   });
 
@@ -72,9 +72,9 @@ describe('getDevBrowserJWTFromURL(url)', () => {
   ];
 
   test.each(testCases)(
-    'returns the dev browser JWT from a url and cleans all dev . Params: url=(%s), jwt=(%s)',
-    (input, jwt) => {
-      expect(extractDevBrowserJWTFromURL(new URL(input, DUMMY_URL_BASE))).toEqual(jwt);
+    'returns the dev browser from a url and cleans all dev . Params: url=(%s), devBrowser=(%s)',
+    (input, devBrowser) => {
+      expect(extractDevBrowserFromURL(new URL(input, DUMMY_URL_BASE))).toEqual(devBrowser);
     },
   );
 });

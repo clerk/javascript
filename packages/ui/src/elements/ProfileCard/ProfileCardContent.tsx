@@ -55,8 +55,8 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
           scrollbarGutter: 'stable',
           paddingTop: theme.space.$7,
           paddingBottom: theme.space.$7,
-          paddingLeft: theme.space.$8,
-          paddingRight: theme.space.$6, //smaller because of stable scrollbar gutter
+          paddingInlineStart: theme.space.$8,
+          paddingInlineEnd: theme.space.$6, //smaller because of stable scrollbar gutter
           [mqu.sm]: {
             padding: `${theme.space.$8} ${theme.space.$5}`,
           },

@@ -2,9 +2,10 @@
 
 import { $, echo } from 'zx';
 
-import { constants, getPackageNames } from './common.mjs';
+import { constants, getChangesetIgnoredPackages, getPackageNames } from './common.mjs';
 
-const packageNames = await getPackageNames();
+const ignoredPackages = await getChangesetIgnoredPackages();
+const packageNames = (await getPackageNames()).filter(name => !ignoredPackages.has(name));
 const packageEntries = packageNames.map(name => `'${name}': patch`).join('\n');
 
 const snapshot = `---

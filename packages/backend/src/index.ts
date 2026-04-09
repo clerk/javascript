@@ -55,6 +55,7 @@ export type { VerifyTokenOptions } from './tokens/verify';
  */
 export type {
   ActorTokenJSON,
+  AgentTaskJSON,
   AccountlessApplicationJSON,
   ClerkResourceJSON,
   TokenJSON,
@@ -65,6 +66,7 @@ export type {
   DomainJSON,
   EmailJSON,
   EmailAddressJSON,
+  EnterpriseConnectionJSON,
   ExternalAccountJSON,
   IdentificationLinkJSON,
   InstanceJSON,
@@ -110,6 +112,7 @@ export type {
  * Resources
  */
 export type {
+  AgentTask,
   APIKey,
   ActorToken,
   AccountlessApplication,
@@ -119,6 +122,7 @@ export type {
   CnameTarget,
   Domain,
   EmailAddress,
+  EnterpriseConnection,
   ExternalAccount,
   Feature,
   Instance,
@@ -159,6 +163,7 @@ export type {
   EmailWebhookEvent,
   OrganizationWebhookEvent,
   OrganizationDomainWebhookEvent,
+  OrganizationInvitationAcceptedWebhookEvent,
   OrganizationInvitationWebhookEvent,
   OrganizationMembershipWebhookEvent,
   RoleWebhookEvent,

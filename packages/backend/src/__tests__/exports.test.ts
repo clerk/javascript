@@ -22,6 +22,7 @@ describe('subpath /errors exports', () => {
   it('should not include a breaking change', () => {
     expect(Object.keys(errorExports).sort()).toMatchInlineSnapshot(`
       [
+        "ClerkAPIResponseError",
         "MachineTokenVerificationError",
         "MachineTokenVerificationErrorCode",
         "SignJWTError",
@@ -29,6 +30,7 @@ describe('subpath /errors exports', () => {
         "TokenVerificationErrorAction",
         "TokenVerificationErrorCode",
         "TokenVerificationErrorReason",
+        "isClerkAPIResponseError",
       ]
     `);
   });
@@ -49,11 +51,9 @@ describe('subpath /internal exports', () => {
         "decorateObjectWithResources",
         "getAuthObjectForAcceptedToken",
         "getAuthObjectFromJwt",
-        "getMachineTokenType",
         "invalidTokenAuthObject",
         "isMachineToken",
         "isMachineTokenByPrefix",
-        "isMachineTokenType",
         "isTokenTypeAccepted",
         "makeAuthObjectSerializable",
         "reverificationError",

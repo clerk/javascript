@@ -1,8 +1,6 @@
 'use client';
-import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
-import type { Ui } from '@clerk/react/internal';
+import { InternalClerkProvider as ReactClerkProvider, type Ui } from '@clerk/react/internal';
 import { InitialStateProvider } from '@clerk/shared/react';
-import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -10,18 +8,13 @@ import React from 'react';
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../../types';
-import { ClerkScripts } from '../../utils/clerk-script';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { RouterTelemetry } from '../../utils/router-telemetry';
 import { invalidateCacheAction } from '../server-actions';
+import { ClerkScripts } from './ClerkScripts';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
-
-// Cached promise for resolving ClerkUI constructor via dynamic import.
-// In RSC, the ui prop from @clerk/ui is serialized without the ClerkUI constructor
-// (not serializable). This re-imports it on the client when needed.
-let _resolvedClerkUI: Promise<ClerkUIConstructor> | undefined;
 
 /**
  * LazyCreateKeylessApplication should only be loaded if the conditions below are met.
@@ -32,7 +25,7 @@ const LazyCreateKeylessApplication = dynamic(() =>
 );
 
 const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderProps<TUi>) => {
-  const { __internal_invokeMiddlewareOnAuthStateChange = true, children } = props;
+  const { __internal_invokeMiddlewareOnAuthStateChange = true, __internal_scriptsSlot, children } = props;
   const router = useRouter();
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
@@ -91,25 +84,11 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
     routerReplace: replace,
   });
 
-  // Resolve ClerkUI for RSC: when the ui prop is serialized through React Server Components,
-  // the ClerkUI constructor is stripped (not serializable). Re-import it on the client.
-  const uiProp = mergedProps.ui as { __brand?: string; ClerkUI?: unknown } | undefined;
-  if (uiProp?.__brand && !uiProp?.ClerkUI) {
-    // webpackIgnore prevents the bundler from statically resolving @clerk/ui/entry at build time,
-    // since @clerk/ui is an optional dependency that may not be installed.
-    // @ts-expect-error - @clerk/ui/entry is resolved by the user's Next.js bundler at runtime, not at package build time
-    // eslint-disable-next-line import/no-unresolved
-    _resolvedClerkUI ??= import(/* webpackIgnore: true */ '@clerk/ui/entry').then(
-      (m: { ClerkUI: ClerkUIConstructor }) => m.ClerkUI,
-    );
-    mergedProps.ui = { ...mergedProps.ui, ClerkUI: _resolvedClerkUI };
-  }
-
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
       <ReactClerkProvider {...mergedProps}>
         <RouterTelemetry />
-        <ClerkScripts router='app' />
+        {__internal_scriptsSlot ?? <ClerkScripts />}
         {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>

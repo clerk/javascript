@@ -109,6 +109,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
                 {...formState.password.props}
                 isRequired={fields.password?.required}
                 isOptional={!fields.password?.required}
+                autoComplete='new-password'
               />
             </Form.ControlRow>
           )}

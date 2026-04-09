@@ -32,6 +32,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'disclosureContentInner',
   'disclosureContent',
 
+  'collapsible',
+  'collapsibleInner',
+
   'lineItemsRoot',
   'lineItemsDivider',
   'lineItemsGroup',

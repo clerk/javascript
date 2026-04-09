@@ -24,7 +24,7 @@ export const ClipboardInput = (props: ClipboardInputProps) => {
         {...rest}
         value={value}
         isDisabled
-        sx={theme => ({ paddingRight: theme.space.$8 })}
+        sx={theme => ({ paddingInlineEnd: theme.space.$8 })}
       />
 
       <Button
@@ -33,7 +33,7 @@ export const ClipboardInput = (props: ClipboardInputProps) => {
         onClick={onCopy}
         sx={{
           position: 'absolute',
-          right: 0,
+          insetInlineEnd: 0,
         }}
       >
         <Icon

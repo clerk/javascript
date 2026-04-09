@@ -2,7 +2,7 @@ import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
-import type { OAuthStrategy, PasskeyStrategy, Web3Strategy } from './strategies';
+import type { OAuthStrategy, PasskeyStrategy, TicketStrategy, Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
 import type { Web3Provider } from './web3';
 
@@ -13,10 +13,15 @@ export interface SignInFutureCreateParams {
    */
   identifier?: string;
   /**
+   * The user's password. Only supported if
+   * [password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled.
+   */
+  password?: string;
+  /**
    * The first factor verification strategy to use in the sign-in flow. Depends on the `identifier` value. Each
    * authentication identifier supports different verification strategies.
    */
-  strategy?: OAuthStrategy | 'enterprise_sso' | PasskeyStrategy;
+  strategy?: OAuthStrategy | 'enterprise_sso' | PasskeyStrategy | TicketStrategy;
   /**
    * The full URL or path that the OAuth provider should redirect to after successful authorization on their part.
    */
@@ -37,6 +42,11 @@ export interface SignInFutureCreateParams {
    * generated from the Backend API. **Required** if `strategy` is set to `'ticket'`.
    */
   ticket?: string;
+  /**
+   * When set to `true`, if a user does not exist, the sign-up will prepare a transfer to sign up a new
+   * account. If bot sign-up protection is enabled, captcha will also be required on sign in.
+   */
+  signUpIfMissing?: boolean;
 }
 
 export type SignInFuturePasswordParams = {
@@ -138,6 +148,14 @@ export interface SignInFutureResetPasswordSubmitParams {
   signOutOfOtherSessions?: boolean;
 }
 
+export interface SignInFutureResetPasswordPhoneCodeSendParams {
+  /**
+   * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if
+   * [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled.
+   */
+  phoneNumber?: string;
+}
+
 export type SignInFuturePhoneCodeSendParams = {
   /**
    * The mechanism to use to send the code to the provided phone number. Defaults to `'sms'`.
@@ -162,6 +180,13 @@ export type SignInFuturePhoneCodeSendParams = {
 );
 
 export interface SignInFuturePhoneCodeVerifyParams {
+  /**
+   * The one-time code that was sent to the user.
+   */
+  code: string;
+}
+
+export interface SignInFutureResetPasswordPhoneCodeVerifyParams {
   /**
    * The one-time code that was sent to the user.
    */
@@ -378,7 +403,7 @@ export interface SignInFutureResource {
     /**
      * Used to send an email code to sign-in
      */
-    sendCode: (params: SignInFutureEmailCodeSendParams) => Promise<{ error: ClerkError | null }>;
+    sendCode: (params?: SignInFutureEmailCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to verify a code sent via email to sign-in
@@ -428,7 +453,7 @@ export interface SignInFutureResource {
     /**
      * Used to send a phone code to sign-in
      */
-    sendCode: (params: SignInFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
+    sendCode: (params?: SignInFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to verify a code sent via phone to sign-in
@@ -449,6 +474,26 @@ export interface SignInFutureResource {
      * Used to verify a password reset code sent via email. Will cause `signIn.status` to become `'needs_new_password'`.
      */
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
+
+    /**
+     * Used to submit a new password, and move the `signIn.status` to `'complete'`.
+     */
+    submitPassword: (params: SignInFutureResetPasswordSubmitParams) => Promise<{ error: ClerkError | null }>;
+  };
+
+  /**
+   *
+   */
+  resetPasswordPhoneCode: {
+    /**
+     * Used to send a password reset code to the first phone number on the account
+     */
+    sendCode: (params?: SignInFutureResetPasswordPhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
+
+    /**
+     * Used to verify a password reset code sent via phone. Will cause `signIn.status` to become `'needs_new_password'`.
+     */
+    verifyCode: (params: SignInFutureResetPasswordPhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to submit a new password, and move the `signIn.status` to `'complete'`.

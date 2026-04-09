@@ -4,7 +4,9 @@ import vuePlugin from 'unplugin-vue/esbuild';
 
 import { name, version } from './package.json';
 
-export default defineConfig(() => {
+export default defineConfig(overrideOptions => {
+  const shouldPublish = !!overrideOptions.env?.publish;
+
   return {
     clean: true,
     entry: ['./src/index.ts', './src/experimental.ts', './src/internal.ts', './src/errors.ts', './src/types/index.ts'],
@@ -13,6 +15,7 @@ export default defineConfig(() => {
     sourcemap: true,
     minify: false,
     dts: false,
+    onSuccess: shouldPublish ? 'pnpm build:dts && pkglab pub --ping' : 'pnpm build:dts',
     esbuildPlugins: [
       // Adds .vue files support
       vuePlugin(),

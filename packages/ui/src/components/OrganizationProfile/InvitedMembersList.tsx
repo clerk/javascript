@@ -101,7 +101,7 @@ const InvitationRow = (props: {
           localizationKey={localizeCustomRole(invitation.role) || unlocalizedRoleLabel}
         />
       </Td>
-      <Td sx={{ textAlign: 'right' }}>
+      <Td sx={{ textAlign: 'end' }}>
         <ThreeDotsMenu
           actions={[
             {

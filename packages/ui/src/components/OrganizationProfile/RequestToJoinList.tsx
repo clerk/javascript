@@ -100,7 +100,7 @@ const RequestRow = withCardStateProvider(
           </Box>
         </Td>
 
-        <Td sx={{ textAlign: 'right' }}>
+        <Td sx={{ textAlign: 'end' }}>
           <AcceptRejectRequestButtons {...{ onAccept, onReject }} />
         </Td>
       </RowContainer>

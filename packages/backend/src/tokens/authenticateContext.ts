@@ -17,6 +17,7 @@ interface AuthenticateContext extends AuthenticateRequestOptions {
   forwardedHost: string | undefined;
   forwardedProto: string | undefined;
   host: string | undefined;
+  method: string;
   origin: string | undefined;
   referrer: string | undefined;
   secFetchDest: string | undefined;
@@ -85,6 +86,11 @@ class AuthenticateContext implements AuthenticateContext {
 
     Object.assign(this, options);
     this.clerkUrl = this.clerkRequest.clerkUrl;
+
+    // Resolve relative proxyUrl to absolute using the request's public origin.
+    if (this.proxyUrl?.startsWith('/')) {
+      this.proxyUrl = `${this.clerkUrl.origin}${this.proxyUrl}`;
+    }
   }
 
   public usesSuffixedCookies(): boolean {
@@ -250,6 +256,14 @@ class AuthenticateContext implements AuthenticateContext {
     assertValidPublishableKey(options.publishableKey);
     this.publishableKey = options.publishableKey;
 
+    // If proxyUrl is a relative path (e.g. '/__clerk'), resolve it against the
+    // request's public origin (derived from x-forwarded-* headers by ClerkRequest).
+    // This lets SDKs pass just the path instead of duplicating forwarded-header parsing.
+    let resolvedProxyUrl = options.proxyUrl;
+    if (resolvedProxyUrl?.startsWith('/')) {
+      resolvedProxyUrl = `${this.clerkRequest.clerkUrl.origin}${resolvedProxyUrl}`;
+    }
+
     const originalPk = parsePublishableKey(this.publishableKey, {
       fatal: true,
       domain: options.domain,
@@ -259,7 +273,7 @@ class AuthenticateContext implements AuthenticateContext {
 
     const pk = parsePublishableKey(this.publishableKey, {
       fatal: true,
-      proxyUrl: options.proxyUrl,
+      proxyUrl: resolvedProxyUrl,
       domain: options.domain,
       isSatellite: options.isSatellite,
     });
@@ -268,6 +282,7 @@ class AuthenticateContext implements AuthenticateContext {
   }
 
   private initHeaderValues() {
+    this.method = this.clerkRequest.method;
     this.tokenInHeader = this.parseAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
     this.origin = this.getHeader(constants.Headers.Origin);
     this.host = this.getHeader(constants.Headers.Host);

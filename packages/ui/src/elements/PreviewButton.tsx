@@ -46,7 +46,7 @@ export const PreviewButton = (props: PreviewButtonProps) => {
           sx={[
             t => ({
               color: t.colors.$colorMutedForeground,
-              marginLeft: t.space.$2,
+              marginInlineStart: t.space.$2,
               visibility: showIconOnHover ? 'hidden' : 'initial',
             }),
             iconSx,

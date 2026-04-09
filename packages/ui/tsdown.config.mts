@@ -14,7 +14,13 @@ export default defineConfig(({ watch }) => {
     external: ['react', 'react-dom', '@clerk/localizations', '@clerk/shared'],
     format: ['esm'], // ESM only
     minify: false,
-    plugins: [svgr()],
+    plugins: [
+      svgr({
+        svgoConfig: {
+          plugins: ['preset-default', 'removeDimensions', 'removeStyleElement'],
+        },
+      }),
+    ],
     define: {
       PACKAGE_NAME: `"${uiPackage.name}"`,
       PACKAGE_VERSION: `"${uiPackage.version}"`,
@@ -47,6 +53,17 @@ export default defineConfig(({ watch }) => {
         } catch (error) {
           console.warn('⚠ Warning: Failed to copy CSS files:', error);
         }
+      },
+    },
+    {
+      ...common,
+      dts: false,
+      entry: ['./src/index.ts'],
+      outDir: './dist/no-rhc',
+      unbundle: true,
+      define: {
+        ...common.define,
+        __BUILD_DISABLE_RHC__: 'true',
       },
     },
   ];

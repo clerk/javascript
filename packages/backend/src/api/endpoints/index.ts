@@ -1,4 +1,5 @@
 export * from './ActorTokenApi';
+export * from './AgentTaskApi';
 export * from './AccountlessApplicationsAPI';
 export * from './AbstractApi';
 export * from './AllowlistIdentifierApi';
@@ -8,6 +9,7 @@ export * from './BlocklistIdentifierApi';
 export * from './ClientApi';
 export * from './DomainApi';
 export * from './EmailAddressApi';
+export * from './EnterpriseConnectionApi';
 export * from './IdPOAuthAccessTokenApi';
 export * from './InstanceApi';
 export * from './InvitationApi';

@@ -1,8 +1,12 @@
 import type {
   BillingCheckoutTotals,
   BillingCheckoutTotalsJSON,
+  BillingCredits,
+  BillingCreditsJSON,
   BillingMoneyAmount,
   BillingMoneyAmountJSON,
+  BillingPerUnitTotal,
+  BillingPerUnitTotalJSON,
   BillingStatementTotals,
   BillingStatementTotalsJSON,
 } from '@clerk/shared/types';
@@ -13,6 +17,38 @@ export const billingMoneyAmountFromJSON = (data: BillingMoneyAmountJSON): Billin
     amountFormatted: data.amount_formatted,
     currency: data.currency,
     currencySymbol: data.currency_symbol,
+  };
+};
+
+const billingPerUnitTotalsFromJSON = (data: BillingPerUnitTotalJSON[]): BillingPerUnitTotal[] => {
+  return data.map(unitTotal => ({
+    name: unitTotal.name,
+    blockSize: unitTotal.block_size,
+    tiers: unitTotal.tiers.map(tier => ({
+      quantity: tier.quantity,
+      feePerBlock: billingMoneyAmountFromJSON(tier.fee_per_block),
+      total: billingMoneyAmountFromJSON(tier.total),
+    })),
+  }));
+};
+
+export const billingCreditsFromJSON = (data: BillingCreditsJSON): BillingCredits => {
+  return {
+    proration: data.proration
+      ? {
+          amount: billingMoneyAmountFromJSON(data.proration.amount),
+          cycleDaysRemaining: data.proration.cycle_days_remaining,
+          cycleDaysTotal: data.proration.cycle_days_total,
+          cycleRemainingPercent: data.proration.cycle_remaining_percent,
+        }
+      : null,
+    payer: data.payer
+      ? {
+          remainingBalance: billingMoneyAmountFromJSON(data.payer.remaining_balance),
+          appliedAmount: billingMoneyAmountFromJSON(data.payer.applied_amount),
+        }
+      : null,
+    total: billingMoneyAmountFromJSON(data.total),
   };
 };
 
@@ -31,7 +67,13 @@ export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | Bil
   if ('credit' in data) {
     totals.credit = data.credit ? billingMoneyAmountFromJSON(data.credit) : null;
   }
+  if ('per_unit_totals' in data) {
+    totals.perUnitTotals = data.per_unit_totals ? billingPerUnitTotalsFromJSON(data.per_unit_totals) : undefined;
+  }
 
+  if ('credits' in data) {
+    totals.credits = data.credits ? billingCreditsFromJSON(data.credits) : null;
+  }
   if ('total_due_now' in data) {
     totals.totalDueNow = billingMoneyAmountFromJSON(data.total_due_now);
   }

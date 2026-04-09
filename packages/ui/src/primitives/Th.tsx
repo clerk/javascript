@@ -8,7 +8,7 @@ import { Box } from './Box';
 
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
-    textAlign: 'left',
+    textAlign: 'start',
     fontSize: theme.fontSizes.$sm,
     fontWeight: theme.fontWeights.$normal,
     color: colors.setAlpha(theme.colors.$colorForeground, 0.62),

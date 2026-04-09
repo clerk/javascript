@@ -2,7 +2,7 @@ import type { AuthObject } from '@clerk/backend';
 import type { Application, Request as ExpressRequest, RequestHandler, Response as ExpressResponse } from 'express';
 import express from 'express';
 import supertest from 'supertest';
-import { vi } from 'vitest';
+import { expect, vi } from 'vitest';
 
 import type { ExpressRequestWithAuth } from '../types';
 
@@ -13,6 +13,18 @@ export function runMiddleware(middleware: RequestHandler | RequestHandler[], hea
   app.use((_req, res, _next) => res.end('Hello world!'));
 
   return supertest(app).get('/').set(headers);
+}
+
+export function runMiddlewareOnPath(
+  middleware: RequestHandler | RequestHandler[],
+  path: string,
+  headers: Record<string, string> = {},
+) {
+  const app: Application = express();
+  app.use(middleware);
+  app.use((_req, res, _next) => res.end('Hello world!'));
+
+  return supertest(app).get(path).set(headers);
 }
 
 export function mockResponse(): ExpressResponse {

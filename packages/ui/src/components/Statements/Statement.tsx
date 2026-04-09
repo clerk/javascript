@@ -220,7 +220,7 @@ function SectionContentDetailsHeader({
       <Box
         elementDescriptor={descriptors.statementSectionContentDetailsHeaderItem}
         sx={{
-          textAlign: 'right',
+          textAlign: 'end',
         }}
       >
         {secondaryTitle && (

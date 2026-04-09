@@ -1,6 +1,7 @@
 import type {
   Clerk,
   InitialState,
+  InternalClerkScriptProps,
   IsomorphicClerkOptions,
   LoadedClerk,
   RedirectUrlProp,
@@ -36,7 +37,10 @@ declare global {
 /**
  * @interface
  */
-export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<IsomorphicClerkOptions, 'appearance'> & {
+export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<
+  IsomorphicClerkOptions,
+  'appearance' | keyof InternalClerkScriptProps
+> & {
   children: React.ReactNode;
   /**
    * Provide an initial state of the Clerk client during server-side rendering. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).

@@ -5,6 +5,11 @@ export const constants = {
   ChangesetConfigFile: '.changeset/config.json',
 };
 
+export async function getChangesetIgnoredPackages() {
+  const config = JSON.parse(await readFile(constants.ChangesetConfigFile, 'utf-8'));
+  return new Set(config.ignore || []);
+}
+
 export async function getPackageJsonFiles() {
   const result = await $`find packages -mindepth 2 -maxdepth 2 -name package.json`.quiet();
   return result.stdout.trim().split('\n').filter(Boolean);

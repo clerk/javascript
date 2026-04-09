@@ -63,7 +63,7 @@ export const CopyAPIKeyModal = ({
       >
         <Card.Content
           sx={t => ({
-            textAlign: 'left',
+            textAlign: 'start',
             padding: `${t.sizes.$4} ${t.sizes.$5} ${t.sizes.$4} ${t.sizes.$6}`,
           })}
         >

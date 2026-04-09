@@ -9,6 +9,7 @@ import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Tooltip } from '@/ui/elements/Tooltip';
+import { getSeatUnitPrice } from '@/ui/utils/billingPlanSeats';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { DevOnly } from '../../common/DevOnly';
@@ -35,15 +36,32 @@ export const CheckoutForm = withCardStateProvider(() => {
     return null;
   }
 
-  const showCredits = !!totals.credit?.amount && totals.credit.amount > 0;
+  const showProratedCredit = !!totals.credits?.proration?.amount && totals.credits.proration.amount.amount > 0;
+  const showAccountCredits = !!totals.credits?.payer?.appliedAmount && totals.credits.payer.appliedAmount.amount > 0;
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
   const fee =
     planPeriod === 'month'
-      ? plan.fee
+      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        plan.fee!
       : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         plan.annualMonthlyFee!;
+
+  const descriptionElements = [];
+  if (planPeriod === 'annual') {
+    descriptionElements.push(localizationKeys('billing.billedAnnually'));
+  }
+  const seatUnitPrice = getSeatUnitPrice(plan);
+  if (seatUnitPrice && seatUnitPrice.tiers.length === 1 && seatUnitPrice.tiers[0].feePerBlock.amount === 0) {
+    descriptionElements.push(
+      seatUnitPrice.tiers[0].endsAfterBlock
+        ? localizationKeys('billing.pricingTable.seatCost.upToSeats', {
+            endsAfterBlock: seatUnitPrice.tiers[0].endsAfterBlock,
+          })
+        : localizationKeys('billing.pricingTable.seatCost.unlimitedSeats'),
+    );
+  }
 
   return (
     <Drawer.Body>
@@ -60,7 +78,7 @@ export const CheckoutForm = withCardStateProvider(() => {
           <LineItems.Group>
             <LineItems.Title
               title={plan.name}
-              description={planPeriod === 'annual' ? localizationKeys('billing.billedAnnually') : undefined}
+              description={descriptionElements}
               badge={
                 plan.freeTrialEnabled && freeTrialEndsAt ? (
                   <SubscriptionBadge subscription={{ status: 'free_trial' }} />
@@ -80,10 +98,20 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Title title={localizationKeys('billing.subtotal')} />
             <LineItems.Description text={`${totals.subtotal.currencySymbol}${totals.subtotal.amountFormatted}`} />
           </LineItems.Group>
-          {showCredits && (
+          {showProratedCredit && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.creditRemainder')} />
-              <LineItems.Description text={`- ${totals.credit?.currencySymbol}${totals.credit?.amountFormatted}`} />
+              <LineItems.Description
+                text={`- ${totals.credits?.proration?.amount.currencySymbol}${totals.credits?.proration?.amount.amountFormatted}`}
+              />
+            </LineItems.Group>
+          )}
+          {showAccountCredits && (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title title={localizationKeys('billing.payerCreditRemainder')} />
+              <LineItems.Description
+                text={`- ${totals.credits?.payer?.appliedAmount?.currencySymbol}${totals.credits?.payer?.appliedAmount?.amountFormatted}`}
+              />
             </LineItems.Group>
           )}
           {showPastDue && (

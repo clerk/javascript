@@ -25,6 +25,8 @@ export interface JwtHeader {
   'x5t#S256'?: string;
   x5t?: string;
   x5c?: string | string[];
+  /** @internal - used by Session Minter for monotonic token freshness checks. Do not depend on this field. */
+  oiat?: number;
 }
 
 declare global {
@@ -185,14 +187,27 @@ export type VersionedJwtPayload =
 export type JwtPayload = JWTPayloadBase & CustomJwtSessionClaims & VersionedJwtPayload;
 
 /**
+ * The type of the actor claim.
+ */
+export type ActClaimType = 'agent';
+
+/**
  * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
  *
  * @inline
  */
 export interface ActClaim {
   sub: string;
+  type?: ActClaimType;
   [x: string]: unknown;
 }
+
+/**
+ * ActClaim narrowed to actor type `'agent'`. Use for session.agent.
+ *
+ * @inline
+ */
+export type AgentActClaim = ActClaim & { type: 'agent' };
 
 /**
  * The current state of the session which can only be `active` or `pending`.

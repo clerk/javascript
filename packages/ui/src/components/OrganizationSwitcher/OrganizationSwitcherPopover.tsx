@@ -115,7 +115,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         align='center'
         sx={t => ({
           width: '100%',
-          paddingRight: t.space.$5,
+          paddingInlineEnd: t.space.$5,
         })}
       >
         <OrganizationPreview

@@ -27,7 +27,7 @@ export const DeleteSection = () => {
         <Action.Closed value='delete'>
           <ProfileSection.Item
             id='danger'
-            sx={t => ({ paddingLeft: t.space.$1 })}
+            sx={t => ({ paddingInlineStart: t.space.$1 })}
           >
             <Action.Trigger value='delete'>
               <ProfileSection.Button

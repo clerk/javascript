@@ -109,7 +109,7 @@ function SignUpStartInternal(): JSX.Element {
     password: useFormControl('password', '', {
       type: 'password',
       label: localizationKeys('formFieldLabel__password'),
-      placeholder: localizationKeys('formFieldInputPlaceholder__password'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__signUpPassword'),
       validatePassword: true,
       buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
     }),
@@ -224,6 +224,7 @@ function SignUpStartInternal(): JSX.Element {
           case ERROR_CODES.FRAUD_ACTION_BLOCKED:
           case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
           case ERROR_CODES.USER_BANNED:
+          case ERROR_CODES.USER_DEACTIVATED:
             card.setError(error);
             break;
           default:

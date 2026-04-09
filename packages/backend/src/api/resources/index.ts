@@ -1,4 +1,5 @@
 export * from './AccountlessApplication';
+export * from './AgentTask';
 export * from './ActorToken';
 export * from './AllowlistIdentifier';
 export * from './APIKey';
@@ -25,6 +26,8 @@ export type { SignUpStatus } from '@clerk/shared/types';
 export * from './CommercePlan';
 export * from './CommerceSubscription';
 export * from './CommerceSubscriptionItem';
+export * from './EnterpriseAccount';
+export * from './EnterpriseConnection';
 export * from './ExternalAccount';
 export * from './Feature';
 export * from './IdentificationLink';
@@ -64,6 +67,7 @@ export * from './Web3Wallet';
 export type {
   EmailWebhookEvent,
   OrganizationDomainWebhookEvent,
+  OrganizationInvitationAcceptedWebhookEvent,
   OrganizationInvitationWebhookEvent,
   OrganizationMembershipWebhookEvent,
   OrganizationWebhookEvent,

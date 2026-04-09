@@ -24,6 +24,7 @@ export const PrintableComponent = (props: UsePrintableReturn['printableProps'] &
   return (
     <div
       ref={ref}
+      // eslint-disable-next-line custom-rules/no-physical-css-properties -- Off-screen hide for print functionality
       style={{ position: 'fixed', left: '-9999px', top: 0, display: 'none' }}
     >
       {children}

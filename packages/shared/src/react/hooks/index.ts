@@ -1,5 +1,5 @@
 export { assertContextExists, createContextAndHook } from './createContextAndHook';
-export { useAPIKeys as __experimental_useAPIKeys } from './useAPIKeys';
+export { useAPIKeys } from './useAPIKeys';
 export { useOrganization } from './useOrganization';
 export { useOrganizationCreationDefaults } from './useOrganizationCreationDefaults';
 export type {
@@ -31,6 +31,11 @@ export { useCheckout as __experimental_useCheckout } from './useCheckout';
 export { __internal_useStatementQuery } from './useStatementQuery';
 export { __internal_usePlanDetailsQuery } from './usePlanDetailsQuery';
 export { __internal_usePaymentAttemptQuery } from './usePaymentAttemptQuery';
+export { __internal_useUserEnterpriseConnections } from './useUserEnterpriseConnections';
+export type {
+  UseUserEnterpriseConnectionsParams,
+  UseUserEnterpriseConnectionsReturn,
+} from './useUserEnterpriseConnections';
 
 export { useUserBase as __internal_useUserBase } from './base/useUserBase';
 export { useClientBase as __internal_useClientBase } from './base/useClientBase';

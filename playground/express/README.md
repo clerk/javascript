@@ -4,7 +4,7 @@ Execute in root folder:
 
 ```bash
 pnpm i
-pnpm build && pnpm yalc:all
+pnpm build
 ```
 
 Execute in current folder:
@@ -12,9 +12,9 @@ Execute in current folder:
 ```bash
 touch .env # set PUBLISHABLE_KEY, SECRET_KEY and JWT_KEY from Clerk Dashboard API keys
 npm i
-rm -rf node_modules/@clerk
-yalc add @clerk/express # also add the packages you made changes to, e.g. @clerk/backend @clerk/types.
 ```
+
+If you need to test local package changes, use pkglab to publish packages locally.
 
 ## Getting Started
 
