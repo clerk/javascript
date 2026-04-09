@@ -57,6 +57,9 @@ export interface TelemetryLogEntry {
   readonly userId?: string;
 }
 
+/**
+ * @inline
+ */
 export interface TelemetryCollector {
   isEnabled: boolean;
   isDebug: boolean;

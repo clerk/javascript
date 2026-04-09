@@ -214,27 +214,27 @@ export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
  */
 export interface Clerk {
   /**
-   * Clerk SDK version number.
+   * The Clerk SDK version number.
    */
   version: string | undefined;
 
   /**
    * If present, contains information about the SDK that the host application is using.
-   * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`
+   * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).
    */
   sdkMetadata: SDKMetadata | undefined;
 
   /**
-   * If true the bootstrapping of Clerk.load() has completed successfully.
+   * Indicates if the `Clerk` object is ready for use. Set to `false` when the `status` is `"loading"`. Set to `true` when the `status` is `"ready"` or `"degraded"`.
    */
   loaded: boolean;
 
   /**
-   * Describes the state the clerk singleton operates in:
-   * - `"error"`: Clerk failed to initialize.
-   * - `"loading"`: Clerk is still attempting to load.
-   * - `"ready"`: Clerk singleton is fully operational.
-   * - `"degraded"`: Clerk singleton is partially operational.
+   * The status of the `Clerk` instance. Possible values are:
+   * - `"error"`: Set when hotloading `clerk-js` or `Clerk.load()` failed.
+   * - `"loading"`: Set during initialization.
+   * - `"ready"`: Set when Clerk is fully operational.
+   * - `"degraded"`: Set when Clerk is partially operational.
    */
   status: ClerkStatus;
 
@@ -245,39 +245,42 @@ export interface Clerk {
 
   frontendApi: string;
 
-  /** Clerk Publishable Key string. */
+  /** Your Clerk [Publishable Key](!publishable-key). */
   publishableKey: string;
 
-  /** Clerk Proxy url string. */
+  /** Your Clerk app's proxy URL. Required for applications that run behind a reverse proxy. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`). */
   proxyUrl: string | undefined;
 
-  /** Clerk Satellite Frontend API string. */
+  /** The current Clerk app's domain. Prefixed with `clerk.` on production if not already prefixed. Returns `""` when ran on the server. */
   domain: string;
 
-  /** Clerk Flag for satellite apps. */
+  /** Indicates if the instance is a satellite app. */
   isSatellite: boolean;
 
-  /** Clerk Instance type is defined from the Publishable key */
+  /** Indicates if the Clerk instance is running in a production or development environment. */
   instanceType: InstanceType | undefined;
 
-  /** Clerk flag for loading Clerk in a standard browser setup */
+  /**
+   * Indicates if the instance is being loaded in a standard browser environment. Set to `false` on native platforms where cookies cannot be set. When `undefined`, Clerk assumes a standard browser.
+   * @inline
+   */
   isStandardBrowser: boolean | undefined;
 
   /**
-   * Indicates whether the current user has a valid signed-in client session
+   * Indicates whether the current user has a valid signed-in client session.
    */
   isSignedIn: boolean;
 
-  /** Client handling most Clerk operations. */
+  /** The `Client` object for the current window. */
   client: ClientResource | undefined;
 
-  /** Current Session. */
+  /** The currently active `Session`, which is guaranteed to be one of the sessions in `Client.sessions`. If there is no active session, this field will be `null`. If the session is loading, this field will be `undefined`. */
   session: SignedInSessionResource | null | undefined;
 
-  /** Active Organization */
+  /** A shortcut to the last active `Session.user.organizationMemberships` which holds an instance of a `Organization` object. If the session is `null` or `undefined`, the user field will match. */
   organization: OrganizationResource | null | undefined;
 
-  /** Current User. */
+  /** A shortcut to `Session.user` which holds the currently active `User` object. If the session is `null` or `undefined`, the user field will match. */
   user: UserResource | null | undefined;
 
   /**
@@ -291,17 +294,26 @@ export interface Clerk {
    * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
    * `effect()` that can be used to subscribe to changes from Signals.
    *
+   * @internal
    * @experimental This experimental API is subject to change.
    */
   __internal_state: State;
 
   /**
+   * The `Billing` object used for managing billing.
+   *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   billing: BillingNamespace;
 
+  /**
+   * [Telemetry](https://clerk.com/docs/guides/how-clerk-works/security/clerk-telemetry) configuration.
+   */
   telemetry: TelemetryCollector | undefined;
 
+  /**
+   * @internal
+   */
   __internal_country?: string | null;
 
   /**
@@ -329,11 +341,13 @@ export interface Clerk {
    * Opens the Clerk Checkout component in a drawer.
    *
    * @param props - Optional checkout configuration parameters.
+   * @internal
    */
   __internal_openCheckout: (props?: __internal_CheckoutProps) => void;
 
   /**
    * Closes the Clerk Checkout drawer.
+   * @internal
    */
   __internal_closeCheckout: () => void;
 
@@ -341,11 +355,13 @@ export interface Clerk {
    * Opens the Clerk PlanDetails drawer component in a drawer.
    *
    * @param props - `plan` or `planId` parameters are required.
+   * @internal
    */
   __internal_openPlanDetails: (props: __internal_PlanDetailsProps) => void;
 
   /**
    * Closes the Clerk PlanDetails drawer.
+   * @internal
    */
   __internal_closePlanDetails: () => void;
 
@@ -353,11 +369,13 @@ export interface Clerk {
    * Opens the Clerk SubscriptionDetails drawer component in a drawer.
    *
    * @param props - Optional configuration parameters.
+   * @internal
    */
   __internal_openSubscriptionDetails: (props?: __internal_SubscriptionDetailsProps) => void;
 
   /**
    * Closes the Clerk SubscriptionDetails drawer.
+   * @internal
    */
   __internal_closeSubscriptionDetails: () => void;
 
@@ -365,16 +383,19 @@ export interface Clerk {
    * Opens the Clerk UserVerification component in a modal.
    *
    * @param props - Optional user verification configuration parameters.
+   * @internal
    */
   __internal_openReverification: (props?: __internal_UserVerificationModalProps) => void;
 
   /**
    * Closes the Clerk user verification modal.
+   * @internal
    */
   __internal_closeReverification: () => void;
 
   /**
    * Attempts to enable a environment setting from a development instance, prompting if disabled.
+   * @internal
    */
   __internal_attemptToEnableEnvironmentSetting: (
     options: __internal_AttemptToEnableEnvironmentSettingParams,
@@ -382,11 +403,13 @@ export interface Clerk {
 
   /**
    * Opens the Clerk Enable Organizations prompt for development instance
+   * @internal
    */
   __internal_openEnableOrganizationsPrompt: (props: __internal_EnableOrganizationsPromptProps) => void;
 
   /**
    * Closes the Clerk Enable Organizations modal.
+   * @internal
    */
   __internal_closeEnableOrganizationsPrompt: () => void;
 
@@ -664,6 +687,7 @@ export interface Clerk {
    *
    * @param targetNode - Target node to mount the OAuth consent component.
    * @param oauthConsentProps - OAuth consent configuration parameters.
+   * @internal
    */
   __internal_mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: __internal_OAuthConsentProps) => void;
 
@@ -671,6 +695,7 @@ export interface Clerk {
    * Unmounts a OAuth consent component from the target element.
    *
    * @param targetNode - Target node to unmount the OAuth consent component from.
+   * @internal
    */
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
@@ -779,7 +804,7 @@ export interface Clerk {
   setActive: SetActive;
 
   /**
-   * Function used to commit a navigation after certain steps in the Clerk processes.
+   * A function used to commit a navigation after certain steps in the Clerk processes.
    */
   navigate: CustomNavigation;
 
@@ -1019,11 +1044,13 @@ export interface Clerk {
   /**
    * Internal flag indicating whether a `setActive` call is in progress. Used to prevent navigations from being
    * initiated outside of the Clerk class.
+   *
+   * @internal
    */
   __internal_setActiveInProgress: boolean;
 
   /**
-   * API Keys Object
+   * The `APIKeys` object used for managing API keys.
    */
   apiKeys: APIKeysNamespace;
 
@@ -1088,6 +1115,9 @@ export type HandleOAuthCallbackParams = TransferableOption &
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
 
+/**
+ * A function used to navigate to a given URL after certain steps in the Clerk processes.
+ */
 export type CustomNavigation = (to: string, options?: NavigateOptions) => Promise<unknown> | void;
 
 export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
@@ -2118,19 +2148,43 @@ export type APIKeysProps = {
 };
 
 export type GetAPIKeysParams = ClerkPaginationParams<{
+  /**
+   * The user or organization ID to query API keys by. If not provided, defaults to the [Active Organization](!active-organization), then the current User.
+   */
   subject?: string;
+  /**
+   * A search query to filter API keys by name.
+   */
   query?: string;
 }>;
 
 export type CreateAPIKeyParams = {
+  /**
+   * The name of the API key.
+   */
   name: string;
+  /**
+   * The user or organization ID to associate the API key with. If not provided, defaults to the [Active Organization](!active-organization), then the current User.
+   */
   subject?: string;
+  /**
+   * The number of seconds until the API key expires. Set to `null` or omit to create a key that never expires.
+   */
   secondsUntilExpiration?: number;
+  /**
+   * The description of the API key.
+   */
   description?: string;
 };
 
 export type RevokeAPIKeyParams = {
+  /**
+   * The ID of the API key to revoke.
+   */
   apiKeyID: string;
+  /**
+   * The reason for revoking the API key.
+   */
   revocationReason?: string;
 };
 

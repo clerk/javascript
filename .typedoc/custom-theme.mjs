@@ -1,5 +1,5 @@
 // @ts-check
-import { ReflectionKind, ReflectionType, UnionType } from 'typedoc';
+import { IntersectionType, ReferenceType, ReflectionKind, ReflectionType, UnionType } from 'typedoc';
 import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
 
 /**
@@ -48,6 +48,21 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
 
     this.partials = {
       ...superPartials,
+      /**
+       * Drop function-valued interface/class properties from the properties table (they remain TypeScript "Property"
+       * members because they use property syntax). Keeps data fields and object namespaces in the table.
+       */
+      /**
+       * @param {import('typedoc').DeclarationReflection[]} model
+       * @param {Parameters<typeof superPartials.propertiesTable>[1]} [options]
+       */
+      propertiesTable: (model, options) => {
+        if (!Array.isArray(model)) {
+          return superPartials.propertiesTable(/** @type {any} */ (model), options);
+        }
+        const filtered = model.filter(prop => !isCallableInterfaceProperty(prop, this.helpers));
+        return superPartials.propertiesTable(filtered, options);
+      },
       /**
        * This hides the "Type parameters" section and the signature title from the output (by default). Shows the signature title if the `@displayFunctionSignature` tag is present.
        * @param {import('typedoc').SignatureReflection} model
@@ -636,4 +651,106 @@ function swap(arr, i, j) {
   arr[i] = arr[j];
   arr[j] = t;
   return arr;
+}
+
+/**
+ * @param {import('typedoc').DeclarationReflection} prop
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext['helpers']} helpers
+ */
+function isCallableInterfaceProperty(prop, helpers) {
+  /**
+   * Use the declared value type for properties. `getDeclarationType` mirrors accessor/parameter behavior and can
+   * return the wrong node when TypeDoc attaches signatures to the property (same class of bug as TypeAlias + `decl.type`).
+   */
+  const t =
+    (prop.kind === ReflectionKind.Property || prop.kind === ReflectionKind.Variable) && prop.type
+      ? prop.type
+      : helpers.getDeclarationType(prop);
+  return isCallablePropertyValueType(t, helpers, new Set());
+}
+
+/**
+ * True when the property's value type is callable (function type, union/intersection of callables, or reference to a
+ * type alias of a function type). Object types with properties (e.g. namespaces) stay false.
+ *
+ * @param {import('typedoc').Type | undefined} t
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext['helpers']} helpers
+ * @param {Set<number>} seenReflectionIds
+ * @returns {boolean}
+ */
+function isCallablePropertyValueType(t, helpers, seenReflectionIds) {
+  if (!t) {
+    return false;
+  }
+  if (t.type === 'optional' && 'elementType' in t) {
+    return isCallablePropertyValueType(
+      /** @type {{ elementType: import('typedoc').Type }} */ (t).elementType,
+      helpers,
+      seenReflectionIds,
+    );
+  }
+  if (t instanceof UnionType) {
+    const nonNullish = t.types.filter(
+      u => !(u.type === 'intrinsic' && ['undefined', 'null'].includes(/** @type {{ name: string }} */ (u).name)),
+    );
+    if (nonNullish.length === 0) {
+      return false;
+    }
+    return nonNullish.every(u => isCallablePropertyValueType(u, helpers, seenReflectionIds));
+  }
+  if (t instanceof IntersectionType) {
+    return t.types.some(u => isCallablePropertyValueType(u, helpers, seenReflectionIds));
+  }
+  if (t instanceof ReflectionType) {
+    const decl = t.declaration;
+    const callSigs = decl.signatures?.length ?? 0;
+    const hasProps = (decl.children?.length ?? 0) > 0;
+    const hasIndex = (decl.indexSignatures?.length ?? 0) > 0;
+    return callSigs > 0 && !hasProps && !hasIndex;
+  }
+  if (t instanceof ReferenceType) {
+    /**
+     * Unresolved reference (`reflection` missing): TypeDoc did not link the symbol (not in entry graph, external,
+     * filtered, etc.). We cannot tell a function alias from an interface, so we only treat a few **name** patterns as
+     * callable (`*Function`, `*Listener`). For anything else, ensure the type is part of the documented program so
+     * `reflection` resolves and the structural checks above apply — do not add one-off type names here.
+     * E.g. `CustomNavigation`, `RouterFn`, etc.
+     */
+    if (!t.reflection && typeof t.name === 'string' && /(?:Function|Listener)$/.test(t.name)) {
+      return true;
+    }
+    const ref = t.reflection;
+    if (!ref) {
+      return false;
+    }
+    const refId = ref.id;
+    if (refId != null && seenReflectionIds.has(refId)) {
+      return false;
+    }
+    if (refId != null) {
+      seenReflectionIds.add(refId);
+    }
+    try {
+      const decl = /** @type {import('typedoc').DeclarationReflection} */ (ref);
+      /**
+       * For `type Fn = (a: T) => U`, TypeDoc may attach call signatures to the TypeAlias reflection.
+       * `getDeclarationType` then returns `signatures[0].type` (here `U`), not the full function type, so we
+       * mis-classify properties typed as that alias (e.g. `navigate: CustomNavigation`) as non-callable.
+       * Prefer `decl.type` (the full RHS) for type aliases.
+       */
+      const typeToCheck =
+        decl.kind === ReflectionKind.TypeAlias && decl.type
+          ? decl.type
+          : (helpers.getDeclarationType(decl) ?? decl.type);
+      if (typeToCheck) {
+        return isCallablePropertyValueType(typeToCheck, helpers, seenReflectionIds);
+      }
+    } finally {
+      if (refId != null) {
+        seenReflectionIds.delete(refId);
+      }
+    }
+    return false;
+  }
+  return false;
 }

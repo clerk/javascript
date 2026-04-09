@@ -99,6 +99,7 @@ const LINK_REPLACEMENTS = [
   ['deleted-object-resource', '/docs/reference/types/deleted-object-resource'],
   ['checkout-flow-resource', '/docs/reference/hooks/use-checkout#checkout-flow-resource'],
   ['organization-creation-defaults-resource', '#organization-creation-defaults-resource'],
+  ['billing-namespace', '/docs/reference/objects/billing'],
 ];
 
 /**
@@ -127,6 +128,10 @@ function getRelativeLinkReplacements() {
 
 function getCatchAllReplacements() {
   return [
+    {
+      pattern: /(?<![\[\w`])`?APIKeysNamespace`?(?![\]\w`])/g,
+      replace: '[`APIKeysNamespace`](/docs/reference/objects/api-keys)',
+    },
     {
       pattern: /(?<![\[\w`])`Appearance`\\<`Theme`\\>/g,
       replace: '[`Appearance<Theme>`](/docs/guides/customizing-clerk/appearance-prop/overview)',
