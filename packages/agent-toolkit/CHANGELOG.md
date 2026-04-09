@@ -1,5 +1,38 @@
 # @clerk/agent-toolkit
 
+## 0.3.12
+
+### Patch Changes
+
+- Update `@modelcontextprotocol/sdk` to `1.26.0` to pick up an upstream security fix. ([#8256](https://github.com/clerk/javascript/pull/8256)) by [@renovate](https://github.com/apps/renovate)
+
+- Updated dependencies [[`fdac10e`](https://github.com/clerk/javascript/commit/fdac10e96ad60c0176cde4e1e3ddc89e40cd0a15), [`4e3cb0a`](https://github.com/clerk/javascript/commit/4e3cb0abed1f8aa1cba032c15da3a94a49162b0c), [`aa32bbc`](https://github.com/clerk/javascript/commit/aa32bbc94e76ea726056810885208c59269b2d2b)]:
+  - @clerk/shared@4.6.0
+  - @clerk/backend@3.2.8
+
+## 0.3.11
+
+### Patch Changes
+
+- Updated dependencies [[`bedad42`](https://github.com/clerk/javascript/commit/bedad42b3a3bce899e23b38ef0b0f8d5b8d1149d)]:
+  - @clerk/backend@3.2.7
+
+## 0.3.10
+
+### Patch Changes
+
+- Updated dependencies [[`8d00737`](https://github.com/clerk/javascript/commit/8d007377d8063a715b05f0f1927715359953b637), [`2c06a5f`](https://github.com/clerk/javascript/commit/2c06a5f1859ce4f1f64111f7c0a61f0093002667)]:
+  - @clerk/backend@3.2.6
+  - @clerk/shared@4.5.0
+
+## 0.3.9
+
+### Patch Changes
+
+- Updated dependencies [[`b289566`](https://github.com/clerk/javascript/commit/b28956617555c21f703a40f8f14fb2ff23d509ae), [`abfd5ef`](https://github.com/clerk/javascript/commit/abfd5efc72739edcac2992dfddd2b23b814f74ba), [`5a54fa9`](https://github.com/clerk/javascript/commit/5a54fa92573723a45632ad6e4c765701c22f91cf), [`636b496`](https://github.com/clerk/javascript/commit/636b496e42d4afff28187966acf1777be880a5c9), [`aa63796`](https://github.com/clerk/javascript/commit/aa63796b67aa862b100cc04f62d944c19cf03ce9)]:
+  - @clerk/shared@4.4.1
+  - @clerk/backend@3.2.5
+
 ## 0.3.8
 
 ### Patch Changes

@@ -1,5 +1,61 @@
 # Change Log
 
+## 3.1.9
+
+### Patch Changes
+
+- Re-exports `useAPIKeys()` hook. ([#8269](https://github.com/clerk/javascript/pull/8269)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage example:
+
+  ```tsx
+  'use client';
+
+  import { useAPIKeys } from '@clerk/nextjs';
+
+  export default function CustomAPIKeys() {
+    const { data, isLoading, page, pageCount, fetchNext, fetchPrevious } = useAPIKeys({
+      pageSize: 10,
+      initialPage: 1,
+    });
+
+    if (isLoading) return <div>Loading...</div>;
+
+    return (
+      <ul>
+        {data?.map(key => (
+          <li key={key.id}>{key.name}</li>
+        ))}
+      </ul>
+    );
+  }
+  ```
+
+- Update `esbuild` dev dependency to `^0.25.0` to address a security vulnerability. ([#8253](https://github.com/clerk/javascript/pull/8253)) by [@renovate](https://github.com/apps/renovate)
+
+- Updated dependencies [[`fdac10e`](https://github.com/clerk/javascript/commit/fdac10e96ad60c0176cde4e1e3ddc89e40cd0a15), [`4e3cb0a`](https://github.com/clerk/javascript/commit/4e3cb0abed1f8aa1cba032c15da3a94a49162b0c), [`aa32bbc`](https://github.com/clerk/javascript/commit/aa32bbc94e76ea726056810885208c59269b2d2b)]:
+  - @clerk/clerk-js@6.6.0
+  - @clerk/shared@4.6.0
+  - @clerk/react@6.2.1
+
+## 3.1.8
+
+### Patch Changes
+
+- Updated dependencies [[`2c06a5f`](https://github.com/clerk/javascript/commit/2c06a5f1859ce4f1f64111f7c0a61f0093002667)]:
+  - @clerk/shared@4.5.0
+  - @clerk/react@6.2.0
+  - @clerk/clerk-js@6.5.0
+
+## 3.1.7
+
+### Patch Changes
+
+- Updated dependencies [[`b289566`](https://github.com/clerk/javascript/commit/b28956617555c21f703a40f8f14fb2ff23d509ae), [`abfd5ef`](https://github.com/clerk/javascript/commit/abfd5efc72739edcac2992dfddd2b23b814f74ba), [`636b496`](https://github.com/clerk/javascript/commit/636b496e42d4afff28187966acf1777be880a5c9), [`aa63796`](https://github.com/clerk/javascript/commit/aa63796b67aa862b100cc04f62d944c19cf03ce9)]:
+  - @clerk/clerk-js@6.4.1
+  - @clerk/shared@4.4.1
+  - @clerk/react@6.1.5
+
 ## 3.1.6
 
 ### Patch Changes

@@ -135,6 +135,29 @@ describe('withRetry', () => {
       expect(mock).toHaveBeenCalledTimes(2);
     });
 
+    it('uses exponential backoff as floor when retryAfter is 0', async () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0);
+      const error = makeClerkAPIError(429, { retryAfter: 0 });
+      const mock = vi
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve().then(() => Promise.reject(error)))
+        .mockResolvedValueOnce({ id: 'user_123' });
+      const client = makeMockClient({ getUser: mock });
+      const wrapped = withRetry(client);
+
+      const promise = (wrapped.users as any).getUser('user_123');
+
+      // retryAfter=0 should NOT cause a 0ms delay; exponential backoff (1000ms for attempt 0) is used as floor
+      await vi.advanceTimersByTimeAsync(999);
+      expect(mock).toHaveBeenCalledTimes(1);
+
+      await vi.advanceTimersByTimeAsync(1);
+      await vi.advanceTimersByTimeAsync(0);
+
+      await expect(promise).resolves.toEqual({ id: 'user_123' });
+      expect(mock).toHaveBeenCalledTimes(2);
+    });
+
     it('caps retryAfter delay at MAX_RETRY_DELAY_MS (30s)', async () => {
       const error = makeClerkAPIError(429, { retryAfter: 60 });
       const mock = vi

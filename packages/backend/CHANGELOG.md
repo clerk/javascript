@@ -1,5 +1,38 @@
 # Change Log
 
+## 3.2.8
+
+### Patch Changes
+
+- Updated dependencies [[`fdac10e`](https://github.com/clerk/javascript/commit/fdac10e96ad60c0176cde4e1e3ddc89e40cd0a15), [`4e3cb0a`](https://github.com/clerk/javascript/commit/4e3cb0abed1f8aa1cba032c15da3a94a49162b0c), [`aa32bbc`](https://github.com/clerk/javascript/commit/aa32bbc94e76ea726056810885208c59269b2d2b)]:
+  - @clerk/shared@4.6.0
+
+## 3.2.7
+
+### Patch Changes
+
+- Fix POST requests with `sec-fetch-dest: document` incorrectly triggering handshake redirects, resulting in 405 errors from FAPI. Non-GET requests (e.g. native form submissions) are now excluded from handshake and multi-domain sync eligibility. ([#8045](https://github.com/clerk/javascript/pull/8045)) by [@jacekradko](https://github.com/jacekradko)
+
+## 3.2.6
+
+### Patch Changes
+
+- Export `OrganizationInvitationAcceptedWebhookEvent` type. ([#8235](https://github.com/clerk/javascript/pull/8235)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`2c06a5f`](https://github.com/clerk/javascript/commit/2c06a5f1859ce4f1f64111f7c0a61f0093002667)]:
+  - @clerk/shared@4.5.0
+
+## 3.2.5
+
+### Patch Changes
+
+- Export `ClerkAPIResponseError` and `ClerkRuntimeError` classes from error subpaths for consistency with the already-exported type guards. ([#8228](https://github.com/clerk/javascript/pull/8228)) by [@jacekradko](https://github.com/jacekradko)
+
+- feat: add `orderBy` argument to `getInvitationList` to control sorting (supports leading '+' for ascending and '-' for descending) ([#7137](https://github.com/clerk/javascript/pull/7137)) by [@mario-jerkovic](https://github.com/mario-jerkovic)
+
+- Updated dependencies [[`b289566`](https://github.com/clerk/javascript/commit/b28956617555c21f703a40f8f14fb2ff23d509ae), [`636b496`](https://github.com/clerk/javascript/commit/636b496e42d4afff28187966acf1777be880a5c9), [`aa63796`](https://github.com/clerk/javascript/commit/aa63796b67aa862b100cc04f62d944c19cf03ce9)]:
+  - @clerk/shared@4.4.1
+
 ## 3.2.4
 
 ### Patch Changes

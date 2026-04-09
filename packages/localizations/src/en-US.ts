@@ -36,6 +36,7 @@ export const enUS: LocalizationResource = {
     menuAction__revoke: 'Revoke key',
     revokeConfirmation: {
       confirmationText: 'Revoke',
+      inputLabel: 'Type "Revoke" to confirm',
       formButtonPrimary__revoke: 'Revoke key',
       formHint: 'Are you sure you want to delete this Secret key?',
       formTitle: 'Revoke "{{apiKeyName}}" secret key?',
@@ -62,6 +63,7 @@ export const enUS: LocalizationResource = {
   badge__upcomingPlan: 'Upcoming',
   badge__userDevice: 'User device',
   badge__you: 'You',
+  badge__banned: 'Banned',
   billing: {
     addPaymentMethod__label: 'Add payment method',
     alwaysFree: 'Always free',

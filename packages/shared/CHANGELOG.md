@@ -1,5 +1,66 @@
 # Change Log
 
+## 4.6.0
+
+### Minor Changes
+
+- Add support for rendering the Banned badge in the organization members list. ([#8261](https://github.com/clerk/javascript/pull/8261)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Improve types for `signIn.create` and `signUp.create` methods. ([#8267](https://github.com/clerk/javascript/pull/8267)) by [@dstaley](https://github.com/dstaley)
+
+- Fixed API keys "Revoke" confirmation modal being stuck disabled when using a localization. ([#8258](https://github.com/clerk/javascript/pull/8258)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.5.0
+
+### Minor Changes
+
+- API keys is now generally available. ([#8059](https://github.com/clerk/javascript/pull/8059)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ### `<APIKeys />` component
+
+  ```tsx
+  import { APIKeys } from '@clerk/react';
+
+  export default function Page() {
+    return <APIKeys />;
+  }
+  ```
+
+  ### `useAPIKeys()` hook
+
+  ```tsx
+  import { useAPIKeys } from '@clerk/react';
+
+  export default function CustomAPIKeys() {
+    const { data, isLoading, page, pageCount, fetchNext, fetchPrevious } = useAPIKeys({
+      pageSize: 10,
+      initialPage: 1,
+    });
+
+    if (isLoading) return <div>Loading...</div>;
+
+    return (
+      <ul>
+        {data?.map(key => (
+          <li key={key.id}>{key.name}</li>
+        ))}
+      </ul>
+    );
+  }
+  ```
+
+## 4.4.1
+
+### Patch Changes
+
+- Add `provider` and `logoPublicUrl` to `EnterpriseConnection` resource ([#8203](https://github.com/clerk/javascript/pull/8203)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add `oiat` (original_issued_at) field to `JwtHeader` type for Session Minter monotonic token freshness checks. ([#8107](https://github.com/clerk/javascript/pull/8107)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add docs URL to `passkey_invalid_rpID_or_domain` error ([#8216](https://github.com/clerk/javascript/pull/8216)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 4.4.0
 
 ### Minor Changes

@@ -14,6 +14,7 @@ export {
   useWaitlist,
   useUser,
   useReverification,
+  useAPIKeys,
 } from '@clerk/react';
 
 export {

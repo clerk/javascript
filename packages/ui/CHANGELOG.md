@@ -1,5 +1,74 @@
 # @clerk/ui
 
+## 1.5.0
+
+### Minor Changes
+
+- Add support for rendering the Banned badge in the organization members list. ([#8261](https://github.com/clerk/javascript/pull/8261)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`fdac10e`](https://github.com/clerk/javascript/commit/fdac10e96ad60c0176cde4e1e3ddc89e40cd0a15), [`4e3cb0a`](https://github.com/clerk/javascript/commit/4e3cb0abed1f8aa1cba032c15da3a94a49162b0c), [`aa32bbc`](https://github.com/clerk/javascript/commit/aa32bbc94e76ea726056810885208c59269b2d2b)]:
+  - @clerk/shared@4.6.0
+  - @clerk/localizations@4.4.0
+
+## 1.4.0
+
+### Minor Changes
+
+- API keys is now generally available. ([#8059](https://github.com/clerk/javascript/pull/8059)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ### `<APIKeys />` component
+
+  ```tsx
+  import { APIKeys } from '@clerk/react';
+
+  export default function Page() {
+    return <APIKeys />;
+  }
+  ```
+
+  ### `useAPIKeys()` hook
+
+  ```tsx
+  import { useAPIKeys } from '@clerk/react';
+
+  export default function CustomAPIKeys() {
+    const { data, isLoading, page, pageCount, fetchNext, fetchPrevious } = useAPIKeys({
+      pageSize: 10,
+      initialPage: 1,
+    });
+
+    if (isLoading) return <div>Loading...</div>;
+
+    return (
+      <ul>
+        {data?.map(key => (
+          <li key={key.id}>{key.name}</li>
+        ))}
+      </ul>
+    );
+  }
+  ```
+
+### Patch Changes
+
+- Adjust padding and display logo on `OrganizationList` header ([#8229](https://github.com/clerk/javascript/pull/8229)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`2c06a5f`](https://github.com/clerk/javascript/commit/2c06a5f1859ce4f1f64111f7c0a61f0093002667)]:
+  - @clerk/shared@4.5.0
+  - @clerk/localizations@4.3.2
+
+## 1.3.1
+
+### Patch Changes
+
+- Display enterprise connection icon on account linking dropdown within `UserProfile` ([#8203](https://github.com/clerk/javascript/pull/8203)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`b289566`](https://github.com/clerk/javascript/commit/b28956617555c21f703a40f8f14fb2ff23d509ae), [`0833cb1`](https://github.com/clerk/javascript/commit/0833cb106347049cb9f91a4dd3cca06bbc628a6a), [`636b496`](https://github.com/clerk/javascript/commit/636b496e42d4afff28187966acf1777be880a5c9), [`d93f8ee`](https://github.com/clerk/javascript/commit/d93f8eeabdb93f1392fbf179c00b1f227c452243), [`aa63796`](https://github.com/clerk/javascript/commit/aa63796b67aa862b100cc04f62d944c19cf03ce9)]:
+  - @clerk/shared@4.4.1
+  - @clerk/localizations@4.3.1
+
 ## 1.3.0
 
 ### Minor Changes

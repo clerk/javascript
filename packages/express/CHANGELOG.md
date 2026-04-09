@@ -1,5 +1,68 @@
 # Change Log
 
+## 2.1.0
+
+### Minor Changes
+
+- Deprecated `requireAuth()` middleware. It will be removed in the next major version. ([#8241](https://github.com/clerk/javascript/pull/8241)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  The `requireAuth()` middleware redirects unauthenticated requests to a sign-in page, which is often unexpected for API routes where a 401 response is more appropriate. Use `clerkMiddleware()` with `getAuth()` instead for explicit control over authentication behavior.
+
+  **Before (deprecated):**
+
+  ```js
+  import { requireAuth } from '@clerk/express';
+
+  app.get('/api/protected', requireAuth(), (req, res) => {
+    // handle authenticated request
+  });
+  ```
+
+  **After (recommended):**
+
+  ```js
+  import { clerkMiddleware, getAuth } from '@clerk/express';
+
+  app.use(clerkMiddleware());
+
+  app.get('/api/protected', (req, res) => {
+    const { userId } = getAuth(req);
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    // handle authenticated request
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`fdac10e`](https://github.com/clerk/javascript/commit/fdac10e96ad60c0176cde4e1e3ddc89e40cd0a15), [`4e3cb0a`](https://github.com/clerk/javascript/commit/4e3cb0abed1f8aa1cba032c15da3a94a49162b0c), [`aa32bbc`](https://github.com/clerk/javascript/commit/aa32bbc94e76ea726056810885208c59269b2d2b)]:
+  - @clerk/shared@4.6.0
+  - @clerk/backend@3.2.8
+
+## 2.0.11
+
+### Patch Changes
+
+- Updated dependencies [[`bedad42`](https://github.com/clerk/javascript/commit/bedad42b3a3bce899e23b38ef0b0f8d5b8d1149d)]:
+  - @clerk/backend@3.2.7
+
+## 2.0.10
+
+### Patch Changes
+
+- Updated dependencies [[`8d00737`](https://github.com/clerk/javascript/commit/8d007377d8063a715b05f0f1927715359953b637), [`2c06a5f`](https://github.com/clerk/javascript/commit/2c06a5f1859ce4f1f64111f7c0a61f0093002667)]:
+  - @clerk/backend@3.2.6
+  - @clerk/shared@4.5.0
+
+## 2.0.9
+
+### Patch Changes
+
+- Updated dependencies [[`b289566`](https://github.com/clerk/javascript/commit/b28956617555c21f703a40f8f14fb2ff23d509ae), [`abfd5ef`](https://github.com/clerk/javascript/commit/abfd5efc72739edcac2992dfddd2b23b814f74ba), [`5a54fa9`](https://github.com/clerk/javascript/commit/5a54fa92573723a45632ad6e4c765701c22f91cf), [`636b496`](https://github.com/clerk/javascript/commit/636b496e42d4afff28187966acf1777be880a5c9), [`aa63796`](https://github.com/clerk/javascript/commit/aa63796b67aa862b100cc04f62d944c19cf03ce9)]:
+  - @clerk/shared@4.4.1
+  - @clerk/backend@3.2.5
+
 ## 2.0.8
 
 ### Patch Changes
