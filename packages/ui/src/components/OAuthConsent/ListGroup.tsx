@@ -1,5 +1,4 @@
-import { Box, descriptors } from '@/ui/customizables';
-import { Text } from '@/ui/customizables';
+import { Box, Text, descriptors } from '@/ui/customizables';
 import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
 import type { ComponentProps } from 'react';
