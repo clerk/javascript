@@ -408,7 +408,7 @@ export class Clerk implements ClerkInterface {
   get oauthApplication(): OAuthApplicationNamespace {
     if (!Clerk._oauthApplication) {
       Clerk._oauthApplication = {
-        fetchConsentInfo: params => OAuthApplication.fetchConsentInfo(params),
+        getConsentInfo: params => OAuthApplication.getConsentInfo(params),
       };
     }
     return Clerk._oauthApplication;

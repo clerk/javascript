@@ -20,7 +20,7 @@ const consentPayload: OAuthConsentInfoJSON = {
   scopes: [{ scope: 'openid', description: 'OpenID', requires_consent: true }],
 };
 
-describe('OAuthApplication.fetchConsentInfo', () => {
+describe('OAuthApplication.getConsentInfo', () => {
   afterEach(() => {
     (global.fetch as Mock)?.mockClear?.();
     BaseResource.clerk = null as any;
@@ -34,7 +34,7 @@ describe('OAuthApplication.fetchConsentInfo', () => {
 
     BaseResource.clerk = {} as any;
 
-    await OAuthApplication.fetchConsentInfo({ oauthClientId: 'my/client id', scope: 'openid email' });
+    await OAuthApplication.getConsentInfo({ oauthClientId: 'my/client id', scope: 'openid email' });
 
     expect(fetchSpy).toHaveBeenCalledWith(
       {
@@ -53,7 +53,7 @@ describe('OAuthApplication.fetchConsentInfo', () => {
 
     BaseResource.clerk = {} as any;
 
-    await OAuthApplication.fetchConsentInfo({ oauthClientId: 'cid' });
+    await OAuthApplication.getConsentInfo({ oauthClientId: 'cid' });
 
     expect(fetchSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -68,7 +68,7 @@ describe('OAuthApplication.fetchConsentInfo', () => {
 
     BaseResource.clerk = {} as any;
 
-    const info = await OAuthApplication.fetchConsentInfo({ oauthClientId: 'client_abc' });
+    const info = await OAuthApplication.getConsentInfo({ oauthClientId: 'client_abc' });
 
     expect(info).toEqual({
       oauthApplicationName: 'My App',
@@ -87,7 +87,7 @@ describe('OAuthApplication.fetchConsentInfo', () => {
 
     BaseResource.clerk = {} as any;
 
-    const info = await OAuthApplication.fetchConsentInfo({ oauthClientId: 'client_abc' });
+    const info = await OAuthApplication.getConsentInfo({ oauthClientId: 'client_abc' });
 
     expect(info).toEqual({
       oauthApplicationName: 'My App',
@@ -106,7 +106,7 @@ describe('OAuthApplication.fetchConsentInfo', () => {
 
     BaseResource.clerk = {} as any;
 
-    const info = await OAuthApplication.fetchConsentInfo({ oauthClientId: 'client_abc' });
+    const info = await OAuthApplication.getConsentInfo({ oauthClientId: 'client_abc' });
     expect(info.scopes).toEqual([]);
   });
 
@@ -127,7 +127,7 @@ describe('OAuthApplication.fetchConsentInfo', () => {
       __internal_handleUnauthenticatedDevBrowser: vi.fn(),
     } as any;
 
-    await expect(OAuthApplication.fetchConsentInfo({ oauthClientId: 'cid' })).rejects.toSatisfy(
+    await expect(OAuthApplication.getConsentInfo({ oauthClientId: 'cid' })).rejects.toSatisfy(
       (err: unknown) => err instanceof ClerkAPIResponseError && err.message === 'Consent metadata unavailable',
     );
 
@@ -142,7 +142,7 @@ describe('OAuthApplication.fetchConsentInfo', () => {
 
     BaseResource.clerk = {} as any;
 
-    await expect(OAuthApplication.fetchConsentInfo({ oauthClientId: 'cid' })).rejects.toMatchObject({
+    await expect(OAuthApplication.getConsentInfo({ oauthClientId: 'cid' })).rejects.toMatchObject({
       code: 'network_error',
     });
   });

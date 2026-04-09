@@ -44,7 +44,7 @@ export type OAuthConsentInfo = {
   scopes: OAuthConsentScope[];
 };
 
-export type FetchOAuthConsentInfoParams = {
+export type GetOAuthConsentInfoParams = {
   /** OAuth `client_id` from the authorize request. */
   oauthClientId: string;
   /** Optional space-delimited scope string from the authorize request. */
@@ -58,5 +58,5 @@ export interface OAuthApplicationNamespace {
   /**
    * Loads consent metadata for the given OAuth client for the signed-in user.
    */
-  fetchConsentInfo: (params: FetchOAuthConsentInfoParams) => Promise<OAuthConsentInfo>;
+  getConsentInfo: (params: GetOAuthConsentInfoParams) => Promise<OAuthConsentInfo>;
 }

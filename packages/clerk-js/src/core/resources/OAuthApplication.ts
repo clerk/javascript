@@ -1,7 +1,7 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import type {
   ClerkResourceJSON,
-  FetchOAuthConsentInfoParams,
+  GetOAuthConsentInfoParams,
   OAuthConsentInfo,
   OAuthConsentInfoJSON,
 } from '@clerk/shared/types';
@@ -15,7 +15,7 @@ export class OAuthApplication extends BaseResource {
     return this;
   }
 
-  static async fetchConsentInfo(params: FetchOAuthConsentInfoParams): Promise<OAuthConsentInfo> {
+  static async getConsentInfo(params: GetOAuthConsentInfoParams): Promise<OAuthConsentInfo> {
     const { oauthClientId, scope } = params;
     const json = await BaseResource._fetch<OAuthConsentInfoJSON>(
       {
