@@ -30,6 +30,28 @@ class ClerkMarkdownTheme extends MarkdownTheme {
 const unionCommentMap = new Map();
 
 /**
+ * Only for these output pages do we remove function-valued members from **property** tables.
+ * Match {@link import('typedoc-plugin-markdown').MarkdownPageEvent#url} as TypeDoc emits it (relative to `out`),
+ * e.g. `shared/clerk.mdx` — not the path after `cpy` to `.typedoc/docs` (that does not change `page.url`).
+ */
+const PROPERTY_TABLE_EXCLUDE_FUNCTIONS_ALLOWLIST = ['shared/clerk.mdx'];
+
+/**
+ * @param {string | undefined} pageUrl
+ * @param {readonly string[]} allowlist
+ */
+function pageMatchesPropertyTableFunctionFilterAllowlist(pageUrl, allowlist) {
+  if (!pageUrl) {
+    return false;
+  }
+  const normalized = pageUrl.replace(/\\/g, '/').replace(/^\.\//, '');
+  return allowlist.some(entry => {
+    const e = entry.replace(/\\/g, '/').replace(/^\/+/, '');
+    return normalized === e || normalized.endsWith(`/${e}`) || normalized.endsWith(e);
+  });
+}
+
+/**
  * Our custom Clerk theme
  * @extends MarkdownThemeContext
  */
@@ -49,10 +71,9 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
     this.partials = {
       ...superPartials,
       /**
-       * Drop function-valued interface/class properties from the properties table (they remain TypeScript "Property"
-       * members because they use property syntax). Keeps data fields and object namespaces in the table.
-       */
-      /**
+       * On allowlisted output pages only (see `PROPERTY_TABLE_EXCLUDE_FUNCTIONS_ALLOWLIST`): drop function-valued
+       * interface/class properties from property tables (property syntax with function types). Other pages unchanged.
+       *
        * @param {import('typedoc').DeclarationReflection[]} model
        * @param {Parameters<typeof superPartials.propertiesTable>[1]} [options]
        */
@@ -60,7 +81,11 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         if (!Array.isArray(model)) {
           return superPartials.propertiesTable(/** @type {any} */ (model), options);
         }
-        const filtered = model.filter(prop => !isCallableInterfaceProperty(prop, this.helpers));
+        const allowlisted = pageMatchesPropertyTableFunctionFilterAllowlist(
+          this.page?.url,
+          PROPERTY_TABLE_EXCLUDE_FUNCTIONS_ALLOWLIST,
+        );
+        const filtered = allowlisted ? model.filter(prop => !isCallableInterfaceProperty(prop, this.helpers)) : model;
         return superPartials.propertiesTable(filtered, options);
       },
       /**
