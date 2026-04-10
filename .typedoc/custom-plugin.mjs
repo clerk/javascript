@@ -276,12 +276,48 @@ function getCatchAllReplacements() {
 /** CommonMark ATX heading: optional indent, 1–6 `#`, then space or end — entire line is left unchanged. */
 const ATX_HEADING_LINE = /^\s{0,3}#{1,6}(?:\s|$)/;
 
+/** Private-use placeholders — must not appear in real MDX and must not match catch-all patterns. */
+const PIPE_CODE_PH = /\uE000(\d+)\uE001/g;
+
+/**
+ * Inline code that contains a pipe (e.g. `` `a \\| b` `` or `` `a | b` ``) cannot receive per-token
+ * link replacements without breaking MDX. Replace those whole spans with placeholders, run catch-alls,
+ * then restore.
+ *
+ * @param {string} line
+ * @returns {{ text: string, placeholders: string[] }}
+ */
+function protectPipeDelimitedInlineCodeSpans(line) {
+  /** @type {string[]} */
+  const placeholders = [];
+  const text = line.replace(/`([^`\n]*)`/g, (full, inner) => {
+    if (!inner.includes('|')) {
+      return full;
+    }
+    const id = placeholders.length;
+    placeholders.push(full);
+    return `\uE000${id}\uE001`;
+  });
+  return { text, placeholders };
+}
+
+/**
+ * @param {string} text
+ * @param {string[]} placeholders
+ */
+function restoreProtectedInlineCodeSpans(text, placeholders) {
+  return text.replace(PIPE_CODE_PH, (_, /** @type {string} */ i) => placeholders[Number(i)] ?? '');
+}
+
 /**
  * Same replacement pass as the catch-all loop in `MarkdownPageEvent.END` (after relative links).
  * Used by `extract-methods.mjs`, which writes MDX outside TypeDoc and never hits that hook.
  *
  * Skips ATX heading lines (`#` … `######`) so titles like `#### SetActiveParams` are never linkified.
  * (A lone `(?<!#)` in regex is not enough: heading text is separated from `###` by spaces.)
+ *
+ * Skips inline code spans that contain `|` (union / enum style like `` `v1 \\| v2` ``) so link rules do
+ * not run inside them — otherwise MDX breaks.
  *
  * @param {string} contents
  */
@@ -295,12 +331,13 @@ export function applyCatchAllMdReplacements(contents) {
       if (ATX_HEADING_LINE.test(line.replace(/\r$/, ''))) {
         return line;
       }
-      let out = line;
+      const { text: withPh, placeholders } = protectPipeDelimitedInlineCodeSpans(line);
+      let out = withPh;
       for (const { pattern, replace } of getCatchAllReplacements()) {
         // @ts-ignore — string | function
         out = out.replace(pattern, replace);
       }
-      return out;
+      return restoreProtectedInlineCodeSpans(out, placeholders);
     })
     .join('\n');
 }

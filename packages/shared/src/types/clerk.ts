@@ -182,16 +182,21 @@ export type SetActiveNavigate = (params: {
   decorateUrl: DecorateUrl;
 }) => void | Promise<unknown>;
 
+/**
+ * A callback that runs after sign out completes.
+ * @inline */
 export type SignOutCallback = () => void | Promise<any>;
 
+/**
+ * Configuration options.
+ */
 export type SignOutOptions = {
   /**
-   * Specify a specific session to sign out. Useful for
-   * multi-session applications.
+   * Specify a specific session to sign out. Useful for multi-session applications.
    */
   sessionId?: string;
   /**
-   * Specify a redirect URL to navigate to after sign out is complete.
+   * Specify a redirect URL to navigate to after sign-out is complete.
    */
   redirectUrl?: string;
 };
@@ -326,11 +331,7 @@ export interface Clerk {
   __internal_country?: string | null;
 
   /**
-   * Signs out the current user on single-session instances, or all users on multi-session instances
-   *
-   * @param signOutCallback - Optional A callback that runs after sign out completes.
-   * @param options - Optional Configuration options, see {@link SignOutOptions}
-   * @returns A promise that resolves when the sign out process completes.
+   * Signs out the current user on single-session instances, or all users on multi-session instances.
    */
   signOut: SignOut;
 

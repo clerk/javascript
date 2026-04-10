@@ -379,7 +379,13 @@ function resolveNominalObjectTypeForSingleParam(t, project) {
       return { sectionTitle: typeDecl.name, holder: typeDecl, typeDecl };
     }
     if (typeDecl.kindOf(ReflectionKind.TypeAlias)) {
-      const holder = resolveDeclarationWithObjectMembers(typeDecl.type);
+      // Same as `resolveDeclarationWithObjectMembers` for a reference: members may live on the alias
+      // (`typeDecl.children`) with no `typeDecl.type` (e.g. `SignOutOptions`, `JoinWaitlistParams`).
+      const holder = typeDecl.children?.length
+        ? typeDecl
+        : typeDecl.type
+          ? resolveDeclarationWithObjectMembers(typeDecl.type)
+          : undefined;
       if (!holder?.children?.length) {
         return undefined;
       }
