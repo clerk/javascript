@@ -220,6 +220,10 @@ function getCatchAllReplacements() {
         '[`OrganizationMembershipPublicMetadata`](/docs/reference/types/metadata#organization-membership-public-metadata)',
     },
     {
+      pattern: /`RedirectOptions`/g,
+      replace: '[`RedirectOptions`](/docs/reference/types/redirect-options)',
+    },
+    {
       pattern: /(?<![\[\w`])`?UserResource`?(?![\]\w`])/g,
       replace: '[`UserResource`](/docs/reference/objects/user)',
     },

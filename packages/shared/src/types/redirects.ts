@@ -17,7 +17,6 @@ export type AfterMultiSessionSingleSignOutUrl = {
 
 /**
  * Redirect URLs for different actions.
- * Mainly used to be used to type internal Clerk functions.
  */
 export type RedirectOptions = SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
@@ -25,6 +24,7 @@ export type RedirectOptions = SignInForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   RedirectUrlProp;
 
+/** @document */
 export type AuthenticateWithRedirectParams = {
   /**
    * The full URL or path to the route that will complete the OAuth or SAML flow.
@@ -91,7 +91,7 @@ export type RedirectUrlProp = {
 
 export type SignUpForceRedirectUrl = {
   /**
-   * This URL will always be redirected to after the user signs up. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * If provided, this URL will always be redirected to after the user signs up. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
    */
   signUpForceRedirectUrl?: string | null;
 };
@@ -116,7 +116,7 @@ export type SignInFallbackRedirectUrl = {
 
 export type SignInForceRedirectUrl = {
   /**
-   * This URL will always be redirected to after the user signs in. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * If provided, this URL will always be redirected to after the user signs in. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
    */
   signInForceRedirectUrl?: string | null;
 };

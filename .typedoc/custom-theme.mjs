@@ -2,6 +2,10 @@
 import { IntersectionType, ReferenceType, ReflectionKind, ReflectionType, UnionType } from 'typedoc';
 import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
 
+import { REFERENCE_OBJECTS_LIST } from './reference-objects.mjs';
+
+export { REFERENCE_OBJECTS_LIST };
+
 /**
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
@@ -30,15 +34,10 @@ class ClerkMarkdownTheme extends MarkdownTheme {
 const unionCommentMap = new Map();
 
 /**
- * Only for these output pages do we remove function-valued members from **property** tables.
- * Match {@link import('typedoc-plugin-markdown').MarkdownPageEvent#url} as TypeDoc emits it (relative to `out`),
- * e.g. `shared/clerk.mdx` — not the path after `cpy` to `.typedoc/docs` (that does not change `page.url`).
- */
-const PROPERTY_TABLE_EXCLUDE_FUNCTIONS_ALLOWLIST = ['shared/clerk.mdx'];
-
-/**
- * @param {string | undefined} pageUrl
- * @param {readonly string[]} allowlist
+ * Only for the specified pages do we remove function-valued members from property tables in the "Properties" section.
+ *
+ * @param {string | undefined} pageUrl - The URL of the page to check.
+ * @param {readonly string[]} allowlist - The list of pages to check.
  */
 function pageMatchesPropertyTableFunctionFilterAllowlist(pageUrl, allowlist) {
   if (!pageUrl) {
@@ -81,10 +80,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         if (!Array.isArray(model)) {
           return superPartials.propertiesTable(/** @type {any} */ (model), options);
         }
-        const allowlisted = pageMatchesPropertyTableFunctionFilterAllowlist(
-          this.page?.url,
-          PROPERTY_TABLE_EXCLUDE_FUNCTIONS_ALLOWLIST,
-        );
+        const allowlisted = pageMatchesPropertyTableFunctionFilterAllowlist(this.page?.url, REFERENCE_OBJECTS_LIST);
         const filtered = allowlisted ? model.filter(prop => !isCallableInterfaceProperty(prop, this.helpers)) : model;
         return superPartials.propertiesTable(filtered, options);
       },

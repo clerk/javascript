@@ -342,7 +342,13 @@
     },
     "//#typedoc:generate": {
       "dependsOn": ["@clerk/nextjs#build", "@clerk/react#build", "@clerk/shared#build"],
-      "inputs": ["tsconfig.typedoc.json", "typedoc.config.mjs"],
+      "inputs": [
+        "tsconfig.typedoc.json",
+        "typedoc.config.mjs",
+        ".typedoc/reference-objects.mjs",
+        ".typedoc/extract-methods.mjs",
+        ".typedoc/extract-returns-and-params.mjs"
+      ],
       "outputs": [".typedoc/**"],
       "outputLogs": "new-only"
     },

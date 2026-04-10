@@ -24,5 +24,8 @@ export interface WaitlistResource extends ClerkResource {
 }
 
 export type JoinWaitlistParams = {
+  /**
+   * The email address of the user to add to the waitlist.
+   */
   emailAddress: string;
 };
