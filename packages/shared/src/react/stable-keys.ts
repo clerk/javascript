@@ -15,7 +15,7 @@ const API_KEYS_KEY = 'apiKeys';
 // Keys for `useOrganizationCreationDefaults`
 const ORGANIZATION_CREATION_DEFAULTS_KEY = 'organizationCreationDefaults';
 
-// Keys for `useOAuthConsent` (consent metadata GET; keep distinct from future submit/mutation keys)
+// Keys for `useOAuthConsent`
 const OAUTH_CONSENT_INFO_KEY = 'oauthConsentInfo';
 
 // Keys for `usePlans`

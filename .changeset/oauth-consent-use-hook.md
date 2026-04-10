@@ -5,4 +5,4 @@
 '@clerk/expo': minor
 ---
 
-Add the `useOAuthConsent` hook to fetch OAuth application consent metadata for signed-in users via Clerk React Query.
+Introduce internal `useOAuthConsent()` hook for fetching OAuth consent screen metadata for the signed-in user.

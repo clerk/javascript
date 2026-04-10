@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
-import type { GetOAuthConsentInfoParams } from '../../types';
+import type { LoadedClerk } from '../../types/clerk';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
@@ -18,8 +18,10 @@ const HOOK_NAME = 'useOAuthConsent';
  * (`GET /me/oauth/consent/{oauthClientId}`). Ensure the user is authenticated before relying on this hook
  * (for example, redirect to sign-in on your custom consent route).
  *
- * **`oauthClientId` and `scope` are optional.** On the client, values default from a **single snapshot** of
- * `window.location.search` (`client_id` and `scope`). Pass them explicitly to override; see {@link UseOAuthConsentParams}.
+ * `oauthClientId` and `scope` are optional. On the client, values default from a single snapshot of
+ * `window.location.search` (`client_id` and `scope`). Pass them explicitly to override.
+ *
+ * @internal
  *
  * @example
  * ### From the URL (`?client_id=...&scope=...`)
@@ -50,15 +52,12 @@ export function useOAuthConsent(params: UseOAuthConsentParams = {}): UseOAuthCon
   const clerk = useClerkInstanceContext();
   const user = useUserBase();
 
-  const [searchSnapshot, setSearchSnapshot] = useState(() =>
-    typeof window !== 'undefined' ? window.location.search : '',
-  );
-
-  useLayoutEffect(() => {
-    setSearchSnapshot(window.location.search);
+  const fromUrl = useMemo(() => {
+    if (typeof window === 'undefined' || !window.location) {
+      return { oauthClientId: '' };
+    }
+    return readOAuthConsentFromSearch(window.location.search);
   }, []);
-
-  const fromUrl = useMemo(() => readOAuthConsentFromSearch(searchSnapshot), [searchSnapshot]);
 
   const oauthClientId = useMemo(() => {
     const raw = oauthClientIdParam !== undefined ? oauthClientIdParam : fromUrl.oauthClientId;
@@ -77,21 +76,12 @@ export function useOAuthConsent(params: UseOAuthConsentParams = {}): UseOAuthCon
     scope,
   });
 
-  const getConsentInfo = clerk.oauthApplication?.getConsentInfo;
   const hasClientId = oauthClientId.length > 0;
-  const queryEnabled = Boolean(user) && hasClientId && enabled && clerk.loaded && typeof getConsentInfo === 'function';
-
-  const queryFn = useCallback(() => {
-    if (!getConsentInfo) {
-      return Promise.reject(new Error('OAuth consent is not available in this Clerk instance'));
-    }
-    const p: GetOAuthConsentInfoParams = scope !== undefined ? { oauthClientId, scope } : { oauthClientId };
-    return getConsentInfo(p);
-  }, [getConsentInfo, oauthClientId, scope]);
+  const queryEnabled = Boolean(user) && hasClientId && enabled && clerk.loaded && !!clerk.oauthApplication;
 
   const query = useClerkQuery({
     queryKey,
-    queryFn,
+    queryFn: () => fetchConsentInfo(clerk, { oauthClientId, scope }),
     enabled: queryEnabled,
     placeholderData: defineKeepPreviousDataFn(keepPreviousData),
   });
@@ -102,4 +92,9 @@ export function useOAuthConsent(params: UseOAuthConsentParams = {}): UseOAuthCon
     isLoading: query.isLoading,
     isFetching: query.isFetching,
   };
+}
+
+function fetchConsentInfo(clerk: LoadedClerk, params: { oauthClientId: string; scope?: string }) {
+  const { oauthClientId, scope } = params;
+  return clerk.oauthApplication.getConsentInfo(scope !== undefined ? { oauthClientId, scope } : { oauthClientId });
 }
