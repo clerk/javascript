@@ -50,6 +50,7 @@ describe('useOAuthConsent', () => {
     mockClerk.oauthApplication = {
       getConsentInfo: getConsentInfoSpy,
     };
+    window.history.replaceState({}, '', '/');
   });
 
   it('fetches consent metadata when signed in', async () => {
@@ -111,5 +112,46 @@ describe('useOAuthConsent', () => {
 
     expect(getConsentInfoSpy).not.toHaveBeenCalled();
     expect(result.current.isLoading).toBe(false);
+  });
+
+  it('uses client_id and scope from the URL when hook params omit them', async () => {
+    window.history.replaceState({}, '', '/?client_id=from_url&scope=openid%20email');
+
+    const { result } = renderHook(() => useOAuthConsent(), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(getConsentInfoSpy).toHaveBeenCalledTimes(1);
+    expect(getConsentInfoSpy).toHaveBeenCalledWith({ oauthClientId: 'from_url', scope: 'openid email' });
+    expect(result.current.data).toEqual(consentInfo);
+  });
+
+  it('prefers explicit oauthClientId over URL client_id', async () => {
+    window.history.replaceState({}, '', '/?client_id=from_url');
+
+    const { result } = renderHook(() => useOAuthConsent({ oauthClientId: 'explicit_id' }), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(getConsentInfoSpy).toHaveBeenCalledWith({ oauthClientId: 'explicit_id' });
+  });
+
+  it('does not fall back to URL client_id when oauthClientId is explicitly empty', () => {
+    window.history.replaceState({}, '', '/?client_id=from_url');
+
+    const { result } = renderHook(() => useOAuthConsent({ oauthClientId: '' }), { wrapper });
+
+    expect(getConsentInfoSpy).not.toHaveBeenCalled();
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it('prefers explicit scope over URL scope', async () => {
+    window.history.replaceState({}, '', '/?client_id=cid&scope=from_url');
+
+    const { result } = renderHook(() => useOAuthConsent({ scope: 'explicit_scope' }), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(getConsentInfoSpy).toHaveBeenCalledWith({ oauthClientId: 'cid', scope: 'explicit_scope' });
   });
 });

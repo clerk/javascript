@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { GetOAuthConsentInfoParams } from '../../types';
@@ -8,7 +8,7 @@ import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import { useUserBase } from './base/useUserBase';
-import { useOAuthConsentCacheKeys } from './useOAuthConsent.shared';
+import { readOAuthConsentFromSearch, useOAuthConsentCacheKeys } from './useOAuthConsent.shared';
 import type { UseOAuthConsentParams, UseOAuthConsentReturn } from './useOAuthConsent.types';
 
 const HOOK_NAME = 'useOAuthConsent';
@@ -18,28 +18,56 @@ const HOOK_NAME = 'useOAuthConsent';
  * (`GET /me/oauth/consent/{oauthClientId}`). Ensure the user is authenticated before relying on this hook
  * (for example, redirect to sign-in on your custom consent route).
  *
+ * **`oauthClientId` and `scope` are optional.** On the client, values default from a **single snapshot** of
+ * `window.location.search` (`client_id` and `scope`). Pass them explicitly to override; see {@link UseOAuthConsentParams}.
+ *
  * @example
- * ### Basic usage
+ * ### From the URL (`?client_id=...&scope=...`)
  *
  * ```tsx
  * import { useOAuthConsent } from '@clerk/react'
  *
- * export default function OAuthConsentPage({ clientId, scope }: { clientId: string; scope?: string }) {
- *   const { data, isLoading, error } = useOAuthConsent({ oauthClientId: clientId, scope })
- *
- *   if (isLoading) return <div>Loading…</div>
- *   if (error) return <div>Unable to load consent</div>
- *
- *   return <div>{data?.oauthApplicationName}</div>
+ * export default function OAuthConsentPage() {
+ *   const { data, isLoading, error } = useOAuthConsent()
+ *   // ...
  * }
  * ```
+ *
+ * @example
+ * ### Explicit values (override URL)
+ *
+ * ```tsx
+ * const { data, isLoading, error } = useOAuthConsent({
+ *   oauthClientId: clientIdFromProps,
+ *   scope: scopeFromProps,
+ * })
+ * ```
  */
-export function useOAuthConsent(params: UseOAuthConsentParams): UseOAuthConsentReturn {
+export function useOAuthConsent(params: UseOAuthConsentParams = {}): UseOAuthConsentReturn {
   useAssertWrappedByClerkProvider(HOOK_NAME);
 
-  const { oauthClientId, scope, keepPreviousData = true, enabled = true } = params;
+  const { oauthClientId: oauthClientIdParam, scope: scopeParam, keepPreviousData = true, enabled = true } = params;
   const clerk = useClerkInstanceContext();
   const user = useUserBase();
+
+  const [searchSnapshot, setSearchSnapshot] = useState(() =>
+    typeof window !== 'undefined' ? window.location.search : '',
+  );
+
+  useLayoutEffect(() => {
+    setSearchSnapshot(window.location.search);
+  }, []);
+
+  const fromUrl = useMemo(() => readOAuthConsentFromSearch(searchSnapshot), [searchSnapshot]);
+
+  const oauthClientId = useMemo(() => {
+    const raw = oauthClientIdParam !== undefined ? oauthClientIdParam : fromUrl.oauthClientId;
+    return raw.trim();
+  }, [oauthClientIdParam, fromUrl.oauthClientId]);
+
+  const scope = useMemo(() => {
+    return scopeParam !== undefined ? scopeParam : fromUrl.scope;
+  }, [scopeParam, fromUrl.scope]);
 
   clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
