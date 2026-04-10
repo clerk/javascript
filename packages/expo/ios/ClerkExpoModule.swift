@@ -224,6 +224,7 @@ public class ClerkAuthNativeView: UIView {
   private var hasInitialized: Bool = false
   private var authEventSent: Bool = false
   private var presentedAuthVC: UIViewController?
+  private var isInvalidated: Bool = false
 
   @objc var onAuthEvent: RCTBubblingEventBlock?
 
@@ -268,6 +269,7 @@ public class ClerkAuthNativeView: UIView {
   }
 
   override public func removeFromSuperview() {
+    isInvalidated = true
     dismissAuthModal()
     super.removeFromSuperview()
   }
@@ -317,7 +319,7 @@ public class ClerkAuthNativeView: UIView {
   /// If a previous modal is still dismissing, waits for its transition coordinator
   /// to finish — no fixed delays.
   private func presentWhenReady(_ authVC: UIViewController, attempts: Int) {
-    guard presentedAuthVC == nil, attempts < 30 else { return }
+    guard !isInvalidated, presentedAuthVC == nil, attempts < 30 else { return }
     guard let rootVC = Self.topViewController() else {
       DispatchQueue.main.async { [weak self] in
         self?.presentWhenReady(authVC, attempts: attempts + 1)
