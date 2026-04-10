@@ -57,6 +57,7 @@ export {
   useOrganizationList,
   useReverification,
   useAPIKeys,
+  useOAuthConsent,
   useSession,
   useSessionList,
   useSignIn,
