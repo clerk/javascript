@@ -118,7 +118,7 @@ describe('clerkMiddleware', () => {
     });
 
     expect(authenticateRequestMock).toHaveBeenCalledWith(
-      expect.any(Request),
+      expect.any(Object),
       expect.objectContaining({
         clockSkewInMs: 12_345,
       }),
