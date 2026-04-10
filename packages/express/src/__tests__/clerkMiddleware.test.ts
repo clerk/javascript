@@ -12,9 +12,9 @@ vi.mock('@clerk/backend/proxy', async () => {
   };
 });
 
+import { authenticateRequest } from '../authenticateRequest';
 import { clerkMiddleware } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
-import { authenticateRequest } from '../authenticateRequest';
 import { assertNoDebugHeaders, assertSignedOutDebugHeaders, runMiddleware, runMiddlewareOnPath } from './helpers';
 
 describe('clerkMiddleware', () => {
