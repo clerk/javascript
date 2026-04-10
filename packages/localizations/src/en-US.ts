@@ -294,6 +294,18 @@ export const enUS: LocalizationResource = {
     title: 'Choose an account',
     titleWithoutPersonal: 'Choose an organization',
   },
+  oauthConsent: {
+    action__allow: 'Allow',
+    action__deny: 'Deny',
+    redirectUriModal: {
+      subtitle: 'Make sure you trust {{applicationName}} and that this URL belongs to {{applicationName}}.',
+      title: 'Redirect URL',
+    },
+    scopeList: {
+      title: 'This will allow {{applicationName}} access to:',
+    },
+    subtitle: 'wants to access {{applicationName}} on behalf of {{identifier}}',
+  },
   organizationProfile: {
     apiKeysPage: {
       title: 'API keys',
