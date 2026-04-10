@@ -891,6 +891,9 @@ export interface Clerk {
 
   /**
    * Returns the configured URL where [`<Waitlist />`](https://clerk.com/docs/reference/components/authentication/waitlist) is mounted or a custom waitlist page is rendered.
+   *
+   * @param opts - Options to control the waitlist URL.
+   * @param opts.initialValues - Initial values to prefill the waitlist form.
    */
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
@@ -930,7 +933,7 @@ export interface Clerk {
   redirectToUserProfile: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where [`<OrganizationProfile />`](https://clerk.com/docs/reference/components/organization/organization-profile) is mounted. This method uses the [`navigate()`](#navigate) method under the hood.
+   * Redirects to the configured URL where [`<OrganizationProfile />`](https://clerk.com/docs/reference/components/organization/organization-profile) is mounted. This method uses the [`navigate()`](https://clerk.com/docs/reference/objects/clerk#navigate) method under the hood.
    *
    * Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
    */
@@ -1157,12 +1160,11 @@ export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
 
 /**
  * A function used to navigate to a given URL after certain steps in the Clerk processes.
- * @inline
- * @param to - The URL or relative path to navigate to.
- * @param options - Optional configuration. `NavigateOptions` is an object that accepts the following properties:
  *
- * - `replace?` (boolean): If `true`, replace the current history entry instead of pushing a new one.
- * - `metadata?` (RouterMetadata): Optional router metadata.
+ * @param to - The URL or relative path to navigate to.
+ * @param options - Optional configuration.
+ * @param options.replace? - If `true`, replace the current history entry instead of pushing a new one.
+ * @param options.metadata? - Optional router metadata.
  */
 export type CustomNavigation = (to: string, options?: NavigateOptions) => Promise<unknown> | void;
 
@@ -1361,8 +1363,15 @@ export type ClerkOptions = ClerkOptionsNavigation &
     taskUrls?: Partial<Record<SessionTask['key'], string>>;
   };
 
+/** @inline */
 export interface NavigateOptions {
+  /**
+   * If `true`, replace the current history entry instead of pushing a new one.
+   */
   replace?: boolean;
+  /**
+   * Optional router metadata.
+   */
   metadata?: RouterMetadata;
 }
 
@@ -1484,13 +1493,9 @@ export type SetActiveParams = {
   redirectUrl?: string;
 
   /**
-   * A custom navigation function to be called just before the session and/or Organization is set.
+   * A custom navigation function to be called just before the session and/or Organization is set. When provided, it takes precedence over the `redirectUrl` parameter for navigation.
    *
-   * When provided, it takes precedence over the `redirectUrl` parameter for navigation.
-   *
-   * The callback receives a `decorateUrl` function that should be used to wrap destination URLs.
-   * This enables Safari ITP cookie refresh when needed. The decorated URL may be an external URL
-   * (starting with `https://`) that requires `window.location.href` instead of client-side navigation.
+   * The callback receives a `decorateUrl` function that should be used to wrap destination URLs. This enables Safari ITP cookie refresh when needed. The decorated URL may be an external URL (starting with `https://`) that requires `window.location.href` instead of client-side navigation.
    *
    * @example
    * ```typescript
@@ -1553,7 +1558,7 @@ export type SignInProps = RoutingOptions & {
    */
   signUpUrl?: string;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -1636,7 +1641,7 @@ export type __internal_UserVerificationProps = RoutingOptions & {
   level?: SessionVerificationLevel;
 
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -1725,7 +1730,7 @@ export type SignUpProps = RoutingOptions & {
    */
   signInUrl?: string;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -1772,7 +1777,7 @@ export type SignUpModalProps = WithoutRouting<SignUpProps> & {
 /** @document */
 export type UserProfileProps = RoutingOptions & {
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -1828,7 +1833,7 @@ export type OrganizationProfileProps = RoutingOptions & {
    */
   afterLeaveOrganizationUrl?: string;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -1888,7 +1893,7 @@ export type CreateOrganizationProps = RoutingOptions & {
    */
   skipInvitationScreen?: boolean;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -1950,7 +1955,7 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   afterSwitchSessionUrl?: string;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -2052,7 +2057,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     skipInvitationScreen?: boolean;
     /**
-     * Customisation options to fully match the Clerk components to your own brand.
+     * Customization options to fully match the Clerk components to your own brand.
      * These options serve as overrides and will be merged with the global `appearance`
      * prop of ClerkProvider(if one is provided)
      */
@@ -2084,7 +2089,7 @@ export type OrganizationListProps = {
     | ((organization: OrganizationResource) => string)
     | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -2121,7 +2126,7 @@ export type WaitlistProps = {
    */
   afterJoinWaitlistUrl?: string;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvided (if one is provided)
    */
@@ -2174,7 +2179,7 @@ type PricingTableBaseProps = {
    */
   for?: ForPayerType;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -2200,7 +2205,7 @@ export type APIKeysProps = {
    */
   perPage?: number;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
