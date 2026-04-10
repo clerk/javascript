@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.clerk.api.Clerk
-import com.clerk.api.network.model.client.Client
 import com.clerk.api.network.serialization.ClerkResult
 import com.facebook.react.bridge.ActivityEventListener
 import com.facebook.react.bridge.Promise
@@ -246,8 +245,10 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     override fun getClientToken(promise: Promise) {
         try {
-            val prefs = reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
-            val deviceToken = prefs.getString("DEVICE_TOKEN", null)
+            // Use the SDK's public API which handles encrypted storage transparently.
+            // Direct SharedPreferences reads break on clerk-android >= 1.0.11 where
+            // DEVICE_TOKEN is encrypted via StorageCipher.
+            val deviceToken = Clerk.getDeviceToken()
             promise.resolve(deviceToken)
         } catch (e: Exception) {
             debugLog(TAG, "getClientToken failed: ${e.message}")
@@ -273,17 +274,8 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
         coroutineScope.launch {
             try {
                 Clerk.auth.signOut()
-                // After sign-out, fetch a brand-new client from the server,
-                // skipping the in-memory client_id header. Without skipping,
-                // the server echoes back the SAME client (with the previous
-                // user's in-progress signIn still attached), and AuthView
-                // re-mounts into the "Get help" fallback because the stale
-                // signIn's status has no startingFirstFactor.
-                try {
-                    Client.getSkippingClientId()
-                } catch (e: Exception) {
-                    debugLog(TAG, "Client.getSkippingClientId() after signOut failed: ${e.message}")
-                }
+                // Client refresh after sign-out is handled by the clerk-android
+                // SDK (SignOutService.signOut calls Client.getSkippingClientId).
                 promise.resolve(null)
             } catch (e: Exception) {
                 promise.reject("E_SIGN_OUT_FAILED", e.message ?: "Sign out failed", e)
