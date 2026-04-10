@@ -1259,6 +1259,10 @@ export type __internal_LocalizationResource = {
     };
     action__deny: LocalizationValue;
     action__allow: LocalizationValue;
+    warning: LocalizationValue<'applicationName' | 'domainAction'>;
+    redirectNotice: LocalizationValue<'domainAction'>;
+    offlineAccessNotice: LocalizationValue;
+    viewFullUrl: LocalizationValue;
     redirectUriModal: {
       title: LocalizationValue;
       subtitle: LocalizationValue<'applicationName'>;
