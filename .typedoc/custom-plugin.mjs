@@ -100,6 +100,7 @@ const LINK_REPLACEMENTS = [
   ['checkout-flow-resource', '/docs/reference/hooks/use-checkout#checkout-flow-resource'],
   ['organization-creation-defaults-resource', '#organization-creation-defaults-resource'],
   ['billing-namespace', '/docs/reference/objects/billing'],
+  ['client-resource', '/docs/reference/objects/client'],
 ];
 
 /**
