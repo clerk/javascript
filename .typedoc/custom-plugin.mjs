@@ -261,6 +261,24 @@ function getCatchAllReplacements() {
 }
 
 /**
+ * Same replacement pass as the catch-all loop in `MarkdownPageEvent.END` (after relative links).
+ * Used by `extract-methods.mjs`, which writes MDX outside TypeDoc and never hits that hook.
+ *
+ * @param {string} contents
+ */
+export function applyCatchAllMdReplacements(contents) {
+  if (!contents) {
+    return contents;
+  }
+  let out = contents;
+  for (const { pattern, replace } of getCatchAllReplacements()) {
+    // @ts-ignore — string | function
+    out = out.replace(pattern, replace);
+  }
+  return out;
+}
+
+/**
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
 export function load(app) {
@@ -274,13 +292,8 @@ export function load(app) {
       }
     }
 
-    const catchAllReplacements = getCatchAllReplacements();
-
-    for (const { pattern, replace } of catchAllReplacements) {
-      if (output.contents) {
-        // @ts-ignore - Mixture of string and function replacements
-        output.contents = output.contents.replace(pattern, replace);
-      }
+    if (output.contents) {
+      output.contents = applyCatchAllMdReplacements(output.contents);
     }
 
     if (fileName) {

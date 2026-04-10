@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { Application, Comment, ReflectionKind } from 'typedoc';
 
 import typedocConfig from '../typedoc.config.mjs';
+import { applyCatchAllMdReplacements } from './custom-plugin.mjs';
 import { REFERENCE_OBJECTS_LIST, REFERENCE_OBJECT_PAGE_SYMBOLS } from './reference-objects.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -501,11 +502,14 @@ function buildMethodMdx(decl) {
   const ts = ['```typescript', formatTypeScriptSignature(sig, name), '```'].join('\n');
   const paramsMd = parametersMarkdownTable(sig, decl);
 
-  const parts = [title, '', description, '', ts, ''];
-  if (paramsMd) {
-    parts.push(paramsMd);
+  // Same catch-all pass as `custom-plugin.mjs` — not run automatically because this MDX bypasses TypeDoc's renderer. Skip the ```typescript``` fence so signatures stay plain code.
+  const head = applyCatchAllMdReplacements([title, '', description].join('\n'));
+  const paramsProcessed = paramsMd ? applyCatchAllMdReplacements(paramsMd) : '';
+  const chunks = [head, ts];
+  if (paramsProcessed) {
+    chunks.push(paramsProcessed);
   }
-  return parts.join('\n').trim() + '\n';
+  return chunks.join('\n\n').trim() + '\n';
 }
 
 /**
