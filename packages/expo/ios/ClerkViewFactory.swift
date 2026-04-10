@@ -348,7 +348,12 @@ class ClerkAuthWrapperViewController: UIHostingController<ClerkAuthWrapperView> 
   override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
     if isBeingDismissed {
-      completeOnce(.success(["cancelled": true]))
+      // Check if auth completed (session exists) vs user cancelled
+      if let session = Clerk.shared.session, session.id != initialSessionId {
+        completeOnce(.success(["sessionId": session.id, "type": "signIn"]))
+      } else {
+        completeOnce(.success(["cancelled": true]))
+      }
     }
   }
 
