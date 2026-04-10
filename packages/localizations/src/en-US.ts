@@ -297,6 +297,8 @@ export const enUS: LocalizationResource = {
   oauthConsent: {
     action__allow: 'Allow',
     action__deny: 'Deny',
+    offlineAccessNotice: " You'll stay signed in until you sign out or revoke access.",
+    redirectNotice: 'If you allow access, this app will redirect you to {{domainAction}}.',
     redirectUriModal: {
       subtitle: 'Make sure you trust {{applicationName}} and that this URL belongs to {{applicationName}}.',
       title: 'Redirect URL',
@@ -305,6 +307,9 @@ export const enUS: LocalizationResource = {
       title: 'This will allow {{applicationName}} access to:',
     },
     subtitle: 'wants to access {{applicationName}} on behalf of {{identifier}}',
+    viewFullUrl: 'View full URL',
+    warning:
+      'Make sure that you trust {{applicationName}} ({{domainAction}}). You may be sharing sensitive data with this site or app.',
   },
   organizationProfile: {
     apiKeysPage: {
