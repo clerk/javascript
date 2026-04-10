@@ -7,6 +7,237 @@ import { REFERENCE_OBJECTS_LIST } from './reference-objects.mjs';
 export { REFERENCE_OBJECTS_LIST };
 
 /**
+ * Unwrap optional TypeDoc types so referenced object shapes are still found.
+ *
+ * @param {import('typedoc').Type} t
+ * @returns {import('typedoc').Type}
+ */
+/**
+ * Prefer structural checks over `instanceof` so we still match when multiple TypeDoc copies are loaded
+ * (otherwise `instanceof IntersectionType` is false at render time).
+ *
+ * @param {import('typedoc').Type | undefined} t
+ * @returns {t is import('typedoc').IntersectionType}
+ */
+function isIntersectionTypeDoc(t) {
+  const o = /** @type {{ type?: string; types?: import('typedoc').Type[] } | null} */ (t);
+  return Boolean(o && typeof o === 'object' && o.type === 'intersection' && Array.isArray(o.types));
+}
+
+/**
+ * @param {import('typedoc').Type | undefined} t
+ * @returns {t is import('typedoc').ReferenceType}
+ */
+function isReferenceTypeDoc(/** @type {import('typedoc').Type | undefined} */ t) {
+  return Boolean(t && typeof t === 'object' && /** @type {{ type?: string }} */ (t).type === 'reference');
+}
+
+/**
+ * @param {import('typedoc').Type | undefined} t
+ * @returns {t is import('typedoc').ReflectionType}
+ */
+function isReflectionTypeDoc(/** @type {import('typedoc').Type | undefined} */ t) {
+  return Boolean(t && typeof t === 'object' && /** @type {{ type?: string }} */ (t).type === 'reflection');
+}
+
+/**
+ * @param {import('typedoc').Type | undefined} t
+ */
+function unwrapOptionalType(t) {
+  if (
+    t &&
+    typeof t === 'object' &&
+    'type' in t &&
+    /** @type {{ type: string }} */ (t).type === 'optional' &&
+    'elementType' in t
+  ) {
+    return /** @type {{ elementType: import('typedoc').Type }} */ (t).elementType;
+  }
+  return t;
+}
+
+/**
+ * When `ReferenceType.reflection` is unset (common for imported aliases), resolve by name in the converted project.
+ *
+ * @param {import('typedoc').ProjectReflection | undefined} project
+ * @param {string} name
+ * @returns {import('typedoc').DeclarationReflection | undefined}
+ */
+function findNamedTypeDeclaration(project, name) {
+  if (!project?.reflections) {
+    return undefined;
+  }
+  for (const r of Object.values(project.reflections)) {
+    if (r.name !== name) {
+      continue;
+    }
+    if (r.kind === ReflectionKind.TypeAlias || r.kind === ReflectionKind.Interface) {
+      return /** @type {import('typedoc').DeclarationReflection} */ (r);
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Collect documented property reflections from one intersection arm (object literal, type alias, interface, nested `&`).
+ *
+ * @param {import('typedoc').Type} t
+ * @param {Set<number>} visitedReflectionIds
+ * @param {import('typedoc').ProjectReflection | undefined} project
+ * @returns {import('typedoc').DeclarationReflection[]}
+ */
+function collectPropertyReflectionsFromIntersectionArm(t, visitedReflectionIds, project) {
+  const unwrapped = unwrapOptionalType(t);
+  if (!unwrapped) {
+    return [];
+  }
+
+  if (isReflectionTypeDoc(unwrapped)) {
+    const decl = unwrapped.declaration;
+    if (!decl) {
+      return [];
+    }
+    if (decl.signatures?.length && !decl.children?.length) {
+      return [];
+    }
+    return (decl.children ?? []).filter(c => c.kind === ReflectionKind.Property);
+  }
+
+  if (isReferenceTypeDoc(unwrapped)) {
+    let ref = unwrapped.reflection;
+    if (!ref && unwrapped.name && project) {
+      ref = findNamedTypeDeclaration(project, unwrapped.name);
+    }
+    if (!ref) {
+      return [];
+    }
+    const declRef = /** @type {import('typedoc').DeclarationReflection | undefined} */ (
+      'kind' in ref ? ref : undefined
+    );
+    if (!declRef) {
+      return [];
+    }
+    const id = declRef.id;
+    if (id != null) {
+      if (visitedReflectionIds.has(id)) {
+        return [];
+      }
+      visitedReflectionIds.add(id);
+    }
+    try {
+      if (declRef.kind === ReflectionKind.TypeAlias) {
+        if (declRef.children?.length) {
+          return declRef.children.filter(
+            /** @param {import('typedoc').DeclarationReflection} c */
+            c => c.kind === ReflectionKind.Property,
+          );
+        }
+        if (declRef.type) {
+          return collectPropertyReflectionsFromIntersectionArm(declRef.type, visitedReflectionIds, project);
+        }
+        return [];
+      }
+      if (
+        (declRef.kind === ReflectionKind.Interface || declRef.kind === ReflectionKind.Class) &&
+        declRef.children?.length
+      ) {
+        return declRef.children.filter(
+          /** @param {import('typedoc').DeclarationReflection} c */
+          c => c.kind === ReflectionKind.Property,
+        );
+      }
+    } finally {
+      if (id != null) {
+        visitedReflectionIds.delete(id);
+      }
+    }
+    return [];
+  }
+
+  if (isIntersectionTypeDoc(unwrapped)) {
+    /** @type {import('typedoc').DeclarationReflection[]} */
+    const out = [];
+    for (const arm of unwrapped.types) {
+      out.push(...collectPropertyReflectionsFromIntersectionArm(arm, visitedReflectionIds, project));
+    }
+    return out;
+  }
+
+  return [];
+}
+
+/**
+ * Merge intersection arms into one property list (later duplicate names override earlier ones, then sort by name).
+ *
+ * @param {import('typedoc').IntersectionType} intersection
+ * @param {import('typedoc').ProjectReflection | undefined} project
+ * @returns {import('typedoc').DeclarationReflection[]}
+ */
+function mergeIntersectionPropertyReflections(intersection, project) {
+  /** @type {Map<string, import('typedoc').DeclarationReflection>} */
+  const byName = new Map();
+  const visited = new Set();
+  for (const arm of intersection.types) {
+    for (const p of collectPropertyReflectionsFromIntersectionArm(arm, visited, project)) {
+      byName.set(p.name, p);
+    }
+  }
+  return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @param {import('typedoc').DeclarationReflection} model
+ * @param {{ nested?: boolean; headingLevel?: number }} opts
+ * @param {import('typedoc').DeclarationReflection[]} mergedChildren
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext['partials']} superPartials
+ */
+function renderMergedIntersectionDeclaration(ctx, model, opts, mergedChildren, superPartials) {
+  /** @type {string[]} */
+  const md = [];
+  const headingLevel = opts.headingLevel ?? 2;
+  const nested = opts.nested ?? false;
+
+  if (!nested && model.sources && !ctx.options.getValue('disableSources')) {
+    md.push(superPartials.sources(model));
+  }
+  if (model?.documents) {
+    md.push(superPartials.documents(model, { headingLevel }));
+  }
+  if (model.comment) {
+    md.push(
+      superPartials.comment(model.comment, {
+        headingLevel,
+        showSummary: true,
+        showTags: false,
+      }),
+    );
+  }
+
+  const synthetic = /** @type {import('typedoc').DeclarationReflection} */ (
+    /** @type {unknown} */ ({
+      children: mergedChildren,
+      parent: model,
+      kind: ReflectionKind.TypeLiteral,
+    })
+  );
+  md.push(superPartials.typeDeclaration(synthetic, { headingLevel }));
+
+  if (model.comment) {
+    md.push(
+      superPartials.comment(model.comment, {
+        headingLevel,
+        showSummary: false,
+        showTags: true,
+        showReturns: true,
+      }),
+    );
+  }
+  md.push(superPartials.inheritance(model, { headingLevel: opts.headingLevel ?? headingLevel }));
+  return md.filter(Boolean).join('\n\n');
+}
+
+/**
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
 export function load(app) {
@@ -355,6 +586,21 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        * @param {{ headingLevel: number, nested?: boolean }} options
        */
       declaration: (model, options = { headingLevel: 2, nested: false }) => {
+        const opts = { nested: false, ...options };
+        const customizedModel = model;
+        customizedModel.typeParameters = undefined;
+
+        if (!opts.nested && model.type && isIntersectionTypeDoc(model.type)) {
+          const merged = mergeIntersectionPropertyReflections(
+            /** @type {import('typedoc').IntersectionType} */ (model.type),
+            model.project,
+          );
+          if (merged.length > 0) {
+            const output = renderMergedIntersectionDeclaration(this, customizedModel, opts, merged, superPartials);
+            return output.replace(/^## Type declaration$/gm, '');
+          }
+        }
+
         // Create a local override
         const localPartials = {
           ...this.partials,
@@ -362,9 +608,6 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         };
         // Store original so that we can restore it later
         const originalPartials = this.partials;
-
-        const customizedModel = model;
-        customizedModel.typeParameters = undefined;
 
         this.partials = localPartials;
         const output = superPartials.declaration(customizedModel, options);
