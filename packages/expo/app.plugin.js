@@ -618,7 +618,7 @@ const VALID_COLOR_KEYS = [
   'shadow',
 ];
 
-const HEX_COLOR_REGEX = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
+const HEX_COLOR_REGEX = /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
 
 function validateThemeJson(theme) {
   const validateColors = (colors, label) => {

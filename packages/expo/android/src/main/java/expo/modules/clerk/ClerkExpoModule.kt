@@ -438,7 +438,12 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
         return try {
             when (cleaned.length) {
                 6 -> Color(android.graphics.Color.parseColor("#FF$cleaned"))
-                8 -> Color(android.graphics.Color.parseColor("#$cleaned"))
+                // Theme JSON uses RRGGBBAA; Android parseColor expects AARRGGBB
+                8 -> {
+                    val rrggbb = cleaned.substring(0, 6)
+                    val aa = cleaned.substring(6, 8)
+                    Color(android.graphics.Color.parseColor("#$aa$rrggbb"))
+                }
                 else -> null
             }
         } catch (e: Exception) {
