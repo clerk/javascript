@@ -865,13 +865,15 @@ export interface Clerk {
 
   /**
    * Returns the configured `afterSignInUrl` of the instance.
-   * @param params - Optional query parameters to append to the URL.
+   * @param params - Optional configuration.
+   * @param params.params - Optional query parameters to append to the URL.
    */
   buildAfterSignInUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
    * Returns the configured `afterSignInUrl` of the instance.
-   * @param params - Optional query parameters to append to the URL.
+   * @param params - Optional configuration.
+   * @param params.params - Optional query parameters to append to the URL.
    */
   buildAfterSignUpUrl({ params }?: { params?: URLSearchParams }): string;
 
@@ -999,7 +1001,7 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
-   * Completes an email link verification flow started by {@link Clerk.client.signIn.createEmailLinkFlow} or {@link Clerk.client.signUp.createEmailLinkFlow}, by processing the verification results from the redirect URL query parameters. This method should be called after the user is redirected back from visiting the verification link in their email.
+   * Completes an email link verification flow started by `Clerk.client.signIn.createEmailLinkFlow` or `Clerk.client.signUp.createEmailLinkFlow`, by processing the verification results from the redirect URL query parameters. This method should be called after the user is redirected back from visiting the verification link in their email.
    * @param params - Allows you to define the URLs where the user should be redirected to on successful verification or pending/completed sign-up or sign-in attempts. If the email link is successfully verified on another device, there's a callback function parameter that allows custom code execution.
    * @param customNavigate - A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
    */
@@ -1496,7 +1498,7 @@ export type SetActiveParams = {
   /**
    * A custom navigation function to be called just before the session and/or Organization is set. When provided, it takes precedence over the `redirectUrl` parameter for navigation.
    *
-   * The callback receives a `decorateUrl` function that should be used to wrap destination URLs. This enables Safari ITP cookie refresh when needed. The decorated URL may be an external URL (starting with `https://`) that requires `window.location.href` instead of client-side navigation.
+   * The callback receives a `decorateUrl` function that should be used to wrap destination URLs. This enables Safari ITP cookie refresh when needed. The decorated URL may be an external URL (starting with `https://`) that requires `window.location.href` instead of client-side navigation. See the [section on using the `navigate()` parameter](https://clerk.com/docs/reference/objects/clerk#using-the-navigate-parameter) for more details.
    *
    * @example
    * ```typescript
@@ -1598,6 +1600,9 @@ export type SignInProps = RoutingOptions & {
   SignUpFallbackRedirectUrl &
   AfterSignOutUrl;
 
+/**
+ * @interface
+ */
 export interface TransferableOption {
   /**
    * Indicates whether or not sign-in attempts are transferable to the sign-up flow. Defaults to `true`. When set to `false`, prevents [opaque sign-ups](!opaque-sign-up) when a user attempts to sign in via OAuth with an email that doesn't exist.

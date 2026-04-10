@@ -101,6 +101,8 @@ const LINK_REPLACEMENTS = [
   ['organization-creation-defaults-resource', '#organization-creation-defaults-resource'],
   ['billing-namespace', '/docs/reference/objects/billing'],
   ['client-resource', '/docs/reference/objects/client'],
+  ['redirect-options', '/docs/reference/types/redirect-options'],
+  ['handle-o-auth-call-back-params', '/docs/reference/types/handle-o-auth-call-back-params'],
 ];
 
 /**
@@ -125,6 +127,24 @@ function getRelativeLinkReplacements() {
       replace: (/** @type {string} */ _match, anchor = '') => `(${newPath}${anchor})`,
     };
   });
+}
+
+/**
+ * First pass of `MarkdownPageEvent.END`: rewrite `(foo.mdx)` / relative paths to `/docs/...` (see {@link LINK_REPLACEMENTS}).
+ * Used by `extract-methods.mjs`, which does not go through the renderer hook.
+ *
+ * @param {string} contents
+ */
+export function applyRelativeLinkReplacements(contents) {
+  if (!contents) {
+    return contents;
+  }
+  let out = contents;
+  for (const { pattern, replace } of getRelativeLinkReplacements()) {
+    // @ts-ignore — string | function
+    out = out.replace(pattern, replace);
+  }
+  return out;
 }
 
 function getCatchAllReplacements() {
@@ -180,7 +200,10 @@ function getCatchAllReplacements() {
       pattern: /(?<![\[\w`#])`?SignedInSessionResource`?(?![\]\w`])/g,
       replace: '[`SignedInSessionResource`](/docs/reference/objects/session)',
     },
-
+    {
+      pattern: /(?<![#])`SignInRedirectOptions`/g,
+      replace: '[`SignInRedirectOptions`](/docs/reference/types/sign-in-redirect-options)',
+    },
     {
       pattern: /(?<![#])`SignUpRedirectOptions`/g,
       replace: '[`SignUpRedirectOptions`](/docs/reference/types/sign-up-redirect-options)',
@@ -232,10 +255,6 @@ function getCatchAllReplacements() {
       pattern: /(?<![#])`OrganizationMembershipPublicMetadata`/g,
       replace:
         '[`OrganizationMembershipPublicMetadata`](/docs/reference/types/metadata#organization-membership-public-metadata)',
-    },
-    {
-      pattern: /(?<![#])`RedirectOptions`/g,
-      replace: '[`RedirectOptions`](/docs/reference/types/redirect-options)',
     },
     {
       pattern: /(?<![\[\w`#])`?UserResource`?(?![\]\w`])/g,
@@ -311,7 +330,7 @@ function restoreProtectedInlineCodeSpans(text, placeholders) {
 }
 
 /**
- * Same replacement pass as the catch-all loop in `MarkdownPageEvent.END` (after relative links).
+ * Second pass of `MarkdownPageEvent.END` (after {@link applyRelativeLinkReplacements}).
  * Used by `extract-methods.mjs`, which writes MDX outside TypeDoc and never hits that hook.
  *
  * Skips ATX heading lines (`#` … `######`) so titles like `#### SetActiveParams` are never linkified.
@@ -349,12 +368,9 @@ export function applyCatchAllMdReplacements(contents) {
 export function load(app) {
   app.renderer.on(MarkdownPageEvent.END, output => {
     const fileName = output.url.split('/').pop();
-    const linkReplacements = getRelativeLinkReplacements();
 
-    for (const { pattern, replace } of linkReplacements) {
-      if (output.contents) {
-        output.contents = output.contents.replace(pattern, replace);
-      }
+    if (output.contents) {
+      output.contents = applyRelativeLinkReplacements(output.contents);
     }
 
     if (output.contents) {

@@ -4,18 +4,184 @@
  * and writes one .mdx per method (kebab file name) next to the main reference page output.
  *
  * Run after `typedoc` (same cwd as repo root). Uses a second TypeDoc convert pass to read reflections.
+ *
+ * Like `extract-returns-and-params.mjs`, parameter tables are not hand-built: they use the same
+ * `MarkdownThemeContext.partials` as TypeDoc markdown output (`parametersTable` / `propertiesTable`, which call
+ * `someType` and therefore pick up `custom-theme.mjs` union/`&lt;code&gt;` behavior). Router + theme are prepared
+ * via `prepare-markdown-renderer.mjs` (same idea as `typedoc-plugin-markdown` `render()`).
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Application, Comment, ReflectionKind } from 'typedoc';
+import { Application, Comment, PageKind, ReflectionKind } from 'typedoc';
+import { MarkdownPageEvent, MarkdownTheme } from 'typedoc-plugin-markdown';
 
 import typedocConfig from '../typedoc.config.mjs';
-import { applyCatchAllMdReplacements } from './custom-plugin.mjs';
+import { applyCatchAllMdReplacements, applyRelativeLinkReplacements } from './custom-plugin.mjs';
+import { prepareMarkdownRenderer } from './prepare-markdown-renderer.mjs';
 import { REFERENCE_OBJECTS_LIST, REFERENCE_OBJECT_PAGE_SYMBOLS } from './reference-objects.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+/**
+ * @param {number} level
+ * @param {string} text
+ */
+function markdownHeading(level, text) {
+  const l = Math.min(Math.max(level, 1), 6);
+  return `${'#'.repeat(l)} ${text}`;
+}
+
+/**
+ * Same as typedoc-plugin-markdown `removeLineBreaks` for table cells.
+ *
+ * @param {string | undefined} str
+ */
+function removeLineBreaksForTableCell(str) {
+  return str?.replace(/\r?\n/g, ' ').replace(/ {2,}/g, ' ');
+}
+
+/**
+ * Append data rows to a markdown table string (header + separator + rows).
+ *
+ * @param {string} tableMd
+ * @param {string[]} rowLines Lines like `| a | b | c |`
+ */
+function appendMarkdownTableRows(tableMd, rowLines) {
+  if (!rowLines.length) {
+    return tableMd;
+  }
+  return `${tableMd.trimEnd()}\n${rowLines.join('\n')}\n`;
+}
+
+/**
+ * Post-process the theme’s parameters markdown table. TypeDoc flattens object params as `parent.child` and may
+ * interleave those rows with other parameters. Here we (1) move each `parent.*` block directly under `parent`,
+ * and (2) rewrite dotted paths in the name column to optional-chaining (`parent?.child`, `a?.b?.c`). Top-level
+ * names are unchanged (`foo?`, `exa`).
+ *
+ * @param {string} tableMd
+ */
+function formatMethodParametersTable(tableMd) {
+  const leadingNewlines = (tableMd.match(/^\n+/) ?? [''])[0];
+  const nonEmpty = tableMd.split('\n').filter(l => l.trim().length);
+  if (nonEmpty.length < 3) {
+    return tableMd;
+  }
+  const header = nonEmpty[0];
+  const sep = nonEmpty[1];
+  const dataLines = nonEmpty.slice(2).filter(l => l.trim().startsWith('|'));
+  if (dataLines.length <= 1) {
+    return tableMd;
+  }
+
+  /** @param {string} line */
+  const firstName = line => {
+    const m = line.match(/^\|\s*(?:<a\s+id="[^"]*"\s*><\/a>\s*)?`([^`]+)`/);
+    return m ? m[1] : '';
+  };
+  /** `parent.child` / `parent?.child` → grouping key `parent` (matches top-level `parent` or `parent?` via fallback below). */
+  /** @param {string} raw */
+  const parentOfNested = raw => {
+    const j = raw.indexOf('?.');
+    if (j !== -1) {
+      return raw.slice(0, j);
+    }
+    const i = raw.indexOf('.');
+    return i === -1 ? '' : raw.slice(0, i);
+  };
+  /** `a.b.c` → `a?.b?.c`; leave `foo?` and names without `.` alone. */
+  /** @param {string} raw */
+  const nameForDisplay = raw => (!raw.includes('.') || raw.includes('?.') ? raw : raw.split('.').join('?.'));
+  /** @param {string} line @param {string} name */
+  const replaceFirstName = (line, name) =>
+    line.replace(/^(\|\s*(?:<a\s+id="[^"]*"\s*><\/a>\s*)?)`[^`]+`/, `$1\`${name}\``);
+
+  const topLevelOrder = [];
+  const seenTop = new Set();
+  /** @type {Map<string, string[]>} */
+  const childrenOf = new Map();
+
+  for (const line of dataLines) {
+    const raw = firstName(line);
+    if (!raw) {
+      continue;
+    }
+    if (!raw.includes('.')) {
+      if (!seenTop.has(raw)) {
+        seenTop.add(raw);
+        topLevelOrder.push(raw);
+      }
+      continue;
+    }
+    const p = parentOfNested(raw);
+    if (!p) {
+      continue;
+    }
+    let bucket = childrenOf.get(p);
+    if (!bucket) {
+      bucket = [];
+      childrenOf.set(p, bucket);
+    }
+    bucket.push(line);
+  }
+
+  for (const lines of childrenOf.values()) {
+    lines.sort((a, b) => firstName(a).localeCompare(firstName(b)));
+  }
+
+  /** @param {string} top */
+  const rowsForParent = top =>
+    childrenOf.get(top) ?? (top.endsWith('?') ? childrenOf.get(top.slice(0, -1)) : undefined);
+
+  const body = [];
+  const emitted = new Set();
+
+  for (const top of topLevelOrder) {
+    const topLine = dataLines.find(l => firstName(l) === top);
+    if (topLine) {
+      const r = firstName(topLine);
+      body.push(replaceFirstName(topLine, nameForDisplay(r)));
+      emitted.add(topLine);
+    }
+    const kids = rowsForParent(top);
+    if (kids) {
+      for (const line of kids) {
+        body.push(replaceFirstName(line, nameForDisplay(firstName(line))));
+        emitted.add(line);
+      }
+    }
+  }
+
+  for (const line of dataLines) {
+    if (!emitted.has(line)) {
+      const r = firstName(line);
+      body.push(r ? replaceFirstName(line, nameForDisplay(r)) : line);
+    }
+  }
+
+  return `${leadingNewlines}${[header, sep, ...body].join('\n')}\n`;
+}
+
+/**
+ * @param {import('typedoc').Application} app
+ * @param {import('typedoc').ProjectReflection} project
+ * @param {string} pageUrl e.g. `shared/clerk.mdx`
+ * @param {import('typedoc').DeclarationReflection} interfaceDecl
+ */
+function createThemeContextForReferencePage(app, project, pageUrl, interfaceDecl) {
+  const page = new MarkdownPageEvent(interfaceDecl);
+  page.url = pageUrl;
+  page.filename = path.join(app.options.getValue('out') ?? '', pageUrl);
+  page.pageKind = PageKind.Reflection;
+  page.project = project;
+  const theme = /** @type {InstanceType<typeof MarkdownTheme> | undefined} */ (app.renderer.theme);
+  if (!theme || typeof theme.getRenderContext !== 'function') {
+    throw new Error('[extract-methods] Renderer theme is not ready; call prepareMarkdownRenderer(app) after convert');
+  }
+  return /** @type {import('typedoc-plugin-markdown').MarkdownThemeContext} */ (theme.getRenderContext(page));
+}
 
 /**
  * TypeDoc `code` display parts often already include backticks (same as {@link Comment.combineDisplayParts}).
@@ -180,6 +346,55 @@ function formatReturnsLineFromTag(tag) {
 /**
  * @param {import('typedoc').Comment | undefined} comment
  */
+/**
+ * `typedoc-plugin-markdown` table partials include `@example` in Description cells. For extract-methods, we want to exclude examples from the generated output.
+ *
+ * Uses the same `getFlattenedDeclarations` list as `propertiesTable` so nested property rows omit examples too.
+ *
+ * @template T
+ * @param {import('typedoc').Reflection[]} roots
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @param {() => T} render
+ * @returns {T}
+ */
+function renderMemberTableOmittingExampleBlocks(roots, ctx, render) {
+  const flatten =
+    typeof ctx.helpers?.getFlattenedDeclarations === 'function'
+      ? ctx.helpers.getFlattenedDeclarations(
+          /** @type {import('typedoc').DeclarationReflection[]} */ (/** @type {unknown} */ (roots)),
+        )
+      : roots;
+  /** @type {Set<import('typedoc').Comment>} */
+  const processedComments = new Set();
+  /** @type {{ ref: import('typedoc').Reflection; orig: import('typedoc').Comment }[]} */
+  const restore = [];
+  for (const r of flatten) {
+    const c = 'comment' in r ? r.comment : undefined;
+    if (!c?.getTag('@example') || processedComments.has(c)) {
+      continue;
+    }
+    processedComments.add(c);
+    const next = c.clone();
+    next.removeTags('@example');
+    for (const ref of flatten) {
+      if (ref.comment === c) {
+        ref.comment = next;
+        restore.push({ ref, orig: c });
+      }
+    }
+  }
+  try {
+    return render();
+  } finally {
+    for (const { ref, orig } of restore) {
+      ref.comment = orig;
+    }
+  }
+}
+
+/**
+ * @param {import('typedoc').Comment | undefined} comment
+ */
 function commentSummaryAndBody(comment) {
   if (!comment) {
     return '';
@@ -212,23 +427,6 @@ function appendSignatureOnlyReturns(declComment, sigComment) {
     return '';
   }
   return formatReturnsLineFromTag(tag);
-}
-
-/**
- * @param {import('typedoc').SignatureReflection} sig
- * @param {import('typedoc').ParameterReflection} param
- * @param {import('typedoc').DeclarationReflection} decl
- */
-function getParamDescription(sig, param, decl) {
-  if (param.comment?.summary?.length) {
-    return displayPartsToString(param.comment.summary).trim();
-  }
-  const tag =
-    sig.comment?.getIdentifiedTag(param.name, '@param') ?? decl.comment?.getIdentifiedTag(param.name, '@param');
-  if (tag?.content?.length) {
-    return Comment.combineDisplayParts(tag.content).trim();
-  }
-  return '';
 }
 
 /**
@@ -278,12 +476,10 @@ function resolveDeclarationWithObjectMembers(t) {
 /**
  * @param {string} baseName
  * @param {string[]} pathSegments
- * @param {boolean} parentOptional
  */
-function formatNestedParamNameColumn(baseName, pathSegments, parentOptional) {
-  const chain = pathSegments.join('.');
-  const inner = parentOptional ? `${baseName}?.${chain}` : `${baseName}.${chain}`;
-  return `\`${inner}\``;
+function formatNestedParamNameColumn(baseName, pathSegments) {
+  const pathChain = pathSegments.join('?.');
+  return `\`${baseName}?.${pathChain}\``;
 }
 
 /**
@@ -293,7 +489,20 @@ function formatNestedParamNameColumn(baseName, pathSegments, parentOptional) {
  * @param {import('typedoc').ParameterReflection} param
  * @returns {string[]}
  */
-function nestedParameterRowsFromDocumentedProperties(param) {
+/**
+ * @param {import('typedoc').ParameterReflection} param
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ */
+function nestedParameterRowsFromDocumentedProperties(param, ctx) {
+  // `parametersTable` already flattens inline `{ ... }` params (see typedoc-plugin-markdown `parseParams`).
+  // Adding rows here would duplicate those (e.g. `options.skipInitialEmit` twice on `addListener`).
+  if (param.type?.type === 'reflection') {
+    const d = /** @type {import('typedoc').DeclarationReflection} */ (param.type.declaration);
+    if (d?.kind === ReflectionKind.TypeLiteral && d.children?.length) {
+      return [];
+    }
+  }
+
   const holder = resolveDeclarationWithObjectMembers(param.type);
   if (!holder?.children?.length) {
     return [];
@@ -307,11 +516,10 @@ function nestedParameterRowsFromDocumentedProperties(param) {
     if (!summary?.length) {
       continue;
     }
-    const nestedTypeRaw = child.type?.toString();
-    const nestedTypeStr = nestedTypeRaw ? `\`${nestedTypeRaw.replace(/\|/g, '\\|')}\`` : '`unknown`';
-    const nestedNameCol = formatNestedParamNameColumn(param.name, [child.name], param.flags.isOptional);
+    const typeCell = child.type ? removeLineBreaksForTableCell(ctx.partials.someType(child.type)) : '`unknown`';
+    const nestedNameCol = formatNestedParamNameColumn(param.name, [child.name]);
     const nestedDesc = displayPartsToString(summary).trim() || '—';
-    rows.push(`| ${nestedNameCol} | ${nestedTypeStr} | ${nestedDesc} |`);
+    rows.push(`| ${nestedNameCol} | ${typeCell} | ${nestedDesc} |`);
   }
   return rows;
 }
@@ -407,33 +615,14 @@ function isNominalParamTypeDocumented(typeDecl, props) {
 }
 
 /**
- * @param {import('typedoc').DeclarationReflection} holder
- * @returns {string[]}
- */
-function propertyTableRowsForDeclaration(holder) {
-  const props = (holder.children ?? []).filter(c => c.kindOf(ReflectionKind.Property));
-  props.sort((a, b) => a.name.localeCompare(b.name));
-  /** @type {string[]} */
-  const rows = [];
-  for (const child of props) {
-    const opt = child.flags.isOptional ? '?' : '';
-    const nameCol = `\`${child.name}${opt}\``;
-    const nestedTypeRaw = child.type?.toString();
-    const nestedTypeStr = nestedTypeRaw ? `\`${nestedTypeRaw.replace(/\|/g, '\\|')}\`` : '`unknown`';
-    const nestedDesc = child.comment?.summary?.length ? displayPartsToString(child.comment.summary).trim() : '—';
-    rows.push(`| ${nameCol} | ${nestedTypeStr} | ${nestedDesc} |`);
-  }
-  return rows;
-}
-
-/**
  * Single parameter that is a named object type (interface / type alias): one section titled after the type,
- * table lists every property (not the outer `params` row).
+ * table lists every property (not the outer `params` row). Uses the same `propertiesTable` partial as TypeDoc.
  *
  * @param {import('typedoc').SignatureReflection} sig
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  * @returns {string | undefined}
  */
-function trySingleNominalParameterTypeSection(sig) {
+function trySingleNominalParameterTypeSection(sig, ctx) {
   const params = sig.parameters ?? [];
   if (params.length !== 1) {
     return undefined;
@@ -450,48 +639,53 @@ function trySingleNominalParameterTypeSection(sig) {
   if (!isNominalParamTypeDocumented(nominal.typeDecl, props)) {
     return undefined;
   }
-  const rows = propertyTableRowsForDeclaration(nominal.holder);
-  if (rows.length === 0) {
+  const tableMd = renderMemberTableOmittingExampleBlocks(props, ctx, () =>
+    ctx.partials.propertiesTable(props, {
+      kind: nominal.typeDecl.kind,
+      isEventProps: false,
+    }),
+  );
+  if (!tableMd?.trim()) {
     return undefined;
   }
-  return [`#### ${nominal.sectionTitle}`, '', '| Name | Type | Description |', '| --- | --- | --- |', ...rows, ''].join(
-    '\n',
-  );
+  return [markdownHeading(4, nominal.sectionTitle), '', tableMd, ''].join('\n');
 }
 
 /**
  * @param {import('typedoc').SignatureReflection} sig
- * @param {import('typedoc').DeclarationReflection} decl
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  */
-function parametersMarkdownTable(sig, decl) {
+function parametersMarkdownTable(sig, ctx) {
   const params = sig.parameters ?? [];
   if (params.length === 0) {
     return '';
   }
 
-  const singleNominal = trySingleNominalParameterTypeSection(sig);
+  const singleNominal = trySingleNominalParameterTypeSection(sig, ctx);
   if (singleNominal) {
     return singleNominal;
   }
 
+  let tableMd = renderMemberTableOmittingExampleBlocks(params, ctx, () => ctx.partials.parametersTable(params));
   /** @type {string[]} */
-  const rows = [];
+  const nested = [];
   for (const p of params) {
-    const typeStr = p.type ? `\`${p.type.toString().replace(/\|/g, '\\|')}\`` : '`unknown`';
-    const opt = p.flags.isOptional ? '?' : '';
-    const nameCol = `\`${p.name}${opt}\``;
-    const desc = getParamDescription(sig, p, decl);
-    rows.push(`| ${nameCol} | ${typeStr} | ${desc || '—'} |`);
-    rows.push(...nestedParameterRowsFromDocumentedProperties(p));
+    nested.push(...nestedParameterRowsFromDocumentedProperties(p, ctx));
+  }
+  if (nested.length) {
+    tableMd = appendMarkdownTableRows(tableMd, nested);
   }
 
-  return ['#### Parameters', '', '| Name | Type | Description |', '| --- | --- | --- |', ...rows, ''].join('\n');
+  tableMd = formatMethodParametersTable(tableMd);
+
+  return [markdownHeading(4, ReflectionKind.pluralString(ReflectionKind.Parameter)), '', tableMd, ''].join('\n');
 }
 
 /**
  * @param {import('typedoc').DeclarationReflection} decl
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  */
-function buildMethodMdx(decl) {
+function buildMethodMdx(decl, ctx) {
   const name = decl.name;
   const sig = getPrimaryCallSignature(decl);
   if (!sig) {
@@ -506,11 +700,12 @@ function buildMethodMdx(decl) {
     description = [description, sigReturns].filter(Boolean).join('\n\n');
   }
   const ts = ['```typescript', formatTypeScriptSignature(sig, name), '```'].join('\n');
-  const paramsMd = parametersMarkdownTable(sig, decl);
+  const paramsMd = parametersMarkdownTable(sig, ctx);
 
-  // Same catch-all pass as `custom-plugin.mjs` — not run automatically because this MDX bypasses TypeDoc's renderer. Skip the ```typescript``` fence so signatures stay plain code.
-  const head = applyCatchAllMdReplacements([title, '', description].join('\n'));
-  const paramsProcessed = paramsMd ? applyCatchAllMdReplacements(paramsMd) : '';
+  // Same post-process as `custom-plugin.mjs` `MarkdownPageEvent.END`: relative `.mdx` links, then catch-alls.
+  // Skip the ```typescript``` fence so signatures stay plain code.
+  const head = applyCatchAllMdReplacements(applyRelativeLinkReplacements([title, '', description].join('\n')));
+  const paramsProcessed = paramsMd ? applyCatchAllMdReplacements(applyRelativeLinkReplacements(paramsMd)) : '';
   const chunks = [head, ts];
   if (paramsProcessed) {
     chunks.push(paramsProcessed);
@@ -521,8 +716,9 @@ function buildMethodMdx(decl) {
 /**
  * @param {string} pageUrl
  * @param {import('typedoc').ProjectReflection} project
+ * @param {import('typedoc').Application} app
  */
-function extractMethodsForPage(pageUrl, project) {
+function extractMethodsForPage(pageUrl, project, app) {
   const symbol = /** @type {Record<string, string>} */ (/** @type {unknown} */ (REFERENCE_OBJECT_PAGE_SYMBOLS))[
     pageUrl
   ];
@@ -538,6 +734,8 @@ function extractMethodsForPage(pageUrl, project) {
     return 0;
   }
 
+  const ctx = createThemeContextForReferencePage(app, project, pageUrl, decl);
+
   const outDir = path.join(__dirname, 'temp-docs', path.dirname(pageUrl), `${path.basename(pageUrl, '.mdx')}-methods`);
   fs.mkdirSync(outDir, { recursive: true });
 
@@ -549,7 +747,7 @@ function extractMethodsForPage(pageUrl, project) {
     if (!isCallableMember(/** @type {import('typedoc').DeclarationReflection} */ (child))) {
       continue;
     }
-    const mdx = buildMethodMdx(/** @type {import('typedoc').DeclarationReflection} */ (child));
+    const mdx = buildMethodMdx(/** @type {import('typedoc').DeclarationReflection} */ (child), ctx);
     if (!mdx) {
       continue;
     }
@@ -575,9 +773,11 @@ async function main() {
     process.exit(1);
   }
 
+  prepareMarkdownRenderer(app, project);
+
   let total = 0;
   for (const pageUrl of REFERENCE_OBJECTS_LIST) {
-    total += extractMethodsForPage(pageUrl, project);
+    total += extractMethodsForPage(pageUrl, project, app);
   }
   console.log(`[extract-methods] Wrote ${total} method files total`);
 }

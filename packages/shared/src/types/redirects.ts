@@ -82,6 +82,7 @@ export type AuthenticateWithRedirectParams = {
 
 export type AuthenticateWithPopupParams = AuthenticateWithRedirectParams & { popup: Window | null };
 
+/** @document */
 export type RedirectUrlProp = {
   /**
    * Full URL or path to navigate to after a successful action.
@@ -89,6 +90,7 @@ export type RedirectUrlProp = {
   redirectUrl?: string | null;
 };
 
+/** @document */
 export type SignUpForceRedirectUrl = {
   /**
    * If provided, this URL will always be redirected to after the user signs up. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
@@ -96,6 +98,7 @@ export type SignUpForceRedirectUrl = {
   signUpForceRedirectUrl?: string | null;
 };
 
+/** @document */
 export type SignUpFallbackRedirectUrl = {
   /**
    * The fallback URL to redirect to after the user signs up, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
@@ -105,6 +108,7 @@ export type SignUpFallbackRedirectUrl = {
   signUpFallbackRedirectUrl?: string | null;
 };
 
+/** @document */
 export type SignInFallbackRedirectUrl = {
   /**
    * The fallback URL to redirect to after the user signs in, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
@@ -114,6 +118,7 @@ export type SignInFallbackRedirectUrl = {
   signInFallbackRedirectUrl?: string | null;
 };
 
+/** @document */
 export type SignInForceRedirectUrl = {
   /**
    * If provided, this URL will always be redirected to after the user signs in. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
