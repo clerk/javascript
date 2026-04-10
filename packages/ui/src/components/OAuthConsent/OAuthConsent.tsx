@@ -2,16 +2,14 @@ import { useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext } from '@/ui/contexts';
-import { Box, Button, Flow, Grid, Text } from '@/ui/customizables';
+import { Box, Button, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { Modal } from '@/ui/elements/Modal';
-import { Tooltip } from '@/ui/elements/Tooltip';
 import { Alert, Textarea } from '@/ui/primitives';
-import { common } from '@/ui/styledSystem';
-import { colors } from '@/ui/utils/colors';
+import { InlineAction } from './InlineAction';
 import { LogoGroup, LogoGroupItem, LogoGroupIcon, LogoGroupSeparator } from './LogoGroup';
 import { OrgSelect } from './OrgSelect';
 import {
@@ -55,9 +53,13 @@ export function OAuthConsentInternal() {
       const { hostname } = new URL(redirectUrl);
       return hostname.split('.').slice(-2).join('.');
     } catch {
-      return '';
+      return 'https://example.com';
     }
   }
+
+  const { t } = useLocalizations();
+  const domainAction = getRootDomain();
+  const viewFullUrlText = t(localizationKeys('oauthConsent.viewFullUrl'));
 
   return (
     <Flow.Root flow='oauthConsent'>
@@ -125,7 +127,12 @@ export function OAuthConsentInternal() {
               </LogoGroup>
             )}
             <Header.Title localizationKey={oAuthApplicationName} />
-            <Header.Subtitle localizationKey={`wants to access ${applicationName} on behalf of ${primaryIdentifier}`} />
+            <Header.Subtitle
+              localizationKey={localizationKeys('oauthConsent.subtitle', {
+                applicationName,
+                identifier: primaryIdentifier || '',
+              })}
+            />
           </Header.Root>
 
           {selectOptions.length > 0 && (
@@ -138,7 +145,11 @@ export function OAuthConsentInternal() {
 
           <ListGroup>
             <ListGroupHeader>
-              <ListGroupHeaderTitle localizationKey={`This will allow ${oAuthApplicationName} access to:`} />
+              <ListGroupHeaderTitle
+                localizationKey={localizationKeys('oauthConsent.scopeList.title', {
+                  applicationName: oAuthApplicationName,
+                })}
+              />
             </ListGroupHeader>
             <ListGroupContent>
               {displayedScopes.map(item => (
@@ -154,30 +165,17 @@ export function OAuthConsentInternal() {
               colorScheme='warning'
               variant='caption'
             >
-              Make sure that you trust {oAuthApplicationName} {''}
-              <Tooltip.Root>
-                <Tooltip.Trigger>
-                  <Text
-                    as='span'
-                    role='button'
-                    tabIndex={0}
-                    aria-label='View full URL'
-                    variant='caption'
-                    sx={{
-                      textDecoration: 'underline',
-                      textDecorationStyle: 'dotted',
-                      cursor: 'pointer',
-                      outline: 'none',
-                      display: 'inline-block',
-                    }}
-                    onClick={() => setIsUriModalOpen(true)}
-                  >
-                    ({getRootDomain()})
-                  </Text>
-                </Tooltip.Trigger>
-                <Tooltip.Content text={`View full URL`} />
-              </Tooltip.Root>
-              {''}. You may be sharing sensitive data with this site or app.
+              <InlineAction
+                text={t(
+                  localizationKeys('oauthConsent.warning', {
+                    applicationName: oAuthApplicationName || applicationName,
+                    domainAction,
+                  }),
+                )}
+                actionText={domainAction}
+                onClick={() => setIsUriModalOpen(true)}
+                tooltipText={viewFullUrlText}
+              />
             </Text>
           </Alert>
           <Grid
@@ -187,11 +185,11 @@ export function OAuthConsentInternal() {
             <Button
               colorScheme='secondary'
               variant='outline'
-              localizationKey='Deny'
+              localizationKey={localizationKeys('oauthConsent.action__deny')}
               onClick={onDeny}
             />
             <Button
-              localizationKey='Allow'
+              localizationKey={localizationKeys('oauthConsent.action__allow')}
               onClick={onAllow}
             />
             <Text
@@ -201,30 +199,13 @@ export function OAuthConsentInternal() {
               colorScheme='secondary'
               variant='caption'
             >
-              If you allow access, this app will redirect you to{' '}
-              <Tooltip.Root>
-                <Tooltip.Trigger>
-                  <Text
-                    as='span'
-                    role='button'
-                    tabIndex={0}
-                    aria-label='View full URL'
-                    variant='caption'
-                    sx={{
-                      textDecoration: 'underline',
-                      textDecorationStyle: 'dotted',
-                      cursor: 'pointer',
-                      outline: 'none',
-                      display: 'inline-block',
-                    }}
-                    onClick={() => setIsUriModalOpen(true)}
-                  >
-                    {getRootDomain()}
-                  </Text>
-                </Tooltip.Trigger>
-                <Tooltip.Content text={`View full URL`} />
-              </Tooltip.Root>
-              .{hasOfflineAccess && " You'll stay signed in until you sign out or revoke access."}
+              <InlineAction
+                text={t(localizationKeys('oauthConsent.redirectNotice', { domainAction }))}
+                actionText={domainAction}
+                onClick={() => setIsUriModalOpen(true)}
+                tooltipText={viewFullUrlText}
+              />
+              {hasOfflineAccess && t(localizationKeys('oauthConsent.offlineAccessNotice'))}
             </Text>
           </Grid>
         </Card.Content>
@@ -262,9 +243,11 @@ function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oAuthApplicati
       <Card.Root>
         <Card.Content>
           <Header.Root>
-            <Header.Title localizationKey={`Redirect URL`} />
+            <Header.Title localizationKey={localizationKeys('oauthConsent.redirectUriModal.title')} />
             <Header.Subtitle
-              localizationKey={`Make sure you trust ${oAuthApplicationName} and that this URL belongs to ${oAuthApplicationName}.`}
+              localizationKey={localizationKeys('oauthConsent.redirectUriModal.subtitle', {
+                applicationName: oAuthApplicationName,
+              })}
             />
           </Header.Root>
           <Textarea
