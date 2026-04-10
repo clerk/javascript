@@ -4,12 +4,16 @@
  * `page.url` values are relative to TypeDoc `out` (e.g. `.typedoc/temp-docs`).
  */
 
-export const REFERENCE_OBJECTS_LIST = ['shared/clerk.mdx', 'shared/client-resource.mdx'];
+/**
+ * TypeDoc output paths for the main reference pages (`shared/<object>/<object>.mdx`, see `ClerkRouter`).
+ * `extract-methods.mjs` reads each file, writes `<object>-properties.mdx` with the same Properties table as TypeDoc, strips Properties from `<object>.mdx`, and writes methods under `<object>-methods/`.
+ */
+export const REFERENCE_OBJECTS_LIST = ['shared/clerk/clerk.mdx', 'shared/client-resource/client-resource.mdx'];
 
 /**
  * Primary interface/class documented on each reference object page (used to resolve TypeDoc reflections).
  */
 export const REFERENCE_OBJECT_PAGE_SYMBOLS = {
-  'shared/clerk.mdx': 'Clerk',
-  'shared/client-resource.mdx': 'ClientResource',
+  'shared/clerk/clerk.mdx': 'Clerk',
+  'shared/client-resource/client-resource.mdx': 'ClientResource',
 };

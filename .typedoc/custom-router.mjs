@@ -1,5 +1,11 @@
 // @ts-check
+import { ReflectionKind } from 'typedoc';
 import { MemberRouter } from 'typedoc-plugin-markdown';
+
+import { REFERENCE_OBJECT_PAGE_SYMBOLS } from './reference-objects.mjs';
+
+/** @type {Set<string>} */
+const REFERENCE_OBJECT_SYMBOL_NAMES = new Set(Object.values(REFERENCE_OBJECT_PAGE_SYMBOLS));
 
 /**
  * From a filepath divided by `/` only keep the first and last part
@@ -71,6 +77,22 @@ class ClerkRouter extends MemberRouter {
      * - shared/use-user
      */
     filePath = flattenDirName(filePath);
+
+    /**
+     * Put each reference object in its own folder alongside `<object>-properties.mdx` and `<object>-methods/` from `extract-methods.mjs`.
+     * E.g. `shared/clerk.mdx` -> `shared/clerk/clerk.mdx` and `shared/clerk/clerk-properties.mdx` and `shared/clerk/clerk-methods/`.
+     */
+    if (
+      (reflection.kind === ReflectionKind.Interface || reflection.kind === ReflectionKind.Class) &&
+      REFERENCE_OBJECT_SYMBOL_NAMES.has(reflection.name)
+    ) {
+      const kebab = toKebabCase(reflection.name);
+      const m = filePath.match(/^([^/]+)\/([^/]+)$/);
+      if (m) {
+        const [, pkg] = m;
+        return `${pkg}/${kebab}/${kebab}`;
+      }
+    }
 
     return filePath;
   }

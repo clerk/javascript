@@ -1,7 +1,6 @@
 // @ts-check
 /**
- * For each entry in REFERENCE_OBJECTS_LIST, finds callable members on the mapped interface/class via TypeDoc
- * and writes one .mdx per method (kebab file name) next to the main reference page output.
+ * For each entry in REFERENCE_OBJECTS_LIST, reads the TypeDoc output (e.g. `shared/clerk/clerk.mdx`), strips **Properties** from the main generated file and copies it into `<object>-properties.mdx`, and writes one .mdx per method under `<object>-methods/`.
  *
  * Run after `typedoc` (same cwd as repo root). Uses a second TypeDoc convert pass to read reflections.
  *
@@ -17,7 +16,11 @@ import { Application, Comment, PageKind, ReflectionKind } from 'typedoc';
 import { MarkdownPageEvent, MarkdownTheme } from 'typedoc-plugin-markdown';
 
 import typedocConfig from '../typedoc.config.mjs';
-import { applyCatchAllMdReplacements, applyRelativeLinkReplacements } from './custom-plugin.mjs';
+import {
+  applyCatchAllMdReplacements,
+  applyRelativeLinkReplacements,
+  stripReferenceObjectPropertiesSection,
+} from './custom-plugin.mjs';
 import { prepareMarkdownRenderer } from './prepare-markdown-renderer.mjs';
 import { REFERENCE_OBJECTS_LIST, REFERENCE_OBJECT_PAGE_SYMBOLS } from './reference-objects.mjs';
 
@@ -167,7 +170,7 @@ function formatMethodParametersTable(tableMd) {
 /**
  * @param {import('typedoc').Application} app
  * @param {import('typedoc').ProjectReflection} project
- * @param {string} pageUrl e.g. `shared/clerk.mdx`
+ * @param {string} pageUrl e.g. `shared/clerk/index.mdx`
  * @param {import('typedoc').DeclarationReflection} interfaceDecl
  */
 function createThemeContextForReferencePage(app, project, pageUrl, interfaceDecl) {
@@ -277,10 +280,62 @@ function isCallableMember(decl) {
   if (decl.kind === ReflectionKind.Method) {
     return true;
   }
-  if (decl.kind === ReflectionKind.Property) {
+  if (decl.kind === ReflectionKind.Property || decl.kind === ReflectionKind.Accessor) {
     return !!getPrimaryCallSignature(decl);
   }
   return false;
+}
+
+/**
+ * @param {string} markdown
+ * @returns {string | undefined} Body under `## Properties` (no heading), or undefined
+ */
+function extractPropertiesSectionBody(markdown) {
+  const normalized = markdown.replace(/\r\n/g, '\n');
+  const m = normalized.match(/(^|\n)## Properties\n+/);
+  if (!m || m.index === undefined) {
+    return undefined;
+  }
+  const start = m.index + m[0].length;
+  const rest = normalized.slice(start);
+  const nextH2 = rest.search(/\n## /);
+  const section = nextH2 === -1 ? rest : rest.slice(0, nextH2);
+  const trimmed = section.trim();
+  return trimmed.length ? trimmed : undefined;
+}
+
+/**
+ * @param {string} pageUrl e.g. `shared/clerk/clerk.mdx`
+ */
+function extractPropertiesAndTrimSourcePage(pageUrl) {
+  const sourcePath = path.join(__dirname, 'temp-docs', pageUrl);
+  if (!fs.existsSync(sourcePath)) {
+    console.warn(`[extract-methods] Expected TypeDoc output missing: ${sourcePath}`);
+    return;
+  }
+  const raw = fs.readFileSync(sourcePath, 'utf-8');
+  const body = extractPropertiesSectionBody(raw);
+  const pageDir = path.dirname(pageUrl);
+  const slug = path.basename(pageUrl, '.mdx');
+  const objectDir = path.join(__dirname, 'temp-docs', pageDir);
+  fs.mkdirSync(objectDir, { recursive: true });
+
+  if (body) {
+    const propertiesDoc = [`## Properties`, '', body.trimEnd(), ''].join('\n');
+    const propertiesPath = path.join(objectDir, `${slug}-properties.mdx`);
+    fs.writeFileSync(
+      propertiesPath,
+      applyCatchAllMdReplacements(applyRelativeLinkReplacements(propertiesDoc)),
+      'utf-8',
+    );
+    console.log(`[extract-methods] Wrote ${path.relative(path.join(__dirname, '..'), propertiesPath)}`);
+  }
+
+  const stripped = stripReferenceObjectPropertiesSection(raw);
+  if (stripped !== raw) {
+    fs.writeFileSync(sourcePath, stripped, 'utf-8');
+    console.log(`[extract-methods] Stripped Properties from ${path.relative(path.join(__dirname, '..'), sourcePath)}`);
+  }
 }
 
 /**
@@ -734,9 +789,14 @@ function extractMethodsForPage(pageUrl, project, app) {
     return 0;
   }
 
+  extractPropertiesAndTrimSourcePage(pageUrl);
+
   const ctx = createThemeContextForReferencePage(app, project, pageUrl, decl);
 
-  const outDir = path.join(__dirname, 'temp-docs', path.dirname(pageUrl), `${path.basename(pageUrl, '.mdx')}-methods`);
+  const pageDir = path.dirname(pageUrl);
+  const slug = path.basename(pageUrl, '.mdx');
+  const objectDir = path.join(__dirname, 'temp-docs', pageDir);
+  const outDir = path.join(objectDir, `${slug}-methods`);
   fs.mkdirSync(outDir, { recursive: true });
 
   let count = 0;

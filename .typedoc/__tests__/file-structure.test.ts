@@ -52,6 +52,10 @@ describe('Typedoc output', () => {
     expect(nestedFolders).toMatchInlineSnapshot(`
       [
         "react/legacy",
+        "shared/clerk",
+        "shared/clerk/clerk-methods",
+        "shared/client-resource",
+        "shared/client-resource/client-resource-methods",
       ]
     `);
   });

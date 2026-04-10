@@ -330,6 +330,20 @@ function restoreProtectedInlineCodeSpans(text, placeholders) {
 }
 
 /**
+ * Remove the Properties section (heading + table) from reference object pages (e.g. `shared/clerk/clerk.mdx`);
+ * the table is copied into `shared/<object>/<object>-properties.mdx` by `extract-methods.mjs`.
+ *
+ * @param {string} contents
+ */
+export function stripReferenceObjectPropertiesSection(contents) {
+  if (!contents) {
+    return contents;
+  }
+  const stripped = contents.replace(/\r\n/g, '\n').replace(/\n## Properties\n+[\s\S]*$/, '');
+  return stripped.trimEnd() + '\n';
+}
+
+/**
  * Second pass of `MarkdownPageEvent.END` (after {@link applyRelativeLinkReplacements}).
  * Used by `extract-methods.mjs`, which writes MDX outside TypeDoc and never hits that hook.
  *
@@ -347,18 +361,20 @@ export function applyCatchAllMdReplacements(contents) {
   }
   return contents
     .split('\n')
-    .map(line => {
-      if (ATX_HEADING_LINE.test(line.replace(/\r$/, ''))) {
-        return line;
-      }
-      const { text: withPh, placeholders } = protectPipeDelimitedInlineCodeSpans(line);
-      let out = withPh;
-      for (const { pattern, replace } of getCatchAllReplacements()) {
-        // @ts-ignore — string | function
-        out = out.replace(pattern, replace);
-      }
-      return restoreProtectedInlineCodeSpans(out, placeholders);
-    })
+    .map(
+      /** @param {string} line */ line => {
+        if (ATX_HEADING_LINE.test(line.replace(/\r$/, ''))) {
+          return line;
+        }
+        const { text: withPh, placeholders } = protectPipeDelimitedInlineCodeSpans(line);
+        let out = withPh;
+        for (const { pattern, replace } of getCatchAllReplacements()) {
+          // @ts-ignore — string | function
+          out = out.replace(pattern, replace);
+        }
+        return restoreProtectedInlineCodeSpans(out, placeholders);
+      },
+    )
     .join('\n');
 }
 
