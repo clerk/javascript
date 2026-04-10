@@ -207,7 +207,7 @@ describe('Clerk singleton', () => {
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-        expect(mockSession.touch).toHaveBeenCalled();
+        expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
       });
 
       describe('with `touchSession` set to false', () => {
@@ -218,7 +218,7 @@ describe('Clerk singleton', () => {
           const sut = new Clerk(productionPublishableKey);
           await sut.load({ touchSession: false });
           await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-          expect(mockSession.touch).toHaveBeenCalled();
+          expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
         });
       });
 
@@ -233,7 +233,7 @@ describe('Clerk singleton', () => {
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-        expect(mockSession.touch).toHaveBeenCalled();
+        expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
       });
 
       it('sets __session and __client_uat cookie before calling __internal_onBeforeSetActive', async () => {
@@ -280,7 +280,7 @@ describe('Clerk singleton', () => {
         await sut.setActive({ organization: 'some-org-slug' });
 
         await waitFor(() => {
-          expect(mockSession2.touch).toHaveBeenCalled();
+          expect(mockSession2.touch).toHaveBeenCalledWith({ intent: 'select_org' });
           expect(mockSession2.getToken).toHaveBeenCalled();
           expect((mockSession2 as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
           expect(sut.session).toMatchObject(mockSession2);
@@ -363,7 +363,7 @@ describe('Clerk singleton', () => {
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
         await sut.setActive({ session: mockSession as any as PendingSessionResource, navigate });
-        expect(mockSession.__internal_touch).toHaveBeenCalled();
+        expect(mockSession.__internal_touch).toHaveBeenCalledWith({ intent: 'select_session' });
         expect(navigate).toHaveBeenCalled();
       });
 
@@ -2386,6 +2386,7 @@ describe('Clerk singleton', () => {
   describe('Clerk().isSatellite and Clerk().domain getters', () => {
     beforeEach(() => {
       mockClientFetch.mockReset();
+      mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [] }));
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -2477,6 +2478,19 @@ describe('Clerk singleton', () => {
 
         expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://clerk.satellite.com/v1/me');
       });
+
+      mockNativeRuntime(() => {
+        test('fapiClient should use Clerk.domain as its baseUrl in non-browser runtimes', async () => {
+          const sut = new Clerk(productionPublishableKey, {
+            domain: 'satellite.com',
+          });
+          await sut.load({
+            isSatellite: true,
+          });
+
+          expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://satellite.com/v1/me');
+        });
+      });
     });
   });
 
@@ -2489,6 +2503,17 @@ describe('Clerk singleton', () => {
         await sut.load({});
 
         expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://proxy.com/api/__clerk/v1/me');
+      });
+
+      mockNativeRuntime(() => {
+        test('fapiClient should use Clerk.proxyUrl as its baseUrl in non-browser runtimes', async () => {
+          const sut = new Clerk(productionPublishableKey, {
+            proxyUrl: 'https://proxy.com/api/__clerk',
+          });
+          await sut.load({});
+
+          expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://proxy.com/api/__clerk/v1/me');
+        });
       });
     });
 

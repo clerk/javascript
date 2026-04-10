@@ -19,6 +19,7 @@ import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { DomainOrProxyUrl, MultiDomainAndOrProxy } from './multiDomain';
 import type { OAuthProvider, OAuthScope } from './oauth';
+import type { OAuthApplicationNamespace } from './oauthApplication';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type { ClerkPaginationParams } from './pagination';
@@ -168,6 +169,7 @@ export type SetActiveNavigate = (params: {
   session: SessionResource;
   /**
    * Decorate the destination URL to enable Safari ITP cookie refresh when needed.
+   *
    * @see {@link DecorateUrl}
    */
   decorateUrl: DecorateUrl;
@@ -644,11 +646,7 @@ export interface Clerk {
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
-   * This API is in early access and may change in future releases.
-   *
-   * Mount a api keys component at the target element.
-   *
-   * @experimental
+   * Mount an API keys component at the target element.
    *
    * @param targetNode - Target to mount the APIKeys component.
    * @param props - Configuration parameters.
@@ -656,14 +654,10 @@ export interface Clerk {
   mountAPIKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
 
   /**
-   * This API is in early access and may change in future releases.
-   *
-   * Unmount a api keys component from the target element.
+   * Unmount an API keys component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @experimental
-   *
-   * @param targetNode - Target node to unmount the ApiKeys component from.
+   * @param targetNode - Target node to unmount the APIKeys component from.
    */
   unmountAPIKeys: (targetNode: HTMLDivElement) => void;
 
@@ -1032,11 +1026,13 @@ export interface Clerk {
 
   /**
    * API Keys Object
-   *
-   * @experimental
-   * This API is in early access and may change in future releases.
    */
   apiKeys: APIKeysNamespace;
+
+  /**
+   * OAuth application helpers (e.g. consent metadata for custom consent UIs).
+   */
+  oauthApplication: OAuthApplicationNamespace;
 
   /**
    * Checkout API
@@ -2507,21 +2503,25 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
   /**
    * The URL that `@clerk/clerk-js` should be hot-loaded from.
+   *
    * @internal
    */
   __internal_clerkJSUrl?: string;
   /**
    * The npm version for `@clerk/clerk-js`.
+   *
    * @internal
    */
   __internal_clerkJSVersion?: string;
   /**
    * The URL that `@clerk/ui` should be hot-loaded from.
+   *
    * @internal
    */
   __internal_clerkUIUrl?: string;
   /**
    * The npm version for `@clerk/ui`.
+   *
    * @internal
    */
   __internal_clerkUIVersion?: string;

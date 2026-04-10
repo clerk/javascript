@@ -1,5 +1,55 @@
 # @clerk/vue
 
+## 2.0.11
+
+### Patch Changes
+
+- Updated dependencies [[`fdac10e`](https://github.com/clerk/javascript/commit/fdac10e96ad60c0176cde4e1e3ddc89e40cd0a15), [`4e3cb0a`](https://github.com/clerk/javascript/commit/4e3cb0abed1f8aa1cba032c15da3a94a49162b0c), [`aa32bbc`](https://github.com/clerk/javascript/commit/aa32bbc94e76ea726056810885208c59269b2d2b)]:
+  - @clerk/shared@4.6.0
+
+## 2.0.10
+
+### Patch Changes
+
+- Updated dependencies [[`2c06a5f`](https://github.com/clerk/javascript/commit/2c06a5f1859ce4f1f64111f7c0a61f0093002667)]:
+  - @clerk/shared@4.5.0
+
+## 2.0.9
+
+### Patch Changes
+
+- Export `ClerkAPIResponseError` and `ClerkRuntimeError` classes from error subpaths for consistency with the already-exported type guards. ([#8228](https://github.com/clerk/javascript/pull/8228)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`b289566`](https://github.com/clerk/javascript/commit/b28956617555c21f703a40f8f14fb2ff23d509ae), [`636b496`](https://github.com/clerk/javascript/commit/636b496e42d4afff28187966acf1777be880a5c9), [`aa63796`](https://github.com/clerk/javascript/commit/aa63796b67aa862b100cc04f62d944c19cf03ce9)]:
+  - @clerk/shared@4.4.1
+
+## 2.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`9a00a1c`](https://github.com/clerk/javascript/commit/9a00a1cc9753a49ea96e520a8e4918075f3efff4), [`00715a6`](https://github.com/clerk/javascript/commit/00715a6d9ea8cf412c989e870a3eff03973fa505), [`b8c73d3`](https://github.com/clerk/javascript/commit/b8c73d34ee30616e63b6320e7a8724630670eeb3), [`1827b50`](https://github.com/clerk/javascript/commit/1827b50a6ef9ab14c48cddc120796a9bf3c965b6), [`7707a31`](https://github.com/clerk/javascript/commit/7707a31eb1977d0c5f2bb72f7ad0768606a55d16)]:
+  - @clerk/shared@4.4.0
+
+## 2.0.7
+
+### Patch Changes
+
+- Deprecate the `signOutOptions` prop on `<SignOutButton />` in favor of top-level `redirectUrl` and `sessionId` props. The `signOutOptions` prop still works but now emits a deprecation warning. ([#8148](https://github.com/clerk/javascript/pull/8148)) by [@jacekradko](https://github.com/jacekradko)
+
+## 2.0.6
+
+### Patch Changes
+
+- Updated dependencies [[`f0533a2`](https://github.com/clerk/javascript/commit/f0533a26db17066a7dcc7992d9589ba3a60cc5b4), [`e00ec97`](https://github.com/clerk/javascript/commit/e00ec97895640db358af5a9df5d03e83f28f5a27)]:
+  - @clerk/shared@4.3.2
+
+## 2.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`b9cb6e5`](https://github.com/clerk/javascript/commit/b9cb6e576bf6af5662fcc624cf2de76120a14565)]:
+  - @clerk/shared@4.3.1
+
 ## 2.0.4
 
 ### Patch Changes

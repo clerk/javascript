@@ -2,7 +2,15 @@ import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus, SignUpVerificationResource } from './signUpCommon';
-import type { Web3Strategy } from './strategies';
+import type {
+  AppleIdTokenStrategy,
+  EnterpriseSSOStrategy,
+  GoogleOneTapStrategy,
+  OAuthStrategy,
+  PhoneCodeStrategy,
+  TicketStrategy,
+  Web3Strategy,
+} from './strategies';
 import type { VerificationResource } from './verification';
 
 export interface SignUpFutureAdditionalParams {
@@ -39,6 +47,17 @@ export interface SignUpFutureAdditionalParams {
 
 export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
   /**
+   * The first factor verification strategy to use in the sign-in flow. Depends on the `identifier` value. Each
+   * authentication identifier supports different verification strategies.
+   */
+  strategy?:
+    | OAuthStrategy
+    | EnterpriseSSOStrategy
+    | TicketStrategy
+    | GoogleOneTapStrategy
+    | AppleIdTokenStrategy
+    | PhoneCodeStrategy;
+  /**
    * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email)
    * is enabled. Keep in mind that the email address requires an extra verification process.
    */
@@ -55,6 +74,11 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
    * the instance settings.
    */
   username?: string;
+  /**
+   * The user's password. Only supported if
+   * [password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled.
+   */
+  password?: string;
   /**
    * When set to `true`, the `SignUp` will attempt to retrieve information from the active `SignIn` instance and use it
    * to complete the sign-up process. This is useful when you want to seamlessly transition a user from a sign-in

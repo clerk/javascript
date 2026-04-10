@@ -18,6 +18,7 @@ interface AuthenticateContext extends AuthenticateRequestOptions {
   forwardedHost: string | undefined;
   forwardedProto: string | undefined;
   host: string | undefined;
+  method: string;
   origin: string | undefined;
   referrer: string | undefined;
   secFetchDest: string | undefined;
@@ -290,6 +291,7 @@ class AuthenticateContext implements AuthenticateContext {
   }
 
   private initHeaderValues() {
+    this.method = this.clerkRequest.method;
     this.tokenInHeader = this.parseAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
     this.origin = this.getHeader(constants.Headers.Origin);
     this.host = this.getHeader(constants.Headers.Host);

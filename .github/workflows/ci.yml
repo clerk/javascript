@@ -274,7 +274,9 @@ jobs:
 
   integration-tests:
     needs: [check-permissions, build-packages]
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    if: >-
+      ${{ (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
+      && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
     permissions:
       contents: read
@@ -292,6 +294,7 @@ jobs:
           [
             "generic",
             "express",
+            "fastify",
             "ap-flows",
             "localhost",
             "sessions",
@@ -305,6 +308,7 @@ jobs:
             "react-router",
             "custom",
             "hono",
+            "chrome-extension",
           ]
         test-project: ["chrome"]
         include:
@@ -355,8 +359,7 @@ jobs:
           fi
           jq --version
 
-      - name: Task Status
-        id: task-status
+      - name: Validate turbo task
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
@@ -366,32 +369,41 @@ jobs:
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
         run: |
-          # Use turbo's built-in --affected flag to detect changes
-          # This automatically uses GITHUB_BASE_REF in GitHub Actions
-          TASK_COUNT=$(pnpm turbo run test:integration:${{ matrix.test-name }} --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
-
-          if [ "$TASK_COUNT" -gt 0 ]; then
-            AFFECTED=1
-          else
-            AFFECTED=0
+          # Validate the turbo task exists. Turbo's --affected flag is a no-op for
+          # root-level tasks (//#) — they are always returned as affected. The previous
+          # --affected check only served to silently skip tests when the task was missing
+          # from turbo.json, hiding real configuration errors.
+          TASK_NAME="test:integration:${{ matrix.test-name }}"
+          TURBO_STDERR=$(mktemp)
+          if ! TURBO_JSON=$(pnpm turbo run "$TASK_NAME" --dry=json 2>"$TURBO_STDERR"); then
+            echo "::error::Turbo task '$TASK_NAME' failed validation"
+            cat "$TURBO_STDERR"
+            exit 1
           fi
 
-          echo "affected=${AFFECTED}"
-          echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
+          if ! TASK_COUNT=$(jq -er '.tasks | length' <<< "$TURBO_JSON"); then
+            echo "::error::Turbo task '$TASK_NAME' returned invalid JSON or missing .tasks"
+            printf '%s\n' "$TURBO_JSON"
+            exit 1
+          fi
+
+          if [ "$TASK_COUNT" -eq 0 ]; then
+            echo "::error::Turbo task '$TASK_NAME' returned 0 tasks"
+            exit 1
+          fi
+
+          echo "Task '$TASK_NAME' validated ($TASK_COUNT tasks in graph)"
 
       - name: Build packages
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         run: pnpm turbo build $TURBO_ARGS --only
 
       - name: Publish to local registry
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         run: pkglab pub --force
 
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 
       - name: Install @clerk/clerk-js in os temp
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-js && cd clerk-js
@@ -399,7 +411,6 @@ jobs:
           pkglab add @clerk/clerk-js
 
       - name: Install @clerk/ui in os temp
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-ui && cd clerk-ui
@@ -411,7 +422,6 @@ jobs:
         run: cd packages/astro && pnpm copy:components
 
       - name: Write all ENV certificates to files in integration/certs
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: actions/github-script@v7
         env:
           INTEGRATION_CERTS: "${{secrets.INTEGRATION_CERTS}}"
@@ -429,12 +439,10 @@ jobs:
             }
 
       - name: LS certs
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration/certs
         run: ls -la && pwd
 
       - name: Run Integration Tests
-        if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
         timeout-minutes: 25
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
@@ -451,12 +459,21 @@ jobs:
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
+      - name: Sanitize artifact name
+        if: ${{ cancelled() || failure() }}
+        id: sanitize
+        run: |
+          SANITIZED="${TEST_NAME//:/-}"
+          echo "artifact-suffix=${SANITIZED}" >> $GITHUB_OUTPUT
+        env:
+          TEST_NAME: ${{ matrix.test-name }}
+
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
-          path: integration/test-results
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.sanitize.outputs.artifact-suffix }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
+          path: test-results
           retention-days: 1
 
   pkg-pr-new:

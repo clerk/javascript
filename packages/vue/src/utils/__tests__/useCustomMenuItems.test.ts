@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { h } from 'vue';
 
 import { MenuAction, MenuLink } from '../../components/ui-components/UserButton';

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "3.1.2",
+  "version": "3.1.9",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -92,6 +92,8 @@
     "token-cache",
     "google",
     "apple",
+    "experimental",
+    "legacy",
     "src/specs",
     "expo-module.config.json",
     "react-native.config.js",
@@ -122,7 +124,7 @@
     "@clerk/expo-passkeys": "workspace:*",
     "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
-    "esbuild": "^0.19.0",
+    "esbuild": "^0.25.0",
     "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "^5.4.0",
     "expo-constants": "^18.0.0",

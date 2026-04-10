@@ -6,7 +6,7 @@ catalogs:
     react: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
     react-dom: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
   react:
-    '@types/react': 18.3.26
+    '@types/react': 18.3.28
     '@types/react-dom': 18.3.7
     react: 18.3.1
     react-dom: 18.3.1
@@ -31,8 +31,40 @@ catalogs:
     '@zxcvbn-ts/language-common': 3.0.4
 
 minimumReleaseAge: 2880
-
 minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
+  # CVE-2026-23869: React Server Components DoS
+  - 'next@15.5.15'
+  - '@next/*'
+  # Renovate security update: @modelcontextprotocol/sdk@1.26.0
+  - '@modelcontextprotocol/sdk@1.26.0'
+  # Renovate security update: esbuild@0.25.0
+  - esbuild@0.25.0
+
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  # Their 4.x package was published with provenance and this
+  # triggers the policy because it's based on publish date and
+  # not semver.
+  - 'eslint-import-resolver-typescript@3.10.1'
+  # Same idea, their 7.1.x publish process is more "trustworthy"
+  - 'vite@6.4.1'
+  # Same idea, their 1.x publish process is more "trustworthy"
+  - 'axios@0.30.2'
+  # Same idea, their 7.x publish process is more "trustworthy"
+  - 'semver@5.7.2 || 6.3.1'
+  # Same idea, their 7.x publish process is more "trustworthy"
+  - 'undici@5.29.0 || 6.22.0'
+  # Same idea, their 2.x publish process is more "trustworthy"
+  - 'ua-parser-js@1.0.41'
+  # Same idea, their 10.x publish process is more "trustworthy"
+  - '@octokit/endpoint@9.0.6'
+  # They experimented with provenance for some earlier versions
+  # and then disabled it before re-enabling it again later.
+  - 'undici-types@6.21.0'
+  # Same here
+  - 'chokidar@4.0.3'
+
+blockExoticSubdeps: true

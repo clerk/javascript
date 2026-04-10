@@ -135,7 +135,7 @@ export const huHU: LocalizationResource = {
         anyNumbers: undefined,
         cardNumber: undefined,
         cvcZip: undefined,
-        developmentMode: undefined,
+        developmentMode: 'Fejlesztői mód',
         expirationDate: undefined,
         testCardInfo: undefined,
       },
@@ -212,11 +212,11 @@ export const huHU: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Fiók törlése',
-  formFieldInputPlaceholder__emailAddress: undefined,
+  formFieldInputPlaceholder__emailAddress: 'Add meg az e-mail címedet',
   formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses: 'pelda@email.hu, pelda2@email.hu',
-  formFieldInputPlaceholder__firstName: undefined,
-  formFieldInputPlaceholder__lastName: undefined,
+  formFieldInputPlaceholder__firstName: 'Keresztnév',
+  formFieldInputPlaceholder__lastName: 'Vezetéknév',
   formFieldInputPlaceholder__organizationDomain: undefined,
   formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
   formFieldInputPlaceholder__organizationName: undefined,
@@ -808,13 +808,14 @@ export const huHU: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: 'Elfogadom az {{ privacyPolicyLink || link("Adatkezelési Tájékoztatót") }}',
+        label__onlyTermsOfService: 'Elfogadom az {{ termsOfServiceLink || link("Általános Szerződési Feltételeket") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Elfogadom az {{ termsOfServiceLink || link("Általános Szerződési Feltételeket") }} és az {{ privacyPolicyLink || link("Adatkezelési Tájékoztatót") }}',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'A folytatáshoz kérlek, olvasd el és fogadd el a feltételeket',
+        title: 'Jogi nyilatkozat',
       },
     },
     phoneCode: {
@@ -1350,6 +1351,7 @@ export const huHU: LocalizationResource = {
         title: 'Email címek',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Fiók összekötése',
         title: 'Vállalati fiókok',
       },
       headerTitle__account: 'Profil adatok',
