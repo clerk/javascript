@@ -102,7 +102,7 @@ const LINK_REPLACEMENTS = [
   ['billing-namespace', '/docs/reference/objects/billing'],
   ['client-resource', '/docs/reference/objects/client'],
   ['redirect-options', '/docs/reference/types/redirect-options'],
-  ['handle-o-auth-call-back-params', '/docs/reference/types/handle-o-auth-call-back-params'],
+  ['handle-o-auth-callback-params', '/docs/reference/types/handle-o-auth-callback-params'],
 ];
 
 /**

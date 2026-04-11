@@ -16,6 +16,7 @@ import { Application, Comment, PageKind, ReflectionKind } from 'typedoc';
 import { MarkdownPageEvent, MarkdownTheme } from 'typedoc-plugin-markdown';
 
 import typedocConfig from '../typedoc.config.mjs';
+import { isCallableInterfaceProperty } from './custom-theme.mjs';
 import {
   applyCatchAllMdReplacements,
   applyRelativeLinkReplacements,
@@ -270,18 +271,50 @@ function getPrimaryCallSignature(decl) {
   if (t && 'declaration' in t && t.declaration?.signatures?.length) {
     return t.declaration.signatures[0];
   }
+  /**
+   * e.g. `navigate: CustomNavigation` — for `type Fn = () => void`, signatures often live on the inner `declaration`
+   * of `alias.type` (ReflectionType), not on `alias.signatures` (see `custom-theme.mjs` `isCallablePropertyValueType`).
+   */
+  if (t && typeof t === 'object' && 'type' in t && /** @type {{ type?: string }} */ (t).type === 'reference') {
+    const ref = /** @type {import('typedoc').ReferenceType} */ (t);
+    const target = ref.reflection;
+    const sigs =
+      target && 'signatures' in target
+        ? /** @type {{ signatures?: import('typedoc').SignatureReflection[] }} */ (target).signatures
+        : undefined;
+    if (sigs?.length) {
+      return sigs[0];
+    }
+    const aliasTarget = /** @type {import('typedoc').DeclarationReflection | undefined} */ (
+      target && 'kind' in target ? target : undefined
+    );
+    if (aliasTarget?.kind === ReflectionKind.TypeAlias && aliasTarget.type && 'declaration' in aliasTarget.type) {
+      const inner = /** @type {import('typedoc').ReflectionType} */ (aliasTarget.type).declaration;
+      if (inner?.signatures?.length) {
+        return inner.signatures[0];
+      }
+    }
+  }
   return undefined;
 }
 
 /**
+ * Must stay aligned with allowlisted `propertiesTable` filtering in `custom-theme.mjs` (callable members are
+ * extracted here, not listed as properties).
+ *
  * @param {import('typedoc').DeclarationReflection} decl
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  */
-function isCallableMember(decl) {
+function shouldExtractCallableMember(decl, ctx) {
   if (decl.kind === ReflectionKind.Method) {
     return true;
   }
-  if (decl.kind === ReflectionKind.Property || decl.kind === ReflectionKind.Accessor) {
-    return !!getPrimaryCallSignature(decl);
+  if (
+    decl.kind === ReflectionKind.Property ||
+    decl.kind === ReflectionKind.Accessor ||
+    decl.kind === ReflectionKind.Variable
+  ) {
+    return isCallableInterfaceProperty(decl, ctx.helpers);
   }
   return false;
 }
@@ -804,7 +837,7 @@ function extractMethodsForPage(pageUrl, project, app) {
     if (child.name.startsWith('__')) {
       continue;
     }
-    if (!isCallableMember(/** @type {import('typedoc').DeclarationReflection} */ (child))) {
+    if (!shouldExtractCallableMember(/** @type {import('typedoc').DeclarationReflection} */ (child), ctx)) {
       continue;
     }
     const mdx = buildMethodMdx(/** @type {import('typedoc').DeclarationReflection} */ (child), ctx);

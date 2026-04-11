@@ -1018,3 +1018,5 @@ function isCallablePropertyValueType(t, helpers, seenReflectionIds) {
   }
   return false;
 }
+
+export { isCallableInterfaceProperty };
