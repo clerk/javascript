@@ -59,14 +59,8 @@ export function useOAuthConsent(params: UseOAuthConsentParams = {}): UseOAuthCon
     return readOAuthConsentFromSearch(window.location.search);
   }, []);
 
-  const oauthClientId = useMemo(() => {
-    const raw = oauthClientIdParam !== undefined ? oauthClientIdParam : fromUrl.oauthClientId;
-    return raw.trim();
-  }, [oauthClientIdParam, fromUrl.oauthClientId]);
-
-  const scope = useMemo(() => {
-    return scopeParam !== undefined ? scopeParam : fromUrl.scope;
-  }, [scopeParam, fromUrl.scope]);
+  const oauthClientId = (oauthClientIdParam !== undefined ? oauthClientIdParam : fromUrl.oauthClientId).trim();
+  const scope = scopeParam !== undefined ? scopeParam : fromUrl.scope;
 
   clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
@@ -83,7 +77,7 @@ export function useOAuthConsent(params: UseOAuthConsentParams = {}): UseOAuthCon
     queryKey,
     queryFn: () => fetchConsentInfo(clerk, { oauthClientId, scope }),
     enabled: queryEnabled,
-    placeholderData: defineKeepPreviousDataFn(keepPreviousData),
+    placeholderData: defineKeepPreviousDataFn(keepPreviousData && queryEnabled),
   });
 
   return {
