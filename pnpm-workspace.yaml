@@ -6,7 +6,7 @@ catalogs:
     react: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
     react-dom: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
   react:
-    '@types/react': 18.3.26
+    '@types/react': 18.3.28
     '@types/react-dom': 18.3.7
     react: 18.3.1
     react-dom: 18.3.1
@@ -35,6 +35,9 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
+  # CVE-2026-23869: React Server Components DoS
+  - 'next@15.5.15'
+  - '@next/*'
   # Renovate security update: @modelcontextprotocol/sdk@1.26.0
   - '@modelcontextprotocol/sdk@1.26.0'
   # Renovate security update: esbuild@0.25.0

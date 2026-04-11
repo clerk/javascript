@@ -88,6 +88,7 @@ import type {
   ListenerOptions,
   LoadedClerk,
   NavigateOptions,
+  OAuthApplicationNamespace,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -178,7 +179,7 @@ import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
 import { Protect } from './protect';
-import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
+import { BaseResource, Client, Environment, OAuthApplication, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
@@ -224,6 +225,7 @@ export class Clerk implements ClerkInterface {
 
   private static _billing: BillingNamespace;
   private static _apiKeys: APIKeysNamespace;
+  private static _oauthApplication: OAuthApplicationNamespace;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
 
   public client: ClientResource | undefined;
@@ -401,6 +403,15 @@ export class Clerk implements ClerkInterface {
       Clerk._apiKeys = new APIKeys();
     }
     return Clerk._apiKeys;
+  }
+
+  get oauthApplication(): OAuthApplicationNamespace {
+    if (!Clerk._oauthApplication) {
+      Clerk._oauthApplication = {
+        getConsentInfo: params => OAuthApplication.getConsentInfo(params),
+      };
+    }
+    return Clerk._oauthApplication;
   }
 
   __experimental_checkout(options: __experimental_CheckoutOptions): CheckoutSignalValue {

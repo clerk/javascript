@@ -245,8 +245,10 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     override fun getClientToken(promise: Promise) {
         try {
-            val prefs = reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
-            val deviceToken = prefs.getString("DEVICE_TOKEN", null)
+            // Use the SDK's public API which handles encrypted storage transparently.
+            // Direct SharedPreferences reads break on clerk-android >= 1.0.11 where
+            // DEVICE_TOKEN is encrypted via StorageCipher.
+            val deviceToken = Clerk.getDeviceToken()
             promise.resolve(deviceToken)
         } catch (e: Exception) {
             debugLog(TAG, "getClientToken failed: ${e.message}")
@@ -272,6 +274,8 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
         coroutineScope.launch {
             try {
                 Clerk.auth.signOut()
+                // Client refresh after sign-out is handled by the clerk-android
+                // SDK (SignOutService.signOut calls Client.getSkippingClientId).
                 promise.resolve(null)
             } catch (e: Exception) {
                 promise.reject("E_SIGN_OUT_FAILED", e.message ?: "Sign out failed", e)

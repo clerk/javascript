@@ -74,8 +74,10 @@ export default defineNuxtModule<ModuleOptions>({
           // Backend specific variables that are safe to share.
           // We want them to be overridable like the other public keys (e.g NUXT_PUBLIC_CLERK_PROXY_URL)
           proxyUrl: options.proxyUrl,
-          apiUrl: '',
-          apiVersion: 'v1',
+          // Deprecated: use NUXT_CLERK_API_URL and NUXT_CLERK_API_VERSION instead.
+          // Kept for backwards compatibility with NUXT_PUBLIC_CLERK_API_URL / NUXT_PUBLIC_CLERK_API_VERSION.
+          apiUrl: undefined,
+          apiVersion: undefined,
         },
       },
       // Private keys available only on within server-side
@@ -84,6 +86,8 @@ export default defineNuxtModule<ModuleOptions>({
         machineSecretKey: undefined,
         jwtKey: undefined,
         webhookSigningSecret: undefined,
+        apiUrl: undefined,
+        apiVersion: undefined,
       },
     });
 
