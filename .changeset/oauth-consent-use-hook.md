@@ -1,8 +1,5 @@
 ---
-'@clerk/shared': minor
-'@clerk/react': minor
-'@clerk/nextjs': minor
-'@clerk/expo': minor
+'@clerk/shared': patch
 ---
 
 Introduce internal `useOAuthConsent()` hook for fetching OAuth consent screen metadata for the signed-in user.

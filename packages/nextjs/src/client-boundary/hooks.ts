@@ -15,7 +15,6 @@ export {
   useUser,
   useReverification,
   useAPIKeys,
-  useOAuthConsent,
 } from '@clerk/react';
 
 export {
