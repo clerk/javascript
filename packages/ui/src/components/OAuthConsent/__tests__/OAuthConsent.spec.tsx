@@ -39,8 +39,8 @@ describe('OAuthConsent', () => {
       writable: true,
       value: {
         ...originalLocation,
-        search: '?client_id=client_test',
-        href: 'https://app.example/?client_id=client_test',
+        search: '?client_id=client_test&redirect_uri=https%3A%2F%2Fapp.example%2Fcallback',
+        href: 'https://app.example/?client_id=client_test&redirect_uri=https%3A%2F%2Fapp.example%2Fcallback',
       },
     });
   });
@@ -236,5 +236,75 @@ describe('OAuthConsent', () => {
     // Clicking Allow invokes the context callback, not a form submission.
     getByText('Allow').click();
     expect(onAllowSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows missing client_id error in the public flow', async () => {
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      writable: true,
+      value: {
+        ...window.location,
+        search: '',
+        href: 'https://app.example/',
+      },
+    });
+
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+
+    const { getByText } = render(<OAuthConsent />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText(/client ID is missing/i)).toBeVisible();
+    });
+  });
+
+  it('shows missing redirect_uri error in the public flow', async () => {
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      writable: true,
+      value: {
+        ...window.location,
+        search: '?client_id=client_test',
+        href: 'https://app.example/?client_id=client_test',
+      },
+    });
+
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+
+    const { getByText } = render(<OAuthConsent />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText(/redirect URI is missing/i)).toBeVisible();
+    });
+  });
+
+  it('shows error message when the consent fetch fails in the public flow', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockRejectedValue(new Error('Invalid OAuth client')),
+    });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+
+    const { getByText } = render(<OAuthConsent />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText(/Invalid OAuth client/i)).toBeVisible();
+    });
   });
 });

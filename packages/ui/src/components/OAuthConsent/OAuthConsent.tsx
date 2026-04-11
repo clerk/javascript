@@ -27,7 +27,7 @@ function _OAuthConsent() {
 
   // Public path: fetch via hook. Falls back to URL when context did not provide the data.
   const fromUrl = readOAuthConsentFromSearch();
-  const { data } = useOAuthConsent({
+  const { data, error: hookError } = useOAuthConsent({
     oauthClientId: ctx.oauthClientId ?? fromUrl.oauthClientId,
     scope: ctx.scope ?? fromUrl.scope,
   });
@@ -47,6 +47,35 @@ function _OAuthConsent() {
   const redirectUrl = ctx.redirectUrl ?? readRedirectUriFromSearch();
 
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
+
+  // Error states only apply to the public flow. The accounts portal path
+  // provides everything via context, so these checks are skipped.
+  const isPublicFlow = !hasContextCallbacks;
+  if (isPublicFlow) {
+    const oauthClientId = ctx.oauthClientId ?? fromUrl.oauthClientId;
+    const errorMessage = !oauthClientId
+      ? 'Authorization failed: the client ID is missing. Please ensure your application is properly configured.'
+      : !redirectUrl
+        ? 'Authorization failed: the redirect URI is missing.'
+        : hookError
+          ? hookError.message || 'Failed to load consent information.'
+          : null;
+
+    if (errorMessage) {
+      return (
+        <Flow.Root flow='oauthConsent'>
+          <Card.Root>
+            <Card.Content>
+              <Alert colorScheme='danger'>
+                <Text variant='caption'>{errorMessage}</Text>
+              </Alert>
+            </Card.Content>
+            <Card.Footer />
+          </Card.Root>
+        </Flow.Root>
+      );
+    }
+  }
 
   const actionUrl = (() => {
     const url = new URL(`https://${clerk.frontendApi}/v1/internal/oauth-consent`);
