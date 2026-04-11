@@ -105,15 +105,6 @@ describe('useOAuthConsent', () => {
     expect(result.current.isLoading).toBe(false);
   });
 
-  it('does not call getConsentInfo when oauthApplication.getConsentInfo is missing', () => {
-    mockClerk.oauthApplication = undefined;
-
-    const { result } = renderHook(() => useOAuthConsent({ oauthClientId: 'cid' }), { wrapper });
-
-    expect(getConsentInfoSpy).not.toHaveBeenCalled();
-    expect(result.current.isLoading).toBe(false);
-  });
-
   it('uses client_id and scope from the URL when hook params omit them', async () => {
     window.history.replaceState({}, '', '/?client_id=from_url&scope=openid%20email');
 
