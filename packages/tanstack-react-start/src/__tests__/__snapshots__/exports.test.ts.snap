@@ -67,7 +67,6 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "useAuth",
   "useClerk",
   "useEmailLink",
-  "useOAuthConsent",
   "useOrganization",
   "useOrganizationCreationDefaults",
   "useOrganizationList",
