@@ -3,3 +3,4 @@
  * If you do, app router will break.
  */
 export { MultisessionAppSupport } from './client-boundary/controlComponents';
+export { useOAuthConsent } from '@clerk/shared/react';
