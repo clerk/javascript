@@ -27,7 +27,7 @@ const HOOK_NAME = 'useOAuthConsent';
  * ### From the URL (`?client_id=...&scope=...`)
  *
  * ```tsx
- * import { useOAuthConsent } from '@clerk/react'
+ * import { useOAuthConsent } from '@clerk/react/internal'
  *
  * export default function OAuthConsentPage() {
  *   const { data, isLoading, error } = useOAuthConsent()
@@ -39,6 +39,8 @@ const HOOK_NAME = 'useOAuthConsent';
  * ### Explicit values (override URL)
  *
  * ```tsx
+ * import { useOAuthConsent } from '@clerk/react/internal'
+ *
  * const { data, isLoading, error } = useOAuthConsent({
  *   oauthClientId: clientIdFromProps,
  *   scope: scopeFromProps,
