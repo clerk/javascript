@@ -66,9 +66,7 @@ function _OAuthConsent() {
         <Flow.Root flow='oauthConsent'>
           <Card.Root>
             <Card.Content>
-              <Alert colorScheme='danger'>
-                <Text variant='caption'>{errorMessage}</Text>
-              </Alert>
+              <Card.Alert>{errorMessage}</Card.Alert>
             </Card.Content>
             <Card.Footer />
           </Card.Root>
