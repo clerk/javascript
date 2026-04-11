@@ -2270,7 +2270,7 @@ export type __internal_OAuthConsentProps = {
   /**
    * Name of the OAuth application.
    */
-  oAuthApplicationName: string;
+  oAuthApplicationName?: string;
   /**
    * Logo URL of the OAuth application.
    */
@@ -2282,7 +2282,7 @@ export type __internal_OAuthConsentProps = {
   /**
    * Scopes requested by the OAuth application.
    */
-  scopes: {
+  scopes?: {
     scope: string;
     description: string | null;
     requires_consent: boolean;
@@ -2290,15 +2290,35 @@ export type __internal_OAuthConsentProps = {
   /**
    * Full URL or path to navigate to after the user allows access.
    */
-  redirectUrl: string;
+  redirectUrl?: string;
   /**
    * Called when user allows access.
    */
-  onAllow: () => void;
+  onAllow?: () => void;
   /**
    * Called when user denies access.
    */
-  onDeny: () => void;
+  onDeny?: () => void;
+};
+
+/**
+ * Props for the public `<OAuthConsent />` React component.
+ */
+export type OAuthConsentProps = {
+  /**
+   * Override the OAuth client ID. Defaults to the `client_id` query parameter
+   * from the current URL.
+   */
+  oauthClientId?: string;
+  /**
+   * Override the OAuth scope. Defaults to the `scope` query parameter from
+   * the current URL.
+   */
+  scope?: string;
+  /**
+   * Customize the appearance of the component.
+   */
+  appearance?: ClerkAppearanceTheme;
 };
 
 export interface HandleEmailLinkVerificationParams {

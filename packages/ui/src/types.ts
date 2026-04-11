@@ -5,6 +5,7 @@ import type {
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
   APIKeysProps,
+  ClerkAppearanceTheme,
   CreateOrganizationProps,
   GoogleOneTapProps,
   NewSubscriptionRedirectUrl,
@@ -164,8 +165,58 @@ export type TaskSetupMFACtx = TaskSetupMFAProps & {
   componentName: 'TaskSetupMFA';
 };
 
-export type OAuthConsentCtx = __internal_OAuthConsentProps & {
+export type OAuthConsentCtx = {
   componentName: 'OAuthConsent';
+  /**
+   * Public-path override forwarded to `useOAuthConsent`. Falls back to the
+   * `client_id` query parameter from the current URL when omitted.
+   */
+  oauthClientId?: string;
+  /**
+   * Public-path override forwarded to `useOAuthConsent`. Falls back to the
+   * `scope` query parameter from the current URL when omitted.
+   */
+  scope?: string;
+  /**
+   * Pre-fetched scopes (accounts portal path). Snake-cased to match the
+   * legacy FAPI response shape.
+   */
+  scopes?: {
+    scope: string;
+    description: string | null;
+    requires_consent: boolean;
+  }[];
+  /**
+   * Pre-fetched OAuth application name (accounts portal path).
+   */
+  oauthApplicationName?: string;
+  /**
+   * Pre-fetched OAuth application logo URL (accounts portal path).
+   */
+  oauthApplicationLogoUrl?: string;
+  /**
+   * Pre-fetched OAuth application URL (accounts portal path).
+   */
+  oauthApplicationUrl?: string;
+  /**
+   * Redirect URI to display in the footer. Accounts portal path pre-populates
+   * this; public path reads `redirect_uri` from `window.location.search`.
+   */
+  redirectUrl?: string;
+  /**
+   * Custom Allow handler (accounts portal path). When omitted, the component
+   * submits its internal hidden form instead.
+   */
+  onAllow?: () => void;
+  /**
+   * Custom Deny handler (accounts portal path). When omitted, the component
+   * submits its internal hidden form instead.
+   */
+  onDeny?: () => void;
+  /**
+   * Customize the appearance of the component.
+   */
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type SubscriptionDetailsCtx = __internal_SubscriptionDetailsProps & {

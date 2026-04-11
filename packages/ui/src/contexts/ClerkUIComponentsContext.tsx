@@ -1,6 +1,7 @@
 import type {
   __internal_OAuthConsentProps,
   APIKeysProps,
+  OAuthConsentProps,
   PricingTableProps,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
@@ -114,12 +115,33 @@ export function ComponentContextProvider({
           {children}
         </APIKeysContext.Provider>
       );
-    case 'OAuthConsent':
+    case 'OAuthConsent': {
+      // Translate legacy `oAuth*` (capital-A) props into the new lowercase `oauth*`
+      // context shape. The accounts portal still calls `clerk.__internal_mountOAuthConsent`
+      // with the old field names for backward compat, so this mapping preserves their
+      // behavior. The public `<OAuthConsent />` React wrapper passes `oauthClientId`
+      // and `scope` through the same path, so we also forward those when present.
+      const legacy = props as __internal_OAuthConsentProps & OAuthConsentProps;
       return (
-        <OAuthConsentContext.Provider value={{ componentName, ...(props as __internal_OAuthConsentProps) }}>
+        <OAuthConsentContext.Provider
+          value={{
+            componentName,
+            oauthClientId: legacy.oauthClientId,
+            scope: legacy.scope,
+            scopes: legacy.scopes,
+            oauthApplicationName: legacy.oAuthApplicationName,
+            oauthApplicationLogoUrl: legacy.oAuthApplicationLogoUrl,
+            oauthApplicationUrl: legacy.oAuthApplicationUrl,
+            redirectUrl: legacy.redirectUrl,
+            onAllow: legacy.onAllow,
+            onDeny: legacy.onDeny,
+            appearance: legacy.appearance,
+          }}
+        >
           {children}
         </OAuthConsentContext.Provider>
       );
+    }
     case 'TaskChooseOrganization':
       return (
         <TaskChooseOrganizationContext.Provider

@@ -2,6 +2,7 @@ import type {
   APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
+  OAuthConsentProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -641,6 +642,37 @@ export const APIKeys = withClerk(
     );
   },
   { component: 'ApiKeys', renderWhileLoading: true },
+);
+
+/**
+ * @internal
+ */
+export const OAuthConsent = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<OAuthConsentProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.__internal_mountOAuthConsent}
+            unmount={clerk.__internal_unmountOAuthConsent}
+            updateProps={(clerk as any).__internal_updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'OAuthConsent', renderWhileLoading: true },
 );
 
 export const UserAvatar = withClerk(

@@ -4,9 +4,8 @@ import type { GetOAuthConsentInfoParams, OAuthConsentInfo } from '../../types';
 /**
  * Options for {@link useOAuthConsent}.
  *
- * `oauthClientId` and `scope` are optional. On the browser, the hook reads a one-time snapshot of
- * `window.location.search` and uses `client_id` and `scope` query keys when you omit them here.
- * Any value you pass explicitly overrides the snapshot for that field only.
+ * Pass `oauthClientId` and `scope` explicitly. The hook does not read from `window.location` or
+ * any other ambient source. The hook is disabled when `oauthClientId` is empty or omitted.
  *
  * @internal
  * @interface
