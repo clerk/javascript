@@ -2270,13 +2270,25 @@ export type __internal_OAuthConsentProps = {
   /**
    * Name of the OAuth application.
    */
-  oAuthApplicationName?: string;
+  oauthApplicationName?: string;
   /**
    * Logo URL of the OAuth application.
    */
-  oAuthApplicationLogoUrl?: string;
+  oauthApplicationLogoUrl?: string;
   /**
    * URL of the OAuth application.
+   */
+  oauthApplicationUrl?: string;
+  /**
+   * @deprecated Use `oauthApplicationName` instead.
+   */
+  oAuthApplicationName?: string;
+  /**
+   * @deprecated Use `oauthApplicationLogoUrl` instead.
+   */
+  oAuthApplicationLogoUrl?: string;
+  /**
+   * @deprecated Use `oauthApplicationUrl` instead.
    */
   oAuthApplicationUrl?: string;
   /**
