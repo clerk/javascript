@@ -22,7 +22,7 @@ catalogs:
     zx: 8.8.5
   module-manager:
     '@base-org/account': 2.0.1
-    '@coinbase/wallet-sdk': 4.3.0
+    '@coinbase/wallet-sdk': 4.3.7
     '@solana/wallet-adapter-base': 0.9.27
     '@solana/wallet-adapter-react': 0.15.39
     '@solana/wallet-standard': 1.1.4
