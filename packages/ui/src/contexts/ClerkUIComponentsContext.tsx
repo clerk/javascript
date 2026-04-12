@@ -116,10 +116,10 @@ export function ComponentContextProvider({
         </APIKeysContext.Provider>
       );
     case 'OAuthConsent': {
-      // New lowercase fields take precedence over the deprecated capital-A ones.
-      // The accounts portal still uses the old names (`oAuthApplicationName`, etc.)
-      // via `clerk.__internal_mountOAuthConsent`; those continue to work through
-      // the `??` fallback until the accounts portal migrates.
+      // Translate capital-A `oAuth*` props from the accounts portal into
+      // the lowercase `oauth*` context shape the component reads.
+      // The public `<OAuthConsent />` wrapper also forwards `oauthClientId`
+      // and `scope` through the same path.
       const p = props as __internal_OAuthConsentProps & OAuthConsentProps;
       return (
         <OAuthConsentContext.Provider
@@ -128,9 +128,9 @@ export function ComponentContextProvider({
             oauthClientId: p.oauthClientId,
             scope: p.scope,
             scopes: p.scopes,
-            oauthApplicationName: p.oauthApplicationName ?? p.oAuthApplicationName,
-            oauthApplicationLogoUrl: p.oauthApplicationLogoUrl ?? p.oAuthApplicationLogoUrl,
-            oauthApplicationUrl: p.oauthApplicationUrl ?? p.oAuthApplicationUrl,
+            oauthApplicationName: p.oAuthApplicationName,
+            oauthApplicationLogoUrl: p.oAuthApplicationLogoUrl,
+            oauthApplicationUrl: p.oAuthApplicationUrl,
             redirectUrl: p.redirectUrl,
             onAllow: p.onAllow,
             onDeny: p.onDeny,
