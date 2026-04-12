@@ -15,7 +15,6 @@ export {
   APIKeys,
   CreateOrganization,
   GoogleOneTap,
-  OAuthConsent,
   OrganizationList,
   OrganizationSwitcher,
   PricingTable,

@@ -34,6 +34,7 @@ function _OAuthConsent() {
   const { data, error: hookError } = useOAuthConsent({
     oauthClientId: ctx.oauthClientId ?? fromUrl.oauthClientId,
     scope: ctx.scope ?? fromUrl.scope,
+    // TODO: Remove this once account portal is refactored to use this component
     enabled: !hasContextCallbacks,
   });
 

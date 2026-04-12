@@ -644,9 +644,6 @@ export const APIKeys = withClerk(
   { component: 'ApiKeys', renderWhileLoading: true },
 );
 
-/**
- * @internal
- */
 export const OAuthConsent = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<OAuthConsentProps & FallbackProp>) => {
     const mountingStatus = useWaitForComponentMount(component);
