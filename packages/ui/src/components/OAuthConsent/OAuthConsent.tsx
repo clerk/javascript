@@ -25,11 +25,16 @@ function _OAuthConsent() {
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
 
-  // Public path: fetch via hook. Falls back to URL when context did not provide the data.
+  // onAllow and onDeny are always provided as a pair by the accounts portal.
+  const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
+
+  // Public path: fetch via hook. Disabled on the accounts portal path
+  // (which already has all data via context) to avoid a wasted FAPI request.
   const fromUrl = readOAuthConsentFromSearch();
   const { data, error: hookError } = useOAuthConsent({
     oauthClientId: ctx.oauthClientId ?? fromUrl.oauthClientId,
     scope: ctx.scope ?? fromUrl.scope,
+    enabled: !hasContextCallbacks,
   });
 
   // Hook returns camelCase `requiresConsent`; the render logic uses snake_case.
@@ -45,8 +50,6 @@ function _OAuthConsent() {
   const oauthApplicationLogoUrl = ctx.oauthApplicationLogoUrl ?? data?.oauthApplicationLogoUrl;
   const oauthApplicationUrl = ctx.oauthApplicationUrl ?? data?.oauthApplicationUrl;
   const redirectUrl = ctx.redirectUrl ?? readRedirectUriFromSearch();
-
-  const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
 
   // Error states only apply to the public flow. The accounts portal path
   // provides everything via context, so these checks are skipped.

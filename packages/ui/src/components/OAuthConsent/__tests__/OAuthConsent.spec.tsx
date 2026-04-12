@@ -236,6 +236,9 @@ describe('OAuthConsent', () => {
     // Clicking Allow invokes the context callback, not a form submission.
     getByText('Allow').click();
     expect(onAllowSpy).toHaveBeenCalledTimes(1);
+
+    // The hook should NOT fire a FAPI request on the accounts portal path.
+    expect(fixtures.clerk.oauthApplication.getConsentInfo).not.toHaveBeenCalled();
   });
 
   it('shows missing client_id error in the public flow', async () => {
