@@ -28,12 +28,16 @@ function _OAuthConsent() {
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
 
+  // Resolve oauthClientId and scope once: context overrides URL fallback.
+  const fromUrl = getOAuthConsentFromSearch();
+  const oauthClientId = ctx.oauthClientId ?? fromUrl.oauthClientId;
+  const scope = ctx.scope ?? fromUrl.scope;
+
   // Public path: fetch via hook. Disabled on the accounts portal path
   // (which already has all data via context) to avoid a wasted FAPI request.
-  const fromUrl = readOAuthConsentFromSearch();
   const { data, error: hookError } = useOAuthConsent({
-    oauthClientId: ctx.oauthClientId ?? fromUrl.oauthClientId,
-    scope: ctx.scope ?? fromUrl.scope,
+    oauthClientId,
+    scope,
     // TODO: Remove this once account portal is refactored to use this component
     enabled: !hasContextCallbacks,
   });
@@ -50,13 +54,10 @@ function _OAuthConsent() {
   const oauthApplicationName = ctx.oauthApplicationName ?? data?.oauthApplicationName ?? '';
   const oauthApplicationLogoUrl = ctx.oauthApplicationLogoUrl ?? data?.oauthApplicationLogoUrl;
   const oauthApplicationUrl = ctx.oauthApplicationUrl ?? data?.oauthApplicationUrl;
-  const redirectUrl = ctx.redirectUrl ?? readRedirectUriFromSearch();
+  const redirectUrl = ctx.redirectUrl ?? getRedirectUriFromSearch();
 
-  // Error states only apply to the public flow. The accounts portal path
-  // provides everything via context, so these checks are skipped.
-  const isPublicFlow = !hasContextCallbacks;
-  if (isPublicFlow) {
-    const oauthClientId = ctx.oauthClientId ?? fromUrl.oauthClientId;
+  // Error states only apply to the public flow.
+  if (!hasContextCallbacks) {
     const errorMessage = !oauthClientId
       ? 'The client ID is missing.'
       : !redirectUrl
@@ -88,10 +89,7 @@ function _OAuthConsent() {
     return url.toString();
   })();
 
-  const forwardedParams =
-    typeof window !== 'undefined' && window.location
-      ? Array.from(new URLSearchParams(window.location.search).entries())
-      : [];
+  const forwardedParams = canReadLocation() ? Array.from(new URLSearchParams(window.location.search).entries()) : [];
 
   // Accounts portal path delegates to context callbacks; public path lets the form submit natively.
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -109,17 +107,9 @@ function _OAuthConsent() {
 
   const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
 
-  const displayedScopes = (scopes || []).filter(item => item.scope !== OFFLINE_ACCESS_SCOPE);
-  const hasOfflineAccess = (scopes || []).some(item => item.scope === OFFLINE_ACCESS_SCOPE);
-
-  function getRootDomain(): string {
-    try {
-      const { hostname } = new URL(redirectUrl);
-      return hostname.split('.').slice(-2).join('.');
-    } catch {
-      return '';
-    }
-  }
+  const displayedScopes = scopes.filter(item => item.scope !== OFFLINE_ACCESS_SCOPE);
+  const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
+  const rootDomain = getRootDomain(redirectUrl);
 
   return (
     <Flow.Root flow='oauthConsent'>
@@ -280,7 +270,7 @@ function _OAuthConsent() {
                       }}
                       onClick={() => setIsUriModalOpen(true)}
                     >
-                      ({getRootDomain()})
+                      ({rootDomain})
                     </Text>
                   </Tooltip.Trigger>
                   <Tooltip.Content text={`View full URL`} />
@@ -331,7 +321,7 @@ function _OAuthConsent() {
                       }}
                       onClick={() => setIsUriModalOpen(true)}
                     >
-                      {getRootDomain()}
+                      {rootDomain}
                     </Text>
                   </Tooltip.Trigger>
                   <Tooltip.Content text={`View full URL`} />
@@ -491,15 +481,26 @@ function ConnectionSeparator() {
   );
 }
 
-function readRedirectUriFromSearch(): string {
-  if (typeof window === 'undefined' || !window.location) {
+const canReadLocation = () => typeof window !== 'undefined' && !!window.location;
+
+function getRootDomain(url: string): string {
+  try {
+    const { hostname } = new URL(url);
+    return hostname.split('.').slice(-2).join('.');
+  } catch {
+    return '';
+  }
+}
+
+function getRedirectUriFromSearch(): string {
+  if (!canReadLocation()) {
     return '';
   }
   return new URL(window.location.href).searchParams.get('redirect_uri') ?? '';
 }
 
-function readOAuthConsentFromSearch(): { oauthClientId: string; scope?: string } {
-  if (typeof window === 'undefined' || !window.location) {
+function getOAuthConsentFromSearch(): { oauthClientId: string; scope?: string } {
+  if (!canReadLocation()) {
     return { oauthClientId: '' };
   }
   const sp = new URLSearchParams(window.location.search);
