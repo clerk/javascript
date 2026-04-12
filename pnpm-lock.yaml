@@ -51,8 +51,8 @@ catalogs:
       specifier: 2.8.1
       version: 2.8.1
     tsup:
-      specifier: 8.5.0
-      version: 8.5.0
+      specifier: 8.5.1
+      version: 8.5.1
     typescript:
       specifier: 5.8.3
       version: 5.8.3
@@ -282,7 +282,7 @@ importers:
         version: 0.15.7(@arethetypeswrong/core@0.18.2)(publint@0.3.18)(typescript@5.8.3)(vue-tsc@3.1.4(typescript@5.8.3))
       tsup:
         specifier: catalog:repo
-        version: 8.5.0(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.8.3)
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.8.3)
       turbo:
         specifier: ^2.5.4
         version: 2.6.0
@@ -494,10 +494,10 @@ importers:
         version: 11.11.1(@types/react@18.3.28)(react@18.3.1)
       '@rsdoctor/rspack-plugin':
         specifier: ^0.4.13
-        version: 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
+        version: 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/cli':
         specifier: ^1.6.0
-        version: 1.6.1(@rspack/core@1.6.1(@swc/helpers@0.5.17))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
+        version: 1.6.1(@rspack/core@1.6.1(@swc/helpers@0.5.17))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/core':
         specifier: ^1.6.0
         version: 1.6.1(@swc/helpers@0.5.17)
@@ -919,7 +919,7 @@ importers:
         version: 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-start':
         specifier: 1.157.16
-        version: 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.2.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.20.6)(yaml@2.8.3))(webpack@5.102.1(esbuild@0.25.12))
+        version: 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.2.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.20.6)(yaml@2.8.3))(webpack@5.102.1(esbuild@0.27.7))
       esbuild-plugin-file-path-extensions:
         specifier: ^2.1.4
         version: 2.1.4
@@ -1005,10 +1005,10 @@ importers:
         version: 2.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@rsdoctor/rspack-plugin':
         specifier: ^0.4.13
-        version: 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
+        version: 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/cli':
         specifier: ^1.6.0
-        version: 1.6.1(@rspack/core@1.6.1(@swc/helpers@0.5.17))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
+        version: 1.6.1(@rspack/core@1.6.1(@swc/helpers@0.5.17))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/core':
         specifier: ^1.6.0
         version: 1.6.1(@swc/helpers@0.5.17)
@@ -10160,9 +10160,6 @@ packages:
   lodash.snakecase@4.1.1:
     resolution: {integrity: sha512-QZ1d4xoBHYUeuouhEq3lk3Uq7ldgyFXGBhg04+oRLnIz8o9T65Eh+8YdroUwn846zchkA9yDsDl5CVVaV2nqYw==}
 
-  lodash.sortby@4.7.0:
-    resolution: {integrity: sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA==}
-
   lodash.startcase@4.4.0:
     resolution: {integrity: sha512-+WKqsK294HMSc2jEbNgpHpd0JfIBhp7rEV4aqXWqFr6AlXov+SlcgB1Fv01y2kGe3Gc8nMW7VA0SrGuSkRfIEg==}
 
@@ -12833,11 +12830,6 @@ packages:
     resolution: {integrity: sha512-i5uvt8C3ikiWeNZSVZNWcfZPItFQOsYTUAOkcUPGd8DqDy1uOUikjt5dG+uRlwyvR108Fb9DOd4GvXfT0N2/uQ==}
     engines: {node: '>= 12'}
 
-  source-map@0.8.0-beta.0:
-    resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
-    engines: {node: '>= 8'}
-    deprecated: The work that was done in this beta branch won't be included in future versions
-
   space-separated-tokens@2.0.2:
     resolution: {integrity: sha512-PEGlAwrG8yXGXRjW32fGbg66JAlOAwbObuqVoJpv/mRgoWDQfgH1wDPvtzWyUSNAXBGSk8h755YDbbcEy3SH2Q==}
 
@@ -13407,9 +13399,6 @@ packages:
   tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
 
-  tr46@1.0.1:
-    resolution: {integrity: sha512-dTpowEjclQ7Kgx5SdBkqRzVhERQXov8/l9Ft9dVM9fmg0W0KQSVaXX9T4i6twCPNtYiZM53lpSSUAwJbFPOHxA==}
-
   tr46@5.1.1:
     resolution: {integrity: sha512-hdF5ZgjTqgAntKkklYw0R03MG2x/bSzTtkxmIRw/sTNV8YXsCJ1tfLAX23lhxhHJlEf3CRCOCGGWw3vI3GaSPw==}
     engines: {node: '>=18'}
@@ -13489,8 +13478,8 @@ packages:
     resolution: {integrity: sha512-LxhtAkPDTkVCMQjt2h6eBVY28KCjikZqZfMcC15YBeNjkgUpdCfBu5HoiOTDu86v6smE8yOjyEktJ8hlbANHQA==}
     engines: {node: '>=0.6.x'}
 
-  tsup@8.5.0:
-    resolution: {integrity: sha512-VmBp77lWNQq6PfuMqCHD3xWl22vEoWsKajkF8t+yMBawlUS8JzEI+vOVMeuNZIuMML8qXRizFKi9oD5glKQVcQ==}
+  tsup@8.5.1:
+    resolution: {integrity: sha512-xtgkqwdhpKWr3tKPmCkvYmS9xnQK3m3XgxZHwSUjvfTjp7YfXe5tT3GgWi0F2N+ZSMsOeWeZFh7ZZFg5iPhing==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -14305,9 +14294,6 @@ packages:
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
 
-  webidl-conversions@4.0.2:
-    resolution: {integrity: sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==}
-
   webidl-conversions@5.0.0:
     resolution: {integrity: sha512-VlZwKPCkYKxQgeSbH5EyngOmRp7Ww7I9rQLERETtf5ofd9pGeswWiOtogpEO850jziPRarreGxn5QIiTqpb2wA==}
     engines: {node: '>=8'}
@@ -14411,9 +14397,6 @@ packages:
 
   whatwg-url@5.0.0:
     resolution: {integrity: sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==}
-
-  whatwg-url@7.1.0:
-    resolution: {integrity: sha512-WUu7Rg1DroM7oQvGWfOiAK21n74Gg+T4elXEQYkOhtyLeWiJFoOGLXPKI/9gzIie9CtwVLm8wtw6YJdKyxSjeg==}
 
   which-boxed-primitive@1.1.1:
     resolution: {integrity: sha512-TbX3mj8n0odCBFVlY8AxkqcHASw3L60jIuF8jFP78az3C2YhmGvqbHBpAjTRH2/xqYunrJ9g1jSyjCjpoWzIAA==}
@@ -19094,12 +19077,12 @@ snapshots:
 
   '@rsdoctor/client@0.4.13': {}
 
-  '@rsdoctor/core@0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))':
+  '@rsdoctor/core@0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
-      '@rsdoctor/graph': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
-      '@rsdoctor/sdk': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
-      '@rsdoctor/types': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.25.12))
-      '@rsdoctor/utils': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.25.12))
+      '@rsdoctor/graph': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/sdk': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/types': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/utils': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.27.7))
       axios: 1.13.2
       enhanced-resolve: 5.12.0
       filesize: 10.1.6
@@ -19117,10 +19100,10 @@ snapshots:
       - utf-8-validate
       - webpack
 
-  '@rsdoctor/graph@0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))':
+  '@rsdoctor/graph@0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
-      '@rsdoctor/types': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.25.12))
-      '@rsdoctor/utils': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.25.12))
+      '@rsdoctor/types': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/utils': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.27.7))
       lodash.unionby: 4.8.0
       socket.io: 4.8.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       source-map: 0.7.6
@@ -19131,13 +19114,13 @@ snapshots:
       - utf-8-validate
       - webpack
 
-  '@rsdoctor/rspack-plugin@0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))':
+  '@rsdoctor/rspack-plugin@0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
-      '@rsdoctor/core': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
-      '@rsdoctor/graph': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
-      '@rsdoctor/sdk': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
-      '@rsdoctor/types': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.25.12))
-      '@rsdoctor/utils': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.25.12))
+      '@rsdoctor/core': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/graph': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/sdk': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/types': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/utils': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/core': 1.6.1(@swc/helpers@0.5.17)
       lodash: 4.17.21
     transitivePeerDependencies:
@@ -19147,12 +19130,12 @@ snapshots:
       - utf-8-validate
       - webpack
 
-  '@rsdoctor/sdk@0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))':
+  '@rsdoctor/sdk@0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@rsdoctor/client': 0.4.13
-      '@rsdoctor/graph': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
-      '@rsdoctor/types': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.25.12))
-      '@rsdoctor/utils': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.25.12))
+      '@rsdoctor/graph': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/types': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/utils': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.27.7))
       '@types/fs-extra': 11.0.4
       body-parser: 1.20.3
       cors: 2.8.5
@@ -19172,20 +19155,20 @@ snapshots:
       - utf-8-validate
       - webpack
 
-  '@rsdoctor/types@0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.25.12))':
+  '@rsdoctor/types@0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@types/connect': 3.4.38
       '@types/estree': 1.0.5
       '@types/tapable': 2.2.7
       source-map: 0.7.6
-      webpack: 5.102.1(esbuild@0.25.12)
+      webpack: 5.102.1(esbuild@0.27.7)
     optionalDependencies:
       '@rspack/core': 1.6.1(@swc/helpers@0.5.17)
 
-  '@rsdoctor/utils@0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.25.12))':
+  '@rsdoctor/utils@0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@babel/code-frame': 7.25.7
-      '@rsdoctor/types': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.25.12))
+      '@rsdoctor/types': 0.4.13(@rspack/core@1.6.1(@swc/helpers@0.5.17))(webpack@5.102.1(esbuild@0.27.7))
       '@types/estree': 1.0.5
       acorn: 8.16.0
       acorn-import-assertions: 1.9.0(acorn@8.16.0)
@@ -19251,11 +19234,11 @@ snapshots:
       '@rspack/binding-win32-ia32-msvc': 1.6.1
       '@rspack/binding-win32-x64-msvc': 1.6.1
 
-  '@rspack/cli@1.6.1(@rspack/core@1.6.1(@swc/helpers@0.5.17))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))':
+  '@rspack/cli@1.6.1(@rspack/core@1.6.1(@swc/helpers@0.5.17))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@discoveryjs/json-ext': 0.5.7
       '@rspack/core': 1.6.1(@swc/helpers@0.5.17)
-      '@rspack/dev-server': 1.1.4(@rspack/core@1.6.1(@swc/helpers@0.5.17))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
+      '@rspack/dev-server': 1.1.4(@rspack/core@1.6.1(@swc/helpers@0.5.17))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       exit-hook: 4.0.0
       webpack-bundle-analyzer: 4.10.2(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
@@ -19275,13 +19258,13 @@ snapshots:
     optionalDependencies:
       '@swc/helpers': 0.5.17
 
-  '@rspack/dev-server@1.1.4(@rspack/core@1.6.1(@swc/helpers@0.5.17))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))':
+  '@rspack/dev-server@1.1.4(@rspack/core@1.6.1(@swc/helpers@0.5.17))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@rspack/core': 1.6.1(@swc/helpers@0.5.17)
       chokidar: 3.6.0
       http-proxy-middleware: 2.0.9(@types/express@4.17.25)
       p-retry: 6.2.1
-      webpack-dev-server: 5.2.2(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12))
+      webpack-dev-server: 5.2.2(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - '@types/express'
@@ -19890,14 +19873,14 @@ snapshots:
     transitivePeerDependencies:
       - crossws
 
-  '@tanstack/react-start@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.2.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.20.6)(yaml@2.8.3))(webpack@5.102.1(esbuild@0.25.12))':
+  '@tanstack/react-start@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.2.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.20.6)(yaml@2.8.3))(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@tanstack/react-router': 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-start-client': 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-start-server': 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/router-utils': 1.154.7
       '@tanstack/start-client-core': 1.157.16
-      '@tanstack/start-plugin-core': 1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.2.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.20.6)(yaml@2.8.3))(webpack@5.102.1(esbuild@0.25.12))
+      '@tanstack/start-plugin-core': 1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.2.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.20.6)(yaml@2.8.3))(webpack@5.102.1(esbuild@0.27.7))
       '@tanstack/start-server-core': 1.157.16
       pathe: 2.0.3
       react: 18.3.1
@@ -19940,7 +19923,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tanstack/router-plugin@1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.2.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.20.6)(yaml@2.8.3))(webpack@5.102.1(esbuild@0.25.12))':
+  '@tanstack/router-plugin@1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.2.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.20.6)(yaml@2.8.3))(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-syntax-jsx': 7.27.1(@babel/core@7.28.5)
@@ -19959,7 +19942,7 @@ snapshots:
     optionalDependencies:
       '@tanstack/react-router': 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       vite: 7.2.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.20.6)(yaml@2.8.3)
-      webpack: 5.102.1(esbuild@0.25.12)
+      webpack: 5.102.1(esbuild@0.27.7)
     transitivePeerDependencies:
       - supports-color
 
@@ -19986,7 +19969,7 @@ snapshots:
 
   '@tanstack/start-fn-stubs@1.154.7': {}
 
-  '@tanstack/start-plugin-core@1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.2.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.20.6)(yaml@2.8.3))(webpack@5.102.1(esbuild@0.25.12))':
+  '@tanstack/start-plugin-core@1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.2.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.20.6)(yaml@2.8.3))(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@babel/code-frame': 7.27.1
       '@babel/core': 7.28.5
@@ -19994,7 +19977,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.40
       '@tanstack/router-core': 1.157.16
       '@tanstack/router-generator': 1.157.16
-      '@tanstack/router-plugin': 1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.2.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.20.6)(yaml@2.8.3))(webpack@5.102.1(esbuild@0.25.12))
+      '@tanstack/router-plugin': 1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.2.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.20.6)(yaml@2.8.3))(webpack@5.102.1(esbuild@0.27.7))
       '@tanstack/router-utils': 1.154.7
       '@tanstack/start-client-core': 1.157.16
       '@tanstack/start-server-core': 1.157.16
@@ -21957,9 +21940,9 @@ snapshots:
     dependencies:
       run-applescript: 7.1.0
 
-  bundle-require@5.1.0(esbuild@0.25.12):
+  bundle-require@5.1.0(esbuild@0.27.7):
     dependencies:
-      esbuild: 0.25.12
+      esbuild: 0.27.7
       load-tsconfig: 0.2.5
 
   bundlewatch@0.4.1:
@@ -26148,8 +26131,6 @@ snapshots:
 
   lodash.snakecase@4.1.1: {}
 
-  lodash.sortby@4.7.0: {}
-
   lodash.startcase@4.4.0: {}
 
   lodash.throttle@4.1.1: {}
@@ -29704,10 +29685,6 @@ snapshots:
 
   source-map@0.7.6: {}
 
-  source-map@0.8.0-beta.0:
-    dependencies:
-      whatwg-url: 7.1.0
-
   space-separated-tokens@2.0.2: {}
 
   spawndamnit@3.0.1:
@@ -30174,15 +30151,15 @@ snapshots:
       ansi-escapes: 4.3.2
       supports-hyperlinks: 2.3.0
 
-  terser-webpack-plugin@5.4.0(esbuild@0.25.12)(webpack@5.102.1(esbuild@0.25.12)):
+  terser-webpack-plugin@5.4.0(esbuild@0.27.7)(webpack@5.102.1(esbuild@0.27.7)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.3.3
       terser: 5.46.1
-      webpack: 5.102.1(esbuild@0.25.12)
+      webpack: 5.102.1(esbuild@0.27.7)
     optionalDependencies:
-      esbuild: 0.25.12
+      esbuild: 0.27.7
 
   terser@5.46.1:
     dependencies:
@@ -30298,10 +30275,6 @@ snapshots:
 
   tr46@0.0.3: {}
 
-  tr46@1.0.1:
-    dependencies:
-      punycode: 2.3.1
-
   tr46@5.1.1:
     dependencies:
       punycode: 2.3.1
@@ -30371,21 +30344,21 @@ snapshots:
 
   tsscmp@1.0.6: {}
 
-  tsup@8.5.0(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.8.3):
+  tsup@8.5.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.8.3):
     dependencies:
-      bundle-require: 5.1.0(esbuild@0.25.12)
+      bundle-require: 5.1.0(esbuild@0.27.7)
       cac: 6.7.14
       chokidar: 4.0.3
       consola: 3.4.2
       debug: 4.4.3(supports-color@8.1.1)
-      esbuild: 0.25.12
+      esbuild: 0.27.7
       fix-dts-default-cjs-exports: 1.0.1
       joycon: 3.1.1
       picocolors: 1.1.1
       postcss-load-config: 6.0.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.6)(yaml@2.8.3)
       resolve-from: 5.0.0
       rollup: 4.53.1
-      source-map: 0.8.0-beta.0
+      source-map: 0.7.6
       sucrase: 3.35.0
       tinyexec: 0.3.2
       tinyglobby: 0.2.15
@@ -31313,8 +31286,6 @@ snapshots:
 
   webidl-conversions@3.0.1: {}
 
-  webidl-conversions@4.0.2: {}
-
   webidl-conversions@5.0.0: {}
 
   webidl-conversions@7.0.0: {}
@@ -31340,7 +31311,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  webpack-dev-middleware@7.4.5(webpack@5.102.1(esbuild@0.25.12)):
+  webpack-dev-middleware@7.4.5(webpack@5.102.1(esbuild@0.27.7)):
     dependencies:
       colorette: 2.0.20
       memfs: 4.50.0
@@ -31349,9 +31320,9 @@ snapshots:
       range-parser: 1.2.1
       schema-utils: 4.3.3
     optionalDependencies:
-      webpack: 5.102.1(esbuild@0.25.12)
+      webpack: 5.102.1(esbuild@0.27.7)
 
-  webpack-dev-server@5.2.2(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.25.12)):
+  webpack-dev-server@5.2.2(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7)):
     dependencies:
       '@types/bonjour': 3.5.13
       '@types/connect-history-api-fallback': 1.5.4
@@ -31379,10 +31350,10 @@ snapshots:
       serve-index: 1.9.1
       sockjs: 0.3.24
       spdy: 4.0.2
-      webpack-dev-middleware: 7.4.5(webpack@5.102.1(esbuild@0.25.12))
+      webpack-dev-middleware: 7.4.5(webpack@5.102.1(esbuild@0.27.7))
       ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     optionalDependencies:
-      webpack: 5.102.1(esbuild@0.25.12)
+      webpack: 5.102.1(esbuild@0.27.7)
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -31399,7 +31370,7 @@ snapshots:
 
   webpack-virtual-modules@0.6.2: {}
 
-  webpack@5.102.1(esbuild@0.25.12):
+  webpack@5.102.1(esbuild@0.27.7):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.8
@@ -31423,7 +31394,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.2
-      terser-webpack-plugin: 5.4.0(esbuild@0.25.12)(webpack@5.102.1(esbuild@0.25.12))
+      terser-webpack-plugin: 5.4.0(esbuild@0.27.7)(webpack@5.102.1(esbuild@0.27.7))
       watchpack: 2.5.1
       webpack-sources: 3.3.4
     transitivePeerDependencies:
@@ -31475,12 +31446,6 @@ snapshots:
     dependencies:
       tr46: 0.0.3
       webidl-conversions: 3.0.1
-
-  whatwg-url@7.1.0:
-    dependencies:
-      lodash.sortby: 4.7.0
-      tr46: 1.0.1
-      webidl-conversions: 4.0.2
 
   which-boxed-primitive@1.1.1:
     dependencies:
