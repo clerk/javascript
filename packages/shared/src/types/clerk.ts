@@ -2269,18 +2269,22 @@ export type __internal_OAuthConsentProps = {
   appearance?: ClerkAppearanceTheme;
   /**
    * Name of the OAuth application.
+   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
    */
   oAuthApplicationName?: string;
   /**
    * Logo URL of the OAuth application.
+   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
    */
   oAuthApplicationLogoUrl?: string;
   /**
    * URL of the OAuth application.
+   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
    */
   oAuthApplicationUrl?: string;
   /**
    * Scopes requested by the OAuth application.
+   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
    */
   scopes?: {
     scope: string;
@@ -2289,14 +2293,17 @@ export type __internal_OAuthConsentProps = {
   }[];
   /**
    * Full URL or path to navigate to after the user allows access.
+   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
    */
   redirectUrl?: string;
   /**
    * Called when user allows access.
+   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
    */
   onAllow?: () => void;
   /**
    * Called when user denies access.
+   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
    */
   onDeny?: () => void;
 };
