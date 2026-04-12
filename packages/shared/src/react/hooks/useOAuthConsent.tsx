@@ -1,5 +1,3 @@
-'use client';
-
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { LoadedClerk } from '../../types/clerk';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
