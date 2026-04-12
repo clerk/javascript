@@ -4,3 +4,4 @@
  */
 export { MultisessionAppSupport } from './client-boundary/controlComponents';
 export { useOAuthConsent } from '@clerk/shared/react';
+export { OAuthConsent } from './client-boundary/uiComponents';
