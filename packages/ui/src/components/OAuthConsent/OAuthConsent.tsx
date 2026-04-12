@@ -85,8 +85,7 @@ function _OAuthConsent() {
     if (clerk.session?.id) {
       url.searchParams.set('_clerk_session_id', clerk.session.id);
     }
-    // TODO: forward dev browser JWT for development instances
-    return url.toString();
+    return clerk.buildUrlWithAuth(url.toString());
   })();
 
   const forwardedParams = canReadLocation() ? Array.from(new URLSearchParams(window.location.search).entries()) : [];
