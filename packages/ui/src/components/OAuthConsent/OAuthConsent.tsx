@@ -54,7 +54,7 @@ function _OAuthConsent() {
   if (isPublicFlow) {
     const oauthClientId = ctx.oauthClientId ?? fromUrl.oauthClientId;
     const errorMessage = !oauthClientId
-      ? 'The client ID is missing. Please ensure your application is properly configured.'
+      ? 'The client ID is missing.'
       : !redirectUrl
         ? 'The redirect URI is missing.'
         : hookError
@@ -72,12 +72,6 @@ function _OAuthConsent() {
           </Card.Root>
         </Flow.Root>
       );
-    }
-
-    // Still loading: don't render the consent card with empty values.
-    // The React wrapper's `fallback` prop handles loading UI.
-    if (!data) {
-      return null;
     }
   }
 
