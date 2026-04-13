@@ -479,7 +479,7 @@ void (async () => {
         app,
         componentControls.oauthConsent.getProps() ?? {
           scopes,
-          oauthClientId: 'Wg9fP2d0pSFXCZ1',
+          oauthClientId: 'Wg9fP2d0pSFXCZ1u',
           redirectUrl: searchParams.get('redirect_uri') ?? 'http://localhost:4000/api/oauth/callback',
         },
       );
