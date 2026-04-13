@@ -77,9 +77,7 @@ export function OrgSelect({ options, value, onChange }: OrgSelectProps) {
         ref={buttonRef}
         aria-haspopup='listbox'
         sx={theme => ({
-          inlineSize: 'min(100%, 16rem)',
           paddingInline: theme.space.$3,
-          marginInline: 'auto',
         })}
       >
         <Image
