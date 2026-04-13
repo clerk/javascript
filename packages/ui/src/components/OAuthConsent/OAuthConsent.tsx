@@ -1,5 +1,5 @@
-import { useClerk, useOAuthConsent, useUser } from '@clerk/shared/react';
-import { useState } from 'react';
+import { useClerk, useOAuthConsent, useOrganizationList, useUser } from '@clerk/shared/react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
 import { Box, Button, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
@@ -27,26 +27,30 @@ import { getForwardedParams, getOAuthConsentFromSearch, getRedirectUriFromSearch
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
-const FAKE_ORG_OPTIONS: OrgOption[] = [
-  { value: 'clerk-nation', label: 'Clerk Nation', logoUrl: 'https://img.clerk.com/static/clerk.png' },
-  {
-    value: 'perky-clerky',
-    label: 'Perky Clerky Clerk Nation Clerk Nation Clerk Nation',
-    logoUrl: 'https://img.clerk.com/static/clerk.png',
-  },
-  { value: 'clerk', label: 'Clerk', logoUrl: 'https://img.clerk.com/static/clerk.png' },
-  { value: 'clerk-of-oz', label: 'The Clerk of Oz', logoUrl: 'https://img.clerk.com/static/clerk.png' },
-];
-
 function _OAuthConsent() {
   const ctx = useOAuthConsentContext();
   const clerk = useClerk();
   const { user } = useUser();
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
-  const [selectedOrg, setSelectedOrg] = useState<string | null>('clerk-nation');
-  // TODO: Remove when org select is implemented
-  const renderOrgSelect = false;
+  const { isLoaded: isMembershipsLoaded, userMemberships } = useOrganizationList({ userMemberships: true });
+
+  const orgOptions: OrgOption[] = (userMemberships.data ?? []).map(m => ({
+    value: m.organization.id,
+    label: m.organization.name,
+    logoUrl: m.organization.imageUrl,
+  }));
+
+  const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
+  const autoSelectedRef = useRef(false);
+
+  // Auto-select the first org once memberships load.
+  useEffect(() => {
+    if (!autoSelectedRef.current && orgOptions.length > 0) {
+      autoSelectedRef.current = true;
+      setSelectedOrg(orgOptions[0].value);
+    }
+  }, [orgOptions]);
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -216,9 +220,9 @@ function _OAuthConsent() {
                 })}
               />
             </Header.Root>
-            {renderOrgSelect && (
+            {ctx.enableOrgSelection && isMembershipsLoaded && (
               <OrgSelect
-                options={FAKE_ORG_OPTIONS}
+                options={orgOptions}
                 value={selectedOrg}
                 onChange={setSelectedOrg}
               />
@@ -301,6 +305,13 @@ function _OAuthConsent() {
               value={value}
             />
           ))}
+        {!hasContextCallbacks && ctx.enableOrgSelection && selectedOrg && (
+          <input
+            type='hidden'
+            name='organization_id'
+            value={selectedOrg}
+          />
+        )}
       </form>
       <RedirectUriModal
         isOpen={isUriModalOpen}
