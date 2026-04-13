@@ -21,4 +21,4 @@ The JSON theme supports:
 - `design.borderRadius` — number, applied to both platforms.
 - `design.fontFamily` — string, **iOS only**.
 
-Theme JSON is validated at prebuild. On iOS the theme is embedded into `Info.plist` (and `UIUserInterfaceStyle` is removed when `darkColors` is present, so the system can switch modes). On Android the JSON is copied into `android/app/src/main/assets/clerk_theme.json`.
+Theme JSON is validated at prebuild. On iOS the theme is embedded into `Info.plist`; on Android the JSON is copied into `android/app/src/main/assets/clerk_theme.json`. The plugin does not modify your app's `userInterfaceStyle` setting — control light/dark mode via `"userInterfaceStyle"` in `app.json`.
