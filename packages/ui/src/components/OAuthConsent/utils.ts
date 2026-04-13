@@ -35,8 +35,16 @@ export function getForwardedParams(): Array<[string, string]> {
   return Array.from(new URLSearchParams(window.location.search).entries());
 }
 
-export function getActionUrl(frontendApi: string, sessionId?: string): string {
-  const url = new URL(`https://${frontendApi}/v1/internal/oauth-consent`);
+export function getActionUrl({
+  frontendApi,
+  sessionId,
+  clientId,
+}: {
+  frontendApi: string;
+  sessionId?: string;
+  clientId: string;
+}): string {
+  const url = new URL(`https://${frontendApi}/v1/me/oauth/consent/${clientId}`);
   if (sessionId) {
     url.searchParams.set('_clerk_session_id', sessionId);
   }

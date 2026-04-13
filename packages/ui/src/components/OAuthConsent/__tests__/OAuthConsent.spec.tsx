@@ -93,7 +93,7 @@ describe('OAuthConsent', () => {
     const { baseElement } = render(<OAuthConsent />, { wrapper });
 
     await waitFor(() => {
-      const form = baseElement.querySelector('form[action*="/v1/internal/oauth-consent"]');
+      const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]');
       expect(form).not.toBeNull();
 
       const allowButton = form!.querySelector('button[value="true"]');
@@ -114,7 +114,7 @@ describe('OAuthConsent', () => {
     const { getByText, baseElement } = render(<OAuthConsent />, { wrapper });
 
     const allowButton = await waitFor(() => getByText('Allow'));
-    const form = baseElement.querySelector('form[action*="/v1/internal/oauth-consent"]')!;
+    const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]')!;
 
     let submitted = false;
     form.addEventListener('submit', e => {
@@ -138,7 +138,7 @@ describe('OAuthConsent', () => {
     const { getByText, baseElement } = render(<OAuthConsent />, { wrapper });
 
     const denyButton = await waitFor(() => getByText('Deny'));
-    const form = baseElement.querySelector('form[action*="/v1/internal/oauth-consent"]')!;
+    const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]')!;
 
     let submitted = false;
     form.addEventListener('submit', e => {
@@ -228,7 +228,7 @@ describe('OAuthConsent', () => {
     await waitFor(() => expect(getByText('Accounts Portal App')).toBeVisible());
 
     // No forwarded hidden inputs inside the form when context callbacks are provided.
-    const form = baseElement.querySelector('form[action*="/v1/internal/oauth-consent"]')!;
+    const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]')!;
     expect(form).not.toBeNull();
     const forwardedInputs = form.querySelectorAll('input[type="hidden"]');
     expect(forwardedInputs.length).toBe(0);

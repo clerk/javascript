@@ -106,7 +106,11 @@ function _OAuthConsent() {
     }
   }
 
-  const actionUrl = getActionUrl(clerk.frontendApi, clerk.session?.id);
+  const actionUrl = getActionUrl({
+    frontendApi: clerk.frontendApi,
+    sessionId: clerk.session?.id,
+    clientId: oauthClientId,
+  });
   const forwardedParams = getForwardedParams();
 
   // Accounts portal path delegates to context callbacks; public path lets the form submit natively.
