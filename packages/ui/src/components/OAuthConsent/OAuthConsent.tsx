@@ -8,6 +8,7 @@ import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
+import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 import { Modal } from '@/ui/elements/Modal';
 import { Tooltip } from '@/ui/elements/Tooltip';
 import { LockDottedCircle } from '@/ui/icons';
@@ -43,7 +44,11 @@ function _OAuthConsent() {
 
   // Public path: fetch via hook. Disabled on the accounts portal path
   // (which already has all data via context) to avoid a wasted FAPI request.
-  const { data, error: hookError } = useOAuthConsent({
+  const {
+    data,
+    error: hookError,
+    isLoading,
+  } = useOAuthConsent({
     oauthClientId,
     scope,
     // TODO: Remove this once account portal is refactored to use this component
@@ -80,6 +85,19 @@ function _OAuthConsent() {
           <Card.Root>
             <Card.Content>
               <Card.Alert>{errorMessage}</Card.Alert>
+            </Card.Content>
+            <Card.Footer />
+          </Card.Root>
+        </Flow.Root>
+      );
+    }
+
+    if (isLoading) {
+      return (
+        <Flow.Root flow='oauthConsent'>
+          <Card.Root>
+            <Card.Content>
+              <LoadingCardContainer />
             </Card.Content>
             <Card.Footer />
           </Card.Root>
