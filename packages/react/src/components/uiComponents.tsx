@@ -1,8 +1,8 @@
 import type {
+  __internal_OAuthConsentProps,
   APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
-  __internal_OAuthConsentProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
