@@ -2266,52 +2266,10 @@ export type __experimental_SubscriptionDetailsButtonProps = {
 };
 
 export type __internal_OAuthConsentProps = {
+  /**
+   * Customize the appearance of the component.
+   */
   appearance?: ClerkAppearanceTheme;
-  /**
-   * Name of the OAuth application.
-   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
-   */
-  oAuthApplicationName?: string;
-  /**
-   * Logo URL of the OAuth application.
-   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
-   */
-  oAuthApplicationLogoUrl?: string;
-  /**
-   * URL of the OAuth application.
-   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
-   */
-  oAuthApplicationUrl?: string;
-  /**
-   * Scopes requested by the OAuth application.
-   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
-   */
-  scopes?: {
-    scope: string;
-    description: string | null;
-    requires_consent: boolean;
-  }[];
-  /**
-   * Full URL or path to navigate to after the user allows access.
-   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
-   */
-  redirectUrl?: string;
-  /**
-   * Called when user allows access.
-   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
-   */
-  onAllow?: () => void;
-  /**
-   * Called when user denies access.
-   * @deprecated Used by the accounts portal. Use the `<OAuthConsent />` component instead.
-   */
-  onDeny?: () => void;
-};
-
-/**
- * Props for the public `<OAuthConsent />` React component.
- */
-export type OAuthConsentProps = {
   /**
    * Override the OAuth client ID. Defaults to the `client_id` query parameter
    * from the current URL.
@@ -2323,9 +2281,44 @@ export type OAuthConsentProps = {
    */
   scope?: string;
   /**
-   * Customize the appearance of the component.
+   * Name of the OAuth application.
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
-  appearance?: ClerkAppearanceTheme;
+  oAuthApplicationName?: string;
+  /**
+   * Logo URL of the OAuth application.
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
+   */
+  oAuthApplicationLogoUrl?: string;
+  /**
+   * URL of the OAuth application.
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
+   */
+  oAuthApplicationUrl?: string;
+  /**
+   * Scopes requested by the OAuth application.
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
+   */
+  scopes?: {
+    scope: string;
+    description: string | null;
+    requires_consent: boolean;
+  }[];
+  /**
+   * Full URL or path to navigate to after the user allows or denies access.
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
+   */
+  redirectUrl?: string;
+  /**
+   * Called when user allows access.
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
+   */
+  onAllow?: () => void;
+  /**
+   * Called when user denies access.
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
+   */
+  onDeny?: () => void;
 };
 
 export interface HandleEmailLinkVerificationParams {
