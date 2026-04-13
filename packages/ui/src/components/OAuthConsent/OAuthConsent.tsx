@@ -21,8 +21,8 @@ import {
   ListGroupItemLabel,
 } from './ListGroup';
 import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupSeparator } from './LogoGroup';
-import { OrgSelect } from './OrgSelect';
 import type { OrgOption } from './OrgSelect';
+// import { OrgSelect } from './OrgSelect';
 import {
   getActionUrl,
   getForwardedParams,
@@ -33,7 +33,7 @@ import {
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
-const FAKE_ORG_OPTIONS: OrgOption[] = [
+const _FAKE_ORG_OPTIONS: OrgOption[] = [
   { value: 'clerk-nation', label: 'Clerk Nation', logoUrl: 'https://img.clerk.com/static/clerk.png' },
   {
     value: 'perky-clerky',
@@ -50,7 +50,7 @@ function _OAuthConsent() {
   const { user } = useUser();
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
-  const [selectedOrg, setSelectedOrg] = useState<string | null>('clerk-nation');
+  // const [selectedOrg, setSelectedOrg] = useState<string | null>('clerk-nation');
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -62,11 +62,7 @@ function _OAuthConsent() {
 
   // Public path: fetch via hook. Disabled on the accounts portal path
   // (which already has all data via context) to avoid a wasted FAPI request.
-  const {
-    data,
-    error: hookError,
-    isLoading,
-  } = useOAuthConsent({
+  const { data, isLoading } = useOAuthConsent({
     oauthClientId,
     scope,
     // TODO: Remove this once account portal is refactored to use this component
@@ -97,9 +93,7 @@ function _OAuthConsent() {
       ? 'The client ID is missing.'
       : !redirectUrl
         ? 'The redirect URI is missing.'
-        : hookError
-          ? hookError.message || 'Failed to load consent information.'
-          : null;
+        : 'Failed to load consent information.';
 
     if (errorMessage) {
       return (
@@ -228,11 +222,11 @@ function _OAuthConsent() {
                 })}
               />
             </Header.Root>
-            <OrgSelect
+            {/*<OrgSelect
               options={FAKE_ORG_OPTIONS}
               value={selectedOrg}
               onChange={setSelectedOrg}
-            />
+            />*/}
             <ListGroup>
               <ListGroupHeader>
                 <ListGroupHeaderTitle
