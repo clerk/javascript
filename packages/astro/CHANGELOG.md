@@ -1,5 +1,17 @@
 # @clerk/astro
 
+## 3.0.13
+
+### Patch Changes
+
+- Bump `astro` devDependency floor to `5.18.1` to pick up an upstream security fix. ([#8279](https://github.com/clerk/javascript/pull/8279)) by [@renovate](https://github.com/apps/renovate)
+
+- Simplified keyless service initialization. ([#7844](https://github.com/clerk/javascript/pull/7844)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`3fd586d`](https://github.com/clerk/javascript/commit/3fd586d171e9c281c4b96f620ee9070b47ba00f4), [`f9ff9e9`](https://github.com/clerk/javascript/commit/f9ff9e937d70713abf96fdd92071cd6e84b8eb80)]:
+  - @clerk/shared@4.7.0
+  - @clerk/backend@3.2.9
+
 ## 3.0.12
 
 ### Patch Changes
