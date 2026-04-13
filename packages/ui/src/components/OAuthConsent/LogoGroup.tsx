@@ -3,8 +3,8 @@ import React from 'react';
 
 import { Box, descriptors, Flex, Icon } from '@/ui/customizables';
 import { LockDottedCircle } from '@/ui/icons';
-import { common } from '@/ui/styledSystem';
 import type { ThemableCssProp } from '@/ui/styledSystem';
+import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
 
 export function LogoGroup({ children }: { children: React.ReactNode }) {

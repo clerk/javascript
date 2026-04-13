@@ -22,12 +22,12 @@ import {
 } from './ListGroup';
 import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupSeparator } from './LogoGroup';
 import type { OrgOption } from './OrgSelect';
-// import { OrgSelect } from './OrgSelect';
+import { OrgSelect } from './OrgSelect';
 import { getForwardedParams, getOAuthConsentFromSearch, getRedirectUriFromSearch, getRootDomain } from './utils';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
-const _FAKE_ORG_OPTIONS: OrgOption[] = [
+const FAKE_ORG_OPTIONS: OrgOption[] = [
   { value: 'clerk-nation', label: 'Clerk Nation', logoUrl: 'https://img.clerk.com/static/clerk.png' },
   {
     value: 'perky-clerky',
@@ -44,7 +44,9 @@ function _OAuthConsent() {
   const { user } = useUser();
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
-  // const [selectedOrg, setSelectedOrg] = useState<string | null>('clerk-nation');
+  const [selectedOrg, setSelectedOrg] = useState<string | null>('clerk-nation');
+  // TODO: Remove when org select is implemented
+  const renderOrgSelect = false;
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -214,11 +216,13 @@ function _OAuthConsent() {
                 })}
               />
             </Header.Root>
-            {/*<OrgSelect
-              options={FAKE_ORG_OPTIONS}
-              value={selectedOrg}
-              onChange={setSelectedOrg}
-            />*/}
+            {renderOrgSelect && (
+              <OrgSelect
+                options={FAKE_ORG_OPTIONS}
+                value={selectedOrg}
+                onChange={setSelectedOrg}
+              />
+            )}
             <ListGroup>
               <ListGroupHeader>
                 <ListGroupHeaderTitle
