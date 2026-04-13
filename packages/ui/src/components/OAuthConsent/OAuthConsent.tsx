@@ -1,22 +1,28 @@
 import { useClerk, useOAuthConsent, useUser } from '@clerk/shared/react';
-import type { ComponentProps } from 'react';
 import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
-import { Box, Button, Flex, Flow, Grid, Icon, Text } from '@/ui/customizables';
+import { Box, Button, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 import { Modal } from '@/ui/elements/Modal';
-import { Tooltip } from '@/ui/elements/Tooltip';
-import { LockDottedCircle } from '@/ui/icons';
 import { Alert, Textarea } from '@/ui/primitives';
-import type { ThemableCssProp } from '@/ui/styledSystem';
-import { common } from '@/ui/styledSystem';
-import { colors } from '@/ui/utils/colors';
 
+import { InlineAction } from './InlineAction';
+import {
+  ListGroup,
+  ListGroupContent,
+  ListGroupHeader,
+  ListGroupHeaderTitle,
+  ListGroupItem,
+  ListGroupItemLabel,
+} from './ListGroup';
+import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupSeparator } from './LogoGroup';
+import { OrgSelect } from './OrgSelect';
+import type { OrgOption } from './OrgSelect';
 import {
   getActionUrl,
   getForwardedParams,
@@ -27,12 +33,24 @@ import {
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
+const FAKE_ORG_OPTIONS: OrgOption[] = [
+  { value: 'clerk-nation', label: 'Clerk Nation', logoUrl: 'https://img.clerk.com/static/clerk.png' },
+  {
+    value: 'perky-clerky',
+    label: 'Perky Clerky Clerk Nation Clerk Nation Clerk Nation',
+    logoUrl: 'https://img.clerk.com/static/clerk.png',
+  },
+  { value: 'clerk', label: 'Clerk', logoUrl: 'https://img.clerk.com/static/clerk.png' },
+  { value: 'clerk-of-oz', label: 'The Clerk of Oz', logoUrl: 'https://img.clerk.com/static/clerk.png' },
+];
+
 function _OAuthConsent() {
   const ctx = useOAuthConsentContext();
   const clerk = useClerk();
   const { user } = useUser();
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
+  const [selectedOrg, setSelectedOrg] = useState<string | null>('clerk-nation');
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -68,6 +86,10 @@ function _OAuthConsent() {
   const oauthApplicationLogoUrl = ctx.oauthApplicationLogoUrl ?? data?.oauthApplicationLogoUrl;
   const oauthApplicationUrl = ctx.oauthApplicationUrl ?? data?.oauthApplicationUrl;
   const redirectUrl = ctx.redirectUrl ?? getRedirectUriFromSearch();
+
+  const { t } = useLocalizations();
+  const domainAction = getRootDomain(redirectUrl);
+  const viewFullUrlText = t(localizationKeys('oauthConsent.viewFullUrl'));
 
   // Error states only apply to the public flow.
   if (!hasContextCallbacks) {
@@ -131,7 +153,6 @@ function _OAuthConsent() {
 
   const displayedScopes = scopes.filter(item => item.scope !== OFFLINE_ACCESS_SCOPE);
   const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
-  const rootDomain = getRootDomain(redirectUrl);
 
   return (
     <Flow.Root flow='oauthConsent'>
@@ -145,36 +166,32 @@ function _OAuthConsent() {
             <Header.Root>
               {/* both have avatars */}
               {oauthApplicationLogoUrl && logoImageUrl && (
-                <ConnectionHeader>
-                  <ConnectionItem justify='end'>
+                <LogoGroup>
+                  <LogoGroupItem justify='end'>
                     <ApplicationLogo
                       src={oauthApplicationLogoUrl}
                       alt={oauthApplicationName}
                       href={oauthApplicationUrl}
                       isExternal
                     />
-                  </ConnectionItem>
-                  <ConnectionSeparator />
-                  <ConnectionItem justify='start'>
+                  </LogoGroupItem>
+                  <LogoGroupSeparator />
+                  <LogoGroupItem justify='start'>
                     <ApplicationLogo />
-                  </ConnectionItem>
-                </ConnectionHeader>
+                  </LogoGroupItem>
+                </LogoGroup>
               )}
               {/* only OAuth app has an avatar */}
               {oauthApplicationLogoUrl && !logoImageUrl && (
-                <ConnectionHeader>
-                  <Box
-                    sx={{
-                      position: 'relative',
-                    }}
-                  >
+                <LogoGroup>
+                  <Box sx={{ position: 'relative' }}>
                     <ApplicationLogo
                       src={oauthApplicationLogoUrl}
                       alt={oauthApplicationName}
                       href={oauthApplicationUrl}
                       isExternal
                     />
-                    <ConnectionIcon
+                    <LogoGroupIcon
                       size='sm'
                       sx={t => ({
                         position: 'absolute',
@@ -183,121 +200,71 @@ function _OAuthConsent() {
                       })}
                     />
                   </Box>
-                </ConnectionHeader>
+                </LogoGroup>
               )}
               {/* only Clerk application has an avatar */}
               {!oauthApplicationLogoUrl && logoImageUrl && (
-                <ConnectionHeader>
-                  <ConnectionItem justify='end'>
-                    <ConnectionIcon />
-                  </ConnectionItem>
-                  <ConnectionSeparator />
-                  <ConnectionItem justify='start'>
+                <LogoGroup>
+                  <LogoGroupItem justify='end'>
+                    <LogoGroupIcon />
+                  </LogoGroupItem>
+                  <LogoGroupSeparator />
+                  <LogoGroupItem justify='start'>
                     <ApplicationLogo />
-                  </ConnectionItem>
-                </ConnectionHeader>
+                  </LogoGroupItem>
+                </LogoGroup>
               )}
               {/* no avatars */}
               {!oauthApplicationLogoUrl && !logoImageUrl && (
-                <ConnectionHeader>
-                  <ConnectionIcon />
-                </ConnectionHeader>
+                <LogoGroup>
+                  <LogoGroupIcon />
+                </LogoGroup>
               )}
               <Header.Title localizationKey={oauthApplicationName} />
               <Header.Subtitle
-                localizationKey={`wants to access ${applicationName} on behalf of ${primaryIdentifier}`}
+                localizationKey={localizationKeys('oauthConsent.subtitle', {
+                  applicationName,
+                  identifier: primaryIdentifier || '',
+                })}
               />
             </Header.Root>
-            <Box
-              sx={t => ({
-                textAlign: 'start',
-                borderWidth: t.borderWidths.$normal,
-                borderStyle: t.borderStyles.$solid,
-                borderColor: t.colors.$borderAlpha100,
-                borderRadius: t.radii.$lg,
-                overflow: 'hidden',
-              })}
-            >
-              <Box
-                sx={t => ({
-                  padding: t.space.$3,
-                  background: common.mergedColorsBackground(
-                    colors.setAlpha(t.colors.$colorBackground, 1),
-                    t.colors.$neutralAlpha50,
-                  ),
-                })}
-              >
-                <Text
-                  variant='subtitle'
-                  localizationKey={`This will allow ${oauthApplicationName} access to:`}
+            <OrgSelect
+              options={FAKE_ORG_OPTIONS}
+              value={selectedOrg}
+              onChange={setSelectedOrg}
+            />
+            <ListGroup>
+              <ListGroupHeader>
+                <ListGroupHeaderTitle
+                  localizationKey={localizationKeys('oauthConsent.scopeList.title', {
+                    applicationName: oauthApplicationName,
+                  })}
                 />
-              </Box>
-              <Box
-                as='ul'
-                sx={t => ({ margin: t.sizes.$none, padding: t.sizes.$none })}
-              >
+              </ListGroupHeader>
+              <ListGroupContent>
                 {displayedScopes.map(item => (
-                  <Box
-                    key={item.scope}
-                    sx={t => ({
-                      display: 'flex',
-                      alignItems: 'baseline',
-                      paddingInline: t.space.$3,
-                      paddingBlock: t.space.$2,
-                      borderTopWidth: t.borderWidths.$normal,
-                      borderTopStyle: t.borderStyles.$solid,
-                      borderTopColor: t.colors.$borderAlpha100,
-                      '&::before': {
-                        content: '""',
-                        display: 'inline-block',
-                        width: t.space.$1,
-                        height: t.space.$1,
-                        background: t.colors.$colorMutedForeground,
-                        borderRadius: t.radii.$circle,
-                        transform: 'translateY(-0.1875rem)',
-                        marginInlineEnd: t.space.$2,
-                        flexShrink: 0,
-                      },
-                    })}
-                    as='li'
-                  >
-                    <Text
-                      variant='subtitle'
-                      localizationKey={item.description || item.scope || ''}
-                    />
-                  </Box>
+                  <ListGroupItem key={item.scope}>
+                    <ListGroupItemLabel>{item.description || item.scope || ''}</ListGroupItemLabel>
+                  </ListGroupItem>
                 ))}
-              </Box>
-            </Box>
+              </ListGroupContent>
+            </ListGroup>
             <Alert colorScheme='warning'>
               <Text
                 colorScheme='warning'
                 variant='caption'
               >
-                Make sure that you trust {oauthApplicationName} {''}
-                <Tooltip.Root>
-                  <Tooltip.Trigger>
-                    <Text
-                      as='span'
-                      role='button'
-                      tabIndex={0}
-                      aria-label='View full URL'
-                      variant='caption'
-                      sx={{
-                        textDecoration: 'underline',
-                        textDecorationStyle: 'dotted',
-                        cursor: 'pointer',
-                        outline: 'none',
-                        display: 'inline-block',
-                      }}
-                      onClick={() => setIsUriModalOpen(true)}
-                    >
-                      ({rootDomain})
-                    </Text>
-                  </Tooltip.Trigger>
-                  <Tooltip.Content text={`View full URL`} />
-                </Tooltip.Root>
-                {''}. You may be sharing sensitive data with this site or app.
+                <InlineAction
+                  text={t(
+                    localizationKeys('oauthConsent.warning', {
+                      applicationName: oauthApplicationName || applicationName,
+                      domainAction,
+                    }),
+                  )}
+                  actionText={domainAction}
+                  onClick={() => setIsUriModalOpen(true)}
+                  tooltipText={viewFullUrlText}
+                />
               </Text>
             </Alert>
             <Grid
@@ -310,45 +277,26 @@ function _OAuthConsent() {
                 value='false'
                 colorScheme='secondary'
                 variant='outline'
-                localizationKey='Deny'
+                localizationKey={localizationKeys('oauthConsent.action__deny')}
               />
               <Button
                 type='submit'
                 name='consented'
                 value='true'
-                localizationKey='Allow'
+                localizationKey={localizationKeys('oauthConsent.action__allow')}
               />
               <Text
-                sx={{
-                  gridColumn: 'span 2',
-                }}
+                sx={{ gridColumn: 'span 2' }}
                 colorScheme='secondary'
                 variant='caption'
               >
-                If you allow access, this app will redirect you to{' '}
-                <Tooltip.Root>
-                  <Tooltip.Trigger>
-                    <Text
-                      as='span'
-                      role='button'
-                      tabIndex={0}
-                      aria-label='View full URL'
-                      variant='caption'
-                      sx={{
-                        textDecoration: 'underline',
-                        textDecorationStyle: 'dotted',
-                        cursor: 'pointer',
-                        outline: 'none',
-                        display: 'inline-block',
-                      }}
-                      onClick={() => setIsUriModalOpen(true)}
-                    >
-                      {rootDomain}
-                    </Text>
-                  </Tooltip.Trigger>
-                  <Tooltip.Content text={`View full URL`} />
-                </Tooltip.Root>
-                .{hasOfflineAccess && " You'll stay signed in until you sign out or revoke access."}
+                <InlineAction
+                  text={t(localizationKeys('oauthConsent.redirectNotice', { domainAction }))}
+                  actionText={domainAction}
+                  onClick={() => setIsUriModalOpen(true)}
+                  tooltipText={viewFullUrlText}
+                />
+                {hasOfflineAccess && t(localizationKeys('oauthConsent.offlineAccessNotice'))}
               </Text>
             </Grid>
           </Card.Content>
@@ -396,9 +344,11 @@ function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oauthApplicati
       <Card.Root>
         <Card.Content>
           <Header.Root>
-            <Header.Title localizationKey={`Redirect URL`} />
+            <Header.Title localizationKey={localizationKeys('oauthConsent.redirectUriModal.title')} />
             <Header.Subtitle
-              localizationKey={`Make sure you trust ${oauthApplicationName} and that this URL belongs to ${oauthApplicationName}.`}
+              localizationKey={localizationKeys('oauthConsent.redirectUriModal.subtitle', {
+                applicationName: oauthApplicationName,
+              })}
             />
           </Header.Root>
           <Textarea
@@ -411,95 +361,6 @@ function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oauthApplicati
         </Card.Content>
       </Card.Root>
     </Modal>
-  );
-}
-
-function ConnectionHeader({ children }: { children: React.ReactNode }) {
-  return (
-    <Flex
-      justify='center'
-      align='center'
-      gap={4}
-      sx={t => ({
-        marginBlockEnd: t.space.$6,
-      })}
-    >
-      {children}
-    </Flex>
-  );
-}
-
-function ConnectionItem({ children, sx, ...props }: ComponentProps<typeof Flex>) {
-  return (
-    <Flex
-      {...props}
-      sx={[{ flex: 1 }, sx]}
-    >
-      {children}
-    </Flex>
-  );
-}
-
-function ConnectionIcon({ size = 'md', sx }: { size?: 'sm' | 'md'; sx?: ThemableCssProp }) {
-  const scale: ThemableCssProp = t => {
-    const value = size === 'sm' ? t.space.$6 : t.space.$12;
-    return {
-      width: value,
-      height: value,
-    };
-  };
-
-  return (
-    <Box
-      sx={t => [
-        {
-          background: common.mergedColorsBackground(
-            colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$neutralAlpha50,
-          ),
-          borderRadius: t.radii.$circle,
-          borderWidth: t.borderWidths.$normal,
-          borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$borderAlpha100,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-        scale,
-        sx,
-      ]}
-    >
-      <Icon
-        icon={LockDottedCircle}
-        sx={t => ({
-          color: t.colors.$primary500,
-        })}
-      />
-    </Box>
-  );
-}
-
-function ConnectionSeparator() {
-  return (
-    <Box
-      as='svg'
-      // @ts-ignore - valid SVG attribute
-      fill='none'
-      viewBox='0 0 16 2'
-      height={2}
-      aria-hidden
-      sx={t => ({
-        color: t.colors.$colorMutedForeground,
-      })}
-    >
-      <path
-        stroke='currentColor'
-        strokeDasharray='0.1 4'
-        strokeLinecap='round'
-        strokeWidth='2'
-        d='M1 1h14'
-      />
-    </Box>
   );
 }
 
