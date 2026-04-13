@@ -134,6 +134,7 @@ export function ComponentContextProvider({
             onAllow: p.onAllow,
             onDeny: p.onDeny,
             appearance: p.appearance,
+            enableOrgSelection: (p as any).__internal_enableOrgSelection === true,
           }}
         >
           {children}

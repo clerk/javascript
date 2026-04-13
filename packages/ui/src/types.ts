@@ -218,6 +218,11 @@ export type OAuthConsentCtx = {
    * Customize the appearance of the component.
    */
   appearance?: ClerkAppearanceTheme;
+  /**
+   * When true, renders the organization picker and submits organization_id
+   * with the consent form. Internal use only, not exposed in the public prop type.
+   */
+  enableOrgSelection?: boolean;
 };
 
 export type SubscriptionDetailsCtx = __internal_SubscriptionDetailsProps & {
