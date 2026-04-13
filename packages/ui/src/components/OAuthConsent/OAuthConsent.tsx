@@ -23,13 +23,7 @@ import {
 import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupSeparator } from './LogoGroup';
 import type { OrgOption } from './OrgSelect';
 // import { OrgSelect } from './OrgSelect';
-import {
-  getActionUrl,
-  getForwardedParams,
-  getOAuthConsentFromSearch,
-  getRedirectUriFromSearch,
-  getRootDomain,
-} from './utils';
+import { getForwardedParams, getOAuthConsentFromSearch, getRedirectUriFromSearch, getRootDomain } from './utils';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
@@ -62,7 +56,7 @@ function _OAuthConsent() {
 
   // Public path: fetch via hook. Disabled on the accounts portal path
   // (which already has all data via context) to avoid a wasted FAPI request.
-  const { data, isLoading } = useOAuthConsent({
+  const { data, isLoading, error } = useOAuthConsent({
     oauthClientId,
     scope,
     // TODO: Remove this once account portal is refactored to use this component
@@ -93,7 +87,9 @@ function _OAuthConsent() {
       ? 'The client ID is missing.'
       : !redirectUrl
         ? 'The redirect URI is missing.'
-        : 'Failed to load consent information.';
+        : error
+          ? (error.message ?? 'Failed to load consent information.')
+          : undefined;
 
     if (errorMessage) {
       return (
@@ -122,11 +118,7 @@ function _OAuthConsent() {
     }
   }
 
-  const actionUrl = getActionUrl({
-    frontendApi: clerk.frontendApi,
-    sessionId: clerk.session?.id,
-    clientId: oauthClientId,
-  });
+  const actionUrl = clerk.oauthApplication.buildConsentActionUrl({ clientId: oauthClientId });
   const forwardedParams = getForwardedParams();
 
   // Accounts portal path delegates to context callbacks; public path lets the form submit natively.

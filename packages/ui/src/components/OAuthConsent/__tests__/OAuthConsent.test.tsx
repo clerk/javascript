@@ -23,10 +23,17 @@ const fakeConsentInfo = {
  * `oauthApplication` is a getter on the Clerk prototype and cannot be assigned
  * directly. Use Object.defineProperty to replace it with a configurable mock.
  */
-function mockOAuthApplication(clerkInstance: any, impl: { getConsentInfo: ReturnType<typeof vi.fn> }) {
+function mockOAuthApplication(
+  clerkInstance: any,
+  impl: { getConsentInfo: ReturnType<typeof vi.fn>; buildConsentActionUrl?: ReturnType<typeof vi.fn> },
+) {
+  const merged = {
+    buildConsentActionUrl: vi.fn().mockReturnValue('https://clerk.example/__clerk_api/v1/me/oauth/consent/client_test'),
+    ...impl,
+  };
   Object.defineProperty(clerkInstance, 'oauthApplication', {
     configurable: true,
-    get: () => impl,
+    get: () => merged,
   });
 }
 

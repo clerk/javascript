@@ -1,5 +1,3 @@
-import { DEV_BROWSER_KEY } from '@clerk/shared/devBrowser';
-
 const canReadLocation = () => typeof window !== 'undefined' && !!window.location;
 
 export function getRootDomain(url: string): string {
@@ -33,26 +31,4 @@ export function getForwardedParams(): Array<[string, string]> {
     return [];
   }
   return Array.from(new URLSearchParams(window.location.search).entries());
-}
-
-export function getActionUrl({
-  frontendApi,
-  sessionId,
-  clientId,
-}: {
-  frontendApi: string;
-  sessionId?: string;
-  clientId: string;
-}): string {
-  const url = new URL(`https://${frontendApi}/v1/me/oauth/consent/${clientId}`);
-  if (sessionId) {
-    url.searchParams.set('_clerk_session_id', sessionId);
-  }
-  if (canReadLocation()) {
-    const dbJwt = new URLSearchParams(window.location.search).get(DEV_BROWSER_KEY);
-    if (dbJwt) {
-      url.searchParams.set(DEV_BROWSER_KEY, dbJwt);
-    }
-  }
-  return url.toString();
 }

@@ -1,21 +1,15 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import type {
-  ClerkResourceJSON,
   GetOAuthConsentInfoParams,
+  OAuthApplicationNamespace,
   OAuthConsentInfo,
   OAuthConsentInfoJSON,
 } from '@clerk/shared/types';
 
-import { BaseResource } from './internal';
+import { BaseResource } from '../../resources/internal';
 
-export class OAuthApplication extends BaseResource {
-  pathRoot = '';
-
-  protected fromJSON(_data: ClerkResourceJSON | null): this {
-    return this;
-  }
-
-  static async getConsentInfo(params: GetOAuthConsentInfoParams): Promise<OAuthConsentInfo> {
+export class OAuthApplication implements OAuthApplicationNamespace {
+  async getConsentInfo(params: GetOAuthConsentInfoParams): Promise<OAuthConsentInfo> {
     const { oauthClientId, scope } = params;
     const json = await BaseResource._fetch<OAuthConsentInfoJSON>(
       {
@@ -30,7 +24,6 @@ export class OAuthApplication extends BaseResource {
       throw new ClerkRuntimeError('Network request failed while offline', { code: 'network_error' });
     }
 
-    // Handle in case we start wrapping the response in the future
     const data = json.response ?? json;
     return {
       oauthApplicationName: data.oauth_application_name,
@@ -39,11 +32,19 @@ export class OAuthApplication extends BaseResource {
       clientId: data.client_id,
       state: data.state,
       scopes:
-        data.scopes?.map(scope => ({
-          scope: scope.scope,
-          description: scope.description,
-          requiresConsent: scope.requires_consent,
+        data.scopes?.map(s => ({
+          scope: s.scope,
+          description: s.description,
+          requiresConsent: s.requires_consent,
         })) ?? [],
     };
+  }
+
+  buildConsentActionUrl({ clientId }: { clientId: string }): string {
+    const url = BaseResource.fapiClient.buildUrl({
+      path: `/me/oauth/consent/${encodeURIComponent(clientId)}`,
+      sessionId: BaseResource.clerk.session?.id,
+    });
+    return BaseResource.clerk.buildUrlWithAuth(url.toString());
   }
 }
