@@ -17,7 +17,7 @@ test.describe('dynamic keys @nextjs', () => {
         () => `import { clerkClient, clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
         import { NextResponse } from 'next/server';
 
-        const isProtectedRoute = createRouteMatcher(['/protected']);
+        const isProtectedRoute = createRouteMatcher(['/protected', '/api/admin(.*)']);
         const shouldFetchBapi = createRouteMatcher(['/fetch-bapi-from-middleware']);
 
         export default clerkMiddleware(async (auth, request) => {
@@ -42,6 +42,13 @@ test.describe('dynamic keys @nextjs', () => {
         export const config = {
           matcher: ['/((?!.*\\\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
         };`,
+      )
+      .addFile(
+        'src/app/api/[module]/[...action]/route.ts',
+        () => `export async function GET(request, { params }) {
+          const { module: mod, action } = await params;
+          return Response.json({ module: mod, action: action.join('/') });
+        }`,
       )
       .addFile(
         'src/app/users-count/page.tsx',
@@ -94,5 +101,51 @@ test.describe('dynamic keys @nextjs', () => {
     await u.page.goToRelative('/fetch-bapi-from-middleware');
     await u.page.waitForAppUrl('/users-count');
     await expect(u.page.getByText(/Users count/i)).toBeVisible();
+  });
+
+  test('handle percent-encoded URL on protected API routes', async () => {
+    // auth.protect() returns 404 for unauthenticated non-page requests
+    const normalRes = await fetch(app.serverUrl + '/api/admin/users');
+    expect(normalRes.status).toBe(404);
+
+    // %61 = 'a': /api/%61dmin/users decodes to /api/admin/users
+    const encodedRes = await fetch(app.serverUrl + '/api/%61dmin/users');
+    expect(encodedRes.status).toBe(404);
+
+    // %64 = 'd': /api/a%64min/users decodes to /api/admin/users
+    const encodedRes2 = await fetch(app.serverUrl + '/api/a%64min/users');
+    expect(encodedRes2.status).toBe(404);
+  });
+
+  test('double-encoded URLs do not resolve to admin (Next.js dynamic route)', async () => {
+    // %2561 decodes one layer to %61 — the catch-all [module] route matches
+    // with module='%61dmin' (not 'admin'), so it's not an admin request.
+    // Returns 200 because the catch-all route handles it, but the param is safe.
+    const res = await fetch(app.serverUrl + '/api/%2561dmin/users');
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.module).not.toBe('admin');
+  });
+
+  test('encoded slash is rejected (Next.js router rejects)', async () => {
+    // %2F decodes to / but Next.js treats api%2Fadmin as one path segment,
+    // so the route doesn't match the [module]/[...action] pattern, returning 404
+    const res = await fetch(app.serverUrl + '/api%2Fadmin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('null byte in path is caught by middleware as protected route', async () => {
+    // %00 decodes to a null char — /api/admin\0/users still matches
+    // /api/admin(.*) so our middleware correctly blocks it with auth.protect()
+    // which returns 404 for unauthenticated non-page requests
+    const res = await fetch(app.serverUrl + '/api/admin%00/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('malformed percent-encoding returns 400 (MalformedURLError)', async () => {
+    // %zz is not valid percent-encoding — our MalformedURLError handler
+    // in clerkMiddleware catches the error and returns 400
+    const res = await fetch(app.serverUrl + '/api/%zz/users');
+    expect(res.status).toBe(400);
   });
 });
