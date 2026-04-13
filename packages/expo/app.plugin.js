@@ -670,14 +670,6 @@ const withClerkTheme = (config, props = {}) => {
   config = withInfoPlist(config, modConfig => {
     modConfig.modResults.ClerkTheme = themeJson;
     console.log('✅ Embedded Clerk theme in Info.plist');
-
-    // When darkColors is provided, remove UIUserInterfaceStyle to allow
-    // the system to switch between light and dark mode automatically.
-    if (themeJson.darkColors) {
-      delete modConfig.modResults.UIUserInterfaceStyle;
-      console.log('✅ Removed UIUserInterfaceStyle to enable system dark mode');
-    }
-
     return modConfig;
   });
 
