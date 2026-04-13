@@ -4,17 +4,7 @@ import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import { createTestUtils } from '../testUtils';
 
-test.describe('dynamic keys @nextjs', () => {
-  test.describe.configure({ mode: 'serial' });
-  let app: Application;
-
-  test.beforeAll(async () => {
-    test.setTimeout(90_000); // Wait for app to be ready
-    app = await appConfigs.next.appRouter
-      .clone()
-      .addFile(
-        'src/middleware.ts',
-        () => `import { clerkClient, clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+const middlewareFile = () => `import { clerkClient, clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
         import { NextResponse } from 'next/server';
 
         const isProtectedRoute = createRouteMatcher(['/protected', '/api/admin(.*)']);
@@ -41,26 +31,33 @@ test.describe('dynamic keys @nextjs', () => {
 
         export const config = {
           matcher: ['/((?!.*\\\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
-        };`,
-      )
-      .addFile(
-        'src/app/api/[module]/[...action]/route.ts',
-        () => `export async function GET(request, { params }) {
+        };`;
+
+const apiRouteFile = () => `export async function GET(request, { params }) {
           const { module: mod, action } = await params;
           return Response.json({ module: mod, action: action.join('/') });
-        }`,
-      )
-      .addFile(
-        'src/app/users-count/page.tsx',
-        () => `import { clerkClient } from '@clerk/nextjs/server'
+        }`;
+
+const usersCountFile = () => `import { clerkClient } from '@clerk/nextjs/server'
 
         export default async function Page(){
           const count = await clerkClient().users?.getCount() ?? 0;
 
           return <p>Users count: {count}</p>
         }
-        `,
-      )
+        `;
+
+test.describe('dynamic keys @nextjs', () => {
+  test.describe.configure({ mode: 'serial' });
+  let app: Application;
+
+  test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
+    app = await appConfigs.next.appRouter
+      .clone()
+      .addFile('src/middleware.ts', middlewareFile)
+      .addFile('src/app/api/[module]/[...action]/route.ts', apiRouteFile)
+      .addFile('src/app/users-count/page.tsx', usersCountFile)
       .commit();
 
     await app.setup();
@@ -101,6 +98,28 @@ test.describe('dynamic keys @nextjs', () => {
     await u.page.goToRelative('/fetch-bapi-from-middleware');
     await u.page.waitForAppUrl('/users-count');
     await expect(u.page.getByText(/Users count/i)).toBeVisible();
+  });
+});
+
+test.describe('percent-encoded URL handling @nextjs', () => {
+  test.describe.configure({ mode: 'serial' });
+  let app: Application;
+
+  test.beforeAll(async () => {
+    test.setTimeout(90_000);
+    app = await appConfigs.next.appRouter
+      .clone()
+      .addFile('src/middleware.ts', middlewareFile)
+      .addFile('src/app/api/[module]/[...action]/route.ts', apiRouteFile)
+      .commit();
+
+    await app.setup();
+    await app.withEnv(appConfigs.envs.withDynamicKeys);
+    await app.dev();
+  });
+
+  test.afterAll(async () => {
+    await app.teardown();
   });
 
   test('handle percent-encoded URL on protected API routes', async () => {
