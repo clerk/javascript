@@ -85,7 +85,13 @@ function _OAuthConsent() {
     if (clerk.session?.id) {
       url.searchParams.set('_clerk_session_id', clerk.session.id);
     }
-    return clerk.buildUrlWithAuth(url.toString());
+    if (canReadLocation()) {
+      const dbJwt = new URLSearchParams(window.location.search).get('__clerk_db_jwt');
+      if (dbJwt) {
+        url.searchParams.set('__clerk_db_jwt', dbJwt);
+      }
+    }
+    return url.toString();
   })();
 
   const forwardedParams = canReadLocation() ? Array.from(new URLSearchParams(window.location.search).entries()) : [];
