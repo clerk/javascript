@@ -1,30 +1,20 @@
+import { execSync } from 'node:child_process';
+
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
 import { createTestUtils } from '../../testUtils';
 
-test.describe('custom middleware @nuxt', () => {
-  test.describe.configure({ mode: 'serial' });
-  let app: Application;
-
-  test.beforeAll(async () => {
-    app = await appConfigs.nuxt.node
-      .clone()
-      .setName('nuxt-custom-middleware')
-      .addFile(
-        'nuxt.config.js',
-        () => `export default defineNuxtConfig({
+const nuxtConfigFile = () => `export default defineNuxtConfig({
           modules: ['@clerk/nuxt'],
           devtools: { enabled: false },
           clerk: {
             skipServerMiddleware: true
           }
-        });`,
-      )
-      .addFile(
-        'server/middleware/clerk.js',
-        () => `import { clerkMiddleware, createRouteMatcher } from '@clerk/nuxt/server';
+        });`;
+
+const clerkMiddlewareFile = () => `import { clerkMiddleware, createRouteMatcher } from '@clerk/nuxt/server';
 
         const isProtectedRoute = createRouteMatcher(['/api/me', '/api/admin(.*)']);
 
@@ -38,17 +28,13 @@ test.describe('custom middleware @nuxt', () => {
             })
           }
         });
-      `,
-      )
-      .addFile(
-        'server/api/admin/[...action].js',
-        () => `export default defineEventHandler((event) => {
+      `;
+
+const adminApiRouteFile = () => `export default defineEventHandler((event) => {
           return { status: 'ok' };
-        });`,
-      )
-      .addFile(
-        'app/pages/me.vue',
-        () => `<script setup>
+        });`;
+
+const mePageFile = () => `<script setup>
         const { data, error } = await useFetch('/api/me');
         </script>
 
@@ -56,11 +42,25 @@ test.describe('custom middleware @nuxt', () => {
           <div v-if="data">Hello, {{ data.firstName }}</div>
           <div v-else-if="error">{{ error.statusCode }}: {{ error.statusMessage }}</div>
           <div v-else>Unknown status</div>
-        </template>`,
-      )
+        </template>`;
+
+test.describe('custom middleware @nuxt', () => {
+  test.describe.configure({ mode: 'serial' });
+  let app: Application;
+
+  test.beforeAll(async () => {
+    app = await appConfigs.nuxt.node
+      .clone()
+      .setName('nuxt-custom-middleware')
+      .addFile('nuxt.config.js', nuxtConfigFile)
+      .addFile('server/middleware/clerk.js', clerkMiddlewareFile)
+      .addFile('server/api/admin/[...action].js', adminApiRouteFile)
+      .addFile('app/pages/me.vue', mePageFile)
       .commit();
 
     await app.setup();
+    // pkglab installs with --ignore-scripts, so nuxt prepare must be run manually
+    execSync('npx nuxt prepare', { cwd: app.appDir, stdio: 'pipe' });
     await app.withEnv(appConfigs.envs.withCustomRoles);
     await app.dev();
   });
@@ -92,6 +92,32 @@ test.describe('custom middleware @nuxt', () => {
     await expect(u.page.getByText(`Hello, ${fakeUser.firstName}`)).toBeVisible();
 
     await fakeUser.deleteIfExists();
+  });
+});
+
+test.describe('percent-encoded URL handling @nuxt', () => {
+  test.describe.configure({ mode: 'serial' });
+  let app: Application;
+
+  test.beforeAll(async () => {
+    test.setTimeout(90_000);
+    app = await appConfigs.nuxt.node
+      .clone()
+      .setName('nuxt-custom-middleware')
+      .addFile('nuxt.config.js', nuxtConfigFile)
+      .addFile('server/middleware/clerk.js', clerkMiddlewareFile)
+      .addFile('server/api/admin/[...action].js', adminApiRouteFile)
+      .commit();
+
+    await app.setup();
+    // pkglab installs with --ignore-scripts, so nuxt prepare must be run manually
+    execSync('npx nuxt prepare', { cwd: app.appDir, stdio: 'pipe' });
+    await app.withEnv(appConfigs.envs.withCustomRoles);
+    await app.dev();
+  });
+
+  test.afterAll(async () => {
+    await app.teardown();
   });
 
   test('handle percent-encoded URL on protected routes', async () => {
@@ -128,10 +154,10 @@ test.describe('custom middleware @nuxt', () => {
     expect(res.status).toBe(401);
   });
 
-  test('malformed percent-encoding is rejected (Nitro rejects before middleware)', async () => {
-    // %zz is not valid percent-encoding — Nitro rejects the request
-    // before our middleware runs, returning 404
+  test('malformed percent-encoding returns 400 (clerkMiddleware catches MalformedURLError)', async () => {
+    // %zz is not valid percent-encoding — createPathMatcher throws
+    // MalformedURLError, which clerkMiddleware catches and returns 400
     const res = await fetch(app.serverUrl + '/api/%zz/users');
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(400);
   });
 });
