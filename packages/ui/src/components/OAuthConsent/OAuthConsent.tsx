@@ -16,6 +16,14 @@ import type { ThemableCssProp } from '@/ui/styledSystem';
 import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
 
+import {
+  getActionUrl,
+  getForwardedParams,
+  getOAuthConsentFromSearch,
+  getRedirectUriFromSearch,
+  getRootDomain,
+} from './utils';
+
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
 function _OAuthConsent() {
@@ -80,21 +88,8 @@ function _OAuthConsent() {
     }
   }
 
-  const actionUrl = (() => {
-    const url = new URL(`https://${clerk.frontendApi}/v1/internal/oauth-consent`);
-    if (clerk.session?.id) {
-      url.searchParams.set('_clerk_session_id', clerk.session.id);
-    }
-    if (canReadLocation()) {
-      const dbJwt = new URLSearchParams(window.location.search).get('__clerk_db_jwt');
-      if (dbJwt) {
-        url.searchParams.set('__clerk_db_jwt', dbJwt);
-      }
-    }
-    return url.toString();
-  })();
-
-  const forwardedParams = canReadLocation() ? Array.from(new URLSearchParams(window.location.search).entries()) : [];
+  const actionUrl = getActionUrl(clerk.frontendApi, clerk.session?.id);
+  const forwardedParams = getForwardedParams();
 
   // Accounts portal path delegates to context callbacks; public path lets the form submit natively.
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -484,34 +479,6 @@ function ConnectionSeparator() {
       />
     </Box>
   );
-}
-
-const canReadLocation = () => typeof window !== 'undefined' && !!window.location;
-
-function getRootDomain(url: string): string {
-  try {
-    const { hostname } = new URL(url);
-    return hostname.split('.').slice(-2).join('.');
-  } catch {
-    return '';
-  }
-}
-
-function getRedirectUriFromSearch(): string {
-  if (!canReadLocation()) {
-    return '';
-  }
-  return new URL(window.location.href).searchParams.get('redirect_uri') ?? '';
-}
-
-function getOAuthConsentFromSearch(): { oauthClientId: string; scope?: string } {
-  if (!canReadLocation()) {
-    return { oauthClientId: '' };
-  }
-  const sp = new URLSearchParams(window.location.search);
-  const oauthClientId = sp.get('client_id') ?? '';
-  const scope = sp.get('scope') ?? undefined;
-  return scope !== undefined ? { oauthClientId, scope } : { oauthClientId };
 }
 
 export const OAuthConsent = withCoreUserGuard(withCardStateProvider(_OAuthConsent));
