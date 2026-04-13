@@ -46,7 +46,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
   }
 
   // Register this factory with the ClerkExpo module
-  public static func register() {
+  @MainActor public static func register() {
     shared.loadThemes()
     clerkViewFactory = shared
   }
@@ -242,7 +242,7 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
   // MARK: - Theme Parsing
 
   /// Reads the "ClerkTheme" dictionary from Info.plist and builds light / dark themes.
-  func loadThemes() {
+  @MainActor func loadThemes() {
     guard let themeDictionary = Bundle.main.object(forInfoDictionaryKey: "ClerkTheme") as? [String: Any] else {
       return
     }
@@ -253,39 +253,39 @@ public final class ClerkViewFactory: ClerkViewFactoryProtocol {
     let fonts = (themeDictionary["design"] as? [String: Any]).flatMap { parseFonts(from: $0) }
 
     if lightColors != nil || design != nil || fonts != nil {
-      lightTheme = ClerkTheme(colors: lightColors, design: design, fonts: fonts)
+      lightTheme = ClerkTheme(colors: lightColors ?? .default, fonts: fonts ?? .default, design: design ?? .default)
     }
 
     // Build dark theme from "darkColors" (inherits same design/fonts)
     if let darkColorsDict = themeDictionary["darkColors"] as? [String: String] {
       let darkColors = parseColors(from: darkColorsDict)
       if darkColors != nil || design != nil || fonts != nil {
-        darkTheme = ClerkTheme(colors: darkColors, design: design, fonts: fonts)
+        darkTheme = ClerkTheme(colors: darkColors ?? .default, fonts: fonts ?? .default, design: design ?? .default)
       }
     }
   }
 
   private func parseColors(from dict: [String: String]) -> ClerkTheme.Colors? {
-    var hasAny = false
-    var colors = ClerkTheme.Colors()
+    let hasAny = dict.values.contains { colorFromHex($0) != nil }
+    guard hasAny else { return nil }
 
-    if let v = dict["primary"].flatMap({ colorFromHex($0) }) { colors.primary = v; hasAny = true }
-    if let v = dict["background"].flatMap({ colorFromHex($0) }) { colors.background = v; hasAny = true }
-    if let v = dict["input"].flatMap({ colorFromHex($0) }) { colors.input = v; hasAny = true }
-    if let v = dict["danger"].flatMap({ colorFromHex($0) }) { colors.danger = v; hasAny = true }
-    if let v = dict["success"].flatMap({ colorFromHex($0) }) { colors.success = v; hasAny = true }
-    if let v = dict["warning"].flatMap({ colorFromHex($0) }) { colors.warning = v; hasAny = true }
-    if let v = dict["foreground"].flatMap({ colorFromHex($0) }) { colors.foreground = v; hasAny = true }
-    if let v = dict["mutedForeground"].flatMap({ colorFromHex($0) }) { colors.mutedForeground = v; hasAny = true }
-    if let v = dict["primaryForeground"].flatMap({ colorFromHex($0) }) { colors.primaryForeground = v; hasAny = true }
-    if let v = dict["inputForeground"].flatMap({ colorFromHex($0) }) { colors.inputForeground = v; hasAny = true }
-    if let v = dict["neutral"].flatMap({ colorFromHex($0) }) { colors.neutral = v; hasAny = true }
-    if let v = dict["border"].flatMap({ colorFromHex($0) }) { colors.border = v; hasAny = true }
-    if let v = dict["ring"].flatMap({ colorFromHex($0) }) { colors.ring = v; hasAny = true }
-    if let v = dict["muted"].flatMap({ colorFromHex($0) }) { colors.muted = v; hasAny = true }
-    if let v = dict["shadow"].flatMap({ colorFromHex($0) }) { colors.shadow = v; hasAny = true }
-
-    return hasAny ? colors : nil
+    return ClerkTheme.Colors(
+      primary: dict["primary"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultPrimaryColor,
+      background: dict["background"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultBackgroundColor,
+      input: dict["input"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultInputColor,
+      danger: dict["danger"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultDangerColor,
+      success: dict["success"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultSuccessColor,
+      warning: dict["warning"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultWarningColor,
+      foreground: dict["foreground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultForegroundColor,
+      mutedForeground: dict["mutedForeground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultMutedForegroundColor,
+      primaryForeground: dict["primaryForeground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultPrimaryForegroundColor,
+      inputForeground: dict["inputForeground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultInputForegroundColor,
+      neutral: dict["neutral"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultNeutralColor,
+      ring: dict["ring"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultRingColor,
+      muted: dict["muted"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultMutedColor,
+      shadow: dict["shadow"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultShadowColor,
+      border: dict["border"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultBorderColor
+    )
   }
 
   private func colorFromHex(_ hex: String) -> Color? {
