@@ -5,7 +5,7 @@ import { appConfigs } from '../../presets';
 import { createTestUtils } from '../../testUtils';
 
 test.describe('custom middleware @nuxt', () => {
-  test.describe.configure({ mode: 'parallel' });
+  test.describe.configure({ mode: 'serial' });
   let app: Application;
 
   test.beforeAll(async () => {
@@ -26,9 +26,10 @@ test.describe('custom middleware @nuxt', () => {
         'server/middleware/clerk.js',
         () => `import { clerkMiddleware, createRouteMatcher } from '@clerk/nuxt/server';
 
+        const isProtectedRoute = createRouteMatcher(['/api/me', '/api/admin(.*)']);
+
         export default clerkMiddleware((event) => {
           const { userId } = event.context.auth();
-          const isProtectedRoute = createRouteMatcher(['/api/me']);
 
           if (!userId && isProtectedRoute(event)) {
             throw createError({
@@ -38,6 +39,12 @@ test.describe('custom middleware @nuxt', () => {
           }
         });
       `,
+      )
+      .addFile(
+        'server/api/admin/[...action].js',
+        () => `export default defineEventHandler((event) => {
+          return { status: 'ok' };
+        });`,
       )
       .addFile(
         'app/pages/me.vue',
@@ -85,5 +92,46 @@ test.describe('custom middleware @nuxt', () => {
     await expect(u.page.getByText(`Hello, ${fakeUser.firstName}`)).toBeVisible();
 
     await fakeUser.deleteIfExists();
+  });
+
+  test('handle percent-encoded URL on protected routes', async () => {
+    const normalRes = await fetch(app.serverUrl + '/api/admin/users');
+    expect(normalRes.status).toBe(401);
+
+    // %61 = 'a': /api/%61dmin/users decodes to /api/admin/users
+    const encodedRes = await fetch(app.serverUrl + '/api/%61dmin/users');
+    expect(encodedRes.status).toBe(401);
+
+    // %64 = 'd': /api/a%64min/users decodes to /api/admin/users
+    const encodedRes2 = await fetch(app.serverUrl + '/api/a%64min/users');
+    expect(encodedRes2.status).toBe(401);
+  });
+
+  test('double-encoded URLs do not match route (Nitro router rejects)', async () => {
+    // %2561 decodes one layer to %61 — Nitro's file-based router does not
+    // match %2561dmin to the admin/ directory, returning 404
+    const res = await fetch(app.serverUrl + '/api/%2561dmin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('encoded slash is caught by middleware as protected route', async () => {
+    // %2F decodes to / — our matcher sees /api/admin/users after decode
+    // and correctly identifies it as protected, returning 401
+    const res = await fetch(app.serverUrl + '/api%2Fadmin/users');
+    expect(res.status).toBe(401);
+  });
+
+  test('null byte in path is caught by middleware as protected route', async () => {
+    // %00 decodes to a null char — /api/admin\0/users still matches
+    // /api/admin(.*) so our middleware correctly blocks it with 401
+    const res = await fetch(app.serverUrl + '/api/admin%00/users');
+    expect(res.status).toBe(401);
+  });
+
+  test('malformed percent-encoding is rejected (Nitro rejects before middleware)', async () => {
+    // %zz is not valid percent-encoding — Nitro rejects the request
+    // before our middleware runs, returning 404
+    const res = await fetch(app.serverUrl + '/api/%zz/users');
+    expect(res.status).toBe(404);
   });
 });

@@ -5,6 +5,24 @@ export type WithPathPatternWildcard<T = string> = `${T & string}(.*)`;
 export type PathPattern = Autocomplete<WithPathPatternWildcard>;
 export type PathMatcherParam = Array<RegExp | PathPattern> | RegExp | PathPattern;
 
+export class MalformedURLError extends Error {
+  public readonly statusCode = 400;
+
+  constructor(pathname: string, cause?: unknown) {
+    super(`Malformed encoding in URL path: ${pathname}`);
+    this.name = 'MalformedURLError';
+    this.cause = cause;
+  }
+}
+
+/**
+ * String-based check for MalformedURLError that works across package bundles
+ * where `instanceof` would fail due to duplicate class identities.
+ */
+export function isMalformedURLError(e: unknown): e is MalformedURLError {
+  return e instanceof Error && e.name === 'MalformedURLError';
+}
+
 const precomputePathRegex = (patterns: Array<string | RegExp>) => {
   return patterns.map(pattern => (pattern instanceof RegExp ? pattern : pathToRegexp(pattern)));
 };
@@ -18,5 +36,12 @@ const precomputePathRegex = (patterns: Array<string | RegExp>) => {
 export const createPathMatcher = (patterns: PathMatcherParam) => {
   const routePatterns = [patterns || ''].flat().filter(Boolean);
   const matchers = precomputePathRegex(routePatterns);
-  return (pathname: string) => matchers.some(matcher => matcher.test(pathname));
+  return (pathname: string) => {
+    try {
+      pathname = decodeURIComponent(pathname);
+    } catch (e) {
+      throw new MalformedURLError(pathname, e);
+    }
+    return matchers.some(matcher => matcher.test(pathname));
+  };
 };
