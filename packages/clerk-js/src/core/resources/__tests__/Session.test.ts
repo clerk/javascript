@@ -730,6 +730,49 @@ describe('Session', () => {
         expect(token).toEqual(mockJwt);
       });
 
+      it('skips background refresh when token is expired on headless runtime', async () => {
+        BaseResource.clerk = clerkMock({
+          // Simulate Expo/React Native headless runtime
+          __internal_getOption: vi.fn().mockImplementation((key: string) => {
+            if (key === 'experimental') {
+              return { runtimeEnvironment: 'headless' };
+            }
+            return undefined;
+          }),
+        });
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        // Let the initial cache populate from lastActiveToken
+        await Promise.resolve();
+        requestSpy.mockClear();
+
+        // Simulate iOS background throttling: jump the system clock well past
+        // token expiration WITHOUT firing timers. This is what happens when iOS
+        // starves the JS thread — the scheduled timer doesn't fire on time.
+        // mockJwt has iat=1666648250, exp=1666648310 (60s token)
+        vi.setSystemTime(new Date(1666648400 * 1000)); // 150s after iat, 90s past exp
+
+        // Now fire the pending refresh timer. It was scheduled for ~43s but
+        // fires late (simulating iOS throttling). Date.now() is past exp,
+        // so the early return should prevent the API call.
+        await vi.advanceTimersByTimeAsync(44 * 1000);
+
+        // No API call should have been made — the early return bailed out
+        expect(requestSpy).not.toHaveBeenCalled();
+      });
+
       it('does not make API call when token has plenty of time remaining', async () => {
         BaseResource.clerk = clerkMock();
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;

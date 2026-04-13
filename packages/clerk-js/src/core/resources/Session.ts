@@ -574,6 +574,21 @@ export class Session extends BaseResource implements SessionResource {
 
     Session.#backgroundRefreshInProgress.add(tokenId);
 
+    // On headless/mobile runtimes (Expo sets runtimeEnvironment to 'headless'), bail out
+    // if the token has already expired. This means the refresh cycle was starved by iOS
+    // background thread throttling. Sending a request with stale credentials would trigger
+    // a 401 → handleUnauthenticated cascade that destroys the session even though it's
+    // still valid on the server. The next foreground getToken() call will handle token
+    // acquisition through the normal path with proper retry logic.
+    const isHeadless =
+      (Session.clerk?.__internal_getOption?.('experimental') as { runtimeEnvironment?: string } | undefined)
+        ?.runtimeEnvironment === 'headless';
+    const lastTokenExp = this.lastActiveToken?.jwt?.claims?.exp;
+    if (isHeadless && lastTokenExp && Date.now() / 1000 > lastTokenExp) {
+      Session.#backgroundRefreshInProgress.delete(tokenId);
+      return;
+    }
+
     const tokenResolver = this.#createTokenResolver(template, organizationId, false);
 
     // Don't cache the promise immediately - only update cache on success
