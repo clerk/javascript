@@ -620,9 +620,15 @@ const VALID_COLOR_KEYS = [
 
 const HEX_COLOR_REGEX = /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
 
+function isPlainObject(value) {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 function validateThemeJson(theme) {
   const validateColors = (colors, label) => {
-    if (!colors || typeof colors !== 'object') return;
+    if (!isPlainObject(colors)) {
+      throw new Error(`Clerk theme: ${label} must be an object`);
+    }
     for (const [key, value] of Object.entries(colors)) {
       if (!VALID_COLOR_KEYS.includes(key)) {
         console.warn(`⚠️  Clerk theme: unknown color key "${key}" in ${label}, ignoring`);
@@ -634,10 +640,13 @@ function validateThemeJson(theme) {
     }
   };
 
-  if (theme.colors) validateColors(theme.colors, 'colors');
-  if (theme.darkColors) validateColors(theme.darkColors, 'darkColors');
+  if (theme.colors != null) validateColors(theme.colors, 'colors');
+  if (theme.darkColors != null) validateColors(theme.darkColors, 'darkColors');
 
-  if (theme.design) {
+  if (theme.design != null) {
+    if (!isPlainObject(theme.design)) {
+      throw new Error(`Clerk theme: design must be an object`);
+    }
     if (theme.design.fontFamily != null && typeof theme.design.fontFamily !== 'string') {
       throw new Error(`Clerk theme: design.fontFamily must be a string`);
     }
