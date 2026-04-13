@@ -6,15 +6,15 @@ Allow Clerk-internal callers to enable an organization picker in the `<OAuthCons
 
 ## Architecture
 
-The feature is gated behind an intentionally untyped internal prop (`__internal_enableOrganizationSelection`) that is read via `(p as any)` in the context translation layer and stored as a typed boolean on the internal `OAuthConsentCtx`. The `OAuthConsent` component reads it from context, fetches the user's org memberships via `useOrganizationList`, and renders the existing `OrgSelect` UI. A hidden `<input name="organization_id">` carries the selected org ID into the native form POST.
+The feature is gated behind an intentionally untyped internal prop (`__internal_enableOrgSelection`) that is read via `(p as any)` in the context translation layer and stored as a typed boolean on the internal `OAuthConsentCtx`. The `OAuthConsent` component reads it from context, fetches the user's org memberships via `useOrganizationList`, and renders the existing `OrgSelect` UI. A hidden `<input name="organization_id">` carries the selected org ID into the native form POST.
 
 ## Files
 
 **Modify:**
 
 - `packages/shared/src/types/clerk.ts` — no changes (prop is intentionally untyped)
-- `packages/ui/src/types.ts` — add `enableOrganizationSelection?: boolean` to `OAuthConsentCtx`
-- `packages/ui/src/contexts/ClerkUIComponentsContext.tsx` — read `(p as any).__internal_enableOrganizationSelection` and forward it into context
+- `packages/ui/src/types.ts` — add `enableOrgSelection?: boolean` to `OAuthConsentCtx`
+- `packages/ui/src/contexts/ClerkUIComponentsContext.tsx` — read `(p as any).__internal_enableOrgSelection` and forward it into context
 - `packages/ui/src/components/OAuthConsent/OAuthConsent.tsx` — replace fake data + `renderOrgSelect = false` gate with real org list and context-driven gate; add hidden input
 
 ## Detailed Design
@@ -28,15 +28,15 @@ Add one field:
  * When true, renders the organization picker and submits organization_id
  * with the consent form. Internal use only — not exposed in the public prop type.
  */
-enableOrganizationSelection?: boolean;
+enableOrgSelection?: boolean;
 ```
 
 ### Context translation (ClerkUIComponentsContext.tsx)
 
-Inside the `OAuthConsent` case, add `enableOrganizationSelection` to the context value:
+Inside the `OAuthConsent` case, add `enableOrgSelection` to the context value:
 
 ```ts
-enableOrganizationSelection: (p as any).__internal_enableOrganizationSelection === true,
+enableOrgSelection: (p as any).__internal_enableOrgSelection === true,
 ```
 
 ### OAuthConsent component
@@ -76,7 +76,7 @@ Render the `OrgSelect` (replacing the `renderOrgSelect` block):
 
 ```tsx
 {
-  ctx.enableOrganizationSelection && userMemberships.isLoaded && (
+  ctx.enableOrgSelection && userMemberships.isLoaded && (
     <OrgSelect
       options={orgOptions}
       value={selectedOrg}
@@ -90,7 +90,7 @@ Add the hidden input inside the `<form>`, rendered only when the feature is on a
 
 ```tsx
 {
-  ctx.enableOrganizationSelection && selectedOrg && (
+  ctx.enableOrgSelection && selectedOrg && (
     <input
       type='hidden'
       name='organization_id'
@@ -114,7 +114,7 @@ Internal callers pass the prop by casting:
 
 ```ts
 Clerk.__internal_mountOAuthConsent(app, {
-  __internal_enableOrganizationSelection: true,
+  __internal_enableOrgSelection: true,
 } as any);
 ```
 
