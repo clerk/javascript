@@ -8,6 +8,7 @@ import type { GetOAuthConsentInfoParams, OAuthConsentInfo } from '../../types';
  * any other ambient source. The hook is disabled when `oauthClientId` is empty or omitted.
  *
  * @internal
+ *
  * @interface
  */
 export type UseOAuthConsentParams = Partial<Pick<GetOAuthConsentInfoParams, 'oauthClientId' | 'scope'>> & {
@@ -27,6 +28,7 @@ export type UseOAuthConsentParams = Partial<Pick<GetOAuthConsentInfoParams, 'oau
 
 /**
  * @internal
+ *
  * @interface
  */
 export type UseOAuthConsentReturn = {

@@ -2282,21 +2282,25 @@ export type __internal_OAuthConsentProps = {
   scope?: string;
   /**
    * Name of the OAuth application.
+   *
    * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
   oAuthApplicationName?: string;
   /**
    * Logo URL of the OAuth application.
+   *
    * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
   oAuthApplicationLogoUrl?: string;
   /**
    * URL of the OAuth application.
+   *
    * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
   oAuthApplicationUrl?: string;
   /**
    * Scopes requested by the OAuth application.
+   *
    * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
   scopes?: {
@@ -2306,16 +2310,19 @@ export type __internal_OAuthConsentProps = {
   }[];
   /**
    * Full URL or path to navigate to after the user allows or denies access.
+   *
    * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
   redirectUrl?: string;
   /**
    * Called when user allows access.
+   *
    * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
   onAllow?: () => void;
   /**
    * Called when user denies access.
+   *
    * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
   onDeny?: () => void;
