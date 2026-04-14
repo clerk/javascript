@@ -30,6 +30,10 @@ function isPlainObject(value) {
 }
 
 function validateThemeJson(theme) {
+  if (!isPlainObject(theme)) {
+    throw new Error('Clerk theme: theme JSON must be a plain object');
+  }
+
   const validateColors = (colors, label) => {
     if (!isPlainObject(colors)) {
       throw new Error(`Clerk theme: ${label} must be an object`);
@@ -80,6 +84,18 @@ describe('validateThemeJson', () => {
 
   test('accepts an empty theme (no keys)', () => {
     expect(() => validateThemeJson({})).not.toThrow();
+  });
+
+  test('throws when theme is null', () => {
+    expect(() => validateThemeJson(null)).toThrow('theme JSON must be a plain object');
+  });
+
+  test('throws when theme is a string', () => {
+    expect(() => validateThemeJson('hello')).toThrow('theme JSON must be a plain object');
+  });
+
+  test('throws when theme is an array', () => {
+    expect(() => validateThemeJson([])).toThrow('theme JSON must be a plain object');
   });
 
   test('accepts theme with only design', () => {

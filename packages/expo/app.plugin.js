@@ -596,8 +596,6 @@ const withClerkAppleSignIn = config => {
  *   - design: { fontFamily: string, borderRadius: number }
  *
  * iOS: Embeds the parsed JSON into Info.plist under key "ClerkTheme".
- *       When darkColors is present, removes UIUserInterfaceStyle to allow
- *       system dark mode.
  * Android: Copies the JSON file to android/app/src/main/assets/clerk_theme.json.
  */
 const VALID_COLOR_KEYS = [
@@ -625,6 +623,10 @@ function isPlainObject(value) {
 }
 
 function validateThemeJson(theme) {
+  if (!isPlainObject(theme)) {
+    throw new Error('Clerk theme: theme JSON must be a plain object');
+  }
+
   const validateColors = (colors, label) => {
     if (!isPlainObject(colors)) {
       throw new Error(`Clerk theme: ${label} must be an object`);
