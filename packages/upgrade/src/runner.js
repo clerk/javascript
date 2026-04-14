@@ -103,7 +103,7 @@ export async function runScans(config, sdk, options) {
 
     for (let idx = 0; idx < files.length; idx++) {
       const file = files[idx];
-      spinner.update(`Scanning ${path.basename(file)} (${idx + 1}/${files.length})`);
+      spinner.update(`Scanning ${path.relative(cwd, file)} (${idx + 1}/${files.length})`);
 
       const content = await fs.readFile(file, 'utf8');
 
