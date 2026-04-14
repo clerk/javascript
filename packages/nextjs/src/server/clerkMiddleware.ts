@@ -160,12 +160,16 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       );
 
       // Handle Frontend API proxy requests early, before authentication
-      const requestUrl = new URL(request.nextUrl.href);
-      const frontendApiProxyConfig =
-        resolvedParams.frontendApiProxy ??
-        (resolvedParams.proxyUrl || PROXY_URL || resolvedParams.domain || DOMAIN
-          ? undefined
-          : getAutoDetectedProxyConfig(requestUrl));
+      let frontendApiProxyConfig = resolvedParams.frontendApiProxy;
+
+      // Auto-detect when no explicit proxy or domain is configured
+      const hasExplicitProxyOrDomain = resolvedParams.proxyUrl || PROXY_URL || resolvedParams.domain || DOMAIN;
+      if (!frontendApiProxyConfig && !hasExplicitProxyOrDomain) {
+        const requestUrl = new URL(request.nextUrl.href);
+        if (shouldAutoProxy(requestUrl.hostname)) {
+          frontendApiProxyConfig = { enabled: true };
+        }
+      }
       if (frontendApiProxyConfig) {
         const { enabled, path: proxyPath = DEFAULT_PROXY_PATH } = frontendApiProxyConfig;
 
@@ -581,10 +585,3 @@ const handleControlFlowErrors = (
 
   throw e;
 };
-
-function getAutoDetectedProxyConfig(requestUrl: URL): FrontendApiProxyOptions | undefined {
-  if (shouldAutoProxy(requestUrl.hostname)) {
-    return { enabled: true };
-  }
-  return undefined;
-}
