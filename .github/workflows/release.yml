@@ -598,11 +598,13 @@ jobs:
           fi
 
       - name: Install dependencies
+        env:
+          NPM_CONFIG_ENGINE_STRICT: "false"
         run: |
           if [ "${{ steps.pm.outputs.manager }}" = "pnpm" ]; then
             pnpm install --frozen-lockfile
           else
-            npm ci
+            npm ci --audit=false --fund=false
           fi
 
       - name: Build
