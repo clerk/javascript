@@ -1,7 +1,9 @@
 name: Release
 run-name: >-
   ${{
-    github.event_name == 'issue_comment'
+    github.event_name == 'workflow_dispatch'
+      && format('[Legacy] Release from {0}', inputs.source_ref)
+    || github.event_name == 'issue_comment'
       && format('[Snapshot] Release by {0}', github.actor)
     || contains(github.event.head_commit.message, 'Version packages')
       && format('[Production] Release from {0}', github.ref_name)
@@ -14,10 +16,24 @@ on:
       - main
   issue_comment:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: 'Full git SHA to build from'
+        type: string
+        required: true
+      packages:
+        description: 'JSON array, e.g. [{"name":"@clerk/nextjs","version":"5.7.6","dist_tag":"latest-nextjs-v5"}]'
+        type: string
+        required: true
+      dry_run:
+        description: 'Log what would publish without actually publishing'
+        type: boolean
+        default: true
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name == 'issue_comment' && format('issue-{0}-{1}', github.event.issue.number, github.actor) || github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name == 'issue_comment' && format('issue-{0}-{1}', github.event.issue.number, github.actor) || github.event_name == 'workflow_dispatch' && format('legacy-{0}', inputs.source_ref) || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 jobs:
   release:
@@ -507,6 +523,162 @@ jobs:
             ${{ steps.package-info.outputs.table }}
             Tip: Use the snippet copy button below to quickly install the required packages.
             ${{ steps.package-info.outputs.snippets }}
+
+  legacy-release:
+    name: Legacy Release
+    if: ${{ github.event_name == 'workflow_dispatch' && github.repository == 'clerk/javascript' && github.run_attempt == 1 }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 30 }}
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Verify triggering actor is repo admin
+        uses: actions/github-script@v7
+        env:
+          TRIGGERING_ACTOR: ${{ github.triggering_actor }}
+        with:
+          script: |
+            const username = process.env.TRIGGERING_ACTOR;
+            const { data } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username,
+            });
+            if (data.permission !== 'admin') {
+              core.setFailed(`Only repo admins can dispatch this workflow. Actor: ${username} (permission: ${data.permission})`);
+            }
+
+      - name: Validate source_ref is a SHA
+        env:
+          SOURCE_REF: ${{ inputs.source_ref }}
+        run: |
+          if ! printf '%s' "$SOURCE_REF" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "::error::source_ref must be a full 40-char git SHA"
+            exit 1
+          fi
+
+      - name: Reject "latest" dist_tag
+        env:
+          PACKAGES: ${{ inputs.packages }}
+        run: |
+          echo "$PACKAGES" | jq -e 'all(.[]; .dist_tag != "latest")' > /dev/null || {
+            echo "::error::'latest' dist_tag is not allowed on this path"; exit 1;
+          }
+
+      - name: Checkout source_ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
+          fetch-depth: 1
+          show-progress: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Detect package manager
+        id: pm
+        run: |
+          if [ -f pnpm-lock.yaml ]; then
+            echo "manager=pnpm" >> "$GITHUB_OUTPUT"
+          else
+            echo "manager=npm" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies
+        run: |
+          if [ "${{ steps.pm.outputs.manager }}" = "pnpm" ]; then
+            pnpm install --frozen-lockfile
+          else
+            npm ci
+          fi
+
+      - name: Build
+        run: |
+          if [ "${{ steps.pm.outputs.manager }}" = "pnpm" ]; then
+            pnpm build
+          else
+            npm run build
+          fi
+
+      - name: Upgrade npm for trusted publishing
+        run: npx npm@11 install -g npm@11
+
+      - name: Publish or dry-run
+        env:
+          NPM_CONFIG_PROVENANCE: true
+          PACKAGES: ${{ inputs.packages }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          PACK: ${{ steps.pm.outputs.manager }}
+        run: |
+          echo "$PACKAGES" | jq -r '.[] | [.name, .version, .dist_tag] | @tsv' | while IFS=$'\t' read -r name version tag; do
+            short="${name#@clerk/}"
+            dir="packages/$short"
+
+            if [ ! -d "$dir" ]; then
+              echo "::error::Package directory not found: $dir"
+              exit 1
+            fi
+
+            pkg_version=$(jq -r .version "$dir/package.json")
+            if [ "$pkg_version" != "$version" ]; then
+              echo "::error::$dir/package.json has version $pkg_version, expected $version"
+              exit 1
+            fi
+
+            echo "::group::Pack $name@$version"
+            if [ "$PACK" = "pnpm" ]; then
+              out=$(cd "$dir" && pnpm pack --json 2>/dev/null || true)
+              if [ -n "$out" ] && echo "$out" | jq -e . >/dev/null 2>&1; then
+                tarball=$(echo "$out" | jq -r '.filename')
+              else
+                # pnpm pack without --json prints the tarball path on stdout
+                tarball=$(cd "$dir" && pnpm pack 2>&1 | tail -n1 | xargs -I{} basename "{}")
+              fi
+            else
+              tarball=$(cd "$dir" && npm pack --json | jq -r '.[0].filename')
+            fi
+            if [ -z "$tarball" ] || [ ! -f "$dir/$tarball" ]; then
+              echo "::error::Failed to resolve tarball filename in $dir"
+              exit 1
+            fi
+            echo "packed: $dir/$tarball"
+            echo "::endgroup::"
+
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "::notice::DRY RUN: would publish $name@$version --tag $tag"
+            else
+              echo "::group::Publish $name@$version --tag $tag"
+              (cd "$dir" && npm publish "$tarball" --tag "$tag" --provenance)
+              echo "::endgroup::"
+            fi
+          done
+
+      - name: Summary
+        if: always()
+        env:
+          SOURCE_REF: ${{ inputs.source_ref }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          PACKAGES: ${{ inputs.packages }}
+        run: |
+          {
+            echo "### Legacy Release"
+            echo ""
+            echo "- source_ref: \`$SOURCE_REF\`"
+            echo "- dry_run: \`$DRY_RUN\`"
+            echo ""
+            echo "#### Packages"
+            echo '```json'
+            echo "$PACKAGES" | jq .
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
   # We're running the CI workflow (where node v20 modules are cached) in
   # merge_group and not on main, we need to explicitly cache node_modules here so
