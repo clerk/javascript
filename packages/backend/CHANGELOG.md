@@ -1,5 +1,12 @@
 # Change Log
 
+## 3.2.10
+
+### Patch Changes
+
+- Updated dependencies [[`dc2de16`](https://github.com/clerk/javascript/commit/dc2de16480086f376449d452d31ae0d2a319af17)]:
+  - @clerk/shared@4.8.0
+
 ## 3.2.9
 
 ### Patch Changes
