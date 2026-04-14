@@ -34,11 +34,7 @@ function _OAuthConsent() {
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
   const { isLoaded: isMembershipsLoaded, userMemberships } = useOrganizationList({
-    userMemberships: {
-      infinite: true,
-      // TODO: Implement infinite scrolling.
-      pageSize: 50,
-    },
+    userMemberships: ctx.enableOrgSelection ? { infinite: true } : undefined,
   });
 
   const orgOptions: OrgOption[] = (userMemberships.data ?? []).map(m => ({
