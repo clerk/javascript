@@ -146,9 +146,10 @@ test.describe('percent-encoded URL handling @nextjs', () => {
     expect(body.module).not.toBe('admin');
   });
 
-  test('encoded slash is rejected (Next.js router rejects)', async () => {
-    // %2F decodes to / but Next.js treats api%2Fadmin as one path segment,
-    // so the route doesn't match the [module]/[...action] pattern, returning 404
+  test('encoded slash is not decoded into a path separator', async () => {
+    // %2F is a reserved delimiter — decodeURI preserves it, so the matcher
+    // sees /api%2Fadmin/users which does not match /api/admin(.*).
+    // The router also treats %2F as a literal segment char, not a separator.
     const res = await fetch(app.serverUrl + '/api%2Fadmin/users');
     expect(res.status).toBe(404);
   });
