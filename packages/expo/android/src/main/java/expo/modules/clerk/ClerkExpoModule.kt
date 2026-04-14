@@ -85,6 +85,10 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
                     }
 
                     Clerk.initialize(reactApplicationContext, pubKey)
+                    // Theme loading is centralized here. ClerkViewFactory.configure()
+                    // and ClerkUserProfileActivity.onCreate() only call Clerk.initialize()
+                    // when Clerk is not yet initialized, so by the time they run
+                    // ClerkExpoModule has already set the custom theme.
                     // Must be set AFTER Clerk.initialize() because initialize()
                     // resets customTheme to its `theme` parameter (default null).
                     loadThemeFromAssets()

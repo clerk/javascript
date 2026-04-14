@@ -716,3 +716,4 @@ const withClerkExpo = (config, props = {}) => {
 };
 
 module.exports = withClerkExpo;
+module.exports._testing = { validateThemeJson, isPlainObject, VALID_COLOR_KEYS, HEX_COLOR_REGEX };
