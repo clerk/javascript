@@ -126,6 +126,16 @@ test.describe('custom middleware @astro', () => {
     const dotSlashTraversal = await fetch(app.serverUrl + '/api/foo%2f%2e%2e%2fadmin/users');
     expect(dotSlashTraversal.status).toBe(404);
   });
+
+  test('double slashes cannot bypass protected route', async () => {
+    // Double slashes before the protected segment
+    const res1 = await fetch(app.serverUrl + '//api/admin/users');
+    expect(res1.status).not.toBe(200);
+
+    // Double slashes in the middle of the path
+    const res2 = await fetch(app.serverUrl + '/api//admin/users');
+    expect(res2.status).not.toBe(200);
+  });
 });
 
 test.describe('custom middleware @astro (production build)', () => {
@@ -228,5 +238,15 @@ test.describe('custom middleware @astro (production build)', () => {
 
     const dotSlashTraversal = await fetch(app.serverUrl + '/api/foo%2f%2e%2e%2fadmin/users');
     expect(dotSlashTraversal.status).toBe(404);
+  });
+
+  test('double slashes cannot bypass protected route', async () => {
+    // Double slashes before the protected segment
+    const res1 = await fetch(app.serverUrl + '//api/admin/users');
+    expect(res1.status).not.toBe(200);
+
+    // Double slashes in the middle of the path
+    const res2 = await fetch(app.serverUrl + '/api//admin/users');
+    expect(res2.status).not.toBe(200);
   });
 });

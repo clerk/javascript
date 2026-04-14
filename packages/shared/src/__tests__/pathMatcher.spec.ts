@@ -95,4 +95,35 @@ describe('createPathMatcher', () => {
       expect(() => matcher('/%')).toThrow(MalformedURLError);
     });
   });
+
+  describe('double-slash normalization', () => {
+    test('matches paths with double slashes before the protected segment', () => {
+      const matcher = createPathMatcher('/api/admin(.*)');
+      expect(matcher('//api/admin/users')).toBe(true);
+      expect(matcher('///api/admin/users')).toBe(true);
+    });
+
+    test('matches paths with double slashes in the middle', () => {
+      const matcher = createPathMatcher('/api/admin(.*)');
+      expect(matcher('/api//admin/users')).toBe(true);
+      expect(matcher('/api///admin/users')).toBe(true);
+    });
+
+    test('matches paths with double slashes after the protected segment', () => {
+      const matcher = createPathMatcher('/api/admin(.*)');
+      expect(matcher('/api/admin//users')).toBe(true);
+    });
+
+    test('does not match unrelated paths with double slashes', () => {
+      const matcher = createPathMatcher('/api/admin(.*)');
+      expect(matcher('//api/other/users')).toBe(false);
+      expect(matcher('/other//api/admin')).toBe(false);
+    });
+
+    test('handles combined percent-encoding and double slashes', () => {
+      const matcher = createPathMatcher('/api/admin(.*)');
+      expect(matcher('//api/%61dmin/users')).toBe(true);
+      expect(matcher('/api//%61dmin/users')).toBe(true);
+    });
+  });
 });

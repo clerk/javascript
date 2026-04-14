@@ -205,4 +205,14 @@ test.describe('percent-encoded URL handling @nextjs', () => {
     const body = await dotSlashTraversal.json();
     expect(body.module).not.toBe('admin');
   });
+
+  test('double slashes cannot bypass protected route', async () => {
+    // Double slashes before the protected segment
+    const res1 = await fetch(app.serverUrl + '//api/admin/users');
+    expect(res1.status).not.toBe(200);
+
+    // Double slashes in the middle of the path
+    const res2 = await fetch(app.serverUrl + '/api//admin/users');
+    expect(res2.status).not.toBe(200);
+  });
 });

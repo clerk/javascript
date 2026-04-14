@@ -42,6 +42,8 @@ export const createPathMatcher = (patterns: PathMatcherParam) => {
     } catch (e) {
       throw new MalformedURLError(pathname, e);
     }
+    // Collapse consecutive slashes so that //api/admin cannot bypass /api/admin
+    pathname = pathname.replace(/\/\/+/g, '/');
     return matchers.some(matcher => matcher.test(pathname));
   };
 };
