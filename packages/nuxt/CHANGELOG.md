@@ -1,5 +1,18 @@
 # @clerk/nuxt
 
+## 2.2.0
+
+### Minor Changes
+
+- Introduce Keyless quickstart for Nuxt. This allows the Clerk SDK to be used without having to sign up and paste your keys manually. ([#7844](https://github.com/clerk/javascript/pull/7844)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`3fd586d`](https://github.com/clerk/javascript/commit/3fd586d171e9c281c4b96f620ee9070b47ba00f4), [`f9ff9e9`](https://github.com/clerk/javascript/commit/f9ff9e937d70713abf96fdd92071cd6e84b8eb80)]:
+  - @clerk/shared@4.7.0
+  - @clerk/backend@3.2.9
+  - @clerk/vue@2.0.12
+
 ## 2.1.2
 
 ### Patch Changes
