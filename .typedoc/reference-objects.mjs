@@ -12,6 +12,8 @@ export const REFERENCE_OBJECTS_LIST = ['shared/clerk/clerk.mdx', 'shared/client-
 
 /**
  * Primary interface/class documented on each reference object page (used to resolve TypeDoc reflections).
+ * keys = stable MDX paths under .typedoc output
+ * values = which TypeDoc declaration to treat as that page’s “main” type for routing and per-method extraction.
  */
 export const REFERENCE_OBJECT_PAGE_SYMBOLS = {
   'shared/clerk/clerk.mdx': 'Clerk',

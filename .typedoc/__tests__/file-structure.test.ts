@@ -47,7 +47,7 @@ describe('Typedoc output', () => {
 
   it('should only have these nested folders', async () => {
     const folders = await scanDirectory('directory');
-    const nestedFolders = folders.filter(folder => !isTopLevelPath(folder));
+    const nestedFolders = folders.filter(folder => !isTopLevelPath(folder)).sort((a, b) => a.localeCompare(b));
 
     expect(nestedFolders).toMatchInlineSnapshot(`
       [

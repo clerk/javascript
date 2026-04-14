@@ -1,6 +1,8 @@
 // @ts-check
-import { IntersectionType, ReferenceType, ReflectionKind, ReflectionType, UnionType } from 'typedoc';
+import { i18n, IntersectionType, ReferenceType, ReflectionKind, ReflectionType, UnionType } from 'typedoc';
 import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
+import { backTicks, htmlTable, table } from '../node_modules/typedoc-plugin-markdown/dist/libs/markdown/index.js';
+import { TypeDeclarationVisibility } from '../node_modules/typedoc-plugin-markdown/dist/options/maps.js';
 
 import { REFERENCE_OBJECTS_LIST } from './reference-objects.mjs';
 
@@ -186,6 +188,161 @@ function mergeIntersectionPropertyReflections(intersection, project) {
 }
 
 /**
+ * For properties typed something like `false \| { a?: … }`, `getFlattenedDeclarations` does not walk the union, so nested keys
+ * never become table rows. Collect object members from each union arm (primitives/literals yield nothing).
+ *
+ * @param {import('typedoc').Type | undefined} t
+ * @param {Set<number>} visitedReflectionIds
+ * @param {import('typedoc').ProjectReflection | undefined} project
+ * @returns {import('typedoc').DeclarationReflection[]}
+ */
+function collectPropertyReflectionsFromUnionObjectArms(t, visitedReflectionIds, project) {
+  const unwrapped = unwrapOptionalType(t);
+  if (!unwrapped || /** @type {{ type?: string }} */ (unwrapped).type !== 'union') {
+    return [];
+  }
+  const union = /** @type {import('typedoc').UnionType} */ (unwrapped);
+  /** @type {Map<string, import('typedoc').DeclarationReflection>} */
+  const byName = new Map();
+  for (const arm of union.types) {
+    for (const p of collectPropertyReflectionsFromIntersectionArm(arm, visitedReflectionIds, project)) {
+      byName.set(p.name, p);
+    }
+  }
+  return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Same logic as typedoc-plugin-markdown `member.typeDeclarationTable`, but **always** runs
+ * `getFlattenedDeclarations` (including our union-object expansion). The default plugin skips
+ * flattening in `compact` mode, which hides nested keys like `telemetry.disabled`.
+ *
+ * @this {import('typedoc-plugin-markdown').MarkdownThemeContext}
+ * @param {import('typedoc').DeclarationReflection[]} model
+ * @param {{ kind?: import('typedoc').ReflectionKind }} options
+ */
+function clerkTypeDeclarationTable(model, options) {
+  const tableColumnsOptions = /** @type {{ leftAlignHeaders?: boolean; hideSources?: boolean }} */ (
+    this.options.getValue('tableColumnSettings') ?? {}
+  );
+  const leftAlignHeadings = tableColumnsOptions.leftAlignHeaders;
+  const isCompact = this.options.getValue('typeDeclarationVisibility') === TypeDeclarationVisibility.Compact;
+  const hasSources = !tableColumnsOptions.hideSources && !this.options.getValue('disableSources');
+  const headers = [];
+  const declarations = this.helpers.getFlattenedDeclarations(model, {
+    includeSignatures: true,
+  });
+  const hasDefaultValues = declarations.some(
+    declaration => Boolean(declaration.defaultValue) && declaration.defaultValue !== '...',
+  );
+  const hasComments = declarations.some(declaration => Boolean(declaration.comment));
+  const theme = /** @type {Record<string, () => string>} */ (/** @type {unknown} */ (i18n));
+  headers.push(theme.theme_name());
+  headers.push(theme.theme_type());
+  if (hasDefaultValues) {
+    headers.push(theme.theme_default_value());
+  }
+  if (hasComments) {
+    headers.push(theme.theme_description());
+  }
+  if (hasSources) {
+    headers.push(theme.theme_defined_in());
+  }
+  /** @type {string[][]} */
+  const rows = [];
+  declarations.forEach(declaration => {
+    const declType = /** @type {{ declaration?: import('typedoc').DeclarationReflection } | undefined} */ (
+      /** @type {unknown} */ (declaration.type)
+    );
+    const optional = declaration.flags.isOptional ? '?' : '';
+    const isSignature = declType?.declaration?.signatures?.length || declaration.signatures?.length;
+    const row = [];
+    const nameColumn = [];
+    if (this.router.hasUrl(declaration) && this.router.getAnchor(declaration)) {
+      nameColumn.push(`<a id="${this.router.getAnchor(declaration)}"></a>`);
+    }
+    const name = backTicks(`${declaration.name}${isSignature ? '()' : ''}${optional}`);
+    nameColumn.push(name);
+    row.push(nameColumn.join(' '));
+    if (isCompact && declaration.type instanceof ReflectionType) {
+      row.push(
+        this.partials.reflectionType(declaration.type, {
+          forceCollapse: isCompact,
+        }),
+      );
+    } else {
+      const type = [];
+      const signatures = declaration.signatures;
+      if (signatures?.length) {
+        signatures.forEach(sig => {
+          type.push(`${this.partials.signatureParameters(sig.parameters || [])} => `);
+        });
+        type.push(this.partials.someType(declaration.type));
+      } else {
+        type.push(this.partials.someType(declaration.type));
+      }
+      row.push(type.join(''));
+    }
+    if (hasDefaultValues) {
+      row.push(
+        !declaration.defaultValue || declaration.defaultValue === '...' ? '-' : backTicks(declaration.defaultValue),
+      );
+    }
+    if (hasComments) {
+      const commentsOut = [];
+      if (declaration.comment) {
+        commentsOut.push(
+          this.partials.comment(declaration.comment, {
+            isTableColumn: true,
+          }),
+        );
+      }
+      if (declType?.declaration?.signatures?.length) {
+        for (const sig of declType.declaration.signatures) {
+          if (sig.comment) {
+            commentsOut.push(
+              this.partials.comment(sig.comment, {
+                isTableColumn: true,
+              }),
+            );
+          }
+        }
+      }
+      if (commentsOut.length) {
+        row.push(commentsOut.join('\n\n'));
+      } else {
+        row.push('-');
+      }
+    }
+    if (hasSources) {
+      row.push(this.partials.sources(declaration, { hideLabel: true }));
+    }
+    rows.push(row);
+  });
+  return clerkShouldDisplayHtmlTable(this, options?.kind)
+    ? htmlTable(headers, rows, leftAlignHeadings)
+    : table(headers, rows, leftAlignHeadings);
+}
+
+/**
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} context
+ * @param {import('typedoc').ReflectionKind | undefined} kind
+ */
+function clerkShouldDisplayHtmlTable(context, kind) {
+  if (
+    kind &&
+    [ReflectionKind.CallSignature, ReflectionKind.Variable, ReflectionKind.TypeAlias].includes(kind) &&
+    context.options.getValue('typeDeclarationFormat') == 'htmlTable'
+  ) {
+    return true;
+  }
+  if (kind === ReflectionKind.Property && context.options.getValue('propertyMembersFormat') == 'htmlTable') {
+    return true;
+  }
+  return false;
+}
+
+/**
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  * @param {import('typedoc').DeclarationReflection} model
  * @param {{ nested?: boolean; headingLevel?: number }} opts
@@ -294,6 +451,38 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
   constructor(theme, page, options) {
     super(theme, page, options);
 
+    const origGetFlattenedDeclarations = this.helpers.getFlattenedDeclarations.bind(this.helpers);
+    this.helpers.getFlattenedDeclarations = (model, options) => {
+      const base = origGetFlattenedDeclarations(model, options);
+      const project = this.page?.project ?? this.page?.model?.project;
+      if (!project) {
+        return base;
+      }
+      /** @type {typeof base} */
+      const out = [];
+      const h = this.helpers;
+      for (const prop of base) {
+        out.push(prop);
+        if (prop.name.includes('.')) {
+          continue;
+        }
+        const nested = collectPropertyReflectionsFromUnionObjectArms(h.getDeclarationType(prop), new Set(), project);
+        for (const child of nested) {
+          out.push(
+            /** @type {typeof prop} */ (
+              /** @type {unknown} */ ({
+                ...child,
+                name: `${prop.name}.${child.name}`,
+                getFullName: () => prop.getFullName(),
+                getFriendlyFullName: () => prop.getFriendlyFullName(),
+              })
+            ),
+          );
+        }
+      }
+      return out;
+    };
+
     const superPartials = this.partials;
 
     this._insideFunctionSignature = false;
@@ -314,6 +503,17 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         const allowlisted = pageMatchesPropertyTableFunctionFilterAllowlist(this.page?.url, REFERENCE_OBJECTS_LIST);
         const filtered = allowlisted ? model.filter(prop => !isCallableInterfaceProperty(prop, this.helpers)) : model;
         return superPartials.propertiesTable(filtered, options);
+      },
+      /**
+       * In `compact` mode the default plugin skips `getFlattenedDeclarations`, so union object members never get
+       * rows. Delegate to {@link clerkTypeDeclarationTable} which always flattens (and picks up union expansion from
+       * our `getFlattenedDeclarations` wrapper).
+       *
+       * @param {import('typedoc').DeclarationReflection[]} model
+       * @param {{ kind?: import('typedoc').ReflectionKind }} options
+       */
+      typeDeclarationTable: (model, options) => {
+        return clerkTypeDeclarationTable.call(this, model, options);
       },
       /**
        * This hides the "Type parameters" section and the signature title from the output (by default). Shows the signature title if the `@displayFunctionSignature` tag is present.

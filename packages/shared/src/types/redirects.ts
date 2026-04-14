@@ -1,12 +1,14 @@
 import type { EnterpriseSSOStrategy, OAuthStrategy } from './strategies';
 
+/** @document */
 export type AfterSignOutUrl = {
   /**
-   * Full URL or path to navigate to after successful sign out.
+   * The full URL or path to navigate to after successful sign out.
    */
   afterSignOutUrl?: string | null;
 };
 
+/** @document */
 export type AfterMultiSessionSingleSignOutUrl = {
   /**
    * The full URL or path to navigate to after signing out the current user is complete.
@@ -126,9 +128,10 @@ export type SignInForceRedirectUrl = {
   signInForceRedirectUrl?: string | null;
 };
 
+/** @document */
 export type NewSubscriptionRedirectUrl = {
   /**
-   * The URL to navigate to after the user completes the checkout and clicks the "Continue" button.
+   * The full URL or path to navigate to after the user completes the checkout and clicks the "Continue" button.
    */
   newSubscriptionRedirectUrl?: string | null;
 };

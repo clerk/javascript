@@ -215,8 +215,28 @@ type EventHandler<E extends ClerkEvent> = (payload: ClerkEventPayload[E]) => voi
 export type ClerkEventPayload = {
   status: ClerkStatus;
 };
-type OnEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>, opt?: { notify: boolean }) => void;
-type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>) => void;
+
+/**
+ * Registers an event listener for a specific Clerk event.
+ *
+ * @param event - The event name to subscribe to.
+ * @param handler - The callback function to execute when the event is dispatched.
+ * @param opt - Optional configuration.
+ * @param opt.notify - If true and the event was previously dispatched, handler will be called immediately with the latest payload.
+ */
+export type OnEventListener = <E extends ClerkEvent>(
+  event: E,
+  handler: EventHandler<E>,
+  opt?: { notify: boolean },
+) => void;
+
+/**
+ * Unregisters an event listener for a specific Clerk event.
+ *
+ * @param event - The event name to unsubscribe from.
+ * @param handler - The callback function to remove.
+ */
+export type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>) => void;
 
 /**
  * @inline
@@ -1195,6 +1215,7 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
+/** @document */
 type ClerkUnsafeOptions = {
   /**
    * Disables the console warning that is logged when Clerk is initialized with development keys.
@@ -1207,6 +1228,9 @@ type ClerkUnsafeOptions = {
   unsafe_disableDevelopmentModeConsoleWarning?: boolean;
 };
 
+/**
+ * @document
+ */
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
@@ -1230,13 +1254,17 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     localization?: LocalizationResource;
+    /**
+     * Indicates whether Clerk should poll against Clerk's backend every 5 minutes.
+     * @default true
+     */
     polling?: boolean;
     /**
      * By default, the last signed-in session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
      */
     selectInitialSession?: (client: ClientResource) => SignedInSessionResource | null;
     /**
-     * By default, ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
+     * Indicates whether ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
      */
     standardBrowser?: boolean;
     /**
@@ -1252,7 +1280,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     signInUrl?: string;
     /**
-     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances but **must be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. **It is required to be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
      */
     signUpUrl?: string;
     /**
@@ -1264,7 +1292,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     allowedRedirectProtocols?: Array<string>;
     /**
-     * This option defines that the application is a satellite application.
+     * Indicates whether the application is a satellite application.
      */
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
@@ -1287,9 +1315,12 @@ export type ClerkOptions = ClerkOptionsNavigation &
     telemetry?:
       | false
       | {
+          /**
+           * If `true`, telemetry will not be collected.
+           */
           disabled?: boolean;
           /**
-           * Telemetry events are only logged to the console and not sent to Clerk
+           * If `true`, telemetry events are only logged to the console and not sent to Clerk
            */
           debug?: boolean;
           /**
@@ -2736,11 +2767,14 @@ export interface BrowserClerkConstructor {
   new (publishableKey: string, options?: DomainOrProxyUrl): BrowserClerk;
 }
 
+/**
+ * Browser `Clerk` instance after `@clerk/clerk-js` loads. Extends [`Clerk`](https://clerk.com/docs/reference/objects/clerk) with `load()` and related browser-only APIs.
+ */
 export interface HeadlessBrowserClerk extends Clerk {
   /**
-   * Initializes the `Clerk` object and loads all necessary environment configuration and instance settings from the [Frontend API](/docs/reference/frontend-api){{ target: '_blank' }}.
+   * Initializes the `Clerk` object and loads all necessary environment configuration and instance settings from the [Frontend API](https://clerk.com/docs/reference/frontend-api){{ target: '_blank' }}.
    *
-   * <If sdk="js-frontend">For the JavaScript SDK, you must call this method before using the `Clerk` object in your code. Refer to the [quickstart guide](/docs/js-frontend/getting-started/quickstart) for more information.</If>
+   * When using the JavaScript SDK, you must call the `load()` method before using the `Clerk` object in your code. Refer to the [quickstart guide](https://clerk.com/docs/js-frontend/getting-started/quickstart) for more information.
    */
   load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
   updateClient: (client: ClientResource) => void;
