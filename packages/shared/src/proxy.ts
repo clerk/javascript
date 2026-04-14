@@ -45,7 +45,7 @@ export function proxyUrlToAbsoluteURL(url: string | undefined): string {
 }
 
 const AUTO_PROXY_HOST_SUFFIXES = ['.vercel.app'];
-const AUTO_PROXY_PATH = '/__clerk';
+export const AUTO_PROXY_PATH = '/__clerk';
 
 export function shouldAutoProxy(hostname: string): boolean {
   return AUTO_PROXY_HOST_SUFFIXES.some(hostSuffix => hostname?.endsWith(hostSuffix)) ?? false;

@@ -38,7 +38,13 @@ import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
-import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL, shouldAutoProxy } from '@clerk/shared/proxy';
+import {
+  AUTO_PROXY_PATH,
+  isHttpOrHttps,
+  isValidProxyUrl,
+  proxyUrlToAbsoluteURL,
+  shouldAutoProxy,
+} from '@clerk/shared/proxy';
 import {
   eventPrebuiltComponentMounted,
   eventPrebuiltComponentOpened,
@@ -366,7 +372,7 @@ export class Clerk implements ClerkInterface {
       }
       // Auto-detect when no explicit proxy or domain is configured (production only)
       if (!this.#domain && this.#instanceType === 'production' && shouldAutoProxy(window.location.hostname)) {
-        return `${window.location.origin}/__clerk`;
+        return `${window.location.origin}${AUTO_PROXY_PATH}`;
       }
     }
 

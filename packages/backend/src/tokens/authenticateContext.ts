@@ -1,5 +1,5 @@
 import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
-import { shouldAutoProxy } from '@clerk/shared/proxy';
+import { AUTO_PROXY_PATH, shouldAutoProxy } from '@clerk/shared/proxy';
 import type { Jwt } from '@clerk/shared/types';
 import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
 
@@ -75,7 +75,7 @@ class AuthenticateContext implements AuthenticateContext {
     if (!options.proxyUrl && !options.domain && options.publishableKey?.startsWith('pk_live_')) {
       const hostname = clerkRequest.clerkUrl.hostname;
       if (shouldAutoProxy(hostname)) {
-        options = { ...options, proxyUrl: `${clerkRequest.clerkUrl.origin}/__clerk` };
+        options = { ...options, proxyUrl: `${clerkRequest.clerkUrl.origin}${AUTO_PROXY_PATH}` };
       }
     }
 
