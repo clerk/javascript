@@ -364,8 +364,8 @@ export class Clerk implements ClerkInterface {
       if (resolved) {
         return resolved;
       }
-      // Auto-detect when no explicit proxy or domain is configured
-      if (!this.#domain && shouldAutoProxy(window.location.hostname)) {
+      // Auto-detect when no explicit proxy or domain is configured (production only)
+      if (!this.#domain && this.#instanceType === 'production' && shouldAutoProxy(window.location.hostname)) {
         return `${window.location.origin}/__clerk`;
       }
     }

@@ -71,8 +71,8 @@ class AuthenticateContext implements AuthenticateContext {
     private clerkRequest: ClerkRequest,
     options: AuthenticateRequestOptions,
   ) {
-    // Auto-detect proxy for supported platform deployments
-    if (!options.proxyUrl && !options.domain) {
+    // Auto-detect proxy for supported platform deployments (production only)
+    if (!options.proxyUrl && !options.domain && options.publishableKey?.startsWith('pk_live_')) {
       const hostname = clerkRequest.clerkUrl.hostname;
       if (shouldAutoProxy(hostname)) {
         options = { ...options, proxyUrl: `${clerkRequest.clerkUrl.origin}/__clerk` };
