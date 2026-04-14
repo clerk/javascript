@@ -1,5 +1,5 @@
 import { useClerk, useOAuthConsent, useOrganizationList, useUser } from '@clerk/shared/react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
 import { Box, Button, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
@@ -42,15 +42,7 @@ function _OAuthConsent() {
   }));
 
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
-  const autoSelectedRef = useRef(false);
-
-  // Auto-select the first org once memberships load.
-  useEffect(() => {
-    if (!autoSelectedRef.current && orgOptions.length > 0) {
-      autoSelectedRef.current = true;
-      setSelectedOrg(orgOptions[0].value);
-    }
-  }, [orgOptions]);
+  const effectiveOrg = selectedOrg ?? orgOptions[0]?.value ?? null;
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -122,6 +114,19 @@ function _OAuthConsent() {
         </Flow.Root>
       );
     }
+  }
+
+  if (ctx.enableOrgSelection && (!isMembershipsLoaded || userMemberships.isLoading)) {
+    return (
+      <Flow.Root flow='oauthConsent'>
+        <Card.Root>
+          <Card.Content>
+            <LoadingCardContainer />
+          </Card.Content>
+          <Card.Footer />
+        </Card.Root>
+      </Flow.Root>
+    );
   }
 
   const actionUrl = clerk.oauthApplication.buildConsentActionUrl({ clientId: oauthClientId });
@@ -220,10 +225,10 @@ function _OAuthConsent() {
                 })}
               />
             </Header.Root>
-            {ctx.enableOrgSelection && isMembershipsLoaded && (
+            {ctx.enableOrgSelection && orgOptions.length > 0 && effectiveOrg && (
               <OrgSelect
                 options={orgOptions}
-                value={selectedOrg}
+                value={effectiveOrg}
                 onChange={setSelectedOrg}
               />
             )}
@@ -305,11 +310,11 @@ function _OAuthConsent() {
               value={value}
             />
           ))}
-        {!hasContextCallbacks && ctx.enableOrgSelection && selectedOrg && (
+        {!hasContextCallbacks && ctx.enableOrgSelection && effectiveOrg && (
           <input
             type='hidden'
             name='organization_id'
-            value={selectedOrg}
+            value={effectiveOrg}
           />
         )}
       </form>
