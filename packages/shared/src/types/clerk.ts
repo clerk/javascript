@@ -864,7 +864,7 @@ export interface Clerk {
   buildSignUpUrl(opts?: RedirectOptions): string;
 
   /**
-   * Returns the configured URL where [`<UserProfile />`](https://clerk.com/docs/reference/components/authentication/user-profile) is mounted or a custom user-profile page is rendered.
+   * Returns the configured URL where [`<UserProfile />`](https://clerk.com/docs/reference/components/user/user-profile) is mounted or a custom user-profile page is rendered.
    */
   buildUserProfileUrl(): string;
 
@@ -990,7 +990,7 @@ export interface Clerk {
   redirectToWaitlist: () => void;
 
   /**
-   * Redirects to the configured URL where [session tasks](https://clerk.com/docs/reference/objects/session#currenttask) are mounted.
+   * Redirects to the configured URL where [session tasks](https://clerk.com/docs/reference/objects/session) are mounted.
    *
    * @param opts - Options to control the redirect (e.g. redirect URL after tasks are complete).
    */
