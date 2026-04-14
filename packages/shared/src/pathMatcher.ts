@@ -38,7 +38,10 @@ export const createPathMatcher = (patterns: PathMatcherParam) => {
   const matchers = precomputePathRegex(routePatterns);
   return (pathname: string) => {
     try {
-      pathname = decodeURIComponent(pathname);
+      // Use decodeURI (not decodeURIComponent) to decode unreserved characters
+      // while preserving path-reserved delimiters like %2F, %3F, %23.
+      // This aligns matcher behavior with how framework routers interpret paths.
+      pathname = decodeURI(pathname);
     } catch (e) {
       throw new MalformedURLError(pathname, e);
     }

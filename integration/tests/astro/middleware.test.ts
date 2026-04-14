@@ -71,11 +71,12 @@ test.describe('custom middleware @astro', () => {
     expect(res.status).toBe(404);
   });
 
-  test('encoded slash is caught by middleware as protected route', async () => {
-    // %2F decodes to / — our matcher sees /api/admin/users after decode
-    // and correctly identifies it as protected, returning 401
+  test('encoded slash is not decoded into a path separator', async () => {
+    // %2F is a reserved delimiter — decodeURI preserves it, so the matcher
+    // sees /api%2Fadmin/users which does not match /api/admin(.*).
+    // The router also treats %2F as a literal segment char, not a separator.
     const res = await fetch(app.serverUrl + '/api%2Fadmin/users');
-    expect(res.status).toBe(401);
+    expect(res.status).not.toBe(200);
   });
 
   test('null byte in path is caught by middleware as protected route', async () => {
@@ -185,11 +186,12 @@ test.describe('custom middleware @astro (production build)', () => {
     expect(res.status).toBe(404);
   });
 
-  test('encoded slash is caught by middleware as protected route', async () => {
-    // %2F decodes to / — our matcher sees /api/admin/users after decode
-    // and correctly identifies it as protected, returning 401
+  test('encoded slash is not decoded into a path separator', async () => {
+    // %2F is a reserved delimiter — decodeURI preserves it, so the matcher
+    // sees /api%2Fadmin/users which does not match /api/admin(.*).
+    // The router also treats %2F as a literal segment char, not a separator.
     const res = await fetch(app.serverUrl + '/api%2Fadmin/users');
-    expect(res.status).toBe(401);
+    expect(res.status).not.toBe(200);
   });
 
   test('null byte in path is caught by middleware as protected route', async () => {

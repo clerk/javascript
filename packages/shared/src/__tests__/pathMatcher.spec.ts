@@ -89,6 +89,16 @@ describe('createPathMatcher', () => {
       expect(matcher('/api/admin/users')).toBe(true);
     });
 
+    test('preserves path-reserved delimiters (%2F, %3F, %23)', () => {
+      const matcher = createPathMatcher('/api/admin(.*)');
+      // %2F is an encoded slash — should NOT be decoded into a path separator
+      // because framework routers treat %2F as a literal segment character
+      expect(matcher('/api%2Fadmin/users')).toBe(false);
+      // %3F (?) and %23 (#) are also reserved and should be preserved
+      expect(matcher('/api/admin%3Fusers')).toBe(true); // stays in (.*)
+      expect(matcher('/api/admin%23users')).toBe(true); // stays in (.*)
+    });
+
     test('throws MalformedURLError on malformed percent-encoding', () => {
       const matcher = createPathMatcher('/api/admin(.*)');
       expect(() => matcher('/api/%zz/users')).toThrow(MalformedURLError);

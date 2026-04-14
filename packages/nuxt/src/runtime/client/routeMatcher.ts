@@ -1,4 +1,4 @@
-import { createPathMatcher, type PathMatcherParam } from '@clerk/shared/pathMatcher';
+import { createPathMatcher, isMalformedURLError, type PathMatcherParam } from '@clerk/shared/pathMatcher';
 import type { RouteMiddleware } from 'nuxt/app';
 
 type RouteLocation = Parameters<RouteMiddleware>[0];
@@ -17,5 +17,14 @@ export type RouteMatcherParam = PathMatcherParam;
  */
 export const createRouteMatcher = (routes: RouteMatcherParam) => {
   const matcher = createPathMatcher(routes);
-  return (to: RouteLocation) => matcher(to.path);
+  return (to: RouteLocation) => {
+    try {
+      return matcher(to.path);
+    } catch (e) {
+      if (isMalformedURLError(e)) {
+        return false;
+      }
+      throw e;
+    }
+  };
 };
