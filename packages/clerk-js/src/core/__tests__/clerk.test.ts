@@ -2527,7 +2527,22 @@ describe('Clerk singleton', () => {
         });
       });
 
-      test('auto-derives proxyUrl when hostname is eligible', () => {
+      test('auto-derives proxyUrl for production instances on eligible hosts', () => {
+        Object.defineProperty(window, 'location', {
+          value: {
+            ...originalLocation,
+            hostname: 'myapp-abc123.vercel.app',
+            origin: 'https://myapp-abc123.vercel.app',
+            href: 'https://myapp-abc123.vercel.app/dashboard',
+          },
+          writable: true,
+        });
+
+        const sut = new Clerk(productionPublishableKey);
+        expect(sut.proxyUrl).toBe('https://myapp-abc123.vercel.app/__clerk');
+      });
+
+      test('does NOT auto-derive proxyUrl for development instances on eligible hosts', () => {
         Object.defineProperty(window, 'location', {
           value: {
             ...originalLocation,
@@ -2539,11 +2554,11 @@ describe('Clerk singleton', () => {
         });
 
         const sut = new Clerk(developmentPublishableKey);
-        expect(sut.proxyUrl).toBe('https://myapp-abc123.vercel.app/__clerk');
+        expect(sut.proxyUrl).toBe('');
       });
 
       test('does NOT auto-derive proxyUrl for ineligible domains', () => {
-        const sut = new Clerk(developmentPublishableKey);
+        const sut = new Clerk(productionPublishableKey);
         expect(sut.proxyUrl).toBe('');
       });
 
@@ -2558,7 +2573,7 @@ describe('Clerk singleton', () => {
           writable: true,
         });
 
-        const sut = new Clerk(developmentPublishableKey, {
+        const sut = new Clerk(productionPublishableKey, {
           proxyUrl: 'https://custom-proxy.example.com/__clerk',
         });
         expect(sut.proxyUrl).toBe('https://custom-proxy.example.com/__clerk');
@@ -2575,7 +2590,7 @@ describe('Clerk singleton', () => {
           writable: true,
         });
 
-        const sut = new Clerk(developmentPublishableKey, {
+        const sut = new Clerk(productionPublishableKey, {
           domain: 'clerk.myapp.com',
         });
         expect(sut.proxyUrl).toBe('');
