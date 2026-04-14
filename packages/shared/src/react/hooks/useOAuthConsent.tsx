@@ -1,14 +1,10 @@
-'use client';
-
-import { useMemo } from 'react';
-
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { LoadedClerk } from '../../types/clerk';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import { useUserBase } from './base/useUserBase';
-import { readOAuthConsentFromSearch, useOAuthConsentCacheKeys } from './useOAuthConsent.shared';
+import { useOAuthConsentCacheKeys } from './useOAuthConsent.shared';
 import type { UseOAuthConsentParams, UseOAuthConsentReturn } from './useOAuthConsent.types';
 
 const HOOK_NAME = 'useOAuthConsent';
@@ -18,26 +14,13 @@ const HOOK_NAME = 'useOAuthConsent';
  * (`GET /me/oauth/consent/{oauthClientId}`). Ensure the user is authenticated before relying on this hook
  * (for example, redirect to sign-in on your custom consent route).
  *
- * `oauthClientId` and `scope` are optional. On the client, values default from a single snapshot of
- * `window.location.search` (`client_id` and `scope`). Pass them explicitly to override.
+ * The hook is a pure data fetcher: it takes an explicit `oauthClientId` and optional `scope` and
+ * issues the fetch when both the user is signed in and `oauthClientId` is non-empty. The query is
+ * disabled when `oauthClientId` is empty or omitted.
  *
  * @internal
  *
  * @example
- * ### From the URL (`?client_id=...&scope=...`)
- *
- * ```tsx
- * import { useOAuthConsent } from '@clerk/react/internal'
- *
- * export default function OAuthConsentPage() {
- *   const { data, isLoading, error } = useOAuthConsent()
- *   // ...
- * }
- * ```
- *
- * @example
- * ### Explicit values (override URL)
- *
  * ```tsx
  * import { useOAuthConsent } from '@clerk/react/internal'
  *
@@ -50,19 +33,11 @@ const HOOK_NAME = 'useOAuthConsent';
 export function useOAuthConsent(params: UseOAuthConsentParams = {}): UseOAuthConsentReturn {
   useAssertWrappedByClerkProvider(HOOK_NAME);
 
-  const { oauthClientId: oauthClientIdParam, scope: scopeParam, keepPreviousData = true, enabled = true } = params;
+  const { oauthClientId: oauthClientIdParam, scope, keepPreviousData = true, enabled = true } = params;
   const clerk = useClerkInstanceContext();
   const user = useUserBase();
 
-  const fromUrl = useMemo(() => {
-    if (typeof window === 'undefined' || !window.location) {
-      return { oauthClientId: '' };
-    }
-    return readOAuthConsentFromSearch(window.location.search);
-  }, []);
-
-  const oauthClientId = (oauthClientIdParam !== undefined ? oauthClientIdParam : fromUrl.oauthClientId).trim();
-  const scope = scopeParam !== undefined ? scopeParam : fromUrl.scope;
+  const oauthClientId = (oauthClientIdParam ?? '').trim();
 
   clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 

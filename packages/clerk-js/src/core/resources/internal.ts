@@ -22,7 +22,6 @@ export * from './ExternalAccount';
 export * from './Feature';
 export * from './IdentificationLink';
 export * from './Image';
-export * from './OAuthApplication';
 export * from './Organization';
 export * from './OrganizationDomain';
 export * from './OrganizationInvitation';
