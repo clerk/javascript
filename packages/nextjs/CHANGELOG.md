@@ -1,5 +1,20 @@
 # Change Log
 
+## 7.1.0
+
+### Minor Changes
+
+- Introduce internal `useOAuthConsent()` hook for fetching OAuth consent screen metadata for the signed-in user. ([#8286](https://github.com/clerk/javascript/pull/8286)) by [@jfoshee](https://github.com/jfoshee)
+
+### Patch Changes
+
+- Bump `next` devDependency to `15.5.15` to pick up the fix for CVE-2026-23869, a high-severity (CVSS 7.5) denial-of-service vulnerability in React Server Components. If you use the Next.js App Router, we recommend upgrading to Next.js `15.5.15` or `16.2.3`. ([#8257](https://github.com/clerk/javascript/pull/8257)) by [@renovate](https://github.com/apps/renovate)
+
+- Updated dependencies [[`3fd586d`](https://github.com/clerk/javascript/commit/3fd586d171e9c281c4b96f620ee9070b47ba00f4), [`f9ff9e9`](https://github.com/clerk/javascript/commit/f9ff9e937d70713abf96fdd92071cd6e84b8eb80)]:
+  - @clerk/react@6.3.0
+  - @clerk/shared@4.7.0
+  - @clerk/backend@3.2.9
+
 ## 7.0.12
 
 ### Patch Changes

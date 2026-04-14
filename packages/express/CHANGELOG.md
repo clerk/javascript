@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.1.1
+
+### Patch Changes
+
+- Forward `clockSkewInMs` from `clerkMiddleware()` to backend `authenticateRequest()`. ([#8287](https://github.com/clerk/javascript/pull/8287)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+- Updated dependencies [[`3fd586d`](https://github.com/clerk/javascript/commit/3fd586d171e9c281c4b96f620ee9070b47ba00f4), [`f9ff9e9`](https://github.com/clerk/javascript/commit/f9ff9e937d70713abf96fdd92071cd6e84b8eb80)]:
+  - @clerk/shared@4.7.0
+  - @clerk/backend@3.2.9
+
 ## 2.1.0
 
 ### Minor Changes
