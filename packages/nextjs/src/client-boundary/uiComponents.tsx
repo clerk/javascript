@@ -31,6 +31,8 @@ export {
   HandleSSOCallback,
 } from '@clerk/react';
 
+export { OAuthConsent } from '@clerk/react/internal';
+
 // The assignment of UserProfile with BaseUserProfile props is used
 // to support the CustomPage functionality (eg UserProfile.Page)
 // Also the `typeof BaseUserProfile` is used to resolve the following error:
