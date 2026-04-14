@@ -94,6 +94,40 @@ test.describe('custom middleware @astro', () => {
     expect(res.status).toBe(500);
   });
 
+  test('encoded dot-current segment is caught by middleware', async () => {
+    // %2e = '.' — /api/%2e/admin/users resolves to /api/./admin/users → /api/admin/users
+    // Our middleware matches the resolved path as protected
+    const res = await fetch(app.serverUrl + '/api/%2e/admin/users');
+    expect(res.status).toBe(401);
+  });
+
+  test('encoded dot-parent segment does not reach protected route', async () => {
+    // %2e%2e = '..' — /api/%2e%2e/admin/users resolves to /api/../admin/users → /admin/users
+    // This doesn't match any route, returning 404
+    const res = await fetch(app.serverUrl + '/api/%2e%2e/admin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('encoded dot-parent traversal through fake segment is caught by middleware', async () => {
+    // /api/foo/%2e%2e/admin/users resolves to /api/foo/../admin/users → /api/admin/users
+    // Our middleware matches the resolved path as protected, returning 401
+    const res = await fetch(app.serverUrl + '/api/foo/%2e%2e/admin/users');
+    expect(res.status).toBe(401);
+  });
+
+  test('fully encoded dot segments with encoded slash are rejected', async () => {
+    // %2e%2f = './', %2e%2e%2f = '../' — when the slash is also encoded,
+    // the entire sequence is treated as a single path segment by the router
+    const dotSlashCurrent = await fetch(app.serverUrl + '/api%2f%2e%2fadmin/users');
+    expect(dotSlashCurrent.status).toBe(404);
+
+    const dotSlashParent = await fetch(app.serverUrl + '/api%2f%2e%2e%2fadmin/users');
+    expect(dotSlashParent.status).toBe(404);
+
+    const dotSlashTraversal = await fetch(app.serverUrl + '/api/foo%2f%2e%2e%2fadmin/users');
+    expect(dotSlashTraversal.status).toBe(404);
+  });
+
   test('double slashes cannot bypass protected route', async () => {
     // Double slashes before the protected segment
     const res1 = await fetch(app.serverUrl + '//api/admin/users');
@@ -172,6 +206,40 @@ test.describe('custom middleware @astro (production build)', () => {
     // MalformedURLError, which handleControlFlowErrors catches and returns 400
     const res = await fetch(app.serverUrl + '/api/%zz/users');
     expect(res.status).toBe(400);
+  });
+
+  test('encoded dot-current segment is caught by middleware', async () => {
+    // %2e = '.' — /api/%2e/admin/users resolves to /api/./admin/users → /api/admin/users
+    // Our middleware matches the resolved path as protected
+    const res = await fetch(app.serverUrl + '/api/%2e/admin/users');
+    expect(res.status).toBe(401);
+  });
+
+  test('encoded dot-parent segment does not reach protected route', async () => {
+    // %2e%2e = '..' — /api/%2e%2e/admin/users resolves to /api/../admin/users → /admin/users
+    // This doesn't match any route, returning 404
+    const res = await fetch(app.serverUrl + '/api/%2e%2e/admin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('encoded dot-parent traversal through fake segment is caught by middleware', async () => {
+    // /api/foo/%2e%2e/admin/users resolves to /api/foo/../admin/users → /api/admin/users
+    // Our middleware matches the resolved path as protected, returning 401
+    const res = await fetch(app.serverUrl + '/api/foo/%2e%2e/admin/users');
+    expect(res.status).toBe(401);
+  });
+
+  test('fully encoded dot segments with encoded slash are rejected', async () => {
+    // %2e%2f = './', %2e%2e%2f = '../' — when the slash is also encoded,
+    // the entire sequence is treated as a single path segment by the router
+    const dotSlashCurrent = await fetch(app.serverUrl + '/api%2f%2e%2fadmin/users');
+    expect(dotSlashCurrent.status).toBe(404);
+
+    const dotSlashParent = await fetch(app.serverUrl + '/api%2f%2e%2e%2fadmin/users');
+    expect(dotSlashParent.status).toBe(404);
+
+    const dotSlashTraversal = await fetch(app.serverUrl + '/api/foo%2f%2e%2e%2fadmin/users');
+    expect(dotSlashTraversal.status).toBe(404);
   });
 
   test('double slashes cannot bypass protected route', async () => {
