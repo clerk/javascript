@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react",
-  "version": "6.2.1",
+  "version": "6.3.0",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -109,8 +109,8 @@
     "@clerk/localizations": "workspace:*",
     "@clerk/ui": "workspace:*",
     "@types/semver": "^7.7.1",
-    "semver": "^7.7.1",
-    "yaml": "^2.8.0"
+    "semver": "^7.7.4",
+    "yaml": "^2.8.3"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",
