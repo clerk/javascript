@@ -38,6 +38,14 @@ const apiRouteFile = () => `export async function GET(request, { params }) {
           return Response.json({ module: mod, action: action.join('/') });
         }`;
 
+const pagesApiRouteFile = () => `export default function handler(req, res) {
+          res.status(200).json({ status: 'ok' });
+        }`;
+
+const pagesUnprotectedApiRouteFile = () => `export default function handler(req, res) {
+          res.status(200).json({ status: 'unprotected' });
+        }`;
+
 const usersCountFile = () => `import { clerkClient } from '@clerk/nextjs/server'
 
         export default async function Page(){
@@ -205,6 +213,127 @@ test.describe('percent-encoded URL handling @nextjs', () => {
     expect(dotSlashTraversal.status).toBe(200);
     const body = await dotSlashTraversal.json();
     expect(body.module).not.toBe('admin');
+  });
+
+  test('double slashes cannot bypass protected route', async () => {
+    // Double slashes before the protected segment
+    const res1 = await fetch(app.serverUrl + '//api/admin/users');
+    expect(res1.status).not.toBe(200);
+
+    // Double slashes in the middle of the path
+    const res2 = await fetch(app.serverUrl + '/api//admin/users');
+    expect(res2.status).not.toBe(200);
+  });
+});
+
+test.describe('percent-encoded URL handling @nextjs pages router', () => {
+  test.describe.configure({ mode: 'serial' });
+  let app: Application;
+
+  test.beforeAll(async () => {
+    test.setTimeout(90_000);
+    app = await appConfigs.next.appRouter
+      .clone()
+      .addFile('src/middleware.ts', middlewareFile)
+      .addFile('src/pages/api/admin/[...action].ts', pagesApiRouteFile)
+      .addFile('src/pages/api/public/[...action].ts', pagesUnprotectedApiRouteFile)
+      .commit();
+
+    await app.setup();
+    await app.withEnv(appConfigs.envs.withDynamicKeys);
+    await app.dev();
+  });
+
+  test.afterAll(async () => {
+    await app.teardown();
+  });
+
+  test('baseline: Pages Router API routes are reachable', async () => {
+    // Unprotected route returns 200 — proves Pages Router is serving requests
+    const publicRes = await fetch(app.serverUrl + '/api/public/test');
+    expect(publicRes.status).toBe(200);
+    const body = await publicRes.json();
+    expect(body.status).toBe('unprotected');
+
+    // Protected route is blocked by middleware — auth.protect() returns 404
+    // for unauthenticated non-page requests
+    const adminRes = await fetch(app.serverUrl + '/api/admin/users');
+    expect(adminRes.status).toBe(404);
+  });
+
+  test('handle percent-encoded URL on protected API routes', async () => {
+    // %61 = 'a': /api/%61dmin/users decodes to /api/admin/users
+    // Middleware catches it as a protected route
+    const encodedRes = await fetch(app.serverUrl + '/api/%61dmin/users');
+    expect(encodedRes.status).toBe(404);
+
+    // %64 = 'd': /api/a%64min/users decodes to /api/admin/users
+    const encodedRes2 = await fetch(app.serverUrl + '/api/a%64min/users');
+    expect(encodedRes2.status).toBe(404);
+  });
+
+  test('double-encoded URLs do not match route (Pages Router rejects)', async () => {
+    // %2561 decodes one layer to %61 — Pages Router doesn't match
+    // %2561dmin to the admin/ directory, returning 404
+    const res = await fetch(app.serverUrl + '/api/%2561dmin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('encoded slash is not decoded into a path separator', async () => {
+    // %2F is a reserved delimiter — decodeURI preserves it, so the matcher
+    // sees /api%2Fadmin/users which does not match /api/admin(.*).
+    // The router also treats %2F as a literal segment char, not a separator.
+    const res = await fetch(app.serverUrl + '/api%2Fadmin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('null byte in path is caught by middleware as protected route', async () => {
+    // %00 decodes to a null char — /api/admin\0/users still matches
+    // /api/admin(.*) so our middleware correctly blocks it with auth.protect()
+    // which returns 404 for unauthenticated non-page requests
+    const res = await fetch(app.serverUrl + '/api/admin%00/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('malformed percent-encoding returns 400 (MalformedURLError)', async () => {
+    // %zz is not valid percent-encoding — our MalformedURLError handler
+    // in clerkMiddleware catches the error and returns 400
+    const res = await fetch(app.serverUrl + '/api/%zz/users');
+    expect(res.status).toBe(400);
+  });
+
+  test('encoded dot-current segment is rejected (Next.js router rejects)', async () => {
+    // %2e = '.' — Next.js does not resolve encoded dot segments in routing,
+    // so /api/%2e/admin/users doesn't match any route, returning 404
+    const res = await fetch(app.serverUrl + '/api/%2e/admin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('encoded dot-parent segment is rejected (Next.js router rejects)', async () => {
+    // %2e%2e = '..' — Next.js does not resolve encoded dot segments,
+    // returning 404
+    const res = await fetch(app.serverUrl + '/api/%2e%2e/admin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('encoded dot-parent traversal is rejected (Next.js router rejects)', async () => {
+    // /api/foo/%2e%2e/admin/users — Next.js treats %2e%2e as a literal
+    // path segment, not a traversal directive, returning 404
+    const res = await fetch(app.serverUrl + '/api/foo/%2e%2e/admin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('fully encoded dot segments with encoded slash are rejected', async () => {
+    // %2e%2f = './', %2e%2e%2f = '../' — when the slash is also encoded,
+    // Next.js treats the entire sequence as a single path segment
+    const dotSlashCurrent = await fetch(app.serverUrl + '/api%2f%2e%2fadmin/users');
+    expect(dotSlashCurrent.status).toBe(404);
+
+    const dotSlashParent = await fetch(app.serverUrl + '/api%2f%2e%2e%2fadmin/users');
+    expect(dotSlashParent.status).toBe(404);
+
+    const dotSlashTraversal = await fetch(app.serverUrl + '/api/foo%2f%2e%2e%2fadmin/users');
+    expect(dotSlashTraversal.status).toBe(404);
   });
 
   test('double slashes cannot bypass protected route', async () => {
