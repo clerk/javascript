@@ -4,10 +4,20 @@ import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import { createTestUtils } from '../testUtils';
 
-const middlewareFile = () => `import { clerkClient, clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+test.describe('dynamic keys @nextjs', () => {
+  test.describe.configure({ mode: 'serial' });
+  let app: Application;
+
+  test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
+    app = await appConfigs.next.appRouter
+      .clone()
+      .addFile(
+        'src/middleware.ts',
+        () => `import { clerkClient, clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
         import { NextResponse } from 'next/server';
 
-        const isProtectedRoute = createRouteMatcher(['/protected', '/api/admin(.*)']);
+        const isProtectedRoute = createRouteMatcher(['/protected']);
         const shouldFetchBapi = createRouteMatcher(['/fetch-bapi-from-middleware']);
 
         export default clerkMiddleware(async (auth, request) => {
@@ -31,33 +41,19 @@ const middlewareFile = () => `import { clerkClient, clerkMiddleware, createRoute
 
         export const config = {
           matcher: ['/((?!.*\\\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
-        };`;
-
-const apiRouteFile = () => `export async function GET(request, { params }) {
-          const { module: mod, action } = await params;
-          return Response.json({ module: mod, action: action.join('/') });
-        }`;
-
-const usersCountFile = () => `import { clerkClient } from '@clerk/nextjs/server'
+        };`,
+      )
+      .addFile(
+        'src/app/users-count/page.tsx',
+        () => `import { clerkClient } from '@clerk/nextjs/server'
 
         export default async function Page(){
           const count = await clerkClient().users?.getCount() ?? 0;
 
           return <p>Users count: {count}</p>
         }
-        `;
-
-test.describe('dynamic keys @nextjs', () => {
-  test.describe.configure({ mode: 'serial' });
-  let app: Application;
-
-  test.beforeAll(async () => {
-    test.setTimeout(90_000); // Wait for app to be ready
-    app = await appConfigs.next.appRouter
-      .clone()
-      .addFile('src/middleware.ts', middlewareFile)
-      .addFile('src/app/api/[module]/[...action]/route.ts', apiRouteFile)
-      .addFile('src/app/users-count/page.tsx', usersCountFile)
+        `,
+      )
       .commit();
 
     await app.setup();
