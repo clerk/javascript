@@ -240,6 +240,10 @@ export type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHa
 
 /**
  * @inline
+ * @property {ClerkStatus} degraded - Set when Clerk is partially operational.
+ * @property {ClerkStatus} error - Set when hotloading `clerk-js` or `Clerk.load()` failed.
+ * @property {ClerkStatus} loading - Set during initialization.
+ * @property {ClerkStatus} ready - Set when Clerk is fully operational.
  */
 export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
 
@@ -265,10 +269,12 @@ export interface Clerk {
 
   /**
    * The status of the `Clerk` instance. Possible values are:
-   * - `"error"`: Set when hotloading `clerk-js` or `Clerk.load()` failed.
-   * - `"loading"`: Set during initialization.
-   * - `"ready"`: Set when Clerk is fully operational.
-   * - `"degraded"`: Set when Clerk is partially operational.
+   * <ul>
+   *  <li>`"error"`: Set when hotloading `clerk-js` or `Clerk.load()` failed.</li>
+   *  <li>`"loading"`: Set during initialization.</li>
+   *  <li>`"ready"`: Set when Clerk is fully operational.</li>
+   *  <li>`"degraded"`: Set when Clerk is partially operational.</li>
+   * </ul>
    */
   status: ClerkStatus;
 
@@ -282,7 +288,7 @@ export interface Clerk {
   /** Your Clerk [Publishable Key](!publishable-key). */
   publishableKey: string;
 
-  /** Your Clerk app's proxy URL. Required for applications that run behind a reverse proxy. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`). */
+  /** **Required for applications that run behind a reverse proxy**. Your Clerk app's proxy URL. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`). */
   proxyUrl: string | undefined;
 
   /** The current Clerk app's domain. Prefixed with `clerk.` on production if not already prefixed. Returns `""` when ran on the server. */
@@ -1031,27 +1037,27 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
-   * Starts a sign-in flow that uses the MetaMask browser extension to authenticate the user using their Metamask wallet address.
+   * Starts a sign-in flow that uses MetaMask to authenticate the user using their Metamask wallet address.
    */
   authenticateWithMetamask: (params?: AuthenticateWithMetamaskParams) => Promise<unknown>;
 
   /**
-   * Starts a sign-in flow that uses the Coinbase Smart Wallet and browser extension to authenticate the user using their Coinbase wallet address.
+   * Starts a sign-in flow that uses Coinbase Smart Wallet to authenticate the user using their Coinbase wallet address.
    */
   authenticateWithCoinbaseWallet: (params?: AuthenticateWithCoinbaseWalletParams) => Promise<unknown>;
 
   /**
-   * Starts a sign-in flow that uses the OKX Wallet browser extension to authenticate the user using their OKX wallet address.
+   * Starts a sign-in flow that uses OKX Wallet to authenticate the user using their OKX wallet address.
    */
   authenticateWithOKXWallet: (params?: AuthenticateWithOKXWalletParams) => Promise<unknown>;
 
   /**
-   * Starts a sign-in flow that uses the Base Account SDK to authenticate the user using their Base wallet address.
+   * Starts a sign-in flow that uses Base to authenticate the user using their Web3 wallet address.
    */
   authenticateWithBase: (params?: AuthenticateWithBaseParams) => Promise<unknown>;
 
   /**
-   * Starts a sign-in flow that uses a Solana supported Web3 wallet browser extension to authenticate the user using their Solana wallet address.
+   * Starts a sign-in flow that uses Solana to authenticate the user using their Solana wallet address.
    */
   authenticateWithSolana: (params: AuthenticateWithSolanaParams) => Promise<unknown>;
 

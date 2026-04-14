@@ -217,6 +217,43 @@ function collectPropertyReflectionsFromUnionObjectArms(t, visitedReflectionIds, 
 }
 
 /**
+ * Appends `parent.child` rows for union object arms (e.g. `false \| { disabled?: … }`). **Only** used when building
+ * {@link clerkTypeDeclarationTable}; we intentionally do **not** hook `helpers.getFlattenedDeclarations` globally —
+ * otherwise top-level `propertiesTable` output (e.g. `Clerk`) would gain synthetic rows like `client.*` for every
+ * property whose type is a union such as `ClientResource \| undefined`.
+ *
+ * @template {import('typedoc').DeclarationReflection} T
+ * @param {T[]} base
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext['helpers']} helpers
+ * @param {import('typedoc').ProjectReflection} project
+ * @returns {T[]}
+ */
+function appendUnionObjectChildPropertyRows(base, helpers, project) {
+  /** @type {T[]} */
+  const out = [];
+  for (const prop of base) {
+    out.push(prop);
+    if (prop.name.includes('.')) {
+      continue;
+    }
+    const nested = collectPropertyReflectionsFromUnionObjectArms(helpers.getDeclarationType(prop), new Set(), project);
+    for (const child of nested) {
+      out.push(
+        /** @type {T} */ (
+          /** @type {unknown} */ ({
+            ...child,
+            name: `${prop.name}.${child.name}`,
+            getFullName: () => prop.getFullName(),
+            getFriendlyFullName: () => prop.getFriendlyFullName(),
+          })
+        ),
+      );
+    }
+  }
+  return out;
+}
+
+/**
  * Used in `clerkTypeDeclarationTable()` to determine if the table should be displayed as an HTML table.
  *
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} context
@@ -237,7 +274,9 @@ function clerkShouldDisplayHtmlTable(context, kind) {
 }
 
 /**
- * Same logic as typedoc-plugin-markdown `member.typeDeclarationTable`, but **always** runs `getFlattenedDeclarations` (including our union-object expansion). The default plugin skips flattening in `compact` mode, which hides nested keys like `telemetry.disabled`.
+ * Same logic as typedoc-plugin-markdown `member.typeDeclarationTable`, but **always** runs `getFlattenedDeclarations`
+ * and then {@link appendUnionObjectChildPropertyRows} (union-object arm rows like `telemetry.*`). The default plugin
+ * skips flattening in `compact` mode, which hides nested keys like `telemetry.disabled`.
  *
  * @this {import('typedoc-plugin-markdown').MarkdownThemeContext}
  * @param {import('typedoc').DeclarationReflection[]} model
@@ -251,9 +290,13 @@ function clerkTypeDeclarationTable(model, options) {
   const isCompact = this.options.getValue('typeDeclarationVisibility') === TypeDeclarationVisibility.Compact;
   const hasSources = !tableColumnsOptions.hideSources && !this.options.getValue('disableSources');
   const headers = [];
-  const declarations = this.helpers.getFlattenedDeclarations(model, {
+  const baseDeclarations = this.helpers.getFlattenedDeclarations(model, {
     includeSignatures: true,
   });
+  const project = this.page?.project ?? this.page?.model?.project;
+  const declarations = project
+    ? appendUnionObjectChildPropertyRows(baseDeclarations, this.helpers, project)
+    : baseDeclarations;
   const hasDefaultValues = declarations.some(
     declaration => Boolean(declaration.defaultValue) && declaration.defaultValue !== '...',
   );
@@ -456,38 +499,6 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
   constructor(theme, page, options) {
     super(theme, page, options);
 
-    const origGetFlattenedDeclarations = this.helpers.getFlattenedDeclarations.bind(this.helpers);
-    this.helpers.getFlattenedDeclarations = (model, options) => {
-      const base = origGetFlattenedDeclarations(model, options);
-      const project = this.page?.project ?? this.page?.model?.project;
-      if (!project) {
-        return base;
-      }
-      /** @type {typeof base} */
-      const out = [];
-      const h = this.helpers;
-      for (const prop of base) {
-        out.push(prop);
-        if (prop.name.includes('.')) {
-          continue;
-        }
-        const nested = collectPropertyReflectionsFromUnionObjectArms(h.getDeclarationType(prop), new Set(), project);
-        for (const child of nested) {
-          out.push(
-            /** @type {typeof prop} */ (
-              /** @type {unknown} */ ({
-                ...child,
-                name: `${prop.name}.${child.name}`,
-                getFullName: () => prop.getFullName(),
-                getFriendlyFullName: () => prop.getFriendlyFullName(),
-              })
-            ),
-          );
-        }
-      }
-      return out;
-    };
-
     const superPartials = this.partials;
 
     this._insideFunctionSignature = false;
@@ -509,7 +520,8 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         return superPartials.propertiesTable(filtered, options);
       },
       /**
-       * In `compact` mode the default plugin skips `getFlattenedDeclarations`, so union object members never get rows. Delegate to {@link clerkTypeDeclarationTable} which always flattens (and picks up union expansion from our `getFlattenedDeclarations` wrapper).
+       * In `compact` mode the default plugin skips `getFlattenedDeclarations`, so union object members never get rows.
+       * Delegate to {@link clerkTypeDeclarationTable} which always flattens and applies {@link appendUnionObjectChildPropertyRows}.
        *
        * @param {import('typedoc').DeclarationReflection[]} model
        * @param {{ kind?: import('typedoc').ReflectionKind }} options
