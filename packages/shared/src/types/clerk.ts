@@ -1228,9 +1228,7 @@ type ClerkUnsafeOptions = {
   unsafe_disableDevelopmentModeConsoleWarning?: boolean;
 };
 
-/**
- * @document
- */
+/** @document */
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &

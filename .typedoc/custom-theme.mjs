@@ -82,6 +82,7 @@ function findNamedTypeDeclaration(project, name) {
 
 /**
  * Collect documented property reflections from one intersection arm (object literal, type alias, interface, nested `&`).
+ * E.g. `{ a: string } & { b: number }` => `[{ name: 'a', type: 'string' }, { name: 'b', type: 'number' }]`
  *
  * @param {import('typedoc').Type} t
  * @param {Set<number>} visitedReflectionIds
@@ -170,6 +171,8 @@ function collectPropertyReflectionsFromIntersectionArm(t, visitedReflectionIds, 
 
 /**
  * Merge intersection arms into one property list (later duplicate names override earlier ones, then sort by name).
+ * type A = type B & type C; type A's properties will be the union of B's and C's properties.
+ * E.g. `ClerkOptions` in clerk.ts
  *
  * @param {import('typedoc').IntersectionType} intersection
  * @param {import('typedoc').ProjectReflection | undefined} project
@@ -190,6 +193,7 @@ function mergeIntersectionPropertyReflections(intersection, project) {
 /**
  * For properties typed something like `false \| { a?: … }`, `getFlattenedDeclarations` does not walk the union, so nested keys
  * never become table rows. Collect object members from each union arm (primitives/literals yield nothing).
+ * E.g. `telemetry` prop in clerk.ts
  *
  * @param {import('typedoc').Type | undefined} t
  * @param {Set<number>} visitedReflectionIds
@@ -213,9 +217,27 @@ function collectPropertyReflectionsFromUnionObjectArms(t, visitedReflectionIds, 
 }
 
 /**
- * Same logic as typedoc-plugin-markdown `member.typeDeclarationTable`, but **always** runs
- * `getFlattenedDeclarations` (including our union-object expansion). The default plugin skips
- * flattening in `compact` mode, which hides nested keys like `telemetry.disabled`.
+ * Used in `clerkTypeDeclarationTable()` to determine if the table should be displayed as an HTML table.
+ *
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} context
+ * @param {import('typedoc').ReflectionKind | undefined} kind
+ */
+function clerkShouldDisplayHtmlTable(context, kind) {
+  if (
+    kind &&
+    [ReflectionKind.CallSignature, ReflectionKind.Variable, ReflectionKind.TypeAlias].includes(kind) &&
+    context.options.getValue('typeDeclarationFormat') == 'htmlTable'
+  ) {
+    return true;
+  }
+  if (kind === ReflectionKind.Property && context.options.getValue('propertyMembersFormat') == 'htmlTable') {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Same logic as typedoc-plugin-markdown `member.typeDeclarationTable`, but **always** runs `getFlattenedDeclarations` (including our union-object expansion). The default plugin skips flattening in `compact` mode, which hides nested keys like `telemetry.disabled`.
  *
  * @this {import('typedoc-plugin-markdown').MarkdownThemeContext}
  * @param {import('typedoc').DeclarationReflection[]} model
@@ -325,24 +347,6 @@ function clerkTypeDeclarationTable(model, options) {
 }
 
 /**
- * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} context
- * @param {import('typedoc').ReflectionKind | undefined} kind
- */
-function clerkShouldDisplayHtmlTable(context, kind) {
-  if (
-    kind &&
-    [ReflectionKind.CallSignature, ReflectionKind.Variable, ReflectionKind.TypeAlias].includes(kind) &&
-    context.options.getValue('typeDeclarationFormat') == 'htmlTable'
-  ) {
-    return true;
-  }
-  if (kind === ReflectionKind.Property && context.options.getValue('propertyMembersFormat') == 'htmlTable') {
-    return true;
-  }
-  return false;
-}
-
-/**
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  * @param {import('typedoc').DeclarationReflection} model
  * @param {{ nested?: boolean; headingLevel?: number }} opts
@@ -423,11 +427,12 @@ const unionCommentMap = new Map();
 
 /**
  * Only for the specified pages do we remove function-valued members from property tables in the "Properties" section.
+ * (Created for the extract-methods script as these methods will be extracted to separate files.)
  *
  * @param {string | undefined} pageUrl - The URL of the page to check.
  * @param {readonly string[]} allowlist - The list of pages to check.
  */
-function pageMatchesPropertyTableFunctionFilterAllowlist(pageUrl, allowlist) {
+function pageMatchesAllowlist(pageUrl, allowlist) {
   if (!pageUrl) {
     return false;
   }
@@ -490,9 +495,6 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
     this.partials = {
       ...superPartials,
       /**
-       * On allowlisted output pages only (see `PROPERTY_TABLE_EXCLUDE_FUNCTIONS_ALLOWLIST`): drop function-valued
-       * interface/class properties from property tables (property syntax with function types). Other pages unchanged.
-       *
        * @param {import('typedoc').DeclarationReflection[]} model
        * @param {Parameters<typeof superPartials.propertiesTable>[1]} [options]
        */
@@ -500,14 +502,14 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         if (!Array.isArray(model)) {
           return superPartials.propertiesTable(/** @type {any} */ (model), options);
         }
-        const allowlisted = pageMatchesPropertyTableFunctionFilterAllowlist(this.page?.url, REFERENCE_OBJECTS_LIST);
+
+        // On allowlisted output pages only, drop function-valued interface/class properties from property tables (property syntax with function types). Other pages unchanged.
+        const allowlisted = pageMatchesAllowlist(this.page?.url, REFERENCE_OBJECTS_LIST);
         const filtered = allowlisted ? model.filter(prop => !isCallableInterfaceProperty(prop, this.helpers)) : model;
         return superPartials.propertiesTable(filtered, options);
       },
       /**
-       * In `compact` mode the default plugin skips `getFlattenedDeclarations`, so union object members never get
-       * rows. Delegate to {@link clerkTypeDeclarationTable} which always flattens (and picks up union expansion from
-       * our `getFlattenedDeclarations` wrapper).
+       * In `compact` mode the default plugin skips `getFlattenedDeclarations`, so union object members never get rows. Delegate to {@link clerkTypeDeclarationTable} which always flattens (and picks up union expansion from our `getFlattenedDeclarations` wrapper).
        *
        * @param {import('typedoc').DeclarationReflection[]} model
        * @param {{ kind?: import('typedoc').ReflectionKind }} options
@@ -1122,10 +1124,7 @@ function swap(arr, i, j) {
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext['helpers']} helpers
  */
 function isCallableInterfaceProperty(prop, helpers) {
-  /**
-   * Use the declared value type for properties. `getDeclarationType` mirrors accessor/parameter behavior and can
-   * return the wrong node when TypeDoc attaches signatures to the property (same class of bug as TypeAlias + `decl.type`).
-   */
+  // Use the declared value type for properties. `getDeclarationType` mirrors accessor/parameter behavior and can return the wrong node when TypeDoc attaches signatures to the property (same class of bug as TypeAlias + `decl.type`).
   const t =
     (prop.kind === ReflectionKind.Property || prop.kind === ReflectionKind.Variable) && prop.type
       ? prop.type
@@ -1134,8 +1133,8 @@ function isCallableInterfaceProperty(prop, helpers) {
 }
 
 /**
- * True when the property's value type is callable (function type, union/intersection of callables, or reference to a
- * type alias of a function type). Object types with properties (e.g. namespaces) stay false.
+ * True when the property's value type is callable (function type, union/intersection of callables, or reference to a type alias of a function type). Object types with properties (e.g. namespaces) stay false.
+ * E.g. `navigate: CustomNavigation` in clerk.ts
  *
  * @param {import('typedoc').Type | undefined} t
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext['helpers']} helpers
@@ -1174,10 +1173,7 @@ function isCallablePropertyValueType(t, helpers, seenReflectionIds) {
   }
   if (t instanceof ReferenceType) {
     /**
-     * Unresolved reference (`reflection` missing): TypeDoc did not link the symbol (not in entry graph, external,
-     * filtered, etc.). We cannot tell a function alias from an interface, so we only treat a few **name** patterns as
-     * callable (`*Function`, `*Listener`). For anything else, ensure the type is part of the documented program so
-     * `reflection` resolves and the structural checks above apply — do not add one-off type names here.
+     * Unresolved reference (`reflection` missing): TypeDoc did not link the symbol (not in entry graph, external, filtered, etc.). We cannot tell a function alias from an interface, so we only treat a few **name** patterns as callable (`*Function`, `*Listener`). For anything else, ensure the type is part of the documented program so `reflection` resolves and the structural checks above apply — do not add one-off type names here.
      * E.g. `CustomNavigation`, `RouterFn`, etc.
      */
     if (!t.reflection && typeof t.name === 'string' && /(?:Function|Listener)$/.test(t.name)) {

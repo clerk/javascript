@@ -60,10 +60,7 @@ function appendMarkdownTableRows(tableMd, rowLines) {
 }
 
 /**
- * Post-process the theme’s parameters markdown table. TypeDoc flattens object params as `parent.child` and may
- * interleave those rows with other parameters. Here we (1) move each `parent.*` block directly under `parent`,
- * and (2) rewrite dotted paths in the name column to optional-chaining (`parent?.child`, `a?.b?.c`). Top-level
- * names are unchanged (`foo?`, `exa`).
+ * Post-process the theme’s parameters markdown table. TypeDoc flattens object params as `parent.child` and may interleave those rows with other parameters. Here we (1) move each `parent.*` block directly under `parent`, and (2) rewrite dotted paths in the name column to optional-chaining (`parent?.child`, `a?.b?.c`). Top-level names are unchanged (`foo?`, `exa`).
  *
  * @param {string} tableMd
  */
@@ -271,10 +268,7 @@ function getPrimaryCallSignature(decl) {
   if (t && 'declaration' in t && t.declaration?.signatures?.length) {
     return t.declaration.signatures[0];
   }
-  /**
-   * e.g. `navigate: CustomNavigation` — for `type Fn = () => void`, signatures often live on the inner `declaration`
-   * of `alias.type` (ReflectionType), not on `alias.signatures` (see `custom-theme.mjs` `isCallablePropertyValueType`).
-   */
+  // E.g. `navigate: CustomNavigation` — for `type Fn = () => void`, signatures often live on the inner `declaration` of `alias.type` (ReflectionType), not on `alias.signatures` (see `custom-theme.mjs` `isCallablePropertyValueType`).
   if (t && typeof t === 'object' && 'type' in t && /** @type {{ type?: string }} */ (t).type === 'reference') {
     const ref = /** @type {import('typedoc').ReferenceType} */ (t);
     const target = ref.reflection;
@@ -299,8 +293,7 @@ function getPrimaryCallSignature(decl) {
 }
 
 /**
- * Must stay aligned with allowlisted `propertiesTable` filtering in `custom-theme.mjs` (callable members are
- * extracted here, not listed as properties).
+ * Must stay aligned with allowlisted `propertiesTable` filtering in `custom-theme.mjs` (callable members are extracted here, not listed as properties).
  *
  * @param {import('typedoc').DeclarationReflection} decl
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
@@ -400,8 +393,7 @@ function formatTypeScriptSignature(sig, memberName) {
 }
 
 /**
- * `@returns - foo` is often stored with a leading dash, which renders as a bullet. Normalize to prose for
- * "Returns …" lines.
+ * `@returns - foo` is often stored with a leading dash, which renders as a bullet. Normalize to prose for "Returns …" lines.
  * @param {string} body
  */
 function normalizeReturnsBody(body) {
@@ -571,8 +563,7 @@ function formatNestedParamNameColumn(baseName, pathSegments) {
 }
 
 /**
- * Rows for object properties that have documentation (including from `@param parent.prop` on the method),
- * which TypeDoc stores on property reflections rather than leaving `@param` block tags on the signature.
+ * Rows for object properties that have documentation (including from `@param parent.prop` on the method), which TypeDoc stores on property reflections rather than leaving `@param` block tags on the signature.
  *
  * @param {import('typedoc').ParameterReflection} param
  * @returns {string[]}
@@ -642,8 +633,7 @@ function lookupInterfaceOrTypeAliasByName(project, name) {
 }
 
 /**
- * Unwrap optional wrappers. When the parameter is a single named interface or type alias for an object
- * shape, returns that name and the declaration holding object properties.
+ * Unwrap optional wrappers. When the parameter is a single named interface or type alias for an object shape, returns that name and the declaration holding object properties.
  *
  * @param {import('typedoc').SomeType | undefined} t
  * @param {import('typedoc').ProjectReflection} project
@@ -703,8 +693,7 @@ function isNominalParamTypeDocumented(typeDecl, props) {
 }
 
 /**
- * Single parameter that is a named object type (interface / type alias): one section titled after the type,
- * table lists every property (not the outer `params` row). Uses the same `propertiesTable` partial as TypeDoc.
+ * Single parameter that is a named object type (interface / type alias): one section titled after the type, table lists every property (not the outer `params` row). Uses the same `propertiesTable` partial as TypeDoc.
  *
  * @param {import('typedoc').SignatureReflection} sig
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
