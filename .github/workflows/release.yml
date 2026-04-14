@@ -560,13 +560,18 @@ jobs:
             exit 1
           fi
 
-      - name: Reject "latest" dist_tag
+      - name: Validate packages
         env:
           PACKAGES: ${{ inputs.packages }}
         run: |
           echo "$PACKAGES" | jq -e 'all(.[]; .dist_tag != "latest")' > /dev/null || {
             echo "::error::'latest' dist_tag is not allowed on this path"; exit 1;
           }
+          invalid=$(echo "$PACKAGES" | jq -r '.[] | select(.name | test("^@clerk/[a-z0-9][a-z0-9-]*$") | not) | .name')
+          if [ -n "$invalid" ]; then
+            echo "::error::Invalid package name(s). Expected @clerk/<kebab-case>. Got: $invalid"
+            exit 1
+          fi
 
       - name: Checkout source_ref
         uses: actions/checkout@v4
