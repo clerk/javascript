@@ -28,6 +28,26 @@ const precomputePathRegex = (patterns: Array<string | RegExp>) => {
 };
 
 /**
+ * Normalizes a URL path for safe route matching.
+ *
+ * 1. Decodes percent-encoded unreserved characters using decodeURI (not
+ *    decodeURIComponent) so path-reserved delimiters like %2F, %3F, %23
+ *    are preserved — matching how framework routers interpret paths.
+ * 2. Collapses consecutive slashes (e.g. //api/admin → /api/admin) to
+ *    prevent bypass via extra slashes.
+ *
+ * @throws {MalformedURLError} if the path contains invalid percent-encoding
+ */
+export const normalizePath = (pathname: string): string => {
+  try {
+    pathname = decodeURI(pathname);
+  } catch (e) {
+    throw new MalformedURLError(pathname, e);
+  }
+  return pathname.replace(/\/\/+/g, '/');
+};
+
+/**
  * Creates a function that matches paths against a set of patterns.
  *
  * @param patterns - A string, RegExp, or array of patterns to match against
@@ -36,17 +56,5 @@ const precomputePathRegex = (patterns: Array<string | RegExp>) => {
 export const createPathMatcher = (patterns: PathMatcherParam) => {
   const routePatterns = [patterns || ''].flat().filter(Boolean);
   const matchers = precomputePathRegex(routePatterns);
-  return (pathname: string) => {
-    try {
-      // Use decodeURI (not decodeURIComponent) to decode unreserved characters
-      // while preserving path-reserved delimiters like %2F, %3F, %23.
-      // This aligns matcher behavior with how framework routers interpret paths.
-      pathname = decodeURI(pathname);
-    } catch (e) {
-      throw new MalformedURLError(pathname, e);
-    }
-    // Collapse consecutive slashes so that //api/admin cannot bypass /api/admin
-    pathname = pathname.replace(/\/\/+/g, '/');
-    return matchers.some(matcher => matcher.test(pathname));
-  };
+  return (pathname: string) => matchers.some(matcher => matcher.test(normalizePath(pathname)));
 };

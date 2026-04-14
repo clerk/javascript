@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
 
-import { createPathMatcher, MalformedURLError } from '../pathMatcher';
+import { createPathMatcher, MalformedURLError, normalizePath } from '../pathMatcher';
 
 vi.mock('../pathToRegexp', () => ({
   pathToRegexp: (pattern: string) => new RegExp(`^${pattern.replace('(.*)', '.*')}$`),
@@ -89,14 +89,10 @@ describe('createPathMatcher', () => {
       expect(matcher('/api/admin/users')).toBe(true);
     });
 
-    test('preserves path-reserved delimiters (%2F, %3F, %23)', () => {
+    test('does not match when reserved delimiters keep segments apart', () => {
       const matcher = createPathMatcher('/api/admin(.*)');
-      // %2F is an encoded slash — should NOT be decoded into a path separator
-      // because framework routers treat %2F as a literal segment character
+      // %2F is an encoded slash — preserved by decodeURI, so the path stays as one segment
       expect(matcher('/api%2Fadmin/users')).toBe(false);
-      // %3F (?) and %23 (#) are also reserved and should be preserved
-      expect(matcher('/api/admin%3Fusers')).toBe(true); // stays in (.*)
-      expect(matcher('/api/admin%23users')).toBe(true); // stays in (.*)
     });
 
     test('throws MalformedURLError on malformed percent-encoding', () => {
@@ -134,6 +130,55 @@ describe('createPathMatcher', () => {
       const matcher = createPathMatcher('/api/admin(.*)');
       expect(matcher('//api/%61dmin/users')).toBe(true);
       expect(matcher('/api//%61dmin/users')).toBe(true);
+    });
+  });
+});
+
+describe('normalizePath', () => {
+  describe('percent-encoding', () => {
+    test('decodes unreserved percent-encoded characters', () => {
+      expect(normalizePath('/api/%61dmin')).toBe('/api/admin');
+      expect(normalizePath('/api/a%64min')).toBe('/api/admin');
+      expect(normalizePath('/%66oo/bar')).toBe('/foo/bar');
+    });
+
+    test('preserves path-reserved delimiters (%2F, %3F, %23)', () => {
+      expect(normalizePath('/api%2Fadmin')).toBe('/api%2Fadmin');
+      expect(normalizePath('/api/admin%3Fusers')).toBe('/api/admin%3Fusers');
+      expect(normalizePath('/api/admin%23section')).toBe('/api/admin%23section');
+    });
+
+    test('returns already-decoded paths unchanged', () => {
+      expect(normalizePath('/api/admin/users')).toBe('/api/admin/users');
+    });
+
+    test('throws MalformedURLError on invalid percent-encoding', () => {
+      expect(() => normalizePath('/api/%zz/users')).toThrow(MalformedURLError);
+      expect(() => normalizePath('/%')).toThrow(MalformedURLError);
+    });
+  });
+
+  describe('slash normalization', () => {
+    test('collapses double slashes', () => {
+      expect(normalizePath('//api/admin')).toBe('/api/admin');
+      expect(normalizePath('/api//admin')).toBe('/api/admin');
+      expect(normalizePath('/api/admin//users')).toBe('/api/admin/users');
+    });
+
+    test('collapses triple and more slashes', () => {
+      expect(normalizePath('///api/admin')).toBe('/api/admin');
+      expect(normalizePath('/api///admin')).toBe('/api/admin');
+    });
+
+    test('leaves single slashes unchanged', () => {
+      expect(normalizePath('/api/admin/users')).toBe('/api/admin/users');
+    });
+  });
+
+  describe('combined normalization', () => {
+    test('decodes percent-encoding and collapses slashes together', () => {
+      expect(normalizePath('//api/%61dmin/users')).toBe('/api/admin/users');
+      expect(normalizePath('/api//%61dmin')).toBe('/api/admin');
     });
   });
 });
