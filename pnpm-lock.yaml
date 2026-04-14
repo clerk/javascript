@@ -786,10 +786,10 @@ importers:
         specifier: ^7.7.1
         version: 7.7.1
       semver:
-        specifier: ^7.7.1
+        specifier: ^7.7.4
         version: 7.7.4
       yaml:
-        specifier: ^2.8.0
+        specifier: ^2.8.3
         version: 2.8.3
 
   packages/react-router:
