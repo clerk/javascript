@@ -167,4 +167,42 @@ test.describe('percent-encoded URL handling @nextjs', () => {
     const res = await fetch(app.serverUrl + '/api/%zz/users');
     expect(res.status).toBe(400);
   });
+
+  test('encoded dot-current segment is rejected (Next.js router rejects)', async () => {
+    // %2e = '.' — Next.js does not resolve encoded dot segments in routing,
+    // so /api/%2e/admin/users doesn't match any route, returning 404
+    const res = await fetch(app.serverUrl + '/api/%2e/admin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('encoded dot-parent segment is rejected (Next.js router rejects)', async () => {
+    // %2e%2e = '..' — Next.js does not resolve encoded dot segments,
+    // returning 404
+    const res = await fetch(app.serverUrl + '/api/%2e%2e/admin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('encoded dot-parent traversal is rejected (Next.js router rejects)', async () => {
+    // /api/foo/%2e%2e/admin/users — Next.js treats %2e%2e as a literal
+    // path segment, not a traversal directive, returning 404
+    const res = await fetch(app.serverUrl + '/api/foo/%2e%2e/admin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('fully encoded dot segments with encoded slash', async () => {
+    // %2e%2f = './', %2e%2e%2f = '../' — when the slash is also encoded,
+    // Next.js treats the entire sequence as a single path segment
+    const dotSlashCurrent = await fetch(app.serverUrl + '/api%2f%2e%2fadmin/users');
+    expect(dotSlashCurrent.status).toBe(404);
+
+    const dotSlashParent = await fetch(app.serverUrl + '/api%2f%2e%2e%2fadmin/users');
+    expect(dotSlashParent.status).toBe(404);
+
+    // The traversal variant hits the catch-all [module] route with
+    // module='foo/../admin' (not 'admin'), so it's not a bypass
+    const dotSlashTraversal = await fetch(app.serverUrl + '/api/foo%2f%2e%2e%2fadmin/users');
+    expect(dotSlashTraversal.status).toBe(200);
+    const body = await dotSlashTraversal.json();
+    expect(body.module).not.toBe('admin');
+  });
 });
