@@ -5,4 +5,4 @@
 '@clerk/nuxt': patch
 ---
 
-Fix route protection bypass via percent-encoded URLs in `createPathMatcher`
+Normalize URL paths in `createPathMatcher` to prevent route protection bypass
