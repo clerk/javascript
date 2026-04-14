@@ -53,6 +53,7 @@ export function OrgSelect({ options, value, onChange }: OrgSelectProps) {
               height: theme.sizes.$5,
               objectFit: 'contain',
               flexShrink: 0,
+              borderRadius: theme.radii.$md,
             })}
           />
           <Text
