@@ -612,6 +612,9 @@ jobs:
             fi
             npm ci --audit=false --fund=false
           fi
+        # NOTE: npm ci requires the fix branch's package-lock.json to match its package.json.
+        # If porting a fix to an old ref whose lockfile is inconsistent, run `npm install`
+        # locally first and commit the refreshed lockfile alongside the fix.
 
       - name: Build
         run: |
