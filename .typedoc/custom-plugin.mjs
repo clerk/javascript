@@ -103,6 +103,7 @@ const LINK_REPLACEMENTS = [
   ['client-resource', '/docs/reference/objects/client'],
   ['redirect-options', '/docs/reference/types/redirect-options'],
   ['handle-o-auth-callback-params', '/docs/reference/types/handle-o-auth-callback-params'],
+  ['session-task', '/docs/reference/types/session-task'],
 ];
 
 /**
@@ -121,8 +122,8 @@ const LINK_REPLACEMENTS = [
 function getRelativeLinkReplacements() {
   return LINK_REPLACEMENTS.map(([fileName, newPath]) => {
     return {
-      // Match both path and optional anchor
-      pattern: new RegExp(`\\((?:(?:\\.{1,2}\\/)+[^()]*?|)${fileName}\\.mdx(#[^)]+)?\\)`, 'g'),
+      // Match both flat links and nested object-doc links
+      pattern: new RegExp(`\\((?:(?:\\.{1,2}\\/)+[^()]*?|)(?:${fileName}\\/)?${fileName}\\.mdx(#[^)]+)?\\)`, 'g'),
       // Preserve the anchor in replacement if it exists
       replace: (/** @type {string} */ _match, anchor = '') => `(${newPath}${anchor})`,
     };
@@ -259,6 +260,10 @@ function getCatchAllReplacements() {
     {
       pattern: /(?<![\[\w`#])`?UserResource`?(?![\]\w`])/g,
       replace: '[`UserResource`](/docs/reference/objects/user)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?LastAuthenticationStrategy`?(?![\]\w`])/g,
+      replace: '[LastAuthenticationStrategy](/docs/reference/types/last-authentication-strategy)',
     },
     {
       /**

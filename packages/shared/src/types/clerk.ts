@@ -248,7 +248,7 @@ export type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHa
 export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
 
 /**
- * Main Clerk SDK object.
+ * The `Clerk` class serves as the central interface for working with Clerk's authentication and user management functionality in your application. As a top-level class in the Clerk SDK, it provides access to key methods and properties for managing users, sessions, API keys, billing, organizations, and more.
  */
 export interface Clerk {
   /**
@@ -1003,7 +1003,7 @@ export interface Clerk {
   redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
   /**
-   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](https://clerk.com/reference/objects/clerk#authenticate-with-google-one-tap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
+   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](#authenticate-with-google-one-tap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
    *
    * @param signInOrUp - The resource returned from the initial `authenticateWithGoogleOneTap()` call (before redirect).
    * @param params - Additional props that define where the user will be redirected to at the end of a successful Google One Tap flow.
