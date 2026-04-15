@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- CJS plugin, no ESM export
 const { validateThemeJson } = require('../../app.plugin.js')._testing;
 
 describe('validateThemeJson', () => {
