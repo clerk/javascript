@@ -14,6 +14,7 @@ import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constan
 import { errorThrower } from './errorThrower';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
+import { isMalformedURLError } from './routeMatcher';
 import type { NextMiddlewareEvtParam, NextMiddlewareRequestParam, NextMiddlewareReturn } from './types';
 import {
   assertKey,
@@ -255,6 +256,10 @@ const createMiddlewareProtect = (
 // This function handles the known errors thrown by the APIs described above,
 // and returns the appropriate response.
 const handleControlFlowErrors = (e: any, clerkRequest: ClerkRequest, requestState: RequestState): Response => {
+  if (isMalformedURLError(e)) {
+    return new NextResponse(null, { status: 400, statusText: 'Bad Request' });
+  }
+
   switch (e.message) {
     case CONTROL_FLOW_ERROR.FORCE_NOT_FOUND:
       // Rewrite to a bogus URL to force not found error
