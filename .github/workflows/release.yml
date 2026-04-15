@@ -47,6 +47,9 @@ jobs:
           # turbo-team: ${{ vars.TURBO_TEAM }}
           # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
+      - name: Upgrade npm for trusted publishing
+        run: npx npm@11 install -g npm@11
+
       - name: Build release
         run: pnpm turbo build $TURBO_ARGS --force
 
@@ -61,8 +64,7 @@ jobs:
           version: pnpm version-packages
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          HUSKY: "0"
           NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
