@@ -17,6 +17,7 @@ import {
 } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { isMalformedURLError } from '@clerk/shared/pathMatcher';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type { PendingSessionOptions } from '@clerk/types';
@@ -412,6 +413,10 @@ const handleControlFlowErrors = (
   requestState: RequestState,
   context: AstroMiddlewareContextParam,
 ): Response => {
+  if (isMalformedURLError(e)) {
+    return new Response(null, { status: 400, statusText: 'Bad Request' });
+  }
+
   switch (e.message) {
     case CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN:
       return createRedirect({
