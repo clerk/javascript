@@ -113,7 +113,10 @@ export function OrgSelect({ options, value, onChange, hasMore, onLoadMore }: Org
           {selected?.label || 'Select an option'}
         </Text>
       </SelectButton>
-      <SelectOptionList footer={hasMore ? <InfiniteListSpinner ref={loadMoreRef} /> : null} />
+      <SelectOptionList
+        footer={hasMore ? <InfiniteListSpinner ref={loadMoreRef} /> : null}
+        onReachEnd={hasMore ? onLoadMore : undefined}
+      />
     </Select>
   );
 }
