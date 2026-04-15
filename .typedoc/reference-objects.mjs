@@ -6,7 +6,7 @@
 
 /**
  * TypeDoc output paths for the main reference pages (`shared/<object>/<object>.mdx`, see `ClerkRouter`).
- * `extract-methods.mjs` reads each file, writes `<object>-properties.mdx` with the same Properties table as TypeDoc, strips Properties from `<object>.mdx`, and writes methods under `<object>-methods/`.
+ * `extract-methods.mjs` reads each file, writes `properties.mdx` with the same Properties table as TypeDoc, strips Properties from `<object>.mdx`, and writes methods under `methods/`.
  */
 export const REFERENCE_OBJECTS_LIST = ['shared/clerk/clerk.mdx', 'shared/client-resource/client-resource.mdx'];
 

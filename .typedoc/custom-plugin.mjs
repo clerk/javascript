@@ -331,7 +331,7 @@ function restoreProtectedInlineCodeSpans(text, placeholders) {
 
 /**
  * Remove the Properties section (heading + table) from reference object pages (e.g. `shared/clerk/clerk.mdx`);
- * the table is copied into `shared/<object>/<object>-properties.mdx` by `extract-methods.mjs`.
+ * the table is copied into `shared/<object>/properties.mdx` by `extract-methods.mjs`.
  *
  * @param {string} contents
  */

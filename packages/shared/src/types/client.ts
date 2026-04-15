@@ -17,9 +17,10 @@ export interface ClientResource extends ClerkResource {
   sessions: SessionResource[];
   /**
    * A list of sessions on this client where the user has completed the full sign-in flow. Sessions can be in one of the following states:
-   *
-   * - **active**: The user has completed the full sign-in flow and all pending tasks.
-   * - **pending**: The user has completed the sign-in flow but still needs to complete one or more required steps (**pending tasks**).
+   * <ul>
+   *  <li>`"active"`: The user has completed the full sign-in flow and all pending tasks.</li>
+   *  <li>`"pending"`: The user has completed the sign-in flow but still needs to complete one or more required steps (**pending tasks**).</li>
+   * </ul>
    */
   signedInSessions: SignedInSessionResource[];
   /**
@@ -39,22 +40,18 @@ export interface ClientResource extends ClerkResource {
    */
   create: () => Promise<ClientResource>;
   /**
-   *
    * Deletes the client. All sessions will be reset.
    */
   destroy: () => Promise<void>;
   /**
-   *
    * Removes all sessions created on the client.
    */
   removeSessions: () => Promise<ClientResource>;
   /**
-   *
    * Clears any locally cached session data for the current client.
    */
   clearCache: () => void;
   /**
-   *
    * Resets the current sign-in attempt. Clears the in-progress sign-in state on the client.
    */
   resetSignIn: () => void;
@@ -63,14 +60,13 @@ export interface ClientResource extends ClerkResource {
    */
   resetSignUp: () => void;
   /**
-   *
    * Returns `true` if the client cookie is due to expire in 8 days or less. Returns `false` otherwise.
    */
   isEligibleForTouch: () => boolean;
   /**
-   *
    * Builds a URL that refreshes the current client's authentication state and then redirects the user to the specified URL.
    *
+   * @param params - The URL to redirect the user to.
    */
   buildTouchUrl: (params: { redirectUrl: URL }) => string;
   /**

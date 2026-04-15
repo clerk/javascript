@@ -53,9 +53,9 @@ describe('Typedoc output', () => {
       [
         "react/legacy",
         "shared/clerk",
-        "shared/clerk/clerk-methods",
+        "shared/clerk/methods",
         "shared/client-resource",
-        "shared/client-resource/client-resource-methods",
+        "shared/client-resource/methods",
       ]
     `);
   });

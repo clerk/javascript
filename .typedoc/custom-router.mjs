@@ -79,8 +79,8 @@ class ClerkRouter extends MemberRouter {
     filePath = flattenDirName(filePath);
 
     /**
-     * Put each reference object in its own folder alongside `<object>-properties.mdx` and `<object>-methods/` from `extract-methods.mjs`.
-     * E.g. `shared/clerk.mdx` -> `shared/clerk/clerk.mdx` and `shared/clerk/clerk-properties.mdx` and `shared/clerk/clerk-methods/`.
+     * Put each reference object in its own folder alongside `properties.mdx` and `methods/` from `extract-methods.mjs`.
+     * E.g. `shared/clerk.mdx` -> `shared/clerk/clerk.mdx`, `shared/clerk/properties.mdx`, and `shared/clerk/methods/`.
      */
     if (
       (reflection.kind === ReflectionKind.Interface || reflection.kind === ReflectionKind.Class) &&

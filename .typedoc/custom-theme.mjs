@@ -2,6 +2,7 @@
 import { i18n, IntersectionType, ReferenceType, ReflectionKind, ReflectionType, UnionType } from 'typedoc';
 import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
 import { backTicks, htmlTable, table } from '../node_modules/typedoc-plugin-markdown/dist/libs/markdown/index.js';
+import { removeLineBreaks } from '../node_modules/typedoc-plugin-markdown/dist/libs/utils/index.js';
 import { TypeDeclarationVisibility } from '../node_modules/typedoc-plugin-markdown/dist/options/maps.js';
 
 import { REFERENCE_OBJECTS_LIST } from './reference-objects.mjs';
@@ -251,6 +252,121 @@ function appendUnionObjectChildPropertyRows(base, helpers, project) {
     }
   }
   return out;
+}
+
+/**
+ * @param {import('typedoc').ParameterReflection[]} parameters
+ */
+function hasDefaultValuesForParameters(parameters) {
+  const defaultValues = parameters.map(
+    param => param.defaultValue !== '{}' && param.defaultValue !== '...' && !!param.defaultValue,
+  );
+  return !defaultValues.every(value => !value);
+}
+
+/**
+ * Same as typedoc-plugin-markdown `member.parametersTable`, but does **not** flatten inline object parameters when the object has only one property (avoids duplicate rows).
+ * E.g. `params: { redirectUrl: string }` would result in duplicate rows like `params` and `params.redirectUrl` with the same `@param` description. This is because the default plugin flattens inline object parameters when the object has only one property, but we don't want to do that.
+ *
+ * @this {import('typedoc-plugin-markdown').MarkdownThemeContext}
+ * @param {import('typedoc').ParameterReflection[]} model
+ */
+function clerkParametersTable(model) {
+  const tableColumnsOptions = /** @type {{ leftAlignHeaders?: boolean; hideDefaults?: boolean }} */ (
+    this.options.getValue('tableColumnSettings') ?? {}
+  );
+  const leftAlignHeadings = tableColumnsOptions.leftAlignHeaders;
+  /**
+   * @param {import('typedoc').ParameterReflection} current
+   * @param {import('typedoc').ParameterReflection[]} acc
+   * @returns {import('typedoc').ParameterReflection[]}
+   */
+  const parseParams = (current, acc) => {
+    const decl = /** @type {{ declaration?: import('typedoc').DeclarationReflection } | undefined} */ (
+      /** @type {unknown} */ (current.type)
+    )?.declaration;
+    const children = decl?.children;
+    const shouldFlatten = decl?.kind === ReflectionKind.TypeLiteral && children && children.length > 1;
+    return shouldFlatten ? [...acc, current, ...flattenParams(current)] : [...acc, current];
+  };
+  /**
+   * @param {import('typedoc').ParameterReflection} current
+   * @returns {import('typedoc').ParameterReflection[]}
+   */
+  const flattenParams = current => {
+    const decl = /** @type {{ declaration?: import('typedoc').DeclarationReflection } | undefined} */ (
+      /** @type {unknown} */ (current.type)
+    )?.declaration;
+    return (
+      decl?.children?.reduce(
+        /**
+         * @param {import('typedoc').ParameterReflection[]} acc
+         * @param {import('typedoc').DeclarationReflection} child
+         * @returns {import('typedoc').ParameterReflection[]}
+         */
+        (acc, child) => {
+          const childObj = {
+            ...child,
+            name: `${current.name}.${child.name}`,
+          };
+          return parseParams(
+            /** @type {import('typedoc').ParameterReflection} */ (/** @type {unknown} */ (childObj)),
+            acc,
+          );
+        },
+        /** @type {import('typedoc').ParameterReflection[]} */ ([]),
+      ) ?? []
+    );
+  };
+  const showDefaults = !tableColumnsOptions.hideDefaults && hasDefaultValuesForParameters(model);
+  const parsedParams = /** @type {import('typedoc').ParameterReflection[]} */ (
+    model.reduce(
+      (acc, current) => parseParams(current, acc),
+      /** @type {import('typedoc').ParameterReflection[]} */ ([]),
+    )
+  );
+  const hasComments = parsedParams.some(param => Boolean(param.comment));
+  const theme = /** @type {Record<string, () => string>} */ (/** @type {unknown} */ (i18n));
+  const headers = [ReflectionKind.singularString(ReflectionKind.Parameter), theme.theme_type()];
+  if (showDefaults) {
+    headers.push(theme.theme_default_value());
+  }
+  if (hasComments) {
+    headers.push(theme.theme_description());
+  }
+  const firstOptionalParamIndex = model.findIndex(parameter => parameter.flags.isOptional);
+  /** @type {string[][]} */
+  const rows = [];
+  parsedParams.forEach((parameter, i) => {
+    const row = [];
+    const isOptional = parameter.flags.isOptional || (firstOptionalParamIndex !== -1 && i > firstOptionalParamIndex);
+    const rest = parameter.flags?.isRest ? '...' : '';
+    const optional = isOptional ? '?' : '';
+    row.push(`${rest}${backTicks(`${parameter.name}${optional}`)}`);
+    if (parameter.type) {
+      const displayType =
+        parameter.type instanceof ReflectionType
+          ? this.partials.reflectionType(parameter.type, {
+              forceCollapse: true,
+            })
+          : this.partials.someType(parameter.type);
+      row.push(removeLineBreaks(displayType));
+    }
+    if (showDefaults) {
+      row.push(backTicks(this.helpers.getParameterDefaultValue(parameter)));
+    }
+    if (hasComments) {
+      if (parameter.comment) {
+        row.push(this.partials.comment(parameter.comment, { isTableColumn: true }));
+      } else {
+        row.push('-');
+      }
+    }
+    rows.push(row);
+  });
+  return this.options.getValue('parametersFormat') == 'table'
+    ? table(headers, rows, leftAlignHeadings)
+    : htmlTable(headers, rows, leftAlignHeadings);
 }
 
 /**
@@ -518,6 +634,14 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         const allowlisted = pageMatchesAllowlist(this.page?.url, REFERENCE_OBJECTS_LIST);
         const filtered = allowlisted ? model.filter(prop => !isCallableInterfaceProperty(prop, this.helpers)) : model;
         return superPartials.propertiesTable(filtered, options);
+      },
+      /**
+       * Parameter tables: same as the stock partial except single-property inline object params are not expanded to nested rows.
+       *
+       * @param {import('typedoc').ParameterReflection[]} model
+       */
+      parametersTable: model => {
+        return clerkParametersTable.call(this, model);
       },
       /**
        * In `compact` mode the default plugin skips `getFlattenedDeclarations`, so union object members never get rows.

@@ -1,4 +1,8 @@
+/** @document */
 export type ClerkResourceReloadParams = {
+  /**
+   * The nonce for the rotating token.
+   */
   rotatingTokenNonce?: string;
 };
 

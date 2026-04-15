@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * For each entry in REFERENCE_OBJECTS_LIST, reads the TypeDoc output (e.g. `shared/clerk/clerk.mdx`), strips **Properties** from the main generated file and copies it into `<object>-properties.mdx`, and writes one .mdx per method under `<object>-methods/`.
+ * For each entry in REFERENCE_OBJECTS_LIST, reads the TypeDoc output (e.g. `shared/clerk/clerk.mdx`), strips **Properties** from the main generated file and copies it into `properties.mdx`, and writes one .mdx per method under `methods/` (alongside the main page in that resource folder).
  *
  * Run after `typedoc` (same cwd as repo root). Uses a second TypeDoc convert pass to read reflections.
  *
@@ -342,13 +342,12 @@ function extractPropertiesAndTrimSourcePage(pageUrl) {
   const raw = fs.readFileSync(sourcePath, 'utf-8');
   const body = extractPropertiesSectionBody(raw);
   const pageDir = path.dirname(pageUrl);
-  const slug = path.basename(pageUrl, '.mdx');
   const objectDir = path.join(__dirname, 'temp-docs', pageDir);
   fs.mkdirSync(objectDir, { recursive: true });
 
   if (body) {
     const propertiesDoc = [`## Properties`, '', body.trimEnd(), ''].join('\n');
-    const propertiesPath = path.join(objectDir, `${slug}-properties.mdx`);
+    const propertiesPath = path.join(objectDir, 'properties.mdx');
     fs.writeFileSync(
       propertiesPath,
       applyCatchAllMdReplacements(applyRelativeLinkReplacements(propertiesDoc)),
@@ -816,9 +815,8 @@ function extractMethodsForPage(pageUrl, project, app) {
   const ctx = createThemeContextForReferencePage(app, project, pageUrl, decl);
 
   const pageDir = path.dirname(pageUrl);
-  const slug = path.basename(pageUrl, '.mdx');
   const objectDir = path.join(__dirname, 'temp-docs', pageDir);
-  const outDir = path.join(objectDir, `${slug}-methods`);
+  const outDir = path.join(objectDir, 'methods');
   fs.mkdirSync(outDir, { recursive: true });
 
   let count = 0;
