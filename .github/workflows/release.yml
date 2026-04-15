@@ -604,7 +604,13 @@ jobs:
           if [ "${{ steps.pm.outputs.manager }}" = "pnpm" ]; then
             pnpm install --frozen-lockfile
           else
-            npm install --audit=false --fund=false --no-save
+            # Pin npm to the version declared in the source_ref's packageManager
+            # so `npm ci` matches the lockfile's origin exactly.
+            pm=$(jq -r '.packageManager // ""' package.json)
+            if [[ "$pm" =~ ^npm@([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+              npm install -g "npm@${BASH_REMATCH[1]}"
+            fi
+            npm ci --audit=false --fund=false
           fi
 
       - name: Build
