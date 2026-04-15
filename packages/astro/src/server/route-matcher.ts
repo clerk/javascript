@@ -7,6 +7,45 @@ type RouteMatcherRoutes = Autocomplete<WithPathPatternWildcard>;
 
 export type RouteMatcherParam = Array<RegExp | RouteMatcherRoutes> | RegExp | RouteMatcherRoutes;
 
+export class MalformedURLError extends Error {
+  public readonly statusCode = 400;
+  public readonly cause?: unknown;
+
+  constructor(pathname: string, cause?: unknown) {
+    super(`Malformed encoding in URL path: ${pathname}`);
+    this.name = 'MalformedURLError';
+    this.cause = cause;
+  }
+}
+
+/**
+ * String-based check for MalformedURLError that works across package bundles
+ * where `instanceof` would fail due to duplicate class identities.
+ */
+export function isMalformedURLError(e: unknown): e is MalformedURLError {
+  return e instanceof Error && e.name === 'MalformedURLError';
+}
+
+/**
+ * Normalizes a URL path for safe route matching.
+ *
+ * 1. Decodes percent-encoded unreserved characters using decodeURI (not
+ *    decodeURIComponent) so path-reserved delimiters like %2F, %3F, %23
+ *    are preserved — matching how framework routers interpret paths.
+ * 2. Collapses consecutive slashes (e.g. //api/admin → /api/admin) to
+ *    prevent bypass via extra slashes.
+ *
+ * @throws {MalformedURLError} if the path contains invalid percent-encoding
+ */
+const normalizePath = (pathname: string): string => {
+  try {
+    pathname = decodeURI(pathname);
+  } catch (e) {
+    throw new MalformedURLError(pathname, e);
+  }
+  return pathname.replace(/\/\/+/g, '/');
+};
+
 // TODO-SHARED: This can be moved to @clerk/shared as an identical implementation exists in @clerk/nextjs
 /**
  * Returns a function that accepts a `Request` object and returns whether the request matches the list of
@@ -19,7 +58,7 @@ export type RouteMatcherParam = Array<RegExp | RouteMatcherRoutes> | RegExp | Ro
 export const createRouteMatcher = (routes: RouteMatcherParam) => {
   const routePatterns = [routes || ''].flat().filter(Boolean);
   const matchers = precomputePathRegex(routePatterns);
-  return (req: Request) => matchers.some(matcher => matcher.test(new URL(req.url).pathname));
+  return (req: Request) => matchers.some(matcher => matcher.test(normalizePath(new URL(req.url).pathname)));
 };
 
 const precomputePathRegex = (patterns: Array<string | RegExp>) => {
