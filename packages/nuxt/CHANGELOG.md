@@ -1,5 +1,17 @@
 # @clerk/nuxt
 
+## 1.13.28
+
+### Patch Changes
+
+- Normalize URL paths in `createPathMatcher` to prevent route protection bypass ([#8310](https://github.com/clerk/javascript/pull/8310)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`2c14f0e`](https://github.com/clerk/javascript/commit/2c14f0e1c560dccad0c62596b4ccd97e3a215151)]:
+  - @clerk/shared@3.47.4
+  - @clerk/backend@2.33.2
+  - @clerk/types@4.101.22
+  - @clerk/vue@1.17.20
+
 ## 1.13.27
 
 ### Patch Changes
