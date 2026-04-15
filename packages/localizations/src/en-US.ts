@@ -1507,6 +1507,7 @@ export const enUS: LocalizationResource = {
       'No Solana Web3 wallets detected. Please install a Web3 supported {{ solanaWalletsLink || link("wallet extension") }}.',
   },
   configureSSO: {
+    headerTitle: 'Configure Single Sign-On (SSO)',
     navbar: {
       title: 'SSO',
       description: 'Configure SSO connection.',

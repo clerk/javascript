@@ -1443,6 +1443,7 @@ export type __internal_LocalizationResource = {
     noneAvailable: LocalizationValue<'solanaWalletsLink'>;
   };
   configureSSO: {
+    headerTitle: LocalizationValue;
     navbar: {
       title: LocalizationValue;
       description: LocalizationValue;
