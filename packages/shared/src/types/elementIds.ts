@@ -45,7 +45,10 @@ export type ProfileSectionId =
   | 'organizationDomains'
   | 'manageVerifiedDomains'
   | 'subscriptionsList'
-  | 'paymentMethods';
+  | 'paymentMethods'
+  | 'configureSSO'
+  | 'testSSO'
+  | 'verifyDomain';
 export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers' | 'billing';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';

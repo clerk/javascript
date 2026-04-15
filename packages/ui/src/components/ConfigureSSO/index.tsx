@@ -1,5 +1,5 @@
 import type { ConfigureSSOProps } from '@clerk/shared/types';
-import React from 'react';
+import React, { type ComponentProps } from 'react';
 
 import { CONFIGURE_SSO_CARD_SCROLLBOX_ID } from '@/constants';
 import { withCoreUserGuard } from '@/contexts';
@@ -7,6 +7,7 @@ import { Flow, localizationKeys } from '@/customizables';
 import { withCardStateProvider } from '@/elements/contexts';
 import { Header } from '@/elements/Header';
 import { ProfileCard } from '@/elements/ProfileCard';
+import { ProfileSection } from '@/elements/Section';
 
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 
@@ -38,7 +39,33 @@ const ConfigureSSOProfileContent = () => {
           textVariant='h2'
         />
       </Header.Root>
+
+      <ConfigureSSOSection
+        title={localizationKeys('configureSSO.configureSSOSection.title', { step: 1 })}
+        id='configureSSO'
+      />
+      <ConfigureSSOSection
+        title={localizationKeys('configureSSO.testSSOSection.title', { step: 2 })}
+        id='testSSO'
+      />
+      <ConfigureSSOSection
+        title={localizationKeys('configureSSO.verifyDomainSection.title', { step: 3 })}
+        id='verifyDomain'
+      />
     </ProfileCard.Content>
+  );
+};
+
+type ConfigureSSOSectionProps = Pick<ComponentProps<typeof ProfileSection.Root>, 'title' | 'id'>;
+
+const ConfigureSSOSection = (props: ConfigureSSOSectionProps) => {
+  return (
+    <ProfileSection.Root
+      title={props.title}
+      id={props.id}
+    >
+      <p>Configure SSO</p>
+    </ProfileSection.Root>
   );
 };
 

@@ -1512,5 +1512,22 @@ export const enUS: LocalizationResource = {
       title: 'SSO',
       description: 'Configure SSO connection.',
     },
+    configureSSOSection: {
+      title: '{{step}}. Configure SSO',
+      actionButtonLabel: 'Configure enterprise connection',
+      actionButtonDescription:
+        'Select the identity provider you want to connect to via SAML or OIDC, then configure the connection.',
+    },
+    testSSOSection: {
+      title: '{{step}}. Test SSO',
+      actionButtonLabel: 'Test your SSO configuration',
+      actionButtonDescription:
+        'Test your SSO configuration to verify you can successfully authenticate via your identity provider',
+    },
+    verifyDomainSection: {
+      title: '{{step}}. Verify domain',
+      actionButtonLabel: 'Verify the domain for your enterprise connection',
+      actionButtonDescription: 'Verify the domain you want to enable the enterprise connection on.',
+    },
   },
 } as const;

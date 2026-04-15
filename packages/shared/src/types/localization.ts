@@ -1448,6 +1448,21 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       description: LocalizationValue;
     };
+    configureSSOSection: {
+      title: LocalizationValue<'step'>;
+      actionButtonLabel: LocalizationValue;
+      actionButtonDescription: LocalizationValue;
+    };
+    testSSOSection: {
+      title: LocalizationValue<'step'>;
+      actionButtonLabel: LocalizationValue;
+      actionButtonDescription: LocalizationValue;
+    };
+    verifyDomainSection: {
+      title: LocalizationValue<'step'>;
+      actionButtonLabel: LocalizationValue;
+      actionButtonDescription: LocalizationValue;
+    };
   };
 };
 
