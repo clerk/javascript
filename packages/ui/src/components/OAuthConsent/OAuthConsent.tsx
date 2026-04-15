@@ -10,6 +10,7 @@ import { Header } from '@/ui/elements/Header';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 import { Modal } from '@/ui/elements/Modal';
 import { Alert, Textarea } from '@/ui/primitives';
+import { Route, Switch } from '@/ui/router';
 
 import { InlineAction } from './InlineAction';
 import {
@@ -114,41 +115,35 @@ function _OAuthConsent() {
 
     if (errorMessage) {
       return (
-        <Flow.Root flow='oauthConsent'>
-          <Card.Root>
-            <Card.Content>
-              <Card.Alert>{errorMessage}</Card.Alert>
-            </Card.Content>
-            <Card.Footer />
-          </Card.Root>
-        </Flow.Root>
+        <Card.Root>
+          <Card.Content>
+            <Card.Alert>{errorMessage}</Card.Alert>
+          </Card.Content>
+          <Card.Footer />
+        </Card.Root>
       );
     }
 
     if (isLoading) {
       return (
-        <Flow.Root flow='oauthConsent'>
-          <Card.Root>
-            <Card.Content>
-              <LoadingCardContainer />
-            </Card.Content>
-            <Card.Footer />
-          </Card.Root>
-        </Flow.Root>
-      );
-    }
-  }
-
-  if (ctx.enableOrgSelection && (!isMembershipsLoaded || userMemberships.isLoading)) {
-    return (
-      <Flow.Root flow='oauthConsent'>
         <Card.Root>
           <Card.Content>
             <LoadingCardContainer />
           </Card.Content>
           <Card.Footer />
         </Card.Root>
-      </Flow.Root>
+      );
+    }
+  }
+
+  if (ctx.enableOrgSelection && (!isMembershipsLoaded || userMemberships.isLoading)) {
+    return (
+      <Card.Root>
+        <Card.Content>
+          <LoadingCardContainer />
+        </Card.Content>
+        <Card.Footer />
+      </Card.Root>
     );
   }
 
@@ -175,7 +170,7 @@ function _OAuthConsent() {
   const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
 
   return (
-    <Flow.Root flow='oauthConsent'>
+    <>
       <form
         method='POST'
         action={actionUrl}
@@ -350,7 +345,7 @@ function _OAuthConsent() {
         redirectUri={redirectUrl}
         oauthApplicationName={oauthApplicationName}
       />
-    </Flow.Root>
+    </>
   );
 }
 
@@ -395,4 +390,20 @@ function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oauthApplicati
   );
 }
 
-export const OAuthConsent = withCoreUserGuard(withCardStateProvider(_OAuthConsent));
+const AuthenticatedRoutes = withCoreUserGuard(withCardStateProvider(_OAuthConsent));
+
+const OAuthConsentInternal = () => {
+  return (
+    <Flow.Root flow='oauthConsent'>
+      <Flow.Part>
+        <Switch>
+          <Route>
+            <AuthenticatedRoutes />
+          </Route>
+        </Switch>
+      </Flow.Part>
+    </Flow.Root>
+  );
+};
+
+export const OAuthConsent = OAuthConsentInternal;

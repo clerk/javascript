@@ -193,9 +193,9 @@ describe('OAuthConsent', () => {
     const getConsentInfo = vi.fn().mockResolvedValue(fakeConsentInfo);
     mockOAuthApplication(fixtures.clerk, { getConsentInfo });
 
-    const { container } = render(<OAuthConsent />, { wrapper });
+    const { queryByText } = render(<OAuthConsent />, { wrapper });
 
-    expect(container.firstChild).toBeNull();
+    expect(queryByText('Clerk CLI')).toBeNull();
     expect(getConsentInfo).not.toHaveBeenCalled();
   });
 

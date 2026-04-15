@@ -704,6 +704,32 @@ export interface PaginatedResponseJSON {
   total_count?: number;
 }
 
+export interface EnterpriseConnectionSamlConnectionJSON {
+  id: string;
+  name: string;
+  idp_entity_id: string;
+  idp_sso_url: string;
+  idp_certificate: string;
+  idp_metadata_url: string;
+  idp_metadata: string;
+  acs_url: string;
+  sp_entity_id: string;
+  sp_metadata_url: string;
+  sync_user_attributes: boolean;
+  allow_subdomains: boolean;
+  allow_idp_initiated: boolean;
+}
+
+export interface EnterpriseConnectionOauthConfigJSON {
+  id: string;
+  name: string;
+  client_id: string;
+  discovery_url: string;
+  logo_public_url: string;
+  created_at: number;
+  updated_at: number;
+}
+
 export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
   object: typeof ObjectType.EnterpriseConnection;
   name: string;
@@ -715,31 +741,8 @@ export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
   disable_additional_identifications: boolean;
   created_at: number;
   updated_at: number;
-  saml_connection?: Pick<
-    SamlConnectionJSON,
-    | 'id'
-    | 'name'
-    | 'idp_entity_id'
-    | 'idp_sso_url'
-    | 'idp_certificate'
-    | 'idp_metadata_url'
-    | 'idp_metadata'
-    | 'acs_url'
-    | 'sp_entity_id'
-    | 'sp_metadata_url'
-    | 'sync_user_attributes'
-    | 'allow_subdomains'
-    | 'allow_idp_initiated'
-  >;
-  oauth_config?: {
-    id: string;
-    name: string;
-    client_id: string;
-    discovery_url: string;
-    logo_public_url: string;
-    created_at: number;
-    updated_at: number;
-  };
+  saml_connection?: EnterpriseConnectionSamlConnectionJSON | null;
+  oauth_config?: EnterpriseConnectionOauthConfigJSON | null;
 }
 
 export interface SamlConnectionJSON extends ClerkResourceJSON {

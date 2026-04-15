@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.8.1
+
+### Patch Changes
+
+- Normalize URL paths in `createPathMatcher` to prevent route protection bypass ([#8311](https://github.com/clerk/javascript/pull/8311)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.8.0
 
 ### Minor Changes
