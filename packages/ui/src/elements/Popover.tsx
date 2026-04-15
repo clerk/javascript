@@ -36,7 +36,7 @@ export const Popover = (props: PopoverProps) => {
     initialFocus,
     outsideElementsInert = false,
     order = ['reference', 'content'],
-    modal = true,
+    modal,
     nodeId,
     isOpen,
     portal = true,

@@ -1,3 +1,4 @@
+import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useUser } from '@clerk/shared/react';
 import { forwardRef } from 'react';
 
@@ -19,6 +20,7 @@ export const UserButtonTrigger = withAvatarShimmer(
     const { user } = useUser();
     const { showName } = useUserButtonContext();
     const { t } = useLocalizations();
+    const userName = (user && (getFullName(user) || getIdentifier(user))) || '';
 
     return (
       <Button
@@ -26,7 +28,11 @@ export const UserButtonTrigger = withAvatarShimmer(
         variant='roundWrapper'
         sx={[t => ({ borderRadius: showName ? t.radii.$md : t.radii.$circle, color: t.colors.$colorForeground }), sx]}
         ref={ref}
-        aria-label={`${props.isOpen ? t(localizationKeys('userButton.action__closeUserMenu')) : t(localizationKeys('userButton.action__openUserMenu'))}`}
+        aria-label={t(
+          localizationKeys(props.isOpen ? 'userButton.action__closeUserMenu' : 'userButton.action__openUserMenu', {
+            name: userName,
+          }),
+        )}
         aria-expanded={props.isOpen}
         aria-haspopup='dialog'
         {...rest}

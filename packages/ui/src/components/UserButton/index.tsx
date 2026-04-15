@@ -1,4 +1,4 @@
-import { cloneElement, type ReactElement, useId } from 'react';
+import { cloneElement, type ReactElement, useCallback, useId, useRef } from 'react';
 
 import { withCardStateProvider, withFloatingTree } from '@/ui/elements/contexts';
 import { Popover } from '@/ui/elements/Popover';
@@ -12,34 +12,49 @@ import { UserButtonTrigger } from './UserButtonTrigger';
 const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(({ children }) => {
   const { defaultOpen } = useUserButtonContext();
 
-  const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
-    defaultOpen,
-    placement: 'bottom-end',
-    offset: 8,
-  });
+  const { floating, reference, styles, toggle, isOpen, nodeId, context, getReferenceProps, getFloatingProps } =
+    usePopover({
+      defaultOpen,
+      placement: 'bottom-end',
+      offset: 8,
+    });
 
   const userButtonMenuId = useId();
+  const popoverRef = useRef<HTMLElement>(null);
+  const floatingRef = useCallback(
+    (node: HTMLElement | null) => {
+      floating(node);
+      popoverRef.current = node;
+    },
+    [floating],
+  );
 
   return (
     <>
       <UserButtonTrigger
         ref={reference}
-        onClick={toggle}
         isOpen={isOpen}
-        aria-controls={isOpen ? userButtonMenuId : undefined}
-        aria-expanded={isOpen}
+        {...getReferenceProps({
+          'aria-controls': isOpen ? userButtonMenuId : undefined,
+        })}
       />
       <Popover
         nodeId={nodeId}
         context={context}
         isOpen={isOpen}
+        order={['content']}
+        initialFocus={popoverRef}
       >
-        {cloneElement(children, {
-          id: userButtonMenuId,
-          close: toggle,
-          ref: floating,
-          style: styles,
-        })}
+        {cloneElement(
+          children,
+          getFloatingProps({
+            id: userButtonMenuId,
+            close: toggle,
+            tabIndex: -1,
+            ref: floatingRef,
+            style: styles,
+          }),
+        )}
       </Popover>
     </>
   );
