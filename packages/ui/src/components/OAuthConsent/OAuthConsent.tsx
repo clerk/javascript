@@ -35,8 +35,7 @@ function _OAuthConsent() {
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
   const { isLoaded: isMembershipsLoaded, userMemberships } = useOrganizationList({
-    // TODO(rob): Implement lazy loading in another PR
-    userMemberships: ctx.enableOrgSelection ? { infinite: true, pageSize: 50 } : undefined,
+    userMemberships: ctx.enableOrgSelection ? { infinite: true } : undefined,
   });
   const orgOptions: OrgOption[] = (userMemberships.data ?? []).map(m => ({
     value: m.organization.id,
