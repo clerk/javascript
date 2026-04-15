@@ -6,3 +6,5 @@ export type SamlIdp = {
 };
 
 export type SamlIdpMap = Record<SamlIdpSlug, SamlIdp>;
+
+export type OidcIdpSlug = 'oidc_custom';

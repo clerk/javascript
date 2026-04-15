@@ -1463,6 +1463,11 @@ export type __internal_LocalizationResource = {
       actionButtonLabel: LocalizationValue;
       actionButtonDescription: LocalizationValue;
     };
+    enterpriseConnectionDrawer: {
+      title: LocalizationValue;
+      selectProviderTitle: LocalizationValue;
+      selectProviderDescription: LocalizationValue;
+    };
   };
 };
 

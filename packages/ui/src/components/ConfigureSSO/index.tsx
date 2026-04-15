@@ -11,6 +11,7 @@ import { ProfileCard } from '@/elements/ProfileCard';
 import { ProfileSection } from '@/elements/Section';
 import { ArrowRightIcon } from '@/icons';
 
+import { ConfigureEnterpriseConnectionDrawer } from './ConfigureEnterpriseConnectionDrawer';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 
 const ConfigureSSOInternal = withCoreUserGuard(() => {
@@ -33,54 +34,64 @@ const ConfigureSSOInternal = withCoreUserGuard(() => {
 
 const ConfigureSSOProfileContent = () => {
   const { user } = useUser();
+  const [enterpriseConnectionDrawerOpen, setEnterpriseConnectionDrawerOpen] = React.useState(false);
 
   const hasPrimaryEmailAddressVerified = user?.primaryEmailAddress?.verification.status === 'verified';
 
   return (
-    <ProfileCard.Content scrollBoxId={CONFIGURE_SSO_CARD_SCROLLBOX_ID}>
-      <Header.Root>
-        <Header.Title
-          localizationKey={localizationKeys('configureSSO.headerTitle')}
-          sx={t => ({ marginBottom: t.space.$4 })}
-          textVariant='h2'
-        />
-      </Header.Root>
+    <>
+      <ProfileCard.Content scrollBoxId={CONFIGURE_SSO_CARD_SCROLLBOX_ID}>
+        <Header.Root>
+          <Header.Title
+            localizationKey={localizationKeys('configureSSO.headerTitle')}
+            sx={t => ({ marginBottom: t.space.$4 })}
+            textVariant='h2'
+          />
+        </Header.Root>
 
-      <ConfigureSSOSection
-        title={localizationKeys('configureSSO.configureSSOSection.title', { step: 1 })}
-        id='configureSSO'
-        actionButtonLabel={localizationKeys('configureSSO.configureSSOSection.actionButtonLabel')}
-        actionButtonDescription={localizationKeys('configureSSO.configureSSOSection.actionButtonDescription')}
-      />
-
-      {/* TODO -> Disable test SSO section until enterprise connection is created */}
-      <ConfigureSSOSection
-        title={localizationKeys('configureSSO.testSSOSection.title', { step: 2 })}
-        id='testSSO'
-        actionButtonLabel={localizationKeys('configureSSO.testSSOSection.actionButtonLabel')}
-        actionButtonDescription={localizationKeys('configureSSO.testSSOSection.actionButtonDescription')}
-      />
-
-      {!hasPrimaryEmailAddressVerified && (
-        // TODO -> Test this section with a user who has a primary email address that is not verified
         <ConfigureSSOSection
-          title={localizationKeys('configureSSO.verifyDomainSection.title', { step: 3 })}
-          id='verifyDomain'
-          actionButtonLabel={localizationKeys('configureSSO.verifyDomainSection.actionButtonLabel')}
-          actionButtonDescription={localizationKeys('configureSSO.verifyDomainSection.actionButtonDescription')}
+          title={localizationKeys('configureSSO.configureSSOSection.title', { step: 1 })}
+          id='configureSSO'
+          actionButtonLabel={localizationKeys('configureSSO.configureSSOSection.actionButtonLabel')}
+          actionButtonDescription={localizationKeys('configureSSO.configureSSOSection.actionButtonDescription')}
+          onActionClick={() => setEnterpriseConnectionDrawerOpen(true)}
         />
-      )}
-    </ProfileCard.Content>
+
+        {/* TODO -> Disable test SSO section until enterprise connection is created */}
+        <ConfigureSSOSection
+          title={localizationKeys('configureSSO.testSSOSection.title', { step: 2 })}
+          id='testSSO'
+          actionButtonLabel={localizationKeys('configureSSO.testSSOSection.actionButtonLabel')}
+          actionButtonDescription={localizationKeys('configureSSO.testSSOSection.actionButtonDescription')}
+        />
+
+        {!hasPrimaryEmailAddressVerified && (
+          // TODO -> Test this section with a user who has a primary email address that is not verified
+          <ConfigureSSOSection
+            title={localizationKeys('configureSSO.verifyDomainSection.title', { step: 3 })}
+            id='verifyDomain'
+            actionButtonLabel={localizationKeys('configureSSO.verifyDomainSection.actionButtonLabel')}
+            actionButtonDescription={localizationKeys('configureSSO.verifyDomainSection.actionButtonDescription')}
+          />
+        )}
+      </ProfileCard.Content>
+
+      <ConfigureEnterpriseConnectionDrawer
+        open={enterpriseConnectionDrawerOpen}
+        onOpenChange={setEnterpriseConnectionDrawerOpen}
+      />
+    </>
   );
 };
 
 type ConfigureSSOSectionProps = Pick<ComponentProps<typeof ProfileSection.Root>, 'title' | 'id'> & {
   actionButtonLabel: NonNullable<ComponentProps<typeof ProfileSection.ArrowButton>['localizationKey']>;
   actionButtonDescription: NonNullable<ComponentProps<typeof Text>['localizationKey']>;
+  onActionClick?: () => void;
 };
 
 const ConfigureSSOSection = (props: ConfigureSSOSectionProps) => {
-  const { title, id, actionButtonLabel, actionButtonDescription } = props;
+  const { title, id, actionButtonLabel, actionButtonDescription, onActionClick } = props;
 
   return (
     <ProfileSection.Root
@@ -94,6 +105,7 @@ const ConfigureSSOSection = (props: ConfigureSSOSectionProps) => {
           id={id}
           leftIcon={ArrowRightIcon}
           type='button'
+          onClick={onActionClick}
         />
 
         <Text

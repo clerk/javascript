@@ -3,6 +3,7 @@ export type * from './apiKeysSettings';
 export type * from './attributes';
 export type * from './authConfig';
 export type * from './authObject';
+export type * from './authorization';
 export type * from './backupCode';
 export type * from './billing';
 export type * from './clerk';
@@ -48,7 +49,6 @@ export type * from './passwords';
 export type * from './permission';
 export type * from './phoneCodeChannel';
 export type * from './phoneNumber';
-export type * from './authorization';
 export type * from './protectConfig';
 export type * from './redirects';
 export type * from './resource';
@@ -58,8 +58,8 @@ export type * from './router';
  * TODO @revamp-hooks: Drop this in the next major release.
  */
 export type * from '../ui/types';
+export type * from './enterpriseSso';
 export type * from './runtime-values';
-export type * from './saml';
 export type * from './session';
 export type * from './sessionVerification';
 export type * from './signIn';

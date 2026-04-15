@@ -1,6 +1,6 @@
+import type { SamlIdpSlug } from './enterpriseSso';
 import type { OAuthProvider } from './oauth';
 import type { ClerkResource } from './resource';
-import type { SamlIdpSlug } from './saml';
 import type { EnterpriseAccountConnectionJSONSnapshot, EnterpriseAccountJSONSnapshot } from './snapshots';
 import type { VerificationResource } from './verification';
 

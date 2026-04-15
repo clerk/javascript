@@ -1529,5 +1529,10 @@ export const enUS: LocalizationResource = {
       actionButtonLabel: 'Verify the domain for your enterprise connection',
       actionButtonDescription: 'Verify the domain you want to enable the enterprise connection on.',
     },
+    enterpriseConnectionDrawer: {
+      title: 'Configure enterprise connection',
+      selectProviderTitle: 'Select your identity provider',
+      selectProviderDescription: "We'll guide you through the detailed setup process next.",
+    },
   },
 } as const;

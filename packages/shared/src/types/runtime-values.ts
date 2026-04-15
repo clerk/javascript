@@ -1,5 +1,5 @@
+import type { SamlIdpMap } from './enterpriseSso';
 import type { OAuthProvider, OAuthProviderData } from './oauth';
-import type { SamlIdpMap } from './saml';
 import type { OAuthStrategy, Web3Strategy } from './strategies';
 import type { Web3Provider, Web3ProviderData } from './web3';
 

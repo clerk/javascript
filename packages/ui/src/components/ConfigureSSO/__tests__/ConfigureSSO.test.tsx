@@ -8,6 +8,19 @@ import { ConfigureSSO } from '../';
 const { createFixtures } = bindCreateFixtures('ConfigureSSO');
 
 describe('ConfigureSSO', () => {
+  it('opens the enterprise connection drawer when the Configure SSO action is clicked', async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+
+    const { userEvent, findByRole, findByText } = render(<ConfigureSSO />, { wrapper });
+
+    const configureButton = await findByRole('button', { name: /configure enterprise connection/i });
+    await userEvent.click(configureButton);
+
+    expect(await findByText(/select your identity provider/i)).toBeVisible();
+  });
+
   it('shows the step to verify domain when the primary email is not verified', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withUser({
