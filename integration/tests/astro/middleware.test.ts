@@ -22,6 +22,22 @@ export const GET: APIRoute = () => {
 };
 `;
 
+// The template's astro.config uses Number(process.env.PORT) which is NaN
+// when PORT is unset (during build). Override with a fallback.
+const astroConfigFile = () => `import { defineConfig } from 'astro/config';
+import node from '@astrojs/node';
+import clerk from '@clerk/astro';
+import react from '@astrojs/react';
+import tailwind from '@astrojs/tailwind';
+
+export default defineConfig({
+  output: 'server',
+  adapter: node({ mode: 'standalone' }),
+  integrations: [clerk(), react(), tailwind()],
+  server: { port: Number(process.env.PORT) || 4321 },
+});
+`;
+
 test.describe('custom middleware @astro', () => {
   test.describe.configure({ mode: 'serial' });
   let app: Application;
@@ -149,7 +165,8 @@ test.describe('custom middleware @astro (production build)', () => {
     app = await appConfigs.astro.node
       .clone()
       .setName('astro-custom-middleware-prod')
-      .addScript('build', 'pnpm astro build')
+      .addScript('build', 'npx astro build')
+      .addFile('astro.config.mjs', astroConfigFile)
       .addFile('src/middleware.ts', middlewareFile)
       .addFile('src/pages/api/admin/[...action].ts', apiRouteFile)
       .commit();
