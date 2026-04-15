@@ -1442,6 +1442,12 @@ export type __internal_LocalizationResource = {
     continue: LocalizationValue<'walletName'>;
     noneAvailable: LocalizationValue<'solanaWalletsLink'>;
   };
+  configureSSO: {
+    navbar: {
+      title: LocalizationValue;
+      description: LocalizationValue;
+    };
+  };
 };
 
 type WithParamName<T> = T &

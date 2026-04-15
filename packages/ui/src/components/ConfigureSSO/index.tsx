@@ -7,23 +7,22 @@ import { Flow } from '@/customizables';
 import { withCardStateProvider } from '@/elements/contexts';
 import { ProfileCard } from '@/elements/ProfileCard';
 
+import { ConfigureSSONavbar } from './ConfigureSSONavbar';
+
 const ConfigureSSOInternal = withCoreUserGuard(() => {
+  const contentRef = React.useRef<HTMLDivElement>(null);
+
   return (
     <Flow.Root flow='configureSSO'>
       <Flow.Part>
         <ProfileCard.Root
-          sx={t => ({
-            display: 'flex',
-            flexDirection: 'column',
-            width: t.sizes.$220,
-            maxWidth: `calc(100vw - ${t.sizes.$8})`,
-            height: t.sizes.$176,
-            overflow: 'hidden',
-          })}
+          sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
         >
-          <ProfileCard.Content scrollBoxId={CONFIGURE_SSO_CARD_SCROLLBOX_ID}>
-            <p>Configure SSO</p>
-          </ProfileCard.Content>
+          <ConfigureSSONavbar contentRef={contentRef}>
+            <ProfileCard.Content scrollBoxId={CONFIGURE_SSO_CARD_SCROLLBOX_ID}>
+              <p>Configure SSO</p>
+            </ProfileCard.Content>
+          </ConfigureSSONavbar>
         </ProfileCard.Root>
       </Flow.Part>
     </Flow.Root>
