@@ -149,6 +149,7 @@ test.describe('custom middleware @astro (production build)', () => {
     app = await appConfigs.astro.node
       .clone()
       .setName('astro-custom-middleware-prod')
+      .addScript('build', 'pnpm astro build')
       .addFile('src/middleware.ts', middlewareFile)
       .addFile('src/pages/api/admin/[...action].ts', apiRouteFile)
       .commit();
