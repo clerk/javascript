@@ -1,3 +1,4 @@
+import { useUser } from '@clerk/shared/react/index';
 import type { ConfigureSSOProps } from '@clerk/shared/types';
 import React, { type ComponentProps } from 'react';
 
@@ -31,6 +32,10 @@ const ConfigureSSOInternal = withCoreUserGuard(() => {
 });
 
 const ConfigureSSOProfileContent = () => {
+  const { user } = useUser();
+
+  const hasPrimaryEmailAddressVerified = user?.primaryEmailAddress?.verification.status === 'verified';
+
   return (
     <ProfileCard.Content scrollBoxId={CONFIGURE_SSO_CARD_SCROLLBOX_ID}>
       <Header.Root>
@@ -47,18 +52,24 @@ const ConfigureSSOProfileContent = () => {
         actionButtonLabel={localizationKeys('configureSSO.configureSSOSection.actionButtonLabel')}
         actionButtonDescription={localizationKeys('configureSSO.configureSSOSection.actionButtonDescription')}
       />
+
+      {/* TODO -> Disable test SSO section until enterprise connection is created */}
       <ConfigureSSOSection
         title={localizationKeys('configureSSO.testSSOSection.title', { step: 2 })}
         id='testSSO'
         actionButtonLabel={localizationKeys('configureSSO.testSSOSection.actionButtonLabel')}
         actionButtonDescription={localizationKeys('configureSSO.testSSOSection.actionButtonDescription')}
       />
-      <ConfigureSSOSection
-        title={localizationKeys('configureSSO.verifyDomainSection.title', { step: 3 })}
-        id='verifyDomain'
-        actionButtonLabel={localizationKeys('configureSSO.verifyDomainSection.actionButtonLabel')}
-        actionButtonDescription={localizationKeys('configureSSO.verifyDomainSection.actionButtonDescription')}
-      />
+
+      {!hasPrimaryEmailAddressVerified && (
+        // TODO -> Test this section with a user who has a primary email address that is not verified
+        <ConfigureSSOSection
+          title={localizationKeys('configureSSO.verifyDomainSection.title', { step: 3 })}
+          id='verifyDomain'
+          actionButtonLabel={localizationKeys('configureSSO.verifyDomainSection.actionButtonLabel')}
+          actionButtonDescription={localizationKeys('configureSSO.verifyDomainSection.actionButtonDescription')}
+        />
+      )}
     </ProfileCard.Content>
   );
 };
