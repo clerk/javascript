@@ -1,11 +1,14 @@
+import { useOrganization, useOrganizationList } from '@clerk/shared/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { useOrganizationList } from '@clerk/shared/react';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
 
 import { OAuthConsent } from '../OAuthConsent';
+
+// Captures the onChange injected into SelectOptionList's useInView so tests
+// can simulate "user scrolled to the bottom of the org dropdown".
+let capturedLoadMoreOnChange: ((inView: boolean) => void) | undefined;
 
 // Default: useOrganizationList returns no memberships and is not loaded.
 // Individual tests override this mock to inject org data.
@@ -15,10 +18,18 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     ...actual,
     useOrganizationList: vi.fn().mockReturnValue({
       isLoaded: false,
-      userMemberships: { data: [] },
+      userMemberships: { data: [], hasNextPage: false, fetchNext: vi.fn(), isLoading: false },
     }),
+    useOrganization: vi.fn().mockReturnValue({ organization: null }),
   };
 });
+
+vi.mock('@/ui/hooks/useInView', () => ({
+  useInView: vi.fn().mockImplementation(({ onChange }: { onChange?: (inView: boolean) => void }) => {
+    capturedLoadMoreOnChange = onChange;
+    return { ref: vi.fn(), inView: false };
+  }),
+}));
 
 const { createFixtures } = bindCreateFixtures('OAuthConsent');
 
@@ -56,6 +67,7 @@ describe('OAuthConsent', () => {
   const originalLocation = window.location;
 
   beforeEach(() => {
+    capturedLoadMoreOnChange = undefined;
     Object.defineProperty(window, 'location', {
       configurable: true,
       writable: true,
@@ -428,6 +440,87 @@ describe('OAuthConsent', () => {
       await waitFor(() => {
         const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]')!;
         expect(form.querySelector('input[name="organization_id"]')).toBeNull();
+      });
+    });
+  });
+
+  describe('org selection — infinite scroll and active-org pre-selection', () => {
+    const twoOrgs = [
+      { organization: { id: 'org_1', name: 'Acme Corp', imageUrl: 'https://img.clerk.com/static/clerk.png' } },
+      { organization: { id: 'org_2', name: 'Beta Inc', imageUrl: 'https://img.clerk.com/static/beta.png' } },
+    ];
+
+    it('wires the load-more sentinel to the onLoadMore callback', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['jane@example.com'] });
+      });
+
+      props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      vi.mocked(useOrganizationList).mockReturnValue({
+        isLoaded: true,
+        userMemberships: { data: twoOrgs, hasNextPage: false, fetchNext: vi.fn(), isLoading: false },
+      } as any);
+
+      render(<OAuthConsent />, { wrapper });
+
+      // The load-more sentinel is always wired up when enableOrgSelection is true
+      // (syntheticHasMore starts at true since syntheticPage=1 < 4)
+      await waitFor(() => {
+        expect(capturedLoadMoreOnChange).toBeDefined();
+      });
+
+      // Calling it should not throw — it calls syntheticFetchNext which updates state
+      expect(() => capturedLoadMoreOnChange!(true)).not.toThrow();
+    });
+
+    it('pre-selects the active organization when the session has one', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['jane@example.com'] });
+      });
+
+      props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      vi.mocked(useOrganizationList).mockReturnValue({
+        isLoaded: true,
+        userMemberships: { data: twoOrgs, hasNextPage: false, fetchNext: vi.fn(), isLoading: false },
+      } as any);
+
+      // Active org is org_2 — second in list, not first, to prove ordering matters
+      vi.mocked(useOrganization).mockReturnValue({ organization: { id: 'org_2' } } as any);
+
+      const { baseElement } = render(<OAuthConsent />, { wrapper });
+
+      await waitFor(() => {
+        const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]')!;
+        const hiddenInput = form.querySelector('input[name="organization_id"]') as HTMLInputElement | null;
+        expect(hiddenInput?.value).toBe('org_2');
+      });
+    });
+
+    it('falls back to the first org when the session has no active organization', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['jane@example.com'] });
+      });
+
+      props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      vi.mocked(useOrganizationList).mockReturnValue({
+        isLoaded: true,
+        userMemberships: { data: twoOrgs, hasNextPage: false, fetchNext: vi.fn(), isLoading: false },
+      } as any);
+
+      vi.mocked(useOrganization).mockReturnValue({ organization: null } as any);
+
+      const { baseElement } = render(<OAuthConsent />, { wrapper });
+
+      await waitFor(() => {
+        const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]')!;
+        const hiddenInput = form.querySelector('input[name="organization_id"]') as HTMLInputElement | null;
+        expect(hiddenInput?.value).toBe('org_1');
       });
     });
   });

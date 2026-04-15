@@ -235,10 +235,11 @@ export const SelectNoResults = (props: PropsOfComponent<typeof Text>) => {
 
 type SelectOptionListProps = PropsOfComponent<typeof Flex> & {
   containerSx?: ThemableCssProp;
+  footer?: React.ReactNode;
 };
 
 export const SelectOptionList = (props: SelectOptionListProps) => {
-  const { containerSx, sx, ...rest } = props;
+  const { containerSx, sx, footer, ...rest } = props;
   const {
     popoverCtx,
     searchInputCtx,
@@ -376,6 +377,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
             );
           })}
           {noResultsMessage && options.length === 0 && <SelectNoResults>{noResultsMessage}</SelectNoResults>}
+          {footer}
         </Flex>
       </Flex>
     </Popover>

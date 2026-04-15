@@ -1,4 +1,4 @@
-import { useClerk, useOAuthConsent, useOrganizationList, useUser } from '@clerk/shared/react';
+import { useClerk, useOAuthConsent, useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
@@ -37,6 +37,7 @@ function _OAuthConsent() {
     // TODO(rob): Implement lazy loading in another PR
     userMemberships: ctx.enableOrgSelection ? { infinite: true, pageSize: 50 } : undefined,
   });
+  const { organization: activeOrg } = useOrganization();
 
   const orgOptions: OrgOption[] = (userMemberships.data ?? []).map(m => ({
     value: m.organization.id,
@@ -44,8 +45,27 @@ function _OAuthConsent() {
     logoUrl: m.organization.imageUrl,
   }));
 
+  // TEMP: Synthetic orgs for manual infinite-scroll testing.
+  // Remove in follow-up once testing with a real account that has 10+ orgs.
+  const [syntheticPage, setSyntheticPage] = useState(1);
+  const syntheticOrgs: OrgOption[] = ctx.enableOrgSelection
+    ? Array.from({ length: syntheticPage * 5 }, (_, i) => ({
+        value: `synthetic_org_${i + 1}`,
+        label: `Synthetic Org ${i + 1}`,
+        logoUrl: orgOptions[0]?.logoUrl ?? '',
+      }))
+    : [];
+  const mergedOrgOptions = ctx.enableOrgSelection ? [...orgOptions, ...syntheticOrgs] : orgOptions;
+  const syntheticHasMore = ctx.enableOrgSelection && syntheticPage < 4; // 4 pages x 5 = 20 total
+  const syntheticFetchNext = () => setSyntheticPage(p => p + 1);
+  // TEMP END
+
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
-  const effectiveOrg = selectedOrg ?? orgOptions[0]?.value ?? null;
+  const effectiveOrg =
+    selectedOrg ??
+    (activeOrg ? mergedOrgOptions.find(o => o.value === activeOrg.id)?.value : undefined) ??
+    mergedOrgOptions[0]?.value ??
+    null;
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -228,11 +248,13 @@ function _OAuthConsent() {
                 })}
               />
             </Header.Root>
-            {ctx.enableOrgSelection && orgOptions.length > 0 && effectiveOrg && (
+            {ctx.enableOrgSelection && mergedOrgOptions.length > 0 && effectiveOrg && (
               <OrgSelect
-                options={orgOptions}
+                options={mergedOrgOptions}
                 value={effectiveOrg}
                 onChange={setSelectedOrg}
+                hasMore={syntheticHasMore}
+                onLoadMore={syntheticFetchNext}
               />
             )}
             <ListGroup>
