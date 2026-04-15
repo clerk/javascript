@@ -1,0 +1,21 @@
+# Happy path: sign in, tap Manage Profile, assert UserProfile opens, dismiss,
+# assert still signed in.
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - happy-path
+---
+- runFlow: ../common/open-app.yaml
+- runFlow: ../common/sign-in-email-password.yaml
+- runFlow: ../common/assert-signed-in.yaml
+# Open UserProfile via Manage Profile button
+- tapOn:
+    text: "Manage Profile"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible:
+    text: "Account"
+# Dismiss the profile
+- back
+- waitForAnimationToEnd:
+    timeout: 2000
+- runFlow: ../common/assert-signed-in.yaml

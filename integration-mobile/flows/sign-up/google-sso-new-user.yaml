@@ -1,0 +1,15 @@
+# Happy path: sign up via Google SSO. Manual-only until OAuth stubs exist.
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - happy-path
+  - manual
+  - sign-up
+---
+- runFlow: ../common/open-app.yaml
+- runFlow: ../common/assert-signed-out.yaml
+- tapOn:
+    text: "Sign in with Google"
+- waitForAnimationToEnd:
+    timeout: 8000
+# Manual: complete Google sign-in for a brand new account
+- runFlow: ../common/assert-signed-in.yaml

@@ -1,0 +1,5 @@
+# Subflow: assert the user is on the signed-out screen with the AuthView visible.
+appId: com.clerk.clerkexpoquickstart
+---
+- assertVisible:
+    text: "Welcome! Sign in to continue."

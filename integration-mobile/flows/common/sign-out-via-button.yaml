@@ -1,0 +1,9 @@
+# Subflow: tap the Sign Out button on the home screen and wait for AuthView.
+appId: com.clerk.clerkexpoquickstart
+---
+- tapOn:
+    text: "Sign Out"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible:
+    text: "Welcome! Sign in to continue."

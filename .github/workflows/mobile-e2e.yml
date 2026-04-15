@@ -1,0 +1,151 @@
+# Manual mobile e2e for @clerk/expo native components.
+# Clones clerk-expo-quickstart, builds the NativeComponentQuickstart app,
+# and runs Maestro flows on iOS simulator and Android emulator.
+name: "Mobile e2e (@clerk/expo)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      quickstart_ref:
+        description: "clerk-expo-quickstart git ref (branch, tag, or SHA)"
+        required: false
+        default: "main"
+      exclude_tags:
+        description: "Maestro tags to exclude (comma-separated)"
+        required: false
+        default: "manual,skip"
+
+concurrency:
+  group: mobile-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - name: Checkout @clerk/javascript
+        uses: actions/checkout@v4
+
+      - name: Checkout clerk-expo-quickstart
+        uses: actions/checkout@v4
+        with:
+          repository: clerk/clerk-expo-quickstart
+          ref: ${{ inputs.quickstart_ref }}
+          path: clerk-expo-quickstart
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install monorepo deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Build @clerk/expo
+        run: pnpm turbo build --filter=@clerk/expo...
+
+      - name: Install quickstart deps
+        working-directory: clerk-expo-quickstart/NativeComponentQuickstart
+        run: pnpm install
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Run Android e2e
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          CLERK_TEST_EMAIL: ${{ secrets.CLERK_TEST_EMAIL }}
+          CLERK_TEST_PASSWORD: ${{ secrets.CLERK_TEST_PASSWORD }}
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          script: |
+            cd clerk-expo-quickstart/NativeComponentQuickstart
+            npx expo prebuild --clean
+            npx expo run:android --variant release --no-bundler
+            cd ../../integration-mobile
+            source config/.env 2>/dev/null || true
+            maestro test --exclude-tags "${{ inputs.exclude_tags }}" flows/
+
+      - name: Upload Maestro artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-android
+          path: ~/.maestro/tests
+
+  ios:
+    name: iOS
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - name: Checkout @clerk/javascript
+        uses: actions/checkout@v4
+
+      - name: Checkout clerk-expo-quickstart
+        uses: actions/checkout@v4
+        with:
+          repository: clerk/clerk-expo-quickstart
+          ref: ${{ inputs.quickstart_ref }}
+          path: clerk-expo-quickstart
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install monorepo deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Build @clerk/expo
+        run: pnpm turbo build --filter=@clerk/expo...
+
+      - name: Install quickstart deps
+        working-directory: clerk-expo-quickstart/NativeComponentQuickstart
+        run: pnpm install
+
+      - name: Cache SPM
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: spm-${{ hashFiles('packages/expo/package.json') }}
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Build and run iOS e2e
+        env:
+          CLERK_TEST_EMAIL: ${{ secrets.CLERK_TEST_EMAIL }}
+          CLERK_TEST_PASSWORD: ${{ secrets.CLERK_TEST_PASSWORD }}
+        run: |
+          cd clerk-expo-quickstart/NativeComponentQuickstart
+          npx expo prebuild --clean
+          npx expo run:ios --configuration Release --no-bundler
+          cd ../../integration-mobile
+          source config/.env 2>/dev/null || true
+          maestro test --exclude-tags "${{ inputs.exclude_tags }},androidOnly" flows/
+
+      - name: Upload Maestro artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-ios
+          path: ~/.maestro/tests

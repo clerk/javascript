@@ -1,0 +1,9 @@
+# Subflow: assert the user is on the signed-in home screen.
+appId: com.clerk.clerkexpoquickstart
+---
+- assertVisible:
+    text: "Welcome"
+- assertVisible:
+    text: "Manage Profile"
+- assertVisible:
+    text: "Sign Out"

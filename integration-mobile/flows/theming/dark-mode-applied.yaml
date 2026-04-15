@@ -1,0 +1,42 @@
+# Theming: verify dark mode applies the darkColors from clerk-theme.json.
+# Android only: iOS hex colors are static for v1 of the theming plugin.
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - theming
+  - androidOnly
+---
+# Force the device to dark mode before launching the app.
+- launchApp:
+    clearState: true
+    arguments:
+      darkMode: true
+- waitForAnimationToEnd:
+    timeout: 5000
+# Dev build: tap the dev server URL to connect
+- runFlow:
+    when:
+      visible: "Development Build"
+    commands:
+      - tapOn: "http://10.0.2.2:8081"
+      - waitForAnimationToEnd:
+          timeout: 8000
+# Dismiss the Expo developer menu if it pops up
+- runFlow:
+    when:
+      visible: "developer menu"
+    commands:
+      - tapOn:
+          point: "1154,2199"
+- waitForAnimationToEnd:
+    timeout: 3000
+- runFlow: ../common/assert-signed-out.yaml
+- takeScreenshot: dark-theme-screenshot
+# Sample a pixel from the primary button. The dark theme primary is #FF6666.
+- runScript:
+    file: ../../scripts/check-theme-color.js
+    env:
+      THEME_IMAGE: dark-theme-screenshot.png
+      THEME_X: "200"
+      THEME_Y: "560"
+      THEME_EXPECTED: "#FF6666"
+      THEME_TOLERANCE: "20"

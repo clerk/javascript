@@ -1,0 +1,39 @@
+# Happy path: sign up with a +clerk_test email address. The Clerk testmode
+# +clerk_test pattern auto-resolves the verification code as 424242.
+#
+# Sign-up flow: email -> Continue -> "Check your email" -> code 424242 ->
+# password screen -> password -> Continue -> home
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - happy-path
+  - sign-up
+---
+- runFlow: ../common/open-app.yaml
+- runFlow: ../common/assert-signed-out.yaml
+# Enter a +clerk_test address with a timestamp suffix so each run is unique
+- tapOn:
+    text: "Enter your email or username"
+- inputText: "tester+clerk_test_${OUTPUT_TIMESTAMP:-default}@example.com"
+- tapOn:
+    text: "Continue"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 3000
+# Should land on "Check your email" verification screen
+- assertVisible:
+    text: "Check your email"
+# Enter the testmode verification code
+- inputText: "424242"
+- waitForAnimationToEnd:
+    timeout: 3000
+# Password creation screen
+- tapOn:
+    text: "Enter your password"
+    optional: true
+- inputText: ${CLERK_TEST_PASSWORD}
+- tapOn:
+    text: "Continue"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 5000
+- runFlow: ../common/assert-signed-in.yaml

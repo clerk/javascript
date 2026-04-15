@@ -1,0 +1,29 @@
+# Happy path: sign in as one user, sign out, sign in as a different user.
+# Requires CLERK_TEST_EMAIL_SECONDARY and CLERK_TEST_PASSWORD_SECONDARY env vars.
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - happy-path
+---
+- runFlow: ../common/open-app.yaml
+- runFlow: ../common/sign-in-email-password.yaml
+- runFlow: ../common/assert-signed-in.yaml
+- runFlow: ../common/sign-out-via-button.yaml
+- runFlow: ../common/assert-signed-out.yaml
+# Sign in as a different user
+- tapOn:
+    text: "Enter your email or username"
+- inputText: ${CLERK_TEST_EMAIL_SECONDARY}
+- tapOn:
+    text: "Continue"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 3000
+- tapOn:
+    text: "Enter your password"
+- inputText: ${CLERK_TEST_PASSWORD_SECONDARY}
+- tapOn:
+    text: "Continue"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 5000
+- runFlow: ../common/assert-signed-in.yaml

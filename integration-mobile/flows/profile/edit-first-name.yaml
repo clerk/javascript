@@ -1,0 +1,31 @@
+# Happy path: open profile, edit first name, save, dismiss, assert still signed in.
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - happy-path
+---
+- runFlow: ../common/open-app.yaml
+- runFlow: ../common/sign-in-email-password.yaml
+- runFlow: ../common/assert-signed-in.yaml
+# Open UserProfile via Manage Profile
+- tapOn:
+    text: "Manage Profile"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible:
+    text: "Account"
+# Tap Edit profile to enter edit mode
+- tapOn:
+    text: "Edit profile"
+- waitForAnimationToEnd:
+    timeout: 2000
+# Clear and type new first name
+- eraseText: 50
+- inputText: "TestUser"
+- tapOn: "Save"
+- waitForAnimationToEnd:
+    timeout: 3000
+# Dismiss profile
+- back
+- waitForAnimationToEnd:
+    timeout: 2000
+- runFlow: ../common/assert-signed-in.yaml

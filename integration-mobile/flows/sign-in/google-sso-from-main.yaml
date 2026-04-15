@@ -1,0 +1,15 @@
+# Happy path: Sign in with Google from the AuthView main screen.
+# Manual-only until we have a Clerk testmode IdP with stubbed OAuth.
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - happy-path
+  - manual
+---
+- runFlow: ../common/open-app.yaml
+- runFlow: ../common/assert-signed-out.yaml
+- tapOn:
+    text: "Sign in with Google"
+- waitForAnimationToEnd:
+    timeout: 8000
+# Manual step: complete Google sign-in. After return, assert home screen.
+- runFlow: ../common/assert-signed-in.yaml

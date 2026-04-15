@@ -1,0 +1,8 @@
+# SKIP: The NativeComponentQuickstart app does not have an inline profile screen.
+# This flow is not applicable and is retained as a placeholder only.
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - skip
+---
+# No-op: inline profile is not available in the quickstart app.
+- runFlow: ../common/open-app.yaml

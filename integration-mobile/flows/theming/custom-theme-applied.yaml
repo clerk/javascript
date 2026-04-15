@@ -1,0 +1,27 @@
+# REGRESSION: Native theming was not applied because Clerk.initialize() on
+# Android was resetting customTheme to its default (null) parameter.
+#
+# This flow takes a screenshot of the AuthView and uses scripts/check-theme-color.js
+# to assert that a sampled pixel matches the expected primary color.
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - regression
+  - theming
+---
+- runFlow: ../common/open-app.yaml
+- runFlow: ../common/assert-signed-out.yaml
+- waitForAnimationToEnd:
+    timeout: 3000
+# Take a screenshot of the AuthView
+- takeScreenshot: theme-screenshot
+# Run the pixel-check helper. Coordinates target the primary "Continue" button.
+# The script exits non-zero if the sampled pixel is more than tolerance away
+# from the expected color.
+- runScript:
+    file: ../../scripts/check-theme-color.js
+    env:
+      THEME_IMAGE: theme-screenshot.png
+      THEME_X: "200"
+      THEME_Y: "560"
+      THEME_EXPECTED: "#FF4444"
+      THEME_TOLERANCE: "20"

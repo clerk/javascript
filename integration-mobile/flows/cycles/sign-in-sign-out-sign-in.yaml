@@ -1,0 +1,16 @@
+# REGRESSION: After sign-in -> sign-out -> sign-in, the second sign-in
+# completed natively but the JS SDK never picked it up. This flow signs in
+# twice in a row to verify the cycle works correctly.
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - regression
+---
+- runFlow: ../common/open-app.yaml
+# First sign-in
+- runFlow: ../common/sign-in-email-password.yaml
+- runFlow: ../common/assert-signed-in.yaml
+# Sign out via the Sign Out button
+- runFlow: ../common/sign-out-via-button.yaml
+# Second sign-in -- must work without the bug
+- runFlow: ../common/sign-in-email-password.yaml
+- runFlow: ../common/assert-signed-in.yaml

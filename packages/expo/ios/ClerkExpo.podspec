@@ -42,5 +42,15 @@ Pod::Spec.new do |s|
                    "ClerkAuthViewManager.swift", "ClerkAuthViewManager.m",
                    "ClerkUserProfileViewManager.swift", "ClerkUserProfileViewManager.m"
 
+  # XCTest unit tests. Cocoapods generates an "ClerkExpo-Unit-Tests" scheme when
+  # the pod is installed with `pod install`, which can be run via:
+  #   xcodebuild test -workspace Pods/Pods.xcworkspace -scheme ClerkExpo-Unit-Tests
+  # The tests are pure-logic (no UIKit / ClerkKit required) so they compile
+  # standalone inside the test target without needing the app to be running.
+  s.test_spec 'Tests' do |test_spec|
+    test_spec.source_files = 'Tests/**/*.swift'
+    test_spec.frameworks = 'XCTest'
+  end
+
   install_modules_dependencies(s)
 end

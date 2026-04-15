@@ -1,0 +1,37 @@
+# REGRESSION: A brief white flash was visible when the native AuthView first
+# mounted. This flow approximates the check by:
+#   1. Cold-launching with clearState
+#   2. Handling the dev build launcher
+#   3. Taking a screenshot at the earliest possible moment
+#   4. Asserting the AuthView is visible (not a blank/white screen)
+appId: com.clerk.clerkexpoquickstart
+tags:
+  - regression
+  - smoke
+---
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd:
+    timeout: 5000
+# Dev build: tap the dev server URL to connect
+- runFlow:
+    when:
+      visible: "Development Build"
+    commands:
+      - tapOn: "http://10.0.2.2:8081"
+      - waitForAnimationToEnd:
+          timeout: 8000
+# Dismiss the Expo developer menu if it pops up
+- runFlow:
+    when:
+      visible: "developer menu"
+    commands:
+      - tapOn:
+          point: "1154,2199"
+# Capture immediately after dev menu dismissal -- catch any white-flash window
+- takeScreenshot: cold-launch-immediate
+- waitForAnimationToEnd:
+    timeout: 5000
+- assertVisible:
+    text: "Welcome! Sign in to continue."
+- takeScreenshot: cold-launch-settled

@@ -1,0 +1,119 @@
+import { act, cleanup, render } from '@testing-library/react';
+import React from 'react';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+
+const mocks = vi.hoisted(() => ({
+  NativeClerkUserProfileView: vi.fn(),
+  isNativeSupported: true,
+  ClerkExpoModule: {
+    signOut: vi.fn(),
+  } as Record<string, any> | null,
+  useClerk: vi.fn(),
+}));
+
+vi.mock('@clerk/react', () => ({ useClerk: mocks.useClerk }));
+
+vi.mock('react-native', () => {
+  const React = require('react');
+  return {
+    Platform: { OS: 'ios' },
+    View: ({ children, style: _s, ...p }: any) =>
+      React.createElement('div', { 'data-testid': p.testID, ...p }, children),
+    Text: ({ children, style: _s, ...p }: any) =>
+      React.createElement('span', { 'data-testid': p.testID, ...p }, children),
+    StyleSheet: { create: (s: any) => s, flatten: (s: any) => s },
+  };
+});
+
+vi.mock('../../specs/NativeClerkUserProfileView', () => ({
+  default: mocks.NativeClerkUserProfileView,
+}));
+
+vi.mock('../../utils/native-module', () => ({
+  get isNativeSupported() {
+    return mocks.isNativeSupported;
+  },
+  get ClerkExpoModule() {
+    return mocks.ClerkExpoModule;
+  },
+}));
+
+import { UserProfileView } from '../UserProfileView';
+
+let recordedProps: Record<string, any> = {};
+let mockClerk: { signOut: ReturnType<typeof vi.fn> };
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  mocks.isNativeSupported = true;
+  mocks.ClerkExpoModule = { signOut: vi.fn().mockResolvedValue(undefined) };
+  recordedProps = {};
+  mockClerk = { signOut: vi.fn().mockResolvedValue(undefined) };
+  mocks.useClerk.mockReturnValue(mockClerk);
+  mocks.NativeClerkUserProfileView.mockImplementation((props: any) => {
+    recordedProps = props;
+    return React.createElement('div', { 'data-testid': 'native-profile' });
+  });
+});
+
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
+
+describe('UserProfileView', () => {
+  test('renders NativeClerkUserProfileView with default props', () => {
+    render(React.createElement(UserProfileView));
+    expect(mocks.NativeClerkUserProfileView).toHaveBeenCalled();
+    expect(recordedProps.isDismissable).toBe(false);
+  });
+
+  test('forwards isDismissable prop', () => {
+    render(React.createElement(UserProfileView, { isDismissable: true }));
+    expect(recordedProps.isDismissable).toBe(true);
+  });
+
+  test('renders fallback when native is unsupported', () => {
+    mocks.isNativeSupported = false;
+    const { container } = render(React.createElement(UserProfileView));
+    expect(container.textContent).toMatch(/only available on iOS and Android/i);
+  });
+
+  test('signedOut event triggers ClerkExpo.signOut and clerk.signOut', async () => {
+    render(React.createElement(UserProfileView));
+    await act(async () => {
+      await recordedProps.onProfileEvent({ nativeEvent: { type: 'signedOut', data: '{}' } });
+    });
+    expect(mocks.ClerkExpoModule!.signOut).toHaveBeenCalledTimes(1);
+    expect(mockClerk.signOut).toHaveBeenCalledTimes(1);
+  });
+
+  test('signOutTriggered ref prevents double sign-out from a duplicate event', async () => {
+    render(React.createElement(UserProfileView));
+    await act(async () => {
+      await recordedProps.onProfileEvent({ nativeEvent: { type: 'signedOut', data: '{}' } });
+      await recordedProps.onProfileEvent({ nativeEvent: { type: 'signedOut', data: '{}' } });
+    });
+    expect(mocks.ClerkExpoModule!.signOut).toHaveBeenCalledTimes(1);
+    expect(mockClerk.signOut).toHaveBeenCalledTimes(1);
+  });
+
+  test('native signOut rejection is swallowed; JS signOut still runs', async () => {
+    mocks.ClerkExpoModule!.signOut.mockRejectedValueOnce(new Error('boom'));
+    render(React.createElement(UserProfileView));
+    await act(async () => {
+      await recordedProps.onProfileEvent({ nativeEvent: { type: 'signedOut', data: '{}' } });
+    });
+    expect(mockClerk.signOut).toHaveBeenCalledTimes(1);
+  });
+
+  test('JS signOut rejection is swallowed (best effort)', async () => {
+    mockClerk.signOut.mockRejectedValueOnce(new Error('js boom'));
+    render(React.createElement(UserProfileView));
+    // should not throw
+    await act(async () => {
+      await recordedProps.onProfileEvent({ nativeEvent: { type: 'signedOut', data: '{}' } });
+    });
+    expect(mockClerk.signOut).toHaveBeenCalledTimes(1);
+  });
+});

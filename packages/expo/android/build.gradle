@@ -41,6 +41,10 @@ android {
     versionName "1.0.0"
   }
 
+  testOptions {
+    unitTests.includeAndroidResources = true
+  }
+
   buildTypes {
     release {
       minifyEnabled false
@@ -124,4 +128,10 @@ dependencies {
   implementation "androidx.activity:activity-compose:$activityComposeVersion"
   implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion"
   implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion"
+
+  // Unit testing
+  testImplementation 'junit:junit:4.13.2'
+  testImplementation 'org.robolectric:robolectric:4.14.1'
+  testImplementation 'io.mockk:mockk:1.13.16'
+  testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1'
 }
