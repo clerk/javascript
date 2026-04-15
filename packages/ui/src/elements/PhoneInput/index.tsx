@@ -231,7 +231,6 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
     >
       <Icon
         icon={Check}
-        size='sm'
         sx={{ visibility: isSelected ? 'visible' : 'hidden' }}
       />
       <Text
