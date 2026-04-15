@@ -610,11 +610,12 @@ jobs:
             if [[ "$pm" =~ ^npm@([0-9]+\.[0-9]+\.[0-9]+) ]]; then
               npm install -g "npm@${BASH_REMATCH[1]}"
             fi
-            npm ci --audit=false --fund=false
+            if ! npm ci --audit=false --fund=false; then
+              echo "::warning::npm ci failed - lockfile inconsistent with package.json at this ref."
+              echo "::warning::Falling back to npm install. For reproducibility, refresh the lockfile in your fix branch."
+              npm install --audit=false --fund=false --no-save
+            fi
           fi
-        # NOTE: npm ci requires the fix branch's package-lock.json to match its package.json.
-        # If porting a fix to an old ref whose lockfile is inconsistent, run `npm install`
-        # locally first and commit the refreshed lockfile alongside the fix.
 
       - name: Build
         run: |
