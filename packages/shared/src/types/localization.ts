@@ -62,9 +62,8 @@ type DeepLocalizationWithoutObjects<T> = {
  * as a starting point.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Needs to be an interface for typedoc to link correctly
-export interface LocalizationResource extends DeepPartial<
-  DeepLocalizationWithoutObjects<__internal_LocalizationResource>
-> {}
+export interface LocalizationResource
+  extends DeepPartial<DeepLocalizationWithoutObjects<__internal_LocalizationResource>> {}
 
 export type __internal_LocalizationResource = {
   locale: string;
@@ -995,8 +994,11 @@ export type __internal_LocalizationResource = {
     action__signOut: LocalizationValue;
     action__signOutAll: LocalizationValue;
     action__addAccount: LocalizationValue;
-    action__openUserMenu: LocalizationValue;
-    action__closeUserMenu: LocalizationValue;
+    action__openUserMenu: LocalizationValue<'name'>;
+    action__closeUserMenu: LocalizationValue<'name'>;
+    label__userButtonPopover?: LocalizationValue;
+    label__accountActions?: LocalizationValue;
+    label__activeSessions?: LocalizationValue;
   };
   organizationSwitcher: {
     personalWorkspace: LocalizationValue;
