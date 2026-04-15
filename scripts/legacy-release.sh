@@ -89,17 +89,17 @@ if [[ "$PKG_VERSION" != "$VERSION" ]]; then
   exit 1
 fi
 
-PACKAGES=$(jq -c -n --arg n "$PKG" --arg v "$VERSION" --arg t "$DIST_TAG" \
-  '[{name:$n, version:$v, dist_tag:$t}]')
+PACKAGES=$(jq -c -n --arg n "$PKG" --arg v "$VERSION" \
+  '[{name:$n, version:$v}]')
 
 cat <<EOF
 Dispatching Release workflow:
-  package:    $PKG
-  version:    $VERSION
-  dist-tag:   $DIST_TAG
-  branch:     $BRANCH
-  source_ref: $LOCAL_SHA
-  dry_run:    $DRY_RUN
+  package:           $PKG
+  version:           $VERSION
+  dist-tag (derived): $DIST_TAG
+  branch:            $BRANCH
+  source_ref:        $LOCAL_SHA
+  dry_run:           $DRY_RUN
 
 EOF
 

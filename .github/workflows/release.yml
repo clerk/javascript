@@ -23,7 +23,7 @@ on:
         type: string
         required: true
       packages:
-        description: 'JSON array, e.g. [{"name":"@clerk/nextjs","version":"5.7.6","dist_tag":"latest-nextjs-v5"}]'
+        description: 'JSON array, e.g. [{"name":"@clerk/nextjs","version":"5.7.6"}]. dist-tag is derived from convention latest-<short>-v<major>.'
         type: string
         required: true
       dry_run:
@@ -564,12 +564,18 @@ jobs:
         env:
           PACKAGES: ${{ inputs.packages }}
         run: |
-          echo "$PACKAGES" | jq -e 'all(.[]; .dist_tag != "latest")' > /dev/null || {
-            echo "::error::'latest' dist_tag is not allowed on this path"; exit 1;
+          echo "$PACKAGES" | jq -e 'type == "array" and length > 0 and all(.[]; type == "object" and (.name | type == "string") and (.version | type == "string"))' > /dev/null || {
+            echo "::error::packages must be a non-empty JSON array of {name, version} objects"
+            exit 1
           }
-          invalid=$(echo "$PACKAGES" | jq -r '.[] | select(.name | test("^@clerk/[a-z0-9][a-z0-9-]*$") | not) | .name')
-          if [ -n "$invalid" ]; then
-            echo "::error::Invalid package name(s). Expected @clerk/<kebab-case>. Got: $invalid"
+          invalid_names=$(echo "$PACKAGES" | jq -r '.[] | select(.name | test("^@clerk/[a-z0-9][a-z0-9-]*$") | not) | .name')
+          if [ -n "$invalid_names" ]; then
+            echo "::error::Invalid package name(s). Expected @clerk/<kebab-case>. Got: $invalid_names"
+            exit 1
+          fi
+          invalid_versions=$(echo "$PACKAGES" | jq -r '.[] | select(.version | test("^[0-9]+\\.[0-9]+\\.[0-9]+") | not) | .version')
+          if [ -n "$invalid_versions" ]; then
+            echo "::error::Invalid version(s). Expected semver <major>.<minor>.<patch>. Got: $invalid_versions"
             exit 1
           fi
 
@@ -635,9 +641,16 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run }}
           PACK: ${{ steps.pm.outputs.manager }}
         run: |
-          echo "$PACKAGES" | jq -r '.[] | [.name, .version, .dist_tag] | @tsv' | while IFS=$'\t' read -r name version tag; do
+          echo "$PACKAGES" | jq -r '.[] | [.name, .version] | @tsv' | while IFS=$'\t' read -r name version; do
             short="${name#@clerk/}"
+            major="${version%%.*}"
+            tag="latest-${short}-v${major}"
             dir="packages/$short"
+
+            if [ "$tag" = "latest" ]; then
+              echo "::error::refuse to publish under 'latest' dist-tag (derived from $name@$version)"
+              exit 1
+            fi
 
             if [ ! -d "$dir" ]; then
               echo "::error::Package directory not found: $dir"
