@@ -181,8 +181,8 @@ const ButtonChildrenWithArrow = ({ children }: PropsWithChildren) => {
         icon={ArrowRightButtonIcon}
         sx={t => ({
           marginInlineStart: t.space.$2,
-          width: t.sizes.$2x5,
-          height: t.sizes.$2x5,
+          width: t.sizes.$4,
+          height: t.sizes.$4,
           opacity: t.opacity.$inactive,
           '[dir="rtl"] &': {
             transform: 'scaleX(-1)',
