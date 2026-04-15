@@ -162,6 +162,13 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
 
     logger.debug('Options debug', { ...options, beforeAuth: !!options.beforeAuth, afterAuth: !!options.afterAuth });
 
+    // Reject malformed percent-encoded paths before any matcher runs (GHSA-vqx2-fgx2-5wq9).
+    try {
+      decodeURI(nextRequest.nextUrl.pathname);
+    } catch {
+      return new NextResponse(null, { status: 400, statusText: 'Bad Request' });
+    }
+
     if (isIgnoredRoute(nextRequest)) {
       logger.debug({ isIgnoredRoute: true });
       if (isDevelopmentFromSecretKey(options.secretKey) && !options.ignoredRoutes) {
