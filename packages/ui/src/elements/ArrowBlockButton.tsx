@@ -9,7 +9,7 @@ import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
   rightIcon?: React.ComponentType | null;
   rightIconSx?: ThemableCssProp;
-  leftIcon?: React.ComponentType | React.ReactElement;
+  leftIcon?: React.ComponentType | React.ReactElement | null;
   leftIconSx?: ThemableCssProp;
   childrenSx?: ThemableCssProp;
   leftIconElementDescriptor?: ElementDescriptor;

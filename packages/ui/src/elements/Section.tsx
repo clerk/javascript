@@ -158,8 +158,9 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
   );
 };
 
-type ProfileSectionButtonProps = PropsOfComponent<typeof ArrowBlockButton> & {
+type ProfileSectionButtonProps = Omit<PropsOfComponent<typeof ArrowBlockButton>, 'leftIcon'> & {
   id: ProfileSectionId;
+  leftIcon?: PropsOfComponent<typeof ArrowBlockButton>['leftIcon'] | null;
 };
 
 const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
@@ -186,7 +187,10 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
 };
 
 const ProfileSectionArrowButton = forwardRef<HTMLButtonElement, ProfileSectionButtonProps>((props, ref) => {
-  const { children, leftIcon = Plus, id, sx, localizationKey, ...rest } = props;
+  const { children, leftIcon, id, sx, localizationKey, ...rest } = props;
+
+  const resolvedLeftIcon = leftIcon === null ? undefined : (leftIcon ?? Plus);
+
   return (
     <ArrowBlockButton
       elementDescriptor={descriptors.profileSectionPrimaryButton}
@@ -201,7 +205,7 @@ const ProfileSectionArrowButton = forwardRef<HTMLButtonElement, ProfileSectionBu
         sx,
       ]}
       textLocalizationKey={localizationKey}
-      leftIcon={leftIcon}
+      leftIcon={resolvedLeftIcon}
       leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
       ref={ref}
       {...rest}

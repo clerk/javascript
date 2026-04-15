@@ -3,11 +3,12 @@ import React, { type ComponentProps } from 'react';
 
 import { CONFIGURE_SSO_CARD_SCROLLBOX_ID } from '@/constants';
 import { withCoreUserGuard } from '@/contexts';
-import { Flow, localizationKeys } from '@/customizables';
+import { Col, Flow, localizationKeys, Text } from '@/customizables';
 import { withCardStateProvider } from '@/elements/contexts';
 import { Header } from '@/elements/Header';
 import { ProfileCard } from '@/elements/ProfileCard';
 import { ProfileSection } from '@/elements/Section';
+import { ArrowRightIcon } from '@/icons';
 
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 
@@ -43,28 +44,55 @@ const ConfigureSSOProfileContent = () => {
       <ConfigureSSOSection
         title={localizationKeys('configureSSO.configureSSOSection.title', { step: 1 })}
         id='configureSSO'
+        actionButtonLabel={localizationKeys('configureSSO.configureSSOSection.actionButtonLabel')}
+        actionButtonDescription={localizationKeys('configureSSO.configureSSOSection.actionButtonDescription')}
       />
       <ConfigureSSOSection
         title={localizationKeys('configureSSO.testSSOSection.title', { step: 2 })}
         id='testSSO'
+        actionButtonLabel={localizationKeys('configureSSO.testSSOSection.actionButtonLabel')}
+        actionButtonDescription={localizationKeys('configureSSO.testSSOSection.actionButtonDescription')}
       />
       <ConfigureSSOSection
         title={localizationKeys('configureSSO.verifyDomainSection.title', { step: 3 })}
         id='verifyDomain'
+        actionButtonLabel={localizationKeys('configureSSO.verifyDomainSection.actionButtonLabel')}
+        actionButtonDescription={localizationKeys('configureSSO.verifyDomainSection.actionButtonDescription')}
       />
     </ProfileCard.Content>
   );
 };
 
-type ConfigureSSOSectionProps = Pick<ComponentProps<typeof ProfileSection.Root>, 'title' | 'id'>;
+type ConfigureSSOSectionProps = Pick<ComponentProps<typeof ProfileSection.Root>, 'title' | 'id'> & {
+  actionButtonLabel: NonNullable<ComponentProps<typeof ProfileSection.ArrowButton>['localizationKey']>;
+  actionButtonDescription: NonNullable<ComponentProps<typeof Text>['localizationKey']>;
+};
 
 const ConfigureSSOSection = (props: ConfigureSSOSectionProps) => {
+  const { title, id, actionButtonLabel, actionButtonDescription } = props;
+
   return (
     <ProfileSection.Root
-      title={props.title}
-      id={props.id}
+      title={title}
+      id={id}
+      centered={false}
     >
-      <p>Configure SSO</p>
+      <Col>
+        <ProfileSection.ArrowButton
+          localizationKey={actionButtonLabel}
+          id={id}
+          leftIcon={ArrowRightIcon}
+          type='button'
+        />
+
+        <Text
+          localizationKey={actionButtonDescription}
+          sx={t => ({
+            paddingInlineStart: t.space.$2x5,
+          })}
+          colorScheme='secondary'
+        />
+      </Col>
     </ProfileSection.Root>
   );
 };
