@@ -15,6 +15,7 @@ import { clerkClient } from './clerk-client';
 import { createCurrentUser } from './current-user';
 import { getAuth } from './get-auth';
 import { getClientSafeEnv, getSafeEnv } from './get-safe-env';
+import { isMalformedURLError } from './route-matcher';
 import { serverRedirectWithAuth } from './server-redirect-with-auth';
 import type {
   AstroMiddleware,
@@ -365,6 +366,10 @@ const handleControlFlowErrors = (
   requestState: RequestState,
   context: AstroMiddlewareContextParam,
 ): Response => {
+  if (isMalformedURLError(e)) {
+    return new Response(null, { status: 400, statusText: 'Bad Request' });
+  }
+
   switch (e.message) {
     case CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN:
       return createRedirect({
