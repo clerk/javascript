@@ -36,6 +36,7 @@ const AVAILABLE_COMPONENTS = [
   'taskChooseOrganization',
   'taskResetPassword',
   'taskSetupMFA',
+  'configureSSO',
 ] as const;
 type AvailableComponent = (typeof AVAILABLE_COMPONENTS)[number];
 
@@ -140,6 +141,7 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
   taskResetPassword: buildComponentControls('taskResetPassword'),
   taskSetupMFA: buildComponentControls('taskSetupMFA'),
+  configureSSO: buildComponentControls('configureSSO'),
 };
 
 declare global {
@@ -447,6 +449,9 @@ void (async () => {
     },
     '/organization-profile': () => {
       Clerk.mountOrganizationProfile(app, componentControls.organizationProfile.getProps() ?? {});
+    },
+    '/configure-sso': () => {
+      Clerk.mountConfigureSSO(app, componentControls.configureSSO.getProps() ?? {});
     },
     '/organization-switcher': () => {
       Clerk.mountOrganizationSwitcher(app, componentControls.organizationSwitcher.getProps() ?? {});

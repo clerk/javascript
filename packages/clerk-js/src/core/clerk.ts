@@ -47,6 +47,7 @@ import {
 } from '@clerk/shared/telemetry';
 import type {
   __experimental_CheckoutOptions,
+  ConfigureSSOProps,
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
   __internal_CheckoutProps,
@@ -1136,6 +1137,27 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountOrganizationProfile = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
+  public mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'ConfigureSSO';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'configureSSO',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  public unmountConfigureSSO = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 

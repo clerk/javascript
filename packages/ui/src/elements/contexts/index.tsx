@@ -104,7 +104,8 @@ export type FlowMetadata = {
     | 'taskChooseOrganization'
     | 'enableOrganizations'
     | 'taskResetPassword'
-    | 'taskSetupMfa';
+    | 'taskSetupMfa'
+    | 'configureSSO';
   part?:
     | 'start'
     | 'emailCode'

@@ -2,6 +2,7 @@ import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type {
+  ConfigureSSOProps,
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
   __internal_CheckoutProps,
@@ -162,6 +163,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   private premountTaskResetPasswordNodes = new Map<HTMLDivElement, TaskResetPasswordProps | undefined>();
   private premountTaskSetupMFANodes = new Map<HTMLDivElement, TaskSetupMFAProps | undefined>();
+  private premountConfigureSSONodes = new Map<HTMLDivElement, ConfigureSSOProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -762,6 +764,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountTaskSetupMFA(node, props);
     });
 
+    this.premountConfigureSSONodes.forEach((props, node) => {
+      clerkjs.mountConfigureSSO(node, props);
+    });
+
     /**
      * Only update status in case `clerk.status` is missing. In any other case, `clerk-js` should be the orchestrator.
      */
@@ -1279,6 +1285,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountAPIKeys(node);
     } else {
       this.premountAPIKeysNodes.delete(node);
+    }
+  };
+
+  mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountConfigureSSO(node, props);
+    } else {
+      this.premountConfigureSSONodes.set(node, props);
+    }
+  };
+
+  unmountConfigureSSO = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountConfigureSSO(node);
+    } else {
+      this.premountConfigureSSONodes.delete(node);
     }
   };
 

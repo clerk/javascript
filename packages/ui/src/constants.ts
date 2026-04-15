@@ -21,3 +21,4 @@ export const USER_BUTTON_ITEM_ID = {
 
 export const USER_PROFILE_CARD_SCROLLBOX_ID = 'clerk-profileCardScrollBox';
 export const ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID = 'clerk-organizationProfileScrollBox';
+export const CONFIGURE_SSO_CARD_SCROLLBOX_ID = 'clerk-configureSSOScrollBox';

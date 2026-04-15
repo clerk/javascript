@@ -1018,6 +1018,7 @@ export type OAuthConsentTheme = Theme;
 export type TaskChooseOrganizationTheme = Theme;
 export type TaskResetPasswordTheme = Theme;
 export type TaskSetupMFATheme = Theme;
+export type ConfigureSSOTheme = Theme;
 
 type GlobalAppearanceOptions = {
   /**
@@ -1106,4 +1107,8 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<EnableOrganizations/>` component
      */
     enableOrganizations?: T;
+    /**
+     * Theme overrides that only apply to the `<ConfigureSSO />` component.
+     */
+    configureSSO?: T;
   };

@@ -169,6 +169,8 @@ export function ComponentContextProvider({
           </SessionTasksContext.Provider>
         </TaskSetupMFAContext.Provider>
       );
+    case 'ConfigureSSO':
+      return <>{children}</>;
     default:
       throw new Error(`Unknown component context: ${componentName}`);
   }

@@ -32,6 +32,7 @@ const componentImportPaths = {
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
   EnableOrganizationsPrompt: () =>
     import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/devPrompts/EnableOrganizationsPrompt'),
+  ConfigureSSO: () => import(/* webpackChunkName: "configureSSO" */ '../components/ConfigureSSO'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -146,6 +147,10 @@ export const OAuthConsent = lazy(() =>
   componentImportPaths.OAuthConsent().then(module => ({ default: module.OAuthConsent })),
 );
 
+export const ConfigureSSO = lazy(() =>
+  componentImportPaths.ConfigureSSO().then(module => ({ default: module.ConfigureSSO })),
+);
+
 export const SessionTasks = lazy(() =>
   componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTasks })),
 );
@@ -185,6 +190,7 @@ export const ClerkComponents = {
   TaskChooseOrganization,
   TaskResetPassword,
   TaskSetupMFA,
+  ConfigureSSO,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

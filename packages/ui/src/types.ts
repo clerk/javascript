@@ -1,4 +1,5 @@
 import type {
+  ConfigureSSOProps,
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
@@ -67,7 +68,8 @@ export type AvailableComponentProps =
   | __internal_OAuthConsentProps
   | TaskChooseOrganizationProps
   | TaskResetPasswordProps
-  | TaskSetupMFAProps;
+  | TaskSetupMFAProps
+  | ConfigureSSOProps;
 
 type ComponentMode = 'modal' | 'mounted';
 type SignInMode = 'modal' | 'redirect';
@@ -166,6 +168,10 @@ export type TaskSetupMFACtx = TaskSetupMFAProps & {
   componentName: 'TaskSetupMFA';
 };
 
+export type ConfigureSSOCtx = ConfigureSSOProps & {
+  componentName: 'ConfigureSSO';
+};
+
 export type OAuthConsentCtx = {
   componentName: 'OAuthConsent';
   /**
@@ -254,5 +260,6 @@ export type AvailableComponentCtx =
   | PlanDetailsCtx
   | TaskChooseOrganizationCtx
   | TaskResetPasswordCtx
-  | TaskSetupMFACtx;
+  | TaskSetupMFACtx
+  | ConfigureSSOCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

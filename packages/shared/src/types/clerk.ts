@@ -662,6 +662,16 @@ export interface Clerk {
   unmountAPIKeys: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount the Configure SSO component at the target element.
+   */
+  mountConfigureSSO: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
+
+  /**
+   * Unmount the Configure SSO component from the target element.
+   */
+  unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a OAuth consent component at the target element.
    *
    * @param targetNode - Target node to mount the OAuth consent component.
@@ -1792,6 +1802,13 @@ export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfilePr
    * (e.g., Radix Dialog, React Aria Components) instead of document.body.
    */
   getContainer?: () => HTMLElement | null;
+};
+
+export type ConfigureSSOProps = RoutingOptions & {
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   */
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type CreateOrganizationProps = RoutingOptions & {
