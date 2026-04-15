@@ -1054,6 +1054,9 @@ importers:
       index-to-position:
         specifier: ^0.1.2
         version: 0.1.2
+      isbinaryfile:
+        specifier: ^5.0.7
+        version: 5.0.7
       jscodeshift:
         specifier: ^17.0.0
         version: 17.3.0(@babel/preset-env@7.28.5(@babel/core@7.28.5))
@@ -9521,6 +9524,10 @@ packages:
 
   isarray@2.0.5:
     resolution: {integrity: sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==}
+
+  isbinaryfile@5.0.7:
+    resolution: {integrity: sha512-gnWD14Jh3FzS3CPhF0AxNOJ8CxqeblPTADzI38r0wt8ZyQl5edpy75myt08EG2oKvpyiqSqsx+Wkz9vtkbTqYQ==}
+    engines: {node: '>= 18.0.0'}
 
   isbot@5.1.32:
     resolution: {integrity: sha512-VNfjM73zz2IBZmdShMfAUg10prm6t7HFUQmNAEOAVS4YH92ZrZcvkMcGX6cIgBJAzWDzPent/EeAtYEHNPNPBQ==}
@@ -25398,6 +25405,8 @@ snapshots:
   isarray@1.0.0: {}
 
   isarray@2.0.5: {}
+
+  isbinaryfile@5.0.7: {}
 
   isbot@5.1.32: {}
 

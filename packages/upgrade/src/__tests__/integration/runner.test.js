@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { loadConfig } from '../../config.js';
@@ -217,6 +220,49 @@ describe('runScans', () => {
     expect(results).toHaveLength(1);
     expect(results[0].title).toBe('Test change without matcher');
     expect(results[0].instances).toEqual([]);
+  });
+
+  it('scans extensionless node scripts as text files', async () => {
+    const config = await loadConfig('nextjs', 6);
+    config.changes = [
+      {
+        title: 'Test extensionless script',
+        matcher: /afterSignInUrl/g,
+        packages: ['*'],
+        category: 'breaking',
+        warning: false,
+        docsAnchor: 'test',
+        content: 'Test',
+      },
+    ];
+
+    const content = '#!/usr/bin/env node\nafterSignInUrl\n';
+    fs.writeFileSync(path.join(fixture.path, 'run'), content, 'utf8');
+
+    const results = await runScans(config, 'nextjs', {
+      dir: fixture.path,
+      ignore: [],
+    });
+
+    const expected = path.relative(process.cwd(), path.join(fixture.path, 'run'));
+    expect(results[0].instances.some(instance => instance.file === expected)).toBe(true);
+  });
+
+  it('skips binary files that are not covered by ignore globs', async () => {
+    const config = await loadConfig('nextjs', 6);
+    config.changes = config.changes.filter(change => change.matcher);
+
+    const binaryPath = path.join(fixture.path, 'binary');
+    fs.writeFileSync(binaryPath, Buffer.from([0x7f, 0x45, 0x4c, 0x46, 0x00]));
+
+    const results = await runScans(config, 'nextjs', {
+      dir: fixture.path,
+      ignore: [],
+    });
+
+    const allInstances = results.flatMap(result => result.instances);
+    const skipped = path.relative(process.cwd(), binaryPath);
+    expect(allInstances.every(instance => instance.file !== skipped)).toBe(true);
   });
 
   it('includes both changes with and without matchers', async () => {

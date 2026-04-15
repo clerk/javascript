@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import chalk from 'chalk';
 import indexToPosition from 'index-to-position';
+import { isBinaryFile } from 'isbinaryfile';
 import { glob } from 'tinyglobby';
 
 import { getCodemodConfig, runCodemod } from './codemods/index.js';
@@ -104,6 +105,10 @@ export async function runScans(config, sdk, options) {
     for (let idx = 0; idx < files.length; idx++) {
       const file = files[idx];
       spinner.update(`Scanning ${path.relative(cwd, file)} (${idx + 1}/${files.length})`);
+
+      if (await isBinaryFile(file)) {
+        continue;
+      }
 
       const content = await fs.readFile(file, 'utf8');
 
