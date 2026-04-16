@@ -23,7 +23,7 @@ import {
   stripReferenceObjectPropertiesSection,
 } from './custom-plugin.mjs';
 import { prepareMarkdownRenderer } from './prepare-markdown-renderer.mjs';
-import { REFERENCE_OBJECTS_LIST, REFERENCE_OBJECT_PAGE_SYMBOLS } from './reference-objects.mjs';
+import { REFERENCE_OBJECTS_LIST, REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -795,16 +795,14 @@ function buildMethodMdx(decl, ctx) {
  * @param {import('typedoc').Application} app
  */
 function extractMethodsForPage(pageUrl, project, app) {
-  const symbol = /** @type {Record<string, string>} */ (/** @type {unknown} */ (REFERENCE_OBJECT_PAGE_SYMBOLS))[
-    pageUrl
-  ];
-  if (!symbol) {
+  const entry = REFERENCE_OBJECT_CONFIG[/** @type {keyof typeof REFERENCE_OBJECT_CONFIG} */ (pageUrl)];
+  if (!entry) {
     console.warn(`[extract-methods] No symbol mapping for ${pageUrl}, skipping`);
     return 0;
   }
 
-  const hint = symbol === 'Clerk' ? 'types/clerk' : symbol === 'ClientResource' ? 'types/client' : undefined;
-  const decl = findInterfaceOrClass(project, symbol, hint);
+  const { symbol, declarationHint } = entry;
+  const decl = findInterfaceOrClass(project, symbol, declarationHint);
   if (!decl?.children) {
     console.warn(`[extract-methods] Could not find interface/class "${symbol}"`);
     return 0;
