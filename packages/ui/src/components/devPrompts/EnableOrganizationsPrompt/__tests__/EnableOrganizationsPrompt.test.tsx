@@ -98,7 +98,7 @@ describe('EnableOrganizationsPrompt success state', () => {
   });
 
   describe('unclaimed keyless, signed-in user', () => {
-    it('renders Continue button and preserves default org name', async () => {
+    it('renders claim CTA with Continue button and preserves default org name', async () => {
       const onSuccess = vi.fn();
       const mockEnableSetting = vi.fn().mockResolvedValue(undefined);
       const mockGetMemberships = vi.fn().mockResolvedValue({
@@ -128,12 +128,16 @@ describe('EnableOrganizationsPrompt success state', () => {
       await enableButton.click();
 
       await vi.waitFor(() => {
-        expect(screen.getByText(/Organizations feature enabled/i)).toBeInTheDocument();
+        expect(screen.getByText(/Organizations are now enabled/i)).toBeInTheDocument();
       });
 
-      // Should show "Continue", not claim CTA
+      // Should show "Continue" button AND claim CTA
       expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument();
-      expect(screen.queryByText(/claim your application/i)).not.toBeInTheDocument();
+      const claimLink = screen.getByRole('link', { name: /claim your application/i });
+      expect(claimLink).toBeInTheDocument();
+
+      // Should NOT show dashboard link (unclaimed keyless can't access it)
+      expect(screen.queryByRole('link', { name: /dashboard/i })).not.toBeInTheDocument();
 
       // Should mention the default org name
       await vi.waitFor(() => {

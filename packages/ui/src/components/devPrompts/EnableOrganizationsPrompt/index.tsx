@@ -37,7 +37,7 @@ const EnableOrganizationsPromptInternal = ({
   const copyKeysUrl = options.__internal_keyless_copyInstanceKeysUrl;
   const isKeyless = Boolean(claimUrl) && Boolean(copyKeysUrl);
   const isClaimed = environment.authConfig.claimedAt !== null;
-  const showKeylessClaimPath = isEnabled && isKeyless && !isClaimed && !clerk.user;
+  const showKeylessClaimPath = isEnabled && isKeyless && !isClaimed;
 
   const claimUrlWithReturnUrl = useMemo(() => {
     if (!showKeylessClaimPath || !claimUrl) return undefined;
@@ -147,7 +147,9 @@ const EnableOrganizationsPromptInternal = ({
                   ]}
                 >
                   {showKeylessClaimPath
-                    ? 'Organizations are now enabled! Claim your application to save this configuration and access the full dashboard.'
+                    ? defaultOrganizationName
+                      ? `Organizations are now enabled and a default organization named "${defaultOrganizationName}" was created. Claim your application to save this configuration and access the full dashboard.`
+                      : 'Organizations are now enabled! Claim your application to save this configuration and access the full dashboard.'
                     : clerk.user && defaultOrganizationName
                       ? `The Organizations feature has been enabled for your application. A default organization named "${defaultOrganizationName}" was created automatically. You can manage or rename it in your`
                       : `The Organizations feature has been enabled for your application. You can manage it in your`}
@@ -272,7 +274,7 @@ const EnableOrganizationsPromptInternal = ({
                       onSuccess?.();
                     }}
                   >
-                    I&apos;ll do it later
+                    {clerk.user ? 'Continue' : 'I\u2019ll do it later'}
                   </PromptButton>
                   <Link
                     href={claimUrlWithReturnUrl}
