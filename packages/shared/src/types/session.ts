@@ -217,23 +217,53 @@ export interface SessionResource extends ClerkResource {
    * The current state of the session.
    */
   status: SessionStatus;
+  /**
+   * The date and time when the session will expire.
+   */
   expireAt: Date;
+  /**
+   * The date and time when the session was abandoned by the user.
+   */
   abandonAt: Date;
   /**
    * An array where each item represents the number of minutes since the last verification of a first or second factor: `[firstFactorAge, secondFactorAge]`.
    */
   factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
+  /**
+   * The token that was last used to authenticate the session.
+   */
   lastActiveToken: TokenResource | null;
+  /**
+   * The ID of the last [Active Organization](!active-organization).
+   */
   lastActiveOrganizationId: string | null;
+  /**
+   * The date and time when the session was last active on the [`Client`](https://clerk.com/docs/reference/objects/client).
+   */
   lastActiveAt: Date;
+  /**
+   * The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/guides/users/impersonation).
+   */
   actor: ActClaim | null;
+  /**
+   * When the session's actor claim has `type: 'agent'`, this property exposes information about the agent and [Agent Task](https://clerk.com/docs/reference/objects/agent-task) that was used to create the session.
+   */
   agent: AgentActClaim | null;
+  /**
+   * The user's pending [session tasks](https://clerk.com/docs/guides/configure/session-tasks).
+   */
   tasks: Array<SessionTask> | null;
+  /**
+   * The user's current pending [session task](https://clerk.com/docs/guides/configure/session-tasks).
+   */
   currentTask?: SessionTask;
   /**
-   * The user associated with the session.
+   * The [`User`](https://clerk.com/docs/reference/objects/user) associated with the session.
    */
   user: UserResource | null;
+  /**
+   * Publicly available information about the current [`User`](https://clerk.com/docs/reference/objects/user).
+   */
   publicUserData: PublicUserData;
   /**
    * Marks the session as ended. The session will no longer be active for this `Client` and its status will become **ended**.
@@ -244,7 +274,13 @@ export interface SessionResource extends ClerkResource {
   getToken: GetToken;
   checkAuthorization: CheckAuthorization;
   clearCache: () => void;
+  /**
+   * The date and time when the session was first created.
+   */
   createdAt: Date;
+  /**
+   * The date and time when the session was last updated.
+   */
   updatedAt: Date;
 
   startVerification: (params: SessionVerifyCreateParams) => Promise<SessionVerificationResource>;
@@ -312,14 +348,41 @@ export interface SessionActivity {
   isMobile?: boolean;
 }
 
+/**
+ * The current state of the session.
+ */
 export type SessionStatus =
+  /**
+   * The session was abandoned client-side.
+   */
   | 'abandoned'
+  /**
+   * The session is valid and all activity is allowed.
+   */
   | 'active'
+  /**
+   * The user signed out of the session, but the [`Session`](https://clerk.com/docs/reference/objects/session) remains in the [`Client`](https://clerk.com/docs/reference/objects/client).
+   */
   | 'ended'
+  /**
+   * The period of allowed activity for this session has passed.
+   */
   | 'expired'
+  /**
+   * The user signed out of the session and the [`Session`](https://clerk.com/docs/reference/objects/session) was removed from the [`Client`](https://clerk.com/docs/reference/objects/client).
+   */
   | 'removed'
+  /**
+   * The session has been replaced by another one, but the previous [`Session`](https://clerk.com/docs/reference/objects/session) remains in the [`Client`](https://clerk.com/docs/reference/objects/client).
+   */
   | 'replaced'
+  /**
+   * The application ended the session and the [`Session`](https://clerk.com/docs/reference/objects/session) was removed from the [`Client`](https://clerk.com/docs/reference/objects/client).
+   */
   | 'revoked'
+  /**
+   * The user has signed in but hasn't completed [session tasks](https://clerk.com/docs/guides/configure/session-tasks).
+   */
   | 'pending';
 
 export type SessionTouchIntent = 'focus' | 'select_session' | 'select_org';
@@ -328,14 +391,41 @@ export type SessionTouchParams = {
   intent?: SessionTouchIntent;
 };
 
+/**
+ * Information about the user that's publicly available.
+ */
 export interface PublicUserData {
+  /**
+   * The user's first name.
+   */
   firstName: string | null;
+  /**
+   * The user's last name.
+   */
   lastName: string | null;
+  /**
+   * Holds the default avatar or user's uploaded profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization).
+   */
   imageUrl: string;
+  /**
+   * Indicates whether the user has a profile picture.
+   */
   hasImage: boolean;
+  /**
+   * The user's identifier, such as their email address or phone number. Can be used for user identification.
+   */
   identifier: string;
+  /**
+   * The user's unique identifier.
+   */
   userId?: string;
+  /**
+   * The user's username.
+   */
   username?: string;
+  /**
+   * Indicates whether the user is banned.
+   */
   banned?: boolean;
 }
 

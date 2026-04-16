@@ -56,6 +56,8 @@ describe('Typedoc output', () => {
         "shared/clerk/methods",
         "shared/client-resource",
         "shared/client-resource/methods",
+        "shared/session-resource",
+        "shared/session-resource/methods",
       ]
     `);
   });

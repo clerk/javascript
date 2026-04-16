@@ -104,6 +104,7 @@ const LINK_REPLACEMENTS = [
   ['redirect-options', '/docs/reference/types/redirect-options'],
   ['handle-o-auth-callback-params', '/docs/reference/types/handle-o-auth-callback-params'],
   ['session-task', '/docs/reference/types/session-task'],
+  ['public-user-data', '/docs/reference/types/public-user-data'],
 ];
 
 /**

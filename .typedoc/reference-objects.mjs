@@ -7,6 +7,9 @@
 /**
  * Reference object page: MDX path → TypeDoc symbol + optional source hint.
  *
+ * Keys **must** match `custom-router.mjs` (`ClerkRouter`): for each symbol, `shared/<kebab(symbol)>/<kebab(symbol)>.mdx`
+ * (e.g. `SessionResource` → `shared/session-resource/session-resource.mdx`). If the path drifts, TypeDoc writes one folder while `extract-methods.mjs` strips/writes under another.
+ *
  * `declarationHint` is a substring of `packages/shared/src/**` file paths (used by `findInterfaceOrClass()` in `extract-methods.mjs` when multiple reflections share the same interface/class name).
  *
  * `extract-methods.mjs` reads each file, writes `properties.mdx` with the same Properties table as TypeDoc, strips Properties from `<object>.mdx`, and writes methods under `methods/`.
@@ -20,7 +23,7 @@ export const REFERENCE_OBJECT_CONFIG = {
     symbol: 'ClientResource',
     declarationHint: 'types/client',
   },
-  'shared/session/session.mdx': {
+  'shared/session-resource/session-resource.mdx': {
     symbol: 'SessionResource',
     declarationHint: 'types/session',
   },

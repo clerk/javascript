@@ -1,7 +1,12 @@
 // @ts-check
-import { i18n, IntersectionType, ReferenceType, ReflectionKind, ReflectionType, UnionType } from 'typedoc';
+import { ArrayType, i18n, IntersectionType, ReferenceType, ReflectionKind, ReflectionType, UnionType } from 'typedoc';
 import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
-import { backTicks, htmlTable, table } from '../node_modules/typedoc-plugin-markdown/dist/libs/markdown/index.js';
+import {
+  backTicks,
+  heading,
+  htmlTable,
+  table,
+} from '../node_modules/typedoc-plugin-markdown/dist/libs/markdown/index.js';
 import { removeLineBreaks } from '../node_modules/typedoc-plugin-markdown/dist/libs/utils/index.js';
 import { TypeDeclarationVisibility } from '../node_modules/typedoc-plugin-markdown/dist/options/maps.js';
 
@@ -390,6 +395,50 @@ function clerkShouldDisplayHtmlTable(context, kind) {
 }
 
 /**
+ * Same rules as typedoc-plugin-markdown `shouldDisplayHTMLTable` in `member.propertiesTable.js` (that helper is not exported). Drives **property-style** tables: `propertiesFormat`, `interfacePropertiesFormat`, etc.
+ *
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} context
+ * @param {import('typedoc').ReflectionKind | undefined} kind
+ */
+function propertiesTableUsesHtmlTable(context, kind) {
+  if (context.options.getValue('propertiesFormat') === 'htmlTable') {
+    return true;
+  }
+  if (kind === ReflectionKind.Interface && context.options.getValue('interfacePropertiesFormat') === 'htmlTable') {
+    return true;
+  }
+  if (kind === ReflectionKind.Class && context.options.getValue('classPropertiesFormat') === 'htmlTable') {
+    return true;
+  }
+  if (kind === ReflectionKind.TypeAlias && context.options.getValue('typeAliasPropertiesFormat') === 'htmlTable') {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Renders a pipe or HTML table using {@link propertiesTableUsesHtmlTable} and `tableColumnSettings.leftAlignHeaders`, matching `member.propertiesTable` output conventions.
+ *
+ * @this {import('typedoc-plugin-markdown').MarkdownThemeContext}
+ * @param {{
+ *   headers: string[];
+ *   rows: string[][];
+ *   kind?: import('typedoc').ReflectionKind;
+ * }} args
+ */
+function renderPropertiesFormatTable(args) {
+  const tableColumnsOptions = /** @type {{ leftAlignHeaders?: boolean }} */ (
+    this.options.getValue('tableColumnSettings') ?? {}
+  );
+  const leftAlignHeadings = tableColumnsOptions.leftAlignHeaders;
+  const kind = args.kind ?? ReflectionKind.TypeAlias;
+  const useHtml = propertiesTableUsesHtmlTable(this, kind);
+  return useHtml
+    ? htmlTable(args.headers, args.rows, leftAlignHeadings)
+    : table(args.headers, args.rows, leftAlignHeadings);
+}
+
+/**
  * Same logic as typedoc-plugin-markdown `member.typeDeclarationTable`, but **always** runs `getFlattenedDeclarations`
  * and then {@link appendUnionObjectChildPropertyRows} (union-object arm rows like `telemetry.*`). The default plugin
  * skips flattening in `compact` mode, which hides nested keys like `telemetry.disabled`.
@@ -555,6 +604,150 @@ function renderMergedIntersectionDeclaration(ctx, model, opts, mergedChildren, s
   }
   md.push(superPartials.inheritance(model, { headingLevel: opts.headingLevel ?? headingLevel }));
   return md.filter(Boolean).join('\n\n');
+}
+
+/**
+ * Union of literals with JSDoc on each `|` arm: **## Properties** + a table via {@link renderPropertiesFormatTable} (same formatting rules as `member.propertiesTable`).
+ *
+ * @this {import('typedoc-plugin-markdown').MarkdownThemeContext}
+ * @param {import('typedoc').DeclarationReflection} model
+ * @param {{ headingLevel?: number }} options
+ */
+function clerkLiteralUnionAsPropertiesTable(model, options) {
+  const unionType = /** @type {import('typedoc').UnionType} */ (model.type);
+  const headingLevel = options.headingLevel ?? 2;
+  const ti = /** @type {{ theme_type: () => string; theme_description: () => string }} */ (
+    /** @type {unknown} */ (i18n)
+  );
+
+  const headers = [ReflectionKind.singularString(ReflectionKind.Property), ti.theme_type(), ti.theme_description()];
+
+  /** @type {string[][]} */
+  const rows = [];
+  unionType.types.forEach((type, i) => {
+    const typeStr = removeLineBreaks(this.partials.someType(type));
+    const anchorRaw = typeStr.replace(/^`|`$/g, '').replace(/"/g, '').trim();
+    const anchorId = anchorRaw.toLowerCase().replace(/[^a-z0-9]/g, '') || `member-${i}`;
+
+    const propertyCell = [`<a id="${anchorId}"></a>`, backTicks(anchorRaw || `member-${i}`)].join(' ');
+
+    const summary = unionType.elementSummaries?.[i];
+    const description = summary ? this.helpers.getCommentParts(summary) : '-';
+
+    rows.push([propertyCell, typeStr, description]);
+  });
+
+  const tableBody = renderPropertiesFormatTable.call(this, {
+    headers,
+    rows,
+    kind: ReflectionKind.TypeAlias,
+  });
+
+  return [heading(headingLevel, ReflectionKind.pluralString(ReflectionKind.Property)), tableBody].join('\n\n');
+}
+
+/**
+ * Same as typedoc-plugin-markdown `member.declaration`, but type aliases whose value is a **union of only literals** (no `ReflectionType` members) still get a "Type declaration" section when TypeDoc populated {@link UnionType.elementSummaries} from JSDoc before each `|` arm.
+ *
+ * Stock `hasTypeDeclaration` required `types.some(t => t instanceof ReflectionType)`, so `SessionStatus` never reached {@link MarkdownThemeContext.partials.typeDeclarationUnionContainer} and only the summary line was emitted.
+ *
+ * @this {import('typedoc-plugin-markdown').MarkdownThemeContext}
+ * @param {import('typedoc').DeclarationReflection} model
+ * @param {{ headingLevel?: number; nested?: boolean }} [options]
+ */
+function clerkDeclaration(model, options = { headingLevel: 2, nested: false }) {
+  const md = [];
+  const opts = {
+    nested: false,
+    ...options,
+  };
+  const headingLevel = opts.headingLevel ?? 2;
+  const optionsWithHeading = { ...options, headingLevel };
+
+  md.push(this.partials.declarationTitle(model));
+  if (!opts.nested && model.sources && !this.options.getValue('disableSources')) {
+    md.push(this.partials.sources(model));
+  }
+  if (model?.documents) {
+    md.push(this.partials.documents(model, { headingLevel }));
+  }
+  /** @type {import('typedoc').DeclarationReflection | undefined} */
+  let typeDeclaration =
+    model.type && 'declaration' in model.type
+      ? /** @type {{ declaration?: import('typedoc').DeclarationReflection }} */ (model.type).declaration
+      : undefined;
+  if (model.type instanceof ArrayType && model.type?.elementType instanceof ReflectionType) {
+    typeDeclaration = model.type?.elementType?.declaration;
+  }
+  const hasTypeDeclaration =
+    Boolean(typeDeclaration) ||
+    (model.type instanceof UnionType &&
+      (model.type.types.some(type => type instanceof ReflectionType) || Boolean(model.type.elementSummaries?.length)));
+  if (model.comment) {
+    md.push(
+      this.partials.comment(model.comment, {
+        headingLevel,
+        showSummary: true,
+        showTags: false,
+      }),
+    );
+  }
+  if (model.type instanceof IntersectionType) {
+    model.type?.types?.forEach(intersectionType => {
+      if (
+        intersectionType instanceof ReflectionType &&
+        !intersectionType.declaration.signatures &&
+        intersectionType.declaration.children
+      ) {
+        md.push(heading(headingLevel, i18n.theme_type_declaration()));
+        md.push(
+          this.partials.typeDeclaration(intersectionType.declaration, {
+            headingLevel,
+          }),
+        );
+      }
+    });
+  }
+  if (model.typeParameters) {
+    md.push(heading(headingLevel, ReflectionKind.pluralString(ReflectionKind.TypeParameter)));
+    if (this.helpers.useTableFormat('parameters')) {
+      md.push(this.partials.typeParametersTable(model.typeParameters));
+    } else {
+      md.push(
+        this.partials.typeParametersList(model.typeParameters, {
+          headingLevel,
+        }),
+      );
+    }
+  }
+  if (hasTypeDeclaration) {
+    if (model.type instanceof UnionType) {
+      if (this.helpers.hasUsefulTypeDetails(model.type)) {
+        md.push(heading(headingLevel, i18n.theme_type_declaration()));
+        md.push(this.partials.typeDeclarationUnionContainer(model, optionsWithHeading));
+      }
+    } else if (typeDeclaration) {
+      const useHeading =
+        typeDeclaration.children?.length &&
+        (model.kind !== ReflectionKind.Property || this.helpers.useTableFormat('properties'));
+      if (useHeading) {
+        md.push(heading(headingLevel, i18n.theme_type_declaration()));
+      }
+      md.push(this.partials.typeDeclarationContainer(model, typeDeclaration, optionsWithHeading));
+    }
+  }
+  if (model.comment) {
+    md.push(
+      this.partials.comment(model.comment, {
+        headingLevel,
+        showSummary: false,
+        showTags: true,
+        showReturns: true,
+      }),
+    );
+  }
+  md.push(this.partials.inheritance(model, { headingLevel }));
+  return md.join('\n\n');
 }
 
 /**
@@ -948,7 +1141,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         const originalPartials = this.partials;
 
         this.partials = localPartials;
-        const output = superPartials.declaration(customizedModel, options);
+        const output = clerkDeclaration.call(this, customizedModel, options);
         this.partials = originalPartials;
 
         // Remove the "Type declaration" heading from the output
@@ -1047,6 +1240,20 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        * @param {{ headingLevel: number }} options
        */
       typeDeclarationUnionContainer: (model, options) => {
+        const optionsWithHeading = { ...options, headingLevel: options?.headingLevel ?? 2 };
+
+        if (model.type instanceof UnionType) {
+          const ut = model.type;
+          const unionReturnHeadings = model.comment?.getTag('@unionReturnHeadings');
+          if (
+            !ut.types.some(arm => arm instanceof ReflectionType) &&
+            ut.elementSummaries?.length &&
+            !unionReturnHeadings
+          ) {
+            return clerkLiteralUnionAsPropertiesTable.call(this, model, optionsWithHeading);
+          }
+        }
+
         /**
          * @type {string[]}
          */
