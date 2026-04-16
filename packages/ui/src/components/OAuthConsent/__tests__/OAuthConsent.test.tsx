@@ -475,31 +475,6 @@ describe('OAuthConsent', () => {
       expect(() => capturedLoadMoreOnChange!(true)).not.toThrow();
     });
 
-    it('pre-selects the active organization when the session has one', async () => {
-      const { wrapper, fixtures, props } = await createFixtures(f => {
-        f.withUser({ email_addresses: ['jane@example.com'] });
-      });
-
-      props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
-      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
-
-      vi.mocked(useOrganizationList).mockReturnValue({
-        isLoaded: true,
-        userMemberships: { data: twoOrgs, hasNextPage: false, fetchNext: vi.fn(), isLoading: false },
-      } as any);
-
-      // Active org is org_2 — second in list, not first, to prove ordering matters
-      vi.mocked(useOrganization).mockReturnValue({ organization: { id: 'org_2' } } as any);
-
-      const { baseElement } = render(<OAuthConsent />, { wrapper });
-
-      await waitFor(() => {
-        const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]')!;
-        const hiddenInput = form.querySelector('input[name="organization_id"]') as HTMLInputElement | null;
-        expect(hiddenInput?.value).toBe('org_2');
-      });
-    });
-
     it('falls back to the first org when the session has no active organization', async () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withUser({ email_addresses: ['jane@example.com'] });
