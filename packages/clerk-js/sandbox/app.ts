@@ -1,5 +1,4 @@
-import { type MockScenario, PageMocking } from '@clerk/msw';
-
+import { PageMocking, type MockScenario } from '@clerk/msw';
 import * as l from '../../localizations';
 import { dark, neobrutalism, shadcn, shadesOfPurple } from '../../ui/src/themes';
 import type { Clerk as ClerkType } from '../';
@@ -351,9 +350,7 @@ function themeSelector() {
 type Preset = { elements: Record<string, any>; options?: Record<string, any>; variables?: Record<string, any> };
 
 function presetToAppearance(preset: Preset | undefined) {
-  if (!preset) {
-    return {};
-  }
+  if (!preset) return {};
   return {
     elements: preset.elements,
     ...(preset.options ? { options: preset.options } : {}),

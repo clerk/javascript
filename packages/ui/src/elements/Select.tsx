@@ -296,11 +296,11 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       if (isOpen) {
-        if (focusedIndex === options.length - 1) {
-          onReachEnd?.();
+        if (onReachEnd && focusedIndex === options.length - 1) {
+          onReachEnd();
           return;
         }
-        return setFocusedIndex((i = 0) => i + 1);
+        return setFocusedIndex((i = 0) => (i === options.length - 1 ? 0 : i + 1));
       }
       return onTriggerClick();
     }

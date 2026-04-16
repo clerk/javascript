@@ -1,4 +1,4 @@
-import { useOrganization, useOrganizationList } from '@clerk/shared/react';
+import { useOrganizationList } from '@clerk/shared/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -20,7 +20,6 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       isLoaded: false,
       userMemberships: { data: [], hasNextPage: false, fetchNext: vi.fn(), isLoading: false },
     }),
-    useOrganization: vi.fn().mockReturnValue({ organization: null }),
   };
 });
 
@@ -450,7 +449,8 @@ describe('OAuthConsent', () => {
       { organization: { id: 'org_2', name: 'Beta Inc', imageUrl: 'https://img.clerk.com/static/beta.png' } },
     ];
 
-    it('wires the load-more sentinel to the onLoadMore callback', async () => {
+    it('calls fetchNext when the load-more sentinel enters view and more pages are available', async () => {
+      const fetchNext = vi.fn();
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withUser({ email_addresses: ['jane@example.com'] });
       });
@@ -460,22 +460,19 @@ describe('OAuthConsent', () => {
 
       vi.mocked(useOrganizationList).mockReturnValue({
         isLoaded: true,
-        userMemberships: { data: twoOrgs, hasNextPage: false, fetchNext: vi.fn(), isLoading: false },
+        userMemberships: { data: twoOrgs, hasNextPage: true, fetchNext, isLoading: false },
       } as any);
 
       render(<OAuthConsent />, { wrapper });
 
-      // The load-more sentinel is always wired up when enableOrgSelection is true
-      // (syntheticHasMore starts at true since syntheticPage=1 < 4)
-      await waitFor(() => {
-        expect(capturedLoadMoreOnChange).toBeDefined();
-      });
+      await waitFor(() => expect(capturedLoadMoreOnChange).toBeDefined());
 
-      // Calling it should not throw — it calls syntheticFetchNext which updates state
-      expect(() => capturedLoadMoreOnChange!(true)).not.toThrow();
+      capturedLoadMoreOnChange!(true);
+      expect(fetchNext).toHaveBeenCalledTimes(1);
     });
 
-    it('falls back to the first org when the session has no active organization', async () => {
+    it('does not call fetchNext when hasNextPage is false', async () => {
+      const fetchNext = vi.fn();
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withUser({ email_addresses: ['jane@example.com'] });
       });
@@ -485,18 +482,14 @@ describe('OAuthConsent', () => {
 
       vi.mocked(useOrganizationList).mockReturnValue({
         isLoaded: true,
-        userMemberships: { data: twoOrgs, hasNextPage: false, fetchNext: vi.fn(), isLoading: false },
+        userMemberships: { data: twoOrgs, hasNextPage: false, fetchNext, isLoading: false },
       } as any);
 
-      vi.mocked(useOrganization).mockReturnValue({ organization: null } as any);
+      render(<OAuthConsent />, { wrapper });
 
-      const { baseElement } = render(<OAuthConsent />, { wrapper });
-
-      await waitFor(() => {
-        const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]')!;
-        const hiddenInput = form.querySelector('input[name="organization_id"]') as HTMLInputElement | null;
-        expect(hiddenInput?.value).toBe('org_1');
-      });
+      await waitFor(() => expect(capturedLoadMoreOnChange).toBeDefined());
+      capturedLoadMoreOnChange!(true);
+      expect(fetchNext).not.toHaveBeenCalled();
     });
   });
 });
