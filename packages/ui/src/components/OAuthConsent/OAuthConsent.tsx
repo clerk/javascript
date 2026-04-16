@@ -24,7 +24,7 @@ import {
 import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupSeparator } from './LogoGroup';
 import type { OrgOption } from './OrgSelect';
 import { OrgSelect } from './OrgSelect';
-import { getForwardedParams, getOAuthConsentFromSearch, getRedirectUriFromSearch, getRootDomain } from './utils';
+import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
@@ -78,7 +78,8 @@ function _OAuthConsent() {
   const redirectUrl = ctx.redirectUrl ?? getRedirectUriFromSearch();
 
   const { t } = useLocalizations();
-  const domainAction = getRootDomain(redirectUrl);
+  const display = getRedirectDisplay(redirectUrl);
+  const domainAction = display.kind === 'invalid' ? '' : display.value;
   const viewFullUrlText = t(localizationKeys('oauthConsent.viewFullUrl'));
 
   // Error states only apply to the public flow.
