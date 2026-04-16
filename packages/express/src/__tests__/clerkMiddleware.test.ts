@@ -1,5 +1,5 @@
 import type { Request, RequestHandler, Response } from 'express';
-import { vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockClerkFrontendApiProxy } = vi.hoisted(() => ({
   mockClerkFrontendApiProxy: vi.fn(),
@@ -12,6 +12,7 @@ vi.mock('@clerk/backend/proxy', async () => {
   };
 });
 
+import { authenticateRequest } from '../authenticateRequest';
 import { clerkMiddleware } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
 import { assertNoDebugHeaders, assertSignedOutDebugHeaders, runMiddleware, runMiddlewareOnPath } from './helpers';
@@ -92,6 +93,36 @@ describe('clerkMiddleware', () => {
     );
 
     assertSignedOutDebugHeaders(response);
+  });
+
+  it('forwards clockSkewInMs to authenticateRequest', async () => {
+    const authenticateRequestMock = vi.fn().mockResolvedValue({});
+    const clerkClient = {
+      authenticateRequest: authenticateRequestMock,
+    } as any;
+
+    await authenticateRequest({
+      clerkClient,
+      request: {
+        method: 'GET',
+        url: '/',
+        headers: {
+          host: 'example.com',
+        },
+      } as Request,
+      options: {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_....',
+        clockSkewInMs: 12_345,
+      },
+    });
+
+    expect(authenticateRequestMock).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        clockSkewInMs: 12_345,
+      }),
+    );
   });
 
   it('throws error if clerkMiddleware is not executed before getAuth', async () => {

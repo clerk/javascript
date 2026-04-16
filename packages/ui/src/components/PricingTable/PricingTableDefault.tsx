@@ -1,9 +1,15 @@
 import { __internal_useOrganizationBase, useClerk, useSession } from '@clerk/shared/react';
-import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/shared/types';
+import type {
+  BillingPlanResource,
+  BillingPlanUnitPrice,
+  BillingSubscriptionPlanPeriod,
+  PricingTableProps,
+} from '@clerk/shared/types';
 import * as React from 'react';
 
 import { Switch } from '@/ui/elements/Switch';
 import { Tooltip } from '@/ui/elements/Tooltip';
+import { getPlanSeatLimit, getSeatUnitPrice, organizationExceedsPlanSeatLimit } from '@/ui/utils/billingPlanSeats';
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import { useProtect } from '../../common';
@@ -20,8 +26,9 @@ import {
   SimpleButton,
   Span,
   Text,
+  useLocalizations,
 } from '../../customizables';
-import { Check, Plus } from '../../icons';
+import { Check, Plus, User, Users } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { SubscriptionBadge } from '../Subscriptions/badge';
 import { getPricingFooterState } from './utils/pricing-footer-state';
@@ -131,7 +138,24 @@ function Card(props: CardProps) {
     [plan, planPeriod, activeOrUpcomingSubscriptionBasedOnPlanPeriod],
   );
 
+  const footerButtonTooltipText = React.useMemo(() => {
+    if (isSignedIn && !canManageBilling) {
+      return localizationKeys('organizationProfile.plansPage.alerts.noPermissionsToManageBilling');
+    }
+
+    if (organization && subscriberType === 'organization' && organizationExceedsPlanSeatLimit(plan, organization)) {
+      const seatLimit = getPlanSeatLimit(plan);
+      return localizationKeys('organizationProfile.plansPage.alerts.planMembershipLimitExceeded', {
+        count: organization.membersCount + organization.pendingInvitationsCount,
+        limit: seatLimit as number,
+      });
+    }
+
+    return null;
+  }, [isSignedIn, canManageBilling, organization, subscriberType, plan]);
+
   const hasFeatures = plan.features.length > 0;
+  const hasSeatFeatures = !!getSeatUnitPrice(plan);
 
   const { shouldShowFooter, shouldShowFooterNotice } = getPricingFooterState({
     subscription,
@@ -190,8 +214,8 @@ function Card(props: CardProps) {
               flexDirection: 'column',
               flex: '1',
               padding: isCompact ? t.space.$3 : t.space.$4,
-              backgroundColor: hasFeatures ? t.colors.$colorBackground : 'transparent',
-              borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
+              backgroundColor: hasFeatures || hasSeatFeatures ? t.colors.$colorBackground : 'transparent',
+              borderTopWidth: hasFeatures || hasSeatFeatures ? t.borderWidths.$normal : 0,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$borderAlpha150,
             })}
@@ -241,17 +265,13 @@ function Card(props: CardProps) {
                     elementDescriptor={descriptors.pricingTableCardFooterButton}
                     block
                     textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                    {...buttonPropsForPlan({ plan, isCompact, selectedPlanPeriod: planPeriod })}
+                    {...buttonPropsForPlan({ plan, organization, isCompact, selectedPlanPeriod: planPeriod })}
                     onClick={event => {
                       onSelect(plan, event);
                     }}
                   />
                 </Tooltip.Trigger>
-                {isSignedIn && !canManageBilling && (
-                  <Tooltip.Content
-                    text={localizationKeys('organizationProfile.plansPage.alerts.noPermissionsToManageBilling')}
-                  />
-                )}
+                {footerButtonTooltipText ? <Tooltip.Content text={footerButtonTooltipText} /> : null}
               </Tooltip.Root>
             )}
           </Box>
@@ -295,12 +315,34 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
     return planPeriod === 'annual' ? plan.annualMonthlyFee : plan.fee;
   }, [plan, planPeriod]);
 
+  const singleUnitPriceTierFee = React.useMemo(() => {
+    if (plan.hasBaseFee || !plan.unitPrices || plan.unitPrices.length !== 1) {
+      return null;
+    }
+
+    const [unitPrice] = plan.unitPrices;
+    if (unitPrice.tiers.length !== 1) {
+      return null;
+    }
+
+    return unitPrice.tiers[0].feePerBlock;
+  }, [plan.hasBaseFee, plan.unitPrices]);
+
+  const feePeriodText = React.useMemo(() => {
+    if (!plan.hasBaseFee && plan.unitPrices && plan.unitPrices.length > 0) {
+      return localizationKeys('billing.monthPerUnit', { unitName: plan.unitPrices[0].name });
+    }
+
+    return plan.fee ? localizationKeys('billing.month') : localizationKeys('billing.year');
+  }, [plan.hasBaseFee, plan.fee, plan.unitPrices]);
+
+  const displayedFee = singleUnitPriceTierFee ?? fee;
   const feeFormatted = React.useMemo(() => {
-    if (!fee) {
+    if (!displayedFee) {
       return '';
     }
-    return `${fee.currencySymbol}${normalizeFormatted(fee.amountFormatted)}`;
-  }, [fee]);
+    return `${displayedFee.currencySymbol}${normalizeFormatted(displayedFee.amountFormatted)}`;
+  }, [displayedFee]);
 
   return (
     <Box
@@ -377,7 +419,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
                 marginInlineEnd: t.space.$0x25,
               },
             })}
-            localizationKey={plan.fee ? localizationKeys('billing.month') : localizationKeys('billing.year')}
+            localizationKey={feePeriodText}
           />
         ) : null}
       </Flex>
@@ -400,7 +442,7 @@ const PeriodToggle = ({
   planPeriod: BillingSubscriptionPlanPeriod;
   setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
 }) => {
-  if (plan.fee && plan.annualMonthlyFee) {
+  if (!plan.isDefault && plan.fee && plan.annualMonthlyFee) {
     return (
       <Box
         elementDescriptor={descriptors.pricingTableCardPeriodToggle}
@@ -493,6 +535,9 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
           padding: 0,
         })}
       >
+        {plan.unitPrices && plan.unitPrices.length > 0 && (plan.hasBaseFee || plan.unitPrices[0].tiers.length > 0) ? (
+          <CardFeaturesListSeatCost plan={plan} />
+        ) : null}
         {plan.features.slice(0, hasMoreFeatures ? (isCompact ? 3 : 8) : totalFeatures).map(feature => (
           <Box
             elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
@@ -552,3 +597,174 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
     </Box>
   );
 });
+
+const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
+  const { t } = useLocalizations();
+  const unitPrices = plan.unitPrices;
+  const period = t(localizationKeys('billing.month'));
+  const periodAbbreviation = t(localizationKeys('billing.monthAbbreviation'));
+
+  const seatRows = React.useMemo(() => {
+    if (!unitPrices) {
+      return null;
+    }
+
+    const seatUnitPrice = getSeatUnitPrice(plan);
+
+    if (!seatUnitPrice) {
+      return null;
+    }
+
+    const formatTierFee = (tier: BillingPlanUnitPrice['tiers'][number]) =>
+      `${tier.feePerBlock.currencySymbol}${normalizeFormatted(tier.feePerBlock.amountFormatted)}`;
+    const getCapacityText = (endsAfterBlock: number | null) =>
+      endsAfterBlock === null
+        ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
+        : localizationKeys('billing.pricingTable.seatCost.upToSeats', { endsAfterBlock });
+
+    if (seatUnitPrice.tiers.length === 1) {
+      const tier = seatUnitPrice.tiers[0];
+      const rows: Array<{
+        elementId: string;
+        icon: typeof User | typeof Users;
+        text: ReturnType<typeof localizationKeys>;
+        additionalText?: ReturnType<typeof localizationKeys>;
+        additionalTooltipText?: string;
+      }> = [];
+
+      if (tier.feePerBlock.amount !== 0 && plan.hasBaseFee) {
+        rows.push({
+          elementId: 'seats',
+          icon: User,
+          text: localizationKeys('billing.pricingTable.seatCost.perSeat', {
+            feePerBlockAmount: formatTierFee(tier),
+            periodAbbreviation,
+          }),
+        });
+      }
+
+      rows.push({
+        elementId: rows.length ? 'seats-limit' : 'seats',
+        icon: Users,
+        text: getCapacityText(tier.endsAfterBlock),
+      });
+
+      return rows;
+    }
+
+    if (seatUnitPrice.tiers.length === 2) {
+      const [includedTier, additionalTier] = seatUnitPrice.tiers;
+
+      if (
+        includedTier &&
+        additionalTier &&
+        includedTier.feePerBlock.amount === 0 &&
+        includedTier.endsAfterBlock !== null &&
+        additionalTier.feePerBlock.amount !== 0
+      ) {
+        const additionalTierFeePerBlockAmount = formatTierFee(additionalTier);
+        const tooltipPrefixText = t(
+          localizationKeys(
+            plan.isDefault && (plan.fee?.amount === 0 || plan.annualMonthlyFee?.amount === 0)
+              ? 'billing.pricingTable.seatCost.tooltip.freeForUpToSeats'
+              : 'billing.pricingTable.seatCost.tooltip.firstSeatsIncludedInPlan',
+            {
+              endsAfterBlock: includedTier.endsAfterBlock,
+            },
+          ),
+        );
+        const tooltipAdditionalText = t(
+          localizationKeys('billing.pricingTable.seatCost.tooltip.additionalSeatsEach', {
+            feePerBlockAmount: additionalTierFeePerBlockAmount,
+            period,
+          }),
+        );
+
+        return [
+          {
+            elementId: 'seats',
+            icon: User,
+            text: localizationKeys('billing.pricingTable.seatCost.includedSeats', {
+              includedSeats: includedTier.endsAfterBlock,
+            }),
+            additionalText: localizationKeys('billing.pricingTable.seatCost.additionalSeats', {
+              additionalTierFeePerBlockAmount,
+              periodAbbreviation,
+            }),
+            additionalTooltipText: `${tooltipPrefixText} ${tooltipAdditionalText}`,
+          },
+          {
+            elementId: 'seats-limit',
+            icon: Users,
+            text: getCapacityText(additionalTier.endsAfterBlock),
+          },
+        ];
+      }
+    }
+
+    return null;
+  }, [period, periodAbbreviation, plan.fee, plan.annualMonthlyFee, t, unitPrices]);
+
+  if (!seatRows?.length) {
+    return null;
+  }
+
+  return (
+    <>
+      {seatRows.map(row => (
+        <Box
+          key={row.elementId}
+          elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
+          elementId={descriptors.pricingTableCardFeaturesListItem.setId(row.elementId)}
+          as='li'
+          sx={t => ({
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: t.space.$2,
+            margin: 0,
+            padding: 0,
+          })}
+        >
+          <Icon
+            icon={row.icon}
+            colorScheme='neutral'
+            size='sm'
+            aria-hidden
+            sx={t => ({
+              transform: `translateY(${t.space.$0x25})`,
+            })}
+          />
+          <Span elementDescriptor={descriptors.pricingTableCardFeaturesListItemContent}>
+            <Text
+              elementDescriptor={descriptors.pricingTableCardFeaturesListItemTitle}
+              colorScheme='body'
+              sx={t => ({
+                fontWeight: t.fontWeights.$normal,
+              })}
+            >
+              <Span localizationKey={row.text} />
+              {row.additionalText ? (
+                <>
+                  {' '}
+                  {row.additionalTooltipText ? (
+                    <Tooltip.Root>
+                      <Tooltip.Trigger>
+                        <Span
+                          localizationKey={row.additionalText}
+                          sx={{ textDecoration: 'underline dotted' }}
+                        />
+                      </Tooltip.Trigger>
+                      <Tooltip.Content text={row.additionalTooltipText} />
+                    </Tooltip.Root>
+                  ) : (
+                    <Span localizationKey={row.additionalText} />
+                  )}
+                </>
+              ) : null}
+            </Text>
+          </Span>
+        </Box>
+      ))}
+    </>
+  );
+};

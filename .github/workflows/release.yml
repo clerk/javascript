@@ -1,5 +1,12 @@
 name: Release
-run-name: ${{ github.event_name == 'issue_comment' && format('Snapshot release by {0}', github.actor) || format('Release pipelines from {0}', github.ref_name) }}
+run-name: >-
+  ${{
+    github.event_name == 'issue_comment'
+      && format('[Snapshot] Release by {0}', github.actor)
+    || contains(github.event.head_commit.message, 'Version packages')
+      && format('[Production] Release from {0}', github.ref_name)
+    || format('[Canary] Release from {0}', github.ref_name)
+  }}
 
 on:
   push:
@@ -53,7 +60,7 @@ jobs:
           turbo-token: ""
 
       - name: Upgrade npm for trusted publishing
-        run: npm install -g npm@latest
+        run: npx npm@11 install -g npm@11
 
       - name: Build release
         run: pnpm turbo build $TURBO_ARGS --force
@@ -74,6 +81,7 @@ jobs:
 
       - name: Trigger workflows on related repos
         if: steps.changesets.outputs.published == 'true'
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           result-encoding: string
@@ -87,31 +95,105 @@ jobs:
               const clerkUiVersion = require('./packages/ui/package.json').version;
               const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-              const dispatches = [
-                github.rest.actions.createWorkflowDispatch({
-                  owner: 'clerk',
-                  repo: 'sdk-infra-workers',
-                  workflow_id: 'update-pkg-versions.yml',
-                  ref: 'main',
-                  inputs: { clerkjsVersion, clerkUiVersion }
-                }),
-                github.rest.actions.createWorkflowDispatch({
-                  owner: 'clerk',
-                  repo: 'dashboard',
-                  workflow_id: 'prepare-nextjs-sdk-update.yml',
-                  ref: 'main',
-                  inputs: { version: nextjsVersion }
-                }),
-                github.rest.actions.createWorkflowDispatch({
-                  owner: 'clerk',
-                  repo: 'clerk-docs',
-                  workflow_id: 'typedoc.yml',
-                  ref: 'main',
-                }),
+              // NOTE: Keep in sync with the `targets` array in the "Recover downstream notifications" step below.
+              const targets = [
+                { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
+                { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
+                { repo: 'clerk-docs', workflow_id: 'typedoc.yml' },
               ];
-              await Promise.all(dispatches);
+              const results = await Promise.allSettled(
+                targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
+              );
+              const failures = results
+                .map((r, i) => r.status === 'rejected' ? { target: targets[i], reason: r.reason } : null)
+                .filter(Boolean);
+              if (failures.length) {
+                failures.forEach(f => core.error(`Dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`));
+                core.setFailed(`${failures.length} downstream dispatch(es) failed`);
+              }
             } else{
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
+            }
+
+      # Recovery: if the changesets action published to npm but then failed
+      # (e.g. git push --follow-tags error), the `published` output is never
+      # set and downstream repos are not notified. This step detects that
+      # scenario by checking npm for the local package version and dispatches
+      # if the packages are already live.
+      - name: Recover downstream notifications
+        if: always() && steps.changesets.conclusion == 'failure'
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          script: |
+            const { execSync } = require('child_process');
+
+            const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+            const clerkUiVersion = require('./packages/ui/package.json').version;
+
+            // Only recover stable releases
+            const preReleases = [
+              clerkjsVersion.includes('-') && `@clerk/clerk-js@${clerkjsVersion}`,
+              clerkUiVersion.includes('-') && `@clerk/ui@${clerkUiVersion}`,
+            ].filter(Boolean);
+            if (preReleases.length > 0) {
+              console.log(`Skipping recovery: ${preReleases.join(', ')} is a pre-release`);
+              return;
+            }
+
+            const preMode = require("fs").existsSync("./.changeset/pre.json");
+            if (preMode) {
+              core.warning("Changeset in pre-mode, skipping recovery dispatch");
+              return;
+            }
+
+            // Check if either version was actually published to npm
+            function isPublished(name, version) {
+              try {
+                return execSync(`npm view ${name}@${version} version`, { encoding: 'utf8' }).trim() === version;
+              } catch (e) {
+                console.log(`npm view ${name}@${version} failed: ${e.message}`);
+                return false;
+              }
+            }
+
+            const clerkjsPublished = isPublished('@clerk/clerk-js', clerkjsVersion);
+            const clerkUiPublished = isPublished('@clerk/ui', clerkUiVersion);
+
+            if (!clerkjsPublished && !clerkUiPublished) {
+              console.log('Neither @clerk/clerk-js nor @clerk/ui were published to npm, no recovery needed');
+              return;
+            }
+
+            const published = [
+              clerkjsPublished && `@clerk/clerk-js@${clerkjsVersion}`,
+              clerkUiPublished && `@clerk/ui@${clerkUiVersion}`,
+            ].filter(Boolean).join(', ');
+            core.warning(`Recovery: ${published} published to npm but downstream repos were not notified. Dispatching now.`);
+
+            const nextjsVersion = require('./packages/nextjs/package.json').version;
+
+            // NOTE: Keep in sync with the `targets` array in the "Trigger workflows on related repos" step above.
+            const targets = [
+              { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
+              { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
+              { repo: 'clerk-docs', workflow_id: 'typedoc.yml' },
+            ];
+            const results = await Promise.allSettled(
+              targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
+            );
+            const failures = results
+              .map((r, i) => r.status === 'rejected' ? { target: targets[i], reason: r.reason } : null)
+              .filter(Boolean);
+            if (failures.length) {
+              failures.forEach(f => core.error(`Recovery dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`));
+              core.setFailed(`${failures.length} recovery dispatch(es) failed`);
+            } else {
+              core.notice('Recovery dispatch completed successfully');
             }
 
       - name: Generate notification payload
@@ -127,6 +209,26 @@ jobs:
           payload: ${{ steps.notification.outputs.payload }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CHANGELOG_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Notify Slack on failure
+        if: ${{ always() && steps.changesets.outcome == 'failure' }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*:red_circle: Stable release failed*\n*Repo:* `${{ github.repository }}`\n*Workflow:* `${{ github.workflow }}`\n*Commit:* `${{ github.sha }}`\n*Triggered by:* `${{ github.actor }}`\n*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View logs>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SDK_SLACKER_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
   canary-release:
@@ -159,7 +261,7 @@ jobs:
           playwright-enabled: true # Must be present to enable caching on branched workflows
 
       - name: Upgrade npm for trusted publishing
-        run: npm install -g npm@latest
+        run: npx npm@11 install -g npm@11
 
       - name: Version packages for canary
         id: version-packages
@@ -178,6 +280,7 @@ jobs:
 
       - name: Trigger workflows on related repos
         if: steps.publish.outcome == 'success'
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           result-encoding: string
@@ -189,30 +292,47 @@ jobs:
             const clerkUiVersion = require('./packages/ui/package.json').version;
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-            const dispatches = [
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerk',
-                repo: 'sdk-infra-workers',
-                workflow_id: 'update-pkg-versions.yml',
-                ref: 'main',
-                inputs: { clerkjsVersion, clerkUiVersion, sourceCommit: context.sha }
-              }),
+            const targets = [
+              { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion, sourceCommit: context.sha } },
             ];
 
             if (nextjsVersion.includes('canary')) {
               console.log('clerk/nextjs changed, will notify clerk/accounts');
-              dispatches.push(
-                github.rest.actions.createWorkflowDispatch({
-                  owner: 'clerk',
-                  repo: 'accounts',
-                  workflow_id: 'release-staging.yml',
-                  ref: 'main',
-                  inputs: { version: nextjsVersion }
-                }),
+              targets.push(
+                { repo: 'accounts', workflow_id: 'release-staging.yml', inputs: { version: nextjsVersion } },
               );
             }
 
-            await Promise.all(dispatches);
+            const results = await Promise.allSettled(
+              targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
+            );
+            const failures = results
+              .map((r, i) => r.status === 'rejected' ? { target: targets[i], reason: r.reason } : null)
+              .filter(Boolean);
+            if (failures.length) {
+              failures.forEach(f => core.error(`Dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`));
+              core.setFailed(`${failures.length} downstream dispatch(es) failed`);
+            }
+
+      - name: Notify Slack on failure
+        if: ${{ always() && steps.publish.outcome == 'failure' }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*:red_circle: Canary release failed*\n*Repo:* `${{ github.repository }}`\n*Workflow:* `${{ github.workflow }}`\n*Commit:* `${{ github.sha }}`\n*Triggered by:* `${{ github.actor }}`\n*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View logs>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SDK_SLACKER_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
   snapshot-release:
     name: Snapshot release
@@ -250,6 +370,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
+          persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
           filter: 'blob:none'
@@ -283,7 +404,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Upgrade npm for trusted publishing
-        run: npm install -g npm@latest
+        run: npx npm@11 install -g npm@11
 
       - name: Extract snapshot name
         id: extract-snapshot-name
@@ -397,6 +518,9 @@ jobs:
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
     continue-on-error: true
+
+    permissions:
+      contents: read
 
     strategy:
       matrix:

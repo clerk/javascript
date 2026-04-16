@@ -1348,6 +1348,7 @@ export const nlBE: LocalizationResource = {
         title: 'E-mailadressen',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Verbind een account',
         title: 'Bedrijfsaccounts',
       },
       headerTitle__account: 'Account',

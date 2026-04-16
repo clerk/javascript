@@ -23,6 +23,7 @@ import {
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath } from '@clerk/backend/proxy';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { isMalformedURLError } from '@clerk/shared/pathMatcher';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -519,6 +520,10 @@ const handleControlFlowErrors = (
   nextRequest: NextRequest,
   requestState: RequestState,
 ): Response => {
+  if (isMalformedURLError(e)) {
+    return new NextResponse(null, { status: 400, statusText: 'Bad Request' });
+  }
+
   if (isNextjsUnauthorizedError(e)) {
     const response = new NextResponse(null, { status: 401 });
 

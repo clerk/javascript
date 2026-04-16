@@ -22,7 +22,15 @@ const createMessageForDisabledBilling = (componentName: 'PricingTable' | 'Checko
   );
 };
 
+const propertyAsFunctionNotSupported = (property: 'proxyUrl' | 'domain') => {
+  return formatWarning(
+    `${property} as a function is not supported in this environment. The value will be ignored. Provide an absolute URL instead.`,
+  );
+};
+
 const warnings = {
+  proxyUrlAsFunctionNotSupported: propertyAsFunctionNotSupported('proxyUrl'),
+  domainAsFunctionNotSupported: propertyAsFunctionNotSupported('domain'),
   cannotRenderComponentWhenSessionExists:
     'The <SignUp/> and <SignIn/> components cannot render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the Home URL instead.',
   cannotRenderSignUpComponentWhenSessionExists:
@@ -54,6 +62,8 @@ const warnings = {
     'The <APIKeys/> component cannot be rendered when user API keys are disabled. Since user API keys are disabled, this is no-op.',
   cannotRenderAPIKeysComponentForOrgWhenDisabled:
     'The <APIKeys/> component cannot be rendered when organization API keys are disabled. Since organization API keys are disabled, this is no-op.',
+  cannotRenderOAuthConsentComponentWhenUserDoesNotExist:
+    '<OAuthConsent/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
 };
 
 type SerializableWarnings = Serializable<typeof warnings>;

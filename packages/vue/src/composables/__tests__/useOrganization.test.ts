@@ -1,6 +1,6 @@
 import type { Clerk } from '@clerk/shared/types';
 import { render } from '@testing-library/vue';
-import { vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, shallowRef } from 'vue';
 
 import { useOrganization } from '../useOrganization';

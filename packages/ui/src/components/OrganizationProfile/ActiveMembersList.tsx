@@ -95,7 +95,16 @@ const MemberRow = (props: {
           user={membership.publicUserData}
           subtitle={membership.publicUserData?.identifier}
           subtitleProps={{ variant: 'caption' }}
-          badge={isCurrentUser && <Badge localizationKey={localizationKeys('badge__you')} />}
+          badge={
+            isCurrentUser ? (
+              <Badge localizationKey={localizationKeys('badge__you')} />
+            ) : membership.publicUserData?.banned ? (
+              <Badge
+                colorScheme='danger'
+                localizationKey={localizationKeys('badge__banned')}
+              />
+            ) : undefined
+          }
         />
       </Td>
       <Td>
