@@ -444,7 +444,7 @@ describe('OAuthConsent', () => {
     });
   });
 
-  describe('org selection — infinite scroll and active-org pre-selection', () => {
+  describe('org selection — infinite scroll', () => {
     const twoOrgs = [
       { organization: { id: 'org_1', name: 'Acme Corp', imageUrl: 'https://img.clerk.com/static/clerk.png' } },
       { organization: { id: 'org_2', name: 'Beta Inc', imageUrl: 'https://img.clerk.com/static/beta.png' } },
