@@ -132,7 +132,8 @@ export type FlowMetadata = {
     | 'chooseWallet'
     | 'enterpriseConnections'
     | 'organizationCreationDisabled'
-    | 'methodSelectionMFA';
+    | 'methodSelectionMFA'
+    | 'protectCheck';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');

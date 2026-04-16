@@ -1,7 +1,13 @@
 import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
-import type { SignUpField, SignUpIdentificationField, SignUpStatus, SignUpVerificationResource } from './signUpCommon';
+import type {
+  ProtectCheckResource,
+  SignUpField,
+  SignUpIdentificationField,
+  SignUpStatus,
+  SignUpVerificationResource,
+} from './signUpCommon';
 import type {
   AppleIdTokenStrategy,
   EnterpriseSSOStrategy,
@@ -501,6 +507,11 @@ export interface SignUpFutureResource {
   readonly locale: string | null;
 
   /**
+   * The current protect check challenge, if one is pending.
+   */
+  readonly protectCheck: ProtectCheckResource | null;
+
+  /**
    * Indicates that the sign-up can be discarded (has been finalized or explicitly reset).
    *
    * @internal
@@ -554,6 +565,12 @@ export interface SignUpFutureResource {
    * Used to perform a Web3-based sign-up.
    */
   web3: (params: SignUpFutureWeb3Params) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Submits a proof token to resolve a pending protect check challenge. The response may contain
+   * another `protectCheck` (a chained challenge) which must be resolved iteratively.
+   */
+  submitProtectCheck: (params: { proofToken: string }) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to convert a sign-up with `status === 'complete'` into an active session. Will cause anything observing the

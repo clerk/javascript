@@ -40,6 +40,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
+import { isSignInProtectGated } from './handleProtectCheck';
 import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
@@ -225,6 +226,9 @@ function SignInStartInternal(): JSX.Element {
         ticket: organizationTicket,
       })
       .then(res => {
+        if (isSignInProtectGated(res)) {
+          return navigate('protect-check');
+        }
         switch (res.status) {
           case 'needs_first_factor': {
             if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
@@ -237,6 +241,8 @@ function SignInStartInternal(): JSX.Element {
             return navigate('factor-two');
           case 'needs_client_trust':
             return navigate('client-trust');
+          case 'needs_protect_check':
+            return navigate('protect-check');
           case 'complete':
             removeClerkQueryParam('__clerk_ticket');
             return clerk.setActive({
@@ -377,6 +383,10 @@ function SignInStartInternal(): JSX.Element {
     try {
       const res = await safePasswordSignInForEnterpriseSSOInstance(signIn.create(buildSignInParams(fields)), fields);
 
+      if (isSignInProtectGated(res)) {
+        return navigate('protect-check');
+      }
+
       switch (res.status) {
         case 'needs_identifier':
           // Check if we need to initiate an enterprise sso flow
@@ -395,6 +405,8 @@ function SignInStartInternal(): JSX.Element {
           return navigate('factor-two');
         case 'needs_client_trust':
           return navigate('client-trust');
+        case 'needs_protect_check':
+          return navigate('protect-check');
         case 'complete':
           return clerk.setActive({
             session: res.createdSessionId,

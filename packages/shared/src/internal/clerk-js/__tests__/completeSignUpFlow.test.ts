@@ -69,6 +69,86 @@ describe('completeSignUpFlow', () => {
     expect(mockNavigate).toHaveBeenCalledWith('verify-phone', { searchParams: new URLSearchParams() });
   });
 
+  it('navigates to protect check page if protect_check is a missing field', async () => {
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: ['protect_check'] as SignUpField[],
+      unverifiedFields: ['email_address'],
+    } as SignUpResource;
+
+    await completeSignUpFlow({
+      signUp: mockSignUp,
+      protectCheckPath: 'protect-check',
+      verifyEmailPath: 'verify-email',
+      handleComplete: mockHandleComplete,
+      navigate: mockNavigate,
+    });
+
+    expect(mockHandleComplete).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith('protect-check', { searchParams: new URLSearchParams() });
+  });
+
+  it('navigates to protect check page when protectCheck field is present even without missing_fields entry', async () => {
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: [] as SignUpField[],
+      unverifiedFields: ['email_address'],
+      protectCheck: {
+        status: 'pending',
+        token: 't',
+        sdkUrl: 'https://example.com/sdk.js',
+      },
+    } as unknown as SignUpResource;
+
+    await completeSignUpFlow({
+      signUp: mockSignUp,
+      protectCheckPath: 'protect-check',
+      verifyEmailPath: 'verify-email',
+      handleComplete: mockHandleComplete,
+      navigate: mockNavigate,
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith('protect-check', { searchParams: new URLSearchParams() });
+  });
+
+  it('skips protect check if no protectCheckPath is provided', async () => {
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: ['protect_check'] as SignUpField[],
+      unverifiedFields: ['email_address'],
+    } as SignUpResource;
+
+    await completeSignUpFlow({
+      signUp: mockSignUp,
+      verifyEmailPath: 'verify-email',
+      handleComplete: mockHandleComplete,
+      navigate: mockNavigate,
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith('verify-email', { searchParams: new URLSearchParams() });
+  });
+
+  it('prioritizes enterprise_sso over protect_check', async () => {
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: ['enterprise_sso', 'protect_check'] as SignUpField[],
+      authenticateWithRedirect: mockAuthenticateWithRedirect,
+    } as unknown as SignUpResource;
+
+    await completeSignUpFlow({
+      signUp: mockSignUp,
+      protectCheckPath: 'protect-check',
+      handleComplete: mockHandleComplete,
+      navigate: mockNavigate,
+      redirectUrl: 'https://example.com/acs',
+      redirectUrlComplete: 'https://example.com/done',
+    });
+
+    expect(mockAuthenticateWithRedirect).toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
   it('does nothing in any other case', async () => {
     const mockSignUp = {
       status: 'missing_requirements',

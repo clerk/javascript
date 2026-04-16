@@ -1,6 +1,7 @@
 import type {
   ClerkResourceJSON,
   ClientTrustState,
+  ProtectCheckJSON,
   SignInFirstFactorJSON,
   SignInSecondFactorJSON,
   UserDataJSON,
@@ -26,6 +27,7 @@ import type {
   UserData,
 } from './signInCommon';
 import type { SignInFutureResource } from './signInFuture';
+import type { ProtectCheckResource } from './signUpCommon';
 import type { SignInJSONSnapshot } from './snapshots';
 import type { CreateEmailLinkFlowReturn, VerificationResource } from './verification';
 import type { AuthenticateWithWeb3Params } from './web3Wallet';
@@ -50,6 +52,12 @@ export interface SignInResource extends ClerkResource {
   identifier: string | null;
   createdSessionId: string | null;
   userData: UserData;
+  /**
+   * The current protect check challenge, if one is pending. Mid-flow fraud-prevention gate
+   * issued by Clerk Protect. When non-null, the client must load the SDK at `sdkUrl`, run the
+   * challenge with `token`, and submit the resulting proof token via `submitProtectCheck`.
+   */
+  protectCheck: ProtectCheckResource | null;
 
   create: (params: SignInCreateParams) => Promise<SignInResource>;
 
@@ -62,6 +70,13 @@ export interface SignInResource extends ClerkResource {
   prepareSecondFactor: (params: PrepareSecondFactorParams) => Promise<SignInResource>;
 
   attemptSecondFactor: (params: AttemptSecondFactorParams) => Promise<SignInResource>;
+
+  /**
+   * Submits a proof token to resolve a pending protect check challenge. The response may contain
+   * another `protectCheck` (a chained challenge) which must be resolved iteratively. After the
+   * gate clears, the client should retry the operation that was gated.
+   */
+  submitProtectCheck: (params: { proofToken: string }) => Promise<SignInResource>;
 
   authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
 
@@ -111,4 +126,5 @@ export interface SignInJSON extends ClerkResourceJSON {
   first_factor_verification: VerificationJSON | null;
   second_factor_verification: VerificationJSON | null;
   created_session_id: string | null;
+  protect_check?: ProtectCheckJSON | null;
 }

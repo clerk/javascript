@@ -13,6 +13,7 @@ import { SignUpStartSolanaWalletsCard } from '@/ui/components/SignUp/SignUpStart
 
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpEnterpriseConnections } from './SignUpEnterpriseConnections';
+import { SignUpProtectCheck } from './SignUpProtectCheck';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
 import { SignUpVerifyEmail } from './SignUpVerifyEmail';
@@ -34,6 +35,12 @@ function SignUpRoutes(): JSX.Element {
   return (
     <Flow.Root flow='signUp'>
       <Switch>
+        <Route
+          path='protect-check'
+          canActivate={clerk => !!clerk.client.signUp.protectCheck}
+        >
+          <SignUpProtectCheck />
+        </Route>
         <Route
           path='verify-email-address'
           canActivate={clerk => !!clerk.client.signUp.emailAddress}

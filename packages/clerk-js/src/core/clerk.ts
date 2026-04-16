@@ -2241,6 +2241,7 @@ export class Clerk implements ClerkInterface {
       firstFactorVerificationErrorCode: firstFactorVerification.error?.code,
       firstFactorVerificationSessionId: firstFactorVerification.error?.meta?.sessionId,
       sessionId: signIn.createdSessionId,
+      protectCheck: signIn.protectCheck,
     };
 
     const makeNavigate = (to: string) => () => navigate(to);
@@ -2262,6 +2263,10 @@ export class Clerk implements ClerkInterface {
     const navigateToResetPassword = makeNavigate(
       params.resetPasswordUrl ||
         buildURL({ base: displayConfig.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
+    );
+
+    const navigateToSignInProtectCheck = makeNavigate(
+      buildURL({ base: displayConfig.signInUrl, hashPath: '/protect-check' }, { stringify: true }),
     );
 
     const redirectUrls = new RedirectUrls(this.#options, params);
@@ -2296,6 +2301,7 @@ export class Clerk implements ClerkInterface {
         verifyPhonePath:
           params.verifyPhoneNumberUrl ||
           buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
+        protectCheckPath: buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
         navigate,
       });
     };
@@ -2332,11 +2338,20 @@ export class Clerk implements ClerkInterface {
       });
     }
 
+    // Per Protect spec §4.4: OAuth/SAML callbacks can result in a protect_check gate that
+    // surfaces on the next /v1/client read. Honor either the field or the status override.
+    if (si.protectCheck || si.status === 'needs_protect_check') {
+      return navigateToSignInProtectCheck();
+    }
+
     const userExistsButNeedsToSignIn =
       su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
 
     if (userExistsButNeedsToSignIn) {
       const res = await signIn.create({ transfer: true });
+      if (res.protectCheck || res.status === 'needs_protect_check') {
+        return navigateToSignInProtectCheck();
+      }
       switch (res.status) {
         case 'complete':
           return this.setActive({
