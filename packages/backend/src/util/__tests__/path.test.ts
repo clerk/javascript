@@ -79,6 +79,10 @@ describe('utils.joinPaths(...args)', () => {
     expect(() => joinPaths('foo', '%2e', 'bar')).toThrow();
   });
 
+  it('rejects too many layers of encoding', () => {
+    expect(() => joinPaths('foo', '%2525252525252525252525252541')).toThrow();
+  });
+
   it('allows legitimate URLs and ID-like segments', () => {
     expect(joinPaths('https://api.clerk.com', 'v1', '/sessions/sess_abc/tokens/supabase')).toBe(
       'https://api.clerk.com/v1/sessions/sess_abc/tokens/supabase',

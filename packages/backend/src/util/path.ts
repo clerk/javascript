@@ -1,14 +1,18 @@
 const SEPARATOR = '/';
 const MULTIPLE_SEPARATOR_REGEX = new RegExp('(?<!:)' + SEPARATOR + '{1,}', 'g');
+const MAX_DECODES = 10;
 
 type PathString = string | null | undefined;
 
 function isDotSegment(segment: string): boolean {
   let candidate = segment;
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i <= MAX_DECODES; i++) {
     // After decoding, check if any slash-separated part is a dot segment
     if (candidate.split(/[/\\]/).some(p => p === '.' || p === '..')) {
       return true;
+    }
+    if (i === MAX_DECODES) {
+      throw new Error(`joinPaths: too many layers of encoding in ${segment}`);
     }
     try {
       const next = decodeURIComponent(candidate);
