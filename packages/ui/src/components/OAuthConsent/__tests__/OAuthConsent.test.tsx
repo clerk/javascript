@@ -1,11 +1,14 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
 import { useOrganizationList } from '@clerk/shared/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
 
 import { OAuthConsent } from '../OAuthConsent';
+
+// Captures the onChange injected into SelectOptionList's useInView so tests
+// can simulate "user scrolled to the bottom of the org dropdown".
+let capturedLoadMoreOnChange: ((inView: boolean) => void) | undefined;
 
 // Default: useOrganizationList returns no memberships and is not loaded.
 // Individual tests override this mock to inject org data.
@@ -15,10 +18,17 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     ...actual,
     useOrganizationList: vi.fn().mockReturnValue({
       isLoaded: false,
-      userMemberships: { data: [] },
+      userMemberships: { data: [], hasNextPage: false, fetchNext: vi.fn(), isLoading: false },
     }),
   };
 });
+
+vi.mock('@/ui/hooks/useInView', () => ({
+  useInView: vi.fn().mockImplementation(({ onChange }: { onChange?: (inView: boolean) => void }) => {
+    capturedLoadMoreOnChange = onChange;
+    return { ref: vi.fn(), inView: false };
+  }),
+}));
 
 const { createFixtures } = bindCreateFixtures('OAuthConsent');
 
@@ -56,6 +66,7 @@ describe('OAuthConsent', () => {
   const originalLocation = window.location;
 
   beforeEach(() => {
+    capturedLoadMoreOnChange = undefined;
     Object.defineProperty(window, 'location', {
       configurable: true,
       writable: true,
@@ -429,6 +440,56 @@ describe('OAuthConsent', () => {
         const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]')!;
         expect(form.querySelector('input[name="organization_id"]')).toBeNull();
       });
+    });
+  });
+
+  describe('org selection — infinite scroll', () => {
+    const twoOrgs = [
+      { organization: { id: 'org_1', name: 'Acme Corp', imageUrl: 'https://img.clerk.com/static/clerk.png' } },
+      { organization: { id: 'org_2', name: 'Beta Inc', imageUrl: 'https://img.clerk.com/static/beta.png' } },
+    ];
+
+    it('calls fetchNext when the load-more sentinel enters view and more pages are available', async () => {
+      const fetchNext = vi.fn();
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['jane@example.com'] });
+      });
+
+      props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      vi.mocked(useOrganizationList).mockReturnValue({
+        isLoaded: true,
+        userMemberships: { data: twoOrgs, hasNextPage: true, fetchNext, isLoading: false },
+      } as any);
+
+      render(<OAuthConsent />, { wrapper });
+
+      await waitFor(() => expect(capturedLoadMoreOnChange).toBeDefined());
+
+      capturedLoadMoreOnChange!(true);
+      expect(fetchNext).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not call fetchNext when hasNextPage is false', async () => {
+      const fetchNext = vi.fn();
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['jane@example.com'] });
+      });
+
+      props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      vi.mocked(useOrganizationList).mockReturnValue({
+        isLoaded: true,
+        userMemberships: { data: twoOrgs, hasNextPage: false, fetchNext, isLoading: false },
+      } as any);
+
+      render(<OAuthConsent />, { wrapper });
+
+      await waitFor(() => expect(capturedLoadMoreOnChange).toBeDefined());
+      capturedLoadMoreOnChange!(true);
+      expect(fetchNext).not.toHaveBeenCalled();
     });
   });
 });
