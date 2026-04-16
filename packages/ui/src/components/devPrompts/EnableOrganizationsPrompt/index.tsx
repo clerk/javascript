@@ -4,9 +4,9 @@ import type { __internal_EnableOrganizationsPromptProps, EnableEnvironmentSettin
 import type { SerializedStyles } from '@emotion/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
-import React, { forwardRef, useId, useLayoutEffect, useRef, useState } from 'react';
+import React, { forwardRef, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { useEnvironment } from '@/ui/contexts';
+import { useEnvironment, useOptions } from '@/ui/contexts';
 import { Modal } from '@/ui/elements/Modal';
 import { InternalThemeProvider } from '@/ui/styledSystem';
 
@@ -30,6 +30,21 @@ const EnableOrganizationsPromptInternal = ({
   const initialFocusRef = useRef<HTMLHeadingElement>(null);
   const environment = useEnvironment();
   const radioGroupLabelId = useId();
+
+  const options = useOptions();
+
+  const claimUrl = options.__internal_keyless_claimKeylessApplicationUrl;
+  const copyKeysUrl = options.__internal_keyless_copyInstanceKeysUrl;
+  const isKeyless = Boolean(claimUrl) && Boolean(copyKeysUrl);
+  const isClaimed = environment.authConfig.claimedAt !== null;
+  const showKeylessClaimPath = isEnabled && isKeyless && !isClaimed && !clerk.user;
+
+  const claimUrlWithReturnUrl = useMemo(() => {
+    if (!showKeylessClaimPath || !claimUrl) return undefined;
+    const url = new URL(claimUrl);
+    url.searchParams.append('return_url', window.location.href);
+    return url.href;
+  }, [showKeylessClaimPath, claimUrl]);
 
   const isComponent = !caller.startsWith('use');
 
@@ -131,17 +146,24 @@ const EnableOrganizationsPromptInternal = ({
                     `,
                   ]}
                 >
-                  {clerk.user && defaultOrganizationName
-                    ? `The Organizations feature has been enabled for your application. A default organization named "${defaultOrganizationName}" was created automatically. You can manage or rename it in your`
-                    : `The Organizations feature has been enabled for your application. You can manage it in your`}{' '}
-                  <Link
-                    href={organizationsDashboardUrl}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    dashboard
-                  </Link>
-                  .
+                  {showKeylessClaimPath
+                    ? 'Organizations are now enabled! Claim your application to save this configuration and access the full dashboard.'
+                    : clerk.user && defaultOrganizationName
+                      ? `The Organizations feature has been enabled for your application. A default organization named "${defaultOrganizationName}" was created automatically. You can manage or rename it in your`
+                      : `The Organizations feature has been enabled for your application. You can manage it in your`}
+                  {!showKeylessClaimPath && (
+                    <>
+                      {' '}
+                      <Link
+                        href={organizationsDashboardUrl}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                      >
+                        dashboard
+                      </Link>
+                      .
+                    </>
+                  )}
                 </p>
               ) : (
                 <>
@@ -242,19 +264,48 @@ const EnableOrganizationsPromptInternal = ({
             })}
           >
             {isEnabled ? (
-              <PromptButton
-                variant='solid'
-                onClick={() => {
-                  if (!clerk.user) {
-                    void clerk.redirectToSignIn();
-                    clerk.__internal_closeEnableOrganizationsPrompt?.();
-                  } else {
-                    onSuccess?.();
-                  }
-                }}
-              >
-                {clerk.user ? 'Continue' : 'Sign in to continue'}
-              </PromptButton>
+              showKeylessClaimPath ? (
+                <>
+                  <PromptButton
+                    variant='outline'
+                    onClick={() => {
+                      onSuccess?.();
+                    }}
+                  >
+                    I&apos;ll do it later
+                  </PromptButton>
+                  <Link
+                    href={claimUrlWithReturnUrl}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    onClick={() => {
+                      clerk.__internal_closeEnableOrganizationsPrompt?.();
+                    }}
+                    css={css`
+                      ${baseButtonStyles}
+                      ${buttonSolidStyles}
+                      color: #fde047;
+                      text-decoration: none;
+                    `}
+                  >
+                    Claim your application
+                  </Link>
+                </>
+              ) : (
+                <PromptButton
+                  variant='solid'
+                  onClick={() => {
+                    if (!clerk.user) {
+                      void clerk.redirectToSignIn();
+                      clerk.__internal_closeEnableOrganizationsPrompt?.();
+                    } else {
+                      onSuccess?.();
+                    }
+                  }}
+                >
+                  {clerk.user ? 'Continue' : 'Sign in to continue'}
+                </PromptButton>
+              )
             ) : (
               <>
                 <PromptButton
