@@ -2,7 +2,7 @@ import { useRef } from 'react';
 
 import { Box, Icon, Image, Text } from '@/ui/customizables';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
-import { Check } from '@/ui/icons';
+import { Checkmark } from '@/ui/icons';
 import { common } from '@/ui/styledSystem';
 
 export type OrgOption = {
@@ -66,7 +66,7 @@ export function OrgSelect({ options, value, onChange }: OrgSelectProps) {
           </Text>
           {isSelected && (
             <Icon
-              icon={Check}
+              icon={Checkmark}
               size='sm'
               sx={theme => ({ color: theme.colors.$primary500 })}
             />

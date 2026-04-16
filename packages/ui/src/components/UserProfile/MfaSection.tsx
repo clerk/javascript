@@ -14,7 +14,7 @@ import { useEnvironment } from '../../contexts';
 import { Badge, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { AuthApp, DotCircle, Mobile } from '../../icons';
+import { AuthApp, DotCircleHorizontal, Mobile } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { MfaBackupCodeCreateScreen, MfaScreen, RemoveMfaPhoneCodeScreen, RemoveMfaTOTPScreen } from './MfaScreens';
 
@@ -128,7 +128,7 @@ export const MfaSection = () => {
               >
                 <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
                   <Icon
-                    icon={DotCircle}
+                    icon={DotCircleHorizontal}
                     sx={theme => ({ color: theme.colors.$neutralAlpha700 })}
                   />
 
@@ -240,7 +240,7 @@ const strategiesMap = {
     key: 'totp',
   },
   backup_code: {
-    icon: DotCircle,
+    icon: DotCircleHorizontal,
     text: 'Backup code',
     key: 'backup_code',
   },

@@ -29,7 +29,7 @@ import {
   Text,
   useLocalizations,
 } from '../../customizables';
-import { Check, Plus, User, Users } from '../../icons';
+import { Checkmark, Plus, UserCircle, Users } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { SubscriptionBadge } from '../Subscriptions/badge';
 import { getPricingFooterState } from './utils/pricing-footer-state';
@@ -564,7 +564,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
             })}
           >
             <Icon
-              icon={Check}
+              icon={Checkmark}
               colorScheme='neutral'
               size='sm'
               aria-hidden
@@ -637,7 +637,7 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
       const tier = seatUnitPrice.tiers[0];
       const rows: Array<{
         elementId: string;
-        icon: typeof User | typeof Users;
+        icon: typeof UserCircle | typeof Users;
         text: ReturnType<typeof localizationKeys>;
         additionalText?: ReturnType<typeof localizationKeys>;
         additionalTooltipText?: string;
@@ -646,7 +646,7 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
       if (tier.feePerBlock.amount !== 0 && plan.hasBaseFee) {
         rows.push({
           elementId: 'seats',
-          icon: User,
+          icon: UserCircle,
           text: localizationKeys('billing.pricingTable.seatCost.perSeat', {
             feePerBlockAmount: formatTierFee(tier),
             periodAbbreviation,
@@ -694,7 +694,7 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
         return [
           {
             elementId: 'seats',
-            icon: User,
+            icon: UserCircle,
             text: localizationKeys('billing.pricingTable.seatCost.includedSeats', {
               includedSeats: includedTier.endsAfterBlock,
             }),

@@ -5,7 +5,7 @@ import { mergeRefs } from '@/ui/utils/mergeRefs';
 import type { FeedbackType } from '@/ui/utils/useFormControl';
 
 import { descriptors, Flex, Icon, Input, Text } from '../../customizables';
-import { Check, ChevronUpDown } from '../../icons';
+import { Checkmark, ChevronUpDown } from '../../icons';
 import { common, type PropsOfComponent } from '../../styledSystem';
 import { Select, SelectButton, SelectOptionList } from '../Select';
 import type { CountryEntry, CountryIso } from './countryCodeData';
@@ -230,7 +230,7 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
       {...rest}
     >
       <Icon
-        icon={Check}
+        icon={Checkmark}
         sx={{ visibility: isSelected ? 'visible' : 'hidden' }}
       />
       <Text
