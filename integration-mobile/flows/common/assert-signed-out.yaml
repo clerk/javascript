@@ -2,4 +2,4 @@
 appId: com.clerk.clerkexpoquickstart
 ---
 - assertVisible:
-    text: "Welcome! Sign in to continue."
+    text: 'Welcome! Sign in to continue\.?'

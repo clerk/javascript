@@ -12,21 +12,22 @@ tags:
       darkMode: true
 - waitForAnimationToEnd:
     timeout: 5000
-# Dev build: tap the dev server URL to connect
+# Dev build: tap the dev server URL to connect (iOS: localhost, Android: 10.0.2.2).
 - runFlow:
     when:
       visible: "Development Build"
     commands:
-      - tapOn: "http://10.0.2.2:8081"
+      - tapOn:
+          text: ".*:8081"
       - waitForAnimationToEnd:
           timeout: 8000
-# Dismiss the Expo developer menu if it pops up
+# Dismiss the Expo developer menu if it pops up (tap transparent backdrop)
 - runFlow:
     when:
-      visible: "developer menu"
+      visible: ".*developer menu.*"
     commands:
       - tapOn:
-          point: "1154,2199"
+          point: "50%,10%"
 - waitForAnimationToEnd:
     timeout: 3000
 - runFlow: ../common/assert-signed-out.yaml

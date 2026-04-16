@@ -6,4 +6,4 @@ appId: com.clerk.clerkexpoquickstart
 - waitForAnimationToEnd:
     timeout: 3000
 - assertVisible:
-    text: "Welcome! Sign in to continue."
+    text: 'Welcome! Sign in to continue\.?'

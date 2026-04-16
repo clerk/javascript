@@ -1,28 +1,55 @@
 # Subflow: launch the NativeComponentQuickstart app from a clean state.
-# This is a dev build, so we must handle the Expo dev launcher and dev menu.
+# This is a dev build, so we must handle the Expo dev launcher (iOS uses
+# http://localhost:8081; Android uses http://10.0.2.2:8081) and the
+# Expo developer menu overlay that appears on first launch.
 appId: com.clerk.clerkexpoquickstart
 ---
 - launchApp:
     clearState: true
 - waitForAnimationToEnd:
     timeout: 5000
-# Dev build: tap the dev server URL to connect
+# Dev launcher: tap whichever dev-server URL is shown (port 8081).
+# Maestro's text field is regex-matched, so ".*:8081" matches both
+# "http://10.0.2.2:8081" (Android) and "http://localhost:8081" (iOS).
 - runFlow:
     when:
       visible: "Development Build"
     commands:
-      - tapOn: "http://10.0.2.2:8081"
+      - tapOn:
+          text: ".*:8081"
       - waitForAnimationToEnd:
-          timeout: 8000
-# Dismiss the Expo developer menu if it pops up
+          timeout: 10000
+# Dismiss the Expo developer menu if it pops up. Tap the "Close" (X)
+# accessibility element at the top-right of the sheet. Both platforms
+# ship a Close button in the sheet header. Fallback: tap the backdrop.
 - runFlow:
     when:
-      visible: "developer menu"
+      visible: ".*developer menu.*"
     commands:
       - tapOn:
-          point: "1154,2199"
+          id: "Close"
+          optional: true
+      - runFlow:
+          when:
+            visible: ".*developer menu.*"
+          commands:
+            - tapOn:
+                point: "50%,20%"
+      - waitForAnimationToEnd:
+          timeout: 2000
 - waitForAnimationToEnd:
     timeout: 3000
+# If a previous flow left the user signed in (session persists in
+# Keychain/SecureStore across clearState), sign out so subsequent flows
+# start from the AuthView.
+- runFlow:
+    when:
+      visible: "Sign Out"
+    commands:
+      - tapOn:
+          text: "Sign Out"
+      - waitForAnimationToEnd:
+          timeout: 3000
 # Assert the AuthView is visible (signed-out state)
 - assertVisible:
-    text: "Welcome! Sign in to continue."
+    text: 'Welcome! Sign in to continue\.?'

@@ -18,7 +18,20 @@ if ! command -v maestro >/dev/null 2>&1; then
 fi
 
 echo "==> Running all non-manual flows on Android..."
-maestro test \
+# Maestro does not auto-recurse into subdirectories. Pass each flow file
+# explicitly to pick up flows/sign-in/, flows/profile/, etc. Skip the
+# flows/common/ directory — those are subflows invoked via runFlow.
+# Use while-read to stay compatible with macOS bash 3.2 (no mapfile).
+FLOW_FILES=()
+while IFS= read -r f; do
+  FLOW_FILES+=("$f")
+done < <(find "$FLOWS_DIR" -type f -name "*.yaml" ! -path "*/common/*")
+
+maestro --platform android test \
   --exclude-tags iosOnly,manual,skip \
+  -e CLERK_TEST_EMAIL="${CLERK_TEST_EMAIL}" \
+  -e CLERK_TEST_PASSWORD="${CLERK_TEST_PASSWORD}" \
+  -e CLERK_TEST_EMAIL_SECONDARY="${CLERK_TEST_EMAIL_SECONDARY:-}" \
+  -e CLERK_TEST_PASSWORD_SECONDARY="${CLERK_TEST_PASSWORD_SECONDARY:-}" \
   "$@" \
-  "$FLOWS_DIR"
+  "${FLOW_FILES[@]}"

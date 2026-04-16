@@ -80,7 +80,9 @@ jobs:
             npx expo run:android --variant release --no-bundler
             cd ../../integration-mobile
             source config/.env 2>/dev/null || true
-            maestro test --exclude-tags "${{ inputs.exclude_tags }}" flows/
+            # Maestro doesn't auto-recurse into subdirectories; pass each flow explicitly.
+            find flows -type f -name "*.yaml" ! -path "*/common/*" -print0 | \
+              xargs -0 maestro test --exclude-tags "${{ inputs.exclude_tags }}"
 
       - name: Upload Maestro artifacts on failure
         if: failure()
@@ -141,7 +143,9 @@ jobs:
           npx expo run:ios --configuration Release --no-bundler
           cd ../../integration-mobile
           source config/.env 2>/dev/null || true
-          maestro test --exclude-tags "${{ inputs.exclude_tags }},androidOnly" flows/
+          # Maestro doesn't auto-recurse into subdirectories; pass each flow explicitly.
+          find flows -type f -name "*.yaml" ! -path "*/common/*" -print0 | \
+            xargs -0 maestro test --exclude-tags "${{ inputs.exclude_tags }},androidOnly"
 
       - name: Upload Maestro artifacts on failure
         if: failure()
