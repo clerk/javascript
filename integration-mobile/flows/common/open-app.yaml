@@ -8,6 +8,16 @@ appId: com.clerk.clerkexpoquickstart
     clearState: true
 - waitForAnimationToEnd:
     timeout: 5000
+# Android Google Password Manager may linger from a previous run.
+# Dismiss it before anything else.
+- runFlow:
+    when:
+      visible: ".*Google Password Manager.*"
+    commands:
+      - tapOn:
+          text: "Not now|Never"
+      - waitForAnimationToEnd:
+          timeout: 2000
 # Dev launcher: tap whichever dev-server URL is shown (port 8081).
 # Maestro's text field is regex-matched, so ".*:8081" matches both
 # "http://10.0.2.2:8081" (Android) and "http://localhost:8081" (iOS).
