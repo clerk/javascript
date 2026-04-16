@@ -1,8 +1,10 @@
 import { useRef } from 'react';
 
+import { InfiniteListSpinner } from '@/ui/common/InfiniteListSpinner';
 import { Box, Icon, Image, Text } from '@/ui/customizables';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
-import { Checkmark } from '@/ui/icons';
+import { useInView } from '@/ui/hooks/useInView';
+import { Check } from '@/ui/icons';
 import { common } from '@/ui/styledSystem';
 
 export type OrgOption = {
@@ -15,11 +17,21 @@ type OrgSelectProps = {
   options: OrgOption[];
   value: string | null;
   onChange: (value: string) => void;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
 };
 
-export function OrgSelect({ options, value, onChange }: OrgSelectProps) {
+export function OrgSelect({ options, value, onChange, hasMore, onLoadMore }: OrgSelectProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const selected = options.find(option => option.value === value);
+  const { ref: loadMoreRef } = useInView({
+    threshold: 0,
+    onChange: inView => {
+      if (inView && hasMore) {
+        onLoadMore?.();
+      }
+    },
+  });
 
   return (
     <Select
@@ -101,7 +113,10 @@ export function OrgSelect({ options, value, onChange }: OrgSelectProps) {
           {selected?.label || 'Select an option'}
         </Text>
       </SelectButton>
-      <SelectOptionList />
+      <SelectOptionList
+        footer={hasMore ? <InfiniteListSpinner ref={loadMoreRef} /> : null}
+        onReachEnd={hasMore ? onLoadMore : undefined}
+      />
     </Select>
   );
 }

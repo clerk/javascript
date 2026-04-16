@@ -145,20 +145,12 @@ export async function verifyJwt(
 
     assertHeaderType(typ, headerType);
     assertHeaderAlgorithm(alg);
-
-    // Payload verifications
-    const { azp, sub, aud, iat, exp, nbf } = payload;
-
-    assertSubClaim(sub);
-    assertAudienceClaim([aud], [audience]);
-    assertAuthorizedPartiesClaim(azp, authorizedParties);
-    assertExpirationClaim(exp, clockSkew);
-    assertActivationClaim(nbf, clockSkew);
-    assertIssuedAtClaim(iat, clockSkew);
   } catch (err) {
     return { errors: [err as TokenVerificationError] };
   }
 
+  // Verify signature before validating claims to prevent oracle attacks
+  // that could leak configuration details through differential error responses
   const { data: signatureValid, errors: signatureErrors } = await hasValidSignature(decoded, key);
   if (signatureErrors) {
     return {
@@ -181,6 +173,20 @@ export async function verifyJwt(
         }),
       ],
     };
+  }
+
+  // Payload verifications (only after signature is confirmed valid)
+  try {
+    const { azp, sub, aud, iat, exp, nbf } = payload;
+
+    assertSubClaim(sub);
+    assertAudienceClaim([aud], [audience]);
+    assertAuthorizedPartiesClaim(azp, authorizedParties);
+    assertExpirationClaim(exp, clockSkew);
+    assertActivationClaim(nbf, clockSkew);
+    assertIssuedAtClaim(iat, clockSkew);
+  } catch (err) {
+    return { errors: [err as TokenVerificationError] };
   }
 
   return { data: payload };
