@@ -2,7 +2,7 @@ import { iconImageUrl } from '@clerk/shared/constants';
 import React from 'react';
 
 import { Button, descriptors, Flex, Icon, Text } from '../customizables';
-import { PencilEdit } from '../icons';
+import { Pen } from '../icons';
 import type { PropsOfComponent } from '../styledSystem';
 import { formatSafeIdentifier, isMaskedIdentifier } from '../utils/formatSafeIdentifier';
 import { getFlagEmojiFromCountryIso, parsePhoneString } from '../utils/phoneUtils';
@@ -27,7 +27,7 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
     >
       <Icon
         elementDescriptor={descriptors.identityPreviewEditButtonIcon}
-        icon={PencilEdit}
+        icon={Pen}
       />
     </Button>
   );

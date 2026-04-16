@@ -10,7 +10,7 @@ import { USER_BUTTON_ITEM_ID } from '../../constants';
 import { useUserButtonContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
-import { Add, CogFilled, SignOut, SwitchArrowRight } from '../../icons';
+import { Add, ArrowRight, Cog, SignOut } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import type { DefaultItemIds, MenuItem } from '../../utils/createCustomMenuItems';
 
@@ -179,7 +179,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
               iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('manageAccount')}
               iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
               iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('manageAccount')}
-              icon={CogFilled}
+              icon={Cog}
               label={localizationKeys('userButton.action__manageAccount')}
               onClick={handleManageAccountClicked}
               focusRing
@@ -277,7 +277,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
         {otherSessions.map(session => (
           <PreviewButton
             key={session.id}
-            icon={SwitchArrowRight}
+            icon={ArrowRight}
             onClick={handleSessionClicked(session)}
             role='menuitem'
           >

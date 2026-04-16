@@ -15,7 +15,7 @@ import {
   Spinner,
   useLocalizations,
 } from '../../customizables';
-import { ArrowRightIcon, Plus, RotateLeftRight } from '../../icons';
+import { ArrowRight, Plus, RotateLeftRight } from '../../icons';
 import { useRouter } from '../../router';
 import { Statement } from './Statement';
 
@@ -130,7 +130,7 @@ export const StatementPage = () => {
                             >
                               <Span localizationKey={localizationKeys('billing.viewPayment')} />
                               <Icon
-                                icon={ArrowRightIcon}
+                                icon={ArrowRight}
                                 size='sm'
                                 aria-hidden
                               />

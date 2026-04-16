@@ -21,7 +21,7 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { usePrefersReducedMotion } from '../../hooks';
-import { Check, InformationCircle } from '../../icons';
+import { Checkmark, InformationCircle } from '../../icons';
 import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
 
 interface PricingTableMatrixProps {
@@ -396,7 +396,7 @@ export function PricingTableMatrix({
                       >
                         {hasFeature && (
                           <Icon
-                            icon={Check}
+                            icon={Checkmark}
                             colorScheme='neutral'
                             size='sm'
                             aria-label={t(localizationKeys('billing.pricingTable.included'))}

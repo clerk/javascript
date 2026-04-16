@@ -3,7 +3,7 @@ import * as React from 'react';
 import type { LocalizationKey } from '../customizables';
 import { Box, Button, Dd, descriptors, Dl, Dt, Icon, Span } from '../customizables';
 import { useClipboard } from '../hooks';
-import { Check, Copy } from '../icons';
+import { Checkmark, Copy } from '../icons';
 import { common } from '../styledSystem';
 import { truncateWithEndVisible } from '../utils/truncateTextWithEndVisible';
 
@@ -287,7 +287,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
     >
       <Icon
         size='sm'
-        icon={hasCopied ? Check : Copy}
+        icon={hasCopied ? Checkmark : Copy}
         aria-hidden
       />
     </Button>

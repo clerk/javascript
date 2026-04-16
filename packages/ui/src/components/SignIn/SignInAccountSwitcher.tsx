@@ -8,7 +8,7 @@ import { UserPreview } from '@/ui/elements/UserPreview';
 import { withRedirectToAfterSignIn } from '../../common';
 import { useEnvironment, useSignInContext, useSignOutContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
-import { Plus, SwitchArrowRight } from '../../icons';
+import { ArrowRight, Plus } from '../../icons';
 import { SignOutAllActions } from '../UserButton/SessionActions';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
@@ -55,7 +55,7 @@ const SignInAccountSwitcherInternal = () => {
                     justifyContent: 'flex-start',
                     borderRadius: 0,
                   })}
-                  icon={SwitchArrowRight}
+                  icon={ArrowRight}
                 >
                   <UserPreview
                     user={s.user}

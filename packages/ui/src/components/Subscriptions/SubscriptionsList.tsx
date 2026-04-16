@@ -15,7 +15,7 @@ import {
 } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, Flex, Icon, localizationKeys, Span, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
-import { ArrowsUpDown, CogFilled, Plans, Plus, Users } from '../../icons';
+import { ArrowUpDown, Cog, Files, Plus, Users } from '../../icons';
 import { useRouter } from '../../router';
 import { SubscriptionBadge } from './badge';
 
@@ -129,7 +129,7 @@ export function SubscriptionsList({
                 width: isManageButtonVisible ? 'unset' : undefined,
               }),
             ]}
-            leftIcon={subscriptionItems.length > 0 ? ArrowsUpDown : Plus}
+            leftIcon={subscriptionItems.length > 0 ? ArrowUpDown : Plus}
             rightIcon={null}
             leftIconSx={t => ({
               width: t.sizes.$4,
@@ -151,7 +151,7 @@ export function SubscriptionsList({
               }),
             ]}
             rightIcon={null}
-            leftIcon={CogFilled}
+            leftIcon={Cog}
             leftIconSx={t => ({
               width: t.sizes.$4,
               height: t.sizes.$4,
@@ -201,7 +201,7 @@ function SubscriptionItemRow({
               gap={1}
             >
               <Icon
-                icon={Plans}
+                icon={Files}
                 sx={t => ({
                   width: t.sizes.$4,
                   height: t.sizes.$4,
