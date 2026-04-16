@@ -160,12 +160,12 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       );
 
       // Handle Frontend API proxy requests early, before authentication
+      const requestUrl = new URL(request.nextUrl.href);
       let frontendApiProxyConfig = resolvedParams.frontendApiProxy;
 
       // Auto-detect when no explicit proxy or domain is configured
       const hasExplicitProxyOrDomain = resolvedParams.proxyUrl || PROXY_URL || resolvedParams.domain || DOMAIN;
       if (!frontendApiProxyConfig && !hasExplicitProxyOrDomain && publishableKey.startsWith('pk_live_')) {
-        const requestUrl = new URL(request.nextUrl.href);
         if (shouldAutoProxy(requestUrl.hostname)) {
           frontendApiProxyConfig = { enabled: true };
         }
