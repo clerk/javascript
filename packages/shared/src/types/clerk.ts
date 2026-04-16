@@ -2467,7 +2467,7 @@ export type __internal_OAuthConsentProps = {
   onDeny: () => void;
 };
 
-/** @document */
+/** @inline */
 export interface HandleEmailLinkVerificationParams {
   /**
    * The full URL to navigate to after successful email link verification on completed sign-up or sign-in on the same device.
