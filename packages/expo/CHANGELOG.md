@@ -1,5 +1,34 @@
 # Change Log
 
+## 3.2.0
+
+### Minor Changes
+
+- Add native component theming via the Expo config plugin. You can now customize the appearance of Clerk's native components (`<AuthView />`, `<UserButton />`, `<UserProfileView />`) on iOS and Android by passing a `theme` prop to the plugin pointing at a JSON file: ([#8243](https://github.com/clerk/javascript/pull/8243)) by [@chriscanin](https://github.com/chriscanin)
+
+  ```json
+  {
+    "expo": {
+      "plugins": [["@clerk/expo", { "theme": "./clerk-theme.json" }]]
+    }
+  }
+  ```
+
+  The JSON theme supports:
+  - `colors` — 15 semantic color tokens (`primary`, `background`, `input`, `danger`, `success`, `warning`, `foreground`, `mutedForeground`, `primaryForeground`, `inputForeground`, `neutral`, `border`, `ring`, `muted`, `shadow`) as 6- or 8-digit hex strings.
+  - `darkColors` — same shape as `colors`; applied automatically when the system is in dark mode.
+  - `design.borderRadius` — number, applied to both platforms.
+  - `design.fontFamily` — string, **iOS only**.
+
+  Theme JSON is validated at prebuild. On iOS the theme is embedded into `Info.plist`; on Android the JSON is copied into `android/app/src/main/assets/clerk_theme.json`. The plugin does not modify your app's `userInterfaceStyle` setting — control light/dark mode via `"userInterfaceStyle"` in `app.json`.
+
+### Patch Changes
+
+- Updated dependencies [[`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/shared@4.8.2
+  - @clerk/clerk-js@6.7.3
+  - @clerk/react@6.4.2
+
 ## 3.1.12
 
 ### Patch Changes
