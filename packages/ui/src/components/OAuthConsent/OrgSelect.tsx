@@ -4,7 +4,7 @@ import { InfiniteListSpinner } from '@/ui/common/InfiniteListSpinner';
 import { Box, Icon, Image, Text } from '@/ui/customizables';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { useInView } from '@/ui/hooks/useInView';
-import { Check } from '@/ui/icons';
+import { Checkmark } from '@/ui/icons';
 import { common } from '@/ui/styledSystem';
 
 export type OrgOption = {
