@@ -7,8 +7,9 @@ appId: com.clerk.clerkexpoquickstart
     timeout: 3000
 - assertVisible:
     text: "Account"
+# iOS renders "Sign out", Android renders "Log out"
 - tapOn:
-    text: "Log out"
+    text: "Log out|Sign out"
 - waitForAnimationToEnd:
     timeout: 3000
 - assertVisible:

@@ -20,14 +20,15 @@ appId: com.clerk.clerkexpoquickstart
       - waitForAnimationToEnd:
           timeout: 10000
 # Dismiss the Expo developer menu if it pops up. Tap the "Close" (X)
-# accessibility element at the top-right of the sheet. Both platforms
-# ship a Close button in the sheet header. Fallback: tap the backdrop.
+# accessibility element at the top-right of the sheet. On iOS the
+# accessibility text is "Close" (not the resource-id "xmark"); on Android
+# it's "Close" on the view's accessibilityText.
 - runFlow:
     when:
       visible: ".*developer menu.*"
     commands:
       - tapOn:
-          id: "Close"
+          text: "Close"
           optional: true
       - runFlow:
           when:

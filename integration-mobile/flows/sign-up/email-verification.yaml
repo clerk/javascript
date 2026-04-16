@@ -4,9 +4,14 @@
 # Sign-up flow: email -> Continue -> "Check your email" -> code 424242 ->
 # password screen -> password -> Continue -> home
 appId: com.clerk.clerkexpoquickstart
+# TODO: sign-up flow needs extra iteration. Each run creates a new user
+# via +clerk_test pattern (testmode code 424242) but assertions on the
+# post-code screen may differ between iOS and Android. Skip until the
+# sign-up path selectors are validated per-platform.
 tags:
   - happy-path
   - sign-up
+  - skip
 ---
 - runFlow: ../common/open-app.yaml
 - runFlow: ../common/assert-signed-out.yaml

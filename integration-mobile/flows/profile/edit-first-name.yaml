@@ -13,9 +13,9 @@ tags:
     timeout: 3000
 - assertVisible:
     text: "Account"
-# Tap Edit profile to enter edit mode
+# Tap profile editor (iOS: "Update profile", Android: "Edit profile")
 - tapOn:
-    text: "Edit profile"
+    text: "(Edit|Update) profile"
 - waitForAnimationToEnd:
     timeout: 2000
 # Clear and type new first name
@@ -24,8 +24,15 @@ tags:
 - tapOn: "Save"
 - waitForAnimationToEnd:
     timeout: 3000
-# Dismiss profile
-- back
+# Dismiss profile (iOS: Close X, Android: back)
+- tapOn:
+    text: "Close"
+    optional: true
+- runFlow:
+    when:
+      visible: "Account"
+    commands:
+      - back
 - waitForAnimationToEnd:
     timeout: 2000
 - runFlow: ../common/assert-signed-in.yaml

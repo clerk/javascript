@@ -1,8 +1,12 @@
 # Happy path: sign in as one user, sign out, sign in as a different user.
 # Requires CLERK_TEST_EMAIL_SECONDARY and CLERK_TEST_PASSWORD_SECONDARY env vars.
 appId: com.clerk.clerkexpoquickstart
+# TODO: requires CLERK_TEST_EMAIL_SECONDARY / CLERK_TEST_PASSWORD_SECONDARY
+# env vars and a second test user in the Clerk dev instance. Skip until
+# a secondary user is provisioned.
 tags:
   - happy-path
+  - skip
 ---
 - runFlow: ../common/open-app.yaml
 - runFlow: ../common/sign-in-email-password.yaml

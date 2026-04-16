@@ -14,8 +14,15 @@ tags:
     timeout: 3000
 - assertVisible:
     text: "Account"
-# Dismiss the profile
-- back
+# Dismiss the profile (iOS: tap Close X, Android: back button)
+- tapOn:
+    text: "Close"
+    optional: true
+- runFlow:
+    when:
+      visible: "Account"
+    commands:
+      - back
 - waitForAnimationToEnd:
     timeout: 2000
 - runFlow: ../common/assert-signed-in.yaml
