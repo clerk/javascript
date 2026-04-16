@@ -20,14 +20,15 @@ import { signJwt } from '../../jwt/signJwt';
 import { server, validateHeaders } from '../../mock-server';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
-function createOAuthJwt(
+async function createSignedOAuthJwt(
   payload = mockOAuthAccessTokenJwtPayload,
   typ: 'at+jwt' | 'application/at+jwt' | 'JWT' = 'at+jwt',
 ) {
-  return createJwt({
+  const { data } = await signJwt(payload, signingJwks, {
+    algorithm: 'RS256',
     header: { typ, kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
-    payload,
   });
+  return data!;
 }
 
 async function createSignedM2MJwt(payload = mockM2MJwtPayload) {
@@ -392,7 +393,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         ),
       );
 
-      const oauthJwt = createOAuthJwt(mockOAuthAccessTokenJwtPayload, 'JWT');
+      const oauthJwt = await createSignedOAuthJwt(mockOAuthAccessTokenJwtPayload, 'JWT');
 
       const result = await verifyMachineAuthToken(oauthJwt, {
         apiUrl: 'https://api.clerk.test',
@@ -472,7 +473,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         exp: mockOAuthAccessTokenJwtPayload.iat - 100,
       };
 
-      const oauthJwt = createOAuthJwt(expiredPayload, 'at+jwt');
+      const oauthJwt = await createSignedOAuthJwt(expiredPayload);
 
       const result = await verifyMachineAuthToken(oauthJwt, {
         apiUrl: 'https://api.clerk.test',
