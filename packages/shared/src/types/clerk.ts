@@ -1003,7 +1003,7 @@ export interface Clerk {
   redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
   /**
-   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](#authenticate-with-google-one-tap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
+   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/objects/clerk#authenticate-with-google-one-tap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
    *
    * @param signInOrUp - The resource returned from the initial `authenticateWithGoogleOneTap()` call (before redirect).
    * @param params - Additional props that define where the user will be redirected to at the end of a successful Google One Tap flow.
@@ -1245,12 +1245,16 @@ export type ClerkOptions = ClerkOptionsNavigation &
   AfterMultiSessionSingleSignOutUrl &
   ClerkUnsafeOptions & {
     /**
-     * Clerk UI module. Pass the `ui` export from `@clerk/ui` to bundle the UI
-     * with your application instead of loading it from the CDN.
+     * **Only required if you're bundling Clerk's UI (`@clerk/ui`) instead of loading it from the Clerk CDN**. Provide the UI module to embed Clerk's prebuilt authentication components directly in your application.
      */
-    ui?: { ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor> };
+    ui?: {
+      /**
+       * Pass the `ui` export from `@clerk/ui`.
+       */
+      ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
+    };
     /**
-     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
+     * Optional [object](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     // TODO @nikos
     appearance?: any;
