@@ -22,17 +22,34 @@ tags:
           text: ".*:8081"
       - waitForAnimationToEnd:
           timeout: 8000
-# Dismiss the Expo developer menu if it pops up (tap transparent backdrop)
+# Dismiss the Expo developer menu if it pops up (Close X with backdrop fallback)
 - runFlow:
     when:
       visible: ".*developer menu.*"
     commands:
       - tapOn:
-          point: "50%,10%"
+          text: "Close"
+          optional: true
+      - runFlow:
+          when:
+            visible: ".*developer menu.*"
+          commands:
+            - tapOn:
+                point: "50%,20%"
 # Capture immediately after dev menu dismissal -- catch any white-flash window
 - takeScreenshot: cold-launch-immediate
 - waitForAnimationToEnd:
     timeout: 5000
+# If a previous flow left the user signed in, sign out first so the
+# cold-launch check can assert on the signed-out AuthView.
+- runFlow:
+    when:
+      visible: "Sign Out"
+    commands:
+      - tapOn:
+          text: "Sign Out"
+      - waitForAnimationToEnd:
+          timeout: 3000
 - assertVisible:
     text: 'Welcome! Sign in to continue\.?'
 - takeScreenshot: cold-launch-settled
