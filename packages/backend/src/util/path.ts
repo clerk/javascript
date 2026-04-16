@@ -4,13 +4,23 @@ const MULTIPLE_SEPARATOR_REGEX = new RegExp('(?<!:)' + SEPARATOR + '{1,}', 'g');
 type PathString = string | null | undefined;
 
 function isDotSegment(segment: string): boolean {
-  let decoded: string;
-  try {
-    decoded = decodeURIComponent(segment);
-  } catch {
-    decoded = segment;
+  let candidate = segment;
+  for (let i = 0; i < 3; i++) {
+    // After decoding, check if any slash-separated part is a dot segment
+    if (candidate.split(/[/\\]/).some(p => p === '.' || p === '..')) {
+      return true;
+    }
+    try {
+      const next = decodeURIComponent(candidate);
+      if (next === candidate) {
+        break;
+      } // stable — no more encoding
+      candidate = next;
+    } catch {
+      break;
+    }
   }
-  return decoded === '.' || decoded === '..';
+  return false;
 }
 
 export function joinPaths(...args: PathString[]): string {
