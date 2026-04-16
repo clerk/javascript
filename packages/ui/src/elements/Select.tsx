@@ -237,10 +237,12 @@ export const SelectNoResults = (props: PropsOfComponent<typeof Text>) => {
 
 type SelectOptionListProps = PropsOfComponent<typeof Flex> & {
   containerSx?: ThemableCssProp;
+  footer?: React.ReactNode;
+  onReachEnd?: () => void;
 };
 
 export const SelectOptionList = (props: SelectOptionListProps) => {
-  const { containerSx, sx, ...rest } = props;
+  const { containerSx, sx, footer, onReachEnd, ...rest } = props;
   const {
     popoverCtx,
     searchInputCtx,
@@ -296,6 +298,10 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       if (isOpen) {
+        if (onReachEnd && focusedIndex === options.length - 1) {
+          onReachEnd();
+          return;
+        }
         return setFocusedIndex((i = 0) => (i === options.length - 1 ? 0 : i + 1));
       }
       return onTriggerClick();
@@ -379,6 +385,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
             );
           })}
           {noResultsMessage && options.length === 0 && <SelectNoResults>{noResultsMessage}</SelectNoResults>}
+          {footer}
         </Flex>
       </Flex>
     </Popover>
