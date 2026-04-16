@@ -167,6 +167,8 @@ const SelectRenderOption = React.memo(
     return (
       <Flex
         ref={ref}
+        role='option'
+        aria-selected={isSelected}
         sx={{
           userSelect: 'none',
           cursor: 'pointer',
@@ -333,7 +335,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
           sx,
         ]}
         // eslint-disable-next-line custom-rules/no-physical-css-properties -- Floating UI library positioning
-        style={{ ...styles, left: styles.left - 1 }}
+        style={styles}
       >
         {comparator && (
           <SelectSearchbar
@@ -344,6 +346,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
         <Flex
           ref={containerRef}
           direction='col'
+          role='listbox'
           tabIndex={comparator ? undefined : 0}
           sx={[
             theme => ({
@@ -390,7 +393,7 @@ export const SelectButton = (
 ) => {
   const { sx, children, icon, iconSx, ...rest } = props;
   const { popoverCtx, onTriggerClick, buttonRenderOption, selectedOption, placeholder, elementId } = useSelectState();
-  const { reference } = popoverCtx;
+  const { reference, isOpen } = popoverCtx;
 
   let show: React.ReactNode = children;
   if (!children) {
@@ -405,6 +408,8 @@ export const SelectButton = (
       variant='outline'
       textVariant='buttonLarge'
       onClick={onTriggerClick}
+      aria-expanded={isOpen}
+      aria-haspopup='listbox'
       sx={[
         theme => ({
           gap: theme.space.$2,
