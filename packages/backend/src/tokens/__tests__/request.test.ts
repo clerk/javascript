@@ -10,13 +10,13 @@ import {
   mockJwtPayload,
   signingJwks,
 } from '../../fixtures';
-import { signJwt } from '../../jwt/signJwt';
 import {
   mockMachineAuthResponses,
   mockSignedOAuthAccessTokenJwt,
   mockTokens,
   mockVerificationResults,
 } from '../../fixtures/machine';
+import { signJwt } from '../../jwt/signJwt';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
