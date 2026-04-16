@@ -294,6 +294,24 @@ describe('Menu', () => {
       expect(trigger).toHaveFocus();
     });
 
+    it('skips a disabled item when navigating with ArrowDown/ArrowUp', async () => {
+      const { wrapper } = await createFixtures();
+      const { getByRole, userEvent } = render(
+        <Harness items={[{ label: 'First' }, { label: 'Second', isDisabled: true }, { label: 'Third' }]} />,
+        { wrapper },
+      );
+
+      getByRole('button', { name: 'Open menu' }).focus();
+      await userEvent.keyboard('{ArrowDown}');
+      await waitFor(() => expect(getByRole('menuitem', { name: 'First' })).toHaveFocus());
+
+      await userEvent.keyboard('{ArrowDown}');
+      await waitFor(() => expect(getByRole('menuitem', { name: 'Third' })).toHaveFocus());
+
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(getByRole('menuitem', { name: 'First' })).toHaveFocus());
+    });
+
     it('applies a roving tabIndex: only the active item is tabbable', async () => {
       const { wrapper } = await createFixtures();
       const { getByRole, userEvent } = render(<Harness items={[{ label: 'First' }, { label: 'Second' }]} />, {
