@@ -78,8 +78,7 @@ function _OAuthConsent() {
   const redirectUrl = ctx.redirectUrl ?? getRedirectUriFromSearch();
 
   const { t } = useLocalizations();
-  const display = getRedirectDisplay(redirectUrl);
-  const domainAction = display.kind === 'invalid' ? '' : display.value;
+  const domainAction = getRedirectDisplay(redirectUrl);
   const viewFullUrlText = t(localizationKeys('oauthConsent.viewFullUrl'));
 
   // Error states only apply to the public flow.

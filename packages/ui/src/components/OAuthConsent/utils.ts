@@ -1,38 +1,23 @@
 const canReadLocation = () => typeof window !== 'undefined' && !!window.location;
 
-export type RedirectDisplay = { kind: 'ip'; value: string } | { kind: 'hostname'; value: string } | { kind: 'invalid' };
-
 const IPV4_REGEX = /^(\d{1,3}\.){3}\d{1,3}$/;
 
-function stripBrackets(host: string): string {
-  return host.startsWith('[') && host.endsWith(']') ? host.slice(1, -1) : host;
-}
-
-function isIpLiteral(normalized: string): boolean {
-  return IPV4_REGEX.test(normalized) || normalized.includes(':');
-}
-
-function formatIpForDisplay(normalized: string): string {
-  return normalized.includes(':') ? `[${normalized}]` : normalized;
-}
-
-function rootDomainOf(hostname: string): string {
-  return hostname.split('.').slice(-2).join('.');
-}
-
-export function getRedirectDisplay(url: string): RedirectDisplay {
+export function getRedirectDisplay(url: string): string {
   let hostname: string;
   try {
     hostname = new URL(url).hostname;
   } catch {
-    return { kind: 'invalid' };
+    return '';
   }
-  if (!hostname) return { kind: 'invalid' };
+  if (!hostname) return '';
 
-  const normalized = stripBrackets(hostname).toLowerCase();
+  // WHATWG URL.hostname includes surrounding brackets for IPv6 literals on some
+  // platforms; strip them so detection and output formatting are uniform.
+  const host = hostname.startsWith('[') && hostname.endsWith(']') ? hostname.slice(1, -1) : hostname;
 
-  if (isIpLiteral(normalized)) return { kind: 'ip', value: formatIpForDisplay(normalized) };
-  return { kind: 'hostname', value: rootDomainOf(normalized) };
+  if (IPV4_REGEX.test(host)) return host;
+  if (host.includes(':')) return `[${host}]`;
+  return host.split('.').slice(-2).join('.');
 }
 
 export function getRedirectUriFromSearch(): string {
