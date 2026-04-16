@@ -86,6 +86,32 @@ describe('tokens.verify(token, options)', () => {
 
     expect(data).toEqual(mockJwtPayload);
   });
+
+  it('returns signature error before claims error when both are invalid', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    // Create a JWT with expired claims AND an invalid signature
+    const expiredJwt = createJwt({
+      payload: { ...mockJwtPayload, exp: mockJwtPayload.iat - 100 },
+    });
+
+    const { errors } = await verifyToken(expiredJwt, {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'a-valid-key',
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      skipJwksCache: true,
+    });
+
+    expect(errors).toBeDefined();
+    expect(errors?.[0].message).toContain('signature');
+  });
 });
 
 describe('tokens.verifyMachineAuthToken(token, options)', () => {
