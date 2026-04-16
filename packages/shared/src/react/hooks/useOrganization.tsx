@@ -69,7 +69,7 @@ export type UseOrganizationParams = {
 export type UseOrganizationReturn<T extends UseOrganizationParams> =
   | {
       /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
+       * A boolean that indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads but may temporarily return to `false` while auth state is updating, such as when switching organizations.
        */
       isLoaded: false;
       /**
