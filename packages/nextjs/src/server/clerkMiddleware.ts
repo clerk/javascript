@@ -164,7 +164,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       // Auto-detect when no explicit proxy or domain is configured
       const hasExplicitProxyOrDomain = resolvedParams.proxyUrl || PROXY_URL || resolvedParams.domain || DOMAIN;
-      if (!frontendApiProxyConfig && !hasExplicitProxyOrDomain) {
+      if (!frontendApiProxyConfig && !hasExplicitProxyOrDomain && publishableKey.startsWith('pk_live_')) {
         const requestUrl = new URL(request.nextUrl.href);
         if (shouldAutoProxy(requestUrl.hostname)) {
           frontendApiProxyConfig = { enabled: true };
