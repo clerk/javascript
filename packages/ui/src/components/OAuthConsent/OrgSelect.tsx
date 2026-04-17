@@ -67,7 +67,6 @@ export function OrgSelect({ options, value, onChange }: OrgSelectProps) {
           {isSelected && (
             <Icon
               icon={Checkmark}
-              size='sm'
               sx={theme => ({ color: theme.colors.$primary500 })}
             />
           )}
