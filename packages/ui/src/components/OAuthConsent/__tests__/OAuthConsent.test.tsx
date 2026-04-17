@@ -371,9 +371,30 @@ describe('OAuthConsent', () => {
       });
     });
 
+    it('does not call useOrganizationList when organizations feature is disabled in the dashboard', async () => {
+      // SDK-63: even when enableOrgSelection is passed, if organizationSettings.enabled is false
+      // the hook must not be called to avoid the "Organizations feature required" dev dialog.
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['jane@example.com'] });
+        // intentionally NOT calling f.withOrganizations()
+      });
+
+      props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      const { queryByRole } = render(<OAuthConsent />, { wrapper });
+
+      await waitFor(() => {
+        expect(queryByRole('combobox')).toBeNull();
+      });
+
+      expect(useOrganizationList).not.toHaveBeenCalled();
+    });
+
     it('renders the org selector when __internal_enableOrgSelection is true and orgs are loaded', async () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withUser({ email_addresses: ['jane@example.com'] });
+        f.withOrganizations();
       });
 
       props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
@@ -397,9 +418,30 @@ describe('OAuthConsent', () => {
       });
     });
 
+    it('shows a loading card while org memberships are being fetched', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['jane@example.com'] });
+        f.withOrganizations();
+      });
+
+      props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      vi.mocked(useOrganizationList).mockReturnValue({
+        isLoaded: false,
+        userMemberships: { data: [], hasNextPage: false, fetchNext: vi.fn(), isLoading: true },
+      } as any);
+
+      const { queryByText } = render(<OAuthConsent />, { wrapper });
+
+      // The consent card content must not be visible while memberships are loading.
+      expect(queryByText('Clerk CLI')).toBeNull();
+    });
+
     it('includes a hidden organization_id input in the form when org selection is enabled and an org is selected', async () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withUser({ email_addresses: ['jane@example.com'] });
+        f.withOrganizations();
       });
 
       props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
@@ -453,6 +495,7 @@ describe('OAuthConsent', () => {
       const fetchNext = vi.fn();
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withUser({ email_addresses: ['jane@example.com'] });
+        f.withOrganizations();
       });
 
       props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
@@ -475,6 +518,7 @@ describe('OAuthConsent', () => {
       const fetchNext = vi.fn();
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withUser({ email_addresses: ['jane@example.com'] });
+        f.withOrganizations();
       });
 
       props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);

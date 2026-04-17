@@ -1,5 +1,5 @@
 import { useClerk, useOAuthConsent, useOrganizationList, useUser } from '@clerk/shared/react';
-import { useCallback, useEffect, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
 import { Box, Button, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
@@ -28,37 +28,54 @@ import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getR
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
-type OrgSelectionProps = {
-  selectedOrg: string | null;
-  onChange: (value: string) => void;
-  onReady: () => void;
+type OrgSelectionContextValue = {
+  orgSelectNode: React.ReactNode;
+  hiddenOrgInput: React.ReactNode;
 };
 
-function OrgSelection({ selectedOrg, onChange, onReady }: OrgSelectionProps) {
-  const { isLoaded: isMembershipsLoaded, userMemberships } = useOrganizationList({
+const OrgSelectionContext = createContext<OrgSelectionContextValue | null>(null);
+
+function OrgSelectSlot() {
+  const ctx = useContext(OrgSelectionContext);
+  return <>{ctx?.orgSelectNode ?? null}</>;
+}
+
+function OrgHiddenInputSlot() {
+  const ctx = useContext(OrgSelectionContext);
+  return <>{ctx?.hiddenOrgInput ?? null}</>;
+}
+
+type OrgSelectionGateProps = {
+  selectedOrg: string | null;
+  onChange: (value: string) => void;
+  children: React.ReactNode;
+};
+
+function OrgSelectionGate({ selectedOrg, onChange, children }: OrgSelectionGateProps) {
+  const { isLoaded, userMemberships } = useOrganizationList({
     userMemberships: { infinite: true },
   });
+
+  if (!isLoaded || userMemberships.isLoading) {
+    return (
+      <Card.Root>
+        <Card.Content>
+          <LoadingCardContainer />
+        </Card.Content>
+        <Card.Footer />
+      </Card.Root>
+    );
+  }
+
   const orgOptions: OrgOption[] = (userMemberships.data ?? []).map(m => ({
     value: m.organization.id,
     label: m.organization.name,
     logoUrl: m.organization.imageUrl,
   }));
-
   const effectiveOrg = selectedOrg ?? orgOptions[0]?.value ?? null;
-  const isReady = isMembershipsLoaded && !userMemberships.isLoading;
 
-  useEffect(() => {
-    if (isReady) {
-      onReady();
-    }
-  }, [isReady, onReady]);
-
-  if (!isReady || orgOptions.length === 0 || !effectiveOrg) {
-    return null;
-  }
-
-  return (
-    <>
+  const orgSelectNode =
+    orgOptions.length > 0 && effectiveOrg ? (
       <OrgSelect
         options={orgOptions}
         value={effectiveOrg}
@@ -66,12 +83,39 @@ function OrgSelection({ selectedOrg, onChange, onReady }: OrgSelectionProps) {
         hasMore={userMemberships.hasNextPage}
         onLoadMore={userMemberships.fetchNext}
       />
-      <input
-        type='hidden'
-        name='organization_id'
-        value={effectiveOrg}
-      />
-    </>
+    ) : null;
+
+  const hiddenOrgInput = effectiveOrg ? (
+    <input
+      type='hidden'
+      name='organization_id'
+      value={effectiveOrg}
+    />
+  ) : null;
+
+  return (
+    <OrgSelectionContext.Provider value={{ orgSelectNode, hiddenOrgInput }}>{children}</OrgSelectionContext.Provider>
+  );
+}
+
+type OrgSelectionProps = {
+  enabled: boolean;
+  selectedOrg: string | null;
+  onChange: (value: string) => void;
+  children: React.ReactNode;
+};
+
+function OrgSelection({ enabled, selectedOrg, onChange, children }: OrgSelectionProps) {
+  if (!enabled) {
+    return <>{children}</>;
+  }
+  return (
+    <OrgSelectionGate
+      selectedOrg={selectedOrg}
+      onChange={onChange}
+    >
+      {children}
+    </OrgSelectionGate>
   );
 }
 
@@ -85,9 +129,8 @@ function _OAuthConsent() {
   } = useEnvironment();
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
-  const needsOrgLoading = ctx.enableOrgSelection && organizationSettings.enabled;
-  const [isOrgSelectionReady, setIsOrgSelectionReady] = useState(!needsOrgLoading);
-  const handleOrgSelectionReady = useCallback(() => setIsOrgSelectionReady(true), []);
+
+  const orgSelectionEnabled = !!(ctx.enableOrgSelection && organizationSettings.enabled);
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -157,24 +200,6 @@ function _OAuthConsent() {
     }
   }
 
-  if (!isOrgSelectionReady) {
-    return (
-      <>
-        <OrgSelection
-          selectedOrg={selectedOrg}
-          onChange={setSelectedOrg}
-          onReady={handleOrgSelectionReady}
-        />
-        <Card.Root>
-          <Card.Content>
-            <LoadingCardContainer />
-          </Card.Content>
-          <Card.Footer />
-        </Card.Root>
-      </>
-    );
-  }
-
   const actionUrl = clerk.oauthApplication.buildConsentActionUrl({ clientId: oauthClientId });
   const forwardedParams = getForwardedParams();
 
@@ -198,7 +223,11 @@ function _OAuthConsent() {
   const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
 
   return (
-    <>
+    <OrgSelection
+      enabled={orgSelectionEnabled}
+      selectedOrg={selectedOrg}
+      onChange={setSelectedOrg}
+    >
       <form
         method='POST'
         action={actionUrl}
@@ -271,13 +300,7 @@ function _OAuthConsent() {
                 })}
               />
             </Header.Root>
-            {ctx.enableOrgSelection && organizationSettings.enabled && (
-              <OrgSelection
-                selectedOrg={selectedOrg}
-                onChange={setSelectedOrg}
-                onReady={handleOrgSelectionReady}
-              />
-            )}
+            <OrgSelectSlot />
             <ListGroup>
               <ListGroupHeader>
                 <ListGroupHeaderTitle
@@ -356,6 +379,7 @@ function _OAuthConsent() {
               value={value}
             />
           ))}
+        {!hasContextCallbacks && <OrgHiddenInputSlot />}
       </form>
       <RedirectUriModal
         isOpen={isUriModalOpen}
@@ -364,7 +388,7 @@ function _OAuthConsent() {
         redirectUri={redirectUrl}
         oauthApplicationName={oauthApplicationName}
       />
-    </>
+    </OrgSelection>
   );
 }
 
