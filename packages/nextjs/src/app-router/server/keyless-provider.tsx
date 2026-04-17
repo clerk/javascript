@@ -43,9 +43,8 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
     .then(mod => mod.keyless().getOrCreateKeys())
     .catch(() => null);
 
-  const { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMessage } = await import(
-    '../../server/keyless-log-cache.js'
-  );
+  const { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMessage } =
+    await import('../../server/keyless-log-cache.js');
 
   if (!newOrReadKeys) {
     // When case keyless should run, but keys are not available, then fallback to throwing for missing keys
