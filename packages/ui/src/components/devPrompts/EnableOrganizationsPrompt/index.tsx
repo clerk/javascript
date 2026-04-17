@@ -4,7 +4,7 @@ import type { __internal_EnableOrganizationsPromptProps, EnableEnvironmentSettin
 import type { SerializedStyles } from '@emotion/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
-import React, { forwardRef, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, useId, useLayoutEffect, useRef, useState } from 'react';
 
 import { useEnvironment, useOptions } from '@/ui/contexts';
 import { Modal } from '@/ui/elements/Modal';
@@ -38,13 +38,6 @@ const EnableOrganizationsPromptInternal = ({
   const isKeyless = Boolean(claimUrl) && Boolean(copyKeysUrl);
   const isClaimed = environment.authConfig.claimedAt !== null;
   const showKeylessClaimPath = isEnabled && isKeyless && !isClaimed;
-
-  const claimUrlWithReturnUrl = useMemo(() => {
-    if (!showKeylessClaimPath || !claimUrl) return undefined;
-    const url = new URL(claimUrl);
-    url.searchParams.append('return_url', window.location.href);
-    return url.href;
-  }, [showKeylessClaimPath, claimUrl]);
 
   const isComponent = !caller.startsWith('use');
 
@@ -277,10 +270,15 @@ const EnableOrganizationsPromptInternal = ({
                     {clerk.user ? 'Continue' : 'I\u2019ll do it later'}
                   </PromptButton>
                   <Link
-                    href={claimUrlWithReturnUrl}
+                    href={claimUrl}
                     target='_blank'
                     rel='noopener noreferrer'
-                    onClick={() => {
+                    onClick={e => {
+                      if (claimUrl) {
+                        const url = new URL(claimUrl);
+                        url.searchParams.append('return_url', window.location.href);
+                        e.currentTarget.href = url.href;
+                      }
                       clerk.__internal_closeEnableOrganizationsPrompt?.();
                     }}
                     css={css`

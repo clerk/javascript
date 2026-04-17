@@ -48,10 +48,14 @@ describe('EnableOrganizationsPrompt success state', () => {
       expect(claimLink).toHaveAttribute('target', '_blank');
       expect(claimLink).toHaveAttribute('rel', 'noopener noreferrer');
 
-      // href should include the claim URL with return_url appended
+      // href should stay raw until the user clicks, then pick up return_url
       const href = claimLink.getAttribute('href')!;
       expect(href).toContain('dashboard.clerk.com/claim');
-      expect(href).toContain('return_url=');
+      expect(href).not.toContain('return_url=');
+
+      await claimLink.click();
+
+      expect(claimLink.getAttribute('href')).toContain('return_url=');
 
       // Should show "I'll do it later" button
       expect(screen.getByRole('button', { name: /i.ll do it later/i })).toBeInTheDocument();
