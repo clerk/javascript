@@ -1,5 +1,15 @@
 # @clerk/nuxt
 
+## 2.2.4
+
+### Patch Changes
+
+- Fixed attrs type in custom UI components. ([#8301](https://github.com/clerk/javascript/pull/8301)) by [@renovate](https://github.com/apps/renovate)
+
+- Updated dependencies [[`fcc6c0c`](https://github.com/clerk/javascript/commit/fcc6c0c511a37da912577864cc12f2039c52e654)]:
+  - @clerk/backend@3.2.13
+  - @clerk/vue@2.0.15
+
 ## 2.2.3
 
 ### Patch Changes
