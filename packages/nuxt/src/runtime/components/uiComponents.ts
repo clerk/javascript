@@ -1,3 +1,4 @@
+import type { RoutingOptions } from '@clerk/shared/types';
 import {
   CreateOrganization as BaseCreateOrganization,
   OrganizationList as BaseOrganizationList,
@@ -49,7 +50,7 @@ const wrapComponentWithRouting = <T extends Component>(baseComponent: T, compone
     const path = usePathnameWithoutSplatRouteParams();
     const routingProps = useRoutingProps(
       componentName,
-      () => attrs,
+      () => attrs as RoutingOptions,
       () => ({ path: path.value }),
     );
     return () => h(baseComponent, routingProps.value, slots);
