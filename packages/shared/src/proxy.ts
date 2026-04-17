@@ -53,7 +53,11 @@ export function shouldAutoProxy(hostname: string): boolean {
 
 function normalizeHostname(hostnameOrUrl: string): string {
   if (hostnameOrUrl.startsWith('http://') || hostnameOrUrl.startsWith('https://')) {
-    return new URL(hostnameOrUrl).hostname;
+    try {
+      return new URL(hostnameOrUrl).hostname;
+    } catch {
+      return '';
+    }
   }
 
   return hostnameOrUrl.split('/')[0] || '';
