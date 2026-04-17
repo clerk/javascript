@@ -4,8 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
 import com.clerk.api.network.serialization.ClerkResult
+import com.clerk.api.ui.ClerkColors
+import com.clerk.api.ui.ClerkDesign
+import com.clerk.api.ui.ClerkTheme
 import com.facebook.react.bridge.ActivityEventListener
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -18,6 +23,7 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import org.json.JSONObject
 
 private const val TAG = "ClerkExpoModule"
 
@@ -79,6 +85,13 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
                     }
 
                     Clerk.initialize(reactApplicationContext, pubKey)
+                    // Theme loading is centralized here. ClerkViewFactory.configure()
+                    // and ClerkUserProfileActivity.onCreate() only call Clerk.initialize()
+                    // when Clerk is not yet initialized, so by the time they run
+                    // ClerkExpoModule has already set the custom theme.
+                    // Must be set AFTER Clerk.initialize() because initialize()
+                    // resets customTheme to its `theme` parameter (default null).
+                    loadThemeFromAssets()
 
                     // Wait for initialization to complete with timeout
                     try {
@@ -370,5 +383,84 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
         result.putBoolean("dismissed", resultCode == Activity.RESULT_CANCELED)
 
         promise.resolve(result)
+    }
+
+    // MARK: - Theme Loading
+
+    private fun loadThemeFromAssets() {
+        try {
+            val jsonString = reactApplicationContext.assets
+                .open("clerk_theme.json")
+                .bufferedReader()
+                .use { it.readText() }
+            val json = JSONObject(jsonString)
+            Clerk.customTheme = parseClerkTheme(json)
+        } catch (e: java.io.FileNotFoundException) {
+            // No theme file provided — use defaults
+        } catch (e: Exception) {
+            debugLog(TAG, "Failed to load clerk_theme.json: ${e.message}")
+        }
+    }
+
+    private fun parseClerkTheme(json: JSONObject): ClerkTheme {
+        val colors = json.optJSONObject("colors")?.let { parseColors(it) }
+        val darkColors = json.optJSONObject("darkColors")?.let { parseColors(it) }
+        val design = json.optJSONObject("design")?.let { parseDesign(it) }
+        return ClerkTheme(
+            colors = colors,
+            darkColors = darkColors,
+            design = design
+        )
+    }
+
+    private fun parseColors(json: JSONObject): ClerkColors {
+        return ClerkColors(
+            primary = json.optStringColor("primary"),
+            background = json.optStringColor("background"),
+            input = json.optStringColor("input"),
+            danger = json.optStringColor("danger"),
+            success = json.optStringColor("success"),
+            warning = json.optStringColor("warning"),
+            foreground = json.optStringColor("foreground"),
+            mutedForeground = json.optStringColor("mutedForeground"),
+            primaryForeground = json.optStringColor("primaryForeground"),
+            inputForeground = json.optStringColor("inputForeground"),
+            neutral = json.optStringColor("neutral"),
+            border = json.optStringColor("border"),
+            ring = json.optStringColor("ring"),
+            muted = json.optStringColor("muted"),
+            shadow = json.optStringColor("shadow")
+        )
+    }
+
+    private fun parseDesign(json: JSONObject): ClerkDesign {
+        return if (json.has("borderRadius")) {
+            ClerkDesign(borderRadius = json.getDouble("borderRadius").toFloat().dp)
+        } else {
+            ClerkDesign()
+        }
+    }
+
+    private fun parseHexColor(hex: String): Color? {
+        val cleaned = hex.removePrefix("#")
+        return try {
+            when (cleaned.length) {
+                6 -> Color(android.graphics.Color.parseColor("#FF$cleaned"))
+                // Theme JSON uses RRGGBBAA; Android parseColor expects AARRGGBB
+                8 -> {
+                    val rrggbb = cleaned.substring(0, 6)
+                    val aa = cleaned.substring(6, 8)
+                    Color(android.graphics.Color.parseColor("#$aa$rrggbb"))
+                }
+                else -> null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun JSONObject.optStringColor(key: String): Color? {
+        val value = optString(key, null) ?: return null
+        return parseHexColor(value)
     }
 }

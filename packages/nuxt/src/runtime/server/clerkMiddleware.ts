@@ -1,6 +1,7 @@
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { AuthStatus, constants, getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { isMalformedURLError } from '@clerk/shared/pathMatcher';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { EventHandler } from 'h3';
 import { createError, eventHandler, setResponseHeader } from 'h3';
@@ -159,6 +160,13 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       };
     }
 
-    await handler?.(event);
+    try {
+      await handler?.(event);
+    } catch (e) {
+      if (isMalformedURLError(e)) {
+        throw createError({ statusCode: 400, statusMessage: 'Bad Request' });
+      }
+      throw e;
+    }
   });
 };

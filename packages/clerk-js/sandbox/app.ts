@@ -470,7 +470,7 @@ void (async () => {
     },
     '/oauth-consent': () => {
       const searchParams = new URLSearchParams(window.location.search);
-      const scopes = (searchParams.get('scopes')?.split(',') ?? []).map(scope => ({
+      const scopes = (searchParams.get('scope')?.split(',') ?? []).map(scope => ({
         scope,
         description: scope === 'offline_access' ? null : `Grants access to your ${scope}`,
         requires_consent: true,
@@ -479,10 +479,9 @@ void (async () => {
         app,
         componentControls.oauthConsent.getProps() ?? {
           scopes,
-          oAuthApplicationName: searchParams.get('oauth-application-name'),
-          redirectUrl: searchParams.get('redirect_uri'),
-          oAuthApplicationLogoUrl: searchParams.get('logo-url'),
-          oAuthApplicationUrl: searchParams.get('app-url'),
+          oauthClientId: 'Wg9fP2d0pSFXCZ1u',
+          redirectUrl: searchParams.get('redirect_uri') ?? 'http://localhost:4000/oauth/callback',
+          __internal_enableOrgSelection: true,
         },
       );
     },
