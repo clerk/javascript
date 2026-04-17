@@ -14,6 +14,7 @@ import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
+import { Select, SelectButton, SelectOption, SelectOptionList } from '@/ui/elements/Select';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
@@ -33,7 +34,7 @@ import {
   withRedirectToSignInTask,
 } from '../../common';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
-import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
+import { Col, descriptors, Flow, localizationKeys, Text } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -76,6 +77,139 @@ const useAutoFillPasskey = () => {
   return {
     isWebAuthnAutofillSupported: isSupported,
   };
+};
+
+// PROTOTYPE: Remove before merging
+const SelectOptionDemo = () => {
+  const [orgValue, setOrgValue] = useState<string | null>('org_1');
+  const [phoneValue, setPhoneValue] = useState<string | null>('us');
+  const [roleValue, setRoleValue] = useState<string | null>('admin');
+  const [defaultValue, setDefaultValue] = useState<string | null>('30d');
+
+  const orgOptions = [
+    { value: 'org_1', label: 'Acme Corp', logoUrl: 'https://img.clerk.com/placeholder' },
+    {
+      value: 'org_2',
+      label: 'Globex Industries Globex Industries Globex Industries',
+      logoUrl: 'https://img.clerk.com/placeholder',
+    },
+    { value: 'org_3', label: 'Initech', logoUrl: 'https://img.clerk.com/placeholder' },
+  ];
+
+  const phoneOptions = [
+    { value: 'us', label: 'United States', code: '1' },
+    { value: 'gb', label: 'United Kingdom', code: '44' },
+    { value: 'de', label: 'Germany', code: '49' },
+    { value: 'fr', label: 'France', code: '33' },
+  ];
+
+  const roleOptions = [
+    { value: 'admin', label: 'Admin' },
+    { value: 'member', label: 'Member' },
+    { value: 'guest', label: 'Guest' },
+  ];
+
+  const expirationOptions = [
+    { value: '7d', label: '7 days' },
+    { value: '30d', label: '30 days' },
+    { value: '90d', label: '90 days' },
+    { value: 'never', label: 'Never' },
+  ];
+
+  return (
+    <Col
+      gap={4}
+      sx={{ padding: '16px 0' }}
+    >
+      <Text variant='subtitle'>SelectOption Variants (prototype)</Text>
+
+      <Text
+        colorScheme='secondary'
+        sx={{ fontSize: '12px' }}
+      >
+        Image + Label (OrgSelect pattern)
+      </Text>
+      <Select
+        options={orgOptions}
+        value={orgValue}
+        onChange={option => setOrgValue(option.value)}
+        matchTriggerWidth
+        renderOption={(option, _index, isSelected) => (
+          <SelectOption isSelected={isSelected}>
+            <SelectOption.Image
+              src={option.logoUrl}
+              alt={option.label}
+            />
+            <SelectOption.Label>{option.label}</SelectOption.Label>
+          </SelectOption>
+        )}
+      >
+        <SelectButton>{orgOptions.find(o => o.value === orgValue)?.label || 'Select org'}</SelectButton>
+        <SelectOptionList />
+      </Select>
+
+      <Text
+        colorScheme='secondary'
+        sx={{ fontSize: '12px' }}
+      >
+        Label + Detail (PhoneInput pattern)
+      </Text>
+      <Select
+        options={phoneOptions}
+        value={phoneValue}
+        onChange={option => setPhoneValue(option.value)}
+        matchTriggerWidth
+        renderOption={(option, _index, isSelected) => (
+          <SelectOption isSelected={isSelected}>
+            <SelectOption.Label>{option.label}</SelectOption.Label>
+            <SelectOption.Detail>+{option.code}</SelectOption.Detail>
+          </SelectOption>
+        )}
+      >
+        <SelectButton>{phoneOptions.find(o => o.value === phoneValue)?.label || 'Select country'}</SelectButton>
+        <SelectOptionList />
+      </Select>
+
+      <Text
+        colorScheme='secondary'
+        sx={{ fontSize: '12px' }}
+      >
+        Label only (RoleSelect pattern)
+      </Text>
+      <Select
+        options={roleOptions}
+        value={roleValue}
+        onChange={option => setRoleValue(option.value)}
+        matchTriggerWidth
+        renderOption={(option, _index, isSelected) => (
+          <SelectOption isSelected={isSelected}>
+            <SelectOption.Label>{option.label}</SelectOption.Label>
+          </SelectOption>
+        )}
+      >
+        <SelectButton>{roleOptions.find(o => o.value === roleValue)?.label || 'Select role'}</SelectButton>
+        <SelectOptionList />
+      </Select>
+
+      <Text
+        colorScheme='secondary'
+        sx={{ fontSize: '12px' }}
+      >
+        Default renderer (Checkout/APIKeys pattern)
+      </Text>
+      <Select
+        options={expirationOptions}
+        value={defaultValue}
+        onChange={option => setDefaultValue(option.value)}
+        matchTriggerWidth
+      >
+        <SelectButton>
+          {expirationOptions.find(o => o.value === defaultValue)?.label || 'Select expiration'}
+        </SelectButton>
+        <SelectOptionList />
+      </Select>
+    </Col>
+  );
 };
 
 function SignInStartInternal(): JSX.Element {
@@ -571,6 +705,8 @@ function SignInStartInternal(): JSX.Element {
               />
             </Header.Root>
             <Card.Alert>{card.error}</Card.Alert>
+            {/* PROTOTYPE: SelectOption variants demo — remove before merging */}
+            <SelectOptionDemo />
             {/*TODO: extract main in its own component */}
             <Col
               elementDescriptor={descriptors.main}
