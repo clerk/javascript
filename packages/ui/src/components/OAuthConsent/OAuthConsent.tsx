@@ -1,5 +1,5 @@
-import { useClerk, useOAuthConsent, useOrganizationList, useUser } from '@clerk/shared/react';
-import { createContext, useContext, useState } from 'react';
+import { useClerk, useOAuthConsent, useUser } from '@clerk/shared/react';
+import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
 import { Box, Button, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
@@ -22,102 +22,10 @@ import {
   ListGroupItemLabel,
 } from './ListGroup';
 import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupSeparator } from './LogoGroup';
-import type { OrgOption } from './OrgSelect';
 import { OrgSelect } from './OrgSelect';
 import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
-
-type OrgSelectionContextValue = {
-  orgSelectNode: React.ReactNode;
-  hiddenOrgInput: React.ReactNode;
-};
-
-const OrgSelectionContext = createContext<OrgSelectionContextValue | null>(null);
-
-function OrgSelectSlot() {
-  const ctx = useContext(OrgSelectionContext);
-  return <>{ctx?.orgSelectNode ?? null}</>;
-}
-
-function OrgHiddenInputSlot() {
-  const ctx = useContext(OrgSelectionContext);
-  return <>{ctx?.hiddenOrgInput ?? null}</>;
-}
-
-type OrgSelectionGateProps = {
-  selectedOrg: string | null;
-  onChange: (value: string) => void;
-  children: React.ReactNode;
-};
-
-function OrgSelectionGate({ selectedOrg, onChange, children }: OrgSelectionGateProps) {
-  const { isLoaded, userMemberships } = useOrganizationList({
-    userMemberships: { infinite: true },
-  });
-
-  if (!isLoaded || userMemberships.isLoading) {
-    return (
-      <Card.Root>
-        <Card.Content>
-          <LoadingCardContainer />
-        </Card.Content>
-        <Card.Footer />
-      </Card.Root>
-    );
-  }
-
-  const orgOptions: OrgOption[] = (userMemberships.data ?? []).map(m => ({
-    value: m.organization.id,
-    label: m.organization.name,
-    logoUrl: m.organization.imageUrl,
-  }));
-  const effectiveOrg = selectedOrg ?? orgOptions[0]?.value ?? null;
-
-  const orgSelectNode =
-    orgOptions.length > 0 && effectiveOrg ? (
-      <OrgSelect
-        options={orgOptions}
-        value={effectiveOrg}
-        onChange={onChange}
-        hasMore={userMemberships.hasNextPage}
-        onLoadMore={userMemberships.fetchNext}
-      />
-    ) : null;
-
-  const hiddenOrgInput = effectiveOrg ? (
-    <input
-      type='hidden'
-      name='organization_id'
-      value={effectiveOrg}
-    />
-  ) : null;
-
-  return (
-    <OrgSelectionContext.Provider value={{ orgSelectNode, hiddenOrgInput }}>{children}</OrgSelectionContext.Provider>
-  );
-}
-
-type OrgSelectionProps = {
-  enabled: boolean;
-  selectedOrg: string | null;
-  onChange: (value: string) => void;
-  children: React.ReactNode;
-};
-
-function OrgSelection({ enabled, selectedOrg, onChange, children }: OrgSelectionProps) {
-  if (!enabled) {
-    return <>{children}</>;
-  }
-  return (
-    <OrgSelectionGate
-      selectedOrg={selectedOrg}
-      onChange={onChange}
-    >
-      {children}
-    </OrgSelectionGate>
-  );
-}
 
 function _OAuthConsent() {
   const ctx = useOAuthConsentContext();
@@ -128,9 +36,18 @@ function _OAuthConsent() {
     organizationSettings,
   } = useEnvironment();
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
-  const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
 
   const orgSelectionEnabled = !!(ctx.enableOrgSelection && organizationSettings.enabled);
+  const orgOptions = orgSelectionEnabled
+    ? (user?.organizationMemberships ?? []).map(m => ({
+        value: m.organization.id,
+        label: m.organization.name,
+        logoUrl: m.organization.imageUrl,
+      }))
+    : [];
+
+  const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
+  const effectiveOrg = selectedOrg ?? orgOptions[0]?.value ?? null;
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -223,11 +140,7 @@ function _OAuthConsent() {
   const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
 
   return (
-    <OrgSelection
-      enabled={orgSelectionEnabled}
-      selectedOrg={selectedOrg}
-      onChange={setSelectedOrg}
-    >
+    <>
       <form
         method='POST'
         action={actionUrl}
@@ -300,7 +213,13 @@ function _OAuthConsent() {
                 })}
               />
             </Header.Root>
-            <OrgSelectSlot />
+            {orgSelectionEnabled && orgOptions.length > 0 && effectiveOrg && (
+              <OrgSelect
+                options={orgOptions}
+                value={effectiveOrg}
+                onChange={setSelectedOrg}
+              />
+            )}
             <ListGroup>
               <ListGroupHeader>
                 <ListGroupHeaderTitle
@@ -379,7 +298,13 @@ function _OAuthConsent() {
               value={value}
             />
           ))}
-        {!hasContextCallbacks && <OrgHiddenInputSlot />}
+        {!hasContextCallbacks && orgSelectionEnabled && effectiveOrg && (
+          <input
+            type='hidden'
+            name='organization_id'
+            value={effectiveOrg}
+          />
+        )}
       </form>
       <RedirectUriModal
         isOpen={isUriModalOpen}
@@ -388,7 +313,7 @@ function _OAuthConsent() {
         redirectUri={redirectUrl}
         oauthApplicationName={oauthApplicationName}
       />
-    </OrgSelection>
+    </>
   );
 }
 
