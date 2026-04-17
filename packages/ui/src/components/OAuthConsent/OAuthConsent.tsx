@@ -1,5 +1,5 @@
 import { useClerk, useOAuthConsent, useOrganizationList, useUser } from '@clerk/shared/react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
 import { Box, Button, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
@@ -31,9 +31,10 @@ const OFFLINE_ACCESS_SCOPE = 'offline_access';
 type OrgSelectionProps = {
   selectedOrg: string | null;
   onChange: (value: string) => void;
+  onReady: () => void;
 };
 
-function OrgSelection({ selectedOrg, onChange }: OrgSelectionProps) {
+function OrgSelection({ selectedOrg, onChange, onReady }: OrgSelectionProps) {
   const { isLoaded: isMembershipsLoaded, userMemberships } = useOrganizationList({
     userMemberships: { infinite: true },
   });
@@ -44,12 +45,15 @@ function OrgSelection({ selectedOrg, onChange }: OrgSelectionProps) {
   }));
 
   const effectiveOrg = selectedOrg ?? orgOptions[0]?.value ?? null;
+  const isReady = isMembershipsLoaded && !userMemberships.isLoading;
 
-  if (!isMembershipsLoaded || userMemberships.isLoading) {
-    return <LoadingCardContainer />;
-  }
+  useEffect(() => {
+    if (isReady) {
+      onReady();
+    }
+  }, [isReady, onReady]);
 
-  if (orgOptions.length === 0 || !effectiveOrg) {
+  if (!isReady || orgOptions.length === 0 || !effectiveOrg) {
     return null;
   }
 
@@ -80,8 +84,10 @@ function _OAuthConsent() {
     organizationSettings,
   } = useEnvironment();
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
-
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
+  const needsOrgLoading = ctx.enableOrgSelection && organizationSettings.enabled;
+  const [isOrgSelectionReady, setIsOrgSelectionReady] = useState(!needsOrgLoading);
+  const handleOrgSelectionReady = useCallback(() => setIsOrgSelectionReady(true), []);
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -149,6 +155,24 @@ function _OAuthConsent() {
         </Card.Root>
       );
     }
+  }
+
+  if (!isOrgSelectionReady) {
+    return (
+      <>
+        <OrgSelection
+          selectedOrg={selectedOrg}
+          onChange={setSelectedOrg}
+          onReady={handleOrgSelectionReady}
+        />
+        <Card.Root>
+          <Card.Content>
+            <LoadingCardContainer />
+          </Card.Content>
+          <Card.Footer />
+        </Card.Root>
+      </>
+    );
   }
 
   const actionUrl = clerk.oauthApplication.buildConsentActionUrl({ clientId: oauthClientId });
@@ -251,6 +275,7 @@ function _OAuthConsent() {
               <OrgSelection
                 selectedOrg={selectedOrg}
                 onChange={setSelectedOrg}
+                onReady={handleOrgSelectionReady}
               />
             )}
             <ListGroup>
