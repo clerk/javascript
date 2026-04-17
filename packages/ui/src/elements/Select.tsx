@@ -384,6 +384,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
               maxHeight: '18vh',
               padding: `${theme.space.$0x5} ${theme.space.$0x5}`,
               ...common.unstyledScrollbar(theme),
+              overflowX: 'hidden',
             }),
             containerSx,
           ]}
@@ -563,6 +564,7 @@ const SelectOptionRoot = ({ isSelected = false, children, sx, ...rest }: SelectO
       as='span'
       sx={[
         theme => ({
+          position: 'relative',
           width: '100%',
           display: 'grid',
           gridTemplateColumns: `1fr ${theme.sizes.$3}`,
@@ -572,6 +574,11 @@ const SelectOptionRoot = ({ isSelected = false, children, sx, ...rest }: SelectO
           paddingBlock: theme.space.$1,
           alignItems: 'center',
           borderRadius: theme.radii.$md,
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            inset: `calc(${theme.space.$0x5} * -1) calc(${theme.space.$1} * -1)`,
+          },
           '&:hover, &[data-focused="true"]': {
             background: common.mutedBackground(theme),
           },
