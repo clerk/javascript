@@ -1,4 +1,5 @@
 import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
+import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import { AUTO_PROXY_PATH, shouldAutoProxy } from '@clerk/shared/proxy';
 import type { Jwt } from '@clerk/shared/types';
 import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
@@ -71,8 +72,10 @@ class AuthenticateContext implements AuthenticateContext {
     private clerkRequest: ClerkRequest,
     options: AuthenticateRequestOptions,
   ) {
-    // Auto-detect proxy for supported platform deployments (production only)
-    if (!options.proxyUrl && !options.domain && options.publishableKey?.startsWith('pk_live_')) {
+    // Auto-detect proxy for supported platform deployments (production only).
+    // Note: hostname is derived from X-Forwarded-Host when present, which is
+    // authoritative on Vercel's edge but spoofable behind misconfigured proxies.
+    if (!options.proxyUrl && !options.domain && isProductionFromPublishableKey(options.publishableKey ?? '')) {
       const hostname = clerkRequest.clerkUrl.hostname;
       if (shouldAutoProxy(hostname)) {
         options = { ...options, proxyUrl: `${clerkRequest.clerkUrl.origin}${AUTO_PROXY_PATH}` };
