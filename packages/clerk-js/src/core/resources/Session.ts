@@ -580,9 +580,8 @@ export class Session extends BaseResource implements SessionResource {
     // If we send that request, the 401 response triggers handleUnauthenticated(), which
     // destroys the session even though it's still valid on the server (30-day lifetime).
     // Instead, bail out here and let the next foreground getToken() call recover normally.
-    const isHeadless =
-      (Session.clerk?.__internal_getOption?.('experimental') as { runtimeEnvironment?: string } | undefined)
-        ?.runtimeEnvironment === 'headless';
+    const experimental = Session.clerk?.__internal_getOption?.('experimental');
+    const isHeadless = experimental?.runtimeEnvironment === 'headless';
     const lastTokenExp = this.lastActiveToken?.jwt?.claims?.exp;
     if (isHeadless && lastTokenExp && Date.now() / 1000 > lastTokenExp) {
       Session.#backgroundRefreshInProgress.delete(tokenId);
