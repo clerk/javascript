@@ -128,6 +128,7 @@ export const Avatar = (props: AvatarProps) => {
         }),
         sx,
       ]}
+      data-rounded={rounded}
     >
       {ImgOrFallback}
 
