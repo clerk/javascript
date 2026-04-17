@@ -742,7 +742,7 @@ describe('Session', () => {
         });
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
 
-        const session = new Session({
+        const _session = new Session({
           status: 'active',
           id: 'session_1',
           object: 'session',
