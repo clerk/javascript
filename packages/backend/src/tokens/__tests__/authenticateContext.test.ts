@@ -259,19 +259,28 @@ describe('AuthenticateContext', () => {
   });
 
   describe('auto-proxy for eligible hosts', () => {
-    it('auto-derives proxyUrl for eligible hostnames', async () => {
+    it('auto-derives proxyUrl for production instances on eligible hostnames', async () => {
       const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
       const context = await createAuthenticateContext(clerkRequest, {
-        publishableKey: pkTest,
+        publishableKey: pkLive,
       });
 
       expect(context.proxyUrl).toBe('https://myapp-abc123.vercel.app/__clerk');
     });
 
+    it('does NOT auto-derive proxyUrl for development instances on eligible hostnames', async () => {
+      const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkTest,
+      });
+
+      expect(context.proxyUrl).toBeUndefined();
+    });
+
     it('does NOT auto-derive proxyUrl for ineligible domains', async () => {
       const clerkRequest = createClerkRequest(new Request('https://myapp.com/dashboard'));
       const context = await createAuthenticateContext(clerkRequest, {
-        publishableKey: pkTest,
+        publishableKey: pkLive,
       });
 
       expect(context.proxyUrl).toBeUndefined();
@@ -280,7 +289,7 @@ describe('AuthenticateContext', () => {
     it('explicit proxyUrl takes precedence over auto-detection', async () => {
       const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
       const context = await createAuthenticateContext(clerkRequest, {
-        publishableKey: pkTest,
+        publishableKey: pkLive,
         proxyUrl: 'https://custom-proxy.example.com/__clerk',
       });
 
@@ -290,7 +299,7 @@ describe('AuthenticateContext', () => {
     it('explicit domain skips auto-detection', async () => {
       const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
       const context = await createAuthenticateContext(clerkRequest, {
-        publishableKey: pkTest,
+        publishableKey: pkLive,
         domain: 'clerk.myapp.com',
       });
 
