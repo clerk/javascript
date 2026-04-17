@@ -21,7 +21,7 @@ import {
   TokenType,
 } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath } from '@clerk/backend/proxy';
-import { parsePublishableKey } from '@clerk/shared/keys';
+import { isProductionFromPublishableKey, parsePublishableKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { shouldAutoProxy } from '@clerk/shared/proxy';
 import { notFound as nextjsNotFound } from 'next/navigation';
@@ -165,7 +165,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       // Auto-detect when no explicit proxy or domain is configured
       const hasExplicitProxyOrDomain = resolvedParams.proxyUrl || PROXY_URL || resolvedParams.domain || DOMAIN;
-      if (!frontendApiProxyConfig && !hasExplicitProxyOrDomain && publishableKey.startsWith('pk_live_')) {
+      if (!frontendApiProxyConfig && !hasExplicitProxyOrDomain && isProductionFromPublishableKey(publishableKey)) {
         if (shouldAutoProxy(requestUrl.hostname)) {
           frontendApiProxyConfig = { enabled: true };
         }
