@@ -184,8 +184,9 @@ import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
+import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
-import { BaseResource, Client, Environment, OAuthApplication, Organization, Waitlist } from './resources/internal';
+import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
@@ -420,9 +421,7 @@ export class Clerk implements ClerkInterface {
 
   get oauthApplication(): OAuthApplicationNamespace {
     if (!Clerk._oauthApplication) {
-      Clerk._oauthApplication = {
-        getConsentInfo: params => OAuthApplication.getConsentInfo(params),
-      };
+      Clerk._oauthApplication = new OAuthApplication();
     }
     return Clerk._oauthApplication;
   }
@@ -1350,6 +1349,15 @@ export class Clerk implements ClerkInterface {
   };
 
   public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderOAuthConsentComponentWhenUserDoesNotExist, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OAuthConsent';
     void this.#clerkUI

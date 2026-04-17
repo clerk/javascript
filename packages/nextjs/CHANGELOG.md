@@ -1,5 +1,71 @@
 # Change Log
 
+## 7.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`fcc6c0c`](https://github.com/clerk/javascript/commit/fcc6c0c511a37da912577864cc12f2039c52e654)]:
+  - @clerk/backend@3.2.13
+  - @clerk/react@6.4.2
+
+## 7.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`f800b4f`](https://github.com/clerk/javascript/commit/f800b4fdfce37884c800070116af6d11627831d7), [`8ee6a32`](https://github.com/clerk/javascript/commit/8ee6a32977afbb0d1e9393b17ec541c29decf785), [`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/backend@3.2.12
+  - @clerk/shared@4.8.2
+  - @clerk/react@6.4.2
+
+## 7.2.1
+
+### Patch Changes
+
+- Normalize URL paths in `createPathMatcher` to prevent route protection bypass ([#8311](https://github.com/clerk/javascript/pull/8311)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`b0b6675`](https://github.com/clerk/javascript/commit/b0b6675bad09eb3dd5b711ad5b45539162664c7a)]:
+  - @clerk/shared@4.8.1
+  - @clerk/backend@3.2.11
+  - @clerk/react@6.4.1
+
+## 7.2.0
+
+### Minor Changes
+
+- Introduce internal `<OAuthConsent />` component for rendering a zero-config OAuth consent screen on an OAuth authorize redirect page. ([#8289](https://github.com/clerk/javascript/pull/8289)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/nextjs';
+
+  export default function OAuthConsentPage() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`dc2de16`](https://github.com/clerk/javascript/commit/dc2de16480086f376449d452d31ae0d2a319af17)]:
+  - @clerk/react@6.4.0
+  - @clerk/shared@4.8.0
+  - @clerk/backend@3.2.10
+
+## 7.1.0
+
+### Minor Changes
+
+- Introduce internal `useOAuthConsent()` hook for fetching OAuth consent screen metadata for the signed-in user. ([#8286](https://github.com/clerk/javascript/pull/8286)) by [@jfoshee](https://github.com/jfoshee)
+
+### Patch Changes
+
+- Bump `next` devDependency to `15.5.15` to pick up the fix for CVE-2026-23869, a high-severity (CVSS 7.5) denial-of-service vulnerability in React Server Components. If you use the Next.js App Router, we recommend upgrading to Next.js `15.5.15` or `16.2.3`. ([#8257](https://github.com/clerk/javascript/pull/8257)) by [@renovate](https://github.com/apps/renovate)
+
+- Updated dependencies [[`3fd586d`](https://github.com/clerk/javascript/commit/3fd586d171e9c281c4b96f620ee9070b47ba00f4), [`f9ff9e9`](https://github.com/clerk/javascript/commit/f9ff9e937d70713abf96fdd92071cd6e84b8eb80)]:
+  - @clerk/react@6.3.0
+  - @clerk/shared@4.7.0
+  - @clerk/backend@3.2.9
+
 ## 7.0.12
 
 ### Patch Changes

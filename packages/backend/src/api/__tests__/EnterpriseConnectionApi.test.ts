@@ -22,6 +22,30 @@ describe('EnterpriseConnectionAPI', () => {
     sync_user_attributes: false,
     allow_subdomains: false,
     disable_additional_identifications: false,
+    saml_connection: {
+      id: 'samlc_1',
+      name: 'Acme SAML',
+      idp_entity_id: 'https://idp.example.com',
+      idp_sso_url: 'https://idp.example.com/sso',
+      idp_certificate: '-----BEGIN CERTIFICATE-----',
+      idp_metadata_url: 'https://idp.example.com/metadata',
+      idp_metadata: '<xml/>',
+      acs_url: 'https://clerk.example.com/v1/saml/acs',
+      sp_entity_id: 'https://clerk.example.com',
+      sp_metadata_url: 'https://clerk.example.com/v1/saml/metadata',
+      sync_user_attributes: true,
+      allow_subdomains: true,
+      allow_idp_initiated: false,
+    },
+    oauth_config: {
+      id: 'eaoc_1',
+      name: 'Acme OIDC',
+      client_id: 'client_abc',
+      discovery_url: 'https://oauth.example.com/.well-known/openid-configuration',
+      logo_public_url: 'https://img.example.com/logo.png',
+      created_at: 1672531200000,
+      updated_at: 1672531200000,
+    },
   };
 
   describe('createEnterpriseConnection', () => {
@@ -178,6 +202,12 @@ describe('EnterpriseConnectionAPI', () => {
       expect(response.domains).toEqual(['clerk.dev']);
       expect(response.active).toBe(true);
       expect(response.organizationId).toBeNull();
+      expect(response.samlConnection).not.toBeNull();
+      expect(response.samlConnection?.id).toBe('samlc_1');
+      expect(response.samlConnection?.idpEntityId).toBe('https://idp.example.com');
+      expect(response.oauthConfig).not.toBeNull();
+      expect(response.oauthConfig?.clientId).toBe('client_abc');
+      expect(response.oauthConfig?.discoveryUrl).toBe('https://oauth.example.com/.well-known/openid-configuration');
     });
   });
 

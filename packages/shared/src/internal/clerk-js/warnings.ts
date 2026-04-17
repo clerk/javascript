@@ -62,6 +62,8 @@ const warnings = {
     'The <APIKeys/> component cannot be rendered when user API keys are disabled. Since user API keys are disabled, this is no-op.',
   cannotRenderAPIKeysComponentForOrgWhenDisabled:
     'The <APIKeys/> component cannot be rendered when organization API keys are disabled. Since organization API keys are disabled, this is no-op.',
+  cannotRenderOAuthConsentComponentWhenUserDoesNotExist:
+    '<OAuthConsent/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
 };
 
 type SerializableWarnings = Serializable<typeof warnings>;

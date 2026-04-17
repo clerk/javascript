@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "6.6.0",
+  "version": "6.7.4",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -109,7 +109,6 @@
     "@rspack/cli": "^1.6.0",
     "@rspack/core": "^1.6.0",
     "@types/cloudflare-turnstile": "^0.2.2",
-    "@types/node": "^22.18.12",
     "@types/webpack-env": "^1.18.8",
     "bundlewatch": "^0.4.1",
     "jsdom": "26.1.0",

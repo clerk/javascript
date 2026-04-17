@@ -8,7 +8,7 @@ import {
   mockJwks,
   mockJwt,
   mockJwtPayload,
-  mockMalformedJwt,
+  signingJwks,
 } from '../../fixtures';
 import {
   mockMachineAuthResponses,
@@ -16,6 +16,7 @@ import {
   mockTokens,
   mockVerificationResults,
 } from '../../fixtures/machine';
+import { signJwt } from '../../jwt/signJwt';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
@@ -1193,13 +1194,20 @@ describe('tokens.authenticateRequest(options)', () => {
       }),
     );
 
+    // Create a properly signed JWT that is missing the 'sub' claim
+    const { sub: _, ...payloadWithoutSub } = mockJwtPayload;
+    const { data: malformedJwt } = await signJwt(payloadWithoutSub, signingJwks, {
+      algorithm: 'RS256',
+      header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+    });
+
     const requestState = await authenticateRequest(
       mockRequestWithCookies(
         {},
         {
           __clerk_db_jwt: 'deadbeef',
           __client_uat: `${mockJwtPayload.iat - 10}`,
-          __session: mockMalformedJwt,
+          __session: malformedJwt!,
         },
       ),
       mockOptions(),

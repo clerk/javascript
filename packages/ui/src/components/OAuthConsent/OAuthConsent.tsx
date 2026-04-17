@@ -1,263 +1,319 @@
-import { useUser } from '@clerk/shared/react';
-import type { ComponentProps } from 'react';
+import { useClerk, useOAuthConsent, useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
-import { useEnvironment, useOAuthConsentContext } from '@/ui/contexts';
-import { Box, Button, Flex, Flow, Grid, Icon, Text } from '@/ui/customizables';
+import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
+import { Box, Button, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
+import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 import { Modal } from '@/ui/elements/Modal';
-import { Tooltip } from '@/ui/elements/Tooltip';
-import { LockDottedCircle } from '@/ui/icons';
 import { Alert, Textarea } from '@/ui/primitives';
-import type { ThemableCssProp } from '@/ui/styledSystem';
-import { common } from '@/ui/styledSystem';
-import { colors } from '@/ui/utils/colors';
+import { Route, Switch } from '@/ui/router';
+
+import { InlineAction } from './InlineAction';
+import {
+  ListGroup,
+  ListGroupContent,
+  ListGroupHeader,
+  ListGroupHeaderTitle,
+  ListGroupItem,
+  ListGroupItemLabel,
+} from './ListGroup';
+import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupSeparator } from './LogoGroup';
+import { OrgSelect } from './OrgSelect';
+import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
-export function OAuthConsentInternal() {
-  const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, oAuthApplicationUrl, redirectUrl, onDeny, onAllow } =
-    useOAuthConsentContext();
+function _OAuthConsent() {
+  const ctx = useOAuthConsentContext();
+  const clerk = useClerk();
   const { user } = useUser();
-  const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
+  const {
+    displayConfig: { applicationName, logoImageUrl },
+    organizationSettings,
+  } = useEnvironment();
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
 
-  const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
+  const orgSelectionEnabled = !!(ctx.enableOrgSelection && organizationSettings.enabled);
+  const orgOptions = orgSelectionEnabled
+    ? (user?.organizationMemberships ?? []).map(m => ({
+        value: m.organization.id,
+        label: m.organization.name,
+        logoUrl: m.organization.imageUrl,
+      }))
+    : [];
 
-  // Filter out offline_access from displayed scopes as it doesn't describe what can be accessed
-  const displayedScopes = (scopes || []).filter(item => item.scope !== OFFLINE_ACCESS_SCOPE);
-  const hasOfflineAccess = (scopes || []).some(item => item.scope === OFFLINE_ACCESS_SCOPE);
+  const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
+  const effectiveOrg = selectedOrg ?? orgOptions[0]?.value ?? null;
 
-  function getRootDomain(): string {
-    try {
-      const { hostname } = new URL(redirectUrl);
-      return hostname.split('.').slice(-2).join('.');
-    } catch {
-      return '';
+  // onAllow and onDeny are always provided as a pair by the accounts portal.
+  const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
+
+  // Resolve oauthClientId and scope once: context overrides URL fallback.
+  const fromUrl = getOAuthConsentFromSearch();
+  const oauthClientId = ctx.oauthClientId ?? fromUrl.oauthClientId;
+  const scope = ctx.scope ?? fromUrl.scope;
+
+  // Public path: fetch via hook. Disabled on the accounts portal path
+  // (which already has all data via context) to avoid a wasted FAPI request.
+  const { data, isLoading, error } = useOAuthConsent({
+    oauthClientId,
+    scope,
+    // TODO: Remove this once account portal is refactored to use this component
+    enabled: !hasContextCallbacks,
+  });
+
+  // Hook returns camelCase `requiresConsent`; the render logic uses snake_case.
+  const mappedHookScopes = data?.scopes?.map(s => ({
+    scope: s.scope,
+    description: s.description,
+    requires_consent: s.requiresConsent,
+  }));
+
+  // Context (accounts portal path) wins over hook data (public path).
+  const scopes = ctx.scopes ?? mappedHookScopes ?? [];
+  const oauthApplicationName = ctx.oauthApplicationName ?? data?.oauthApplicationName ?? '';
+  const oauthApplicationLogoUrl = ctx.oauthApplicationLogoUrl ?? data?.oauthApplicationLogoUrl;
+  const oauthApplicationUrl = ctx.oauthApplicationUrl ?? data?.oauthApplicationUrl;
+  const redirectUrl = ctx.redirectUrl ?? getRedirectUriFromSearch();
+
+  const { t } = useLocalizations();
+  const domainAction = getRedirectDisplay(redirectUrl);
+  const viewFullUrlText = t(localizationKeys('oauthConsent.viewFullUrl'));
+
+  // Error states only apply to the public flow.
+  if (!hasContextCallbacks) {
+    const errorMessage = !oauthClientId
+      ? 'The client ID is missing.'
+      : !redirectUrl
+        ? 'The redirect URI is missing.'
+        : error
+          ? (error.message ?? 'Failed to load consent information.')
+          : undefined;
+
+    if (errorMessage) {
+      return (
+        <Card.Root>
+          <Card.Content>
+            <Card.Alert>{errorMessage}</Card.Alert>
+          </Card.Content>
+          <Card.Footer />
+        </Card.Root>
+      );
+    }
+
+    if (isLoading) {
+      return (
+        <Card.Root>
+          <Card.Content>
+            <LoadingCardContainer />
+          </Card.Content>
+          <Card.Footer />
+        </Card.Root>
+      );
     }
   }
 
+  const actionUrl = clerk.oauthApplication.buildConsentActionUrl({ clientId: oauthClientId });
+  const forwardedParams = getForwardedParams();
+
+  // Accounts portal path delegates to context callbacks; public path lets the form submit natively.
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    if (!hasContextCallbacks) {
+      return;
+    }
+    e.preventDefault();
+    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+    if (submitter?.value === 'true') {
+      ctx.onAllow?.();
+    } else {
+      ctx.onDeny?.();
+    }
+  };
+
+  const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
+
+  const displayedScopes = scopes.filter(item => item.scope !== OFFLINE_ACCESS_SCOPE);
+  const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
+
   return (
-    <Flow.Root flow='oauthConsent'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root>
-            {/* both have avatars */}
-            {oAuthApplicationLogoUrl && logoImageUrl && (
-              <ConnectionHeader>
-                <ConnectionItem justify='end'>
-                  <ApplicationLogo
-                    src={oAuthApplicationLogoUrl}
-                    alt={oAuthApplicationName}
-                    href={oAuthApplicationUrl}
-                    isExternal
-                  />
-                </ConnectionItem>
-                <ConnectionSeparator />
-                <ConnectionItem justify='start'>
-                  <ApplicationLogo />
-                </ConnectionItem>
-              </ConnectionHeader>
-            )}
-            {/* only OAuth app has an avatar */}
-            {oAuthApplicationLogoUrl && !logoImageUrl && (
-              <ConnectionHeader>
-                <Box
-                  sx={{
-                    position: 'relative',
-                  }}
-                >
-                  <ApplicationLogo
-                    src={oAuthApplicationLogoUrl}
-                    alt={oAuthApplicationName}
-                    href={oAuthApplicationUrl}
-                    isExternal
-                  />
-                  <ConnectionIcon
-                    size='sm'
-                    sx={t => ({
-                      position: 'absolute',
-                      bottom: `calc(${t.space.$3} * -1)`,
-                      insetInlineEnd: `calc(${t.space.$3} * -1)`,
-                    })}
-                  />
-                </Box>
-              </ConnectionHeader>
-            )}
-            {/* only Clerk application has an avatar */}
-            {!oAuthApplicationLogoUrl && logoImageUrl && (
-              <ConnectionHeader>
-                <ConnectionItem justify='end'>
-                  <ConnectionIcon />
-                </ConnectionItem>
-                <ConnectionSeparator />
-                <ConnectionItem justify='start'>
-                  <ApplicationLogo />
-                </ConnectionItem>
-              </ConnectionHeader>
-            )}
-            {/* no avatars */}
-            {!oAuthApplicationLogoUrl && !logoImageUrl && (
-              <ConnectionHeader>
-                <ConnectionIcon />
-              </ConnectionHeader>
-            )}
-            <Header.Title localizationKey={oAuthApplicationName} />
-            <Header.Subtitle localizationKey={`wants to access ${applicationName} on behalf of ${primaryIdentifier}`} />
-          </Header.Root>
-          <Box
-            sx={t => ({
-              textAlign: 'start',
-              borderWidth: t.borderWidths.$normal,
-              borderStyle: t.borderStyles.$solid,
-              borderColor: t.colors.$borderAlpha100,
-              borderRadius: t.radii.$lg,
-              overflow: 'hidden',
-            })}
-          >
-            <Box
-              sx={t => ({
-                padding: t.space.$3,
-                background: common.mergedColorsBackground(
-                  colors.setAlpha(t.colors.$colorBackground, 1),
-                  t.colors.$neutralAlpha50,
-                ),
-              })}
-            >
-              <Text
-                variant='subtitle'
-                localizationKey={`This will allow ${oAuthApplicationName} access to:`}
+    <>
+      <form
+        method='POST'
+        action={actionUrl}
+        onSubmit={handleSubmit}
+      >
+        <Card.Root>
+          <Card.Content>
+            <Header.Root>
+              {/* both have avatars */}
+              {oauthApplicationLogoUrl && logoImageUrl && (
+                <LogoGroup>
+                  <LogoGroupItem justify='end'>
+                    <ApplicationLogo
+                      src={oauthApplicationLogoUrl}
+                      alt={oauthApplicationName}
+                      href={oauthApplicationUrl}
+                      isExternal
+                    />
+                  </LogoGroupItem>
+                  <LogoGroupSeparator />
+                  <LogoGroupItem justify='start'>
+                    <ApplicationLogo />
+                  </LogoGroupItem>
+                </LogoGroup>
+              )}
+              {/* only OAuth app has an avatar */}
+              {oauthApplicationLogoUrl && !logoImageUrl && (
+                <LogoGroup>
+                  <Box sx={{ position: 'relative' }}>
+                    <ApplicationLogo
+                      src={oauthApplicationLogoUrl}
+                      alt={oauthApplicationName}
+                      href={oauthApplicationUrl}
+                      isExternal
+                    />
+                    <LogoGroupIcon
+                      size='sm'
+                      sx={t => ({
+                        position: 'absolute',
+                        bottom: `calc(${t.space.$3} * -1)`,
+                        insetInlineEnd: `calc(${t.space.$3} * -1)`,
+                      })}
+                    />
+                  </Box>
+                </LogoGroup>
+              )}
+              {/* only Clerk application has an avatar */}
+              {!oauthApplicationLogoUrl && logoImageUrl && (
+                <LogoGroup>
+                  <LogoGroupItem justify='end'>
+                    <LogoGroupIcon />
+                  </LogoGroupItem>
+                  <LogoGroupSeparator />
+                  <LogoGroupItem justify='start'>
+                    <ApplicationLogo />
+                  </LogoGroupItem>
+                </LogoGroup>
+              )}
+              {/* no avatars */}
+              {!oauthApplicationLogoUrl && !logoImageUrl && (
+                <LogoGroup>
+                  <LogoGroupIcon />
+                </LogoGroup>
+              )}
+              <Header.Title localizationKey={oauthApplicationName} />
+              <Header.Subtitle
+                localizationKey={localizationKeys('oauthConsent.subtitle', {
+                  applicationName,
+                  identifier: primaryIdentifier || '',
+                })}
               />
-            </Box>
-            <Box
-              as='ul'
-              sx={t => ({ margin: t.sizes.$none, padding: t.sizes.$none })}
-            >
-              {displayedScopes.map(item => (
-                <Box
-                  key={item.scope}
-                  sx={t => ({
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    paddingInline: t.space.$3,
-                    paddingBlock: t.space.$2,
-                    borderTopWidth: t.borderWidths.$normal,
-                    borderTopStyle: t.borderStyles.$solid,
-                    borderTopColor: t.colors.$borderAlpha100,
-                    '&::before': {
-                      content: '""',
-                      display: 'inline-block',
-                      width: t.space.$1,
-                      height: t.space.$1,
-                      background: t.colors.$colorMutedForeground,
-                      borderRadius: t.radii.$circle,
-                      transform: 'translateY(-0.1875rem)',
-                      marginInlineEnd: t.space.$2,
-                      flexShrink: 0,
-                    },
+            </Header.Root>
+            {orgSelectionEnabled && orgOptions.length > 0 && effectiveOrg && (
+              <OrgSelect
+                options={orgOptions}
+                value={effectiveOrg}
+                onChange={setSelectedOrg}
+              />
+            )}
+            <ListGroup>
+              <ListGroupHeader>
+                <ListGroupHeaderTitle
+                  localizationKey={localizationKeys('oauthConsent.scopeList.title', {
+                    applicationName: oauthApplicationName,
                   })}
-                  as='li'
-                >
-                  <Text
-                    variant='subtitle'
-                    localizationKey={item.description || item.scope || ''}
-                  />
-                </Box>
-              ))}
-            </Box>
-          </Box>
-          <Alert colorScheme='warning'>
-            <Text
-              colorScheme='warning'
-              variant='caption'
+                />
+              </ListGroupHeader>
+              <ListGroupContent>
+                {displayedScopes.map(item => (
+                  <ListGroupItem key={item.scope}>
+                    <ListGroupItemLabel>{item.description || item.scope || ''}</ListGroupItemLabel>
+                  </ListGroupItem>
+                ))}
+              </ListGroupContent>
+            </ListGroup>
+            <Alert colorScheme='warning'>
+              <Text
+                colorScheme='warning'
+                variant='caption'
+              >
+                <InlineAction
+                  text={t(
+                    localizationKeys('oauthConsent.warning', {
+                      applicationName: oauthApplicationName || applicationName,
+                      domainAction,
+                    }),
+                  )}
+                  actionText={domainAction}
+                  onClick={() => setIsUriModalOpen(true)}
+                  tooltipText={viewFullUrlText}
+                />
+              </Text>
+            </Alert>
+            <Grid
+              columns={2}
+              gap={3}
             >
-              Make sure that you trust {oAuthApplicationName} {''}
-              <Tooltip.Root>
-                <Tooltip.Trigger>
-                  <Text
-                    as='span'
-                    role='button'
-                    tabIndex={0}
-                    aria-label='View full URL'
-                    variant='caption'
-                    sx={{
-                      textDecoration: 'underline',
-                      textDecorationStyle: 'dotted',
-                      cursor: 'pointer',
-                      outline: 'none',
-                      display: 'inline-block',
-                    }}
-                    onClick={() => setIsUriModalOpen(true)}
-                  >
-                    ({getRootDomain()})
-                  </Text>
-                </Tooltip.Trigger>
-                <Tooltip.Content text={`View full URL`} />
-              </Tooltip.Root>
-              {''}. You may be sharing sensitive data with this site or app.
-            </Text>
-          </Alert>
-          <Grid
-            columns={2}
-            gap={3}
-          >
-            <Button
-              colorScheme='secondary'
-              variant='outline'
-              localizationKey='Deny'
-              onClick={onDeny}
+              <Button
+                type='submit'
+                name='consented'
+                value='false'
+                colorScheme='secondary'
+                variant='outline'
+                localizationKey={localizationKeys('oauthConsent.action__deny')}
+              />
+              <Button
+                type='submit'
+                name='consented'
+                value='true'
+                localizationKey={localizationKeys('oauthConsent.action__allow')}
+              />
+              <Text
+                sx={{ gridColumn: 'span 2' }}
+                colorScheme='secondary'
+                variant='caption'
+              >
+                <InlineAction
+                  text={t(localizationKeys('oauthConsent.redirectNotice', { domainAction }))}
+                  actionText={domainAction}
+                  onClick={() => setIsUriModalOpen(true)}
+                  tooltipText={viewFullUrlText}
+                />
+                {hasOfflineAccess && t(localizationKeys('oauthConsent.offlineAccessNotice'))}
+              </Text>
+            </Grid>
+          </Card.Content>
+          <Card.Footer />
+        </Card.Root>
+        {!hasContextCallbacks &&
+          forwardedParams.map(([key, value]) => (
+            <input
+              key={key}
+              type='hidden'
+              name={key}
+              value={value}
             />
-            <Button
-              localizationKey='Allow'
-              onClick={onAllow}
-            />
-            <Text
-              sx={{
-                gridColumn: 'span 2',
-              }}
-              colorScheme='secondary'
-              variant='caption'
-            >
-              If you allow access, this app will redirect you to{' '}
-              <Tooltip.Root>
-                <Tooltip.Trigger>
-                  <Text
-                    as='span'
-                    role='button'
-                    tabIndex={0}
-                    aria-label='View full URL'
-                    variant='caption'
-                    sx={{
-                      textDecoration: 'underline',
-                      textDecorationStyle: 'dotted',
-                      cursor: 'pointer',
-                      outline: 'none',
-                      display: 'inline-block',
-                    }}
-                    onClick={() => setIsUriModalOpen(true)}
-                  >
-                    {getRootDomain()}
-                  </Text>
-                </Tooltip.Trigger>
-                <Tooltip.Content text={`View full URL`} />
-              </Tooltip.Root>
-              .{hasOfflineAccess && " You'll stay signed in until you sign out or revoke access."}
-            </Text>
-          </Grid>
-        </Card.Content>
-        <Card.Footer />
-      </Card.Root>
+          ))}
+        {!hasContextCallbacks && orgSelectionEnabled && effectiveOrg && (
+          <input
+            type='hidden'
+            name='organization_id'
+            value={effectiveOrg}
+          />
+        )}
+      </form>
       <RedirectUriModal
         isOpen={isUriModalOpen}
         onOpen={() => setIsUriModalOpen(true)}
         onClose={() => setIsUriModalOpen(false)}
         redirectUri={redirectUrl}
-        oAuthApplicationName={oAuthApplicationName}
+        oauthApplicationName={oauthApplicationName}
       />
-    </Flow.Root>
+    </>
   );
 }
 
@@ -266,10 +322,10 @@ type RedirectUriModalProps = {
   onClose: () => void;
   isOpen: boolean;
   redirectUri: string;
-  oAuthApplicationName: string;
+  oauthApplicationName: string;
 };
 
-function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oAuthApplicationName }: RedirectUriModalProps) {
+function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oauthApplicationName }: RedirectUriModalProps) {
   if (!isOpen) {
     return null;
   }
@@ -282,9 +338,11 @@ function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oAuthApplicati
       <Card.Root>
         <Card.Content>
           <Header.Root>
-            <Header.Title localizationKey={`Redirect URL`} />
+            <Header.Title localizationKey={localizationKeys('oauthConsent.redirectUriModal.title')} />
             <Header.Subtitle
-              localizationKey={`Make sure you trust ${oAuthApplicationName} and that this URL belongs to ${oAuthApplicationName}.`}
+              localizationKey={localizationKeys('oauthConsent.redirectUriModal.subtitle', {
+                applicationName: oauthApplicationName,
+              })}
             />
           </Header.Root>
           <Textarea
@@ -300,93 +358,20 @@ function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oAuthApplicati
   );
 }
 
-function ConnectionHeader({ children }: { children: React.ReactNode }) {
+const AuthenticatedRoutes = withCoreUserGuard(withCardStateProvider(_OAuthConsent));
+
+const OAuthConsentInternal = () => {
   return (
-    <Flex
-      justify='center'
-      align='center'
-      gap={4}
-      sx={t => ({
-        marginBlockEnd: t.space.$6,
-      })}
-    >
-      {children}
-    </Flex>
+    <Flow.Root flow='oauthConsent'>
+      <Flow.Part>
+        <Switch>
+          <Route>
+            <AuthenticatedRoutes />
+          </Route>
+        </Switch>
+      </Flow.Part>
+    </Flow.Root>
   );
-}
+};
 
-function ConnectionItem({ children, sx, ...props }: ComponentProps<typeof Flex>) {
-  return (
-    <Flex
-      {...props}
-      sx={[{ flex: 1 }, sx]}
-    >
-      {children}
-    </Flex>
-  );
-}
-
-function ConnectionIcon({ size = 'md', sx }: { size?: 'sm' | 'md'; sx?: ThemableCssProp }) {
-  const scale: ThemableCssProp = t => {
-    const value = size === 'sm' ? t.space.$6 : t.space.$12;
-    return {
-      width: value,
-      height: value,
-    };
-  };
-
-  return (
-    <Box
-      sx={t => [
-        {
-          background: common.mergedColorsBackground(
-            colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$neutralAlpha50,
-          ),
-          borderRadius: t.radii.$circle,
-          borderWidth: t.borderWidths.$normal,
-          borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$borderAlpha100,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-        scale,
-        sx,
-      ]}
-    >
-      <Icon
-        icon={LockDottedCircle}
-        sx={t => ({
-          color: t.colors.$primary500,
-        })}
-      />
-    </Box>
-  );
-}
-
-function ConnectionSeparator() {
-  return (
-    <Box
-      as='svg'
-      // @ts-ignore - valid SVG attribute
-      fill='none'
-      viewBox='0 0 16 2'
-      height={2}
-      aria-hidden
-      sx={t => ({
-        color: t.colors.$colorMutedForeground,
-      })}
-    >
-      <path
-        stroke='currentColor'
-        strokeDasharray='0.1 4'
-        strokeLinecap='round'
-        strokeWidth='2'
-        d='M1 1h14'
-      />
-    </Box>
-  );
-}
-
-export const OAuthConsent = withCardStateProvider(OAuthConsentInternal);
+export const OAuthConsent = OAuthConsentInternal;

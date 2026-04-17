@@ -1,5 +1,54 @@
 # Change Log
 
+## 3.1.14
+
+### Patch Changes
+
+- Updated dependencies [[`ca46860`](https://github.com/clerk/javascript/commit/ca46860c1833026698d40f3ca8f2b8fbc85b2b39), [`ff5bd7d`](https://github.com/clerk/javascript/commit/ff5bd7d8ccd5b60540459c771d3eafb8d77249dd), [`22f0b27`](https://github.com/clerk/javascript/commit/22f0b2714eec96d831a4ebd150ebbe4b86ecf0f8), [`0067481`](https://github.com/clerk/javascript/commit/0067481ae99bb657f3e3e67cdba90d901678172b), [`14d072a`](https://github.com/clerk/javascript/commit/14d072a3eefda43c394e503a1f5ecc919eccac98)]:
+  - @clerk/ui@1.6.3
+  - @clerk/clerk-js@6.7.4
+  - @clerk/react@6.4.2
+
+## 3.1.13
+
+### Patch Changes
+
+- Updated dependencies [[`6f36c51`](https://github.com/clerk/javascript/commit/6f36c51fe388dda575088daea251df67ebf851bc), [`45b773a`](https://github.com/clerk/javascript/commit/45b773af40aa7a9c9a4771b09e96ca942cbac06f), [`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/ui@1.6.2
+  - @clerk/shared@4.8.2
+  - @clerk/clerk-js@6.7.3
+  - @clerk/react@6.4.2
+
+## 3.1.12
+
+### Patch Changes
+
+- Updated dependencies [[`b0b6675`](https://github.com/clerk/javascript/commit/b0b6675bad09eb3dd5b711ad5b45539162664c7a)]:
+  - @clerk/shared@4.8.1
+  - @clerk/clerk-js@6.7.2
+  - @clerk/react@6.4.1
+  - @clerk/ui@1.6.1
+
+## 3.1.11
+
+### Patch Changes
+
+- Updated dependencies [[`dc2de16`](https://github.com/clerk/javascript/commit/dc2de16480086f376449d452d31ae0d2a319af17)]:
+  - @clerk/react@6.4.0
+  - @clerk/shared@4.8.0
+  - @clerk/ui@1.6.0
+  - @clerk/clerk-js@6.7.1
+
+## 3.1.10
+
+### Patch Changes
+
+- Updated dependencies [[`3fd586d`](https://github.com/clerk/javascript/commit/3fd586d171e9c281c4b96f620ee9070b47ba00f4), [`f9ff9e9`](https://github.com/clerk/javascript/commit/f9ff9e937d70713abf96fdd92071cd6e84b8eb80)]:
+  - @clerk/clerk-js@6.7.0
+  - @clerk/react@6.3.0
+  - @clerk/shared@4.7.0
+  - @clerk/ui@1.5.1
+
 ## 3.1.9
 
 ### Patch Changes

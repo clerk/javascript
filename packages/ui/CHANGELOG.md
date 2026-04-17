@@ -1,5 +1,67 @@
 # @clerk/ui
 
+## 1.6.3
+
+### Patch Changes
+
+- Fix EnableOrganizationsPrompt in keyless mode: show "Claim your application" CTA instead of broken "Sign in to continue" when organizations are enabled on an unclaimed keyless app with no signed-in user. ([#8341](https://github.com/clerk/javascript/pull/8341)) by [@mwickett](https://github.com/mwickett)
+
+- Use `user.organizationMemberships` from the already-loaded user object to populate the org select in the OAuth consent screen, avoiding a redundant memberships fetch. ([#8350](https://github.com/clerk/javascript/pull/8350)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Correctly display IP redirect URIs in OAuth consent. ([#8342](https://github.com/clerk/javascript/pull/8342)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add scroll-driven fade overlays to `ListGroupContent` in the OAuthConsent component so overflowing scope lists visually indicate more content above and below. ([#8339](https://github.com/clerk/javascript/pull/8339)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 1.6.2
+
+### Patch Changes
+
+- Add infinite loading to organization selection in `<OAuthConsent />`. ([#8309](https://github.com/clerk/javascript/pull/8309)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix OAuthConsent always redirecting to sign-in by adopting the `AuthenticatedRoutes` pattern used by other full-page components ([#8327](https://github.com/clerk/javascript/pull/8327)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/shared@4.8.2
+  - @clerk/localizations@4.5.2
+
+## 1.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`b0b6675`](https://github.com/clerk/javascript/commit/b0b6675bad09eb3dd5b711ad5b45539162664c7a)]:
+  - @clerk/shared@4.8.1
+  - @clerk/localizations@4.5.1
+
+## 1.6.0
+
+### Minor Changes
+
+- Introduce internal `<OAuthConsent />` component for rendering a zero-config OAuth consent screen on an OAuth authorize redirect page. ([#8289](https://github.com/clerk/javascript/pull/8289)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/nextjs';
+
+  export default function OAuthConsentPage() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`dc2de16`](https://github.com/clerk/javascript/commit/dc2de16480086f376449d452d31ae0d2a319af17)]:
+  - @clerk/shared@4.8.0
+  - @clerk/localizations@4.5.0
+
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies [[`3fd586d`](https://github.com/clerk/javascript/commit/3fd586d171e9c281c4b96f620ee9070b47ba00f4), [`f9ff9e9`](https://github.com/clerk/javascript/commit/f9ff9e937d70713abf96fdd92071cd6e84b8eb80)]:
+  - @clerk/shared@4.7.0
+  - @clerk/localizations@4.4.1
+
 ## 1.5.0
 
 ### Minor Changes

@@ -59,4 +59,12 @@ export interface OAuthApplicationNamespace {
    * Loads consent metadata for the given OAuth client for the signed-in user.
    */
   getConsentInfo: (params: GetOAuthConsentInfoParams) => Promise<OAuthConsentInfo>;
+
+  /**
+   * Returns the URL to use as the `action` attribute of the consent form.
+   * Includes `_clerk_session_id` and, in development, the dev browser JWT.
+   * Custom-flow developers building their own consent UI use this alongside
+   * the `useOAuthConsent` hook.
+   */
+  buildConsentActionUrl: (params: { clientId: string }) => string;
 }

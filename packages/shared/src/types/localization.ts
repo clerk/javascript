@@ -1252,6 +1252,22 @@ export type __internal_LocalizationResource = {
     suggestionsAcceptedLabel: LocalizationValue;
     action__createOrganization: LocalizationValue;
   };
+  oauthConsent: {
+    subtitle: LocalizationValue<'applicationName' | 'identifier'>;
+    scopeList: {
+      title: LocalizationValue<'applicationName'>;
+    };
+    action__deny: LocalizationValue;
+    action__allow: LocalizationValue;
+    warning: LocalizationValue<'applicationName' | 'domainAction'>;
+    redirectNotice: LocalizationValue<'domainAction'>;
+    offlineAccessNotice: LocalizationValue;
+    viewFullUrl: LocalizationValue;
+    redirectUriModal: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue<'applicationName'>;
+    };
+  };
   unstable__errors: UnstableErrors;
   dates: {
     previous6Days: LocalizationValue<'date'>;

@@ -1,5 +1,43 @@
 # Change Log
 
+## 4.8.2
+
+### Patch Changes
+
+- Add `emailAddress`, `phoneNumber`, and `username` support to `signUp.update()` ([#8320](https://github.com/clerk/javascript/pull/8320)) by [@dstaley](https://github.com/dstaley)
+
+- Added development runtime error when mounting `<OAuthconsent />` without active session. ([#8335](https://github.com/clerk/javascript/pull/8335)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.8.1
+
+### Patch Changes
+
+- Normalize URL paths in `createPathMatcher` to prevent route protection bypass ([#8311](https://github.com/clerk/javascript/pull/8311)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 4.8.0
+
+### Minor Changes
+
+- Introduce internal `<OAuthConsent />` component for rendering a zero-config OAuth consent screen on an OAuth authorize redirect page. ([#8289](https://github.com/clerk/javascript/pull/8289)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/nextjs';
+
+  export default function OAuthConsentPage() {
+    return <OAuthConsent />;
+  }
+  ```
+
+## 4.7.0
+
+### Minor Changes
+
+- Add `OAuthApplication` resource and `getConsentInfo()` method for retrieving OAuth consent information, enabling custom OAuth consent flows. ([#8275](https://github.com/clerk/javascript/pull/8275)) by [@jfoshee](https://github.com/jfoshee)
+
+- Introduce internal `useOAuthConsent()` hook for fetching OAuth consent screen metadata for the signed-in user. ([#8286](https://github.com/clerk/javascript/pull/8286)) by [@jfoshee](https://github.com/jfoshee)
+
 ## 4.6.0
 
 ### Minor Changes
