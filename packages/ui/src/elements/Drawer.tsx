@@ -426,12 +426,7 @@ const Close = React.forwardRef<HTMLButtonElement>((_, ref) => {
       variant='ghost'
       aria-label='Close drawer'
       onClick={() => setIsOpen(false)}
-      icon={
-        <Icon
-          icon={CloseIcon}
-          size='sm'
-        />
-      }
+      icon={<Icon icon={CloseIcon} />}
       sx={t => ({
         color: t.colors.$colorMutedForeground,
         padding: t.space.$3,
