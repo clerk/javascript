@@ -9,7 +9,7 @@
     "start": "PORT=$PORT NODE_ENV=production tsx src/server/main.ts"
   },
   "dependencies": {
-    "@hono/node-server": "^1.14.1",
+    "@hono/node-server": "^1.19.14",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "hono": "^4.12.7",
