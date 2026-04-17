@@ -28,14 +28,14 @@ import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getR
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
-function _OAuthConsent() {
-  const ctx = useOAuthConsentContext();
-  const clerk = useClerk();
-  const { user } = useUser();
-  const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
-  const [isUriModalOpen, setIsUriModalOpen] = useState(false);
+type OrgSelectionProps = {
+  selectedOrg: string | null;
+  onChange: (value: string) => void;
+};
+
+function OrgSelection({ selectedOrg, onChange }: OrgSelectionProps) {
   const { isLoaded: isMembershipsLoaded, userMemberships } = useOrganizationList({
-    userMemberships: ctx.enableOrgSelection ? { infinite: true } : undefined,
+    userMemberships: { infinite: true },
   });
   const orgOptions: OrgOption[] = (userMemberships.data ?? []).map(m => ({
     value: m.organization.id,
@@ -43,8 +43,45 @@ function _OAuthConsent() {
     logoUrl: m.organization.imageUrl,
   }));
 
-  const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
   const effectiveOrg = selectedOrg ?? orgOptions[0]?.value ?? null;
+
+  if (!isMembershipsLoaded || userMemberships.isLoading) {
+    return <LoadingCardContainer />;
+  }
+
+  if (orgOptions.length === 0 || !effectiveOrg) {
+    return null;
+  }
+
+  return (
+    <>
+      <OrgSelect
+        options={orgOptions}
+        value={effectiveOrg}
+        onChange={onChange}
+        hasMore={userMemberships.hasNextPage}
+        onLoadMore={userMemberships.fetchNext}
+      />
+      <input
+        type='hidden'
+        name='organization_id'
+        value={effectiveOrg}
+      />
+    </>
+  );
+}
+
+function _OAuthConsent() {
+  const ctx = useOAuthConsentContext();
+  const clerk = useClerk();
+  const { user } = useUser();
+  const {
+    displayConfig: { applicationName, logoImageUrl },
+    organizationSettings,
+  } = useEnvironment();
+  const [isUriModalOpen, setIsUriModalOpen] = useState(false);
+
+  const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -112,17 +149,6 @@ function _OAuthConsent() {
         </Card.Root>
       );
     }
-  }
-
-  if (ctx.enableOrgSelection && (!isMembershipsLoaded || userMemberships.isLoading)) {
-    return (
-      <Card.Root>
-        <Card.Content>
-          <LoadingCardContainer />
-        </Card.Content>
-        <Card.Footer />
-      </Card.Root>
-    );
   }
 
   const actionUrl = clerk.oauthApplication.buildConsentActionUrl({ clientId: oauthClientId });
@@ -221,13 +247,10 @@ function _OAuthConsent() {
                 })}
               />
             </Header.Root>
-            {ctx.enableOrgSelection && orgOptions.length > 0 && effectiveOrg && (
-              <OrgSelect
-                options={orgOptions}
-                value={effectiveOrg}
+            {ctx.enableOrgSelection && organizationSettings.enabled && (
+              <OrgSelection
+                selectedOrg={selectedOrg}
                 onChange={setSelectedOrg}
-                hasMore={userMemberships.hasNextPage}
-                onLoadMore={userMemberships.fetchNext}
               />
             )}
             <ListGroup>
@@ -308,13 +331,6 @@ function _OAuthConsent() {
               value={value}
             />
           ))}
-        {!hasContextCallbacks && ctx.enableOrgSelection && effectiveOrg && (
-          <input
-            type='hidden'
-            name='organization_id'
-            value={effectiveOrg}
-          />
-        )}
       </form>
       <RedirectUriModal
         isOpen={isUriModalOpen}
