@@ -158,6 +158,9 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
             ...(isDraggingOver && {
               outline: `${t.borderWidths.$normal} dashed ${t.colors.$primary500}`,
               outlineOffset: t.space.$0x5,
+              '&:has([data-rounded="true"])': {
+                borderRadius: t.radii.$circle,
+              },
             }),
           })}
         >
