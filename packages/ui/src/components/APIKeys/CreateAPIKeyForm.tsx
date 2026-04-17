@@ -8,7 +8,6 @@ import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
-import { ChevronUpDown } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
@@ -99,7 +98,6 @@ const ExpirationSelector: React.FC<ExpirationSelectorProps> = ({ selectedExpirat
     >
       <SelectButton
         ref={buttonRef}
-        icon={ChevronUpDown}
         sx={t => ({
           justifyContent: 'space-between',
           backgroundColor: t.colors.$colorBackground,
@@ -107,12 +105,7 @@ const ExpirationSelector: React.FC<ExpirationSelectorProps> = ({ selectedExpirat
         aria-labelledby='expiration-field'
         id='expiration-field'
       />
-      <SelectOptionList
-        sx={t => ({
-          paddingBlock: t.space.$1,
-          color: t.colors.$colorForeground,
-        })}
-      />
+      <SelectOptionList />
     </Select>
   );
 };
