@@ -200,52 +200,27 @@ describe('OAuthConsent', () => {
     });
   });
 
-  it('uses context values when provided (accounts portal path)', async () => {
-    const onAllowSpy = vi.fn();
-    const onDenySpy = vi.fn();
-
+  it('uses redirectUrl prop over URL param', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['jane@example.com'] });
     });
 
-    // Simulate the accounts portal path: `clerk.__internal_mountOAuthConsent` is
-    // called with the legacy `oAuth*` (capital-A) prop shape from
-    // `__internal_OAuthConsentProps`. The `ComponentContextProvider` translates
-    // these to the lowercase `oauth*` shape that the component reads from context
-    // (see the `case 'OAuthConsent':` block in ClerkUIComponentsContext.tsx).
-    // This test verifies the translation end-to-end: if it were broken, the
-    // component would fall back to the hook mock's 'Clerk CLI' name and the
-    // `getByText('Accounts Portal App')` assertion would fail.
     props.setProps({
       componentName: 'OAuthConsent',
-      scopes: [{ scope: 'openid', description: 'Identity', requires_consent: true }],
-      oAuthApplicationName: 'Accounts Portal App',
-      oAuthApplicationLogoUrl: 'https://example.com/ap-logo.png',
-      oAuthApplicationUrl: 'https://example.com/ap',
-      redirectUrl: 'https://example.com/callback',
-      onAllow: onAllowSpy,
-      onDeny: onDenySpy,
+      oauthClientId: 'client_test',
+      redirectUrl: 'https://override.example/callback',
     } as any);
 
     mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
 
     const { getByText, baseElement } = render(<OAuthConsent />, { wrapper });
 
-    // Context values win: the displayed name is the accounts portal one, not 'Clerk CLI'.
-    await waitFor(() => expect(getByText('Accounts Portal App')).toBeVisible());
+    await waitFor(() => {
+      expect(getByText('Allow')).toBeVisible();
+    });
 
-    // No forwarded hidden inputs inside the form when context callbacks are provided.
-    const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]')!;
-    expect(form).not.toBeNull();
-    const forwardedInputs = form.querySelectorAll('input[type="hidden"]');
-    expect(forwardedInputs.length).toBe(0);
-
-    // Clicking Allow invokes the context callback, not a form submission.
-    getByText('Allow').click();
-    expect(onAllowSpy).toHaveBeenCalledTimes(1);
-
-    // The hook should NOT fire a FAPI request on the accounts portal path.
-    expect(fixtures.clerk.oauthApplication.getConsentInfo).not.toHaveBeenCalled();
+    expect(baseElement.textContent).toContain('override.example');
+    expect(baseElement.textContent).not.toContain('app.example');
   });
 
   it('shows missing client_id error in the public flow', async () => {

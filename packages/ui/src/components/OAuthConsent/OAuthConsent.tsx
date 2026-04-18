@@ -49,102 +49,65 @@ function _OAuthConsent() {
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
   const effectiveOrg = selectedOrg ?? orgOptions[0]?.value ?? null;
 
-  // onAllow and onDeny are always provided as a pair by the accounts portal.
-  const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
-
-  // Resolve oauthClientId and scope once: context overrides URL fallback.
   const fromUrl = getOAuthConsentFromSearch();
   const oauthClientId = ctx.oauthClientId ?? fromUrl.oauthClientId;
   const scope = ctx.scope ?? fromUrl.scope;
 
-  // Public path: fetch via hook. Disabled on the accounts portal path
-  // (which already has all data via context) to avoid a wasted FAPI request.
-  const { data, isLoading, error } = useOAuthConsent({
-    oauthClientId,
-    scope,
-    // TODO: Remove this once account portal is refactored to use this component
-    enabled: !hasContextCallbacks,
-  });
+  const { data, isLoading, error } = useOAuthConsent({ oauthClientId, scope });
 
-  // Hook returns camelCase `requiresConsent`; the render logic uses snake_case.
-  const mappedHookScopes = data?.scopes?.map(s => ({
-    scope: s.scope,
-    description: s.description,
-    requires_consent: s.requiresConsent,
-  }));
-
-  // Context (accounts portal path) wins over hook data (public path).
-  const scopes = ctx.scopes ?? mappedHookScopes ?? [];
-  const oauthApplicationName = ctx.oauthApplicationName ?? data?.oauthApplicationName ?? '';
-  const oauthApplicationLogoUrl = ctx.oauthApplicationLogoUrl ?? data?.oauthApplicationLogoUrl;
-  const oauthApplicationUrl = ctx.oauthApplicationUrl ?? data?.oauthApplicationUrl;
+  const scopes = data?.scopes ?? [];
+  const oauthApplicationName = data?.oauthApplicationName ?? '';
+  const oauthApplicationLogoUrl = data?.oauthApplicationLogoUrl;
+  const oauthApplicationUrl = data?.oauthApplicationUrl;
   const redirectUrl = ctx.redirectUrl ?? getRedirectUriFromSearch();
 
   const { t } = useLocalizations();
   const domainAction = getRedirectDisplay(redirectUrl);
   const viewFullUrlText = t(localizationKeys('oauthConsent.viewFullUrl'));
 
-  // Error states only apply to the public flow.
-  if (!hasContextCallbacks) {
-    const errorMessage = !oauthClientId
-      ? 'The client ID is missing.'
-      : !redirectUrl
-        ? 'The redirect URI is missing.'
-        : error
-          ? (error.message ?? 'Failed to load consent information.')
-          : undefined;
+  const errorMessage = !oauthClientId
+    ? 'The client ID is missing.'
+    : !redirectUrl
+      ? 'The redirect URI is missing.'
+      : error
+        ? (error.message ?? 'Failed to load consent information.')
+        : undefined;
 
-    if (errorMessage) {
-      return (
-        <Card.Root>
-          <Card.Content>
-            <Card.Alert>{errorMessage}</Card.Alert>
-          </Card.Content>
-          <Card.Footer />
-        </Card.Root>
-      );
-    }
+  if (errorMessage) {
+    return (
+      <Card.Root>
+        <Card.Content>
+          <Card.Alert>{errorMessage}</Card.Alert>
+        </Card.Content>
+        <Card.Footer />
+      </Card.Root>
+    );
+  }
 
-    if (isLoading) {
-      return (
-        <Card.Root>
-          <Card.Content>
-            <LoadingCardContainer />
-          </Card.Content>
-          <Card.Footer />
-        </Card.Root>
-      );
-    }
+  if (isLoading) {
+    return (
+      <Card.Root>
+        <Card.Content>
+          <LoadingCardContainer />
+        </Card.Content>
+        <Card.Footer />
+      </Card.Root>
+    );
   }
 
   const actionUrl = clerk.oauthApplication.buildConsentActionUrl({ clientId: oauthClientId });
   const forwardedParams = getForwardedParams();
 
-  // Accounts portal path delegates to context callbacks; public path lets the form submit natively.
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    if (!hasContextCallbacks) {
-      return;
-    }
-    e.preventDefault();
-    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
-    if (submitter?.value === 'true') {
-      ctx.onAllow?.();
-    } else {
-      ctx.onDeny?.();
-    }
-  };
-
   const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
 
-  const displayedScopes = scopes.filter(item => item.scope !== OFFLINE_ACCESS_SCOPE);
-  const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
+  const displayedScopes = scopes.filter(s => s.scope !== OFFLINE_ACCESS_SCOPE);
+  const hasOfflineAccess = scopes.some(s => s.scope === OFFLINE_ACCESS_SCOPE);
 
   return (
     <>
       <form
         method='POST'
         action={actionUrl}
-        onSubmit={handleSubmit}
       >
         <Card.Root>
           <Card.Content>
@@ -229,9 +192,9 @@ function _OAuthConsent() {
                 />
               </ListGroupHeader>
               <ListGroupContent>
-                {displayedScopes.map(item => (
-                  <ListGroupItem key={item.scope}>
-                    <ListGroupItemLabel>{item.description || item.scope || ''}</ListGroupItemLabel>
+                {displayedScopes.map(s => (
+                  <ListGroupItem key={s.scope}>
+                    <ListGroupItemLabel>{s.description || s.scope || ''}</ListGroupItemLabel>
                   </ListGroupItem>
                 ))}
               </ListGroupContent>
@@ -289,16 +252,15 @@ function _OAuthConsent() {
           </Card.Content>
           <Card.Footer />
         </Card.Root>
-        {!hasContextCallbacks &&
-          forwardedParams.map(([key, value]) => (
-            <input
-              key={key}
-              type='hidden'
-              name={key}
-              value={value}
-            />
-          ))}
-        {!hasContextCallbacks && orgSelectionEnabled && effectiveOrg && (
+        {forwardedParams.map(([key, value]) => (
+          <input
+            key={key}
+            type='hidden'
+            name={key}
+            value={value}
+          />
+        ))}
+        {orgSelectionEnabled && effectiveOrg && (
           <input
             type='hidden'
             name='organization_id'

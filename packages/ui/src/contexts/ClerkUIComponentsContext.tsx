@@ -115,10 +115,6 @@ export function ComponentContextProvider({
         </APIKeysContext.Provider>
       );
     case 'OAuthConsent': {
-      // Translate capital-A `oAuth*` props from the accounts portal into
-      // the lowercase `oauth*` context shape the component reads.
-      // The public `<OAuthConsent />` wrapper also forwards `oauthClientId`
-      // and `scope` through the same path.
       const p = props as __internal_OAuthConsentProps;
       return (
         <OAuthConsentContext.Provider
@@ -126,13 +122,7 @@ export function ComponentContextProvider({
             componentName,
             oauthClientId: p.oauthClientId,
             scope: p.scope,
-            scopes: p.scopes,
-            oauthApplicationName: p.oAuthApplicationName,
-            oauthApplicationLogoUrl: p.oAuthApplicationLogoUrl,
-            oauthApplicationUrl: p.oAuthApplicationUrl,
             redirectUrl: p.redirectUrl,
-            onAllow: p.onAllow,
-            onDeny: p.onDeny,
             appearance: p.appearance,
             enableOrgSelection: (p as any).__internal_enableOrgSelection === true,
           }}

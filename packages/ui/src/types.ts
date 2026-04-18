@@ -169,51 +169,20 @@ export type TaskSetupMFACtx = TaskSetupMFAProps & {
 export type OAuthConsentCtx = {
   componentName: 'OAuthConsent';
   /**
-   * Public-path override forwarded to `useOAuthConsent`. Falls back to the
-   * `client_id` query parameter from the current URL when omitted.
+   * Override the OAuth client ID. Defaults to the `client_id` query parameter
+   * from the current URL.
    */
   oauthClientId?: string;
   /**
-   * Public-path override forwarded to `useOAuthConsent`. Falls back to the
-   * `scope` query parameter from the current URL when omitted.
+   * Override the OAuth scope. Defaults to the `scope` query parameter from
+   * the current URL.
    */
   scope?: string;
   /**
-   * Pre-fetched scopes (accounts portal path). Snake-cased to match the
-   * legacy FAPI response shape.
-   */
-  scopes?: {
-    scope: string;
-    description: string | null;
-    requires_consent: boolean;
-  }[];
-  /**
-   * Pre-fetched OAuth application name (accounts portal path).
-   */
-  oauthApplicationName?: string;
-  /**
-   * Pre-fetched OAuth application logo URL (accounts portal path).
-   */
-  oauthApplicationLogoUrl?: string;
-  /**
-   * Pre-fetched OAuth application URL (accounts portal path).
-   */
-  oauthApplicationUrl?: string;
-  /**
-   * Redirect URI to display in the footer. Accounts portal path pre-populates
-   * this; public path reads `redirect_uri` from `window.location.search`.
+   * Override the redirect URI. Defaults to the `redirect_uri` query parameter
+   * from the current URL.
    */
   redirectUrl?: string;
-  /**
-   * Custom Allow handler (accounts portal path). When omitted, the component
-   * submits its internal hidden form instead.
-   */
-  onAllow?: () => void;
-  /**
-   * Custom Deny handler (accounts portal path). When omitted, the component
-   * submits its internal hidden form instead.
-   */
-  onDeny?: () => void;
   /**
    * Customize the appearance of the component.
    */

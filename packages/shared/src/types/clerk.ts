@@ -2281,51 +2281,10 @@ export type __internal_OAuthConsentProps = {
    */
   scope?: string;
   /**
-   * Name of the OAuth application.
-   *
-   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
-   */
-  oAuthApplicationName?: string;
-  /**
-   * Logo URL of the OAuth application.
-   *
-   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
-   */
-  oAuthApplicationLogoUrl?: string;
-  /**
-   * URL of the OAuth application.
-   *
-   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
-   */
-  oAuthApplicationUrl?: string;
-  /**
-   * Scopes requested by the OAuth application.
-   *
-   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
-   */
-  scopes?: {
-    scope: string;
-    description: string | null;
-    requires_consent: boolean;
-  }[];
-  /**
-   * Full URL or path to navigate to after the user allows or denies access.
-   *
-   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
+   * Override the redirect URI. Defaults to the `redirect_uri` query parameter
+   * from the current URL.
    */
   redirectUrl?: string;
-  /**
-   * Called when user allows access.
-   *
-   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
-   */
-  onAllow?: () => void;
-  /**
-   * Called when user denies access.
-   *
-   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
-   */
-  onDeny?: () => void;
 };
 
 export interface HandleEmailLinkVerificationParams {
