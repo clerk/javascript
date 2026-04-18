@@ -100,6 +100,7 @@ export type CheckAuthorizationParamsWithCustomPermissions = WithReverification<
   | { role?: never; permission?: never; feature?: never; plan?: never }
 >;
 
+/** @document */
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 
 type CheckAuthorizationParams = WithReverification<
@@ -265,14 +266,34 @@ export interface SessionResource extends ClerkResource {
    * Publicly available information about the current [`User`](https://clerk.com/docs/reference/objects/user).
    */
   publicUserData: PublicUserData;
+
   /**
    * Marks the session as ended. The session will no longer be active for this `Client` and its status will become **ended**.
    */
   end: () => Promise<SessionResource>;
+  /**
+   * Invalidates the current session by marking it as removed. Once removed, the session will be deactivated for the current Client instance and its `status` will be set to `removed`. This operation cannot be undone.
+   */
   remove: () => Promise<SessionResource>;
+  /**
+   * Updates the session's last active timestamp to the current time. This method should be called periodically to indicate ongoing user activity and prevent the session from becoming stale. The updated timestamp is used for session management and analytics purposes.
+   */
   touch: (params?: SessionTouchParams) => Promise<SessionResource>;
+  /**
+   * Retrieves the current user's [session token](https://clerk.com/docs/guides/sessions/session-tokens) or a [custom JWT template](https://clerk.com/docs/guides/sessions/jwt-templates).
+   *
+   * This method uses a cache so a network request will only be made if the token in memory has expired. The TTL for a Clerk token is one minute. It retries on transient failures (e.g. network errors); when the browser is offline and retries are exhausted, it throws `ClerkOfflineError`.
+   *
+   * Tokens can only be generated if the user is signed in.
+   */
   getToken: GetToken;
+  /**
+   * Checks if the user is [authorized for the specified Role, Permission, Feature, or Plan](https://clerk.com/docs/guides/secure/authorization-checks) or requires the user to [reverify their credentials](https://clerk.com/docs/guides/secure/reverification) if their last verification is older than allowed.
+   */
   checkAuthorization: CheckAuthorization;
+  /**
+   * Clears the cache for the current session. This is useful if the session has been updated and the cache is no longer valid.
+   */
   clearCache: () => void;
   /**
    * The date and time when the session was first created.
@@ -282,20 +303,43 @@ export interface SessionResource extends ClerkResource {
    * The date and time when the session was last updated.
    */
   updatedAt: Date;
-
+  /**
+   * Initiates the reverification flow.
+   * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   */
   startVerification: (params: SessionVerifyCreateParams) => Promise<SessionVerificationResource>;
+  /**
+   * Initiates the [first factor verification](!first-factor-verification) process. This is a required step to complete a reverification flow when using a preparable factor.
+   * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   */
   prepareFirstFactorVerification: (
     factor: SessionVerifyPrepareFirstFactorParams,
   ) => Promise<SessionVerificationResource>;
+  /**
+   * Attempts to complete the [first factor verification](!first-factor-verification) process.
+   * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   */
   attemptFirstFactorVerification: (
     attemptFactor: SessionVerifyAttemptFirstFactorParams,
   ) => Promise<SessionVerificationResource>;
+  /**
+   * Initiates the [second factor verification](!second-factor-verification) process.
+   * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   */
   prepareSecondFactorVerification: (
     params: SessionVerifyPrepareSecondFactorParams,
   ) => Promise<SessionVerificationResource>;
+  /**
+   * Attempts to complete the [second factor verification](!second-factor-verification) process.
+   * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   */
   attemptSecondFactorVerification: (
     params: SessionVerifyAttemptSecondFactorParams,
   ) => Promise<SessionVerificationResource>;
+  /**
+   * Initiates a verification flow using passkeys.
+   * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   */
   verifyWithPasskey: () => Promise<SessionVerificationResource>;
   __internal_toSnapshot: () => SessionJSONSnapshot;
   __internal_touch: (params?: SessionTouchParams) => Promise<ClientResource | undefined>;
@@ -461,6 +505,7 @@ export type SessionVerifyPrepareFirstFactorParams =
    * @experimental
    */
   | Omit<EnterpriseSSOConfig, 'actionCompleteRedirectUrl'>;
+
 export type SessionVerifyAttemptFirstFactorParams =
   | EmailCodeAttempt
   | PhoneCodeAttempt

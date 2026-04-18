@@ -105,6 +105,7 @@ const LINK_REPLACEMENTS = [
   ['handle-o-auth-callback-params', '/docs/reference/types/handle-o-auth-callback-params'],
   ['session-task', '/docs/reference/types/session-task'],
   ['public-user-data', '/docs/reference/types/public-user-data'],
+  ['session-status', '/docs/reference/types/session-status'],
 ];
 
 /**

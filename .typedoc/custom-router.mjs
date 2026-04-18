@@ -53,7 +53,24 @@ class ClerkRouter extends MemberRouter {
         const isExactMatch = page.url.toLocaleLowerCase().endsWith('readme.mdx');
         const isMatchWithNumber = page.url.toLocaleLowerCase().match(/readme-\d+\.mdx$/);
 
-        return !(isExactMatch || isMatchWithNumber);
+        if (isExactMatch || isMatchWithNumber) {
+          return false;
+        }
+
+        /**
+         * `@inline` marks types that should be expanded at use sites, not documented as their own page.
+         * TypeDoc still assigns `fullUrls` for exported aliases, so we also strip links in the theme's `referenceType` partial (`custom-theme.mjs`).
+         */
+        const model = page.model;
+        if (
+          model &&
+          'comment' in model &&
+          /** @type {{ comment?: import('typedoc').Comment | undefined }} */ (model).comment?.hasModifier('@inline')
+        ) {
+          return false;
+        }
+
+        return true;
       });
 
     return modifiedPages;

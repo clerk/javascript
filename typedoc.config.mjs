@@ -97,6 +97,10 @@ const config = {
     gitRevision: 'main',
     blockTags: [...OptionDefaults.blockTags, ...CUSTOM_BLOCK_TAGS],
     modifierTags: [...OptionDefaults.modifierTags.filter(tag => tag !== '@experimental')],
+    /**
+     * Stops TypeDoc from generating standalone pages for inline types.
+     */
+    excludeTags: OptionDefaults.excludeTags.filter(tag => tag !== '@inline' && tag !== '@inlineType'),
     exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     readme: 'none',
     disableGit: true,

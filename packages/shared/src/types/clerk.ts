@@ -1254,7 +1254,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
       ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
     };
     /**
-     * Optional [object](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
+     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages. See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
      */
     // TODO @nikos
     appearance?: any;

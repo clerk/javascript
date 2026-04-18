@@ -12,8 +12,19 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Application, Comment, PageKind, ReflectionKind } from 'typedoc';
+import {
+  Application,
+  Comment,
+  IntersectionType,
+  OptionalType,
+  PageKind,
+  ReferenceType,
+  ReflectionKind,
+  ReflectionType,
+  UnionType,
+} from 'typedoc';
 import { MarkdownPageEvent, MarkdownTheme } from 'typedoc-plugin-markdown';
+import { removeLineBreaks } from '../node_modules/typedoc-plugin-markdown/dist/libs/utils/index.js';
 
 import typedocConfig from '../typedoc.config.mjs';
 import { isCallableInterfaceProperty } from './custom-theme.mjs';
@@ -257,6 +268,81 @@ function findInterfaceOrClass(project, name, sourcePathHint) {
 }
 
 /**
+ * Walk instantiated generic / alias chains (e.g. `CheckAuthorization` → `CheckAuthorizationFn<Params>` → `(…) => boolean`) until we find a {@link ReflectionType} call signature. Uses reflection IDs to avoid infinite loops.
+ *
+ * @param {import('typedoc').Type | undefined} t
+ * @param {Set<number>} visitedReflectionIds
+ * @returns {import('typedoc').SignatureReflection | undefined}
+ */
+function getCallSignatureFromType(t, visitedReflectionIds) {
+  if (!t || typeof t !== 'object') {
+    return undefined;
+  }
+  const tag = /** @type {{ type?: string }} */ (t).type;
+  if (tag === 'optional' && 'elementType' in t) {
+    return getCallSignatureFromType(
+      /** @type {{ elementType: import('typedoc').Type }} */ (t).elementType,
+      visitedReflectionIds,
+    );
+  }
+  if (t instanceof ReflectionType) {
+    if (t.declaration?.signatures?.length) {
+      return t.declaration.signatures[0];
+    }
+    return undefined;
+  }
+  if (t instanceof ReferenceType) {
+    const target = t.reflection;
+    if (
+      target &&
+      'signatures' in target &&
+      /** @type {{ signatures?: import('typedoc').SignatureReflection[] }} */ (target).signatures?.length
+    ) {
+      return /** @type {import('typedoc').DeclarationReflection} */ (target).signatures[0];
+    }
+    if (!target || !('kind' in target)) {
+      return undefined;
+    }
+    const decl = /** @type {import('typedoc').DeclarationReflection} */ (target);
+    const id = decl.id;
+    if (id != null) {
+      if (visitedReflectionIds.has(id)) {
+        return undefined;
+      }
+      visitedReflectionIds.add(id);
+    }
+    try {
+      if (decl.kind === ReflectionKind.TypeAlias && decl.type) {
+        return getCallSignatureFromType(decl.type, visitedReflectionIds);
+      }
+    } finally {
+      if (id != null) {
+        visitedReflectionIds.delete(id);
+      }
+    }
+    return undefined;
+  }
+  if (t instanceof UnionType) {
+    for (const arm of t.types) {
+      const sig = getCallSignatureFromType(arm, visitedReflectionIds);
+      if (sig) {
+        return sig;
+      }
+    }
+    return undefined;
+  }
+  if (t instanceof IntersectionType) {
+    for (const arm of t.types) {
+      const sig = getCallSignatureFromType(arm, visitedReflectionIds);
+      if (sig) {
+        return sig;
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
  * @param {import('typedoc').DeclarationReflection} decl
  * @returns {import('typedoc').SignatureReflection | undefined}
  */
@@ -288,8 +374,120 @@ function getPrimaryCallSignature(decl) {
         return inner.signatures[0];
       }
     }
+    // `type X = SomeFn<Args>` — RHS is often ReferenceType (generic alias), not ReflectionType; recurse (e.g. `checkAuthorization: CheckAuthorization`).
+    if (aliasTarget?.kind === ReflectionKind.TypeAlias && aliasTarget.type) {
+      const fromRhs = getCallSignatureFromType(aliasTarget.type, new Set());
+      if (fromRhs) {
+        return fromRhs;
+      }
+    }
+    const fromRef = getCallSignatureFromType(ref, new Set());
+    if (fromRef) {
+      return fromRef;
+    }
   }
   return undefined;
+}
+
+/**
+ * @param {import('typedoc').Type | undefined} t
+ */
+function unwrapOptionalType(t) {
+  if (!t || typeof t !== 'object') {
+    return t;
+  }
+  if (/** @type {{ type?: string }} */ (t).type === 'optional' && 'elementType' in t) {
+    return /** @type {{ elementType: import('typedoc').Type }} */ (t).elementType;
+  }
+  return t;
+}
+
+/**
+ * For `prop: OuterAlias` where `type OuterAlias = SomeFn<TArg>`, maps generic parameter names on `SomeFn` to the instantiated type arguments (e.g. `Params` → `CheckAuthorizationParams`).
+ *
+ * @param {import('typedoc').DeclarationReflection} propertyDecl
+ * @returns {Map<string, import('typedoc').Type> | undefined}
+ */
+function getGenericInstantiationMapFromCallableProperty(propertyDecl) {
+  const t = unwrapOptionalType(propertyDecl.type);
+  if (!(t instanceof ReferenceType) || !t.reflection) {
+    return undefined;
+  }
+  const alias = /** @type {import('typedoc').DeclarationReflection} */ (t.reflection);
+  if (!alias.kindOf(ReflectionKind.TypeAlias) || !alias.type) {
+    return undefined;
+  }
+  const inner = unwrapOptionalType(alias.type);
+  if (!(inner instanceof ReferenceType) || !inner.typeArguments?.length || !inner.reflection) {
+    return undefined;
+  }
+  const generic = /** @type {import('typedoc').DeclarationReflection} */ (inner.reflection);
+  const tpls = generic.typeParameters;
+  if (!tpls?.length) {
+    return undefined;
+  }
+  /** @type {Map<string, import('typedoc').Type>} */
+  const map = new Map();
+  for (let i = 0; i < inner.typeArguments.length; i++) {
+    const tp = tpls[i];
+    const arg = inner.typeArguments[i];
+    if (tp?.name && arg) {
+      map.set(tp.name, arg);
+    }
+  }
+  return map.size ? map : undefined;
+}
+
+/**
+ * Replace references to generic type parameters with instantiated types from {@link getGenericInstantiationMapFromCallableProperty}.
+ *
+ * @param {import('typedoc').Type | undefined} t
+ * @param {Map<string, import('typedoc').Type> | undefined} map
+ * @returns {import('typedoc').Type | undefined}
+ */
+function substituteGenericParamRefsInType(t, map) {
+  if (!t || !map?.size) {
+    return t;
+  }
+  if (/** @type {{ type?: string }} */ (t).type === 'optional' && 'elementType' in t) {
+    const el = /** @type {{ elementType: import('typedoc').Type }} */ (t).elementType;
+    const next = substituteGenericParamRefsInType(el, map);
+    if (next && next !== el) {
+      return new OptionalType(/** @type {import('typedoc').SomeType} */ (/** @type {unknown} */ (next)));
+    }
+    return t;
+  }
+  if (t instanceof ReferenceType && map.has(t.name)) {
+    return map.get(t.name) ?? t;
+  }
+  return t;
+}
+
+/**
+ * @param {import('typedoc').SignatureReflection} sig
+ * @param {Map<string, import('typedoc').Type> | undefined} instantiationMap
+ */
+function signatureWithInstantiation(sig, instantiationMap) {
+  if (!instantiationMap?.size) {
+    return sig;
+  }
+  const parameters = (sig.parameters ?? []).map(p => {
+    const newType = substituteGenericParamRefsInType(p.type, instantiationMap);
+    if (newType === p.type) {
+      return p;
+    }
+    return Object.assign(Object.create(Object.getPrototypeOf(p)), p, { type: newType });
+  });
+  const newReturn = substituteGenericParamRefsInType(sig.type, instantiationMap) ?? sig.type;
+  const out = Object.assign(Object.create(Object.getPrototypeOf(sig)), sig, {
+    parameters,
+    type: newReturn,
+    typeParameters: undefined,
+  });
+  if (sig.project) {
+    out.project = sig.project;
+  }
+  return out;
 }
 
 /**
@@ -374,20 +572,36 @@ function toKebabCase(name) {
 }
 
 /**
+ * Plain TypeScript-like type text for ```typescript``` fences (no markdown / backticks from {@link MarkdownThemeContext.partials.someType}).
+ *
+ * @param {import('typedoc').Type | undefined} t
+ */
+function typeStringForTypeScriptFence(t) {
+  if (!t) {
+    return 'unknown';
+  }
+  return removeLineBreaks(t.toString());
+}
+
+/**
  * @param {import('typedoc').SignatureReflection} sig
  * @param {string} memberName
+ * @param {Map<string, import('typedoc').Type> | undefined} instantiationMap
  */
-function formatTypeScriptSignature(sig, memberName) {
-  const typeParams = sig.typeParameters?.map(tp => tp.name).join(', ') ?? '';
-  const typeParamStr = typeParams ? `<${typeParams}>` : '';
+function formatTypeScriptSignature(sig, memberName, instantiationMap) {
+  const hideOuterTypeParams = Boolean(instantiationMap?.size) && (sig.typeParameters?.length ?? 0) > 0;
+  const typeParamStr =
+    !hideOuterTypeParams && sig.typeParameters?.length ? `<${sig.typeParameters.map(tp => tp.name).join(', ')}>` : '';
   const params =
     sig.parameters?.map(p => {
       const opt = p.flags.isOptional ? '?' : '';
       const rest = p.flags.isRest ? '...' : '';
-      const typeStr = p.type ? p.type.toString() : 'unknown';
+      const t = substituteGenericParamRefsInType(p.type, instantiationMap) ?? p.type;
+      const typeStr = typeStringForTypeScriptFence(t);
       return `${rest}${p.name}${opt}: ${typeStr}`;
     }) ?? [];
-  const ret = sig.type ? sig.type.toString() : 'void';
+  const retT = substituteGenericParamRefsInType(sig.type, instantiationMap) ?? sig.type;
+  const ret = retT ? typeStringForTypeScriptFence(retT) : 'void';
   return `function ${memberName}${typeParamStr}(${params.join(', ')}): ${ret}`;
 }
 
@@ -704,7 +918,8 @@ function trySingleNominalParameterTypeSection(sig, ctx) {
     return undefined;
   }
   const p = params[0];
-  const nominal = resolveNominalObjectTypeForSingleParam(p.type, sig.project);
+  const project = sig.project ?? ctx.page?.project;
+  const nominal = resolveNominalObjectTypeForSingleParam(p.type, project);
   if (!nominal) {
     return undefined;
   }
@@ -730,14 +945,16 @@ function trySingleNominalParameterTypeSection(sig, ctx) {
 /**
  * @param {import('typedoc').SignatureReflection} sig
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @param {Map<string, import('typedoc').Type> | undefined} instantiationMap
  */
-function parametersMarkdownTable(sig, ctx) {
-  const params = sig.parameters ?? [];
+function parametersMarkdownTable(sig, ctx, instantiationMap) {
+  const sigForDisplay = signatureWithInstantiation(sig, instantiationMap);
+  const params = sigForDisplay.parameters ?? [];
   if (params.length === 0) {
     return '';
   }
 
-  const singleNominal = trySingleNominalParameterTypeSection(sig, ctx);
+  const singleNominal = trySingleNominalParameterTypeSection(sigForDisplay, ctx);
   if (singleNominal) {
     return singleNominal;
   }
@@ -775,8 +992,9 @@ function buildMethodMdx(decl, ctx) {
   if (sigReturns) {
     description = [description, sigReturns].filter(Boolean).join('\n\n');
   }
-  const ts = ['```typescript', formatTypeScriptSignature(sig, name), '```'].join('\n');
-  const paramsMd = parametersMarkdownTable(sig, ctx);
+  const instantiationMap = getGenericInstantiationMapFromCallableProperty(decl);
+  const ts = ['```typescript', formatTypeScriptSignature(sig, name, instantiationMap), '```'].join('\n');
+  const paramsMd = parametersMarkdownTable(sig, ctx, instantiationMap);
 
   // Same post-process as `custom-plugin.mjs` `MarkdownPageEvent.END`: relative `.mdx` links, then catch-alls.
   // Skip the ```typescript``` fence so signatures stay plain code.

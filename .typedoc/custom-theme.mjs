@@ -270,8 +270,66 @@ function hasDefaultValuesForParameters(parameters) {
 }
 
 /**
- * Same as typedoc-plugin-markdown `member.parametersTable`, but does **not** flatten inline object parameters when the object has only one property (avoids duplicate rows).
- * E.g. `params: { redirectUrl: string }` would result in duplicate rows like `params` and `params.redirectUrl` with the same `@param` description. This is because the default plugin flattens inline object parameters when the object has only one property, but we don't want to do that.
+ * Object shape for a parameter: inline `{ … }`, optional-wrapped, or reference to a type alias / interface.
+ *
+ * @param {import('typedoc').Type | undefined} t
+ * @returns {import('typedoc').DeclarationReflection | undefined}
+ */
+function getParameterObjectShapeDeclaration(t) {
+  if (!t || typeof t !== 'object') {
+    return undefined;
+  }
+  const o =
+    /** @type {{ type?: string; declaration?: import('typedoc').DeclarationReflection; elementType?: import('typedoc').Type }} */ (
+      /** @type {unknown} */ (t)
+    );
+  if (o.type === 'optional' && o.elementType) {
+    return getParameterObjectShapeDeclaration(o.elementType);
+  }
+  if (o.type === 'reflection' && o.declaration) {
+    const d = o.declaration;
+    if (d.kind === ReflectionKind.TypeLiteral || d.kind === ReflectionKind.Interface) {
+      return d;
+    }
+  }
+  if (o.type === 'reference') {
+    const ref = /** @type {import('typedoc').ReferenceType} */ (t);
+    const sym = ref.reflection;
+    if (!sym) {
+      return undefined;
+    }
+    const target = /** @type {import('typedoc').DeclarationReflection} */ (sym);
+    if (sym.kind === ReflectionKind.TypeAlias && target.type) {
+      return getParameterObjectShapeDeclaration(target.type);
+    }
+    if (sym.kind === ReflectionKind.Interface) {
+      return target;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Same as typedoc-plugin-markdown `member.parametersTable`, but avoids useless duplicate rows when a one-property object has **no** property-level JSDoc (the description lives only on `@param`). When the sole property **does** have its own documentation, we flatten so both rows appear.
+ *
+ * @param {import('typedoc').DeclarationReflection | undefined} decl
+ */
+function shouldFlattenInlineObjectParameter(decl) {
+  if (!decl?.children?.length) {
+    return false;
+  }
+  if (decl.kind !== ReflectionKind.TypeLiteral && decl.kind !== ReflectionKind.Interface) {
+    return false;
+  }
+  if (decl.children.length > 1) {
+    return true;
+  }
+  const only = decl.children[0];
+  return Boolean(only?.comment?.hasVisibleComponent());
+}
+
+/**
+ * Same as typedoc-plugin-markdown `member.parametersTable`, with `shouldFlattenInlineObjectParameter` and `getParameterObjectShapeDeclaration`.
  *
  * @this {import('typedoc-plugin-markdown').MarkdownThemeContext}
  * @param {import('typedoc').ParameterReflection[]} model
@@ -287,11 +345,8 @@ function clerkParametersTable(model) {
    * @returns {import('typedoc').ParameterReflection[]}
    */
   const parseParams = (current, acc) => {
-    const decl = /** @type {{ declaration?: import('typedoc').DeclarationReflection } | undefined} */ (
-      /** @type {unknown} */ (current.type)
-    )?.declaration;
-    const children = decl?.children;
-    const shouldFlatten = decl?.kind === ReflectionKind.TypeLiteral && children && children.length > 1;
+    const decl = getParameterObjectShapeDeclaration(current.type);
+    const shouldFlatten = shouldFlattenInlineObjectParameter(decl);
     return shouldFlatten ? [...acc, current, ...flattenParams(current)] : [...acc, current];
   };
   /**
@@ -299,9 +354,7 @@ function clerkParametersTable(model) {
    * @returns {import('typedoc').ParameterReflection[]}
    */
   const flattenParams = current => {
-    const decl = /** @type {{ declaration?: import('typedoc').DeclarationReflection } | undefined} */ (
-      /** @type {unknown} */ (current.type)
-    )?.declaration;
+    const decl = getParameterObjectShapeDeclaration(current.type);
     return (
       decl?.children?.reduce(
         /**
@@ -664,7 +717,6 @@ function clerkDeclaration(model, options = { headingLevel: 2, nested: false }) {
   const headingLevel = opts.headingLevel ?? 2;
   const optionsWithHeading = { ...options, headingLevel };
 
-  md.push(this.partials.declarationTitle(model));
   if (!opts.nested && model.sources && !this.options.getValue('disableSources')) {
     md.push(this.partials.sources(model));
   }
@@ -814,6 +866,12 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
 
     this.partials = {
       ...superPartials,
+      /**
+       * Remove the blockquote signature line.
+       *
+       * @returns {string}
+       */
+      declarationTitle: () => '',
       /**
        * @param {import('typedoc').DeclarationReflection[]} model
        * @param {Parameters<typeof superPartials.propertiesTable>[1]} [options]
@@ -1132,17 +1190,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           }
         }
 
-        // Create a local override
-        const localPartials = {
-          ...this.partials,
-          declarationTitle: () => '',
-        };
-        // Store original so that we can restore it later
-        const originalPartials = this.partials;
-
-        this.partials = localPartials;
         const output = clerkDeclaration.call(this, customizedModel, options);
-        this.partials = originalPartials;
 
         // Remove the "Type declaration" heading from the output
         // This heading is generated by the original declaration partial
