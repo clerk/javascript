@@ -753,12 +753,30 @@ function resolveDeclarationWithObjectMembers(t) {
     }
   }
   if (t.type === 'intersection') {
-    for (const inner of /** @type {import('typedoc').IntersectionType} */ (t).types) {
+    const inter = /** @type {import('typedoc').IntersectionType} */ (t);
+    /** @type {Map<string, import('typedoc').DeclarationReflection>} */
+    const byName = new Map();
+    for (const inner of inter.types) {
       const res = resolveDeclarationWithObjectMembers(inner);
-      if (res) {
-        return res;
+      if (res?.children?.length) {
+        for (const c of res.children) {
+          if (c.kindOf(ReflectionKind.Property)) {
+            byName.set(c.name, c);
+          }
+        }
       }
     }
+    if (byName.size === 0) {
+      return undefined;
+    }
+    // Synthetic holder so nominal param sections list every `&` arm (e.g. `RedirectOptions`).
+    return /** @type {import('typedoc').DeclarationReflection} */ (
+      /** @type {unknown} */ ({
+        children: [...byName.values()].sort((a, b) => a.name.localeCompare(b.name)),
+        kind: ReflectionKind.TypeLiteral,
+        name: '__intersectionMerged',
+      })
+    );
   }
   if (t.type === 'optional') {
     return resolveDeclarationWithObjectMembers(/** @type {import('typedoc').OptionalType} */ (t).elementType);
@@ -776,12 +794,44 @@ function formatNestedParamNameColumn(baseName, pathSegments) {
 }
 
 /**
- * Rows for object properties that have documentation (including from `@param parent.prop` on the method), which TypeDoc stores on property reflections rather than leaving `@param` block tags on the signature.
+ * This function unwraps a TypeDoc parameter type if it is an optional type. If the provided type is of type "optional", it returns the underlying element type (the real type being wrapped). If it is not optional or is undefined, it returns the type as-is.
  *
- * @param {import('typedoc').ParameterReflection} param
- * @returns {string[]}
+ * @param {import('typedoc').SomeType | undefined} t
+ * @returns {import('typedoc').SomeType | undefined}
  */
+function unwrapOptionalParamType(t) {
+  if (t?.type === 'optional') {
+    return /** @type {import('typedoc').OptionalType} */ (t).elementType;
+  }
+  return t;
+}
+
 /**
+ * When TypeDoc renders a parameter type as a markdown link to another generated `.mdx` file, that type has a dedicated page — omit nested `param?.prop` rows so readers follow the type link instead.
+ * `@inline` aliases are expanded by the theme and do not link to a standalone page.
+ *
+ * @param {import('typedoc').SomeType | undefined} t
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ */
+function parameterTypeLinksToStandaloneMdxPage(t, ctx) {
+  const bare = unwrapOptionalParamType(t);
+  if (!bare) {
+    return false;
+  }
+  if (bare.type === 'reference') {
+    const ref = /** @type {import('typedoc').ReferenceType} */ (bare);
+    if (ref.reflection?.comment?.hasModifier('@inline')) {
+      return false;
+    }
+  }
+  const md = removeLineBreaksForTableCell(ctx.partials.someType(bare) ?? '') ?? '';
+  return /\.mdx(?:#[^)]*)?\)/.test(md);
+}
+
+/**
+ * Rows for object properties on a nominal param type (e.g. `HandleOAuthCallbackParams`), including from `@param parent.prop` on the method.
+ * Lists every property on the resolved shape; uses the property comment when present, otherwise `—` (intersection aliases often omit comments on some arms in the model).
+ *
  * @param {import('typedoc').ParameterReflection} param
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
  */
@@ -795,22 +845,23 @@ function nestedParameterRowsFromDocumentedProperties(param, ctx) {
     }
   }
 
+  if (parameterTypeLinksToStandaloneMdxPage(param.type, ctx)) {
+    return [];
+  }
+
   const holder = resolveDeclarationWithObjectMembers(param.type);
   if (!holder?.children?.length) {
     return [];
   }
-  const props = holder.children.filter(c => c.kindOf(ReflectionKind.Property) && c.comment?.summary?.length);
+  const props = holder.children.filter(c => c.kindOf(ReflectionKind.Property));
   props.sort((a, b) => a.name.localeCompare(b.name));
   /** @type {string[]} */
   const rows = [];
   for (const child of props) {
     const summary = child.comment?.summary;
-    if (!summary?.length) {
-      continue;
-    }
     const typeCell = child.type ? removeLineBreaksForTableCell(ctx.partials.someType(child.type)) : '`unknown`';
     const nestedNameCol = formatNestedParamNameColumn(param.name, [child.name]);
-    const nestedDesc = displayPartsToString(summary).trim() || '—';
+    const nestedDesc = summary?.length ? displayPartsToString(summary).trim() || '—' : '—';
     rows.push(`| ${nestedNameCol} | ${typeCell} | ${nestedDesc} |`);
   }
   return rows;

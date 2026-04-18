@@ -429,9 +429,14 @@ export type SessionStatus =
    */
   | 'pending';
 
+/** @inline */
 export type SessionTouchIntent = 'focus' | 'select_session' | 'select_org';
 
+/** @document */
 export type SessionTouchParams = {
+  /**
+   * The intent of the touch operation.
+   */
   intent?: SessionTouchIntent;
 };
 
@@ -483,9 +488,19 @@ export interface SessionTask {
   key: 'choose-organization' | 'reset-password' | 'setup-mfa';
 }
 
+/** @document */
 export type GetTokenOptions = {
+  /**
+   * The Organization associated with the generated session token. _Does not modify the session's currently [Active Organization](!active-organization)._
+   */
   organizationId?: string;
+  /**
+   * Whether to skip the cache lookup and force a call to the server instead, even within the TTL. Useful if the token claims are time-sensitive or depend on data that can be updated (e.g. user fields). Defaults to `false`.
+   */
   skipCache?: boolean;
+  /**
+   * The name of the JWT template from the [Clerk Dashboard](https://dashboard.clerk.com/~/jwt-templates) to generate a new token from. E.g. 'firebase', 'grafbase', or your custom template's name.
+   */
   template?: string;
 };
 /**

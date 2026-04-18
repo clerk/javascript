@@ -873,6 +873,25 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        */
       declarationTitle: () => '',
       /**
+       * TypeDoc's default links every {@link ReferenceType} to a URL. Types marked `@inline` are expanded at use sites and (via the router) have no standalone page — linking produces broken relative `.mdx` paths in extracted method docs. Render the **aliased type** (RHS) so literals and unions show as `'phone_code'`, not `PhoneCodeStrategy`.
+       *
+       * @param {import('typedoc').ReferenceType} model
+       */
+      referenceType: model => {
+        if (model.reflection?.comment?.hasModifier('@inline')) {
+          const decl = /** @type {import('typedoc').DeclarationReflection} */ (model.reflection);
+          // Generic instantiation, e.g. `Fn<Args>` — let `someType` apply type arguments.
+          if (model.typeArguments?.length) {
+            return removeLineBreaks(this.partials.someType(model));
+          }
+          if (decl.kindOf(ReflectionKind.TypeAlias) && decl.type) {
+            return removeLineBreaks(this.partials.someType(decl.type));
+          }
+          return backTicks(decl.name);
+        }
+        return superPartials.referenceType.call(this, model);
+      },
+      /**
        * @param {import('typedoc').DeclarationReflection[]} model
        * @param {Parameters<typeof superPartials.propertiesTable>[1]} [options]
        */

@@ -891,15 +891,13 @@ export interface Clerk {
 
   /**
    * Returns the configured `afterSignInUrl` of the instance.
-   * @param params - Optional configuration.
-   * @param params.params - Optional query parameters to append to the URL.
+   * @param params - Optional query parameters to append to the URL.
    */
   buildAfterSignInUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
    * Returns the configured `afterSignInUrl` of the instance.
-   * @param params - Optional configuration.
-   * @param params.params - Optional query parameters to append to the URL.
+   * @param params - Optional query parameters to append to the URL.
    */
   buildAfterSignUpUrl({ params }?: { params?: URLSearchParams }): string;
 
