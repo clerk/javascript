@@ -1045,7 +1045,10 @@ function buildMethodMdx(decl, ctx) {
   }
   const instantiationMap = getGenericInstantiationMapFromCallableProperty(decl);
   const ts = ['```typescript', formatTypeScriptSignature(sig, name, instantiationMap), '```'].join('\n');
-  const paramsMd = parametersMarkdownTable(sig, ctx, instantiationMap);
+  const skipParametersSection =
+    Boolean(decl.comment?.hasModifier('@skipParametersSection')) ||
+    Boolean(sig.comment?.hasModifier('@skipParametersSection'));
+  const paramsMd = skipParametersSection ? '' : parametersMarkdownTable(sig, ctx, instantiationMap);
 
   // Same post-process as `custom-plugin.mjs` `MarkdownPageEvent.END`: relative `.mdx` links, then catch-alls.
   // Skip the ```typescript``` fence so signatures stay plain code.

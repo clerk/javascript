@@ -423,14 +423,6 @@ export class Clerk implements ClerkInterface {
     return !!this.session;
   }
 
-  /**
-   * Create an instance of the `Clerk` class with dedicated options.
-   *
-   * This method is only available when importing `Clerk` from `@clerk/clerk-js`, rather than using a Window script.
-   *
-   * @param key - Your Clerk [Publishable Key](!publishable-key).
-   * @param options - The satellite domain or reverse proxy URL used to connect to Clerk.
-   */
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 

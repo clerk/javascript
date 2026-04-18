@@ -289,6 +289,7 @@ export interface SessionResource extends ClerkResource {
   getToken: GetToken;
   /**
    * Checks if the user is [authorized for the specified Role, Permission, Feature, or Plan](https://clerk.com/docs/guides/secure/authorization-checks) or requires the user to [reverify their credentials](https://clerk.com/docs/guides/secure/reverification) if their last verification is older than allowed.
+   * @skipParametersSection
    */
   checkAuthorization: CheckAuthorization;
   /**
@@ -311,6 +312,7 @@ export interface SessionResource extends ClerkResource {
   /**
    * Initiates the [first factor verification](!first-factor-verification) process. This is a required step to complete a reverification flow when using a preparable factor.
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   * @skipParametersSection
    */
   prepareFirstFactorVerification: (
     factor: SessionVerifyPrepareFirstFactorParams,
@@ -318,6 +320,7 @@ export interface SessionResource extends ClerkResource {
   /**
    * Attempts to complete the [first factor verification](!first-factor-verification) process.
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   * @skipParametersSection
    */
   attemptFirstFactorVerification: (
     attemptFactor: SessionVerifyAttemptFirstFactorParams,
@@ -325,6 +328,7 @@ export interface SessionResource extends ClerkResource {
   /**
    * Initiates the [second factor verification](!second-factor-verification) process.
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   * @skipParametersSection
    */
   prepareSecondFactorVerification: (
     params: SessionVerifyPrepareSecondFactorParams,
@@ -332,6 +336,7 @@ export interface SessionResource extends ClerkResource {
   /**
    * Attempts to complete the [second factor verification](!second-factor-verification) process.
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   * @skipParametersSection
    */
   attemptSecondFactorVerification: (
     params: SessionVerifyAttemptSecondFactorParams,
@@ -508,6 +513,7 @@ export type GetTokenOptions = {
  */
 export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
 
+/** @document */
 export type SessionVerifyCreateParams = {
   level: SessionVerificationLevel;
 };

@@ -96,7 +96,11 @@ const config = {
     excludeNotDocumented: true,
     gitRevision: 'main',
     blockTags: [...OptionDefaults.blockTags, ...CUSTOM_BLOCK_TAGS],
-    modifierTags: [...OptionDefaults.modifierTags.filter(tag => tag !== '@experimental')],
+    modifierTags: [
+      ...OptionDefaults.modifierTags.filter(tag => tag !== '@experimental'),
+      /** Suppresses the Parameters table in `.typedoc/extract-methods.mjs` method MDX. */
+      '@skipParametersSection',
+    ],
     /**
      * Stops TypeDoc from generating standalone pages for inline types.
      */
