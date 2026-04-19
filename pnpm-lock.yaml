@@ -647,7 +647,7 @@ importers:
         version: link:../shared
     devDependencies:
       hono:
-        specifier: ^4.12.12
+        specifier: ^4.12.14
         version: 4.12.14
 
   packages/localizations:
