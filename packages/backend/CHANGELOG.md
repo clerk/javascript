@@ -1,5 +1,22 @@
 # Change Log
 
+## 3.2.13
+
+### Patch Changes
+
+- Add path traversal protections in `joinPaths` ([#8331](https://github.com/clerk/javascript/pull/8331)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 3.2.12
+
+### Patch Changes
+
+- Introduce `samlConnection` and `oauthConfig` into the `EnterpriseConnection` resource. ([#8326](https://github.com/clerk/javascript/pull/8326)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- The JWT claims are verified after the signature to avoid leaking information through error messages on forged tokens. ([#8332](https://github.com/clerk/javascript/pull/8332)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/shared@4.8.2
+
 ## 3.2.11
 
 ### Patch Changes

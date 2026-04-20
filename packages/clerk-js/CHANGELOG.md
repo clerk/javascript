@@ -1,5 +1,24 @@
 # Change Log
 
+## 6.7.4
+
+### Patch Changes
+
+- fix(clerk-js): Prevent background token refresh from destroying sessions on mobile ([#8303](https://github.com/clerk/javascript/pull/8303)) by [@chriscanin](https://github.com/chriscanin)
+
+  On iOS, background thread throttling can starve the JS event loop for hours (e.g., overnight audio apps). When the SDK's background refresh timer eventually fires with stale credentials, the resulting 401 would trigger `handleUnauthenticated()` and destroy the session even though it's still valid on the server.
+
+  Adds an early return in `#refreshTokenInBackground()`, gated to headless/mobile runtimes only (Expo sets `runtimeEnvironment` to `'headless'`). If the token has already expired when the refresh timer fires, bail out instead of sending a request with stale credentials. The next foreground `getToken()` call handles token acquisition through the normal path with proper retry logic.
+
+## 6.7.3
+
+### Patch Changes
+
+- Added development runtime error when mounting `<OAuthconsent />` without active session. ([#8335](https://github.com/clerk/javascript/pull/8335)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/shared@4.8.2
+
 ## 6.7.2
 
 ### Patch Changes
