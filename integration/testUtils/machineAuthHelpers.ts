@@ -125,13 +125,20 @@ async function obtainOAuthAccessToken({
   await page.goto(authorizeUrl.toString());
 
   await signIn.waitForMounted();
+
+  const consentInfoLoaded = page.waitForResponse(
+    res => res.url().includes('/me/oauth/consent/') && res.request().method() === 'GET',
+    { timeout: 30_000 },
+  );
+
   await signIn.signInWithEmailAndInstantPassword({
     email: fakeUser.email,
     password: fakeUser.password,
   });
 
+  await consentInfoLoaded;
+
   const consentButton = page.getByRole('button', { name: 'Allow' });
-  await consentButton.waitFor({ timeout: 10000 });
   await consentButton.click();
 
   await page.waitForURL(/oauth\/callback/, { timeout: 10000 });
