@@ -1,6 +1,6 @@
 ---
 "@clerk/shared": patch
-"@clerk/ui": patch
+"@clerk/ui": minor
 ---
 
 Removed unused internal `<OAuthConsent />` properties.
