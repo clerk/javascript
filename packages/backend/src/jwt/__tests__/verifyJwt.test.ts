@@ -241,4 +241,32 @@ describe('verifyJwt(jwt, options)', () => {
     const { data } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
     expect(data).toEqual(mockJwtPayload);
   });
+
+  it('falls back to the default clock skew when clockSkewInMs is NaN', async () => {
+    vi.setSystemTime(new Date((mockJwtPayload.exp + 1) * 1000));
+    const inputVerifyJwtOptions = {
+      key: mockJwks.keys[0],
+      issuer: mockJwtPayload.iss,
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      clockSkewInMs: Number.NaN,
+    };
+    const { data } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(data).toEqual(mockJwtPayload);
+
+    vi.setSystemTime(new Date((mockJwtPayload.exp + 60) * 1000));
+    const { errors: [error] = [] } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(error?.message).toContain('JWT is expired');
+  });
+
+  it('falls back to the default clock skew when clockSkewInMs is Infinity', async () => {
+    vi.setSystemTime(new Date((mockJwtPayload.exp + 3600) * 1000));
+    const inputVerifyJwtOptions = {
+      key: mockJwks.keys[0],
+      issuer: mockJwtPayload.iss,
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      clockSkewInMs: Number.POSITIVE_INFINITY,
+    };
+    const { errors: [error] = [] } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(error?.message).toContain('JWT is expired');
+  });
 });
