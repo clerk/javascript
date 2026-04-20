@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.2.13
+
+### Patch Changes
+
+- Add path traversal protections in `joinPaths` ([#8331](https://github.com/clerk/javascript/pull/8331)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
 ## 3.2.12
 
 ### Patch Changes
