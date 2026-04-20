@@ -1,14 +1,4 @@
-import type { AttributeData, EmailAddressResource, PhoneNumberResource, Web3WalletResource } from '@clerk/shared/types';
-
-/**
- * An attribute is "available" in the UserProfile if it's enabled for sign-up
- * OR used as a first/second factor for sign-in. This covers instances where
- * an attribute is disabled for sign-up but still used for authentication
- * (e.g. accounts provisioned exclusively by invitation).
- */
-export function isAttributeAvailable(attr: AttributeData | undefined): boolean {
-  return Boolean(attr?.enabled || attr?.used_for_first_factor || attr?.used_for_second_factor);
-}
+import type { EmailAddressResource, PhoneNumberResource, Web3WalletResource } from '@clerk/shared/types';
 
 type IDable = { id: string };
 

@@ -18,7 +18,6 @@ import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
-import { isAttributeAvailable } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
 import { VerifyWithEnterpriseConnection } from './VerifyWithEnterpriseConnection';
 import { VerifyWithLink } from './VerifyWithLink';
@@ -139,7 +138,9 @@ const getTranslationKeyByStrategy = (strategy: PrepareEmailAddressVerificationPa
 function isEmailLinksEnabledForInstance(env: EnvironmentResource): boolean {
   const { userSettings } = env;
   const { email_address } = userSettings.attributes;
-  return Boolean(isAttributeAvailable(email_address) && email_address?.verifications.includes('email_link'));
+  return Boolean(
+    userSettings.availableAttributes.includes('email_address') && email_address?.verifications.includes('email_link'),
+  );
 }
 
 /**
