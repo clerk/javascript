@@ -46,8 +46,11 @@ function _OAuthConsent() {
       }))
     : [];
 
+  const lastActiveOrgId = clerk.session?.lastActiveOrganizationId;
+  const defaultOrg = orgOptions.find(o => o.value === lastActiveOrgId)?.value ?? orgOptions[0]?.value ?? null;
+
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
-  const effectiveOrg = selectedOrg ?? orgOptions[0]?.value ?? null;
+  const effectiveOrg = selectedOrg ?? defaultOrg;
 
   const fromUrl = getOAuthConsentFromSearch();
   const oauthClientId = ctx.oauthClientId ?? fromUrl.oauthClientId;
