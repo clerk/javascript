@@ -415,5 +415,87 @@ describe('OAuthConsent', () => {
         expect(form.querySelector('input[name="organization_id"]')).toBeNull();
       });
     });
+
+    it('defaults the selected org to session.lastActiveOrganizationId when it matches a membership', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({
+          email_addresses: ['jane@example.com'],
+          organization_memberships: [
+            { id: 'org_1', name: 'Acme Corp' },
+            { id: 'org_2', name: 'Globex' },
+            { id: 'org_3', name: 'Initech' },
+          ],
+        });
+        f.withOrganizations();
+      });
+
+      fixtures.clerk.session.lastActiveOrganizationId = 'org_3';
+
+      props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      const { baseElement } = render(<OAuthConsent />, { wrapper });
+
+      await waitFor(() => {
+        const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]')!;
+        const hiddenInput = form.querySelector('input[name="organization_id"]') as HTMLInputElement | null;
+        expect(hiddenInput).not.toBeNull();
+        expect(hiddenInput!.value).toBe('org_3');
+      });
+    });
+
+    it('falls back to the first membership when lastActiveOrganizationId does not match any membership', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({
+          email_addresses: ['jane@example.com'],
+          organization_memberships: [
+            { id: 'org_1', name: 'Acme Corp' },
+            { id: 'org_2', name: 'Globex' },
+          ],
+        });
+        f.withOrganizations();
+      });
+
+      fixtures.clerk.session.lastActiveOrganizationId = 'org_deleted';
+
+      props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      const { baseElement } = render(<OAuthConsent />, { wrapper });
+
+      await waitFor(() => {
+        const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]')!;
+        const hiddenInput = form.querySelector('input[name="organization_id"]') as HTMLInputElement | null;
+        expect(hiddenInput).not.toBeNull();
+        expect(hiddenInput!.value).toBe('org_1');
+      });
+    });
+
+    it('falls back to the first membership when lastActiveOrganizationId is null', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({
+          email_addresses: ['jane@example.com'],
+          organization_memberships: [
+            { id: 'org_1', name: 'Acme Corp' },
+            { id: 'org_2', name: 'Globex' },
+          ],
+        });
+        f.withOrganizations();
+      });
+
+      fixtures.clerk.session.lastActiveOrganizationId = null;
+
+      props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      const { baseElement } = render(<OAuthConsent />, { wrapper });
+
+      await waitFor(() => {
+        const form = baseElement.querySelector('form[action*="/v1/me/oauth/consent/"]')!;
+        const hiddenInput = form.querySelector('input[name="organization_id"]') as HTMLInputElement | null;
+        expect(hiddenInput).not.toBeNull();
+        expect(hiddenInput!.value).toBe('org_1');
+      });
+    });
   });
 });
