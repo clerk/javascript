@@ -84,13 +84,13 @@ export const Show = ComponentsModule.Show as ServerComponentsServerModuleTypes['
 
 /**
  * `auth` is not available from this import path.
- * 
+ *
  * **To fix this error:**
  * ```diff
  * - import { auth } from '@clerk/nextjs'
  * + import { auth } from '@clerk/nextjs/server'
  * ```
- * 
+ *
  * The `auth` function is only available in server-side contexts:
  * API Routes, Server Components, Server Actions, and Middleware.
  */
