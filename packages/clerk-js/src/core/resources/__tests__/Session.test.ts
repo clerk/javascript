@@ -1595,7 +1595,8 @@ describe('Session', () => {
       expect(isAuthorized).toBe(false);
     });
 
-    it('first factor not enrolled should be authorized for secondFactor assurance', async () => {
+    it('first factor not enrolled should NOT be authorized for secondFactor assurance', async () => {
+      // factor1Age === -1 is not a valid state; fail closed regardless of factor2 age.
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -1613,7 +1614,7 @@ describe('Session', () => {
         reverification: 'strict',
       });
 
-      expect(isAuthorized).toBe(true);
+      expect(isAuthorized).toBe(false);
     });
   });
 

@@ -25,22 +25,28 @@ type AuthorizationOptions = {
   plans: string | null | undefined;
 };
 
+// Internal verdict for each authorization dimension.
+// pass  = caller asked, the dimension is satisfied
+// fail  = caller asked, the dimension is not satisfied (includes "data missing" - fail closed)
+// skip  = caller did not ask in this dimension; it does not contribute to the result
+type CheckResult = 'pass' | 'fail' | 'skip';
+
 type CheckOrgAuthorization = (
   params: { role?: OrganizationCustomRoleKey; permission?: OrganizationCustomPermissionKey },
   options: Pick<AuthorizationOptions, 'orgId' | 'orgRole' | 'orgPermissions'>,
-) => boolean | null;
+) => CheckResult;
 
 type CheckBillingAuthorization = (
   params: { feature?: string; plan?: string },
   options: Pick<AuthorizationOptions, 'plans' | 'features'>,
-) => boolean | null;
+) => CheckResult;
 
 type CheckReverificationAuthorization = (
   params: {
     reverification?: ReverificationConfig;
   },
   { factorVerificationAge }: AuthorizationOptions,
-) => boolean | null;
+) => CheckResult;
 
 const TYPES_TO_OBJECTS: TypesToConfig = {
   strict_mfa: {
@@ -72,33 +78,60 @@ const USER_SCOPES = new Set(['u', 'user']);
 const isValidMaxAge = (maxAge: any) => typeof maxAge === 'number' && maxAge > 0;
 const isValidLevel = (level: any) => ALLOWED_LEVELS.has(level);
 const isValidVerificationType = (type: any) => ALLOWED_TYPES.has(type);
+const isValidFactorAge = (x: unknown): x is number =>
+  typeof x === 'number' && Number.isFinite(x) && (x === -1 || x >= 0);
 
 const prefixWithOrg = (value: string) => value.replace(/^(org:)*/, 'org:');
 
 /**
  * Checks if a user has the required organization-level authorization.
  * Verifies if the user has the specified role or permission within their organization.
+ * If both role and permission are provided, both must match (AND).
  *
- * @returns null, if unable to determine due to missing data or unspecified role/permission.
+ * @returns 'skip' if neither role nor permission was requested; 'fail' if a requested
+ *   check cannot be satisfied or the required claim is missing; 'pass' otherwise.
  */
 const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   const { orgId, orgRole, orgPermissions } = options;
-  if (!params.role && !params.permission) {
-    return null;
+  const roleAsked = params.role !== undefined;
+  const permAsked = params.permission !== undefined;
+
+  if (!roleAsked && !permAsked) {
+    return 'skip';
   }
 
-  if (!orgId || !orgRole || !orgPermissions) {
-    return null;
+  // Asked with a non-string value (e.g. null cast through `as any`): fail closed
+  // rather than letting `prefixWithOrg` throw.
+  if (roleAsked && typeof params.role !== 'string') {
+    return 'fail';
+  }
+  if (permAsked && typeof params.permission !== 'string') {
+    return 'fail';
   }
 
-  if (params.permission) {
-    return orgPermissions.includes(prefixWithOrg(params.permission));
+  if (!orgId) {
+    return 'fail';
   }
 
-  if (params.role) {
-    return prefixWithOrg(orgRole) === prefixWithOrg(params.role);
+  if (roleAsked) {
+    if (!orgRole) {
+      return 'fail';
+    }
+    if (prefixWithOrg(orgRole) !== prefixWithOrg(params.role as string)) {
+      return 'fail';
+    }
   }
-  return null;
+
+  if (permAsked) {
+    if (!orgPermissions) {
+      return 'fail';
+    }
+    if (!orgPermissions.includes(prefixWithOrg(params.permission as string))) {
+      return 'fail';
+    }
+  }
+
+  return 'pass';
 };
 
 const checkForFeatureOrPlan = (claim: string, featureOrPlan: string) => {
@@ -125,17 +158,49 @@ const checkForFeatureOrPlan = (claim: string, featureOrPlan: string) => {
   return [...orgFeatures, ...userFeatures].includes(id);
 };
 
+/**
+ * Checks if a user is entitled to the requested feature or plan.
+ * If both feature and plan are provided, both must match (AND).
+ *
+ * @returns 'skip' if neither feature nor plan was requested; 'fail' if a requested
+ *   check cannot be satisfied or the corresponding claim is missing; 'pass' otherwise.
+ */
 const checkBillingAuthorization: CheckBillingAuthorization = (params, options) => {
   const { features, plans } = options;
+  const featureAsked = params.feature !== undefined;
+  const planAsked = params.plan !== undefined;
 
-  if (params.feature && features) {
-    return checkForFeatureOrPlan(features, params.feature);
+  if (!featureAsked && !planAsked) {
+    return 'skip';
   }
 
-  if (params.plan && plans) {
-    return checkForFeatureOrPlan(plans, params.plan);
+  // Asked with a non-string value: fail closed before handing to checkForFeatureOrPlan.
+  if (featureAsked && typeof params.feature !== 'string') {
+    return 'fail';
   }
-  return null;
+  if (planAsked && typeof params.plan !== 'string') {
+    return 'fail';
+  }
+
+  if (featureAsked) {
+    if (!features) {
+      return 'fail';
+    }
+    if (!checkForFeatureOrPlan(features, params.feature as string)) {
+      return 'fail';
+    }
+  }
+
+  if (planAsked) {
+    if (!plans) {
+      return 'fail';
+    }
+    if (!checkForFeatureOrPlan(plans, params.plan as string)) {
+      return 'fail';
+    }
+  }
+
+  return 'pass';
 };
 
 const splitByScope = (fea: string | null | undefined) => {
@@ -197,41 +262,86 @@ const validateReverificationConfig = (config: ReverificationConfig | undefined |
  * Compares the user's factor verification ages against the specified maxAge.
  * Handles different verification levels (first factor, second factor, multi-factor).
  *
- * @returns null, if requirements or verification data are missing.
+ * @returns 'skip' if reverification was not requested; 'fail' if the requirement cannot
+ *   be satisfied or the verification data is missing or malformed; 'pass' otherwise.
  */
 const checkReverificationAuthorization: CheckReverificationAuthorization = (params, { factorVerificationAge }) => {
-  if (!params.reverification || !factorVerificationAge) {
-    return null;
+  if (params.reverification === undefined) {
+    return 'skip';
   }
 
-  const isValidReverification = validateReverificationConfig(params.reverification);
-  if (!isValidReverification) {
-    return null;
+  if (!factorVerificationAge) {
+    return 'fail';
   }
 
-  const { level, afterMinutes } = isValidReverification();
+  // Validate the tuple shape before comparing ages to defend against malformed JWT
+  // payloads or TS `as any` escapes. `factor1Age` / `factor2Age` must be numbers
+  // representing minutes (or -1 when a factor group is not enabled).
+  if (
+    !Array.isArray(factorVerificationAge) ||
+    factorVerificationAge.length !== 2 ||
+    !isValidFactorAge(factorVerificationAge[0]) ||
+    !isValidFactorAge(factorVerificationAge[1])
+  ) {
+    return 'fail';
+  }
+
+  const getConfig = validateReverificationConfig(params.reverification);
+  if (!getConfig) {
+    return 'fail';
+  }
+
+  const { level, afterMinutes } = getConfig();
   const [factor1Age, factor2Age] = factorVerificationAge;
 
-  // -1 indicates the factor group (1fa,2fa) is not enabled
-  // -1 for 1fa is not a valid scenario, but we need to make sure we handle it properly
-  const isValidFactor1 = factor1Age !== -1 ? afterMinutes > factor1Age : null;
-  const isValidFactor2 = factor2Age !== -1 ? afterMinutes > factor2Age : null;
+  // -1 indicates the factor group (1fa, 2fa) is not enabled.
+  // -1 for 1fa is not a valid state; fail closed.
+  if (factor1Age === -1) {
+    return 'fail';
+  }
+
+  const factor1FreshEnough = afterMinutes > factor1Age;
 
   switch (level) {
     case 'first_factor':
-      return isValidFactor1;
+      return factor1FreshEnough ? 'pass' : 'fail';
     case 'second_factor':
-      return factor2Age !== -1 ? isValidFactor2 : isValidFactor1;
+      // Existing behavior: when no 2FA is enrolled, fall back to first-factor freshness.
+      // A separate product decision tracks whether strict/moderate/lax should fail
+      // closed here instead.
+      return (factor2Age === -1 ? factor1FreshEnough : afterMinutes > factor2Age) ? 'pass' : 'fail';
     case 'multi_factor':
-      return factor2Age === -1 ? isValidFactor1 : isValidFactor1 && isValidFactor2;
+      return (factor2Age === -1 ? factor1FreshEnough : factor1FreshEnough && afterMinutes > factor2Age)
+        ? 'pass'
+        : 'fail';
   }
 };
 
 /**
+ * Combines per-dimension results into a single authorization decision.
+ *
+ * Rules:
+ * - `skip` entries are ignored (the caller did not ask about that dimension)
+ * - a single `fail` is a hard denial
+ * - at least one dimension must have been asked, otherwise deny
+ * - all asked dimensions must `pass` (AND)
+ */
+const combine = (results: CheckResult[]): boolean => {
+  let any = false;
+  for (const r of results) {
+    if (r === 'skip') continue;
+    if (r === 'fail') return false;
+    any = true;
+  }
+  return any;
+};
+
+/**
  * Creates a function for comprehensive user authorization checks.
- * Combines organization-level and reverification authentication checks.
- * The returned function authorizes if both checks pass, or if at least one passes
- * when the other is indeterminate. Fails if userId is missing.
+ * Combines organization, billing, and reverification checks. The returned function
+ * authorizes only when every requested dimension passes; any requested dimension
+ * that cannot be satisfied (including missing or malformed session data) denies
+ * the request. Fails if `userId` is missing.
  */
 const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthorizationWithCustomPermissions => {
   return (params): boolean => {
@@ -239,15 +349,11 @@ const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthoriza
       return false;
     }
 
-    const billingAuthorization = checkBillingAuthorization(params, options);
-    const orgAuthorization = checkOrgAuthorization(params, options);
-    const reverificationAuthorization = checkReverificationAuthorization(params, options);
-
-    if ([billingAuthorization || orgAuthorization, reverificationAuthorization].some(a => a === null)) {
-      return [billingAuthorization || orgAuthorization, reverificationAuthorization].some(a => a === true);
-    }
-
-    return [billingAuthorization || orgAuthorization, reverificationAuthorization].every(a => a === true);
+    return combine([
+      checkOrgAuthorization(params, options),
+      checkBillingAuthorization(params, options),
+      checkReverificationAuthorization(params, options),
+    ]);
   };
 };
 
