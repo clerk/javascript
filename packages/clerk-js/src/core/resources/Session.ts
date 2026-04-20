@@ -574,6 +574,20 @@ export class Session extends BaseResource implements SessionResource {
 
     Session.#backgroundRefreshInProgress.add(tokenId);
 
+    // Mobile only: skip this refresh if the token is already expired.
+    // On iOS, the OS throttles background JS threads for hours (e.g. overnight audio apps).
+    // The refresh timer fires late — well past token expiry — with stale credentials.
+    // If we send that request, the 401 response triggers handleUnauthenticated(), which
+    // destroys the session even though it's still valid on the server (30-day lifetime).
+    // Instead, bail out here and let the next foreground getToken() call recover normally.
+    const experimental = Session.clerk?.__internal_getOption?.('experimental');
+    const isHeadless = experimental?.runtimeEnvironment === 'headless';
+    const lastTokenExp = this.lastActiveToken?.jwt?.claims?.exp;
+    if (isHeadless && lastTokenExp && Date.now() / 1000 > lastTokenExp) {
+      Session.#backgroundRefreshInProgress.delete(tokenId);
+      return;
+    }
+
     const tokenResolver = this.#createTokenResolver(template, organizationId, false);
 
     // Don't cache the promise immediately - only update cache on success

@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.8.2
+
+### Patch Changes
+
+- Add `emailAddress`, `phoneNumber`, and `username` support to `signUp.update()` ([#8320](https://github.com/clerk/javascript/pull/8320)) by [@dstaley](https://github.com/dstaley)
+
+- Added development runtime error when mounting `<OAuthconsent />` without active session. ([#8335](https://github.com/clerk/javascript/pull/8335)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 4.8.1
 
 ### Patch Changes
