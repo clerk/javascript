@@ -3,4 +3,4 @@
 "@clerk/ui": patch
 ---
 
-Removed unused `<OAuthConsent />` properties.
+Removed unused internal `<OAuthConsent />` properties.
