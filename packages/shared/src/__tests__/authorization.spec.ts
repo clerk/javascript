@@ -162,6 +162,19 @@ describe('createCheckAuthorization', () => {
     expect(has({ feature: 'org:premium' })).toBe(false);
   });
 
+  it('fails strict_mfa when the user has no second factor enrolled', () => {
+    const has = createCheckAuthorization({
+      userId: 'user_123',
+      orgId: null,
+      orgRole: null,
+      orgPermissions: null,
+      features: '',
+      plans: '',
+      factorVerificationAge: [0, -1],
+    });
+    expect(has({ reverification: 'strict_mfa' })).toBe(false);
+  });
+
   it('fails reverification when factor1Age is -1 (invalid state)', () => {
     const has = createCheckAuthorization({
       userId: 'user_123',

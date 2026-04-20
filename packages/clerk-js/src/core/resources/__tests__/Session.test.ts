@@ -1190,7 +1190,9 @@ describe('Session', () => {
       expect(isAuthorized).toBe(true);
     });
 
-    it('user with second factor not enrolled should be downgraded to first factor and be considered authorized', async () => {
+    it('user with second factor not enrolled should NOT be authorized for multi_factor level', async () => {
+      // multi_factor requires a fresh second factor. With no second factor enrolled
+      // (factor2Age === -1) the requirement cannot be satisfied; fail closed.
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -1211,7 +1213,7 @@ describe('Session', () => {
         },
       });
 
-      expect(isAuthorized).toBe(true);
+      expect(isAuthorized).toBe(false);
     });
 
     it('user with second factor not enrolled should be downgraded to first factor and be considered unauthorized', async () => {
@@ -1235,7 +1237,10 @@ describe('Session', () => {
       expect(isAuthorized).toBe(false);
     });
 
-    it('user with second factor not enrolled and first factor verified should be authorized for multifactor assurance', async () => {
+    it('user with second factor not enrolled should NOT be authorized for multifactor assurance', async () => {
+      // strict_mfa / multi_factor requires a fresh second factor. When the user has
+      // no second factor enrolled (factor2Age === -1), the requirement cannot be
+      // satisfied, so the check must fail closed.
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -1253,7 +1258,7 @@ describe('Session', () => {
         reverification: 'strict_mfa',
       });
 
-      expect(isAuthorized).toBe(true);
+      expect(isAuthorized).toBe(false);
     });
 
     it('user with second factor not enrolled and first factor stale should be NOT authorized for multifactor assurance', async () => {

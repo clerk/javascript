@@ -311,9 +311,9 @@ const checkReverificationAuthorization: CheckReverificationAuthorization = (para
       // closed here instead.
       return (factor2Age === -1 ? factor1FreshEnough : afterMinutes > factor2Age) ? 'pass' : 'fail';
     case 'multi_factor':
-      return (factor2Age === -1 ? factor1FreshEnough : factor1FreshEnough && afterMinutes > factor2Age)
-        ? 'pass'
-        : 'fail';
+      // multi_factor (strict_mfa) requires a fresh second factor. If no second factor
+      // is enrolled we cannot satisfy the requirement; fail closed.
+      return factor2Age !== -1 && factor1FreshEnough && afterMinutes > factor2Age ? 'pass' : 'fail';
   }
 };
 
