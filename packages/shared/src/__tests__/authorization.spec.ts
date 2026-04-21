@@ -297,6 +297,32 @@ describe('createCheckAuthorization', () => {
       } as any),
     ).toBe(true);
   });
+
+  it('authorizes permission + strict_mfa via graceful downgrade when no second factor is enrolled', () => {
+    const has = createCheckAuthorization({
+      userId: 'user_123',
+      orgId: 'org_123',
+      orgRole: 'org:admin',
+      orgPermissions: ['org:sys_memberships:read'],
+      features: '',
+      plans: '',
+      factorVerificationAge: [0, -1],
+    });
+    expect(has({ permission: 'org:sys_memberships:read', reverification: 'strict_mfa' })).toBe(true);
+  });
+
+  it('fails permission + reverification when no factors are enrolled', () => {
+    const has = createCheckAuthorization({
+      userId: 'user_123',
+      orgId: 'org_123',
+      orgRole: 'org:admin',
+      orgPermissions: ['org:sys_memberships:read'],
+      features: '',
+      plans: '',
+      factorVerificationAge: [-1, -1],
+    });
+    expect(has({ permission: 'org:sys_memberships:read', reverification: 'strict' })).toBe(false);
+  });
 });
 
 describe('splitByScope', () => {
