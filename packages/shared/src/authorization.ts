@@ -284,22 +284,30 @@ const checkReverificationAuthorization: CheckReverificationAuthorization = (para
   const [factor1Age, factor2Age] = factorVerificationAge;
 
   // -1 indicates the factor group (1fa, 2fa) is not enabled.
-  // -1 for 1fa is not a valid state; fail closed.
-  if (factor1Age === -1) {
+  // If neither factor is enrolled we cannot verify anything; fail closed.
+  if (factor1Age === -1 && factor2Age === -1) {
     return 'fail';
   }
 
-  const factor1FreshEnough = afterMinutes > factor1Age;
+  const factor1FreshEnough = factor1Age !== -1 && afterMinutes > factor1Age;
+  const factor2FreshEnough = factor2Age !== -1 && afterMinutes > factor2Age;
 
   switch (level) {
     case 'first_factor':
       return factor1FreshEnough ? 'pass' : 'fail';
     case 'second_factor':
-      return (factor2Age === -1 ? factor1FreshEnough : afterMinutes > factor2Age) ? 'pass' : 'fail';
+      // Graceful downgrade: prefer second factor; fall back to whichever factor is
+      // enrolled when the other is missing.
+      if (factor2Age === -1) return factor1FreshEnough ? 'pass' : 'fail';
+      if (factor1Age === -1) return factor2FreshEnough ? 'pass' : 'fail';
+      return factor2FreshEnough ? 'pass' : 'fail';
     case 'multi_factor':
-      // multi_factor (strict_mfa) requires a fresh second factor. If no second factor
-      // is enrolled we cannot satisfy the requirement; fail closed.
-      return factor2Age !== -1 && factor1FreshEnough && afterMinutes > factor2Age ? 'pass' : 'fail';
+      // Graceful downgrade: no second factor enrolled falls back to first factor.
+      if (factor2Age === -1) return factor1FreshEnough ? 'pass' : 'fail';
+      // Second factor exists but first factor is not enrolled - we cannot satisfy
+      // the multi-factor requirement.
+      if (factor1Age === -1) return 'fail';
+      return factor1FreshEnough && factor2FreshEnough ? 'pass' : 'fail';
   }
 };
 

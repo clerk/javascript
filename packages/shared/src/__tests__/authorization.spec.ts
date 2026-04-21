@@ -162,32 +162,6 @@ describe('createCheckAuthorization', () => {
     expect(has({ feature: 'org:premium' })).toBe(false);
   });
 
-  it('fails strict_mfa when the user has no second factor enrolled', () => {
-    const has = createCheckAuthorization({
-      userId: 'user_123',
-      orgId: null,
-      orgRole: null,
-      orgPermissions: null,
-      features: '',
-      plans: '',
-      factorVerificationAge: [0, -1],
-    });
-    expect(has({ reverification: 'strict_mfa' })).toBe(false);
-  });
-
-  it('fails reverification when factor1Age is -1 (invalid state)', () => {
-    const has = createCheckAuthorization({
-      userId: 'user_123',
-      orgId: null,
-      orgRole: null,
-      orgPermissions: null,
-      features: '',
-      plans: '',
-      factorVerificationAge: [-1, 0],
-    });
-    expect(has({ reverification: 'strict' } as any)).toBe(false);
-  });
-
   it('fails when factor ages are negative non-sentinel values', () => {
     const has = createCheckAuthorization({
       userId: 'user_123',
@@ -277,6 +251,51 @@ describe('createCheckAuthorization', () => {
       factorVerificationAge: [0, 0],
     });
     expect(has({ feature: 'org:premium', reverification: 'strict' } as any)).toBe(false);
+  });
+
+  it('authorizes permission + reverification when both match', () => {
+    const has = createCheckAuthorization({
+      userId: 'user_123',
+      orgId: 'org_123',
+      orgRole: 'org:admin',
+      orgPermissions: ['org:sys_memberships:read'],
+      features: '',
+      plans: '',
+      factorVerificationAge: [0, 0],
+    });
+    expect(has({ permission: 'org:sys_memberships:read', reverification: 'strict' })).toBe(true);
+  });
+
+  it('authorizes role + feature when both match', () => {
+    const has = createCheckAuthorization({
+      userId: 'user_123',
+      orgId: 'org_123',
+      orgRole: 'org:admin',
+      orgPermissions: ['org:read'],
+      features: 'o:reservations',
+      plans: '',
+      factorVerificationAge: [0, 0],
+    });
+    expect(has({ role: 'org:admin', feature: 'org:reservations' } as any)).toBe(true);
+  });
+
+  it('authorizes every requested dimension when all three match', () => {
+    const has = createCheckAuthorization({
+      userId: 'user_123',
+      orgId: 'org_123',
+      orgRole: 'org:admin',
+      orgPermissions: ['org:sys_memberships:read'],
+      features: 'o:reservations',
+      plans: '',
+      factorVerificationAge: [0, 0],
+    });
+    expect(
+      has({
+        permission: 'org:sys_memberships:read',
+        feature: 'org:reservations',
+        reverification: 'strict',
+      } as any),
+    ).toBe(true);
   });
 });
 

@@ -1190,7 +1190,7 @@ describe('Session', () => {
       expect(isAuthorized).toBe(true);
     });
 
-    it('user with second factor not enrolled should NOT be authorized for multi_factor level', async () => {
+    it('user with second factor not enrolled should be downgraded to first factor and be considered authorized', async () => {
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -1211,7 +1211,7 @@ describe('Session', () => {
         },
       });
 
-      expect(isAuthorized).toBe(false);
+      expect(isAuthorized).toBe(true);
     });
 
     it('user with second factor not enrolled should be downgraded to first factor and be considered unauthorized', async () => {
@@ -1235,7 +1235,7 @@ describe('Session', () => {
       expect(isAuthorized).toBe(false);
     });
 
-    it('user with second factor not enrolled should NOT be authorized for multifactor assurance', async () => {
+    it('user with second factor not enrolled and first factor verified should be authorized for multifactor assurance', async () => {
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -1253,7 +1253,7 @@ describe('Session', () => {
         reverification: 'strict_mfa',
       });
 
-      expect(isAuthorized).toBe(false);
+      expect(isAuthorized).toBe(true);
     });
 
     it('user with second factor not enrolled and first factor stale should be NOT authorized for multifactor assurance', async () => {
@@ -1595,7 +1595,7 @@ describe('Session', () => {
       expect(isAuthorized).toBe(false);
     });
 
-    it('first factor not enrolled should NOT be authorized for secondFactor assurance', async () => {
+    it('first factor not enrolled should be authorized for secondFactor assurance', async () => {
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -1613,7 +1613,7 @@ describe('Session', () => {
         reverification: 'strict',
       });
 
-      expect(isAuthorized).toBe(false);
+      expect(isAuthorized).toBe(true);
     });
   });
 
