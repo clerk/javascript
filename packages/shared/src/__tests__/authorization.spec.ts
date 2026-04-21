@@ -267,9 +267,6 @@ describe('createCheckAuthorization', () => {
   });
 
   it('fails missing features claim when combined with a passing reverification check', () => {
-    // Directly exercises the primary bypass pattern via billing coercion: with the
-    // pre-fix logic, `billing=fail` + `reverification=pass` would collapse via the
-    // `||` short-circuit into a `pass`. The new combiner rejects it.
     const has = createCheckAuthorization({
       userId: 'user_123',
       orgId: 'org_123',

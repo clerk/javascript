@@ -1,5 +1,6 @@
 ---
 "@clerk/shared": patch
+"@clerk/backend": patch
 "@clerk/clerk-js": patch
 "@clerk/nextjs": patch
 ---
@@ -14,6 +15,6 @@ Behavior is now:
 - `strict_mfa` (and any `multi_factor` level) now fails closed when the user has no second factor enrolled. Previously it silently downgraded to a first-factor check.
 - `session.checkAuthorization()` now uses the active organization's id (not the membership row id) when building the authorization options.
 
-Single-condition checks (`has({ permission })`, `has({ reverification })`, and so on) continue to work as before. Callback-form `auth.protect(has => ...)` is unaffected unless the callback itself invokes the affected multi-key shapes.
+Single-condition role, permission, feature, and plan checks (`has({ permission })`, etc.) are unchanged. The one exception is `has({ reverification: 'strict_mfa' })` (and any `multi_factor` level) on users without a second factor enrolled, which now denies instead of silently downgrading - see the bullet above. Callback-form `auth.protect(has => ...)` is unaffected unless the callback itself invokes the affected shapes.
 
 Separately, `auth.protect()` in `@clerk/nextjs` previously discarded authorization params (`role`, `permission`, `feature`, `plan`, `reverification`) whenever the same argument object also contained `unauthenticatedUrl`, `unauthorizedUrl`, or `token`. TypeScript's excess-property check caught this for inline object literals but did not apply once the argument was assigned to a variable, spread, or used from JavaScript. Mixed-shape calls like `auth.protect({ role: 'org:admin', unauthorizedUrl: '/denied' })` or `auth.protect({ permission: 'org:X', token: 'session_token' })` now correctly enforce the authorization check instead of silently letting every authenticated caller through.

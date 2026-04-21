@@ -658,9 +658,6 @@ describe('clerkMiddleware(params)', () => {
     });
 
     it('still authorizes when RBAC params are mixed with unauthorizedUrl in a single argument', async () => {
-      // Regression: previously a single object containing both a role/permission and
-      // an options key (unauthorizedUrl / unauthenticatedUrl / token) caused the auth
-      // params to be discarded, letting every authenticated user through.
       const req = mockRequest({
         url: '/protected',
         headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
@@ -687,8 +684,6 @@ describe('clerkMiddleware(params)', () => {
     });
 
     it('still authorizes when permission is mixed with token in a single argument', async () => {
-      // Regression: previously `{ permission, token }` silently discarded the
-      // permission check and returned authorized for every caller.
       const req = mockRequest({
         url: '/protected',
         headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
@@ -714,8 +709,6 @@ describe('clerkMiddleware(params)', () => {
     });
 
     it('passes through when mixed-shape authorization succeeds', async () => {
-      // Positive path: `{ role, unauthorizedUrl }` with the role satisfied should
-      // let the request through without redirecting to unauthorizedUrl.
       const req = mockRequest({
         url: '/protected',
         headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
@@ -741,9 +734,6 @@ describe('clerkMiddleware(params)', () => {
     });
 
     it('takes the options-only fast path for options objects with unknown extra keys', async () => {
-      // Regression: options-only calls (no role/permission/feature/plan/reverification)
-      // should not hit `has()` even when the argument carries stray keys from spread
-      // or variable assignment.
       const req = mockRequest({
         url: '/protected',
         headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),

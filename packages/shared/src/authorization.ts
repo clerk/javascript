@@ -303,9 +303,12 @@ const checkReverificationAuthorization: CheckReverificationAuthorization = (para
   }
 };
 
-// At least one dimension must have been asked, and none may have failed (AND).
+// At least one dimension must have passed, and every non-skip result must be a pass.
+// This is an AND across asked dimensions with a fail-closed default: if a helper ever
+// returns anything other than 'pass' or 'skip' (a typo, off-type, or future variant),
+// it is treated as a denial.
 const combine = (results: CheckResult[]): boolean =>
-  results.some(r => r !== 'skip') && results.every(r => r !== 'fail');
+  results.some(r => r === 'pass') && results.every(r => r === 'pass' || r === 'skip');
 
 /**
  * Creates a function for comprehensive user authorization checks.
