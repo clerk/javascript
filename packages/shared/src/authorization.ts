@@ -85,18 +85,14 @@ const prefixWithOrg = (value: string) => value.replace(/^(org:)*/, 'org:');
 
 /**
  * Checks if a user has the required organization-level authorization.
- * Verifies if the user has the specified role or permission within their organization.
  * If both role and permission are provided, both must match (AND).
- *
- * @returns 'skip' if neither role nor permission was requested; 'fail' if a requested
- *   check cannot be satisfied or the required claim is missing; 'pass' otherwise.
  */
 const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   const { orgId, orgRole, orgPermissions } = options;
   const roleAsked = params.role !== undefined;
-  const permAsked = params.permission !== undefined;
+  const permissionAsked = params.permission !== undefined;
 
-  if (!roleAsked && !permAsked) {
+  if (!roleAsked && !permissionAsked) {
     return 'skip';
   }
 
@@ -105,7 +101,7 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   if (roleAsked && typeof params.role !== 'string') {
     return 'fail';
   }
-  if (permAsked && typeof params.permission !== 'string') {
+  if (permissionAsked && typeof params.permission !== 'string') {
     return 'fail';
   }
 
@@ -122,7 +118,7 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
     }
   }
 
-  if (permAsked) {
+  if (permissionAsked) {
     if (!orgPermissions) {
       return 'fail';
     }
@@ -161,9 +157,6 @@ const checkForFeatureOrPlan = (claim: string, featureOrPlan: string) => {
 /**
  * Checks if a user is entitled to the requested feature or plan.
  * If both feature and plan are provided, both must match (AND).
- *
- * @returns 'skip' if neither feature nor plan was requested; 'fail' if a requested
- *   check cannot be satisfied or the corresponding claim is missing; 'pass' otherwise.
  */
 const checkBillingAuthorization: CheckBillingAuthorization = (params, options) => {
   const { features, plans } = options;
@@ -259,11 +252,7 @@ const validateReverificationConfig = (config: ReverificationConfig | undefined |
 
 /**
  * Evaluates if the user meets re-verification authentication requirements.
- * Compares the user's factor verification ages against the specified maxAge.
  * Handles different verification levels (first factor, second factor, multi-factor).
- *
- * @returns 'skip' if reverification was not requested; 'fail' if the requirement cannot
- *   be satisfied or the verification data is missing or malformed; 'pass' otherwise.
  */
 const checkReverificationAuthorization: CheckReverificationAuthorization = (params, { factorVerificationAge }) => {
   if (params.reverification === undefined) {
@@ -306,9 +295,6 @@ const checkReverificationAuthorization: CheckReverificationAuthorization = (para
     case 'first_factor':
       return factor1FreshEnough ? 'pass' : 'fail';
     case 'second_factor':
-      // Existing behavior: when no 2FA is enrolled, fall back to first-factor freshness.
-      // A separate product decision tracks whether strict/moderate/lax should fail
-      // closed here instead.
       return (factor2Age === -1 ? factor1FreshEnough : afterMinutes > factor2Age) ? 'pass' : 'fail';
     case 'multi_factor':
       // multi_factor (strict_mfa) requires a fresh second factor. If no second factor
@@ -317,24 +303,9 @@ const checkReverificationAuthorization: CheckReverificationAuthorization = (para
   }
 };
 
-/**
- * Combines per-dimension results into a single authorization decision.
- *
- * Rules:
- * - `skip` entries are ignored (the caller did not ask about that dimension)
- * - a single `fail` is a hard denial
- * - at least one dimension must have been asked, otherwise deny
- * - all asked dimensions must `pass` (AND)
- */
-const combine = (results: CheckResult[]): boolean => {
-  let any = false;
-  for (const r of results) {
-    if (r === 'skip') continue;
-    if (r === 'fail') return false;
-    any = true;
-  }
-  return any;
-};
+// At least one dimension must have been asked, and none may have failed (AND).
+const combine = (results: CheckResult[]): boolean =>
+  results.some(r => r !== 'skip') && results.every(r => r !== 'fail');
 
 /**
  * Creates a function for comprehensive user authorization checks.

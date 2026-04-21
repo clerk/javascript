@@ -1191,8 +1191,6 @@ describe('Session', () => {
     });
 
     it('user with second factor not enrolled should NOT be authorized for multi_factor level', async () => {
-      // multi_factor requires a fresh second factor. With no second factor enrolled
-      // (factor2Age === -1) the requirement cannot be satisfied; fail closed.
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -1238,9 +1236,6 @@ describe('Session', () => {
     });
 
     it('user with second factor not enrolled should NOT be authorized for multifactor assurance', async () => {
-      // strict_mfa / multi_factor requires a fresh second factor. When the user has
-      // no second factor enrolled (factor2Age === -1), the requirement cannot be
-      // satisfied, so the check must fail closed.
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -1601,7 +1596,6 @@ describe('Session', () => {
     });
 
     it('first factor not enrolled should NOT be authorized for secondFactor assurance', async () => {
-      // factor1Age === -1 is not a valid state; fail closed regardless of factor2 age.
       const session = new Session({
         status: 'active',
         id: 'session_1',

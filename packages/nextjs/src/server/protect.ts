@@ -216,11 +216,8 @@ const getAuthorizationParams = (arg: any) => {
     return arg as (has: CheckAuthorizationWithCustomPermissions) => boolean;
   }
 
-  // Pick the known authorization keys out of the argument. This preserves the
-  // intended authorization check even when the caller also passes options
-  // (`unauthenticatedUrl`, `unauthorizedUrl`, `token`) on the same object.
-  // Unknown extra keys are ignored rather than forwarded to `has()`, which keeps
-  // options-only calls with stray keys on the fast path.
+  // Pick only the known authorization keys so option keys (unauthorizedUrl,
+  // token, etc.) and unknown extras do not leak into has().
   const authParams: Record<string, unknown> = {};
   for (const key of AUTH_PARAM_KEYS) {
     if (arg[key] !== undefined) {
