@@ -368,9 +368,8 @@ async function runHandlerWithRequestState({
 
   let handlerResult: Response = NextResponse.next();
   try {
-    const userHandlerResult = await clerkMiddlewareRequestDataStorage.run(
-      clerkMiddlewareRequestDataStore,
-      async () => handler?.(authHandler, request, event),
+    const userHandlerResult = await clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, async () =>
+      handler?.(authHandler, request, event),
     );
     handlerResult = userHandlerResult || handlerResult;
   } catch (e: any) {
