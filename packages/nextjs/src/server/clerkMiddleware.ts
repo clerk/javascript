@@ -12,6 +12,7 @@ import type {
 import {
   AuthStatus,
   constants,
+  createBootstrapSignedOutState,
   createClerkRequest,
   createRedirect,
   getAuthObjectForAcceptedToken,
@@ -230,6 +231,54 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       });
     });
 
+    // Bootstrap path for the keyless window where no publishable key is available yet.
+    // The real authenticateRequest() can't run without keys, so we synthesize a signed-out
+    // RequestState and run the user's handler against it. This closes the middleware-bypass
+    // window: authorization logic (e.g. auth.protect()) fail-closed during bootstrap instead
+    // of being skipped entirely.
+    const bootstrapNextMiddleware: NextMiddleware = withLogger(
+      'clerkMiddleware',
+      logger => async (request, event) => {
+        const resolvedParams = typeof params === 'function' ? await params(request) : params;
+        const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
+
+        const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL || '';
+        const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL || '';
+
+        const options = {
+          publishableKey: '',
+          secretKey: '',
+          signInUrl,
+          signUpUrl,
+          ...resolvedParams,
+        };
+
+        clerkMiddlewareRequestDataStore.set('requestData', options);
+
+        if (options.debug) {
+          logger.enable();
+        }
+
+        const clerkRequest = createClerkRequest(request);
+        logger.debug('keyless bootstrap (no publishable key)', () => ({ signInUrl, signUpUrl }));
+        logger.debug('url', () => clerkRequest.toJSON());
+
+        const requestState = createBootstrapSignedOutState({ signInUrl, signUpUrl });
+
+        return runHandlerWithRequestState({
+          clerkRequest,
+          request,
+          event,
+          requestState,
+          handler,
+          options,
+          resolvedParams,
+          keyless,
+          logger,
+        });
+      },
+    );
+
     const keylessMiddleware: NextMiddleware = async (request, event) => {
       /**
        * This mechanism replaces a full-page reload. Ensures that middleware will re-run and authenticate the request properly without the secret key or publishable key to be missing.
@@ -245,14 +294,13 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const authHeader = getHeader(request, constants.Headers.Authorization)?.replace('Bearer ', '') ?? '';
 
       /**
-       * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.
+       * In keyless mode, when no publishable key is available yet, we still run the user's
+       * middleware handler — against a synthetic signed-out RequestState — so authorization
+       * logic is enforced during the bootstrap window. `<ClerkProvider/>` downstream resumes
+       * the flow once keys are provisioned client-side.
        */
       if (isMissingPublishableKey && !isMachineTokenByPrefix(authHeader)) {
-        const res = NextResponse.next();
-        setRequestHeadersOnNextResponse(res, request, {
-          [constants.Headers.AuthStatus]: 'signed-out',
-        });
-        return res;
+        return bootstrapNextMiddleware(request, event);
       }
 
       return baseNextMiddleware(request, event);
