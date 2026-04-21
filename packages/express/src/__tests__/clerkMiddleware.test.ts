@@ -125,6 +125,84 @@ describe('clerkMiddleware', () => {
     );
   });
 
+  it('forwards arbitrary AuthenticateRequestOptions/VerifyTokenOptions to authenticateRequest', async () => {
+    const authenticateRequestMock = vi.fn().mockResolvedValue({});
+    const clerkClient = {
+      authenticateRequest: authenticateRequestMock,
+    } as any;
+
+    const organizationSyncOptions = {
+      organizationPatterns: ['/orgs/:slug'],
+    };
+
+    await authenticateRequest({
+      clerkClient,
+      request: {
+        method: 'GET',
+        url: '/',
+        headers: {
+          host: 'example.com',
+        },
+      } as Request,
+      options: {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_....',
+        clockSkewInMs: 12_345,
+        audience: 'https://api.example.com',
+        authorizedParties: ['https://example.com'],
+        jwtKey: 'jwt-key-value',
+        acceptsToken: 'session_token',
+        organizationSyncOptions,
+        skipJwksCache: true,
+        headerType: 'JWT',
+      } as any,
+    });
+
+    expect(authenticateRequestMock).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        audience: 'https://api.example.com',
+        authorizedParties: ['https://example.com'],
+        clockSkewInMs: 12_345,
+        jwtKey: 'jwt-key-value',
+        acceptsToken: 'session_token',
+        organizationSyncOptions,
+        skipJwksCache: true,
+        headerType: 'JWT',
+      }),
+    );
+  });
+
+  it('does not forward middleware-only options (clerkClient, debug, frontendApiProxy) to authenticateRequest', async () => {
+    const authenticateRequestMock = vi.fn().mockResolvedValue({});
+    const clerkClient = {
+      authenticateRequest: authenticateRequestMock,
+    } as any;
+
+    await authenticateRequest({
+      clerkClient,
+      request: {
+        method: 'GET',
+        url: '/',
+        headers: {
+          host: 'example.com',
+        },
+      } as Request,
+      options: {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_....',
+        clerkClient,
+        debug: true,
+        frontendApiProxy: { enabled: true, path: '/__clerk' },
+      },
+    });
+
+    const forwarded = authenticateRequestMock.mock.calls[0][1];
+    expect(forwarded).not.toHaveProperty('clerkClient');
+    expect(forwarded).not.toHaveProperty('debug');
+    expect(forwarded).not.toHaveProperty('frontendApiProxy');
+  });
+
   it('throws error if clerkMiddleware is not executed before getAuth', async () => {
     const customMiddleware: RequestHandler = (request, response, next) => {
       const auth = getAuth(request);
