@@ -125,7 +125,7 @@ export class Session extends BaseResource implements SessionResource {
     return createCheckAuthorization({
       userId: this.user?.id,
       factorVerificationAge: this.factorVerificationAge,
-      orgId: activeMembership?.id,
+      orgId: activeMembership?.organization?.id,
       orgRole: activeMembership?.role,
       orgPermissions: activeMembership?.permissions,
       features: (this.lastActiveToken?.jwt?.claims.fea as string) || '',
