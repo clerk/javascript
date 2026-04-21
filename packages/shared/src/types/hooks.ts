@@ -26,7 +26,7 @@ type CheckAuthorizationSignedOut = CheckAuthorizationWithoutOrgOrUser;
 export type UseAuthReturn =
   | {
       /**
-       * A boolean that indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads but may temporarily return to `false` while auth state is updating, such as when switching organizations.
+       * A boolean that indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via `setActive()`).
        */
       isLoaded: false;
       /**
@@ -123,7 +123,7 @@ export type UseAuthReturn =
 export type UseSignInReturn =
   | {
       /**
-       * A boolean that indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads but may temporarily return to `false` while auth state is updating, such as when switching organizations.
+       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
        */
       isLoaded: false;
       /**
@@ -147,7 +147,7 @@ export type UseSignInReturn =
 export type UseSignUpReturn =
   | {
       /**
-       * A boolean that indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads but may temporarily return to `false` while auth state is updating, such as when switching organizations.
+       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
        */
       isLoaded: false;
       /**
@@ -171,7 +171,7 @@ export type UseSignUpReturn =
 export type UseSessionReturn =
   | {
       /**
-       * A boolean that indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads but may temporarily return to `false` while auth state is updating, such as when switching organizations.
+       * A boolean that indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via `setActive()`).
        */
       isLoaded: false;
       /**
@@ -200,7 +200,7 @@ export type UseSessionReturn =
 export type UseSessionListReturn =
   | {
       /**
-       * A boolean that indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads but may temporarily return to `false` while auth state is updating, such as when switching organizations.
+       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
        */
       isLoaded: false;
       /**
@@ -224,7 +224,7 @@ export type UseSessionListReturn =
 export type UseUserReturn =
   | {
       /**
-       * A boolean that indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads but may temporarily return to `false` while auth state is updating, such as when switching organizations.
+       * A boolean that indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via `setActive()`).
        */
       isLoaded: false;
       /**
