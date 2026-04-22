@@ -114,9 +114,9 @@
   "devDependencies": {
     "@floating-ui/react-dom": "^2.1.8",
     "@rsdoctor/rspack-plugin": "^0.4.13",
-    "@rspack/cli": "^1.7.11",
-    "@rspack/core": "^1.7.11",
-    "@rspack/plugin-react-refresh": "^1.6.2",
+    "@rspack/cli": "catalog:rspack",
+    "@rspack/core": "catalog:rspack",
+    "@rspack/plugin-react-refresh": "catalog:rspack",
     "@svgr/rollup": "^8.1.0",
     "@svgr/webpack": "^6.5.1",
     "@types/webpack-env": "^1.18.8",
