@@ -26,7 +26,30 @@ class ClerkRequest extends Request {
     // https://github.com/nodejs/undici/issues/2155
     // https://github.com/nodejs/undici/blob/7153a1c78d51840bbe16576ce353e481c3934701/lib/fetch/request.js#L854
     const url = typeof input !== 'string' && 'url' in input ? input.url : String(input);
-    super(url, init || typeof input === 'string' ? undefined : input);
+    // Build init explicitly when cloning a Request. Passing the Request directly as init
+    // makes undici extract `signal` from it, and Node 24 rejects signals from a different
+    // realm (e.g. NextRequest) with a strict instanceof check.
+    let cloneInit: RequestInit | undefined;
+    if (init) {
+      cloneInit = init;
+    } else if (typeof input !== 'string') {
+      const req = input as Request;
+      cloneInit = {
+        body: req.body,
+        cache: req.cache,
+        credentials: req.credentials,
+        headers: req.headers,
+        integrity: req.integrity,
+        keepalive: req.keepalive,
+        method: req.method,
+        mode: req.mode,
+        redirect: req.redirect,
+        referrer: req.referrer,
+        referrerPolicy: req.referrerPolicy,
+        ...(req.body ? { duplex: 'half' } : {}),
+      } as RequestInit;
+    }
+    super(url, cloneInit);
     this.clerkUrl = this.deriveUrlFromHeaders(this);
     this.cookies = this.parseCookies(this);
   }
