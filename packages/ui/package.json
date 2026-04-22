@@ -98,7 +98,7 @@
     "@clerk/shared": "workspace:^",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",
-    "@floating-ui/react": "0.27.12",
+    "@floating-ui/react": "catalog:repo",
     "@formkit/auto-animate": "^0.8.2",
     "@solana/wallet-adapter-base": "catalog:module-manager",
     "@solana/wallet-adapter-react": "catalog:module-manager",
