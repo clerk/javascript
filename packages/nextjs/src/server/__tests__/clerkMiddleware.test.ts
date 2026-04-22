@@ -673,7 +673,7 @@ describe('clerkMiddleware(params)', () => {
       });
 
       const resp = await clerkMiddleware(async auth => {
-        await auth.protect({ permission: 'org:sys_memberships:read', token: TokenType.SessionToken });
+        await auth.protect({ permission: 'org:sys_memberships:read', token: TokenType.SessionToken } as any);
       })(req, {} as NextFetchEvent);
 
       expect(hasSpy).toHaveBeenCalledWith({ permission: 'org:sys_memberships:read' });
@@ -698,7 +698,7 @@ describe('clerkMiddleware(params)', () => {
       });
 
       const resp = await clerkMiddleware(async auth => {
-        await auth.protect({ role: 'org:admin', unauthorizedUrl: 'https://www.clerk.com/denied' });
+        await auth.protect({ role: 'org:admin', unauthorizedUrl: 'https://www.clerk.com/denied' } as any);
       })(req, {} as NextFetchEvent);
 
       expect(hasSpy).toHaveBeenCalledWith({ role: 'org:admin' });
