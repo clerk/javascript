@@ -131,7 +131,8 @@ export async function verifyJwt(
   options: VerifyJwtOptions,
 ): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
   const { audience, authorizedParties, clockSkewInMs, key, headerType } = options;
-  const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_MS;
+  const clockSkew =
+    typeof clockSkewInMs === 'number' && Number.isFinite(clockSkewInMs) ? clockSkewInMs : DEFAULT_CLOCK_SKEW_IN_MS;
 
   const { data: decoded, errors } = decodeJwt(token);
   if (errors) {

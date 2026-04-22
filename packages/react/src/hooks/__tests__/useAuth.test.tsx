@@ -1,4 +1,3 @@
-import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { ClerkInstanceContext, InitialStateProvider } from '@clerk/shared/react';
 import type { LoadedClerk, UseAuthReturn } from '@clerk/shared/types';
 import { render, renderHook } from '@testing-library/react';
@@ -8,11 +7,6 @@ import { afterAll, beforeAll, beforeEach, describe, expect, expectTypeOf, it, te
 import { errorThrower } from '../../errors/errorThrower';
 import { invalidStateError } from '../../errors/messages';
 import { useAuth, useDerivedAuth } from '../useAuth';
-
-vi.mock('@clerk/shared/authorization', async () => ({
-  ...(await vi.importActual('@clerk/shared/authorization')),
-  createCheckAuthorization: vi.fn().mockReturnValue(vi.fn().mockReturnValue(true)),
-}));
 
 vi.mock('../../errors/errorThrower', () => ({
   errorThrower: {
@@ -264,10 +258,6 @@ describe('useDerivedAuth', () => {
     expect(typeof current.has).toBe('function');
     expect(current.signOut).toBe(authObject.signOut);
     expect(current.getToken).toBe(authObject.getToken);
-
-    // Check has function behavior
-    vi.mocked(createCheckAuthorization).mockReturnValueOnce(vi.fn().mockReturnValue('authorized'));
-    expect(current.has?.({ permission: 'read' })).toBe('authorized');
   });
 
   it('returns signed in without org context when sessionId and userId are present but no orgId', () => {
@@ -297,8 +287,7 @@ describe('useDerivedAuth', () => {
     expect(current.signOut).toBe(authObject.signOut);
     expect(current.getToken).toBe(authObject.getToken);
 
-    // Check derivedHas fallback
-    vi.mocked(createCheckAuthorization).mockReturnValueOnce(vi.fn().mockReturnValue(false));
+    // Real createCheckAuthorization falls closed when org context is missing.
     expect(current.has?.({ permission: 'read' })).toBe(false);
   });
 
