@@ -62,9 +62,8 @@
     "playwright": "^1.59.1",
     "react": "catalog:react",
     "react-dom": "catalog:react",
-    "rolldown": "1.0.0-rc.15",
     "typescript": "catalog:repo",
-    "vite": "^8.0.8",
+    "vite": "6.4.1",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "4.1.4",
     "vitest-axe": "^0.1.0"

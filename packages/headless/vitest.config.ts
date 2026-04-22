@@ -2,6 +2,9 @@ import { defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 
 export default defineConfig({
+  optimizeDeps: {
+    include: ['react/jsx-dev-runtime'],
+  },
   test: {
     browser: {
       enabled: true,
