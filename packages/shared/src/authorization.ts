@@ -298,15 +298,23 @@ const checkReverificationAuthorization: CheckReverificationAuthorization = (para
     case 'second_factor':
       // Graceful downgrade: prefer second factor; fall back to whichever factor is
       // enrolled when the other is missing.
-      if (factor2Age === -1) return factor1FreshEnough ? 'pass' : 'fail';
-      if (factor1Age === -1) return factor2FreshEnough ? 'pass' : 'fail';
+      if (factor2Age === -1) {
+        return factor1FreshEnough ? 'pass' : 'fail';
+      }
+      if (factor1Age === -1) {
+        return factor2FreshEnough ? 'pass' : 'fail';
+      }
       return factor2FreshEnough ? 'pass' : 'fail';
     case 'multi_factor':
       // Graceful downgrade: no second factor enrolled falls back to first factor.
-      if (factor2Age === -1) return factor1FreshEnough ? 'pass' : 'fail';
+      if (factor2Age === -1) {
+        return factor1FreshEnough ? 'pass' : 'fail';
+      }
       // Second factor exists but first factor is not enrolled - we cannot satisfy
       // the multi-factor requirement.
-      if (factor1Age === -1) return 'fail';
+      if (factor1Age === -1) {
+        return 'fail';
+      }
       return factor1FreshEnough && factor2FreshEnough ? 'pass' : 'fail';
   }
 };
