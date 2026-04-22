@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.101.23
+
+### Patch Changes
+
+- Updated dependencies [[`e085a17`](https://github.com/clerk/javascript/commit/e085a174e4b6072022f3ace907bcf020f3216272)]:
+  - @clerk/shared@3.47.5
+
 ## 4.101.22
 
 ### Patch Changes

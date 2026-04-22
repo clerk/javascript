@@ -1,5 +1,15 @@
 # @clerk/tanstack-react-start
 
+## 0.29.11
+
+### Patch Changes
+
+- Updated dependencies [[`e085a17`](https://github.com/clerk/javascript/commit/e085a174e4b6072022f3ace907bcf020f3216272)]:
+  - @clerk/shared@3.47.5
+  - @clerk/backend@2.33.3
+  - @clerk/clerk-react@5.61.6
+  - @clerk/types@4.101.23
+
 ## 0.29.10
 
 ### Patch Changes
