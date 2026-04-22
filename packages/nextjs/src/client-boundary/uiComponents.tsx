@@ -15,6 +15,8 @@ export {
   APIKeys,
   CreateOrganization,
   GoogleOneTap,
+  HandleSSOCallback,
+  OAuthConsent,
   OrganizationList,
   OrganizationSwitcher,
   PricingTable,
@@ -28,10 +30,7 @@ export {
   UserAvatar,
   UserButton,
   Waitlist,
-  HandleSSOCallback,
 } from '@clerk/react';
-
-export { OAuthConsent } from '@clerk/react/internal';
 
 // The assignment of UserProfile with BaseUserProfile props is used
 // to support the CustomPage functionality (eg UserProfile.Page)

@@ -7,7 +7,14 @@ import type { ClerkProviderProps } from './types';
 
 export { setErrorThrowerOptions } from './errors/errorThrower';
 export { MultisessionAppSupport } from './components/controlComponents';
+/**
+ * @deprecated Import `useOAuthConsent` from `@clerk/react` instead.
+ */
 export { useOAuthConsent } from '@clerk/shared/react';
+
+/**
+ * @deprecated Import `OAuthConsent` from `@clerk/react` instead.
+ */
 export { OAuthConsent } from './components/uiComponents';
 export { useRoutingProps } from './hooks/useRoutingProps';
 export { useDerivedAuth } from './hooks/useAuth';

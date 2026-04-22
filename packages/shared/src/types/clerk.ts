@@ -667,14 +667,14 @@ export interface Clerk {
    * @param targetNode - Target node to mount the OAuth consent component.
    * @param oauthConsentProps - OAuth consent configuration parameters.
    */
-  __internal_mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: __internal_OAuthConsentProps) => void;
+  mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: OAuthConsentProps) => void;
 
   /**
    * Unmounts a OAuth consent component from the target element.
    *
    * @param targetNode - Target node to unmount the OAuth consent component from.
    */
-  __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
+  unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a TaskChooseOrganization component at the target element.
@@ -2265,7 +2265,7 @@ export type __experimental_SubscriptionDetailsButtonProps = {
   };
 };
 
-export type __internal_OAuthConsentProps = {
+export type OAuthConsentProps = {
   /**
    * Customize the appearance of the component.
    */

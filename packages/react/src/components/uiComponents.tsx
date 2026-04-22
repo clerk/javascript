@@ -1,5 +1,5 @@
 import type {
-  __internal_OAuthConsentProps,
+  OAuthConsentProps,
   APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -645,7 +645,7 @@ export const APIKeys = withClerk(
 );
 
 export const OAuthConsent = withClerk(
-  ({ clerk, component, fallback, ...props }: WithClerkProp<__internal_OAuthConsentProps & FallbackProp>) => {
+  ({ clerk, component, fallback, ...props }: WithClerkProp<OAuthConsentProps & FallbackProp>) => {
     const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
@@ -659,8 +659,8 @@ export const OAuthConsent = withClerk(
         {clerk.loaded && (
           <ClerkHostRenderer
             component={component}
-            mount={clerk.__internal_mountOAuthConsent}
-            unmount={clerk.__internal_unmountOAuthConsent}
+            mount={clerk.mountOAuthConsent}
+            unmount={clerk.unmountOAuthConsent}
             updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}

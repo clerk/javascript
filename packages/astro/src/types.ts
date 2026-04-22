@@ -119,4 +119,5 @@ export type InternalUIComponentId =
   | 'google-one-tap'
   | 'waitlist'
   | 'pricing-table'
-  | 'api-keys';
+  | 'api-keys'
+  | 'oauth-consent';
