@@ -88,6 +88,7 @@ import type {
   ListenerOptions,
   LoadedClerk,
   NavigateOptions,
+  OAuthApplicationNamespace,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -177,6 +178,7 @@ import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
+import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
@@ -224,6 +226,7 @@ export class Clerk implements ClerkInterface {
 
   private static _billing: BillingNamespace;
   private static _apiKeys: APIKeysNamespace;
+  private static _oauthApplication: OAuthApplicationNamespace;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
 
   public client: ClientResource | undefined;
@@ -401,6 +404,13 @@ export class Clerk implements ClerkInterface {
       Clerk._apiKeys = new APIKeys();
     }
     return Clerk._apiKeys;
+  }
+
+  get oauthApplication(): OAuthApplicationNamespace {
+    if (!Clerk._oauthApplication) {
+      Clerk._oauthApplication = new OAuthApplication();
+    }
+    return Clerk._oauthApplication;
   }
 
   __experimental_checkout(options: __experimental_CheckoutOptions): CheckoutSignalValue {
@@ -1326,6 +1336,15 @@ export class Clerk implements ClerkInterface {
   };
 
   public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderOAuthConsentComponentWhenUserDoesNotExist, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OAuthConsent';
     void this.#clerkUI

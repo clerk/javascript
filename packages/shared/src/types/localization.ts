@@ -62,8 +62,9 @@ type DeepLocalizationWithoutObjects<T> = {
  * as a starting point.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Needs to be an interface for typedoc to link correctly
-export interface LocalizationResource
-  extends DeepPartial<DeepLocalizationWithoutObjects<__internal_LocalizationResource>> {}
+export interface LocalizationResource extends DeepPartial<
+  DeepLocalizationWithoutObjects<__internal_LocalizationResource>
+> {}
 
 export type __internal_LocalizationResource = {
   locale: string;
@@ -1251,6 +1252,22 @@ export type __internal_LocalizationResource = {
     action__suggestionsAccept: LocalizationValue;
     suggestionsAcceptedLabel: LocalizationValue;
     action__createOrganization: LocalizationValue;
+  };
+  oauthConsent: {
+    subtitle: LocalizationValue<'applicationName' | 'identifier'>;
+    scopeList: {
+      title: LocalizationValue<'applicationName'>;
+    };
+    action__deny: LocalizationValue;
+    action__allow: LocalizationValue;
+    warning: LocalizationValue<'applicationName' | 'domainAction'>;
+    redirectNotice: LocalizationValue<'domainAction'>;
+    offlineAccessNotice: LocalizationValue;
+    viewFullUrl: LocalizationValue;
+    redirectUriModal: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue<'applicationName'>;
+    };
   };
   unstable__errors: UnstableErrors;
   dates: {

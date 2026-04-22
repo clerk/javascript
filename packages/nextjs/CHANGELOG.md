@@ -1,5 +1,137 @@
 # Change Log
 
+## 7.2.5
+
+### Patch Changes
+
+- Refactor `clerkMiddleware` internals to factor the post-authentication pipeline (handler invocation, CSP, redirects, response decoration) into a private `runHandlerWithRequestState` helper. Pure refactor — no behavioral change. ([#8368](https://github.com/clerk/javascript/pull/8368)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`93855c2`](https://github.com/clerk/javascript/commit/93855c26a624780a52ed12c25ea6605b6c009ec1)]:
+  - @clerk/backend@3.3.0
+
+## 7.2.4
+
+### Patch Changes
+
+- Add helpful TypeScript error for incorrect `auth` import path ([#8358](https://github.com/clerk/javascript/pull/8358)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix an authorization bypass in `has()`, `auth.protect()`, and related predicates when a single call combined conditions from more than one dimension (for example, `{ permission, reverification }` or `{ feature, permission }`). A dimension that should have denied the request was treated as indeterminate and ignored by the combining logic, allowing other passing dimensions to carry the result and authorize the call when it should have failed closed. ([#8372](https://github.com/clerk/javascript/pull/8372)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Behavior is now:
+  - When a requested dimension cannot be satisfied because the underlying session data is missing, malformed, or invalid, the call denies. Previously these cases were treated as indeterminate and ignored, which could let another passing dimension carry the call.
+  - Fixed a minor bug where `session.checkAuthorization()` was building authorization options from the membership row id instead of the organization id.
+
+  Single-condition role, permission, feature, and plan checks (`has({ permission })`, etc.) are unchanged. Single-condition `reverification` checks are unchanged on well-formed session data; calls with a missing or malformed `factorVerificationAge` payload now deny where they previously returned indeterminate. Callback-form `auth.protect(has => ...)` is unaffected unless the callback itself invokes the affected shapes.
+
+  Separately, `auth.protect()` in `@clerk/nextjs` previously discarded authorization params (`role`, `permission`, `feature`, `plan`, `reverification`) whenever the same argument object also contained `unauthenticatedUrl`, `unauthorizedUrl`, or `token`. TypeScript's excess-property check caught this for inline object literals but did not apply once the argument was assigned to a variable, spread, or used from JavaScript. Mixed-shape calls like `auth.protect({ role: 'org:admin', unauthorizedUrl: '/denied' })` or `auth.protect({ permission: 'org:X', token: 'session_token' })` now correctly enforce the authorization check instead of silently letting every authenticated caller through.
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f), [`abaa339`](https://github.com/clerk/javascript/commit/abaa3390b076cf8b5ccfc0a22312d5bde0c60988)]:
+  - @clerk/shared@4.8.3
+  - @clerk/backend@3.2.14
+  - @clerk/react@6.4.3
+
+## 7.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`fcc6c0c`](https://github.com/clerk/javascript/commit/fcc6c0c511a37da912577864cc12f2039c52e654)]:
+  - @clerk/backend@3.2.13
+  - @clerk/react@6.4.2
+
+## 7.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`f800b4f`](https://github.com/clerk/javascript/commit/f800b4fdfce37884c800070116af6d11627831d7), [`8ee6a32`](https://github.com/clerk/javascript/commit/8ee6a32977afbb0d1e9393b17ec541c29decf785), [`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/backend@3.2.12
+  - @clerk/shared@4.8.2
+  - @clerk/react@6.4.2
+
+## 7.2.1
+
+### Patch Changes
+
+- Normalize URL paths in `createPathMatcher` to prevent route protection bypass ([#8311](https://github.com/clerk/javascript/pull/8311)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`b0b6675`](https://github.com/clerk/javascript/commit/b0b6675bad09eb3dd5b711ad5b45539162664c7a)]:
+  - @clerk/shared@4.8.1
+  - @clerk/backend@3.2.11
+  - @clerk/react@6.4.1
+
+## 7.2.0
+
+### Minor Changes
+
+- Introduce internal `<OAuthConsent />` component for rendering a zero-config OAuth consent screen on an OAuth authorize redirect page. ([#8289](https://github.com/clerk/javascript/pull/8289)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/nextjs';
+
+  export default function OAuthConsentPage() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`dc2de16`](https://github.com/clerk/javascript/commit/dc2de16480086f376449d452d31ae0d2a319af17)]:
+  - @clerk/react@6.4.0
+  - @clerk/shared@4.8.0
+  - @clerk/backend@3.2.10
+
+## 7.1.0
+
+### Minor Changes
+
+- Introduce internal `useOAuthConsent()` hook for fetching OAuth consent screen metadata for the signed-in user. ([#8286](https://github.com/clerk/javascript/pull/8286)) by [@jfoshee](https://github.com/jfoshee)
+
+### Patch Changes
+
+- Bump `next` devDependency to `15.5.15` to pick up the fix for CVE-2026-23869, a high-severity (CVSS 7.5) denial-of-service vulnerability in React Server Components. If you use the Next.js App Router, we recommend upgrading to Next.js `15.5.15` or `16.2.3`. ([#8257](https://github.com/clerk/javascript/pull/8257)) by [@renovate](https://github.com/apps/renovate)
+
+- Updated dependencies [[`3fd586d`](https://github.com/clerk/javascript/commit/3fd586d171e9c281c4b96f620ee9070b47ba00f4), [`f9ff9e9`](https://github.com/clerk/javascript/commit/f9ff9e937d70713abf96fdd92071cd6e84b8eb80)]:
+  - @clerk/react@6.3.0
+  - @clerk/shared@4.7.0
+  - @clerk/backend@3.2.9
+
+## 7.0.12
+
+### Patch Changes
+
+- Re-exports `useAPIKeys()` hook. ([#8269](https://github.com/clerk/javascript/pull/8269)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage example:
+
+  ```tsx
+  'use client';
+
+  import { useAPIKeys } from '@clerk/nextjs';
+
+  export default function CustomAPIKeys() {
+    const { data, isLoading, page, pageCount, fetchNext, fetchPrevious } = useAPIKeys({
+      pageSize: 10,
+      initialPage: 1,
+    });
+
+    if (isLoading) return <div>Loading...</div>;
+
+    return (
+      <ul>
+        {data?.map(key => (
+          <li key={key.id}>{key.name}</li>
+        ))}
+      </ul>
+    );
+  }
+  ```
+
+- Updated dependencies [[`fdac10e`](https://github.com/clerk/javascript/commit/fdac10e96ad60c0176cde4e1e3ddc89e40cd0a15), [`4e3cb0a`](https://github.com/clerk/javascript/commit/4e3cb0abed1f8aa1cba032c15da3a94a49162b0c), [`aa32bbc`](https://github.com/clerk/javascript/commit/aa32bbc94e76ea726056810885208c59269b2d2b)]:
+  - @clerk/shared@4.6.0
+  - @clerk/backend@3.2.8
+  - @clerk/react@6.2.1
+
 ## 7.0.11
 
 ### Patch Changes

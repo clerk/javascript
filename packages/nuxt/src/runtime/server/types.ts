@@ -7,3 +7,11 @@ export type AuthOptions = PendingSessionOptions & Pick<AuthenticateRequestOption
  * @internal This type is used to define the `auth` function in the event context.
  */
 export type AuthFn = GetAuthFnNoRequest;
+
+/**
+ * @internal Keyless mode data injected into event context
+ */
+export interface ClerkKeylessContext {
+  claimUrl?: string;
+  apiKeysUrl?: string;
+}

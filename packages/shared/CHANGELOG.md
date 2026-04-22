@@ -1,5 +1,69 @@
 # Change Log
 
+## 4.8.3
+
+### Patch Changes
+
+- Fix an authorization bypass in `has()`, `auth.protect()`, and related predicates when a single call combined conditions from more than one dimension (for example, `{ permission, reverification }` or `{ feature, permission }`). A dimension that should have denied the request was treated as indeterminate and ignored by the combining logic, allowing other passing dimensions to carry the result and authorize the call when it should have failed closed. ([#8372](https://github.com/clerk/javascript/pull/8372)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Behavior is now:
+  - When a requested dimension cannot be satisfied because the underlying session data is missing, malformed, or invalid, the call denies. Previously these cases were treated as indeterminate and ignored, which could let another passing dimension carry the call.
+  - Fixed a minor bug where `session.checkAuthorization()` was building authorization options from the membership row id instead of the organization id.
+
+  Single-condition role, permission, feature, and plan checks (`has({ permission })`, etc.) are unchanged. Single-condition `reverification` checks are unchanged on well-formed session data; calls with a missing or malformed `factorVerificationAge` payload now deny where they previously returned indeterminate. Callback-form `auth.protect(has => ...)` is unaffected unless the callback itself invokes the affected shapes.
+
+  Separately, `auth.protect()` in `@clerk/nextjs` previously discarded authorization params (`role`, `permission`, `feature`, `plan`, `reverification`) whenever the same argument object also contained `unauthenticatedUrl`, `unauthorizedUrl`, or `token`. TypeScript's excess-property check caught this for inline object literals but did not apply once the argument was assigned to a variable, spread, or used from JavaScript. Mixed-shape calls like `auth.protect({ role: 'org:admin', unauthorizedUrl: '/denied' })` or `auth.protect({ permission: 'org:X', token: 'session_token' })` now correctly enforce the authorization check instead of silently letting every authenticated caller through.
+
+## 4.8.2
+
+### Patch Changes
+
+- Add `emailAddress`, `phoneNumber`, and `username` support to `signUp.update()` ([#8320](https://github.com/clerk/javascript/pull/8320)) by [@dstaley](https://github.com/dstaley)
+
+- Added development runtime error when mounting `<OAuthconsent />` without active session. ([#8335](https://github.com/clerk/javascript/pull/8335)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.8.1
+
+### Patch Changes
+
+- Normalize URL paths in `createPathMatcher` to prevent route protection bypass ([#8311](https://github.com/clerk/javascript/pull/8311)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 4.8.0
+
+### Minor Changes
+
+- Introduce internal `<OAuthConsent />` component for rendering a zero-config OAuth consent screen on an OAuth authorize redirect page. ([#8289](https://github.com/clerk/javascript/pull/8289)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/nextjs';
+
+  export default function OAuthConsentPage() {
+    return <OAuthConsent />;
+  }
+  ```
+
+## 4.7.0
+
+### Minor Changes
+
+- Add `OAuthApplication` resource and `getConsentInfo()` method for retrieving OAuth consent information, enabling custom OAuth consent flows. ([#8275](https://github.com/clerk/javascript/pull/8275)) by [@jfoshee](https://github.com/jfoshee)
+
+- Introduce internal `useOAuthConsent()` hook for fetching OAuth consent screen metadata for the signed-in user. ([#8286](https://github.com/clerk/javascript/pull/8286)) by [@jfoshee](https://github.com/jfoshee)
+
+## 4.6.0
+
+### Minor Changes
+
+- Add support for rendering the Banned badge in the organization members list. ([#8261](https://github.com/clerk/javascript/pull/8261)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Improve types for `signIn.create` and `signUp.create` methods. ([#8267](https://github.com/clerk/javascript/pull/8267)) by [@dstaley](https://github.com/dstaley)
+
+- Fixed API keys "Revoke" confirmation modal being stuck disabled when using a localization. ([#8258](https://github.com/clerk/javascript/pull/8258)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 4.5.0
 
 ### Minor Changes

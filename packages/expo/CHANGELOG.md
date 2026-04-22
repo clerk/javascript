@@ -1,5 +1,123 @@
 # Change Log
 
+## 3.2.2
+
+### Patch Changes
+
+- Bump `clerk-android` to `1.0.13` to pick up credential flow and auth UI improvements from the native Android SDK. This addresses feedback from Expo customers including improved error messaging when no Google account is available on the device, correct handling of Activity context on Android 13 for Google Sign-In and Passkey flows, and silent dismissal when a user cancels passkey creation. ([#8366](https://github.com/clerk/javascript/pull/8366)) by [@chriscanin](https://github.com/chriscanin)
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f)]:
+  - @clerk/shared@4.8.3
+  - @clerk/clerk-js@6.7.5
+  - @clerk/react@6.4.3
+
+## 3.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`ff5bd7d`](https://github.com/clerk/javascript/commit/ff5bd7d8ccd5b60540459c771d3eafb8d77249dd)]:
+  - @clerk/clerk-js@6.7.4
+  - @clerk/react@6.4.2
+
+## 3.2.0
+
+### Minor Changes
+
+- Add native component theming via the Expo config plugin. You can now customize the appearance of Clerk's native components (`<AuthView />`, `<UserButton />`, `<UserProfileView />`) on iOS and Android by passing a `theme` prop to the plugin pointing at a JSON file: ([#8243](https://github.com/clerk/javascript/pull/8243)) by [@chriscanin](https://github.com/chriscanin)
+
+  ```json
+  {
+    "expo": {
+      "plugins": [["@clerk/expo", { "theme": "./clerk-theme.json" }]]
+    }
+  }
+  ```
+
+  The JSON theme supports:
+  - `colors` — 15 semantic color tokens (`primary`, `background`, `input`, `danger`, `success`, `warning`, `foreground`, `mutedForeground`, `primaryForeground`, `inputForeground`, `neutral`, `border`, `ring`, `muted`, `shadow`) as 6- or 8-digit hex strings.
+  - `darkColors` — same shape as `colors`; applied automatically when the system is in dark mode.
+  - `design.borderRadius` — number, applied to both platforms.
+  - `design.fontFamily` — string, **iOS only**.
+
+  Theme JSON is validated at prebuild. On iOS the theme is embedded into `Info.plist`; on Android the JSON is copied into `android/app/src/main/assets/clerk_theme.json`. The plugin does not modify your app's `userInterfaceStyle` setting — control light/dark mode via `"userInterfaceStyle"` in `app.json`.
+
+### Patch Changes
+
+- Updated dependencies [[`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/shared@4.8.2
+  - @clerk/clerk-js@6.7.3
+  - @clerk/react@6.4.2
+
+## 3.1.12
+
+### Patch Changes
+
+- Updated dependencies [[`b0b6675`](https://github.com/clerk/javascript/commit/b0b6675bad09eb3dd5b711ad5b45539162664c7a)]:
+  - @clerk/shared@4.8.1
+  - @clerk/clerk-js@6.7.2
+  - @clerk/react@6.4.1
+
+## 3.1.11
+
+### Patch Changes
+
+- Updated dependencies [[`dc2de16`](https://github.com/clerk/javascript/commit/dc2de16480086f376449d452d31ae0d2a319af17)]:
+  - @clerk/react@6.4.0
+  - @clerk/shared@4.8.0
+  - @clerk/clerk-js@6.7.1
+
+## 3.1.10
+
+### Patch Changes
+
+- - Fix iOS OAuth (SSO) sign-in failing silently when initiated from the forgot password screen of the inline `<AuthView>` component. ([#8260](https://github.com/clerk/javascript/pull/8260)) by [@chriscanin](https://github.com/chriscanin)
+
+  - Fix Android `<AuthView>` getting stuck on the "Get help" screen after sign out via `<UserProfileView>`.
+  - Fix a brief white flash when the inline `<AuthView>` first mounts on iOS.
+
+- Updated dependencies [[`3fd586d`](https://github.com/clerk/javascript/commit/3fd586d171e9c281c4b96f620ee9070b47ba00f4), [`f9ff9e9`](https://github.com/clerk/javascript/commit/f9ff9e937d70713abf96fdd92071cd6e84b8eb80)]:
+  - @clerk/clerk-js@6.7.0
+  - @clerk/react@6.3.0
+  - @clerk/shared@4.7.0
+
+## 3.1.9
+
+### Patch Changes
+
+- Re-exports `useAPIKeys()` hook. ([#8269](https://github.com/clerk/javascript/pull/8269)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage example:
+
+  ```tsx
+  'use client';
+
+  import { useAPIKeys } from '@clerk/nextjs';
+
+  export default function CustomAPIKeys() {
+    const { data, isLoading, page, pageCount, fetchNext, fetchPrevious } = useAPIKeys({
+      pageSize: 10,
+      initialPage: 1,
+    });
+
+    if (isLoading) return <div>Loading...</div>;
+
+    return (
+      <ul>
+        {data?.map(key => (
+          <li key={key.id}>{key.name}</li>
+        ))}
+      </ul>
+    );
+  }
+  ```
+
+- Update `esbuild` dev dependency to `^0.25.0` to address a security vulnerability. ([#8253](https://github.com/clerk/javascript/pull/8253)) by [@renovate](https://github.com/apps/renovate)
+
+- Updated dependencies [[`fdac10e`](https://github.com/clerk/javascript/commit/fdac10e96ad60c0176cde4e1e3ddc89e40cd0a15), [`4e3cb0a`](https://github.com/clerk/javascript/commit/4e3cb0abed1f8aa1cba032c15da3a94a49162b0c), [`aa32bbc`](https://github.com/clerk/javascript/commit/aa32bbc94e76ea726056810885208c59269b2d2b)]:
+  - @clerk/clerk-js@6.6.0
+  - @clerk/shared@4.6.0
+  - @clerk/react@6.2.1
+
 ## 3.1.8
 
 ### Patch Changes

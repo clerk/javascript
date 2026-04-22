@@ -20,6 +20,7 @@
     "**/node_modules/**",
     ".nvmrc",
     "integration/templates/**",
+    "packages/upgrade/src/__tests__/fixtures/**",
     "playground/**",
   ],
   includePaths: [
@@ -35,65 +36,6 @@
     enabled: false,
   },
   packageRules: [
-    {
-      groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "agent-toolkit-dev-minor",
-      matchFileNames: [
-        "packages/agent-toolkit/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      automerge: true,
-      semanticCommitScope: "agent-toolkit",
-    },
-    {
-      groupName: "[DEV] major dependencies",
-      groupSlug: "agent-toolkit-dev-major",
-      matchFileNames: [
-        "packages/agent-toolkit/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "agent-toolkit",
-    },
-    {
-      groupName: "minor & patch dependencies",
-      groupSlug: "agent-toolkit-prod-minor",
-      matchFileNames: [
-        "packages/agent-toolkit/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      semanticCommitScope: "agent-toolkit",
-    },
-    {
-      groupName: "major dependencies",
-      groupSlug: "agent-toolkit-prod-major",
-      matchFileNames: [
-        "packages/agent-toolkit/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "agent-toolkit",
-    },
     {
       groupName: "[DEV] minor & patch dependencies",
       groupSlug: "astro-dev-minor",

@@ -6,23 +6,27 @@ catalogs:
     react: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
     react-dom: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
   react:
-    '@types/react': 18.3.26
+    '@types/react': 18.3.28
     '@types/react-dom': 18.3.7
     react: 18.3.1
     react-dom: 18.3.1
   repo:
-    '@swc/helpers': 0.5.17
+    '@swc/helpers': 0.5.21
     core-js: 3.47.0
     rolldown: 1.0.0-beta.47
     tsdown: 0.15.7
     tslib: 2.8.1
-    tsup: 8.5.0
+    tsup: 8.5.1
     typescript: 5.8.3
-    vue: 3.5.24
+    vue: 3.5.32
     zx: 8.8.5
+  rspack:
+    '@rspack/cli': 1.7.11
+    '@rspack/core': 1.7.11
+    '@rspack/plugin-react-refresh': 1.6.2
   module-manager:
     '@base-org/account': 2.0.1
-    '@coinbase/wallet-sdk': 4.3.0
+    '@coinbase/wallet-sdk': 4.3.7
     '@solana/wallet-adapter-base': 0.9.27
     '@solana/wallet-adapter-react': 0.15.39
     '@solana/wallet-standard': 1.1.4
@@ -35,6 +39,9 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
+  # CVE-2026-23869: React Server Components DoS
+  - 'next@15.5.15'
+  - '@next/*'
   # Renovate security update: @modelcontextprotocol/sdk@1.26.0
   - '@modelcontextprotocol/sdk@1.26.0'
   # Renovate security update: esbuild@0.25.0

@@ -24,7 +24,7 @@ import { incomingMessageToRequest, loadApiEnv, loadClientEnv, requestToProxyRequ
  */
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, request, options } = opts;
-  const { jwtKey, authorizedParties, audience, acceptsToken } = options || {};
+  const { jwtKey, authorizedParties, audience, acceptsToken, clockSkewInMs } = options || {};
 
   const clerkRequest = createClerkRequest(incomingMessageToRequest(request));
   const env = { ...loadApiEnv(), ...loadClientEnv() };
@@ -55,6 +55,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     machineSecretKey,
     publishableKey,
     jwtKey,
+    clockSkewInMs,
     authorizedParties,
     proxyUrl,
     isSatellite,
