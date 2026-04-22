@@ -2,13 +2,13 @@ import { __internal_useOrganizationBase, useClerk } from '@clerk/shared/react';
 import type {
   __internal_CheckoutProps,
   __internal_SubscriptionDetailsProps,
-  BillingPlanResource,
   BillingSubscriptionItemResource,
 } from '@clerk/shared/types';
 import * as React from 'react';
 import { useCallback, useContext, useState } from 'react';
 
 import { Users } from '@/icons';
+import { common } from '@/styledSystem';
 import { useProtect } from '@/ui/common/Gate';
 import {
   SubscriptionDetailsContext,
@@ -19,6 +19,7 @@ import { CardAlert } from '@/ui/elements/Card/CardAlert';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
+import { isManageableSubscriptionItem } from '@/ui/utils/billingSubscription';
 import { handleError } from '@/ui/utils/errorHandler';
 import { formatDate } from '@/ui/utils/formatDate';
 
@@ -44,9 +45,6 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { SubscriptionBadge } from '../Subscriptions/badge';
-import { common } from '@/styledSystem';
-
-const isFreePlan = (plan: BillingPlanResource) => !plan.hasBaseFee;
 
 // We cannot derive the state of confirmation modal from the existence subscription, as it will make the animation laggy when the confirmation closes.
 const SubscriptionForCancellationContext = React.createContext<{
@@ -376,14 +374,14 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
   const canOrgManageBilling = useProtect(has => has({ permission: 'org:sys_billing:manage' }));
   const canManageBilling = subscriberType === 'user' || canOrgManageBilling;
 
+  const isManageable = isManageableSubscriptionItem(subscription);
   const isSwitchable =
     ((subscription.planPeriod === 'month' && Boolean(subscription.plan.annualMonthlyFee)) ||
       (subscription.planPeriod === 'annual' && Boolean(subscription.plan.fee))) &&
     subscription.status !== 'past_due' &&
-    !subscription.plan.isDefault;
-  const isFree = isFreePlan(subscription.plan);
-  const isCancellable = subscription.canceledAt === null && !isFree;
-  const isReSubscribable = subscription.canceledAt !== null && !isFree;
+    isManageable;
+  const isCancellable = subscription.canceledAt === null && isManageable;
+  const isReSubscribable = subscription.canceledAt !== null && isManageable;
 
   const openCheckout = useCallback(
     (params?: __internal_CheckoutProps) => {
