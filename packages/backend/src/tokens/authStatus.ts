@@ -271,6 +271,9 @@ export function signedOutInvalidToken(): UnauthenticatedState<null> {
 type BootstrapSignedOutParams = {
   signInUrl?: string;
   signUpUrl?: string;
+  isSatellite?: boolean;
+  domain?: string;
+  proxyUrl?: string;
   reason?: AuthReason;
   message?: string;
   headers?: Headers;
@@ -285,10 +288,16 @@ type BootstrapSignedOutParams = {
  *
  * `signInUrl` / `signUpUrl` are carried through so that `redirectToSignIn` /
  * `redirectToSignUp` can resolve to the application's own routes during bootstrap.
+ * `isSatellite` / `domain` / `proxyUrl` are carried through so that cross-origin
+ * satellite redirects produced by `createRedirect` include the `__clerk_status=needs-sync`
+ * marker required for the return-trip handshake.
  */
 export function createBootstrapSignedOutState({
   signInUrl = '',
   signUpUrl = '',
+  isSatellite = false,
+  domain = '',
+  proxyUrl = '',
   reason = AuthErrorReason.SessionTokenAndUATMissing,
   message = '',
   headers = new Headers(),
@@ -297,10 +306,10 @@ export function createBootstrapSignedOutState({
     status: AuthStatus.SignedOut,
     reason,
     message,
-    proxyUrl: '',
+    proxyUrl,
     publishableKey: '',
-    isSatellite: false,
-    domain: '',
+    isSatellite,
+    domain,
     signInUrl,
     signUpUrl,
     afterSignInUrl: '',
