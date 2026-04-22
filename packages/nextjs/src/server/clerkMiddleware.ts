@@ -231,11 +231,10 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       });
     });
 
-    // Bootstrap path for the keyless window where no publishable key is available yet.
-    // The real authenticateRequest() can't run without keys, so we synthesize a signed-out
-    // RequestState and run the user's handler against it. This closes the middleware-bypass
-    // window: authorization logic (e.g. auth.protect()) fail-closed during bootstrap instead
-    // of being skipped entirely.
+    /**
+     * Runs the user's handler against a synthetic signed-out `RequestState` during the keyless
+     * bootstrap window, so authorization fails closed until a publishable key is provisioned.
+     */
     const bootstrapNextMiddleware: NextMiddleware = withLogger(
       'clerkMiddleware',
       logger => async (request, event) => {
