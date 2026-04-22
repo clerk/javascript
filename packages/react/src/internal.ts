@@ -1,3 +1,4 @@
+import { useOAuthConsent as useOAuthConsentOriginal } from '@clerk/shared/react';
 import type { InternalClerkScriptProps } from '@clerk/shared/types';
 import type { Ui } from '@clerk/ui/internal';
 import type React from 'react';
@@ -5,7 +6,6 @@ import type React from 'react';
 import { OAuthConsent as OAuthConsentOriginal } from './components/uiComponents';
 import { ClerkProvider } from './contexts/ClerkProvider';
 import type { ClerkProviderProps } from './types';
-import { useOAuthConsent as useOAuthConsentOriginal } from '@clerk/shared/react';
 
 export { setErrorThrowerOptions } from './errors/errorThrower';
 export { MultisessionAppSupport } from './components/controlComponents';
