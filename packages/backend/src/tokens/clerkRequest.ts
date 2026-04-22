@@ -37,7 +37,9 @@ class ClerkRequest extends Request {
     } else if (typeof input !== 'string') {
       cloneInit = new Proxy(input as Request, {
         get(target, prop) {
-          if (prop === 'signal') return undefined;
+          if (prop === 'signal') {
+            return undefined;
+          }
           return Reflect.get(target, prop, target);
         },
       }) as unknown as RequestInit;
