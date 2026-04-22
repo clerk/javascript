@@ -26,28 +26,21 @@ class ClerkRequest extends Request {
     // https://github.com/nodejs/undici/issues/2155
     // https://github.com/nodejs/undici/blob/7153a1c78d51840bbe16576ce353e481c3934701/lib/fetch/request.js#L854
     const url = typeof input !== 'string' && 'url' in input ? input.url : String(input);
-    // Build init explicitly when cloning a Request. Passing the Request directly as init
-    // makes undici extract `signal` from it, and Node 24 rejects signals from a different
-    // realm (e.g. NextRequest) with a strict instanceof check.
+    // When cloning a Request by passing it as init, hide its `signal`. Undici's
+    // Request constructor in Node 24 performs a strict instanceof check on the
+    // signal and rejects ones from a different realm (e.g. NextRequest). Using a
+    // Proxy keeps property access lazy so environments that don't implement
+    // optional getters (e.g. Cloudflare Workers' Request lacks `cache`) still work.
     let cloneInit: RequestInit | undefined;
     if (init) {
       cloneInit = init;
     } else if (typeof input !== 'string') {
-      const req = input as Request;
-      cloneInit = {
-        body: req.body,
-        cache: req.cache,
-        credentials: req.credentials,
-        headers: req.headers,
-        integrity: req.integrity,
-        keepalive: req.keepalive,
-        method: req.method,
-        mode: req.mode,
-        redirect: req.redirect,
-        referrer: req.referrer,
-        referrerPolicy: req.referrerPolicy,
-        ...(req.body ? { duplex: 'half' } : {}),
-      } as RequestInit;
+      cloneInit = new Proxy(input as Request, {
+        get(target, prop) {
+          if (prop === 'signal') return undefined;
+          return Reflect.get(target, prop, target);
+        },
+      }) as unknown as RequestInit;
     }
     super(url, cloneInit);
     this.clerkUrl = this.deriveUrlFromHeaders(this);

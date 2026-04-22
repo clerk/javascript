@@ -218,7 +218,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - node-version: 24
+          - node-version: 24.15.0
             test-filter: "**"
             filter-label: "**"
           - node-version: 20
@@ -260,7 +260,7 @@ jobs:
       - name: Run Typedoc tests
         run: |
           # Only run Typedoc tests for one matrix version and main test run
-          if [ "${{ matrix.node-version }}" == "24" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
+          if [ "${{ matrix.node-version }}" == "24.15.0" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
             pnpm turbo run //#test:typedoc
           fi
         env:
@@ -504,7 +504,7 @@ jobs:
         uses: ./.github/actions/init-blacksmith
         with:
           turbo-enabled: true
-          node-version: 24
+          node-version: 24.15.0
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
