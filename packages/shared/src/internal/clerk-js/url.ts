@@ -400,6 +400,7 @@ export const pathFromFullPath = (fullPath: string) => {
 
 const frontendApiRedirectPathsWithUserInput: string[] = [
   '/oauth/authorize', // OAuth2 identify provider flow
+  '/oauth/authorize/continue', // OAuth 2 identity provider continuation
 ];
 
 const frontendApiRedirectPathsNoUserInput: string[] = [
@@ -421,6 +422,16 @@ export function isRedirectForFAPIInitiatedFlow(frontendApi: string, redirectUrl:
 export function requiresUserInput(redirectUrl: string): boolean {
   const url = new URL(redirectUrl, DUMMY_URL_BASE);
   return frontendApiRedirectPathsWithUserInput.includes(url.pathname);
+}
+
+export function isFAPIInitiatedFlowPath(url: string): boolean {
+  try {
+    const parsed = new URL(url, DUMMY_URL_BASE);
+    const allFAPIFlowPaths = [...frontendApiRedirectPathsWithUserInput, ...frontendApiRedirectPathsNoUserInput];
+    return allFAPIFlowPaths.includes(parsed.pathname);
+  } catch {
+    return false;
+  }
 }
 
 export const isAllowedRedirect =
