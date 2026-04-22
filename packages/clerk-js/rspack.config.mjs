@@ -1,11 +1,17 @@
 // @ts-check
-const rspack = require('@rspack/core');
-const packageJSON = require('./package.json');
-const path = require('path');
-const { merge } = require('webpack-merge');
-const ReactRefreshPlugin = require('@rspack/plugin-react-refresh');
-const { RsdoctorRspackPlugin } = require('@rsdoctor/rspack-plugin');
-const { svgLoader, typescriptLoaderProd, typescriptLoaderDev } = require('../../scripts/rspack-common');
+import rspack from '@rspack/core';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+import { merge } from 'webpack-merge';
+import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
+import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
+import { svgLoader, typescriptLoaderProd, typescriptLoaderDev } from '../../scripts/rspack-common.js';
+import packageJSON from './package.json' with { type: 'json' };
+
+const require = createRequire(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
@@ -185,7 +191,7 @@ const commonForProd = () => {
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: '[name].js',
-      libraryTarget: 'umd',
+      library: { type: 'umd' },
       globalObject: 'globalThis',
     },
     optimization: {
@@ -305,7 +311,7 @@ const prodConfig = ({ mode, env, analysis }) => {
       },
       output: {
         filename: '[name].mjs',
-        libraryTarget: 'module',
+        library: { type: 'module' },
       },
       plugins: [
         // Include the lazy chunks in the bundle as well
@@ -329,7 +335,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     {
       output: {
         filename: '[name].js',
-        libraryTarget: 'commonjs',
+        library: { type: 'commonjs' },
       },
       plugins: [
         // Include the lazy chunks in the bundle as well
@@ -378,7 +384,7 @@ const prodConfig = ({ mode, env, analysis }) => {
       },
       output: {
         filename: '[name].mjs',
-        libraryTarget: 'module',
+        library: { type: 'module' },
       },
     },
   );
@@ -392,7 +398,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     {
       output: {
         filename: '[name].js',
-        libraryTarget: 'commonjs',
+        library: { type: 'commonjs' },
       },
     },
   );
@@ -443,7 +449,7 @@ const devConfig = ({ mode, env }) => {
         publicPath: isSandbox ? `` : `${devUrl.origin}/npm`,
         crossOriginLoading: 'anonymous',
         filename: `[name].js`,
-        libraryTarget: 'umd',
+        library: { type: 'umd' },
       },
       optimization: {
         minimize: false,
@@ -463,11 +469,8 @@ const devConfig = ({ mode, env }) => {
             }
           : {}),
       },
-      cache: true,
-      experiments: {
-        cache: {
-          type: 'memory',
-        },
+      cache: {
+        type: 'memory',
       },
       lazyCompilation: false,
     };
@@ -507,7 +510,7 @@ const devConfig = ({ mode, env }) => {
   return entryToConfigMap[variant];
 };
 
-module.exports = env => {
+export default env => {
   const mode = env.production ? 'production' : 'development';
   const analysis = !!env.analysis;
 
