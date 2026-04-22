@@ -107,7 +107,7 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   }
 
   if (roleAsked) {
-    if (!orgRole) {
+    if (typeof orgRole !== 'string' || !orgRole) {
       return 'fail';
     }
     if (prefixWithOrg(orgRole) !== prefixWithOrg(params.role as string)) {
@@ -116,7 +116,7 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   }
 
   if (permissionAsked) {
-    if (!orgPermissions) {
+    if (!Array.isArray(orgPermissions)) {
       return 'fail';
     }
     if (!orgPermissions.includes(prefixWithOrg(params.permission as string))) {
@@ -164,19 +164,27 @@ const checkBillingAuthorization: CheckBillingAuthorization = (params, options) =
   }
 
   if (featureAsked) {
-    if (!features) {
+    if (typeof features !== 'string' || !features) {
       return 'fail';
     }
-    if (!checkForFeatureOrPlan(features, params.feature as string)) {
+    try {
+      if (!checkForFeatureOrPlan(features, params.feature as string)) {
+        return 'fail';
+      }
+    } catch {
       return 'fail';
     }
   }
 
   if (planAsked) {
-    if (!plans) {
+    if (typeof plans !== 'string' || !plans) {
       return 'fail';
     }
-    if (!checkForFeatureOrPlan(plans, params.plan as string)) {
+    try {
+      if (!checkForFeatureOrPlan(plans, params.plan as string)) {
+        return 'fail';
+      }
+    } catch {
       return 'fail';
     }
   }

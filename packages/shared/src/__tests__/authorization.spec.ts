@@ -22,6 +22,58 @@ describe('createCheckAuthorization', () => {
     expect(checkAuthorization({ feature: 'dashboard' })).toBe(true);
   });
 
+  it('fails closed on malformed orgRole claim', () => {
+    const has = createCheckAuthorization({
+      userId: 'user_123',
+      orgId: 'org_123',
+      orgRole: 123 as any,
+      orgPermissions: ['org:sys_profile:delete'],
+      features: '',
+      plans: '',
+      factorVerificationAge: [0, 0],
+    });
+    expect(has({ role: 'org:admin' } as any)).toBe(false);
+  });
+
+  it('fails closed on malformed orgPermissions claim', () => {
+    const has = createCheckAuthorization({
+      userId: 'user_123',
+      orgId: 'org_123',
+      orgRole: 'org:admin',
+      orgPermissions: {} as any,
+      features: '',
+      plans: '',
+      factorVerificationAge: [0, 0],
+    });
+    expect(has({ permission: 'org:sys_profile:delete' } as any)).toBe(false);
+  });
+
+  it('fails closed on malformed features claim', () => {
+    const has = createCheckAuthorization({
+      userId: 'user_123',
+      orgId: 'org_123',
+      orgRole: 'org:admin',
+      orgPermissions: ['org:read'],
+      features: {} as any,
+      plans: '',
+      factorVerificationAge: [0, 0],
+    });
+    expect(has({ feature: 'org:premium' } as any)).toBe(false);
+  });
+
+  it('fails closed on malformed plans claim', () => {
+    const has = createCheckAuthorization({
+      userId: 'user_123',
+      orgId: 'org_123',
+      orgRole: 'org:admin',
+      orgPermissions: ['org:read'],
+      features: '',
+      plans: {} as any,
+      factorVerificationAge: [0, 0],
+    });
+    expect(has({ plan: 'u:plus' } as any)).toBe(false);
+  });
+
   it('fails when no dimension was requested', () => {
     const has = createCheckAuthorization({
       userId: 'user_123',
