@@ -263,8 +263,8 @@ const isPagePathAvailable = () => {
   return Boolean(
     // available on next@14
     pagePath ||
-    // available on next@15
-    page,
+      // available on next@15
+      page,
   );
 };
 
