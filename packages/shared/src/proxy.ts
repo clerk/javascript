@@ -70,6 +70,12 @@ type GetAutoProxyUrlFromEnvironmentOptions = {
   environment?: NodeJS.ProcessEnv;
 };
 
+/**
+ * Determines if the current Vercel environment should use auto-proxy.
+ * Note: This runs both at build time (static generation) and at runtime
+ * (server-side rendering) via mergeNextClerkPropsWithEnv in providers.
+ * The return value may become the proxyUrl or the script src prefix.
+ */
 export function getAutoProxyUrlFromEnvironment({
   publishableKey,
   hasDomain = false,
