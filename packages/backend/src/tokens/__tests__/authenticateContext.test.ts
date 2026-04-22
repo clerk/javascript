@@ -259,7 +259,21 @@ describe('AuthenticateContext', () => {
   });
 
   describe('auto-proxy for eligible hosts', () => {
-    it('auto-derives proxyUrl for production instances on eligible hostnames', async () => {
+    const originalEnv = process.env;
+
+    beforeEach(() => {
+      process.env = {
+        ...originalEnv,
+        VERCEL_TARGET_ENV: 'production',
+        VERCEL_PROJECT_PRODUCTION_URL: 'myapp-abc123.vercel.app',
+      };
+    });
+
+    afterEach(() => {
+      process.env = originalEnv;
+    });
+
+    it('auto-derives proxyUrl when Vercel env vars indicate production vercel.app', async () => {
       const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
       const context = await createAuthenticateContext(clerkRequest, {
         publishableKey: pkLive,
@@ -268,7 +282,7 @@ describe('AuthenticateContext', () => {
       expect(context.proxyUrl).toBe('https://myapp-abc123.vercel.app/__clerk');
     });
 
-    it('does NOT auto-derive proxyUrl for development instances on eligible hostnames', async () => {
+    it('does NOT auto-derive proxyUrl for development keys', async () => {
       const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
       const context = await createAuthenticateContext(clerkRequest, {
         publishableKey: pkTest,
@@ -277,8 +291,10 @@ describe('AuthenticateContext', () => {
       expect(context.proxyUrl).toBeUndefined();
     });
 
-    it('does NOT auto-derive proxyUrl for ineligible domains', async () => {
-      const clerkRequest = createClerkRequest(new Request('https://myapp.com/dashboard'));
+    it('does NOT auto-derive proxyUrl when Vercel env vars are absent', async () => {
+      delete process.env.VERCEL_TARGET_ENV;
+      delete process.env.VERCEL_PROJECT_PRODUCTION_URL;
+      const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
       const context = await createAuthenticateContext(clerkRequest, {
         publishableKey: pkLive,
       });
