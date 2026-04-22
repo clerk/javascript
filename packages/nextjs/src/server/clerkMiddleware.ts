@@ -235,48 +235,45 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
      * Runs the user's handler against a synthetic signed-out `RequestState` during the keyless
      * bootstrap window, so authorization fails closed until a publishable key is provisioned.
      */
-    const bootstrapNextMiddleware: NextMiddleware = withLogger(
-      'clerkMiddleware',
-      logger => async (request, event) => {
-        const resolvedParams = typeof params === 'function' ? await params(request) : params;
-        const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
+    const bootstrapNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
+      const resolvedParams = typeof params === 'function' ? await params(request) : params;
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
 
-        const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL || '';
-        const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL || '';
+      const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL || '';
+      const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL || '';
 
-        const options = {
-          publishableKey: '',
-          secretKey: '',
-          signInUrl,
-          signUpUrl,
-          ...resolvedParams,
-        };
+      const options = {
+        publishableKey: '',
+        secretKey: '',
+        signInUrl,
+        signUpUrl,
+        ...resolvedParams,
+      };
 
-        clerkMiddlewareRequestDataStore.set('requestData', options);
+      clerkMiddlewareRequestDataStore.set('requestData', options);
 
-        if (options.debug) {
-          logger.enable();
-        }
+      if (options.debug) {
+        logger.enable();
+      }
 
-        const clerkRequest = createClerkRequest(request);
-        logger.debug('keyless bootstrap (no publishable key)', () => ({ signInUrl, signUpUrl }));
-        logger.debug('url', () => clerkRequest.toJSON());
+      const clerkRequest = createClerkRequest(request);
+      logger.debug('keyless bootstrap (no publishable key)', () => ({ signInUrl, signUpUrl }));
+      logger.debug('url', () => clerkRequest.toJSON());
 
-        const requestState = createBootstrapSignedOutState({ signInUrl, signUpUrl });
+      const requestState = createBootstrapSignedOutState({ signInUrl, signUpUrl });
 
-        return runHandlerWithRequestState({
-          clerkRequest,
-          request,
-          event,
-          requestState,
-          handler,
-          options,
-          resolvedParams,
-          keyless,
-          logger,
-        });
-      },
-    );
+      return runHandlerWithRequestState({
+        clerkRequest,
+        request,
+        event,
+        requestState,
+        handler,
+        options,
+        resolvedParams,
+        keyless,
+        logger,
+      });
+    });
 
     const keylessMiddleware: NextMiddleware = async (request, event) => {
       /**
