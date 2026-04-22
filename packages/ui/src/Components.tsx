@@ -236,29 +236,41 @@ export const mountComponentRenderer = (
       // .unmountComponent incorrectly called before the component is rendered
       if (!componentsControlsResolver) {
         const deferredPromise = createDeferredPromise();
-        componentsControlsResolver = import('./lazyModules/common').then(({ createRoot }) => {
-          createRoot(clerkRoot).render(
-            <Components
-              getClerk={getClerk}
-              getEnvironment={getEnvironment}
-              options={options}
-              onComponentsMounted={() => {
-                // Defer warning check to avoid blocking component mount
-                // Only check in development mode (based on publishable key, not NODE_ENV)
-                if (getClerk().instanceType === 'development') {
-                  const scheduleWarningCheck =
-                    typeof requestIdleCallback === 'function'
-                      ? requestIdleCallback
-                      : (cb: () => void) => setTimeout(cb, 0);
-                  scheduleWarningCheck(() => warnAboutCustomizationWithoutPinning(options));
-                }
-                deferredPromise.resolve();
-              }}
-              moduleManager={moduleManager}
-            />,
+        const mountTimeout = setTimeout(() => {
+          console.error(
+            '[Clerk UI] Component renderer did not mount within 10s. Common causes: a failed chunk load, a dev-server misconfiguration (e.g. unresolved lazy-compilation proxy), or a ClerkProvider/mountX call before the page is hydrated. Check the Network tab for stalled or empty requests.',
           );
-          return deferredPromise.promise.then(() => componentsControls);
-        });
+        }, 10_000);
+        componentsControlsResolver = import('./lazyModules/common')
+          .then(({ createRoot }) => {
+            createRoot(clerkRoot).render(
+              <Components
+                getClerk={getClerk}
+                getEnvironment={getEnvironment}
+                options={options}
+                onComponentsMounted={() => {
+                  clearTimeout(mountTimeout);
+                  // Defer warning check to avoid blocking component mount
+                  // Only check in development mode (based on publishable key, not NODE_ENV)
+                  if (getClerk().instanceType === 'development') {
+                    const scheduleWarningCheck =
+                      typeof requestIdleCallback === 'function'
+                        ? requestIdleCallback
+                        : (cb: () => void) => setTimeout(cb, 0);
+                    scheduleWarningCheck(() => warnAboutCustomizationWithoutPinning(options));
+                  }
+                  deferredPromise.resolve();
+                }}
+                moduleManager={moduleManager}
+              />,
+            );
+            return deferredPromise.promise.then(() => componentsControls);
+          })
+          .catch(err => {
+            clearTimeout(mountTimeout);
+            console.error('[Clerk UI] Failed to initialize component renderer:', err);
+            throw err;
+          });
       }
       return componentsControlsResolver.then(controls => controls);
     },
