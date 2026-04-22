@@ -1,5 +1,14 @@
 # Change Log
 
+## 7.2.5
+
+### Patch Changes
+
+- Refactor `clerkMiddleware` internals to factor the post-authentication pipeline (handler invocation, CSP, redirects, response decoration) into a private `runHandlerWithRequestState` helper. Pure refactor — no behavioral change. ([#8368](https://github.com/clerk/javascript/pull/8368)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`93855c2`](https://github.com/clerk/javascript/commit/93855c26a624780a52ed12c25ea6605b6c009ec1)]:
+  - @clerk/backend@3.3.0
+
 ## 7.2.4
 
 ### Patch Changes
