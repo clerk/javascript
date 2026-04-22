@@ -292,12 +292,6 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
       const authHeader = getHeader(request, constants.Headers.Authorization)?.replace('Bearer ', '') ?? '';
 
-      /**
-       * In keyless mode, when no publishable key is available yet, we still run the user's
-       * middleware handler — against a synthetic signed-out RequestState — so authorization
-       * logic is enforced during the bootstrap window. `<ClerkProvider/>` downstream resumes
-       * the flow once keys are provisioned client-side.
-       */
       if (isMissingPublishableKey && !isMachineTokenByPrefix(authHeader)) {
         return bootstrapNextMiddleware(request, event);
       }
