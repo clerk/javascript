@@ -1235,7 +1235,7 @@ export const koKR: LocalizationResource = {
     },
     mfaTOTPPage: {
       authenticatorApp: {
-        buttonAbleToScan__nonPrimary: '대신 QR 코드 스캔 하세요',
+        buttonAbleToScan__nonPrimary: '대신 QR 코드를 스캔 하세요',
         buttonUnableToScan__nonPrimary: 'QR 코드를 스캔할 수 없나요?',
         infoText__ableToScan: '인증 앱에서 새 로그인 방법을 만들고 QR 코드를 스캔해 계정에 연결해 주세요.',
         infoText__unableToScan: '인증 장치에서 새 로그인 방법을 만든 다음 아래 키를 입력해 주세요.',
