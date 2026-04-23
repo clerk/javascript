@@ -100,16 +100,26 @@ export const useSignInContext = (): SignInContextType => {
 
   const authQueryString = redirectUrls.toSearchParams().toString();
 
+  // For virtual routing (modal), ctx.signUpUrl contains the internal CLERK-ROUTER/VIRTUAL path,
+  // which is not valid as an OAuth redirect URL. Use the configured options URL as the base instead.
+  const ssoCallbackBaseUrl =
+    !isCombinedFlow && ctx.routing === 'virtual'
+      ? buildURL(
+          { base: options.signUpUrl || displayConfig.signUpUrl, hashSearchParams: [queryParams, preservedParams] },
+          { stringify: true },
+        )
+      : signUpUrl;
+
   const emailLinkRedirectUrl = buildRedirectUrl({
     routing: ctx.routing,
-    baseUrl: signUpUrl,
+    baseUrl: ssoCallbackBaseUrl,
     authQueryString,
     path: ctx.path,
     endpoint: isCombinedFlow ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE : MAGIC_LINK_VERIFY_PATH_ROUTE,
   });
   const ssoCallbackUrl = buildRedirectUrl({
     routing: ctx.routing,
-    baseUrl: signUpUrl,
+    baseUrl: ssoCallbackBaseUrl,
     authQueryString,
     path: ctx.path,
     endpoint: isCombinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
