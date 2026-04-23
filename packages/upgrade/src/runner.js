@@ -1,12 +1,14 @@
+import { execSync } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import chalk from 'chalk';
 import indexToPosition from 'index-to-position';
-import { glob } from 'tinyglobby';
+import { isBinaryFile } from 'isbinaryfile';
+import { escapePath, glob } from 'tinyglobby';
 
 import { getCodemodConfig, runCodemod } from './codemods/index.js';
-import { createSpinner, renderCodemodResults } from './render.js';
+import { createSpinner, renderCodemodResults, renderDebug } from './render.js';
 
 const GLOBBY_IGNORE = [
   'node_modules/**',
@@ -95,15 +97,15 @@ export async function runScans(config, sdk, options) {
 
   try {
     const cwd = path.resolve(options.dir);
-    const files = await glob('**/*', {
-      cwd,
-      absolute: true,
-      ignore: [...GLOBBY_IGNORE, ...(options.ignore || [])],
-    });
+    const files = await getFilesToScan(cwd, options);
 
     for (let idx = 0; idx < files.length; idx++) {
       const file = files[idx];
-      spinner.update(`Scanning ${path.basename(file)} (${idx + 1}/${files.length})`);
+      spinner.update(`Scanning ${path.relative(cwd, file)} (${idx + 1}/${files.length})`);
+
+      if (await isBinaryFile(file)) {
+        continue;
+      }
 
       const content = await fs.readFile(file, 'utf8');
 
@@ -153,6 +155,34 @@ function loadMatchers(config, sdk) {
   return config.changes.filter(change => {
     const packages = change.packages || ['*'];
     return packages.includes('*') || packages.includes(sdk);
+  });
+}
+
+async function getFilesToScan(cwd, options) {
+  // NOTE: tinyglobby recommends shelling out to git for .gitignore support instead of
+  // implementing it internally:
+  // - https://superchupu.dev/tinyglobby/migration#gitignore
+  // - https://github.com/SuperchupuDev/tinyglobby/issues/92
+  function gitIgnored() {
+    try {
+      return execSync('git ls-files --others --ignored --exclude-standard --directory', {
+        cwd,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      })
+        .split('\n')
+        .filter(Boolean)
+        .map(file => escapePath(file));
+    } catch (error) {
+      renderDebug(`Skipping .gitignore support for scans in ${cwd}: ${error.message}`);
+      return [];
+    }
+  }
+
+  return glob('**/*', {
+    cwd,
+    absolute: true,
+    ignore: [...GLOBBY_IGNORE, ...(options.ignore || []), ...(options.skipGitignore ? [] : gitIgnored())],
   });
 }
 

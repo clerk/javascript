@@ -38,6 +38,7 @@
     "execa": "9.4.1",
     "gray-matter": "^4.0.3",
     "index-to-position": "^0.1.2",
+    "isbinaryfile": "^5.0.7",
     "jscodeshift": "^17.0.0",
     "marked": "^11.1.1",
     "meow": "^11.0.0",
