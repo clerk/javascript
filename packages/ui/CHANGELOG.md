@@ -1,5 +1,21 @@
 # @clerk/ui
 
+## 1.6.5
+
+### Patch Changes
+
+- Fixed OAuth `redirect_url` for `openSignIn` modal. ([#8385](https://github.com/clerk/javascript/pull/8385)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 1.6.4
+
+### Patch Changes
+
+- Default the organization selection in `<OAuthConsent />` to the user's last active organization, falling back to the first membership when it is not set or no longer available. ([#8362](https://github.com/clerk/javascript/pull/8362)) by [@kylemac](https://github.com/kylemac)
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f)]:
+  - @clerk/shared@4.8.3
+  - @clerk/localizations@4.5.3
+
 ## 1.6.3
 
 ### Patch Changes

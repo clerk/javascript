@@ -657,6 +657,107 @@ describe('clerkMiddleware(params)', () => {
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
+    it('still authorizes when RBAC params are mixed with unauthorizedUrl in a single argument', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+      const hasSpy = vi.fn().mockReturnValue(false);
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedIn,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: 'user-id', has: hasSpy }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        const opts = { role: 'random-role', unauthorizedUrl: 'https://www.clerk.com/denied' } as const;
+        await auth.protect(opts);
+      })(req, {} as NextFetchEvent);
+
+      expect(hasSpy).toHaveBeenCalledWith({ role: 'random-role' });
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toEqual('https://www.clerk.com/denied');
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('still authorizes when permission is mixed with token in a single argument', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+      const hasSpy = vi.fn().mockReturnValue(false);
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedIn,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: 'user-id', has: hasSpy }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ permission: 'org:sys_memberships:read', token: TokenType.SessionToken } as any);
+      })(req, {} as NextFetchEvent);
+
+      expect(hasSpy).toHaveBeenCalledWith({ permission: 'org:sys_memberships:read' });
+      expect(resp?.status).toEqual(200);
+      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-rewrite');
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('passes through when mixed-shape authorization succeeds', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+      const hasSpy = vi.fn().mockReturnValue(true);
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedIn,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: 'user-id', has: hasSpy }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ role: 'org:admin', unauthorizedUrl: 'https://www.clerk.com/denied' } as any);
+      })(req, {} as NextFetchEvent);
+
+      expect(hasSpy).toHaveBeenCalledWith({ role: 'org:admin' });
+      expect(resp?.status).toEqual(200);
+      expect(resp?.headers.get('location')).toBeFalsy();
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('takes the options-only fast path for options objects with unknown extra keys', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+      const hasSpy = vi.fn().mockReturnValue(false);
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedIn,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: 'user-id', has: hasSpy }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ unauthorizedUrl: 'https://www.clerk.com/denied', foo: 'bar' } as any);
+      })(req, {} as NextFetchEvent);
+
+      expect(hasSpy).not.toHaveBeenCalled();
+      expect(resp?.status).toEqual(200);
+      expect(resp?.headers.get('location')).toBeFalsy();
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
     it('redirects to unauthenticatedUrl when protect is called with the redirectUrl param, the user is signed out, and is a page request', async () => {
       const req = mockRequest({
         url: '/protected',
