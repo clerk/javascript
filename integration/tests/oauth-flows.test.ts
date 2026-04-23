@@ -117,11 +117,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     // The sso-callback base must come from ClerkProvider.signInUrl (CLERK_SIGN_IN_URL=/sign-in in this fixture).
     // Asserting origin alone would also pass for a blanket window.location.href style fix; asserting the
     // pathname is /sign-in pins the redirect to ClerkProvider.signInUrl rather than displayConfig.signInUrl
-    // (accounts portal) or the current page URL.
+    // (accounts portal) or the current page URL. The hash assertion guarantees the callback actually targets
+    // the sso-callback route — without it, a regression that drops the #/sso-callback fragment would still
+    // satisfy origin/pathname while breaking the OAuth return path at runtime.
     const parsed = new URL(redirectUrl!);
     const appOrigin = new URL(app.serverUrl).origin;
     expect(parsed.origin).toBe(appOrigin);
     expect(parsed.pathname).toBe('/sign-in');
+    expect(parsed.hash).toMatch(/^#\/sso-callback/);
   });
 
   test('sign up modal', async ({ page, context }) => {
