@@ -1,5 +1,11 @@
 # @clerk/ui
 
+## 1.6.5
+
+### Patch Changes
+
+- Fixed OAuth `redirect_url` for `openSignIn` modal. ([#8385](https://github.com/clerk/javascript/pull/8385)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 1.6.4
 
 ### Patch Changes
