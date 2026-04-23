@@ -27,7 +27,6 @@ import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
 import type { SignInStartIdentifier } from '../../common';
 import {
-  buildSSOCallbackURL,
   getIdentifierControlDisplayValues,
   groupIdentifiers,
   withRedirectToAfterSignIn,
@@ -216,7 +215,7 @@ function SignInStartInternal(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
   const status = useLoadingStatus();
-  const { displayConfig, userSettings, authConfig } = useEnvironment();
+  const { userSettings, authConfig } = useEnvironment();
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
@@ -547,7 +546,7 @@ function SignInStartInternal(): JSX.Element {
   };
 
   const authenticateWithEnterpriseSSO = async () => {
-    const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
+    const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     return signIn.authenticateWithRedirect({
@@ -617,7 +616,7 @@ function SignInStartInternal(): JSX.Element {
 
       clerk.client.signUp[attribute] = identifierField.value;
 
-      const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
+      const redirectUrl = ctx.ssoCallbackUrl;
       const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
       return handleCombinedFlowTransfer({

@@ -1,5 +1,24 @@
 # Change Log
 
+## 3.2.2
+
+### Patch Changes
+
+- Bump `clerk-android` to `1.0.13` to pick up credential flow and auth UI improvements from the native Android SDK. This addresses feedback from Expo customers including improved error messaging when no Google account is available on the device, correct handling of Activity context on Android 13 for Google Sign-In and Passkey flows, and silent dismissal when a user cancels passkey creation. ([#8366](https://github.com/clerk/javascript/pull/8366)) by [@chriscanin](https://github.com/chriscanin)
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f)]:
+  - @clerk/shared@4.8.3
+  - @clerk/clerk-js@6.7.5
+  - @clerk/react@6.4.3
+
+## 3.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`ff5bd7d`](https://github.com/clerk/javascript/commit/ff5bd7d8ccd5b60540459c771d3eafb8d77249dd)]:
+  - @clerk/clerk-js@6.7.4
+  - @clerk/react@6.4.2
+
 ## 3.2.0
 
 ### Minor Changes
