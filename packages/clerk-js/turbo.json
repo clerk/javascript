@@ -7,7 +7,7 @@
         "src/**",
         "tsconfig.json",
         "tsconfig.declarations.json",
-        "rspack.config.js",
+        "rspack.config.mjs",
 
         "!**/*.test.*",
         "!**/test/**",
