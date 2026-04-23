@@ -100,16 +100,20 @@ export const useSignInContext = (): SignInContextType => {
 
   const authQueryString = redirectUrls.toSearchParams().toString();
 
+  // Callback routes owned by the SignIn tree are always SignIn-rooted — including the combined-flow
+  // branches mounted at `create/sso-callback` and `create/verify` under the SignIn component
+  // (packages/ui/src/components/SignIn/index.tsx). Anchor both callback URLs to signInUrl and let
+  // the endpoint carry the combined-flow affordance, instead of juggling bases per flow/routing.
   const emailLinkRedirectUrl = buildRedirectUrl({
     routing: ctx.routing,
-    baseUrl: signUpUrl,
+    baseUrl: signInUrl,
     authQueryString,
     path: ctx.path,
     endpoint: isCombinedFlow ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE : MAGIC_LINK_VERIFY_PATH_ROUTE,
   });
   const ssoCallbackUrl = buildRedirectUrl({
     routing: ctx.routing,
-    baseUrl: signUpUrl,
+    baseUrl: signInUrl,
     authQueryString,
     path: ctx.path,
     endpoint: isCombinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,

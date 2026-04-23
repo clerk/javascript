@@ -469,6 +469,7 @@ const devConfig = ({ mode, env }) => {
           type: 'memory',
         },
       },
+      lazyCompilation: false,
     };
   };
 

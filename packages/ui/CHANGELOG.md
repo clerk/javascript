@@ -1,5 +1,45 @@
 # @clerk/ui
 
+## 1.6.5
+
+### Patch Changes
+
+- Fixed OAuth `redirect_url` for `openSignIn` modal. ([#8385](https://github.com/clerk/javascript/pull/8385)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 1.6.4
+
+### Patch Changes
+
+- Default the organization selection in `<OAuthConsent />` to the user's last active organization, falling back to the first membership when it is not set or no longer available. ([#8362](https://github.com/clerk/javascript/pull/8362)) by [@kylemac](https://github.com/kylemac)
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f)]:
+  - @clerk/shared@4.8.3
+  - @clerk/localizations@4.5.3
+
+## 1.6.3
+
+### Patch Changes
+
+- Fix EnableOrganizationsPrompt in keyless mode: show "Claim your application" CTA instead of broken "Sign in to continue" when organizations are enabled on an unclaimed keyless app with no signed-in user. ([#8341](https://github.com/clerk/javascript/pull/8341)) by [@mwickett](https://github.com/mwickett)
+
+- Use `user.organizationMemberships` from the already-loaded user object to populate the org select in the OAuth consent screen, avoiding a redundant memberships fetch. ([#8350](https://github.com/clerk/javascript/pull/8350)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Correctly display IP redirect URIs in OAuth consent. ([#8342](https://github.com/clerk/javascript/pull/8342)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add scroll-driven fade overlays to `ListGroupContent` in the OAuthConsent component so overflowing scope lists visually indicate more content above and below. ([#8339](https://github.com/clerk/javascript/pull/8339)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 1.6.2
+
+### Patch Changes
+
+- Add infinite loading to organization selection in `<OAuthConsent />`. ([#8309](https://github.com/clerk/javascript/pull/8309)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix OAuthConsent always redirecting to sign-in by adopting the `AuthenticatedRoutes` pattern used by other full-page components ([#8327](https://github.com/clerk/javascript/pull/8327)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/shared@4.8.2
+  - @clerk/localizations@4.5.2
+
 ## 1.6.1
 
 ### Patch Changes

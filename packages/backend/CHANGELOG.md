@@ -1,5 +1,37 @@
 # Change Log
 
+## 3.3.0
+
+### Minor Changes
+
+- Add `createBootstrapSignedOutState` helper to `@clerk/backend/internal`. Returns a synthetic `UnauthenticatedState<'session_token'>` without requiring a publishable key or an `AuthenticateContext`. Intended for framework integrations that need to run authorization logic before real Clerk keys are available (e.g. the Next.js keyless bootstrap window). Accepts optional `signInUrl`, `signUpUrl`, `isSatellite`, `domain`, and `proxyUrl` so that `createRedirect`-driven flows (including cross-origin satellite sign-in with the `__clerk_status=needs-sync` handshake marker) behave correctly during bootstrap. ([#8368](https://github.com/clerk/javascript/pull/8368)) by [@jacekradko](https://github.com/jacekradko)
+
+## 3.2.14
+
+### Patch Changes
+
+- A clock skew of 0 will not fall back to the default value anymore. ([#8359](https://github.com/clerk/javascript/pull/8359)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f)]:
+  - @clerk/shared@4.8.3
+
+## 3.2.13
+
+### Patch Changes
+
+- Add path traversal protections in `joinPaths` ([#8331](https://github.com/clerk/javascript/pull/8331)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 3.2.12
+
+### Patch Changes
+
+- Introduce `samlConnection` and `oauthConfig` into the `EnterpriseConnection` resource. ([#8326](https://github.com/clerk/javascript/pull/8326)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- The JWT claims are verified after the signature to avoid leaking information through error messages on forged tokens. ([#8332](https://github.com/clerk/javascript/pull/8332)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/shared@4.8.2
+
 ## 3.2.11
 
 ### Patch Changes

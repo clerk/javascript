@@ -25,7 +25,7 @@
     { "path": "./dist/planDetails*.js", "maxSize": "5.5KB" },
     { "path": "./dist/subscriptionDetails*.js", "maxSize": "7KB" },
     { "path": "./dist/apiKeys*.js", "maxSize": "6KB" },
-    { "path": "./dist/oauthConsent*.js", "maxSize": "4.5KB" },
+    { "path": "./dist/oauthConsent*.js", "maxSize": "6KB" },
     { "path": "./dist/up-billing-page*.js", "maxSize": "3KB" },
     { "path": "./dist/op-billing-page*.js", "maxSize": "3KB" },
     { "path": "./dist/up-plans-page*.js", "maxSize": "2.5KB" },
