@@ -162,6 +162,16 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       .sort();
   }
 
+  get availableAttributes(): Array<keyof UserSettingsResource['attributes']> {
+    if (!this.attributes) {
+      return [];
+    }
+
+    return Object.entries(this.attributes)
+      .filter(([, attr]) => attr.enabled || attr.used_for_first_factor || attr.used_for_second_factor)
+      .map(([name]) => name) as Array<keyof UserSettingsResource['attributes']>;
+  }
+
   get web3FirstFactors(): Web3Strategy[] {
     if (!this.attributes) {
       return [];

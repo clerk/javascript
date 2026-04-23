@@ -15,14 +15,13 @@ import { UserProfileSection } from './UserProfileSection';
 import { Web3Section } from './Web3Section';
 
 export const AccountPage = withCardStateProvider(() => {
-  const { attributes, social, enterpriseSSO } = useEnvironment().userSettings;
+  const { attributes, availableAttributes, social, enterpriseSSO } = useEnvironment().userSettings;
   const card = useCardState();
   const { user } = useUser();
   const { shouldAllowIdentificationCreation, immutableAttributes } = useUserProfileContext();
-
-  const showUsername = attributes.username?.enabled;
-  const showEmail = attributes.email_address?.enabled;
-  const showPhone = attributes.phone_number?.enabled;
+  const showUsername = availableAttributes.includes('username');
+  const showEmail = availableAttributes.includes('email_address');
+  const showPhone = availableAttributes.includes('phone_number');
   const showConnectedAccounts = social && Object.values(social).filter(p => p.enabled).length > 0;
   const showEnterpriseAccounts = user && enterpriseSSO.enabled;
   const showWeb3 = attributes.web3_wallet?.enabled;

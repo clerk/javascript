@@ -141,6 +141,7 @@ export interface UserSettingsResource extends ClerkResource {
   web3FirstFactors: Web3Strategy[];
   alternativePhoneCodeChannels: PhoneCodeChannel[];
   enabledFirstFactorIdentifiers: Attribute[];
+  availableAttributes: Attribute[];
   instanceIsPasswordBased: boolean;
   hasValidAuthFactor: boolean;
   __internal_toSnapshot: () => UserSettingsJSONSnapshot;
