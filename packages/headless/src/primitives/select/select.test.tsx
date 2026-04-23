@@ -213,6 +213,114 @@ describe('Select', () => {
       const activeOption = document.querySelector('[data-cl-slot="select-option"][data-cl-active]');
       expect(activeOption).toBeInTheDocument();
     });
+
+    it('scrolls options into view on arrow key navigation', async () => {
+      const manyItems = Array.from({ length: 20 }, (_, i) => ({
+        label: `Item ${i + 1}`,
+        value: `item-${i + 1}`,
+      }));
+
+      const user = userEvent.setup();
+      render(
+        <Select
+          items={manyItems}
+          alignItemWithTrigger={false}
+        >
+          <Select.Trigger>
+            <Select.Value placeholder='Pick...' />
+          </Select.Trigger>
+          <Select.Positioner>
+            <Select.Popup>
+              <div style={{ maxHeight: '100px', overflow: 'auto' }}>
+                {manyItems.map(({ label, value }) => (
+                  <Select.Option
+                    key={value}
+                    value={value}
+                    label={label}
+                  >
+                    {label}
+                  </Select.Option>
+                ))}
+              </div>
+            </Select.Popup>
+          </Select.Positioner>
+        </Select>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+
+      // Navigate down through many items to force scrolling
+      for (let i = 0; i < 15; i++) {
+        await user.keyboard('{ArrowDown}');
+      }
+
+      const activeOption = document.querySelector('[data-cl-slot="select-option"][data-cl-active]');
+      expect(activeOption).toBeInTheDocument();
+
+      // The active item should be visible within its scroll container
+      const scrollContainer = activeOption!.closest('div[style]') as HTMLElement;
+      const optionRect = activeOption!.getBoundingClientRect();
+      const containerRect = scrollContainer.getBoundingClientRect();
+
+      expect(optionRect.bottom).toBeLessThanOrEqual(containerRect.bottom + 1);
+      expect(optionRect.top).toBeGreaterThanOrEqual(containerRect.top - 1);
+    });
+
+    it('scrolls selected item into view when reopening', async () => {
+      const manyItems = Array.from({ length: 20 }, (_, i) => ({
+        label: `Item ${i + 1}`,
+        value: `item-${i + 1}`,
+      }));
+
+      const user = userEvent.setup();
+      render(
+        <Select
+          items={manyItems}
+          alignItemWithTrigger={false}
+        >
+          <Select.Trigger>
+            <Select.Value placeholder='Pick...' />
+          </Select.Trigger>
+          <Select.Positioner>
+            <Select.Popup>
+              <div style={{ maxHeight: '100px', overflow: 'auto' }}>
+                {manyItems.map(({ label, value }) => (
+                  <Select.Option
+                    key={value}
+                    value={value}
+                    label={label}
+                  >
+                    {label}
+                  </Select.Option>
+                ))}
+              </div>
+            </Select.Popup>
+          </Select.Positioner>
+        </Select>,
+      );
+
+      const trigger = screen.getByRole('combobox');
+
+      // Open, navigate to item near the bottom, select it
+      await user.click(trigger);
+      for (let i = 0; i < 15; i++) {
+        await user.keyboard('{ArrowDown}');
+      }
+      await user.keyboard('{Enter}');
+
+      // Reopen — the selected item should be scrolled into view
+      await user.click(trigger);
+
+      const selectedOption = document.querySelector('[data-cl-slot="select-option"][data-cl-selected]');
+      expect(selectedOption).toBeInTheDocument();
+
+      const scrollContainer = selectedOption!.closest('div[style]') as HTMLElement;
+      const optionRect = selectedOption!.getBoundingClientRect();
+      const containerRect = scrollContainer.getBoundingClientRect();
+
+      expect(optionRect.bottom).toBeLessThanOrEqual(containerRect.bottom + 1);
+      expect(optionRect.top).toBeGreaterThanOrEqual(containerRect.top - 1);
+    });
   });
 
   describe('option state attributes', () => {

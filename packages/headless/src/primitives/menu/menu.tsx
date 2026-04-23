@@ -69,7 +69,6 @@ interface MenuContextValue {
   isNested: boolean;
   mounted: boolean;
   transitionProps: TransitionProps;
-  setHasFocusInside: React.Dispatch<React.SetStateAction<boolean>>;
   parentContext: MenuContextValue | null;
 }
 
@@ -107,7 +106,6 @@ function MenuInner(props: MenuProps) {
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
-  const [hasFocusInside, setHasFocusInside] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const elementsRef = useRef<Array<HTMLElement | null>>([]);
@@ -227,7 +225,6 @@ function MenuInner(props: MenuProps) {
       isNested,
       mounted,
       transitionProps,
-      setHasFocusInside,
       parentContext,
     }),
     [
@@ -276,7 +273,7 @@ export interface MenuTriggerProps extends ComponentProps<'button'> {}
 
 function MenuTrigger(props: MenuTriggerProps) {
   const { render, ref: consumerRef, ...otherProps } = props;
-  const { open, isNested, refs, getReferenceProps, parentContext, setHasFocusInside } = useMenuContext();
+  const { open, isNested, refs, getReferenceProps, parentContext } = useMenuContext();
 
   const item = useListItem();
 
@@ -287,14 +284,7 @@ function MenuTrigger(props: MenuTriggerProps) {
   let referenceProps: Record<string, unknown>;
 
   if (isNested && parentContext) {
-    referenceProps = getReferenceProps(
-      parentContext.getItemProps({
-        onFocus() {
-          setHasFocusInside(false);
-          parentContext.setHasFocusInside(true);
-        },
-      }) as React.HTMLProps<HTMLElement>,
-    );
+    referenceProps = getReferenceProps(parentContext.getItemProps() as React.HTMLProps<HTMLElement>);
   } else {
     referenceProps = getReferenceProps();
   }
@@ -444,7 +434,7 @@ export interface MenuItemProps extends ComponentProps<'button'> {
 
 function MenuItem(props: MenuItemProps) {
   const { render, label, disabled, closeOnClick = true, ...otherProps } = props;
-  const { activeIndex, getItemProps, setHasFocusInside } = useMenuContext();
+  const { activeIndex, getItemProps } = useMenuContext();
   const tree = useFloatingTree();
   const item = useListItem({ label: disabled ? null : label });
   const isActive = item.index === activeIndex;
@@ -466,9 +456,6 @@ function MenuItem(props: MenuItemProps) {
         if (!disabled && closeOnClick) {
           tree?.events.emit('click');
         }
-      },
-      onFocus() {
-        setHasFocusInside(true);
       },
     }) as React.ComponentPropsWithRef<'button'>),
   };

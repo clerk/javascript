@@ -16,19 +16,10 @@ import {
   useFloatingNodeId,
   useFloatingParentNodeId,
   useInteractions,
+  useMergeRefs,
   useRole,
 } from '@floating-ui/react';
-import {
-  createContext,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { createContext, type ReactNode, useContext, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { type TransitionProps, useFloatingTransition } from '../../hooks/use-floating-transition';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
@@ -251,13 +242,7 @@ function DialogPopup(props: DialogPopupProps) {
   const { popupRef, refs, getFloatingProps, floatingContext, modal, labelId, descriptionId, transitionProps } =
     useDialogContext();
 
-  const combinedRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      (popupRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-      refs.setFloating(node);
-    },
-    [popupRef, refs],
-  );
+  const combinedRef = useMergeRefs([popupRef, refs.setFloating]);
 
   const defaultProps = {
     'data-cl-slot': 'dialog-popup',

@@ -15,6 +15,7 @@ import {
   offset,
   type Placement,
   type ReferenceType,
+  shift,
   size,
   type UseInteractionsReturn,
   useClick,
@@ -25,6 +26,7 @@ import {
   useInteractions,
   useListItem,
   useListNavigation,
+  useMergeRefs,
   useRole,
   useTypeahead,
 } from '@floating-ui/react';
@@ -185,6 +187,7 @@ function SelectInner(props: SelectProps) {
     middleware: [
       offset(sideOffset),
       flip(),
+      shift({ padding: 5 }),
       size({
         apply({ availableHeight, elements }) {
           Object.assign(elements.floating.style, {
@@ -557,19 +560,7 @@ function SelectOption(props: SelectOptionProps) {
   }, [value, displayLabel, valueToLabelRef]);
 
   // Track the selected item element for alignItemWithTrigger
-  const combinedRef = useCallback(
-    (node: HTMLElement | null) => {
-      // Forward to FloatingList's ref
-      if (typeof itemRef === 'function') {
-        itemRef(node);
-      }
-      // Track selected item
-      if (isSelected) {
-        selectedItemRef.current = node;
-      }
-    },
-    [itemRef, isSelected, selectedItemRef],
-  );
+  const combinedRef = useMergeRefs([itemRef, isSelected ? selectedItemRef : null]);
 
   const state = {
     selected: isSelected,
