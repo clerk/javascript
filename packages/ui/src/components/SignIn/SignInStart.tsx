@@ -375,7 +375,25 @@ function SignInStartInternal(): JSX.Element {
       } as any);
     }
     try {
-      const res = await safePasswordSignInForEnterpriseSSOInstance(signIn.create(buildSignInParams(fields)), fields);
+      // Sign up if missing sign-in-or-sign-up flows only support public sign-up
+      // instances and identifiers that can be verified out-of-band.
+      const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
+      const signUpAttribute = getSignUpAttributeFromIdentifier(identifierField);
+      const supportsSignUpIfMissing =
+        signUpAttribute !== 'username' && userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC;
+      const shouldSignUpIfMissing =
+        isCombinedFlow &&
+        userSettings.attackProtection.enumeration_protection.enabled &&
+        supportsSignUpIfMissing &&
+        !hasPassword;
+
+      const res = await safePasswordSignInForEnterpriseSSOInstance(
+        signIn.create({
+          ...buildSignInParams(fields),
+          ...(shouldSignUpIfMissing && { signUpIfMissing: true }),
+        }),
+        fields,
+      );
 
       switch (res.status) {
         case 'needs_identifier':

@@ -10,7 +10,10 @@ import { ExclamationTriangle, SwitchArrows, TickShield } from '../icons';
 import type { InternalTheme } from '../styledSystem';
 import { animations } from '../styledSystem';
 
-export type EmailLinkUIStatus = VerifyTokenStatus | 'verified_switch_tab' | 'loading';
+// `transferable` is a transient internal state - by the time we render any
+// status card the caller has already either completed the sign-up transfer
+// or fallen through to the "verified on other device" path.
+export type EmailLinkUIStatus = Exclude<VerifyTokenStatus, 'transferable'> | 'verified_switch_tab' | 'loading';
 
 type EmailLinkStatusCardProps = React.PropsWithChildren<{
   title: LocalizationKey;
