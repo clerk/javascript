@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from '../../test-utils/axe';
@@ -239,6 +239,71 @@ describe('Tooltip', () => {
     it('has no violations when open', async () => {
       renderTooltip({ defaultOpen: true });
       expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
+    });
+  });
+
+  describe('Tooltip.Group', () => {
+    function renderTooltipGroup() {
+      return render(
+        <Tooltip.Group delay={{ open: 0, close: 0 }}>
+          <Tooltip delay={0}>
+            <Tooltip.Trigger>Button A</Tooltip.Trigger>
+            <Tooltip.Positioner>
+              <Tooltip.Popup>Tooltip A</Tooltip.Popup>
+            </Tooltip.Positioner>
+          </Tooltip>
+          <Tooltip delay={0}>
+            <Tooltip.Trigger>Button B</Tooltip.Trigger>
+            <Tooltip.Positioner>
+              <Tooltip.Popup>Tooltip B</Tooltip.Popup>
+            </Tooltip.Positioner>
+          </Tooltip>
+        </Tooltip.Group>,
+      );
+    }
+
+    it('renders grouped tooltips', async () => {
+      renderTooltipGroup();
+
+      expect(screen.getByRole('button', { name: 'Button A' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Button B' })).toBeInTheDocument();
+    });
+
+    it('opens tooltip within a group on hover', async () => {
+      const user = userEvent.setup();
+      renderTooltipGroup();
+
+      const triggerA = screen.getByRole('button', { name: 'Button A' });
+      await user.hover(triggerA);
+
+      await waitFor(() => {
+        expect(screen.getByText('Tooltip A')).toBeInTheDocument();
+      });
+    });
+
+    it('switches between grouped tooltips without full delay', async () => {
+      const user = userEvent.setup();
+      renderTooltipGroup();
+
+      const triggerA = screen.getByRole('button', { name: 'Button A' });
+      const triggerB = screen.getByRole('button', { name: 'Button B' });
+
+      // Open first tooltip (wait for it to appear)
+      await user.hover(triggerA);
+      await waitFor(() => {
+        expect(screen.getByText('Tooltip A')).toBeInTheDocument();
+      });
+
+      // Move to second tooltip — group instant phase should show it quickly
+      await user.unhover(triggerA);
+      await user.hover(triggerB);
+
+      await waitFor(() => {
+        expect(screen.getByText('Tooltip B')).toBeInTheDocument();
+      });
+
+      // First tooltip should no longer be visible
+      expect(screen.queryByText('Tooltip A')).not.toBeInTheDocument();
     });
   });
 });

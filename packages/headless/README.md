@@ -6,16 +6,16 @@ This package is **internal** (`private: true`) and consumed by `@clerk/ui`. It e
 
 ## Primitives
 
-| Primitive    | Import                         | Description                                             |
-| ------------ | ------------------------------ | ------------------------------------------------------- |
-| Accordion    | `@clerk/headless/accordion`    | Expandable content sections with single/multiple mode   |
-| Autocomplete | `@clerk/headless/autocomplete` | Combobox input with filterable option list              |
-| Dialog       | `@clerk/headless/dialog`       | Modal dialog with focus trapping and scroll lock        |
-| Menu         | `@clerk/headless/menu`         | Dropdown and nested context menus with safe hover zones |
-| Popover      | `@clerk/headless/popover`      | Non-modal floating content triggered by click           |
-| Select       | `@clerk/headless/select`       | Dropdown select with typeahead and keyboard navigation  |
-| Tabs         | `@clerk/headless/tabs`         | Tab navigation with animated indicator                  |
-| Tooltip      | `@clerk/headless/tooltip`      | Hover/focus tooltip with configurable delay             |
+| Primitive    | Import                         | Description                                                   |
+| ------------ | ------------------------------ | ------------------------------------------------------------- |
+| Accordion    | `@clerk/headless/accordion`    | Expandable content sections with single/multiple mode         |
+| Autocomplete | `@clerk/headless/autocomplete` | Combobox input with filterable option list                    |
+| Dialog       | `@clerk/headless/dialog`       | Modal dialog with focus trapping and scroll lock              |
+| Menu         | `@clerk/headless/menu`         | Dropdown and nested context menus with safe hover zones       |
+| Popover      | `@clerk/headless/popover`      | Non-modal floating content triggered by click                 |
+| Select       | `@clerk/headless/select`       | Dropdown select with typeahead and keyboard navigation        |
+| Tabs         | `@clerk/headless/tabs`         | Tab navigation with animated indicator                        |
+| Tooltip      | `@clerk/headless/tooltip`      | Hover/focus tooltip with configurable delay and group support |
 
 Shared utilities are available at `@clerk/headless/utils` (includes `renderElement` and `mergeProps`).
 

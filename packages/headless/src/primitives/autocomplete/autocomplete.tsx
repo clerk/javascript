@@ -165,7 +165,10 @@ function AutocompleteInner(props: AutocompleteProps) {
       flip({ padding: 5 }),
       size({
         apply({ rects, availableHeight, elements }) {
-          // Skip in List mode — only apply auto-sizing in Positioner mode
+          // Autocomplete supports two floating targets: Positioner (portal mode)
+          // and List (inline mode). Both call refs.setFloating, but only
+          // Positioner should be auto-sized. Skip when the floating element is
+          // the inline List.
           if (elements.floating.getAttribute('data-cl-slot') !== 'autocomplete-positioner') return;
           Object.assign(elements.floating.style, {
             width: `${rects.reference.width}px`,

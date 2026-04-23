@@ -6,6 +6,7 @@ import {
   type ExtendedRefs,
   FloatingArrow,
   type FloatingContext,
+  FloatingDelayGroup,
   FloatingNode,
   FloatingPortal,
   FloatingTree,
@@ -15,6 +16,7 @@ import {
   type ReferenceType,
   shift,
   type UseInteractionsReturn,
+  useDelayGroup,
   useDismiss,
   useFloating,
   useFloatingNodeId,
@@ -113,6 +115,10 @@ function TooltipInner(props: TooltipProps) {
     open,
     ref: popupRef,
   });
+
+  // Integrate with FloatingDelayGroup when inside a Tooltip.Group.
+  // Safe to call unconditionally — no-op without a parent provider.
+  useDelayGroup(floatingContext, { id: nodeId });
 
   const hover = useHover(floatingContext, {
     move: false,
@@ -289,6 +295,30 @@ function TooltipArrowComponent(props: TooltipArrowProps) {
 }
 
 // ---------------------------------------------------------------------------
+// Tooltip.Group
+// ---------------------------------------------------------------------------
+
+export interface TooltipGroupProps {
+  /** Shared delay config for grouped tooltips. Default: { open: 200, close: 100 } */
+  delay?: number | { open?: number; close?: number };
+  /** Time in ms before the group resets to non-instant phase. Default: 300 */
+  timeoutMs?: number;
+  children: ReactNode;
+}
+
+function TooltipGroupRoot(props: TooltipGroupProps) {
+  const { delay = { open: 200, close: 100 }, timeoutMs = 300, children } = props;
+  return (
+    <FloatingDelayGroup
+      delay={delay}
+      timeoutMs={timeoutMs}
+    >
+      {children}
+    </FloatingDelayGroup>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Compound export
 // ---------------------------------------------------------------------------
 
@@ -298,4 +328,5 @@ export const Tooltip = Object.assign(TooltipRoot, {
   Positioner: TooltipPositioner,
   Popup: TooltipPopup,
   Arrow: TooltipArrowComponent,
+  Group: TooltipGroupRoot,
 });

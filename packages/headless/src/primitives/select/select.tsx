@@ -12,6 +12,7 @@ import {
   FloatingPortal,
   FloatingTree,
   flip,
+  type Middleware,
   offset,
   type Placement,
   type ReferenceType,
@@ -38,7 +39,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -77,6 +77,45 @@ function resolveLabel(
   if (label) return label;
   // 3. fallback to raw value
   return value;
+}
+
+// ---------------------------------------------------------------------------
+// alignSelectedItem middleware
+// ---------------------------------------------------------------------------
+
+/**
+ * Custom floating-ui middleware that positions the floating element so the
+ * selected item overlays the reference (trigger), like a native `<select>`.
+ * Running as middleware means it automatically re-runs on scroll/resize via
+ * `autoUpdate`, preventing drift.
+ */
+function alignSelectedItem(selectedItemRef: RefObject<HTMLElement | null>): Middleware {
+  return {
+    name: 'alignSelectedItem',
+    fn({ elements }) {
+      const selectedEl = selectedItemRef.current;
+      if (!selectedEl) return {};
+
+      const floatingRect = elements.floating.getBoundingClientRect();
+      const selectedRect = selectedEl.getBoundingClientRect();
+      const referenceRect = (elements.reference as HTMLElement).getBoundingClientRect();
+
+      // How far the selected item is from the top of the floating element
+      const itemOffsetInPopup = selectedRect.top - floatingRect.top;
+
+      // Position so the selected item sits at the same Y as the trigger
+      const desiredTop = referenceRect.top - itemOffsetInPopup;
+
+      // Clamp to viewport with 8px padding
+      const viewportHeight = window.innerHeight;
+      const clampedTop = Math.max(8, Math.min(desiredTop, viewportHeight - floatingRect.height - 8));
+
+      return {
+        x: referenceRect.left,
+        y: clampedTop,
+      };
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -185,9 +224,8 @@ function SelectInner(props: SelectProps) {
     onOpenChange: setOpen,
     placement: placementProp,
     middleware: [
-      offset(sideOffset),
-      flip(),
-      shift({ padding: 5 }),
+      offset(alignProp ? 0 : sideOffset),
+      ...(!alignProp ? [flip(), shift({ padding: 5 })] : []),
       size({
         apply({ availableHeight, elements }) {
           Object.assign(elements.floating.style, {
@@ -195,7 +233,8 @@ function SelectInner(props: SelectProps) {
           });
         },
       }),
-      arrow({ element: arrowRef }),
+      ...(!alignProp ? [arrow({ element: arrowRef })] : []),
+      ...(alignProp ? [alignSelectedItem(selectedItemRef)] : []),
       floatingCssVars({ sideOffset }),
     ],
     whileElementsMounted: autoUpdate,
@@ -402,7 +441,6 @@ export interface SelectPositionerProps extends ComponentProps<'div'> {}
 function SelectPositioner(props: SelectPositionerProps) {
   const { render, ...otherProps } = props;
   const {
-    open,
     mounted,
     floatingContext,
     refs,
@@ -411,61 +449,16 @@ function SelectPositioner(props: SelectPositionerProps) {
     getFloatingProps,
     elementsRef,
     labelsRef,
-    selectedItemRef,
-    alignItemWithTrigger,
     setActiveIndex,
   } = useSelectContext();
 
-  const [alignOffset, setAlignOffset] = useState<CSSProperties | null>(null);
-
-  // alignItemWithTrigger: compute the vertical offset so the selected item
-  // text overlays the trigger. Runs after the popup has rendered.
-  useLayoutEffect(() => {
-    if (!open || !mounted || !alignItemWithTrigger) {
-      setAlignOffset(null);
-      return;
-    }
-
-    const triggerEl = refs.domReference.current as HTMLElement | null;
-    const floatingEl = refs.floating.current;
-    const selectedEl = selectedItemRef.current;
-
-    if (!triggerEl || !floatingEl || !selectedEl) {
-      setAlignOffset(null);
-      return;
-    }
-
-    const triggerRect = triggerEl.getBoundingClientRect();
-    const floatingRect = floatingEl.getBoundingClientRect();
-    const selectedRect = selectedEl.getBoundingClientRect();
-
-    // How far the selected item is from the top of the floating element
-    const itemOffsetInPopup = selectedRect.top - floatingRect.top;
-
-    // We want the selected item to sit at the same Y as the trigger
-    const desiredTop = triggerRect.top - itemOffsetInPopup;
-
-    // Clamp to viewport
-    const viewportHeight = window.innerHeight;
-    const clampedTop = Math.max(8, Math.min(desiredTop, viewportHeight - floatingRect.height - 8));
-
-    setAlignOffset({
-      position: 'fixed',
-      top: clampedTop,
-      left: triggerRect.left,
-      minWidth: triggerRect.width,
-    });
-  }, [open, mounted, alignItemWithTrigger, refs, selectedItemRef]);
-
   const side = placement.split('-')[0];
-
-  const positionStyle = alignOffset ?? floatingStyles;
 
   const defaultProps = {
     'data-cl-slot': 'select-positioner',
     'data-cl-side': side,
     ref: refs.setFloating,
-    style: positionStyle,
+    style: floatingStyles,
     ...(getFloatingProps({
       onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
         if (event.key === 'Home' || event.key === 'End') {

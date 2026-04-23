@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from '../../test-utils/axe';
@@ -522,6 +522,97 @@ describe('Select', () => {
       const positioner = document.querySelector('[data-cl-slot="select-positioner"]') as HTMLElement;
       // Standard Floating UI positioning uses position: absolute with transform
       expect(positioner.style.position).toBe('absolute');
+    });
+
+    const manyItems: SelectItem[] = Array.from({ length: 20 }, (_, i) => ({
+      label: `Item ${i + 1}`,
+      value: `item-${i + 1}`,
+    }));
+
+    it('aligns selected item with trigger vertically', async () => {
+      render(
+        <Select
+          items={manyItems}
+          defaultOpen
+          defaultValue='item-10'
+        >
+          <Select.Trigger>
+            <Select.Value placeholder='Pick...' />
+          </Select.Trigger>
+          <Select.Positioner>
+            <Select.Popup>
+              {manyItems.map(({ label, value }) => (
+                <Select.Option
+                  key={value}
+                  value={value}
+                  label={label}
+                >
+                  {label}
+                </Select.Option>
+              ))}
+            </Select.Popup>
+          </Select.Positioner>
+        </Select>,
+      );
+
+      const trigger = screen.getByRole('combobox');
+      const selectedOption = document.querySelector('[data-cl-slot="select-option"][data-cl-selected]');
+      expect(selectedOption).toBeInTheDocument();
+
+      const triggerRect = trigger.getBoundingClientRect();
+      const selectedRect = selectedOption!.getBoundingClientRect();
+
+      // The selected item should be positioned near the trigger's vertical position
+      expect(Math.abs(selectedRect.top - triggerRect.top)).toBeLessThan(50);
+    });
+
+    it('repositions when ancestor scrolls', async () => {
+      const user = userEvent.setup();
+      render(
+        <div
+          data-testid='scroll-container'
+          style={{ height: '200px', overflow: 'auto', paddingTop: '300px' }}
+        >
+          <Select
+            items={manyItems}
+            defaultValue='item-5'
+          >
+            <Select.Trigger>
+              <Select.Value placeholder='Pick...' />
+            </Select.Trigger>
+            <Select.Positioner>
+              <Select.Popup>
+                {manyItems.map(({ label, value }) => (
+                  <Select.Option
+                    key={value}
+                    value={value}
+                    label={label}
+                  >
+                    {label}
+                  </Select.Option>
+                ))}
+              </Select.Popup>
+            </Select.Positioner>
+          </Select>
+          <div style={{ height: '500px' }} />
+        </div>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+
+      const positioner = document.querySelector('[data-cl-slot="select-positioner"]') as HTMLElement;
+      const initialTop = positioner.getBoundingClientRect().top;
+
+      // Scroll the container
+      const scrollContainer = screen.getByTestId('scroll-container');
+      scrollContainer.scrollTop = 100;
+      scrollContainer.dispatchEvent(new Event('scroll'));
+
+      // autoUpdate repositions on scroll — wait for the update
+      await waitFor(() => {
+        const newTop = positioner.getBoundingClientRect().top;
+        expect(newTop).not.toBe(initialTop);
+      });
     });
   });
 

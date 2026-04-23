@@ -1,5 +1,6 @@
 export type {
   TooltipArrowProps,
+  TooltipGroupProps,
   TooltipPopupProps,
   TooltipPortalProps,
   TooltipPositionerProps,
