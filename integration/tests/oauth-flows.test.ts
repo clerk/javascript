@@ -217,6 +217,50 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 });
 
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })(
+  'oauth flows combined @nextjs',
+  ({ app }) => {
+    test.describe.configure({ mode: 'serial' });
+
+    test.afterAll(async () => {
+      await app.teardown();
+    });
+
+    test('openSignIn OAuth in combined flow targets /sign-in#/create/sso-callback', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.page.goToRelative('/buttons');
+      await u.page.waitForClerkJsLoaded();
+      await u.po.expect.toBeSignedOut();
+
+      await u.page.evaluate(() => {
+        (window as any).Clerk.openSignIn({ forceRedirectUrl: '/protected' });
+      });
+      await u.po.signIn.waitForModal();
+
+      const signInPostPromise = page.waitForRequest(
+        req => req.method() === 'POST' && /\/v1\/client\/sign_ins(\?|$)/.test(req.url()),
+      );
+
+      await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+
+      const signInPost = await signInPostPromise;
+      const body = new URLSearchParams(signInPost.postData() || '');
+      const redirectUrl = body.get('redirect_url');
+      expect(redirectUrl).toBeTruthy();
+
+      // Combined flow (CLERK_SIGN_UP_URL is unset in this env): the sso-callback must anchor to
+      // ClerkProvider.signInUrl and carry the combined-flow /create segment, since the
+      // create/sso-callback route is mounted under the SignIn tree — not SignUp.
+      const parsed = new URL(redirectUrl!);
+      const appOrigin = new URL(app.serverUrl).origin;
+      expect(parsed.origin).toBe(appOrigin);
+      expect(parsed.pathname).toBe('/sign-in');
+      expect(parsed.hash).toMatch(/^#\/create\/sso-callback/);
+    });
+  },
+);
+
 testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
   'oauth popup with path-based routing @react',
   ({ app }) => {
