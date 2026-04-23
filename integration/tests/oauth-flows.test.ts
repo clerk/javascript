@@ -114,10 +114,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     const redirectUrl = body.get('redirect_url');
     expect(redirectUrl).toBeTruthy();
 
-    // The sso-callback should be served from the app's origin (derived from ClerkProvider.signInUrl),
-    // not from the accounts portal / displayConfig.signInUrl origin.
+    // The sso-callback base must come from ClerkProvider.signInUrl (CLERK_SIGN_IN_URL=/sign-in in this fixture).
+    // Asserting origin alone would also pass for a blanket window.location.href style fix; asserting the
+    // pathname is /sign-in pins the redirect to ClerkProvider.signInUrl rather than displayConfig.signInUrl
+    // (accounts portal) or the current page URL.
+    const parsed = new URL(redirectUrl!);
     const appOrigin = new URL(app.serverUrl).origin;
-    expect(new URL(redirectUrl!).origin).toBe(appOrigin);
+    expect(parsed.origin).toBe(appOrigin);
+    expect(parsed.pathname).toBe('/sign-in');
   });
 
   test('sign up modal', async ({ page, context }) => {
