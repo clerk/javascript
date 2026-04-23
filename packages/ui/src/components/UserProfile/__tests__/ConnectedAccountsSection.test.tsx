@@ -1,11 +1,30 @@
 import type { ExternalAccountResource } from '@clerk/shared/types';
 import { act, waitFor } from '@testing-library/react';
+import type { ComponentType, PropsWithChildren } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
 
+import { AppearanceProvider } from '../../../customizables';
 import { ConnectedAccountsSection } from '../ConnectedAccountsSection';
+
+// jsdom never fires CSS `animationend`/`transitionend` events, so
+// `@formkit/auto-animate` (used by ProfileSection.ItemList) can never complete
+// its exit animation and retains unmounted DOM nodes indefinitely. This
+// prevents tests from deterministically asserting that a subtree was removed
+// after a state change. Disabling animations via appearance options makes the
+// Animated wrapper a no-op so React's unmount is reflected in the DOM
+// synchronously. The real-browser animation path is covered by manual testing
+// and by `Collapsible.test.tsx`.
+const withAnimationsDisabled = (Wrapper: ComponentType<PropsWithChildren>) => {
+  const WithAnimationsDisabled = ({ children }: PropsWithChildren) => (
+    <Wrapper>
+      <AppearanceProvider appearance={{ options: { animations: false } }}>{children}</AppearanceProvider>
+    </Wrapper>
+  );
+  return WithAnimationsDisabled;
+};
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
@@ -280,7 +299,9 @@ describe('ConnectedAccountsSection ', () => {
   describe('Handles opening/closing actions', () => {
     it('closes remove account form when connect account action is clicked', async () => {
       const { wrapper } = await createFixtures(withSomeConnections);
-      const { userEvent, getByText, getByRole, queryByRole } = render(<ConnectedAccountsSection />, { wrapper });
+      const { userEvent, getByText, getByRole, queryByRole } = render(<ConnectedAccountsSection />, {
+        wrapper: withAnimationsDisabled(wrapper),
+      });
 
       const item = getByText(/google/i);
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];

@@ -33,7 +33,7 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
 
   return (
     <Menu elementId={elementId}>
-      <MenuTrigger arialLabel={isOpen => `${isOpen ? 'Close' : 'Open'} menu`}>
+      <MenuTrigger ariaLabel={(isOpen: boolean) => `${isOpen ? 'Close' : 'Open'} menu`}>
         <Button
           sx={t =>
             !isBordered

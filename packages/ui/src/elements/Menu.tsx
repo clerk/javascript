@@ -1,8 +1,17 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { MenuId } from '@clerk/shared/types';
 import type { Placement } from '@floating-ui/react';
+import {
+  FloatingList,
+  useClick,
+  useInteractions,
+  useListItem,
+  useListNavigation,
+  useMergeRefs,
+  useRole,
+} from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
-import React, { cloneElement, isValidElement, useLayoutEffect, useRef } from 'react';
+import React, { cloneElement, isValidElement, useRef } from 'react';
 
 import type { Button } from '../customizables';
 import { Col, descriptors, SimpleButton } from '../customizables';
@@ -14,9 +23,16 @@ import { colors } from '../utils/colors';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';
 
+type UseInteractionsReturn = ReturnType<typeof useInteractions>;
+
 type MenuState = {
   popoverCtx: UsePopoverReturn;
   elementId?: MenuId;
+  getReferenceProps: UseInteractionsReturn['getReferenceProps'];
+  getFloatingProps: UseInteractionsReturn['getFloatingProps'];
+  getItemProps: UseInteractionsReturn['getItemProps'];
+  activeIndex: number | null;
+  elementsRef: React.MutableRefObject<Array<HTMLElement | null>>;
 };
 
 export const [MenuStateCtx, useMenuState] = createContextAndHook<MenuState>('MenuState');
@@ -33,8 +49,41 @@ export const Menu = withFloatingTree((props: MenuProps) => {
     offset: 8,
     shoudFlip: true,
   });
+  const { context, isOpen } = popoverCtx;
 
-  const value = React.useMemo(() => ({ value: { popoverCtx, elementId } }), [{ ...popoverCtx }, elementId]);
+  const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
+  const elementsRef = useRef<Array<HTMLElement | null>>([]);
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      setActiveIndex(null);
+    }
+  }, [isOpen]);
+
+  const click = useClick(context);
+  const role = useRole(context, { role: 'menu' });
+  const listNavigation = useListNavigation(context, {
+    listRef: elementsRef,
+    activeIndex,
+    onNavigate: setActiveIndex,
+    loop: true,
+  });
+  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([click, role, listNavigation]);
+
+  const value = React.useMemo(
+    () => ({
+      value: {
+        popoverCtx,
+        elementId,
+        getReferenceProps,
+        getFloatingProps,
+        getItemProps,
+        activeIndex,
+        elementsRef,
+      },
+    }),
+    [popoverCtx, elementId, getReferenceProps, getFloatingProps, getItemProps, activeIndex],
+  );
 
   return (
     <MenuStateCtx.Provider
@@ -44,14 +93,14 @@ export const Menu = withFloatingTree((props: MenuProps) => {
   );
 });
 
-type MenuTriggerProps = React.PropsWithChildren<{ arialLabel?: string | ((open: boolean) => string) }>;
+type MenuTriggerProps = React.PropsWithChildren<{ ariaLabel?: string | ((open: boolean) => string) }>;
 
 export const MenuTrigger = (props: MenuTriggerProps) => {
-  const { children, arialLabel } = props;
-  const { popoverCtx, elementId } = useMenuState();
-  const { reference, toggle, isOpen } = popoverCtx;
+  const { children, ariaLabel } = props;
+  const { popoverCtx, elementId, getReferenceProps } = useMenuState();
+  const { reference, isOpen } = popoverCtx;
 
-  const normalizedAriaLabel = typeof arialLabel === 'function' ? arialLabel(isOpen) : arialLabel;
+  const normalizedAriaLabel = typeof ariaLabel === 'function' ? ariaLabel(isOpen) : ariaLabel;
 
   if (!isValidElement(children)) {
     return null;
@@ -63,22 +112,10 @@ export const MenuTrigger = (props: MenuTriggerProps) => {
     elementDescriptor: children.props.elementDescriptor || descriptors.menuButton,
     elementId: children.props.elementId || descriptors.menuButton.setId(elementId),
     'aria-label': normalizedAriaLabel,
-    'aria-expanded': isOpen,
-    onClick: (e: React.MouseEvent) => {
-      children.props?.onClick?.(e);
-      toggle();
-    },
+    ...getReferenceProps({
+      onClick: children.props?.onClick,
+    }),
   });
-};
-
-const findMenuItem = (el: Element, siblingType: 'prev' | 'next', options?: { countSelf?: boolean }) => {
-  let tagName = options?.countSelf ? el.tagName : '';
-  let sibling: Element | null = el;
-  while (sibling && tagName.toUpperCase() !== 'BUTTON') {
-    sibling = sibling[siblingType === 'prev' ? 'previousElementSibling' : 'nextElementSibling'];
-    tagName = sibling?.tagName ?? '';
-  }
-  return sibling;
 };
 
 type MenuListProps = PropsOfComponent<typeof Col> & {
@@ -87,30 +124,10 @@ type MenuListProps = PropsOfComponent<typeof Col> & {
 
 export const MenuList = (props: MenuListProps) => {
   const { sx, asPortal, ...rest } = props;
-  const { popoverCtx, elementId } = useMenuState();
+  const { popoverCtx, elementId, getFloatingProps, elementsRef } = useMenuState();
   const { floating, styles, isOpen, context, nodeId } = popoverCtx;
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-  useLayoutEffect(() => {
-    const current = containerRef.current;
-    floating(current);
-  }, [isOpen]);
-
-  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const current = containerRef.current;
-    if (!current) {
-      return;
-    }
-
-    if (current !== document.activeElement) {
-      return;
-    }
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      return (findMenuItem(current.children[0], 'next', { countSelf: true }) as HTMLElement)?.focus();
-    }
-  };
+  const mergedRef = useMergeRefs([containerRef, floating]);
 
   return (
     <Popover
@@ -118,34 +135,37 @@ export const MenuList = (props: MenuListProps) => {
       nodeId={nodeId}
       isOpen={isOpen}
       portal={asPortal}
+      order={['content']}
+      modal={false}
     >
-      <Col
-        elementDescriptor={descriptors.menuList}
-        elementId={descriptors.menuList.setId(elementId)}
-        ref={containerRef}
-        role='menu'
-        onKeyDown={onKeyDown}
-        sx={[
-          t => ({
-            backgroundColor: colors.makeSolid(t.colors.$colorBackground),
-            borderWidth: t.borderWidths.$normal,
-            borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$borderAlpha150,
-            outline: 'none',
-            borderRadius: t.radii.$md,
-            padding: t.space.$0x5,
-            overflow: 'hidden',
-            top: `calc(100% + ${t.space.$2})`,
-            animation: `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
-            transformOrigin: 'top center',
-            zIndex: t.zIndices.$dropdown,
-            gap: t.space.$0x5,
-          }),
-          sx,
-        ]}
-        style={styles}
-        {...rest}
-      />
+      <FloatingList elementsRef={elementsRef}>
+        <Col
+          elementDescriptor={descriptors.menuList}
+          elementId={descriptors.menuList.setId(elementId)}
+          ref={mergedRef}
+          sx={[
+            t => ({
+              backgroundColor: colors.makeSolid(t.colors.$colorBackground),
+              borderWidth: t.borderWidths.$normal,
+              borderStyle: t.borderStyles.$solid,
+              borderColor: t.colors.$borderAlpha150,
+              outline: 'none',
+              borderRadius: t.radii.$md,
+              padding: t.space.$0x5,
+              overflow: 'hidden',
+              top: `calc(100% + ${t.space.$2})`,
+              animation: `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
+              transformOrigin: 'top center',
+              zIndex: t.zIndices.$dropdown,
+              gap: t.space.$0x5,
+            }),
+            sx,
+          ]}
+          style={styles}
+          {...getFloatingProps()}
+          {...rest}
+        />
+      </FloatingList>
     </Popover>
   );
 };
@@ -157,43 +177,30 @@ type MenuItemProps = PropsOfComponent<typeof Button> & {
 
 export const MenuItem = (props: MenuItemProps) => {
   const { sx, onClick, destructive, closeAfterClick = true, ...rest } = props;
-  const { popoverCtx, elementId } = useMenuState();
+  const { popoverCtx, elementId, getItemProps, activeIndex } = useMenuState();
   const { toggle } = popoverCtx;
-  const buttonRef = useRef<HTMLButtonElement>(null);
-
-  const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    const current = buttonRef.current;
-    if (!current) {
-      return;
-    }
-
-    const key = e.key;
-    if (key !== 'ArrowUp' && key !== 'ArrowDown') {
-      return;
-    }
-
-    e.preventDefault();
-    const sibling = findMenuItem(current, key === 'ArrowUp' ? 'prev' : 'next');
-    (sibling as HTMLElement)?.focus();
-  };
+  const item = useListItem();
+  const isActive = item.index === activeIndex;
 
   return (
     <SimpleButton
-      ref={buttonRef}
+      ref={item.ref}
       elementDescriptor={descriptors.menuItem}
       elementId={descriptors.menuItem.setId(elementId)}
       hoverAsFocus
       variant='ghost'
       colorScheme={destructive ? 'danger' : 'neutral'}
       role='menuitem'
-      onKeyDown={onKeyDown}
+      tabIndex={isActive ? 0 : -1}
       focusRing={false}
-      onClick={e => {
-        onClick?.(e);
-        if (closeAfterClick) {
-          toggle();
-        }
-      }}
+      {...getItemProps({
+        onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
+          onClick?.(e);
+          if (closeAfterClick) {
+            toggle();
+          }
+        },
+      })}
       sx={[
         theme => ({
           justifyContent: 'start',
