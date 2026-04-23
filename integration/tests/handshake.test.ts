@@ -70,7 +70,7 @@ test.describe('Client handshake @generic', () => {
   });
 
   test.afterAll(async () => {
-    await app.teardown();
+    await app?.teardown();
     await new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
@@ -1098,7 +1098,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
   });
 
   test.afterAll('setup local Clerk API mock', async () => {
-    await app.teardown();
+    await app?.teardown();
     return new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
@@ -1485,7 +1485,7 @@ test.describe('Client handshake with an organization activation avoids infinite 
   });
 
   test.afterAll('setup local Clerk API mock', async () => {
-    await thisApp.teardown();
+    await thisApp?.teardown();
     return new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 

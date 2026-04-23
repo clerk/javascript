@@ -24,8 +24,21 @@ export const common: PlaywrightTestConfig = {
   },
 } as const;
 
+// Parse optional shard from env (e.g., PLAYWRIGHT_SHARD="1/3")
+const parseShard = (shardEnv: string | undefined) => {
+  if (!shardEnv) {
+    return undefined;
+  }
+  const [current, total] = shardEnv.split('/').map(Number);
+  if (!current || !total || current > total) {
+    return undefined;
+  }
+  return { current, total };
+};
+
 export default defineConfig({
   ...common,
+  shard: parseShard(process.env.PLAYWRIGHT_SHARD),
 
   projects: [
     {
