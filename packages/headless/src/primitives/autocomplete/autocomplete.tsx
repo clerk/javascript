@@ -66,6 +66,7 @@ interface AutocompleteContextValue {
   popupRef: React.RefObject<HTMLDivElement | null>;
   arrowRef: React.MutableRefObject<SVGSVGElement | null>;
   valuesByIndexRef: React.MutableRefObject<Map<number, string>>;
+  setInlineMode: React.Dispatch<React.SetStateAction<boolean>>;
   handleSelect: (value: string, index: number, label: string) => void;
   handleInputChange: (value: string) => void;
   registerSelectedIndex: (index: number, value: string) => void;
@@ -125,6 +126,7 @@ function AutocompleteInner(props: AutocompleteProps) {
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [inlineMode, setInlineMode] = useState(false);
 
   const elementsRef = useRef<Array<HTMLElement | null>>([]);
   const labelsRef = useRef<Array<string | null>>([]);
@@ -188,7 +190,14 @@ function AutocompleteInner(props: AutocompleteProps) {
     ref: popupRef,
   });
 
-  const dismiss = useDismiss(floatingContext);
+  const dismiss = useDismiss(floatingContext, {
+    escapeKey: !inlineMode,
+    outsidePress: !inlineMode,
+    bubbles: {
+      escapeKey: inlineMode,
+      outsidePress: inlineMode,
+    },
+  });
   const role = useRole(floatingContext, { role: 'listbox' });
   const listNav = useListNavigation(floatingContext, {
     listRef: elementsRef,
@@ -246,6 +255,7 @@ function AutocompleteInner(props: AutocompleteProps) {
       popupRef,
       arrowRef,
       valuesByIndexRef,
+      setInlineMode,
       handleSelect,
       handleInputChange,
       registerSelectedIndex,
@@ -530,12 +540,17 @@ export interface AutocompleteListProps extends ComponentProps<'div'> {}
  */
 function AutocompleteList(props: AutocompleteListProps) {
   const { render, ...otherProps } = props;
-  const { elementsRef, labelsRef, refs } = useAutocompleteContext();
+  const { elementsRef, labelsRef, refs, getFloatingProps, setInlineMode } = useAutocompleteContext();
+
+  useEffect(() => {
+    setInlineMode(true);
+    return () => setInlineMode(false);
+  }, [setInlineMode]);
 
   const defaultProps = {
     'data-cl-slot': 'autocomplete-list',
-    role: 'listbox' as const,
     ref: refs.setFloating,
+    ...(getFloatingProps() as React.ComponentPropsWithRef<'div'>),
   };
 
   return (

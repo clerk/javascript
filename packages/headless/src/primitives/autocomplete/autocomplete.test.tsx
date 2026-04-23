@@ -475,6 +475,29 @@ describe('Autocomplete', () => {
       expect(activeOption).toBeInTheDocument();
     });
 
+    it('links the input to the inline listbox with aria-controls', () => {
+      render(<InlineAutocomplete />);
+
+      const input = screen.getByRole('combobox');
+      const list = document.querySelector('[data-cl-slot="autocomplete-list"]');
+
+      expect(list).toHaveAttribute('id');
+      expect(input).toHaveAttribute('aria-controls', list?.getAttribute('id'));
+    });
+
+    it('updates aria-activedescendant during keyboard navigation', async () => {
+      const user = userEvent.setup();
+      render(<InlineAutocomplete />);
+
+      const input = screen.getByRole('combobox');
+      await user.click(input);
+      await user.keyboard('{ArrowDown}');
+
+      const activeOption = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      expect(activeOption).toHaveAttribute('id');
+      expect(input).toHaveAttribute('aria-activedescendant', activeOption?.getAttribute('id'));
+    });
+
     it('selects option on Enter after arrow navigation', async () => {
       const onValueChange = vi.fn();
       const user = userEvent.setup();
@@ -577,9 +600,6 @@ describe('Autocomplete', () => {
                 value={selectedValue}
                 inputValue={inputValue}
                 onInputValueChange={setInputValue}
-                onOpenChange={open => {
-                  if (!open) setPopoverOpen(false);
-                }}
                 onValueChange={value => {
                   setSelectedValue(value);
                   setPopoverOpen(false);
@@ -615,6 +635,19 @@ describe('Autocomplete', () => {
 
       const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
       expect(options).toHaveLength(4);
+    });
+
+    it('wires the popover autocomplete input to the inline listbox', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopover />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+
+      const input = screen.getByRole('combobox');
+      const list = document.querySelector('[data-cl-slot="autocomplete-list"]');
+
+      expect(list).toHaveAttribute('id');
+      expect(input).toHaveAttribute('aria-controls', list?.getAttribute('id'));
     });
 
     it('navigates options with arrow keys inside popover', async () => {
@@ -801,9 +834,6 @@ describe('Autocomplete', () => {
                 value={selectedValue}
                 inputValue={inputValue}
                 onInputValueChange={setInputValue}
-                onOpenChange={open => {
-                  if (!open) setPopoverOpen(false);
-                }}
                 onValueChange={value => {
                   setSelectedValue(value);
                   setPopoverOpen(false);
@@ -835,13 +865,57 @@ describe('Autocomplete', () => {
       const user = userEvent.setup();
       render(<AutocompleteInPopoverFull />);
 
-      await user.click(screen.getByText('Pick a fruit...'));
+      const trigger = screen.getByText('Pick a fruit...');
+      await user.click(trigger);
       expect(document.querySelectorAll('[data-cl-slot="autocomplete-option"]').length).toBeGreaterThan(0);
 
       await user.keyboard('{Escape}');
 
       // Popover should close — no options visible
       expect(document.querySelector('[data-cl-slot="autocomplete-option"]')).not.toBeInTheDocument();
+      expect(document.activeElement).toBe(trigger);
+    });
+
+    it('focuses the input on open with an empty value', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+
+      const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
+      expect(document.activeElement).toBe(input);
+      expect(input.value).toBe('');
+    });
+
+    it('keeps the input empty on open even when a selected item exists', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+      await user.click(screen.getByText('Cherry'));
+
+      await user.click(screen.getByText('Cherry'));
+
+      const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
+      expect(document.activeElement).toBe(input);
+      expect(input.value).toBe('');
+    });
+
+    it('marks the previously selected item as active on reopen while focus stays on the input', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+      await user.click(screen.getByText('Banana'));
+
+      await user.click(screen.getByText('Banana'));
+
+      const input = screen.getByPlaceholderText('Search...');
+      const active = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+
+      expect(document.activeElement).toBe(input);
+      expect(active).toHaveTextContent('Banana');
+      expect(input).toHaveAttribute('aria-activedescendant', active?.getAttribute('id'));
     });
 
     it('clears input on reopen after Escape', async () => {
@@ -929,6 +1003,20 @@ describe('Autocomplete', () => {
 
       // Popover should close and trigger should show Banana
       expect(screen.getByText('Banana').closest('[data-cl-slot="popover-trigger"]')).toBeInTheDocument();
+    });
+
+    it('selects the highlighted item with Enter, closes the popover, and returns focus to the trigger', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      const trigger = screen.getByText('Pick a fruit...');
+      await user.click(trigger);
+      await user.keyboard('{ArrowDown}{ArrowDown}{Enter}');
+
+      const updatedTrigger = screen.getByText('Banana');
+      expect(updatedTrigger.closest('[data-cl-slot="popover-trigger"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-cl-slot="autocomplete-option"]')).not.toBeInTheDocument();
+      expect(document.activeElement).toBe(updatedTrigger);
     });
 
     it('keeps focus on input during keyboard navigation', async () => {
@@ -1025,6 +1113,41 @@ describe('Autocomplete', () => {
 
       await user.click(screen.getByPlaceholderText('Search fruits...'));
       await user.keyboard('a');
+
+      expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
+    });
+
+    it('has no violations for the inline listbox inside a popover', async () => {
+      const user = userEvent.setup();
+      render(
+        <Popover defaultOpen>
+          <Popover.Trigger>Pick a fruit...</Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Popover.Title>Fruit picker</Popover.Title>
+              <Autocomplete open>
+                <Autocomplete.Input
+                  placeholder='Search...'
+                  autoFocus
+                />
+                <Autocomplete.List>
+                  {fruits.map(f => (
+                    <Autocomplete.Option
+                      key={f.value}
+                      value={f.value}
+                      label={f.label}
+                    >
+                      {f.label}
+                    </Autocomplete.Option>
+                  ))}
+                </Autocomplete.List>
+              </Autocomplete>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
 
       expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
     });

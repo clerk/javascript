@@ -43,16 +43,31 @@ function MyAutocomplete() {
 
 ### Inline List (inside another floating element)
 
-Use `Autocomplete.List` instead of `Positioner + Popup` when nesting inside a Popover or Dialog. This skips the portal and floating positioning.
+Use `Autocomplete.List` when the autocomplete input lives inside an outer floating surface such as a Popover or Dialog. In this mode, the outer primitive owns placement and dismissal for the overall panel, while `Autocomplete` still owns the combobox/listbox semantics between the input and the results list.
 
 ```tsx
-<Autocomplete>
-  <Autocomplete.Input />
-  <Autocomplete.List>
-    <Autocomplete.Option value='one' />
-  </Autocomplete.List>
-</Autocomplete>
+<Popover>
+  <Popover.Trigger>Pick a country</Popover.Trigger>
+  <Popover.Positioner>
+    <Popover.Popup>
+      <Autocomplete open>
+        <Autocomplete.Input
+          placeholder='Search countries...'
+          autoFocus
+        />
+        <Autocomplete.List>
+          <Autocomplete.Option
+            value='us'
+            label='United States'
+          />
+        </Autocomplete.List>
+      </Autocomplete>
+    </Popover.Popup>
+  </Popover.Positioner>
+</Popover>
 ```
+
+In this pattern, keep the outer `Popover` or `Dialog` as the source of truth for whether the panel is visible. `Autocomplete` should render the input and inline listbox inside that surface, and selecting an option can close the outer shell if desired.
 
 ## Parts
 
