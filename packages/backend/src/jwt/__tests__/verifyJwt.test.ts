@@ -217,4 +217,56 @@ describe('verifyJwt(jwt, options)', () => {
     expect(error?.message).toContain('Invalid JWT type');
     expect(error?.message).toContain('Expected "at+jwt, application/at+jwt"');
   });
+
+  it('rejects an expired JWT when clockSkewInMs is explicitly 0', async () => {
+    vi.setSystemTime(new Date((mockJwtPayload.exp + 1) * 1000));
+    const inputVerifyJwtOptions = {
+      key: mockJwks.keys[0],
+      issuer: mockJwtPayload.iss,
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      clockSkewInMs: 0,
+    };
+    const { errors: [error] = [] } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(error).toBeDefined();
+    expect(error?.message).toContain('JWT is expired');
+  });
+
+  it('accepts a recently expired JWT within the default clock skew when clockSkewInMs is undefined', async () => {
+    vi.setSystemTime(new Date((mockJwtPayload.exp + 1) * 1000));
+    const inputVerifyJwtOptions = {
+      key: mockJwks.keys[0],
+      issuer: mockJwtPayload.iss,
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+    };
+    const { data } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(data).toEqual(mockJwtPayload);
+  });
+
+  it('falls back to the default clock skew when clockSkewInMs is NaN', async () => {
+    vi.setSystemTime(new Date((mockJwtPayload.exp + 1) * 1000));
+    const inputVerifyJwtOptions = {
+      key: mockJwks.keys[0],
+      issuer: mockJwtPayload.iss,
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      clockSkewInMs: Number.NaN,
+    };
+    const { data } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(data).toEqual(mockJwtPayload);
+
+    vi.setSystemTime(new Date((mockJwtPayload.exp + 60) * 1000));
+    const { errors: [error] = [] } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(error?.message).toContain('JWT is expired');
+  });
+
+  it('falls back to the default clock skew when clockSkewInMs is Infinity', async () => {
+    vi.setSystemTime(new Date((mockJwtPayload.exp + 3600) * 1000));
+    const inputVerifyJwtOptions = {
+      key: mockJwks.keys[0],
+      issuer: mockJwtPayload.iss,
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      clockSkewInMs: Number.POSITIVE_INFINITY,
+    };
+    const { errors: [error] = [] } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(error?.message).toContain('JWT is expired');
+  });
 });
