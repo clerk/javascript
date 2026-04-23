@@ -1,5 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
 import { instanceKeys } from '../presets/envs';
@@ -89,6 +89,35 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     await u.page.waitForAppUrl('/protected');
 
     await u.po.expect.toBeSignedIn();
+  });
+
+  test('openSignIn OAuth uses ClerkProvider.signInUrl for sso-callback', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.page.goToRelative('/buttons');
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+
+    await u.page.evaluate(() => {
+      (window as any).Clerk.openSignIn({ forceRedirectUrl: '/protected' });
+    });
+    await u.po.signIn.waitForModal();
+
+    const signInPostPromise = page.waitForRequest(
+      req => req.method() === 'POST' && /\/v1\/client\/sign_ins(\?|$)/.test(req.url()),
+    );
+
+    await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+
+    const signInPost = await signInPostPromise;
+    const body = new URLSearchParams(signInPost.postData() || '');
+    const redirectUrl = body.get('redirect_url');
+    expect(redirectUrl).toBeTruthy();
+
+    // The sso-callback should be served from the app's origin (derived from ClerkProvider.signInUrl),
+    // not from the accounts portal / displayConfig.signInUrl origin.
+    const appOrigin = new URL(app.serverUrl).origin;
+    expect(new URL(redirectUrl!).origin).toBe(appOrigin);
   });
 
   test('sign up modal', async ({ page, context }) => {
