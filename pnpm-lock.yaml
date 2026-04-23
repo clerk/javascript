@@ -62,6 +62,16 @@ catalogs:
     zx:
       specifier: 8.8.5
       version: 8.8.5
+  rspack:
+    '@rspack/cli':
+      specifier: 1.7.11
+      version: 1.7.11
+    '@rspack/core':
+      specifier: 1.7.11
+      version: 1.7.11
+    '@rspack/plugin-react-refresh':
+      specifier: 1.6.2
+      version: 1.6.2
 
 overrides:
   react: 18.3.1
@@ -468,11 +478,14 @@ importers:
         specifier: ^0.4.13
         version: 0.4.13(@rspack/core@1.7.11(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/cli':
-        specifier: ^1.6.0
+        specifier: catalog:rspack
         version: 1.7.11(@rspack/core@1.7.11(@swc/helpers@0.5.21))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/core':
-        specifier: ^1.6.0
+        specifier: catalog:rspack
         version: 1.7.11(@swc/helpers@0.5.21)
+      '@rspack/plugin-react-refresh':
+        specifier: catalog:rspack
+        version: 1.6.2(react-refresh@0.17.0)
       '@types/cloudflare-turnstile':
         specifier: ^0.2.2
         version: 0.2.2
@@ -976,13 +989,13 @@ importers:
         specifier: ^0.4.13
         version: 0.4.13(@rspack/core@1.7.11(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/cli':
-        specifier: ^1.7.11
+        specifier: catalog:rspack
         version: 1.7.11(@rspack/core@1.7.11(@swc/helpers@0.5.21))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/core':
-        specifier: ^1.7.11
+        specifier: catalog:rspack
         version: 1.7.11(@swc/helpers@0.5.21)
       '@rspack/plugin-react-refresh':
-        specifier: ^1.6.2
+        specifier: catalog:rspack
         version: 1.6.2(react-refresh@0.17.0)
       '@svgr/rollup':
         specifier: ^8.1.0
@@ -2575,7 +2588,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.28':
     resolution: {integrity: sha512-lvt72KNitGuixYD2l3SZmRKVu2G4zJpmg5V7WfUBNpmUU5oODBw/6qmiJ6kSLAlfDozscUk+BBGknBBzxUrwrA==}

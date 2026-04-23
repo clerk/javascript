@@ -38,7 +38,7 @@ export {
   getAuthObjectForAcceptedToken,
 } from './tokens/authObjects';
 
-export { AuthStatus } from './tokens/authStatus';
+export { AuthStatus, createBootstrapSignedOutState } from './tokens/authStatus';
 export type {
   RequestState,
   SignedInState,
