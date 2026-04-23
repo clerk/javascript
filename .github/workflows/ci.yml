@@ -221,7 +221,7 @@ jobs:
           - node-version: 24.15.0
             test-filter: "**"
             filter-label: "**"
-          - node-version: 20
+          - node-version: 20.9.0
             test-filter: "**"
             filter-label: "**"
 
