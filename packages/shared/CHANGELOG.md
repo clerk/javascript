@@ -1,5 +1,174 @@
 # Change Log
 
+## 4.8.3
+
+### Patch Changes
+
+- Fix an authorization bypass in `has()`, `auth.protect()`, and related predicates when a single call combined conditions from more than one dimension (for example, `{ permission, reverification }` or `{ feature, permission }`). A dimension that should have denied the request was treated as indeterminate and ignored by the combining logic, allowing other passing dimensions to carry the result and authorize the call when it should have failed closed. ([#8372](https://github.com/clerk/javascript/pull/8372)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Behavior is now:
+  - When a requested dimension cannot be satisfied because the underlying session data is missing, malformed, or invalid, the call denies. Previously these cases were treated as indeterminate and ignored, which could let another passing dimension carry the call.
+  - Fixed a minor bug where `session.checkAuthorization()` was building authorization options from the membership row id instead of the organization id.
+
+  Single-condition role, permission, feature, and plan checks (`has({ permission })`, etc.) are unchanged. Single-condition `reverification` checks are unchanged on well-formed session data; calls with a missing or malformed `factorVerificationAge` payload now deny where they previously returned indeterminate. Callback-form `auth.protect(has => ...)` is unaffected unless the callback itself invokes the affected shapes.
+
+  Separately, `auth.protect()` in `@clerk/nextjs` previously discarded authorization params (`role`, `permission`, `feature`, `plan`, `reverification`) whenever the same argument object also contained `unauthenticatedUrl`, `unauthorizedUrl`, or `token`. TypeScript's excess-property check caught this for inline object literals but did not apply once the argument was assigned to a variable, spread, or used from JavaScript. Mixed-shape calls like `auth.protect({ role: 'org:admin', unauthorizedUrl: '/denied' })` or `auth.protect({ permission: 'org:X', token: 'session_token' })` now correctly enforce the authorization check instead of silently letting every authenticated caller through.
+
+## 4.8.2
+
+### Patch Changes
+
+- Add `emailAddress`, `phoneNumber`, and `username` support to `signUp.update()` ([#8320](https://github.com/clerk/javascript/pull/8320)) by [@dstaley](https://github.com/dstaley)
+
+- Added development runtime error when mounting `<OAuthconsent />` without active session. ([#8335](https://github.com/clerk/javascript/pull/8335)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.8.1
+
+### Patch Changes
+
+- Normalize URL paths in `createPathMatcher` to prevent route protection bypass ([#8311](https://github.com/clerk/javascript/pull/8311)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 4.8.0
+
+### Minor Changes
+
+- Introduce internal `<OAuthConsent />` component for rendering a zero-config OAuth consent screen on an OAuth authorize redirect page. ([#8289](https://github.com/clerk/javascript/pull/8289)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/nextjs';
+
+  export default function OAuthConsentPage() {
+    return <OAuthConsent />;
+  }
+  ```
+
+## 4.7.0
+
+### Minor Changes
+
+- Add `OAuthApplication` resource and `getConsentInfo()` method for retrieving OAuth consent information, enabling custom OAuth consent flows. ([#8275](https://github.com/clerk/javascript/pull/8275)) by [@jfoshee](https://github.com/jfoshee)
+
+- Introduce internal `useOAuthConsent()` hook for fetching OAuth consent screen metadata for the signed-in user. ([#8286](https://github.com/clerk/javascript/pull/8286)) by [@jfoshee](https://github.com/jfoshee)
+
+## 4.6.0
+
+### Minor Changes
+
+- Add support for rendering the Banned badge in the organization members list. ([#8261](https://github.com/clerk/javascript/pull/8261)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Improve types for `signIn.create` and `signUp.create` methods. ([#8267](https://github.com/clerk/javascript/pull/8267)) by [@dstaley](https://github.com/dstaley)
+
+- Fixed API keys "Revoke" confirmation modal being stuck disabled when using a localization. ([#8258](https://github.com/clerk/javascript/pull/8258)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.5.0
+
+### Minor Changes
+
+- API keys is now generally available. ([#8059](https://github.com/clerk/javascript/pull/8059)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ### `<APIKeys />` component
+
+  ```tsx
+  import { APIKeys } from '@clerk/react';
+
+  export default function Page() {
+    return <APIKeys />;
+  }
+  ```
+
+  ### `useAPIKeys()` hook
+
+  ```tsx
+  import { useAPIKeys } from '@clerk/react';
+
+  export default function CustomAPIKeys() {
+    const { data, isLoading, page, pageCount, fetchNext, fetchPrevious } = useAPIKeys({
+      pageSize: 10,
+      initialPage: 1,
+    });
+
+    if (isLoading) return <div>Loading...</div>;
+
+    return (
+      <ul>
+        {data?.map(key => (
+          <li key={key.id}>{key.name}</li>
+        ))}
+      </ul>
+    );
+  }
+  ```
+
+## 4.4.1
+
+### Patch Changes
+
+- Add `provider` and `logoPublicUrl` to `EnterpriseConnection` resource ([#8203](https://github.com/clerk/javascript/pull/8203)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add `oiat` (original_issued_at) field to `JwtHeader` type for Session Minter monotonic token freshness checks. ([#8107](https://github.com/clerk/javascript/pull/8107)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add docs URL to `passkey_invalid_rpID_or_domain` error ([#8216](https://github.com/clerk/javascript/pull/8216)) by [@tmilewski](https://github.com/tmilewski)
+
+## 4.4.0
+
+### Minor Changes
+
+- Add support for seat-based billing plans in Clerk Billing. ([#8006](https://github.com/clerk/javascript/pull/8006)) by [@dstaley](https://github.com/dstaley)
+
+- Add `EnterpriseConnection` resource ([#8175](https://github.com/clerk/javascript/pull/8175)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  `User.getEnterpriseConnections()` was wrongly typed as returning `EnterpriseAccountConnectionResource[]`, it now returns `EnterpriseConnectionResource[]`
+
+- Allow to link external accounts to enterprise accounts via `UserProfile` ([#8091](https://github.com/clerk/javascript/pull/8091)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+### Patch Changes
+
+- Improved error handling when creating API keys. ([#8056](https://github.com/clerk/javascript/pull/8056)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Use distinct password placeholder for sign-up forms ([#8082](https://github.com/clerk/javascript/pull/8082)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.3.2
+
+### Patch Changes
+
+- Fix false offline detection in React Native by checking `navigator.product` and `typeof navigator.onLine` before treating the environment as disconnected ([#8084](https://github.com/clerk/javascript/pull/8084)) by [@eliotgevers](https://github.com/eliotgevers)
+
+- Add optional `intent` parameter to `session.touch()` to indicate why the touch was triggered (focus, session switch, or org switch). This enables the backend to skip expensive client piggybacking for focus-only touches. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 4.3.1
+
+### Patch Changes
+
+- Ensure clerk-js accepts `proxyUrl` and `domain` in non-browser environments. ([#8095](https://github.com/clerk/javascript/pull/8095)) by [@brkalow](https://github.com/brkalow)
+
+## 4.3.0
+
+### Minor Changes
+
+- Support `sign_up_if_missing` on SignIn.create, including captcha ([#8030](https://github.com/clerk/javascript/pull/8030)) by [@dmoerner](https://github.com/dmoerner)
+
+## 4.2.0
+
+### Minor Changes
+
+- Add support for annual-only Billing plans. ([#8012](https://github.com/clerk/javascript/pull/8012)) by [@dstaley](https://github.com/dstaley)
+
+## 4.1.0
+
+### Minor Changes
+
+- Prevent modification of immutable attributes in UserProfile ([#7931](https://github.com/clerk/javascript/pull/7931)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Narrow the error conditions that trigger the unauthenticated flow (sign-out) to only high-confidence authentication failures (401, 422). Previously, all 4xx errors — including 429 rate limits — were treated as auth failures, which could sign users out during transient rate limiting. Non-auth errors from `setActive` now propagate to the caller instead of being silently swallowed. ([#8004](https://github.com/clerk/javascript/pull/8004)) by [@brkalow](https://github.com/brkalow)
+
+- Add `typesVersions` fallback so that `@clerk/shared/types` resolves correctly under `moduleResolution: "node"` in TypeScript. ([#7998](https://github.com/clerk/javascript/pull/7998)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 4.0.0
 
 ### Major Changes

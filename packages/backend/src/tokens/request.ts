@@ -475,7 +475,9 @@ export const authenticateRequest: AuthenticateRequest = (async (
       }
     }
     const isRequestEligibleForMultiDomainSync =
-      authenticateContext.isSatellite && authenticateContext.secFetchDest === 'document';
+      authenticateContext.isSatellite &&
+      authenticateContext.secFetchDest === 'document' &&
+      authenticateContext.method === 'GET';
 
     /**
      * Begin multi-domain sync flows
@@ -484,7 +486,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
      * - 'false' (NeedsSync): Trigger sync - satellite returning from primary sign-in
      * - 'true' (Completed): Sync done - prevents re-sync loop
      *
-     * With satelliteAutoSync=false:
+     * With satelliteAutoSync=false or unset (Core 3 default):
      * - Skip handshake on first visit if no cookies exist (return signedOut immediately)
      * - Trigger handshake when __clerk_synced=false is present (post sign-in redirect)
      * - Allow normal token verification flow when cookies exist (enables refresh)
@@ -499,8 +501,8 @@ export const authenticateRequest: AuthenticateRequest = (async (
     const hasCookies = hasSessionToken || hasActiveClient;
 
     // Determine if we should skip handshake for satellites with no cookies
-    // satelliteAutoSync defaults to true, so we only skip when explicitly set to false
-    const shouldSkipSatelliteHandshake = authenticateContext.satelliteAutoSync === false && !hasCookies && !needsSync;
+    // satelliteAutoSync defaults to false (Core 3), so we skip unless explicitly set to true
+    const shouldSkipSatelliteHandshake = authenticateContext.satelliteAutoSync !== true && !hasCookies && !needsSync;
 
     if (authenticateContext.instanceType === 'production' && isRequestEligibleForMultiDomainSync && !syncCompleted) {
       // With satelliteAutoSync=false: skip handshake if no cookies and no sync trigger
@@ -650,6 +652,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       // Check for cross-origin requests from satellite domains to primary domain
       const shouldForceHandshakeForCrossDomain =
         !authenticateContext.isSatellite && // We're on primary
+        authenticateContext.method === 'GET' && // Only GET navigations (POST form submissions set sec-fetch-dest: document too)
         authenticateContext.secFetchDest === 'document' && // Document navigation
         authenticateContext.isCrossOriginReferrer() && // Came from different domain
         !authenticateContext.isKnownClerkReferrer() && // Not from Clerk accounts portal or FAPI

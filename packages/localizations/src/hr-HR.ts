@@ -1353,6 +1353,7 @@ export const hrHR: LocalizationResource = {
         title: 'Adrese e-pošte',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Poveži račun',
         title: 'Poslovni računi',
       },
       headerTitle__account: 'Detalji profila',

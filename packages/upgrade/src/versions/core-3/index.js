@@ -1,7 +1,7 @@
 export default {
   id: 'core-3',
   name: 'Core 3',
-  docsUrl: 'https://clerk.com/docs/upgrade-guides/core-3',
+  docsUrl: 'https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3',
   sdkVersions: {
     nextjs: { from: 6, to: 7 },
     react: { from: 5, to: 6 },

@@ -1,0 +1,24 @@
+{
+  "name": "chrome-extension-vite",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build && vite build --config vite.background.config.ts && cp manifest.json dist/manifest.json"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.3",
+    "vite": "^4.3.9"
+  },
+  "engines": {
+    "node": ">=22.11.0"
+  }
+}

@@ -22,7 +22,6 @@ Core Package Categories
 - **Backend**: `@clerk/backend` - Server-side utilities and JWT verification
 - **Shared Utilities**: `@clerk/shared`, `@clerk/types` - Common utilities and TypeScript types
 - **Developer Tools**: `@clerk/testing`, `@clerk/dev-cli`, `@clerk/upgrade`
-- **Specialized**: `@clerk/agent-toolkit` - AI agent integration tools
 
 Directory Structure
 
@@ -75,7 +74,7 @@ Environment Configuration
 
 - Supports multiple Clerk environment variables (CLERK*\*, NEXT_PUBLIC_CLERK*\*, etc.)
 - Development, staging, and production configurations
-- Verdaccio for local npm registry testing
+- pkglab for local npm registry testing
 - Docker support for integration testing
 - CI/CD with GitHub Actions
 

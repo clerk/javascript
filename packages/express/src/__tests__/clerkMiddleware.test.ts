@@ -1,5 +1,5 @@
 import type { Request, RequestHandler, Response } from 'express';
-import { vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockClerkFrontendApiProxy } = vi.hoisted(() => ({
   mockClerkFrontendApiProxy: vi.fn(),
@@ -12,6 +12,7 @@ vi.mock('@clerk/backend/proxy', async () => {
   };
 });
 
+import { authenticateRequest } from '../authenticateRequest';
 import { clerkMiddleware } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
 import { assertNoDebugHeaders, assertSignedOutDebugHeaders, runMiddleware, runMiddlewareOnPath } from './helpers';
@@ -94,6 +95,36 @@ describe('clerkMiddleware', () => {
     assertSignedOutDebugHeaders(response);
   });
 
+  it('forwards clockSkewInMs to authenticateRequest', async () => {
+    const authenticateRequestMock = vi.fn().mockResolvedValue({});
+    const clerkClient = {
+      authenticateRequest: authenticateRequestMock,
+    } as any;
+
+    await authenticateRequest({
+      clerkClient,
+      request: {
+        method: 'GET',
+        url: '/',
+        headers: {
+          host: 'example.com',
+        },
+      } as Request,
+      options: {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_....',
+        clockSkewInMs: 12_345,
+      },
+    });
+
+    expect(authenticateRequestMock).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        clockSkewInMs: 12_345,
+      }),
+    );
+  });
+
   it('throws error if clerkMiddleware is not executed before getAuth', async () => {
     const customMiddleware: RequestHandler = (request, response, next) => {
       const auth = getAuth(request);
@@ -169,6 +200,35 @@ describe('clerkMiddleware', () => {
       }).expect(307);
 
       expect(response.header).toHaveProperty('x-clerk-auth-status', 'handshake');
+    });
+
+    it('falls back to default proxy path when path reduces to empty string', async () => {
+      mockClerkFrontendApiProxy.mockResolvedValueOnce(new globalThis.Response('proxied', { status: 200 }));
+
+      // path: '/' strips to '' — should fall back to DEFAULT_PROXY_PATH (/__clerk)
+      // and only intercept /__clerk, not every request
+      await runMiddlewareOnPath(
+        clerkMiddleware({ frontendApiProxy: { enabled: true, path: '/' } }),
+        '/__clerk/v1/client',
+        {},
+      ).expect(200);
+
+      expect(mockClerkFrontendApiProxy).toHaveBeenCalled();
+    });
+
+    it('does not intercept non-proxy paths when path reduces to empty string', async () => {
+      // path: '/' strips to '' — without the fallback guard, this would match everything
+      const response = await runMiddlewareOnPath(
+        clerkMiddleware({ frontendApiProxy: { enabled: true, path: '/' } }),
+        '/api/users',
+        {
+          Cookie: '__client_uat=1711618859;',
+          'Sec-Fetch-Dest': 'document',
+        },
+      ).expect(307);
+
+      expect(response.header).toHaveProperty('x-clerk-auth-status', 'handshake');
+      expect(mockClerkFrontendApiProxy).not.toHaveBeenCalled();
     });
 
     it('still authenticates requests to other paths when proxy is configured', async () => {

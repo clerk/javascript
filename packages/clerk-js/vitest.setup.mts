@@ -50,7 +50,7 @@ beforeAll(() => {
     return ogToLocaleDateString.call(this, 'en-US', args[1]); // Pass options if provided
   };
 
-  // --- Setup from jest.jsdom-with-timezone.ts ---
+  // Keep locale and timezone deterministic across test environments.
   // Set a default timezone (e.g., UTC) for consistency
   process.env.TZ = 'UTC';
 });
@@ -60,7 +60,7 @@ afterAll(() => {
   Date.prototype.toLocaleDateString = ogToLocaleDateString;
 });
 
-// --- Setup from package jest.setup.ts ---
+// Shared DOM and runtime setup for component tests.
 
 // Mock Response class if not already defined by jsdom/happy-dom
 class FakeResponse {}
@@ -269,6 +269,12 @@ vi.mock('@formkit/auto-animate/react', () => ({
   useAutoAnimate: () => [null],
 }));
 
+// Also mock the base module to prevent its side effects (setInterval/setTimeout
+// that call requestAnimationFrame) from firing after jsdom environment teardown.
+vi.mock('@formkit/auto-animate', () => ({
+  default: () => ({ enable: () => {}, disable: () => {}, destroy: () => {} }),
+}));
+
 // Mock browser-tabs-lock to prevent window access errors in tests
 vi.mock('browser-tabs-lock', () => {
   return {
@@ -279,7 +285,7 @@ vi.mock('browser-tabs-lock', () => {
   };
 });
 
-// Mock jest-chrome if its functionality is needed
+// Mock browser extension APIs when a test needs them.
 // Example: Mocking chrome.runtime.sendMessage
 // global.chrome = {
 //   runtime: {

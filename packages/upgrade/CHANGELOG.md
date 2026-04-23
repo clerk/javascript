@@ -1,5 +1,17 @@
 # @clerk/upgrade
 
+## 2.0.2
+
+### Patch Changes
+
+- fix(upgrade): Correct Core 3 upgrade guide docs URL ([#8014](https://github.com/clerk/javascript/pull/8014)) by [@manovotny](https://github.com/manovotny)
+
+## 2.0.1
+
+### Patch Changes
+
+- Fix `@clerk/react` target version from `^7.0.0` to `^6.0.0` in Core 3 upgrade config ([#7975](https://github.com/clerk/javascript/pull/7975)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 2.0.0
 
 ### Major Changes

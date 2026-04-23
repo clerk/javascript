@@ -5,6 +5,11 @@ const { name, version } = JSON.parse(readFileSync('./package.json', 'utf8'));
 
 export default defineConfig({
   plugins: [],
+  resolve: {
+    alias: {
+      'vitest-chrome': 'vitest-chrome/lib/index.esm.js',
+    },
+  },
   define: {
     PACKAGE_NAME: JSON.stringify(name),
     PACKAGE_VERSION: JSON.stringify(version),

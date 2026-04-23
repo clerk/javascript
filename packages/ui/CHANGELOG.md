@@ -1,5 +1,249 @@
 # @clerk/ui
 
+## 1.6.5
+
+### Patch Changes
+
+- Fixed OAuth `redirect_url` for `openSignIn` modal. ([#8385](https://github.com/clerk/javascript/pull/8385)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 1.6.4
+
+### Patch Changes
+
+- Default the organization selection in `<OAuthConsent />` to the user's last active organization, falling back to the first membership when it is not set or no longer available. ([#8362](https://github.com/clerk/javascript/pull/8362)) by [@kylemac](https://github.com/kylemac)
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f)]:
+  - @clerk/shared@4.8.3
+  - @clerk/localizations@4.5.3
+
+## 1.6.3
+
+### Patch Changes
+
+- Fix EnableOrganizationsPrompt in keyless mode: show "Claim your application" CTA instead of broken "Sign in to continue" when organizations are enabled on an unclaimed keyless app with no signed-in user. ([#8341](https://github.com/clerk/javascript/pull/8341)) by [@mwickett](https://github.com/mwickett)
+
+- Use `user.organizationMemberships` from the already-loaded user object to populate the org select in the OAuth consent screen, avoiding a redundant memberships fetch. ([#8350](https://github.com/clerk/javascript/pull/8350)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Correctly display IP redirect URIs in OAuth consent. ([#8342](https://github.com/clerk/javascript/pull/8342)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add scroll-driven fade overlays to `ListGroupContent` in the OAuthConsent component so overflowing scope lists visually indicate more content above and below. ([#8339](https://github.com/clerk/javascript/pull/8339)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 1.6.2
+
+### Patch Changes
+
+- Add infinite loading to organization selection in `<OAuthConsent />`. ([#8309](https://github.com/clerk/javascript/pull/8309)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix OAuthConsent always redirecting to sign-in by adopting the `AuthenticatedRoutes` pattern used by other full-page components ([#8327](https://github.com/clerk/javascript/pull/8327)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/shared@4.8.2
+  - @clerk/localizations@4.5.2
+
+## 1.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`b0b6675`](https://github.com/clerk/javascript/commit/b0b6675bad09eb3dd5b711ad5b45539162664c7a)]:
+  - @clerk/shared@4.8.1
+  - @clerk/localizations@4.5.1
+
+## 1.6.0
+
+### Minor Changes
+
+- Introduce internal `<OAuthConsent />` component for rendering a zero-config OAuth consent screen on an OAuth authorize redirect page. ([#8289](https://github.com/clerk/javascript/pull/8289)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/nextjs';
+
+  export default function OAuthConsentPage() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`dc2de16`](https://github.com/clerk/javascript/commit/dc2de16480086f376449d452d31ae0d2a319af17)]:
+  - @clerk/shared@4.8.0
+  - @clerk/localizations@4.5.0
+
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies [[`3fd586d`](https://github.com/clerk/javascript/commit/3fd586d171e9c281c4b96f620ee9070b47ba00f4), [`f9ff9e9`](https://github.com/clerk/javascript/commit/f9ff9e937d70713abf96fdd92071cd6e84b8eb80)]:
+  - @clerk/shared@4.7.0
+  - @clerk/localizations@4.4.1
+
+## 1.5.0
+
+### Minor Changes
+
+- Add support for rendering the Banned badge in the organization members list. ([#8261](https://github.com/clerk/javascript/pull/8261)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`fdac10e`](https://github.com/clerk/javascript/commit/fdac10e96ad60c0176cde4e1e3ddc89e40cd0a15), [`4e3cb0a`](https://github.com/clerk/javascript/commit/4e3cb0abed1f8aa1cba032c15da3a94a49162b0c), [`aa32bbc`](https://github.com/clerk/javascript/commit/aa32bbc94e76ea726056810885208c59269b2d2b)]:
+  - @clerk/shared@4.6.0
+  - @clerk/localizations@4.4.0
+
+## 1.4.0
+
+### Minor Changes
+
+- API keys is now generally available. ([#8059](https://github.com/clerk/javascript/pull/8059)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ### `<APIKeys />` component
+
+  ```tsx
+  import { APIKeys } from '@clerk/react';
+
+  export default function Page() {
+    return <APIKeys />;
+  }
+  ```
+
+  ### `useAPIKeys()` hook
+
+  ```tsx
+  import { useAPIKeys } from '@clerk/react';
+
+  export default function CustomAPIKeys() {
+    const { data, isLoading, page, pageCount, fetchNext, fetchPrevious } = useAPIKeys({
+      pageSize: 10,
+      initialPage: 1,
+    });
+
+    if (isLoading) return <div>Loading...</div>;
+
+    return (
+      <ul>
+        {data?.map(key => (
+          <li key={key.id}>{key.name}</li>
+        ))}
+      </ul>
+    );
+  }
+  ```
+
+### Patch Changes
+
+- Adjust padding and display logo on `OrganizationList` header ([#8229](https://github.com/clerk/javascript/pull/8229)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`2c06a5f`](https://github.com/clerk/javascript/commit/2c06a5f1859ce4f1f64111f7c0a61f0093002667)]:
+  - @clerk/shared@4.5.0
+  - @clerk/localizations@4.3.2
+
+## 1.3.1
+
+### Patch Changes
+
+- Display enterprise connection icon on account linking dropdown within `UserProfile` ([#8203](https://github.com/clerk/javascript/pull/8203)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`b289566`](https://github.com/clerk/javascript/commit/b28956617555c21f703a40f8f14fb2ff23d509ae), [`0833cb1`](https://github.com/clerk/javascript/commit/0833cb106347049cb9f91a4dd3cca06bbc628a6a), [`636b496`](https://github.com/clerk/javascript/commit/636b496e42d4afff28187966acf1777be880a5c9), [`d93f8ee`](https://github.com/clerk/javascript/commit/d93f8eeabdb93f1392fbf179c00b1f227c452243), [`aa63796`](https://github.com/clerk/javascript/commit/aa63796b67aa862b100cc04f62d944c19cf03ce9)]:
+  - @clerk/shared@4.4.1
+  - @clerk/localizations@4.3.1
+
+## 1.3.0
+
+### Minor Changes
+
+- Add support for seat-based billing plans in Clerk Billing. ([#8006](https://github.com/clerk/javascript/pull/8006)) by [@dstaley](https://github.com/dstaley)
+
+- Add `EnterpriseConnection` resource ([#8175](https://github.com/clerk/javascript/pull/8175)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  `User.getEnterpriseConnections()` was wrongly typed as returning `EnterpriseAccountConnectionResource[]`, it now returns `EnterpriseConnectionResource[]`
+
+- Allow to link external accounts to enterprise accounts via `UserProfile` ([#8091](https://github.com/clerk/javascript/pull/8091)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+### Patch Changes
+
+- Improved error handling when creating API keys. ([#8056](https://github.com/clerk/javascript/pull/8056)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Use distinct password placeholder for sign-up forms ([#8082](https://github.com/clerk/javascript/pull/8082)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`f26d623`](https://github.com/clerk/javascript/commit/f26d623440740300036e246c6d10e06ca5af9cb5), [`9a00a1c`](https://github.com/clerk/javascript/commit/9a00a1cc9753a49ea96e520a8e4918075f3efff4), [`00715a6`](https://github.com/clerk/javascript/commit/00715a6d9ea8cf412c989e870a3eff03973fa505), [`118999c`](https://github.com/clerk/javascript/commit/118999cb5231a1889e367e337a5936e1d8dc02bf), [`9ec56ab`](https://github.com/clerk/javascript/commit/9ec56ab86749f184d95fd762868bba07b6e195e0), [`b8c73d3`](https://github.com/clerk/javascript/commit/b8c73d34ee30616e63b6320e7a8724630670eeb3), [`1827b50`](https://github.com/clerk/javascript/commit/1827b50a6ef9ab14c48cddc120796a9bf3c965b6), [`7707a31`](https://github.com/clerk/javascript/commit/7707a31eb1977d0c5f2bb72f7ad0768606a55d16), [`23f773b`](https://github.com/clerk/javascript/commit/23f773b472e1f5769452a4c3ae3e72f196359f8d)]:
+  - @clerk/localizations@4.3.0
+  - @clerk/shared@4.4.0
+
+## 1.2.4
+
+### Patch Changes
+
+- Move `react` and `react-dom` from `dependencies` to `peerDependencies` ([#8160](https://github.com/clerk/javascript/pull/8160)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix minor internal issues with TypeScript types. ([#8076](https://github.com/clerk/javascript/pull/8076)) by [@dstaley](https://github.com/dstaley)
+
+- Fix false positive in structural CSS detection where Clerk's own internal classes (`.cl-internal-*`) were incorrectly triggering the warning on fresh installs. ([#8142](https://github.com/clerk/javascript/pull/8142)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`46093fa`](https://github.com/clerk/javascript/commit/46093fae837a98f830a596062b6f1c9d44fc7c8d)]:
+  - @clerk/localizations@4.2.4
+
+## 1.2.3
+
+### Patch Changes
+
+- Fix issue where default plans offered the ability to switch to annual. ([#8077](https://github.com/clerk/javascript/pull/8077)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`f0533a2`](https://github.com/clerk/javascript/commit/f0533a26db17066a7dcc7992d9589ba3a60cc5b4), [`e00ec97`](https://github.com/clerk/javascript/commit/e00ec97895640db358af5a9df5d03e83f28f5a27)]:
+  - @clerk/shared@4.3.2
+  - @clerk/localizations@4.2.3
+
+## 1.2.2
+
+### Patch Changes
+
+- Improve spacing for `CreateOrganization` and `OrganizationList` ([#8034](https://github.com/clerk/javascript/pull/8034)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix issue where monthly/annual toggle appeared on default free plans. ([#8052](https://github.com/clerk/javascript/pull/8052)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`296f52e`](https://github.com/clerk/javascript/commit/296f52e0180969b7a6153a904e298242d3528e35), [`b9cb6e5`](https://github.com/clerk/javascript/commit/b9cb6e576bf6af5662fcc624cf2de76120a14565)]:
+  - @clerk/localizations@4.2.2
+  - @clerk/shared@4.3.1
+
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`de1386f`](https://github.com/clerk/javascript/commit/de1386fc90a3e8c2bab515b693c84a1b383525d3)]:
+  - @clerk/shared@4.3.0
+  - @clerk/localizations@4.2.1
+
+## 1.2.0
+
+### Minor Changes
+
+- Add support for annual-only Billing plans. ([#8012](https://github.com/clerk/javascript/pull/8012)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`3e63793`](https://github.com/clerk/javascript/commit/3e637932b1b7af669955f0e4f86233106f7d18ef)]:
+  - @clerk/localizations@4.2.0
+  - @clerk/shared@4.2.0
+
+## 1.1.0
+
+### Minor Changes
+
+- Prevent modification of immutable attributes in UserProfile ([#7931](https://github.com/clerk/javascript/pull/7931)) by [@dmoerner](https://github.com/dmoerner)
+
+- Remove remotely hosted code from new @clerk/ui package ([#7983](https://github.com/clerk/javascript/pull/7983)) by [@royanger](https://github.com/royanger)
+
+### Patch Changes
+
+- Updated dependencies [[`776ee1b`](https://github.com/clerk/javascript/commit/776ee1b3f3a576976b43352a93b6988340e83353), [`7fb870d`](https://github.com/clerk/javascript/commit/7fb870d37a8c153e9b0e6313b1d38ff53bc2f49b), [`e7a25e8`](https://github.com/clerk/javascript/commit/e7a25e8e5135346f62e4bccfb25ce1870597ad58), [`de089c5`](https://github.com/clerk/javascript/commit/de089c57efba7a1e4c4d8da416370c8ba4084ff6), [`09cb6d4`](https://github.com/clerk/javascript/commit/09cb6d4d45286cf4e657b880696bf0ff81a8a3e8)]:
+  - @clerk/shared@4.1.0
+  - @clerk/localizations@4.1.0
+
+## 1.0.1
+
+### Patch Changes
+
+- Update `MIN_CLERK_JS_VERSION` to `6.0.0` for Core 3 release ([#7827](https://github.com/clerk/javascript/pull/7827)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 1.0.0
 
 ### Major Changes

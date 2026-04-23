@@ -1,0 +1,363 @@
+name: E2E Staging
+
+on:
+  repository_dispatch:
+    types: [staging-deploy]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch to test against'
+        required: false
+        default: 'main'
+        type: string
+      clerk-go-commit-sha:
+        description: 'clerk_go commit SHA for status reporting'
+        required: false
+        type: string
+      sdk-source:
+        description: "SDK source: 'latest' uses published @latest from npm, 'ref' builds from the checked-out branch"
+        required: false
+        default: 'latest'
+        type: choice
+        options:
+          - latest
+          - ref
+      notify-slack:
+        description: 'Send Slack notification on failure'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.inputs.ref || github.event.client_payload.ref || 'main' }}
+  cancel-in-progress: true
+
+jobs:
+  permissions-check:
+    name: Check Permissions
+    if: ${{ github.event_name != 'repository_dispatch' }}
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    steps:
+      - name: Check org membership
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const org = context.repo.owner;
+            const username = process.env.GITHUB_TRIGGERING_ACTOR || context.actor;
+
+            try {
+              const { status } = await github.rest.orgs.checkMembershipForUser({
+                org,
+                username,
+              });
+
+              if (status !== 204) {
+                core.setFailed(`User '${username}' is not a member of the '${org}' organization.`);
+              }
+            } catch (error) {
+              if (error?.status === 404) {
+                core.setFailed(`User '${username}' is not a member of the '${org}' organization.`);
+              } else {
+                core.setFailed(
+                  `Org membership check failed for '${username}' in '${org}' (status: ${error?.status ?? 'unknown'}): ${error?.message ?? 'unknown error'}`
+                );
+              }
+            }
+
+  validate-instances:
+    name: Validate Staging Instances
+    needs: [permissions-check]
+    if: ${{ always() && (needs.permissions-check.result == 'success' || needs.permissions-check.result == 'skipped') }}
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    steps:
+      - name: Normalize inputs
+        id: inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_REF: ${{ github.event.inputs.ref }}
+          PAYLOAD_REF: ${{ github.event.client_payload.ref }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "ref=${INPUT_REF:-main}" >> $GITHUB_OUTPUT
+          else
+            echo "ref=${PAYLOAD_REF:-main}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate ref
+        env:
+          REF: ${{ steps.inputs.outputs.ref }}
+        run: |
+          if [[ ! "$REF" =~ ^(main|release/.*)$ ]]; then
+            echo "::error::Ref '$REF' is not allowed. Only 'main' and 'release/*' branches are permitted."
+            exit 1
+          fi
+
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.inputs.outputs.ref }}
+          sparse-checkout: scripts/validate-staging-instances.mjs
+          fetch-depth: 1
+
+      - name: Validate staging instance settings
+        run: node scripts/validate-staging-instances.mjs
+        env:
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
+
+  integration-tests:
+    name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }})
+    needs: [permissions-check]
+    if: ${{ always() && (needs.permissions-check.result == 'success' || needs.permissions-check.result == 'skipped') }}
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
+
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        test-name:
+          - 'sessions:staging'
+          - 'handshake:staging'
+          - 'generic'
+          - 'cache-components'
+          - 'express'
+          - 'hono'
+          - 'quickstart'
+          - 'react-router'
+          - 'tanstack-react-start'
+        test-project: ['chrome']
+
+    steps:
+      - name: Normalize inputs
+        id: inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_REF: ${{ github.event.inputs.ref }}
+          INPUT_COMMIT_SHA: ${{ github.event.inputs.clerk-go-commit-sha }}
+          INPUT_NOTIFY_SLACK: ${{ github.event.inputs.notify-slack }}
+          INPUT_SDK_SOURCE: ${{ github.event.inputs.sdk-source }}
+          PAYLOAD_REF: ${{ github.event.client_payload.ref }}
+          PAYLOAD_COMMIT_SHA: ${{ github.event.client_payload.clerk-go-commit-sha }}
+          PAYLOAD_NOTIFY_SLACK: ${{ github.event.client_payload.notify-slack }}
+          PAYLOAD_SDK_SOURCE: ${{ github.event.client_payload.sdk-source }}
+          TEST_NAME: ${{ matrix.test-name }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "ref=${INPUT_REF:-main}" >> $GITHUB_OUTPUT
+            echo "clerk-go-commit-sha=$INPUT_COMMIT_SHA" >> $GITHUB_OUTPUT
+            echo "notify-slack=$INPUT_NOTIFY_SLACK" >> $GITHUB_OUTPUT
+            echo "sdk-source=${INPUT_SDK_SOURCE:-latest}" >> $GITHUB_OUTPUT
+          else
+            echo "ref=${PAYLOAD_REF:-main}" >> $GITHUB_OUTPUT
+            echo "clerk-go-commit-sha=${PAYLOAD_COMMIT_SHA:-}" >> $GITHUB_OUTPUT
+            echo "notify-slack=${PAYLOAD_NOTIFY_SLACK:-true}" >> $GITHUB_OUTPUT
+            echo "sdk-source=${PAYLOAD_SDK_SOURCE:-latest}" >> $GITHUB_OUTPUT
+          fi
+          echo "artifact-suffix=${TEST_NAME//:/-}" >> $GITHUB_OUTPUT
+
+      - name: Validate ref
+        env:
+          REF: ${{ steps.inputs.outputs.ref }}
+        run: |
+          if [[ ! "$REF" =~ ^(main|release/.*)$ ]]; then
+            echo "::error::Ref '$REF' is not allowed. Only 'main' and 'release/*' branches are permitted."
+            exit 1
+          fi
+
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.inputs.outputs.ref }}
+          fetch-depth: 1
+          fetch-tags: false
+          filter: 'blob:none'
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true
+
+      - name: Verify jq is installed
+        run: |
+          if ! command -v jq &> /dev/null; then
+            echo "jq not found, installing..."
+            sudo apt-get update && sudo apt-get install -y jq
+          fi
+          jq --version
+
+      - name: Build packages
+        run: pnpm turbo build $TURBO_ARGS --only
+
+      # --- SDK from ref: publish to local registry ---
+      - name: Publish to local registry
+        if: ${{ steps.inputs.outputs.sdk-source == 'ref' }}
+        run: pkglab pub --force
+
+      - name: Edit .npmrc [link-workspace-packages=false]
+        if: ${{ steps.inputs.outputs.sdk-source == 'ref' }}
+        run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
+
+      - name: Install @clerk/clerk-js from local registry
+        if: ${{ steps.inputs.outputs.sdk-source == 'ref' }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          mkdir clerk-js && cd clerk-js
+          pnpm init
+          pkglab add @clerk/clerk-js
+
+      - name: Install @clerk/ui from local registry
+        if: ${{ steps.inputs.outputs.sdk-source == 'ref' }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          mkdir clerk-ui && cd clerk-ui
+          pnpm init
+          pkglab add @clerk/ui
+
+      # --- SDK from npm: install @latest published versions ---
+      - name: Install @clerk/clerk-js@latest from npm
+        if: ${{ steps.inputs.outputs.sdk-source == 'latest' }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          mkdir clerk-js && cd clerk-js
+          pnpm init
+          pnpm add @clerk/clerk-js@latest
+
+      - name: Install @clerk/ui@latest from npm
+        if: ${{ steps.inputs.outputs.sdk-source == 'latest' }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          mkdir clerk-ui && cd clerk-ui
+          pnpm init
+          pnpm add @clerk/ui@latest
+
+      - name: Write all ENV certificates to files in integration/certs
+        uses: actions/github-script@v7
+        env:
+          INTEGRATION_CERTS: '${{ secrets.INTEGRATION_CERTS }}'
+          INTEGRATION_ROOT_CA: '${{ secrets.INTEGRATION_ROOT_CA }}'
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const rootCa = process.env.INTEGRATION_ROOT_CA;
+            if (!rootCa) {
+              core.setFailed('INTEGRATION_ROOT_CA secret is not set');
+              return;
+            }
+            fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', 'rootCA.pem'), rootCa);
+            const certs = JSON.parse(process.env.INTEGRATION_CERTS);
+            for (const [name, cert] of Object.entries(certs)) {
+                fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', name), cert);
+            }
+
+      - name: Run Integration Tests
+        id: integration-tests
+        timeout-minutes: 25
+        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
+        env:
+          E2E_DEBUG: '1'
+          E2E_STAGING: '1'
+          E2E_WORKERS: '2'
+          E2E_SDK_SOURCE: ${{ steps.inputs.outputs.sdk-source }}
+          E2E_APP_CLERK_JS_DIR: ${{ runner.temp }}
+          E2E_APP_CLERK_UI_DIR: ${{ runner.temp }}
+          E2E_CLERK_JS_VERSION: 'latest'
+          E2E_CLERK_UI_VERSION: 'latest'
+          E2E_PROJECT: ${{ matrix.test-project }}
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
+
+      - name: Upload test-results
+        if: ${{ cancelled() || failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.inputs.outputs.artifact-suffix }}
+          path: test-results
+          retention-days: 1
+
+  report:
+    name: Report Results
+    needs: [integration-tests]
+    if: always()
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Normalize inputs
+        id: inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_REF: ${{ github.event.inputs.ref }}
+          INPUT_COMMIT_SHA: ${{ github.event.inputs.clerk-go-commit-sha }}
+          INPUT_NOTIFY_SLACK: ${{ github.event.inputs.notify-slack }}
+          INPUT_SDK_SOURCE: ${{ github.event.inputs.sdk-source }}
+          PAYLOAD_REF: ${{ github.event.client_payload.ref }}
+          PAYLOAD_COMMIT_SHA: ${{ github.event.client_payload.clerk-go-commit-sha }}
+          PAYLOAD_NOTIFY_SLACK: ${{ github.event.client_payload.notify-slack }}
+          PAYLOAD_SDK_SOURCE: ${{ github.event.client_payload.sdk-source }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "ref=${INPUT_REF:-main}" >> $GITHUB_OUTPUT
+            echo "clerk-go-commit-sha=$INPUT_COMMIT_SHA" >> $GITHUB_OUTPUT
+            echo "notify-slack=$INPUT_NOTIFY_SLACK" >> $GITHUB_OUTPUT
+            echo "sdk-source=${INPUT_SDK_SOURCE:-latest}" >> $GITHUB_OUTPUT
+          else
+            echo "ref=${PAYLOAD_REF:-main}" >> $GITHUB_OUTPUT
+            echo "clerk-go-commit-sha=${PAYLOAD_COMMIT_SHA:-}" >> $GITHUB_OUTPUT
+            echo "notify-slack=${PAYLOAD_NOTIFY_SLACK:-true}" >> $GITHUB_OUTPUT
+            echo "sdk-source=${PAYLOAD_SDK_SOURCE:-latest}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Notify Slack on failure
+        if: ${{ needs.integration-tests.result == 'failure' && steps.inputs.outputs.notify-slack == 'true' }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*:red_circle: Staging E2E tests failed*\n*Repo:* `${{ github.repository }}`\n*Ref:* `${{ steps.inputs.outputs.ref }}`\n*SDK:* `${{ steps.inputs.outputs.sdk-source }}`\n*clerk_go commit:* `${{ steps.inputs.outputs.clerk-go-commit-sha || 'N/A' }}`\n*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View logs>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.STAGING_E2E_SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      # Uncomment when clerk_go side is ready
+      # - name: Post commit status to clerk_go
+      #   if: ${{ steps.inputs.outputs.clerk-go-commit-sha != '' }}
+      #   uses: actions/github-script@v7
+      #   with:
+      #     github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+      #     script: |
+      #       await github.rest.repos.createCommitStatus({
+      #         owner: 'clerk',
+      #         repo: 'clerk_go',
+      #         sha: '${{ steps.inputs.outputs.clerk-go-commit-sha }}',
+      #         state: '${{ needs.integration-tests.result == 'success' && 'success' || 'failure' }}',
+      #         target_url: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+      #         context: 'e2e-staging / clerk-javascript',
+      #         description: 'JS SDK e2e tests against staging'
+      #       });
