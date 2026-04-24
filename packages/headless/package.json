@@ -1,0 +1,75 @@
+{
+  "name": "@clerk/headless",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./select": {
+      "import": "./dist/primitives/select/index.js",
+      "types": "./dist/primitives/select/index.d.ts"
+    },
+    "./menu": {
+      "import": "./dist/primitives/menu/index.js",
+      "types": "./dist/primitives/menu/index.d.ts"
+    },
+    "./dialog": {
+      "import": "./dist/primitives/dialog/index.js",
+      "types": "./dist/primitives/dialog/index.d.ts"
+    },
+    "./popover": {
+      "import": "./dist/primitives/popover/index.js",
+      "types": "./dist/primitives/popover/index.d.ts"
+    },
+    "./tooltip": {
+      "import": "./dist/primitives/tooltip/index.js",
+      "types": "./dist/primitives/tooltip/index.d.ts"
+    },
+    "./autocomplete": {
+      "import": "./dist/primitives/autocomplete/index.js",
+      "types": "./dist/primitives/autocomplete/index.d.ts"
+    },
+    "./tabs": {
+      "import": "./dist/primitives/tabs/index.js",
+      "types": "./dist/primitives/tabs/index.d.ts"
+    },
+    "./accordion": {
+      "import": "./dist/primitives/accordion/index.js",
+      "types": "./dist/primitives/accordion/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "rm -rf dist && vite build",
+    "dev": "vite build --watch",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@floating-ui/react": "catalog:repo"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
+    "@vitest/browser": "4.1.4",
+    "@vitest/browser-playwright": "4.1.4",
+    "axe-core": "^4.11.3",
+    "playwright": "^1.59.1",
+    "react": "catalog:react",
+    "react-dom": "catalog:react",
+    "typescript": "catalog:repo",
+    "vite": "6.4.1",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "4.1.4",
+    "vitest-axe": "^0.1.0"
+  },
+  "peerDependencies": {
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
+  }
+}

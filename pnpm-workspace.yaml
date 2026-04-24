@@ -11,6 +11,7 @@ catalogs:
     react: 18.3.1
     react-dom: 18.3.1
   repo:
+    '@floating-ui/react': 0.27.12
     '@swc/helpers': 0.5.21
     core-js: 3.47.0
     rolldown: 1.0.0-beta.47
