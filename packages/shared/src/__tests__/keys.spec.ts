@@ -282,7 +282,7 @@ describe('publishableKeyFromHost(host, fallbackKey?)', () => {
   });
 
   it('throws when host is empty', () => {
-    expect(() => publishableKeyFromHost('')).toThrow('publishableKeyFromHost: host must not be empty.');
+    expect(() => publishableKeyFromHost('')).toThrow('Host must not be empty.');
   });
 });
 

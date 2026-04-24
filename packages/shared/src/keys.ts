@@ -70,7 +70,7 @@ export function publishableKeyFromHost(host: string, fallbackKey?: string): stri
   }
   const hostname = host.toLowerCase().replace(/:\d+$/, '');
   if (!hostname) {
-    throw new Error('publishableKeyFromHost: host must not be empty.');
+    throw new Error('Host must not be empty.');
   }
   return buildPublishableKey(`clerk.${hostname}`);
 }
