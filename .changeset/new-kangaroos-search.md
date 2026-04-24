@@ -4,6 +4,7 @@
 
 Support dynamic options callback in `clerkMiddleware`:
 
+Usage:
 
 ```ts
 app.use(clerkMiddleware((req) => ({
