@@ -78,7 +78,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16 --ignore-rules unexpected-module-syntax",
+    "lint:attw": "attw --pack . --profile node16 --ignore-rules false-cjs",
     "lint:publint": "publint",
     "test": "vitest run",
     "test:watch": "vitest watch"
