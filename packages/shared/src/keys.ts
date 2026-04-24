@@ -54,7 +54,7 @@ export function buildPublishableKey(frontendApi: string): string {
  *
  * @example
  * // React
- * <ClerkProvider publishableKey={publishableKeyFromHost(window.location.host, process.env.VITE_CLERK_PUBLISHABLE_KEY)}>
+ * <ClerkProvider publishableKey={publishableKeyFromHost(window.location.host, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY)}>
  *
  * @example
  * // Express (inside clerkMiddleware callback)
