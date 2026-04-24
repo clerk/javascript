@@ -21,7 +21,7 @@ import {
 } from '@floating-ui/react';
 import { createContext, type ReactNode, useContext, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useControllableState } from '../../hooks/use-controllable-state';
-import { type TransitionProps, useFloatingTransition } from '../../hooks/use-floating-transition';
+import { type TransitionProps, useTransition } from '../../hooks/use-transition';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 
 // ---------------------------------------------------------------------------
@@ -46,6 +46,7 @@ interface DialogContextValue {
 }
 
 const DialogContext = createContext<DialogContextValue | null>(null);
+const DialogScopedContext = createContext(false);
 
 function useDialogContext() {
   const ctx = useContext(DialogContext);
@@ -85,7 +86,7 @@ function DialogInner(props: DialogProps) {
     onOpenChange: setOpen,
   });
 
-  const { mounted, transitionProps } = useFloatingTransition({
+  const { mounted, transitionProps } = useTransition({
     open,
     ref: popupRef,
   });
@@ -187,14 +188,20 @@ function DialogTrigger(props: DialogTriggerProps) {
 
 export interface DialogPortalProps {
   children: ReactNode;
+  root?: HTMLElement | null | React.RefObject<HTMLElement | null>;
 }
 
 function DialogPortal(props: DialogPortalProps) {
   const { mounted } = useDialogContext();
+  const isScoped = props.root != null;
 
   if (!mounted) return null;
 
-  return <FloatingPortal>{props.children}</FloatingPortal>;
+  return (
+    <FloatingPortal root={props.root}>
+      <DialogScopedContext.Provider value={isScoped}>{props.children}</DialogScopedContext.Provider>
+    </FloatingPortal>
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -209,6 +216,7 @@ export interface DialogBackdropProps extends ComponentProps<'div'> {
 function DialogBackdrop(props: DialogBackdropProps) {
   const { render, lockScroll = true, ...otherProps } = props;
   const { open, mounted, transitionProps } = useDialogContext();
+  const scoped = useContext(DialogScopedContext);
 
   const state = { open };
 
@@ -227,6 +235,12 @@ function DialogBackdrop(props: DialogBackdropProps) {
     },
     props: mergeProps<'div'>(defaultProps, otherProps),
   });
+
+  // When scoped to a container (Dialog.Portal has a root), skip FloatingOverlay
+  // which uses position:fixed. CSS on the backdrop element handles positioning.
+  if (scoped) {
+    return backdropElement;
+  }
 
   return <FloatingOverlay lockScroll={lockScroll}>{backdropElement}</FloatingOverlay>;
 }

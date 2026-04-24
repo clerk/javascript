@@ -51,7 +51,8 @@ const [open, setOpen] = useState(false);
 | --------------------- | --------------- | ---------------------------------------- |
 | `Popover`             | —               | Root context provider                    |
 | `Popover.Trigger`     | `<button>`      | Toggles the popover on click             |
-| `Popover.Positioner`  | `<div>`         | Floating positioned container (portal)   |
+| `Popover.Portal`      | —               | Portals children (accepts `root` prop)   |
+| `Popover.Positioner`  | `<div>`         | Floating positioned container            |
 | `Popover.Popup`       | `<div>`         | Visual content wrapper                   |
 | `Popover.Arrow`       | `<svg>`         | Optional floating arrow                  |
 | `Popover.Title`       | `<h2>`          | Heading, wired to `aria-labelledby`      |

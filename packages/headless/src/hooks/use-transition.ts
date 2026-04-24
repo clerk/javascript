@@ -4,7 +4,7 @@ import { type CSSProperties, type RefObject, useEffect, useMemo } from 'react';
 import { useAnimationsFinished } from './use-animations-finished';
 import { type TransitionStatus, useTransitionStatus } from './use-transition-status';
 
-export interface UseFloatingTransitionOptions {
+export interface UseTransitionOptions {
   open: boolean;
   ref: RefObject<HTMLElement | null>;
 }
@@ -17,18 +17,18 @@ export interface TransitionProps {
   style?: CSSProperties;
 }
 
-export interface UseFloatingTransitionReturn {
+export interface UseTransitionReturn {
   mounted: boolean;
   transitionStatus: TransitionStatus;
   transitionProps: TransitionProps;
 }
 
 /**
- * Base UI-style enter/exit animation lifecycle for Floating UI components.
+ * Enter/exit animation lifecycle hook.
  *
  * Returns:
- * - `mounted`: whether the floating element should render. Gate your JSX on this.
- * - `transitionProps`: spread onto the floating element. Exposes
+ * - `mounted`: whether the element should render. Gate your JSX on this.
+ * - `transitionProps`: spread onto the element. Exposes
  *   `data-cl-open` / `data-cl-closed` / `data-cl-starting-style` /
  *   `data-cl-ending-style` data attributes and an inline `transition: none` on
  *   the first mount frame.
@@ -37,7 +37,7 @@ export interface UseFloatingTransitionReturn {
  * transitions (via `[data-cl-starting-style]` / `[data-cl-ending-style]`) and
  * CSS keyframe animations (via `[data-cl-open]` / `[data-cl-closed]`).
  */
-export function useFloatingTransition({ open, ref }: UseFloatingTransitionOptions): UseFloatingTransitionReturn {
+export function useTransition({ open, ref }: UseTransitionOptions): UseTransitionReturn {
   const { mounted, transitionStatus, setMounted } = useTransitionStatus(open);
   const runOnAnimationsFinished = useAnimationsFinished(ref, open);
 

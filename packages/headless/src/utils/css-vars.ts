@@ -1,27 +1,27 @@
 import { detectOverflow, type Middleware } from '@floating-ui/react';
 
 /**
- * Floating UI middleware that sets CSS custom properties on the floating element:
+ * Positioning middleware that sets CSS custom properties on the floating element:
  *
- * - `--anchor-width`      – reference element width (px)
- * - `--anchor-height`     – reference element height (px)
- * - `--available-width`   – available width between anchor and viewport edge (px)
- * - `--available-height`  – available height between anchor and viewport edge (px)
- * - `--transform-origin`  – CSS transform-origin pointing back toward the anchor
+ * - `--cl-anchor-width`      – reference element width (px)
+ * - `--cl-anchor-height`     – reference element height (px)
+ * - `--cl-available-width`   – available width between anchor and viewport edge (px)
+ * - `--cl-available-height`  – available height between anchor and viewport edge (px)
+ * - `--cl-transform-origin`  – CSS transform-origin pointing back toward the anchor
  *
  * Place **after** `arrow()` so arrow position data is available for transform-origin.
  */
-export function floatingCssVars(opts?: { sideOffset?: number }): Middleware {
+export function cssVars(opts?: { sideOffset?: number }): Middleware {
   return {
-    name: 'floatingCssVars',
+    name: 'cssVars',
     async fn(state) {
       const { elements, rects, middlewareData, placement } = state;
       const style = elements.floating.style;
       const sideOffset = opts?.sideOffset ?? 0;
 
       // Anchor dimensions
-      style.setProperty('--anchor-width', `${rects.reference.width}px`);
-      style.setProperty('--anchor-height', `${rects.reference.height}px`);
+      style.setProperty('--cl-anchor-width', `${rects.reference.width}px`);
+      style.setProperty('--cl-anchor-height', `${rects.reference.height}px`);
 
       // Available space
       const overflow = await detectOverflow(state, { padding: 5 });
@@ -41,8 +41,8 @@ export function floatingCssVars(opts?: { sideOffset?: number }): Middleware {
             ? rects.floating.width - overflow.right
             : rects.floating.width - Math.max(overflow.left, 0) - Math.max(overflow.right, 0);
 
-      style.setProperty('--available-width', `${availableWidth}px`);
-      style.setProperty('--available-height', `${availableHeight}px`);
+      style.setProperty('--cl-available-width', `${availableWidth}px`);
+      style.setProperty('--cl-available-height', `${availableHeight}px`);
 
       // Transform origin — points back toward the anchor
       const arrowEl = elements.floating.querySelector("[data-cl-slot$='-arrow']") as HTMLElement | null;
@@ -68,7 +68,7 @@ export function floatingCssVars(opts?: { sideOffset?: number }): Middleware {
         right: `${-sideOffset}px ${transformY}px`,
       };
 
-      style.setProperty('--transform-origin', originMap[side]);
+      style.setProperty('--cl-transform-origin', originMap[side]);
 
       return {};
     },

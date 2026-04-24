@@ -82,7 +82,8 @@ By default, the selected option visually aligns with the trigger. Disable this f
 | `Select`            | —               | Root context provider                      |
 | `Select.Trigger`    | `<button>`      | Toggles the dropdown on click              |
 | `Select.Value`      | `<span>`        | Displays the selected label or placeholder |
-| `Select.Positioner` | `<div>`         | Floating positioned container (portal)     |
+| `Select.Portal`     | —               | Portals children (accepts `root` prop)     |
+| `Select.Positioner` | `<div>`         | Floating positioned container              |
 | `Select.Popup`      | `<div>`         | Visual wrapper for the option list         |
 | `Select.Option`     | `<button>`      | A selectable option                        |
 | `Select.Arrow`      | `<svg>`         | Optional floating arrow                    |

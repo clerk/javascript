@@ -188,11 +188,11 @@ describe('Accordion', () => {
       expect(panel).not.toHaveAttribute('data-cl-starting-style');
     });
 
-    it('sets --accordion-panel-height CSS variable on panel', () => {
+    it('sets --cl-accordion-panel-height CSS variable on panel', () => {
       renderAccordion({ defaultValue: ['item1'] });
       const panel = document.querySelector('[data-cl-slot="accordion-panel"]') as HTMLElement;
       // Verify the CSS variable is present in the style attribute
-      expect(panel.getAttribute('style')).toContain('--accordion-panel-height');
+      expect(panel.getAttribute('style')).toContain('--cl-accordion-panel-height');
     });
   });
 

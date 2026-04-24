@@ -75,7 +75,8 @@ In this pattern, keep the outer `Popover` or `Dialog` as the source of truth for
 | ------------------------- | --------------- | ---------------------------------------- |
 | `Autocomplete`            | —               | Root context provider                    |
 | `Autocomplete.Input`      | `<input>`       | Text input that drives filtering         |
-| `Autocomplete.Positioner` | `<div>`         | Floating positioned container (portal)   |
+| `Autocomplete.Portal`     | —               | Portals children (accepts `root` prop)   |
+| `Autocomplete.Positioner` | `<div>`         | Floating positioned container            |
 | `Autocomplete.Popup`      | `<div>`         | Visual wrapper for the option list       |
 | `Autocomplete.List`       | `<div>`         | Inline alternative to Positioner + Popup |
 | `Autocomplete.Option`     | `<div>`         | A selectable option                      |

@@ -55,13 +55,14 @@ By default, arrowing to a tab immediately activates it. Use `activationMode="man
 
 ## Parts
 
-| Part             | Default Element | Description                                |
-| ---------------- | --------------- | ------------------------------------------ |
-| `Tabs`           | —               | Root context provider                      |
-| `Tabs.List`      | `<div>`         | Container for tabs (`role="tablist"`)      |
-| `Tabs.Tab`       | `<button>`      | A tab trigger (`role="tab"`)               |
-| `Tabs.Panel`     | `<div>`         | Content panel (`role="tabpanel"`)          |
-| `Tabs.Indicator` | `<span>`        | Animated indicator tracking the active tab |
+| Part             | Default Element | Description                                        |
+| ---------------- | --------------- | -------------------------------------------------- |
+| `Tabs`           | —               | Root context provider                              |
+| `Tabs.List`      | `<div>`         | Container for tabs (`role="tablist"`)              |
+| `Tabs.Tab`       | `<button>`      | A tab trigger inside `Tabs.List` (`role="tab"`)    |
+| `Tabs.Trigger`   | `<button>`      | Standalone tab trigger for use outside `Tabs.List` |
+| `Tabs.Panel`     | `<div>`         | Content panel (`role="tabpanel"`)                  |
+| `Tabs.Indicator` | `<span>`        | Animated indicator tracking the active tab         |
 
 ## Props
 
@@ -82,11 +83,21 @@ By default, arrowing to a tab immediately activates it. Use `activationMode="man
 | `value`    | `string`  | **required** | Unique tab identifier, must match a Panel's `value`        |
 | `disabled` | `boolean` | —            | Disables the tab (uses `aria-disabled`, remains focusable) |
 
+### `Tabs.Trigger`
+
+A standalone tab button for use outside `Tabs.List`. Unlike `Tabs.Tab`, it does not participate in roving tabindex keyboard navigation — it's a plain button with `onClick`.
+
+| Prop       | Type      | Default      | Description                                  |
+| ---------- | --------- | ------------ | -------------------------------------------- |
+| `value`    | `string`  | **required** | Tab identifier, must match a Panel's `value` |
+| `disabled` | `boolean` | —            | Disables the trigger                         |
+
 ### `Tabs.Panel`
 
-| Prop    | Type     | Default      | Description                |
-| ------- | -------- | ------------ | -------------------------- |
-| `value` | `string` | **required** | Must match a Tab's `value` |
+| Prop               | Type      | Default      | Description                                                         |
+| ------------------ | --------- | ------------ | ------------------------------------------------------------------- |
+| `value`            | `string`  | **required** | Must match a Tab's `value`                                          |
+| `shouldForceMount` | `boolean` | —            | When true, keeps the panel in layout flow instead of using `hidden` |
 
 ### `Tabs.List`, `Tabs.Indicator`
 
@@ -104,31 +115,37 @@ No additional props beyond standard HTML attributes and the `render` prop.
 
 ## Data Attributes
 
-| Attribute          | Applies To | Description                         |
-| ------------------ | ---------- | ----------------------------------- |
-| `data-cl-slot`     | All parts  | Part identifier (e.g. `"tabs-tab"`) |
-| `data-cl-selected` | Tab        | Active tab                          |
-| `data-cl-disabled` | Tab        | Disabled tab                        |
-| `data-cl-hidden`   | Panel      | Inactive panel                      |
+| Attribute                | Applies To   | Description                                           |
+| ------------------------ | ------------ | ----------------------------------------------------- |
+| `data-cl-slot`           | All parts    | Part identifier (e.g. `"tabs-tab"`, `"tabs-trigger"`) |
+| `data-cl-selected`       | Tab, Trigger | Active tab                                            |
+| `data-cl-disabled`       | Tab, Trigger | Disabled tab                                          |
+| `data-cl-hidden`         | Panel        | Inactive panel                                        |
+| `data-cl-open`           | Panel        | Selected panel (when `shouldForceMount`)              |
+| `data-cl-closed`         | Panel        | Deselected panel (when `shouldForceMount`)            |
+| `data-cl-starting-style` | Panel        | Enter animation frame (when `shouldForceMount`)       |
+| `data-cl-ending-style`   | Panel        | Exit animation frame (when `shouldForceMount`)        |
 
-## Indicator CSS Variables
+## CSS Variables
+
+### Indicator
 
 `Tabs.Indicator` exposes CSS custom properties for positioning and sizing:
 
-| CSS Variable   | Description                        |
-| -------------- | ---------------------------------- |
-| `--tab-left`   | Left offset of the active tab (px) |
-| `--tab-width`  | Width of the active tab (px)       |
-| `--tab-top`    | Top offset of the active tab (px)  |
-| `--tab-height` | Height of the active tab (px)      |
+| CSS Variable      | Description                        |
+| ----------------- | ---------------------------------- |
+| `--cl-tab-left`   | Left offset of the active tab (px) |
+| `--cl-tab-width`  | Width of the active tab (px)       |
+| `--cl-tab-top`    | Top offset of the active tab (px)  |
+| `--cl-tab-height` | Height of the active tab (px)      |
 
 Use these to animate the indicator:
 
 ```css
 [data-cl-slot='tabs-indicator'] {
   position: absolute;
-  left: var(--tab-left);
-  width: var(--tab-width);
+  left: var(--cl-tab-left);
+  width: var(--cl-tab-width);
   transition:
     left 200ms ease,
     width 200ms ease;
@@ -137,10 +154,41 @@ Use these to animate the indicator:
 
 The initial render suppresses the transition to prevent the indicator from animating from `0,0`.
 
+### Panel (with `shouldForceMount`)
+
+When `shouldForceMount` is set, panels expose a direction variable for directional animations:
+
+| CSS Variable                    | Description                                                    |
+| ------------------------------- | -------------------------------------------------------------- |
+| `--cl-tab-transition-direction` | `"1"` when navigating forward, `"-1"` when navigating backward |
+
+Use this to drive directional slide animations:
+
+```css
+[data-cl-slot='tabs-panel'] {
+  --_direction: var(--cl-tab-transition-direction, 1);
+  transition:
+    opacity 200ms,
+    translate 200ms;
+}
+[data-cl-slot='tabs-panel'][data-cl-starting-style],
+[data-cl-slot='tabs-panel'][data-cl-ending-style] {
+  opacity: 0;
+}
+[data-cl-slot='tabs-panel'][data-cl-starting-style] {
+  translate: calc(var(--_direction) * 8px) 0;
+}
+[data-cl-slot='tabs-panel'][data-cl-ending-style] {
+  translate: calc(var(--_direction) * -8px) 0;
+}
+```
+
 ## Important Notes
 
 - **`Tabs.List` must have `position: relative`** in your CSS for the indicator to position correctly.
-- **Panels use the `hidden` attribute** — they stay in the DOM but are hidden when inactive. This preserves state in inactive panels.
+- **Panels use the `hidden` attribute** by default — they stay in the DOM but are hidden when inactive. This preserves state in inactive panels.
+- **`shouldForceMount` panels** stay in layout flow with `inert` on inactive panels. This enables CSS enter/exit animations between tabs. The initially-selected panel appears instantly (no enter animation on page load).
+- **`Tabs.Trigger` vs `Tabs.Tab`**: Use `Tabs.Tab` inside `Tabs.List` for keyboard-navigable tabs with roving tabindex. Use `Tabs.Trigger` for standalone tab buttons placed anywhere in the tree (e.g., in a sidebar).
 - **Disabled tabs use `aria-disabled`**, not the native `disabled` attribute, keeping them focusable for keyboard users.
 - **Indicator is `aria-hidden`** — it's purely decorative.
 

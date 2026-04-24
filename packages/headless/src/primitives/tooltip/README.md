@@ -56,7 +56,8 @@ const [open, setOpen] = useState(false);
 | -------------------- | --------------- | ------------------------------------------------ |
 | `Tooltip`            | —               | Root context provider                            |
 | `Tooltip.Trigger`    | `<button>`      | Element that triggers the tooltip on hover/focus |
-| `Tooltip.Positioner` | `<div>`         | Floating positioned container (portal)           |
+| `Tooltip.Portal`     | —               | Portals children (accepts `root` prop)           |
+| `Tooltip.Positioner` | `<div>`         | Floating positioned container                    |
 | `Tooltip.Popup`      | `<div>`         | The visible tooltip content                      |
 | `Tooltip.Arrow`      | `<svg>`         | Optional arrow pointing at the trigger           |
 

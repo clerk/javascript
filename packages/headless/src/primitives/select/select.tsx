@@ -44,8 +44,8 @@ import {
   useState,
 } from 'react';
 import { useControllableState } from '../../hooks/use-controllable-state';
-import { type TransitionProps, useFloatingTransition } from '../../hooks/use-floating-transition';
-import { floatingCssVars } from '../../utils/floating-css-vars';
+import { type TransitionProps, useTransition } from '../../hooks/use-transition';
+import { cssVars } from '../../utils/css-vars';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 
 // ---------------------------------------------------------------------------
@@ -235,12 +235,12 @@ function SelectInner(props: SelectProps) {
       }),
       ...(!alignProp ? [arrow({ element: arrowRef })] : []),
       ...(alignProp ? [alignSelectedItem(selectedItemRef)] : []),
-      floatingCssVars({ sideOffset }),
+      cssVars({ sideOffset }),
     ],
     whileElementsMounted: autoUpdate,
   });
 
-  const { mounted, transitionProps } = useFloatingTransition({
+  const { mounted, transitionProps } = useTransition({
     open,
     ref: popupRef,
   });
@@ -424,12 +424,13 @@ function SelectValue(props: SelectValueProps) {
 
 export interface SelectPortalProps {
   children: ReactNode;
+  root?: HTMLElement | null | React.RefObject<HTMLElement | null>;
 }
 
 function SelectPortal(props: SelectPortalProps) {
   const { mounted } = useSelectContext();
   if (!mounted) return null;
-  return <FloatingPortal>{props.children}</FloatingPortal>;
+  return <FloatingPortal root={props.root}>{props.children}</FloatingPortal>;
 }
 
 // ---------------------------------------------------------------------------

@@ -376,12 +376,12 @@ describe('Tabs', () => {
       expect(indicator).toHaveAttribute('aria-hidden', 'true');
     });
 
-    it('sets --tab-width and --tab-left CSS vars', () => {
+    it('sets --cl-tab-width and --cl-tab-left CSS vars', () => {
       renderWithIndicator();
       const indicator = screen.getByTestId('indicator');
       // In a real browser, getBoundingClientRect returns actual measurements
-      expect(indicator.style.getPropertyValue('--tab-width')).toBeTruthy();
-      expect(indicator.style.getPropertyValue('--tab-left')).toBeTruthy();
+      expect(indicator.style.getPropertyValue('--cl-tab-width')).toBeTruthy();
+      expect(indicator.style.getPropertyValue('--cl-tab-left')).toBeTruthy();
     });
 
     it('updates position when tab changes', async () => {
@@ -395,7 +395,7 @@ describe('Tabs', () => {
 
       // Verify the effect ran and style properties are set
       expect(indicator.style.position).toBe('absolute');
-      expect(indicator.style.getPropertyValue('--tab-width')).toBeDefined();
+      expect(indicator.style.getPropertyValue('--cl-tab-width')).toBeDefined();
     });
 
     it('skips transition on initial render', () => {

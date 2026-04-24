@@ -107,12 +107,12 @@ All parts accept a `render` prop for polymorphic rendering and standard HTML att
 
 ## CSS Animation
 
-`Accordion.Panel` exposes a `--accordion-panel-height` CSS custom property set to the panel's `scrollHeight` in pixels. Use this for height-based expand/collapse animations:
+`Accordion.Panel` exposes a `--cl-accordion-panel-height` CSS custom property set to the panel's `scrollHeight` in pixels. Use this for height-based expand/collapse animations:
 
 ```css
 [data-cl-slot='accordion-panel'] {
   overflow: hidden;
-  height: var(--accordion-panel-height);
+  height: var(--cl-accordion-panel-height);
   transition: height 200ms ease;
 }
 [data-cl-slot='accordion-panel'][data-cl-closed] {

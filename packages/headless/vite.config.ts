@@ -21,7 +21,7 @@ export default defineConfig({
         'primitives/accordion/index': 'src/primitives/accordion/index.ts',
         'utils/index': 'src/utils/index.ts',
         'hooks/use-controllable-state': 'src/hooks/use-controllable-state.ts',
-        'hooks/use-floating-transition': 'src/hooks/use-floating-transition.ts',
+        'hooks/use-transition': 'src/hooks/use-transition.ts',
         'hooks/use-transition-status': 'src/hooks/use-transition-status.ts',
         'hooks/use-animations-finished': 'src/hooks/use-animations-finished.ts',
       },

@@ -78,7 +78,8 @@ const [open, setOpen] = useState(false);
 | ----------------- | --------------- | -------------------------------------- |
 | `Menu`            | —               | Root context provider                  |
 | `Menu.Trigger`    | `<button>`      | Opens/closes the menu                  |
-| `Menu.Positioner` | `<div>`         | Floating positioned container (portal) |
+| `Menu.Portal`     | —               | Portals children (accepts `root` prop) |
+| `Menu.Positioner` | `<div>`         | Floating positioned container          |
 | `Menu.Popup`      | `<div>`         | Visual wrapper for menu items          |
 | `Menu.Item`       | `<button>`      | A menu action item                     |
 | `Menu.Separator`  | `<div>`         | Visual divider between items           |

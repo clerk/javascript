@@ -28,8 +28,8 @@ import {
 } from '@floating-ui/react';
 import { type CSSProperties, createContext, type ReactNode, useContext, useMemo, useRef } from 'react';
 import { useControllableState } from '../../hooks/use-controllable-state';
-import { type TransitionProps, useFloatingTransition } from '../../hooks/use-floating-transition';
-import { floatingCssVars } from '../../utils/floating-css-vars';
+import { type TransitionProps, useTransition } from '../../hooks/use-transition';
+import { cssVars } from '../../utils/css-vars';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 
 // ---------------------------------------------------------------------------
@@ -106,12 +106,12 @@ function TooltipInner(props: TooltipProps) {
       }),
       shift({ padding: 5 }),
       arrow({ element: arrowRef }),
-      floatingCssVars({ sideOffset }),
+      cssVars({ sideOffset }),
     ],
     whileElementsMounted: autoUpdate,
   });
 
-  const { mounted, transitionProps } = useFloatingTransition({
+  const { mounted, transitionProps } = useTransition({
     open,
     ref: popupRef,
   });
@@ -214,12 +214,13 @@ function TooltipTrigger(props: TooltipTriggerProps) {
 
 export interface TooltipPortalProps {
   children: ReactNode;
+  root?: HTMLElement | null | React.RefObject<HTMLElement | null>;
 }
 
 function TooltipPortal(props: TooltipPortalProps) {
   const { mounted } = useTooltipContext();
   if (!mounted) return null;
-  return <FloatingPortal>{props.children}</FloatingPortal>;
+  return <FloatingPortal root={props.root}>{props.children}</FloatingPortal>;
 }
 
 // ---------------------------------------------------------------------------

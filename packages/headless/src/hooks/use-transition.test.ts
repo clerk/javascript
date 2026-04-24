@@ -1,9 +1,9 @@
 import { act, renderHook } from '@testing-library/react';
 import type { RefObject } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useFloatingTransition } from './use-floating-transition';
+import { useTransition } from './use-transition';
 
-describe('useFloatingTransition', () => {
+describe('useTransition', () => {
   let rafCallbacks: Array<FrameRequestCallback>;
   let originalRaf: typeof requestAnimationFrame;
   let originalCaf: typeof cancelAnimationFrame;
@@ -51,7 +51,7 @@ describe('useFloatingTransition', () => {
 
   it('returns mounted=false and empty transitionProps when closed', () => {
     const ref = createElementRef();
-    const { result } = renderHook(() => useFloatingTransition({ open: false, ref }));
+    const { result } = renderHook(() => useTransition({ open: false, ref }));
 
     expect(result.current.mounted).toBe(false);
     expect(result.current.transitionProps).toEqual({});
@@ -59,7 +59,7 @@ describe('useFloatingTransition', () => {
 
   it('returns mounted=true with starting-style props on open', () => {
     const ref = createElementRef();
-    const { result } = renderHook(() => useFloatingTransition({ open: true, ref }));
+    const { result } = renderHook(() => useTransition({ open: true, ref }));
 
     expect(result.current.mounted).toBe(true);
     expect(result.current.transitionProps).toEqual({
@@ -71,7 +71,7 @@ describe('useFloatingTransition', () => {
 
   it('clears starting-style after first frame, keeps data-cl-open', () => {
     const ref = createElementRef();
-    const { result } = renderHook(() => useFloatingTransition({ open: true, ref }));
+    const { result } = renderHook(() => useTransition({ open: true, ref }));
 
     act(() => flushRaf());
 
@@ -82,7 +82,7 @@ describe('useFloatingTransition', () => {
 
   it('sets closing props while animations are running', async () => {
     const { ref, el, resolveAnim } = createAnimatingRef();
-    const { result, rerender } = renderHook(({ open }) => useFloatingTransition({ open, ref }), {
+    const { result, rerender } = renderHook(({ open }) => useTransition({ open, ref }), {
       initialProps: { open: true },
     });
     act(() => flushRaf());
@@ -110,7 +110,7 @@ describe('useFloatingTransition', () => {
 
   it('unmounts immediately when no animations are running', async () => {
     const ref = createElementRef();
-    const { result, rerender } = renderHook(({ open }) => useFloatingTransition({ open, ref }), {
+    const { result, rerender } = renderHook(({ open }) => useTransition({ open, ref }), {
       initialProps: { open: true },
     });
     act(() => flushRaf());
@@ -126,7 +126,7 @@ describe('useFloatingTransition', () => {
   it('stays mounted while animations are running', async () => {
     const { ref, el, resolveAnim } = createAnimatingRef();
 
-    const { result, rerender } = renderHook(({ open }) => useFloatingTransition({ open, ref }), {
+    const { result, rerender } = renderHook(({ open }) => useTransition({ open, ref }), {
       initialProps: { open: true },
     });
     act(() => flushRaf());
@@ -151,7 +151,7 @@ describe('useFloatingTransition', () => {
 
   it('handles rapid open→close — unmounts after animations finish', async () => {
     const ref = createElementRef();
-    const { result, rerender } = renderHook(({ open }) => useFloatingTransition({ open, ref }), {
+    const { result, rerender } = renderHook(({ open }) => useTransition({ open, ref }), {
       initialProps: { open: false },
     });
 
@@ -171,7 +171,7 @@ describe('useFloatingTransition', () => {
 
   it('handles rapid close→open by cancelling exit', async () => {
     const { ref, el, resolveAnim } = createAnimatingRef();
-    const { result, rerender } = renderHook(({ open }) => useFloatingTransition({ open, ref }), {
+    const { result, rerender } = renderHook(({ open }) => useTransition({ open, ref }), {
       initialProps: { open: true },
     });
     act(() => flushRaf());

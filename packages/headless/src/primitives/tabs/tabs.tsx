@@ -14,6 +14,7 @@ import {
   useState,
 } from 'react';
 import { useControllableState } from '../../hooks/use-controllable-state';
+import { useTransition } from '../../hooks/use-transition';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 
 // ---------------------------------------------------------------------------
@@ -29,6 +30,7 @@ interface TabsContextValue {
   registerTab: (value: string, element: HTMLElement | null) => void;
   getTabElement: (value: string) => HTMLElement | null;
   listRef: React.RefObject<HTMLElement | null>;
+  direction: 1 | -1;
 }
 
 const TabsContext = createContext<TabsContextValue | null>(null);
@@ -57,15 +59,22 @@ export interface TabsProps {
 function TabsRoot(props: TabsProps) {
   const { orientation = 'horizontal', activationMode = 'automatic', children } = props;
 
-  const [value, setValue] = useControllableState(props.value, props.defaultValue ?? '', props.onValueChange);
+  const [value, setValueRaw] = useControllableState(props.value, props.defaultValue ?? '', props.onValueChange);
 
+  const [direction, setDirection] = useState<1 | -1>(1);
   const tabsId = useId();
   const tabElementsRef = useRef<Map<string, HTMLElement>>(new Map());
+  const tabOrderRef = useRef<string[]>([]);
   const listRef = useRef<HTMLElement | null>(null);
+  const valueRef = useRef(value);
+  valueRef.current = value;
 
   const registerTab = useCallback((tabValue: string, element: HTMLElement | null) => {
     if (element) {
       tabElementsRef.current.set(tabValue, element);
+      if (!tabOrderRef.current.includes(tabValue)) {
+        tabOrderRef.current.push(tabValue);
+      }
     } else {
       tabElementsRef.current.delete(tabValue);
     }
@@ -74,6 +83,18 @@ function TabsRoot(props: TabsProps) {
   const getTabElement = useCallback((tabValue: string) => {
     return tabElementsRef.current.get(tabValue) ?? null;
   }, []);
+
+  const setValue = useCallback(
+    (newValue: string) => {
+      const prevIndex = tabOrderRef.current.indexOf(valueRef.current);
+      const nextIndex = tabOrderRef.current.indexOf(newValue);
+      if (prevIndex !== -1 && nextIndex !== -1) {
+        setDirection(nextIndex > prevIndex ? 1 : -1);
+      }
+      setValueRaw(newValue);
+    },
+    [setValueRaw],
+  );
 
   const contextValue = useMemo<TabsContextValue>(
     () => ({
@@ -85,8 +106,9 @@ function TabsRoot(props: TabsProps) {
       registerTab,
       getTabElement,
       listRef,
+      direction,
     }),
-    [value, setValue, orientation, activationMode, tabsId, registerTab, getTabElement],
+    [value, setValue, orientation, activationMode, tabsId, registerTab, getTabElement, direction],
   );
 
   return <TabsContext.Provider value={contextValue}>{children}</TabsContext.Provider>;
@@ -226,15 +248,34 @@ function TabsTab(props: TabsTabProps) {
 
 export interface TabsPanelProps extends ComponentProps<'div'> {
   value: string;
+  /** When true, removes `hidden` so the panel stays in layout flow. */
+  shouldForceMount?: boolean;
 }
 
 function TabsPanel(props: TabsPanelProps) {
-  const { render, value: panelValue, ...otherProps } = props;
-  const { value: selectedValue, tabsId } = useTabsContext();
+  const { render, value: panelValue, shouldForceMount, ...otherProps } = props;
+  const { value: selectedValue, tabsId, direction } = useTabsContext();
 
   const isSelected = selectedValue === panelValue;
   const tabId = `${tabsId}-tab-${panelValue}`;
   const panelId = `${tabsId}-panel-${panelValue}`;
+
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const { transitionProps } = useTransition({
+    open: isSelected,
+    ref: panelRef,
+  });
+
+  // Suppress enter animation on initial mount so the initially-selected panel
+  // appears instantly. After the panel has been deselected once, subsequent
+  // selections will animate normally. Matches the Accordion pattern.
+  const hasBeenDeselected = useRef(false);
+  if (!isSelected) hasBeenDeselected.current = true;
+
+  const effectiveTransitionProps =
+    shouldForceMount && !hasBeenDeselected.current
+      ? { ...transitionProps, 'data-cl-starting-style': undefined, style: undefined }
+      : transitionProps;
 
   const state = { hidden: !isSelected };
 
@@ -244,7 +285,15 @@ function TabsPanel(props: TabsPanelProps) {
     role: 'tabpanel' as const,
     'aria-labelledby': tabId,
     tabIndex: 0,
-    hidden: !isSelected || undefined,
+    inert: !isSelected || undefined,
+    hidden: !isSelected && !shouldForceMount ? true : undefined,
+    ...(shouldForceMount
+      ? {
+          ref: panelRef,
+          ...effectiveTransitionProps,
+          style: { ...effectiveTransitionProps.style, ['--cl-tab-transition-direction' as string]: String(direction) },
+        }
+      : {}),
   };
 
   return renderElement({
@@ -255,6 +304,60 @@ function TabsPanel(props: TabsPanelProps) {
       hidden: (v: boolean) => (v ? { 'data-cl-hidden': '' } : null),
     },
     props: mergeProps<'div'>(defaultProps, otherProps),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Tabs.Trigger
+// ---------------------------------------------------------------------------
+
+export interface TabsTriggerProps extends ComponentProps<'button'> {
+  value: string;
+  disabled?: boolean;
+}
+
+function TabsTrigger(props: TabsTriggerProps) {
+  const { render, value: tabValue, disabled, ...otherProps } = props;
+  const { value: selectedValue, setValue, tabsId, registerTab } = useTabsContext();
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+
+  const isSelected = selectedValue === tabValue;
+  const tabId = `${tabsId}-tab-${tabValue}`;
+  const panelId = `${tabsId}-panel-${tabValue}`;
+
+  useLayoutEffect(() => {
+    registerTab(tabValue, triggerRef.current);
+    return () => registerTab(tabValue, null);
+  }, [tabValue, registerTab]);
+
+  const state = {
+    selected: isSelected,
+    disabled: !!disabled,
+  };
+
+  const defaultProps = {
+    'data-cl-slot': 'tabs-trigger',
+    ref: triggerRef,
+    id: tabId,
+    role: 'tab' as const,
+    type: 'button' as const,
+    'aria-selected': isSelected,
+    'aria-controls': panelId,
+    'aria-disabled': disabled || undefined,
+    onClick: () => {
+      if (!disabled) setValue(tabValue);
+    },
+  };
+
+  return renderElement({
+    defaultTagName: 'button',
+    render,
+    state,
+    stateAttributesMapping: {
+      selected: (v: boolean) => (v ? { 'data-cl-selected': '' } : null),
+      disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+    },
+    props: mergeProps<'button'>(defaultProps, otherProps),
   });
 }
 
@@ -299,10 +402,10 @@ function TabsIndicator(props: TabsIndicatorProps) {
         position: 'absolute',
         left: newRect.left,
         width: newRect.width,
-        ['--tab-left' as string]: `${newRect.left}px`,
-        ['--tab-width' as string]: `${newRect.width}px`,
-        ['--tab-top' as string]: `${newRect.top}px`,
-        ['--tab-height' as string]: `${newRect.height}px`,
+        ['--cl-tab-left' as string]: `${newRect.left}px`,
+        ['--cl-tab-width' as string]: `${newRect.width}px`,
+        ['--cl-tab-top' as string]: `${newRect.top}px`,
+        ['--cl-tab-height' as string]: `${newRect.height}px`,
         ...(prev == null ? { transition: 'none' } : {}),
       });
     } else {
@@ -310,10 +413,10 @@ function TabsIndicator(props: TabsIndicatorProps) {
         position: 'absolute',
         top: newRect.top,
         height: newRect.height,
-        ['--tab-left' as string]: `${newRect.left}px`,
-        ['--tab-width' as string]: `${newRect.width}px`,
-        ['--tab-top' as string]: `${newRect.top}px`,
-        ['--tab-height' as string]: `${newRect.height}px`,
+        ['--cl-tab-left' as string]: `${newRect.left}px`,
+        ['--cl-tab-width' as string]: `${newRect.width}px`,
+        ['--cl-tab-top' as string]: `${newRect.top}px`,
+        ['--cl-tab-height' as string]: `${newRect.height}px`,
         ...(prev == null ? { transition: 'none' } : {}),
       });
     }
@@ -339,6 +442,7 @@ function TabsIndicator(props: TabsIndicatorProps) {
 export const Tabs = Object.assign(TabsRoot, {
   List: TabsList,
   Tab: TabsTab,
+  Trigger: TabsTrigger,
   Panel: TabsPanel,
   Indicator: TabsIndicator,
 });

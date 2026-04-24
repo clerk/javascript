@@ -50,7 +50,8 @@ const [open, setOpen] = useState(false);
 | -------------------- | --------------- | ----------------------------------------------- |
 | `Dialog`             | —               | Root context provider                           |
 | `Dialog.Trigger`     | `<button>`      | Opens/closes the dialog on click                |
-| `Dialog.Backdrop`    | `<div>`         | Overlay + portal + focus manager host           |
+| `Dialog.Portal`      | —               | Portals children (defaults to `document.body`)  |
+| `Dialog.Backdrop`    | `<div>`         | Overlay + focus manager host                    |
 | `Dialog.Popup`       | `<div>`         | The dialog content container                    |
 | `Dialog.Title`       | `<h2>`          | Dialog heading, wired to `aria-labelledby`      |
 | `Dialog.Description` | `<p>`           | Dialog description, wired to `aria-describedby` |
@@ -67,11 +68,19 @@ const [open, setOpen] = useState(false);
 | `onOpenChange` | `(open: boolean) => void` | —       | Called when open state changes          |
 | `modal`        | `boolean`                 | `true`  | Traps focus and blocks page interaction |
 
+### `Dialog.Portal`
+
+| Prop   | Type                                                          | Default         | Description                      |
+| ------ | ------------------------------------------------------------- | --------------- | -------------------------------- |
+| `root` | `HTMLElement \| null \| React.RefObject<HTMLElement \| null>` | `document.body` | Container element to portal into |
+
+When `root` is provided, the dialog is "scoped" to that container: `Dialog.Backdrop` skips `FloatingOverlay` (no fixed positioning or scroll lock), and consumers handle positioning via CSS on the container.
+
 ### `Dialog.Backdrop`
 
-| Prop         | Type      | Default | Description                     |
-| ------------ | --------- | ------- | ------------------------------- |
-| `lockScroll` | `boolean` | `true`  | Prevents body scroll while open |
+| Prop         | Type      | Default | Description                                           |
+| ------------ | --------- | ------- | ----------------------------------------------------- |
+| `lockScroll` | `boolean` | `true`  | Prevents body scroll while open (skipped when scoped) |
 
 ### `Dialog.Trigger`, `Dialog.Popup`, `Dialog.Title`, `Dialog.Description`, `Dialog.Close`
 

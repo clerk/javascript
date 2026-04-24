@@ -14,7 +14,7 @@ import React, {
   useState,
 } from 'react';
 import { useControllableState } from '../../hooks/use-controllable-state';
-import { useFloatingTransition } from '../../hooks/use-floating-transition';
+import { useTransition } from '../../hooks/use-transition';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 
 // ---------------------------------------------------------------------------
@@ -278,7 +278,7 @@ function AccordionPanel(props: AccordionPanelProps) {
   const hasBeenClosed = useRef(false);
   if (!open) hasBeenClosed.current = true;
 
-  const { mounted, transitionProps } = useFloatingTransition({
+  const { mounted, transitionProps } = useTransition({
     open,
     ref: panelRef as RefObject<HTMLElement>,
   });
@@ -323,7 +323,7 @@ function AccordionPanel(props: AccordionPanelProps) {
     ref: panelRef,
     ...effectiveTransitionProps,
     style: {
-      '--accordion-panel-height': height != null ? `${height}px` : undefined,
+      '--cl-accordion-panel-height': height != null ? `${height}px` : undefined,
       ...effectiveTransitionProps.style,
     },
   };
