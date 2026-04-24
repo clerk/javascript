@@ -31,7 +31,11 @@
       "require": "./dist/cjs/index.js"
     },
     "./server": {
-      "types": "./dist/types/server/index.d.ts",
+      "types": "./dist/types/server/index.rsc.d.ts",
+      "react-server": {
+        "import": "./dist/esm/server/index.rsc.js",
+        "require": "./dist/cjs/server/index.rsc.js"
+      },
       "import": "./dist/esm/server/index.js",
       "require": "./dist/cjs/server/index.js"
     },

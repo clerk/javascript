@@ -1,3 +1,5 @@
+import 'server-only';
+
 import type { SessionAuthObject } from '@clerk/backend';
 import type { AuthOptions, GetAuthFnNoRequest, RedirectFun } from '@clerk/backend/internal';
 import { constants, createClerkRequest, createRedirect, TokenType } from '@clerk/backend/internal';
@@ -75,9 +77,6 @@ export type AuthFn = GetAuthFnNoRequest<SessionAuthWithRedirect, true> & {
  * - Requires [`clerkMiddleware()`](https://clerk.com/docs/reference/nextjs/clerk-middleware) to be configured.
  */
 export const auth: AuthFn = (async (options?: AuthOptions) => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('server-only');
-
   try {
     const request = await buildRequestLike();
 
@@ -158,9 +157,6 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
 }) as AuthFn;
 
 auth.protect = async (...args: any[]) => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('server-only');
-
   const request = await buildRequestLike();
   const requestedToken = args?.[0]?.token || args?.[1]?.token || TokenType.SessionToken;
   const authObject = await auth({ acceptsToken: requestedToken });

@@ -1,3 +1,5 @@
+import 'server-only';
+
 import type { User } from '@clerk/backend';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 
@@ -29,9 +31,6 @@ type CurrentUserOptions = PendingSessionOptions;
  * ```
  */
 export async function currentUser(opts?: CurrentUserOptions): Promise<User | null> {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('server-only');
-
   try {
     const { userId } = await auth({ treatPendingAsSignedOut: opts?.treatPendingAsSignedOut });
     if (!userId) {
