@@ -9,6 +9,16 @@ describe('patchRequest', () => {
     expect(cloned.url).toBe('https://example.com/path?token=xyz&foo=bar');
   });
 
+  it('preserves an encoded nested redirect_url with its own query and port', () => {
+    // Mirrors the shape reported in the TanStack + Lovable handshake bug:
+    // the outer URL's `redirect_url` param is a percent-encoded inner URL with
+    // a port and its own query string, which must survive the clone verbatim.
+    const nested = 'https://localhost:8080/?token=abc';
+    const original = new Request(`https://example.com/handshake?redirect_url=${encodeURIComponent(nested)}`);
+    const cloned = patchRequest(original);
+    expect(new URL(cloned.url).searchParams.get('redirect_url')).toBe(nested);
+  });
+
   it('preserves x-forwarded-* headers', () => {
     const original = new Request('https://example.com/', {
       headers: { 'x-forwarded-host': 'example.com', 'x-forwarded-proto': 'https' },
@@ -24,10 +34,22 @@ describe('patchRequest', () => {
     expect(cloned.method).toBe('POST');
   });
 
-  it('returns a new Request instance', () => {
-    const original = new Request('https://example.com/');
+  it('preserves redirect and cache', () => {
+    const original = new Request('https://example.com/', {
+      redirect: 'manual',
+      cache: 'no-cache',
+    });
     const cloned = patchRequest(original);
-    expect(cloned).not.toBe(original);
-    expect(cloned).toBeInstanceOf(Request);
+    expect(cloned.redirect).toBe('manual');
+    expect(cloned.cache).toBe('no-cache');
+  });
+
+  it('forwards signal aborts from the original request', () => {
+    const controller = new AbortController();
+    const original = new Request('https://example.com/', { signal: controller.signal });
+    const cloned = patchRequest(original);
+    expect(cloned.signal.aborted).toBe(false);
+    controller.abort();
+    expect(cloned.signal.aborted).toBe(true);
   });
 });
