@@ -44,6 +44,31 @@ export function buildPublishableKey(frontendApi: string): string {
 }
 
 /**
+ * Derives a publishable key from the current hostname. Intended for multi-domain
+ * setups (e.g. custom domains on top of a default domain) where the correct key
+ * must be resolved per request.
+ *
+ * Pass the env publishable key as `fallbackKey` so that development instances
+ * (pk_test_) are returned as-is instead of being incorrectly derived.
+ *
+ * @example
+ * // React
+ * <ClerkProvider publishableKey={publishableKeyFromHost(window.location.host, process.env.VITE_CLERK_PUBLISHABLE_KEY)}>
+ *
+ * @example
+ * // Express (inside clerkMiddleware callback)
+ * clerkMiddleware((req) => ({
+ *   publishableKey: publishableKeyFromHost(req.hostname, process.env.CLERK_PUBLISHABLE_KEY),
+ * }))
+ */
+export function publishableKeyFromHost(host: string, fallbackKey?: string): string {
+  if (fallbackKey && isDevelopmentFromPublishableKey(fallbackKey)) {
+    return fallbackKey;
+  }
+  return buildPublishableKey(`clerk.${host.toLowerCase()}`);
+}
+
+/**
  * Validates that a decoded publishable key has the correct format.
  * The decoded value should be a frontend API followed by exactly one '$' at the end.
  *
