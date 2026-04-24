@@ -27,6 +27,10 @@ export interface FrontendApiProxyOptions {
   path?: string;
 }
 
+export type ClerkMiddlewareOptionsCallback = (
+  req: ExpressRequest,
+) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
+
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;
   clerkClient?: ClerkClient;
