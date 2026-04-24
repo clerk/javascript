@@ -9,7 +9,6 @@ export default defineConfig(overrideOptions => {
   return {
     entry: {
       index: './src/index.ts',
-      internal: './src/internal.ts',
       webhooks: './src/webhooks.ts',
       types: './src/types/index.ts',
     },
