@@ -272,6 +272,14 @@ describe('publishableKeyFromHost(host, fallbackKey?)', () => {
   it('derives from host when no fallbackKey is provided', () => {
     expect(publishableKeyFromHost('custom-domain.com')).toBe(buildPublishableKey('clerk.custom-domain.com'));
   });
+
+  it('strips the port from the host before deriving', () => {
+    expect(publishableKeyFromHost('example.com:3000')).toBe(publishableKeyFromHost('example.com'));
+  });
+
+  it('strips the port even when combined with case normalization', () => {
+    expect(publishableKeyFromHost('Example.COM:8080')).toBe(publishableKeyFromHost('example.com'));
+  });
 });
 
 describe('getCookieSuffix(publishableKey, subtle?)', () => {

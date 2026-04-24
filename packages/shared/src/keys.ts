@@ -53,8 +53,8 @@ export function buildPublishableKey(frontendApi: string): string {
  * from the host (e.g. localhost).
  *
  * @example
- * // React
- * <ClerkProvider publishableKey={publishableKeyFromHost(window.location.host, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY)}>
+ * // React (use window.location.hostname, not window.location.host, to avoid including the port)
+ * <ClerkProvider publishableKey={publishableKeyFromHost(window.location.hostname, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY)}>
  *
  * @example
  * // Express (inside clerkMiddleware callback)
@@ -66,7 +66,8 @@ export function publishableKeyFromHost(host: string, fallbackKey?: string): stri
   if (fallbackKey && isDevelopmentFromPublishableKey(fallbackKey)) {
     return fallbackKey;
   }
-  return buildPublishableKey(`clerk.${host.toLowerCase()}`);
+  const hostname = host.toLowerCase().replace(/:\d+$/, '');
+  return buildPublishableKey(`clerk.${hostname}`);
 }
 
 /**
