@@ -280,6 +280,10 @@ describe('publishableKeyFromHost(host, fallbackKey?)', () => {
   it('strips the port even when combined with case normalization', () => {
     expect(publishableKeyFromHost('Example.COM:8080')).toBe(publishableKeyFromHost('example.com'));
   });
+
+  it('throws when host is empty', () => {
+    expect(() => publishableKeyFromHost('')).toThrow('publishableKeyFromHost: host must not be empty.');
+  });
 });
 
 describe('getCookieSuffix(publishableKey, subtle?)', () => {

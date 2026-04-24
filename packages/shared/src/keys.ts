@@ -58,6 +58,8 @@ export function buildPublishableKey(frontendApi: string): string {
  *
  * @example
  * // Express (inside clerkMiddleware callback)
+ * // Note: when `trust proxy` is enabled, req.hostname reads from X-Forwarded-Host,
+ * // which can be spoofed if your proxy is not properly configured.
  * clerkMiddleware((req) => ({
  *   publishableKey: publishableKeyFromHost(req.hostname, process.env.CLERK_PUBLISHABLE_KEY),
  * }))
@@ -67,6 +69,9 @@ export function publishableKeyFromHost(host: string, fallbackKey?: string): stri
     return fallbackKey;
   }
   const hostname = host.toLowerCase().replace(/:\d+$/, '');
+  if (!hostname) {
+    throw new Error('publishableKeyFromHost: host must not be empty.');
+  }
   return buildPublishableKey(`clerk.${hostname}`);
 }
 
