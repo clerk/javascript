@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`/server public exports > default condition (pages-safe) should not include a breaking change 1`] = `
+exports[`/server public exports > default condition (pages-safe) > should not include a breaking change 1`] = `
 [
   "buildClerkProps",
   "clerkClient",
@@ -16,7 +16,7 @@ exports[`/server public exports > default condition (pages-safe) should not incl
 ]
 `;
 
-exports[`/server public exports > react-server condition should not include a breaking change 1`] = `
+exports[`/server public exports > react-server condition > should not include a breaking change 1`] = `
 [
   "auth",
   "buildClerkProps",
