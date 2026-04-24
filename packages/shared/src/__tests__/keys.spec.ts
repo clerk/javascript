@@ -10,6 +10,7 @@ import {
   isProductionFromSecretKey,
   isPublishableKey,
   parsePublishableKey,
+  publishableKeyFromHost,
 } from '../keys';
 
 describe('buildPublishableKey(frontendApi)', () => {
@@ -242,6 +243,34 @@ describe('isProductionFromSecretKey(key)', () => {
   test.each(cases)('given %p as a secret key string, returns %p', (secretKeyStr, expected) => {
     const result = isProductionFromSecretKey(secretKeyStr);
     expect(result).toEqual(expected);
+  });
+});
+
+describe('publishableKeyFromHost(host, fallbackKey?)', () => {
+  it('derives a pk_live_ key from a production hostname', () => {
+    const result = publishableKeyFromHost('example.com');
+    expect(result).toMatch(/^pk_live_/);
+    expect(result).toBe(buildPublishableKey('clerk.example.com'));
+  });
+
+  it('lowercases the host before deriving', () => {
+    expect(publishableKeyFromHost('Example.COM')).toBe(publishableKeyFromHost('example.com'));
+  });
+
+  it('returns the fallbackKey as-is when it is a development key', () => {
+    const devKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
+    expect(publishableKeyFromHost('localhost', devKey)).toBe(devKey);
+  });
+
+  it('derives from host when fallbackKey is a production key', () => {
+    const prodKey = 'pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ=';
+    const result = publishableKeyFromHost('custom-domain.com', prodKey);
+    expect(result).toMatch(/^pk_live_/);
+    expect(result).toBe(buildPublishableKey('clerk.custom-domain.com'));
+  });
+
+  it('derives from host when no fallbackKey is provided', () => {
+    expect(publishableKeyFromHost('custom-domain.com')).toBe(buildPublishableKey('clerk.custom-domain.com'));
   });
 });
 
