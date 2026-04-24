@@ -58,11 +58,14 @@ export function buildPublishableKey(frontendApi: string): string {
  *
  * @example
  * // Express (inside clerkMiddleware callback)
- * // Note: when `trust proxy` is enabled, req.hostname reads from X-Forwarded-Host,
- * // which can be spoofed if your proxy is not properly configured.
- * clerkMiddleware((req) => ({
- *   publishableKey: publishableKeyFromHost(req.hostname, process.env.CLERK_PUBLISHABLE_KEY),
- * }))
+ * // Validate req.hostname against a known allowlist before passing it in.
+ * // When `trust proxy` is enabled, req.hostname reads from X-Forwarded-Host
+ * // and can be spoofed if your proxy is not properly configured.
+ * const ALLOWED_HOSTS = ['domain-a.com', 'domain-b.com'];
+ * clerkMiddleware((req) => {
+ *   if (!ALLOWED_HOSTS.includes(req.hostname)) throw new Error('Unknown host');
+ *   return { publishableKey: publishableKeyFromHost(req.hostname, process.env.CLERK_PUBLISHABLE_KEY) };
+ * })
  */
 export function publishableKeyFromHost(host: string, fallbackKey?: string): string {
   if (fallbackKey && isDevelopmentFromPublishableKey(fallbackKey)) {
