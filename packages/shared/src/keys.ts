@@ -48,23 +48,17 @@ export function buildPublishableKey(frontendApi: string): string {
  * setups (e.g. custom domains on top of a default domain) where the correct key
  * must be resolved per request.
  *
- * Pass the env publishable key as `fallbackKey` so that development instances
- * (pk_test_) are returned as-is instead of being incorrectly derived.
- *
  * @example
  * // React
- * <ClerkProvider publishableKey={publishableKeyFromHost(window.location.host, process.env.VITE_CLERK_PUBLISHABLE_KEY)}>
+ * <ClerkProvider publishableKey={publishableKeyFromHost(window.location.host)}>
  *
  * @example
  * // Express (inside clerkMiddleware callback)
  * clerkMiddleware((req) => ({
- *   publishableKey: publishableKeyFromHost(req.hostname, process.env.CLERK_PUBLISHABLE_KEY),
+ *   publishableKey: publishableKeyFromHost(req.hostname),
  * }))
  */
-export function publishableKeyFromHost(host: string, fallbackKey?: string): string {
-  if (fallbackKey && isDevelopmentFromPublishableKey(fallbackKey)) {
-    return fallbackKey;
-  }
+export function publishableKeyFromHost(host: string): string {
   return buildPublishableKey(`clerk.${host.toLowerCase()}`);
 }
 
