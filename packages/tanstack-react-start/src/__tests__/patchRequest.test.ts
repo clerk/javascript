@@ -6,7 +6,7 @@ describe('patchRequest', () => {
   it('preserves the URL including path and query string', () => {
     const original = new Request('https://example.com/path?token=xyz&foo=bar');
     const cloned = patchRequest(original);
-    expect(cloned.url).toBe('https://example.com/path?token=xyz&foo=bar');
+    expect(cloned.url).toBe(original.url);
   });
 
   it('preserves an encoded nested redirect_url with its own query and port', () => {
@@ -16,6 +16,7 @@ describe('patchRequest', () => {
     const nested = 'https://localhost:8080/?token=abc';
     const original = new Request(`https://example.com/handshake?redirect_url=${encodeURIComponent(nested)}`);
     const cloned = patchRequest(original);
+    expect(cloned.url).toBe(original.url);
     expect(new URL(cloned.url).searchParams.get('redirect_url')).toBe(nested);
   });
 
@@ -51,5 +52,19 @@ describe('patchRequest', () => {
     expect(cloned.signal.aborted).toBe(false);
     controller.abort();
     expect(cloned.signal.aborted).toBe(true);
+  });
+
+  it('clones POST requests without forwarding the body', () => {
+    // patchRequest deliberately omits `body` from the cloned init (see #7020)
+    // so the original request's body stays intact for downstream consumers and
+    // the undici duplex issues the helper was written to avoid do not resurface.
+    const original = new Request('https://example.com/api', {
+      method: 'POST',
+      body: 'payload',
+      headers: { 'content-type': 'text/plain' },
+    });
+    const cloned = patchRequest(original);
+    expect(cloned.method).toBe('POST');
+    expect(cloned.body).toBeNull();
   });
 });
