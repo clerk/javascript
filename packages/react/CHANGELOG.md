@@ -1,5 +1,14 @@
 # Change Log
 
+## 6.4.4
+
+### Patch Changes
+
+- Add `publishableKeyFromHost` utility for resolving the correct publishable key per hostname in multi-domain setups. Re-exported from `@clerk/react/internal`. ([#8398](https://github.com/clerk/javascript/pull/8398)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9)]:
+  - @clerk/shared@4.8.4
+
 ## 6.4.3
 
 ### Patch Changes

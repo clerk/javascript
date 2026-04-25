@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.4.0
+
+### Minor Changes
+
+- Add backend query to GET organization settings for an instance. ([#8367](https://github.com/clerk/javascript/pull/8367)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9)]:
+  - @clerk/shared@4.8.4
+
 ## 3.3.0
 
 ### Minor Changes
