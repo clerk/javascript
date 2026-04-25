@@ -30,17 +30,17 @@ const PUBLISHABLE_KEY_TEST_PREFIX = 'pk_test_';
 const PUBLISHABLE_FRONTEND_API_DEV_REGEX = /^(([a-z]+)-){2}([0-9]{1,2})\.clerk\.accounts([a-z.]*)(dev|com)$/i;
 
 /**
- * Converts a frontend API URL into a base64-encoded publishable key.
+ * Converts a frontend API URL into an unpadded base64-encoded publishable key.
  *
  * @param frontendApi - The frontend API URL (e.g., 'clerk.example.com').
- * @returns A base64-encoded publishable key with appropriate prefix (pk_live_ or pk_test_).
+ * @returns An unpadded base64-encoded publishable key with appropriate prefix (pk_live_ or pk_test_).
  */
 export function buildPublishableKey(frontendApi: string): string {
   const isDevKey =
     PUBLISHABLE_FRONTEND_API_DEV_REGEX.test(frontendApi) ||
     (frontendApi.startsWith('clerk.') && LEGACY_DEV_INSTANCE_SUFFIXES.some(s => frontendApi.endsWith(s)));
   const keyPrefix = isDevKey ? PUBLISHABLE_KEY_TEST_PREFIX : PUBLISHABLE_KEY_LIVE_PREFIX;
-  return `${keyPrefix}${isomorphicBtoa(`${frontendApi}$`)}`;
+  return `${keyPrefix}${isomorphicBtoa(`${frontendApi}$`).replace(/=+$/, '')}`;
 }
 
 /**
