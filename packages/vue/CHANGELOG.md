@@ -1,5 +1,33 @@
 # @clerk/vue
 
+## 2.0.18
+
+### Patch Changes
+
+- Updated dependencies [[`da76490`](https://github.com/clerk/javascript/commit/da7649075e24351737271318e81842b5c298dee1)]:
+  - @clerk/shared@4.8.5
+
+## 2.0.17
+
+### Patch Changes
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9)]:
+  - @clerk/shared@4.8.4
+
+## 2.0.16
+
+### Patch Changes
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f)]:
+  - @clerk/shared@4.8.3
+
+## 2.0.15
+
+### Patch Changes
+
+- Updated dependencies [[`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/shared@4.8.2
+
 ## 2.0.14
 
 ### Patch Changes

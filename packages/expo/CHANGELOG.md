@@ -1,5 +1,71 @@
 # Change Log
 
+## 3.2.4
+
+### Patch Changes
+
+- Updated dependencies [[`da76490`](https://github.com/clerk/javascript/commit/da7649075e24351737271318e81842b5c298dee1)]:
+  - @clerk/shared@4.8.5
+  - @clerk/clerk-js@6.7.7
+  - @clerk/react@6.4.5
+
+## 3.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9)]:
+  - @clerk/shared@4.8.4
+  - @clerk/react@6.4.4
+  - @clerk/clerk-js@6.7.6
+
+## 3.2.2
+
+### Patch Changes
+
+- Bump `clerk-android` to `1.0.13` to pick up credential flow and auth UI improvements from the native Android SDK. This addresses feedback from Expo customers including improved error messaging when no Google account is available on the device, correct handling of Activity context on Android 13 for Google Sign-In and Passkey flows, and silent dismissal when a user cancels passkey creation. ([#8366](https://github.com/clerk/javascript/pull/8366)) by [@chriscanin](https://github.com/chriscanin)
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f)]:
+  - @clerk/shared@4.8.3
+  - @clerk/clerk-js@6.7.5
+  - @clerk/react@6.4.3
+
+## 3.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`ff5bd7d`](https://github.com/clerk/javascript/commit/ff5bd7d8ccd5b60540459c771d3eafb8d77249dd)]:
+  - @clerk/clerk-js@6.7.4
+  - @clerk/react@6.4.2
+
+## 3.2.0
+
+### Minor Changes
+
+- Add native component theming via the Expo config plugin. You can now customize the appearance of Clerk's native components (`<AuthView />`, `<UserButton />`, `<UserProfileView />`) on iOS and Android by passing a `theme` prop to the plugin pointing at a JSON file: ([#8243](https://github.com/clerk/javascript/pull/8243)) by [@chriscanin](https://github.com/chriscanin)
+
+  ```json
+  {
+    "expo": {
+      "plugins": [["@clerk/expo", { "theme": "./clerk-theme.json" }]]
+    }
+  }
+  ```
+
+  The JSON theme supports:
+  - `colors` — 15 semantic color tokens (`primary`, `background`, `input`, `danger`, `success`, `warning`, `foreground`, `mutedForeground`, `primaryForeground`, `inputForeground`, `neutral`, `border`, `ring`, `muted`, `shadow`) as 6- or 8-digit hex strings.
+  - `darkColors` — same shape as `colors`; applied automatically when the system is in dark mode.
+  - `design.borderRadius` — number, applied to both platforms.
+  - `design.fontFamily` — string, **iOS only**.
+
+  Theme JSON is validated at prebuild. On iOS the theme is embedded into `Info.plist`; on Android the JSON is copied into `android/app/src/main/assets/clerk_theme.json`. The plugin does not modify your app's `userInterfaceStyle` setting — control light/dark mode via `"userInterfaceStyle"` in `app.json`.
+
+### Patch Changes
+
+- Updated dependencies [[`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/shared@4.8.2
+  - @clerk/clerk-js@6.7.3
+  - @clerk/react@6.4.2
+
 ## 3.1.12
 
 ### Patch Changes

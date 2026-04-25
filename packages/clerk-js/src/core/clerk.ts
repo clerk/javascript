@@ -1336,6 +1336,15 @@ export class Clerk implements ClerkInterface {
   };
 
   public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderOAuthConsentComponentWhenUserDoesNotExist, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OAuthConsent';
     void this.#clerkUI

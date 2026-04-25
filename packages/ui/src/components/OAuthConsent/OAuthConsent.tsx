@@ -1,4 +1,4 @@
-import { useClerk, useOAuthConsent, useOrganizationList, useUser } from '@clerk/shared/react';
+import { useClerk, useOAuthConsent, useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
@@ -22,9 +22,8 @@ import {
   ListGroupItemLabel,
 } from './ListGroup';
 import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupSeparator } from './LogoGroup';
-import type { OrgOption } from './OrgSelect';
 import { OrgSelect } from './OrgSelect';
-import { getForwardedParams, getOAuthConsentFromSearch, getRedirectUriFromSearch, getRootDomain } from './utils';
+import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 
@@ -32,21 +31,26 @@ function _OAuthConsent() {
   const ctx = useOAuthConsentContext();
   const clerk = useClerk();
   const { user } = useUser();
-  const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
+  const {
+    displayConfig: { applicationName, logoImageUrl },
+    organizationSettings,
+  } = useEnvironment();
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
-  const { isLoaded: isMembershipsLoaded, userMemberships } = useOrganizationList({
-    // TODO(rob): Implement lazy loading in another PR
-    userMemberships: ctx.enableOrgSelection ? { infinite: true, pageSize: 50 } : undefined,
-  });
 
-  const orgOptions: OrgOption[] = (userMemberships.data ?? []).map(m => ({
-    value: m.organization.id,
-    label: m.organization.name,
-    logoUrl: m.organization.imageUrl,
-  }));
+  const orgSelectionEnabled = !!(ctx.enableOrgSelection && organizationSettings.enabled);
+  const orgOptions = orgSelectionEnabled
+    ? (user?.organizationMemberships ?? []).map(m => ({
+        value: m.organization.id,
+        label: m.organization.name,
+        logoUrl: m.organization.imageUrl,
+      }))
+    : [];
+
+  const lastActiveOrgId = clerk.session?.lastActiveOrganizationId;
+  const defaultOrg = orgOptions.find(o => o.value === lastActiveOrgId)?.value ?? orgOptions[0]?.value ?? null;
 
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
-  const effectiveOrg = selectedOrg ?? orgOptions[0]?.value ?? null;
+  const effectiveOrg = selectedOrg ?? defaultOrg;
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -80,7 +84,7 @@ function _OAuthConsent() {
   const redirectUrl = ctx.redirectUrl ?? getRedirectUriFromSearch();
 
   const { t } = useLocalizations();
-  const domainAction = getRootDomain(redirectUrl);
+  const domainAction = getRedirectDisplay(redirectUrl);
   const viewFullUrlText = t(localizationKeys('oauthConsent.viewFullUrl'));
 
   // Error states only apply to the public flow.
@@ -114,17 +118,6 @@ function _OAuthConsent() {
         </Card.Root>
       );
     }
-  }
-
-  if (ctx.enableOrgSelection && (!isMembershipsLoaded || userMemberships.isLoading)) {
-    return (
-      <Card.Root>
-        <Card.Content>
-          <LoadingCardContainer />
-        </Card.Content>
-        <Card.Footer />
-      </Card.Root>
-    );
   }
 
   const actionUrl = clerk.oauthApplication.buildConsentActionUrl({ clientId: oauthClientId });
@@ -223,7 +216,7 @@ function _OAuthConsent() {
                 })}
               />
             </Header.Root>
-            {ctx.enableOrgSelection && orgOptions.length > 0 && effectiveOrg && (
+            {orgSelectionEnabled && orgOptions.length > 0 && effectiveOrg && (
               <OrgSelect
                 options={orgOptions}
                 value={effectiveOrg}
@@ -308,7 +301,7 @@ function _OAuthConsent() {
               value={value}
             />
           ))}
-        {!hasContextCallbacks && ctx.enableOrgSelection && effectiveOrg && (
+        {!hasContextCallbacks && orgSelectionEnabled && effectiveOrg && (
           <input
             type='hidden'
             name='organization_id'
