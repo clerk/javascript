@@ -69,12 +69,14 @@ export function getResponseClerkState(requestState: RequestState, additionalStat
  * @internal
  */
 export const patchRequest = (request: Request) => {
+  // Omit `signal` from the clone: Node 24's bundled undici tightened the
+  // instanceof AbortSignal check, which rejects cross-realm signals (e.g.
+  // those carried by framework Request subclasses).
   const clonedRequest = new Request(request.url, {
     headers: request.headers,
     method: request.method,
     redirect: request.redirect,
     cache: request.cache,
-    signal: request.signal,
   });
 
   // If duplex is not set, set it to 'half' to avoid duplex issues with unidici
