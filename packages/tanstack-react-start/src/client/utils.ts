@@ -77,6 +77,8 @@ export const mergeWithPublicEnvs = (restInitState: any) => {
     __internal_clerkUIVersion: restInitState.__internal_clerkUIVersion || envVars.clerkUIVersion,
     signInForceRedirectUrl: restInitState.signInForceRedirectUrl,
     prefetchUI: restInitState.prefetchUI ?? envVars.prefetchUI,
+    unsafe_disableDevelopmentModeConsoleWarning:
+      restInitState.unsafe_disableDevelopmentModeConsoleWarning || envVars.unsafeDisableDevelopmentModeConsoleWarning,
   };
 };
 

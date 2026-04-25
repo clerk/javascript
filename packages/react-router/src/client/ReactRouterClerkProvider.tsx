@@ -67,6 +67,7 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
     __prefetchUI,
     __telemetryDisabled,
     __telemetryDebug,
+    __unsafeDisableDevelopmentModeConsoleWarning,
     __keylessClaimUrl,
     __keylessApiKeysUrl,
   } = clerkState?.__internal_clerk_state || {};
@@ -101,6 +102,7 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
       disabled: __telemetryDisabled,
       debug: __telemetryDebug,
     },
+    unsafe_disableDevelopmentModeConsoleWarning: __unsafeDisableDevelopmentModeConsoleWarning,
   };
 
   const keylessProps = __keylessClaimUrl
