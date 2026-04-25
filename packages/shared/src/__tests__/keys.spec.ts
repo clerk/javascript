@@ -14,9 +14,9 @@ import {
 
 describe('buildPublishableKey(frontendApi)', () => {
   const cases = [
-    ['fake-clerk-test.clerk.accounts.dev', 'pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ='],
+    ['fake-clerk-test.clerk.accounts.dev', 'pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ'],
     ['foo-bar-13.clerk.accounts.dev', 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk'],
-    ['clerk.boring.sawfly-91.lcl.dev', 'pk_test_Y2xlcmsuYm9yaW5nLnNhd2ZseS05MS5sY2wuZGV2JA=='],
+    ['clerk.boring.sawfly-91.lcl.dev', 'pk_test_Y2xlcmsuYm9yaW5nLnNhd2ZseS05MS5sY2wuZGV2JA'],
     ['clerk.boring.sawfly-91.lclclerk.com', 'pk_test_Y2xlcmsuYm9yaW5nLnNhd2ZseS05MS5sY2xjbGVyay5jb20k'],
   ];
 
@@ -36,7 +36,7 @@ describe('parsePublishableKey(key)', () => {
     ['', null],
     ['whatever', null],
     [
-      'pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ=',
+      'pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ',
       { instanceType: 'production', frontendApi: 'fake-clerk-test.clerk.accounts.dev' },
     ],
     [
