@@ -1,5 +1,15 @@
 # @clerk/ui
 
+## 1.6.6
+
+### Patch Changes
+
+- Display web3wallet in UserProfile when added by administrator ([#7981](https://github.com/clerk/javascript/pull/7981)) by [@dmoerner](https://github.com/dmoerner)
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9), [`4b62ce8`](https://github.com/clerk/javascript/commit/4b62ce86afd56e6aacc5278226a07b093a66b0d3)]:
+  - @clerk/shared@4.8.4
+  - @clerk/localizations@4.5.4
+
 ## 1.6.5
 
 ### Patch Changes

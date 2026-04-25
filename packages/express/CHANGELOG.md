@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.1.8
+
+### Patch Changes
+
+- Support dynamic options callback in `clerkMiddleware` for multi-domain and multi-tenant setups. ([#8398](https://github.com/clerk/javascript/pull/8398)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9), [`d9011b4`](https://github.com/clerk/javascript/commit/d9011b45d622fecc727b3531fbedd805a4310abc)]:
+  - @clerk/shared@4.8.4
+  - @clerk/backend@3.4.0
+
 ## 2.1.7
 
 ### Patch Changes

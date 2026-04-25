@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.8.4
+
+### Patch Changes
+
+- Add `publishableKeyFromHost` utility for resolving the correct publishable key per hostname in multi-domain setups. Re-exported from `@clerk/react/internal`. ([#8398](https://github.com/clerk/javascript/pull/8398)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix `useOrganizationList` and `useOrganization` briefly reporting paginated resources as `isLoading: false` with empty data before the query starts. ([#8395](https://github.com/clerk/javascript/pull/8395)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 4.8.3
 
 ### Patch Changes
