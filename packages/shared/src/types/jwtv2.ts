@@ -98,10 +98,9 @@ type JWTPayloadBase = {
   sts?: SessionStatusClaim;
 
   /**
-   * Reserved session claim. When present, the session is operating under
-   * a restricted scope and SDK consumers should treat affected
-   * functionality as unavailable. The claim shape is opaque and may
-   * change without notice.
+   * Reserved session claim. The claim shape is opaque and may change
+   * without notice. Do not depend on its presence or absence for
+   * authorization checks.
    */
   ams?: AmsClaim;
 
@@ -223,20 +222,9 @@ export type AgentActClaim = ActClaim & { type: 'agent' };
 export type SessionStatusClaim = Extract<SessionStatus, 'active' | 'pending'>;
 
 /**
- * Shape of the optional `ams` session claim. Carries an identifier and a
- * list of opaque scope strings that constrain what the session is
- * permitted to do. Both fields should be treated as opaque tokens; their
- * vocabulary is owned by the issuer and may change without notice.
+ * Opaque optional `ams` session claim. Consumers must not inspect its value
+ * or depend on its presence or absence for authorization checks.
  *
  * @inline
  */
-export interface AmsClaim {
-  /**
-   * Opaque identifier the session is scoped to.
-   */
-  app_id: string;
-  /**
-   * Opaque scope strings. Consumers should test for membership only.
-   */
-  scopes: string[];
-}
+export type AmsClaim = unknown;

@@ -1,55 +1,32 @@
 import { useSession } from '@clerk/shared/react';
-import type { AmsClaim } from '@clerk/shared/types';
 
 /**
- * Return shape for {@link useAms}. Splits the "claim absent" case from
- * the "claim present" case so callers can use `hasScope` unconditionally
- * — when the claim is absent `hasScope` always returns `true`, meaning
- * sites that read `if (!hasScope('foo')) hide()` keep working on
- * regular sessions.
+ * Return shape for {@link useAms}. The claim is opaque, so callers should
+ * only branch on whether it is present.
  */
-export type UseAmsReturn =
-  | {
-      isActive: false;
-      appId: undefined;
-      scopes: undefined;
-      hasScope: () => true;
-    }
-  | {
-      isActive: true;
-      appId: string;
-      scopes: string[];
-      hasScope: (scope: string) => boolean;
-    };
+export type UseAmsReturn = {
+  isActive: boolean;
+};
 
 const INACTIVE: UseAmsReturn = {
   isActive: false,
-  appId: undefined,
-  scopes: undefined,
-  hasScope: () => true,
 };
 
 /**
  * Returns information about the optional `ams` claim on the active
- * session. When the claim is present the session is operating under a
- * restricted scope; the returned `hasScope` helper can be used to gate
- * UI on individual scope strings.
+ * session. The claim shape is intentionally opaque.
  *
  * Reactive — re-renders when the session token rotates.
  */
 export const useAms = (): UseAmsReturn => {
   const { session } = useSession();
-  const ams = session?.lastActiveToken?.jwt?.claims.ams as AmsClaim | undefined;
+  const claims = session?.lastActiveToken?.jwt?.claims;
 
-  if (!ams || typeof ams.app_id !== 'string') {
+  if (!claims || !Object.prototype.hasOwnProperty.call(claims, 'ams')) {
     return INACTIVE;
   }
 
-  const scopes = Array.isArray(ams.scopes) ? ams.scopes : [];
   return {
     isActive: true,
-    appId: ams.app_id,
-    scopes,
-    hasScope: (scope: string) => scopes.includes(scope),
   };
 };
