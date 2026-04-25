@@ -67,7 +67,7 @@ const mergeEnvVarsWithParams = (
       debug: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DEBUG),
     },
     unsafe_disableDevelopmentModeConsoleWarning:
-      paramUnsafeDisableDevelopmentModeConsoleWarning ||
+      paramUnsafeDisableDevelopmentModeConsoleWarning ??
       isTruthy(import.meta.env.PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING),
     // Read from params (server-injected via __CLERK_ASTRO_SAFE_VARS__)
     // These are dynamically resolved by middleware, not from env vars

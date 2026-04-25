@@ -27,6 +27,7 @@ export const pickFromClerkInitState = (
     __clerkUIVersion,
     __telemetryDisabled,
     __telemetryDebug,
+    __unsafeDisableDevelopmentModeConsoleWarning,
     __signInForceRedirectUrl,
     __signUpForceRedirectUrl,
     __signInFallbackRedirectUrl,
@@ -53,6 +54,7 @@ export const pickFromClerkInitState = (
       disabled: __telemetryDisabled,
       debug: __telemetryDebug,
     },
+    unsafe_disableDevelopmentModeConsoleWarning: __unsafeDisableDevelopmentModeConsoleWarning,
     signInForceRedirectUrl: __signInForceRedirectUrl,
     signUpForceRedirectUrl: __signUpForceRedirectUrl,
     signInFallbackRedirectUrl: __signInFallbackRedirectUrl,
@@ -78,7 +80,7 @@ export const mergeWithPublicEnvs = (restInitState: any) => {
     signInForceRedirectUrl: restInitState.signInForceRedirectUrl,
     prefetchUI: restInitState.prefetchUI ?? envVars.prefetchUI,
     unsafe_disableDevelopmentModeConsoleWarning:
-      restInitState.unsafe_disableDevelopmentModeConsoleWarning || envVars.unsafeDisableDevelopmentModeConsoleWarning,
+      restInitState.unsafe_disableDevelopmentModeConsoleWarning ?? envVars.unsafeDisableDevelopmentModeConsoleWarning,
   };
 };
 
