@@ -494,7 +494,7 @@ importers:
         version: 1.18.8
       bundlewatch:
         specifier: ^0.4.1
-        version: 0.4.1
+        version: 0.4.2
       jsdom:
         specifier: 26.1.0
         version: 26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
@@ -1007,8 +1007,8 @@ importers:
         specifier: ^1.18.8
         version: 1.18.8
       bundlewatch:
-        specifier: ^0.4.1
-        version: 0.4.1
+        specifier: ^0.4.2
+        version: 0.4.2
       cross-fetch:
         specifier: ^4.1.0
         version: 4.1.0
@@ -2588,7 +2588,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {'0': node >=0.10.0}
+    engines: {node: '>=0.10.0'}
 
   '@expo/cli@0.22.28':
     resolution: {integrity: sha512-lvt72KNitGuixYD2l3SZmRKVu2G4zJpmg5V7WfUBNpmUU5oODBw/6qmiJ6kSLAlfDozscUk+BBGknBBzxUrwrA==}
@@ -6149,8 +6149,8 @@ packages:
     resolution: {integrity: sha512-ilYanEU8vxxBexpJd8cWM4ElSQq4QctCLKih0TSfjIfCQTeyH/6zVrmIJfLPrKTKJRbiG+cfnZbQIjAlJmF1jQ==}
     engines: {node: '>=4'}
 
-  axios@0.30.2:
-    resolution: {integrity: sha512-0pE4RQ4UQi1jKY6p7u6i1Tkzqmu+d+/tHS7Q7rKunWLB9WyilBTpHHpXzPNMDj5hTbK0B0PTLSz07yqMBiF6xg==}
+  axios@0.31.1:
+    resolution: {integrity: sha512-Ef8DUZSZQP6igY48mjGaoEjwhely97lserep0IFJifBH4YdKvwH5eMLniy3kig2HQoBNR8EkZpDjowxwTJcmbg==}
 
   axios@1.13.2:
     resolution: {integrity: sha512-VPk9ebNqPcy5lRGuSlKx752IlDatOjT9paPlm8A7yOuW2Fbvp4X3JznJtT4f0GzGLLiWE9W8onz51SqLYwzGaA==}
@@ -6466,8 +6466,8 @@ packages:
     peerDependencies:
       esbuild: '>=0.18'
 
-  bundlewatch@0.4.1:
-    resolution: {integrity: sha512-SIobIhMX8DhoGiNlZ+IqicXRBkp7NQTKGEoZP82Tu8FQhoykbTdTQlL4zYT7n6swjH9wahJ9RTefz0Xwva5FXA==}
+  bundlewatch@0.4.2:
+    resolution: {integrity: sha512-67hWKEbLZyokB07wF4TFJ8X1TL/bcZWipbTQBAf9wwcc4fHe31vFk8m2CMwByMZa5DcK4ZzeRIn6Ldt8Q9f9aw==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -21278,7 +21278,7 @@ snapshots:
 
   axe-core@4.11.0: {}
 
-  axios@0.30.2:
+  axios@0.31.1:
     dependencies:
       follow-redirects: 1.15.11
       form-data: 4.0.4
@@ -21700,9 +21700,9 @@ snapshots:
       esbuild: 0.27.7
       load-tsconfig: 0.2.5
 
-  bundlewatch@0.4.1:
+  bundlewatch@0.4.2:
     dependencies:
-      axios: 0.30.2
+      axios: 0.31.1
       bytes: 3.1.2
       chalk: 4.1.2
       ci-env: 1.17.0
