@@ -13,7 +13,7 @@ catalogs:
   repo:
     '@swc/helpers': 0.5.21
     core-js: 3.47.0
-    rolldown: 1.0.0-beta.47
+    rolldown: 1.0.0-rc.17
     tsdown: 0.15.7
     tslib: 2.8.1
     tsup: 8.5.1
