@@ -77,7 +77,7 @@ const undefinedPaginatedResource = {
 export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
   | {
       /**
-       * A boolean that indicates whether Clerk has loaded the current authentication state and there is an authenticated user. Initially `false`, becomes `true` once Clerk loads with a user, and can revert to `false` while auth state is updating (for example, when switching organizations via `setActive()`).
+       * A boolean that indicates whether Clerk has loaded the current authentication state and there is an authenticated user. Initially `false`, becomes `true` once Clerk loads with a user, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
        */
       isLoaded: false;
       /**

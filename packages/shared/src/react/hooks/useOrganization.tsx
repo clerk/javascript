@@ -69,7 +69,7 @@ export type UseOrganizationParams = {
 export type UseOrganizationReturn<T extends UseOrganizationParams> =
   | {
       /**
-       * A boolean that indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via `setActive()`).
+       * A boolean that indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
        */
       isLoaded: false;
       /**
