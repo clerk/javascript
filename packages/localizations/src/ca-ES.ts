@@ -817,10 +817,10 @@ export const caES: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: 'He llegit i acepto la Política de Privacitat',
-        label__onlyTermsOfService: 'He llegit i acepto els Termes del Servei',
+        label__onlyPrivacyPolicy: 'He llegit i accepto la Política de Privacitat',
+        label__onlyTermsOfService: 'He llegit i accepto els Termes del Servei',
         label__termsOfServiceAndPrivacyPolicy:
-          'He llegit i acepto els {{ termsOfServiceLink || link("Termes del Servei") }} i la {{ privacyPolicyLink || link("Política de Privacitat") }}',
+          'He llegit i accepto els {{ termsOfServiceLink || link("Termes del Servei") }} i la {{ privacyPolicyLink || link("Política de Privacitat") }}',
       },
       continue: {
         subtitle: 'En continuar, acceptes les condicions esmentades.',
