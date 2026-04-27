@@ -37,11 +37,16 @@ type WithSessionParams = Partial<SessionJSON>;
 
 export const getOrganizationId = (orgParams: OrgParams) => orgParams?.id || orgParams?.name || 'test_id';
 
+// Membership and organization have distinct primary keys in production
+// (e.g. `orgmem_...` vs `org_...`). Mirror that in fixtures so regression tests for
+// Session.checkAuthorization correctly use organization.id rather than membership.id.
+const getOrganizationMembershipId = (orgParams: OrgParams) => `orgmem_${getOrganizationId(orgParams)}`;
+
 export const createOrganizationMembership = (params: OrgParams): OrganizationMembershipJSON => {
   const { role, permissions, ...orgParams } = params;
   return {
     created_at: new Date().getTime(),
-    id: getOrganizationId(orgParams),
+    id: getOrganizationMembershipId(orgParams),
     object: 'organization_membership',
     organization: {
       created_at: new Date().getTime(),
