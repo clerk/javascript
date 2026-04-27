@@ -69,26 +69,17 @@ export function getResponseClerkState(requestState: RequestState, additionalStat
  * @internal
  */
 export const patchRequest = (request: Request) => {
-  // Forward aborts via a local AbortController instead of passing the original
-  // signal: Node 24's bundled undici tightened the instanceof AbortSignal check
-  // and rejects cross-realm signals (e.g. those carried by framework Request
-  // subclasses).
-  const controller = new AbortController();
-  const originalSignal = request.signal;
-  if (originalSignal) {
-    if (originalSignal.aborted) {
-      controller.abort(originalSignal.reason);
-    } else {
-      originalSignal.addEventListener('abort', () => controller.abort(originalSignal.reason), { once: true });
-    }
-  }
-
+  // Omit `signal` from the clone: Node 24's bundled undici tightened the
+  // instanceof AbortSignal check on RequestInit.signal and rejects any signal
+  // it does not recognize as its own — including the standard AbortSignal from
+  // framework Request subclasses or from `new AbortController()`. Until the
+  // ecosystem stabilizes, abort propagation through this clone is intentionally
+  // dropped. See packages/backend/src/proxy.ts for the same workaround.
   const clonedRequest = new Request(request.url, {
     headers: request.headers,
     method: request.method,
     redirect: request.redirect,
     cache: request.cache,
-    signal: controller.signal,
   });
 
   // If duplex is not set, set it to 'half' to avoid duplex issues with unidici
