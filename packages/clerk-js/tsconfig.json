@@ -7,7 +7,7 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
-    "lib": ["dom", "dom.iterable", "es2021.intl"],
+    "lib": ["dom", "dom.iterable", "es2021.intl", "es2022.error"],
     "module": "esnext",
     "moduleResolution": "Bundler",
     "noEmit": true,
