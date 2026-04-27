@@ -47,8 +47,8 @@
     "tinyglobby": "^0.2.15"
   },
   "devDependencies": {
-    "@babel/cli": "^7.24.7",
-    "@babel/preset-react": "^7.24.7",
+    "@babel/cli": "^7.28.6",
+    "@babel/preset-react": "^7.28.5",
     "@types/jscodeshift": "^0.12.0"
   },
   "engines": {

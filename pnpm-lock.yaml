@@ -1062,10 +1062,10 @@ importers:
         version: 0.2.16
     devDependencies:
       '@babel/cli':
-        specifier: ^7.24.7
-        version: 7.28.3(@babel/core@7.28.5)
+        specifier: ^7.28.6
+        version: 7.28.6(@babel/core@7.28.5)
       '@babel/preset-react':
-        specifier: ^7.24.7
+        specifier: ^7.28.5
         version: 7.28.5(@babel/core@7.28.5)
       '@types/jscodeshift':
         specifier: ^0.12.0
@@ -1172,8 +1172,8 @@ packages:
     resolution: {integrity: sha512-UFBgfeldP06qu6khs/yY+q1cDAaArM2/7AEIqQ9Cuvf7B1hNLq0xDrZkct+QoIGyjq56y8IaE2I3CTvG99mlhQ==}
     engines: {node: 18.20.8 || ^20.3.0 || >=22.0.0}
 
-  '@babel/cli@7.28.3':
-    resolution: {integrity: sha512-n1RU5vuCX0CsaqaXm9I0KUCNKNQMy5epmzl/xdSSm70bSqhg9GWhgeosypyQLc0bK24+Xpk1WGzZlI9pJtkZdg==}
+  '@babel/cli@7.28.6':
+    resolution: {integrity: sha512-6EUNcuBbNkj08Oj4gAZ+BUU8yLCgKzgVX4gaTh09Ya2C8ICM4P+G30g4m3akRxSYAp3A/gnWchrNst7px4/nUQ==}
     engines: {node: '>=6.9.0'}
     hasBin: true
     peerDependencies:
@@ -14698,7 +14698,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/cli@7.28.3(@babel/core@7.28.5)':
+  '@babel/cli@7.28.6(@babel/core@7.28.5)':
     dependencies:
       '@babel/core': 7.28.5
       '@jridgewell/trace-mapping': 0.3.31
