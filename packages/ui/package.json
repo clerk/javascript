@@ -120,7 +120,7 @@
     "@svgr/rollup": "^8.1.0",
     "@svgr/webpack": "^6.5.1",
     "@types/webpack-env": "^1.18.8",
-    "bundlewatch": "^0.4.1",
+    "bundlewatch": "^0.4.2",
     "cross-fetch": "^4.1.0",
     "minimatch": "^10.2.5",
     "tsdown": "catalog:repo",
