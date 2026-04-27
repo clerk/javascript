@@ -5,6 +5,7 @@ import type React from 'react';
 import { ClerkProvider } from './contexts/ClerkProvider';
 import type { ClerkProviderProps } from './types';
 
+export { publishableKeyFromHost } from '@clerk/shared/keys';
 export { setErrorThrowerOptions } from './errors/errorThrower';
 export { MultisessionAppSupport } from './components/controlComponents';
 export { useOAuthConsent } from '@clerk/shared/react';

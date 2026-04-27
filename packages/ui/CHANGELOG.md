@@ -1,5 +1,39 @@
 # @clerk/ui
 
+## 1.6.7
+
+### Patch Changes
+
+- Updated dependencies [[`da76490`](https://github.com/clerk/javascript/commit/da7649075e24351737271318e81842b5c298dee1)]:
+  - @clerk/shared@4.8.5
+  - @clerk/localizations@4.5.5
+
+## 1.6.6
+
+### Patch Changes
+
+- Display web3wallet in UserProfile when added by administrator ([#7981](https://github.com/clerk/javascript/pull/7981)) by [@dmoerner](https://github.com/dmoerner)
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9), [`4b62ce8`](https://github.com/clerk/javascript/commit/4b62ce86afd56e6aacc5278226a07b093a66b0d3)]:
+  - @clerk/shared@4.8.4
+  - @clerk/localizations@4.5.4
+
+## 1.6.5
+
+### Patch Changes
+
+- Fixed OAuth `redirect_url` for `openSignIn` modal. ([#8385](https://github.com/clerk/javascript/pull/8385)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 1.6.4
+
+### Patch Changes
+
+- Default the organization selection in `<OAuthConsent />` to the user's last active organization, falling back to the first membership when it is not set or no longer available. ([#8362](https://github.com/clerk/javascript/pull/8362)) by [@kylemac](https://github.com/kylemac)
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f)]:
+  - @clerk/shared@4.8.3
+  - @clerk/localizations@4.5.3
+
 ## 1.6.3
 
 ### Patch Changes
