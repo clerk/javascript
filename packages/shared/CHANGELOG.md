@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.8.5
+
+### Patch Changes
+
+- Generate publishable keys with unpadded Base64 encoding to match backend output. ([#8400](https://github.com/clerk/javascript/pull/8400)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
 ## 4.8.4
 
 ### Patch Changes
