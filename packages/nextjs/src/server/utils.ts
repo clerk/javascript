@@ -163,9 +163,18 @@ function createTokenSignature(token: string, key: string): string {
   return HmacSHA1(token, key).toString();
 }
 
-// Constant-time string equality. The signature is HMAC-SHA1 hex (fixed 40 chars),
-// so the early length check leaks no secret. Synchronous and runtime-agnostic so
-// it works in Edge Runtime, where node:crypto.timingSafeEqual isn't reliably available.
+/**
+ * Constant-time string equality. Used to compare HMAC signatures without leaking
+ * timing information about how many leading characters matched — `===` and `!==`
+ * on strings short-circuit on the first mismatching character, which would let an
+ * attacker reconstruct the expected signature byte-by-byte across many timed
+ * requests against the Next.js origin.
+ *
+ * Synchronous and runtime-agnostic so it works in Edge Runtime, where
+ * `node:crypto.timingSafeEqual` isn't reliably available. The early length check
+ * leaks length, but is safe here because the only caller compares HMAC-SHA1 hex
+ * digests of fixed length (40 chars).
+ */
 function constantTimeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) {
     return false;
