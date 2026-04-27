@@ -50,10 +50,6 @@ export class APIKey {
      */
     readonly createdBy: string | null,
     /**
-     * An optional description for the API key.
-     */
-    readonly description: string | null,
-    /**
      * The date and time when the API key was last used to authenticate a request.
      */
     readonly lastUsedAt: number | null,
@@ -65,6 +61,10 @@ export class APIKey {
      * The date when the API key was last updated.
      */
     readonly updatedAt: number,
+    /**
+     * A description for the API key.
+     */
+    readonly description?: string | null,
     /**
      * The API key secret. **This property is only present in the response from [`create()`](/docs/reference/objects/api-keys#create) and cannot be retrieved later.**
      */

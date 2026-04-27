@@ -1182,11 +1182,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     signUpUrl?: string;
     /**
-     * An optional array of domains to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
+     * An array of domains to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
      */
     allowedRedirectOrigins?: Array<string | RegExp>;
     /**
-     * An optional array of protocols to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
+     * An array of protocols to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
      */
     allowedRedirectProtocols?: Array<string>;
     /**
