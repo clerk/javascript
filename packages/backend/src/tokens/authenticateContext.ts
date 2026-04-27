@@ -1,5 +1,5 @@
 import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
-import { AUTO_PROXY_PATH, getAutoProxyUrlFromEnvironment } from '@clerk/shared/proxy';
+import { getAutoProxyUrlFromEnvironment } from '@clerk/shared/proxy';
 import type { Jwt } from '@clerk/shared/types';
 import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
 
