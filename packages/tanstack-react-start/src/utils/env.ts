@@ -1,9 +1,9 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isTruthy } from '@clerk/shared/underscore';
 
-export const getPublicEnvVariables = () => {
+export const getPublicEnvVariables = (context?: Record<string, any>) => {
   const getValue = (name: string): string => {
-    return getEnvVariable(`VITE_${name}`) || getEnvVariable(name);
+    return getEnvVariable(`VITE_${name}`, context) || getEnvVariable(name, context);
   };
 
   return {

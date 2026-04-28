@@ -2,9 +2,13 @@ import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 
 import { getPublicEnvVariables } from '../utils/env';
+import { getCloudflareWorkerEnv } from './cloudflareEnv';
 
-export const commonEnvs = () => {
-  const publicEnvs = getPublicEnvVariables();
+export const commonEnvs = (context?: Record<string, any>) => {
+  // On Cloudflare Workers, resolve env from the runtime.
+  // Falls back to undefined on non-CF environments.
+  const cfEnv = context ?? getCloudflareWorkerEnv();
+  const publicEnvs = getPublicEnvVariables(cfEnv);
 
   return {
     // Public environment variables
@@ -23,17 +27,17 @@ export const commonEnvs = () => {
     TELEMETRY_DEBUG: publicEnvs.telemetryDebug,
 
     // Server-only environment variables
-    API_VERSION: getEnvVariable('CLERK_API_VERSION') || 'v1',
-    SECRET_KEY: getEnvVariable('CLERK_SECRET_KEY'),
-    MACHINE_SECRET_KEY: getEnvVariable('CLERK_MACHINE_SECRET_KEY'),
-    ENCRYPTION_KEY: getEnvVariable('CLERK_ENCRYPTION_KEY'),
-    CLERK_JWT_KEY: getEnvVariable('CLERK_JWT_KEY'),
-    API_URL: getEnvVariable('CLERK_API_URL') || apiUrlFromPublishableKey(publicEnvs.publishableKey),
+    API_VERSION: getEnvVariable('CLERK_API_VERSION', cfEnv) || 'v1',
+    SECRET_KEY: getEnvVariable('CLERK_SECRET_KEY', cfEnv),
+    MACHINE_SECRET_KEY: getEnvVariable('CLERK_MACHINE_SECRET_KEY', cfEnv),
+    ENCRYPTION_KEY: getEnvVariable('CLERK_ENCRYPTION_KEY', cfEnv),
+    CLERK_JWT_KEY: getEnvVariable('CLERK_JWT_KEY', cfEnv),
+    API_URL: getEnvVariable('CLERK_API_URL', cfEnv) || apiUrlFromPublishableKey(publicEnvs.publishableKey),
 
     SDK_METADATA: {
       name: PACKAGE_NAME,
       version: PACKAGE_VERSION,
-      environment: getEnvVariable('NODE_ENV'),
+      environment: getEnvVariable('NODE_ENV', cfEnv),
     },
   } as const;
 };
