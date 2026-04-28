@@ -24,20 +24,36 @@ import { incomingMessageToRequest, loadApiEnv, loadClientEnv, requestToProxyRequ
  */
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, request, options } = opts;
-  const { jwtKey, authorizedParties, audience, acceptsToken, clockSkewInMs } = options || {};
+  // Peel off middleware-only keys and the few options that need middleware-side
+  // resolution (env fallbacks, URL normalization). Everything else is spread
+  // straight through, so new AuthenticateRequestOptions/VerifyTokenOptions
+  // fields flow to the backend without another code change here.
+  const {
+    clerkClient: _clerkClient,
+    debug: _debug,
+    frontendApiProxy: _frontendApiProxy,
+    isSatellite: isSatelliteInput,
+    domain: domainInput,
+    signInUrl: signInUrlInput,
+    proxyUrl: proxyUrlInput,
+    secretKey: secretKeyInput,
+    machineSecretKey: machineSecretKeyInput,
+    publishableKey: publishableKeyInput,
+    ...restOptions
+  } = options || {};
 
   const clerkRequest = createClerkRequest(incomingMessageToRequest(request));
   const env = { ...loadApiEnv(), ...loadClientEnv() };
 
-  const secretKey = options?.secretKey || env.secretKey;
-  const machineSecretKey = options?.machineSecretKey || env.machineSecretKey;
-  const publishableKey = options?.publishableKey || env.publishableKey;
+  const secretKey = secretKeyInput || env.secretKey;
+  const machineSecretKey = machineSecretKeyInput || env.machineSecretKey;
+  const publishableKey = publishableKeyInput || env.publishableKey;
 
-  const isSatellite = handleValueOrFn(options?.isSatellite, clerkRequest.clerkUrl, env.isSatellite);
-  const domain = handleValueOrFn(options?.domain, clerkRequest.clerkUrl) || env.domain;
-  const signInUrl = options?.signInUrl || env.signInUrl;
+  const isSatellite = handleValueOrFn(isSatelliteInput, clerkRequest.clerkUrl, env.isSatellite);
+  const domain = handleValueOrFn(domainInput, clerkRequest.clerkUrl) || env.domain;
+  const signInUrl = signInUrlInput || env.signInUrl;
   const proxyUrl = absoluteProxyUrl(
-    handleValueOrFn(options?.proxyUrl, clerkRequest.clerkUrl, env.proxyUrl),
+    handleValueOrFn(proxyUrlInput, clerkRequest.clerkUrl, env.proxyUrl),
     clerkRequest.clerkUrl.toString(),
   );
 
@@ -50,18 +66,14 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   }
 
   return clerkClient.authenticateRequest(clerkRequest, {
-    audience,
+    ...restOptions,
     secretKey,
     machineSecretKey,
     publishableKey,
-    jwtKey,
-    clockSkewInMs,
-    authorizedParties,
     proxyUrl,
     isSatellite,
     domain,
     signInUrl,
-    acceptsToken,
   });
 };
 
