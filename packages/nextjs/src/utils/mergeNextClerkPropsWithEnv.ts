@@ -1,4 +1,5 @@
 import type { InternalClerkScriptProps } from '@clerk/react/internal';
+import { getAutoProxyUrlFromEnvironment } from '@clerk/shared/proxy';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import { SDK_METADATA } from '../server/constants';
@@ -22,16 +23,26 @@ function getPrefetchUIFromEnvAndProps(propsPrefetchUI: NextClerkProviderProps['p
 export const mergeNextClerkPropsWithEnv = (
   props: Omit<NextClerkProviderProps, 'children'> & InternalClerkScriptProps,
 ): any => {
+  const publishableKey = props.publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
+  const proxyUrl = props.proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL || '';
+  const domain = props.domain || process.env.NEXT_PUBLIC_CLERK_DOMAIN || '';
+
   return {
     ...props,
-    publishableKey: props.publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',
+    publishableKey,
     __internal_clerkJSUrl: props.__internal_clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS_URL,
     __internal_clerkJSVersion: props.__internal_clerkJSVersion || process.env.NEXT_PUBLIC_CLERK_JS_VERSION,
     __internal_clerkUIUrl: props.__internal_clerkUIUrl || process.env.NEXT_PUBLIC_CLERK_UI_URL,
     __internal_clerkUIVersion: props.__internal_clerkUIVersion || process.env.NEXT_PUBLIC_CLERK_UI_VERSION,
     prefetchUI: getPrefetchUIFromEnvAndProps(props.prefetchUI),
-    proxyUrl: props.proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL || '',
-    domain: props.domain || process.env.NEXT_PUBLIC_CLERK_DOMAIN || '',
+    proxyUrl:
+      proxyUrl ||
+      getAutoProxyUrlFromEnvironment({
+        hasDomain: !!domain,
+        hasProxyUrl: !!proxyUrl,
+        publishableKey,
+      }),
+    domain,
     isSatellite: props.isSatellite || isTruthy(process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE),
     signInUrl: props.signInUrl || process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '',
     signUpUrl: props.signUpUrl || process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '',
