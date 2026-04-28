@@ -1,3 +1,7 @@
+# Note: There is a copy of this workflow in ci-fork-integration.yml that is
+# used for triggering integration tests on forked PRs. If you tweak this
+# workflow, see if that also needs to be updated.
+
 name: CI
 
 on:
@@ -289,6 +293,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      # This needs to be kept in sync with ci-fork-integration.yml
       matrix:
         test-name:
           [
@@ -475,6 +480,34 @@ jobs:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.sanitize.outputs.artifact-suffix }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
           path: test-results
           retention-days: 1
+
+  integration-tests-gate:
+    needs: [integration-tests]
+    if: >-
+      ${{ always()
+      && github.event_name == 'pull_request'
+      && needs.integration-tests.result != 'skipped' }}
+    runs-on: "blacksmith-2vcpu-ubuntu-2204"
+    permissions:
+      statuses: write
+    name: Integration Tests Gate
+    steps:
+      - name: Report integration test status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RESULT: ${{ needs.integration-tests.result }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ "$RESULT" = "success" ]; then
+            STATE="success"
+          else
+            STATE="failure"
+          fi
+          gh api "repos/$REPO/statuses/$SHA" \
+            -f state="$STATE" \
+            -f context="integration-tests" \
+            -f description="Integration tests: $RESULT"
 
   pkg-pr-new:
     name: Publish with pkg-pr-new

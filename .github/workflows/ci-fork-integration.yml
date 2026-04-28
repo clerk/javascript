@@ -1,0 +1,313 @@
+# Note: There is a copy of this workflow in ci.yml that is
+# used for triggering integration tests on forked PRs. If you tweak this
+# workflow, see if that also needs to be updated.
+
+name: 'CI: Fork Integration Tests'
+
+on:
+  pull_request_target:
+    types: [labeled, synchronize]
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  remove-label-on-push:
+    if: >-
+      ${{ github.event.action == 'synchronize'
+      && github.event.pull_request.head.repo.full_name != github.repository }}
+    runs-on: 'blacksmith-2vcpu-ubuntu-2204'
+    permissions:
+      # Needed for removing the "safe-to-test" label
+      pull-requests: write
+    name: Remove safe-to-test label
+    steps:
+      - name: Remove safe-to-test label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh pr edit "$PR_NUMBER" --repo "$REPO" --remove-label "safe-to-test" || true
+
+  check-label-permissions:
+    if: >-
+      ${{ github.event.action == 'labeled'
+      && github.event.label.name == 'safe-to-test'
+      && github.event.pull_request.head.repo.full_name != github.repository }}
+    runs-on: 'blacksmith-2vcpu-ubuntu-2204'
+    permissions:
+      pull-requests: write
+    name: Check Label Sender Permissions
+    steps:
+      - name: Verify label sender has write access
+        id: checkAccess
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: write
+          username: ${{ github.event.sender.login }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove unauthorized label and fail
+        if: ${{ steps.checkAccess.outputs.require-result == 'false' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          echo "::error::User ${{ github.event.sender.login }} added safe-to-test but only has '${{ steps.checkAccess.outputs.user-permission }}' permission (write required)."
+          gh pr edit "$PR_NUMBER" --repo "$REPO" --remove-label "safe-to-test" || true
+          exit 1
+
+  integration-tests:
+    needs: [check-label-permissions]
+    if: >-
+      ${{ github.event.action == 'labeled'
+      && github.event.label.name == 'safe-to-test'
+      && github.event.pull_request.head.repo.full_name != github.repository
+      && github.event.pull_request.draft == false }}
+    name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
+    permissions:
+      contents: read
+      actions: write
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
+
+    strategy:
+      fail-fast: false
+      # This needs to be kept in sync with ci.yml
+      matrix:
+        test-name:
+          [
+            'generic',
+            'express',
+            'fastify',
+            'ap-flows',
+            'localhost',
+            'sessions',
+            'sessions:staging',
+            'handshake',
+            'handshake:staging',
+            'astro',
+            'tanstack-react-start',
+            'vue',
+            'nuxt',
+            'react-router',
+            'custom',
+            'hono',
+            'chrome-extension',
+          ]
+        test-project: ['chrome']
+        include:
+          - test-name: 'billing'
+            test-project: 'chrome'
+          - test-name: 'machine'
+            test-project: 'chrome'
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '15'
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '16'
+          - test-name: 'quickstart'
+            test-project: 'chrome'
+            next-version: '15'
+          - test-name: 'quickstart'
+            test-project: 'chrome'
+            next-version: '16'
+          - test-name: 'cache-components'
+            test-project: 'chrome'
+            next-version: '16'
+
+    steps:
+      # Phase 1: Check out the base branch so that the composite action
+      # at .github/actions/init-blacksmith comes from trusted code.
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          fetch-tags: false
+          filter: 'blob:none'
+          show-progress: false
+
+      - name: Setup (from base branch)
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true
+
+      # Phase 2: Overlay the fork code at the exact SHA frozen in the event payload.
+      # This SHA was captured when the label was applied and cannot be changed by
+      # subsequent pushes to the fork branch.
+      - name: Checkout fork PR (SHA-pinned)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+          fetch-tags: false
+          filter: 'blob:none'
+          show-progress: false
+          clean: false
+
+      - name: Re-install dependencies for fork code
+        run: pnpm install
+
+      - name: Verify jq is installed
+        shell: bash
+        run: |
+          if ! command -v jq &> /dev/null; then
+            echo "jq not found, installing..."
+            sudo apt-get update && sudo apt-get install -y jq
+          fi
+          jq --version
+
+      - name: Validate turbo task
+        env:
+          E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          E2E_CLERK_JS_VERSION: 'latest'
+          E2E_CLERK_UI_VERSION: 'latest'
+          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
+          E2E_PROJECT: ${{ matrix.test-project }}
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+        run: |
+          TASK_NAME="test:integration:${{ matrix.test-name }}"
+          TURBO_STDERR=$(mktemp)
+          if ! TURBO_JSON=$(pnpm turbo run "$TASK_NAME" --dry=json 2>"$TURBO_STDERR"); then
+            echo "::error::Turbo task '$TASK_NAME' failed validation"
+            cat "$TURBO_STDERR"
+            exit 1
+          fi
+
+          if ! TASK_COUNT=$(jq -er '.tasks | length' <<< "$TURBO_JSON"); then
+            echo "::error::Turbo task '$TASK_NAME' returned invalid JSON or missing .tasks"
+            printf '%s\n' "$TURBO_JSON"
+            exit 1
+          fi
+
+          if [ "$TASK_COUNT" -eq 0 ]; then
+            echo "::error::Turbo task '$TASK_NAME' returned 0 tasks"
+            exit 1
+          fi
+
+          echo "Task '$TASK_NAME' validated ($TASK_COUNT tasks in graph)"
+
+      - name: Build packages
+        run: pnpm turbo build $TURBO_ARGS --only
+
+      - name: Publish to local registry
+        run: pkglab pub --force
+
+      - name: Edit .npmrc [link-workspace-packages=false]
+        run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
+
+      - name: Install @clerk/clerk-js in os temp
+        working-directory: ${{runner.temp}}
+        run: |
+          mkdir clerk-js && cd clerk-js
+          pnpm init
+          pkglab add @clerk/clerk-js
+
+      - name: Install @clerk/ui in os temp
+        working-directory: ${{runner.temp}}
+        run: |
+          mkdir clerk-ui && cd clerk-ui
+          pnpm init
+          pkglab add @clerk/ui
+
+      - name: Copy components @clerk/astro
+        if: ${{ matrix.test-name == 'astro' }}
+        run: cd packages/astro && pnpm copy:components
+
+      - name: Write all ENV certificates to files in integration/certs
+        uses: actions/github-script@v7
+        env:
+          INTEGRATION_CERTS: '${{secrets.INTEGRATION_CERTS}}'
+          INTEGRATION_ROOT_CA: '${{secrets.INTEGRATION_ROOT_CA}}'
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const rootCa = process.env.INTEGRATION_ROOT_CA;
+            console.log('rootCa', rootCa);
+            fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', 'rootCA.pem'), rootCa);
+            const certs = JSON.parse(process.env.INTEGRATION_CERTS);
+            for (const [name, cert] of Object.entries(certs)) {
+                fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', name), cert);
+            }
+
+      - name: LS certs
+        working-directory: ./integration/certs
+        run: ls -la && pwd
+
+      - name: Run Integration Tests
+        id: integration-tests
+        timeout-minutes: 25
+        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
+        env:
+          E2E_DEBUG: '1'
+          E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          E2E_CLERK_JS_VERSION: 'latest'
+          E2E_CLERK_UI_VERSION: 'latest'
+          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
+          E2E_PROJECT: ${{ matrix.test-project }}
+          E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+
+      - name: Sanitize artifact name
+        if: ${{ cancelled() || failure() }}
+        id: sanitize
+        run: |
+          SANITIZED="${TEST_NAME//:/-}"
+          echo "artifact-suffix=${SANITIZED}" >> $GITHUB_OUTPUT
+        env:
+          TEST_NAME: ${{ matrix.test-name }}
+
+      - name: Upload test-results
+        if: ${{ cancelled() || failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-fork-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.sanitize.outputs.artifact-suffix }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
+          path: test-results
+          retention-days: 1
+
+  integration-tests-gate:
+    needs: [integration-tests]
+    if: ${{ always() && needs.integration-tests.result != 'skipped' }}
+    runs-on: 'blacksmith-2vcpu-ubuntu-2204'
+    permissions:
+      statuses: write
+    name: Fork Integration Tests Gate
+    steps:
+      - name: Report integration test status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RESULT: ${{ needs.integration-tests.result }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ "$RESULT" = "success" ]; then
+            STATE="success"
+          else
+            STATE="failure"
+          fi
+          gh api "repos/$REPO/statuses/$SHA" \
+            -f state="$STATE" \
+            -f context="integration-tests" \
+            -f description="Fork integration tests: $RESULT"
