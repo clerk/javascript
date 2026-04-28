@@ -100,6 +100,7 @@ export type CheckAuthorizationParamsWithCustomPermissions = WithReverification<
   | { role?: never; permission?: never; feature?: never; plan?: never }
 >;
 
+/** @document */
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 
 type CheckAuthorizationParams = WithReverification<
@@ -217,49 +218,133 @@ export interface SessionResource extends ClerkResource {
    * The current state of the session.
    */
   status: SessionStatus;
+  /**
+   * The date and time when the session will expire.
+   */
   expireAt: Date;
+  /**
+   * The date and time when the session was abandoned by the user.
+   */
   abandonAt: Date;
   /**
    * An array where each item represents the number of minutes since the last verification of a first or second factor: `[firstFactorAge, secondFactorAge]`.
    */
   factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
+  /**
+   * The token that was last used to authenticate the session.
+   */
   lastActiveToken: TokenResource | null;
+  /**
+   * The ID of the last [Active Organization](!active-organization).
+   */
   lastActiveOrganizationId: string | null;
+  /**
+   * The date and time when the session was last active on the [`Client`](https://clerk.com/docs/reference/objects/client).
+   */
   lastActiveAt: Date;
+  /**
+   * The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/guides/users/impersonation).
+   */
   actor: ActClaim | null;
+  /**
+   * When the session's actor claim has `type: 'agent'`, this property exposes information about the agent and [Agent Task](https://clerk.com/docs/reference/objects/agent-task) that was used to create the session.
+   */
   agent: AgentActClaim | null;
+  /**
+   * The user's pending [session tasks](https://clerk.com/docs/guides/configure/session-tasks).
+   */
   tasks: Array<SessionTask> | null;
+  /**
+   * The user's current pending [session task](https://clerk.com/docs/guides/configure/session-tasks).
+   */
   currentTask?: SessionTask;
   /**
-   * The user associated with the session.
+   * The [`User`](https://clerk.com/docs/reference/objects/user) associated with the session.
    */
   user: UserResource | null;
+  /**
+   * Publicly available information about the current [`User`](https://clerk.com/docs/reference/objects/user).
+   */
   publicUserData: PublicUserData;
+
   /**
    * Marks the session as ended. The session will no longer be active for this `Client` and its status will become **ended**.
    */
   end: () => Promise<SessionResource>;
+  /**
+   * Invalidates the current session by marking it as removed. Once removed, the session will be deactivated for the current Client instance and its `status` will be set to `removed`. This operation cannot be undone.
+   */
   remove: () => Promise<SessionResource>;
+  /**
+   * Updates the session's last active timestamp to the current time. This method should be called periodically to indicate ongoing user activity and prevent the session from becoming stale. The updated timestamp is used for session management and analytics purposes.
+   */
   touch: (params?: SessionTouchParams) => Promise<SessionResource>;
+  /**
+   * Retrieves the current user's [session token](https://clerk.com/docs/guides/sessions/session-tokens) or a [custom JWT template](https://clerk.com/docs/guides/sessions/jwt-templates).
+   *
+   * This method uses a cache so a network request will only be made if the token in memory has expired. The TTL for a Clerk token is one minute. It retries on transient failures (e.g. network errors); when the browser is offline and retries are exhausted, it throws `ClerkOfflineError`.
+   *
+   * Tokens can only be generated if the user is signed in.
+   */
   getToken: GetToken;
+  /**
+   * Checks if the user is [authorized for the specified Role, Permission, Feature, or Plan](https://clerk.com/docs/guides/secure/authorization-checks) or requires the user to [reverify their credentials](https://clerk.com/docs/guides/secure/reverification) if their last verification is older than allowed.
+   * @skipParametersSection
+   */
   checkAuthorization: CheckAuthorization;
+  /**
+   * Clears the cache for the current session. This is useful if the session has been updated and the cache is no longer valid.
+   */
   clearCache: () => void;
+  /**
+   * The date and time when the session was first created.
+   */
   createdAt: Date;
+  /**
+   * The date and time when the session was last updated.
+   */
   updatedAt: Date;
-
+  /**
+   * Initiates the reverification flow.
+   * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   */
   startVerification: (params: SessionVerifyCreateParams) => Promise<SessionVerificationResource>;
+  /**
+   * Initiates the [first factor verification](!first-factor-verification) process. This is a required step to complete a reverification flow when using a preparable factor.
+   * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   * @skipParametersSection
+   */
   prepareFirstFactorVerification: (
     factor: SessionVerifyPrepareFirstFactorParams,
   ) => Promise<SessionVerificationResource>;
+  /**
+   * Attempts to complete the [first factor verification](!first-factor-verification) process.
+   * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   * @skipParametersSection
+   */
   attemptFirstFactorVerification: (
     attemptFactor: SessionVerifyAttemptFirstFactorParams,
   ) => Promise<SessionVerificationResource>;
+  /**
+   * Initiates the [second factor verification](!second-factor-verification) process.
+   * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   * @skipParametersSection
+   */
   prepareSecondFactorVerification: (
     params: SessionVerifyPrepareSecondFactorParams,
   ) => Promise<SessionVerificationResource>;
+  /**
+   * Attempts to complete the [second factor verification](!second-factor-verification) process.
+   * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   * @skipParametersSection
+   */
   attemptSecondFactorVerification: (
     params: SessionVerifyAttemptSecondFactorParams,
   ) => Promise<SessionVerificationResource>;
+  /**
+   * Initiates a verification flow using passkeys.
+   * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   */
   verifyWithPasskey: () => Promise<SessionVerificationResource>;
   __internal_toSnapshot: () => SessionJSONSnapshot;
   __internal_touch: (params?: SessionTouchParams) => Promise<ClientResource | undefined>;
@@ -312,30 +397,89 @@ export interface SessionActivity {
   isMobile?: boolean;
 }
 
+/**
+ * The current state of the session.
+ */
 export type SessionStatus =
+  /**
+   * The session was abandoned client-side.
+   */
   | 'abandoned'
+  /**
+   * The session is valid and all activity is allowed.
+   */
   | 'active'
+  /**
+   * The user signed out of the session, but the [`Session`](https://clerk.com/docs/reference/objects/session) remains in the [`Client`](https://clerk.com/docs/reference/objects/client).
+   */
   | 'ended'
+  /**
+   * The period of allowed activity for this session has passed.
+   */
   | 'expired'
+  /**
+   * The user signed out of the session and the [`Session`](https://clerk.com/docs/reference/objects/session) was removed from the [`Client`](https://clerk.com/docs/reference/objects/client).
+   */
   | 'removed'
+  /**
+   * The session has been replaced by another one, but the previous [`Session`](https://clerk.com/docs/reference/objects/session) remains in the [`Client`](https://clerk.com/docs/reference/objects/client).
+   */
   | 'replaced'
+  /**
+   * The application ended the session and the [`Session`](https://clerk.com/docs/reference/objects/session) was removed from the [`Client`](https://clerk.com/docs/reference/objects/client).
+   */
   | 'revoked'
+  /**
+   * The user has signed in but hasn't completed [session tasks](https://clerk.com/docs/guides/configure/session-tasks).
+   */
   | 'pending';
 
+/** @inline */
 export type SessionTouchIntent = 'focus' | 'select_session' | 'select_org';
 
+/** @document */
 export type SessionTouchParams = {
+  /**
+   * The intent of the touch operation.
+   */
   intent?: SessionTouchIntent;
 };
 
+/**
+ * Information about the user that's publicly available.
+ */
 export interface PublicUserData {
+  /**
+   * The user's first name.
+   */
   firstName: string | null;
+  /**
+   * The user's last name.
+   */
   lastName: string | null;
+  /**
+   * Holds the default avatar or user's uploaded profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization).
+   */
   imageUrl: string;
+  /**
+   * Indicates whether the user has a profile picture.
+   */
   hasImage: boolean;
+  /**
+   * The user's identifier, such as their email address or phone number. Can be used for user identification.
+   */
   identifier: string;
+  /**
+   * The user's unique identifier.
+   */
   userId?: string;
+  /**
+   * The user's username.
+   */
   username?: string;
+  /**
+   * Indicates whether the user is banned.
+   */
   banned?: boolean;
 }
 
@@ -349,9 +493,19 @@ export interface SessionTask {
   key: 'choose-organization' | 'reset-password' | 'setup-mfa';
 }
 
+/** @document */
 export type GetTokenOptions = {
+  /**
+   * The Organization associated with the generated session token. _Does not modify the session's currently [Active Organization](!active-organization)._
+   */
   organizationId?: string;
+  /**
+   * Whether to skip the cache lookup and force a call to the server instead, even within the TTL. Useful if the token claims are time-sensitive or depend on data that can be updated (e.g. user fields). Defaults to `false`.
+   */
   skipCache?: boolean;
+  /**
+   * The name of the JWT template from the [Clerk Dashboard](https://dashboard.clerk.com/~/jwt-templates) to generate a new token from. E.g. 'firebase', 'grafbase', or your custom template's name.
+   */
   template?: string;
 };
 /**
@@ -359,6 +513,7 @@ export type GetTokenOptions = {
  */
 export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
 
+/** @document */
 export type SessionVerifyCreateParams = {
   level: SessionVerificationLevel;
 };
@@ -371,6 +526,7 @@ export type SessionVerifyPrepareFirstFactorParams =
    * @experimental
    */
   | Omit<EnterpriseSSOConfig, 'actionCompleteRedirectUrl'>;
+
 export type SessionVerifyAttemptFirstFactorParams =
   | EmailCodeAttempt
   | PhoneCodeAttempt

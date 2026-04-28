@@ -47,11 +47,17 @@ describe('Typedoc output', () => {
 
   it('should only have these nested folders', async () => {
     const folders = await scanDirectory('directory');
-    const nestedFolders = folders.filter(folder => !isTopLevelPath(folder));
+    const nestedFolders = folders.filter(folder => !isTopLevelPath(folder)).sort((a, b) => a.localeCompare(b));
 
     expect(nestedFolders).toMatchInlineSnapshot(`
       [
         "react/legacy",
+        "shared/clerk",
+        "shared/clerk/methods",
+        "shared/client-resource",
+        "shared/client-resource/methods",
+        "shared/session-resource",
+        "shared/session-resource/methods",
       ]
     `);
   });

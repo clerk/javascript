@@ -1,5 +1,11 @@
 // @ts-check
+import { ReflectionKind } from 'typedoc';
 import { MemberRouter } from 'typedoc-plugin-markdown';
+
+import { REFERENCE_OBJECT_PAGE_SYMBOLS } from './reference-objects.mjs';
+
+/** @type {Set<string>} */
+const REFERENCE_OBJECT_SYMBOL_NAMES = new Set(Object.values(REFERENCE_OBJECT_PAGE_SYMBOLS));
 
 /**
  * From a filepath divided by `/` only keep the first and last part
@@ -47,7 +53,24 @@ class ClerkRouter extends MemberRouter {
         const isExactMatch = page.url.toLocaleLowerCase().endsWith('readme.mdx');
         const isMatchWithNumber = page.url.toLocaleLowerCase().match(/readme-\d+\.mdx$/);
 
-        return !(isExactMatch || isMatchWithNumber);
+        if (isExactMatch || isMatchWithNumber) {
+          return false;
+        }
+
+        /**
+         * `@inline` marks types that should be expanded at use sites, not documented as their own page.
+         * TypeDoc still assigns `fullUrls` for exported aliases, so we also strip links in the theme's `referenceType` partial (`custom-theme.mjs`).
+         */
+        const model = page.model;
+        if (
+          model &&
+          'comment' in model &&
+          /** @type {{ comment?: import('typedoc').Comment | undefined }} */ (model).comment?.hasModifier('@inline')
+        ) {
+          return false;
+        }
+
+        return true;
       });
 
     return modifiedPages;
@@ -71,6 +94,22 @@ class ClerkRouter extends MemberRouter {
      * - shared/use-user
      */
     filePath = flattenDirName(filePath);
+
+    /**
+     * Put each reference object in its own folder alongside `properties.mdx` and `methods/` from `extract-methods.mjs`.
+     * E.g. `shared/clerk.mdx` -> `shared/clerk/clerk.mdx`, `shared/clerk/properties.mdx`, and `shared/clerk/methods/`.
+     */
+    if (
+      (reflection.kind === ReflectionKind.Interface || reflection.kind === ReflectionKind.Class) &&
+      REFERENCE_OBJECT_SYMBOL_NAMES.has(reflection.name)
+    ) {
+      const kebab = toKebabCase(reflection.name);
+      const m = filePath.match(/^([^/]+)\/([^/]+)$/);
+      if (m) {
+        const [, pkg] = m;
+        return `${pkg}/${kebab}/${kebab}`;
+      }
+    }
 
     return filePath;
   }

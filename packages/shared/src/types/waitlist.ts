@@ -23,6 +23,10 @@ export interface WaitlistResource extends ClerkResource {
   join: (params: JoinWaitlistParams) => Promise<{ error: ClerkError | null }>;
 }
 
+/** @document */
 export type JoinWaitlistParams = {
+  /**
+   * The email address of the user to add to the waitlist.
+   */
   emailAddress: string;
 };

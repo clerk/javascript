@@ -135,7 +135,16 @@ export type SDKMetadata = {
   environment?: string;
 };
 
+/**
+ * A callback function that is called when Clerk resources change.
+ * @inline
+ */
 export type ListenerCallback = (emission: Resources) => void;
+/**
+ * Optional configuration for the `addListener()` method.
+ * @param skipInitialEmit - If `true`, the callback will not be called immediately after registration. Defaults to `false`.
+ * @inline
+ */
 export type ListenerOptions = { skipInitialEmit?: boolean };
 export type UnsubscribeCallback = () => void;
 
@@ -175,16 +184,21 @@ export type SetActiveNavigate = (params: {
   decorateUrl: DecorateUrl;
 }) => void | Promise<unknown>;
 
+/**
+ * A callback that runs after sign out completes.
+ * @inline */
 export type SignOutCallback = () => void | Promise<any>;
 
+/**
+ * Configuration options.
+ */
 export type SignOutOptions = {
   /**
-   * Specify a specific session to sign out. Useful for
-   * multi-session applications.
+   * Specify a specific session to sign out. Useful for multi-session applications.
    */
   sessionId?: string;
   /**
-   * Specify a redirect URL to navigate to after sign out is complete.
+   * Specify a redirect URL to navigate to after sign-out is complete.
    */
   redirectUrl?: string;
 };
@@ -203,40 +217,66 @@ type EventHandler<E extends ClerkEvent> = (payload: ClerkEventPayload[E]) => voi
 export type ClerkEventPayload = {
   status: ClerkStatus;
 };
-type OnEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>, opt?: { notify: boolean }) => void;
-type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>) => void;
+
+/**
+ * Registers an event listener for a specific Clerk event.
+ *
+ * @param event - The event name to subscribe to.
+ * @param handler - The callback function to execute when the event is dispatched.
+ * @param opt - Optional configuration.
+ * @param opt.notify - If true and the event was previously dispatched, handler will be called immediately with the latest payload.
+ */
+export type OnEventListener = <E extends ClerkEvent>(
+  event: E,
+  handler: EventHandler<E>,
+  opt?: { notify: boolean },
+) => void;
+
+/**
+ * Unregisters an event listener for a specific Clerk event.
+ *
+ * @param event - The event name to unsubscribe from.
+ * @param handler - The callback function to remove.
+ */
+export type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>) => void;
 
 /**
  * @inline
+ * @property {ClerkStatus} degraded - Set when Clerk is partially operational.
+ * @property {ClerkStatus} error - Set when hotloading `clerk-js` or `Clerk.load()` failed.
+ * @property {ClerkStatus} loading - Set during initialization.
+ * @property {ClerkStatus} ready - Set when Clerk is fully operational.
  */
 export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
 
 /**
- * Main Clerk SDK object.
+ * The `Clerk` class serves as the central interface for working with Clerk's authentication and user management functionality in your application. As a top-level class in the Clerk SDK, it provides access to key methods and properties for managing users, sessions, API keys, billing, organizations, and more.
  */
 export interface Clerk {
   /**
-   * Clerk SDK version number.
+   * The Clerk SDK version number.
    */
   version: string | undefined;
 
   /**
    * If present, contains information about the SDK that the host application is using.
-   * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`
+   * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).
    */
   sdkMetadata: SDKMetadata | undefined;
 
   /**
-   * If true the bootstrapping of Clerk.load() has completed successfully.
+   * Indicates if the `Clerk` object is ready for use. Set to `false` when the `status` is `"loading"`. Set to `true` when the `status` is `"ready"` or `"degraded"`.
    */
   loaded: boolean;
 
   /**
-   * Describes the state the clerk singleton operates in:
-   * - `"error"`: Clerk failed to initialize.
-   * - `"loading"`: Clerk is still attempting to load.
-   * - `"ready"`: Clerk singleton is fully operational.
-   * - `"degraded"`: Clerk singleton is partially operational.
+   * The status of the `Clerk` instance. Possible values are:
+   * <ul>
+   *  <li>`"error"`: Set when hotloading `clerk-js` or `Clerk.load()` failed.</li>
+   *  <li>`"loading"`: Set during initialization.</li>
+   *  <li>`"ready"`: Set when Clerk is fully operational.</li>
+   *  <li>`"degraded"`: Set when Clerk is partially operational.</li>
+   * </ul>
    */
   status: ClerkStatus;
 
@@ -247,39 +287,42 @@ export interface Clerk {
 
   frontendApi: string;
 
-  /** Clerk Publishable Key string. */
+  /** Your Clerk [Publishable Key](!publishable-key). */
   publishableKey: string;
 
-  /** Clerk Proxy url string. */
+  /** **Required for applications that run behind a reverse proxy**. Your Clerk app's proxy URL. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`). */
   proxyUrl: string | undefined;
 
-  /** Clerk Satellite Frontend API string. */
+  /** The current Clerk app's domain. Prefixed with `clerk.` on production if not already prefixed. Returns `""` when ran on the server. */
   domain: string;
 
-  /** Clerk Flag for satellite apps. */
+  /** Indicates if the instance is a satellite app. */
   isSatellite: boolean;
 
-  /** Clerk Instance type is defined from the Publishable key */
+  /** Indicates if the Clerk instance is running in a production or development environment. */
   instanceType: InstanceType | undefined;
 
-  /** Clerk flag for loading Clerk in a standard browser setup */
+  /**
+   * Indicates if the instance is being loaded in a standard browser environment. Set to `false` on native platforms where cookies cannot be set. When `undefined`, Clerk assumes a standard browser.
+   * @inline
+   */
   isStandardBrowser: boolean | undefined;
 
   /**
-   * Indicates whether the current user has a valid signed-in client session
+   * Indicates whether the current user has a valid signed-in client session.
    */
   isSignedIn: boolean;
 
-  /** Client handling most Clerk operations. */
+  /** The `Client` object for the current window. */
   client: ClientResource | undefined;
 
-  /** Current Session. */
+  /** The currently active `Session`, which is guaranteed to be one of the sessions in `Client.sessions`. If there is no active session, this field will be `null`. If the session is loading, this field will be `undefined`. */
   session: SignedInSessionResource | null | undefined;
 
-  /** Active Organization */
+  /** A shortcut to the last active `Session.user.organizationMemberships` which holds an instance of a `Organization` object. If the session is `null` or `undefined`, the user field will match. */
   organization: OrganizationResource | null | undefined;
 
-  /** Current User. */
+  /** A shortcut to `Session.user` which holds the currently active `User` object. If the session is `null` or `undefined`, the user field will match. */
   user: UserResource | null | undefined;
 
   /**
@@ -293,25 +336,30 @@ export interface Clerk {
    * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
    * `effect()` that can be used to subscribe to changes from Signals.
    *
+   * @internal
    * @experimental This experimental API is subject to change.
    */
   __internal_state: State;
 
   /**
+   * The `Billing` object used for managing billing.
+   *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   billing: BillingNamespace;
 
+  /**
+   * [Telemetry](https://clerk.com/docs/guides/how-clerk-works/security/clerk-telemetry) configuration.
+   */
   telemetry: TelemetryCollector | undefined;
 
+  /**
+   * @internal
+   */
   __internal_country?: string | null;
 
   /**
-   * Signs out the current user on single-session instances, or all users on multi-session instances
-   *
-   * @param signOutCallback - Optional A callback that runs after sign out completes.
-   * @param options - Optional Configuration options, see {@link SignOutOptions}
-   * @returns A promise that resolves when the sign out process completes.
+   * Signs out the current user on single-session instances, or all users on multi-session instances.
    */
   signOut: SignOut;
 
@@ -331,11 +379,13 @@ export interface Clerk {
    * Opens the Clerk Checkout component in a drawer.
    *
    * @param props - Optional checkout configuration parameters.
+   * @internal
    */
   __internal_openCheckout: (props?: __internal_CheckoutProps) => void;
 
   /**
    * Closes the Clerk Checkout drawer.
+   * @internal
    */
   __internal_closeCheckout: () => void;
 
@@ -343,11 +393,13 @@ export interface Clerk {
    * Opens the Clerk PlanDetails drawer component in a drawer.
    *
    * @param props - `plan` or `planId` parameters are required.
+   * @internal
    */
   __internal_openPlanDetails: (props: __internal_PlanDetailsProps) => void;
 
   /**
    * Closes the Clerk PlanDetails drawer.
+   * @internal
    */
   __internal_closePlanDetails: () => void;
 
@@ -355,11 +407,13 @@ export interface Clerk {
    * Opens the Clerk SubscriptionDetails drawer component in a drawer.
    *
    * @param props - Optional configuration parameters.
+   * @internal
    */
   __internal_openSubscriptionDetails: (props?: __internal_SubscriptionDetailsProps) => void;
 
   /**
    * Closes the Clerk SubscriptionDetails drawer.
+   * @internal
    */
   __internal_closeSubscriptionDetails: () => void;
 
@@ -367,16 +421,19 @@ export interface Clerk {
    * Opens the Clerk UserVerification component in a modal.
    *
    * @param props - Optional user verification configuration parameters.
+   * @internal
    */
   __internal_openReverification: (props?: __internal_UserVerificationModalProps) => void;
 
   /**
    * Closes the Clerk user verification modal.
+   * @internal
    */
   __internal_closeReverification: () => void;
 
   /**
    * Attempts to enable a environment setting from a development instance, prompting if disabled.
+   * @internal
    */
   __internal_attemptToEnableEnvironmentSetting: (
     options: __internal_AttemptToEnableEnvironmentSettingParams,
@@ -384,11 +441,13 @@ export interface Clerk {
 
   /**
    * Opens the Clerk Enable Organizations prompt for development instance
+   * @internal
    */
   __internal_openEnableOrganizationsPrompt: (props: __internal_EnableOrganizationsPromptProps) => void;
 
   /**
    * Closes the Clerk Enable Organizations modal.
+   * @internal
    */
   __internal_closeEnableOrganizationsPrompt: () => void;
 
@@ -666,6 +725,7 @@ export interface Clerk {
    *
    * @param targetNode - Target node to mount the OAuth consent component.
    * @param oauthConsentProps - OAuth consent configuration parameters.
+   * @internal
    */
   __internal_mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: __internal_OAuthConsentProps) => void;
 
@@ -673,6 +733,7 @@ export interface Clerk {
    * Unmounts a OAuth consent component from the target element.
    *
    * @param targetNode - Target node to unmount the OAuth consent component from.
+   * @internal
    */
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
@@ -732,27 +793,29 @@ export interface Clerk {
   __internal_loadStripeJs: () => Promise<any>;
 
   /**
-   * Register a listener that triggers a callback each time important Clerk resources are changed.
-   * Allows to hook up at different steps in the sign up, sign in processes.
+   * Register a listener that triggers a callback whenever a change in the [`Client`](https://clerk.com/docs/reference/objects/client), [`Session`](https://clerk.com/docs/reference/objects/session), [`User`](https://clerk.com/docs/reference/objects/user), or [`Organization`](https://clerk.com/docs/reference/objects/organization) resources occurs. This method is primarily used to build frontend SDKs like [`@clerk/react`](https://www.npmjs.com/package/@clerk/react).
+   *
+   * Allows hooking up at different steps in the sign up, sign in processes.
    *
    * Some important checkpoints:
-   *    When there is an active session, user === session.user.
-   *    When there is no active session, user and session will both be null.
-   *    When a session is loading, user and session will be undefined.
+   * - When there is an active session, `user === session.user`.
+   * - When there is no active session, user and session will both be `null`.
+   * - When a session is loading, user and session will be `undefined`.
    *
-   * @param callback - Callback function receiving the most updated Clerk resources after a change.
-   * @param options.skipInitialEmit - If true, the callback will not be called immediately after registration.
-   * @returns - Unsubscribe callback
+   * @param callback - The function to call when Clerk resources change.
+   * @param options - Optional configuration.
+   * @param options.skipInitialEmit - If `true`, the callback will not be called immediately after registration. Defaults to `false`.
+   * @returns - An `UnsubscribeCallback` function that can be used to remove the listener from the `Clerk` object.
    */
   addListener: (callback: ListenerCallback, options?: ListenerOptions) => UnsubscribeCallback;
 
   /**
    * Registers an event handler for a specific Clerk event.
    *
-   * @param event - The event name to subscribe to
-   * @param handler - The callback function to execute when the event is dispatched
-   * @param opt - Optional configuration object
-   * @param opt.notify - If true and the event was previously dispatched, handler will be called immediately with the latest payload
+   * @param event - The event name to subscribe to.
+   * @param handler - The callback function to execute when the event is triggered.
+   * @param opt - An optional object to control the behavior of the event handler. If true, and the event was previously dispatched, handler will be called immediately with the latest payload.
+   * @param opt.notify - If `true` and the event was previously dispatched, the handler will be called immediately with the latest payload.
    */
   on: OnEventListener;
 
@@ -760,7 +823,7 @@ export interface Clerk {
    * Removes an event handler for a specific Clerk event.
    *
    * @param event - The event name to unsubscribe from
-   * @param handler - The callback function to remove
+   * @param handler - The callback function to remove.
    */
   off: OffEventListener;
 
@@ -773,7 +836,7 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
-   * Set the active session and Organization explicitly.
+   * A method used to set the current session and/or Organization for the client. Accepts a [`SetActiveParams`](https://clerk.com/docs/reference/types/set-active-params) object.
    *
    * If the session param is `null`, the active session is deleted.
    * In a similar fashion, if the organization param is `null`, the current organization is removed as active.
@@ -781,148 +844,170 @@ export interface Clerk {
   setActive: SetActive;
 
   /**
-   * Function used to commit a navigation after certain steps in the Clerk processes.
+   * Helper method which will use the custom push navigation function of your application to navigate to the provided URL or relative path.
+   *
+   * Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
    */
   navigate: CustomNavigation;
 
   /**
-   * Decorates the provided url with the auth token for development instances.
+   * Decorates the provided URL with the auth token for development instances.
    *
-   * @param to
+   * @param to - The route to create a URL towards.
    */
   buildUrlWithAuth(to: string): string;
 
   /**
-   * Returns the configured url where `<SignIn/>` is mounted or a custom sign-in page is rendered.
+   * Returns the configured URL where [`<SignIn/>`](https://clerk.com/docs/reference/components/authentication/sign-in) is mounted or a custom sign-in page is rendered.
    *
-   * @param opts - A {@link RedirectOptions} object
+   * @param opts - Options used to control the redirect in the constructed URL.
    */
   buildSignInUrl(opts?: RedirectOptions): string;
 
   /**
-   * Returns the configured url where `<SignUp/>` is mounted or a custom sign-up page is rendered.
+   * Returns the configured URL where [`<SignUp/>`](https://clerk.com/docs/reference/components/authentication/sign-up) is mounted or a custom sign-up page is rendered.
    *
-   * @param opts - A {@link RedirectOptions} object
+   * @param opts - Options used to control the redirect in the constructed URL.
    */
   buildSignUpUrl(opts?: RedirectOptions): string;
 
   /**
-   * Returns the url where `<UserProfile />` is mounted or a custom user-profile page is rendered.
+   * Returns the configured URL where [`<UserProfile />`](https://clerk.com/docs/reference/components/user/user-profile) is mounted or a custom user-profile page is rendered.
    */
   buildUserProfileUrl(): string;
 
   /**
-   * Returns the configured url where `<CreateOrganization />` is mounted or a custom create-organization page is rendered.
+   * Returns the configured URL where [`<CreateOrganization />`](https://clerk.com/docs/reference/components/organization/create-organization) is mounted or a custom create-organization page is rendered.
    */
   buildCreateOrganizationUrl(): string;
 
   /**
-   * Returns the configured url where `<OrganizationProfile />` is mounted or a custom organization-profile page is rendered.
+   * Returns the configured URL where [`<OrganizationProfile />`](https://clerk.com/docs/reference/components/organization/organization-profile) is mounted or a custom organization-profile page is rendered.
    */
   buildOrganizationProfileUrl(): string;
 
   /**
-   * Returns the configured url where tasks are mounted.
+   * Returns the configured URL where [session tasks](https://clerk.com/docs/guides/configure/session-tasks) are mounted.
    */
   buildTasksUrl(): string;
 
   /**
-   * Returns the configured afterSignInUrl of the instance.
+   * Returns the configured `afterSignInUrl` of the instance.
+   * @param params - Optional query parameters to append to the URL.
    */
   buildAfterSignInUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
-   * Returns the configured afterSignInUrl of the instance.
+   * Returns the configured `afterSignInUrl` of the instance.
+   * @param params - Optional query parameters to append to the URL.
    */
   buildAfterSignUpUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
-   * Returns the configured afterSignOutUrl of the instance.
+   * Returns the configured `afterSignOutUrl` of the instance.
    */
   buildAfterSignOutUrl(): string;
 
   /**
-   * Returns the configured newSubscriptionRedirectUrl of the instance.
+   * Returns the configured `newSubscriptionRedirectUrl` of the instance.
    */
   buildNewSubscriptionRedirectUrl(): string;
 
   /**
-   * Returns the configured afterMultiSessionSingleSignOutUrl of the instance.
+   * Returns the configured `afterMultiSessionSingleSignOutUrl` of the instance.
    */
   buildAfterMultiSessionSingleSignOutUrl(): string;
 
   /**
-   * Returns the configured url where `<Waitlist/>` is mounted or a custom waitlist page is rendered.
+   * Returns the configured URL where [`<Waitlist />`](https://clerk.com/docs/reference/components/authentication/waitlist) is mounted or a custom waitlist page is rendered.
+   *
+   * @param opts - Options to control the waitlist URL.
+   * @param opts.initialValues - Initial values to prefill the waitlist form.
    */
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
   /**
    *
-   * Redirects to the provided url after decorating it with the auth token for development instances.
+   * Redirects to the provided URL after appending authentication credentials. For development instances, this method decorates the URL with an auth token to maintain authentication state. For production instances, the standard session cookie is used.
    *
-   * @param to
+   * Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
+   *
+   * @param to - The URL to redirect to.
    */
   redirectWithAuth(to: string): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where `<SignIn/>` is mounted.
+   * Redirects to the sign-in URL, as configured in your application's instance settings. This method uses the [`navigate()`](https://clerk.com/docs/reference/objects/clerk#navigate) method under the hood.
    *
-   * @param opts - A {@link RedirectOptions} object
+   * Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
+   *
+   * @param opts - Options to control the redirect.
    */
   redirectToSignIn(opts?: SignInRedirectOptions): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where `<SignUp/>` is mounted.
+   * Redirects to the sign-up URL, as configured in your application's instance settings. This method uses the [`navigate()`](https://clerk.com/docs/reference/objects/clerk#navigate) method under the hood.
    *
-   * @param opts - A {@link RedirectOptions} object
+   * Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
+   *
+   * @param opts - Options to control the redirect.
    */
   redirectToSignUp(opts?: SignUpRedirectOptions): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where `<UserProfile/>` is mounted.
+   * Redirects to the configured URL where [`<UserProfile />`](https://clerk.com/docs/reference/components/user/user-profile) is mounted.
+   *
+   * Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
    */
   redirectToUserProfile: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where `<OrganizationProfile />` is mounted.
+   * Redirects to the configured URL where [`<OrganizationProfile />`](https://clerk.com/docs/reference/components/organization/organization-profile) is mounted. This method uses the [`navigate()`](https://clerk.com/docs/reference/objects/clerk#navigate) method under the hood.
+   *
+   * Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
    */
   redirectToOrganizationProfile: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where `<CreateOrganization />` is mounted.
+   * Redirects to the configured URL where [`<CreateOrganization />`](https://clerk.com/docs/reference/components/organization/create-organization) is mounted. This method uses the [`navigate()`](https://clerk.com/docs/reference/objects/clerk#navigate) method under the hood.
+   *
+   * Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
    */
   redirectToCreateOrganization: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured afterSignIn URL.
+   * Redirects to the configured `afterSignIn` URL.
    */
   redirectToAfterSignIn: () => void;
 
   /**
-   * Redirects to the configured afterSignUp URL.
+   * Redirects to the configured `afterSignUp` URL.
    */
   redirectToAfterSignUp: () => void;
 
   /**
-   * Redirects to the configured afterSignOut URL.
+   * Redirects to the configured `afterSignOut` URL.
    */
   redirectToAfterSignOut: () => void;
 
   /**
-   * Redirects to the configured URL where `<Waitlist/>` is mounted.
+   * Redirects to the configured URL where [`<Waitlist />`](https://clerk.com/docs/reference/components/authentication/waitlist) is mounted.
    */
   redirectToWaitlist: () => void;
 
   /**
-   * Redirects to the configured URL where tasks are mounted.
+   * Redirects to the configured URL where [session tasks](https://clerk.com/docs/reference/objects/session) are mounted.
    *
-   * @param opts - A {@link RedirectOptions} object
+   * @param opts - Options to control the redirect (e.g. redirect URL after tasks are complete).
    */
   redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
   /**
-   * Completes a Google One Tap redirection flow started by
-   * {@link Clerk.authenticateWithGoogleOneTap}
+   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/objects/clerk#authenticate-with-google-one-tap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
+   *
+   * @param signInOrUp - The resource returned from the initial `authenticateWithGoogleOneTap()` call (before redirect).
+   * @param params - Additional props that define where the user will be redirected to at the end of a successful Google One Tap flow.
+   * @param customNavigate - A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
    */
   handleGoogleOneTapCallback: (
     signInOrUp: SignInResource | SignUpResource,
@@ -931,8 +1016,10 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
-   * Completes an OAuth or SAML redirection flow started by
-   * {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
+   * Completes a custom OAuth or SAML redirect flow that was started by calling [`SignIn.authenticateWithRedirect(params)`](https://clerk.com/docs/reference/objects/sign-in) or [`SignUp.authenticateWithRedirect(params)`](https://clerk.com/docs/reference/objects/sign-up).
+   *
+   * @param params - Additional props that define where the user will be redirected to at the end of a successful OAuth or SAML flow.
+   * @param customNavigate - A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
    */
   handleRedirectCallback: (
     params: HandleOAuthCallbackParams | HandleSamlCallbackParams,
@@ -940,7 +1027,9 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
-   * Completes a Email Link flow  started by {@link Clerk.client.signIn.createEmailLinkFlow} or {@link Clerk.client.signUp.createEmailLinkFlow}
+   * Completes an email link verification flow started by `Clerk.client.signIn.createEmailLinkFlow` or `Clerk.client.signUp.createEmailLinkFlow`, by processing the verification results from the redirect URL query parameters. This method should be called after the user is redirected back from visiting the verification link in their email.
+   * @param params - Allows you to define the URLs where the user should be redirected to on successful verification or pending/completed sign-up or sign-in attempts. If the email link is successfully verified on another device, there's a callback function parameter that allows custom code execution.
+   * @param customNavigate - A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
    */
   handleEmailLinkVerification: (
     params: HandleEmailLinkVerificationParams,
@@ -948,32 +1037,32 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
-   * Authenticates user using their Metamask browser extension
+   * Starts a sign-in flow that uses MetaMask to authenticate the user using their Metamask wallet address.
    */
   authenticateWithMetamask: (params?: AuthenticateWithMetamaskParams) => Promise<unknown>;
 
   /**
-   * Authenticates user using their Coinbase Smart Wallet and browser extension
+   * Starts a sign-in flow that uses Coinbase Smart Wallet to authenticate the user using their Coinbase wallet address.
    */
   authenticateWithCoinbaseWallet: (params?: AuthenticateWithCoinbaseWalletParams) => Promise<unknown>;
 
   /**
-   * Authenticates user using their OKX Wallet browser extension
+   * Starts a sign-in flow that uses OKX Wallet to authenticate the user using their OKX wallet address.
    */
   authenticateWithOKXWallet: (params?: AuthenticateWithOKXWalletParams) => Promise<unknown>;
 
   /**
-   * Authenticates user using Base Account SDK
+   * Starts a sign-in flow that uses Base to authenticate the user using their Web3 wallet address.
    */
   authenticateWithBase: (params?: AuthenticateWithBaseParams) => Promise<unknown>;
 
   /**
-   * Authenticates user using their Solana supported Web3 wallet browser extension
+   * Starts a sign-in flow that uses Solana to authenticate the user using their Solana wallet address.
    */
   authenticateWithSolana: (params: AuthenticateWithSolanaParams) => Promise<unknown>;
 
   /**
-   * Authenticates user using their Web3 Wallet browser extension
+   * Starts a sign-in flow that uses a Web3 Wallet browser extension to authenticate the user using their Ethereum wallet address.
    */
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
 
@@ -985,20 +1074,28 @@ export interface Clerk {
   ) => Promise<SignInResource | SignUpResource>;
 
   /**
-   * Creates an Organization, adding the current user as admin.
+   * Creates an Organization programmatically, adding the current user as admin. Returns an [`Organization`](https://clerk.com/docs/reference/objects/organization) object.
+   *
+   * > [!NOTE]
+   * > For React-based apps, consider using the [`<CreateOrganization />`](https://clerk.com/docs/reference/components/organization/create-organization) component.
    */
   createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
 
   /**
-   * Retrieves a single Organization by ID.
+   * Retrieves a single [Organization](https://clerk.com/docs/reference/objects/organization) by ID.
+   *
+   * @param organizationId - The ID of the Organization to retrieve.
    */
   getOrganization: (organizationId: string) => Promise<OrganizationResource>;
 
   /**
-   * Handles a 401 response from Frontend API by refreshing the client and session object accordingly
+   * Handles a 401 response from the Frontend API by refreshing the [`Client`](https://clerk.com/docs/reference/objects/client) and [`Session`](https://clerk.com/docs/reference/objects/session) object accordingly.
    */
   handleUnauthenticated: () => Promise<unknown>;
 
+  /**
+   * Create a new waitlist entry programmatically. Requires that you set your app's sign-up mode to [**Waitlist**](https://clerk.com/docs/guides/secure/restricting-access#waitlist) in the Clerk Dashboard.
+   */
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
 
   /**
@@ -1021,11 +1118,13 @@ export interface Clerk {
   /**
    * Internal flag indicating whether a `setActive` call is in progress. Used to prevent navigations from being
    * initiated outside of the Clerk class.
+   *
+   * @internal
    */
   __internal_setActiveInProgress: boolean;
 
   /**
-   * API Keys Object
+   * The `APIKeys` object used for managing API keys.
    */
   apiKeys: APIKeysNamespace;
 
@@ -1043,44 +1142,42 @@ export interface Clerk {
   __experimental_checkout: __experimental_CheckoutFunction;
 }
 
+/** @document */
 export type HandleOAuthCallbackParams = TransferableOption &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl & {
     /**
-     * Full URL or path where the SignIn component is mounted.
+     * The full URL or path where the [`<SignIn />`](https://clerk.com/docs/reference/components/authentication/sign-in) component is mounted.
      */
     signInUrl?: string;
     /**
-     * Full URL or path where the SignUp component is mounted.
+     * The full URL or path where the [`<SignUp />`](https://clerk.com/docs/reference/components/authentication/sign-up) component is mounted.
      */
     signUpUrl?: string;
     /**
-     * Full URL or path to navigate to during sign in,
-     * if identifier verification is required.
+     * The full URL or path to navigate to during sign in, if [first factor verification](!first-factor-verification) is required.
      */
     firstFactorUrl?: string;
     /**
-     * Full URL or path to navigate to during sign in,
-     * if 2FA is enabled.
+     * The full URL or path to navigate to during sign in, if [multi-factor authentication](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#multi-factor-authentication) is enabled.
      */
     secondFactorUrl?: string;
     /**
-     * Full URL or path to navigate to during sign in,
-     * if the user is required to reset their password.
+     * The full URL or path to navigate to during sign in, if the user is required to reset their password.
      */
     resetPasswordUrl?: string;
     /**
-     * Full URL or path to navigate to after an incomplete sign up.
+     * The full URL or path to navigate to if the sign up requires additional information.
      */
     continueSignUpUrl?: string | null;
     /**
-     * Full URL or path to navigate to after requesting email verification.
+     * The full URL or path to navigate to after requesting email verification.
      */
     verifyEmailAddressUrl?: string | null;
     /**
-     * Full URL or path to navigate to after requesting phone verification.
+     * The full URL or path to navigate to after requesting phone verification.
      */
     verifyPhoneNumberUrl?: string | null;
     /**
@@ -1088,13 +1185,21 @@ export type HandleOAuthCallbackParams = TransferableOption &
      */
     reloadResource?: 'signIn' | 'signUp';
     /**
-     * Additional arbitrary metadata to be stored alongside the User object when a sign-up transfer occurs.
+     * Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object.
      */
     unsafeMetadata?: SignUpUnsafeMetadata;
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
 
+/**
+ * A function used to navigate to a given URL after certain steps in the Clerk processes.
+ *
+ * @param to - The URL or relative path to navigate to.
+ * @param options - Optional configuration.
+ * @param options.replace? - If `true`, replace the current history entry instead of pushing a new one.
+ * @param options.metadata? - Optional router metadata.
+ */
 export type CustomNavigation = (to: string, options?: NavigateOptions) => Promise<unknown> | void;
 
 export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
@@ -1121,6 +1226,7 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
+/** @document */
 type ClerkUnsafeOptions = {
   /**
    * Disables the console warning that is logged when Clerk is initialized with development keys.
@@ -1133,6 +1239,7 @@ type ClerkUnsafeOptions = {
   unsafe_disableDevelopmentModeConsoleWarning?: boolean;
 };
 
+/** @document */
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
@@ -1143,12 +1250,16 @@ export type ClerkOptions = ClerkOptionsNavigation &
   AfterMultiSessionSingleSignOutUrl &
   ClerkUnsafeOptions & {
     /**
-     * Clerk UI module. Pass the `ui` export from `@clerk/ui` to bundle the UI
-     * with your application instead of loading it from the CDN.
+     * **Only required if you're bundling Clerk's UI (`@clerk/ui`) instead of loading it from the Clerk CDN**. Provide the UI module to embed Clerk's prebuilt authentication components directly in your application.
      */
-    ui?: { ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor> };
+    ui?: {
+      /**
+       * Pass the `ui` export from `@clerk/ui`.
+       */
+      ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
+    };
     /**
-     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
+     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages. See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
      */
     // TODO @nikos
     appearance?: any;
@@ -1156,13 +1267,17 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     localization?: LocalizationResource;
+    /**
+     * Indicates whether Clerk should poll against Clerk's backend every 5 minutes.
+     * @default true
+     */
     polling?: boolean;
     /**
      * By default, the last signed-in session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
      */
     selectInitialSession?: (client: ClientResource) => SignedInSessionResource | null;
     /**
-     * By default, ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
+     * Indicates whether ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
      */
     standardBrowser?: boolean;
     /**
@@ -1178,7 +1293,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     signInUrl?: string;
     /**
-     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances but **must be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. **It is required to be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
      */
     signUpUrl?: string;
     /**
@@ -1190,7 +1305,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     allowedRedirectProtocols?: Array<string>;
     /**
-     * This option defines that the application is a satellite application.
+     * Indicates whether the application is a satellite application.
      */
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
@@ -1213,9 +1328,12 @@ export type ClerkOptions = ClerkOptionsNavigation &
     telemetry?:
       | false
       | {
+          /**
+           * If `true`, telemetry will not be collected.
+           */
           disabled?: boolean;
           /**
-           * Telemetry events are only logged to the console and not sent to Clerk
+           * If `true`, telemetry events are only logged to the console and not sent to Clerk
            */
           debug?: boolean;
           /**
@@ -1292,11 +1410,21 @@ export type ClerkOptions = ClerkOptionsNavigation &
     taskUrls?: Partial<Record<SessionTask['key'], string>>;
   };
 
+/** @inline */
 export interface NavigateOptions {
+  /**
+   * If `true`, replace the current history entry instead of pushing a new one.
+   */
   replace?: boolean;
+  /**
+   * Optional router metadata.
+   */
   metadata?: RouterMetadata;
 }
 
+/**
+ * @inline
+ */
 export interface Resources {
   client: ClientResource;
   session?: SignedInSessionResource | null;
@@ -1412,13 +1540,9 @@ export type SetActiveParams = {
   redirectUrl?: string;
 
   /**
-   * A custom navigation function to be called just before the session and/or Organization is set.
+   * A custom navigation function to be called just before the session and/or Organization is set. When provided, it takes precedence over the `redirectUrl` parameter for navigation.
    *
-   * When provided, it takes precedence over the `redirectUrl` parameter for navigation.
-   *
-   * The callback receives a `decorateUrl` function that should be used to wrap destination URLs.
-   * This enables Safari ITP cookie refresh when needed. The decorated URL may be an external URL
-   * (starting with `https://`) that requires `window.location.href` instead of client-side navigation.
+   * The callback receives a `decorateUrl` function that should be used to wrap destination URLs. This enables Safari ITP cookie refresh when needed. The decorated URL may be an external URL (starting with `https://`) that requires `window.location.href` instead of client-side navigation. See the [section on using the `navigate()` parameter](https://clerk.com/docs/reference/objects/clerk#using-the-navigate-parameter) for more details.
    *
    * @example
    * ```typescript
@@ -1453,6 +1577,7 @@ export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
   | { path?: never; routing?: Extract<RoutingStrategy, 'hash'> };
 
+/** @document */
 export type SignInProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after successful sign in.
@@ -1480,7 +1605,7 @@ export type SignInProps = RoutingOptions & {
    */
   signUpUrl?: string;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -1519,10 +1644,12 @@ export type SignInProps = RoutingOptions & {
   SignUpFallbackRedirectUrl &
   AfterSignOutUrl;
 
+/**
+ * @interface
+ */
 export interface TransferableOption {
   /**
-   * Indicates whether or not sign in attempts are transferable to the sign up flow.
-   * When set to false, prevents opaque sign ups when a user attempts to sign in via OAuth with an email that doesn't exist.
+   * Indicates whether or not sign-in attempts are transferable to the sign-up flow. Defaults to `true`. When set to `false`, prevents [opaque sign-ups](!opaque-sign-up) when a user attempts to sign in via OAuth with an email that doesn't exist.
    *
    * @default true
    */
@@ -1564,7 +1691,7 @@ export type __internal_UserVerificationProps = RoutingOptions & {
   level?: SessionVerificationLevel;
 
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -1604,6 +1731,7 @@ export type __internal_AttemptToEnableEnvironmentSettingResult = {
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
+/** @document */
 export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
   /**
    * Whether to cancel the Google One Tap request if a user clicks outside the prompt.
@@ -1629,6 +1757,7 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
   appearance?: ClerkAppearanceTheme;
 };
 
+/** @document */
 export type SignUpProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after successful sign up.
@@ -1651,7 +1780,7 @@ export type SignUpProps = RoutingOptions & {
    */
   signInUrl?: string;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -1695,9 +1824,10 @@ export type SignUpModalProps = WithoutRouting<SignUpProps> & {
   getContainer?: () => HTMLElement | null;
 };
 
+/** @document */
 export type UserProfileProps = RoutingOptions & {
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -1744,6 +1874,7 @@ export type UserProfileModalProps = WithoutRouting<UserProfileProps> & {
   getContainer?: () => HTMLElement | null;
 };
 
+/** @document */
 export type OrganizationProfileProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after the user leaves the currently Active Organization.
@@ -1752,7 +1883,7 @@ export type OrganizationProfileProps = RoutingOptions & {
    */
   afterLeaveOrganizationUrl?: string;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -1794,6 +1925,7 @@ export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfilePr
   getContainer?: () => HTMLElement | null;
 };
 
+/** @document */
 export type CreateOrganizationProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after creating a new Organization.
@@ -1811,13 +1943,14 @@ export type CreateOrganizationProps = RoutingOptions & {
    */
   skipInvitationScreen?: boolean;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
   appearance?: ClerkAppearanceTheme;
 };
 
+/** @document */
 export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps> & {
   /**
    * Function that returns the container element where portals should be rendered.
@@ -1827,7 +1960,10 @@ export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProp
   getContainer?: () => HTMLElement | null;
 };
 
+/** @inline */
 type UserProfileMode = 'modal' | 'navigation';
+
+/** @document */
 type UserButtonProfileMode =
   | {
       userProfileUrl?: never;
@@ -1869,7 +2005,7 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   afterSwitchSessionUrl?: string;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -1906,6 +2042,7 @@ type CreateOrganizationMode =
   | { createOrganizationUrl: string; createOrganizationMode?: 'navigation' }
   | { createOrganizationUrl?: never; createOrganizationMode?: 'modal' };
 
+/** @document */
 export type OrganizationSwitcherProps = CreateOrganizationMode &
   OrganizationProfileMode & {
     /**
@@ -1970,7 +2107,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     skipInvitationScreen?: boolean;
     /**
-     * Customisation options to fully match the Clerk components to your own brand.
+     * Customization options to fully match the Clerk components to your own brand.
      * These options serve as overrides and will be merged with the global `appearance`
      * prop of ClerkProvider(if one is provided)
      */
@@ -1982,6 +2119,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
   };
 
+/** @document */
 export type OrganizationListProps = {
   /**
    * Full URL or path to navigate to after creating a new Organization.
@@ -2001,7 +2139,7 @@ export type OrganizationListProps = {
     | ((organization: OrganizationResource) => string)
     | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -2031,13 +2169,14 @@ export type OrganizationListProps = {
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
 };
 
+/** @document */
 export type WaitlistProps = {
   /**
    * Full URL or path to navigate to after join waitlist.
    */
   afterJoinWaitlistUrl?: string;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvided (if one is provided)
    */
@@ -2048,6 +2187,7 @@ export type WaitlistProps = {
   signInUrl?: string;
 };
 
+/** @document */
 export type WaitlistModalProps = WaitlistProps & {
   /**
    * Function that returns the container element where portals should be rendered.
@@ -2057,6 +2197,7 @@ export type WaitlistModalProps = WaitlistProps & {
   getContainer?: () => HTMLElement | null;
 };
 
+/** @document */
 type PricingTableDefaultProps = {
   /**
    * The position of the CTA button.
@@ -2078,6 +2219,7 @@ type PricingTableDefaultProps = {
   newSubscriptionRedirectUrl?: string;
 };
 
+/** @document */
 type PricingTableBaseProps = {
   /**
    * The subscriber type to display plans for.
@@ -2087,7 +2229,7 @@ type PricingTableBaseProps = {
    */
   for?: ForPayerType;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -2101,8 +2243,10 @@ type PricingTableBaseProps = {
 
 type PortalRoot = HTMLElement | null | undefined;
 
+/** @document */
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
+/** @document */
 export type APIKeysProps = {
   /**
    * The number of API keys to show per page.
@@ -2111,7 +2255,7 @@ export type APIKeysProps = {
    */
   perPage?: number;
   /**
-   * Customisation options to fully match the Clerk components to your own brand.
+   * Customization options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
@@ -2124,20 +2268,47 @@ export type APIKeysProps = {
   showDescription?: boolean;
 };
 
+/** @document */
 export type GetAPIKeysParams = ClerkPaginationParams<{
+  /**
+   * The user or organization ID to query API keys by. If not provided, defaults to the [Active Organization](!active-organization), then the current User.
+   */
   subject?: string;
+  /**
+   * A search query to filter API keys by name.
+   */
   query?: string;
 }>;
 
+/** @document */
 export type CreateAPIKeyParams = {
+  /**
+   * The name of the API key.
+   */
   name: string;
+  /**
+   * The user or organization ID to associate the API key with. If not provided, defaults to the [Active Organization](!active-organization), then the current User.
+   */
   subject?: string;
+  /**
+   * The number of seconds until the API key expires. Set to `null` or omit to create a key that never expires.
+   */
   secondsUntilExpiration?: number;
+  /**
+   * The description of the API key.
+   */
   description?: string;
 };
 
+/** @document */
 export type RevokeAPIKeyParams = {
+  /**
+   * The ID of the API key to revoke.
+   */
   apiKeyID: string;
+  /**
+   * The reason for revoking the API key.
+   */
   revocationReason?: string;
 };
 
@@ -2328,20 +2499,18 @@ export type __internal_OAuthConsentProps = {
   onDeny?: () => void;
 };
 
+/** @inline */
 export interface HandleEmailLinkVerificationParams {
   /**
-   * Full URL or path to navigate to after successful magic link verification
-   * on completed sign up or sign in on the same device.
+   * The full URL to navigate to after successful email link verification on completed sign-up or sign-in on the same device.
    */
   redirectUrlComplete?: string;
   /**
-   * Full URL or path to navigate to after successful magic link verification
-   * on the same device, but not completed sign in or sign up.
+   * The full URL to navigate to after successful email link verification on the same device, but without completing sign-in or sign-up.
    */
   redirectUrl?: string;
   /**
-   * Callback function to be executed after successful magic link
-   * verification on another device.
+   * Callback function to be executed after successful email link verification on another device.
    */
   onVerifiedOnOtherDevice?: () => void;
 }
@@ -2384,37 +2553,63 @@ export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
     | 'oauthFlow'
   >;
 
+/** @document */
 export type TaskChooseOrganizationProps = {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
    */
   redirectUrlComplete: string;
+  /**
+   * Customization options to fully match the Clerk components to your own brand.
+   */
   appearance?: ClerkAppearanceTheme;
 };
 
+/** @document */
 export type TaskResetPasswordProps = {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
    */
   redirectUrlComplete: string;
+  /**
+   * Customization options to fully match the Clerk components to your own brand.
+   */
   appearance?: ClerkAppearanceTheme;
 };
 
+/** @document */
 export type TaskSetupMFAProps = {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
    */
   redirectUrlComplete: string;
+  /**
+   * Customization options to fully match the Clerk components to your own brand.
+   */
   appearance?: ClerkAppearanceTheme;
 };
 
+/** @document */
 export type CreateOrganizationInvitationParams = {
+  /**
+   * The email address of the user to invite.
+   */
   emailAddress: string;
+  /**
+   * The role of the user to invite.
+   */
   role: OrganizationCustomRoleKey;
 };
 
+/** @document */
 export type CreateBulkOrganizationInvitationParams = {
+  /**
+   * The email addresses of the users to invite.
+   */
   emailAddresses: string[];
+  /**
+   * The role of the users to invite.
+   */
   role: OrganizationCustomRoleKey;
 };
 
@@ -2432,60 +2627,175 @@ export interface CreateOrganizationParams {
   slug?: string;
 }
 
+/** @document */
 export interface ClerkAuthenticateWithWeb3Params {
+  /**
+   * A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
+   */
   customNavigate?: (to: string) => Promise<unknown>;
+  /**
+   * The full URL or path to navigate to after a successful sign-in or sign-up.
+   */
   redirectUrl?: string;
+  /**
+   * The URL to navigate to if the sign-up process is missing user information.
+   */
   signUpContinueUrl?: string;
+  /**
+   * Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object.
+   */
   unsafeMetadata?: SignUpUnsafeMetadata;
+  /**
+   * The strategy to use for the sign-in flow.
+   */
   strategy: Web3Strategy;
+  /**
+   * A boolean indicating whether the user has agreed to the [legal compliance](https://clerk.com/docs/guides/secure/legal-compliance) documents.
+   */
   legalAccepted?: boolean;
+  /**
+   * The URL to navigate to if [second factor](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#multi-factor-authentication) is required.
+   */
   secondFactorUrl?: string;
+  /**
+   * The name of the wallet to use for authentication.
+   */
   walletName?: string;
 }
 
+/** @document */
 export interface AuthenticateWithMetamaskParams {
+  /**
+   * A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
+   */
   customNavigate?: (to: string) => Promise<unknown>;
+  /**
+   * The full URL or path to navigate to after a successful sign-in or sign-up.
+   */
   redirectUrl?: string;
+  /**
+   * The URL to navigate to if the sign-up process is missing user information.
+   */
   signUpContinueUrl?: string;
+  /**
+   * Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object.
+   */
   unsafeMetadata?: SignUpUnsafeMetadata;
+  /**
+   * A boolean indicating whether the user has agreed to the [legal compliance](https://clerk.com/docs/guides/secure/legal-compliance) documents.
+   */
   legalAccepted?: boolean;
 }
 
+/** @document */
 export interface AuthenticateWithCoinbaseWalletParams {
+  /**
+   * A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
+   */
   customNavigate?: (to: string) => Promise<unknown>;
+  /**
+   * The full URL or path to navigate to after a successful sign-in or sign-up.
+   */
   redirectUrl?: string;
+  /**
+   * The URL to navigate to if the sign-up process is missing user information.
+   */
   signUpContinueUrl?: string;
+  /**
+   * Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object.
+   */
   unsafeMetadata?: SignUpUnsafeMetadata;
+  /**
+   * A boolean indicating whether the user has agreed to the [legal compliance](https://clerk.com/docs/guides/secure/legal-compliance) documents.
+   */
   legalAccepted?: boolean;
 }
 
+/** @document */
 export interface AuthenticateWithOKXWalletParams {
+  /**
+   * A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
+   */
   customNavigate?: (to: string) => Promise<unknown>;
+  /**
+   * The full URL or path to navigate to after a successful sign-in or sign-up.
+   */
   redirectUrl?: string;
+  /**
+   * The URL to navigate to if the sign-up process is missing user information.
+   */
   signUpContinueUrl?: string;
+  /**
+   * Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object.
+   */
   unsafeMetadata?: SignUpUnsafeMetadata;
+  /**
+   * A boolean indicating whether the user has agreed to the [legal compliance](https://clerk.com/docs/guides/secure/legal-compliance) documents.
+   */
   legalAccepted?: boolean;
 }
 
+/** @document */
 export interface AuthenticateWithGoogleOneTapParams {
+  /**
+   * The Google credential token from the Google Identity Services response.
+   */
   token: string;
+  /**
+   * A boolean indicating whether the user has agreed to the [legal compliance](https://clerk.com/docs/guides/secure/legal-compliance) documents.
+   */
   legalAccepted?: boolean;
 }
 
+/** @document */
 export interface AuthenticateWithBaseParams {
+  /**
+   * A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
+   */
   customNavigate?: (to: string) => Promise<unknown>;
+  /**
+   * The full URL or path to navigate to after a successful sign-in or sign-up.
+   */
   redirectUrl?: string;
+  /**
+   * The URL to navigate to if the sign-up process is missing user information.
+   */
   signUpContinueUrl?: string;
+  /**
+   * Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object.
+   */
   unsafeMetadata?: SignUpUnsafeMetadata;
+  /**
+   * A boolean indicating whether the user has agreed to the [legal compliance](https://clerk.com/docs/guides/secure/legal-compliance) documents.
+   */
   legalAccepted?: boolean;
 }
 
+/** @document */
 export interface AuthenticateWithSolanaParams {
+  /**
+   * A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
+   */
   customNavigate?: (to: string) => Promise<unknown>;
+  /**
+   * The full URL or path to navigate to after a successful sign-in or sign-up.
+   */
   redirectUrl?: string;
+  /**
+   * The URL to navigate to if the sign-up process is missing user information.
+   */
   signUpContinueUrl?: string;
+  /**
+   * Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object.
+   */
   unsafeMetadata?: SignUpUnsafeMetadata;
+  /**
+   * A boolean indicating whether the user has agreed to the [legal compliance](https://clerk.com/docs/guides/secure/legal-compliance) documents.
+   */
   legalAccepted?: boolean;
+  /**
+   * The name of the Solana wallet to use for authentication.
+   */
   walletName: string;
 }
 
@@ -2497,7 +2807,15 @@ export interface BrowserClerkConstructor {
   new (publishableKey: string, options?: DomainOrProxyUrl): BrowserClerk;
 }
 
+/**
+ * Browser `Clerk` instance after `@clerk/clerk-js` loads. Extends [`Clerk`](https://clerk.com/docs/reference/objects/clerk) with `load()` and related browser-only APIs.
+ */
 export interface HeadlessBrowserClerk extends Clerk {
+  /**
+   * Initializes the `Clerk` object and loads all necessary environment configuration and instance settings from the [Frontend API](https://clerk.com/docs/reference/frontend-api){{ target: '_blank' }}.
+   *
+   * When using the JavaScript SDK, you must call the `load()` method before using the `Clerk` object in your code. Refer to the [quickstart guide](https://clerk.com/docs/js-frontend/getting-started/quickstart) for more information.
+   */
   load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
   updateClient: (client: ClientResource) => void;
 }

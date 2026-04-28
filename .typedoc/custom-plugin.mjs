@@ -99,6 +99,13 @@ const LINK_REPLACEMENTS = [
   ['deleted-object-resource', '/docs/reference/types/deleted-object-resource'],
   ['checkout-flow-resource', '/docs/reference/hooks/use-checkout#checkout-flow-resource'],
   ['organization-creation-defaults-resource', '#organization-creation-defaults-resource'],
+  ['billing-namespace', '/docs/reference/objects/billing'],
+  ['client-resource', '/docs/reference/objects/client'],
+  ['redirect-options', '/docs/reference/types/redirect-options'],
+  ['handle-o-auth-callback-params', '/docs/reference/types/handle-o-auth-callback-params'],
+  ['session-task', '/docs/reference/types/session-task'],
+  ['public-user-data', '/docs/reference/types/public-user-data'],
+  ['session-status', '/docs/reference/types/session-status'],
 ];
 
 /**
@@ -117,106 +124,148 @@ const LINK_REPLACEMENTS = [
 function getRelativeLinkReplacements() {
   return LINK_REPLACEMENTS.map(([fileName, newPath]) => {
     return {
-      // Match both path and optional anchor
-      pattern: new RegExp(`\\((?:(?:\\.{1,2}\\/)+[^()]*?|)${fileName}\\.mdx(#[^)]+)?\\)`, 'g'),
+      // Match both flat links and nested object-doc links
+      pattern: new RegExp(`\\((?:(?:\\.{1,2}\\/)+[^()]*?|)(?:${fileName}\\/)?${fileName}\\.mdx(#[^)]+)?\\)`, 'g'),
       // Preserve the anchor in replacement if it exists
       replace: (/** @type {string} */ _match, anchor = '') => `(${newPath}${anchor})`,
     };
   });
 }
 
+/**
+ * First pass of `MarkdownPageEvent.END`: rewrite `(foo.mdx)` / relative paths to `/docs/...` (see {@link LINK_REPLACEMENTS}).
+ * Used by `extract-methods.mjs`, which does not go through the renderer hook.
+ *
+ * @param {string} contents
+ */
+export function applyRelativeLinkReplacements(contents) {
+  if (!contents) {
+    return contents;
+  }
+  let out = contents;
+  for (const { pattern, replace } of getRelativeLinkReplacements()) {
+    // @ts-ignore — string | function
+    out = out.replace(pattern, replace);
+  }
+  return out;
+}
+
 function getCatchAllReplacements() {
   return [
     {
-      pattern: /(?<![\[\w`])`Appearance`\\<`Theme`\\>/g,
+      pattern: /(?<![\[\w`#])`?APIKeysNamespace`?(?![\]\w`])/g,
+      replace: '[`APIKeysNamespace`](/docs/reference/objects/api-keys)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`Appearance`\\<`Theme`\\>/g,
       replace: '[`Appearance<Theme>`](/docs/guides/customizing-clerk/appearance-prop/overview)',
     },
     {
-      pattern: /\(CreateOrganizationParams\)/g,
+      pattern: /(?<![#])\(CreateOrganizationParams\)/g,
       replace: '([CreateOrganizationParams](#create-organization-params))',
     },
     {
-      pattern: /`LoadedClerk`/g,
+      pattern: /(?<![#])`LoadedClerk`/g,
       replace: '[Clerk](/docs/reference/objects/clerk)',
     },
     {
-      pattern: /(?<![\[\w`])`?LocalizationResource`?(?![\]\w`])/g,
+      pattern: /(?<![\[\w`#])`?LocalizationResource`?(?![\]\w`])/g,
       replace: '[`LocalizationResource`](/docs/guides/customizing-clerk/localization)',
     },
     {
       // SessionResource appears in plain text, with an array next to it, with backticks, etc.
       // e.g. `SessionResource[]`
-      pattern: /(?<![`[\]])\bSessionResource(\[\])?\b(?![\]\)`])/g,
+      pattern: /(?<![`#[\]])\bSessionResource(\[\])?\b(?![\]\)`])/g,
       replace: '[`SessionResource`](/docs/reference/objects/session)$1',
     },
     {
-      pattern: /(?<![\[\w`])`?SessionStatusClaim`?(?![\]\w`])/g,
+      pattern: /(?<![\[\w`#])`?SessionStatusClaim`?(?![\]\w`])/g,
       replace: '[`SessionStatusClaim`](/docs/reference/types/session-status)',
     },
     {
-      pattern: /(?<![`[\]])\bSetActiveParams\b(?![\]\(])/g,
+      pattern: /(?<![`#[\]])\bSetActiveParams\b(?![\]\(])/g,
       replace: '[SetActiveParams](/docs/reference/types/set-active-params)',
     },
     {
-      pattern: /(?<![\[\w`])`?SignInResource`?(?![\]\w`])/g,
+      pattern: /(?<![\[\w`#])`?SignInResource`?(?![\]\w`])/g,
       replace: '[`SignInResource`](/docs/reference/objects/sign-in)',
     },
     {
-      pattern: /(?<![\[\w`])`?((?:SignIn|SignUp)Errors)`?(?![\]\w`])/g,
+      pattern: /(?<![\[\w`#])`?((?:SignIn|SignUp)Errors)`?(?![\]\w`])/g,
       replace: (/** @type {string} */ _match, /** @type {string} */ type) =>
         `[\`${type}\`](/docs/reference/types/errors)`,
     },
     {
-      pattern: /(?<![\[\w`])`?SignInFutureResource`?(?![\]\w`])/g,
+      pattern: /(?<![\[\w`#])`?SignInFutureResource`?(?![\]\w`])/g,
       replace: '[`SignInFutureResource`](/docs/reference/objects/sign-in-future)',
     },
     {
-      pattern: /(?<![\[\w`])`?SignedInSessionResource`?(?![\]\w`])/g,
+      pattern: /(?<![\[\w`#])`?SignedInSessionResource`?(?![\]\w`])/g,
       replace: '[`SignedInSessionResource`](/docs/reference/objects/session)',
     },
     {
-      pattern: /(?<![\[\w`])`?SignUpResource`?(?![\]\w`])/g,
+      pattern: /(?<![#])`SignInRedirectOptions`/g,
+      replace: '[`SignInRedirectOptions`](/docs/reference/types/sign-in-redirect-options)',
+    },
+    {
+      pattern: /(?<![#])`SignUpRedirectOptions`/g,
+      replace: '[`SignUpRedirectOptions`](/docs/reference/types/sign-up-redirect-options)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?SignUpResource`?(?![\]\w`])/g,
       replace: '[`SignUpResource`](/docs/reference/objects/sign-up)',
     },
     {
-      pattern: /(?<![\[\w`])`?SignUpFutureResource`?(?![\]\w`])/g,
+      pattern: /(?<![#])`SignUpUnsafeMetadata`/g,
+      replace: '[`SignUpUnsafeMetadata`](/docs/reference/types/metadata#sign-up-unsafe-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?SignUpFutureResource`?(?![\]\w`])/g,
       replace: '[`SignUpFutureResource`](/docs/reference/objects/sign-up-future)',
     },
     {
-      pattern: /(?<![\[\w`])`?OrganizationResource`?(?![\]\w`])/g,
+      pattern: /(?<![#])`TasksRedirectOptions`/g,
+      replace: '[`TasksRedirectOptions`](/docs/reference/types/redirect-options)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?OrganizationResource`?(?![\]\w`])/g,
       replace: '[`OrganizationResource`](/docs/reference/objects/organization)',
     },
     {
-      pattern: /`OrganizationPrivateMetadata`/g,
+      pattern: /(?<![#])`OrganizationPrivateMetadata`/g,
       replace: '[`OrganizationPrivateMetadata`](/docs/reference/types/metadata#organization-private-metadata)',
     },
     {
-      pattern: /OrganizationPublicMetadata/g,
+      pattern: /(?<![#])\bOrganizationPublicMetadata\b/g,
       replace: '[OrganizationPublicMetadata](/docs/reference/types/metadata#organization-public-metadata)',
     },
     {
-      pattern: /`OrganizationInvitationPrivateMetadata`/g,
+      pattern: /(?<![#])`OrganizationInvitationPrivateMetadata`/g,
       replace:
         '[`OrganizationInvitationPrivateMetadata`](/docs/reference/types/metadata#organization-invitation-private-metadata)',
     },
     {
-      pattern: /`OrganizationInvitationPublicMetadata`/g,
+      pattern: /(?<![#])`OrganizationInvitationPublicMetadata`/g,
       replace:
         '[`OrganizationInvitationPublicMetadata`](/docs/reference/types/metadata#organization-invitation-public-metadata)',
     },
     {
-      pattern: /`OrganizationMembershipPrivateMetadata`/g,
+      pattern: /(?<![#])`OrganizationMembershipPrivateMetadata`/g,
       replace:
         '[`OrganizationMembershipPrivateMetadata`](/docs/reference/types/metadata#organization-membership-private-metadata)',
     },
     {
-      pattern: /`OrganizationMembershipPublicMetadata`/g,
+      pattern: /(?<![#])`OrganizationMembershipPublicMetadata`/g,
       replace:
         '[`OrganizationMembershipPublicMetadata`](/docs/reference/types/metadata#organization-membership-public-metadata)',
     },
     {
-      pattern: /(?<![\[\w`])`?UserResource`?(?![\]\w`])/g,
+      pattern: /(?<![\[\w`#])`?UserResource`?(?![\]\w`])/g,
       replace: '[`UserResource`](/docs/reference/objects/user)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?LastAuthenticationStrategy`?(?![\]\w`])/g,
+      replace: '[LastAuthenticationStrategy](/docs/reference/types/last-authentication-strategy)',
     },
     {
       /**
@@ -251,27 +300,104 @@ function getCatchAllReplacements() {
   ];
 }
 
+/** CommonMark ATX heading: optional indent, 1–6 `#`, then space or end — entire line is left unchanged. */
+const ATX_HEADING_LINE = /^\s{0,3}#{1,6}(?:\s|$)/;
+
+/** Private-use placeholders — must not appear in real MDX and must not match catch-all patterns. */
+const PIPE_CODE_PH = /\uE000(\d+)\uE001/g;
+
+/**
+ * Inline code that contains a pipe (e.g. `` `a \\| b` `` or `` `a | b` ``) cannot receive per-token
+ * link replacements without breaking MDX. Replace those whole spans with placeholders, run catch-alls,
+ * then restore.
+ *
+ * @param {string} line
+ * @returns {{ text: string, placeholders: string[] }}
+ */
+function protectPipeDelimitedInlineCodeSpans(line) {
+  /** @type {string[]} */
+  const placeholders = [];
+  const text = line.replace(/`([^`\n]*)`/g, (full, inner) => {
+    if (!inner.includes('|')) {
+      return full;
+    }
+    const id = placeholders.length;
+    placeholders.push(full);
+    return `\uE000${id}\uE001`;
+  });
+  return { text, placeholders };
+}
+
+/**
+ * @param {string} text
+ * @param {string[]} placeholders
+ */
+function restoreProtectedInlineCodeSpans(text, placeholders) {
+  return text.replace(PIPE_CODE_PH, (_, /** @type {string} */ i) => placeholders[Number(i)] ?? '');
+}
+
+/**
+ * Remove the Properties section (heading + table) from reference object pages (e.g. `shared/clerk/clerk.mdx`);
+ * the table is copied into `shared/<object>/properties.mdx` by `extract-methods.mjs`.
+ *
+ * @param {string} contents
+ */
+export function stripReferenceObjectPropertiesSection(contents) {
+  if (!contents) {
+    return contents;
+  }
+  const stripped = contents.replace(/\r\n/g, '\n').replace(/\n## Properties\n+[\s\S]*$/, '');
+  return stripped.trimEnd() + '\n';
+}
+
+/**
+ * Second pass of `MarkdownPageEvent.END` (after {@link applyRelativeLinkReplacements}).
+ * Used by `extract-methods.mjs`, which writes MDX outside TypeDoc and never hits that hook.
+ *
+ * Skips ATX heading lines (`#` … `######`) so titles like `#### SetActiveParams` are never linkified.
+ * (A lone `(?<!#)` in regex is not enough: heading text is separated from `###` by spaces.)
+ *
+ * Skips inline code spans that contain `|` (union / enum style like `` `v1 \\| v2` ``) so link rules do
+ * not run inside them — otherwise MDX breaks.
+ *
+ * @param {string} contents
+ */
+export function applyCatchAllMdReplacements(contents) {
+  if (!contents) {
+    return contents;
+  }
+  return contents
+    .split('\n')
+    .map(
+      /** @param {string} line */ line => {
+        if (ATX_HEADING_LINE.test(line.replace(/\r$/, ''))) {
+          return line;
+        }
+        const { text: withPh, placeholders } = protectPipeDelimitedInlineCodeSpans(line);
+        let out = withPh;
+        for (const { pattern, replace } of getCatchAllReplacements()) {
+          // @ts-ignore — string | function
+          out = out.replace(pattern, replace);
+        }
+        return restoreProtectedInlineCodeSpans(out, placeholders);
+      },
+    )
+    .join('\n');
+}
+
 /**
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
 export function load(app) {
   app.renderer.on(MarkdownPageEvent.END, output => {
     const fileName = output.url.split('/').pop();
-    const linkReplacements = getRelativeLinkReplacements();
 
-    for (const { pattern, replace } of linkReplacements) {
-      if (output.contents) {
-        output.contents = output.contents.replace(pattern, replace);
-      }
+    if (output.contents) {
+      output.contents = applyRelativeLinkReplacements(output.contents);
     }
 
-    const catchAllReplacements = getCatchAllReplacements();
-
-    for (const { pattern, replace } of catchAllReplacements) {
-      if (output.contents) {
-        // @ts-ignore - Mixture of string and function replacements
-        output.contents = output.contents.replace(pattern, replace);
-      }
+    if (output.contents) {
+      output.contents = applyCatchAllMdReplacements(output.contents);
     }
 
     if (fileName) {

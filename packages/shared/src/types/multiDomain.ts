@@ -60,13 +60,16 @@ export type MultiDomainAndOrProxyPrimitives =
       domain?: never;
     };
 
+/**
+ * Only one of the two properties are allowed to be set at a time.
+ */
 export type DomainOrProxyUrl = {
   /**
-   * **Required for applications that run behind a reverse proxy**. The URL that Clerk will proxy requests to. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`).
+   * **Required for applications that run behind a reverse proxy**. The URL that Clerk will proxy requests to. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`), or a function that will be called with a `URL` made from `window.location.href`.
    */
   proxyUrl?: string | ((url: URL) => string);
   /**
-   * **Required if your application is a satellite application**. Sets the domain of the satellite application.
+   * **Required if your application is a satellite application**. Sets the domain of the satellite application. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`), or a function that will be called with a `URL` made from `window.location.href`.
    */
   domain?: string | ((url: URL) => string);
 };
