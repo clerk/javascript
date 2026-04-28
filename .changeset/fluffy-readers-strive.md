@@ -1,5 +1,5 @@
 ---
-'@clerk/ui': major
+'@clerk/ui': minor
 ---
 
-Render OAuthConsent organization selector from scope
+Render OAuthConsent organization selector from `user:org:read` scope.
