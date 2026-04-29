@@ -26,6 +26,7 @@ import { OrgSelect } from './OrgSelect';
 import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
+const USER_ORG_READ_SCOPE = 'user:org:read';
 
 function _OAuthConsent() {
   const ctx = useOAuthConsentContext();
@@ -37,20 +38,7 @@ function _OAuthConsent() {
   } = useEnvironment();
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
 
-  const orgSelectionEnabled = !!(ctx.enableOrgSelection && organizationSettings.enabled);
-  const orgOptions = orgSelectionEnabled
-    ? (user?.organizationMemberships ?? []).map(m => ({
-        value: m.organization.id,
-        label: m.organization.name,
-        logoUrl: m.organization.imageUrl,
-      }))
-    : [];
-
-  const lastActiveOrgId = clerk.session?.lastActiveOrganizationId;
-  const defaultOrg = orgOptions.find(o => o.value === lastActiveOrgId)?.value ?? orgOptions[0]?.value ?? null;
-
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
-  const effectiveOrg = selectedOrg ?? defaultOrg;
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -82,6 +70,19 @@ function _OAuthConsent() {
   const oauthApplicationLogoUrl = ctx.oauthApplicationLogoUrl ?? data?.oauthApplicationLogoUrl;
   const oauthApplicationUrl = ctx.oauthApplicationUrl ?? data?.oauthApplicationUrl;
   const redirectUrl = ctx.redirectUrl ?? getRedirectUriFromSearch();
+
+  const hasOrgReadScope = scopes.some(s => s.scope === USER_ORG_READ_SCOPE);
+  const orgSelectionEnabled = !!((hasOrgReadScope || ctx.enableOrgSelection) && organizationSettings.enabled);
+  const orgOptions = orgSelectionEnabled
+    ? (user?.organizationMemberships ?? []).map(m => ({
+        value: m.organization.id,
+        label: m.organization.name,
+        logoUrl: m.organization.imageUrl,
+      }))
+    : [];
+  const lastActiveOrgId = clerk.session?.lastActiveOrganizationId;
+  const defaultOrg = orgOptions.find(o => o.value === lastActiveOrgId)?.value ?? orgOptions[0]?.value ?? null;
+  const effectiveOrg = selectedOrg ?? defaultOrg;
 
   const { t } = useLocalizations();
   const domainAction = getRedirectDisplay(redirectUrl);
@@ -139,7 +140,7 @@ function _OAuthConsent() {
 
   const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
 
-  const displayedScopes = scopes.filter(item => item.scope !== OFFLINE_ACCESS_SCOPE);
+  const displayedScopes = scopes.filter(item => ![OFFLINE_ACCESS_SCOPE, USER_ORG_READ_SCOPE].includes(item.scope));
   const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
 
   return (
