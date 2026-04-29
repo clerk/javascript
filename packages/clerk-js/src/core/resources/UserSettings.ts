@@ -136,7 +136,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     }
 
     return Object.entries(this.social)
-      .filter(([, desc]) => desc.enabled && desc.authenticatable)
+      .filter(([, desc]) => desc.enabled && desc.authenticatable && desc.strategy)
       .map(([, desc]) => desc.strategy)
       .sort();
   }
@@ -157,7 +157,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     }
 
     return Object.entries(this.social)
-      .filter(([, desc]) => desc.enabled)
+      .filter(([, desc]) => desc.enabled && desc.strategy)
       .map(([, desc]) => desc.strategy)
       .sort();
   }
