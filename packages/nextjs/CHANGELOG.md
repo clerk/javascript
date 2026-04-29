@@ -1,5 +1,18 @@
 # Change Log
 
+## 7.2.8
+
+### Patch Changes
+
+- Use a constant-time comparison when validating the integrity signature on the middleware-to-origin auth header handoff (`assertTokenSignature`). The previous `!==` compare was timing-variable; the new helper is synchronous and runtime-agnostic so it works in both Node and Edge Runtime. ([#8411](https://github.com/clerk/javascript/pull/8411)) by [@jacekradko](https://github.com/jacekradko)
+
+- Auto-proxy FAPI requests for `.vercel.app` subdomains. When deployed to a `.vercel.app` domain without explicit proxy or domain configuration, the SDK automatically routes Frontend API requests through `/__clerk` on the app's own origin. This enables Clerk production mode on Vercel deployments without manual proxy setup. ([#8035](https://github.com/clerk/javascript/pull/8035)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863), [`e0a63f9`](https://github.com/clerk/javascript/commit/e0a63f9f976fd25f4ed68080c84b72149ef64646)]:
+  - @clerk/shared@4.8.6
+  - @clerk/backend@3.4.2
+  - @clerk/react@6.4.6
+
 ## 7.2.7
 
 ### Patch Changes

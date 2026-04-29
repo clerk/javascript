@@ -1,5 +1,13 @@
 # @clerk/ui
 
+## 1.6.8
+
+### Patch Changes
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`00f9ff9`](https://github.com/clerk/javascript/commit/00f9ff942f0568f3839a04ff2527339d8fbf3a5d), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863)]:
+  - @clerk/shared@4.8.6
+  - @clerk/localizations@4.5.6
+
 ## 1.6.7
 
 ### Patch Changes
