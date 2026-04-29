@@ -27,13 +27,13 @@ export class Waitlist extends BaseResource implements WaitlistResource {
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.createdAt = unixEpochToDate(data.created_at);
 
-    eventBus.emit('resource:update', { resource: this });
+    eventBus.emit('resource:state-change', { resource: this });
     return this;
   }
 
   async join(params: JoinWaitlistParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this, async () => {
-      await Waitlist.join(params);
+      await this._basePost({ path: this.pathRoot, body: params });
     });
   }
 
