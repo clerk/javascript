@@ -390,6 +390,25 @@ describe('OAuthConsent', () => {
       });
     });
 
+    it('renders the org selector when __internal_enableOrgSelection is true (fallback for existing apps)', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({
+          email_addresses: ['jane@example.com'],
+          organization_memberships: [{ id: 'org_1', name: 'Acme Corp' }],
+        });
+        f.withOrganizations();
+      });
+
+      props.setProps({ componentName: 'OAuthConsent', __internal_enableOrgSelection: true } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      const { getByText } = render(<OAuthConsent />, { wrapper });
+
+      await waitFor(() => {
+        expect(getByText('Acme Corp')).toBeVisible();
+      });
+    });
+
     it('does not display user:org:read in the scopes list', async () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withUser({

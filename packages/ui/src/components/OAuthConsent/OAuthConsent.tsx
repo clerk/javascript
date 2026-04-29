@@ -72,7 +72,7 @@ function _OAuthConsent() {
   const redirectUrl = ctx.redirectUrl ?? getRedirectUriFromSearch();
 
   const hasOrgReadScope = scopes.some(s => s.scope === USER_ORG_READ_SCOPE);
-  const orgSelectionEnabled = !!(hasOrgReadScope && organizationSettings.enabled);
+  const orgSelectionEnabled = !!((hasOrgReadScope || ctx.enableOrgSelection) && organizationSettings.enabled);
   const orgOptions = orgSelectionEnabled
     ? (user?.organizationMemberships ?? []).map(m => ({
         value: m.organization.id,
