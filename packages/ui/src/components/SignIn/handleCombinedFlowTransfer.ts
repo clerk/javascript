@@ -100,6 +100,7 @@ export function handleCombinedFlowTransfer({
           signUp: res,
           verifyEmailPath: 'create/verify-email-address',
           verifyPhonePath: 'create/verify-phone-number',
+          protectCheckPath: 'create/protect-check',
           handleComplete: () =>
             clerk.setActive({
               session: res.createdSessionId,

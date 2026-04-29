@@ -803,6 +803,11 @@ export const enUS: LocalizationResource = {
       subtitle: 'Select a wallet below to sign in',
       title: 'Sign in with Solana',
     },
+    protectCheck: {
+      loading: 'Loading…',
+      subtitle: 'Please wait while we verify your request.',
+      title: 'Verifying your request',
+    },
   },
   signInEnterPasswordTitle: 'Enter your password',
   signUp: {
@@ -898,6 +903,11 @@ export const enUS: LocalizationResource = {
     web3Solana: {
       subtitle: 'Select a wallet below to sign up',
       title: 'Sign up with Solana',
+    },
+    protectCheck: {
+      loading: 'Loading…',
+      subtitle: 'Please wait while we verify your request.',
+      title: 'Verifying your request',
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
@@ -1019,6 +1029,7 @@ export const enUS: LocalizationResource = {
     api_key_name_already_exists: 'API Key name already exists.',
     api_key_usage_exceeded: 'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
     avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+    action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
     avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
     captcha_invalid: undefined,
     captcha_unavailable:
@@ -1084,6 +1095,13 @@ export const enUS: LocalizationResource = {
       sentencePrefix: 'Your password must contain',
     },
     phone_number_exists: undefined,
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: "Verification didn't complete. Please try again.",
+    protect_check_invalid_script: "Couldn't load verification. Please contact support if this persists.",
+    protect_check_invalid_sdk_url: "Verification couldn't start. Please contact support.",
+    protect_check_script_load_failed:
+      "Couldn't load verification. This may be caused by a network issue or a Content Security Policy that blocks the verification script. Please try again or contact support.",
     session_exists: undefined,
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',

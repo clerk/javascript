@@ -2,6 +2,7 @@ import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
+import type { ProtectCheckResource } from './signUpCommon';
 import type { OAuthStrategy, PasskeyStrategy, TicketStrategy, Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
 import type { Web3Provider } from './web3';
@@ -369,6 +370,11 @@ export interface SignInFutureResource {
   readonly userData: UserData;
 
   /**
+   * The current protect check challenge, if one is pending.
+   */
+  readonly protectCheck: ProtectCheckResource | null;
+
+  /**
    * Indicates that the sign-in can be discarded (has been finalized or explicitly reset).
    *
    * @internal
@@ -558,6 +564,12 @@ export interface SignInFutureResource {
    * scenarios where the authentication strategy needs to be determined dynamically at runtime.
    */
   passkey: (params?: SignInFuturePasskeyParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Submits a proof token to resolve a pending protect check challenge. The response may contain
+   * another `protectCheck` (a chained challenge) which must be resolved iteratively.
+   */
+  submitProtectCheck: (params: { proofToken: string }) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to convert a sign-in with `status === 'complete'` into an active session. Will cause anything observing the

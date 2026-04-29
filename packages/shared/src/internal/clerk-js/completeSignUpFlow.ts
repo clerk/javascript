@@ -5,6 +5,7 @@ type CompleteSignUpFlowProps = {
   signUp: SignUpResource;
   verifyEmailPath?: string;
   verifyPhonePath?: string;
+  protectCheckPath?: string;
   continuePath?: string;
   navigate: (to: string, options?: { searchParams?: URLSearchParams }) => Promise<unknown>;
   handleComplete?: () => Promise<void>;
@@ -17,6 +18,7 @@ export const completeSignUpFlow = ({
   signUp,
   verifyEmailPath,
   verifyPhonePath,
+  protectCheckPath,
   continuePath,
   navigate,
   handleComplete,
@@ -38,6 +40,13 @@ export const completeSignUpFlow = ({
     }
 
     const params = forwardClerkQueryParams();
+
+    // Per Protect spec §5.1: the protect_check field is the authoritative gating signal.
+    // Sign-up also surfaces it via missing_fields entry; treat either as equivalent.
+    const isProtectGated = !!signUp.protectCheck || signUp.missingFields.some(mf => mf === 'protect_check');
+    if (isProtectGated && protectCheckPath) {
+      return navigate(protectCheckPath, { searchParams: params });
+    }
 
     if (signUp.unverifiedFields?.includes('email_address') && verifyEmailPath) {
       return navigate(verifyEmailPath, { searchParams: params });

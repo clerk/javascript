@@ -12,6 +12,7 @@ import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { type LocalizationKey, localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
+import { isSignInProtectGated } from './handleProtectCheck';
 
 export type SignInFactorOneAlternativeChannelCodeCard = Pick<
   VerificationCodeCardProps,
@@ -63,6 +64,10 @@ export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOne
       .then(async res => {
         await resolve();
 
+        if (isSignInProtectGated(res)) {
+          return navigate('../protect-check');
+        }
+
         switch (res.status) {
           case 'complete':
             return setActive({
@@ -75,6 +80,8 @@ export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOne
             return navigate('../factor-two');
           case 'needs_new_password':
             return navigate('../reset-password');
+          case 'needs_protect_check':
+            return navigate('../protect-check');
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
