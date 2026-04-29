@@ -667,6 +667,21 @@ export interface Clerk {
    * @param targetNode - Target node to mount the OAuth consent component.
    * @param oauthConsentProps - OAuth consent configuration parameters.
    */
+  __internal_mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: __internal_OAuthConsentProps) => void;
+
+  /**
+   * Unmounts a OAuth consent component from the target element.
+   *
+   * @param targetNode - Target node to unmount the OAuth consent component from.
+   */
+  __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a OAuth consent component at the target element.
+   *
+   * @param targetNode - Target node to mount the OAuth consent component.
+   * @param oauthConsentProps - OAuth consent configuration parameters.
+   */
   mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: OAuthConsentProps) => void;
 
   /**
@@ -2327,6 +2342,9 @@ export type OAuthConsentProps = {
    */
   onDeny?: () => void;
 };
+
+/** @deprecated Use OAuthConsentProps instead. */
+export type __internal_OAuthConsentProps = OAuthConsentProps;
 
 export interface HandleEmailLinkVerificationParams {
   /**

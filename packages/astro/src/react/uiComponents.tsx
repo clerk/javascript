@@ -1,6 +1,6 @@
 import type {
   GoogleOneTapProps,
-  OAuthConsentProps,
+  __internal_OAuthConsentProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -198,11 +198,11 @@ export const PricingTable = withClerk(({ clerk, ...props }: WithClerkProp<Pricin
   );
 }, 'PricingTable');
 
-export const OAuthConsent = withClerk(({ clerk, ...props }: WithClerkProp<OAuthConsentProps>) => {
+export const OAuthConsent = withClerk(({ clerk, ...props }: WithClerkProp<__internal_OAuthConsentProps>) => {
   return (
     <Portal
-      mount={clerk?.mountOAuthConsent}
-      unmount={clerk?.unmountOAuthConsent}
+      mount={clerk?.__internal_mountOAuthConsent}
+      unmount={clerk?.__internal_unmountOAuthConsent}
       props={props}
     />
   );

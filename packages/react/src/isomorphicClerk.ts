@@ -6,7 +6,7 @@ import type {
   __internal_AttemptToEnableEnvironmentSettingResult,
   __internal_CheckoutProps,
   __internal_EnableOrganizationsPromptProps,
-  OAuthConsentProps,
+  __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
@@ -158,7 +158,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   private premountAPIKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
-  private premountOAuthConsentNodes = new Map<HTMLDivElement, OAuthConsentProps | undefined>();
+  private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   private premountTaskResetPasswordNodes = new Map<HTMLDivElement, TaskResetPasswordProps | undefined>();
   private premountTaskSetupMFANodes = new Map<HTMLDivElement, TaskSetupMFAProps | undefined>();
@@ -747,7 +747,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     });
 
     this.premountOAuthConsentNodes.forEach((props, node) => {
-      clerkjs.mountOAuthConsent(node, props);
+      clerkjs.__internal_mountOAuthConsent(node, props);
     });
 
     this.premountTaskChooseOrganizationNodes.forEach((props, node) => {
@@ -1282,17 +1282,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {
+  __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.mountOAuthConsent(node, props);
+      this.clerkjs.__internal_mountOAuthConsent(node, props);
     } else {
       this.premountOAuthConsentNodes.set(node, props);
     }
   };
 
-  unmountOAuthConsent = (node: HTMLDivElement) => {
+  __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.unmountOAuthConsent(node);
+      this.clerkjs.__internal_unmountOAuthConsent(node);
     } else {
       this.premountOAuthConsentNodes.delete(node);
     }
