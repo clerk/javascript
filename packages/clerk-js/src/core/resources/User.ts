@@ -14,7 +14,9 @@ import type {
   EnterpriseConnectionResource,
   ExternalAccountJSON,
   ExternalAccountResource,
+  CreateMeEnterpriseConnectionParams,
   GetEnterpriseConnectionsParams,
+  UpdateMeEnterpriseConnectionParams,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -36,6 +38,10 @@ import type {
 } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import {
+  buildCreateMeEnterpriseConnectionBody,
+  buildUpdateMeEnterpriseConnectionBody,
+} from '../../utils/meEnterpriseConnectionBody';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
@@ -314,6 +320,46 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as EnterpriseConnectionJSON[];
 
     return (json || []).map(connection => new EnterpriseConnection(connection));
+  };
+
+  createEnterpriseConnection = async (
+    params: CreateMeEnterpriseConnectionParams,
+  ): Promise<EnterpriseConnectionResource> => {
+    const json = (
+      await BaseResource._fetch<EnterpriseConnectionJSON>({
+        path: `${this.path()}/enterprise_connections`,
+        method: 'POST',
+        body: buildCreateMeEnterpriseConnectionBody(params) as any,
+      })
+    )?.response as unknown as EnterpriseConnectionJSON;
+
+    return new EnterpriseConnection(json);
+  };
+
+  updateEnterpriseConnection = async (
+    enterpriseConnectionId: string,
+    params: UpdateMeEnterpriseConnectionParams,
+  ): Promise<EnterpriseConnectionResource> => {
+    const json = (
+      await BaseResource._fetch<EnterpriseConnectionJSON>({
+        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
+        method: 'PATCH',
+        body: buildUpdateMeEnterpriseConnectionBody(params) as any,
+      })
+    )?.response as unknown as EnterpriseConnectionJSON;
+
+    return new EnterpriseConnection(json);
+  };
+
+  deleteEnterpriseConnection = async (enterpriseConnectionId: string): Promise<DeletedObjectResource> => {
+    const json = (
+      await BaseResource._fetch<DeletedObjectJSON>({
+        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
+        method: 'DELETE',
+      })
+    )?.response as unknown as DeletedObjectJSON;
+
+    return new DeletedObject(json);
   };
 
   initializePaymentMethod: typeof initializePaymentMethod = params => {
