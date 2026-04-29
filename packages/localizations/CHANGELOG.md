@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.5.6
+
+### Patch Changes
+
+- Expand the Catalan (`ca-ES`) localization by filling in previously undefined translations across billing, checkout, subscription management, cancellation flows, and related UI strings. ([#8412](https://github.com/clerk/javascript/pull/8412)) by [@marcvive](https://github.com/marcvive)
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863)]:
+  - @clerk/shared@4.8.6
+
 ## 4.5.5
 
 ### Patch Changes
