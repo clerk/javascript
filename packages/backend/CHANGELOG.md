@@ -1,5 +1,52 @@
 # Change Log
 
+## 3.4.2
+
+### Patch Changes
+
+- Auto-proxy FAPI requests for `.vercel.app` subdomains. When deployed to a `.vercel.app` domain without explicit proxy or domain configuration, the SDK automatically routes Frontend API requests through `/__clerk` on the app's own origin. This enables Clerk production mode on Vercel deployments without manual proxy setup. ([#8035](https://github.com/clerk/javascript/pull/8035)) by [@brkalow](https://github.com/brkalow)
+
+- Fix `Request` cloning and outbound `fetch` to omit cross-realm `AbortSignal`. Node 24's bundled undici tightened the `instanceof AbortSignal` check on `RequestInit.signal`, which broke: ([#8351](https://github.com/clerk/javascript/pull/8351)) by [@jacekradko](https://github.com/jacekradko)
+  - Cloning framework-specific requests such as `NextRequest` in `@clerk/backend`'s `ClerkRequest`.
+  - Subclassed `Request`s passed through `patchRequest` in `@clerk/react-router` and `@clerk/tanstack-react-start`.
+  - Frontend API proxying in `@clerk/backend`'s `clerkFrontendApiProxy`, which forwarded the inbound request's signal to the upstream `fetch`. Abort propagation will be restored in a follow-up via an in-realm `AbortController` bridge.
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863)]:
+  - @clerk/shared@4.8.6
+
+## 3.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`da76490`](https://github.com/clerk/javascript/commit/da7649075e24351737271318e81842b5c298dee1)]:
+  - @clerk/shared@4.8.5
+
+## 3.4.0
+
+### Minor Changes
+
+- Add backend query to GET organization settings for an instance. ([#8367](https://github.com/clerk/javascript/pull/8367)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9)]:
+  - @clerk/shared@4.8.4
+
+## 3.3.0
+
+### Minor Changes
+
+- Add `createBootstrapSignedOutState` helper to `@clerk/backend/internal`. Returns a synthetic `UnauthenticatedState<'session_token'>` without requiring a publishable key or an `AuthenticateContext`. Intended for framework integrations that need to run authorization logic before real Clerk keys are available (e.g. the Next.js keyless bootstrap window). Accepts optional `signInUrl`, `signUpUrl`, `isSatellite`, `domain`, and `proxyUrl` so that `createRedirect`-driven flows (including cross-origin satellite sign-in with the `__clerk_status=needs-sync` handshake marker) behave correctly during bootstrap. ([#8368](https://github.com/clerk/javascript/pull/8368)) by [@jacekradko](https://github.com/jacekradko)
+
+## 3.2.14
+
+### Patch Changes
+
+- A clock skew of 0 will not fall back to the default value anymore. ([#8359](https://github.com/clerk/javascript/pull/8359)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f)]:
+  - @clerk/shared@4.8.3
+
 ## 3.2.13
 
 ### Patch Changes

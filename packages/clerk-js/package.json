@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "6.7.4",
+  "version": "6.7.8",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -91,7 +91,7 @@
     "@solana/wallet-standard": "catalog:module-manager",
     "@stripe/stripe-js": "5.6.0",
     "@swc/helpers": "catalog:repo",
-    "@tanstack/query-core": "5.90.16",
+    "@tanstack/query-core": "^5.90.16",
     "@wallet-standard/core": "catalog:module-manager",
     "@zxcvbn-ts/core": "catalog:module-manager",
     "@zxcvbn-ts/language-common": "catalog:module-manager",
@@ -106,8 +106,9 @@
     "@clerk/testing": "workspace:^",
     "@emotion/react": "11.11.1",
     "@rsdoctor/rspack-plugin": "^0.4.13",
-    "@rspack/cli": "^1.6.0",
-    "@rspack/core": "^1.6.0",
+    "@rspack/cli": "catalog:rspack",
+    "@rspack/core": "catalog:rspack",
+    "@rspack/plugin-react-refresh": "catalog:rspack",
     "@types/cloudflare-turnstile": "^0.2.2",
     "@types/webpack-env": "^1.18.8",
     "bundlewatch": "^0.4.1",
