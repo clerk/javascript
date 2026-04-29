@@ -256,6 +256,39 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('oauth
     expect(parsed.pathname).toBe('/sign-in');
     expect(parsed.hash).toMatch(/^#\/create\/sso-callback/);
   });
+
+  test('openSignUp OAuth in combined flow targets /sign-in#/create/sso-callback', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.page.goToRelative('/buttons');
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+
+    await u.page.evaluate(() => {
+      (window as any).Clerk.openSignUp({ forceRedirectUrl: '/protected' });
+    });
+    await u.po.signUp.waitForModal();
+
+    const signUpPostPromise = page.waitForRequest(
+      req => req.method() === 'POST' && /\/v1\/client\/sign_ups(\?|$)/.test(req.url()),
+    );
+
+    await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+
+    const signUpPost = await signUpPostPromise;
+    const body = new URLSearchParams(signUpPost.postData() || '');
+    const redirectUrl = body.get('redirect_url');
+    expect(redirectUrl).toBeTruthy();
+
+    // With CLERK_SIGN_UP_URL unset, signUpUrl would fall back to displayConfig.signUpUrl
+    // (the accounts portal). Combined-flow modal should anchor to ClerkProvider.signInUrl
+    // instead, since the create/sso-callback route is mounted under the SignIn tree.
+    const parsed = new URL(redirectUrl!);
+    const appOrigin = new URL(app.serverUrl).origin;
+    expect(parsed.origin).toBe(appOrigin);
+    expect(parsed.pathname).toBe('/sign-in');
+    expect(parsed.hash).toMatch(/^#\/create\/sso-callback/);
+  });
 });
 
 testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
