@@ -18,7 +18,7 @@ catalogs:
     tslib: 2.8.1
     tsup: 8.5.1
     typescript: 5.8.3
-    vue: 3.5.32
+    vue: 3.5.33
     zx: 8.8.5
   rspack:
     '@rspack/cli': 1.7.11

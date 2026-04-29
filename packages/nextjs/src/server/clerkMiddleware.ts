@@ -21,9 +21,10 @@ import {
   TokenType,
 } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath } from '@clerk/backend/proxy';
-import { parsePublishableKey } from '@clerk/shared/keys';
+import { isProductionFromPublishableKey, parsePublishableKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { isMalformedURLError } from '@clerk/shared/pathMatcher';
+import { shouldAutoProxy } from '@clerk/shared/proxy';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -35,7 +36,7 @@ import type { Logger, LoggerNoCommit } from '../utils/debugLogger';
 import { withLogger } from '../utils/debugLogger';
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
-import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
+import { DOMAIN, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { type ContentSecurityPolicyOptions, createContentSecurityPolicyHeaders } from './content-security-policy';
 import { errorThrower } from './errorThrower';
 import { getHeader } from './headers-utils';
@@ -161,12 +162,20 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       );
 
       // Handle Frontend API proxy requests early, before authentication
-      const frontendApiProxyConfig = resolvedParams.frontendApiProxy;
+      const requestUrl = new URL(request.nextUrl.href);
+      let frontendApiProxyConfig = resolvedParams.frontendApiProxy;
+
+      // Auto-detect when no explicit proxy or domain is configured
+      const hasExplicitProxyOrDomain = resolvedParams.proxyUrl || PROXY_URL || resolvedParams.domain || DOMAIN;
+      if (!frontendApiProxyConfig && !hasExplicitProxyOrDomain && isProductionFromPublishableKey(publishableKey)) {
+        if (shouldAutoProxy(requestUrl.hostname)) {
+          frontendApiProxyConfig = { enabled: true };
+        }
+      }
       if (frontendApiProxyConfig) {
         const { enabled, path: proxyPath = DEFAULT_PROXY_PATH } = frontendApiProxyConfig;
 
         // Resolve enabled - either boolean or function
-        const requestUrl = new URL(request.url);
         const isEnabled = typeof enabled === 'function' ? enabled(requestUrl) : enabled;
 
         if (isEnabled && matchProxyPath(request, { proxyPath })) {
