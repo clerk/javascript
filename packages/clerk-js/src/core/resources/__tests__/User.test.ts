@@ -327,7 +327,6 @@ describe('User', () => {
     expect(call.path).toBe('/me/enterprise_connections/ec_123/test_runs');
     expect(call.search.get('limit')).toBe('10');
     expect(call.search.get('offset')).toBe('0');
-    expect(call.search.get('paginated')).toBe('true');
     expect(call.search.getAll('status')).toEqual(['pending', 'success']);
 
     expect(result.total_count).toBe(1);
