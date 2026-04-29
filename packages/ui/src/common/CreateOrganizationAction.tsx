@@ -3,9 +3,12 @@ import { useUser } from '@clerk/shared/react/index';
 import { Action } from '../elements/Actions';
 import { Add } from '../icons';
 
-type CreateOrganizationActionProps = Omit<React.ComponentProps<typeof Action>, 'icon'>;
+type CreateOrganizationActionProps = Omit<React.ComponentProps<typeof Action>, 'icon'> & {
+  icon?: React.ComponentProps<typeof Action>['icon'];
+};
 
 export const CreateOrganizationAction = (props: CreateOrganizationActionProps) => {
+  const { icon = Add, ...rest } = props;
   const { user } = useUser();
 
   if (!user?.createOrganizationEnabled) {
@@ -14,8 +17,8 @@ export const CreateOrganizationAction = (props: CreateOrganizationActionProps) =
 
   return (
     <Action
-      {...props}
-      icon={Add}
+      {...rest}
+      icon={icon}
     />
   );
 };

@@ -12,7 +12,7 @@ import {
   useAppearance,
   type LocalizationKey,
 } from '../customizables';
-import { ArrowLeftIcon } from '../icons';
+import { ArrowLeft } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { ApplicationLogo } from './ApplicationLogo';
 import { VerticalDivider } from './Divider';
@@ -109,7 +109,7 @@ const BackLink = React.memo((props: PropsOfComponent<typeof Link>): JSX.Element 
       {...rest}
     >
       <Icon
-        icon={ArrowLeftIcon}
+        icon={ArrowLeft}
         sx={t => ({
           color: t.colors.$colorForeground,
           '[dir="rtl"] &': {

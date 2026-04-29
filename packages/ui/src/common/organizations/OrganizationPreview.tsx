@@ -7,7 +7,7 @@ import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { PreviewButton } from '@/ui/elements/PreviewButton';
 
 import { Box, Button, Col, descriptors, Flex, Spinner } from '../../customizables';
-import { SwitchArrowRight } from '../../icons';
+import { ArrowRight } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
 
@@ -132,7 +132,7 @@ export const OrganizationPreviewButton = (props: OrganizationPreviewButtonProps)
   return (
     <PreviewButton
       sx={[sharedStyles]}
-      icon={SwitchArrowRight}
+      icon={ArrowRight}
       {...props}
     />
   );

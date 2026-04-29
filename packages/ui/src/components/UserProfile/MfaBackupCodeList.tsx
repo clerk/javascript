@@ -6,7 +6,7 @@ import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Box, Button, Col, Grid, Heading, Icon, localizationKeys, Text } from '../../customizables';
 import { useClipboard } from '../../hooks';
-import { Check, Copy, Download, Print } from '../../icons';
+import { ArrowDownTray, Checkmark, Copy, Print } from '../../icons';
 import { MfaBackupCodeTile } from './MfaBackupCodeTile';
 
 type MfaBackupCodeListProps = {
@@ -119,7 +119,7 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
             sx={t => ({ width: '100%', padding: `${t.space.$0x25} 0`, borderRadius: 0 })}
             onClick={onDownloadTxtFile}
           >
-            <Icon icon={Download} />
+            <Icon icon={ArrowDownTray} />
           </Button>
 
           <Button
@@ -134,7 +134,7 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
             onClick={onCopy}
             sx={t => ({ width: '100%', padding: `${t.space.$2} 0`, borderRadius: 0 })}
           >
-            <Icon icon={hasCopied ? Check : Copy} />
+            <Icon icon={hasCopied ? Checkmark : Copy} />
           </Button>
         </Grid>
       </Box>

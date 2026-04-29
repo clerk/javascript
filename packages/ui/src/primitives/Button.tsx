@@ -2,7 +2,7 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import { descriptors, Icon, Spinner } from '../customizables';
-import { ArrowRightButtonIcon } from '../icons';
+import { TriangleRight } from '../icons';
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { common, createCssVariables, createVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
@@ -178,11 +178,11 @@ const ButtonChildrenWithArrow = ({ children }: PropsWithChildren) => {
       {children}
       <Icon
         elementDescriptor={descriptors.buttonArrowIcon}
-        icon={ArrowRightButtonIcon}
+        icon={TriangleRight}
         sx={t => ({
           marginInlineStart: t.space.$2,
-          width: t.sizes.$2x5,
-          height: t.sizes.$2x5,
+          width: t.sizes.$4,
+          height: t.sizes.$4,
           opacity: t.opacity.$inactive,
           '[dir="rtl"] &': {
             transform: 'scaleX(-1)',

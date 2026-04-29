@@ -9,7 +9,7 @@ import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/shared
 
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements/Navbar';
-import { Code, CreditCard, Organization, TickShield, User, Users } from '../icons';
+import { Building, Code, CreditCard, ShieldCheck, UserCircle, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
@@ -269,13 +269,13 @@ const getUserProfileDefaultRoutes = ({
     {
       name: localizationKeys('userProfile.navbar.account'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT,
-      icon: User,
+      icon: UserCircle,
       path: 'account',
     },
     {
       name: localizationKeys('userProfile.navbar.security'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY,
-      icon: TickShield,
+      icon: ShieldCheck,
       path: 'security',
     },
   ];
@@ -323,7 +323,7 @@ const getOrganizationProfileDefaultRoutes = ({
     {
       name: localizationKeys('organizationProfile.navbar.general'),
       id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL,
-      icon: Organization,
+      icon: Building,
       path: 'organization-general',
     },
     {
