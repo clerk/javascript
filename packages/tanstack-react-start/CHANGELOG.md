@@ -1,5 +1,19 @@
 # @clerk/tanstack-react-start
 
+## 1.1.8
+
+### Patch Changes
+
+- Fix `Request` cloning and outbound `fetch` to omit cross-realm `AbortSignal`. Node 24's bundled undici tightened the `instanceof AbortSignal` check on `RequestInit.signal`, which broke: ([#8351](https://github.com/clerk/javascript/pull/8351)) by [@jacekradko](https://github.com/jacekradko)
+  - Cloning framework-specific requests such as `NextRequest` in `@clerk/backend`'s `ClerkRequest`.
+  - Subclassed `Request`s passed through `patchRequest` in `@clerk/react-router` and `@clerk/tanstack-react-start`.
+  - Frontend API proxying in `@clerk/backend`'s `clerkFrontendApiProxy`, which forwarded the inbound request's signal to the upstream `fetch`. Abort propagation will be restored in a follow-up via an in-realm `AbortController` bridge.
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863), [`e0a63f9`](https://github.com/clerk/javascript/commit/e0a63f9f976fd25f4ed68080c84b72149ef64646)]:
+  - @clerk/shared@4.8.6
+  - @clerk/backend@3.4.2
+  - @clerk/react@6.4.6
+
 ## 1.1.7
 
 ### Patch Changes
