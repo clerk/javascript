@@ -1255,6 +1255,17 @@ export type ClerkOptions = ClerkOptionsNavigation &
          * directly with the provided Clerk instance. Used by React Native / Expo.
          */
         runtimeEnvironment: 'headless';
+        /**
+         * Enable stale-while-revalidate initialization. When enabled, Clerk will
+         * initialize immediately using cached client data from the previous page load,
+         * then silently swap to fresh data when the server response arrives.
+         *
+         * Requires a previous successful load to populate the cache.
+         * First-time visitors and signed-out users see the normal loading flow.
+         *
+         * @default false
+         */
+        swr: boolean;
       },
       Record<string, any>
     >;

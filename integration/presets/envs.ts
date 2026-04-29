@@ -112,6 +112,11 @@ const withEmailCodes_destroy_client = withEmailCodes
   .clone()
   .setEnvVariable('public', 'EXPERIMENTAL_PERSIST_CLIENT', 'false');
 
+const withEmailCodes_swr = withEmailCodes
+  .clone()
+  .setId('withEmailCodes_swr')
+  .setEnvVariable('public', 'EXPERIMENTAL_SWR', 'true');
+
 const withSharedUIVariant = withEmailCodes
   .clone()
   .setId('withSharedUIVariant')
@@ -257,6 +262,7 @@ export const envs = {
   withDynamicKeys,
   withEmailCodes,
   withEmailCodes_destroy_client,
+  withEmailCodes_swr,
   withEmailCodesProxy,
   withEmailCodesQuickstart,
   withEmailLinks,

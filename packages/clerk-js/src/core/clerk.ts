@@ -188,6 +188,7 @@ import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
+import { isTokenExpiringSoon, SWRClientCache } from './swr-client-cache';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
@@ -3000,6 +3001,135 @@ export class Clerk implements ClerkInterface {
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
     const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
 
+    // SWR: attempt to initialize from cached client data
+    const swrEnabled = this.#options.experimental?.swr;
+    let swrStatus: 'ready' | 'degraded' | null = null;
+
+    if (swrEnabled) {
+      const cachedSnapshot = SWRClientCache.read(this.#publishableKey);
+
+      if (cachedSnapshot && cachedSnapshot.sessions?.length) {
+        try {
+          // Clear any existing Client instance to ensure the cached snapshot is used.
+          // getOrCreateInstance silently ignores the data param if an instance already exists.
+          Client.clearInstance();
+          const cachedClient = Client.getOrCreateInstance(cachedSnapshot);
+          this.updateClient(cachedClient);
+
+          if (this.session) {
+            // Check if the existing __session cookie has a valid (non-expired) JWT.
+            // SSR apps always have a fresh token (middleware refresh sets it).
+            // CSR apps have a valid token if the user returned within ~60s.
+            const existingJwt = this.#authService?.getSessionCookie();
+            const tokenStillValid = existingJwt ? !isTokenExpiringSoon(existingJwt) : false;
+
+            if (tokenStillValid) {
+              // Token is still valid - use cached client as-is, zero network wait.
+              // The poller will refresh the token before it expires.
+              swrStatus = 'ready';
+            } else {
+              // Token expired or missing - call getToken to validate session and get fresh token.
+              // This is edge-routed and fast (~50-100ms).
+              const tokenResult = await this.session.getToken({ skipCache: true }).catch((err: unknown) => {
+                // Distinguish auth errors (session dead) from transient errors
+                if (is4xxError(err)) {
+                  return null; // session revoked
+                }
+                // Transient error: session may still be alive, proceed as degraded
+                return 'transient_error' as const;
+              });
+
+              if (tokenResult === null) {
+                // Session revoked: discard cache, clear client, proceed to normal flow
+                SWRClientCache.clear(this.#publishableKey);
+                Client.clearInstance();
+                this.client = undefined;
+                this.#updateAccessors(undefined);
+              } else if (tokenResult === 'transient_error') {
+                // Network/server issue, token unvalidated. Emit degraded with cached data.
+                swrStatus = 'degraded';
+              } else {
+                // Token is fresh, session is alive. SWR success.
+                swrStatus = 'ready';
+              }
+            }
+          }
+        } catch {
+          // Cache corrupted or other error, proceed to normal flow
+          SWRClientCache.clear(this.#publishableKey);
+        }
+      }
+    }
+
+    if (swrStatus) {
+      // Handle FAPI-initiated redirects (email link verification, etc.)
+      // This MUST run before emitting ready, otherwise the redirect never happens.
+      if (await this.#redirectFAPIInitiatedFlow()) {
+        return;
+      }
+
+      // Set client UAT cookie for development instances with custom domains
+      this.#authService?.setClientUatCookieForDevelopmentInstances();
+
+      // Restore cached environment before emitting ready so components
+      // that read displayConfig/authConfig have valid data
+      const envSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
+        CLERK_ENVIRONMENT_STORAGE_ENTRY,
+        null,
+      );
+      if (envSnapshot) {
+        this.updateEnvironment(new Environment(envSnapshot));
+      }
+
+      // Emit loaded with the appropriate status
+      this.#publicEventBus.emit(clerkEvents.Status, swrStatus);
+
+      // Continue fetching /env and /client in background (fire-and-forget)
+      // When they resolve, they silently update the state
+      const initEnvironmentPromise = Environment.getInstance()
+        .fetch({ touch: shouldTouchEnv })
+        .then(res => this.updateEnvironment(res))
+        .catch(() => {
+          // Fall back to cached env (same as existing behavior)
+          const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
+            CLERK_ENVIRONMENT_STORAGE_ENTRY,
+            null,
+          );
+          if (environmentSnapshot) {
+            this.updateEnvironment(new Environment(environmentSnapshot));
+          }
+        });
+
+      const refreshClient = Client.getOrCreateInstance()
+        .fetch()
+        .then(res => {
+          // If the cached session is no longer in the fresh client, select a new
+          // default session before calling updateClient. This handles the SWR
+          // stale-to-fresh swap without changing updateClient's semantics for
+          // all callers (a revoked session should sign out, not silently switch).
+          if (this.session) {
+            const stillExists = res.sessions?.some((s: { id: string }) => s.id === this.session?.id);
+            if (!stillExists) {
+              const fallback = this.#defaultSession(res);
+              this.#updateAccessors(fallback, { dangerouslySkipEmit: true });
+            }
+          }
+          // updateClient triggers #emit which fires the SWR save listener
+          this.updateClient(res);
+        })
+        .catch(() => {
+          // /client failed but we already have cached data, no action needed
+        });
+
+      // Don't await - let these run in the background
+      void allSettled([initEnvironmentPromise, refreshClient]);
+
+      this.#runPostInitSetup();
+
+      return; // Skip the normal flow below
+    }
+
+    // --- Normal flow (unchanged from here) ---
     let initializationDegradedCounter = 0;
 
     let retries = 0;
@@ -3095,11 +3225,7 @@ export class Clerk implements ClerkInterface {
       }
     }
 
-    this.#captchaHeartbeat = new CaptchaHeartbeat(this);
-    void this.#captchaHeartbeat.start();
-    this.#clearClerkQueryParams();
-    this.#handleImpersonationFab();
-    this.#handleKeylessPrompt();
+    this.#runPostInitSetup();
 
     this.#publicEventBus.emit(clerkEvents.Status, initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
@@ -3159,6 +3285,14 @@ export class Clerk implements ClerkInterface {
     return session || null;
   };
 
+  #runPostInitSetup = () => {
+    this.#captchaHeartbeat = new CaptchaHeartbeat(this);
+    void this.#captchaHeartbeat.start();
+    this.#clearClerkQueryParams();
+    this.#handleImpersonationFab();
+    this.#handleKeylessPrompt();
+  };
+
   #setupBrowserListeners = (): void => {
     if (!inClientSide()) {
       return;
@@ -3186,6 +3320,9 @@ export class Clerk implements ClerkInterface {
      */
     this.#broadcastChannel?.addEventListener('message', (event: MessageEvent) => {
       if (event.data?.type === 'signout') {
+        if (this.#options.experimental?.swr) {
+          SWRClientCache.clear(this.#publishableKey);
+        }
         void this.handleUnauthenticated({ broadcast: false });
       }
     });
@@ -3195,6 +3332,9 @@ export class Clerk implements ClerkInterface {
      */
     eventBus.on(events.UserSignOut, () => {
       this.#broadcastChannel?.postMessage({ type: 'signout' });
+      if (this.#options.experimental?.swr) {
+        SWRClientCache.clear(this.#publishableKey);
+      }
     });
 
     eventBus.on(events.EnvironmentUpdate, () => {
@@ -3205,6 +3345,20 @@ export class Clerk implements ClerkInterface {
         24 * 60 * 60 * 1_000,
       );
     });
+
+    // Cache client snapshot for SWR initialization (only when SWR is enabled)
+    if (this.#options.experimental?.swr) {
+      let lastSavedUpdatedAt: number | undefined;
+      this.addListener(({ client }) => {
+        if (client) {
+          const updatedAt = client.updatedAt?.getTime();
+          if (updatedAt !== lastSavedUpdatedAt) {
+            lastSavedUpdatedAt = updatedAt;
+            SWRClientCache.save(client.__internal_toSnapshot(), this.#publishableKey);
+          }
+        }
+      });
+    }
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
