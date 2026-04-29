@@ -126,7 +126,10 @@ const unboundCreateFixtures = (
             <EnvironmentProvider value={environmentMock}>
               <OptionsProvider value={optionsMock}>
                 <RouteContext.Provider value={routerMock}>
-                  <AppearanceProvider appearanceKey={'signIn'}>
+                  <AppearanceProvider
+                    appearanceKey={'signIn'}
+                    appearance={componentContextProps?.appearance}
+                  >
                     <FlowMetadataProvider flow={componentName as any}>
                       <InternalThemeProvider>{contextWrappedChildren}</InternalThemeProvider>
                     </FlowMetadataProvider>

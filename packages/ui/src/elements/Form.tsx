@@ -1,5 +1,6 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { FieldId } from '@clerk/shared/types';
+import type { CountryIso } from './PhoneInput/countryCodeData';
 import type { PropsWithChildren } from 'react';
 import React, { forwardRef, useState } from 'react';
 
@@ -196,10 +197,11 @@ const PasswordInput = forwardRef<HTMLInputElement, CommonInputProps>((props, ref
   );
 });
 
-const PhoneInput = (props: CommonInputProps) => {
+const PhoneInput = (props: CommonInputProps & { defaultCountryIso?: CountryIso }) => {
+  const { defaultCountryIso, ...rest } = props;
   return (
-    <CommonInputWrapper {...props}>
-      <Field.PhoneInput />
+    <CommonInputWrapper {...rest}>
+      <Field.PhoneInput defaultCountryIso={defaultCountryIso} />
     </CommonInputWrapper>
   );
 };

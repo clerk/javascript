@@ -12,7 +12,7 @@ import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 import { createUsernameError } from '@/ui/utils/usernameUtils';
 
 import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
-import { descriptors, Flex, Flow, localizationKeys, useLocalizations } from '../../customizables';
+import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import { useRouter } from '../../router';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
@@ -44,8 +44,9 @@ function SignUpContinueInternal() {
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const isCombinedFlow = !!(_isCombinedFlow && !!isWithinSignInContext);
   const isProgressiveSignUp = userSettings.signUp.progressive;
+  const { preferredIdentifier } = useAppearance().parsedOptions;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
-    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
+    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive, undefined, preferredIdentifier),
   );
   const ctx = useSignUpContext();
 

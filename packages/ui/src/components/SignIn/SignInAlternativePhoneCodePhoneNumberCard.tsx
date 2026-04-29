@@ -1,4 +1,5 @@
 import type { PhoneCodeChannelData } from '@clerk/shared/types';
+import type { CountryIso } from '@/ui/elements/PhoneInput/countryCodeData';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState } from '@/ui/elements/contexts';
@@ -16,10 +17,11 @@ type SignUpAlternativePhoneCodePhoneNumberCardProps = {
   phoneNumberFormState: FormControlState<any>;
   onUseAnotherMethod: () => void;
   phoneCodeProvider: PhoneCodeChannelData;
+  defaultCountryIso?: CountryIso;
 };
 
 export const SignInAlternativePhoneCodePhoneNumberCard = (props: SignUpAlternativePhoneCodePhoneNumberCardProps) => {
-  const { handleSubmit, phoneNumberFormState, onUseAnotherMethod, phoneCodeProvider } = props;
+  const { handleSubmit, phoneNumberFormState, onUseAnotherMethod, phoneCodeProvider, defaultCountryIso } = props;
   const { providerToDisplayData, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const provider = phoneCodeProvider.name;
   const channel = phoneCodeProvider.channel;
@@ -72,6 +74,7 @@ export const SignInAlternativePhoneCodePhoneNumberCard = (props: SignUpAlternati
               <Form.ControlRow elementId='phoneNumber'>
                 <Form.PhoneInput
                   {...phoneNumberFormState.props}
+                  defaultCountryIso={defaultCountryIso}
                   label={localizationKeys('signIn.start.alternativePhoneCodeProvider.label', { provider })}
                   isRequired
                   isOptional={false}

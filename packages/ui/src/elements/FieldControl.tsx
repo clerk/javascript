@@ -25,6 +25,7 @@ import type { FormFeedbackProps } from './FormControl';
 import { FormFeedback } from './FormControl';
 import { InputGroup } from './InputGroup';
 import { PasswordInput } from './PasswordInput';
+import type { CountryIso } from './PhoneInput/countryCodeData';
 import { PhoneInput } from './PhoneInput';
 import { RadioItem, RadioLabel } from './RadioGroup';
 
@@ -168,7 +169,7 @@ const FieldFeedback = (props: Pick<FormFeedbackProps, 'elementDescriptors' | 'ce
   );
 };
 
-const PhoneInputElement = forwardRef<HTMLInputElement>((_, ref) => {
+const PhoneInputElement = forwardRef<HTMLInputElement, { defaultCountryIso?: CountryIso }>((props, ref) => {
   const { t } = useLocalizations();
   const formField = useFormField();
   const { placeholder, ...inputProps } = sanitizeInputProps(formField);
@@ -179,6 +180,7 @@ const PhoneInputElement = forwardRef<HTMLInputElement>((_, ref) => {
       elementDescriptor={descriptors.formFieldInput}
       elementId={descriptors.formFieldInput.setId(formField.fieldId)}
       {...inputProps}
+      defaultCountryIso={props.defaultCountryIso}
       feedbackType={formField.feedbackType}
       placeholder={t(placeholder)}
     />

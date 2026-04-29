@@ -1362,6 +1362,7 @@ export type SignInInitialValues = {
   emailAddress?: string;
   phoneNumber?: string;
   username?: string;
+  phoneNumberCountryCode?: string;
 };
 
 export type SignUpInitialValues = {

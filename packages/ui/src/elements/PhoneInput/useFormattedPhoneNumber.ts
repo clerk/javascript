@@ -5,7 +5,11 @@ import { extractDigits, formatPhoneNumber, parsePhoneString } from '@/ui/utils/p
 import type { CountryIso } from './countryCodeData';
 import { IsoToCountryMap } from './countryCodeData';
 
-type UseFormattedPhoneNumberProps = { initPhoneWithCode: string; locationBasedCountryIso?: CountryIso };
+type UseFormattedPhoneNumberProps = {
+  initPhoneWithCode: string;
+  locationBasedCountryIso?: CountryIso;
+  defaultCountryIso?: CountryIso;
+};
 
 const format = (str: string, iso: CountryIso) => {
   if (!str) {
@@ -21,11 +25,16 @@ export const useFormattedPhoneNumber = (props: UseFormattedPhoneNumberProps) => 
     return number;
   });
 
-  const [iso, setIso] = React.useState(
-    parsePhoneString(props.initPhoneWithCode || '').number
-      ? parsePhoneString(props.initPhoneWithCode || '').iso
-      : props.locationBasedCountryIso || 'us',
-  );
+  const [iso, setIso] = React.useState(() => {
+    const parsed = parsePhoneString(props.initPhoneWithCode || '');
+    if (parsed.number) {
+      return parsed.iso;
+    }
+    if (props.defaultCountryIso && IsoToCountryMap.has(props.defaultCountryIso)) {
+      return props.defaultCountryIso;
+    }
+    return props.locationBasedCountryIso || 'us';
+  });
 
   React.useEffect(() => {
     setNumber(extractDigits(number));

@@ -23,15 +23,27 @@ const createSelectOption = (country: CountryEntry) => {
 
 const countryOptions = [...IsoToCountryMap.values()].map(createSelectOption);
 
-type PhoneInputProps = PropsOfComponent<typeof Input> & { locationBasedCountryIso?: CountryIso };
+type PhoneInputProps = PropsOfComponent<typeof Input> & {
+  locationBasedCountryIso?: CountryIso;
+  defaultCountryIso?: CountryIso;
+};
 
 const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedbackType?: FeedbackType }>((props, ref) => {
-  const { onChange: onChangeProp, value, locationBasedCountryIso, feedbackType, sx, ...rest } = props;
+  const {
+    onChange: onChangeProp,
+    value,
+    locationBasedCountryIso,
+    defaultCountryIso,
+    feedbackType,
+    sx,
+    ...rest
+  } = props;
   const phoneInputRef = useRef<HTMLInputElement>(null);
   const phoneInputBox = useRef<HTMLDivElement>(null);
   const { setNumber, setIso, setNumberAndIso, numberWithCode, iso, formattedNumber } = useFormattedPhoneNumber({
     initPhoneWithCode: value as string,
     locationBasedCountryIso,
+    defaultCountryIso,
   });
 
   const callOnChangeProp = () => {

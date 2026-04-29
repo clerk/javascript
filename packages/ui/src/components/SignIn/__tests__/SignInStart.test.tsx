@@ -479,6 +479,65 @@ describe('SignInStart', () => {
     });
   });
 
+  describe('preferredIdentifier (appearance option)', () => {
+    it('selects phone_number tab when set to phoneNumber', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPhoneNumber();
+      });
+      props.setProps({ appearance: { options: { preferredIdentifier: 'phoneNumber' } } });
+
+      render(<SignInStart />, { wrapper });
+      screen.getByText(/phone number/i);
+    });
+
+    it('selects email_address tab when set to emailAddress', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPhoneNumber();
+      });
+      props.setProps({ appearance: { options: { preferredIdentifier: 'emailAddress' } } });
+
+      render(<SignInStart />, { wrapper });
+      screen.getByText(/email address/i);
+    });
+
+    it('is ignored when identifier is not enabled', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      props.setProps({ appearance: { options: { preferredIdentifier: 'phoneNumber' } } });
+
+      render(<SignInStart />, { wrapper });
+      screen.getByText(/email address/i);
+    });
+
+    it('single filled initialValues value takes precedence', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPhoneNumber();
+      });
+      props.setProps({
+        initialValues: { phoneNumber: '+306911111111' },
+        appearance: { options: { preferredIdentifier: 'emailAddress' } },
+      });
+
+      render(<SignInStart />, { wrapper });
+      screen.getByDisplayValue(/691 1111111/i);
+    });
+
+    it('username maps to email_address_username when both enabled', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withUsername();
+      });
+      props.setProps({ appearance: { options: { preferredIdentifier: 'username' } } });
+
+      render(<SignInStart />, { wrapper });
+      screen.getByText(/email address or username/i);
+    });
+  });
+
   describe('Submitting form via instant password autofill', () => {
     const ERROR_CODES = ['strategy_for_user_invalid', 'form_password_incorrect', 'form_password_pwned'];
     ERROR_CODES.forEach(code => {

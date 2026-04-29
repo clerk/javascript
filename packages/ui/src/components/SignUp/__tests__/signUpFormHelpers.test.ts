@@ -1047,4 +1047,71 @@ describe('getInitialActiveIdentifier()', () => {
       expect(getInitialActiveIdentifier(attributes, false)).toBe(null);
     });
   });
+
+  describe('respects preferredIdentifier on ties', () => {
+    it('returns phoneNumber in email-or-phone when preferredIdentifier is phoneNumber', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', true, false, true),
+        phone_number: createAttributeData('phone_number', true, false, true),
+      };
+
+      expect(getInitialActiveIdentifier(attributes, false, undefined, 'phoneNumber')).toBe('phoneNumber');
+    });
+
+    it('returns emailAddress in email-or-phone when preferredIdentifier is emailAddress', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', true, false, true),
+        phone_number: createAttributeData('phone_number', true, false, true),
+      };
+
+      expect(getInitialActiveIdentifier(attributes, false, undefined, 'emailAddress')).toBe('emailAddress');
+    });
+
+    it('returns phoneNumber when both are required and preferredIdentifier is phoneNumber', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', true, true, true),
+        phone_number: createAttributeData('phone_number', true, true, true),
+      };
+
+      expect(getInitialActiveIdentifier(attributes, false, undefined, 'phoneNumber')).toBe('phoneNumber');
+    });
+
+    it('defaults to emailAddress in email-or-phone when no preferredIdentifier', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', true, false, true),
+        phone_number: createAttributeData('phone_number', true, false, true),
+      };
+
+      expect(getInitialActiveIdentifier(attributes, false)).toBe('emailAddress');
+    });
+
+    it('ignores preferredIdentifier username since SignUp only has email/phone', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', true, false, true),
+        phone_number: createAttributeData('phone_number', true, false, true),
+      };
+
+      expect(getInitialActiveIdentifier(attributes, false, undefined, 'username')).toBe('emailAddress');
+    });
+
+    it('initialValues take precedence over preferredIdentifier', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', true, false, true),
+        phone_number: createAttributeData('phone_number', true, false, true),
+      };
+
+      expect(getInitialActiveIdentifier(attributes, false, { emailAddress: 'test@example.com' }, 'phoneNumber')).toBe(
+        'emailAddress',
+      );
+    });
+
+    it('returns phoneNumber in progressive signup email-or-phone with preferredIdentifier', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', true, false, true),
+        phone_number: createAttributeData('phone_number', true, false, true),
+      };
+
+      expect(getInitialActiveIdentifier(attributes, true, undefined, 'phoneNumber')).toBe('phoneNumber');
+    });
+  });
 });
