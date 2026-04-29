@@ -2,7 +2,9 @@ import { createContextAndHook } from '@clerk/shared/react';
 import type { MenuId } from '@clerk/shared/types';
 import type { Placement } from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
-import React, { cloneElement, isValidElement, useLayoutEffect, useRef } from 'react';
+import React, { cloneElement, isValidElement, useRef } from 'react';
+
+import { useMergeRefs } from '@floating-ui/react';
 
 import type { Button } from '../customizables';
 import { Col, descriptors, SimpleButton } from '../customizables';
@@ -44,14 +46,14 @@ export const Menu = withFloatingTree((props: MenuProps) => {
   );
 });
 
-type MenuTriggerProps = React.PropsWithChildren<{ arialLabel?: string | ((open: boolean) => string) }>;
+type MenuTriggerProps = React.PropsWithChildren<{ ariaLabel?: string | ((open: boolean) => string) }>;
 
 export const MenuTrigger = (props: MenuTriggerProps) => {
-  const { children, arialLabel } = props;
+  const { children, ariaLabel } = props;
   const { popoverCtx, elementId } = useMenuState();
   const { reference, toggle, isOpen } = popoverCtx;
 
-  const normalizedAriaLabel = typeof arialLabel === 'function' ? arialLabel(isOpen) : arialLabel;
+  const normalizedAriaLabel = typeof ariaLabel === 'function' ? ariaLabel(isOpen) : ariaLabel;
 
   if (!isValidElement(children)) {
     return null;
@@ -64,6 +66,7 @@ export const MenuTrigger = (props: MenuTriggerProps) => {
     elementId: children.props.elementId || descriptors.menuButton.setId(elementId),
     'aria-label': normalizedAriaLabel,
     'aria-expanded': isOpen,
+    'aria-haspopup': 'menu',
     onClick: (e: React.MouseEvent) => {
       children.props?.onClick?.(e);
       toggle();
@@ -90,11 +93,7 @@ export const MenuList = (props: MenuListProps) => {
   const { popoverCtx, elementId } = useMenuState();
   const { floating, styles, isOpen, context, nodeId } = popoverCtx;
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-  useLayoutEffect(() => {
-    const current = containerRef.current;
-    floating(current);
-  }, [isOpen]);
+  const mergedRef = useMergeRefs([containerRef, floating]);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const current = containerRef.current;
@@ -122,7 +121,7 @@ export const MenuList = (props: MenuListProps) => {
       <Col
         elementDescriptor={descriptors.menuList}
         elementId={descriptors.menuList.setId(elementId)}
-        ref={containerRef}
+        ref={mergedRef}
         role='menu'
         onKeyDown={onKeyDown}
         sx={[
