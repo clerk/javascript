@@ -609,7 +609,9 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
     // This can eagerly run handshake since client_uat is SameSite=Strict in dev
     if (!hasActiveClient && hasSessionToken) {
-      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenWithoutClientUAT, '');
+      if (handshakeService.isRequestEligibleForHandshake()) {
+        return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenWithoutClientUAT, '');
+      }
     }
 
     if (hasActiveClient && !hasSessionToken) {
@@ -623,7 +625,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleSessionTokenError(decodedErrors[0], 'cookie');
     }
 
-    if (decodeResult.payload.iat < authenticateContext.clientUat) {
+    if (authenticateContext.clientUat && decodeResult.payload.iat < authenticateContext.clientUat) {
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenIATBeforeClientUAT, '');
     }
 
