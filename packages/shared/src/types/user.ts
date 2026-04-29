@@ -8,6 +8,11 @@ import type {
   EnterpriseConnectionResource,
   UpdateMeEnterpriseConnectionParams,
 } from './enterpriseConnection';
+import type {
+  EnterpriseConnectionTestRunInitResource,
+  EnterpriseConnectionTestRunResource,
+  GetEnterpriseConnectionTestRunsParams,
+} from './enterpriseConnectionTestRun';
 import type { ExternalAccountResource } from './externalAccount';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
@@ -124,14 +129,19 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   getOrganizationCreationDefaults: () => Promise<OrganizationCreationDefaultsResource>;
   leaveOrganization: (organizationId: string) => Promise<DeletedObjectResource>;
   getEnterpriseConnections: (params?: GetEnterpriseConnectionsParams) => Promise<EnterpriseConnectionResource[]>;
-  createEnterpriseConnection: (
-    params: CreateMeEnterpriseConnectionParams,
-  ) => Promise<EnterpriseConnectionResource>;
+  createEnterpriseConnection: (params: CreateMeEnterpriseConnectionParams) => Promise<EnterpriseConnectionResource>;
   updateEnterpriseConnection: (
     enterpriseConnectionId: string,
     params: UpdateMeEnterpriseConnectionParams,
   ) => Promise<EnterpriseConnectionResource>;
   deleteEnterpriseConnection: (enterpriseConnectionId: string) => Promise<DeletedObjectResource>;
+  createEnterpriseConnectionTestRun: (
+    enterpriseConnectionId: string,
+  ) => Promise<EnterpriseConnectionTestRunInitResource>;
+  getEnterpriseConnectionTestRuns: (
+    enterpriseConnectionId: string,
+    params?: GetEnterpriseConnectionTestRunsParams,
+  ) => Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>>;
   createTOTP: () => Promise<TOTPResource>;
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
