@@ -269,6 +269,73 @@ describe('User', () => {
     expect(result.deleted).toBe(true);
   });
 
+  it('creates an enterprise connection test run', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: { url: 'https://example.com/test' } }));
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    const init = await user.createEnterpriseConnectionTestRun('ec_123');
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/me/enterprise_connections/ec_123/test_runs',
+    });
+
+    expect(init.url).toBe('https://example.com/test');
+  });
+
+  it('lists enterprise connection test runs', async () => {
+    const paginated = {
+      data: [
+        {
+          object: 'enterprise_connection_test_run' as const,
+          id: 'run_1',
+          status: 'success',
+          connection_type: 'saml' as const,
+          created_at: 1700000000000,
+        },
+      ],
+      total_count: 1,
+    };
+
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: paginated }));
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    const result = await user.getEnterpriseConnectionTestRuns('ec_123', {
+      initialPage: 1,
+      pageSize: 10,
+      status: ['pending', 'success'],
+    });
+
+    // @ts-ignore
+    const call = BaseResource._fetch.mock.calls[0][0];
+    expect(call.method).toBe('GET');
+    expect(call.path).toBe('/me/enterprise_connections/ec_123/test_runs');
+    expect(call.search.get('limit')).toBe('10');
+    expect(call.search.get('offset')).toBe('0');
+    expect(call.search.get('paginated')).toBe('true');
+    expect(call.search.getAll('status')).toEqual(['pending', 'success']);
+
+    expect(result.total_count).toBe(1);
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0].id).toBe('run_1');
+    expect(result.data[0].connectionType).toBe('saml');
+  });
+
   it('creates a web3 wallet', async () => {
     const targetWeb3Wallet = '0x0000000000000000000000000000000000000000';
     const web3WalletJSON = {
