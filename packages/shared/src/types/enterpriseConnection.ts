@@ -97,3 +97,53 @@ export interface EnterpriseOAuthConfigResource {
   createdAt: Date | null;
   updatedAt: Date | null;
 }
+
+export type MeEnterpriseConnectionProvider =
+  | 'saml_custom'
+  | 'saml_okta'
+  | 'saml_google'
+  | 'saml_microsoft'
+  | 'oidc_custom'
+  | 'oidc_github_enterprise'
+  | 'oidc_gitlab';
+
+export type MeEnterpriseConnectionSamlInput = {
+  idpEntityId?: string | null;
+  idpSsoUrl?: string | null;
+  idpCertificate?: string | null;
+  idpMetadataUrl?: string | null;
+  idpMetadata?: string | null;
+  attributeMapping?: Record<string, unknown> | null;
+  allowSubdomains?: boolean | null;
+  allowIdpInitiated?: boolean | null;
+  forceAuthn?: boolean | null;
+};
+
+export type MeEnterpriseConnectionOidcInput = {
+  clientId?: string | null;
+  clientSecret?: string | null;
+  discoveryUrl?: string | null;
+  authUrl?: string | null;
+  tokenUrl?: string | null;
+  userInfoUrl?: string | null;
+  requiresPkce?: boolean | null;
+};
+
+export type CreateMeEnterpriseConnectionParams = {
+  provider: MeEnterpriseConnectionProvider;
+  name: string;
+  organizationId?: string | null;
+  saml?: MeEnterpriseConnectionSamlInput | null;
+  oidc?: MeEnterpriseConnectionOidcInput | null;
+};
+
+export type UpdateMeEnterpriseConnectionParams = {
+  name?: string | null;
+  active?: boolean | null;
+  syncUserAttributes?: boolean | null;
+  disableAdditionalIdentifications?: boolean | null;
+  organizationId?: string | null;
+  customAttributes?: Record<string, unknown> | null;
+  saml?: MeEnterpriseConnectionSamlInput | null;
+  oidc?: MeEnterpriseConnectionOidcInput | null;
+};

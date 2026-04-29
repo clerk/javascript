@@ -139,6 +139,136 @@ describe('User', () => {
     expect(connections[0].allowOrganizationAccountLinking).toBe(true);
   });
 
+  it('creates an enterprise connection', async () => {
+    const enterpriseConnectionJSON = {
+      id: 'ec_new',
+      object: 'enterprise_connection' as const,
+      name: 'New SSO',
+      active: true,
+      provider: 'saml_okta',
+      logo_public_url: null,
+      domains: ['acme.com'],
+      organization_id: null,
+      sync_user_attributes: true,
+      disable_additional_identifications: false,
+      allow_organization_account_linking: false,
+      custom_attributes: [],
+      oauth_config: null,
+      saml_connection: null,
+      created_at: 1234567890,
+      updated_at: 1234567890,
+    };
+
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: enterpriseConnectionJSON }));
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    const conn = await user.createEnterpriseConnection({
+      provider: 'saml_okta',
+      name: 'New SSO',
+      organizationId: 'org_1',
+      saml: { idpEntityId: 'https://idp.example.com' },
+    });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/me/enterprise_connections',
+      body: {
+        provider: 'saml_okta',
+        name: 'New SSO',
+        organization_id: 'org_1',
+        saml: { idp_entity_id: 'https://idp.example.com' },
+      },
+    });
+
+    expect(conn.id).toBe('ec_new');
+    expect(conn.name).toBe('New SSO');
+  });
+
+  it('updates an enterprise connection', async () => {
+    const enterpriseConnectionJSON = {
+      id: 'ec_123',
+      object: 'enterprise_connection' as const,
+      name: 'Updated',
+      active: false,
+      provider: 'saml_okta',
+      logo_public_url: null,
+      domains: ['acme.com'],
+      organization_id: null,
+      sync_user_attributes: true,
+      disable_additional_identifications: false,
+      allow_organization_account_linking: false,
+      custom_attributes: [],
+      oauth_config: null,
+      saml_connection: null,
+      created_at: 1234567890,
+      updated_at: 1234567900,
+    };
+
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: enterpriseConnectionJSON }));
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    await user.updateEnterpriseConnection('ec_123', {
+      name: 'Updated',
+      active: false,
+      syncUserAttributes: true,
+    });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'PATCH',
+      path: '/me/enterprise_connections/ec_123',
+      body: {
+        name: 'Updated',
+        active: false,
+        sync_user_attributes: true,
+      },
+    });
+  });
+
+  it('deletes an enterprise connection', async () => {
+    const deletedJSON = {
+      object: 'enterprise_connection',
+      id: 'ec_123',
+      deleted: true,
+    };
+
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: deletedJSON }));
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    const result = await user.deleteEnterpriseConnection('ec_123');
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'DELETE',
+      path: '/me/enterprise_connections/ec_123',
+    });
+
+    expect(result.id).toBe('ec_123');
+    expect(result.deleted).toBe(true);
+  });
+
   it('creates a web3 wallet', async () => {
     const targetWeb3Wallet = '0x0000000000000000000000000000000000000000';
     const web3WalletJSON = {
