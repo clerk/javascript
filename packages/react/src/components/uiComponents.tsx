@@ -1,6 +1,6 @@
 import type {
   __experimental_ConfigureSSOProps,
-  __internal_OAuthConsentProps,
+  OAuthConsentProps,
   APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -677,7 +677,7 @@ export const ConfigureSSO = withClerk(
 );
 
 export const OAuthConsent = withClerk(
-  ({ clerk, component, fallback, ...props }: WithClerkProp<__internal_OAuthConsentProps & FallbackProp>) => {
+  ({ clerk, component, fallback, ...props }: WithClerkProp<OAuthConsentProps & FallbackProp>) => {
     const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 

@@ -59,7 +59,6 @@ import type {
   __internal_AttemptToEnableEnvironmentSettingResult,
   __internal_CheckoutProps,
   __internal_EnableOrganizationsPromptProps,
-  __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
@@ -97,7 +96,7 @@ import type {
   LoadedClerk,
   NavigateOptions,
   OAuthApplicationNamespace,
-  OAuthConsentProps,
+  __internal_OAuthConsentProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -1328,7 +1327,7 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
-  public mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {
+  public mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderOAuthConsentComponentWhenUserDoesNotExist, {

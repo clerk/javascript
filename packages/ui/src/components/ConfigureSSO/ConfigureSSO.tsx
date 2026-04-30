@@ -28,6 +28,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
     <ProfileCard.Root
       sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
     >
+      {/* TODO -> Display application + organization information */}
       <NavbarContextProvider contentRef={contentRef}>
         <NavBar
           title={localizationKeys('configureSSO.navbar.title')}

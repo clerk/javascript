@@ -14,11 +14,9 @@ import type {
 
 import { unixEpochToDate } from '../../utils/date';
 import { clerkUnsupportedReloadMethod } from '../errors';
-import { BaseResource } from './Base';
 
-export class EnterpriseConnectionTestRun extends BaseResource implements EnterpriseConnectionTestRunResource {
+export class EnterpriseConnectionTestRun implements EnterpriseConnectionTestRunResource {
   pathRoot = '/me';
-  private enterpriseConnectionId = '';
 
   id!: string;
   status!: string;
@@ -29,21 +27,15 @@ export class EnterpriseConnectionTestRun extends BaseResource implements Enterpr
   oauth: EnterpriseConnectionTestRunOauthPayloadResource | null = null;
   createdAt: Date | null = null;
 
-  constructor(data: EnterpriseConnectionTestRunJSON, enterpriseConnectionId: string) {
-    super();
-    this.enterpriseConnectionId = enterpriseConnectionId;
+  constructor(data: EnterpriseConnectionTestRunJSON) {
     this.fromJSON(data);
-  }
-
-  protected path(): string {
-    return `${this.pathRoot}/enterprise_connections/${this.enterpriseConnectionId}/test_runs/${this.id}`;
   }
 
   reload(_?: ClerkResourceReloadParams): Promise<this> {
     clerkUnsupportedReloadMethod('EnterpriseConnectionTestRun');
   }
 
-  protected fromJSON(data: EnterpriseConnectionTestRunJSON | null): this {
+  private fromJSON(data: EnterpriseConnectionTestRunJSON | null): this {
     if (!data) {
       return this;
     }

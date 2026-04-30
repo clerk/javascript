@@ -1,5 +1,4 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
-import { deepCamelToSnake } from '@clerk/shared/underscore';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
@@ -22,16 +21,8 @@ import type {
   EnterpriseConnectionTestRunsPaginatedJSON,
   ExternalAccountJSON,
   ExternalAccountResource,
-  ClerkPaginatedResponse,
-  CreateMeEnterpriseConnectionParams,
-  EnterpriseConnectionTestRunInitJSON,
-  EnterpriseConnectionTestRunJSON,
-  EnterpriseConnectionTestRunsPaginatedJSON,
-  EnterpriseConnectionTestRunInitResource,
-  EnterpriseConnectionTestRunResource,
-  GetEnterpriseConnectionTestRunsParams,
   GetEnterpriseConnectionsParams,
-  UpdateMeEnterpriseConnectionParams,
+  GetEnterpriseConnectionTestRunsParams,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -56,7 +47,6 @@ import { deepCamelToSnake } from '@clerk/shared/underscore';
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
@@ -345,7 +335,7 @@ export class User extends BaseResource implements UserResource {
       await BaseResource._fetch<EnterpriseConnectionJSON>({
         path: `${this.path()}/enterprise_connections`,
         method: 'POST',
-        body: deepCamelToSnake(params) as any,
+        body: toMeEnterpriseConnectionBody(params) as any,
       })
     )?.response as unknown as EnterpriseConnectionJSON;
 
@@ -360,7 +350,7 @@ export class User extends BaseResource implements UserResource {
       await BaseResource._fetch<EnterpriseConnectionJSON>({
         path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
         method: 'PATCH',
-        body: deepCamelToSnake(params) as any,
+        body: toMeEnterpriseConnectionBody(params) as any,
       })
     )?.response as unknown as EnterpriseConnectionJSON;
 
@@ -396,7 +386,7 @@ export class User extends BaseResource implements UserResource {
     params?: GetEnterpriseConnectionTestRunsParams,
   ): Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>> => {
     const { status, ...rest } = params || {};
-    const search = convertPageToOffsetSearchParams({ ...rest, paginated: true });
+    const search = convertPageToOffsetSearchParams(rest);
     if (status?.length) {
       for (const s of status) {
         search.append('status', s);
@@ -413,9 +403,7 @@ export class User extends BaseResource implements UserResource {
 
     return {
       total_count: payload?.total_count ?? 0,
-      data: (payload?.data ?? []).map(
-        (row: EnterpriseConnectionTestRunJSON) => new EnterpriseConnectionTestRun(row, enterpriseConnectionId),
-      ),
+      data: (payload?.data ?? []).map((row: EnterpriseConnectionTestRunJSON) => new EnterpriseConnectionTestRun(row)),
     };
   };
 
