@@ -1,6 +1,6 @@
 import type {
+  OAuthConsentProps,
   __experimental_ConfigureSSOProps,
-  __internal_OAuthConsentProps,
   APIKeysProps,
   PricingTableProps,
   TaskChooseOrganizationProps,

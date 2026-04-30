@@ -240,6 +240,135 @@ describe('User', () => {
     });
   });
 
+  it('preserves `saml.attributeMapping` and `saml.customAttributes` keys when creating an enterprise connection', async () => {
+    BaseResource._fetch = vi.fn().mockReturnValue(
+      Promise.resolve({
+        response: {
+          id: 'ec_new',
+          object: 'enterprise_connection' as const,
+          name: 'New SSO',
+          active: true,
+          provider: 'saml_okta',
+          logo_public_url: null,
+          domains: [],
+          organization_id: null,
+          sync_user_attributes: true,
+          disable_additional_identifications: false,
+          allow_organization_account_linking: false,
+          custom_attributes: [],
+          oauth_config: null,
+          saml_connection: null,
+          created_at: 1,
+          updated_at: 1,
+        },
+      }),
+    );
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    await user.createEnterpriseConnection({
+      provider: 'saml_okta',
+      name: 'New SSO',
+      saml: {
+        idpEntityId: 'https://idp.example.com',
+        attributeMapping: {
+          emailAddress: 'mail',
+          firstName: 'givenName',
+          'custom:role': 'role',
+        },
+      },
+    });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/me/enterprise_connections',
+      body: {
+        provider: 'saml_okta',
+        name: 'New SSO',
+        saml: {
+          idp_entity_id: 'https://idp.example.com',
+          attribute_mapping: {
+            emailAddress: 'mail',
+            firstName: 'givenName',
+            'custom:role': 'role',
+          },
+        },
+      },
+    });
+  });
+
+  it('preserves `customAttributes` and `saml.attributeMapping` keys when updating an enterprise connection', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(
+      Promise.resolve({
+        response: {
+          id: 'ec_123',
+          object: 'enterprise_connection' as const,
+          name: 'Updated',
+          active: true,
+          provider: 'saml_okta',
+          logo_public_url: null,
+          domains: [],
+          organization_id: null,
+          sync_user_attributes: true,
+          disable_additional_identifications: false,
+          allow_organization_account_linking: false,
+          custom_attributes: [],
+          oauth_config: null,
+          saml_connection: null,
+          created_at: 1,
+          updated_at: 2,
+        },
+      }),
+    );
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    await user.updateEnterpriseConnection('ec_123', {
+      customAttributes: {
+        MyClaim: 'x',
+        CustomValue: 'y',
+        nestedCamelKey: { innerCamelKey: 'z' },
+      },
+      saml: {
+        attributeMapping: {
+          emailAddress: 'mail',
+          firstName: 'givenName',
+        },
+      },
+    });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'PATCH',
+      path: '/me/enterprise_connections/ec_123',
+      body: {
+        custom_attributes: {
+          MyClaim: 'x',
+          CustomValue: 'y',
+          nestedCamelKey: { innerCamelKey: 'z' },
+        },
+        saml: {
+          attribute_mapping: {
+            emailAddress: 'mail',
+            firstName: 'givenName',
+          },
+        },
+      },
+    });
+  });
+
   it('deletes an enterprise connection', async () => {
     const deletedJSON = {
       object: 'enterprise_connection',

@@ -66,7 +66,7 @@ export type AvailableComponentProps =
   | __internal_PlanDetailsProps
   | APIKeysProps
   | __experimental_ConfigureSSOProps
-  | __internal_OAuthConsentProps
+  | OAuthConsentProps
   | TaskChooseOrganizationProps
   | TaskResetPasswordProps
   | TaskSetupMFAProps;
