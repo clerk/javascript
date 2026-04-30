@@ -220,9 +220,9 @@ export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void =
     });
 
     test.afterAll(async () => {
-      await fakeAPIKey.revoke();
-      await fakeUser.deleteIfExists();
-      await app.teardown();
+      await fakeAPIKey?.revoke();
+      await fakeUser?.deleteIfExists();
+      await app?.teardown();
     });
 
     test('should return 401 if no API key is provided', async ({ request }) => {
@@ -311,8 +311,8 @@ export const registerM2MAuthTests = (adapter: MachineAuthTestAdapter): void => {
     });
 
     test.afterAll(async () => {
-      await network.cleanup();
-      await app.teardown();
+      await network?.cleanup();
+      await app?.teardown();
     });
 
     test('rejects requests with invalid M2M tokens', async ({ request }) => {
@@ -355,13 +355,26 @@ export const registerM2MAuthTests = (adapter: MachineAuthTestAdapter): void => {
       });
 
       try {
-        const res = await u.page.request.get(new URL(adapter.m2m.path, app.serverUrl).toString(), {
-          headers: { Authorization: `Bearer ${m2mToken.token}` },
-        });
-        expect(res.status()).toBe(200);
-        const body = await res.json();
-        expect(body.subject).toBe(network.unscopedSender.id);
-        expect(body.tokenType).toBe(TokenType.M2MToken);
+        const url = new URL(adapter.m2m.path, app.serverUrl).toString();
+        const headers = { Authorization: `Bearer ${m2mToken.token}` };
+
+        // Newly granted scopes can take a moment to propagate before the M2M
+        // token is accepted, so poll until the request is authorized.
+        let body: { subject: string; tokenType: string } | undefined;
+        await expect
+          .poll(
+            async () => {
+              const res = await u.page.request.get(url, { headers });
+              if (res.status() !== 200) return res.status();
+              body = await res.json();
+              return 200;
+            },
+            { timeout: 10_000, intervals: [250, 500, 1000, 1000, 2000] },
+          )
+          .toBe(200);
+
+        expect(body!.subject).toBe(network.unscopedSender.id);
+        expect(body!.tokenType).toBe(TokenType.M2MToken);
       } finally {
         await u.services.clerk.m2m.revokeToken({ m2mTokenId: m2mToken.id });
       }
@@ -418,9 +431,9 @@ export const registerOAuthAuthTests = (adapter: MachineAuthTestAdapter): void =>
     });
 
     test.afterAll(async () => {
-      await fakeOAuth.cleanup();
-      await fakeUser.deleteIfExists();
-      await app.teardown();
+      await fakeOAuth?.cleanup();
+      await fakeUser?.deleteIfExists();
+      await app?.teardown();
     });
 
     test('verifies valid OAuth access token obtained through authorization flow', async ({ page, context }) => {
