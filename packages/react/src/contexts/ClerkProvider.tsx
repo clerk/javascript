@@ -18,7 +18,6 @@ function ClerkProviderBase<TUi extends Ui>(props: ClerkProviderProps<TUi>) {
   return (
     <ClerkContextProvider
       initialState={initialState}
-      // @ts-expect-error - Fixme!
       clerk={isomorphicClerk}
       clerkStatus={clerkStatus}
     >
