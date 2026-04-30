@@ -44,7 +44,7 @@ export type NavbarRoute = {
 };
 type NavBarProps = {
   title: LocalizationKey;
-  description: LocalizationKey;
+  description?: LocalizationKey;
   contentRef: React.RefObject<HTMLDivElement>;
   routes: NavbarRoute[];
   header?: React.ReactNode;
@@ -140,7 +140,7 @@ export const NavBar = (props: NavBarProps) => {
 };
 
 const NavbarContainer = (
-  props: React.PropsWithChildren<{ title: LocalizationKey | string; description: LocalizationKey | string }>,
+  props: React.PropsWithChildren<{ title: LocalizationKey | string; description?: LocalizationKey | string }>,
 ) => {
   const { title, description } = props;
   return (
@@ -175,10 +175,12 @@ const NavbarContainer = (
             localizationKey={title}
           />
 
-          <Text
-            colorScheme='secondary'
-            localizationKey={description}
-          />
+          {description ? (
+            <Text
+              colorScheme='secondary'
+              localizationKey={description}
+            />
+          ) : null}
         </Col>
         {props.children}
       </Col>
