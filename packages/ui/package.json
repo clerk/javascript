@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "1.6.7",
+  "version": "1.6.8",
   "description": "Internal package that contains the UI components for the Clerk frontend SDKs",
   "repository": {
     "type": "git",
@@ -120,7 +120,7 @@
     "@svgr/rollup": "^8.1.0",
     "@svgr/webpack": "^6.5.1",
     "@types/webpack-env": "^1.18.8",
-    "bundlewatch": "^0.4.1",
+    "bundlewatch": "^0.4.2",
     "cross-fetch": "^4.1.0",
     "minimatch": "^10.2.5",
     "tsdown": "catalog:repo",
