@@ -23,7 +23,6 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "ClerkLoaded",
   "ClerkLoading",
   "ClerkProvider",
-  "ConfigureSSO",
   "CreateOrganization",
   "GoogleOneTap",
   "HandleSSOCallback",
