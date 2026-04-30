@@ -220,9 +220,9 @@ export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void =
     });
 
     test.afterAll(async () => {
-      await fakeAPIKey.revoke();
-      await fakeUser.deleteIfExists();
-      await app.teardown();
+      await fakeAPIKey?.revoke();
+      await fakeUser?.deleteIfExists();
+      await app?.teardown();
     });
 
     test('should return 401 if no API key is provided', async ({ request }) => {
@@ -311,8 +311,8 @@ export const registerM2MAuthTests = (adapter: MachineAuthTestAdapter): void => {
     });
 
     test.afterAll(async () => {
-      await network.cleanup();
-      await app.teardown();
+      await network?.cleanup();
+      await app?.teardown();
     });
 
     test('rejects requests with invalid M2M tokens', async ({ request }) => {
@@ -418,9 +418,9 @@ export const registerOAuthAuthTests = (adapter: MachineAuthTestAdapter): void =>
     });
 
     test.afterAll(async () => {
-      await fakeOAuth.cleanup();
-      await fakeUser.deleteIfExists();
-      await app.teardown();
+      await fakeOAuth?.cleanup();
+      await fakeUser?.deleteIfExists();
+      await app?.teardown();
     });
 
     test('verifies valid OAuth access token obtained through authorization flow', async ({ page, context }) => {
