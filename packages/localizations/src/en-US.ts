@@ -1131,11 +1131,14 @@ export const enUS: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Add account',
-    action__closeUserMenu: 'Close user menu',
+    action__closeUserMenu: '{{name}} - Close account panel',
     action__manageAccount: 'Manage account',
-    action__openUserMenu: 'Open user menu',
+    action__openUserMenu: '{{name}} - Open account panel',
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
+    label__userButtonPopover: 'Account panel',
+    label__accountActions: 'Account actions',
+    label__activeSessions: 'Active sessions',
   },
   userProfile: {
     apiKeysPage: {

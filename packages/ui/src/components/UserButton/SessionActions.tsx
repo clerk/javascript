@@ -9,7 +9,7 @@ import { UserPreview } from '@/ui/elements/UserPreview';
 import { USER_BUTTON_ITEM_ID } from '../../constants';
 import { useUserButtonContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { descriptors, Flex, localizationKeys } from '../../customizables';
+import { descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
 import { Add, CogFilled, SignOut, SwitchArrowRight } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import type { DefaultItemIds, MenuItem } from '../../utils/createCustomMenuItems';
@@ -27,6 +27,7 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
   const { handleManageAccountClicked, handleSignOutSessionClicked, handleUserProfileActionClicked, session } = props;
 
   const { menutItems } = useUserButtonContext();
+  const { t } = useLocalizations();
 
   const commonActionSx: ThemableCssProp = t => ({
     borderTopWidth: t.borderWidths.$normal,
@@ -54,7 +55,8 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
 
   return (
     <Actions
-      role='menu'
+      role='group'
+      aria-label={t(localizationKeys('userButton.label__accountActions'))}
       elementDescriptor={descriptors.userButtonPopoverActions}
       elementId={descriptors.userButtonPopoverActions.setId('singleSession')}
       sx={t => ({
@@ -102,6 +104,7 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
                 ? handleSignOutSessionClicked(session)
                 : () => handleActionClick(item)
             }
+            role={undefined}
             sx={commonActionSx}
             iconSx={t => ({
               width: t.sizes.$4,
@@ -138,6 +141,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
   } = props;
 
   const { menutItems } = useUserButtonContext();
+  const { t } = useLocalizations();
 
   const handleActionClick = async (route: MenuItem) => {
     if (route?.path) {
@@ -164,7 +168,8 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
     <>
       {hasOnlyDefaultItems ? (
         <SmallActions
-          role='menu'
+          role='group'
+          aria-label={t(localizationKeys('userButton.label__accountActions'))}
           elementDescriptor={descriptors.userButtonPopoverActions}
           elementId={descriptors.userButtonPopoverActions.setId('multiSession')}
         >
@@ -183,6 +188,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
               label={localizationKeys('userButton.action__manageAccount')}
               onClick={handleManageAccountClicked}
               focusRing
+              role={undefined}
             />
             <SmallAction
               elementDescriptor={descriptors.userButtonPopoverActionButton}
@@ -195,12 +201,14 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
               label={localizationKeys('userButton.action__signOut')}
               onClick={handleSignOutSessionClicked(session)}
               focusRing
+              role={undefined}
             />
           </Flex>
         </SmallActions>
       ) : (
         <SmallActions
-          role='menu'
+          role='group'
+          aria-label={t(localizationKeys('userButton.label__accountActions'))}
           elementDescriptor={descriptors.userButtonPopoverActions}
           elementId={descriptors.userButtonPopoverActions.setId('multiSession')}
           sx={t => ({
@@ -246,6 +254,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
                     ? handleSignOutSessionClicked(session)
                     : () => handleActionClick(item)
                 }
+                role={undefined}
                 sx={t => ({
                   border: 0,
                   padding: `${t.space.$2} ${t.space.$5}`,
@@ -267,7 +276,8 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
       )}
 
       <Actions
-        role='menu'
+        role='group'
+        aria-label={t(localizationKeys('userButton.label__activeSessions'))}
         sx={t => ({
           borderTopStyle: t.borderStyles.$solid,
           borderTopWidth: t.borderWidths.$normal,
@@ -279,7 +289,6 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
             key={session.id}
             icon={SwitchArrowRight}
             onClick={handleSessionClicked(session)}
-            role='menuitem'
           >
             <UserPreview user={session.user} />
           </PreviewButton>
@@ -294,6 +303,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
           icon={Add}
           label={localizationKeys('userButton.action__addAccount')}
           onClick={handleAddAccountClicked}
+          role={undefined}
           iconSx={t => ({
             width: t.sizes.$9,
             height: t.sizes.$6,
@@ -336,9 +346,11 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
     sx,
     actionSx,
   } = props;
+  const { t } = useLocalizations();
   return (
     <Actions
-      role='menu'
+      role='group'
+      aria-label={t(label || localizationKeys('userButton.action__signOutAll'))}
       sx={[
         t => ({
           padding: t.space.$2,
@@ -358,6 +370,7 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
         onClick={handleSignOutAllClicked}
         variant='ghost'
         colorScheme='neutral'
+        role={undefined}
         sx={[
           t => ({
             backgroundColor: t.colors.$transparent,
