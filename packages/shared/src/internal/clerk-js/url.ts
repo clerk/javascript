@@ -400,12 +400,13 @@ export const pathFromFullPath = (fullPath: string) => {
 
 const frontendApiRedirectPathsWithUserInput: string[] = [
   '/oauth/authorize', // OAuth2 identify provider flow
+  '/oauth/authorize/continue', // OAuth 2 identity provider continuation
+  '/oauth/authorize-with-immediate-redirect', // OAuth 2 identity provider (requires sign-in first)
 ];
 
 const frontendApiRedirectPathsNoUserInput: string[] = [
   '/v1/verify', // magic links
   '/v1/tickets/accept', // ticket flow
-  '/oauth/authorize-with-immediate-redirect', // OAuth 2 identity provider
   '/oauth/end_session', // OIDC logout
 ];
 
@@ -421,6 +422,28 @@ export function isRedirectForFAPIInitiatedFlow(frontendApi: string, redirectUrl:
 export function requiresUserInput(redirectUrl: string): boolean {
   const url = new URL(redirectUrl, DUMMY_URL_BASE);
   return frontendApiRedirectPathsWithUserInput.includes(url.pathname);
+}
+
+/**
+ * Checks if a URL points to a known FAPI-initiated flow endpoint.
+ * Only matches absolute URLs whose origin differs from the current window origin,
+ * preventing customer app routes from accidentally matching FAPI paths.
+ */
+export function isFAPIInitiatedFlowPath(url: string): boolean {
+  try {
+    // Only match absolute URLs — relative paths like "/oauth/authorize" should not match
+    // as they would be customer app routes, not FAPI endpoints.
+    // new URL(url) without a base will throw for relative URLs.
+    const parsed = new URL(url);
+    // Ensure the URL is not on the same origin as the current page (FAPI is always cross-origin)
+    if (typeof window !== 'undefined' && parsed.origin === window.location.origin) {
+      return false;
+    }
+    const allFAPIFlowPaths = [...frontendApiRedirectPathsWithUserInput, ...frontendApiRedirectPathsNoUserInput];
+    return allFAPIFlowPaths.includes(parsed.pathname);
+  } catch {
+    return false;
+  }
 }
 
 export const isAllowedRedirect =
