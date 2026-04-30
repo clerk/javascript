@@ -105,6 +105,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   };
   enterpriseSSO: EnterpriseSSOSettings = {
     enabled: false,
+    self_serve_sso: false,
   };
   passkeySettings: PasskeySettingsData = {
     allow_autofill: false,

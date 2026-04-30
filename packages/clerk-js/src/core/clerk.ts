@@ -15,6 +15,7 @@ import {
   disabledAllBillingFeatures,
   disabledOrganizationAPIKeysFeature,
   disabledOrganizationsFeature,
+  disabledSelfServeSSOFeature,
   disabledUserAPIKeysFeature,
   isSignedInAndSingleSessionModeEnabled,
   noOrganizationExists,
@@ -72,9 +73,9 @@ import type {
   AuthenticateWithSolanaParams,
   BillingNamespace,
   CheckoutSignalValue,
+  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
-  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -209,6 +210,7 @@ const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_se
 const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
 const CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE = 'cannot_render_api_keys_user_disabled';
 const CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE = 'cannot_render_api_keys_org_disabled';
+const CANNOT_RENDER_SELF_SERVE_SSO_DISABLED_ERROR_CODE = 'cannot_render_self_serve_sso_disabled';
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -546,7 +548,7 @@ export class Clerk implements ClerkInterface {
     ) {
       // Typing this.#options as ClerkOptions to ensure proper type checking. TypeScript will infer the type as `never`
       // since missing both `routerPush` and `routerReplace` is not a valid ClerkOptions.
-      const options = this.#options;
+      const options = this.#options as ClerkOptions;
       const missingRouter = !options.routerPush ? 'routerPush' : 'routerReplace';
       logger.warnOnce(
         `Clerk: Both \`routerPush\` and \`routerReplace\` need to be defined, but \`${missingRouter}\` is not defined. This may cause issues with navigation in your application.`,
@@ -1444,6 +1446,15 @@ export class Clerk implements ClerkInterface {
    * @param props Configuration parameters.
    */
   public __experimental_mountConfigureSSO = (node: HTMLDivElement, props?: __experimental_ConfigureSSOProps) => {
+    if (disabledSelfServeSSOFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderConfigureSSOComponentWhenDisabled, {
+          code: CANNOT_RENDER_SELF_SERVE_SSO_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     this.assertComponentsReady(this.#clerkUI);
     const component = 'ConfigureSSO';
     void this.#clerkUI
@@ -2993,8 +3004,8 @@ export class Clerk implements ClerkInterface {
     this.#authService = await AuthCookieService.create(
       this,
       this.#fapiClient,
-
-      this.#instanceType,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.#instanceType!,
       this.#publicEventBus,
     );
 

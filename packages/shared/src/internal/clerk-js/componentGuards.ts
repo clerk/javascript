@@ -45,3 +45,7 @@ export const disabledOrganizationAPIKeysFeature: ComponentGuard = (_, environmen
 export const disabledAllAPIKeysFeatures: ComponentGuard = (_, environment) => {
   return disabledUserAPIKeysFeature(_, environment) && disabledOrganizationAPIKeysFeature(_, environment);
 };
+
+export const disabledSelfServeSSOFeature: ComponentGuard = (_, environment) => {
+  return !environment?.userSettings.enterpriseSSO.self_serve_sso;
+};
