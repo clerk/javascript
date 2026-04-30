@@ -213,9 +213,12 @@ export const esES: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'El enlace de verificación ha expirado. Por favor solicite uno nuevo.',
   formFieldHintText__optional: 'Opcional',
   formFieldHintText__slug: 'Un slug es un ID legible que debe ser único. Es comúnmente usado en URLs.',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
+  // NOTE: This file uses Latin American Spanish conventions (e.g. 'Ingrese' for 'Type/Enter').
+  // The European Spanish (es-ES) equivalent would be 'Introduzca' or 'Introduce'.
+  // Future maintainers may want to align this file with European Spanish usage.
+  formFieldInputPlaceholder__apiKeyDescription: 'Describe por qué estás generando esta clave',
+  formFieldInputPlaceholder__apiKeyExpirationDate: 'Selecciona fecha',
+  formFieldInputPlaceholder__apiKeyName: 'Ingrese el nombre de su clave secreta',
   formFieldInputPlaceholder__backupCode: 'Ingrese su código de respaldo',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eliminar cuenta',
   formFieldInputPlaceholder__emailAddress: 'Ingrese su dirección de correo electrónico',
@@ -229,6 +232,7 @@ export const esES: LocalizationResource = {
   formFieldInputPlaceholder__organizationName: 'Ingrese el nombre de la organización',
   formFieldInputPlaceholder__organizationSlug: 'Ingrese un slug único para la organización',
   formFieldInputPlaceholder__password: 'Ingrese su contraseña',
+  formFieldInputPlaceholder__signUpPassword: 'Asigne una contraseña',
   formFieldInputPlaceholder__phoneNumber: 'Ingrese su número telefónico',
   formFieldInputPlaceholder__username: 'Ingrese su nombre de usuario',
   formFieldInput__emailAddress_format: undefined,
