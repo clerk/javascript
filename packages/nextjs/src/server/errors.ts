@@ -28,6 +28,8 @@ export const authAuthHeaderMissing = (helperName = 'auth', prefixSteps?: string[
 - Your ${fileReference} matcher is configured to match this route or page.
 - If you are using the src directory, make sure the ${fileReference} file is inside of it.
 
+If you've verified your configuration and are still seeing this error, there may be a runtime issue or a problem communicating with Clerk.
+
 For more details, see https://clerk.com/err/auth-middleware
 `;
 };
