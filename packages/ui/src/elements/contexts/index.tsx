@@ -98,6 +98,7 @@ export type FlowMetadata = {
     | 'planDetails'
     | 'pricingTable'
     | 'apiKeys'
+    | 'configureSSO'
     | 'oauthConsent'
     | 'subscriptionDetails'
     | 'tasks'
