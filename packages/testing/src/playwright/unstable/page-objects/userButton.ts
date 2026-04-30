@@ -7,7 +7,7 @@ export const createUserButtonPageObject = (testArgs: { page: EnhancedPage }) => 
 
   const self = {
     waitForMounted: () => {
-      return page.waitForSelector('.cl-userButtonTrigger', { state: 'attached', timeout: 30_000 });
+      return page.waitForSelector('.cl-userButtonTrigger', { state: 'attached' });
     },
     toggleTrigger: () => {
       return page.locator('.cl-userButtonTrigger').click();

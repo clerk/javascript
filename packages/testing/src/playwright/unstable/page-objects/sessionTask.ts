@@ -27,9 +27,7 @@ export const createSessionTaskComponentPageObject = (testArgs: { page: EnhancedP
       newPassword: string;
       confirmPassword: string;
     }) => {
-      const newPasswordInput = page.locator('input[name=newPassword]');
-      await newPasswordInput.waitFor({ state: 'visible', timeout: 30_000 });
-      await newPasswordInput.fill(newPassword);
+      await page.locator('input[name=newPassword]').fill(newPassword);
       await page.locator('input[name=confirmPassword]').fill(confirmPassword);
 
       const resetPasswordButton = page.getByRole('button', { name: /reset password/i });
