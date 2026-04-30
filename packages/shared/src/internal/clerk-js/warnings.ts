@@ -64,6 +64,8 @@ const warnings = {
     'The <APIKeys/> component cannot be rendered when organization API keys are disabled. Since organization API keys are disabled, this is no-op.',
   cannotRenderOAuthConsentComponentWhenUserDoesNotExist:
     '<OAuthConsent/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
+  cannotRenderConfigureSSOComponentWhenDisabled:
+    'The <ConfigureSSO/> component cannot be rendered when self-serve SSO is disabled. Visit `https://dashboard.clerk.com` to enable the feature. Since self-serve SSO is disabled, this is no-op.',
 };
 
 type SerializableWarnings = Serializable<typeof warnings>;
