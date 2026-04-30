@@ -3,9 +3,9 @@ import type { SelectId } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactElement, ReactNode } from 'react';
 import React, { useState } from 'react';
 
-import { Button, descriptors, Flex, Icon, Input, Text } from '../customizables';
+import { Box, Button, descriptors, Flex, Icon, Image, Input, Text } from '../customizables';
 import { usePopover, useSearchInput } from '../hooks';
-import { ChevronDown } from '../icons';
+import { Check, ChevronDown } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations, common } from '../styledSystem';
 import { colors } from '../utils/colors';
@@ -32,6 +32,7 @@ type SelectProps<O extends Option> = {
   elementId?: SelectId;
   portal?: boolean;
   referenceElement?: React.RefObject<HTMLElement>;
+  matchTriggerWidth?: boolean;
 };
 
 type SelectState<O extends Option> = Pick<
@@ -51,27 +52,11 @@ type SelectState<O extends Option> = Pick<
 
 const [SelectStateCtx, useSelectState] = createContextAndHook<SelectState<any>>('SelectState');
 
-const defaultRenderOption = <O extends Option>(option: O, _index?: number) => {
+const defaultRenderOption = <O extends Option>(option: O, _index?: number, isSelected?: boolean) => {
   return (
-    <Flex
-      sx={theme => ({
-        position: 'relative',
-        width: '100%',
-        padding: `${theme.space.$2} ${theme.space.$4}`,
-        margin: `0 ${theme.space.$1}`,
-        borderRadius: theme.radii.$md,
-        '&:hover, &[data-focused="true"]': {
-          background: common.mutedBackground(theme),
-        },
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          inset: `calc(${theme.space.$0x5} * -1) calc(${theme.space.$1} * -1)`,
-        },
-      })}
-    >
-      <Text truncate>{option.label || option.value}</Text>
-    </Flex>
+    <SelectOption isSelected={isSelected}>
+      <SelectOption.Label>{option.label || option.value}</SelectOption.Label>
+    </SelectOption>
   );
 };
 
@@ -93,11 +78,12 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
     children,
     portal = false,
     referenceElement = null,
+    matchTriggerWidth = false,
     ...rest
   } = props;
   const popoverCtx = usePopover({
     autoUpdate: true,
-    adjustToReferenceWidth: !!referenceElement,
+    adjustToReferenceWidth: matchTriggerWidth || !!referenceElement,
     referenceElement: referenceElement,
   });
   const togglePopover = popoverCtx.toggle;
@@ -358,6 +344,8 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
               overflowY: 'auto',
               maxHeight: '18vh',
               padding: `${theme.space.$0x5} ${theme.space.$0x5}`,
+              ...common.unstyledScrollbar(theme),
+              overflowX: 'hidden',
             }),
             containerSx,
           ]}
@@ -404,6 +392,20 @@ export const SelectButton = (
     show = selectedOption ? buttonRenderOption(selectedOption) : <Text as='span'>{placeholder}</Text>;
   }
 
+  // Wrap plain string/number children in a truncating Text
+  if (typeof show === 'string' || typeof show === 'number') {
+    show = (
+      <Text
+        as='span'
+        truncate
+        colorScheme='body'
+        sx={{ flex: 1, minWidth: 0, textAlign: 'start' as const }}
+      >
+        {show}
+      </Text>
+    );
+  }
+
   return (
     <Button
       elementDescriptor={descriptors.selectButton}
@@ -418,6 +420,7 @@ export const SelectButton = (
           paddingInlineStart: theme.space.$3x5,
           paddingInlineEnd: theme.space.$3x5,
           alignItems: 'center',
+          overflow: 'hidden',
           '> *': { pointerEvents: 'none' },
         }),
         sx,
@@ -435,3 +438,130 @@ export const SelectButton = (
     </Button>
   );
 };
+
+// --- SelectOption compound component ---
+
+const SelectOptionImage = (props: { src: string; alt?: string; sx?: ThemableCssProp }) => {
+  const { src, alt = '', sx } = props;
+  return (
+    <Image
+      data-slot='image'
+      src={src}
+      alt={alt}
+      sx={[
+        theme => ({
+          width: theme.sizes.$5,
+          height: theme.sizes.$5,
+          objectFit: 'contain',
+          flexShrink: 0,
+          borderRadius: theme.radii.$md,
+        }),
+        sx,
+      ]}
+    />
+  );
+};
+
+const SelectOptionLabel = (props: PropsOfComponent<typeof Text>) => {
+  const { children, sx, ...rest } = props;
+  return (
+    <Text
+      data-slot='label'
+      truncate
+      as='span'
+      variant='subtitle'
+      sx={[{ textAlign: 'start', minWidth: 0 }, sx]}
+      {...rest}
+    >
+      {children}
+    </Text>
+  );
+};
+
+const SelectOptionDetail = (props: PropsOfComponent<typeof Text>) => {
+  const { children, sx, ...rest } = props;
+  return (
+    <Text
+      data-slot='detail'
+      as='span'
+      colorScheme='secondary'
+      sx={sx}
+      {...rest}
+    >
+      {children}
+    </Text>
+  );
+};
+
+type SelectOptionRootProps = {
+  isSelected?: boolean;
+  children: ReactNode;
+  sx?: ThemableCssProp;
+  [key: string]: unknown;
+};
+
+const SelectOptionRoot = ({ isSelected = false, children, sx, ...rest }: SelectOptionRootProps) => {
+  return (
+    <Box
+      as='span'
+      sx={[
+        theme => ({
+          position: 'relative',
+          width: '100%',
+          display: 'grid',
+          gridTemplateColumns: `1fr ${theme.sizes.$3}`,
+          columnGap: theme.space.$2,
+          paddingInlineStart: theme.space.$1,
+          paddingInlineEnd: theme.space.$1x5,
+          paddingBlock: theme.space.$1,
+          alignItems: 'center',
+          borderRadius: theme.radii.$md,
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            inset: `calc(${theme.space.$0x5} * -1) calc(${theme.space.$1} * -1)`,
+          },
+          '&:hover, &[data-focused="true"]': {
+            background: common.mutedBackground(theme),
+          },
+          '&[data-selected="true"]': {
+            background: common.mutedBackground(theme),
+          },
+          '&:has([data-slot="image"])': {
+            gridTemplateColumns: `${theme.sizes.$5} 1fr ${theme.sizes.$3}`,
+          },
+          '&:has([data-slot="detail"])': {
+            gridTemplateColumns: `${theme.sizes.$3} 1fr auto`,
+            '& [data-slot="check"]': {
+              order: -1,
+            },
+          },
+        }),
+        sx,
+      ]}
+      {...rest}
+    >
+      {children}
+      <Flex
+        data-slot='check'
+        as='span'
+        center
+        sx={theme => ({
+          color: theme.colors.$primary500,
+          visibility: isSelected ? 'visible' : 'hidden',
+        })}
+      >
+        <Icon
+          icon={Check}
+          size='sm'
+        />
+      </Flex>
+    </Box>
+  );
+};
+
+export const SelectOption = Object.assign(SelectOptionRoot, {
+  Image: SelectOptionImage,
+  Label: SelectOptionLabel,
+  Detail: SelectOptionDetail,
+});

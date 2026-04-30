@@ -1,13 +1,13 @@
 import { useClerk } from '@clerk/shared/react';
-import React, { forwardRef, memo, useEffect, useMemo, useRef } from 'react';
+import React, { forwardRef, useEffect, useMemo, useRef } from 'react';
 
 import { mergeRefs } from '@/ui/utils/mergeRefs';
 import type { FeedbackType } from '@/ui/utils/useFormControl';
 
-import { descriptors, Flex, Icon, Input, Text } from '../../customizables';
-import { Check, ChevronUpDown } from '../../icons';
+import { descriptors, Flex, Input, Text } from '../../customizables';
+import { ChevronUpDown } from '../../icons';
 import { common, type PropsOfComponent } from '../../styledSystem';
-import { Select, SelectButton, SelectOptionList } from '../Select';
+import { Select, SelectButton, SelectOption, SelectOptionList } from '../Select';
 import type { CountryEntry, CountryIso } from './countryCodeData';
 import { IsoToCountryMap } from './countryCodeData';
 import { useFormattedPhoneNumber } from './useFormattedPhoneNumber';
@@ -90,18 +90,10 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         portal
         referenceElement={phoneInputBox}
         renderOption={(option, _index, isSelected) => (
-          <CountryCodeListItem
-            sx={theme => ({
-              '&:hover': {
-                backgroundColor: theme.colors.$neutralAlpha100,
-              },
-              '&[data-focused="true"]': {
-                backgroundColor: theme.colors.$neutralAlpha150,
-              },
-            })}
-            isSelected={isSelected}
-            country={option.country}
-          />
+          <SelectOption isSelected={isSelected}>
+            <SelectOption.Label>{option.country.name}</SelectOption.Label>
+            <SelectOption.Detail>+{option.country.code}</SelectOption.Detail>
+          </SelectOption>
         )}
         onChange={option => {
           setIso(option.country.iso);
@@ -144,13 +136,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
             {iso}
           </Text>
         </SelectButton>
-        <SelectOptionList
-          sx={{ padding: '0 0' }}
-          containerSx={theme => ({
-            gap: 0,
-            padding: `${theme.space.$0x5} 0`,
-          })}
-        />
+        <SelectOptionList />
       </Select>
 
       <Flex
@@ -205,42 +191,6 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
           {...rest}
         />
       </Flex>
-    </Flex>
-  );
-});
-
-type CountryCodeListItemProps = PropsOfComponent<typeof Flex> & {
-  isSelected?: boolean;
-  country: CountryEntry;
-};
-const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
-  const { country, isSelected, sx, ...rest } = props;
-  return (
-    <Flex
-      center
-      sx={[
-        theme => ({
-          width: '100%',
-          gap: theme.space.$2,
-          padding: `${theme.space.$1x5} ${theme.space.$4}`,
-          color: theme.colors.$colorForeground,
-        }),
-        sx,
-      ]}
-      {...rest}
-    >
-      <Icon
-        icon={Check}
-        size='sm'
-        sx={{ visibility: isSelected ? 'visible' : 'hidden' }}
-      />
-      <Text
-        as='div'
-        sx={{ width: '100%', textAlign: 'start' }}
-      >
-        {country.name}
-      </Text>
-      <Text colorScheme='secondary'>+{country.code}</Text>
     </Flex>
   );
 });

@@ -15,7 +15,7 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { DevOnly } from '../../common/DevOnly';
 import { useCheckoutContext, usePaymentMethods } from '../../contexts';
 import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Spinner, Text } from '../../customizables';
-import { ChevronUpDown, InformationCircle } from '../../icons';
+import { InformationCircle } from '../../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import * as AddPaymentMethod from '../PaymentMethods/AddPaymentMethod';
 import { PaymentMethodRow } from '../PaymentMethods/PaymentMethodRow';
@@ -496,7 +496,6 @@ const ExistingPaymentMethodForm = withCardStateProvider(
               value={selectedPaymentMethod?.id}
             />
             <SelectButton
-              icon={ChevronUpDown}
               sx={t => ({
                 justifyContent: 'space-between',
                 backgroundColor: t.colors.$colorBackground,
@@ -504,12 +503,7 @@ const ExistingPaymentMethodForm = withCardStateProvider(
             >
               {selectedPaymentMethod && <PaymentMethodRow paymentMethod={selectedPaymentMethod} />}
             </SelectButton>
-            <SelectOptionList
-              sx={t => ({
-                paddingBlock: t.space.$1,
-                color: t.colors.$colorForeground,
-              })}
-            />
+            <SelectOptionList />
           </Select>
         ) : (
           <input
