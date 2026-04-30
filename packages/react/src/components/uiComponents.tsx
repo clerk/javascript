@@ -1,6 +1,7 @@
 import type {
   __internal_OAuthConsentProps,
   APIKeysProps,
+  ConfigureSSOProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -642,6 +643,37 @@ export const APIKeys = withClerk(
     );
   },
   { component: 'ApiKeys', renderWhileLoading: true },
+);
+
+/**
+ * @experimental This component is in early access and may change in future releases.
+ */
+export const ConfigureSSO = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<ConfigureSSOProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountConfigureSSO}
+            unmount={clerk.unmountConfigureSSO}
+            updateProps={(clerk as any).__internal_updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'ConfigureSSO', renderWhileLoading: true },
 );
 
 export const OAuthConsent = withClerk(
