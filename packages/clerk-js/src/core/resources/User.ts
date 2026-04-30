@@ -1,4 +1,5 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
+import { deepCamelToSnake } from '@clerk/shared/underscore';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
@@ -14,7 +15,16 @@ import type {
   EnterpriseConnectionResource,
   ExternalAccountJSON,
   ExternalAccountResource,
+  ClerkPaginatedResponse,
+  CreateMeEnterpriseConnectionParams,
+  EnterpriseConnectionTestRunInitJSON,
+  EnterpriseConnectionTestRunJSON,
+  EnterpriseConnectionTestRunsPaginatedJSON,
+  EnterpriseConnectionTestRunInitResource,
+  EnterpriseConnectionTestRunResource,
+  GetEnterpriseConnectionTestRunsParams,
   GetEnterpriseConnectionsParams,
+  UpdateMeEnterpriseConnectionParams,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -36,6 +46,7 @@ import type {
 } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
@@ -46,6 +57,7 @@ import {
   EmailAddress,
   EnterpriseAccount,
   EnterpriseConnection,
+  EnterpriseConnectionTestRun,
   ExternalAccount,
   Image,
   OrganizationMembership,
@@ -314,6 +326,87 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as EnterpriseConnectionJSON[];
 
     return (json || []).map(connection => new EnterpriseConnection(connection));
+  };
+
+  createEnterpriseConnection = async (
+    params: CreateMeEnterpriseConnectionParams,
+  ): Promise<EnterpriseConnectionResource> => {
+    const json = (
+      await BaseResource._fetch<EnterpriseConnectionJSON>({
+        path: `${this.path()}/enterprise_connections`,
+        method: 'POST',
+        body: deepCamelToSnake(params) as any,
+      })
+    )?.response as unknown as EnterpriseConnectionJSON;
+
+    return new EnterpriseConnection(json);
+  };
+
+  updateEnterpriseConnection = async (
+    enterpriseConnectionId: string,
+    params: UpdateMeEnterpriseConnectionParams,
+  ): Promise<EnterpriseConnectionResource> => {
+    const json = (
+      await BaseResource._fetch<EnterpriseConnectionJSON>({
+        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
+        method: 'PATCH',
+        body: deepCamelToSnake(params) as any,
+      })
+    )?.response as unknown as EnterpriseConnectionJSON;
+
+    return new EnterpriseConnection(json);
+  };
+
+  deleteEnterpriseConnection = async (enterpriseConnectionId: string): Promise<DeletedObjectResource> => {
+    const json = (
+      await BaseResource._fetch<DeletedObjectJSON>({
+        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
+        method: 'DELETE',
+      })
+    )?.response as unknown as DeletedObjectJSON;
+
+    return new DeletedObject(json);
+  };
+
+  createEnterpriseConnectionTestRun = async (
+    enterpriseConnectionId: string,
+  ): Promise<EnterpriseConnectionTestRunInitResource> => {
+    const json = (
+      await BaseResource._fetch({
+        path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
+        method: 'POST',
+      })
+    )?.response as unknown as EnterpriseConnectionTestRunInitJSON;
+
+    return { url: json.url };
+  };
+
+  getEnterpriseConnectionTestRuns = async (
+    enterpriseConnectionId: string,
+    params?: GetEnterpriseConnectionTestRunsParams,
+  ): Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>> => {
+    const { status, ...rest } = params || {};
+    const search = convertPageToOffsetSearchParams({ ...rest, paginated: true });
+    if (status?.length) {
+      for (const s of status) {
+        search.append('status', s);
+      }
+    }
+
+    const res = await BaseResource._fetch({
+      path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}/test_runs`,
+      method: 'GET',
+      search,
+    });
+
+    const payload = res?.response as unknown as EnterpriseConnectionTestRunsPaginatedJSON | undefined;
+
+    return {
+      total_count: payload?.total_count ?? 0,
+      data: (payload?.data ?? []).map(
+        (row: EnterpriseConnectionTestRunJSON) => new EnterpriseConnectionTestRun(row, enterpriseConnectionId),
+      ),
+    };
   };
 
   initializePaymentMethod: typeof initializePaymentMethod = params => {
