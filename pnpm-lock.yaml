@@ -41,6 +41,9 @@ catalogs:
     '@swc/helpers':
       specifier: 0.5.21
       version: 0.5.21
+    '@tanstack/query-core':
+      specifier: ^5.100.6
+      version: 5.100.6
     core-js:
       specifier: 3.47.0
       version: 3.47.0
@@ -438,7 +441,7 @@ importers:
         specifier: catalog:repo
         version: 0.5.21
       '@tanstack/query-core':
-        specifier: ^5.100.6
+        specifier: catalog:repo
         version: 5.100.6
       '@wallet-standard/core':
         specifier: catalog:module-manager
@@ -811,7 +814,7 @@ importers:
   packages/shared:
     dependencies:
       '@tanstack/query-core':
-        specifier: ^5.100.6
+        specifier: catalog:repo
         version: 5.100.6
       dequal:
         specifier: 2.0.3
