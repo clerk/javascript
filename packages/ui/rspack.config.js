@@ -287,7 +287,6 @@ const devConfig = (mode, env) => {
         type: 'memory',
       },
     },
-    lazyCompilation: false,
     // Only externalize React when using the shared variant (e.g., with @clerk/react).
     // For standalone usage or non-React frameworks, bundle React normally.
     ...(useSharedReact ? { externals: [sharedReactExternalsHandler] } : {}),

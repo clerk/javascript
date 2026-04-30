@@ -62,16 +62,6 @@ catalogs:
     zx:
       specifier: 8.8.5
       version: 8.8.5
-  rspack:
-    '@rspack/cli':
-      specifier: 1.7.11
-      version: 1.7.11
-    '@rspack/core':
-      specifier: 1.7.11
-      version: 1.7.11
-    '@rspack/plugin-react-refresh':
-      specifier: 1.6.2
-      version: 1.6.2
 
 overrides:
   react: 18.3.1
@@ -478,14 +468,11 @@ importers:
         specifier: ^0.4.13
         version: 0.4.13(@rspack/core@1.7.11(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/cli':
-        specifier: catalog:rspack
+        specifier: ^1.6.0
         version: 1.7.11(@rspack/core@1.7.11(@swc/helpers@0.5.21))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/core':
-        specifier: catalog:rspack
+        specifier: ^1.6.0
         version: 1.7.11(@swc/helpers@0.5.21)
-      '@rspack/plugin-react-refresh':
-        specifier: catalog:rspack
-        version: 1.6.2(react-refresh@0.17.0)
       '@types/cloudflare-turnstile':
         specifier: ^0.2.2
         version: 0.2.2
@@ -989,13 +976,13 @@ importers:
         specifier: ^0.4.13
         version: 0.4.13(@rspack/core@1.7.11(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/cli':
-        specifier: catalog:rspack
+        specifier: ^1.7.11
         version: 1.7.11(@rspack/core@1.7.11(@swc/helpers@0.5.21))(@types/express@4.17.25)(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/core':
-        specifier: catalog:rspack
+        specifier: ^1.7.11
         version: 1.7.11(@swc/helpers@0.5.21)
       '@rspack/plugin-react-refresh':
-        specifier: catalog:rspack
+        specifier: ^1.6.2
         version: 1.6.2(react-refresh@0.17.0)
       '@svgr/rollup':
         specifier: ^8.1.0
