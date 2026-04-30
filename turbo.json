@@ -27,8 +27,6 @@
     "RSDOCTOR",
     "TZ",
     "VERCEL",
-    "VERCEL_PROJECT_PRODUCTION_URL",
-    "VERCEL_TARGET_ENV",
     "VITE_CLERK_*"
   ],
   "globalPassThroughEnv": [

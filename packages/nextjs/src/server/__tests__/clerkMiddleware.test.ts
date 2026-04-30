@@ -1326,40 +1326,6 @@ describe('frontendApiProxy multi-domain support', () => {
   });
 });
 
-describe('auto-proxy for eligible hosts', () => {
-  const productionPublishableKey = 'pk_live_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
-
-  it('auto-intercepts /__clerk/* requests on eligible hostnames', async () => {
-    const req = new NextRequest(new URL('/__clerk/v1/client', 'https://myapp-abc123.vercel.app').toString(), {
-      method: 'GET',
-      headers: new Headers(),
-    });
-
-    const resp = await clerkMiddleware({ publishableKey: productionPublishableKey })(req, {} as NextFetchEvent);
-
-    // Proxy should intercept the request — authenticateRequest should NOT be called
-    expect((await clerkClient()).authenticateRequest).not.toBeCalled();
-    expect(resp?.status).toBeDefined();
-  });
-
-  it('uses request.nextUrl for auto-detection', async () => {
-    const req = new NextRequest('http://127.0.0.1:3000/__clerk/v1/client', {
-      method: 'GET',
-      headers: new Headers(),
-    });
-
-    Object.defineProperty(req, 'nextUrl', {
-      value: new URL('https://myapp-abc123.vercel.app/__clerk/v1/client'),
-      configurable: true,
-    });
-
-    const resp = await clerkMiddleware({ publishableKey: productionPublishableKey })(req, {} as NextFetchEvent);
-
-    expect((await clerkClient()).authenticateRequest).not.toBeCalled();
-    expect(resp?.status).toBeDefined();
-  });
-});
-
 describe('contentSecurityPolicy option', () => {
   it('forwards CSP headers as request headers when strict mode is enabled', async () => {
     const resp = await clerkMiddleware({
