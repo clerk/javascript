@@ -12,6 +12,7 @@ import type {
 import {
   AuthStatus,
   constants,
+  createBootstrapSignedOutState,
   createClerkRequest,
   createRedirect,
   getAuthObjectForAcceptedToken,
@@ -239,6 +240,50 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       });
     });
 
+    /**
+     * Runs the user's handler against a synthetic signed-out `RequestState` during the keyless
+     * bootstrap window, so authorization fails closed until a publishable key is provisioned.
+     */
+    const bootstrapNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
+      const resolvedParams = typeof params === 'function' ? await params(request) : params;
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
+
+      const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL || '';
+      const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL || '';
+
+      const options = {
+        publishableKey: '',
+        secretKey: '',
+        signInUrl,
+        signUpUrl,
+        ...resolvedParams,
+      };
+
+      clerkMiddlewareRequestDataStore.set('requestData', options);
+
+      if (options.debug) {
+        logger.enable();
+      }
+
+      const clerkRequest = createClerkRequest(request);
+      logger.debug('keyless bootstrap (no publishable key)', () => ({ signInUrl, signUpUrl }));
+      logger.debug('url', () => clerkRequest.toJSON());
+
+      const requestState = createBootstrapSignedOutState({ signInUrl, signUpUrl });
+
+      return runHandlerWithRequestState({
+        clerkRequest,
+        request,
+        event,
+        requestState,
+        handler,
+        options,
+        resolvedParams,
+        keyless,
+        logger,
+      });
+    });
+
     const keylessMiddleware: NextMiddleware = async (request, event) => {
       /**
        * This mechanism replaces a full-page reload. Ensures that middleware will re-run and authenticate the request properly without the secret key or publishable key to be missing.
@@ -253,15 +298,8 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
       const authHeader = getHeader(request, constants.Headers.Authorization)?.replace('Bearer ', '') ?? '';
 
-      /**
-       * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.
-       */
       if (isMissingPublishableKey && !isMachineTokenByPrefix(authHeader)) {
-        const res = NextResponse.next();
-        setRequestHeadersOnNextResponse(res, request, {
-          [constants.Headers.AuthStatus]: 'signed-out',
-        });
-        return res;
+        return bootstrapNextMiddleware(request, event);
       }
 
       return baseNextMiddleware(request, event);
