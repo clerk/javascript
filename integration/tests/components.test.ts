@@ -20,8 +20,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('component
 
   test.afterAll(async () => {
     await app.teardown();
-    await fakeUser.deleteIfExists();
-    await fakeOrganization.delete();
+    await fakeUser?.deleteIfExists();
+    await fakeOrganization?.delete();
   });
 
   const components = [
