@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.5.7
+
+### Patch Changes
+
+- Update multiple localizations with complete translations for previously missing sections including billing, reverification, API keys, MFA setup, task reset password, restricted access, enterprise connections, and legal consent. Languages updated: Icelandic (is-IS), Norwegian (nb-NO), Finnish (fi-FI), Croatian (hr-HR), Hungarian (hu-HU). ([#8224](https://github.com/clerk/javascript/pull/8224)) by [@bjaben](https://github.com/bjaben)
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea)]:
+  - @clerk/shared@4.8.7
+
 ## 4.5.6
 
 ### Patch Changes
