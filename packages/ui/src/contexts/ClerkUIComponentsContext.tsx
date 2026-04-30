@@ -1,4 +1,5 @@
 import type {
+  __experimental_ConfigureSSOProps,
   __internal_OAuthConsentProps,
   APIKeysProps,
   PricingTableProps,
@@ -13,6 +14,7 @@ import type { ReactNode } from 'react';
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
   APIKeysContext,
+  ConfigureSSOContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
   OAuthConsentContext,
@@ -113,6 +115,12 @@ export function ComponentContextProvider({
         <APIKeysContext.Provider value={{ componentName, ...(props as APIKeysProps) }}>
           {children}
         </APIKeysContext.Provider>
+      );
+    case 'ConfigureSSO':
+      return (
+        <ConfigureSSOContext.Provider value={{ componentName, ...(props as __experimental_ConfigureSSOProps) }}>
+          {children}
+        </ConfigureSSOContext.Provider>
       );
     case 'OAuthConsent': {
       // Translate capital-A `oAuth*` props from the accounts portal into

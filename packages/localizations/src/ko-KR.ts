@@ -182,6 +182,11 @@ export const koKR: LocalizationResource = {
     viewPayment: '결제 보기',
     year: '년',
   },
+  configureSSO: {
+    navbar: {
+      title: '싱글 사인온(SSO) 구성',
+    },
+  },
   createOrganization: {
     formButtonSubmit: '조직 만들기',
     invitePage: {

@@ -184,6 +184,11 @@ export const zhTW: LocalizationResource = {
     viewPayment: '查看付款',
     year: '年',
   },
+  configureSSO: {
+    navbar: {
+      title: '設定單一登入 (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: '創建組織',
     invitePage: {

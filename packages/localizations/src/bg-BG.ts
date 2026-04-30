@@ -179,6 +179,11 @@ export const bgBG: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Конфигуриране на единен вход (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Създаване на организация',
     invitePage: {

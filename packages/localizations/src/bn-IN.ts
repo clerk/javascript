@@ -178,6 +178,11 @@ export const bnIN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'একক সাইন-অন (SSO) কনফিগার করুন',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'সংগঠন তৈরি করুন',
     invitePage: {

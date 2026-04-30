@@ -1,4 +1,5 @@
 import type {
+  __experimental_ConfigureSSOProps,
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
@@ -64,6 +65,7 @@ export type AvailableComponentProps =
   | __internal_SubscriptionDetailsProps
   | __internal_PlanDetailsProps
   | APIKeysProps
+  | __experimental_ConfigureSSOProps
   | __internal_OAuthConsentProps
   | TaskChooseOrganizationProps
   | TaskResetPasswordProps
@@ -142,6 +144,11 @@ export type PricingTableCtx = PricingTableProps & {
 
 export type APIKeysCtx = APIKeysProps & {
   componentName: 'APIKeys';
+  mode?: ComponentMode;
+};
+
+export type ConfigureSSOCtx = __experimental_ConfigureSSOProps & {
+  componentName: 'ConfigureSSO';
   mode?: ComponentMode;
 };
 
@@ -249,6 +256,7 @@ export type AvailableComponentCtx =
   | PricingTableCtx
   | CheckoutCtx
   | APIKeysCtx
+  | ConfigureSSOCtx
   | OAuthConsentCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx

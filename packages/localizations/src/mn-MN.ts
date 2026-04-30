@@ -178,6 +178,11 @@ export const mnMN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Нэгдсэн нэвтрэлт (SSO) тохируулах',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Байгуулга үүсгэх',
     invitePage: {

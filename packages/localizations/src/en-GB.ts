@@ -178,6 +178,11 @@ export const enGB: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Configure Single Sign-On (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Create organisation',
     invitePage: {

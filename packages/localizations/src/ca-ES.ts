@@ -185,6 +185,11 @@ export const caES: LocalizationResource = {
     viewPayment: 'Veure pagament',
     year: 'Any',
   },
+  configureSSO: {
+    navbar: {
+      title: "Configura l'inici de sessió únic (SSO)",
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Crea organització',
     invitePage: {

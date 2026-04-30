@@ -186,6 +186,11 @@ export const frFR: LocalizationResource = {
     viewPayment: 'Voir le paiement',
     year: 'An',
   },
+  configureSSO: {
+    navbar: {
+      title: "Configurer l'authentification unique (SSO)",
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Créer l’organisation',
     invitePage: {

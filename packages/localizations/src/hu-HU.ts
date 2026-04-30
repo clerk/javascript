@@ -178,6 +178,11 @@ export const huHU: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Egyszeri bejelentkezés (SSO) beállítása',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Szervezet létrehozása',
     invitePage: {

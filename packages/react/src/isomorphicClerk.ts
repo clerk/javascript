@@ -25,6 +25,7 @@ import type {
   ClerkOptions,
   ClerkStatus,
   ClientResource,
+  __experimental_ConfigureSSOProps,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
@@ -158,6 +159,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   private premountAPIKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
+  private premountConfigureSSONodes = new Map<HTMLDivElement, __experimental_ConfigureSSOProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   private premountTaskResetPasswordNodes = new Map<HTMLDivElement, TaskResetPasswordProps | undefined>();
@@ -746,6 +748,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountAPIKeys(node, props);
     });
 
+    this.premountConfigureSSONodes.forEach((props, node) => {
+      clerkjs.__experimental_mountConfigureSSO(node, props);
+    });
+
     this.premountOAuthConsentNodes.forEach((props, node) => {
       clerkjs.__internal_mountOAuthConsent(node, props);
     });
@@ -1279,6 +1285,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountAPIKeys(node);
     } else {
       this.premountAPIKeysNodes.delete(node);
+    }
+  };
+
+  __experimental_mountConfigureSSO = (node: HTMLDivElement, props?: __experimental_ConfigureSSOProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__experimental_mountConfigureSSO(node, props);
+    } else {
+      this.premountConfigureSSONodes.set(node, props);
+    }
+  };
+
+  __experimental_unmountConfigureSSO = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__experimental_unmountConfigureSSO(node);
+    } else {
+      this.premountConfigureSSONodes.delete(node);
     }
   };
 

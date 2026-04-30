@@ -178,6 +178,11 @@ export const nlNL: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Single sign-on (SSO) configureren',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Creëer organisatie',
     invitePage: {

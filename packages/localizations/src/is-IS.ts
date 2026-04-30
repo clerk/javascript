@@ -178,6 +178,11 @@ export const isIS: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Stilla einnar innskráningar (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Stofna samtök',
     invitePage: {

@@ -178,6 +178,11 @@ export const beBY: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Налада адзінага ўваходу (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Стварыць арганізацыю',
     invitePage: {

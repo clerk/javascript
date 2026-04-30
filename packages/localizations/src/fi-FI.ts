@@ -184,6 +184,11 @@ export const fiFI: LocalizationResource = {
     viewPayment: 'Näytä maksu',
     year: 'Vuosi',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Määritä kertakirjautuminen (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Luo organisaatio',
     invitePage: {

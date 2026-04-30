@@ -178,6 +178,11 @@ export const hiIN: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'सिंगल साइन-ऑन (SSO) कॉन्फ़िगर करें',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'संगठन बनाएँ',
     invitePage: {

@@ -178,6 +178,11 @@ export const ruRU: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Настроить единый вход (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Создать организацию',
     invitePage: {
