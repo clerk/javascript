@@ -38,11 +38,14 @@ export type {
 
 /**
  * NextJS-specific exports
+ *
+ * NOTE: `auth` and `currentUser` are re-exported from `./index.rsc.ts` only,
+ * which is selected via the `react-server` export condition. Loading them
+ * outside the RSC layer (e.g. from pages-router code) would transitively
+ * import `server-only` and crash at module load.
  */
 export { getAuth } from './createGetAuth';
 export { buildClerkProps } from './buildClerkProps';
-export { auth } from '../app-router/server/auth';
-export { currentUser } from '../app-router/server/currentUser';
 export { clerkMiddleware } from './clerkMiddleware';
 export type { ClerkMiddlewareAuth, ClerkMiddlewareSessionAuthObject, ClerkMiddlewareOptions } from './clerkMiddleware';
 
