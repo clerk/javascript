@@ -10,4 +10,12 @@
 
 Expose `OAuthConsent` as a public component export across React-based SDKs.
 
-Also expose `useOAuthConsent()` as a public hook where supported.
+Example:
+
+```tsx
+import { OAuthConsent } from '@clerk/react';
+
+export default function Page() {
+  return <OAuthConsent />;
+}
+```
