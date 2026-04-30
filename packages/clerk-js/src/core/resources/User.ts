@@ -1,10 +1,11 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
-import { deepCamelToSnake } from '@clerk/shared/underscore';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
+  ClerkPaginatedResponse,
   CreateEmailAddressParams,
   CreateExternalAccountParams,
+  CreateMeEnterpriseConnectionParams,
   CreatePhoneNumberParams,
   CreateWeb3WalletParams,
   DeletedObjectJSON,
@@ -13,18 +14,15 @@ import type {
   EnterpriseAccountResource,
   EnterpriseConnectionJSON,
   EnterpriseConnectionResource,
+  EnterpriseConnectionTestRunInitJSON,
+  EnterpriseConnectionTestRunInitResource,
+  EnterpriseConnectionTestRunJSON,
+  EnterpriseConnectionTestRunResource,
+  EnterpriseConnectionTestRunsPaginatedJSON,
   ExternalAccountJSON,
   ExternalAccountResource,
-  ClerkPaginatedResponse,
-  CreateMeEnterpriseConnectionParams,
-  EnterpriseConnectionTestRunInitJSON,
-  EnterpriseConnectionTestRunJSON,
-  EnterpriseConnectionTestRunsPaginatedJSON,
-  EnterpriseConnectionTestRunInitResource,
-  EnterpriseConnectionTestRunResource,
-  GetEnterpriseConnectionTestRunsParams,
   GetEnterpriseConnectionsParams,
-  UpdateMeEnterpriseConnectionParams,
+  GetEnterpriseConnectionTestRunsParams,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -36,6 +34,7 @@ import type {
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
+  UpdateMeEnterpriseConnectionParams,
   UpdateUserParams,
   UpdateUserPasswordParams,
   UserJSON,
@@ -44,9 +43,10 @@ import type {
   VerifyTOTPParams,
   Web3WalletResource,
 } from '@clerk/shared/types';
+import { deepCamelToSnake } from '@clerk/shared/underscore';
 
-import { unixEpochToDate } from '../../utils/date';
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
+import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
