@@ -17,10 +17,21 @@ export function useUserBase(): UserResource | null | undefined {
       [clerk],
     ),
     useCallback(() => {
-      if (!clerk.loaded || !clerk.__internal_lastEmittedResources) {
+      // DIAG: instrument userButton mount regression
+      const fellBack = !clerk.loaded || !(clerk as any).__internal_lastEmittedResources;
+      // eslint-disable-next-line no-console
+      console.log('[CLERK_DIAG] useUserBase getSnapshot', {
+        loaded: !!clerk.loaded,
+        hasLastEmitted: !!(clerk as any).__internal_lastEmittedResources,
+        emittedUserId: (clerk as any).__internal_lastEmittedResources?.user?.id,
+        clerkUserId: (clerk as any).user?.id,
+        sessionId: (clerk as any).session?.id,
+        fellBackToInitial: fellBack,
+      });
+      if (fellBack) {
         return getInitialState();
       }
-      return clerk.__internal_lastEmittedResources.user;
+      return (clerk as any).__internal_lastEmittedResources.user;
     }, [clerk, getInitialState]),
     getInitialState,
   );

@@ -3235,9 +3235,22 @@ export class Clerk implements ClerkInterface {
         organization: this.organization,
       };
       this.__internal_lastEmittedResources = resources;
+      // DIAG: instrument userButton mount regression
+      // eslint-disable-next-line no-console
+      console.log('[CLERK_DIAG] clerk.#emit', {
+        listeners: this.#listeners.length,
+        userId: this.user?.id ?? null,
+        sessionId: this.session?.id ?? null,
+        clientId: this.client?.id ?? null,
+        sessionsOnClient: this.client?.sessions?.length ?? 0,
+      });
       for (const listener of this.#listeners) {
         listener(resources);
       }
+    } else {
+      // DIAG: emit was skipped because client is unset
+      // eslint-disable-next-line no-console
+      console.log('[CLERK_DIAG] clerk.#emit skipped (no client)');
     }
   };
 
