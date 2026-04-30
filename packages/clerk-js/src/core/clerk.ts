@@ -77,6 +77,7 @@ import type {
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
+  ConfigureSSOProps,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -1432,6 +1433,38 @@ export class Clerk implements ClerkInterface {
    * @param targetNode Target node to unmount the APIKeys component from.
    */
   public unmountAPIKeys = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
+  /**
+   * Mount a configure SSO component at the target element.
+   * @param targetNode Target to mount the ConfigureSSO component.
+   * @param props Configuration parameters.
+   */
+  public mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'ConfigureSSO';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'configureSSO',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  /**
+   * Unmount a configure SSO component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the ConfigureSSO component from.
+   */
+  public unmountConfigureSSO = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 

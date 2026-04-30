@@ -188,6 +188,8 @@ export default defineNuxtModule<ModuleOptions>({
       'Waitlist',
       // API Keys
       'APIKeys',
+      // SSO
+      'ConfigureSSO',
     ];
     otherComponents.forEach(component => {
       void addComponent({

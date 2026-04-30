@@ -662,6 +662,22 @@ export interface Clerk {
   unmountAPIKeys: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount a configure SSO component at the target element.
+   *
+   * @param targetNode - Target to mount the ConfigureSSO component.
+   * @param props - Configuration parameters.
+   */
+  mountConfigureSSO: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
+
+  /**
+   * Unmount a configure SSO component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode - Target node to unmount the ConfigureSSO component from.
+   */
+  unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a OAuth consent component at the target element.
    *
    * @param targetNode - Target node to mount the OAuth consent component.
@@ -2122,6 +2138,15 @@ export type APIKeysProps = {
    * @default false
    */
   showDescription?: boolean;
+};
+
+export type ConfigureSSOProps = {
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type GetAPIKeysParams = ClerkPaginationParams<{
