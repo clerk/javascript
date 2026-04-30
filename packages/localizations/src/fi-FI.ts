@@ -81,6 +81,7 @@ export const fiFI: LocalizationResource = {
     availableFeatures: 'Sisältyvät ominaisuudet',
     billedAnnually: 'Laskutetaan vuosittain',
     billedMonthlyOnly: 'Laskutus vain kuukausittain',
+    billedAnnuallyOnly: 'Laskutus vain vuosittain',
     cancelFreeTrial: 'Peruuta ilmainen kokeilu',
     cancelFreeTrialAccessUntil:
       "Kokeilusi pysyy aktiivisena {{ date | longDate('fi-FI') }} asti. Tämän jälkeen menetät pääsyn kokeiluominaisuuksiin. Sinulta ei veloiteta.",
@@ -120,7 +121,10 @@ export const fiFI: LocalizationResource = {
       totalDueAfterTrial: 'Erääntyy kokeilun päätyttyä {{days}} päivän kuluttua',
     },
     credit: 'Hyvitys',
+    prorationCredit: 'Suhteutettu hyvitys',
+    accountCredit: 'Tilihyvitys',
     creditRemainder: 'Hyvitys nykyisen tilauksesi jäljellä olevalta ajalta.',
+    payerCreditRemainder: 'Hyvitys tilin saldosta.',
     defaultFreePlanActive: 'Olet tällä hetkellä ilmaisella tilauksella.',
     free: 'Ilmainen',
     getStarted: 'Aloita',
@@ -129,6 +133,8 @@ export const fiFI: LocalizationResource = {
     manage: 'Hallinnoi',
     manageSubscription: 'Hallinnoi tilausta',
     month: 'Kuukausi',
+    monthAbbreviation: 'kk',
+    monthPerUnit: 'Kuukausi per {{unitName}}',
     monthly: 'Kuukausittain',
     pastDue: 'Erääntynyt',
     pay: 'Maksa {{amount}}',
@@ -151,8 +157,22 @@ export const fiFI: LocalizationResource = {
     pricingTable: {
       billingCycle: 'Laskutusjakso',
       included: 'Sisältyy',
+      seatCost: {
+        freeUpToSeats: 'Ilmainen enintään {{endsAfterBlock}} paikalle',
+        upToSeats: 'Enintään {{endsAfterBlock}} paikkaa',
+        perSeat: '{{feePerBlockAmount}}/{{periodAbbreviation}} per paikka',
+        includedSeats: '{{includedSeats}} paikkaa sisältyy',
+        additionalSeats: '({{additionalTierFeePerBlockAmount}}/{{periodAbbreviation}} lisäpaikoista)',
+        unlimitedSeats: 'Rajattomasti paikkoja',
+        tooltip: {
+          freeForUpToSeats: 'Ilmainen enintään {{endsAfterBlock}} paikalle.',
+          additionalSeatsEach: 'Lisäpaikat {{feePerBlockAmount}}/{{period}} kappale.',
+          firstSeatsIncludedInPlan: 'Ensimmäiset {{endsAfterBlock}} paikkaa sisältyvät tilaukseen.',
+        },
+      },
     },
     reSubscribe: 'Tilaa uudelleen',
+    seats: 'Paikat',
     seeAllFeatures: 'Näytä kaikki ominaisuudet',
     startFreeTrial: 'Aloita ilmainen kokeilu',
     startFreeTrial__days: 'Aloita {{days}} päivän ilmainen kokeilu',
@@ -183,6 +203,8 @@ export const fiFI: LocalizationResource = {
     viewFeatures: 'Näytä ominaisuudet',
     viewPayment: 'Näytä maksu',
     year: 'Vuosi',
+    yearAbbreviation: 'v',
+    yearPerUnit: 'Vuosi per {{unitName}}',
   },
   createOrganization: {
     formButtonSubmit: 'Luo organisaatio',
@@ -224,13 +246,14 @@ export const fiFI: LocalizationResource = {
   formFieldInputPlaceholder__emailAddresses: 'esimerkki@domain.fi, esimerkki2@domain.fi',
   formFieldInputPlaceholder__firstName: 'Etunimi',
   formFieldInputPlaceholder__lastName: 'Sukunimi',
-  formFieldInputPlaceholder__organizationDomain: undefined,
-  formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
+  formFieldInputPlaceholder__organizationDomain: 'esimerkki.fi',
+  formFieldInputPlaceholder__organizationDomainEmailAddress: 'sinä@esimerkki.fi',
   formFieldInputPlaceholder__organizationName: 'Organisaation nimi',
   formFieldInputPlaceholder__organizationSlug: 'minun-org',
   formFieldInputPlaceholder__password: 'Syötä salasanasi',
+  formFieldInputPlaceholder__signUpPassword: 'Luo salasana',
   formFieldInputPlaceholder__phoneNumber: 'Syötä puhelinnumerosi',
-  formFieldInputPlaceholder__username: undefined,
+  formFieldInputPlaceholder__username: 'Syötä käyttäjänimesi',
   formFieldInput__emailAddress_format: 'Esimerkki: nimi@esimerkki.fi',
   formFieldLabel__apiKey: 'API-avain',
   formFieldLabel__apiKeyDescription: 'Kuvaus',
@@ -324,6 +347,7 @@ export const fiFI: LocalizationResource = {
         empty: 'Ei tositteita näytettäväksi',
         itemCaption__paidForPlan: 'Maksettu {{plan}} {{period}} -tilauksesta',
         itemCaption__proratedCredit: 'Suhteutettu hyvitys edellisen tilauksen osittaisesta käytöstä',
+        itemCaption__payerCredit: 'Hyvitys tilin saldosta',
         itemCaption__subscribedAndPaidForPlan: 'Tilattu ja maksettu {{plan}} {{period}} -tilaus',
         notFound: 'Tosite ei löytynyt',
         tableHeader__amount: 'Summa',
@@ -421,6 +445,8 @@ export const fiFI: LocalizationResource = {
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'Sinulla ei ole oikeuksia hallinnoida tämän organisaation laskutusta.',
+        planMembershipLimitExceeded:
+          'Organisaatiossasi on {{count}} jäsentä (sisältäen odottavat kutsut). Tämä paketti sallii vain {{limit}} jäsentä.',
       },
       title: 'Tilaukset',
     },
@@ -464,6 +490,7 @@ export const fiFI: LocalizationResource = {
     start: {
       headerTitle__general: 'Yleinen',
       headerTitle__members: 'Jäsenet',
+      membershipSeatUsageLabel: '{{count}} / {{limit}} paikkaa käytössä',
       profileSection: {
         primaryButton: 'Päivitä profiili',
         title: 'Organisaation profiili',
@@ -710,13 +737,13 @@ export const fiFI: LocalizationResource = {
       title: 'Syötä salasanasi',
     },
     passwordCompromised: {
-      title: undefined,
+      title: 'Salasana vaarantunut',
     },
     passwordPwned: {
       title: 'Salasana tietomurrossa',
     },
     passwordUntrusted: {
-      title: undefined,
+      title: 'Salasana epäluotettava',
     },
     phoneCode: {
       formTitle: 'Vahvistuskoodi',
@@ -758,7 +785,7 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Tervetuloa takaisin! Kirjaudu sisään jatkaaksesi',
       subtitleCombined: undefined,
       title: 'Kirjaudu sisään',
-      titleCombined: undefined,
+      titleCombined: 'Jatka kohteeseen {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Todennuskoodi',
@@ -894,8 +921,8 @@ export const fiFI: LocalizationResource = {
       title: 'Määritä organisaatiosi',
     },
     organizationCreationDisabled: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Ota yhteyttä organisaatiosi ylläpitäjään saadaksesi kutsun.',
+      title: 'Sinun on kuuluttava organisaatioon',
     },
     signOut: {
       actionLink: 'Kirjaudu ulos',
@@ -908,74 +935,84 @@ export const fiFI: LocalizationResource = {
       actionLink: 'Kirjaudu ulos',
       actionText: 'Kirjautuneena käyttäjänä {{identifier}}',
     },
-    subtitle: undefined,
-    title: undefined,
+    subtitle: 'Tilisi vaatii uuden salasanan ennen kuin voit jatkaa',
+    title: 'Nollaa salasanasi',
   },
   taskSetupMfa: {
-    badge: undefined,
+    badge: 'Kaksivaiheisen todennuksen asennus',
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Kirjaudu ulos',
+      actionText: 'Kirjautuneena käyttäjänä {{identifier}}',
     },
     smsCode: {
       addPhone: {
-        formButtonPrimary: undefined,
-        infoText: undefined,
+        formButtonPrimary: 'Jatka',
+        infoText:
+          'Vahvistuskoodin sisältävä tekstiviesti lähetetään tähän puhelinnumeroon. Viesti- ja tiedonsiirtomaksuja saatetaan periä.',
       },
-      addPhoneNumber: undefined,
-      cancel: undefined,
-      subtitle: undefined,
+      addPhoneNumber: 'Lisää puhelinnumero',
+      cancel: 'Peruuta',
+      subtitle: 'Valitse puhelinnumero, jota haluat käyttää SMS-koodin kaksivaiheiseen todennukseen',
       success: {
-        finishButton: undefined,
-        message1: undefined,
-        message2: undefined,
-        title: undefined,
+        finishButton: 'Jatka',
+        message1:
+          'Kaksivaiheinen todennus on nyt käytössä. Kirjautuessasi sinun on syötettävä tähän puhelinnumeroon lähetetty vahvistuskoodi lisävaiheena.',
+        message2:
+          'Tallenna nämä varakoodit ja säilytä ne turvallisessa paikassa. Jos menetät pääsyn todennuslaitteeseesi, voit käyttää varakoodeja kirjautuaksesi sisään.',
+        title: 'SMS-koodin todennus käytössä',
       },
-      title: undefined,
+      title: 'Lisää SMS-koodin todennus',
       verifyPhone: {
-        formButtonPrimary: undefined,
-        formTitle: undefined,
-        resendButton: undefined,
-        subtitle: undefined,
-        title: undefined,
+        formButtonPrimary: 'Jatka',
+        formTitle: 'Vahvistuskoodi',
+        resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
+        subtitle: 'Syötä vahvistuskoodi, joka lähetettiin numeroon',
+        title: 'Vahvista puhelinnumerosi',
       },
     },
     start: {
       methodSelection: {
-        phoneCode: undefined,
-        totp: undefined,
+        phoneCode: 'SMS-koodi',
+        totp: 'Todennussovellus',
       },
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Valitse menetelmä, jolla haluat suojata tilisi ylimääräisellä turvallisuustasolla',
+      title: 'Ota kaksivaiheinen todennus käyttöön',
     },
     totpCode: {
       addAuthenticatorApp: {
-        buttonAbleToScan__nonPrimary: undefined,
-        buttonUnableToScan__nonPrimary: undefined,
-        formButtonPrimary: undefined,
-        formButtonReset: undefined,
-        infoText__ableToScan: undefined,
-        infoText__unableToScan: undefined,
-        inputLabel__unableToScan1: undefined,
+        buttonAbleToScan__nonPrimary: 'Skannaa sen sijaan QR-koodi',
+        buttonUnableToScan__nonPrimary: 'Etkö voi skannata QR-koodia?',
+        formButtonPrimary: 'Jatka',
+        formButtonReset: 'Peruuta',
+        infoText__ableToScan:
+          'Aseta uusi kirjautumistapa todennussovellukseesi ja skannaa seuraava QR-koodi linkittääksesi se tilillesi.',
+        infoText__unableToScan: 'Aseta uusi kirjautumistapa todennussovellukseesi ja syötä alla annettu avain.',
+        inputLabel__unableToScan1:
+          'Varmista, että Aikaperusteiset tai Yksittäiset salasanat on käytössä ja viimeistele tilin linkitys.',
       },
       success: {
-        finishButton: undefined,
-        message1: undefined,
-        message2: undefined,
-        title: undefined,
+        finishButton: 'Jatka',
+        message1:
+          'Kaksivaiheinen todennus on nyt käytössä. Kirjautuessasi sinun on syötettävä vahvistuskoodi tästä todennussovelluksesta lisävaiheena.',
+        message2:
+          'Tallenna nämä varakoodit ja säilytä ne turvallisessa paikassa. Jos menetät pääsyn todennuslaitteeseesi, voit käyttää varakoodeja kirjautuaksesi sisään.',
+        title: 'Todennussovelluksen todennus käytössä',
       },
-      title: undefined,
+      title: 'Lisää todennussovellus',
       verifyTotp: {
-        formButtonPrimary: undefined,
-        formButtonReset: undefined,
-        formTitle: undefined,
-        subtitle: undefined,
-        title: undefined,
+        formButtonPrimary: 'Jatka',
+        formButtonReset: 'Peruuta',
+        formTitle: 'Vahvistuskoodi',
+        subtitle: 'Syötä todennussovelluksesi luoma vahvistuskoodi',
+        title: 'Lisää todennussovellus',
       },
     },
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} on jo tämän organisaation jäsen.',
+    api_key_name_already_exists: 'API-avaimen nimi on jo olemassa.',
+    api_key_usage_exceeded:
+      'Olet saavuttanut käyttörajasi. Voit poistaa rajoituksen siirtymällä maksulliseen tilaukseen.',
     avatar_file_size_exceeded: 'Tiedostokoko ylittää enimmäisrajan 10 Mt. Valitse pienempi tiedosto.',
     avatar_file_type_invalid: 'Tiedostotyyppiä ei tueta. Lataa JPG-, PNG-, GIF- tai WEBP-kuva.',
     captcha_invalid:
@@ -989,7 +1026,7 @@ export const fiFI: LocalizationResource = {
     form_identifier_exists__phone_number: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     form_identifier_exists__username: 'Tämä käyttäjänimi on jo käytössä. Kokeile toista.',
     form_identifier_not_found: 'Ei voi löytää tiliä näillä tiedoilla.',
-    form_new_password_matches_current: undefined,
+    form_new_password_matches_current: 'Uusi salasana ei voi olla sama kuin nykyinen salasana.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Sähköpostiosoiteen tulee olla kelvollinen.',
     form_param_format_invalid__phone_number: 'Puhelinnumeron on oltava kelvollisessa kansainvälisessä muodossa',
@@ -1003,7 +1040,7 @@ export const fiFI: LocalizationResource = {
     form_param_value_invalid: undefined,
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_length_too_short: undefined,
+    form_password_length_too_short: 'Salasanasi on liian lyhyt. Sen on oltava vähintään 8 merkkiä pitkä.',
     form_password_not_strong_enough: 'Salasana ei ole riittävän vahva.',
     form_password_or_identifier_incorrect:
       'Salasana tai sähköpostiosoite on väärä. Yritä uudelleen tai käytä toista menetelmää.',
@@ -1011,10 +1048,11 @@ export const fiFI: LocalizationResource = {
     form_password_pwned__sign_in: 'Salasana on ollut mukana julkisissa tietovuodoissa. Vaihdathan salasanasi.',
     form_password_size_in_bytes_exceeded:
       'Salasanasi on ylittänyt sallitun tavumäärän, lyhennä sitä tai poista joitain erikoismerkkejä.',
-    form_password_untrusted__sign_in: undefined,
+    form_password_untrusted__sign_in:
+      'Salasanasi on saattanut vaarantua. Tilisi suojaamiseksi jatka vaihtoehtoisella kirjautumismenetelmällä. Sinun on vaihdettava salasanasi kirjautumisen jälkeen.',
     form_password_validation_failed: 'Väärä salasana.',
     form_username_invalid_character: undefined,
-    form_username_invalid_length: undefined,
+    form_username_invalid_length: 'Käyttäjänimen on oltava {{min_length}}–{{max_length}} merkkiä pitkä.',
     form_username_needs_non_number_char: 'Käyttäjänimessä tulee olla vähintään yksi ei-numeerinen merkki.',
     identification_deletion_failed: 'Et voi poistaa viimeistä henkilöllisyyttäsi.',
     not_allowed_access:
@@ -1022,7 +1060,8 @@ export const fiFI: LocalizationResource = {
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
-    organization_membership_quota_exceeded: undefined,
+    organization_membership_quota_exceeded:
+      'Olet saavuttanut organisaation jäsenmäärän ylärajan, mukaan lukien odottavat kutsut.',
     organization_minimum_permissions_needed: undefined,
     organization_not_found_or_unauthorized:
       'Et ole enää tämän organisaation jäsen. Valitse tai luo toinen organisaatio.',
@@ -1151,6 +1190,7 @@ export const fiFI: LocalizationResource = {
         empty: 'Ei tositteita näytettäväksi',
         itemCaption__paidForPlan: 'Maksettu {{plan}} {{period}} -paketista',
         itemCaption__proratedCredit: 'Suhteutettu hyvitys edellisen tilauksen osittaisesta käytöstä',
+        itemCaption__payerCredit: 'Hyvitys tilin saldosta',
         itemCaption__subscribedAndPaidForPlan: 'Tilattu ja maksettu {{plan}} {{period}} -paketti',
         notFound: 'Tosite ei löytynyt',
         tableHeader__amount: 'Summa',
