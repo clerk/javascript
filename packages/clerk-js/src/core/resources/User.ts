@@ -403,9 +403,7 @@ export class User extends BaseResource implements UserResource {
 
     return {
       total_count: payload?.total_count ?? 0,
-      data: (payload?.data ?? []).map(
-        (row: EnterpriseConnectionTestRunJSON) => new EnterpriseConnectionTestRun(row, enterpriseConnectionId),
-      ),
+      data: (payload?.data ?? []).map((row: EnterpriseConnectionTestRunJSON) => new EnterpriseConnectionTestRun(row)),
     };
   };
 
