@@ -386,7 +386,7 @@ export class User extends BaseResource implements UserResource {
     params?: GetEnterpriseConnectionTestRunsParams,
   ): Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>> => {
     const { status, ...rest } = params || {};
-    const search = convertPageToOffsetSearchParams({ ...rest, paginated: true });
+    const search = convertPageToOffsetSearchParams(rest);
     if (status?.length) {
       for (const s of status) {
         search.append('status', s);
