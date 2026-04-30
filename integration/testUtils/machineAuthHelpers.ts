@@ -349,34 +349,40 @@ export const registerM2MAuthTests = (adapter: MachineAuthTestAdapter): void => {
       const u = createTestUtils({ app, page, context });
 
       await u.services.clerk.machines.createScope(network.unscopedSender.id, network.primaryServer.id);
-      const m2mToken = await u.services.clerk.m2m.createToken({
-        machineSecretKey: network.unscopedSender.secretKey,
-        secondsUntilExpiration: 60 * 30,
-      });
+
+      const url = new URL(adapter.m2m.path, app.serverUrl).toString();
+      const issuedTokenIds: string[] = [];
 
       try {
-        const url = new URL(adapter.m2m.path, app.serverUrl).toString();
-        const headers = { Authorization: `Bearer ${m2mToken.token}` };
-
-        // Newly granted scopes can take a moment to propagate before the M2M
-        // token is accepted, so poll until the request is authorized.
+        // The new scope can take a moment to propagate to token-issuance, so
+        // mint a fresh token on each poll iteration and stop once the issued
+        // token is accepted by the primary server.
         let body: { subject: string; tokenType: string } | undefined;
         await expect
           .poll(
             async () => {
-              const res = await u.page.request.get(url, { headers });
+              const m2mToken = await u.services.clerk.m2m.createToken({
+                machineSecretKey: network.unscopedSender.secretKey,
+                secondsUntilExpiration: 60 * 30,
+              });
+              issuedTokenIds.push(m2mToken.id);
+              const res = await u.page.request.get(url, {
+                headers: { Authorization: `Bearer ${m2mToken.token}` },
+              });
               if (res.status() !== 200) return res.status();
               body = await res.json();
               return 200;
             },
-            { timeout: 10_000, intervals: [250, 500, 1000, 1000, 2000] },
+            { timeout: 30_000, intervals: [500, 1000, 2000, 2000, 3000] },
           )
           .toBe(200);
 
         expect(body!.subject).toBe(network.unscopedSender.id);
         expect(body!.tokenType).toBe(TokenType.M2MToken);
       } finally {
-        await u.services.clerk.m2m.revokeToken({ m2mTokenId: m2mToken.id });
+        for (const id of issuedTokenIds) {
+          await u.services.clerk.m2m.revokeToken({ m2mTokenId: id }).catch(() => {});
+        }
       }
     });
 
