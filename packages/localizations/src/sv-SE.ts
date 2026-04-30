@@ -178,6 +178,11 @@ export const svSE: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Konfigurera enkel inloggning (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Skapa organisation',
     invitePage: {

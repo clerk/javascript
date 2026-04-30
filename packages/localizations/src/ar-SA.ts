@@ -178,6 +178,11 @@ export const arSA: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'تكوين تسجيل الدخول الموحد (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'أنشاء منظمة',
     invitePage: {

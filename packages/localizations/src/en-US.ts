@@ -197,6 +197,11 @@ export const enUS: LocalizationResource = {
     yearAbbreviation: 'yr',
     yearPerUnit: 'Year per {{unitName}}',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Configure Single Sign-On (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Create organization',
     invitePage: {

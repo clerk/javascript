@@ -178,6 +178,11 @@ export const hrHR: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Konfiguriraj jedinstvenu prijavu (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'kreiraj organizaciju',
     invitePage: {

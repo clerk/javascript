@@ -184,6 +184,11 @@ export const roRO: LocalizationResource = {
     viewPayment: 'Vezi plata',
     year: 'An',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Configurați autentificarea unică (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Creează organizație',
     invitePage: {

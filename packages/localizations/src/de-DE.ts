@@ -184,6 +184,11 @@ export const deDE: LocalizationResource = {
     viewPayment: 'Zahlung anzeigen',
     year: 'Jahr',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Single Sign-On (SSO) konfigurieren',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Organisation erstellen',
     invitePage: {

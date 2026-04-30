@@ -178,6 +178,11 @@ export const nbNO: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Konfigurer enkeltpålogging (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Opprett organisasjon',
     invitePage: {

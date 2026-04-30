@@ -178,6 +178,11 @@ export const ukUA: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Налаштувати єдиний вхід (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Створити організацію',
     invitePage: {
