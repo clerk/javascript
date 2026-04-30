@@ -1093,8 +1093,6 @@ export type Appearance<T = Theme> = T &
     apiKeys?: T;
     /**
      * Theme overrides that only apply to the `<ConfigureSSO />` component
-     *
-     * @experimental This appearance key is in early access and may change in future releases.
      */
     __experimental_configureSSO?: T;
     /**
