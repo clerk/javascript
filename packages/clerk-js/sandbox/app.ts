@@ -475,7 +475,7 @@ void (async () => {
         description: scope === 'offline_access' ? null : `Grants access to your ${scope}`,
         requires_consent: true,
       }));
-      Clerk.__internal_mountOAuthConsent(
+      Clerk.mountOAuthConsent(
         app,
         componentControls.oauthConsent.getProps() ?? {
           scopes,

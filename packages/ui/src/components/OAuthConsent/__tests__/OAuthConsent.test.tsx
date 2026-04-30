@@ -208,9 +208,9 @@ describe('OAuthConsent', () => {
       f.withUser({ email_addresses: ['jane@example.com'] });
     });
 
-    // Simulate the accounts portal path: `clerk.__internal_mountOAuthConsent` is
+    // Simulate the accounts portal path: `clerk.mountOAuthConsent` is
     // called with the legacy `oAuth*` (capital-A) prop shape from
-    // `__internal_OAuthConsentProps`. The `ComponentContextProvider` translates
+    // `OAuthConsentProps`. The `ComponentContextProvider` translates
     // these to the lowercase `oauth*` shape that the component reads from context
     // (see the `case 'OAuthConsent':` block in ClerkUIComponentsContext.tsx).
     // This test verifies the translation end-to-end: if it were broken, the

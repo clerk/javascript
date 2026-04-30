@@ -7,6 +7,7 @@ import type {
   __internal_CheckoutProps,
   __internal_EnableOrganizationsPromptProps,
   __internal_OAuthConsentProps,
+  OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
@@ -1296,6 +1297,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     } else {
       this.premountOAuthConsentNodes.delete(node);
     }
+  };
+
+  mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {
+    this.__internal_mountOAuthConsent(node, props);
+  };
+
+  unmountOAuthConsent = (node: HTMLDivElement) => {
+    this.__internal_unmountOAuthConsent(node);
   };
 
   mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps): void => {

@@ -6,6 +6,7 @@ export { default as CreateOrganization } from './ui-components/CreateOrganizatio
 export { default as OrganizationList } from './ui-components/OrganizationList.vue';
 export { default as PricingTable } from './ui-components/PricingTable.vue';
 export { default as APIKeys } from './ui-components/APIKeys.vue';
+export { default as OAuthConsent } from './ui-components/OAuthConsent.vue';
 export { UserProfile } from './ui-components/UserProfile';
 export { OrganizationProfile } from './ui-components/OrganizationProfile';
 export { OrganizationSwitcher } from './ui-components/OrganizationSwitcher';
