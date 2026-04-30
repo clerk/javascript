@@ -27,6 +27,14 @@ function getPrefetchUIFromEnv(): boolean | undefined {
   return undefined;
 }
 
+function getUnsafeDisableDevelopmentModeConsoleWarningFromEnv(): boolean | undefined {
+  const value =
+    getEnvVariable('VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING') ||
+    getEnvVariable('CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING');
+
+  return value ? isTruthy(value) : undefined;
+}
+
 export function getResponseClerkState(requestState: RequestState, additionalStateOptions: AdditionalStateOptions = {}) {
   const { reason, message, isSignedIn, ...rest } = requestState;
 
@@ -48,6 +56,7 @@ export function getResponseClerkState(requestState: RequestState, additionalStat
     __prefetchUI: getPrefetchUIFromEnv(),
     __telemetryDisabled: isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED')),
     __telemetryDebug: isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG')),
+    __unsafeDisableDevelopmentModeConsoleWarning: getUnsafeDisableDevelopmentModeConsoleWarningFromEnv(),
     __signInForceRedirectUrl:
       additionalStateOptions.signInForceRedirectUrl || getEnvVariable('CLERK_SIGN_IN_FORCE_REDIRECT_URL') || '',
     __signUpForceRedirectUrl:
