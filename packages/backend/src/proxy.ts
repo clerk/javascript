@@ -297,15 +297,12 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
 
   try {
     // Make the proxied request
-    // TODO: Restore abort cascade via an in-realm AbortController bridge,
-    // and consider adding AbortSignal.timeout(30_000) via AbortSignal.any().
-    // `request.signal` is intentionally omitted: Node 24's bundled undici
-    // tightened the instanceof AbortSignal check on RequestInit.signal, which
-    // rejects cross-realm signals carried by framework Request subclasses.
+    // TODO: Consider adding AbortSignal.timeout(30_000) via AbortSignal.any()
     const fetchOptions: RequestInit = {
       method: request.method,
       headers,
       redirect: 'manual',
+      signal: request.signal,
     };
 
     // Only set duplex when body is present (required for streaming bodies)
