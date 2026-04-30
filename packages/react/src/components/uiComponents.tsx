@@ -1,7 +1,7 @@
 import type {
+  __experimental_ConfigureSSOProps,
   __internal_OAuthConsentProps,
   APIKeysProps,
-  ConfigureSSOProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -649,7 +649,7 @@ export const APIKeys = withClerk(
  * @experimental This component is in early access and may change in future releases.
  */
 export const ConfigureSSO = withClerk(
-  ({ clerk, component, fallback, ...props }: WithClerkProp<ConfigureSSOProps & FallbackProp>) => {
+  ({ clerk, component, fallback, ...props }: WithClerkProp<__experimental_ConfigureSSOProps & FallbackProp>) => {
     const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
@@ -663,8 +663,8 @@ export const ConfigureSSO = withClerk(
         {clerk.loaded && (
           <ClerkHostRenderer
             component={component}
-            mount={clerk.mountConfigureSSO}
-            unmount={clerk.unmountConfigureSSO}
+            mount={clerk.__experimental_mountConfigureSSO}
+            unmount={clerk.__experimental_unmountConfigureSSO}
             updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}

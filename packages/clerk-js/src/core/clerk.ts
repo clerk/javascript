@@ -53,6 +53,7 @@ import {
 } from '@clerk/shared/telemetry';
 import type {
   __experimental_CheckoutOptions,
+  __experimental_ConfigureSSOProps,
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
   __internal_CheckoutProps,
@@ -71,13 +72,12 @@ import type {
   AuthenticateWithSolanaParams,
   BillingNamespace,
   CheckoutSignalValue,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
-  ConfigureSSOProps,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -523,7 +523,7 @@ export class Clerk implements ClerkInterface {
     ) {
       // Typing this.#options as ClerkOptions to ensure proper type checking. TypeScript will infer the type as `never`
       // since missing both `routerPush` and `routerReplace` is not a valid ClerkOptions.
-      const options = this.#options as ClerkOptions;
+      const options = this.#options;
       const missingRouter = !options.routerPush ? 'routerPush' : 'routerReplace';
       logger.warnOnce(
         `Clerk: Both \`routerPush\` and \`routerReplace\` need to be defined, but \`${missingRouter}\` is not defined. This may cause issues with navigation in your application.`,
@@ -1429,10 +1429,12 @@ export class Clerk implements ClerkInterface {
 
   /**
    * Mount a configure SSO component at the target element.
+   *
+   * @experimental
    * @param targetNode Target to mount the ConfigureSSO component.
    * @param props Configuration parameters.
    */
-  public mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
+  public __experimental_mountConfigureSSO = (node: HTMLDivElement, props?: __experimental_ConfigureSSOProps) => {
     this.assertComponentsReady(this.#clerkUI);
     const component = 'ConfigureSSO';
     void this.#clerkUI
@@ -1440,7 +1442,7 @@ export class Clerk implements ClerkInterface {
       .then(controls =>
         controls.mountComponent({
           name: component,
-          appearanceKey: 'configureSSO',
+          appearanceKey: '__experimental_configureSSO',
           node,
           props,
         }),
@@ -1453,9 +1455,10 @@ export class Clerk implements ClerkInterface {
    * Unmount a configure SSO component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
+   * @experimental
    * @param targetNode Target node to unmount the ConfigureSSO component from.
    */
-  public unmountConfigureSSO = (node: HTMLDivElement) => {
+  public __experimental_unmountConfigureSSO = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
@@ -2981,8 +2984,8 @@ export class Clerk implements ClerkInterface {
     this.#authService = await AuthCookieService.create(
       this,
       this.#fapiClient,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.#instanceType!,
+
+      this.#instanceType,
       this.#publicEventBus,
     );
 
