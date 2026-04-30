@@ -335,7 +335,7 @@ export class User extends BaseResource implements UserResource {
       await BaseResource._fetch<EnterpriseConnectionJSON>({
         path: `${this.path()}/enterprise_connections`,
         method: 'POST',
-        body: deepCamelToSnake(params) as any,
+        body: toMeEnterpriseConnectionBody(params) as any,
       })
     )?.response as unknown as EnterpriseConnectionJSON;
 
@@ -350,7 +350,7 @@ export class User extends BaseResource implements UserResource {
       await BaseResource._fetch<EnterpriseConnectionJSON>({
         path: `${this.path()}/enterprise_connections/${enterpriseConnectionId}`,
         method: 'PATCH',
-        body: deepCamelToSnake(params) as any,
+        body: toMeEnterpriseConnectionBody(params) as any,
       })
     )?.response as unknown as EnterpriseConnectionJSON;
 
@@ -547,4 +547,31 @@ export class User extends BaseResource implements UserResource {
       created_at: this.createdAt?.getTime() || null,
     };
   }
+}
+
+/**
+ * Serializes `CreateMeEnterpriseConnectionParams` / `UpdateMeEnterpriseConnectionParams`
+ * for the `/me/enterprise_connections` FAPI endpoints.
+ *
+ * Uses `deepCamelToSnake` but preserves `saml.attributeMapping` and `customAttributes` as-is. Their keys are
+ * user-supplied data and must not be camel→snake transformed.
+ */
+function toMeEnterpriseConnectionBody(
+  params: CreateMeEnterpriseConnectionParams | UpdateMeEnterpriseConnectionParams,
+): Record<string, unknown> {
+  const originalAttributeMapping =
+    params.saml && typeof params.saml === 'object' ? params.saml.attributeMapping : undefined;
+  const originalCustomAttributes = 'customAttributes' in params ? params.customAttributes : undefined;
+
+  const body = deepCamelToSnake(params) as Record<string, any>;
+
+  if (originalAttributeMapping !== undefined && body.saml && typeof body.saml === 'object') {
+    body.saml.attribute_mapping = originalAttributeMapping;
+  }
+
+  if (originalCustomAttributes !== undefined) {
+    body.custom_attributes = originalCustomAttributes;
+  }
+
+  return body;
 }
