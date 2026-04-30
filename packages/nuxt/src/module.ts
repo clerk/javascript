@@ -188,14 +188,29 @@ export default defineNuxtModule<ModuleOptions>({
       'Waitlist',
       // API Keys
       'APIKeys',
-      // SSO
-      'ConfigureSSO',
     ];
     otherComponents.forEach(component => {
       void addComponent({
         name: component,
         export: component,
         filePath: '@clerk/vue',
+      });
+    });
+
+    /**
+     * Experimental components from `@clerk/vue/experimental`.
+     * @experimental These components and their prop types are unstable and may change in future releases.
+     */
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    const experimentalComponents: Array<keyof typeof import('@clerk/vue/experimental')> = [
+      // SSO
+      'ConfigureSSO',
+    ];
+    experimentalComponents.forEach(component => {
+      void addComponent({
+        name: component,
+        export: component,
+        filePath: '@clerk/vue/experimental',
       });
     });
   },

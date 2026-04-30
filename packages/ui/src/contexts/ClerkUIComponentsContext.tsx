@@ -1,7 +1,7 @@
 import type {
+  __experimental_ConfigureSSOProps,
   __internal_OAuthConsentProps,
   APIKeysProps,
-  ConfigureSSOProps,
   PricingTableProps,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
@@ -118,7 +118,7 @@ export function ComponentContextProvider({
       );
     case 'ConfigureSSO':
       return (
-        <ConfigureSSOContext.Provider value={{ componentName, ...(props as ConfigureSSOProps) }}>
+        <ConfigureSSOContext.Provider value={{ componentName, ...(props as __experimental_ConfigureSSOProps) }}>
           {children}
         </ConfigureSSOContext.Provider>
       );

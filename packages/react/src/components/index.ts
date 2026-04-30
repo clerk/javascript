@@ -1,6 +1,5 @@
 export {
   APIKeys,
-  ConfigureSSO,
   CreateOrganization,
   GoogleOneTap,
   OrganizationList,

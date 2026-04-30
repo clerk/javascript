@@ -664,18 +664,22 @@ export interface Clerk {
   /**
    * Mount a configure SSO component at the target element.
    *
+   * @experimental This method is in early access and may change in future releases.
+   *
    * @param targetNode - Target to mount the ConfigureSSO component.
    * @param props - Configuration parameters.
    */
-  mountConfigureSSO: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
+  __experimental_mountConfigureSSO: (targetNode: HTMLDivElement, props?: __experimental_ConfigureSSOProps) => void;
 
   /**
    * Unmount a configure SSO component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
+   * @experimental This method is in early access and may change in future releases.
+   *
    * @param targetNode - Target node to unmount the ConfigureSSO component from.
    */
-  unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
+  __experimental_unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a OAuth consent component at the target element.
@@ -2140,7 +2144,10 @@ export type APIKeysProps = {
   showDescription?: boolean;
 };
 
-export type ConfigureSSOProps = {
+/**
+ * @experimental This type is in early access and may change in future releases.
+ */
+export type __experimental_ConfigureSSOProps = {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`

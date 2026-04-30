@@ -1,4 +1,5 @@
 import type {
+  __experimental_ConfigureSSOProps,
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
@@ -6,7 +7,6 @@ import type {
   __internal_UserVerificationProps,
   APIKeysProps,
   ClerkAppearanceTheme,
-  ConfigureSSOProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   NewSubscriptionRedirectUrl,
@@ -65,7 +65,7 @@ export type AvailableComponentProps =
   | __internal_SubscriptionDetailsProps
   | __internal_PlanDetailsProps
   | APIKeysProps
-  | ConfigureSSOProps
+  | __experimental_ConfigureSSOProps
   | __internal_OAuthConsentProps
   | TaskChooseOrganizationProps
   | TaskResetPasswordProps
@@ -147,7 +147,7 @@ export type APIKeysCtx = APIKeysProps & {
   mode?: ComponentMode;
 };
 
-export type ConfigureSSOCtx = ConfigureSSOProps & {
+export type ConfigureSSOCtx = __experimental_ConfigureSSOProps & {
   componentName: 'ConfigureSSO';
   mode?: ComponentMode;
 };

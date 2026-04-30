@@ -1014,7 +1014,7 @@ export type CheckoutTheme = Theme;
 export type PlanDetailTheme = Theme;
 export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
-export type ConfigureSSOTheme = Theme;
+export type __experimental_ConfigureSSOTheme = Theme;
 export type OAuthConsentTheme = Theme;
 export type TaskChooseOrganizationTheme = Theme;
 export type TaskResetPasswordTheme = Theme;
@@ -1093,8 +1093,10 @@ export type Appearance<T = Theme> = T &
     apiKeys?: T;
     /**
      * Theme overrides that only apply to the `<ConfigureSSO />` component
+     *
+     * @experimental This appearance key is in early access and may change in future releases.
      */
-    configureSSO?: T;
+    __experimental_configureSSO?: T;
     /**
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */

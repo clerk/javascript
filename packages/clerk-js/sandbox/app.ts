@@ -471,7 +471,7 @@ void (async () => {
       Clerk.mountAPIKeys(app, componentControls.apiKeys.getProps() ?? {});
     },
     '/configure-sso': () => {
-      Clerk.mountConfigureSSO(app, componentControls.configureSSO.getProps() ?? {});
+      Clerk.__experimental_mountConfigureSSO(app, componentControls.configureSSO.getProps() ?? {});
     },
     '/oauth-consent': () => {
       const searchParams = new URLSearchParams(window.location.search);

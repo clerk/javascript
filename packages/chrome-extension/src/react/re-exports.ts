@@ -5,7 +5,6 @@ export {
   ClerkFailed,
   ClerkLoaded,
   ClerkLoading,
-  ConfigureSSO,
   CreateOrganization,
   HandleSSOCallback,
   OrganizationList,

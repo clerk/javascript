@@ -1,4 +1,4 @@
-import type { ConfigureSSOProps } from '@clerk/shared/types';
+import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { withCoreUserGuard } from '@/contexts';
@@ -40,4 +40,5 @@ const AuthenticatedContent = withCoreUserGuard(() => {
   );
 });
 
-export const ConfigureSSO: React.ComponentType<ConfigureSSOProps> = withCardStateProvider(ConfigureSSOInternal);
+export const ConfigureSSO: React.ComponentType<__experimental_ConfigureSSOProps> =
+  withCardStateProvider(ConfigureSSOInternal);

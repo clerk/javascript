@@ -13,7 +13,6 @@ import { useEnforceCorrectRoutingProps } from './hooks/useEnforceRoutingProps';
 
 export {
   APIKeys,
-  ConfigureSSO,
   CreateOrganization,
   GoogleOneTap,
   OrganizationList,
