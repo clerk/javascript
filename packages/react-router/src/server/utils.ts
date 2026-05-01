@@ -102,6 +102,7 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __prefetchUI: envVars.prefetchUI,
     __telemetryDisabled: envVars.telemetryDisabled,
     __telemetryDebug: envVars.telemetryDebug,
+    __unsafeDisableDevelopmentModeConsoleWarning: envVars.unsafeDisableDevelopmentModeConsoleWarning,
   };
 
   if (canUseKeyless && __keylessClaimUrl) {
