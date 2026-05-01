@@ -1,5 +1,5 @@
 import type {
-  __internal_OAuthConsentProps,
+  OAuthConsentProps,
   APIKeysProps,
   PricingTableProps,
   TaskChooseOrganizationProps,
@@ -119,7 +119,7 @@ export function ComponentContextProvider({
       // the lowercase `oauth*` context shape the component reads.
       // The public `<OAuthConsent />` wrapper also forwards `oauthClientId`
       // and `scope` through the same path.
-      const p = props as __internal_OAuthConsentProps;
+      const p = props as OAuthConsentProps;
       return (
         <OAuthConsentContext.Provider
           value={{
