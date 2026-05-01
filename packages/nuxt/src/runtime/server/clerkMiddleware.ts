@@ -4,10 +4,8 @@ import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandl
 import { isMalformedURLError } from '@clerk/shared/pathMatcher';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { EventHandler } from 'h3';
-import { createError, eventHandler, setResponseHeader } from 'h3';
 
-// @ts-expect-error: Nitro import. Handled by Nuxt.
-import { useRuntimeConfig } from '#imports';
+import { createError, eventHandler, setResponseHeader, useRuntimeConfig } from '#imports';
 
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';

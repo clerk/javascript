@@ -10,7 +10,10 @@
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "#imports": ["./src/runtime/types/nitro-server"]
+    }
   },
   "include": ["src"]
 }
