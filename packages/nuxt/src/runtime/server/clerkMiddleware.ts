@@ -25,13 +25,13 @@ interface ClerkMiddleware {
    * @example
    * export default clerkMiddleware((event) => { ... }, options);
    */
-  (handler: EventHandler, options?: AuthenticateRequestOptions): ReturnType<typeof eventHandler>;
+  (handler: EventHandler, options?: AuthenticateRequestOptions): EventHandler;
 
   /**
    * @example
    * export default clerkMiddleware(options);
    */
-  (options?: AuthenticateRequestOptions): ReturnType<typeof eventHandler>;
+  (options?: AuthenticateRequestOptions): EventHandler;
 }
 
 /**
