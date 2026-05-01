@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/query-core';
 import { vi } from 'vitest';
 
-import { __setClerkQueryClientForTest } from '../../../clerk-rq/clerk-query-client';
+import { __setClerkQueryClientForTest } from '@/react/clerk-rq/clerk-query-client';
 
 /**
  * Builds a deterministic QueryClient and installs it as the shared singleton.
