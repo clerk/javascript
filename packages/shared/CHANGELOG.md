@@ -1,5 +1,35 @@
 # Change Log
 
+## 4.8.7
+
+### Patch Changes
+
+- Raise the `@tanstack/query-core` floor to `^5.100.6` in the repo catalog and consume it from `@clerk/shared` and `@clerk/clerk-js` so the version baked into the production `clerk-js` CDN bundle stays in lockstep with what consumer-side `@clerk/shared` resolves to. ([#8432](https://github.com/clerk/javascript/pull/8432)) by [@jacekradko](https://github.com/jacekradko)
+
+  Fixes a runtime crash (`TypeError: e.isFetched is not a function`) introduced when consumer dedupe resolved `query-core` to `5.100.x` (which adds `Query.isFetched()`) while the published CDN bundle still embedded `5.90.16`. The new `QueryObserver` then called `isFetched()` on `Query` objects from the older bundled version.
+
+## 4.8.6
+
+### Patch Changes
+
+- Auto-proxy FAPI requests for `.vercel.app` subdomains. When deployed to a `.vercel.app` domain without explicit proxy or domain configuration, the SDK automatically routes Frontend API requests through `/__clerk` on the app's own origin. This enables Clerk production mode on Vercel deployments without manual proxy setup. ([#8035](https://github.com/clerk/javascript/pull/8035)) by [@brkalow](https://github.com/brkalow)
+
+- Loosen `@tanstack/query-core` dependency from an exact pin to a caret range (`^5.90.16`) so it can dedupe with consumer-installed `@tanstack/react-query` versions. This avoids Vite `resolve.dedupe` resolution failures under Bun when two divergent copies of `query-core` end up nested instead of hoisted. ([#8417](https://github.com/clerk/javascript/pull/8417)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.8.5
+
+### Patch Changes
+
+- Generate publishable keys with unpadded Base64 encoding to match backend output. ([#8400](https://github.com/clerk/javascript/pull/8400)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+## 4.8.4
+
+### Patch Changes
+
+- Add `publishableKeyFromHost` utility for resolving the correct publishable key per hostname in multi-domain setups. Re-exported from `@clerk/react/internal`. ([#8398](https://github.com/clerk/javascript/pull/8398)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix `useOrganizationList` and `useOrganization` briefly reporting paginated resources as `isLoading: false` with empty data before the query starts. ([#8395](https://github.com/clerk/javascript/pull/8395)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 4.8.3
 
 ### Patch Changes
