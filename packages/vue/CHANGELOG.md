@@ -1,5 +1,28 @@
 # @clerk/vue
 
+## 2.1.0
+
+### Minor Changes
+
+- Expose `OAuthConsent` as a public component export for Vue and Nuxt. ([#8381](https://github.com/clerk/javascript/pull/8381)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```vue
+  <script setup lang="ts">
+  import { OAuthConsent } from '@clerk/vue';
+  </script>
+
+  <template>
+    <OAuthConsent />
+  </template>
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+
 ## 2.0.20
 
 ### Patch Changes

@@ -1,5 +1,33 @@
 # Change Log
 
+## 4.9.0
+
+### Minor Changes
+
+- Add internal API methods to manage enterprise connections ([#8421](https://github.com/clerk/javascript/pull/8421)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Expose `OAuthConsent` as a public component export across React-based SDKs. ([#8381](https://github.com/clerk/javascript/pull/8381)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/react';
+
+  export default function Page() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Add an env-var shortcut for `unsafe_disableDevelopmentModeConsoleWarning` across the Astro, Nuxt, React Router, and TanStack Start integrations so the development-keys console warning can be suppressed without threading the option through `<ClerkProvider>` manually: ([#8402](https://github.com/clerk/javascript/pull/8402)) by [@jacekradko](https://github.com/jacekradko)
+  - Astro: `PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+  - Nuxt: `NUXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+  - React Router: `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING` (or `CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`)
+  - TanStack Start: `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING` (or `CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`)
+
+  The Next.js equivalent (`NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`) already existed; the JSDoc on `unsafe_disableDevelopmentModeConsoleWarning` now lists every framework's env-var shortcut and clarifies that suppressing the warning at source also keeps it from being mirrored to the dev-server terminal (e.g. Next.js with `experimental.browserDebugInfoInTerminal`).
+
 ## 4.8.7
 
 ### Patch Changes
