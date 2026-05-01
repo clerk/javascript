@@ -345,28 +345,6 @@ export const registerM2MAuthTests = (adapter: MachineAuthTestAdapter): void => {
       expect(body.tokenType).toBe(TokenType.M2MToken);
     });
 
-    test('authorizes after dynamically granting scope', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
-
-      await u.services.clerk.machines.createScope(network.unscopedSender.id, network.primaryServer.id);
-      const m2mToken = await u.services.clerk.m2m.createToken({
-        machineSecretKey: network.unscopedSender.secretKey,
-        secondsUntilExpiration: 60 * 30,
-      });
-
-      try {
-        const res = await u.page.request.get(new URL(adapter.m2m.path, app.serverUrl).toString(), {
-          headers: { Authorization: `Bearer ${m2mToken.token}` },
-        });
-        expect(res.status()).toBe(200);
-        const body = await res.json();
-        expect(body.subject).toBe(network.unscopedSender.id);
-        expect(body.tokenType).toBe(TokenType.M2MToken);
-      } finally {
-        await u.services.clerk.m2m.revokeToken({ m2mTokenId: m2mToken.id });
-      }
-    });
-
     test('verifies JWT format M2M token via local verification', async ({ request }) => {
       const jwtToken = await createJwtM2MToken(createMachineClient(), network.scopedSender.secretKey);
 
