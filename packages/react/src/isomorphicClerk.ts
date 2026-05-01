@@ -36,6 +36,7 @@ import type {
   ListenerOptions,
   LoadedClerk,
   OAuthApplicationNamespace,
+  OAuthConsentProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -1296,6 +1297,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     } else {
       this.premountOAuthConsentNodes.delete(node);
     }
+  };
+
+  mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {
+    this.__internal_mountOAuthConsent(node, props);
+  };
+
+  unmountOAuthConsent = (node: HTMLDivElement) => {
+    this.__internal_unmountOAuthConsent(node);
   };
 
   mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps): void => {

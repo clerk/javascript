@@ -12,6 +12,7 @@ catalogs:
     react-dom: 18.3.1
   repo:
     '@swc/helpers': 0.5.21
+    '@tanstack/query-core': ^5.100.6
     core-js: 3.47.0
     rolldown: 1.0.0-beta.47
     tsdown: 0.15.7

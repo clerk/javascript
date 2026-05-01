@@ -1,6 +1,6 @@
 import type {
   __internal_CheckoutProps,
-  __internal_OAuthConsentProps,
+  OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
@@ -32,7 +32,7 @@ import type { MutableRefObject } from 'react';
 import type { WithInternalRouting } from './internal';
 
 export type {
-  __internal_OAuthConsentProps,
+  OAuthConsentProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -64,7 +64,7 @@ export type AvailableComponentProps =
   | __internal_SubscriptionDetailsProps
   | __internal_PlanDetailsProps
   | APIKeysProps
-  | __internal_OAuthConsentProps
+  | OAuthConsentProps
   | TaskChooseOrganizationProps
   | TaskResetPasswordProps
   | TaskSetupMFAProps;
