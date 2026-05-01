@@ -1365,6 +1365,7 @@ export const taIN: LocalizationResource = {
         title: 'மின்னஞ்சல் முகவரிகள்',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'கணக்கை இணைக்கவும்',
         title: 'நிறுவன கணக்குகள்',
       },
       headerTitle__account: 'சுயவிவர விவரங்கள்',

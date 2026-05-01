@@ -1,0 +1,4 @@
+{
+  "main": "../dist/apple/index.js",
+  "types": "../dist/apple/index.d.ts"
+}

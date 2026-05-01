@@ -6,6 +6,7 @@ import type { Application } from '../models/application';
 import { createEmailService } from './emailService';
 import { createInvitationService } from './invitationsService';
 import { createOrganizationsService } from './organizationsService';
+import { withRetry } from './retryableClerkClient';
 import type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail } from './usersService';
 import { createUserService } from './usersService';
 import { createWaitlistService } from './waitlistService';
@@ -34,7 +35,7 @@ export const createTestUtils = <
 ): Params extends Partial<CreateAppPageObjectArgs> ? FullReturn : OnlyAppReturn => {
   const { app, context, browser, useTestingToken = true } = params || {};
 
-  const clerkClient = createClerkClient(app);
+  const clerkClient = withRetry(createClerkClient(app));
   const services = {
     clerk: clerkClient,
     email: createEmailService(),

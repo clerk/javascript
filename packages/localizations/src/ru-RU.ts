@@ -1370,6 +1370,7 @@ export const ruRU: LocalizationResource = {
         title: 'Адреса электронной почты',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Подключить учетную запись',
         title: 'Корпоративные учетные записи',
       },
       headerTitle__account: 'Учетная запись',

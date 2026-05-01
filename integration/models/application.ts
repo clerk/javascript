@@ -72,9 +72,10 @@ export const application = (
       const nodeModulesExist = await fs.pathExists(path.resolve(appDirPath, 'node_modules'));
       if (force || !nodeModulesExist) {
         const log = logger.child({ prefix: 'setup' }).info;
-        // Use pkglab add to install packages from the local registry
+        // Use pkglab add to install packages from the local registry,
+        // unless E2E_SDK_SOURCE=latest which installs from npm instead
         const pkglabDeps = config.pkglabDependencies;
-        if (pkglabDeps.length > 0) {
+        if (pkglabDeps.length > 0 && process.env.E2E_SDK_SOURCE !== 'latest') {
           await run(`pkglab add ${pkglabDeps.join(' ')}`, { cwd: appDirPath, log });
         } else {
           await run(scripts.setup, { cwd: appDirPath, log });

@@ -1354,6 +1354,7 @@ export const skSK: LocalizationResource = {
         title: 'Emailové adresy',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Pripojiť účet',
         title: 'Firemné účty',
       },
       headerTitle__account: 'Účet',

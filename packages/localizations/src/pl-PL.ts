@@ -1357,6 +1357,7 @@ export const plPL: LocalizationResource = {
         title: 'Adresy email',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Połącz konto',
         title: 'Konta firmowe',
       },
       headerTitle__account: 'Konto',

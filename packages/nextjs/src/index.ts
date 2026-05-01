@@ -56,6 +56,7 @@ export {
   useOrganizationCreationDefaults,
   useOrganizationList,
   useReverification,
+  useAPIKeys,
   useSession,
   useSessionList,
   useSignIn,
@@ -80,3 +81,17 @@ import type { ServerComponentsServerModuleTypes } from './components.server';
 
 export const ClerkProvider = ComponentsModule.ClerkProvider as ServerComponentsServerModuleTypes['ClerkProvider'];
 export const Show = ComponentsModule.Show as ServerComponentsServerModuleTypes['Show'];
+
+/**
+ * `auth` is not available from this import path.
+ *
+ * **To fix this error:**
+ * ```diff
+ * - import { auth } from '@clerk/nextjs'
+ * + import { auth } from '@clerk/nextjs/server'
+ * ```
+ *
+ * The `auth` function is only available in server-side contexts:
+ * API Routes, Server Components, Server Actions, and Middleware.
+ */
+export declare const auth: never;

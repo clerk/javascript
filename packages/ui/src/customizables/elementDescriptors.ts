@@ -53,6 +53,18 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'logoBox',
   'logoImage',
 
+  'logoGroup',
+  'logoGroupItem',
+  'logoGroupIcon',
+  'logoGroupSeparator',
+
+  'listGroup',
+  'listGroupHeader',
+  'listGroupHeaderTitle',
+  'listGroupContent',
+  'listGroupItem',
+  'listGroupItemLabel',
+
   'header',
   'headerTitle',
   'headerSubtitle',

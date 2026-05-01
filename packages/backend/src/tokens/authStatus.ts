@@ -268,6 +268,61 @@ export function signedOutInvalidToken(): UnauthenticatedState<null> {
   });
 }
 
+type BootstrapSignedOutParams = {
+  signInUrl?: string;
+  signUpUrl?: string;
+  isSatellite?: boolean;
+  domain?: string;
+  proxyUrl?: string;
+  reason?: AuthReason;
+  message?: string;
+  headers?: Headers;
+};
+
+/**
+ * Returns a synthetic `UnauthenticatedState` without requiring a publishable key or an
+ * `AuthenticateContext`. Intended for framework integrations that need to run
+ * authorization logic for a request that arrived before real Clerk keys are available
+ * (e.g. the Next.js keyless bootstrap window). The returned state has
+ * `status: 'signed-out'` and `toAuth()` returns a standard signed-out session auth object.
+ *
+ * `signInUrl` / `signUpUrl` are carried through so that `redirectToSignIn` /
+ * `redirectToSignUp` can resolve to the application's own routes during bootstrap.
+ * `isSatellite` / `domain` / `proxyUrl` are carried through so that cross-origin
+ * satellite redirects produced by `createRedirect` include the `__clerk_status=needs-sync`
+ * marker required for the return-trip handshake.
+ */
+export function createBootstrapSignedOutState({
+  signInUrl = '',
+  signUpUrl = '',
+  isSatellite = false,
+  domain = '',
+  proxyUrl = '',
+  reason = AuthErrorReason.SessionTokenAndUATMissing,
+  message = '',
+  headers = new Headers(),
+}: BootstrapSignedOutParams = {}): UnauthenticatedState<SessionTokenType> {
+  return withDebugHeaders({
+    status: AuthStatus.SignedOut,
+    reason,
+    message,
+    proxyUrl,
+    publishableKey: '',
+    isSatellite,
+    domain,
+    signInUrl,
+    signUpUrl,
+    afterSignInUrl: '',
+    afterSignUpUrl: '',
+    isSignedIn: false,
+    isAuthenticated: false,
+    tokenType: TokenType.SessionToken,
+    toAuth: () => signedOutAuthObject({ status: AuthStatus.SignedOut, reason, message }),
+    headers,
+    token: null,
+  });
+}
+
 const withDebugHeaders = <T extends { headers: Headers; message?: string; reason?: AuthReason; status?: AuthStatus }>(
   requestState: T,
 ): T => {

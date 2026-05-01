@@ -1345,6 +1345,7 @@ export const srRS: LocalizationResource = {
         title: 'E-mail adrese',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Poveži nalog',
         title: 'Korporativni nalozi',
       },
       headerTitle__account: 'Detalji profila',

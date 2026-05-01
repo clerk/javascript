@@ -1345,6 +1345,7 @@ export const ukUA: LocalizationResource = {
         title: 'Адреси електронної пошти',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Підключити акаунт',
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Обліковий запис',

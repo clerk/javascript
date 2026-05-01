@@ -2,7 +2,7 @@ import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
-import type { OAuthStrategy, PasskeyStrategy, Web3Strategy } from './strategies';
+import type { OAuthStrategy, PasskeyStrategy, TicketStrategy, Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
 import type { Web3Provider } from './web3';
 
@@ -13,10 +13,15 @@ export interface SignInFutureCreateParams {
    */
   identifier?: string;
   /**
+   * The user's password. Only supported if
+   * [password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled.
+   */
+  password?: string;
+  /**
    * The first factor verification strategy to use in the sign-in flow. Depends on the `identifier` value. Each
    * authentication identifier supports different verification strategies.
    */
-  strategy?: OAuthStrategy | 'enterprise_sso' | PasskeyStrategy;
+  strategy?: OAuthStrategy | 'enterprise_sso' | PasskeyStrategy | TicketStrategy;
   /**
    * The full URL or path that the OAuth provider should redirect to after successful authorization on their part.
    */

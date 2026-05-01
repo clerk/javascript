@@ -46,7 +46,7 @@ export type UseOrganizationParams = {
    * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    * <ul>
-   *  <li>`role`: An array of [`OrganizationCustomRoleKey`](https://clerk.com/docs/reference/javascript/types/organization-custom-role-key).</li>
+   *  <li>`role`: An array of [`OrganizationCustomRoleKey`](https://clerk.com/docs/reference/types/organization-custom-role-key).</li>
    *  <li>`query`: A string that filters the memberships by the provided string.</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
    * </ul>
@@ -69,7 +69,7 @@ export type UseOrganizationParams = {
 export type UseOrganizationReturn<T extends UseOrganizationParams> =
   | {
       /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
+       * A boolean that indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
        */
       isLoaded: false;
       /**

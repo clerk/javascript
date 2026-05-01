@@ -86,4 +86,5 @@ export const constants = {
    * PK and SK pairs from the env to use for integration tests.
    */
   INTEGRATION_INSTANCE_KEYS: process.env.INTEGRATION_INSTANCE_KEYS,
+  INTEGRATION_STAGING_INSTANCE_KEYS: process.env.INTEGRATION_STAGING_INSTANCE_KEYS,
 } as const;

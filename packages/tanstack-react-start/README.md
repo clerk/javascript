@@ -29,8 +29,6 @@
 
 [Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_tanstack_react_start) is the easiest way to add authentication and user management to your Tanstack Start application. Add sign up, sign in, and profile management to your application in minutes.
 
-> [!WARNING] > `@clerk/tanstack-react-start` is currently in beta. It's not recommended to use it in production just yet, but it would be much appreciated if you give it a try.
-
 ### Prerequisites
 
 - TanStack Start `^1.157.0` or later

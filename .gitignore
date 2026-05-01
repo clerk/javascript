@@ -81,6 +81,7 @@ playground/*/yarn.lock
 
 # integration testing
 .keys.json
+.keys.staging.json
 .env.json
 .temp_integration
 playwright-report

@@ -4,7 +4,7 @@ import type { ClientJSON } from './JSON';
 import { Session } from './Session';
 
 /**
- * The Backend `Client` object is similar to the [`Client`](https://clerk.com/docs/reference/javascript/client) object as it holds information about the authenticated sessions in the current device. However, the Backend `Client` object is different from the `Client` object in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Clients#operation/GetClient) and is not directly accessible from the Frontend API.
+ * The Backend `Client` object is similar to the [`Client`](https://clerk.com/docs/reference/objects/client) object as it holds information about the authenticated sessions in the current device. However, the Backend `Client` object is different from the `Client` object in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Clients#operation/GetClient) and is not directly accessible from the Frontend API.
  */
 export class Client {
   constructor(
@@ -21,11 +21,11 @@ export class Client {
      */
     readonly sessions: Session[],
     /**
-     * The ID of the [`SignIn`](https://clerk.com/docs/reference/javascript/sign-in){{ target: '_blank' }}.
+     * The ID of the [`SignIn`](https://clerk.com/docs/reference/objects/sign-in).
      */
     readonly signInId: string | null,
     /**
-     * The ID of the [`SignUp`](https://clerk.com/docs/reference/javascript/sign-up){{ target: '_blank' }}.
+     * The ID of the [`SignUp`](https://clerk.com/docs/reference/objects/sign-up).
      */
     readonly signUpId: string | null,
     /**

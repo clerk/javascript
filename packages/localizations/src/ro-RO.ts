@@ -1365,6 +1365,7 @@ export const roRO: LocalizationResource = {
         title: 'Adrese de email',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Conectează cont',
         title: 'Conturi enterprise',
       },
       headerTitle__account: 'Detalii profil',

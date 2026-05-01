@@ -1325,6 +1325,7 @@ export const heIL: LocalizationResource = {
         title: 'כתובת אימייל',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'חבר חשבון',
         title: 'חשבונות ארגוניים',
       },
       headerTitle__account: 'חשבון',

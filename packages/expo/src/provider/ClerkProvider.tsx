@@ -1,6 +1,7 @@
 import '../polyfills';
 
 import type { ClerkProviderProps as ReactClerkProviderProps } from '@clerk/react';
+import { useAuth } from '@clerk/react';
 import { InternalClerkProvider as ClerkReactProvider, type Ui } from '@clerk/react/internal';
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
@@ -52,11 +53,95 @@ const SDK_METADATA = {
   version: PACKAGE_VERSION,
 };
 
+/**
+ * Syncs JS SDK auth state to the native Clerk SDK.
+ *
+ * When a user authenticates via the JS SDK (custom sign-in forms, useSignIn, etc.)
+ * rather than through native `<AuthView />`, the native SDK doesn't know about the
+ * session. This component watches for JS auth state changes and pushes the bearer
+ * token to the native SDK so native components (UserButton, UserProfileView) work.
+ *
+ * Must be rendered inside `ClerkReactProvider` so `useAuth()` has access to context.
+ */
+function NativeSessionSync({
+  publishableKey,
+  tokenCache,
+}: {
+  publishableKey: string;
+  tokenCache: TokenCache | undefined;
+}) {
+  const { isSignedIn } = useAuth();
+  const hasSyncedRef = useRef(false);
+  // Use the provided tokenCache, falling back to the default SecureStore cache
+  const effectiveTokenCache = tokenCache ?? defaultTokenCache;
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      hasSyncedRef.current = false;
+
+      // Clear the native session so native components (UserButton, etc.)
+      // don't continue showing a signed-in state after JS-side sign out.
+      const ClerkExpo = NativeClerkModule;
+      if (ClerkExpo?.signOut) {
+        void ClerkExpo.signOut().catch((error: unknown) => {
+          if (__DEV__) {
+            console.warn('[NativeSessionSync] Failed to clear native session:', error);
+          }
+        });
+      }
+
+      return;
+    }
+
+    if (hasSyncedRef.current) {
+      return;
+    }
+
+    const syncToNative = async () => {
+      try {
+        const ClerkExpo = NativeClerkModule;
+        if (!ClerkExpo?.configure || !ClerkExpo?.getSession) {
+          return;
+        }
+
+        // Check if native already has a session (e.g. auth via AuthView or initial load)
+        const nativeSession = (await ClerkExpo.getSession()) as {
+          sessionId?: string;
+          session?: { id: string };
+        } | null;
+        const hasNativeSession = !!(nativeSession?.sessionId || nativeSession?.session?.id);
+
+        if (hasNativeSession) {
+          hasSyncedRef.current = true;
+          return;
+        }
+
+        // Read the JS SDK's client JWT and push it to the native SDK
+        const bearerToken = (await effectiveTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
+        if (bearerToken) {
+          await ClerkExpo.configure(publishableKey, bearerToken);
+          hasSyncedRef.current = true;
+        }
+      } catch (error) {
+        if (__DEV__) {
+          console.warn('[NativeSessionSync] Failed to sync JS session to native:', error);
+        }
+      }
+    };
+
+    void syncToNative();
+  }, [isSignedIn, publishableKey, effectiveTokenCache]);
+
+  return null;
+}
+
 export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi>): JSX.Element {
   const {
     children,
     tokenCache,
     publishableKey,
+    proxyUrl,
+    domain,
     __experimental_passkeys,
     experimental,
     __experimental_resourceCache,
@@ -80,6 +165,8 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     ? getClerkInstance({
         publishableKey: pk,
         tokenCache,
+        proxyUrl,
+        domain,
         __experimental_passkeys,
         __experimental_resourceCache,
       })
@@ -100,15 +187,21 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
           const ClerkExpo = NativeClerkModule;
 
           if (ClerkExpo?.configure) {
-            // Read the JS SDK's client JWT to sync with the native SDK
+            // Read the JS SDK's client JWT to sync with the native SDK.
+            // Use the user-provided tokenCache so custom caches are honored.
+            const effectiveTokenCache = tokenCache ?? defaultTokenCache;
             let bearerToken: string | null = null;
             try {
-              bearerToken = (await defaultTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
+              bearerToken = (await effectiveTokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
             } catch (e) {
               if (__DEV__) {
                 console.warn('[ClerkProvider] Token cache read failed:', e);
               }
             }
+
+            // Always configure the native SDK on launch, even without a token.
+            // The iOS SDK requires Clerk.configure() before Clerk.shared can be accessed.
+            // If we have a bearer token, pass it so the native SDK picks up the JS session.
             await ClerkExpo.configure(pk, bearerToken);
 
             if (!isMountedRef.current) {
@@ -228,6 +321,17 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     const syncNativeAuthToJs = async () => {
       try {
         if (nativeAuthState.type === 'signedIn' && nativeAuthState.sessionId && clerkInstance.setActive) {
+          // Copy the native client's bearer token to the JS SDK's token cache
+          // so API requests use the native client (which has the session).
+          const ClerkExpo = NativeClerkModule;
+          if (ClerkExpo?.getClientToken) {
+            const nativeClientToken = await ClerkExpo.getClientToken();
+            if (nativeClientToken) {
+              const effectiveTokenCache = tokenCache ?? defaultTokenCache;
+              await effectiveTokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, nativeClientToken);
+            }
+          }
+
           // Ensure the session exists in the client before calling setActive
           const sessionInClient = clerkInstance.client?.sessions?.some(
             (s: { id: string }) => s.id === nativeAuthState.sessionId,
@@ -283,6 +387,8 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       key={pk}
       {...rest}
       publishableKey={pk}
+      proxyUrl={proxyUrl}
+      domain={domain}
       sdkMetadata={SDK_METADATA}
       Clerk={clerkInstance}
       standardBrowser={!isNative()}
@@ -293,6 +399,12 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
         ...(isNative() && { runtimeEnvironment: 'headless' as const }),
       }}
     >
+      {isNative() && (
+        <NativeSessionSync
+          publishableKey={pk}
+          tokenCache={tokenCache}
+        />
+      )}
       {children}
     </ClerkReactProvider>
   );

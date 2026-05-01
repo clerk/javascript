@@ -1327,6 +1327,7 @@ export const kkKZ: LocalizationResource = {
         title: 'Электрондық пошталар',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Есептік жазбаны қосу',
         title: 'Кәсіпорын есептік жазбалары',
       },
       headerTitle__account: 'Профиль мәліметтері',

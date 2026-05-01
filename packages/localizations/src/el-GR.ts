@@ -1374,6 +1374,7 @@ export const elGR: LocalizationResource = {
         title: 'Διευθύνσεις email',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Σύνδεση λογαριασμού',
         title: 'Επιχειρησιακοί λογαριασμοί',
       },
       headerTitle__account: 'Λογαριασμός',

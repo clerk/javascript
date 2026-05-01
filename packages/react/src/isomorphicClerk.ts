@@ -35,6 +35,7 @@ import type {
   ListenerCallback,
   ListenerOptions,
   LoadedClerk,
+  OAuthApplicationNamespace,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -118,11 +119,13 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_reloadInitialResources'
   | 'billing'
   | 'apiKeys'
+  | 'oauthApplication'
   | '__internal_setActiveInProgress'
 > & {
   client: ClientResource | undefined;
   billing: BillingNamespace | undefined;
   apiKeys: APIKeysNamespace | undefined;
+  oauthApplication: OAuthApplicationNamespace | undefined;
 };
 
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
@@ -842,6 +845,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get apiKeys(): APIKeysNamespace | undefined {
     return this.clerkjs?.apiKeys;
+  }
+
+  get oauthApplication(): OAuthApplicationNamespace | undefined {
+    return this.clerkjs?.oauthApplication;
   }
 
   __experimental_checkout = (...args: Parameters<Clerk['__experimental_checkout']>) => {

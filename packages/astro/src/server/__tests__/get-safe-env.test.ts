@@ -136,6 +136,21 @@ describe('get-safe-env', () => {
       const env = getSafeEnv({ locals } as any);
       expect(env.sk).toBe('sk_from_cf_workers');
     });
+
+    it('falls back to locals.runtime.env when cloudflareEnv is missing the key (CF Pages)', async () => {
+      // On CF Pages, cloudflare:workers env may have bindings (D1, R2) but
+      // not dashboard secrets like CLERK_SECRET_KEY.
+      vi.doMock('cloudflare:workers', () => ({
+        env: { SOME_OTHER_BINDING: 'value' },
+      }));
+
+      const { initCloudflareEnv, getSafeEnv } = await import('../get-safe-env');
+      await initCloudflareEnv();
+
+      const locals = { runtime: { env: { CLERK_SECRET_KEY: 'sk_from_runtime' } } };
+      const env = getSafeEnv({ locals } as any);
+      expect(env.sk).toBe('sk_from_runtime');
+    });
   });
 });
 

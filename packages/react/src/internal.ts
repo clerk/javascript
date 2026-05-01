@@ -5,8 +5,11 @@ import type React from 'react';
 import { ClerkProvider } from './contexts/ClerkProvider';
 import type { ClerkProviderProps } from './types';
 
+export { publishableKeyFromHost } from '@clerk/shared/keys';
 export { setErrorThrowerOptions } from './errors/errorThrower';
 export { MultisessionAppSupport } from './components/controlComponents';
+export { useOAuthConsent } from '@clerk/shared/react';
+export { OAuthConsent } from './components/uiComponents';
 export { useRoutingProps } from './hooks/useRoutingProps';
 export { useDerivedAuth } from './hooks/useAuth';
 export { IS_REACT_SHARED_VARIANT_COMPATIBLE } from './utils/versionCheck';

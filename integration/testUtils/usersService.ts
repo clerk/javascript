@@ -1,7 +1,7 @@
 import type { APIKey, ClerkClient, Organization, User } from '@clerk/backend';
 import { faker } from '@faker-js/faker';
 
-import { hash } from '../models/helpers';
+import { fakerPassword, hash } from '../models/helpers';
 
 async function withErrorLogging<T>(operation: string, fn: () => Promise<T>): Promise<T> {
   try {
@@ -133,7 +133,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
         lastName: faker.person.lastName(),
         email: withEmail ? email : undefined,
         username: withUsername ? `${randomHash}_clerk_cookie` : undefined,
-        password: withPassword ? `${email}${randomHash}` : undefined,
+        password: withPassword ? fakerPassword() : undefined,
         phoneNumber: withPhoneNumber ? phoneNumber : undefined,
         deleteIfExists: () => self.deleteIfExists({ email, phoneNumber }),
       };

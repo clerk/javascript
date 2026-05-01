@@ -4,7 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
+import com.clerk.api.network.serialization.ClerkResult
+import com.clerk.api.ui.ClerkColors
+import com.clerk.api.ui.ClerkDesign
+import com.clerk.api.ui.ClerkTheme
 import com.facebook.react.bridge.ActivityEventListener
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -17,6 +23,7 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import org.json.JSONObject
 
 private const val TAG = "ClerkExpoModule"
 
@@ -67,41 +74,77 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
             try {
                 publishableKey = pubKey
 
-                // If the JS SDK has a bearer token, write it to the native SDK's
-                // SharedPreferences so both SDKs share the same Clerk API client.
-                if (!bearerToken.isNullOrEmpty()) {
-                    reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
-                        .edit()
-                        .putString("DEVICE_TOKEN", bearerToken)
-                        .apply()
-                    debugLog(TAG, "configure - wrote JS bearer token to native SharedPreferences")
-                }
-
-                Clerk.initialize(reactApplicationContext, pubKey)
-
-                // Wait for initialization to complete with timeout
-                try {
-                    withTimeout(10_000L) {
-                        Clerk.isInitialized.first { it }
+                if (!Clerk.isInitialized.value) {
+                    // First-time initialization — write the bearer token to SharedPreferences
+                    // before initializing so the SDK boots with the correct client.
+                    if (!bearerToken.isNullOrEmpty()) {
+                        reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
+                            .edit()
+                            .putString("DEVICE_TOKEN", bearerToken)
+                            .apply()
                     }
-                } catch (e: TimeoutCancellationException) {
-                    val initError = Clerk.initializationError.value
-                    val message = if (initError != null) {
-                        "Clerk initialization timed out: ${initError.message}"
+
+                    Clerk.initialize(reactApplicationContext, pubKey)
+                    // Theme loading is centralized here. ClerkViewFactory.configure()
+                    // and ClerkUserProfileActivity.onCreate() only call Clerk.initialize()
+                    // when Clerk is not yet initialized, so by the time they run
+                    // ClerkExpoModule has already set the custom theme.
+                    // Must be set AFTER Clerk.initialize() because initialize()
+                    // resets customTheme to its `theme` parameter (default null).
+                    loadThemeFromAssets()
+
+                    // Wait for initialization to complete with timeout
+                    try {
+                        withTimeout(10_000L) {
+                            Clerk.isInitialized.first { it }
+                        }
+                        // If a bearer token was provided, wait for the session to hydrate
+                        // so callers that immediately call getSession() see the session.
+                        if (!bearerToken.isNullOrEmpty()) {
+                            withTimeout(5_000L) {
+                                Clerk.sessionFlow.first { it != null }
+                            }
+                        }
+                    } catch (e: TimeoutCancellationException) {
+                        val initError = Clerk.initializationError.value
+                        val message = if (initError != null) {
+                            "Clerk initialization timed out: ${initError.message}"
+                        } else {
+                            "Clerk initialization timed out after 10 seconds"
+                        }
+                        promise.reject("E_TIMEOUT", message)
+                        return@launch
+                    }
+
+                    // Check for initialization errors
+                    val error = Clerk.initializationError.value
+                    if (error != null) {
+                        promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}")
                     } else {
-                        "Clerk initialization timed out after 10 seconds"
+                        promise.resolve(null)
                     }
-                    promise.reject("E_TIMEOUT", message)
                     return@launch
                 }
 
-                // Check for initialization errors
-                val error = Clerk.initializationError.value
-                if (error != null) {
-                    promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}")
-                } else {
-                    promise.resolve(null)
+                // Already initialized — use the public SDK API to update
+                // the device token and trigger a client/environment refresh.
+                if (!bearerToken.isNullOrEmpty()) {
+                    val result = Clerk.updateDeviceToken(bearerToken)
+                    if (result is ClerkResult.Failure) {
+                        debugLog(TAG, "configure - updateDeviceToken failed: ${result.error}")
+                    }
+
+                    // Wait for session to appear with the new token (up to 5s)
+                    try {
+                        withTimeout(5_000L) {
+                            Clerk.sessionFlow.first { it != null }
+                        }
+                    } catch (_: TimeoutCancellationException) {
+                        debugLog(TAG, "configure - session did not appear after token update")
+                    }
                 }
+
+                promise.resolve(null)
             } catch (e: Exception) {
                 promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${e.message}", e)
             }
@@ -174,14 +217,14 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     override fun getSession(promise: Promise) {
         if (!Clerk.isInitialized.value) {
-            promise.reject("E_NOT_INITIALIZED", "Clerk SDK is not initialized. Call configure() first.")
+            // Return null when not initialized (matches iOS behavior)
+            // so callers can proceed to call configure() with a bearer token.
+            promise.resolve(null)
             return
         }
 
         val session = Clerk.session
         val user = Clerk.user
-
-        debugLog(TAG, "getSession - hasSession: ${session != null}, hasUser: ${user != null}")
 
         val result = WritableNativeMap()
 
@@ -215,9 +258,10 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     override fun getClientToken(promise: Promise) {
         try {
-            val prefs = reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
-            val deviceToken = prefs.getString("DEVICE_TOKEN", null)
-            debugLog(TAG, "getClientToken - deviceToken: ${if (deviceToken != null) "found" else "null"}")
+            // Use the SDK's public API which handles encrypted storage transparently.
+            // Direct SharedPreferences reads break on clerk-android >= 1.0.11 where
+            // DEVICE_TOKEN is encrypted via StorageCipher.
+            val deviceToken = Clerk.getDeviceToken()
             promise.resolve(deviceToken)
         } catch (e: Exception) {
             debugLog(TAG, "getClientToken failed: ${e.message}")
@@ -230,13 +274,21 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     override fun signOut(promise: Promise) {
         if (!Clerk.isInitialized.value) {
-            promise.reject("E_NOT_INITIALIZED", "Clerk SDK is not initialized. Call configure() first.")
+            // Clear DEVICE_TOKEN from SharedPreferences even when not initialized,
+            // so the next Clerk.initialize() doesn't boot with a stale client token.
+            reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
+                .edit()
+                .remove("DEVICE_TOKEN")
+                .apply()
+            promise.resolve(null)
             return
         }
 
         coroutineScope.launch {
             try {
                 Clerk.auth.signOut()
+                // Client refresh after sign-out is handled by the clerk-android
+                // SDK (SignOutService.signOut calls Client.getSkippingClientId).
                 promise.resolve(null)
             } catch (e: Exception) {
                 promise.reject("E_SIGN_OUT_FAILED", e.message ?: "Sign out failed", e)
@@ -258,16 +310,12 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
     }
 
     private fun handleAuthResult(resultCode: Int, data: Intent?) {
-        debugLog(TAG, "handleAuthResult - resultCode: $resultCode")
-
         val promise = pendingAuthPromise ?: return
         pendingAuthPromise = null
 
         if (resultCode == Activity.RESULT_OK) {
             val session = Clerk.session
             val user = Clerk.user
-
-            debugLog(TAG, "handleAuthResult - hasSession: ${session != null}, hasUser: ${user != null}")
 
             val result = WritableNativeMap()
 
@@ -296,7 +344,6 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
 
             promise.resolve(result)
         } else {
-            debugLog(TAG, "handleAuthResult - user cancelled")
             val result = WritableNativeMap()
             result.putBoolean("cancelled", true)
             promise.resolve(result)
@@ -336,5 +383,84 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
         result.putBoolean("dismissed", resultCode == Activity.RESULT_CANCELED)
 
         promise.resolve(result)
+    }
+
+    // MARK: - Theme Loading
+
+    private fun loadThemeFromAssets() {
+        try {
+            val jsonString = reactApplicationContext.assets
+                .open("clerk_theme.json")
+                .bufferedReader()
+                .use { it.readText() }
+            val json = JSONObject(jsonString)
+            Clerk.customTheme = parseClerkTheme(json)
+        } catch (e: java.io.FileNotFoundException) {
+            // No theme file provided — use defaults
+        } catch (e: Exception) {
+            debugLog(TAG, "Failed to load clerk_theme.json: ${e.message}")
+        }
+    }
+
+    private fun parseClerkTheme(json: JSONObject): ClerkTheme {
+        val colors = json.optJSONObject("colors")?.let { parseColors(it) }
+        val darkColors = json.optJSONObject("darkColors")?.let { parseColors(it) }
+        val design = json.optJSONObject("design")?.let { parseDesign(it) }
+        return ClerkTheme(
+            colors = colors,
+            darkColors = darkColors,
+            design = design
+        )
+    }
+
+    private fun parseColors(json: JSONObject): ClerkColors {
+        return ClerkColors(
+            primary = json.optStringColor("primary"),
+            background = json.optStringColor("background"),
+            input = json.optStringColor("input"),
+            danger = json.optStringColor("danger"),
+            success = json.optStringColor("success"),
+            warning = json.optStringColor("warning"),
+            foreground = json.optStringColor("foreground"),
+            mutedForeground = json.optStringColor("mutedForeground"),
+            primaryForeground = json.optStringColor("primaryForeground"),
+            inputForeground = json.optStringColor("inputForeground"),
+            neutral = json.optStringColor("neutral"),
+            border = json.optStringColor("border"),
+            ring = json.optStringColor("ring"),
+            muted = json.optStringColor("muted"),
+            shadow = json.optStringColor("shadow")
+        )
+    }
+
+    private fun parseDesign(json: JSONObject): ClerkDesign {
+        return if (json.has("borderRadius")) {
+            ClerkDesign(borderRadius = json.getDouble("borderRadius").toFloat().dp)
+        } else {
+            ClerkDesign()
+        }
+    }
+
+    private fun parseHexColor(hex: String): Color? {
+        val cleaned = hex.removePrefix("#")
+        return try {
+            when (cleaned.length) {
+                6 -> Color(android.graphics.Color.parseColor("#FF$cleaned"))
+                // Theme JSON uses RRGGBBAA; Android parseColor expects AARRGGBB
+                8 -> {
+                    val rrggbb = cleaned.substring(0, 6)
+                    val aa = cleaned.substring(6, 8)
+                    Color(android.graphics.Color.parseColor("#$aa$rrggbb"))
+                }
+                else -> null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun JSONObject.optStringColor(key: String): Color? {
+        val value = optString(key, null) ?: return null
+        return parseHexColor(value)
     }
 }

@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.clerk.api.Clerk
+import com.clerk.api.network.model.client.Client
 import com.clerk.ui.userprofile.UserProfileView
 
 /**
@@ -71,7 +72,17 @@ class ClerkUserProfileActivity : ComponentActivity() {
       // Detect sign-out: if we had a session and now it's null, user signed out
       LaunchedEffect(session) {
         if (hadSession && session == null) {
-          debugLog(TAG, "Sign-out detected - session became null, dismissing activity")
+          debugLog(TAG, "Sign-out detected - session became null")
+          // Fetch a brand-new client from the server, skipping the in-memory
+          // client_id header. Without skipping, the server echoes back the SAME
+          // client (with the previous user's in-progress signIn still attached),
+          // and the AuthView re-mounts into the "Get help" fallback because the
+          // stale signIn's status has no startingFirstFactor.
+          try {
+            Client.getSkippingClientId()
+          } catch (e: Exception) {
+            Log.w(TAG, "Client.getSkippingClientId() after UserProfile sign-out failed: ${e.message}")
+          }
           finishWithSuccess()
         }
         // Update hadSession if we get a session (handles edge cases)

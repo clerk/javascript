@@ -1114,8 +1114,10 @@ export const clerkHandlers = [
       const membership = (currentUser as any).organizationMemberships.find((m: any) => m.organization?.id === orgId);
       if (membership) {
         return createNoStoreResponse({
-          data: [SessionService.serialize(membership)],
-          total_count: 1,
+          response: {
+            data: [SessionService.serialize(membership)],
+            total_count: 1,
+          },
         });
       }
     }

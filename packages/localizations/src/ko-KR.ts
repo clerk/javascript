@@ -1333,6 +1333,7 @@ export const koKR: LocalizationResource = {
         title: '이메일 주소',
       },
       enterpriseAccountsSection: {
+        primaryButton: '계정 연결하기',
         title: '기업 계정',
       },
       headerTitle__account: '프로필',
