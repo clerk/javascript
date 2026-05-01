@@ -35,10 +35,6 @@
       "types": "./dist/server/index.d.ts",
       "default": "./dist/server/index.js"
     },
-    "./internal": {
-      "types": "./dist/internal.d.ts",
-      "default": "./dist/internal.js"
-    },
     "./errors": {
       "types": "./dist/errors.d.ts",
       "default": "./dist/errors.js"
