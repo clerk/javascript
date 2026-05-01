@@ -71,6 +71,8 @@ export default defineNuxtModule<ModuleOptions>({
           // prefetchUI config: can be false or undefined
           prefetchUI: options.prefetchUI,
           isSatellite: options.isSatellite,
+          // Listed explicitly so it can be overridden via NUXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING.
+          unsafe_disableDevelopmentModeConsoleWarning: options.unsafe_disableDevelopmentModeConsoleWarning,
           // Backend specific variables that are safe to share.
           // We want them to be overridable like the other public keys (e.g NUXT_PUBLIC_CLERK_PROXY_URL)
           proxyUrl: options.proxyUrl,

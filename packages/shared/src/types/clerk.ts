@@ -1123,7 +1123,17 @@ type ClerkOptionsNavigation =
 
 type ClerkUnsafeOptions = {
   /**
-   * Disables the console warning that is logged when Clerk is initialized with development keys.
+   * Disables the `Clerk has been loaded with development keys` console warning that is logged when Clerk is
+   * initialized with development keys. The warning is emitted by `clerk-js` to the browser console; in dev servers
+   * that mirror browser logs to the terminal (e.g. Next.js with `experimental.browserDebugInfoInTerminal`), setting
+   * this option also stops it from showing up there.
+   *
+   * Each framework integration also exposes an env-var shortcut so you don't need to thread the option through
+   * `<ClerkProvider>` manually:
+   * - Next.js: `NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+   * - Astro: `PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+   * - TanStack Start / React Router: `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+   * - Nuxt: `NUXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
    *
    * [WARNING] The development mode warning is intended to ensure that you don't go to production with a non-production
    * Clerk instance. If you're disabling it, please make sure you don't ship with a non-production Clerk instance!
