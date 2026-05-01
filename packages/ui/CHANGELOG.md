@@ -1,5 +1,37 @@
 # @clerk/ui
 
+## 1.7.0
+
+### Minor Changes
+
+- Render OAuthConsent organization selector from `user:org:read` scope. ([#8415](https://github.com/clerk/javascript/pull/8415)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Expose `OAuthConsent` as a public component export across React-based SDKs. ([#8381](https://github.com/clerk/javascript/pull/8381)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/react';
+
+  export default function Page() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+  - @clerk/localizations@4.5.8
+
+## 1.6.9
+
+### Patch Changes
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea), [`5eec2fe`](https://github.com/clerk/javascript/commit/5eec2fee4e5b36d0b7dafedc704760e245d3a0e9)]:
+  - @clerk/shared@4.8.7
+  - @clerk/localizations@4.5.7
+
 ## 1.6.8
 
 ### Patch Changes

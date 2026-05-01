@@ -1,5 +1,39 @@
 # Change Log
 
+## 6.8.0
+
+### Minor Changes
+
+- Add internal API methods to manage enterprise connections ([#8421](https://github.com/clerk/javascript/pull/8421)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Expose `OAuthConsent` as a public component export across React-based SDKs. ([#8381](https://github.com/clerk/javascript/pull/8381)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/react';
+
+  export default function Page() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+
+## 6.7.9
+
+### Patch Changes
+
+- Raise the `@tanstack/query-core` floor to `^5.100.6` in the repo catalog and consume it from `@clerk/shared` and `@clerk/clerk-js` so the version baked into the production `clerk-js` CDN bundle stays in lockstep with what consumer-side `@clerk/shared` resolves to. ([#8432](https://github.com/clerk/javascript/pull/8432)) by [@jacekradko](https://github.com/jacekradko)
+
+  Fixes a runtime crash (`TypeError: e.isFetched is not a function`) introduced when consumer dedupe resolved `query-core` to `5.100.x` (which adds `Query.isFetched()`) while the published CDN bundle still embedded `5.90.16`. The new `QueryObserver` then called `isFetched()` on `Query` objects from the older bundled version.
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea)]:
+  - @clerk/shared@4.8.7
+
 ## 6.7.8
 
 ### Patch Changes

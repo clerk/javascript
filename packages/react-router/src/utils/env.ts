@@ -21,6 +21,9 @@ export const getPublicEnvVariables = (context: AppLoadContext | undefined) => {
     prefetchUI: getValue('CLERK_PREFETCH_UI') === 'false' ? false : undefined,
     telemetryDisabled: isTruthy(getValue('CLERK_TELEMETRY_DISABLED')),
     telemetryDebug: isTruthy(getValue('CLERK_TELEMETRY_DEBUG')),
+    unsafeDisableDevelopmentModeConsoleWarning: isTruthy(
+      getValue('CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING'),
+    ),
     signInForceRedirectUrl: getValue('CLERK_SIGN_IN_FORCE_REDIRECT_URL'),
     signUpForceRedirectUrl: getValue('CLERK_SIGN_UP_FORCE_REDIRECT_URL'),
     signInFallbackRedirectUrl: getValue('CLERK_SIGN_IN_FALLBACK_REDIRECT_URL'),
