@@ -32,13 +32,13 @@ const singleSessionEnvironment: EnvironmentPreset = {
     commerce_settings: {
       billing: {
         organization: {
-          enabled: false,
-          has_paid_plans: false,
+          enabled: true,
+          has_paid_plans: true,
         },
         stripe_publishable_key: '',
         user: {
-          enabled: false,
-          has_paid_plans: false,
+          enabled: true,
+          has_paid_plans: true,
         },
       },
       id: 'commerce_settings_1',

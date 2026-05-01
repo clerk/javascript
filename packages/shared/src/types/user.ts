@@ -3,6 +3,7 @@ import type { BillingPayerMethods } from './billing';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
 import type { EnterpriseAccountResource } from './enterpriseAccount';
+import type { EnterpriseConnectionResource } from './enterpriseConnection';
 import type { ExternalAccountResource } from './externalAccount';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
@@ -118,6 +119,7 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   ) => Promise<ClerkPaginatedResponse<OrganizationSuggestionResource>>;
   getOrganizationCreationDefaults: () => Promise<OrganizationCreationDefaultsResource>;
   leaveOrganization: (organizationId: string) => Promise<DeletedObjectResource>;
+  getEnterpriseConnections: (params?: GetEnterpriseConnectionsParams) => Promise<EnterpriseConnectionResource[]>;
   createTOTP: () => Promise<TOTPResource>;
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
@@ -141,7 +143,8 @@ export type CreatePhoneNumberParams = { phoneNumber: string };
 export type CreateWeb3WalletParams = { web3Wallet: string };
 export type SetProfileImageParams = { file: Blob | File | string | null };
 export type CreateExternalAccountParams = {
-  strategy: OAuthStrategy;
+  strategy?: OAuthStrategy;
+  enterpriseConnectionId?: string;
   redirectUrl?: string;
   additionalScopes?: OAuthScope[];
   oidcPrompt?: string;
@@ -183,3 +186,7 @@ export type GetUserOrganizationMembershipParams = ClerkPaginationParams;
 export type GetOrganizationMemberships = (
   params?: GetUserOrganizationMembershipParams,
 ) => Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>;
+
+export type GetEnterpriseConnectionsParams = {
+  withOrganizationAccountLinking?: boolean;
+};

@@ -108,6 +108,43 @@ E2E_APP_SK=sk_test_xxx E2E_APP_PK=pk_test_xxx E2E_APP_URL=http://localhost:3000 
 
 You need to replace all environment variables with your specific values/needs, above are just placeholders.
 
+## Running tests against staging
+
+The integration suite supports running tests against Clerk's **staging** environment (`clerkstage.dev`) in addition to the default production environment. This is used to validate SDK behavior against staging API changes before they ship to production.
+
+### How it works
+
+When `E2E_STAGING=1` is set, the `withInstanceKeys` wrapper in [`presets/envs.ts`](../integration/presets/envs.ts) automatically swaps each environment config's PK/SK to their staging equivalents and sets `CLERK_API_URL` to `https://api.clerkstage.dev`. Staging keys are looked up by prefixing the production key name with `clerkstage-` (e.g., `with-email-codes` becomes `clerkstage-with-email-codes`).
+
+If a staging key doesn't exist for a given config, the config is left without a staging API URL. The `isStagingReady` function checks whether a config has been swapped, and long running apps that aren't staging-ready are **gracefully skipped** rather than causing test failures. This means you can run the full test suite against staging even if only a subset of instances have been mirrored.
+
+### Staging keys
+
+Staging keys are stored separately from production keys:
+
+- **Locally**: `.keys.staging.json` (same format as `.keys.json`, gitignored)
+- **CI**: `INTEGRATION_STAGING_INSTANCE_KEYS` environment variable (JSON, same format as `INTEGRATION_INSTANCE_KEYS`)
+
+Running `pnpm integration:secrets` will fetch staging keys from 1Password if they exist. If the staging keys field isn't available, the script skips them gracefully.
+
+### Running locally
+
+```shell
+E2E_STAGING=1 pnpm test:integration:base
+```
+
+Or for a specific preset:
+
+```shell
+E2E_STAGING=1 pnpm test:integration:nextjs
+```
+
+Tests whose environment configs don't have staging keys will be skipped automatically.
+
+### CI
+
+The [`e2e-staging.yml`](../.github/workflows/e2e-staging.yml) workflow runs integration tests against staging. It sets `E2E_STAGING=1` and provides `INTEGRATION_STAGING_INSTANCE_KEYS` from repository secrets. This workflow is triggered by `workflow_dispatch` (manually or from `clerk_go`) and is typically used to validate staging API changes before release.
+
 ## Writing your first test
 
 In this step-by-step instruction you'll learn how to create a new integration test. If your test case already fits into an existing file, please add a new `test()` block instead of creating a whole new file.
@@ -291,18 +328,13 @@ If you need to run a test suite inside a different environment (e.g. a different
    }
    ```
 
-1. Inside `presets/envs.ts`, create a new environment config:
+1. Inside `presets/envs.ts`, create a new environment config wrapped with `withInstanceKeys`:
 
    ```ts
-   const yourConciseName = environmentConfig()
-     .setId('yourConciseName')
-     .setEnvVariable('private', 'CLERK_API_URL', process.env.E2E_APP_STAGING_CLERK_API_URL)
-     .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['your-concise-name'].sk)
-     .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['your-concise-name'].pk)
-     .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
-     .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
-     .setEnvVariable('public', 'CLERK_JS', process.env.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+   const yourConciseName = withInstanceKeys('your-concise-name', base.clone().setId('yourConciseName'));
    ```
+
+   The `withInstanceKeys` wrapper sets PK/SK from the instance keys map and automatically swaps to staging keys when `E2E_STAGING=1` is set. The first argument is the production key name — the staging key is looked up as `clerkstage-your-concise-name`. See [Running tests against staging](#running-tests-against-staging) for more details.
 
 1. Export `yourConciseName` from the file:
 
@@ -313,7 +345,7 @@ If you need to run a test suite inside a different environment (e.g. a different
    } as const;
    ```
 
-1. Ensure that your new keys are added to the `INTEGRATION_INSTANCE_KEYS` environment variable inside the repository so that GitHub actions can successfully run.
+1. Ensure that your new keys are added to the `INTEGRATION_INSTANCE_KEYS` environment variable inside the repository so that GitHub actions can successfully run. If you also have staging keys, add them to `INTEGRATION_STAGING_INSTANCE_KEYS`.
 
 ## Debugging tests
 
@@ -357,7 +389,10 @@ You need to replace the `XXX` in the `path` with the ID of your long running app
 
 ### Constants
 
-To get an overview of all the available environment variables you can set, read [`constants.ts`](../integration/constants.ts).
+To get an overview of all the available environment variables you can set, read [`constants.ts`](../integration/constants.ts). Notable additions include:
+
+- `E2E_STAGING`: Set to `1` to run tests against the staging environment
+- `INTEGRATION_STAGING_INSTANCE_KEYS`: JSON-encoded staging instance keys (used in CI)
 
 ### Application configs
 
@@ -498,6 +533,8 @@ A long running application is a thin wrapper around an `Application` that expose
 
 Since installing dependencies and booting up an app is a slow operation, long running applications are designed to start **once** in `global.setup` stay open while the tests run, and then stop in `global.teardown` so they can be reused by different suites.
 
+When running in staging mode (`E2E_STAGING=1`), long running apps are filtered by `isStagingReady`. Apps whose environment configs don't have staging keys are excluded from the list — `getByPattern` will return an empty array for those apps instead of throwing, and will log which suites were skipped. At startup, a summary of all skipped apps is also logged. This allows the full test suite to run against staging even when only a subset of instances have been mirrored. If a pattern doesn't match any known app (e.g. a typo), it will still throw an error regardless of staging mode.
+
 You'd define it like so:
 
 ```ts
@@ -522,20 +559,22 @@ Example usage of an existing config (also see [Application](#application)):
 await app.withEnv(appConfigs.envs.withEmailCodes);
 ```
 
-Inside [`presets/envs.ts`](../integration/presets/envs.ts) you can also create a completely new environment config:
+Inside [`presets/envs.ts`](../integration/presets/envs.ts) you can also create a completely new environment config. All new configs should be wrapped with `withInstanceKeys` to enable staging environment swapping:
 
 ```ts
-const withCustomRoles = environmentConfig()
-  .setId('withCustomRoles')
-  .setEnvVariable('private', 'CLERK_API_URL', process.env.E2E_APP_STAGING_CLERK_API_URL)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-custom-roles'].sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-custom-roles'].pk)
-  .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
-  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
-  .setEnvVariable('public', 'CLERK_JS', process.env.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+const withCustomRoles = withInstanceKeys(
+  'with-custom-roles',
+  base
+    .clone()
+    .setId('withCustomRoles')
+    .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
+    .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up'),
+);
 ```
 
-Read [creating a new environment config](#creating-a-new-environment-config) to learn more.
+When `E2E_STAGING=1`, this will automatically look up `clerkstage-with-custom-roles` from the staging keys and swap the PK, SK, and API URL. If the staging key doesn't exist, the config will not be staging-ready and any long running apps using it will be gracefully skipped.
+
+Read [creating a new environment config](#creating-a-new-environment-config) and [running tests against staging](#running-tests-against-staging) to learn more.
 
 ### Deployments
 
@@ -578,7 +617,9 @@ The integration suite uses [`presets/envs.ts`](../integration/presets/envs.ts) t
 
 This is why you created the `.keys.json` file in the [initial setup](#initial-setup) step. Those secret and publishable keys are used to create environment configs. Inside GitHub actions these keys are provided through the `INTEGRATION_INSTANCE_KEYS` environment variable.
 
-They keys defined in `.keys.json.sample` correspond with the Clerk instances in the **Integration testing** organization.
+The keys defined in `.keys.json.sample` correspond with the Clerk instances in the **Integration testing** organization.
+
+For staging tests, a separate `.keys.staging.json` file (or `INTEGRATION_STAGING_INSTANCE_KEYS` env var in CI) provides staging instance keys. These are merged into the key map at startup and used by `withInstanceKeys` when `E2E_STAGING=1` is set. See [Running tests against staging](#running-tests-against-staging) for details.
 
 ### Test isolation
 

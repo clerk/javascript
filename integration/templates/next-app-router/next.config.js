@@ -1,6 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  outputFileTracingRoot: '/',
-};
+const nextConfig = {};
 
 module.exports = nextConfig;

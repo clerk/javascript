@@ -1,7 +1,8 @@
-import { createApp, eventHandler, setResponseHeader, toWebHandler } from 'h3';
-import { vi } from 'vitest';
+import { createApp, createError, eventHandler, setResponseHeader, toWebHandler } from 'h3';
+import { describe, expect, test, vi } from 'vitest';
 
 import { clerkMiddleware } from '../clerkMiddleware';
+import { createRouteMatcher } from '../routeMatcher';
 
 const SESSION_AUTH_RESPONSE = {
   userId: 'user_2jZSstSbxtTndD9P7q4kDl0VVZa',
@@ -58,6 +59,25 @@ vi.mock('../clerkClient', () => {
 });
 
 describe('clerkMiddleware(params)', () => {
+  test('returns 400 when createRouteMatcher encounters malformed percent-encoding', async () => {
+    const isProtectedRoute = createRouteMatcher(['/api/admin(.*)']);
+    const app = createApp();
+    const handler = toWebHandler(app);
+    app.use(
+      clerkMiddleware(event => {
+        if (isProtectedRoute(event)) {
+          throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
+        }
+      }),
+    );
+    app.use(
+      '/',
+      eventHandler(() => ({ status: 'ok' })),
+    );
+    const response = await handler(new Request(new URL('/api/%zz/users', 'http://localhost')));
+    expect(response.status).toBe(400);
+  });
+
   test('renders route as normally when used without params', async () => {
     const app = createApp();
     const handler = toWebHandler(app);

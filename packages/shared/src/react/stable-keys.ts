@@ -15,6 +15,9 @@ const API_KEYS_KEY = 'apiKeys';
 // Keys for `useOrganizationCreationDefaults`
 const ORGANIZATION_CREATION_DEFAULTS_KEY = 'organizationCreationDefaults';
 
+// Keys for `useOAuthConsent`
+const OAUTH_CONSENT_INFO_KEY = 'oauthConsentInfo';
+
 // Keys for `usePlans`
 const PLANS_KEY = 'billing-plans';
 
@@ -54,6 +57,9 @@ export const STABLE_KEYS = {
 
   // Keys for `useOrganizationCreationDefaults`
   ORGANIZATION_CREATION_DEFAULTS_KEY,
+
+  // Keys for `useOAuthConsent`
+  OAUTH_CONSENT_INFO_KEY,
 } as const;
 
 export type ResourceCacheStableKey = (typeof STABLE_KEYS)[keyof typeof STABLE_KEYS];
@@ -66,10 +72,13 @@ export type ResourceCacheStableKey = (typeof STABLE_KEYS)[keyof typeof STABLE_KE
 const PAYMENT_ATTEMPT_KEY = 'billing-payment-attempt';
 const BILLING_PLANS_KEY = 'billing-plan';
 const BILLING_STATEMENTS_KEY = 'billing-statement';
+const USER_ENTERPRISE_CONNECTIONS_KEY = 'userEnterpriseConnections';
+
 export const INTERNAL_STABLE_KEYS = {
   PAYMENT_ATTEMPT_KEY,
   BILLING_PLANS_KEY,
   BILLING_STATEMENTS_KEY,
+  USER_ENTERPRISE_CONNECTIONS_KEY,
 } as const;
 
 export type __internal_ResourceCacheStableKey = (typeof INTERNAL_STABLE_KEYS)[keyof typeof INTERNAL_STABLE_KEYS];

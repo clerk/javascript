@@ -27,6 +27,8 @@ export const ObjectType = {
   Cookies: 'cookies',
   Domain: 'domain',
   Email: 'email',
+  EnterpriseAccount: 'enterprise_account',
+  EnterpriseConnection: 'enterprise_connection',
   EmailAddress: 'email_address',
   ExternalAccount: 'external_account',
   FacebookAccount: 'facebook_account',
@@ -191,6 +193,37 @@ export interface EmailAddressJSON extends ClerkResourceJSON {
   email_address: string;
   verification: VerificationJSON | null;
   linked_to: IdentificationLinkJSON[];
+}
+
+export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
+  active: boolean;
+  allow_idp_initiated: boolean;
+  allow_subdomains: boolean;
+  disable_additional_identifications: boolean;
+  domain: string;
+  logo_public_url: string | null;
+  name: string;
+  protocol: string;
+  provider: string;
+  sync_user_attributes: boolean;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface EnterpriseAccountJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.EnterpriseAccount;
+  active: boolean;
+  email_address: string;
+  enterprise_connection: EnterpriseAccountConnectionJSON | null;
+  first_name: string | null;
+  last_name: string | null;
+  protocol: string;
+  provider: string;
+  provider_user_id: string | null;
+  public_metadata: Record<string, unknown>;
+  verification: VerificationJSON | null;
+  last_authenticated_at: number | null;
+  enterprise_connection_id: string | null;
 }
 
 export interface ExternalAccountJSON extends ClerkResourceJSON {
@@ -595,6 +628,7 @@ export interface UserJSON extends ClerkResourceJSON {
   web3_wallets: Web3WalletJSON[];
   organization_memberships: OrganizationMembershipJSON[] | null;
   external_accounts: ExternalAccountJSON[];
+  enterprise_accounts: EnterpriseAccountJSON[];
   password_last_updated_at: number | null;
   public_metadata: UserPublicMetadata;
   private_metadata: UserPrivateMetadata;
@@ -668,6 +702,47 @@ export interface UserDeletedJSON extends DeletedObjectJSON {
 export interface PaginatedResponseJSON {
   data: object[];
   total_count?: number;
+}
+
+export interface EnterpriseConnectionSamlConnectionJSON {
+  id: string;
+  name: string;
+  idp_entity_id: string;
+  idp_sso_url: string;
+  idp_certificate: string;
+  idp_metadata_url: string;
+  idp_metadata: string;
+  acs_url: string;
+  sp_entity_id: string;
+  sp_metadata_url: string;
+  sync_user_attributes: boolean;
+  allow_subdomains: boolean;
+  allow_idp_initiated: boolean;
+}
+
+export interface EnterpriseConnectionOauthConfigJSON {
+  id: string;
+  name: string;
+  client_id: string;
+  discovery_url: string;
+  logo_public_url: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.EnterpriseConnection;
+  name: string;
+  domains: string[];
+  organization_id: string | null;
+  active: boolean;
+  sync_user_attributes: boolean;
+  allow_subdomains: boolean;
+  disable_additional_identifications: boolean;
+  created_at: number;
+  updated_at: number;
+  saml_connection?: EnterpriseConnectionSamlConnectionJSON | null;
+  oauth_config?: EnterpriseConnectionOauthConfigJSON | null;
 }
 
 export interface SamlConnectionJSON extends ClerkResourceJSON {
@@ -854,7 +929,7 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   is_recurring: boolean;
   has_base_fee: boolean;
   publicly_visible: boolean;
-  fee: BillingMoneyAmountJSON;
+  fee: BillingMoneyAmountJSON | null;
   annual_fee: BillingMoneyAmountJSON | null;
   annual_monthly_fee: BillingMoneyAmountJSON | null;
   for_payer_type: 'org' | 'user';

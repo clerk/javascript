@@ -9,6 +9,7 @@ import {
   ClientAPI,
   DomainAPI,
   EmailAddressAPI,
+  EnterpriseConnectionAPI,
   IdPOAuthAccessTokenApi,
   InstanceAPI,
   InvitationAPI,
@@ -67,6 +68,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     clients: new ClientAPI(request),
     domains: new DomainAPI(request),
     emailAddresses: new EmailAddressAPI(request),
+    enterpriseConnections: new EnterpriseConnectionAPI(request),
     idPOAuthAccessToken: new IdPOAuthAccessTokenApi(
       buildRequest({
         ...options,
@@ -96,7 +98,6 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     phoneNumbers: new PhoneNumberAPI(request),
     proxyChecks: new ProxyCheckAPI(request),
     redirectUrls: new RedirectUrlAPI(request),
-    samlConnections: new SamlConnectionAPI(request),
     sessions: new SessionAPI(request),
     signInTokens: new SignInTokenAPI(request),
     signUps: new SignUpAPI(request),
@@ -104,5 +105,10 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     users: new UserAPI(request),
     waitlistEntries: new WaitlistEntryAPI(request),
     webhooks: new WebhookAPI(request),
+
+    /**
+     * @deprecated Use `enterpriseConnections` instead.
+     */
+    samlConnections: new SamlConnectionAPI(request),
   };
 }

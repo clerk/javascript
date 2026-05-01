@@ -68,6 +68,48 @@ const routes = [
     path: '/billing/subscription-details-btn',
     component: () => import('./views/billing/SubscriptionDetailsBtn.vue'),
   },
+  // Composable state routes (public, for testing composable output)
+  {
+    name: 'AuthState',
+    path: '/auth-state',
+    component: () => import('./views/AuthState.vue'),
+  },
+  {
+    name: 'UserState',
+    path: '/user-state',
+    component: () => import('./views/UserState.vue'),
+  },
+  {
+    name: 'SessionState',
+    path: '/session-state',
+    component: () => import('./views/SessionState.vue'),
+  },
+  {
+    name: 'OrgState',
+    path: '/org-state',
+    component: () => import('./views/OrgState.vue'),
+  },
+  // Component test routes
+  {
+    name: 'SignOut',
+    path: '/sign-out',
+    component: () => import('./views/SignOutPage.vue'),
+  },
+  {
+    name: 'OrganizationList',
+    path: '/org-list',
+    component: () => import('./views/OrganizationListPage.vue'),
+  },
+  {
+    name: 'CreateOrganization',
+    path: '/create-org',
+    component: () => import('./views/CreateOrganizationPage.vue'),
+  },
+  {
+    name: 'ShowComponent',
+    path: '/show-component',
+    component: () => import('./views/ShowComponent.vue'),
+  },
 ];
 
 const router = createRouter({

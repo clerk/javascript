@@ -60,7 +60,7 @@ export const SetupMfaStartScreen = withCardStateProvider((props: SetupMfaStartSc
           })}
         >
           {availableMethods.map(method => {
-            const methodConfig = METHOD_CONFIG[method] ?? null;
+            const methodConfig = METHOD_CONFIG[method as keyof typeof METHOD_CONFIG] ?? null;
 
             if (!methodConfig) {
               return null;

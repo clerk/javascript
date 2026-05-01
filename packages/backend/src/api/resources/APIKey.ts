@@ -66,7 +66,7 @@ export class APIKey {
      */
     readonly updatedAt: number,
     /**
-     * The API key secret. **This property is only present in the response from [`create()`](/docs/reference/javascript/api-keys#create) and cannot be retrieved later.**
+     * The API key secret. **This property is only present in the response from [`create()`](/docs/reference/objects/api-keys#create) and cannot be retrieved later.**
      */
     readonly secret?: string,
   ) {}

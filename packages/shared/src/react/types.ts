@@ -12,7 +12,7 @@ export type CacheSetter<CData = any> = (
  */
 export type PaginatedResources<T = unknown, Infinite = false> = {
   /**
-   * An array that contains the fetched data. For example, for the `memberships` attribute, data will be an array of [`OrganizationMembership`](https://clerk.com/docs/reference/javascript/types/organization-membership) objects.
+   * An array that contains the fetched data. For example, for the `memberships` attribute, data will be an array of [`OrganizationMembership`](https://clerk.com/docs/reference/types/organization-membership) objects.
    */
   data: T[];
   /**

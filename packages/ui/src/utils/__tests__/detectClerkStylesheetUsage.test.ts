@@ -177,6 +177,42 @@ describe('detectStructuralClerkCss', () => {
     });
   });
 
+  describe('should NOT flag .cl-internal-* classes', () => {
+    test('.cl-internal- class with :has() selector', () => {
+      mockStyleSheets([
+        createMockStyleSheet([
+          createMockStyleRule(
+            '.cl-internal-go4bxw:has(button:focus-visible)',
+            '.cl-internal-go4bxw:has(button:focus-visible) { }',
+          ),
+        ]),
+      ]);
+
+      const hits = detectStructuralClerkCss();
+      expect(hits).toHaveLength(0);
+    });
+
+    test('.cl-internal- class with descendant selector', () => {
+      mockStyleSheets([
+        createMockStyleSheet([createMockStyleRule('.cl-internal-o2kwkh ul', '.cl-internal-o2kwkh ul { }')]),
+      ]);
+
+      const hits = detectStructuralClerkCss();
+      expect(hits).toHaveLength(0);
+    });
+
+    test('tag with descendant .cl-internal- class', () => {
+      mockStyleSheets([
+        createMockStyleSheet([
+          createMockStyleRule('button:hover .cl-internal-gxb76v', 'button:hover .cl-internal-gxb76v { }'),
+        ]),
+      ]);
+
+      const hits = detectStructuralClerkCss();
+      expect(hits).toHaveLength(0);
+    });
+  });
+
   describe('should handle CORS-blocked stylesheets gracefully', () => {
     test('skips stylesheets that throw on cssRules access', () => {
       const blockedSheet = {

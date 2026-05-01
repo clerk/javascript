@@ -1363,6 +1363,7 @@ export const esMX: LocalizationResource = {
         title: 'Correos electrónicos',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Conectar cuenta',
         title: 'Cuentas de empresa',
       },
       headerTitle__account: 'Detalles de la cuenta',

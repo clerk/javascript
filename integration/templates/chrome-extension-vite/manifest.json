@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Clerk Test Extension",
+  "version": "1.0.0",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": ["storage", "cookies"],
+  "host_permissions": ["http://localhost/*"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}

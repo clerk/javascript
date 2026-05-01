@@ -32,6 +32,7 @@ jobs:
       - name: Setup
         uses: ./.github/actions/init
         with:
+          turbo-enabled: false
           turbo-team: ''
           turbo-token: ''
 

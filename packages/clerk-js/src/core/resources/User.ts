@@ -10,8 +10,11 @@ import type {
   DeletedObjectResource,
   EmailAddressResource,
   EnterpriseAccountResource,
+  EnterpriseConnectionJSON,
+  EnterpriseConnectionResource,
   ExternalAccountJSON,
   ExternalAccountResource,
+  GetEnterpriseConnectionsParams,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -42,6 +45,7 @@ import {
   DeletedObject,
   EmailAddress,
   EnterpriseAccount,
+  EnterpriseConnection,
   ExternalAccount,
   Image,
   OrganizationMembership,
@@ -156,7 +160,7 @@ export class User extends BaseResource implements UserResource {
   };
 
   createExternalAccount = async (params: CreateExternalAccountParams): Promise<ExternalAccountResource> => {
-    const { strategy, redirectUrl, additionalScopes } = params || {};
+    const { strategy, redirectUrl, additionalScopes, enterpriseConnectionId } = params || {};
 
     const json = (
       await BaseResource._fetch<ExternalAccountJSON>({
@@ -166,6 +170,7 @@ export class User extends BaseResource implements UserResource {
           strategy,
           redirect_url: redirectUrl,
           additional_scope: additionalScopes,
+          enterprise_connection_id: enterpriseConnectionId,
         } as any,
       })
     )?.response as unknown as ExternalAccountJSON;
@@ -287,6 +292,28 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as DeletedObjectJSON;
 
     return new DeletedObject(json);
+  };
+
+  getEnterpriseConnections = async (
+    params?: GetEnterpriseConnectionsParams,
+  ): Promise<EnterpriseConnectionResource[]> => {
+    const { withOrganizationAccountLinking } = params || {};
+
+    const json = (
+      await BaseResource._fetch({
+        path: '/me/enterprise_connections',
+        method: 'GET',
+        ...(withOrganizationAccountLinking !== undefined
+          ? {
+              search: {
+                with_organization_account_linking: String(withOrganizationAccountLinking),
+              },
+            }
+          : {}),
+      })
+    )?.response as unknown as EnterpriseConnectionJSON[];
+
+    return (json || []).map(connection => new EnterpriseConnection(connection));
   };
 
   initializePaymentMethod: typeof initializePaymentMethod = params => {

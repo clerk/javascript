@@ -1372,6 +1372,7 @@ export const frFR: LocalizationResource = {
         title: 'Adresses e-mail',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Connecter un compte',
         title: 'Comptes entreprises',
       },
       headerTitle__account: 'Compte',

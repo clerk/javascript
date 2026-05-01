@@ -1351,6 +1351,7 @@ export const trTR: LocalizationResource = {
         title: 'E-posta adresleri',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Hesap bağla',
         title: 'Kurumsal hesaplar',
       },
       headerTitle__account: 'Hesap',

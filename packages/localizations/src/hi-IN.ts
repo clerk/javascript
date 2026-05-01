@@ -1360,6 +1360,7 @@ export const hiIN: LocalizationResource = {
         title: 'ईमेल पते',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'खाता कनेक्ट करें',
         title: 'एंटरप्राइज खाते',
       },
       headerTitle__account: 'प्रोफ़ाइल विवरण',

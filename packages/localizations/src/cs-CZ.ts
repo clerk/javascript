@@ -1361,6 +1361,7 @@ export const csCZ: LocalizationResource = {
         title: 'E-mailové adresy',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Připojit účet',
         title: 'Podnikové účty',
       },
       headerTitle__account: 'Podrobnosti profilu',

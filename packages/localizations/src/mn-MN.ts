@@ -1350,6 +1350,7 @@ export const mnMN: LocalizationResource = {
         title: 'Имэйл хаягууд',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Бүртгэлийг холбоно уу',
         title: 'Байгууллагын бүртгэлүүд',
       },
       headerTitle__account: 'Профайлын дэлгэрэнгүй',

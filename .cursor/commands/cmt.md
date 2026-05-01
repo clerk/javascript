@@ -17,7 +17,7 @@ Generate a commit message for changes in this chat. **Do not commit or push** (s
 
 Scopes must match package/app names. No scope is also valid. Invalid scope = commitlint rejection.
 
-- **Packages:** agent-toolkit, astro, backend, chrome-extension, clerk-js, dev-cli, elements, expo, expo-passkeys, express, fastify, localizations, nextjs, nuxt, react, react-router, remix, shared, tanstack-react-start, testing, themes, types, ui, upgrade, vue
+- **Packages:** astro, backend, chrome-extension, clerk-js, dev-cli, elements, expo, expo-passkeys, express, fastify, localizations, nextjs, nuxt, react, react-router, remix, shared, tanstack-react-start, testing, themes, types, ui, upgrade, vue
 - **Other:** docs, repo, release, e2e, \*
 
 ---

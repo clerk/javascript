@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: "0 7 * * *"
 
+permissions:
+  contents: read
+
 jobs:
   integration-tests:
     name: Integration Tests
@@ -110,7 +113,7 @@ jobs:
           path: |
             ${{runner.temp}}/test-output.log
             /tmp/.temp_integration/
-            integration/test-results/
+            test-results/
           retention-days: 7
 
       - name: Report Status

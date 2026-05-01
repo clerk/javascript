@@ -18,8 +18,9 @@ import {
   SessionJWTCache,
 } from '../../cache';
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
+import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { errorThrower } from '../../errorThrower';
-import { isNative } from '../../utils';
+import { assertValidProxyUrl, isNative } from '../../utils';
 import type { BuildClerkOptions } from './types';
 
 /**
@@ -36,33 +37,80 @@ type FapiResponse = Response & {
   payload: { errors?: Array<{ code: string }> } | null;
 };
 
-const KEY = '__clerk_client_jwt';
+type ClerkRuntimeOptions = Pick<BuildClerkOptions, 'publishableKey' | 'proxyUrl' | 'domain'>;
+type ResolvedClerkRuntimeOptions = Omit<ClerkRuntimeOptions, 'publishableKey'> & {
+  publishableKey: string;
+};
+
+function hasOwnOption<Key extends keyof ClerkRuntimeOptions>(
+  options: ClerkRuntimeOptions | undefined,
+  key: Key,
+): options is ClerkRuntimeOptions & Required<Pick<ClerkRuntimeOptions, Key>> {
+  return !!options && Object.prototype.hasOwnProperty.call(options, key);
+}
 
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
+let __internal_clerkOptions: ClerkRuntimeOptions | undefined;
+
+/**
+ * Resolves the next native singleton config while preserving existing values for omitted options.
+ * A publishable key change starts from a clean proxy/domain config unless those values are
+ * explicitly provided alongside the new key.
+ */
+function getUpdatedClerkOptions(
+  currentOptions: ClerkRuntimeOptions | undefined,
+  nextOptions: ClerkRuntimeOptions | undefined,
+): {
+  hasConfigChanged: boolean;
+  options: ResolvedClerkRuntimeOptions;
+} {
+  const hasNextProxyUrl = hasOwnOption(nextOptions, 'proxyUrl');
+  const hasNextDomain = hasOwnOption(nextOptions, 'domain');
+  const hasKeyChanged =
+    !!currentOptions &&
+    typeof nextOptions?.publishableKey !== 'undefined' &&
+    nextOptions.publishableKey !== currentOptions.publishableKey;
+  const hasProxyChanged = !!currentOptions && hasNextProxyUrl && nextOptions.proxyUrl !== currentOptions.proxyUrl;
+  const hasDomainChanged = !!currentOptions && hasNextDomain && nextOptions.domain !== currentOptions.domain;
+
+  return {
+    hasConfigChanged: hasKeyChanged || hasProxyChanged || hasDomainChanged,
+    options: {
+      publishableKey: nextOptions?.publishableKey ?? currentOptions?.publishableKey ?? '',
+      proxyUrl: hasKeyChanged
+        ? nextOptions?.proxyUrl
+        : hasNextProxyUrl
+          ? nextOptions.proxyUrl
+          : currentOptions?.proxyUrl,
+      domain: hasKeyChanged ? nextOptions?.domain : hasNextDomain ? nextOptions.domain : currentOptions?.domain,
+    },
+  };
+}
 
 export function createClerkInstance(ClerkClass: typeof Clerk) {
   return (options?: BuildClerkOptions): HeadlessBrowserClerk | BrowserClerk => {
+    const { tokenCache = MemoryTokenCache, __experimental_resourceCache: createResourceCache } = options || {};
     const {
-      publishableKey = '',
-      tokenCache = MemoryTokenCache,
-      __experimental_resourceCache: createResourceCache,
-    } = options || {};
+      hasConfigChanged,
+      options: { publishableKey, proxyUrl, domain },
+    } = getUpdatedClerkOptions(__internal_clerkOptions, options);
 
     if (!__internal_clerk && !publishableKey) {
       errorThrower.throwMissingPublishableKeyError();
     }
 
-    // Support "hot-swapping" the Clerk instance at runtime. See JS-598 for additional details.
-    const hasKeyChanged = __internal_clerk && !!publishableKey && publishableKey !== __internal_clerk.publishableKey;
+    if (!__internal_clerk || hasConfigChanged) {
+      assertValidProxyUrl(proxyUrl);
 
-    if (!__internal_clerk || hasKeyChanged) {
-      if (hasKeyChanged) {
-        tokenCache.clearToken?.(KEY);
+      if (hasConfigChanged) {
+        tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
       }
 
       const getToken = tokenCache.getToken;
       const saveToken = tokenCache.saveToken;
-      __internal_clerk = new ClerkClass(publishableKey) as unknown as BrowserClerk;
+
+      __internal_clerkOptions = { publishableKey, proxyUrl, domain };
+      __internal_clerk = new ClerkClass(publishableKey, { proxyUrl, domain }) as unknown as BrowserClerk;
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API
@@ -103,10 +151,9 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           return Promise.resolve(true);
         };
 
-        if (createResourceCache) {
-          const isClerkNetworkError = (err: unknown): boolean =>
-            isClerkRuntimeError(err) && err.code === 'network_error';
+        const isClerkNetworkError = (err: unknown): boolean => isClerkRuntimeError(err) && err.code === 'network_error';
 
+        if (createResourceCache) {
           const retryInitilizeResourcesFromFAPI = async () => {
             try {
               await __internal_clerk?.__internal_reloadInitialResources();
@@ -125,12 +172,9 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           ClientResourceCache.init({ publishableKey, storage: createResourceCache });
           SessionJWTCache.init({ publishableKey, storage: createResourceCache });
 
-          // At this point __internal_clerk is guaranteed to be defined (just created above)
-
-          const clerk = __internal_clerk;
-          clerk.addListener(({ client }) => {
+          __internal_clerk.addListener(({ client }) => {
             // @ts-expect-error - This is an internal API
-            const environment = clerk?.__internal_environment as EnvironmentResource;
+            const environment = __internal_clerk?.__internal_environment as EnvironmentResource;
             if (environment) {
               void EnvironmentResourceCache.save(environment.__internal_toSnapshot());
             }
@@ -149,7 +193,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             }
           });
 
-          clerk.__internal_getCachedResources = async (): Promise<{
+          __internal_clerk.__internal_getCachedResources = async (): Promise<{
             client: ClientJSONSnapshot | null;
             environment: EnvironmentJSONSnapshot | null;
           }> => {
@@ -173,7 +217,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         // Instructs the backend to parse the api token from the Authorization header.
         requestInit.url?.searchParams.append('_is_native', '1');
 
-        const jwt = await getToken(KEY);
+        const jwt = await getToken(CLERK_CLIENT_JWT_KEY);
         (requestInit.headers as Headers).set('authorization', jwt || '');
 
         // Instructs the backend that the request is from a mobile device.
@@ -189,10 +233,10 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       __internal_clerk.__internal_onAfterResponse(async (_: FapiRequestInit, response: FapiResponse) => {
         const authHeader = response.headers.get('authorization');
         if (authHeader) {
-          await saveToken(KEY, authHeader);
+          await saveToken(CLERK_CLIENT_JWT_KEY, authHeader);
         }
 
-        if (!nativeApiErrorShown && response.payload?.errors?.[0]?.code === 'native_api_disabled') {
+        if (__DEV__ && !nativeApiErrorShown && response.payload?.errors?.[0]?.code === 'native_api_disabled') {
           console.error(
             'The Native API is disabled for this instance.\nGo to Clerk Dashboard > Configure > Native applications to enable it.\nOr, navigate here: https://dashboard.clerk.com/last-active?path=native-applications',
           );
@@ -200,6 +244,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         }
       });
     }
+    // At this point __internal_clerk is guaranteed to be defined
     return __internal_clerk;
   };
 }

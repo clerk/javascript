@@ -1314,6 +1314,7 @@ export const zhCN: LocalizationResource = {
         title: '电子邮件地址',
       },
       enterpriseAccountsSection: {
+        primaryButton: '连接账户',
         title: '企业账户',
       },
       headerTitle__account: '账户',

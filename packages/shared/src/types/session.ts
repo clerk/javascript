@@ -199,7 +199,7 @@ export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCust
  *
  * The `Session` object includes methods for recording session activity and ending the session client-side. For security reasons, sessions can also expire server-side.
  *
- * As soon as a [`User`](https://clerk.com/docs/reference/javascript/user) signs in, Clerk creates a `Session` for the current [`Client`](https://clerk.com/docs/reference/javascript/client). Clients can have more than one sessions at any point in time, but only one of those sessions will be **active**.
+ * As soon as a [`User`](https://clerk.com/docs/reference/objects/user) signs in, Clerk creates a `Session` for the current [`Client`](https://clerk.com/docs/reference/objects/client). Clients can have more than one sessions at any point in time, but only one of those sessions will be **active**.
  *
  * In certain scenarios, a session might be replaced by another one. This is often the case with [multi-session applications](https://clerk.com/docs/guides/secure/session-options#multi-session-applications).
  *
@@ -240,7 +240,7 @@ export interface SessionResource extends ClerkResource {
    */
   end: () => Promise<SessionResource>;
   remove: () => Promise<SessionResource>;
-  touch: () => Promise<SessionResource>;
+  touch: (params?: SessionTouchParams) => Promise<SessionResource>;
   getToken: GetToken;
   checkAuthorization: CheckAuthorization;
   clearCache: () => void;
@@ -262,7 +262,7 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   verifyWithPasskey: () => Promise<SessionVerificationResource>;
   __internal_toSnapshot: () => SessionJSONSnapshot;
-  __internal_touch: () => Promise<ClientResource | undefined>;
+  __internal_touch: (params?: SessionTouchParams) => Promise<ClientResource | undefined>;
 }
 
 /**
@@ -322,6 +322,12 @@ export type SessionStatus =
   | 'revoked'
   | 'pending';
 
+export type SessionTouchIntent = 'focus' | 'select_session' | 'select_org';
+
+export type SessionTouchParams = {
+  intent?: SessionTouchIntent;
+};
+
 export interface PublicUserData {
   firstName: string | null;
   lastName: string | null;
@@ -330,6 +336,7 @@ export interface PublicUserData {
   identifier: string;
   userId?: string;
   username?: string;
+  banned?: boolean;
 }
 
 /**

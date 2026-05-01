@@ -16,6 +16,7 @@ export * from './DeletedObject';
 export * from './DisplayConfig';
 export * from './EmailAddress';
 export * from './EnterpriseAccount';
+export * from './EnterpriseConnection';
 export * from './Environment';
 export * from './ExternalAccount';
 export * from './Feature';

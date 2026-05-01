@@ -5,7 +5,7 @@ import { useClientBase } from './base/useClientBase';
 
 const hookName = 'useSessionList';
 /**
- * The `useSessionList()` hook returns an array of [`Session`](https://clerk.com/docs/reference/javascript/session) objects that have been registered on the client device.
+ * The `useSessionList()` hook returns an array of [`Session`](https://clerk.com/docs/reference/objects/session) objects that have been registered on the client device.
  *
  * @unionReturnHeadings
  * ["Initialization", "Loaded"]

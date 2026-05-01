@@ -81,6 +81,7 @@ playground/*/yarn.lock
 
 # integration testing
 .keys.json
+.keys.staging.json
 .env.json
 .temp_integration
 playwright-report
@@ -90,6 +91,10 @@ sessions.pem
 
 # pkglab / Verdaccio local registry
 .verdaccio
+
+# yalc
+.yalc/
+yalc.lock
 
 # Release preflight
 .release-artifacts/

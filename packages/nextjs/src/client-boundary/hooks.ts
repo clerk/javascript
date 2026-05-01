@@ -4,6 +4,7 @@ export {
   useAuth,
   useClerk,
   useEmailLink,
+  useOAuthConsent,
   useOrganization,
   useOrganizationList,
   useOrganizationCreationDefaults,
@@ -14,6 +15,7 @@ export {
   useWaitlist,
   useUser,
   useReverification,
+  useAPIKeys,
 } from '@clerk/react';
 
 export {

@@ -26,7 +26,7 @@ import { OrganizationCreationDefaultsAlert } from './OrganizationCreationDefault
 
 type CreateOrganizationScreenProps = {
   onCancel?: () => void;
-  organizationCreationDefaults?: OrganizationCreationDefaultsResource;
+  organizationCreationDefaults?: OrganizationCreationDefaultsResource | null;
 };
 
 export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) => {

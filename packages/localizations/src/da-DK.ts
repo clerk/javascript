@@ -1345,6 +1345,7 @@ export const daDK: LocalizationResource = {
         title: 'E-mailadresser',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Tilknyt konto',
         title: 'Virksomhedskonti',
       },
       headerTitle__account: 'Konto',

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { writeFile } from 'node:fs/promises';
+import { rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { $ } from 'zx';
@@ -46,4 +46,23 @@ if (!envItem || !keysItem) {
 await writeFile(join(process.cwd(), 'integration', '.env.local'), envItem);
 await writeFile(join(process.cwd(), 'integration', '.keys.json'), keysItem);
 
-console.log('Keys and env written to .keys.json and .env.local');
+// Fetch staging keys (optional — won't fail if the field doesn't exist)
+const stagingKeysItem = await $`op read 'op://Shared/JS SDKs integration tests/add more/.keys.staging.json'`
+  .then(res => {
+    if (res.exitCode === 0) {
+      return res.stdout;
+    }
+
+    return null;
+  })
+  .catch(() => {
+    return null;
+  });
+
+if (stagingKeysItem) {
+  await writeFile(join(process.cwd(), 'integration', '.keys.staging.json'), stagingKeysItem);
+  console.log('Keys and env written to .keys.json, .keys.staging.json, and .env.local');
+} else {
+  await rm(join(process.cwd(), 'integration', '.keys.staging.json'), { force: true });
+  console.log('Keys and env written to .keys.json and .env.local (staging keys not found, skipping)');
+}
