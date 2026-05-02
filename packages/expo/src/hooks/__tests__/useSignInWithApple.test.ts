@@ -128,6 +128,7 @@ describe('useSignInWithApple', () => {
       const mockIdentityToken = 'mock-identity-token';
       mocks.signInAsync.mockResolvedValue({
         identityToken: mockIdentityToken,
+        fullName: { givenName: 'Jane', familyName: 'Doe' },
       });
 
       mockSignIn.create.mockResolvedValue(undefined);
@@ -152,8 +153,35 @@ describe('useSignInWithApple', () => {
       expect(mockSignUp.create).toHaveBeenCalledWith({
         transfer: true,
         unsafeMetadata: { source: 'test' },
+        firstName: 'Jane',
+        lastName: 'Doe',
       });
       expect(response.createdSessionId).toBe('new-user-session-id');
+    });
+
+    test('should omit name fields on transfer when Apple returns no fullName', async () => {
+      const mockIdentityToken = 'mock-identity-token';
+      mocks.signInAsync.mockResolvedValue({
+        identityToken: mockIdentityToken,
+      });
+
+      mockSignIn.create.mockResolvedValue(undefined);
+      mockSignIn.firstFactorVerification.status = 'transferable';
+
+      const mockSignUpWithSession = { ...mockSignUp, createdSessionId: 'new-user-session-id' };
+      mocks.useSignUp.mockReturnValue({
+        signUp: mockSignUpWithSession,
+        isLoaded: true,
+      });
+
+      const { result } = renderHook(() => useSignInWithApple());
+
+      await result.current.startAppleAuthenticationFlow();
+
+      expect(mockSignUp.create).toHaveBeenCalledWith({
+        transfer: true,
+        unsafeMetadata: undefined,
+      });
     });
 
     test('should handle user cancellation gracefully', async () => {

@@ -116,10 +116,13 @@ export function useSignInWithApple() {
       const userNeedsToBeCreated = signIn.firstFactorVerification.status === 'transferable';
 
       if (userNeedsToBeCreated) {
-        // User doesn't exist - create a new SignUp with transfer
+        // User doesn't exist - create a new SignUp with transfer & name fields
+        const { givenName, familyName } = credential.fullName ?? {};
         await signUp.create({
           transfer: true,
           unsafeMetadata: startAppleAuthenticationFlowParams?.unsafeMetadata,
+          ...(givenName ? { firstName: givenName } : {}),
+          ...(familyName ? { lastName: familyName } : {}),
         });
 
         return {
