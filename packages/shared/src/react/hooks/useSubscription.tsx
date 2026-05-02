@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
-import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
-import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
-import { useClerkQuery } from '../clerk-rq/useQuery';
+import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
+import { useClerkQueryClient } from '../query/use-clerk-query-client';
+import { useClerkQuery } from '../query/useQuery';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import { useOrganizationBase } from './base/useOrganizationBase';
 import { useUserBase } from './base/useUserBase';

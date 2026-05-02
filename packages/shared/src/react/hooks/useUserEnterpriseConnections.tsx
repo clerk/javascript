@@ -6,9 +6,9 @@ import type {
   EnterpriseConnectionResource,
   UpdateMeEnterpriseConnectionParams,
 } from '../../types/enterpriseConnection';
-import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
-import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
-import { useClerkQuery } from '../clerk-rq/useQuery';
+import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
+import { useClerkQueryClient } from '../query/use-clerk-query-client';
+import { useClerkQuery } from '../query/useQuery';
 import { useClerkInstanceContext } from '../contexts';
 import { useUserBase } from './base/useUserBase';
 import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';

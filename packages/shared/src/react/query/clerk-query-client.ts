@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/query-core';
 
 /**
- * The QueryClient backing every clerk-rq hook. Owned by `@clerk/shared` so the
+ * The QueryClient backing every clerk-query hook. Owned by `@clerk/shared` so the
  * `QueryObserver` that observes it and the `Query` objects inside it always
  * resolve to the same `@tanstack/query-core` (no cross-bundle drift between
  * the consumer-side `@clerk/shared` and the production CDN `clerk-js` bundle).

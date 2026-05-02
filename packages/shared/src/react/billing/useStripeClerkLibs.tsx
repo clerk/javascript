@@ -1,7 +1,7 @@
 import type { loadStripe } from '@stripe/stripe-js';
 
-import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
-import { useClerkQuery } from '../clerk-rq/useQuery';
+import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
+import { useClerkQuery } from '../query/useQuery';
 import { useClerk } from '../hooks/useClerk';
 
 type LoadStripeFn = typeof loadStripe;

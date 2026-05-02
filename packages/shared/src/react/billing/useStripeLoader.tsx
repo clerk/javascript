@@ -1,8 +1,8 @@
 import type { Stripe } from '@stripe/stripe-js';
 import { useMemo } from 'react';
 
-import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
-import { useClerkQuery } from '../clerk-rq/useQuery';
+import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
+import { useClerkQuery } from '../query/useQuery';
 import { useBillingIsEnabled } from '../hooks/useBillingIsEnabled';
 import type { UseStripeClerkLibsResult } from './useStripeClerkLibs';
 
