@@ -1,5 +1,5 @@
 import type { ClerkPaginationRequest } from '@clerk/shared/types';
-import { joinPaths } from 'src/util/path';
+import { joinPaths } from '../../util/path';
 
 import type { DeletedObject } from '../resources/DeletedObject';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
