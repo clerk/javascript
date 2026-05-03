@@ -81,7 +81,7 @@
     "dotenv": "17.2.2"
   },
   "devDependencies": {
-    "@playwright/test": "^1.56.1",
+    "@playwright/test": "^1.59.1",
     "cypress": "^14.5.4"
   },
   "peerDependencies": {
