@@ -5,14 +5,17 @@ import {
   mockJwks,
   mockJwt,
   mockJwtHeader,
+  mockM2MJwtPayload,
   mockJwtPayload,
   mockOAuthAccessTokenJwtPayload,
   pemEncodedPublicKey,
+  pemEncodedSignKey,
   publicJwks,
   signedJwt,
   someOtherPublicKey,
 } from '../../fixtures';
 import { mockSignedOAuthAccessTokenJwt, mockSignedOAuthAccessTokenJwtApplicationTyp } from '../../fixtures/machine';
+import { signJwt } from '../signJwt';
 import { decodeJwt, hasValidSignature, verifyJwt } from '../verifyJwt';
 
 const invalidTokenError = {
@@ -216,6 +219,50 @@ describe('verifyJwt(jwt, options)', () => {
     expect(error).toBeDefined();
     expect(error?.message).toContain('Invalid JWT type');
     expect(error?.message).toContain('Expected "at+jwt, application/at+jwt"');
+  });
+
+  it('verifies JWT when array aud includes the configured audience', async () => {
+    const audience = 'https://my-resource.example.com';
+    const { data: jwtWithArrayAud } = await signJwt(
+      {
+        ...mockM2MJwtPayload,
+        aud: ['https://other-resource.example.com', audience],
+      },
+      pemEncodedSignKey,
+      {
+        algorithm: mockJwtHeader.alg,
+        header: mockJwtHeader,
+      },
+    );
+
+    const { data } = await verifyJwt(jwtWithArrayAud || '', {
+      key: pemEncodedPublicKey,
+      audience,
+    });
+
+    expect(data?.aud).toEqual(['https://other-resource.example.com', audience]);
+  });
+
+  it('rejects JWT when array aud does not include the configured audience', async () => {
+    const { data: jwtWithArrayAud } = await signJwt(
+      {
+        ...mockM2MJwtPayload,
+        aud: ['https://attacker.example.com'],
+      },
+      pemEncodedSignKey,
+      {
+        algorithm: mockJwtHeader.alg,
+        header: mockJwtHeader,
+      },
+    );
+
+    const { errors: [error] = [] } = await verifyJwt(jwtWithArrayAud || '', {
+      key: pemEncodedPublicKey,
+      audience: 'https://my-resource.example.com',
+    });
+
+    expect(error).toBeDefined();
+    expect(error?.message).toContain('Invalid JWT audience claim array');
   });
 
   it('rejects an expired JWT when clockSkewInMs is explicitly 0', async () => {
