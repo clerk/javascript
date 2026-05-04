@@ -1,3 +1,3 @@
 export { Wizard } from './Wizard';
 export { useWizard, useRegisterContinueAction } from './WizardContext';
-export type { ContinueAction, WizardContextValue, WizardStep } from './types';
+export type { ContinueAction, WizardContextValue, WizardInnerStep, WizardStep } from './types';

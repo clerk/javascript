@@ -4,21 +4,20 @@ import { Col, Flex, Heading, Text } from '@/customizables';
 import { Wizard } from '@/elements/Wizard';
 
 interface StepLayoutProps {
-  title: React.ReactNode;
+  title?: React.ReactNode;
   subtitle?: React.ReactNode;
-  /**
-   * If true, renders the "Step X / Y" badge on the title row.
-   * Defaults to true.
-   */
-  showStepIndicator?: boolean;
   children: React.ReactNode;
 }
 
 /**
  * Renders the title row (with the Wizard's Step X/Y badge) on top, a divider, and the step body
  * underneath. Each individual step file owns the body content.
+ *
+ * The Step X/Y badge is rendered via `Wizard.StepIndicator`, which
+ * self-hides on steps that have no inner sub-steps — so consumers
+ * never have to opt in/out manually.
  */
-export const StepLayout = ({ title, subtitle, showStepIndicator = true, children }: StepLayoutProps): JSX.Element => {
+export const StepLayout = ({ title, subtitle, children }: StepLayoutProps): JSX.Element => {
   return (
     <Col
       sx={{
@@ -31,32 +30,34 @@ export const StepLayout = ({ title, subtitle, showStepIndicator = true, children
         justify='between'
         sx={theme => ({
           gap: theme.space.$4,
-          padding: `${theme.space.$5} ${theme.space.$6}`,
+          padding: theme.space.$5,
         })}
       >
-        <Col sx={theme => ({ gap: theme.space.$1, minWidth: 0 })}>
-          <Heading
-            textVariant='h3'
-            sx={theme => ({ color: theme.colors.$colorForeground, fontSize: theme.fontSizes.$lg })}
-          >
-            {title}
-          </Heading>
-          {subtitle ? (
-            <Text
-              as='p'
-              variant='body'
-              sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+        {title ? (
+          <Col sx={theme => ({ gap: theme.space.$1, minWidth: 0 })}>
+            <Heading
+              textVariant='h3'
+              sx={theme => ({ color: theme.colors.$colorForeground, fontSize: theme.fontSizes.$lg })}
             >
-              {subtitle}
-            </Text>
-          ) : null}
-        </Col>
-        {showStepIndicator ? <Wizard.StepIndicator /> : null}
+              {title}
+            </Heading>
+            {subtitle ? (
+              <Text
+                as='p'
+                variant='body'
+                sx={theme => ({ color: theme.colors.$colorMutedForeground })}
+              >
+                {subtitle}
+              </Text>
+            ) : null}
+          </Col>
+        ) : null}
+        <Wizard.StepIndicator />
       </Flex>
       <Col
         sx={theme => ({
           flex: 1,
-          padding: theme.space.$6,
+          paddingInline: theme.space.$5,
           overflowY: 'auto',
         })}
       >

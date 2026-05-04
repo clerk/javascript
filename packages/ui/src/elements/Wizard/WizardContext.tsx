@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { ContinueAction, WizardContextValue, WizardStep } from './types';
+import type { ContinueAction, WizardContextValue, WizardInnerStep, WizardStep } from './types';
 
 const WizardContext = React.createContext<WizardContextValue<any> | null>(null);
 WizardContext.displayName = 'WizardContext';
@@ -16,6 +16,8 @@ export function useWizard<TData = unknown>(): WizardContextValue<TData> {
 interface WizardProviderProps<TData> {
   activeSteps: WizardStep<TData>[];
   currentStep: WizardStep<TData> | undefined;
+  innerSteps: WizardInnerStep<TData>[];
+  currentInnerStep: WizardInnerStep<TData> | undefined;
   goNext: WizardContextValue<TData>['goNext'];
   goPrev: WizardContextValue<TData>['goPrev'];
   goToStep: WizardContextValue<TData>['goToStep'];
@@ -23,32 +25,46 @@ interface WizardProviderProps<TData> {
 }
 
 export function WizardProvider<TData>(props: WizardProviderProps<TData>): JSX.Element {
-  const { activeSteps, currentStep, goNext, goPrev, goToStep, children } = props;
+  const { activeSteps, currentStep, innerSteps, currentInnerStep, goNext, goPrev, goToStep, children } = props;
 
   const [continueAction, setContinueAction] = React.useState<ContinueAction | undefined>(undefined);
 
-  // Reset the registered continue action whenever the active step changes,
-  // so that a stale handler from a previous step never lingers.
+  // Reset the registered continue action whenever the active (inner) step
+  // changes, so that a stale handler from a previous step never lingers.
+  // Inner-step transitions don't change `currentStep`, so we also key
+  // off `currentInnerStep`.
   React.useEffect(() => {
     setContinueAction(undefined);
-  }, [currentStep?.id]);
+  }, [currentStep?.id, currentInnerStep?.id]);
 
   const value = React.useMemo<WizardContextValue<TData>>(() => {
     const currentIndex = currentStep ? activeSteps.findIndex(s => s.id === currentStep.id) : -1;
+    const currentInnerIndex = currentInnerStep ? innerSteps.findIndex(s => s.id === currentInnerStep.id) : -1;
+    const totalInnerSteps = innerSteps.length;
+    const hasInnerSteps = totalInnerSteps > 0;
+
+    const isFirstStep = currentIndex === 0 && (!hasInnerSteps || currentInnerIndex <= 0);
+    const isLastStep =
+      currentIndex === activeSteps.length - 1 && (!hasInnerSteps || currentInnerIndex === totalInnerSteps - 1);
+
     return {
       activeSteps,
       currentStep,
       currentIndex,
       totalSteps: activeSteps.length,
-      isFirstStep: currentIndex === 0,
-      isLastStep: currentIndex === activeSteps.length - 1,
+      innerSteps,
+      currentInnerStep,
+      currentInnerIndex,
+      totalInnerSteps,
+      isFirstStep,
+      isLastStep,
       goNext,
       goPrev,
       goToStep,
       continueAction,
       setContinueAction,
     };
-  }, [activeSteps, currentStep, goNext, goPrev, goToStep, continueAction]);
+  }, [activeSteps, currentStep, innerSteps, currentInnerStep, goNext, goPrev, goToStep, continueAction]);
 
   return <WizardContext.Provider value={value}>{children}</WizardContext.Provider>;
 }

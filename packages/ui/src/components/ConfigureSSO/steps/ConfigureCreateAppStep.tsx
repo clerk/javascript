@@ -3,7 +3,7 @@ import { useRegisterContinueAction, useWizard } from '@/elements/Wizard';
 
 import { StepLayout } from './StepLayout';
 
-export const Configure = (): JSX.Element => {
+export const ConfigureCreateApp = (): JSX.Element => {
   const { goNext } = useWizard();
 
   useRegisterContinueAction({
@@ -15,7 +15,7 @@ export const Configure = (): JSX.Element => {
       title='Configure Okta Workforce'
       subtitle='Create a new enterprise application in your Okta Dashboard.'
     >
-      <Text as='p'>Configuration form goes here.</Text>
+      <Text as='p'>UI goes here</Text>
     </StepLayout>
   );
 };

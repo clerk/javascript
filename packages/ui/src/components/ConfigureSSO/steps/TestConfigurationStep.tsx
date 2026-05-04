@@ -5,8 +5,8 @@ import { StepLayout } from './StepLayout';
 export const TestConfigurationStep = (): JSX.Element => {
   return (
     <StepLayout
-      title='Test your connection'
-      subtitle='Make sure everything is wired up before you finish.'
+      title='Test your SSO connection'
+      subtitle='Test your SSO configuration to verify you can successfully authenticate via your identity provider'
     >
       <Col
         sx={theme => ({
@@ -21,8 +21,7 @@ export const TestConfigurationStep = (): JSX.Element => {
           variant='body'
           sx={theme => ({ color: theme.colors.$colorMutedForeground })}
         >
-          Test step UI goes here. The shared &ldquo;Continue&rdquo; button is hidden on the last step; use a step-local
-          primary action to finish.
+          UI goes here
         </Text>
       </Col>
     </StepLayout>
