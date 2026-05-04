@@ -163,7 +163,7 @@ export const CheckoutForm = withCardStateProvider(() => {
             </LineItems.Group>
           )}
 
-          {!!freeTrialEndsAt && !!plan.freeTrialDays && totals.totalDueAfterFreeTrial && (
+          {!!freeTrialEndsAt && !!plan.freeTrialDays && totals.totalDueAfterFreeTrial ? (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title
                 title={localizationKeys('billing.checkout.totalDueAfterTrial', {
@@ -172,6 +172,13 @@ export const CheckoutForm = withCardStateProvider(() => {
               />
               <LineItems.Description
                 text={`${totals.totalDueAfterFreeTrial.currencySymbol}${totals.totalDueAfterFreeTrial.amountFormatted}`}
+              />
+            </LineItems.Group>
+          ) : (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title title={localizationKeys('billing.checkout.totalDuePerPeriod')} />
+              <LineItems.Description
+                text={`${totals.totalDuePerPeriod.currencySymbol}${totals.totalDuePerPeriod.amountFormatted}`}
               />
             </LineItems.Group>
           )}
