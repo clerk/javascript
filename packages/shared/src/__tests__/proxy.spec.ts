@@ -137,6 +137,29 @@ describe('getAutoProxyUrlFromEnvironment(options)', () => {
       }),
     ).toBe('');
   });
+
+  it('returns empty string when process is unavailable and no explicit environment is provided', () => {
+    const processDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'process');
+    let result: string | undefined;
+    let error: unknown;
+
+    Reflect.deleteProperty(globalThis, 'process');
+
+    try {
+      result = getAutoProxyUrlFromEnvironment({
+        publishableKey: 'pk_live_Zm9vLmNsZXJrLmNvbSQ=',
+      });
+    } catch (e) {
+      error = e;
+    } finally {
+      if (processDescriptor) {
+        Object.defineProperty(globalThis, 'process', processDescriptor);
+      }
+    }
+
+    expect(error).toBeUndefined();
+    expect(result).toBe('');
+  });
 });
 
 describe('proxyUrlToAbsoluteURL(url)', () => {
