@@ -66,6 +66,8 @@ const warnings = {
     '<OAuthConsent/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotRenderConfigureSSOComponentWhenDisabled:
     'The <ConfigureSSO/> component cannot be rendered when self-serve SSO is disabled. Visit `https://dashboard.clerk.com` to enable the feature. Since self-serve SSO is disabled, this is no-op.',
+  cannotRenderConfigureSSOComponentWhenEmailAddressDisabled:
+    'The <ConfigureSSO/> component cannot be rendered when email addresses are disabled on the instance. Visit `https://dashboard.clerk.com` to enable email addresses. Since email addresses are disabled, this is no-op.',
 };
 
 type SerializableWarnings = Serializable<typeof warnings>;

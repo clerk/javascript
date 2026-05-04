@@ -49,3 +49,7 @@ export const disabledAllAPIKeysFeatures: ComponentGuard = (_, environment) => {
 export const disabledSelfServeSSOFeature: ComponentGuard = (_, environment) => {
   return !environment?.userSettings.enterpriseSSO.self_serve_sso;
 };
+
+export const disabledEmailAddressAttribute: ComponentGuard = (_, environment) => {
+  return !environment?.userSettings.attributes.email_address?.enabled;
+};
