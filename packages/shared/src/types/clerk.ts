@@ -19,6 +19,7 @@ import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { DomainOrProxyUrl, MultiDomainAndOrProxy } from './multiDomain';
 import type { OAuthProvider, OAuthScope } from './oauth';
+import type { OAuthApplicationNamespace } from './oauthApplication';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type { ClerkPaginationParams } from './pagination';
@@ -177,6 +178,7 @@ export type SetActiveNavigate = (params: {
   session: SessionResource;
   /**
    * Decorate the destination URL to enable Safari ITP cookie refresh when needed.
+   *
    * @see {@link DecorateUrl}
    */
   decorateUrl: DecorateUrl;
@@ -736,6 +738,21 @@ export interface Clerk {
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts a OAuth consent component at the target element.
+   *
+   * @param targetNode - Target node to mount the OAuth consent component.
+   * @param oauthConsentProps - OAuth consent configuration parameters.
+   */
+  mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: OAuthConsentProps) => void;
+
+  /**
+   * Unmounts a OAuth consent component from the target element.
+   *
+   * @param targetNode - Target node to unmount the OAuth consent component from.
+   */
+  unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a TaskChooseOrganization component at the target element.
    *
    * @param targetNode - Target node to mount the TaskChooseOrganization component.
@@ -1127,6 +1144,11 @@ export interface Clerk {
   apiKeys: APIKeysNamespace;
 
   /**
+   * OAuth application helpers (e.g. consent metadata for custom consent UIs).
+   */
+  oauthApplication: OAuthApplicationNamespace;
+
+  /**
    * Checkout API
    *
    * @experimental
@@ -1222,7 +1244,17 @@ type ClerkOptionsNavigation =
 /** @document */
 type ClerkUnsafeOptions = {
   /**
-   * Disables the console warning that is logged when Clerk is initialized with development keys.
+   * Disables the `Clerk has been loaded with development keys` console warning that is logged when Clerk is
+   * initialized with development keys. The warning is emitted by `clerk-js` to the browser console; in dev servers
+   * that mirror browser logs to the terminal (e.g. Next.js with `experimental.browserDebugInfoInTerminal`), setting
+   * this option also stops it from showing up there.
+   *
+   * Each framework integration also exposes an env-var shortcut so you don't need to thread the option through
+   * `<ClerkProvider>` manually:
+   * - Next.js: `NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+   * - Astro: `PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+   * - TanStack Start / React Router: `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+   * - Nuxt: `NUXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
    *
    * [WARNING] The development mode warning is intended to ensure that you don't go to production with a non-production
    * Clerk instance. If you're disabling it, please make sure you don't ship with a non-production Clerk instance!
@@ -2429,43 +2461,74 @@ export type __experimental_SubscriptionDetailsButtonProps = {
   };
 };
 
-export type __internal_OAuthConsentProps = {
+export type OAuthConsentProps = {
+  /**
+   * Customize the appearance of the component.
+   */
   appearance?: ClerkAppearanceTheme;
   /**
-   * Name of the OAuth application.
+   * Override the OAuth client ID. Defaults to the `client_id` query parameter
+   * from the current URL.
    */
-  oAuthApplicationName: string;
+  oauthClientId?: string;
+  /**
+   * Override the OAuth scope. Defaults to the `scope` query parameter from
+   * the current URL.
+   */
+  scope?: string;
+  /**
+   * Name of the OAuth application.
+   *
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
+   */
+  oAuthApplicationName?: string;
   /**
    * Logo URL of the OAuth application.
+   *
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
   oAuthApplicationLogoUrl?: string;
   /**
    * URL of the OAuth application.
+   *
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
   oAuthApplicationUrl?: string;
   /**
    * Scopes requested by the OAuth application.
+   *
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
-  scopes: {
+  scopes?: {
     scope: string;
     description: string | null;
     requires_consent: boolean;
   }[];
   /**
-   * Full URL or path to navigate to after the user allows access.
+   * Full URL or path to navigate to after the user allows or denies access.
+   *
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
-  redirectUrl: string;
+  redirectUrl?: string;
   /**
    * Called when user allows access.
+   *
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
-  onAllow: () => void;
+  onAllow?: () => void;
   /**
    * Called when user denies access.
+   *
+   * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
-  onDeny: () => void;
+  onDeny?: () => void;
 };
 
+/** @deprecated Use OAuthConsentProps instead. */
+export type __internal_OAuthConsentProps = OAuthConsentProps;
+
 /** @inline */
+
 export interface HandleEmailLinkVerificationParams {
   /**
    * The full URL to navigate to after successful email link verification on completed sign-up or sign-in on the same device.
@@ -2814,21 +2877,25 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
   /**
    * The URL that `@clerk/clerk-js` should be hot-loaded from.
+   *
    * @internal
    */
   __internal_clerkJSUrl?: string;
   /**
    * The npm version for `@clerk/clerk-js`.
+   *
    * @internal
    */
   __internal_clerkJSVersion?: string;
   /**
    * The URL that `@clerk/ui` should be hot-loaded from.
+   *
    * @internal
    */
   __internal_clerkUIUrl?: string;
   /**
    * The npm version for `@clerk/ui`.
+   *
    * @internal
    */
   __internal_clerkUIVersion?: string;

@@ -15,6 +15,9 @@ const API_KEYS_KEY = 'apiKeys';
 // Keys for `useOrganizationCreationDefaults`
 const ORGANIZATION_CREATION_DEFAULTS_KEY = 'organizationCreationDefaults';
 
+// Keys for `useOAuthConsent`
+const OAUTH_CONSENT_INFO_KEY = 'oauthConsentInfo';
+
 // Keys for `usePlans`
 const PLANS_KEY = 'billing-plans';
 
@@ -54,6 +57,9 @@ export const STABLE_KEYS = {
 
   // Keys for `useOrganizationCreationDefaults`
   ORGANIZATION_CREATION_DEFAULTS_KEY,
+
+  // Keys for `useOAuthConsent`
+  OAUTH_CONSENT_INFO_KEY,
 } as const;
 
 export type ResourceCacheStableKey = (typeof STABLE_KEYS)[keyof typeof STABLE_KEYS];

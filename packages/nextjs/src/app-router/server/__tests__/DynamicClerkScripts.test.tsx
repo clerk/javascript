@@ -86,4 +86,24 @@ describe('DynamicClerkScripts', () => {
     expect(html).not.toContain('nonce="test');
     expect(html).not.toContain('nonce="csp');
   });
+
+  it('renders initial script tags with relative proxied asset URLs', async () => {
+    mockHeaders.mockResolvedValue(
+      new Map([
+        ['X-Nonce', null],
+        ['Content-Security-Policy', ''],
+      ]),
+    );
+
+    const html = await render(
+      DynamicClerkScripts({
+        ...defaultProps,
+        proxyUrl: '/__clerk',
+      }),
+    );
+
+    expect(html).toContain('src="/__clerk/npm/@clerk/clerk-js@');
+    expect(html).toContain('href="/__clerk/npm/@clerk/ui@');
+    expect(html).toContain('data-clerk-proxy-url="/__clerk"');
+  });
 });

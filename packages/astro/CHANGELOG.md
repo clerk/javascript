@@ -1,5 +1,127 @@
 # @clerk/astro
 
+## 3.1.0
+
+### Minor Changes
+
+- Add an env-var shortcut for `unsafe_disableDevelopmentModeConsoleWarning` across the Astro, Nuxt, React Router, and TanStack Start integrations so the development-keys console warning can be suppressed without threading the option through `<ClerkProvider>` manually: ([#8402](https://github.com/clerk/javascript/pull/8402)) by [@jacekradko](https://github.com/jacekradko)
+  - Astro: `PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+  - Nuxt: `NUXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+  - React Router: `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING` (or `CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`)
+  - TanStack Start: `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING` (or `CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`)
+
+  The Next.js equivalent (`NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`) already existed; the JSDoc on `unsafe_disableDevelopmentModeConsoleWarning` now lists every framework's env-var shortcut and clarifies that suppressing the warning at source also keeps it from being mirrored to the dev-server terminal (e.g. Next.js with `experimental.browserDebugInfoInTerminal`).
+
+- Expose `OAuthConsent` as a public component export for Astro. ([#8381](https://github.com/clerk/javascript/pull/8381)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```astro
+  ---
+  import { OAuthConsent } from '@clerk/astro/components';
+  ---
+
+  <OAuthConsent />
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+  - @clerk/backend@3.4.4
+
+## 3.0.23
+
+### Patch Changes
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea)]:
+  - @clerk/shared@4.8.7
+  - @clerk/backend@3.4.3
+
+## 3.0.22
+
+### Patch Changes
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863), [`e0a63f9`](https://github.com/clerk/javascript/commit/e0a63f9f976fd25f4ed68080c84b72149ef64646)]:
+  - @clerk/shared@4.8.6
+  - @clerk/backend@3.4.2
+
+## 3.0.21
+
+### Patch Changes
+
+- Updated dependencies [[`da76490`](https://github.com/clerk/javascript/commit/da7649075e24351737271318e81842b5c298dee1)]:
+  - @clerk/shared@4.8.5
+  - @clerk/backend@3.4.1
+
+## 3.0.20
+
+### Patch Changes
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9), [`d9011b4`](https://github.com/clerk/javascript/commit/d9011b45d622fecc727b3531fbedd805a4310abc)]:
+  - @clerk/shared@4.8.4
+  - @clerk/backend@3.4.0
+
+## 3.0.19
+
+### Patch Changes
+
+- Updated dependencies [[`93855c2`](https://github.com/clerk/javascript/commit/93855c26a624780a52ed12c25ea6605b6c009ec1)]:
+  - @clerk/backend@3.3.0
+
+## 3.0.18
+
+### Patch Changes
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f), [`abaa339`](https://github.com/clerk/javascript/commit/abaa3390b076cf8b5ccfc0a22312d5bde0c60988)]:
+  - @clerk/shared@4.8.3
+  - @clerk/backend@3.2.14
+
+## 3.0.17
+
+### Patch Changes
+
+- Updated dependencies [[`fcc6c0c`](https://github.com/clerk/javascript/commit/fcc6c0c511a37da912577864cc12f2039c52e654)]:
+  - @clerk/backend@3.2.13
+
+## 3.0.16
+
+### Patch Changes
+
+- Updated dependencies [[`f800b4f`](https://github.com/clerk/javascript/commit/f800b4fdfce37884c800070116af6d11627831d7), [`8ee6a32`](https://github.com/clerk/javascript/commit/8ee6a32977afbb0d1e9393b17ec541c29decf785), [`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/backend@3.2.12
+  - @clerk/shared@4.8.2
+
+## 3.0.15
+
+### Patch Changes
+
+- Normalize URL paths in `createPathMatcher` to prevent route protection bypass ([#8311](https://github.com/clerk/javascript/pull/8311)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`b0b6675`](https://github.com/clerk/javascript/commit/b0b6675bad09eb3dd5b711ad5b45539162664c7a)]:
+  - @clerk/shared@4.8.1
+  - @clerk/backend@3.2.11
+
+## 3.0.14
+
+### Patch Changes
+
+- Updated dependencies [[`dc2de16`](https://github.com/clerk/javascript/commit/dc2de16480086f376449d452d31ae0d2a319af17)]:
+  - @clerk/shared@4.8.0
+  - @clerk/backend@3.2.10
+
+## 3.0.13
+
+### Patch Changes
+
+- Bump `astro` devDependency floor to `5.18.1` to pick up an upstream security fix. ([#8279](https://github.com/clerk/javascript/pull/8279)) by [@renovate](https://github.com/apps/renovate)
+
+- Simplified keyless service initialization. ([#7844](https://github.com/clerk/javascript/pull/7844)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`3fd586d`](https://github.com/clerk/javascript/commit/3fd586d171e9c281c4b96f620ee9070b47ba00f4), [`f9ff9e9`](https://github.com/clerk/javascript/commit/f9ff9e937d70713abf96fdd92071cd6e84b8eb80)]:
+  - @clerk/shared@4.7.0
+  - @clerk/backend@3.2.9
+
 ## 3.0.12
 
 ### Patch Changes

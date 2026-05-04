@@ -12,6 +12,7 @@ vi.mock('@clerk/backend/proxy', async () => {
   };
 });
 
+import { authenticateRequest } from '../authenticateRequest';
 import { clerkMiddleware } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
 import { assertNoDebugHeaders, assertSignedOutDebugHeaders, runMiddleware, runMiddlewareOnPath } from './helpers';
@@ -92,6 +93,36 @@ describe('clerkMiddleware', () => {
     );
 
     assertSignedOutDebugHeaders(response);
+  });
+
+  it('forwards clockSkewInMs to authenticateRequest', async () => {
+    const authenticateRequestMock = vi.fn().mockResolvedValue({});
+    const clerkClient = {
+      authenticateRequest: authenticateRequestMock,
+    } as any;
+
+    await authenticateRequest({
+      clerkClient,
+      request: {
+        method: 'GET',
+        url: '/',
+        headers: {
+          host: 'example.com',
+        },
+      } as Request,
+      options: {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_....',
+        clockSkewInMs: 12_345,
+      },
+    });
+
+    expect(authenticateRequestMock).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        clockSkewInMs: 12_345,
+      }),
+    );
   });
 
   it('throws error if clerkMiddleware is not executed before getAuth', async () => {
@@ -211,6 +242,54 @@ describe('clerkMiddleware', () => {
       ).expect(307);
 
       expect(response.header).toHaveProperty('x-clerk-auth-status', 'handshake');
+    });
+  });
+
+  describe('with options callback', () => {
+    it('accepts a callback function and resolves options per request', async () => {
+      const optionsCallback = vi.fn().mockResolvedValue({
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_....',
+      });
+
+      const response = await runMiddleware(clerkMiddleware(optionsCallback), {
+        Cookie: '__clerk_db_jwt=deadbeef;',
+      }).expect(200, 'Hello world!');
+
+      expect(optionsCallback).toHaveBeenCalledOnce();
+      assertSignedOutDebugHeaders(response);
+    });
+
+    it('calls the callback with the incoming request', async () => {
+      let capturedHostname: string | undefined;
+
+      const optionsCallback = vi.fn().mockImplementation((req: Request) => {
+        capturedHostname = req.hostname;
+        return Promise.resolve({
+          publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+          secretKey: 'sk_test_....',
+        });
+      });
+
+      await runMiddleware(clerkMiddleware(optionsCallback), {
+        Cookie: '__clerk_db_jwt=deadbeef;',
+        Host: 'example.com',
+      }).expect(200, 'Hello world!');
+
+      expect(capturedHostname).toBe('example.com');
+    });
+
+    it('accepts a synchronous callback (non-Promise return)', async () => {
+      const optionsCallback = vi.fn().mockReturnValue({
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_....',
+      });
+
+      const response = await runMiddleware(clerkMiddleware(optionsCallback), {
+        Cookie: '__clerk_db_jwt=deadbeef;',
+      }).expect(200, 'Hello world!');
+
+      assertSignedOutDebugHeaders(response);
     });
   });
 

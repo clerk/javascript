@@ -38,7 +38,13 @@ import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
-import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
+import {
+  AUTO_PROXY_PATH,
+  isHttpOrHttps,
+  isValidProxyUrl,
+  proxyUrlToAbsoluteURL,
+  shouldAutoProxy,
+} from '@clerk/shared/proxy';
 import {
   eventPrebuiltComponentMounted,
   eventPrebuiltComponentOpened,
@@ -88,6 +94,8 @@ import type {
   ListenerOptions,
   LoadedClerk,
   NavigateOptions,
+  OAuthApplicationNamespace,
+  OAuthConsentProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -177,6 +185,7 @@ import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
+import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
@@ -224,6 +233,7 @@ export class Clerk implements ClerkInterface {
 
   private static _billing: BillingNamespace;
   private static _apiKeys: APIKeysNamespace;
+  private static _oauthApplication: OAuthApplicationNamespace;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
 
   public client: ClientResource | undefined;
@@ -358,7 +368,14 @@ export class Clerk implements ClerkInterface {
       if (!isValidProxyUrl(_unfilteredProxy)) {
         errorThrower.throwInvalidProxyUrl({ url: _unfilteredProxy });
       }
-      return proxyUrlToAbsoluteURL(_unfilteredProxy);
+      const resolved = proxyUrlToAbsoluteURL(_unfilteredProxy);
+      if (resolved) {
+        return resolved;
+      }
+      // Auto-detect when no explicit proxy or domain is configured (production only)
+      if (!this.#domain && this.#instanceType === 'production' && shouldAutoProxy(window.location.hostname)) {
+        return `${window.location.origin}${AUTO_PROXY_PATH}`;
+      }
     }
 
     if (typeof this.#proxyUrl === 'function') {
@@ -401,6 +418,13 @@ export class Clerk implements ClerkInterface {
       Clerk._apiKeys = new APIKeys();
     }
     return Clerk._apiKeys;
+  }
+
+  get oauthApplication(): OAuthApplicationNamespace {
+    if (!Clerk._oauthApplication) {
+      Clerk._oauthApplication = new OAuthApplication();
+    }
+    return Clerk._oauthApplication;
   }
 
   __experimental_checkout(options: __experimental_CheckoutOptions): CheckoutSignalValue {
@@ -1325,7 +1349,16 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
-  public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+  public mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderOAuthConsentComponentWhenUserDoesNotExist, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OAuthConsent';
     void this.#clerkUI
@@ -1340,8 +1373,22 @@ export class Clerk implements ClerkInterface {
       );
   };
 
-  public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+  public unmountOAuthConsent = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
+  /**
+   * @deprecated Use mountOAuthConsent instead.
+   */
+  public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    return this.mountOAuthConsent(node, props);
+  };
+
+  /**
+   * @deprecated Use unmountOAuthConsent instead.
+   */
+  public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+    return this.unmountOAuthConsent(node);
   };
 
   /**

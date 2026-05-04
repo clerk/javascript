@@ -92,10 +92,6 @@ integration:
   - changed-files:
       - any-glob-to-any-file: integration/**
 
-agent-toolkit:
-  - changed-files:
-      - any-glob-to-any-file: packages/agent-toolkit/**
-
 # Base branch labels
 core-2:
   - base-branch: '^release/core-2$'

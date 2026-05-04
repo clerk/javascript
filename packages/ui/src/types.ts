@@ -1,10 +1,11 @@
 import type {
   __internal_CheckoutProps,
-  __internal_OAuthConsentProps,
+  OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
   APIKeysProps,
+  ClerkAppearanceTheme,
   CreateOrganizationProps,
   GoogleOneTapProps,
   NewSubscriptionRedirectUrl,
@@ -31,7 +32,7 @@ import type { MutableRefObject } from 'react';
 import type { WithInternalRouting } from './internal';
 
 export type {
-  __internal_OAuthConsentProps,
+  OAuthConsentProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -63,6 +64,7 @@ export type AvailableComponentProps =
   | __internal_SubscriptionDetailsProps
   | __internal_PlanDetailsProps
   | APIKeysProps
+  | OAuthConsentProps
   | TaskChooseOrganizationProps
   | TaskResetPasswordProps
   | TaskSetupMFAProps;
@@ -164,8 +166,63 @@ export type TaskSetupMFACtx = TaskSetupMFAProps & {
   componentName: 'TaskSetupMFA';
 };
 
-export type OAuthConsentCtx = __internal_OAuthConsentProps & {
+export type OAuthConsentCtx = {
   componentName: 'OAuthConsent';
+  /**
+   * Public-path override forwarded to `useOAuthConsent`. Falls back to the
+   * `client_id` query parameter from the current URL when omitted.
+   */
+  oauthClientId?: string;
+  /**
+   * Public-path override forwarded to `useOAuthConsent`. Falls back to the
+   * `scope` query parameter from the current URL when omitted.
+   */
+  scope?: string;
+  /**
+   * Pre-fetched scopes (accounts portal path). Snake-cased to match the
+   * legacy FAPI response shape.
+   */
+  scopes?: {
+    scope: string;
+    description: string | null;
+    requires_consent: boolean;
+  }[];
+  /**
+   * Pre-fetched OAuth application name (accounts portal path).
+   */
+  oauthApplicationName?: string;
+  /**
+   * Pre-fetched OAuth application logo URL (accounts portal path).
+   */
+  oauthApplicationLogoUrl?: string;
+  /**
+   * Pre-fetched OAuth application URL (accounts portal path).
+   */
+  oauthApplicationUrl?: string;
+  /**
+   * Redirect URI to display in the footer. Accounts portal path pre-populates
+   * this; public path reads `redirect_uri` from `window.location.search`.
+   */
+  redirectUrl?: string;
+  /**
+   * Custom Allow handler (accounts portal path). When omitted, the component
+   * submits its internal hidden form instead.
+   */
+  onAllow?: () => void;
+  /**
+   * Custom Deny handler (accounts portal path). When omitted, the component
+   * submits its internal hidden form instead.
+   */
+  onDeny?: () => void;
+  /**
+   * Customize the appearance of the component.
+   */
+  appearance?: ClerkAppearanceTheme;
+  /**
+   * When true, renders the organization picker and submits organization_id
+   * with the consent form. Internal use only, not exposed in the public prop type.
+   */
+  enableOrgSelection?: boolean;
 };
 
 export type SubscriptionDetailsCtx = __internal_SubscriptionDetailsProps & {

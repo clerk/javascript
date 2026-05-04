@@ -1,5 +1,115 @@
 # Change Log
 
+## 4.9.0
+
+### Minor Changes
+
+- Add internal API methods to manage enterprise connections ([#8421](https://github.com/clerk/javascript/pull/8421)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Expose `OAuthConsent` as a public component export across React-based SDKs. ([#8381](https://github.com/clerk/javascript/pull/8381)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/react';
+
+  export default function Page() {
+    return <OAuthConsent />;
+  }
+  ```
+
+### Patch Changes
+
+- Add an env-var shortcut for `unsafe_disableDevelopmentModeConsoleWarning` across the Astro, Nuxt, React Router, and TanStack Start integrations so the development-keys console warning can be suppressed without threading the option through `<ClerkProvider>` manually: ([#8402](https://github.com/clerk/javascript/pull/8402)) by [@jacekradko](https://github.com/jacekradko)
+  - Astro: `PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+  - Nuxt: `NUXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`
+  - React Router: `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING` (or `CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`)
+  - TanStack Start: `VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING` (or `CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`)
+
+  The Next.js equivalent (`NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING`) already existed; the JSDoc on `unsafe_disableDevelopmentModeConsoleWarning` now lists every framework's env-var shortcut and clarifies that suppressing the warning at source also keeps it from being mirrored to the dev-server terminal (e.g. Next.js with `experimental.browserDebugInfoInTerminal`).
+
+## 4.8.7
+
+### Patch Changes
+
+- Raise the `@tanstack/query-core` floor to `^5.100.6` in the repo catalog and consume it from `@clerk/shared` and `@clerk/clerk-js` so the version baked into the production `clerk-js` CDN bundle stays in lockstep with what consumer-side `@clerk/shared` resolves to. ([#8432](https://github.com/clerk/javascript/pull/8432)) by [@jacekradko](https://github.com/jacekradko)
+
+  Fixes a runtime crash (`TypeError: e.isFetched is not a function`) introduced when consumer dedupe resolved `query-core` to `5.100.x` (which adds `Query.isFetched()`) while the published CDN bundle still embedded `5.90.16`. The new `QueryObserver` then called `isFetched()` on `Query` objects from the older bundled version.
+
+## 4.8.6
+
+### Patch Changes
+
+- Auto-proxy FAPI requests for `.vercel.app` subdomains. When deployed to a `.vercel.app` domain without explicit proxy or domain configuration, the SDK automatically routes Frontend API requests through `/__clerk` on the app's own origin. This enables Clerk production mode on Vercel deployments without manual proxy setup. ([#8035](https://github.com/clerk/javascript/pull/8035)) by [@brkalow](https://github.com/brkalow)
+
+- Loosen `@tanstack/query-core` dependency from an exact pin to a caret range (`^5.90.16`) so it can dedupe with consumer-installed `@tanstack/react-query` versions. This avoids Vite `resolve.dedupe` resolution failures under Bun when two divergent copies of `query-core` end up nested instead of hoisted. ([#8417](https://github.com/clerk/javascript/pull/8417)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.8.5
+
+### Patch Changes
+
+- Generate publishable keys with unpadded Base64 encoding to match backend output. ([#8400](https://github.com/clerk/javascript/pull/8400)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+## 4.8.4
+
+### Patch Changes
+
+- Add `publishableKeyFromHost` utility for resolving the correct publishable key per hostname in multi-domain setups. Re-exported from `@clerk/react/internal`. ([#8398](https://github.com/clerk/javascript/pull/8398)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix `useOrganizationList` and `useOrganization` briefly reporting paginated resources as `isLoading: false` with empty data before the query starts. ([#8395](https://github.com/clerk/javascript/pull/8395)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.8.3
+
+### Patch Changes
+
+- Fix an authorization bypass in `has()`, `auth.protect()`, and related predicates when a single call combined conditions from more than one dimension (for example, `{ permission, reverification }` or `{ feature, permission }`). A dimension that should have denied the request was treated as indeterminate and ignored by the combining logic, allowing other passing dimensions to carry the result and authorize the call when it should have failed closed. ([#8372](https://github.com/clerk/javascript/pull/8372)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Behavior is now:
+  - When a requested dimension cannot be satisfied because the underlying session data is missing, malformed, or invalid, the call denies. Previously these cases were treated as indeterminate and ignored, which could let another passing dimension carry the call.
+  - Fixed a minor bug where `session.checkAuthorization()` was building authorization options from the membership row id instead of the organization id.
+
+  Single-condition role, permission, feature, and plan checks (`has({ permission })`, etc.) are unchanged. Single-condition `reverification` checks are unchanged on well-formed session data; calls with a missing or malformed `factorVerificationAge` payload now deny where they previously returned indeterminate. Callback-form `auth.protect(has => ...)` is unaffected unless the callback itself invokes the affected shapes.
+
+  Separately, `auth.protect()` in `@clerk/nextjs` previously discarded authorization params (`role`, `permission`, `feature`, `plan`, `reverification`) whenever the same argument object also contained `unauthenticatedUrl`, `unauthorizedUrl`, or `token`. TypeScript's excess-property check caught this for inline object literals but did not apply once the argument was assigned to a variable, spread, or used from JavaScript. Mixed-shape calls like `auth.protect({ role: 'org:admin', unauthorizedUrl: '/denied' })` or `auth.protect({ permission: 'org:X', token: 'session_token' })` now correctly enforce the authorization check instead of silently letting every authenticated caller through.
+
+## 4.8.2
+
+### Patch Changes
+
+- Add `emailAddress`, `phoneNumber`, and `username` support to `signUp.update()` ([#8320](https://github.com/clerk/javascript/pull/8320)) by [@dstaley](https://github.com/dstaley)
+
+- Added development runtime error when mounting `<OAuthconsent />` without active session. ([#8335](https://github.com/clerk/javascript/pull/8335)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.8.1
+
+### Patch Changes
+
+- Normalize URL paths in `createPathMatcher` to prevent route protection bypass ([#8311](https://github.com/clerk/javascript/pull/8311)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 4.8.0
+
+### Minor Changes
+
+- Introduce internal `<OAuthConsent />` component for rendering a zero-config OAuth consent screen on an OAuth authorize redirect page. ([#8289](https://github.com/clerk/javascript/pull/8289)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage example:
+
+  ```tsx
+  import { OAuthConsent } from '@clerk/nextjs';
+
+  export default function OAuthConsentPage() {
+    return <OAuthConsent />;
+  }
+  ```
+
+## 4.7.0
+
+### Minor Changes
+
+- Add `OAuthApplication` resource and `getConsentInfo()` method for retrieving OAuth consent information, enabling custom OAuth consent flows. ([#8275](https://github.com/clerk/javascript/pull/8275)) by [@jfoshee](https://github.com/jfoshee)
+
+- Introduce internal `useOAuthConsent()` hook for fetching OAuth consent screen metadata for the signed-in user. ([#8286](https://github.com/clerk/javascript/pull/8286)) by [@jfoshee](https://github.com/jfoshee)
+
 ## 4.6.0
 
 ### Minor Changes
