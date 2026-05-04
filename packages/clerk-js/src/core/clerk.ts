@@ -95,6 +95,7 @@ import type {
   LoadedClerk,
   NavigateOptions,
   OAuthApplicationNamespace,
+  OAuthConsentProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -1348,7 +1349,7 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
-  public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+  public mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderOAuthConsentComponentWhenUserDoesNotExist, {
@@ -1372,8 +1373,22 @@ export class Clerk implements ClerkInterface {
       );
   };
 
-  public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+  public unmountOAuthConsent = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
+  /**
+   * @deprecated Use mountOAuthConsent instead.
+   */
+  public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    return this.mountOAuthConsent(node, props);
+  };
+
+  /**
+   * @deprecated Use unmountOAuthConsent instead.
+   */
+  public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+    return this.unmountOAuthConsent(node);
   };
 
   /**
