@@ -7,9 +7,15 @@ import { common, mqu } from '../../styledSystem';
 type ProfileCardContentProps = React.PropsWithChildren<{
   contentRef?: React.RefObject<HTMLDivElement>;
   scrollBoxId?: string;
+  /**
+   * Disables the default padding on the inner scroll container. Useful for
+   * flows like the SSO configuration wizard whose internal sections (header,
+   * body, footer) already provide their own spacing.
+   */
+  disablePadding?: boolean;
 }>;
 export const ProfileCardContent = (props: ProfileCardContentProps) => {
-  const { contentRef, children, scrollBoxId } = props;
+  const { contentRef, children, scrollBoxId, disablePadding = false } = props;
   const router = useRouter();
   const scrollPosRef = React.useRef(0);
 
@@ -53,13 +59,17 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         sx={theme => ({
           flex: `1`,
           scrollbarGutter: 'stable',
-          paddingTop: theme.space.$7,
-          paddingBottom: theme.space.$7,
-          paddingInlineStart: theme.space.$8,
-          paddingInlineEnd: theme.space.$6, //smaller because of stable scrollbar gutter
-          [mqu.sm]: {
-            padding: `${theme.space.$8} ${theme.space.$5}`,
-          },
+          ...(disablePadding
+            ? { padding: 0 }
+            : {
+                paddingTop: theme.space.$7,
+                paddingBottom: theme.space.$7,
+                paddingInlineStart: theme.space.$8,
+                paddingInlineEnd: theme.space.$6, //smaller because of stable scrollbar gutter
+                [mqu.sm]: {
+                  padding: `${theme.space.$8} ${theme.space.$5}`,
+                },
+              }),
           ...common.maxHeightScroller(theme),
         })}
         ref={contentRef}

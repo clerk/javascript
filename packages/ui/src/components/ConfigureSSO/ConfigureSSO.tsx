@@ -8,8 +8,12 @@ import { ApplicationLogo } from '@/elements/ApplicationLogo';
 import { withCardStateProvider } from '@/elements/contexts';
 import { NavBar, NavbarContextProvider } from '@/elements/Navbar';
 import { ProfileCard } from '@/elements/ProfileCard';
+import { Wizard } from '@/elements/Wizard';
 import { BoxIcon } from '@/icons';
 import { Route, Switch } from '@/router';
+
+import { ConfigureSSOFlowProvider, useConfigureSSOFlow } from './ConfigureSSOContext';
+import { CONFIGURE_SSO_STEPS } from './constants';
 
 const ConfigureSSOInternal = () => {
   return (
@@ -89,11 +93,33 @@ const AuthenticatedContent = withCoreUserGuard(() => {
           routes={[]}
           contentRef={contentRef}
         />
-        <ProfileCard.Content contentRef={contentRef} />
+        <ConfigureSSOFlowProvider>
+          <ConfigureSSOWizardPanel contentRef={contentRef} />
+        </ConfigureSSOFlowProvider>
       </NavbarContextProvider>
     </ProfileCard.Root>
   );
 });
+
+const ConfigureSSOWizardPanel = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+  const data = useConfigureSSOFlow();
+
+  return (
+    <ProfileCard.Content
+      contentRef={contentRef}
+      disablePadding
+    >
+      <Wizard.Root
+        steps={CONFIGURE_SSO_STEPS}
+        data={data}
+      >
+        <Wizard.Header />
+        <Wizard.Content />
+        <Wizard.Footer />
+      </Wizard.Root>
+    </ProfileCard.Content>
+  );
+};
 
 const OrganizationSidebarSubtitle = () => {
   const { organization } = useOrganization();
