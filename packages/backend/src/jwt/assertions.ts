@@ -47,12 +47,13 @@ export const assertAudienceClaim = (aud?: unknown, audience?: unknown) => {
   }
 };
 
-export const assertHeaderType = (typ?: unknown, allowedTypes: string | string[] = 'JWT') => {
-  if (typeof typ === 'undefined') {
+export const assertHeaderType = (typ?: unknown, allowedTypes?: string | string[]) => {
+  if (typeof typ === 'undefined' && typeof allowedTypes === 'undefined') {
     return;
   }
 
-  const allowed = Array.isArray(allowedTypes) ? allowedTypes : [allowedTypes];
+  const expectedTypes = allowedTypes ?? 'JWT';
+  const allowed = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
   if (!allowed.includes(typ as string)) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
