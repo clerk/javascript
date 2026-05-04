@@ -1,4 +1,6 @@
-export { Configure } from './ConfigureStep';
+export { ConfigureCreateApp } from './ConfigureCreateAppStep';
+export { ConfigureMapAttributes } from './ConfigureMapAttributesStep';
+export { ConfirmationStep } from './ConfirmationStep';
 export { ProvideEmail } from './ProvideEmailStep';
 export { StepLayout } from './StepLayout';
 export { TestConfigurationStep as TestStep } from './TestConfigurationStep';

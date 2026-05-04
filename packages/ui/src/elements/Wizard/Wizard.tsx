@@ -4,7 +4,7 @@ import { Badge, Button, descriptors, Flex, Icon, Text, useLocalizations } from '
 import { CaretLeft, CaretRight } from '@/icons';
 import { Route, Switch, useRouter } from '@/router';
 
-import type { WizardStep } from './types';
+import type { WizardInnerStep, WizardStep } from './types';
 import { useWizard, WizardProvider } from './WizardContext';
 
 interface WizardRootProps<TData = unknown> {
@@ -23,9 +23,9 @@ const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
 
   const activeSteps = React.useMemo(() => steps.filter(step => !step.shouldSkip?.(data as TData)), [steps, data]);
 
-  // Detect the current step based on the URL. We iterate from the last
-  // (most specific) step back to the second one — the first step is the
-  // index route and always wins as a fallback.
+  // Detect the current main step based on the URL. We iterate from the
+  // last (most specific) step back to the second one — the first step
+  // is the index route and always wins as a fallback.
   const currentStep = React.useMemo<WizardStep<TData> | undefined>(() => {
     if (activeSteps.length === 0) {
       return undefined;
@@ -38,44 +38,121 @@ const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
     return activeSteps[0];
   }, [activeSteps, router]);
 
-  const navigateToStep = React.useCallback(
-    (step: WizardStep<TData> | undefined) => {
-      if (!step) {
+  // Active inner steps of the current main step, after `shouldSkip`.
+  const innerSteps = React.useMemo<WizardInnerStep<TData>[]>(() => {
+    if (!currentStep?.steps) {
+      return [];
+    }
+    return currentStep.steps.filter(step => !step.shouldSkip?.(data as TData));
+  }, [currentStep, data]);
+
+  // Detect the current inner step within the current main step using
+  // the same most-specific-first scan. The first inner step is the
+  // index route — it matches when no deeper path is found. The first
+  // main step is the wizard's catch-all route (it has no URL prefix
+  // of its own), so its inner steps live directly under the wizard
+  // base; for any other main step they live under `<main.path>/`.
+  const currentInnerStep = React.useMemo<WizardInnerStep<TData> | undefined>(() => {
+    if (!currentStep || innerSteps.length === 0) {
+      return undefined;
+    }
+    const isFirstMain = activeSteps[0]?.id === currentStep.id;
+    for (let i = innerSteps.length - 1; i >= 1; i--) {
+      const innerPath = isFirstMain ? innerSteps[i].path : `${currentStep.path}/${innerSteps[i].path}`;
+      if (router.matches(innerPath)) {
+        return innerSteps[i];
+      }
+    }
+    return innerSteps[0];
+  }, [activeSteps, currentStep, innerSteps, router]);
+
+  // Resolves a navigation target to the relative path the SDK router
+  // expects. The first non-skipped main step is the wizard's catch-all
+  // route, so it contributes no URL segment; its inner steps live
+  // directly under the wizard base. Other main steps live at their
+  // own `path`, with inner steps nested under it. The first inner
+  // step of any main step is its parent's index route and so lives
+  // at the parent's URL.
+  const resolveNavigation = React.useCallback(
+    (mainStep: WizardStep<TData> | undefined, innerStep?: WizardInnerStep<TData>): string | undefined => {
+      if (!mainStep) {
+        return undefined;
+      }
+      const isFirstMain = activeSteps[0]?.id === mainStep.id;
+      const innerList = mainStep.steps?.filter(s => !s.shouldSkip?.(data as TData)) ?? [];
+      const targetInner = innerStep ?? innerList[0];
+      const isFirstInner = !targetInner || innerList[0]?.id === targetInner.id;
+
+      const mainSegment = isFirstMain ? '' : mainStep.path;
+      const innerSegment = isFirstInner ? '' : targetInner.path;
+      const segments = [mainSegment, innerSegment].filter(Boolean);
+      return segments.length === 0 ? './' : segments.join('/');
+    },
+    [activeSteps, data],
+  );
+
+  const navigateTo = React.useCallback(
+    (mainStep: WizardStep<TData> | undefined, innerStep?: WizardInnerStep<TData>) => {
+      const to = resolveNavigation(mainStep, innerStep);
+      if (to === undefined) {
         return;
       }
-      const isFirst = activeSteps[0]?.id === step.id;
-      // First step is the index route, so navigate to the wizard base.
-      // Subsequent steps live at `<base>/<step.path>`.
-      return router.navigate(isFirst ? './' : step.path);
+      return router.navigate(to);
     },
-    [activeSteps, router],
+    [resolveNavigation, router],
   );
 
   const goNext = React.useCallback(() => {
     if (!currentStep) {
       return;
     }
-    const idx = activeSteps.findIndex(s => s.id === currentStep.id);
-    return navigateToStep(activeSteps[idx + 1]);
-  }, [activeSteps, currentStep, navigateToStep]);
+    // Within a container step, advance through the inner steps first.
+    if (innerSteps.length > 0) {
+      const idx = innerSteps.findIndex(s => s.id === currentInnerStep?.id);
+      if (idx >= 0 && idx < innerSteps.length - 1) {
+        return navigateTo(currentStep, innerSteps[idx + 1]);
+      }
+    }
+    // Otherwise (or after the last inner step), jump to the next main
+    // step. Lands on its first inner step, if any.
+    const mainIdx = activeSteps.findIndex(s => s.id === currentStep.id);
+    return navigateTo(activeSteps[mainIdx + 1]);
+  }, [activeSteps, currentStep, currentInnerStep, innerSteps, navigateTo]);
 
   const goPrev = React.useCallback(() => {
     if (!currentStep) {
       return;
     }
-    const idx = activeSteps.findIndex(s => s.id === currentStep.id);
-    return navigateToStep(activeSteps[idx - 1]);
-  }, [activeSteps, currentStep, navigateToStep]);
+    if (innerSteps.length > 0) {
+      const idx = innerSteps.findIndex(s => s.id === currentInnerStep?.id);
+      if (idx > 0) {
+        return navigateTo(currentStep, innerSteps[idx - 1]);
+      }
+    }
+    const mainIdx = activeSteps.findIndex(s => s.id === currentStep.id);
+    const prevMain = activeSteps[mainIdx - 1];
+    if (!prevMain) {
+      return;
+    }
+    // When stepping back into a container step, land on its *last*
+    // inner step — that's the position the user would naturally
+    // expect to revisit.
+    const prevInnerList = prevMain.steps?.filter(s => !s.shouldSkip?.(data as TData)) ?? [];
+    const targetInner = prevInnerList[prevInnerList.length - 1];
+    return navigateTo(prevMain, targetInner);
+  }, [activeSteps, currentStep, currentInnerStep, data, innerSteps, navigateTo]);
 
   const goToStep = React.useCallback(
-    (id: string) => navigateToStep(activeSteps.find(s => s.id === id)),
-    [activeSteps, navigateToStep],
+    (id: string) => navigateTo(activeSteps.find(s => s.id === id)),
+    [activeSteps, navigateTo],
   );
 
   return (
     <WizardProvider
       activeSteps={activeSteps}
       currentStep={currentStep}
+      innerSteps={innerSteps}
+      currentInnerStep={currentInnerStep}
       goNext={goNext}
       goPrev={goPrev}
       goToStep={goToStep}
@@ -86,25 +163,64 @@ const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
 };
 
 /**
- * Renders the active step component via the SDK router. The first
- * active step is mounted as the index route; the rest get `path` routes
- * matching their `WizardStep.path`.
+ * Renders the inner steps of a container step as nested routes. Falls
+ * back to the step's own `Component` for leaf steps.
  */
-const Content = (): JSX.Element => {
-  const { activeSteps } = useWizard();
+const StepRoutes = <TData,>({ step }: { step: WizardStep<TData> }): JSX.Element | null => {
+  if (!step.steps?.length) {
+    if (!step.Component) {
+      return null;
+    }
+    const StepComponent = step.Component;
+    return <StepComponent />;
+  }
+
   return (
     <Switch>
-      {activeSteps.map((step, i) => {
-        const StepComponent = step.Component;
+      {step.steps.map((inner, i) => {
+        const InnerComponent = inner.Component;
         return (
           <Route
-            key={step.id}
-            {...(i === 0 ? { index: true } : { path: step.path })}
+            key={inner.id}
+            {...(i === 0 ? { index: true } : { path: inner.path })}
           >
-            <StepComponent />
+            <InnerComponent />
           </Route>
         );
       })}
+    </Switch>
+  );
+};
+
+/**
+ * Renders the active step component via the SDK router. Non-first
+ * steps get `path` routes matching their `WizardStep.path`. The
+ * first step is mounted last as a path-less, index-less catch-all
+ * so that it owns the wizard's base URL *and* any deeper URL that
+ * doesn't belong to another main step — that's how its inner steps
+ * (which would otherwise live under a non-existent first-step path
+ * segment) end up routable. Container steps render their inner
+ * steps under nested routes.
+ */
+const Content = (): JSX.Element => {
+  const { activeSteps } = useWizard();
+  if (activeSteps.length === 0) {
+    return <></>;
+  }
+  const [firstStep, ...restSteps] = activeSteps;
+  return (
+    <Switch>
+      {restSteps.map(step => (
+        <Route
+          key={step.id}
+          path={step.path}
+        >
+          <StepRoutes step={step} />
+        </Route>
+      ))}
+      <Route key={firstStep.id}>
+        <StepRoutes step={firstStep} />
+      </Route>
     </Switch>
   );
 };
@@ -194,13 +310,15 @@ const Header = (): JSX.Element => {
 };
 
 /**
- * Compact "Step X / Y" badge for a step to show next to its own title.
- * Reads the count from context so it stays in sync with skipped steps.
+ * Compact "Step X / Y" badge that tracks the current main step's
+ * inner-step progress. Renders nothing when the current step has no
+ * inner steps — that's the signal that the parent layout doesn't
+ * need to reserve room for it.
  */
 const StepIndicator = (): JSX.Element | null => {
-  const { currentIndex, totalSteps } = useWizard();
+  const { totalInnerSteps, currentInnerIndex } = useWizard();
 
-  if (currentIndex < 0) {
+  if (totalInnerSteps <= 0 || currentInnerIndex < 0) {
     return null;
   }
 
@@ -216,7 +334,7 @@ const StepIndicator = (): JSX.Element | null => {
           as='span'
           sx={t => ({ fontSize: t.fontSizes.$xs })}
         >
-          Step {currentIndex + 1}/{totalSteps}
+          Step {currentInnerIndex + 1}/{totalInnerSteps}
         </Text>
       </Badge>
     </Flex>

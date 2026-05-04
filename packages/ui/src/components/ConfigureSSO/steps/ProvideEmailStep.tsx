@@ -32,8 +32,8 @@ export const ProvideEmail = (): JSX.Element => {
 
   return (
     <StepLayout
-      title='Configure SSO'
-      subtitle='Create a new enterprise application in your Okta Dashboard'
+      title='Verify your domain'
+      subtitle='Verify the domain you want to enable the enterprise connection on.'
     >
       <Flex
         direction='col'
