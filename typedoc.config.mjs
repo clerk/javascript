@@ -85,7 +85,13 @@ const config = {
   theme: 'clerkTheme',
   router: 'clerk-router',
   readme: 'none',
-  notRenderedTags: [...OptionDefaults.notRenderedTags, ...CUSTOM_BLOCK_TAGS],
+  notRenderedTags: [
+    ...OptionDefaults.notRenderedTags,
+    ...CUSTOM_BLOCK_TAGS,
+    /** Parsed for router/theme; must not appear as a doc section (otherwise renders as **Inline**). */
+    '@inline',
+    '@inlineType',
+  ],
   packageOptions: {
     includeVersion: false,
     excludePrivate: true,
@@ -100,6 +106,9 @@ const config = {
       ...OptionDefaults.modifierTags.filter(tag => tag !== '@experimental'),
       /** Suppresses the Parameters table in `.typedoc/extract-methods.mjs` method MDX. */
       '@skipParametersSection',
+      /** Type-only / router hints; not user-facing prose (see `notRenderedTags`). */
+      '@inline',
+      '@inlineType',
     ],
     /**
      * Stops TypeDoc from generating standalone pages for inline types.

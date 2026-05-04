@@ -74,7 +74,7 @@ export interface ClientResource extends ClerkResource {
    */
   lastActiveSessionId: string | null;
   /**
-   * Last authentication strategy used by this client; `null` when unknown or feature disabled.
+   * The last authentication strategy used by this client; `null` when unknown or feature disabled.
    */
   lastAuthenticationStrategy: LastAuthenticationStrategy | null;
   /**
