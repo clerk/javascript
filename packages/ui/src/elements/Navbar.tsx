@@ -7,7 +7,7 @@ import type { ElementDescriptor, ElementId } from '../customizables/elementDescr
 import { useNavigateToFlowStart, usePopover } from '../hooks';
 import { Menu } from '../icons';
 import { useRouter } from '../router';
-import type { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations, common, mqu } from '../styledSystem';
 import { colors } from '../utils/colors';
 import { Card } from './Card';
@@ -44,6 +44,7 @@ export type NavbarRoute = {
 };
 type NavBarProps = {
   title: LocalizationKey;
+  titleSx?: ThemableCssProp;
   description?: LocalizationKey;
   contentRef: React.RefObject<HTMLDivElement>;
   routes: NavbarRoute[];
@@ -51,7 +52,7 @@ type NavBarProps = {
 };
 
 export const NavBar = (props: NavBarProps) => {
-  const { contentRef, title, description, routes, header } = props;
+  const { contentRef, title, titleSx, description, routes, header } = props;
   const { close } = useNavbarContext();
   const { navigate } = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
@@ -126,6 +127,7 @@ export const NavBar = (props: NavBarProps) => {
     <>
       <NavbarContainer
         title={title}
+        titleSx={titleSx}
         description={description}
       >
         {header}
@@ -140,9 +142,13 @@ export const NavBar = (props: NavBarProps) => {
 };
 
 const NavbarContainer = (
-  props: React.PropsWithChildren<{ title: LocalizationKey | string; description?: LocalizationKey | string }>,
+  props: React.PropsWithChildren<{
+    title: LocalizationKey | string;
+    titleSx?: ThemableCssProp;
+    description?: LocalizationKey | string;
+  }>,
 ) => {
-  const { title, description } = props;
+  const { title, titleSx, description } = props;
   return (
     <Col
       elementDescriptor={descriptors.navbar}
@@ -172,6 +178,7 @@ const NavbarContainer = (
         >
           <Heading
             as='h1'
+            sx={titleSx}
             localizationKey={title}
           />
 
