@@ -27,6 +27,10 @@ export const REFERENCE_OBJECT_CONFIG = {
     symbol: 'SessionResource',
     declarationHint: 'types/session',
   },
+  'shared/user-resource/user-resource.mdx': {
+    symbol: 'UserResource',
+    declarationHint: 'types/user',
+  },
 };
 
 /** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG}. */

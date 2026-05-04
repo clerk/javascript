@@ -744,6 +744,53 @@ function resolveDeclarationWithObjectMembers(t) {
     const r = ref.reflection;
     if (r && 'type' in r) {
       const decl = /** @type {import('typedoc').DeclarationReflection} */ (r);
+      const typeArgs = ref.typeArguments ?? [];
+
+      /**
+       * Generic aliases like `ClerkPaginationParams<{ status?: … }>` are a reference with `typeArguments`.
+       * TypeDoc often puts pagination fields only on the target alias `children` and omits `decl.type`, so returning `decl` early drops the type argument object. Merge base + each type argument's properties.
+       */
+      if (typeArgs.length > 0) {
+        /** @type {Map<string, import('typedoc').DeclarationReflection>} */
+        const byName = new Map();
+        if (decl.type) {
+          const fromType = resolveDeclarationWithObjectMembers(decl.type);
+          if (fromType?.children?.length) {
+            for (const c of fromType.children) {
+              if (c.kindOf(ReflectionKind.Property)) {
+                byName.set(c.name, c);
+              }
+            }
+          }
+        }
+        if (byName.size === 0 && decl.children?.length) {
+          for (const c of decl.children) {
+            if (c.kindOf(ReflectionKind.Property)) {
+              byName.set(c.name, c);
+            }
+          }
+        }
+        for (const ta of typeArgs) {
+          const fromArg = resolveDeclarationWithObjectMembers(ta);
+          if (fromArg?.children?.length) {
+            for (const c of fromArg.children) {
+              if (c.kindOf(ReflectionKind.Property)) {
+                byName.set(c.name, c);
+              }
+            }
+          }
+        }
+        if (byName.size > 0) {
+          return /** @type {import('typedoc').DeclarationReflection} */ (
+            /** @type {unknown} */ ({
+              children: [...byName.values()].sort((a, b) => a.name.localeCompare(b.name)),
+              kind: ReflectionKind.TypeLiteral,
+              name: '__referenceMerged',
+            })
+          );
+        }
+      }
+
       if (decl.children?.length) {
         return decl;
       }
@@ -929,12 +976,13 @@ function resolveNominalObjectTypeForSingleParam(t, project) {
       return { sectionTitle: typeDecl.name, holder: typeDecl, typeDecl };
     }
     if (typeDecl.kindOf(ReflectionKind.TypeAlias)) {
-      // Same as `resolveDeclarationWithObjectMembers` for a reference: members may live on the alias
-      // (`typeDecl.children`) with no `typeDecl.type` (e.g. `SignOutOptions`, `JoinWaitlistParams`).
-      const holder = typeDecl.children?.length
-        ? typeDecl
-        : typeDecl.type
-          ? resolveDeclarationWithObjectMembers(typeDecl.type)
+      // Prefer resolving `typeAlias.type` so intersections and generic instantiations (e.g. `ClerkPaginationParams<{ status?: … }>`) merge every `&` arm into one property list.
+      // Some aliases only attach members on `typeDecl.children` with no object shape on `.type`; keep that fallback (e.g. `SignOutOptions`, `JoinWaitlistParams`).
+      const fromResolvedType = typeDecl.type ? resolveDeclarationWithObjectMembers(typeDecl.type) : undefined;
+      const holder = fromResolvedType?.children?.length
+        ? fromResolvedType
+        : typeDecl.children?.length
+          ? typeDecl
           : undefined;
       if (!holder?.children?.length) {
         return undefined;
