@@ -1,14 +1,15 @@
+import { useOrganization } from '@clerk/shared/react/index';
 import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { useEnvironment, withCoreUserGuard } from '@/contexts';
-import { Col, Flex, Flow, localizationKeys, Text } from '@/customizables';
+import { Box, Col, Flex, Flow, Icon, localizationKeys, Text, useAppearance } from '@/customizables';
 import { ApplicationLogo } from '@/elements/ApplicationLogo';
 import { withCardStateProvider } from '@/elements/contexts';
 import { NavBar, NavbarContextProvider } from '@/elements/Navbar';
 import { ProfileCard } from '@/elements/ProfileCard';
+import { BoxIcon } from '@/icons';
 import { Route, Switch } from '@/router';
-import { useOrganization } from '@clerk/shared/react/index';
 
 const ConfigureSSOInternal = () => {
   return (
@@ -26,8 +27,10 @@ const ConfigureSSOInternal = () => {
 
 const AuthenticatedContent = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
-  const { applicationName } = useEnvironment().displayConfig;
+  const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const { organizationSettings } = useEnvironment();
+  const { parsedOptions } = useAppearance();
+  const hasLogo = Boolean(parsedOptions.logoImageUrl || logoImageUrl);
 
   return (
     <ProfileCard.Root
@@ -37,24 +40,47 @@ const AuthenticatedContent = withCoreUserGuard(() => {
         <NavBar
           header={
             <Flex
+              align='center'
               sx={t => ({
                 gap: t.space.$2,
                 padding: `${t.space.$none} ${t.space.$3}`,
                 maxWidth: '100%',
               })}
             >
-              <ApplicationLogo
-                sx={t => ({ width: t.space.$9, height: t.space.$9, borderRadius: t.radii.$md, overflow: 'hidden' })}
-              />
+              {hasLogo ? (
+                <ApplicationLogo
+                  sx={t => ({ width: t.space.$9, height: t.space.$9, borderRadius: t.radii.$md, overflow: 'hidden' })}
+                />
+              ) : (
+                <Box
+                  sx={t => ({
+                    width: t.space.$9,
+                    height: t.space.$9,
+                    flexShrink: 0,
+                    borderRadius: t.radii.$md,
+                    backgroundColor: t.colors.$primary500,
+                    color: t.colors.$colorPrimaryForeground,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  })}
+                  aria-hidden
+                >
+                  <Icon
+                    icon={BoxIcon}
+                    sx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
+                  />
+                </Box>
+              )}
 
-              <Col sx={t => ({ gap: t.space.$0x5, minWidth: 0 })}>
+              <Col sx={{ minWidth: 0 }}>
                 <Text
                   as='p'
                   truncate
                 >
                   {applicationName}
                 </Text>
-                {organizationSettings.enabled && <OrganizationSubtitle />}
+                {organizationSettings.enabled && <OrganizationSidebarSubtitle />}
               </Col>
             </Flex>
           }
@@ -69,8 +95,13 @@ const AuthenticatedContent = withCoreUserGuard(() => {
   );
 });
 
-const OrganizationSubtitle = () => {
+const OrganizationSidebarSubtitle = () => {
   const { organization } = useOrganization();
+
+  if (!organization) {
+    return null;
+  }
+
   return (
     <Text
       as='span'
