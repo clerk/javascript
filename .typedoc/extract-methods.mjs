@@ -685,6 +685,9 @@ function renderMemberTableOmittingExampleBlocks(roots, ctx, render) {
   }
 }
 
+/** Block tags omitted from extracted method prose (see `custom-theme.mjs` `comment` partial for theme output). */
+const BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE = new Set(['@param', '@typeParam', '@returns', '@experimental']);
+
 /**
  * @param {import('typedoc').Comment | undefined} comment
  */
@@ -694,7 +697,7 @@ function commentSummaryAndBody(comment) {
   }
   const summary = displayPartsToString(comment.summary).trim();
   const block = comment.blockTags
-    ?.filter(t => !['@param', '@typeParam', '@returns'].includes(t.tag))
+    ?.filter(t => !BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE.has(t.tag))
     .map(t => displayPartsToString(t.content).trim())
     .filter(Boolean)
     .join('\n\n');

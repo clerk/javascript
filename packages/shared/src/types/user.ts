@@ -210,12 +210,24 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    */
   createdAt: Date | null;
 
+  /**
+   * Updates the user's attributes. Use this method to save information you collected about the user.
+   *
+   * The appropriate settings must be enabled in the Clerk Dashboard for the user to be able to update their attributes. For example, if you want to use the `update({ firstName })` method, you must enable the **First and last name** setting. It can be found on the [**User & authentication**](https://dashboard.clerk.com/~/user-authentication/user-and-authentication?user_auth_tab=user-profile) page in the Clerk Dashboard.
+   * @skipParametersSection
+   */
   update: (params: UpdateUserParams) => Promise<UserResource>;
   /**
    * Deletes the current user.
    */
   delete: () => Promise<void>;
+  /**
+   * Updates the user's password.
+   */
   updatePassword: (params: UpdateUserPasswordParams) => Promise<UserResource>;
+  /**
+   * Removes the user's password.
+   */
   removePassword: (params: RemoveUserPasswordParams) => Promise<UserResource>;
   /**
    * Adds an email address for the user. A new [`EmailAddress`](https://clerk.com/docs/reference/types/email-address) will be created and associated with the user.
@@ -243,8 +255,19 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    * Adds a Web3 wallet for the user. A new [`Web3WalletResource`](https://clerk.com/docs/reference/types/web3-wallet) will be created and associated with the user.
    */
   createWeb3Wallet: (params: CreateWeb3WalletParams) => Promise<Web3WalletResource>;
+  /**
+   * A check whether or not the given resource is the primary identifier for the user.
+   * @param ident - The resource checked against the user to see if it is the primary identifier.
+   */
   isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource | Web3WalletResource) => boolean;
+  /**
+   * Retrieves all **active** sessions for this user. This method uses a cache so a network request will only be triggered only once.
+   * @returns An array of [`SessionWithActivities`](https://clerk.com/docs/reference/types/session-with-activities) objects.
+   */
   getSessions: () => Promise<SessionWithActivitiesResource[]>;
+  /**
+   * Adds the user's profile image or replaces it if one already exists. This method will upload an image and associate it with the user.
+   */
   setProfileImage: (params: SetProfileImageParams) => Promise<ImageResource>;
   /**
    * Adds an external account for the user. A new [`ExternalAccount`](https://clerk.com/docs/reference/types/external-account) will be created and associated with the user. This method is useful if you want to allow an already signed-in user to connect their account with an external provider, such as Facebook, GitHub, etc., so that they can sign in with that provider in the future.
@@ -298,9 +321,16 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    * @returns A [`TOTPResource`](https://clerk.com/docs/reference/types/totp-resource) object.
    *
    * > [!WARNING]
-   * > The **Authenticator application** multi-factor strategy must be enabled in your app's settings in the Clerk Dashboard. See the [Multi-factor authentication](/docs/guides/configure/auth-strategies/sign-up-sign-in-options#multi-factor-authentication) section to learn more.
+   * > The **Authenticator application** multi-factor strategy must be enabled in your app's settings in the Clerk Dashboard. See the [Multi-factor authentication](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#multi-factor-authentication) section to learn more.
    */
   createTOTP: () => Promise<TOTPResource>;
+  /**
+   * Verifies a TOTP secret after a user has created it. The user must provide a code from their authenticator app that has been generated using the previously created secret. This way, correct set up and ownership of the authenticator app can be validated.
+   * @returns A [`TOTPResource`](https://clerk.com/docs/reference/types/totp-resource) object.
+   *
+   * > [!WARNING]
+   * > The **Authenticator application** multi-factor strategy must be enabled in your app's settings in the Clerk Dashboard. See the [Multi-factor authentication](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#multi-factor-authentication) section to learn more.
+   */
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   /**
    * Disables TOTP by deleting the user's TOTP secret.

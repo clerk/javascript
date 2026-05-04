@@ -868,13 +868,14 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       ...superPartials,
       /**
        * Stock `comments.comment` prints every {@link Comment.modifierTags} as **`TitleCase`** before the summary.
-       * `@inline` / `@inlineType` are router/type hints only — they must not appear in property tables or prose.
+       * `@inline` / `@inlineType` are router/type hints only; `@experimental` is SDK-only guidance — none of these
+       * must appear in property tables or prose.
        *
        * @param {import('typedoc').Comment} model
        * @param {Parameters<typeof superPartials.comment>[1]} [options]
        */
       comment: (model, options) => {
-        const hidden = new Set(['@inline', '@inlineType']);
+        const hidden = new Set(['@inline', '@inlineType', '@experimental']);
         const modTags = model?.modifierTags ? Array.from(model.modifierTags) : [];
         if (modTags.some(/** @param {string} t */ t => hidden.has(t))) {
           const clone = Object.assign(Object.create(Object.getPrototypeOf(model)), model, {
