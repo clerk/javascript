@@ -75,8 +75,8 @@ export class SessionAPI extends AbstractAPI {
    * Retrieves a session token or generates a JWT using a specified template.
    *
    * @param sessionId - The ID of the session for which to generate the token
-   * @param template - Optional name of the JWT template configured in the Clerk Dashboard.
-   * @param expiresInSeconds - Optional expiration time for the token in seconds.
+   * @param template - The name of the JWT template configured in the Clerk Dashboard.
+   * @param expiresInSeconds - The expiration time for the token in seconds.
    *   If not provided, uses the default expiration.
    *
    * @returns A promise that resolves to the generated token

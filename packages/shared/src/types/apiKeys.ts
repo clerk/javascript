@@ -48,7 +48,7 @@ export interface APIKeyResource extends ClerkResource {
    */
   createdBy: string | null;
   /**
-   * An optional description for the API key.
+   * A description for the API key.
    */
   description: string | null;
   /**

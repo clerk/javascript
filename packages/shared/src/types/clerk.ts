@@ -829,7 +829,7 @@ export interface Clerk {
    *
    * @param event - The event name to subscribe to.
    * @param handler - The callback function to execute when the event is triggered.
-   * @param opt - An optional object to control the behavior of the event handler. If true, and the event was previously dispatched, handler will be called immediately with the latest payload.
+   * @param opt - An object to control the behavior of the event handler. If true, and the event was previously dispatched, handler will be called immediately with the latest payload.
    * @param opt.notify - If `true` and the event was previously dispatched, the handler will be called immediately with the latest payload.
    */
   on: OnEventListener;
@@ -1284,12 +1284,12 @@ export type ClerkOptions = ClerkOptionsNavigation &
       ClerkUI?: ClerkUIConstructor | Promise<ClerkUIConstructor>;
     };
     /**
-     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages. See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
+     * An object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages. See the [Appearance](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
      */
     // TODO @nikos
     appearance?: any;
     /**
-     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
+     * An object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     localization?: LocalizationResource;
     /**
@@ -1306,7 +1306,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     standardBrowser?: boolean;
     /**
-     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
+     * The support email address for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     supportEmail?: string;
     /**
@@ -1322,11 +1322,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     signUpUrl?: string;
     /**
-     * An optional array of domains to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
+     * An array of domains to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
      */
     allowedRedirectOrigins?: Array<string | RegExp>;
     /**
-     * An optional array of protocols to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
+     * An array of protocols to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
      */
     allowedRedirectProtocols?: Array<string>;
     /**
@@ -1442,7 +1442,7 @@ export interface NavigateOptions {
    */
   replace?: boolean;
   /**
-   * Optional router metadata.
+   * Router metadata.
    */
   metadata?: RouterMetadata;
 }
@@ -1495,7 +1495,7 @@ type RouterFn = (
    */
   to: string,
   /**
-   * Optional metadata
+   * Metadata
    */
   metadata?: {
     /**
