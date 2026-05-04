@@ -161,15 +161,27 @@ function getCatchAllReplacements() {
   return [
     {
       pattern: /(?<![\[\w`#])`?APIKeysNamespace`?(?![\]\w`])/g,
-      replace: '[`APIKeysNamespace`](/docs/reference/objects/api-keys)',
+      replace: '[APIKeys](/docs/reference/objects/api-keys)',
     },
     {
       pattern: /(?<![\[\w`#])`Appearance`\\<`Theme`\\>/g,
-      replace: '[`Appearance<Theme>`](/docs/guides/customizing-clerk/appearance-prop/overview)',
+      replace: '[Appearance<Theme>](/docs/guides/customizing-clerk/appearance-prop/overview)',
     },
     {
       pattern: /(?<![#])\(CreateOrganizationParams\)/g,
       replace: '([CreateOrganizationParams](#create-organization-params))',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?EmailAddressResource`?(?![\]\w`])/g,
+      replace: '[EmailAddressResource](/docs/reference/types/email-address)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?EnterpriseAccountResource`?(?![\]\w`])/g,
+      replace: '[EnterpriseAccountResource](/docs/reference/types/enterprise-account)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?ExternalAccountResource`?(?![\]\w`])/g,
+      replace: '[ExternalAccountResource](/docs/reference/types/external-account)',
     },
     {
       pattern: /(?<![#])`LoadedClerk`/g,
@@ -177,17 +189,25 @@ function getCatchAllReplacements() {
     },
     {
       pattern: /(?<![\[\w`#])`?LocalizationResource`?(?![\]\w`])/g,
-      replace: '[`LocalizationResource`](/docs/guides/customizing-clerk/localization)',
+      replace: '[LocalizationResource](/docs/guides/customizing-clerk/localization)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?PasskeyResource`?(?![\]\w`])/g,
+      replace: '[PasskeyResource](/docs/reference/types/passkey-resource)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?PhoneNumberResource`?(?![\]\w`])/g,
+      replace: '[PhoneNumberResource](/docs/reference/types/phone-number)',
     },
     {
       // SessionResource appears in plain text, with an array next to it, with backticks, etc.
       // e.g. `SessionResource[]`
       pattern: /(?<![`#[\]])\bSessionResource(\[\])?\b(?![\]\)`])/g,
-      replace: '[`SessionResource`](/docs/reference/objects/session)$1',
+      replace: '[SessionResource](/docs/reference/objects/session)$1',
     },
     {
       pattern: /(?<![\[\w`#])`?SessionStatusClaim`?(?![\]\w`])/g,
-      replace: '[`SessionStatusClaim`](/docs/reference/types/session-status)',
+      replace: '[SessionStatusClaim](/docs/reference/types/session-status)',
     },
     {
       pattern: /(?<![`#[\]])\bSetActiveParams\b(?![\]\(])/g,
@@ -195,7 +215,7 @@ function getCatchAllReplacements() {
     },
     {
       pattern: /(?<![\[\w`#])`?SignInResource`?(?![\]\w`])/g,
-      replace: '[`SignInResource`](/docs/reference/objects/sign-in)',
+      replace: '[SignInResource](/docs/reference/objects/sign-in)',
     },
     {
       pattern: /(?<![\[\w`#])`?((?:SignIn|SignUp)Errors)`?(?![\]\w`])/g,
@@ -204,43 +224,43 @@ function getCatchAllReplacements() {
     },
     {
       pattern: /(?<![\[\w`#])`?SignInFutureResource`?(?![\]\w`])/g,
-      replace: '[`SignInFutureResource`](/docs/reference/objects/sign-in-future)',
+      replace: '[SignInFutureResource](/docs/reference/objects/sign-in-future)',
     },
     {
       pattern: /(?<![\[\w`#])`?SignedInSessionResource`?(?![\]\w`])/g,
-      replace: '[`SignedInSessionResource`](/docs/reference/objects/session)',
+      replace: '[SignedInSessionResource](/docs/reference/objects/session)',
     },
     {
       pattern: /(?<![#])`SignInRedirectOptions`/g,
-      replace: '[`SignInRedirectOptions`](/docs/reference/types/sign-in-redirect-options)',
+      replace: '[SignInRedirectOptions](/docs/reference/types/sign-in-redirect-options)',
     },
     {
       pattern: /(?<![#])`SignUpRedirectOptions`/g,
-      replace: '[`SignUpRedirectOptions`](/docs/reference/types/sign-up-redirect-options)',
+      replace: '[SignUpRedirectOptions](/docs/reference/types/sign-up-redirect-options)',
     },
     {
       pattern: /(?<![\[\w`#])`?SignUpResource`?(?![\]\w`])/g,
-      replace: '[`SignUpResource`](/docs/reference/objects/sign-up)',
+      replace: '[SignUpResource](/docs/reference/objects/sign-up)',
     },
     {
       pattern: /(?<![#])`SignUpUnsafeMetadata`/g,
-      replace: '[`SignUpUnsafeMetadata`](/docs/reference/types/metadata#sign-up-unsafe-metadata)',
+      replace: '[SignUpUnsafeMetadata](/docs/reference/types/metadata#sign-up-unsafe-metadata)',
     },
     {
       pattern: /(?<![\[\w`#])`?SignUpFutureResource`?(?![\]\w`])/g,
-      replace: '[`SignUpFutureResource`](/docs/reference/objects/sign-up-future)',
+      replace: '[SignUpFutureResource](/docs/reference/objects/sign-up-future)',
     },
     {
       pattern: /(?<![#])`TasksRedirectOptions`/g,
-      replace: '[`TasksRedirectOptions`](/docs/reference/types/redirect-options)',
+      replace: '[TasksRedirectOptions](/docs/reference/types/redirect-options)',
     },
     {
       pattern: /(?<![\[\w`#])`?OrganizationResource`?(?![\]\w`])/g,
-      replace: '[`OrganizationResource`](/docs/reference/objects/organization)',
+      replace: '[OrganizationResource](/docs/reference/objects/organization)',
     },
     {
       pattern: /(?<![#])`OrganizationPrivateMetadata`/g,
-      replace: '[`OrganizationPrivateMetadata`](/docs/reference/types/metadata#organization-private-metadata)',
+      replace: '[OrganizationPrivateMetadata](/docs/reference/types/metadata#organization-private-metadata)',
     },
     {
       pattern: /(?<![#])\bOrganizationPublicMetadata\b/g,
@@ -249,22 +269,34 @@ function getCatchAllReplacements() {
     {
       pattern: /(?<![#])`OrganizationInvitationPrivateMetadata`/g,
       replace:
-        '[`OrganizationInvitationPrivateMetadata`](/docs/reference/types/metadata#organization-invitation-private-metadata)',
+        '[OrganizationInvitationPrivateMetadata](/docs/reference/types/metadata#organization-invitation-private-metadata)',
     },
     {
       pattern: /(?<![#])`OrganizationInvitationPublicMetadata`/g,
       replace:
-        '[`OrganizationInvitationPublicMetadata`](/docs/reference/types/metadata#organization-invitation-public-metadata)',
+        '[OrganizationInvitationPublicMetadata](/docs/reference/types/metadata#organization-invitation-public-metadata)',
     },
     {
       pattern: /(?<![#])`OrganizationMembershipPrivateMetadata`/g,
       replace:
-        '[`OrganizationMembershipPrivateMetadata`](/docs/reference/types/metadata#organization-membership-private-metadata)',
+        '[OrganizationMembershipPrivateMetadata](/docs/reference/types/metadata#organization-membership-private-metadata)',
     },
     {
       pattern: /(?<![#])`OrganizationMembershipPublicMetadata`/g,
       replace:
-        '[`OrganizationMembershipPublicMetadata`](/docs/reference/types/metadata#organization-membership-public-metadata)',
+        '[OrganizationMembershipPublicMetadata](/docs/reference/types/metadata#organization-membership-public-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?UserPrivateMetadata`?(?![\]\w`])/g,
+      replace: '[UserPrivateMetadata](/docs/reference/types/metadata#user-private-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?UserPublicMetadata`?(?![\]\w`])/g,
+      replace: '[UserPublicMetadata](/docs/reference/types/metadata#user-public-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?UserUnsafeMetadata`?(?![\]\w`])/g,
+      replace: '[UserUnsafeMetadata](/docs/reference/types/metadata#user-unsafe-metadata)',
     },
     {
       pattern: /(?<![\[\w`#])`?UserResource`?(?![\]\w`])/g,
@@ -273,6 +305,10 @@ function getCatchAllReplacements() {
     {
       pattern: /(?<![\[\w`#])`?LastAuthenticationStrategy`?(?![\]\w`])/g,
       replace: '[LastAuthenticationStrategy](/docs/reference/types/last-authentication-strategy)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?Web3WalletResource`?(?![\]\w`])/g,
+      replace: '[Web3WalletResource](/docs/reference/types/web3-wallet)',
     },
     {
       /**
