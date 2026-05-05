@@ -1,5 +1,6 @@
 import { useUser } from '@clerk/shared/react/index';
-import React from 'react';
+import type { EnterpriseConnectionResource } from '@clerk/shared/types';
+import React, { type PropsWithChildren } from 'react';
 
 /**
  * Shared form state for the ConfigureSSO wizard. Lives outside the
@@ -7,50 +8,47 @@ import React from 'react';
  *  - it persists across step navigations (each step is its own
  *    `<Route>`, mounted/unmounted on navigation)
  *  - `shouldSkip` predicates on `WizardStep` can read it as plain data
- *    via `<Wizard.Root data={ssoCtx} />`.
+ *    via `<Wizard.Root data={ssoCtx} />`
  */
 export interface ConfigureSSOData {
-  email: string;
   /**
-   * Domain id returned by the API after the email is submitted.
-   * Empty until the first step succeeds.
-   */
-  domainId: string;
-  /**
-   * `true` if the domain returned by the API is already verified at the
-   * time the user submits their email — the "Verify domain" step is
-   * skipped in that case.
+   * `true` if the user primary email address domain is already verified
    */
   domainAlreadyVerified: boolean;
+  /**
+   * The enterprise connection from the user's primary email address domain
+   */
+  enterpriseConnection: EnterpriseConnectionResource | undefined;
 }
 
-export interface ConfigureSSOContextValue extends ConfigureSSOData {
-  setEmail: (email: string) => void;
-  setDomainId: (id: string) => void;
+export type ConfigureSSOContextValue = ConfigureSSOData;
+
+interface ConfigureSSOFlowProviderProps {
+  /**
+   * The user's enterprise connection, fetched by the parent so that
+   * the wizard can show a loading state before mounting the panel.
+   * `undefined` when the user has no enterprise connection
+   */
+  enterpriseConnection: EnterpriseConnectionResource | undefined;
 }
 
 const ConfigureSSOFlowContext = React.createContext<ConfigureSSOContextValue | null>(null);
 ConfigureSSOFlowContext.displayName = 'ConfigureSSOFlowContext';
 
-export const ConfigureSSOFlowProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {
-  const [domainId, setDomainId] = React.useState('');
-
+export const ConfigureSSOFlowProvider = ({
+  enterpriseConnection,
+  children,
+}: PropsWithChildren<ConfigureSSOFlowProviderProps>): JSX.Element => {
   const { user } = useUser();
 
-  // user is guaranteed to be defined because we're using the withCoreUserGuard HOC
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const [email, setEmail] = React.useState(user!.primaryEmailAddress?.emailAddress ?? '');
   const domainAlreadyVerified = user?.primaryEmailAddress?.verification.status === 'verified';
 
   const value = React.useMemo<ConfigureSSOContextValue>(
     () => ({
-      email,
-      domainId,
+      enterpriseConnection,
       domainAlreadyVerified,
-      setEmail,
-      setDomainId,
     }),
-    [email, domainId, domainAlreadyVerified],
+    [enterpriseConnection, domainAlreadyVerified],
   );
 
   return <ConfigureSSOFlowContext.Provider value={value}>{children}</ConfigureSSOFlowContext.Provider>;

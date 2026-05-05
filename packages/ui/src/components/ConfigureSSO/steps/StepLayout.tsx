@@ -14,8 +14,7 @@ interface StepLayoutProps {
  * underneath. Each individual step file owns the body content.
  *
  * The Step X/Y badge is rendered via `Wizard.StepIndicator`, which
- * self-hides on steps that have no inner sub-steps — so consumers
- * never have to opt in/out manually.
+ * self-hides on steps that have no inner sub-steps
  */
 export const StepLayout = ({ title, subtitle, children }: StepLayoutProps): JSX.Element => {
   return (
@@ -41,6 +40,7 @@ export const StepLayout = ({ title, subtitle, children }: StepLayoutProps): JSX.
             >
               {title}
             </Heading>
+
             {subtitle ? (
               <Text
                 as='p'

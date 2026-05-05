@@ -29,10 +29,7 @@ export function WizardProvider<TData>(props: WizardProviderProps<TData>): JSX.El
 
   const [continueAction, setContinueAction] = React.useState<ContinueAction | undefined>(undefined);
 
-  // Reset the registered continue action whenever the active (inner) step
-  // changes, so that a stale handler from a previous step never lingers.
-  // Inner-step transitions don't change `currentStep`, so we also key
-  // off `currentInnerStep`.
+  // Clear stale continue actions when the active (inner) step changes
   React.useEffect(() => {
     setContinueAction(undefined);
   }, [currentStep?.id, currentInnerStep?.id]);
@@ -70,14 +67,7 @@ export function WizardProvider<TData>(props: WizardProviderProps<TData>): JSX.El
 }
 
 /**
- * Helper for step components that need to register a Continue action.
- *
- * The `handler` is forwarded through a ref so a fresh closure on each
- * render does not retrigger the effect (which would cause an infinite
- * loop, since updating the registered action re-renders consumers and
- * therefore the step itself). State-shaped fields like `isDisabled` /
- * `isLoading` / `label` are watched as primitives and re-publish the
- * action when they change.
+ * Helper for step components that need to register a Continue action
  */
 export function useRegisterContinueAction(action: ContinueAction | undefined): void {
   const { setContinueAction } = useWizard();
@@ -95,6 +85,7 @@ export function useRegisterContinueAction(action: ContinueAction | undefined): v
       setContinueAction(undefined);
       return;
     }
+
     setContinueAction({
       handler: () => handlerRef.current?.(),
       isDisabled,
@@ -104,7 +95,7 @@ export function useRegisterContinueAction(action: ContinueAction | undefined): v
   }, [hasAction, isDisabled, isLoading, label, setContinueAction]);
 
   // Separate unmount-only cleanup, so dep changes above don't transiently
-  // clear the registered action.
+  // clear the registered action
   React.useEffect(() => {
     return () => setContinueAction(undefined);
   }, [setContinueAction]);

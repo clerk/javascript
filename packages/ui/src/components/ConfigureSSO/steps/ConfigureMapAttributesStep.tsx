@@ -15,7 +15,7 @@ export const ConfigureMapAttributes = (): JSX.Element => {
       title='Map attributes'
       subtitle='Map identity provider attributes to Clerk user properties.'
     >
-      <Text as='p'>UI goes here</Text>
+      <Text>UI goes here</Text>
     </StepLayout>
   );
 };
