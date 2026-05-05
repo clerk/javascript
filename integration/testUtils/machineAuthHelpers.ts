@@ -12,8 +12,8 @@ import type { ApplicationConfig } from '../models/applicationConfig';
 import type { EnvironmentConfig } from '../models/environment';
 import { appConfigs } from '../presets';
 import { instanceKeys } from '../presets/envs';
-import type { FakeAPIKey, FakeUser } from './usersService';
 import { createTestUtils } from './index';
+import type { FakeAPIKey, FakeUser } from './usersService';
 
 export type FakeMachineNetwork = {
   primaryServer: Machine;

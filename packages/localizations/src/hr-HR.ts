@@ -207,6 +207,11 @@ export const hrHR: LocalizationResource = {
     yearAbbreviation: 'god',
     yearPerUnit: 'Godina po {{unitName}}',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Konfiguriraj jedinstvenu prijavu (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'kreiraj organizaciju',
     invitePage: {

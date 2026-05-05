@@ -32,6 +32,7 @@ const AVAILABLE_COMPONENTS = [
   'waitlist',
   'pricingTable',
   'apiKeys',
+  'configureSSO',
   'oauthConsent',
   'taskChooseOrganization',
   'taskResetPassword',
@@ -136,6 +137,7 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   waitlist: buildComponentControls('waitlist'),
   pricingTable: buildComponentControls('pricingTable'),
   apiKeys: buildComponentControls('apiKeys'),
+  configureSSO: buildComponentControls('configureSSO'),
   oauthConsent: buildComponentControls('oauthConsent'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
   taskResetPassword: buildComponentControls('taskResetPassword'),
@@ -467,6 +469,9 @@ void (async () => {
     },
     '/api-keys': () => {
       Clerk.mountAPIKeys(app, componentControls.apiKeys.getProps() ?? {});
+    },
+    '/configure-sso': () => {
+      Clerk.__experimental_mountConfigureSSO(app, componentControls.configureSSO.getProps() ?? {});
     },
     '/oauth-consent': () => {
       const searchParams = new URLSearchParams(window.location.search);
