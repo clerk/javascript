@@ -207,6 +207,11 @@ export const nbNO: LocalizationResource = {
     yearAbbreviation: 'år',
     yearPerUnit: 'År per {{unitName}}',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Konfigurer enkeltpålogging (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Opprett organisasjon',
     invitePage: {

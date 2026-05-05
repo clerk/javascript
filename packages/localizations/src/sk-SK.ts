@@ -178,6 +178,11 @@ export const skSK: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Nastaviť jednotné prihlasovanie (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Vytvoriť organizáciu',
     invitePage: {

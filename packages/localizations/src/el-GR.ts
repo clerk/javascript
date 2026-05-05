@@ -178,6 +178,11 @@ export const elGR: LocalizationResource = {
     viewPayment: 'Προβολή πληρωμής',
     year: 'έτος',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Διαμόρφωση Ενιαίας Σύνδεσης (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Δημιουργία οργανισμού',
     invitePage: {
