@@ -15,7 +15,7 @@ export const ConfigureCreateApp = (): JSX.Element => {
       title='Configure Okta Workforce'
       subtitle='Create a new enterprise application in your Okta Dashboard.'
     >
-      <Text as='p'>UI goes here</Text>
+      <Text>UI goes here</Text>
     </StepLayout>
   );
 };

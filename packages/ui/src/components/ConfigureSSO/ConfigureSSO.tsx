@@ -1,9 +1,20 @@
-import { useOrganization } from '@clerk/shared/react/index';
+import { __internal_useUserEnterpriseConnections, useOrganization } from '@clerk/shared/react';
 import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { useEnvironment, withCoreUserGuard } from '@/contexts';
-import { Box, Col, Flex, Flow, Icon, localizationKeys, Text, useAppearance } from '@/customizables';
+import {
+  Box,
+  Col,
+  descriptors,
+  Flex,
+  Flow,
+  Icon,
+  localizationKeys,
+  Spinner,
+  Text,
+  useAppearance,
+} from '@/customizables';
 import { ApplicationLogo } from '@/elements/ApplicationLogo';
 import { withCardStateProvider } from '@/elements/contexts';
 import { NavBar, NavbarContextProvider } from '@/elements/Navbar';
@@ -35,6 +46,11 @@ const AuthenticatedContent = withCoreUserGuard(() => {
   const { organizationSettings } = useEnvironment();
   const { parsedOptions } = useAppearance();
   const hasLogo = Boolean(parsedOptions.logoImageUrl || logoImageUrl);
+
+  const { data: enterpriseConnections, isLoading: isLoadingEnterpriseConnections } =
+    __internal_useUserEnterpriseConnections({ enabled: true });
+  // Currently FAPI only supports one enterprise connection per user
+  const enterpriseConnection = enterpriseConnections?.[0];
 
   return (
     <ProfileCard.Root
@@ -93,31 +109,58 @@ const AuthenticatedContent = withCoreUserGuard(() => {
           routes={[]}
           contentRef={contentRef}
         />
-        <ConfigureSSOFlowProvider>
-          <ConfigureSSOWizardPanel contentRef={contentRef} />
-        </ConfigureSSOFlowProvider>
+        <Col
+          ref={contentRef}
+          elementDescriptor={descriptors.scrollBox}
+          sx={t => ({
+            backgroundColor: t.colors.$colorBackground,
+            position: 'relative',
+            borderRadius: t.radii.$lg,
+            width: '100%',
+            overflow: 'hidden',
+            borderWidth: t.borderWidths.$normal,
+            borderStyle: t.borderStyles.$solid,
+            borderColor: t.colors.$borderAlpha150,
+            marginBlock: '-1px',
+            marginInlineEnd: '-1px',
+            flex: 1,
+          })}
+        >
+          {isLoadingEnterpriseConnections ? (
+            <Flex
+              align='center'
+              justify='center'
+              sx={{ flex: 1 }}
+            >
+              <Spinner
+                size='lg'
+                colorScheme='primary'
+                elementDescriptor={descriptors.spinner}
+              />
+            </Flex>
+          ) : (
+            <ConfigureSSOFlowProvider enterpriseConnection={enterpriseConnection}>
+              <ConfigureSSOWizardPanel />
+            </ConfigureSSOFlowProvider>
+          )}
+        </Col>
       </NavbarContextProvider>
     </ProfileCard.Root>
   );
 });
 
-const ConfigureSSOWizardPanel = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+const ConfigureSSOWizardPanel = () => {
   const data = useConfigureSSOFlow();
 
   return (
-    <ProfileCard.Content
-      contentRef={contentRef}
-      disablePadding
+    <Wizard.Root
+      steps={CONFIGURE_SSO_STEPS}
+      data={data}
     >
-      <Wizard.Root
-        steps={CONFIGURE_SSO_STEPS}
-        data={data}
-      >
-        <Wizard.Header />
-        <Wizard.Content />
-        <Wizard.Footer />
-      </Wizard.Root>
-    </ProfileCard.Content>
+      <Wizard.Header />
+      <Wizard.Content />
+      <Wizard.Footer />
+    </Wizard.Root>
   );
 };
 

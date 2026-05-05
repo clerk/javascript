@@ -3,5 +3,5 @@ export { ConfigureMapAttributes } from './ConfigureMapAttributesStep';
 export { ConfirmationStep } from './ConfirmationStep';
 export { ProvideEmail } from './ProvideEmailStep';
 export { StepLayout } from './StepLayout';
-export { TestConfigurationStep as TestStep } from './TestConfigurationStep';
+export { TestConfigurationStep } from './TestConfigurationStep';
 export { VerifyDomain } from './VerifyDomainStep';

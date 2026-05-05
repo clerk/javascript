@@ -6,7 +6,7 @@ import {
   ConfigureMapAttributes,
   ConfirmationStep,
   ProvideEmail,
-  TestStep,
+  TestConfigurationStep,
   VerifyDomain,
 } from './steps';
 
@@ -15,10 +15,9 @@ export const CONFIGURE_SSO_STEPS: ReadonlyArray<WizardStep<ConfigureSSOData>> = 
     id: 'verify-email-domain',
     path: 'verify-email-domain',
     label: 'Verify domain',
-    isOptional: true,
     // Skip this step when there's a primary email address domain already verified
     shouldSkip: data => data.domainAlreadyVerified,
-    steps: [
+    innerSteps: [
       {
         id: 'provide-email',
         path: 'provide-email',
@@ -35,7 +34,7 @@ export const CONFIGURE_SSO_STEPS: ReadonlyArray<WizardStep<ConfigureSSOData>> = 
     id: 'configure',
     path: 'configure',
     label: 'Configure',
-    steps: [
+    innerSteps: [
       {
         id: 'create-app',
         path: 'create-app',
@@ -52,7 +51,7 @@ export const CONFIGURE_SSO_STEPS: ReadonlyArray<WizardStep<ConfigureSSOData>> = 
     id: 'test',
     path: 'test',
     label: 'Test',
-    Component: TestStep,
+    Component: TestConfigurationStep,
   },
   {
     id: 'confirmation',
