@@ -11,6 +11,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
+        'primitives/accordion/index': 'src/primitives/accordion/index.ts',
         'primitives/dialog/index': 'src/primitives/dialog/index.ts',
         'utils/index': 'src/utils/index.ts',
         'hooks/use-controllable-state': 'src/hooks/use-controllable-state.ts',
