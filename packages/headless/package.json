@@ -8,6 +8,10 @@
       "import": "./dist/primitives/accordion/index.js",
       "types": "./dist/primitives/accordion/index.d.ts"
     },
+    "./tabs": {
+      "import": "./dist/primitives/tabs/index.js",
+      "types": "./dist/primitives/tabs/index.d.ts"
+    },
     "./dialog": {
       "import": "./dist/primitives/dialog/index.js",
       "types": "./dist/primitives/dialog/index.d.ts"
