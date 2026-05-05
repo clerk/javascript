@@ -36,11 +36,29 @@ export type OAuthConsentScope = {
  * Includes information needed to populate the consent dialog.
  */
 export type OAuthConsentInfo = {
+  /**
+   * Display name of the OAuth application requesting access.
+   */
   oauthApplicationName: string;
+  /**
+   * URL of the OAuth application's logo image.
+   */
   oauthApplicationLogoUrl: string;
+  /**
+   * Homepage URL of the OAuth application.
+   */
   oauthApplicationUrl: string;
+  /**
+   * The OAuth `client_id` identifying the application.
+   */
   clientId: string;
+  /**
+   * The `state` parameter from the original authorize request.
+   */
   state: string;
+  /**
+   * List of scopes the application is requesting, with descriptions and consent requirements.
+   */
   scopes: OAuthConsentScope[];
 };
 
