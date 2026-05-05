@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { Col, Flex, Heading, Text } from '@/customizables';
+import { Col, Flex, Heading, type LocalizationKey, Text } from '@/customizables';
 
 import { ConfigureSSOWizard } from '../wizard';
 
 interface StepLayoutProps {
-  title?: React.ReactNode;
-  subtitle?: React.ReactNode;
+  title?: LocalizationKey | string;
+  subtitle?: LocalizationKey | string;
   children: React.ReactNode;
 }
 
@@ -38,18 +38,16 @@ export const StepLayout = ({ title, subtitle, children }: StepLayoutProps): JSX.
             <Heading
               textVariant='h3'
               sx={theme => ({ color: theme.colors.$colorForeground, fontSize: theme.fontSizes.$lg })}
-            >
-              {title}
-            </Heading>
+              localizationKey={title}
+            />
 
             {subtitle ? (
               <Text
                 as='p'
                 variant='body'
                 sx={theme => ({ color: theme.colors.$colorMutedForeground })}
-              >
-                {subtitle}
-              </Text>
+                localizationKey={subtitle}
+              />
             ) : null}
           </Col>
         ) : null}

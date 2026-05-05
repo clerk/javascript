@@ -129,7 +129,6 @@ const ConfigureSSOSteps = () => {
   const { user } = useUser();
 
   const primaryEmailAddress = user?.primaryEmailAddress;
-  const emailAddressVerified = primaryEmailAddress?.verification.status === 'verified';
 
   return (
     <ConfigureSSOWizard>
