@@ -13,6 +13,10 @@
       "import": "./dist/primitives/tabs/index.js",
       "types": "./dist/primitives/tabs/index.d.ts"
     },
+    "./tooltip": {
+      "import": "./dist/primitives/tooltip/index.js",
+      "types": "./dist/primitives/tooltip/index.d.ts"
+    },
     "./dialog": {
       "import": "./dist/primitives/dialog/index.js",
       "types": "./dist/primitives/dialog/index.d.ts"
