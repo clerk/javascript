@@ -3,12 +3,9 @@ import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
 /**
- * Shared form state for the ConfigureSSO wizard. Lives outside the
- * Wizard's own context so that:
- *  - it persists across step navigations (each step is its own
- *    `<Route>`, mounted/unmounted on navigation)
- *  - `shouldSkip` predicates on `WizardStep` can read it as plain data
- *    via `<Wizard.Root data={ssoCtx} />`
+ * Shared form state for the ConfigureSSO wizard, persisted across step
+ * route mounts and exposed to `WizardStep.shouldSkip` via `Wizard.Root`'s
+ * `data` prop
  */
 export interface ConfigureSSOData {
   /**
