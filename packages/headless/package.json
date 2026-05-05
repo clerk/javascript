@@ -28,6 +28,10 @@
       "import": "./dist/primitives/menu/index.js",
       "types": "./dist/primitives/menu/index.d.ts"
     },
+    "./autocomplete": {
+      "import": "./dist/primitives/autocomplete/index.js",
+      "types": "./dist/primitives/autocomplete/index.d.ts"
+    },
     "./dialog": {
       "import": "./dist/primitives/dialog/index.js",
       "types": "./dist/primitives/dialog/index.d.ts"
