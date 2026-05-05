@@ -82,10 +82,7 @@ const LINK_REPLACEMENTS = [
   ['enterprise-account-connection', '/docs/reference/backend/types/backend-enterprise-account-connection'],
   ['enterprise-connection', '/docs/reference/backend/types/backend-enterprise-connection'],
   ['enterprise-connection-oauth-config', '/docs/reference/backend/types/backend-enterprise-connection-oauth-config'],
-  [
-    'enterprise-connection-saml-connection',
-    '/docs/reference/backend/types/backend-enterprise-connection-saml-connection',
-  ],
+  ['enterprise-connection-saml-connection', '/docs/reference/backend/types/backend-enterprise-connection-saml-connection'],
   ['external-account', '/docs/reference/backend/types/backend-external-account'],
   ['phone-number', '/docs/reference/backend/types/backend-phone-number'],
   ['saml-account', '/docs/reference/backend/types/backend-saml-account'],
