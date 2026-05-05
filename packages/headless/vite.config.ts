@@ -14,6 +14,7 @@ export default defineConfig({
         'primitives/accordion/index': 'src/primitives/accordion/index.ts',
         'primitives/tabs/index': 'src/primitives/tabs/index.ts',
         'primitives/tooltip/index': 'src/primitives/tooltip/index.ts',
+        'primitives/popover/index': 'src/primitives/popover/index.ts',
         'primitives/dialog/index': 'src/primitives/dialog/index.ts',
         'utils/index': 'src/utils/index.ts',
         'hooks/use-controllable-state': 'src/hooks/use-controllable-state.ts',
