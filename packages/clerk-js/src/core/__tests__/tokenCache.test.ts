@@ -63,7 +63,9 @@ describe('SessionTokenCache', () => {
     SessionTokenCache.close();
 
     // Now mock BroadcastChannel so next initialization uses the mock
-    global.BroadcastChannel = vi.fn(() => mockBroadcastChannel) as any;
+    global.BroadcastChannel = vi.fn(function () {
+      return mockBroadcastChannel;
+    }) as any;
 
     SessionTokenCache.clear();
 
