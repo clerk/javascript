@@ -134,7 +134,7 @@ export type FlowMetadata = {
     | 'enterpriseConnections'
     | 'organizationCreationDisabled'
     | 'methodSelectionMFA'
-    | 'provideEmail'
+    | 'addEmailAddress'
     | 'verifyDomain'
     | 'configureCreateApp'
     | 'configureMapAttributes'

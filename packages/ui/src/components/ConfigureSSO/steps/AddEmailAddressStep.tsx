@@ -3,7 +3,7 @@ import { useRegisterContinueAction, useWizard } from '@/elements/Wizard';
 
 import { StepLayout } from './StepLayout';
 
-export const ProvideEmailStep = (): JSX.Element => {
+export const AddEmailAddressStep = (): JSX.Element => {
   const { goNext } = useWizard();
 
   useRegisterContinueAction({
