@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Badge, Box, Button, descriptors, Flex, Icon, Spinner, Text, useLocalizations } from '@/customizables';
+import { Badge, Box, Button, Col, descriptors, Flex, Icon, Spinner, Text, useLocalizations } from '@/customizables';
 import { CaretLeft, CaretRight } from '@/icons';
 import { Route, Switch, useRouter } from '@/router';
 
@@ -241,13 +241,25 @@ const Body = ({ activeSteps }: { activeSteps: ConfigureSSOWizardActiveStep[] }):
           key={step.id}
           path={step.path}
         >
-          {step.children}
+          <StepBody step={step} />
         </Route>
       ))}
-      <Route key={firstStep.id}>{firstStep.children}</Route>
+      <Route key={firstStep.id}>
+        <StepBody step={firstStep} />
+      </Route>
     </Switch>
   );
 };
+
+const StepBody = ({ step }: { step: ConfigureSSOWizardActiveStep }): JSX.Element => (
+  <Col
+    elementDescriptor={descriptors.configureSSOWizardBody}
+    elementId={descriptors.configureSSOWizardBody.setId(step.id)}
+    sx={{ flex: 1, minHeight: 0 }}
+  >
+    {step.children}
+  </Col>
+);
 
 /**
  * Numbered breadcrumb of the outermost wizard's active steps.
@@ -260,6 +272,7 @@ const Header = (): JSX.Element => {
 
   return (
     <Flex
+      elementDescriptor={descriptors.configureSSOWizardHeader}
       align='center'
       sx={theme => ({
         gap: theme.space.$2,
@@ -282,6 +295,9 @@ const Header = (): JSX.Element => {
               <SkeletonBreadcrumbStep />
             ) : (
               <Button
+                elementDescriptor={descriptors.configureSSOWizardHeaderItem}
+                elementId={descriptors.configureSSOWizardHeaderItem.setId(step.id)}
+                isActive={isCurrent}
                 variant='unstyled'
                 isDisabled={!isReachable}
                 onClick={() => {
@@ -296,6 +312,9 @@ const Header = (): JSX.Element => {
                 })}
               >
                 <Flex
+                  elementDescriptor={descriptors.configureSSOWizardHeaderItemBullet}
+                  elementId={descriptors.configureSSOWizardHeaderItemBullet.setId(step.id)}
+                  isActive={isCurrent}
                   align='center'
                   justify='center'
                   sx={theme => ({
@@ -315,6 +334,8 @@ const Header = (): JSX.Element => {
                   {index + 1}
                 </Flex>
                 <Text
+                  elementDescriptor={descriptors.configureSSOWizardHeaderItemLabel}
+                  elementId={descriptors.configureSSOWizardHeaderItemLabel.setId(step.id)}
                   as='span'
                   variant='body'
                   sx={{ fontWeight: 'inherit', color: 'inherit' }}
@@ -325,6 +346,7 @@ const Header = (): JSX.Element => {
             )}
             {index < activeSteps.length - 1 && (
               <Icon
+                elementDescriptor={descriptors.configureSSOWizardHeaderSeparator}
                 icon={CaretRight}
                 size='sm'
                 sx={theme => ({ color: theme.colors.$colorMutedForeground })}
@@ -374,7 +396,10 @@ const StepIndicator = (): JSX.Element | null => {
   }
 
   return (
-    <Flex sx={{ marginBottom: 'auto' }}>
+    <Flex
+      elementDescriptor={descriptors.configureSSOWizardStepIndicator}
+      sx={{ marginBottom: 'auto' }}
+    >
       <Badge
         colorScheme='primary'
         sx={{
@@ -468,6 +493,7 @@ const Footer = (props: FooterProps): JSX.Element => {
     >
       {!hidePrevious && (
         <Button
+          elementDescriptor={descriptors.configureSSOWizardFooterPreviousButton}
           variant='outline'
           size='sm'
           isDisabled={isForceDisabled || isFirstStep}
@@ -482,6 +508,7 @@ const Footer = (props: FooterProps): JSX.Element => {
         </Button>
       )}
       <Button
+        elementDescriptor={descriptors.configureSSOWizardFooterContinueButton}
         variant='solid'
         size='sm'
         isDisabled={isForceDisabled || continueAction?.isDisabled || isLastStep}

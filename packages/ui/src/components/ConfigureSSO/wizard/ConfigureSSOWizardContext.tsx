@@ -2,20 +2,9 @@ import React from 'react';
 
 import type { ConfigureSSOWizardContextValue, ContinueAction } from './types';
 
-/**
- * Per-wizard context. Each `<ConfigureSSOWizard>` renders one of
- * these, so `useConfigureSSOWizard()` returns the *nearest* wizard.
- * Inner wizards reach their parent via `React.useContext` *before*
- * overriding the provider with their own value
- */
 export const ConfigureSSOWizardContext = React.createContext<ConfigureSSOWizardContextValue | null>(null);
 ConfigureSSOWizardContext.displayName = 'ConfigureSSOWizardContext';
 
-/**
- * Returns the nearest `<ConfigureSSOWizard>`'s API. Inner steps
- * registered inside a nested wizard see the inner wizard's `goNext`,
- * which itself cascades to the parent wizard on overflow
- */
 export function useConfigureSSOWizard(): ConfigureSSOWizardContextValue {
   const ctx = React.useContext(ConfigureSSOWizardContext);
 
@@ -41,9 +30,9 @@ interface WizardChromeRegistry {
   continueAction: ContinueAction | undefined;
   setContinueAction: (action: ContinueAction | undefined) => void;
   /**
-   * Marks a wizard as mounted; called by every `<ConfigureSSOWizard>`
-   * on mount and unmount. Footer-level controls always dispatch to
-   * the deepest wizard in this stack
+   * Marks a wizard as mounted, called by every `<ConfigureSSOWizard>`
+   * on mount and unmount
+   * Footer-level controls always dispatch to the deepest wizard in this stack
    */
   pushWizard: (ref: WizardValueRef) => void;
   popWizard: (ref: WizardValueRef) => void;
