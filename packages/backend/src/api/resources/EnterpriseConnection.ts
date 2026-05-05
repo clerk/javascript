@@ -4,6 +4,9 @@ import type {
   EnterpriseConnectionSamlConnectionJSON,
 } from './JSON';
 
+/**
+ * The Backend `EnterpriseConnectionSamlConnection` object holds information about a SAML enterprise connection for an instance or organization.
+ */
 export class EnterpriseConnectionSamlConnection {
   constructor(
     /**
