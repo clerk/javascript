@@ -25,6 +25,7 @@ export { OAuthConsent };
 
 export { useRoutingProps } from './hooks/useRoutingProps';
 export { useDerivedAuth } from './hooks/useAuth';
+export { __internal_useToken } from './hooks/useToken';
 export { IS_REACT_SHARED_VARIANT_COMPATIBLE } from './utils/versionCheck';
 
 export {

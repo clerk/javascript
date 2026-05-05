@@ -4,6 +4,7 @@ import type {
   CheckoutSignalValue,
   Clerk,
   ForPayerType,
+  SessionTokenSignalValue,
   SignInErrors,
   SignUpErrors,
   SignUpVerificationResource,
@@ -113,6 +114,7 @@ export class StateProxy implements State {
   private readonly signInSignalProxy = this.buildSignInProxy();
   private readonly signUpSignalProxy = this.buildSignUpProxy();
   private readonly waitlistSignalProxy = this.buildWaitlistProxy();
+  private readonly sessionTokenSignalProxy: SessionTokenSignalValue = { isLoaded: false, token: undefined };
 
   signInSignal() {
     return this.signInSignalProxy;
@@ -122,6 +124,9 @@ export class StateProxy implements State {
   }
   waitlistSignal() {
     return this.waitlistSignalProxy;
+  }
+  sessionTokenSignal() {
+    return this.sessionTokenSignalProxy;
   }
 
   get __internal_waitlist() {
@@ -442,6 +447,9 @@ export class StateProxy implements State {
   }
   __internal_computed<T>(_: (prev?: T) => T): () => T {
     throw new Error('__internal_computed called before Clerk is loaded');
+  }
+  __internal_setSessionToken(): void {
+    throw new Error('__internal_setSessionToken called before Clerk is loaded');
   }
 
   private get state() {
