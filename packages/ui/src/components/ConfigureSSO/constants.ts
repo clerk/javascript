@@ -15,8 +15,6 @@ export const CONFIGURE_SSO_STEPS: ReadonlyArray<WizardStep<ConfigureSSOData>> = 
     id: 'verify-email-domain',
     path: 'verify-email-domain',
     label: 'Verify domain',
-    // Skip this step when there's a primary email address domain already verified
-    shouldSkip: data => data.domainAlreadyVerified,
     innerSteps: [
       {
         id: 'provide-email',
@@ -29,6 +27,8 @@ export const CONFIGURE_SSO_STEPS: ReadonlyArray<WizardStep<ConfigureSSOData>> = 
         Component: VerifyDomain,
       },
     ],
+    // Skip this step when there's a primary email address domain already verified
+    shouldSkip: data => data.domainAlreadyVerified,
   },
   {
     id: 'configure',

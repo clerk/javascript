@@ -11,7 +11,7 @@ interface StepLayoutProps {
 
 /**
  * Renders the title row (with the Wizard's Step X/Y badge) on top, a divider, and the step body
- * underneath. Each individual step file owns the body content.
+ * underneath. Each individual step file owns the body content
  *
  * The Step X/Y badge is rendered via `Wizard.StepIndicator`, which
  * self-hides on steps that have no inner sub-steps
