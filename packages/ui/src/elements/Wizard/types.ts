@@ -153,6 +153,12 @@ export interface WizardContextValue<TData = unknown> {
    */
   isLastStep: boolean;
   /**
+   * `true` while the parent flow is still loading async dependencies.
+   * The header renders a skeleton breadcrumb, the content renders a
+   * centered spinner, and the footer's buttons are disabled
+   */
+  isLoading: boolean;
+  /**
    * Navigate forward. Within a container step, advances through inner
    * steps first, otherwise (or on the last inner step) advances to
    * the next main step. No-op at the very end of the wizard

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Badge, Button, descriptors, Flex, Icon, Text, useLocalizations } from '@/customizables';
+import { Badge, Box, Button, descriptors, Flex, Icon, Spinner, Text, useLocalizations } from '@/customizables';
 import { CaretLeft, CaretRight } from '@/icons';
 import { Route, Switch, useRouter } from '@/router';
 
@@ -14,11 +14,17 @@ interface WizardRootProps<TData = unknown> {
    * referenced shape changes, the active step list is recomputed
    */
   data?: TData;
+  /**
+   * `true` while the parent flow is still loading async dependencies.
+   * The header renders a skeleton breadcrumb, the content renders a
+   * centered spinner, and the footer's buttons are disabled
+   */
+  isLoading?: boolean;
   children: React.ReactNode;
 }
 
 const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
-  const { steps, data, children } = props;
+  const { steps, data, isLoading = false, children } = props;
   const router = useRouter();
 
   const activeSteps = React.useMemo(() => steps.filter(s => !s.shouldSkip?.(data as TData)), [steps, data]);
@@ -127,6 +133,7 @@ const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
       currentStep={currentStep}
       innerSteps={innerSteps}
       currentInnerStep={currentInnerStep}
+      isLoading={isLoading}
       goNext={goNext}
       goPrev={goPrev}
       goToStep={goToStep}
@@ -169,11 +176,30 @@ const StepRoutes = <TData,>({ step }: { step: WizardStep<TData> }): JSX.Element 
  * doesn't match another main step (e.g. its own inner-step paths)
  */
 const Content = (): JSX.Element | null => {
-  const { activeSteps } = useWizard();
+  const { activeSteps, isLoading } = useWizard();
+
+  if (isLoading) {
+    return (
+      <Flex
+        align='center'
+        justify='center'
+        sx={{ flex: 1 }}
+      >
+        <Spinner
+          size='xs'
+          colorScheme='neutral'
+          elementDescriptor={descriptors.spinner}
+        />
+      </Flex>
+    );
+  }
+
   if (activeSteps.length === 0) {
     return null;
   }
+
   const [firstStep, ...restSteps] = activeSteps;
+
   return (
     <Switch>
       {restSteps.map(step => (
@@ -196,7 +222,7 @@ const Content = (): JSX.Element | null => {
  * are clickable for backwards navigation, future steps are disabled
  */
 const Header = (): JSX.Element => {
-  const { activeSteps, currentIndex, goToStep } = useWizard();
+  const { activeSteps, currentIndex, isLoading, goToStep } = useWizard();
   const { t } = useLocalizations();
 
   return (
@@ -219,47 +245,51 @@ const Header = (): JSX.Element => {
 
         return (
           <React.Fragment key={step.id}>
-            <Button
-              variant='unstyled'
-              isDisabled={!isReachable}
-              onClick={() => {
-                if (isReachable) {
-                  void goToStep(step.id);
-                }
-              }}
-              sx={theme => ({
-                gap: theme.space.$1x5,
-                padding: 0,
-                color: isCurrent ? theme.colors.$colorForeground : theme.colors.$colorMutedForeground,
-              })}
-            >
-              <Flex
-                align='center'
-                justify='center'
+            {isLoading ? (
+              <SkeletonBreadcrumbStep />
+            ) : (
+              <Button
+                variant='unstyled'
+                isDisabled={!isReachable}
+                onClick={() => {
+                  if (isReachable) {
+                    void goToStep(step.id);
+                  }
+                }}
                 sx={theme => ({
-                  width: theme.sizes.$5,
-                  height: theme.sizes.$5,
-                  borderRadius: theme.radii.$circle,
-                  fontSize: theme.fontSizes.$xs,
-                  fontWeight: theme.fontWeights.$semibold,
-                  backgroundColor: isCurrent
-                    ? theme.colors.$colorForeground
-                    : isCompleted
-                      ? theme.colors.$neutralAlpha200
-                      : theme.colors.$neutralAlpha100,
-                  color: isCurrent ? theme.colors.$colorBackground : theme.colors.$colorMutedForeground,
+                  gap: theme.space.$1x5,
+                  padding: 0,
+                  color: isCurrent ? theme.colors.$colorForeground : theme.colors.$colorMutedForeground,
                 })}
               >
-                {index + 1}
-              </Flex>
-              <Text
-                as='span'
-                variant='body'
-                sx={{ fontWeight: 'inherit', color: 'inherit' }}
-              >
-                {label}
-              </Text>
-            </Button>
+                <Flex
+                  align='center'
+                  justify='center'
+                  sx={theme => ({
+                    width: theme.sizes.$5,
+                    height: theme.sizes.$5,
+                    borderRadius: theme.radii.$circle,
+                    fontSize: theme.fontSizes.$xs,
+                    fontWeight: theme.fontWeights.$semibold,
+                    backgroundColor: isCurrent
+                      ? theme.colors.$colorForeground
+                      : isCompleted
+                        ? theme.colors.$neutralAlpha200
+                        : theme.colors.$neutralAlpha100,
+                    color: isCurrent ? theme.colors.$colorBackground : theme.colors.$colorMutedForeground,
+                  })}
+                >
+                  {index + 1}
+                </Flex>
+                <Text
+                  as='span'
+                  variant='body'
+                  sx={{ fontWeight: 'inherit', color: 'inherit' }}
+                >
+                  {label}
+                </Text>
+              </Button>
+            )}
             {index < activeSteps.length - 1 && (
               <Icon
                 icon={CaretRight}
@@ -273,6 +303,30 @@ const Header = (): JSX.Element => {
     </Flex>
   );
 };
+
+const SkeletonBreadcrumbStep = (): JSX.Element => (
+  <Flex
+    align='center'
+    sx={t => ({ gap: t.space.$1x5 })}
+  >
+    <Box
+      sx={t => ({
+        width: t.sizes.$5,
+        height: t.sizes.$5,
+        borderRadius: t.radii.$circle,
+        backgroundColor: t.colors.$neutralAlpha100,
+      })}
+    />
+    <Box
+      sx={t => ({
+        width: t.sizes.$16,
+        height: t.space.$3,
+        borderRadius: t.radii.$md,
+        backgroundColor: t.colors.$neutralAlpha100,
+      })}
+    />
+  </Flex>
+);
 
 /**
  * Compact "Step X / Y" badge that tracks the current main step's
@@ -322,6 +376,12 @@ interface FooterProps {
    * default)
    */
   hidePrevious?: boolean;
+  /**
+   * Force-disables both Previous and Continue regardless of the
+   * wizard's own state. Useful while async dependencies of the flow
+   * are still loading
+   */
+  isDisabled?: boolean;
 }
 
 /**
@@ -330,8 +390,9 @@ interface FooterProps {
  * simply advances to the next step
  */
 const Footer = (props: FooterProps): JSX.Element => {
-  const { previousLabel = 'Previous', continueLabel = 'Continue', hidePrevious = false } = props;
-  const { isFirstStep, isLastStep, goPrev, goNext, continueAction } = useWizard();
+  const { previousLabel = 'Previous', continueLabel = 'Continue', hidePrevious = false, isDisabled = false } = props;
+  const { isFirstStep, isLastStep, isLoading, goPrev, goNext, continueAction } = useWizard();
+  const isForceDisabled = isDisabled || isLoading;
   const { t } = useLocalizations();
 
   const continueLabelToShow =
@@ -367,7 +428,7 @@ const Footer = (props: FooterProps): JSX.Element => {
         <Button
           variant='outline'
           size='sm'
-          isDisabled={isFirstStep}
+          isDisabled={isForceDisabled || isFirstStep}
           onClick={() => void goPrev()}
         >
           <Icon
@@ -381,7 +442,7 @@ const Footer = (props: FooterProps): JSX.Element => {
       <Button
         variant='solid'
         size='sm'
-        isDisabled={continueAction?.isDisabled || isLastStep}
+        isDisabled={isForceDisabled || continueAction?.isDisabled || isLastStep}
         isLoading={continueAction?.isLoading}
         onClick={handleContinue}
       >

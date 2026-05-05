@@ -7,9 +7,11 @@ WizardContext.displayName = 'WizardContext';
 
 export function useWizard<TData = unknown>(): WizardContextValue<TData> {
   const ctx = React.useContext(WizardContext);
+
   if (!ctx) {
-    throw new Error('useWizard called outside of <Wizard.Root>.');
+    throw new Error('useWizard called outside of <Wizard.Root>');
   }
+
   return ctx as WizardContextValue<TData>;
 }
 
@@ -18,6 +20,7 @@ interface WizardProviderProps<TData> {
   currentStep: WizardStep<TData> | undefined;
   innerSteps: WizardInnerStep<TData>[];
   currentInnerStep: WizardInnerStep<TData> | undefined;
+  isLoading: boolean;
   goNext: WizardContextValue<TData>['goNext'];
   goPrev: WizardContextValue<TData>['goPrev'];
   goToStep: WizardContextValue<TData>['goToStep'];
@@ -25,7 +28,8 @@ interface WizardProviderProps<TData> {
 }
 
 export function WizardProvider<TData>(props: WizardProviderProps<TData>): JSX.Element {
-  const { activeSteps, currentStep, innerSteps, currentInnerStep, goNext, goPrev, goToStep, children } = props;
+  const { activeSteps, currentStep, innerSteps, currentInnerStep, isLoading, goNext, goPrev, goToStep, children } =
+    props;
 
   const [continueAction, setContinueAction] = React.useState<ContinueAction | undefined>(undefined);
 
@@ -55,13 +59,14 @@ export function WizardProvider<TData>(props: WizardProviderProps<TData>): JSX.El
       totalInnerSteps,
       isFirstStep,
       isLastStep,
+      isLoading,
       goNext,
       goPrev,
       goToStep,
       continueAction,
       setContinueAction,
     };
-  }, [activeSteps, currentStep, innerSteps, currentInnerStep, goNext, goPrev, goToStep, continueAction]);
+  }, [activeSteps, currentStep, innerSteps, currentInnerStep, isLoading, goNext, goPrev, goToStep, continueAction]);
 
   return <WizardContext.Provider value={value}>{children}</WizardContext.Provider>;
 }

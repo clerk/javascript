@@ -3,18 +3,7 @@ import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { useEnvironment, withCoreUserGuard } from '@/contexts';
-import {
-  Box,
-  Col,
-  descriptors,
-  Flex,
-  Flow,
-  Icon,
-  localizationKeys,
-  Spinner,
-  Text,
-  useAppearance,
-} from '@/customizables';
+import { Box, Col, descriptors, Flex, Flow, Icon, localizationKeys, Text, useAppearance } from '@/customizables';
 import { ApplicationLogo } from '@/elements/ApplicationLogo';
 import { withCardStateProvider } from '@/elements/contexts';
 import { NavBar, NavbarContextProvider } from '@/elements/Navbar';
@@ -29,13 +18,11 @@ import { CONFIGURE_SSO_STEPS } from './constants';
 const ConfigureSSOInternal = () => {
   return (
     <Flow.Root flow='configureSSO'>
-      <Flow.Part>
-        <Switch>
-          <Route>
-            <AuthenticatedContent />
-          </Route>
-        </Switch>
-      </Flow.Part>
+      <Switch>
+        <Route>
+          <AuthenticatedContent />
+        </Route>
+      </Switch>
     </Flow.Root>
   );
 };
@@ -126,23 +113,12 @@ const AuthenticatedContent = withCoreUserGuard(() => {
             flex: 1,
           })}
         >
-          {isLoadingEnterpriseConnections ? (
-            <Flex
-              align='center'
-              justify='center'
-              sx={{ flex: 1 }}
-            >
-              <Spinner
-                size='lg'
-                colorScheme='primary'
-                elementDescriptor={descriptors.spinner}
-              />
-            </Flex>
-          ) : (
-            <ConfigureSSOFlowProvider enterpriseConnection={enterpriseConnection}>
-              <ConfigureSSOWizardPanel />
-            </ConfigureSSOFlowProvider>
-          )}
+          <ConfigureSSOFlowProvider
+            enterpriseConnection={enterpriseConnection}
+            isLoading={isLoadingEnterpriseConnections}
+          >
+            <ConfigureSSOWizardPanel />
+          </ConfigureSSOFlowProvider>
         </Col>
       </NavbarContextProvider>
     </ProfileCard.Root>
@@ -156,6 +132,7 @@ const ConfigureSSOWizardPanel = () => {
     <Wizard.Root
       steps={CONFIGURE_SSO_STEPS}
       data={data}
+      isLoading={data.isLoading}
     >
       <Wizard.Header />
       <Wizard.Content />
