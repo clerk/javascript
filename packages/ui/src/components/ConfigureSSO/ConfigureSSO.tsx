@@ -1,4 +1,4 @@
-import { __internal_useUserEnterpriseConnections, useOrganization } from '@clerk/shared/react';
+import { __internal_useUserEnterpriseConnections, useOrganization, useUser } from '@clerk/shared/react';
 import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
@@ -11,15 +11,8 @@ import { ProfileCard } from '@/elements/ProfileCard';
 import { BoxIcon } from '@/icons';
 import { Route, Switch } from '@/router';
 
-import { ConfigureSSOFlowProvider, useConfigureSSOFlow } from './ConfigureSSOContext';
-import {
-  ConfigureCreateApp,
-  ConfigureMapAttributes,
-  ConfirmationStep,
-  ProvideEmail,
-  TestConfigurationStep,
-  VerifyDomain,
-} from './steps';
+import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
+import { ConfigureCreateApp, ConfirmationStep, ProvideEmail, TestConfigurationStep, VerifyDomain } from './steps';
 import { ConfigureSSOWizard } from './wizard';
 
 const ConfigureSSOInternal = () => {
@@ -132,59 +125,46 @@ const AuthenticatedContent = withCoreUserGuard(() => {
   );
 });
 
-/**
- * The full ConfigureSSO step tree, declared inline. Each
- * `<ConfigureSSOWizard.Step>` is one breadcrumb entry; nested
- * `<ConfigureSSOWizard>` blocks declare inner sub-step routing.
- *
- * Conditional rendering on a step (`{cond && <Step ... />}`) skips
- * it from the breadcrumb and from `goNext`/`goPrev` traversal — no
- * `shouldSkip` predicate needed
- */
 const ConfigureSSOSteps = () => {
-  const { domainAlreadyVerified } = useConfigureSSOFlow();
+  const { user } = useUser();
+  const primaryEmailAddress = user?.primaryEmailAddress;
 
   return (
     <ConfigureSSOWizard>
-      {!domainAlreadyVerified && (
-        <ConfigureSSOWizard.Step
-          id='verify-email-domain'
-          path='verify-email-domain'
-          label='Verify domain'
-        >
-          <ConfigureSSOWizard>
+      <ConfigureSSOWizard.Step
+        id='verify-email-domain'
+        path='verify-email-domain'
+        label='Verify domain'
+      >
+        <ConfigureSSOWizard>
+          {!primaryEmailAddress && (
             <ConfigureSSOWizard.Step
               id='provide-email'
               path='provide-email'
             >
               <ProvideEmail />
             </ConfigureSSOWizard.Step>
-            <ConfigureSSOWizard.Step
-              id='verify-domain'
-              path='verify-domain'
-            >
-              <VerifyDomain />
-            </ConfigureSSOWizard.Step>
-          </ConfigureSSOWizard>
-        </ConfigureSSOWizard.Step>
-      )}
+          )}
+          <ConfigureSSOWizard.Step
+            id='verify-domain'
+            path='verify-domain'
+          >
+            <VerifyDomain />
+          </ConfigureSSOWizard.Step>
+        </ConfigureSSOWizard>
+      </ConfigureSSOWizard.Step>
       <ConfigureSSOWizard.Step
         id='configure'
         path='configure'
         label='Configure'
       >
         <ConfigureSSOWizard>
+          {/* TODO: Implement configure steps */}
           <ConfigureSSOWizard.Step
             id='create-app'
             path='create-app'
           >
             <ConfigureCreateApp />
-          </ConfigureSSOWizard.Step>
-          <ConfigureSSOWizard.Step
-            id='map-attributes'
-            path='map-attributes'
-          >
-            <ConfigureMapAttributes />
           </ConfigureSSOWizard.Step>
         </ConfigureSSOWizard>
       </ConfigureSSOWizard.Step>

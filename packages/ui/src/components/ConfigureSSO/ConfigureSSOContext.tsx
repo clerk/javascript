@@ -1,17 +1,10 @@
-import { useUser } from '@clerk/shared/react/index';
 import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
 /**
- * Shared form state for the ConfigureSSO wizard, persisted across step
- * route mounts. Sourced by the wizard via `useConfigureSSOFlow()` and
- * passed to each step's `shouldSkip` predicate
+ * Shared form state for the ConfigureSSO wizard, persisted across steps
  */
 export interface ConfigureSSOData {
-  /**
-   * `true` if the user primary email address domain is already verified
-   */
-  domainAlreadyVerified: boolean;
   /**
    * The enterprise connection from the user's primary email address domain
    */
@@ -39,17 +32,12 @@ export const ConfigureSSOFlowProvider = ({
   isLoading,
   children,
 }: PropsWithChildren<ConfigureSSOFlowProviderProps>): JSX.Element => {
-  const { user } = useUser();
-
-  const domainAlreadyVerified = user?.primaryEmailAddress?.verification.status === 'verified';
-
   const value = React.useMemo<ConfigureSSOContextValue>(
     () => ({
       enterpriseConnection,
-      domainAlreadyVerified,
       isLoading,
     }),
-    [enterpriseConnection, domainAlreadyVerified, isLoading],
+    [enterpriseConnection, isLoading],
   );
 
   return <ConfigureSSOFlowContext.Provider value={value}>{children}</ConfigureSSOFlowContext.Provider>;
