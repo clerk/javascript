@@ -18,3 +18,10 @@ export { ClerkContextProvider } from './ClerkContextProvider';
 export * from './billing/payment-element';
 
 export { UNSAFE_PortalProvider, usePortalRoot } from './PortalProvider';
+
+export {
+  __createClerkTestQueryClient,
+  __resetClerkQueryClientForTest,
+  __setClerkQueryClientForTest,
+  getClerkQueryClient,
+} from './clerk-rq/clerk-query-client';
