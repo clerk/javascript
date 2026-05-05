@@ -74,9 +74,9 @@ import type {
   AuthenticateWithSolanaParams,
   BillingNamespace,
   CheckoutSignalValue,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1452,6 +1452,15 @@ export class Clerk implements ClerkInterface {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderConfigureSSOComponentWhenEmailAddressDisabled, {
           code: CANNOT_RENDER_CONFIGURE_SSO_EMAIL_ADDRESS_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenCheckout, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
         });
       }
       return;
