@@ -170,7 +170,9 @@ describe('isomorphicClerk', () => {
         load: vi.fn().mockResolvedValue(undefined),
         loaded: false,
       };
-      const mockClerkCtor = vi.fn().mockImplementation(() => mockInstance);
+      const mockClerkCtor = vi.fn().mockImplementation(function () {
+        return mockInstance;
+      });
       mockClerkCtor.prototype = {};
 
       const clerk = new IsomorphicClerk({
