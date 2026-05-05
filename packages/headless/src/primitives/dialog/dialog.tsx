@@ -242,6 +242,10 @@ function DialogBackdrop(props: DialogBackdropProps) {
     return backdropElement;
   }
 
+  if (!mounted) {
+    return null;
+  }
+
   return <FloatingOverlay lockScroll={lockScroll}>{backdropElement}</FloatingOverlay>;
 }
 
