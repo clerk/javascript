@@ -1,7 +1,7 @@
+import { __createClerkTestQueryClient } from '@clerk/shared/react';
 import type { ActiveSessionResource, LoadedClerk } from '@clerk/shared/types';
 import { type Mocked, vi } from 'vitest';
 
-import { QueryClient } from '@/core/query-core';
 import type { RouteContextValue } from '@/ui/router';
 
 type FunctionLike = (...args: any) => any;
@@ -46,19 +46,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedCle
   // Cast clerk to any to allow mocking properties
   const clerkAny = clerk as any;
 
-  const defaultQueryClient = {
-    __tag: 'clerk-rq-client' as const,
-    client: new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-          // Setting staleTime to Infinity will not cause issues between tests as long as each test
-          // case has its own wrapper that initializes a Clerk instance with a new QueryClient.
-          staleTime: Infinity,
-        },
-      },
-    }),
-  };
+  __createClerkTestQueryClient();
 
   mockMethodsOf(clerkAny);
   if (clerkAny.client) {
@@ -91,12 +79,6 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedCle
   if (clerkAny.billing) {
     mockMethodsOf(clerkAny.billing);
   }
-
-  // Mock the __internal_queryClient getter property
-  Object.defineProperty(clerkAny, '__internal_queryClient', {
-    get: vi.fn(() => defaultQueryClient),
-    configurable: true,
-  });
 
   mockProp(clerkAny, 'navigate');
   mockProp(clerkAny, 'setActive');
