@@ -21,6 +21,10 @@
       "import": "./dist/primitives/popover/index.js",
       "types": "./dist/primitives/popover/index.d.ts"
     },
+    "./select": {
+      "import": "./dist/primitives/select/index.js",
+      "types": "./dist/primitives/select/index.d.ts"
+    },
     "./dialog": {
       "import": "./dist/primitives/dialog/index.js",
       "types": "./dist/primitives/dialog/index.d.ts"
