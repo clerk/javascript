@@ -178,6 +178,11 @@ export const esUY: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Configurar inicio de sesión único (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Crear organización',
     invitePage: {

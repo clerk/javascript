@@ -1292,6 +1292,11 @@ export type __internal_LocalizationResource = {
       message: LocalizationValue;
     };
   };
+  configureSSO: {
+    navbar: {
+      title: LocalizationValue;
+    };
+  };
   apiKeys: {
     formTitle: LocalizationValue;
     formHint: LocalizationValue;

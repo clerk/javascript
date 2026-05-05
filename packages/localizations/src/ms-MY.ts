@@ -178,6 +178,11 @@ export const msMY: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Konfigurasi Log Masuk Tunggal (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Cipta organisasi',
     invitePage: {
