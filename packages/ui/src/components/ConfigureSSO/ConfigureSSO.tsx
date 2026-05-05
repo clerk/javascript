@@ -12,7 +12,7 @@ import { BoxIcon } from '@/icons';
 import { Route, Switch } from '@/router';
 
 import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
-import { ConfigureCreateApp, ConfirmationStep, ProvideEmail, TestConfigurationStep, VerifyDomain } from './steps';
+import { ConfigureCreateApp, ConfirmationStep, ProvideEmail, TestConfigurationStep, VerifyDomainStep } from './steps';
 import { ConfigureSSOWizard } from './wizard';
 
 const ConfigureSSOInternal = () => {
@@ -127,6 +127,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
 
 const ConfigureSSOSteps = () => {
   const { user } = useUser();
+
   const primaryEmailAddress = user?.primaryEmailAddress;
 
   return (
@@ -149,7 +150,7 @@ const ConfigureSSOSteps = () => {
             id='verify-domain'
             path='verify-domain'
           >
-            <VerifyDomain />
+            <VerifyDomainStep />
           </ConfigureSSOWizard.Step>
         </ConfigureSSOWizard>
       </ConfigureSSOWizard.Step>

@@ -27,6 +27,11 @@ export interface ConfigureSSOWizardStepProps {
    */
   label?: LocalizationKey | string;
   /**
+   * Marks this step as completed regardless of its position relative
+   * to the current step
+   */
+  isCompleted?: boolean;
+  /**
    * The step body. Anything React, including a nested
    * `<ConfigureSSOWizard>` for inner sub-steps
    */
@@ -68,6 +73,7 @@ export interface ConfigureSSOWizardActiveStep {
   id: string;
   path: string;
   label?: LocalizationKey | string;
+  isCompleted?: boolean;
   children: React.ReactNode;
 }
 

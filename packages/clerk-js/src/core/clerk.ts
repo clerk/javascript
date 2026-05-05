@@ -1459,7 +1459,7 @@ export class Clerk implements ClerkInterface {
 
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotOpenCheckout, {
+        throw new ClerkRuntimeError(warnings.cannotRenderConfigureSSOComponentWhenUserDoesNotExist, {
           code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
         });
       }

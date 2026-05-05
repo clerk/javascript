@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Badge, Box, Button, Col, descriptors, Flex, Icon, Spinner, Text, useLocalizations } from '@/customizables';
-import { CaretLeft, CaretRight } from '@/icons';
+import { CaretLeft, CaretRight, Check } from '@/icons';
 import { Route, Switch, useRouter } from '@/router';
 
 import { useConfigureSSOFlow } from '../ConfigureSSOContext';
@@ -54,6 +54,7 @@ function extractSteps(children: React.ReactNode): ConfigureSSOWizardActiveStep[]
       id: props.id,
       path: props.path,
       label: props.label,
+      isCompleted: props.isCompleted,
       children: props.children,
     });
   });
@@ -177,8 +178,8 @@ const RootInner = ({ parentWizard, isNested, children }: RootInnerProps): JSX.El
       goPrev,
       goToStep,
       isNested,
-      isFirstStep: index <= 0 && !parentWizard,
-      isLastStep: index === activeSteps.length - 1 && !parentWizard,
+      isFirstStep: index <= 0 && (!parentWizard || parentWizard.isFirstStep),
+      isLastStep: index === activeSteps.length - 1 && (!parentWizard || parentWizard.isLastStep),
     };
   }, [activeSteps, currentStep, isLoading, goNext, goPrev, goToStep, isNested, parentWizard]);
 
@@ -285,8 +286,8 @@ const Header = (): JSX.Element => {
     >
       {activeSteps.map((step, index) => {
         const isCurrent = index === currentIndex;
-        const isCompleted = index < currentIndex;
-        const isReachable = index <= currentIndex;
+        const isCompleted = step.isCompleted ?? index < currentIndex;
+        const isReachable = isCompleted || index <= currentIndex;
         const labelText = step.label ? (typeof step.label === 'string' ? step.label : t(step.label)) : '';
 
         return (
@@ -326,12 +327,23 @@ const Header = (): JSX.Element => {
                     backgroundColor: isCurrent
                       ? theme.colors.$colorForeground
                       : isCompleted
-                        ? theme.colors.$neutralAlpha200
+                        ? theme.colors.$success500
                         : theme.colors.$neutralAlpha100,
-                    color: isCurrent ? theme.colors.$colorBackground : theme.colors.$colorMutedForeground,
+                    color: isCurrent
+                      ? theme.colors.$colorBackground
+                      : isCompleted
+                        ? theme.colors.$white
+                        : theme.colors.$colorMutedForeground,
                   })}
                 >
-                  {index + 1}
+                  {isCompleted && !isCurrent ? (
+                    <Icon
+                      icon={Check}
+                      size='xs'
+                    />
+                  ) : (
+                    index + 1
+                  )}
                 </Flex>
                 <Text
                   elementDescriptor={descriptors.configureSSOWizardHeaderItemLabel}

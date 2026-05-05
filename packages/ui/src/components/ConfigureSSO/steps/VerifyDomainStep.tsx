@@ -3,11 +3,13 @@ import { Flow, Text } from '@/customizables';
 import { useConfigureSSOWizard, useRegisterContinueAction } from '../wizard';
 import { StepLayout } from './StepLayout';
 
-export const VerifyDomain = (): JSX.Element => {
+export const VerifyDomainStep = (): JSX.Element => {
   const { goNext } = useConfigureSSOWizard();
 
   useRegisterContinueAction({
     handler: () => goNext(),
+    // TODO: Implement verification
+    isDisabled: true,
   });
 
   return (
