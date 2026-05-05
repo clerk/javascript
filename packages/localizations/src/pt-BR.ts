@@ -184,6 +184,11 @@ export const ptBR: LocalizationResource = {
     viewPayment: 'Ver pagamento',
     year: 'Ano',
   },
+  configureSSO: {
+    navbar: {
+      title: 'Configurar logon único (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Criar organização',
     invitePage: {

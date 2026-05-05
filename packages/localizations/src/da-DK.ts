@@ -178,6 +178,11 @@ export const daDK: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'Konfigurer single sign-on (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'Opret organisation',
     invitePage: {
