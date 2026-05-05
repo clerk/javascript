@@ -204,6 +204,12 @@ export const enUS: LocalizationResource = {
     verifyEmailDomainStep: {
       title: 'Verify email address',
       subtitle: 'Verify the email address you want to enable the enterprise connection on.',
+      addEmailAddress: {
+        formTitle: 'We need your email',
+        formSubtitle: 'In order to start we will need your email address',
+        inputPlaceholder: 'name@company.com',
+        inputLabel: 'Email address',
+      },
       emailCode: {
         formTitle: 'Verify your email address',
         formSubtitle: 'Enter the verification code sent to {{identifier}}',

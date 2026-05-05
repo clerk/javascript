@@ -1299,6 +1299,12 @@ export type __internal_LocalizationResource = {
     verifyEmailDomainStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      addEmailAddress: {
+        formTitle: LocalizationValue;
+        formSubtitle: LocalizationValue;
+        inputPlaceholder: LocalizationValue;
+        inputLabel: LocalizationValue;
+      };
       emailCode: {
         formTitle: LocalizationValue;
         formSubtitle: LocalizationValue<'identifier'>;

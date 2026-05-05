@@ -1,7 +1,7 @@
 import { useReverification, useUser } from '@clerk/shared/react';
 import React from 'react';
 
-import { Col, Flow, Form, Heading, Icon, Input, Text } from '@/customizables';
+import { Col, Flow, Form, Heading, Icon, Input, localizationKeys, Text, useLocalizations } from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { useRegisterContinueAction, useWizard } from '@/elements/Wizard';
 import { DuotoneAtSymbol } from '@/icons';
@@ -15,6 +15,7 @@ export const AddEmailAddressStep = (): JSX.Element => {
   const { goNext } = useWizard();
   const { user } = useUser();
   const card = useCardState();
+  const { t } = useLocalizations();
   const [email, setEmail] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -57,8 +58,8 @@ export const AddEmailAddressStep = (): JSX.Element => {
   return (
     <Flow.Part part='addEmailAddress'>
       <StepLayout
-        title='Verify email address'
-        subtitle='Verify the domain you want to enable the enterprise connection on.'
+        title={localizationKeys('configureSSO.verifyEmailDomainStep.title')}
+        subtitle={localizationKeys('configureSSO.verifyEmailDomainStep.subtitle')}
       >
         <Form
           onSubmit={e => {
@@ -93,16 +94,14 @@ export const AddEmailAddressStep = (): JSX.Element => {
               <Heading
                 textVariant='h2'
                 sx={t => ({ color: t.colors.$colorForeground })}
-              >
-                We need your email
-              </Heading>
+                localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.formTitle')}
+              />
               <Text
                 as='p'
                 variant='body'
                 sx={t => ({ color: t.colors.$colorMutedForeground })}
-              >
-                In order to start we will need your email address
-              </Text>
+                localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.formSubtitle')}
+              />
             </Col>
 
             <Col sx={t => ({ gap: t.space.$1x5, width: '100%' })}>
@@ -110,12 +109,12 @@ export const AddEmailAddressStep = (): JSX.Element => {
                 type='email'
                 // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
-                placeholder='name@company.com'
+                placeholder={t(localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.inputPlaceholder'))}
                 value={email}
                 onChange={e => setEmail(e.currentTarget.value)}
                 hasError={Boolean(card.error)}
                 isDisabled={isSubmitting}
-                aria-label='Email address'
+                aria-label={t(localizationKeys('configureSSO.verifyEmailDomainStep.addEmailAddress.inputLabel'))}
               />
               {card.error ? (
                 <Text
