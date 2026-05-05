@@ -1,6 +1,6 @@
+import { useClerkInstanceContext } from '../contexts';
 import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
 import { useClerkQuery } from '../query/useQuery';
-import { useClerkInstanceContext } from '../contexts';
 import { useOrganizationBase } from './base/useOrganizationBase';
 import { useUserBase } from './base/useUserBase';
 import { useBillingIsEnabled } from './useBillingIsEnabled';

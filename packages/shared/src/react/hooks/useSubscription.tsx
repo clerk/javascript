@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
 import { useClerkQueryClient } from '../query/use-clerk-query-client';
 import { useClerkQuery } from '../query/useQuery';
-import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import { useOrganizationBase } from './base/useOrganizationBase';
 import { useUserBase } from './base/useUserBase';
 import { useBillingIsEnabled } from './useBillingIsEnabled';

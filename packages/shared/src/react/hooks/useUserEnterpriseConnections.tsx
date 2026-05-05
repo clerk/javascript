@@ -6,10 +6,10 @@ import type {
   EnterpriseConnectionResource,
   UpdateMeEnterpriseConnectionParams,
 } from '../../types/enterpriseConnection';
+import { useClerkInstanceContext } from '../contexts';
 import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
 import { useClerkQueryClient } from '../query/use-clerk-query-client';
 import { useClerkQuery } from '../query/useQuery';
-import { useClerkInstanceContext } from '../contexts';
 import { useUserBase } from './base/useUserBase';
 import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
 import { useUserEnterpriseConnectionsCacheKeys } from './useUserEnterpriseConnections.shared';

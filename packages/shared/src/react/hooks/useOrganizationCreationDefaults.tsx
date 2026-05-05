@@ -1,8 +1,8 @@
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { EnvironmentResource } from '../../types/environment';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
 import { useClerkQuery } from '../query/useQuery';
-import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import { useUserBase } from './base/useUserBase';
 import { useOrganizationCreationDefaultsCacheKeys } from './useOrganizationCreationDefaults.shared';
 import type {
