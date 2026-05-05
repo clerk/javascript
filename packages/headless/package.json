@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./accordion": {
+      "import": "./dist/primitives/accordion/index.js",
+      "types": "./dist/primitives/accordion/index.d.ts"
+    },
     "./dialog": {
       "import": "./dist/primitives/dialog/index.js",
       "types": "./dist/primitives/dialog/index.d.ts"
