@@ -1,20 +1,23 @@
 import { useReverification } from '@clerk/shared/react';
 import React from 'react';
 
-import { Col, Flow, Heading, localizationKeys, Text } from '@/customizables';
+import { Col, Flow, Heading, Icon, Input, localizationKeys, Text } from '@/customizables';
 import { useFieldOTP } from '@/elements/CodeControl';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
 import { useRegisterContinueAction, useWizard } from '@/elements/Wizard';
+import { DuotoneAtSymbol } from '@/icons';
 import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSOFlow } from '../ConfigureSSOContext';
 import { StepLayout } from './StepLayout';
 
-export const VerifyDomain = (): JSX.Element => {
+export const VerifyDomainStep = (): JSX.Element => {
   const { goNext } = useWizard();
   const { primaryEmailAddress } = useConfigureSSOFlow();
   const card = useCardState();
+
+  const isVerified = primaryEmailAddress?.verification.status === 'verified';
 
   const prepareEmailVerification = useReverification(() =>
     primaryEmailAddress?.prepareVerification({ strategy: 'email_code' }),
@@ -28,8 +31,11 @@ export const VerifyDomain = (): JSX.Element => {
     [prepareEmailVerification, card],
   );
 
+  const codeSubmittedRef = React.useRef(false);
+
   const otp = useFieldOTP({
     onCodeEntryFinished: (code, resolve, reject) => {
+      codeSubmittedRef.current = true;
       attemptEmailVerification(code)
         .then(() => resolve())
         .catch(reject);
@@ -42,26 +48,37 @@ export const VerifyDomain = (): JSX.Element => {
     },
   });
 
-  // Send the first code on mount, and clear any stale card error that
-  // could be lingering from a previous step
+  const { values, length } = otp.otpControl.otpInputProps;
+  const isCodeComplete = values.filter(Boolean).length === length;
+  const showVerifiedView = isVerified && !codeSubmittedRef.current;
+
+  // OTP auto-submits on the last digit, "Continue" is a fallback that
+  // mirrors its loading state and is disabled until every slot is filled.
+  // When the email is already verified, "Continue" just advances the wizard
+  useRegisterContinueAction(
+    showVerifiedView
+      ? {
+          handler: () => {
+            void goNext();
+          },
+        }
+      : {
+          handler: otp.onFakeContinue,
+          isDisabled: !isCodeComplete,
+          isLoading: otp.isLoading,
+        },
+  );
+
+  // Send the first code on mount (only when there's something to verify),
+  // and clear any stale card error that could be lingering from a previous step
   React.useEffect(() => {
-    void prepare();
+    if (!isVerified) {
+      void prepare();
+    }
     card.setError(undefined);
     return () => card.setError(undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const { values, length } = otp.otpControl.otpInputProps;
-  const isCodeComplete = values.filter(Boolean).length === length;
-
-  // The OTP auto-submits on the last digit — Continue is a fallback for
-  // keyboard users / screen readers, so it tracks the same loading state
-  // and stays disabled until every slot is filled
-  useRegisterContinueAction({
-    handler: otp.onFakeContinue,
-    isDisabled: !isCodeComplete,
-    isLoading: otp.isLoading,
-  });
 
   return (
     <Flow.Part part='verifyDomain'>
@@ -74,30 +91,67 @@ export const VerifyDomain = (): JSX.Element => {
           sx={t => ({
             flex: 1,
             justifyContent: 'center',
-            gap: t.space.$5,
+            gap: t.space.$2,
             paddingBlock: t.space.$8,
           })}
         >
-          <Col sx={t => ({ gap: t.space.$1, textAlign: 'center' })}>
-            <Heading
-              textVariant='h1'
-              sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$sm })}
-            >
-              Verify your email address
-            </Heading>
-            <Text
-              as='p'
-              variant='body'
-              sx={t => ({ color: t.colors.$colorMutedForeground })}
-            >
-              Enter the verification code sent to {primaryEmailAddress?.emailAddress ?? ''}
-            </Text>
-          </Col>
+          {showVerifiedView && primaryEmailAddress ? (
+            <>
+              <Icon
+                icon={DuotoneAtSymbol}
+                sx={t => ({
+                  width: t.sizes.$8,
+                  height: t.sizes.$8,
+                  color: t.colors.$neutralAlpha600,
+                })}
+              />
+              <Col sx={t => ({ gap: t.space.$1, textAlign: 'center', maxWidth: t.sizes.$66 })}>
+                <Heading
+                  textVariant='h1'
+                  sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$sm })}
+                >
+                  We got your email
+                </Heading>
+                <Text
+                  as='p'
+                  variant='body'
+                  sx={t => ({ color: t.colors.$colorMutedForeground })}
+                >
+                  You&apos;ve verified your email address with the following email
+                </Text>
+              </Col>
+              <Input
+                type='email'
+                value={primaryEmailAddress.emailAddress}
+                readOnly
+                aria-label='Verified email address'
+                sx={t => ({ width: '100%', maxWidth: t.sizes.$66, backgroundColor: t.colors.$neutralAlpha50 })}
+              />
+            </>
+          ) : (
+            <>
+              <Col sx={t => ({ gap: t.space.$1, textAlign: 'center' })}>
+                <Heading
+                  textVariant='h1'
+                  sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$sm })}
+                >
+                  Verify your email address
+                </Heading>
+                <Text
+                  as='p'
+                  variant='body'
+                  sx={t => ({ color: t.colors.$colorMutedForeground })}
+                >
+                  Enter the verification code sent to {primaryEmailAddress?.emailAddress ?? ''}
+                </Text>
+              </Col>
 
-          <Form.OTPInput
-            {...otp}
-            resendButton={localizationKeys('userProfile.emailAddressPage.emailCode.resendButton')}
-          />
+              <Form.OTPInput
+                {...otp}
+                resendButton={localizationKeys('userProfile.emailAddressPage.emailCode.resendButton')}
+              />
+            </>
+          )}
         </Col>
       </StepLayout>
     </Flow.Part>

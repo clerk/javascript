@@ -2,12 +2,12 @@ import type { WizardStep } from '@/elements/Wizard';
 
 import type { ConfigureSSOData } from './ConfigureSSOContext';
 import {
-  AddEmailAddress,
+  AddEmailAddressStep,
   ConfigureCreateApp,
   ConfigureMapAttributes,
   ConfirmationStep,
   TestConfigurationStep,
-  VerifyDomain,
+  VerifyDomainStep,
 } from './steps';
 
 export const CONFIGURE_SSO_STEPS: ReadonlyArray<WizardStep<ConfigureSSOData>> = [
@@ -19,17 +19,15 @@ export const CONFIGURE_SSO_STEPS: ReadonlyArray<WizardStep<ConfigureSSOData>> = 
       {
         id: 'add-email-address',
         path: 'add-email-address',
-        Component: AddEmailAddress,
+        Component: AddEmailAddressStep,
         shouldSkip: data => !!data.primaryEmailAddress,
       },
       {
         id: 'verify-domain',
         path: 'verify-domain',
-        Component: VerifyDomain,
-        shouldSkip: data => data.primaryEmailAddress?.verification.status === 'verified',
+        Component: VerifyDomainStep,
       },
     ],
-    shouldSkip: data => data.primaryEmailAddress?.verification.status === 'verified',
   },
   {
     id: 'configure',
