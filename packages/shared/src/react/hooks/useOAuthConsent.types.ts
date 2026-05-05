@@ -2,11 +2,6 @@ import type { ClerkAPIResponseError } from '../../errors/clerkApiResponseError';
 import type { GetOAuthConsentInfoParams, OAuthConsentInfo } from '../../types';
 
 /**
- * Options for {@link useOAuthConsent}.
- *
- * Pass `oauthClientId` and `scope` explicitly. The hook does not read from `window.location` or
- * any other ambient source. The hook is disabled when `oauthClientId` is empty or omitted.
- *
  * @interface
  */
 export type UseOAuthConsentParams = Pick<GetOAuthConsentInfoParams, 'oauthClientId' | 'scope'> & {
@@ -29,8 +24,7 @@ export type UseOAuthConsentParams = Pick<GetOAuthConsentInfoParams, 'oauthClient
  */
 export type UseOAuthConsentReturn = {
   /**
-   * OAuth consent screen metadata from Clerk, or `undefined` before the first successful fetch.
-   * Additional fields (e.g. submission helpers) may be added in the future without renaming this hook.
+   * The OAuth consent screen metadata returned by Clerk, or `undefined` before the first successful fetch.
    */
   data: OAuthConsentInfo | undefined;
   /**
