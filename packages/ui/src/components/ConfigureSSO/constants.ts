@@ -1,6 +1,3 @@
-import type { WizardStep } from '@/elements/Wizard';
-
-import type { ConfigureSSOData } from './ConfigureSSOContext';
 import {
   ConfigureCreateApp,
   ConfigureMapAttributes,
@@ -9,8 +6,9 @@ import {
   TestConfigurationStep,
   VerifyDomain,
 } from './steps';
+import type { ConfigureSSOWizardStep } from './wizard';
 
-export const CONFIGURE_SSO_STEPS: ReadonlyArray<WizardStep<ConfigureSSOData>> = [
+export const CONFIGURE_SSO_STEPS: ReadonlyArray<ConfigureSSOWizardStep> = [
   {
     id: 'verify-email-domain',
     path: 'verify-email-domain',

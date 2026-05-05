@@ -4,38 +4,35 @@ import { Badge, Box, Button, descriptors, Flex, Icon, Spinner, Text, useLocaliza
 import { CaretLeft, CaretRight } from '@/icons';
 import { Route, Switch, useRouter } from '@/router';
 
-import type { WizardInnerStep, WizardStep } from './types';
-import { useWizard, WizardProvider } from './WizardContext';
+import { useConfigureSSOFlow } from '../ConfigureSSOContext';
+import { ConfigureSSOWizardProvider, useConfigureSSOWizard } from './ConfigureSSOWizardContext';
+import type { ConfigureSSOWizardInnerStep, ConfigureSSOWizardStep } from './types';
 
-interface WizardRootProps<TData = unknown> {
-  steps: ReadonlyArray<WizardStep<TData>>;
-  /**
-   * Optional data passed to each step's `shouldSkip` predicate. When the
-   * referenced shape changes, the active step list is recomputed
-   */
-  data?: TData;
-  /**
-   * `true` while the parent flow is still loading async dependencies.
-   * The header renders a skeleton breadcrumb, the content renders a
-   * centered spinner, and the footer's buttons are disabled
-   */
-  isLoading?: boolean;
+interface ConfigureSSOWizardRootProps {
+  steps: ReadonlyArray<ConfigureSSOWizardStep>;
   children: React.ReactNode;
 }
 
-const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
-  const { steps, data, isLoading = false, children } = props;
+/**
+ * Top-level wizard scaffold for the ConfigureSSO flow. Sources its
+ * `data` and `isLoading` from `useConfigureSSOFlow()` directly, so it
+ * must be rendered inside `<ConfigureSSOFlowProvider>`
+ */
+const Root = (props: ConfigureSSOWizardRootProps): JSX.Element => {
+  const { steps, children } = props;
   const router = useRouter();
+  const data = useConfigureSSOFlow();
+  const { isLoading } = data;
 
-  const activeSteps = React.useMemo(() => steps.filter(s => !s.shouldSkip?.(data as TData)), [steps, data]);
+  const activeSteps = React.useMemo(() => steps.filter(s => !s.shouldSkip?.(data)), [steps, data]);
 
   const getActiveInnerSteps = React.useCallback(
-    (step: WizardStep<TData> | undefined): WizardInnerStep<TData>[] =>
-      step?.innerSteps?.filter(s => !s.shouldSkip?.(data as TData)) ?? [],
+    (step: ConfigureSSOWizardStep | undefined): ConfigureSSOWizardInnerStep[] =>
+      step?.innerSteps?.filter(s => !s.shouldSkip?.(data)) ?? [],
     [data],
   );
 
-  const currentStep = React.useMemo<WizardStep<TData> | undefined>(() => {
+  const currentStep = React.useMemo<ConfigureSSOWizardStep | undefined>(() => {
     if (activeSteps.length === 0) {
       return undefined;
     }
@@ -57,7 +54,7 @@ const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
   // is the catch-all, the first inner step of any main
   // step is its parent's index route (no segment)
   const buildPath = React.useCallback(
-    (mainStep: WizardStep<TData>, innerStep?: WizardInnerStep<TData>): string => {
+    (mainStep: ConfigureSSOWizardStep, innerStep?: ConfigureSSOWizardInnerStep): string => {
       const inners = getActiveInnerSteps(mainStep);
       const target = innerStep ?? inners[0];
       const isFirstMain = activeSteps[0]?.id === mainStep.id;
@@ -68,7 +65,7 @@ const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
     [activeSteps, getActiveInnerSteps],
   );
 
-  const currentInnerStep = React.useMemo<WizardInnerStep<TData> | undefined>(() => {
+  const currentInnerStep = React.useMemo<ConfigureSSOWizardInnerStep | undefined>(() => {
     if (!currentStep || innerSteps.length === 0) {
       return undefined;
     }
@@ -82,7 +79,7 @@ const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
   }, [currentStep, innerSteps, router, buildPath]);
 
   const navigateTo = React.useCallback(
-    (mainStep: WizardStep<TData> | undefined, innerStep?: WizardInnerStep<TData>) =>
+    (mainStep: ConfigureSSOWizardStep | undefined, innerStep?: ConfigureSSOWizardInnerStep) =>
       mainStep ? router.navigate(buildPath(mainStep, innerStep)) : undefined,
     [router, buildPath],
   );
@@ -128,7 +125,7 @@ const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
   );
 
   return (
-    <WizardProvider
+    <ConfigureSSOWizardProvider
       activeSteps={activeSteps}
       currentStep={currentStep}
       innerSteps={innerSteps}
@@ -139,7 +136,7 @@ const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
       goToStep={goToStep}
     >
       {children}
-    </WizardProvider>
+    </ConfigureSSOWizardProvider>
   );
 };
 
@@ -147,7 +144,7 @@ const Root = <TData,>(props: WizardRootProps<TData>): JSX.Element => {
  * Renders a container step's inner sub-routes, or falls back to the
  * step's own `Component` for leaf steps
  */
-const StepRoutes = <TData,>({ step }: { step: WizardStep<TData> }): JSX.Element | null => {
+const StepRoutes = ({ step }: { step: ConfigureSSOWizardStep }): JSX.Element | null => {
   const Component = step.Component;
   if (!step.innerSteps?.length) {
     return Component ? <Component /> : null;
@@ -176,7 +173,7 @@ const StepRoutes = <TData,>({ step }: { step: WizardStep<TData> }): JSX.Element 
  * doesn't match another main step (e.g. its own inner-step paths)
  */
 const Content = (): JSX.Element | null => {
-  const { activeSteps, isLoading } = useWizard();
+  const { activeSteps, isLoading } = useConfigureSSOWizard();
 
   if (isLoading) {
     return (
@@ -222,7 +219,7 @@ const Content = (): JSX.Element | null => {
  * are clickable for backwards navigation, future steps are disabled
  */
 const Header = (): JSX.Element => {
-  const { activeSteps, currentIndex, isLoading, goToStep } = useWizard();
+  const { activeSteps, currentIndex, isLoading, goToStep } = useConfigureSSOWizard();
   const { t } = useLocalizations();
 
   return (
@@ -335,7 +332,7 @@ const SkeletonBreadcrumbStep = (): JSX.Element => (
  * need to reserve room for it
  */
 const StepIndicator = (): JSX.Element | null => {
-  const { totalInnerSteps, currentInnerIndex } = useWizard();
+  const { totalInnerSteps, currentInnerIndex } = useConfigureSSOWizard();
 
   if (totalInnerSteps <= 0 || currentInnerIndex < 0) {
     return null;
@@ -391,7 +388,7 @@ interface FooterProps {
  */
 const Footer = (props: FooterProps): JSX.Element => {
   const { previousLabel = 'Previous', continueLabel = 'Continue', hidePrevious = false, isDisabled = false } = props;
-  const { isFirstStep, isLastStep, isLoading, goPrev, goNext, continueAction } = useWizard();
+  const { isFirstStep, isLastStep, isLoading, goPrev, goNext, continueAction } = useConfigureSSOWizard();
   const isForceDisabled = isDisabled || isLoading;
   const { t } = useLocalizations();
 
@@ -457,7 +454,7 @@ const Footer = (props: FooterProps): JSX.Element => {
   );
 };
 
-export const Wizard = {
+export const ConfigureSSOWizard = {
   Root,
   Header,
   Content,

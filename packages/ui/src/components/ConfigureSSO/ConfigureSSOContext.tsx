@@ -4,8 +4,8 @@ import React, { type PropsWithChildren } from 'react';
 
 /**
  * Shared form state for the ConfigureSSO wizard, persisted across step
- * route mounts and exposed to `WizardStep.shouldSkip` via `Wizard.Root`'s
- * `data` prop
+ * route mounts. Sourced by the wizard via `useConfigureSSOFlow()` and
+ * passed to each step's `shouldSkip` predicate
  */
 export interface ConfigureSSOData {
   /**

@@ -1,10 +1,10 @@
 import { Flow, Text } from '@/customizables';
-import { useRegisterContinueAction, useWizard } from '@/elements/Wizard';
 
+import { useConfigureSSOWizard, useRegisterContinueAction } from '../wizard';
 import { StepLayout } from './StepLayout';
 
 export const ConfigureMapAttributes = (): JSX.Element => {
-  const { goNext } = useWizard();
+  const { goNext } = useConfigureSSOWizard();
 
   useRegisterContinueAction({
     handler: () => goNext(),

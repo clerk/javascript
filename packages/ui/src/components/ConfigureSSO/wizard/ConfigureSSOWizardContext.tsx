@@ -1,33 +1,38 @@
 import React from 'react';
 
-import type { ContinueAction, WizardContextValue, WizardInnerStep, WizardStep } from './types';
+import type {
+  ConfigureSSOWizardContextValue,
+  ConfigureSSOWizardInnerStep,
+  ConfigureSSOWizardStep,
+  ContinueAction,
+} from './types';
 
-const WizardContext = React.createContext<WizardContextValue<any> | null>(null);
-WizardContext.displayName = 'WizardContext';
+const ConfigureSSOWizardContext = React.createContext<ConfigureSSOWizardContextValue | null>(null);
+ConfigureSSOWizardContext.displayName = 'ConfigureSSOWizardContext';
 
-export function useWizard<TData = unknown>(): WizardContextValue<TData> {
-  const ctx = React.useContext(WizardContext);
+export function useConfigureSSOWizard(): ConfigureSSOWizardContextValue {
+  const ctx = React.useContext(ConfigureSSOWizardContext);
 
   if (!ctx) {
-    throw new Error('useWizard called outside of <Wizard.Root>');
+    throw new Error('useConfigureSSOWizard called outside of <ConfigureSSOWizard.Root>');
   }
 
-  return ctx as WizardContextValue<TData>;
+  return ctx;
 }
 
-interface WizardProviderProps<TData> {
-  activeSteps: WizardStep<TData>[];
-  currentStep: WizardStep<TData> | undefined;
-  innerSteps: WizardInnerStep<TData>[];
-  currentInnerStep: WizardInnerStep<TData> | undefined;
+interface ConfigureSSOWizardProviderProps {
+  activeSteps: ConfigureSSOWizardStep[];
+  currentStep: ConfigureSSOWizardStep | undefined;
+  innerSteps: ConfigureSSOWizardInnerStep[];
+  currentInnerStep: ConfigureSSOWizardInnerStep | undefined;
   isLoading: boolean;
-  goNext: WizardContextValue<TData>['goNext'];
-  goPrev: WizardContextValue<TData>['goPrev'];
-  goToStep: WizardContextValue<TData>['goToStep'];
+  goNext: ConfigureSSOWizardContextValue['goNext'];
+  goPrev: ConfigureSSOWizardContextValue['goPrev'];
+  goToStep: ConfigureSSOWizardContextValue['goToStep'];
   children: React.ReactNode;
 }
 
-export function WizardProvider<TData>(props: WizardProviderProps<TData>): JSX.Element {
+export function ConfigureSSOWizardProvider(props: ConfigureSSOWizardProviderProps): JSX.Element {
   const { activeSteps, currentStep, innerSteps, currentInnerStep, isLoading, goNext, goPrev, goToStep, children } =
     props;
 
@@ -38,7 +43,7 @@ export function WizardProvider<TData>(props: WizardProviderProps<TData>): JSX.El
     setContinueAction(undefined);
   }, [currentStep?.id, currentInnerStep?.id]);
 
-  const value = React.useMemo<WizardContextValue<TData>>(() => {
+  const value = React.useMemo<ConfigureSSOWizardContextValue>(() => {
     const currentIndex = currentStep ? activeSteps.findIndex(s => s.id === currentStep.id) : -1;
     const currentInnerIndex = currentInnerStep ? innerSteps.findIndex(s => s.id === currentInnerStep.id) : -1;
     const totalInnerSteps = innerSteps.length;
@@ -68,14 +73,14 @@ export function WizardProvider<TData>(props: WizardProviderProps<TData>): JSX.El
     };
   }, [activeSteps, currentStep, innerSteps, currentInnerStep, isLoading, goNext, goPrev, goToStep, continueAction]);
 
-  return <WizardContext.Provider value={value}>{children}</WizardContext.Provider>;
+  return <ConfigureSSOWizardContext.Provider value={value}>{children}</ConfigureSSOWizardContext.Provider>;
 }
 
 /**
  * Helper for step components that need to register a Continue action
  */
 export function useRegisterContinueAction(action: ContinueAction | undefined): void {
-  const { setContinueAction } = useWizard();
+  const { setContinueAction } = useConfigureSSOWizard();
 
   const handlerRef = React.useRef<ContinueAction['handler'] | undefined>(action?.handler);
   handlerRef.current = action?.handler;

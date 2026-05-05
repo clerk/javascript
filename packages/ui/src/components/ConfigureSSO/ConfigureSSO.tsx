@@ -8,12 +8,12 @@ import { ApplicationLogo } from '@/elements/ApplicationLogo';
 import { withCardStateProvider } from '@/elements/contexts';
 import { NavBar, NavbarContextProvider } from '@/elements/Navbar';
 import { ProfileCard } from '@/elements/ProfileCard';
-import { Wizard } from '@/elements/Wizard';
 import { BoxIcon } from '@/icons';
 import { Route, Switch } from '@/router';
 
-import { ConfigureSSOFlowProvider, useConfigureSSOFlow } from './ConfigureSSOContext';
+import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
 import { CONFIGURE_SSO_STEPS } from './constants';
+import { ConfigureSSOWizard } from './wizard';
 
 const ConfigureSSOInternal = () => {
   return (
@@ -117,29 +117,17 @@ const AuthenticatedContent = withCoreUserGuard(() => {
             enterpriseConnection={enterpriseConnection}
             isLoading={isLoadingEnterpriseConnections}
           >
-            <ConfigureSSOWizardPanel />
+            <ConfigureSSOWizard.Root steps={CONFIGURE_SSO_STEPS}>
+              <ConfigureSSOWizard.Header />
+              <ConfigureSSOWizard.Content />
+              <ConfigureSSOWizard.Footer />
+            </ConfigureSSOWizard.Root>
           </ConfigureSSOFlowProvider>
         </Col>
       </NavbarContextProvider>
     </ProfileCard.Root>
   );
 });
-
-const ConfigureSSOWizardPanel = () => {
-  const data = useConfigureSSOFlow();
-
-  return (
-    <Wizard.Root
-      steps={CONFIGURE_SSO_STEPS}
-      data={data}
-      isLoading={data.isLoading}
-    >
-      <Wizard.Header />
-      <Wizard.Content />
-      <Wizard.Footer />
-    </Wizard.Root>
-  );
-};
 
 const OrganizationSidebarSubtitle = () => {
   const { organization } = useOrganization();

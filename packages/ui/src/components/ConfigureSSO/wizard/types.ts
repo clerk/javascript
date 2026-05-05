@@ -2,14 +2,16 @@ import type React from 'react';
 
 import type { LocalizationKey } from '@/customizables';
 
+import type { ConfigureSSOData } from '../ConfigureSSOContext';
+
 /**
- * Describes a single step in a multi-step Wizard
+ * Describes a single main step in the ConfigureSSO wizard.
  *
  * A step can either be a *leaf* (renders a single `Component`) or a
- * *container* (declares an ordered list of `innerSteps`)
- * Containers are routed under their parent path (e.g. `/configure/create-app`)
+ * *container* (declares an ordered list of `innerSteps`).
+ * Containers are routed under their parent path (e.g. `/configure/create-app`).
  */
-export interface WizardStep<TData = unknown> {
+export interface ConfigureSSOWizardStep {
   /**
    * Stable identifier for the step. Used for keying and for `goToStep(id)`
    */
@@ -41,23 +43,24 @@ export interface WizardStep<TData = unknown> {
    * their own URL (`<parent.path>/<inner.path>`). The first inner
    * step is mounted as the parent's index route
    */
-  innerSteps?: ReadonlyArray<WizardInnerStep<TData>>;
+  innerSteps?: ReadonlyArray<ConfigureSSOWizardInnerStep>;
   /**
-   * When it returns `true`, removes the step from the
-   * active list. Skipped steps are not rendered, do not appear in the
-   * breadcrumb, and are jumped over by `goNext`/`goPrev`.
+   * When it returns `true`, removes the step from the active list.
+   * Skipped steps are not rendered, do not appear in the breadcrumb,
+   * and are jumped over by `goNext`/`goPrev`.
    *
-   * Receives the optional `data` value passed to `<Wizard.Root data={...}>`
+   * Receives the live ConfigureSSO flow data sourced from
+   * `useConfigureSSOFlow()`
    */
-  shouldSkip?: (data: TData) => boolean;
+  shouldSkip?: (data: ConfigureSSOData) => boolean;
 }
 
 /**
- * Inner sub-step of a container `WizardStep`. Inner steps are not
- * shown in the breadcrumb, instead they drive the per-step indicator
- * badge ("Step X / Y") and the Continue/Previous footer behaviour
+ * Inner sub-step of a container `ConfigureSSOWizardStep`. Inner steps
+ * are not shown in the breadcrumb, instead they drive the per-step
+ * indicator badge ("Step X / Y") and the Continue/Previous footer behaviour
  */
-export interface WizardInnerStep<TData = unknown> {
+export interface ConfigureSSOWizardInnerStep {
   /**
    * Stable identifier, unique within the parent step
    */
@@ -72,9 +75,9 @@ export interface WizardInnerStep<TData = unknown> {
    */
   Component: React.ComponentType;
   /**
-   * Same semantics as `WizardStep.shouldSkip`, scoped to inner steps
+   * Same semantics as `ConfigureSSOWizardStep.shouldSkip`, scoped to inner steps
    */
-  shouldSkip?: (data: TData) => boolean;
+  shouldSkip?: (data: ConfigureSSOData) => boolean;
 }
 
 /**
@@ -104,17 +107,17 @@ export interface ContinueAction {
   label?: LocalizationKey | string;
 }
 
-export interface WizardContextValue<TData = unknown> {
+export interface ConfigureSSOWizardContextValue {
   /**
    * The list of main steps after `shouldSkip` has been applied. This
    * is what the breadcrumb iterates over
    */
-  activeSteps: WizardStep<TData>[];
+  activeSteps: ConfigureSSOWizardStep[];
   /**
    * The main step matched by the current SDK route, or `undefined`
    * while the router is settling
    */
-  currentStep: WizardStep<TData> | undefined;
+  currentStep: ConfigureSSOWizardStep | undefined;
   /**
    * Index of `currentStep` within `activeSteps`. `-1` if not matched
    */
@@ -127,12 +130,12 @@ export interface WizardContextValue<TData = unknown> {
    * Active inner steps of the current main step (after `shouldSkip`).
    * Empty when the current step has no inner steps
    */
-  innerSteps: WizardInnerStep<TData>[];
+  innerSteps: ConfigureSSOWizardInnerStep[];
   /**
    * The inner step matched by the current SDK route. `undefined` when
    * the current main step has no inner steps
    */
-  currentInnerStep: WizardInnerStep<TData> | undefined;
+  currentInnerStep: ConfigureSSOWizardInnerStep | undefined;
   /**
    * Index of `currentInnerStep` within `innerSteps`. `-1` when there
    * is no inner step (or none matched)

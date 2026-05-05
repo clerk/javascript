@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { Col, Flex, Heading, Text } from '@/customizables';
-import { Wizard } from '@/elements/Wizard';
+
+import { ConfigureSSOWizard } from '../wizard';
 
 interface StepLayoutProps {
   title?: React.ReactNode;
@@ -13,8 +14,8 @@ interface StepLayoutProps {
  * Renders the title row (with the Wizard's Step X/Y badge) on top, a divider, and the step body
  * underneath. Each individual step file owns the body content
  *
- * The Step X/Y badge is rendered via `Wizard.StepIndicator`, which
- * self-hides on steps that have no inner sub-steps
+ * The Step X/Y badge is rendered via `ConfigureSSOWizard.StepIndicator`,
+ * which self-hides on steps that have no inner sub-steps
  */
 export const StepLayout = ({ title, subtitle, children }: StepLayoutProps): JSX.Element => {
   return (
@@ -52,7 +53,7 @@ export const StepLayout = ({ title, subtitle, children }: StepLayoutProps): JSX.
             ) : null}
           </Col>
         ) : null}
-        <Wizard.StepIndicator />
+        <ConfigureSSOWizard.StepIndicator />
       </Flex>
       <Col
         sx={theme => ({
