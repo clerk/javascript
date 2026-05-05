@@ -178,6 +178,11 @@ export const heIL: LocalizationResource = {
     viewPayment: undefined,
     year: undefined,
   },
+  configureSSO: {
+    navbar: {
+      title: 'הגדרת כניסה אחידה (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'צור ארגון',
     invitePage: {

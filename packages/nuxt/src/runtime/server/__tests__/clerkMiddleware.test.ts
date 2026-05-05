@@ -38,9 +38,16 @@ const MOCK_OPTIONS = {
   signUpUrl: '/bar',
 };
 
-vi.mock('#imports', () => {
+vi.mock('#imports', async () => {
+  const h3 = await import('h3');
   return {
     useRuntimeConfig: () => ({}),
+    createError,
+    eventHandler,
+    setResponseHeader,
+    getRequestHeaders: h3.getRequestHeaders,
+    getRequestProtocol: h3.getRequestProtocol,
+    getRequestURL: h3.getRequestURL,
   };
 });
 

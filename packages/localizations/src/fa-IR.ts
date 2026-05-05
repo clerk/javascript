@@ -183,6 +183,11 @@ export const faIR: LocalizationResource = {
     viewPayment: 'مشاهده پرداخت',
     year: 'سال',
   },
+  configureSSO: {
+    navbar: {
+      title: 'پیکربندی ورود یکپارچه (SSO)',
+    },
+  },
   createOrganization: {
     formButtonSubmit: 'ایجاد سازمان',
     invitePage: {

@@ -92,6 +92,7 @@ export type OAuthProviders = {
 };
 export type EnterpriseSSOSettings = {
   enabled: boolean;
+  self_serve_sso: boolean;
 };
 
 export type AttributesJSON = {
