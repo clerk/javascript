@@ -14,8 +14,6 @@ const HOOK_NAME = 'useOAuthConsent';
  * (`GET /me/oauth/consent/{oauthClientId}`). Ensure the user is authenticated before relying on this hook
  * (for example, redirect to sign-in on your custom consent route).
  *
- * @internal
- *
  * @example
  * ```tsx
  * import { useOAuthConsent } from '@clerk/react/internal'
