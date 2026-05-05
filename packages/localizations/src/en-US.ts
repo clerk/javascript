@@ -201,6 +201,20 @@ export const enUS: LocalizationResource = {
     navbar: {
       title: 'Configure Single Sign-On (SSO)',
     },
+    verifyEmailDomainStep: {
+      title: 'Verify email address',
+      subtitle: 'Verify the email address you want to enable the enterprise connection on.',
+      emailCode: {
+        formTitle: 'Verify your email address',
+        formSubtitle: 'Enter the verification code sent to {{identifier}}',
+        resendButton: "Didn't receive a code? Resend",
+        verified: {
+          title: 'We got your email',
+          subtitle: "You've verified your email address with the following email",
+          inputLabel: 'Verified email address',
+        },
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Create organization',

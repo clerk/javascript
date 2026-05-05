@@ -1,7 +1,7 @@
 import { useReverification } from '@clerk/shared/react';
 import React from 'react';
 
-import { Col, Flow, Heading, Icon, Input, localizationKeys, Text } from '@/customizables';
+import { Col, Flow, Heading, Icon, Input, localizationKeys, Text, useLocalizations } from '@/customizables';
 import { useFieldOTP } from '@/elements/CodeControl';
 import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
@@ -16,6 +16,7 @@ export const VerifyDomainStep = (): JSX.Element => {
   const { goNext } = useWizard();
   const { primaryEmailAddress } = useConfigureSSOFlow();
   const card = useCardState();
+  const { t } = useLocalizations();
 
   const isVerified = primaryEmailAddress?.verification.status === 'verified';
 
@@ -83,8 +84,8 @@ export const VerifyDomainStep = (): JSX.Element => {
   return (
     <Flow.Part part='verifyDomain'>
       <StepLayout
-        title='Verify email address'
-        subtitle='Verify the email address you want to enable the enterprise connection on.'
+        title={localizationKeys('configureSSO.verifyEmailDomainStep.title')}
+        subtitle={localizationKeys('configureSSO.verifyEmailDomainStep.subtitle')}
       >
         <Col
           align='center'
@@ -109,22 +110,20 @@ export const VerifyDomainStep = (): JSX.Element => {
                 <Heading
                   textVariant='h1'
                   sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$sm })}
-                >
-                  We got your email
-                </Heading>
+                  localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.verified.title')}
+                />
                 <Text
                   as='p'
                   variant='body'
                   sx={t => ({ color: t.colors.$colorMutedForeground })}
-                >
-                  You&apos;ve verified your email address with the following email
-                </Text>
+                  localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.verified.subtitle')}
+                />
               </Col>
               <Input
                 type='email'
                 value={primaryEmailAddress.emailAddress}
                 readOnly
-                aria-label='Verified email address'
+                aria-label={t(localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.verified.inputLabel'))}
                 sx={t => ({ width: '100%', maxWidth: t.sizes.$66, backgroundColor: t.colors.$neutralAlpha50 })}
               />
             </>
@@ -134,21 +133,21 @@ export const VerifyDomainStep = (): JSX.Element => {
                 <Heading
                   textVariant='h1'
                   sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$sm })}
-                >
-                  Verify your email address
-                </Heading>
+                  localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formTitle')}
+                />
                 <Text
                   as='p'
                   variant='body'
                   sx={t => ({ color: t.colors.$colorMutedForeground })}
-                >
-                  Enter the verification code sent to {primaryEmailAddress?.emailAddress ?? ''}
-                </Text>
+                  localizationKey={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.formSubtitle', {
+                    identifier: primaryEmailAddress?.emailAddress ?? '',
+                  })}
+                />
               </Col>
 
               <Form.OTPInput
                 {...otp}
-                resendButton={localizationKeys('userProfile.emailAddressPage.emailCode.resendButton')}
+                resendButton={localizationKeys('configureSSO.verifyEmailDomainStep.emailCode.resendButton')}
               />
             </>
           )}
