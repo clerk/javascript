@@ -49,6 +49,8 @@ minimumReleaseAgeExclude:
   - esbuild@0.25.0
   # Renovate security update: astro@6.1.6
   - astro@6.1.6
+  # Renovate security update: uuid@14.0.0
+  - uuid@14.0.0
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
