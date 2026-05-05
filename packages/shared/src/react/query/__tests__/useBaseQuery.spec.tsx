@@ -3,6 +3,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createMockClerk, createMockQueryClient } from '../../hooks/__tests__/mocks/clerk';
+import { __resetClerkQueryClientForTest, __setClerkQueryClientForTest } from '../clerk-query-client';
 import { useClerkInfiniteQuery } from '../useInfiniteQuery';
 import { useClerkQuery } from '../useQuery';
 
@@ -16,22 +17,15 @@ vi.mock('../../contexts', () => ({
 
 const wrapper = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 
-const makeClerkWithoutQueryClient = () => {
-  const mockClerk = createMockClerk({ queryClient: null });
-  Object.defineProperty(mockClerk, '__internal_queryClient', {
-    get: () => undefined,
-    configurable: true,
-  });
-  return mockClerk;
-};
-
 afterEach(() => {
   vi.clearAllMocks();
+  __resetClerkQueryClientForTest();
 });
 
 describe('useBaseQuery - dummy result while query client is not attached', () => {
   beforeEach(() => {
-    activeClerk = makeClerkWithoutQueryClient();
+    activeClerk = createMockClerk({ queryClient: null });
+    __setClerkQueryClientForTest(undefined);
   });
 
   it('reports isLoading: true when the query would be enabled', () => {
@@ -109,8 +103,8 @@ describe('useBaseQuery - dummy result while query client is not attached', () =>
 
 describe('useBaseQuery - normal behavior once query client attaches', () => {
   it('delegates to the real observer when the query client is loaded', async () => {
-    const queryClient = createMockQueryClient();
-    activeClerk = createMockClerk({ queryClient });
+    createMockQueryClient();
+    activeClerk = createMockClerk({ queryClient: undefined });
 
     const queryFn = vi.fn(async () => 'result');
     const { result } = renderHook(

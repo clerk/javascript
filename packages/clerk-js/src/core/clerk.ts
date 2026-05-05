@@ -138,7 +138,6 @@ import type {
 import type { ClerkUI } from '@clerk/shared/ui';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
-import type { QueryClient } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 import { ModuleManager } from '@/utils/moduleManager';
@@ -248,7 +247,6 @@ export class Clerk implements ClerkInterface {
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
 
-  #queryClient: QueryClient | undefined;
   #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
@@ -267,28 +265,6 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
-
-  get __internal_queryClient(): { __tag: 'clerk-rq-client'; client: QueryClient } | undefined {
-    if (!this.#queryClient) {
-      void import('./query-core')
-        .then(module => module.QueryClient)
-        .then(QueryClient => {
-          if (this.#queryClient) {
-            return;
-          }
-          this.#queryClient = new QueryClient();
-          // @ts-expect-error - queryClientStatus is not typed
-          this.#publicEventBus.emit('queryClientStatus', 'ready');
-        });
-    }
-
-    return this.#queryClient
-      ? {
-          __tag: 'clerk-rq-client',
-          client: this.#queryClient,
-        }
-      : undefined;
-  }
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
