@@ -14,9 +14,6 @@ export interface ClerkResource {
    * The unique identifier of the resource.
    */
   readonly id?: string | undefined;
-  /**
-   * The root path of the resource.
-   */
   pathRoot: string;
   /**
    * Reloads the resource, which is useful when you want to access the latest user data after performing a mutation. To make the updated data immediately available, this method forces a session token refresh instead of waiting for the automatic refresh cycle that could temporarily retain stale information. Learn more about [forcing a token refresh](https://clerk.com/docs/guides/sessions/force-token-refresh).

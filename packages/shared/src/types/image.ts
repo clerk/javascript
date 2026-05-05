@@ -1,6 +1,6 @@
 import type { ClerkResource } from './resource';
 
-/** @document */
+/** Represents information about an image. */
 export interface ImageResource extends ClerkResource {
   /**
    * The unique identifier of the image.

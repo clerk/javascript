@@ -376,7 +376,7 @@ export type CreatePhoneNumberParams = {
 /** @document */
 export type CreateWeb3WalletParams = {
   /**
-   * The Web3 wallet to add to the user.
+   * The Web3 wallet address, made up of either 0x + 40 hexadecimal characters or a `base58` encoded `ed25519` public key (for Solana wallets).
    */
   web3Wallet: string;
 };
@@ -453,7 +453,12 @@ export type UpdateUserPasswordParams = {
 };
 
 /** @document */
-export type RemoveUserPasswordParams = Pick<UpdateUserPasswordParams, 'currentPassword'>;
+export type RemoveUserPasswordParams = {
+  /**
+   * The user's current password.
+   */
+  currentPassword?: string;
+};
 
 /** @document */
 export type GetUserOrganizationInvitationsParams = ClerkPaginationParams<{
@@ -471,7 +476,6 @@ export type GetUserOrganizationSuggestionsParams = ClerkPaginationParams<{
   status?: OrganizationSuggestionStatus | OrganizationSuggestionStatus[];
 }>;
 
-/** @document */
 export type GetUserOrganizationMembershipParams = ClerkPaginationParams;
 
 /**

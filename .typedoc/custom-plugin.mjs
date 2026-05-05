@@ -255,6 +255,10 @@ function getCatchAllReplacements() {
       replace: '[TasksRedirectOptions](/docs/reference/types/redirect-options)',
     },
     {
+      pattern: /(?<![\[\w`#])`?OAuthStrategy`?(?![\]\w`])/g,
+      replace: '[OAuthStrategy](/docs/reference/types/sso#o-auth-strategy)',
+    },
+    {
       pattern: /(?<![\[\w`#])`?OrganizationResource`?(?![\]\w`])/g,
       replace: '[OrganizationResource](/docs/reference/objects/organization)',
     },
