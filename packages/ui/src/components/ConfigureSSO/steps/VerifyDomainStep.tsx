@@ -1,4 +1,4 @@
-import { Text } from '@/customizables';
+import { Flow, Text } from '@/customizables';
 import { useRegisterContinueAction, useWizard } from '@/elements/Wizard';
 
 import { StepLayout } from './StepLayout';
@@ -11,11 +11,13 @@ export const VerifyDomain = (): JSX.Element => {
   });
 
   return (
-    <StepLayout
-      title='Verify your domain'
-      subtitle='Verify the domain you want to enable the enterprise connection on.'
-    >
-      <Text>UI goes here</Text>
-    </StepLayout>
+    <Flow.Part part='verifyDomain'>
+      <StepLayout
+        title='Verify your domain'
+        subtitle='Verify the domain you want to enable the enterprise connection on.'
+      >
+        <Text>UI goes here</Text>
+      </StepLayout>
+    </Flow.Part>
   );
 };

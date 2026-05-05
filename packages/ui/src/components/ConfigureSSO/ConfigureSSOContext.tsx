@@ -18,15 +18,17 @@ export interface ConfigureSSOData {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
 }
 
-export type ConfigureSSOContextValue = ConfigureSSOData;
+export interface ConfigureSSOContextValue extends ConfigureSSOData {
+  /**
+   * `true` while the parent is still fetching the user's enterprise
+   * connection
+   */
+  isLoading: boolean;
+}
 
 interface ConfigureSSOFlowProviderProps {
-  /**
-   * The user's enterprise connection, fetched by the parent so that
-   * the wizard can show a loading state before mounting the panel.
-   * `undefined` when the user has no enterprise connection
-   */
   enterpriseConnection: EnterpriseConnectionResource | undefined;
+  isLoading: boolean;
 }
 
 const ConfigureSSOFlowContext = React.createContext<ConfigureSSOContextValue | null>(null);
@@ -34,6 +36,7 @@ ConfigureSSOFlowContext.displayName = 'ConfigureSSOFlowContext';
 
 export const ConfigureSSOFlowProvider = ({
   enterpriseConnection,
+  isLoading,
   children,
 }: PropsWithChildren<ConfigureSSOFlowProviderProps>): JSX.Element => {
   const { user } = useUser();
@@ -44,8 +47,9 @@ export const ConfigureSSOFlowProvider = ({
     () => ({
       enterpriseConnection,
       domainAlreadyVerified,
+      isLoading,
     }),
-    [enterpriseConnection, domainAlreadyVerified],
+    [enterpriseConnection, domainAlreadyVerified, isLoading],
   );
 
   return <ConfigureSSOFlowContext.Provider value={value}>{children}</ConfigureSSOFlowContext.Provider>;
